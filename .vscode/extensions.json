@@ -1,0 +1,11 @@
+{
+  "recommendations": [
+    "svelte.svelte-vscode",
+    "dbaeumer.vscode-eslint",
+    "oxc.oxc-vscode",
+    "bradlc.vscode-tailwindcss",
+    "vitest.explorer",
+    "charliermarsh.ruff",
+    "astral-sh.ty"
+  ]
+}

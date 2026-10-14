@@ -1,0 +1,59 @@
+<!doctype html>
+<html lang="%lang%">
+  <head>
+    <meta charset="utf-8" />
+    <link rel="icon" href="%sveltekit.assets%/favicon.png" />
+    <meta
+      name="viewport"
+      content="width=device-width, initial-scale=1, viewport-fit=cover"
+    />
+    <script>
+      (() => {
+        const agent = navigator.userAgent;
+        const isAppleTouch =
+          /iPhone|iPad|iPod/.test(agent) ||
+          (/Macintosh/.test(agent) && navigator.maxTouchPoints > 1);
+
+        if (!isAppleTouch || !CSS.supports("font", "-apple-system-body"))
+          return;
+
+        // WebKit exposes Dynamic Type only through this font; 17px is its default size.
+        const probe = document.createElement("span");
+        probe.style.cssText =
+          "position:absolute;visibility:hidden;font:-apple-system-body";
+
+        const apply = () => {
+          document.documentElement.append(probe);
+          const scale = Math.min(
+            Math.max(parseFloat(getComputedStyle(probe).fontSize) / 17, 1),
+            2,
+          );
+          probe.remove();
+          document.documentElement.style.fontSize =
+            scale === 1 ? "" : `${scale * 100}%`;
+        };
+
+        apply();
+        addEventListener("pageshow", apply);
+        document.addEventListener("visibilitychange", () => {
+          if (document.visibilityState === "visible") apply();
+        });
+      })();
+    </script>
+    <script>
+      addEventListener(
+        "pointerover",
+        (event) => {
+          const pointer = event.pointerType === "mouse" ? "fine" : "coarse";
+          if (document.documentElement.dataset.pointer !== pointer)
+            document.documentElement.dataset.pointer = pointer;
+        },
+        { capture: true, passive: true },
+      );
+    </script>
+    %sveltekit.head%
+  </head>
+  <body data-sveltekit-preload-data="tap">
+    <div style="display: contents">%sveltekit.body%</div>
+  </body>
+</html>

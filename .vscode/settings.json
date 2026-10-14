@@ -1,0 +1,57 @@
+{
+  "[*]": { "editor.tabSize": 2 },
+  "svelte.enable-ts-plugin": true,
+  "svelte.plugin.svelte.defaultScriptLanguage": "ts",
+  "svelte.plugin.svelte.format.enable": false,
+  "js/ts.tsdk.path": "node_modules/typescript/lib",
+  "[css]": { "editor.tabSize": 2 },
+  "[typescript]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[json]": {
+    "editor.tabSize": 2,
+    "editor.defaultFormatter": "oxc.oxc-vscode"
+  },
+  "[jsonc]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[markdown]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "[svelte]": { "editor.defaultFormatter": "oxc.oxc-vscode" },
+  "js/ts.updateImportsOnFileMove.enabled": "always",
+  "editor.codeActionsOnSave": {
+    "source.fixAll.eslint": "explicit",
+    "source.organizeImports": "never",
+    "source.removeUnusedImports": "explicit"
+  },
+  "files.associations": { "*.css": "tailwindcss" },
+  "eslint.runtime": "node",
+  "eslint.rules.customizations": [
+    { "rule": "style/*", "severity": "off", "fixable": true },
+    { "rule": "*-indent", "severity": "off", "fixable": true },
+    { "rule": "*-spacing", "severity": "off", "fixable": true },
+    { "rule": "*-spaces", "severity": "off", "fixable": true },
+    { "rule": "*-order", "severity": "off", "fixable": true },
+    { "rule": "*-dangle", "severity": "off", "fixable": true },
+    { "rule": "*-newline", "severity": "off", "fixable": true },
+    { "rule": "*quotes", "severity": "off", "fixable": true },
+    { "rule": "*semi", "severity": "off", "fixable": true }
+  ],
+  "eslint.validate": [
+    "svelte",
+    "typescript",
+    "html",
+    "markdown",
+    "json",
+    "json5",
+    "jsonc",
+    "yaml",
+    "toml",
+    "xml"
+  ],
+  "tailwindCSS.classAttributes": [
+    "class",
+    "className",
+    "triggerClass",
+    "contentClass"
+  ],
+  "tailwindCSS.classFunctions": ["cn", "tv", "tw"]
+}

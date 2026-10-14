@@ -1,0 +1,32 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>%sveltekit.status% (%sveltekit.error.message%)</title>
+  </head>
+  <body
+    style="
+      display: grid;
+      flex-direction: column;
+      gap: 0.5rem;
+      align-content: center;
+      align-items: center;
+      justify-content: center;
+      justify-items: center;
+      background: #ffffff;
+      font-family: system-ui, sans-serif;
+      text-align: center;
+      height: 100dvh;
+      box-sizing: border-box;
+      padding: 1rem;
+      margin: 0;
+    "
+  >
+    <h1 style="margin: 0; margin-top: -2rem; font-size: 4rem; font-weight: 600">
+      %sveltekit.status%
+    </h1>
+    <div style="margin: 0; font-size: 1.2rem; font-weight: 400">
+      %sveltekit.error.message%
+    </div>
+  </body>
+</html>
