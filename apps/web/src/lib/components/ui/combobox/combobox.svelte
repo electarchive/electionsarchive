@@ -22,6 +22,7 @@
     wide = false,
     row,
     selection,
+    trigger,
     onValueChange,
   }: {
     items: Array<Item>;
@@ -35,6 +36,7 @@
     wide?: boolean;
     row?: Snippet<[Item]>;
     selection?: Snippet<[Item]>;
+    trigger?: Snippet<[Record<string, unknown>]>;
     onValueChange?: (value: string | null) => void;
   } = $props();
 
@@ -56,7 +58,7 @@
   });
 </script>
 
-{#snippet trigger(props: Record<string, unknown>)}
+{#snippet field(props: Record<string, unknown>)}
   <button
     {...props}
     type="button"
@@ -135,7 +137,7 @@
   <Drawer.Root bind:open>
     <Drawer.Trigger>
       {#snippet child({ props })}
-        {@render trigger(props)}
+        {@render (trigger ?? field)(props)}
       {/snippet}
     </Drawer.Trigger>
     <Drawer.Content>
@@ -151,7 +153,7 @@
   <Popover.Root bind:open>
     <Popover.Trigger>
       {#snippet child({ props })}
-        {@render trigger(props)}
+        {@render (trigger ?? field)(props)}
       {/snippet}
     </Popover.Trigger>
     <Popover.Content

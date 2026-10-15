@@ -13,11 +13,13 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Changes from "./changes.svelte";
+  import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
   import PlaceSwitcher from "./place-switcher.svelte";
   import Places from "./places.svelte";
   import Results, { OUTCOMES } from "./results.svelte";
   import Seats from "./seats.svelte";
+  import Series from "./series.svelte";
 
   const {
     contest,
@@ -162,32 +164,6 @@
       parties.length > 1 &&
       total >= 15
     );
-  });
-  const years = $derived.by(() => {
-    const seen = Object.groupBy(
-      contest.series,
-      (entry) => entry.date?.slice(0, 4) ?? "",
-    );
-    return contest.series.map((entry) => {
-      const key = entry.date?.slice(0, 4) ?? "";
-      const label =
-        (seen[key]?.length ?? 0) > 1 && entry.date != null
-          ? new Intl.DateTimeFormat(getLocale(), {
-              month: "short",
-              year: "numeric",
-              timeZone: "UTC",
-            }).format(new Date(`${entry.date}T00:00:00Z`))
-          : key;
-      return { ...entry, label };
-    });
-  });
-  const carried = $derived.by(() => {
-    const query = new URLSearchParams(
-      [...page.url.searchParams].filter(([key]) => key !== "vs"),
-    )
-      .toString()
-      .replaceAll("%2F", "/");
-    return query === "" ? ("" as const) : (`?${query}` as const);
   });
   const items = $derived.by(() => {
     const winners = new Map(
@@ -368,63 +344,8 @@
       {/if}
     </p>
   </div>
-  {#if years.length > 1}
-    <nav
-      class={cn(
-        "-mx-3.5 flex scrollbar-thin flex-row-reverse overflow-x-auto px-3.5 md:mx-0 md:px-0",
-        { "md:col-span-2": years.length > 8 },
-      )}
-      aria-label={m.series_label()}
-      {@attach (strip: HTMLElement) => {
-        const current =
-          strip.querySelectorAll("li")[
-            years.findIndex((entry) => entry.current)
-          ];
-        void document.fonts.ready.then(() => {
-          if (current != null) {
-            const box = current.getBoundingClientRect();
-            strip.scrollLeft +=
-              box.left -
-              strip.getBoundingClientRect().left -
-              (strip.clientWidth - box.width) / 2;
-          }
-        });
-      }}
-    >
-      <ol class="me-auto flex inline-max">
-        {#each years as entry (entry.path ?? entry.label)}
-          <li class="-ms-px first:ms-0">
-            {#if entry.current || entry.path == null}
-              <span
-                class={cn(
-                  "flex items-center border border-input bg-card px-2.5 font-mono text-[0.8125rem] tabular-nums block-8",
-                  {
-                    "relative z-10 border-foreground highlighter font-semibold":
-                      entry.current,
-                    "line-through": entry.annulled,
-                  },
-                )}
-                aria-current={entry.current ? "page" : undefined}
-                title={entry.annulled
-                  ? m.series_annulled({ year: entry.label })
-                  : undefined}>{entry.label}</span
-              >
-            {:else}
-              <a
-                class={cn(
-                  "flex items-center border border-input bg-card px-2.5 font-mono text-[0.8125rem] text-muted-foreground tabular-nums block-8 hover:relative hover:z-10 hover:border-foreground hover:text-foreground",
-                  { "line-through": entry.annulled },
-                )}
-                href={resolve(`/[...path]${carried}`, { path: entry.path })}
-                title={entry.annulled
-                  ? m.series_annulled({ year: entry.label })
-                  : undefined}>{entry.label}</a
-              >
-            {/if}
-          </li>
-        {/each}
-      </ol>
-    </nav>
+  {#if contest.series.length > 1}
+    <Series series={contest.series} />
   {/if}
   {#if contest.scope.trail.length > 1}
     <nav class="md:col-span-2" aria-label={m.scope_path()}>
@@ -583,48 +504,13 @@
           {#if item.year == null}
             <span class="flex-1 min-inline-0">{item.label}</span>
           {:else}
-            <span
-              class={cn(
-                "shrink-0 self-start font-mono font-semibold tabular-nums inline-10",
-                { "line-through": item.annulled },
-              )}>{item.year}</span
-            >
-            <span
-              class="flex flex-1 flex-wrap items-baseline gap-x-1.5 min-inline-0"
-            >
-              {#if item.winner == null}
-                <span class="text-pretty">{item.phrase}</span>
-              {:else}
-                <span class="flex items-baseline gap-1.5">
-                  <span
-                    class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
-                    style:background-color={swatch(
-                      item.winner.color,
-                      item.winner.key,
-                    )}
-                  ></span>
-                  <span class="text-pretty">{item.winner.label}</span>
-                </span>
-                <span
-                  class="font-mono text-xs text-muted-foreground tabular-nums"
-                  >{item.winner.measure === "electoral_votes"
-                    ? m.series_electoral({
-                        votes: count(item.winner.votes),
-                        total: count(item.winner.total),
-                      })
-                    : percent(item.winner.share)}</span
-                >
-              {/if}
-              {#if item.annulled}
-                <span class="highlighter px-1 text-xs font-semibold"
-                  >{m.election_annulled()}</span
-                >
-              {/if}
-            </span>
-            <span
-              class="shrink-0 self-start font-mono text-xs/5 text-muted-foreground tabular-nums"
-              >{item.when}</span
-            >
+            <ElectionRow
+              year={item.year}
+              winner={item.winner}
+              phrase={item.phrase}
+              when={item.when}
+              annulled={item.annulled}
+            />
           {/if}
         {/snippet}
         {#snippet selection(item: (typeof items)[number])}

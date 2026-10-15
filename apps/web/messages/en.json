@@ -213,8 +213,6 @@
   "series_filter": "Filter by year or winner",
   "series_empty": "No election matches.",
   "series_electoral": "{votes} of {total}",
-  "series_keys": "Step through years with [ and ]",
-  "series_compared": "Compared",
   "preview_loading": "Loading…",
   "preview_failed": "This preview didn't load.",
   "preview_compare": "Compare with {year}",

@@ -1538,9 +1538,9 @@ export const contests = {
             entry.current ||
             entries.every(
               (peer) =>
-                peer === entry ||
+                peer.indirect === entry.indirect ||
                 peer.date?.slice(0, 4) !== entry.date?.slice(0, 4) ||
-                (!peer.current && (!entry.indirect || peer.indirect)),
+                (!peer.current && !entry.indirect),
             ),
         )
         .toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? ""))
