@@ -14,13 +14,37 @@ from ea.raw import Artifact
 from ea.store import DATA, Connection
 
 LATE = ("name", "slug", "external_id", "note", "citation", "entity_merge")
+TRANSLITERATION = str.maketrans(
+    {
+        "ß": "ss",
+        "ẞ": "SS",
+        "ı": "i",
+        "ł": "l",
+        "Ł": "L",
+        "ø": "o",
+        "Ø": "O",
+        "æ": "ae",
+        "Æ": "AE",
+        "œ": "oe",
+        "Œ": "OE",
+        "đ": "d",
+        "Đ": "D",
+        "ð": "d",
+        "Ð": "D",
+        "þ": "th",
+        "Þ": "Th",
+    }
+)
 
 
 def slug(text: str) -> str:
     return re.sub(
         r"[^a-z0-9]+",
         "-",
-        unicodedata.normalize("NFKD", re.sub(r"[‐-―]", "-", text)).encode("ascii", "ignore").decode().lower(),
+        unicodedata.normalize("NFKD", re.sub(r"[‐-―]", "-", text).translate(TRANSLITERATION))
+        .encode("ascii", "ignore")
+        .decode()
+        .lower(),
     ).strip("-")
 
 

@@ -6,9 +6,9 @@ from pathlib import Path
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import Changeset, slug
 from ea.sources.tr import ysk
-from ea.sources.tr.ysk import CANDIDATES, PARTIES, PRESIDENT_CELLS, PROVINCES, ROUND_DAYS, key, title, upper
+from ea.sources.tr.ysk import CANDIDATES, PARTIES, PRESIDENT_CELLS, PROVINCES, ROUND_DAYS, title, upper
 from ea.store import DATA, connect
 
 SOURCE = "tr.oveo"
@@ -256,7 +256,7 @@ def emit() -> Path:
         election = cs.key("tr.election", str(day))
         contest = cs.key("tr.contest", f"{day}:president")
         options = {
-            index: cs.key("tr.option", f"{day}:president:{key(label)}") for index, (label, _) in enumerate(CANDIDATES)
+            index: cs.key("tr.option", f"{day}:president:{slug(label)}") for index, (label, _) in enumerate(CANDIDATES)
         }
         if turkey in cs.minted or contest in cs.minted or any(option in cs.minted for option in options.values()):
             raise ValueError("publish tr.ysk before tr.oveo")
@@ -347,7 +347,7 @@ def emit() -> Path:
             printed = gazette.filter(pl.col("code") == code)
             running = set(printed.filter(pl.col("measure") == VOTES)["option"].drop_nulls())
             choices = {
-                index: cs.key("tr.option", f"{contest_key}:{key(full)}")
+                index: cs.key("tr.option", f"{contest_key}:{slug(full)}")
                 for index, (full, *_) in enumerate(PARTIES)
                 if full in running
             }

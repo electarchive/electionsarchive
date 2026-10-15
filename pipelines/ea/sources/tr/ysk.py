@@ -2437,10 +2437,6 @@ def parse() -> None:
     ).sort("start").write_parquet(PARSED / "mayors.parquet")
 
 
-def key(text: str) -> str:
-    return slug(text.replace("ı", "i"))
-
-
 def emit() -> Path:
     pages = pl.read_parquet(PARSED / "pages.parquet")
     president = pl.read_parquet(PARSED / "president.parquet")
@@ -2589,7 +2585,7 @@ def emit() -> Path:
                 name(parties[full], short, kind="abbreviation", end=day)
                 continue
             start = next((day for successor, day in RENAMED.values() if successor == full), None)
-            parties[full] = cs.key("tr.party", key(full))
+            parties[full] = cs.key("tr.party", slug(full))
             cs.add("party", id=parties[full], kind="party", polity_id=turkey)
             name(parties[full], full, start=start)
             name(parties[full], short, kind="abbreviation", start=start)
@@ -2598,7 +2594,7 @@ def emit() -> Path:
             [label for label, _ in CANDIDATES + CANDIDATES_2018 + CANDIDATES_2014]
             + ["Ekrem İmamoğlu", "Binali Yıldırım"]
         ):
-            persons[label] = cs.key("tr.person", key(label))
+            persons[label] = cs.key("tr.person", slug(label))
             if persons[label] in cs.minted:
                 cs.add("person", id=persons[label])
                 name(persons[label], label)
@@ -2800,7 +2796,7 @@ def emit() -> Path:
             declared = result_set(contest_key, elections[number], contests[number], PRESIDENT[number])
             for index in range(len(CANDIDATES)) if number == 1 else RUNOFF:
                 label, party = CANDIDATES[index]
-                option = cs.key("tr.option", f"{contest_key}:{key(label)}")
+                option = cs.key("tr.option", f"{contest_key}:{slug(label)}")
                 options[f"{contest_key}:{index}"] = str(option)
                 cs.add(
                     "contest_option",
@@ -2810,7 +2806,7 @@ def emit() -> Path:
                     party_id=None if party is None else parties[party],
                     ballot_label=label,
                 )
-                candidacy = cs.key("tr.candidacy", f"{contest_key}:{key(label)}")
+                candidacy = cs.key("tr.candidacy", f"{contest_key}:{slug(label)}")
                 cs.add(
                     "candidacy",
                     id=candidacy,
@@ -2868,7 +2864,7 @@ def emit() -> Path:
         cs.add("slug", path=f"tr/{DAY_2018}-general/president", entity_id=contest)
         declared = result_set(contest_key, general, contest, PRESIDENT_2018)
         for index, (label, party) in enumerate(CANDIDATES_2018):
-            option = cs.key("tr.option", f"{contest_key}:{key(label)}")
+            option = cs.key("tr.option", f"{contest_key}:{slug(label)}")
             options[f"{contest_key}:{index}"] = str(option)
             cs.add(
                 "contest_option",
@@ -2878,7 +2874,7 @@ def emit() -> Path:
                 party_id=parties[party],
                 ballot_label=label,
             )
-            candidacy = cs.key("tr.candidacy", f"{contest_key}:{key(label)}")
+            candidacy = cs.key("tr.candidacy", f"{contest_key}:{slug(label)}")
             cs.add(
                 "candidacy",
                 id=candidacy,
@@ -2926,7 +2922,7 @@ def emit() -> Path:
         cs.add("slug", path=f"tr/{DAY_2014}-presidential/president", entity_id=direct)
         declared = result_set(contest_key, presidential, direct, PRESIDENT_2014)
         for index, (label, party) in enumerate(CANDIDATES_2014):
-            option = cs.key("tr.option", f"{contest_key}:{key(label)}")
+            option = cs.key("tr.option", f"{contest_key}:{slug(label)}")
             options[f"{contest_key}:{index}"] = str(option)
             cs.add(
                 "contest_option",
@@ -2936,7 +2932,7 @@ def emit() -> Path:
                 party_id=None if party is None else parties[party],
                 ballot_label=label,
             )
-            candidacy = cs.key("tr.candidacy", f"{contest_key}:{key(label)}")
+            candidacy = cs.key("tr.candidacy", f"{contest_key}:{slug(label)}")
             cs.add(
                 "candidacy",
                 id=candidacy,
@@ -3196,7 +3192,7 @@ def emit() -> Path:
                 INDEPENDENTS_2007_CAVEAT,
             ),
         ):
-            alliances = {label: cs.key("tr.alliance", f"{day}:{key(label)}") for label, _ in coalitions}
+            alliances = {label: cs.key("tr.alliance", f"{day}:{slug(label)}") for label, _ in coalitions}
             for label, alliance in alliances.items():
                 cs.add("alliance", id=alliance, kind="electoral_alliance", election_id=election)
                 name(alliance, label)
@@ -3235,7 +3231,7 @@ def emit() -> Path:
                 *standing,
                 *([(INDEPENDENTS, None, None)] if INDEPENDENTS in won_seats else []),
             ]:
-                option = cs.key("tr.option", f"{national_key}:{key(full)}")
+                option = cs.key("tr.option", f"{national_key}:{slug(full)}")
                 options[f"{national_key}:{full}"] = str(option)
                 cs.add(
                     "contest_option",
@@ -3249,7 +3245,7 @@ def emit() -> Path:
                 if full in won_seats:
                     cs.add("outcome", result_set_id=declared, option_id=option, kind="won", seats=won_seats[full])
             for label, alliance in alliances.items():
-                option = cs.key("tr.option", f"{national_key}:{key(label)}")
+                option = cs.key("tr.option", f"{national_key}:{slug(label)}")
                 options[f"{national_key}:{label}"] = str(option)
                 cs.add(
                     "contest_option",
@@ -3307,7 +3303,7 @@ def emit() -> Path:
                     default_result_kind="counted",
                 )
                 name(contest, f"Grand National Assembly, {label}", "en")
-                cs.add("slug", path=f"{path}/parliament/{key(label)}", entity_id=contest)
+                cs.add("slug", path=f"{path}/parliament/{slug(label)}", entity_id=contest)
                 if day == DAY_2018 and (plate, number) == KAHRAMANMARAS:
                     cs.add("note", entity_id=contest, kind="caveat", body_md=KAHRAMANMARAS_CAVEAT)
                 if day == DAY_2011 and code == "21":
@@ -3315,7 +3311,7 @@ def emit() -> Path:
                 declared = result_set(contest_key, election, contest, url)
                 won = dict(seats.filter(pl.col("code") == code).select("option", "seats").iter_rows())
                 for full, _, alliance, *_ in [*standing, (INDEPENDENTS, None, None)]:
-                    option = cs.key("tr.option", f"{contest_key}:{key(full)}")
+                    option = cs.key("tr.option", f"{contest_key}:{slug(full)}")
                     options[f"{contest_key}:{full}"] = str(option)
                     cs.add(
                         "contest_option",
@@ -3342,7 +3338,7 @@ def emit() -> Path:
                                 name(person, "Can Atalay", kind="short")
                     elif (
                         known := next(
-                            (uuid for label, uuid in persons.items() if key(label) == key(row["label"])), None
+                            (uuid for label, uuid in persons.items() if slug(label) == slug(row["label"])), None
                         )
                     ) is not None:
                         person = known
@@ -3533,7 +3529,7 @@ def emit() -> Path:
             cs.add("slug", path=f"tr/{day}-referendum/constitution", entity_id=contest)
             declared = result_set(contest_key, vote, contest, url)
             for position, answer in enumerate(ANSWERS_2017, 1):
-                option = cs.key("tr.option", f"{contest_key}:{key(answer)}")
+                option = cs.key("tr.option", f"{contest_key}:{slug(answer)}")
                 options[f"{contest_key}:{answer}"] = str(option)
                 cs.add(
                     "contest_option",
@@ -3651,7 +3647,7 @@ def emit() -> Path:
                     "Cumhuriyet Halk Partisi": ("Ekrem İmamoğlu", "İYİ Parti"),
                     "Adalet ve Kalkınma Partisi": ("Binali Yıldırım", "Milliyetçi Hareket Partisi"),
                 }.get(party, (None, None))
-                option = cs.key("tr.option", f"{contest_key}:{key(party)}")
+                option = cs.key("tr.option", f"{contest_key}:{slug(party)}")
                 options[f"{contest_key}:{party}"] = str(option)
                 cs.add(
                     "contest_option",
@@ -3662,7 +3658,7 @@ def emit() -> Path:
                     ballot_label=INDEPENDENTS if party == "others" else party,
                 )
                 if candidate is not None and supporter is not None:
-                    candidacy = cs.key("tr.candidacy", f"{contest_key}:{key(candidate)}")
+                    candidacy = cs.key("tr.candidacy", f"{contest_key}:{slug(candidate)}")
                     cs.add(
                         "candidacy",
                         id=candidacy,

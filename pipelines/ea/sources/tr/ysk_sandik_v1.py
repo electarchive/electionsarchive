@@ -10,7 +10,7 @@ from uuid import UUID, uuid7
 
 import polars as pl
 
-from ea import raw
+from ea import changeset, raw
 from ea.changeset import Changeset
 from ea.sources.tr import oveo, ysk
 from ea.sources.tr.ysk import (
@@ -46,7 +46,6 @@ from ea.sources.tr.ysk import (
     ROUND_DAYS,
     VALID,
     VOTES,
-    key,
     title,
     upper,
 )
@@ -495,13 +494,13 @@ def emit() -> Path:
 
         parties: dict[str, UUID] = {}
         alliances = {
-            f"{day}:{label}": cs.key("tr.alliance", f"{day}:{key(label)}")
+            f"{day}:{label}": cs.key("tr.alliance", f"{day}:{changeset.slug(label)}")
             for day, standing in ((ROUND_DAYS[1], ALLIANCES), (DAY_2018, ALLIANCES_2018))
             for label, _ in standing
         }
         options: dict[str, str] = {}
         for contest_key, option in votes.select("contest", "option").unique().sort("contest", "option").iter_rows():
-            id = cs.key("tr.option", f"{contest_key}:{key(option)}")
+            id = cs.key("tr.option", f"{contest_key}:{changeset.slug(option)}")
             options[f"{contest_key}\x1f{option}"] = str(id)
             if id not in cs.minted:
                 continue
@@ -509,7 +508,7 @@ def emit() -> Path:
             if contest in cs.minted:
                 raise ValueError("publish tr.ysk before tr.ysk_sandik")
             if contest_key == f"{MARCH}:istanbul-mayor" and option != "others":
-                parties[option] = cs.key("tr.party", key(option))
+                parties[option] = cs.key("tr.party", changeset.slug(option))
                 if parties[option] in cs.minted:
                     if option not in NEW_PARTIES:
                         raise ValueError(f"publish tr.ysk before tr.ysk_sandik: no party {option}")
