@@ -414,6 +414,12 @@ PRESIDENT_METHODOLOGY = (
     "before the 2017 amendments, it was Article 102."
 )
 RENAMED = {"İşçi Partisi": ("Vatan Partisi", date(2015, 2, 15))}
+FORMER = {
+    "Millet Partisi": ("Islahatçı Demokrasi Partisi", "IDP", date(1992, 11, 23)),
+    "Milliyetçi Hareket Partisi": ("Milliyetçi Çalışma Partisi", "MÇP", date(1993, 1, 24)),
+    "Türkiye Komünist Partisi": ("Sosyalist İktidar Partisi", "SİP", date(2001, 11, 11)),
+    "Demokrat Parti": ("Doğru Yol Partisi", "DYP", date(2007, 5, 27)),
+}
 MISPRINTED = {"Sabahat Akkiray": "Sabahat Akkiraz"}
 PRESIDENT_CAVEAT = (
     "Customs-gate ballot boxes serve voters registered abroad, so the gazette prints the abroad register again for "
@@ -2587,6 +2593,10 @@ def emit() -> Path:
             start = next((day for successor, day in RENAMED.values() if successor == full), None)
             parties[full] = cs.key("tr.party", slug(full))
             cs.add("party", id=parties[full], kind="party", polity_id=turkey)
+            if full in FORMER:
+                former, abbreviation, start = FORMER[full]
+                name(parties[full], former, end=start)
+                name(parties[full], abbreviation, kind="abbreviation", end=start)
             name(parties[full], full, start=start)
             name(parties[full], short, kind="abbreviation", start=start)
         persons: dict[str, UUID] = {}
