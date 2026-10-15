@@ -12,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "2"
+VERSION = "3"
 TITLE = "Political parties and their colors"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
@@ -114,7 +114,6 @@ INHERITED: dict[tuple[str, str], str] = {
     ("IT", "Impegno Civico"): "Q113375810",
     ("IT", "Partito Democratico – Italia Democratica e Progressista"): "Q47729",
     ("IT", "Südtiroler Volkspartei – PATT"): "Q606620",
-    ("TR", "Özgürlük ve Dayanışma Partisi"): "Q307890",
     ("CH-ZH", "Partei der Arbeit"): "Q661771",
 }
 CHOSEN = {"Q47729": "EF1C27", "Q113168799": "56B45D"}
@@ -334,6 +333,7 @@ def emit() -> Path:
                  from contest_option o join contest k on k.id = o.contest_id join election e on e.id = k.election_id
                  where o.party_id = p.id
                ) s(first, last, options)
+               where not exists (select from entity_merge m where m.entity_id = p.id)
                order by p.id"""
         ).fetchall()
         states: dict[str, str] = dict(
@@ -355,6 +355,7 @@ def emit() -> Path:
             conn.execute("select value, entity_id from external_id where scheme = 'wikidata'").fetchall()
         )
 
+        owned = {entity: item for item, entity in taken.items()}
         found: dict[UUID, tuple[str | None, str | None, int]] = {}
         claims: dict[str, list[tuple[int, int, UUID]]] = defaultdict(list)
         for party, iso, kind, full, short, first, last, options in parties:
@@ -368,6 +369,10 @@ def emit() -> Path:
                 found[party] = (item, inherited, options)
                 if item is not None:
                     claims[item].append((1_000, options, party))
+                continue
+            if party in owned:
+                found[party] = (owned[party], inherited, options)
+                claims[owned[party]].append((1_000, options, party))
                 continue
             scores: Counter[str] = Counter()
             for text in full + short:

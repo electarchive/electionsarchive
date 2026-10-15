@@ -1740,6 +1740,7 @@ export const contests = {
         left join entity_merge tm on tm.entity_id = r.to_party_id
         where r.to_party_id is not null
           and (r.date is null or r.date <= greatest(${contest.date ?? "infinity"}::date, ${chosen?.date ?? null}::date))
+          and (r.election_id is null or r.election_id in (${contest.election}::uuid, ${chosen?.election ?? null}::uuid))
         union all
         select coalesce(fm.into_id, a.party_id), coalesce(tm.into_id, a.parent_party_id), a.kind::text
         from party_affiliation a
