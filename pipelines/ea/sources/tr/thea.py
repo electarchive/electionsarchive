@@ -7,7 +7,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources import thea
-from ea.sources.tr.ysk import FORMER, INDEPENDENTS, PROVINCES, REGISTERED, VALID, VOTERS, VOTES
+from ea.sources.tr.ysk import FORMER, INDEPENDENTS, PROVINCES, REGISTERED, RENAMED, VALID, VOTERS, VOTES
 from ea.store import connect
 
 SOURCE = "tr.thea"
@@ -65,6 +65,7 @@ PLATES = {slug(name): plate for plate, name in enumerate(PROVINCES, 1)} | {
 FORMER_NAMES = {3: "Afyon", 33: "İçel", 63: "Urfa"}
 CKMP_RENAMED = date(1969, 2, 8)
 BP_RENAMED = date(1971, 11, 27)
+MGP_RENAMED = date(1971, 1, 29)
 PARTIES = {
     "demokrat-parti-1946": [("Demokrat Parti", "DP", None, None)],
     "millet-partisi-1948": [("Millet Partisi", "MP", None, None)],
@@ -84,7 +85,10 @@ PARTIES = {
         ("Birlik Partisi", "BP", None, BP_RENAMED),
         ("Türkiye Birlik Partisi", "TBP", BP_RENAMED, None),
     ],
-    "guven-partisi": [("Güven Partisi", "GP", None, None)],
+    "guven-partisi": [
+        ("Güven Partisi", "GP", None, MGP_RENAMED),
+        ("Millî Güven Partisi", "MGP", MGP_RENAMED, None),
+    ],
     "cumhuriyetci-guven-partisi": [("Cumhuriyetçi Güven Partisi", "CGP", None, None)],
     "demokratik-parti": [("Demokratik Parti", "DP", None, None)],
     "milli-selamet-partisi": [("Milli Selamet Partisi", "MSP", None, None)],
@@ -97,7 +101,6 @@ PARTIES = {
     "sosyalist-parti": [("Sosyalist Parti", "SP", None, None)],
     "halkin-demokrasi-partisi": [("Halkın Demokrasi Partisi", "HADEP", None, None)],
     "yeni-demokrasi-hareketi": [("Yeni Demokrasi Hareketi", "YDH", None, None)],
-    "yeniden-dogus-partisi": [("Yeniden Doğuş Partisi", "YDP", None, None)],
     "yeni-parti": [("Yeni Parti", "Yeni Parti", None, None)],
     "fazilet-partisi": [("Fazilet Partisi", "FP", None, None)],
     "demokrat-turkiye-partisi": [("Demokrat Türkiye Partisi", "DTP", None, None)],
@@ -109,12 +112,21 @@ PARTIES = {
     "yeni-turkiye-partisi": [("Yeni Türkiye Partisi", "YTP", None, None)],
     "demokratik-sol-parti": [("Demokratik Sol Parti", "DSP", None, None)],
     "buyuk-birlik-partisi": [("Büyük Birlik Partisi", "BBP", None, None)],
-    "ozgurluk-ve-dayanisma-partisi": [("Özgürlük ve Dayanışma Partisi", "ÖDP", None, None)],
+    "sol-parti": [
+        ("Özgürlük ve Dayanışma Partisi", "ÖDP", None, RENAMED["Özgürlük ve Dayanışma Partisi"][1]),
+        ("Sol Parti", "SOL Parti", RENAMED["Özgürlük ve Dayanışma Partisi"][1], None),
+    ],
     "liberal-demokrat-parti": [("Liberal Demokrat Parti", "LDP", None, None)],
-    "emek-partisi": [("Emek Partisi", "EMEP", None, None)],
+    "emek-partisi": [
+        ("Emeğin Partisi", "EMEP", None, FORMER["Emek Partisi"][2]),
+        ("Emek Partisi", "EMEP", FORMER["Emek Partisi"][2], None),
+    ],
     "isci-partisi": [("İşçi Partisi", "İP", None, None)],
     "adalet-ve-kalkinma-partisi": [("Adalet ve Kalkınma Partisi", "AK Parti", None, None)],
-    "genc-parti": [("Genç Parti", "Genç Parti", None, None)],
+    "genc-parti": [
+        ("Yeniden Doğuş Partisi", "YDP", None, FORMER["Genç Parti"][2]),
+        ("Genç Parti", "Genç Parti", FORMER["Genç Parti"][2], None),
+    ],
     "saadet-partisi": [("Saadet Partisi", "Saadet", None, None)],
     "yurt-partisi": [("Yurt Partisi", "YURT-P", None, None)],
     "bagimsiz-turkiye-partisi": [("Bağımsız Türkiye Partisi", "BTP", None, None)],
@@ -162,7 +174,7 @@ CODES_1983 = {
     8: "demokratik-halk-partisi",
     9: "demokrat-turkiye-partisi",
     10: "saadet-partisi",
-    11: "ozgurluk-ve-dayanisma-partisi",
+    11: "sol-parti",
     13: "bagimsiz-turkiye-partisi",
     14: "buyuk-birlik-partisi",
     16: "adalet-ve-kalkinma-partisi",
@@ -179,7 +191,7 @@ CODES_1983 = {
     30: "baris-partisi",
     33: "halkin-demokrasi-partisi",
     34: "halkci-parti",
-    36: "yeniden-dogus-partisi",
+    36: "genc-parti",
     37: "millet-partisi",
     40: "cumhuriyet-halk-partisi",
     43: "sosyaldemokrat-halkci-parti",

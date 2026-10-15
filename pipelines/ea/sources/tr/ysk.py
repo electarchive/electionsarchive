@@ -413,12 +413,17 @@ PRESIDENT_METHODOLOGY = (
     "most votes face each other in a second round two weeks later. The current constitutional rule is Article 101; "
     "before the 2017 amendments, it was Article 102."
 )
-RENAMED = {"İşçi Partisi": ("Vatan Partisi", date(2015, 2, 15))}
+RENAMED = {
+    "İşçi Partisi": ("Vatan Partisi", date(2015, 2, 15)),
+    "Özgürlük ve Dayanışma Partisi": ("Sol Parti", date(2019, 12, 22)),
+}
 FORMER = {
     "Millet Partisi": ("Islahatçı Demokrasi Partisi", "IDP", date(1992, 11, 23)),
     "Milliyetçi Hareket Partisi": ("Milliyetçi Çalışma Partisi", "MÇP", date(1993, 1, 24)),
     "Türkiye Komünist Partisi": ("Sosyalist İktidar Partisi", "SİP", date(2001, 11, 11)),
     "Demokrat Parti": ("Doğru Yol Partisi", "DYP", date(2007, 5, 27)),
+    "Genç Parti": ("Yeniden Doğuş Partisi", "YDP", date(2002, 8, 23)),
+    "Emek Partisi": ("Emeğin Partisi", "EMEP", date(2005, 11, 27)),
 }
 MISPRINTED = {"Sabahat Akkiray": "Sabahat Akkiraz"}
 PRESIDENT_CAVEAT = (
