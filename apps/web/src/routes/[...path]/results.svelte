@@ -371,7 +371,7 @@
           {#if span != null && paired}
             <td class="px-2 py-1 max-md:hidden">
               {#if line.before != null || line.after != null}
-                <Tooltip.Root>
+                <Tooltip.Root disableCloseOnTriggerClick>
                   <Tooltip.Trigger
                     class="block cursor-default inline-full"
                     aria-label={m.trend_label({ from: span.from, to: span.to })}
@@ -379,6 +379,7 @@
                     {@render trend(line.before, line.after)}
                   </Tooltip.Trigger>
                   <Tooltip.Content
+                    collisionPadding={8}
                     class="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-baseline gap-x-2 gap-y-1 py-1.5 max-inline-80"
                     style="--party: {swatch(row.color, row.key)}"
                   >

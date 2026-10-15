@@ -645,7 +645,7 @@
         {/snippet}
       </Combobox>
       {#if contest.target != null}
-        <Tooltip.Root>
+        <Tooltip.Root disableCloseOnTriggerClick>
           <Tooltip.Trigger
             class="shrink-0 rounded-xs highlighter px-1 text-[0.8125rem] font-semibold"
           >
@@ -653,7 +653,10 @@
               ? m.quality_exact()
               : m.quality_estimated()}
           </Tooltip.Trigger>
-          <Tooltip.Content class="leading-snug max-inline-64">
+          <Tooltip.Content
+            collisionPadding={8}
+            class="leading-snug max-inline-64"
+          >
             {contest.comparison.label === "exact"
               ? m.quality_exact_detail()
               : m.quality_estimated_detail()}
@@ -671,7 +674,7 @@
           >{m.match_label()}</span
         >
         <div class="flex">
-          <Tooltip.Root {tether} delayDuration={300}>
+          <Tooltip.Root disableCloseOnTriggerClick {tether} delayDuration={300}>
             {#snippet children({ payload })}
               {#each matches as option (option.value)}
                 <Tooltip.Trigger {tether} payload={option.detail}>
@@ -695,8 +698,9 @@
                   {/snippet}
                 </Tooltip.Trigger>
               {/each}
-              <Tooltip.Content class="leading-snug max-inline-64"
-                >{payload}</Tooltip.Content
+              <Tooltip.Content
+                collisionPadding={8}
+                class="leading-snug max-inline-64">{payload}</Tooltip.Content
               >
             {/snippet}
           </Tooltip.Root>
