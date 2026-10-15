@@ -4,6 +4,7 @@ import json
 import re
 import unicodedata
 import zipfile
+from collections import Counter
 from datetime import date, datetime
 from pathlib import Path
 from urllib.parse import urlencode
@@ -16,11 +17,15 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "it.interno"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 OPENDATA = "https://elezionistorico.interno.gov.it/daithome/documenti/opendata"
 CAMERA = f"{OPENDATA}/camera/camera-20220925.zip"
 REFERENDUM = f"{OPENDATA}/referendum/referendum-20250608.zip"
+TRASPARENZA = (
+    "https://dait.interno.gov.it/documenti/trasparenza/POLITICHE_20220925/CAMERA_ITALIA_20220925/"
+    "CAMERA_ITALIA_20220925_pluri.json"
+)
 ISTAT = "https://www.istat.it/storage/codici-unita-amministrative/Elenco-comuni-italiani.csv"
 QUERY = """
 PREFIX ocd: <http://dati.camera.it/ocd/>
@@ -139,6 +144,11 @@ CAMERA_NOTE = (
     "Mandates of the 19th legislature, rewritten to each member's current state. A mandate's type and list may "
     "reflect a later change, but start and end dates and annulments are kept."
 )
+TRASPARENZA_NOTE = (
+    "The ministry's list of candidates for the Chamber's multi-member colleges, as filed. Each candidate's "
+    "position on their list comes from here, because the open-data candidate file is out of list order in 19 "
+    "lists. Only names and positions are read; tax codes, birthplaces, and attached documents are not."
+)
 METHODOLOGY = (
     "Italy elects its 400 deputies under the Rosatellum (Law 165/2017). Each voter casts one ballot: a mark on a list "
     "also counts for the coalition's single-member candidate, and a mark on the candidate alone is shared among the "
@@ -199,6 +209,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, REFERENDUM, suffix=".zip")
     raw.fetch(SOURCE, ISTAT, suffix=".csv")
     raw.fetch(SOURCE, MANDATES, suffix=".json")
+    raw.fetch(SOURCE, TRASPARENZA, suffix=".json")
 
 
 def parse() -> None:
@@ -399,6 +410,10 @@ def parse() -> None:
     negative = legend_votes.filter(pl.col("votes") < 0)
     print("negative candidate-only votes:", negative.height, negative.head(5).rows())
 
+    ranks = {
+        (key(row["desc_ente"]), key(row["desc_lista"]), key(row["cogn_c"]), key(row["nome_c"])): row["num_c"]
+        for row in json.loads(raw.cached(SOURCE, TRASPARENZA).path.read_text())["candidati"]
+    }
     members = (
         table(
             "camera2022_candidatilista.csv",
@@ -406,7 +421,12 @@ def parse() -> None:
         )
         .with_columns(
             birth=pl.col("datanascita").map_elements(born, pl.Date),
-            position=pl.int_range(pl.len()).over("CollPlurinom", "descrlista") + 1,
+            position=pl.struct("CollPlurinom", "descrlista", "cognome", "nome").map_elements(
+                lambda row: ranks[
+                    key(row["CollPlurinom"]), key(row["descrlista"]), key(row["cognome"]), key(row["nome"])
+                ],
+                pl.Int64,
+            ),
             elected=pl.col("CODTIPOELETTO") == "E",
         )
         .select(
@@ -418,6 +438,27 @@ def parse() -> None:
             birth="birth",
             sex="sesso",
             elected="elected",
+        )
+    )
+    filed: dict[tuple[str, str, str], Counter[date]] = {}
+    for surname, forename, label, birth in members.select("surname", "forename", "label", "birth").iter_rows():
+        filed.setdefault((surname, forename, label), Counter())[birth] += 1
+    usual: dict[tuple[str, str, str], date] = {}
+    for name, births in filed.items():
+        ranked = births.most_common()
+        if len(ranked) > 1 and ranked[0][1] == ranked[1][1]:
+            raise ValueError(f"{name} is filed with tied birth dates {ranked}")
+        usual[name] = ranked[0][0]
+    aliases = [
+        (f"{key(surname)}:{key(forename)}:{birth}", f"{key(surname)}:{key(forename)}:{usual[surname, forename, label]}")
+        for (surname, forename, label), births in filed.items()
+        for birth in births
+        if birth != usual[surname, forename, label]
+    ]
+    print("list candidates filed with another birth date:", aliases)
+    members = members.with_columns(
+        birth=pl.struct("surname", "forename", "label").map_elements(
+            lambda row: usual[row["surname"], row["forename"], row["label"]], pl.Date
         )
     )
     mandates = [
@@ -619,6 +660,7 @@ def parse() -> None:
         schema=["person", "surname", "forename", "birth", "sex"],
         orient="row",
     ).write_parquet(PARSED / "persons.parquet")
+    pl.DataFrame(aliases, schema=["alias", "person"], orient="row").write_parquet(PARSED / "aliases.parquet")
     pl.DataFrame(annulments).write_parquet(PARSED / "annulments.parquet")
     pl.DataFrame(tenures, infer_schema_length=None).write_parquet(PARSED / "tenures.parquet")
     pl.DataFrame(list(groups.items()), schema=["label", "group"], orient="row").write_parquet(PARSED / "lists.parquet")
@@ -750,6 +792,7 @@ def emit() -> Path:
         interno = cs.source("Ministero dell'Interno", "Eligendo: archivio storico delle elezioni, open data")
         istat = cs.source("ISTAT", "Elenco dei comuni italiani")
         camera = cs.source("Camera dei deputati", "Mandati dei deputati della XIX legislatura")
+        trasparenza = cs.source("Ministero dell'Interno", "Elezioni trasparenti: liste e candidati, Camera 2022")
         for source, publisher, title, url, license, license_url, notes in (
             (
                 interno,
@@ -778,6 +821,15 @@ def emit() -> Path:
                 "https://creativecommons.org/licenses/by/3.0/deed.it",
                 CAMERA_NOTE,
             ),
+            (
+                trasparenza,
+                "Ministero dell'Interno",
+                "Elezioni trasparenti: liste e candidati, Camera 2022",
+                "https://dait.interno.gov.it/elezioni/trasparenza/elezioni-politiche-2022",
+                INTERNO_LICENSE,
+                None,
+                TRASPARENZA_NOTE,
+            ),
         ):
             cs.add(
                 "source",
@@ -794,6 +846,7 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, REFERENDUM), interno)
         cs.artifact(raw.cached(SOURCE, ISTAT), istat)
         cs.artifact(raw.cached(SOURCE, MANDATES), camera)
+        cs.artifact(raw.cached(SOURCE, TRASPARENZA), trasparenza)
 
         italy = cs.polity("IT")
         cs.add("polity", id=italy, kind="sovereign_state", iso_code="IT")
@@ -996,6 +1049,12 @@ def emit() -> Path:
                 gender={"M": "male", "F": "female"}[sex],
             )
             name(person_ids[person], f"{forename} {surname}", "it")
+        for alias, person in pl.read_parquet(PARSED / "aliases.parquet").iter_rows():
+            found = conn.execute(
+                "select entity_id from external_id where scheme = %s and value = %s", [f"{SOURCE}.person", alias]
+            ).fetchone()
+            if found is not None and found[0] != person_ids[person]:
+                cs.add("entity_merge", entity_id=found[0], into_id=person_ids[person])
         person_names = {person: f"{forename} {surname}" for person, surname, forename, *_ in persons.iter_rows()}
 
         result_sets: dict[str, str] = {}
@@ -1152,7 +1211,7 @@ def emit() -> Path:
             if position is None:
                 candidacy = cs.key("it.candidacy", f"{GENERAL}:camera:{single}:{person}")
             else:
-                candidacy = cs.key("it.candidacy", f"{GENERAL}:camera:{college}:{slug(label)}:{position}")
+                candidacy = cs.key("it.candidacy", f"{GENERAL}:camera:{college}:{slug(label)}:{person}")
                 cs.add(
                     "candidacy",
                     id=candidacy,
