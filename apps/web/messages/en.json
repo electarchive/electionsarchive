@@ -111,6 +111,7 @@
   "seats_position": "No. {position} on the list",
   "seats_keys": "Use arrow keys to move between seats; press Enter to open a seat's district.",
   "seats_whole": "All of {place}",
+  "seats_filled": "{count} seats filled in this election.",
   "seats_part": "Shows {count} of the {total} total seats.",
   "electors_title": "Electoral votes",
   "electors_majority": "{count} to win",
@@ -156,7 +157,27 @@
       }
     }
   ],
+  "election_stages": "Subsequent stages",
+  "election_places": "Elections in each {noun}",
   "election_children": "Elections held within this one",
+  "race_round": "{name} round {round}",
+  "race_lede_seats": "{party} won {seats} of the {total} seats, with {share} of the vote.",
+  "race_lede_electors": "{party} won {seats} of the {total} electoral votes, with {share} of the popular vote.",
+  "race_lede_electors_only": "{party} won {seats} of the {total} electoral votes.",
+  "race_lede_electors_tied": "{party} and {runner} tied with {seats} of the {total} electoral votes each.",
+  "race_lede_won": "{party} won with {share} of the vote, {margin} points ahead of {runner}.",
+  "race_lede_votes": "{party} led with {share} of the vote, {margin} points ahead of {runner}.",
+  "race_contests": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} contest",
+        "countPlural=*": "{count} contests"
+      }
+    }
+  ],
+  "race_open": "View full results",
   "election_parent": "Part of {name}",
   "polity_subdivisions": "Subdivisions",
   "polity_elections": "Elections",

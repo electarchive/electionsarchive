@@ -688,7 +688,7 @@
       onpick={(value) => {
         filter = { at: page.url.href, value };
         if (value != null) {
-          document.querySelector("#places-title")?.scrollIntoView();
+          document.querySelector("[data-places]")?.scrollIntoView();
         }
       }}
     />

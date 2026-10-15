@@ -18,6 +18,7 @@
     span,
     publishers,
     votes,
+    limit = 100,
     only = $bindable(null),
   }: {
     places: NonNullable<
@@ -31,10 +32,11 @@
     } | null;
     publishers: Array<string>;
     votes: string;
+    limit?: number;
     only?: number | string | null;
   } = $props();
 
-  const LIMIT = 100;
+  const uid = $props.id();
 
   let query = $state("");
   let column = $state<"name" | "leader" | "margin" | "valid" | "shift">("name");
@@ -134,7 +136,7 @@
       })
       .map((entry) => ({ ...entry.row, move: entry.move }));
   });
-  const visible = $derived(all ? filtered : filtered.slice(0, LIMIT));
+  const visible = $derived(all ? filtered : filtered.slice(0, limit));
   const levels = $derived(
     places.levels.map((level) => ({
       ...level,
@@ -248,11 +250,12 @@
 
 <section
   class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-2"
-  aria-labelledby="places-title"
+  aria-labelledby="{uid}-title"
+  data-places
 >
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2.5">
     <h2
-      id="places-title"
+      id="{uid}-title"
       class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
     >
       {m.places_title({ noun })}
@@ -664,7 +667,7 @@
     {/snippet}
   </Tooltip.Root>
 
-  {#if !all && filtered.length > LIMIT}
+  {#if !all && filtered.length > limit}
     <button
       type="button"
       class="flex keycap items-center justify-center rounded-sm border border-input bg-card text-[0.8125rem] font-semibold block-8 hover:bg-secondary"

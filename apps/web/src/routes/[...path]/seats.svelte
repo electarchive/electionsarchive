@@ -16,6 +16,7 @@
     place,
     link,
     size,
+    isComplete = true,
   }: {
     parties: Array<{
       key: string;
@@ -36,7 +37,10 @@
     place: string;
     link: { name: string; path: string | null } | null;
     size: number | null;
+    isComplete?: boolean;
   } = $props();
+
+  const uid = $props.id();
 
   let hovered = $state<string | null>(null);
   let active = $state<number | null>(null);
@@ -170,7 +174,9 @@
       2
     );
   });
-  const whole = $derived(link == null && (size == null || size === totals.all));
+  const whole = $derived(
+    link == null && (size === totals.all || (size == null && isComplete)),
+  );
   const reach = $derived(96 + dot + 2);
   const top = $derived(whole ? reach + 12 : reach);
   const center = $derived(
@@ -196,9 +202,12 @@
         place,
       });
     }
-    return whole
-      ? m.seats_majority({ count: count(majority) })
-      : m.seats_part({ count: count(totals.all), total: count(size ?? 0) });
+    if (whole) {
+      return m.seats_majority({ count: count(majority) });
+    }
+    return size == null
+      ? m.seats_filled({ count: count(totals.all) })
+      : m.seats_part({ count: count(totals.all), total: count(size) });
   });
   const tip = $derived.by(() => {
     const seat = active == null ? undefined : seats[active];
@@ -266,10 +275,10 @@
 
 <section
   class="col-span-12 grid content-start gap-3 bg-card p-3.5 lg:col-span-4"
-  aria-labelledby="seats-title"
+  aria-labelledby="{uid}-title"
 >
   <h2
-    id="seats-title"
+    id="{uid}-title"
     class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
   >
     {m.seats_title()}
@@ -293,8 +302,10 @@
       role="listbox"
       tabindex="0"
       aria-label={whole ? `${count(totals.all)} ${m.seats_title()}` : caption}
-      aria-describedby="seats-keys"
-      aria-activedescendant={active == null ? undefined : `seat-${active}`}
+      aria-describedby="{uid}-keys"
+      aria-activedescendant={active == null
+        ? undefined
+        : `${uid}-seat-${active}`}
       onpointermove={track}
       onpointerdown={track}
       onmousedown={(event) => event.preventDefault()}
@@ -354,7 +365,7 @@
             : places[seat.member.place]?.name,
         )}
         <circle
-          id="seat-{seat.index}"
+          id="{uid}-seat-{seat.index}"
           class="transition-[fill] duration-150 motion-reduce:transition-none"
           cx={seat.x}
           cy={seat.y}
@@ -462,7 +473,7 @@
       </div>
     {/if}
   </div>
-  <p id="seats-keys" class="sr-only">{m.seats_keys()}</p>
+  <p id="{uid}-keys" class="sr-only">{m.seats_keys()}</p>
   <p class="text-center text-[0.8125rem] text-pretty text-muted-foreground">
     {caption}
     {#if link?.path != null}

@@ -42,6 +42,7 @@
     ...(second == null ? [] : [second]),
   ]);
   const tether = TooltipPrimitive.createTether<number>();
+  const uid = $props.id();
 </script>
 
 {#snippet about(row: (typeof electors.rows)[number] | undefined)}
@@ -107,12 +108,12 @@
 
 <section
   class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5"
-  aria-labelledby="electors-title"
+  aria-labelledby="{uid}-title"
 >
   <div class="flex items-end justify-between gap-4">
     {@render side(first)}
     <h2
-      id="electors-title"
+      id="{uid}-title"
       class="pbe-0.5 text-[0.8125rem] text-muted-foreground max-sm:sr-only"
     >
       {m.electors_title()}

@@ -104,6 +104,7 @@ type Found = {
   id: string;
   kind: string;
   indirect: boolean;
+  isElectoral: boolean;
   series: string;
   root: string;
   election: string;
@@ -186,7 +187,9 @@ async function find(id: string) {
     )
     select c.id, c.kind::text as kind, case when r.kind = 'ballot_question' then r.id::text
       else concat_ws(':', r.office_id, r.body_id, r.kind, r.round_number, r.party_scope_id) end as series,
-      r.id as root, e.id as election, e.kind = 'indirect' as indirect, e.polity_id as polity, e.date_from::text as date,
+      r.id as root, e.id as election, e.kind = 'indirect' as indirect,
+      exists (select from body b where b.id = r.body_id and b.kind = 'electoral_college') as "isElectoral",
+      e.polity_id as polity, e.date_from::text as date,
       ${CYCLE} as year, e.status::text as status,
       case when a.id is not null then json_build_object('id', a.id, 'k', a.k) end as place
     from contest c
@@ -451,6 +454,8 @@ async function load(
   const picked = await db.execute<{
     area: number;
     k: number;
+    contest: string;
+    root: string;
     stage: string;
     status: string;
     completeness: number | null;
@@ -468,8 +473,8 @@ async function load(
       select c.id, grp.root from contest c join grp on c.allocation_parent_id = grp.id
     ),
     picked as (
-      select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.stage, rs.status, rs.completeness, rs.is_default,
-        rs.source_id
+      select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.contest_id as contest, grp.root, rs.stage, rs.status,
+        rs.completeness, rs.is_default, rs.source_id
       from result_set rs join grp on grp.id = rs.contest_id
       ${
         owners.length === 0
@@ -482,7 +487,7 @@ async function load(
       order by rs.contest_id, a.k, rs.is_default desc, array_position(${STAGES}, rs.stage),
         rs.completeness desc nulls last
     )
-    select p.area, p.k, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
+    select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
       s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution
     from picked p join source s on s.id = p.source_id
   `);
@@ -626,13 +631,16 @@ async function load(
     color,
     options.rows.map((row) => [row.party, tallies.get(row.k) ?? 0] as const),
   );
+  const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
   const sharing = Map.groupBy(
     options.rows.filter((row) => row.person != null && row.party != null),
-    (row) => row.party ?? "",
+    (row) => `${rootOf.get(row.contest) ?? row.contest}:${row.party ?? ""}`,
   );
+  const shared = new Set(sharing.values().map((rows) => rows[0]?.party ?? ""))
+    .size;
   const tints = new Map(
-    sharing.entries().flatMap(([party, rows]) => {
-      const base = color.get(party);
+    sharing.values().flatMap((rows) => {
+      const base = color.get(rows[0]?.party ?? "");
       const order = [
         ...new Set(
           rows
@@ -652,7 +660,7 @@ async function load(
         return [
           [
             row.k,
-            sharing.size === 1
+            shared === 1
               ? `oklch(from ${base} l max(c, 0.1) calc(h + ${rank * 137.5}))`
               : `oklch(from ${base} calc(l + ${step}) c h)`,
           ] as const,
@@ -2358,7 +2366,13 @@ export const contests = {
               };
             })
       )
-        .filter((row) => isRoot && contest.kind === "office" && row.votes > 0)
+        .filter(
+          (row) =>
+            isRoot &&
+            contest.kind === "office" &&
+            (contest.isElectoral || ballots != null) &&
+            row.votes > 0,
+        )
         .map((row) => ({
           key: row.key,
           label: row.label,
@@ -2451,16 +2465,29 @@ async function races(election: string, polity: string, date: string | null) {
       kind: string;
       series: string;
       owner: string | null;
+      office: string | null;
+      election: string;
+      day: string | null;
+      round: number | null;
+      isOffice: boolean;
+      isStage: boolean;
       size: number | null;
       area: string | null;
       k: number | null;
       scheme: string | null;
       noun: string | null;
     }>(sql`
+      with recursive tree(id, stage) as (
+        select ${election}::uuid, false
+        union all
+        select k.id, tree.stage or k.kind = 'indirect' from election k join tree on k.parent_id = tree.id
+      )
       select c.id, c.kind::text as kind,
         case when c.kind = 'ballot_question' then c.id::text
-          else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
-        coalesce(c.body_id, c.office_id) as owner, z.seats as size,
+          else concat_ws(':', c.office_id, c.body_id, c.kind, e.date_from, c.party_scope_id, tree.stage) end as series,
+        coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
+        e.date_from::text as day, c.round_number as round,
+        c.kind = 'office' as "isOffice", tree.stage as "isStage", z.seats as size,
         a.id as area, a.k, a.scheme_code as scheme, sc.noun
       from contest c
       join election e on e.id = c.election_id
@@ -2471,7 +2498,8 @@ async function races(election: string, polity: string, date: string | null) {
         where z.body_id = c.body_id and (z.valid @> e.date_from or z.valid_from between e.date_from and e.date_from + 150)
         order by z.valid_from desc nulls last limit 1
       ) z on true
-      where c.election_id = ${election}::uuid and c.allocation_parent_id is null
+      join tree on tree.id = c.election_id
+      where c.allocation_parent_id is null
     `),
     db.execute<{ id: string; k: number }>(sql`
       select a.id, a.k from polity_territory pt join area a on a.id = pt.area_id
@@ -2503,6 +2531,7 @@ async function races(election: string, polity: string, date: string | null) {
     `),
   ]);
   const lineage = branches.rows.map((row) => ({ ...row, toLabel: "" }));
+  const parentOf = new Map(branches.rows.map((row) => [row.from, row.to]));
   const built = await Promise.all(
     groups.map(async (group) => {
       const roots = group.map((row) => row.id);
@@ -2551,18 +2580,26 @@ async function races(election: string, polity: string, date: string | null) {
       );
       const folded = Map.groupBy(rows, (row) =>
         single == null && row.cell.party != null
-          ? `party:${row.cell.party}`
+          ? `party:${parentOf.get(row.cell.party) ?? row.cell.party}`
           : row.key,
       );
       const parties = await names(
-        folded
-          .entries()
-          .flatMap(([key, members]) =>
-            members.some((row) => row.key === key) || !key.startsWith("party:")
-              ? []
-              : [key.slice(6)],
-          )
-          .toArray(),
+        [
+          ...folded
+            .entries()
+            .flatMap(([key, members]) =>
+              single == null
+                ? key.startsWith("party:")
+                  ? [key.slice(6)]
+                  : []
+                : members.flatMap((row) =>
+                    row.cell.person == null ? [] : [row.cell.person],
+                  ),
+            ),
+          ...(table?.legend ?? []).flatMap((item) =>
+            item.key.startsWith("party:") ? [item.key.slice(6)] : [],
+          ),
+        ],
         date,
       );
       const results = folded
@@ -2579,8 +2616,16 @@ async function races(election: string, polity: string, date: string | null) {
           }
           return {
             key,
-            label: parties.full.get(party ?? "") ?? lead?.label ?? "",
-            short: parties.short.get(party ?? "") ?? lead?.short ?? null,
+            label:
+              parties.full.get(
+                (single == null ? party : lead?.cell.person) ?? "",
+              ) ??
+              lead?.label ??
+              "",
+            short:
+              (single == null ? parties.short.get(party ?? "") : null) ??
+              lead?.short ??
+              null,
             color: lead?.color ?? null,
             lean: lead?.lean ?? null,
             person: members.length === 1 ? (lead?.cell.person ?? null) : null,
@@ -2599,6 +2644,12 @@ async function races(election: string, polity: string, date: string | null) {
           ) ?? "",
         path: single == null ? null : (slugs.get(single.id) ?? null),
         kind: head?.kind ?? "",
+        isOffice: head?.isOffice ?? false,
+        isStage: head?.isStage ?? false,
+        round: head?.round ?? null,
+        office: head?.office ?? null,
+        election: head?.election ?? "",
+        day: head?.day ?? null,
         count: group.length,
         size: head?.size ?? null,
         measure: here?.measure ?? "votes",
@@ -2617,11 +2668,76 @@ async function races(election: string, polity: string, date: string | null) {
                 ],
                 level: first?.scheme ?? "",
                 ...table,
+                legend: table.legend.map((item) =>
+                  item.key.startsWith("party:")
+                    ? {
+                        ...item,
+                        label:
+                          parties.full.get(item.key.slice(6)) ?? item.label,
+                        short: parties.short.get(item.key.slice(6)) ?? null,
+                      }
+                    : item,
+                ),
               },
       };
     }),
   );
-  return built.toSorted((a, b) => b.valid - a.valid);
+  const stages = built.filter(
+    (race) =>
+      race.isStage &&
+      race.isOffice &&
+      built.some(
+        (other) =>
+          !other.isStage &&
+          other.office === race.office &&
+          other.measure !== "electoral_votes",
+      ),
+  );
+  const stagePaths = await paths(stages.map((race) => race.election));
+  return built
+    .filter(
+      (race) =>
+        !stages.includes(race) &&
+        stages.every((stage) => stage.election !== race.election),
+    )
+    .map(({ isStage, office, election, day, ...race }) => {
+      const stage = stages.find((entry) => entry.office === office);
+      const rows = (
+        stage == null && race.measure === "electoral_votes" ? race : stage
+      )?.results;
+      return {
+        ...race,
+        electors:
+          rows == null
+            ? null
+            : {
+                rows: rows
+                  .filter((row) => row.votes > 0)
+                  .map((row) => {
+                    const line = race.results.find(
+                      (entry) =>
+                        entry.person != null && entry.person === row.person,
+                    );
+                    return {
+                      key: row.key,
+                      label: row.label,
+                      short: line?.short ?? row.short,
+                      color: line?.color ?? row.color,
+                      person: row.person,
+                      party: line?.party ?? row.party,
+                      votes: row.votes,
+                    };
+                  }),
+                appointed: stage?.size ?? race.size,
+                link: {
+                  path: stagePaths.get(stage?.election ?? "") ?? null,
+                  date: stage?.day ?? day,
+                  popular: false,
+                },
+              },
+      };
+    })
+    .toSorted((a, b) => b.valid - a.valid);
 }
 
 export const elections = {
@@ -2647,7 +2763,30 @@ export const elections = {
             name: v.string(),
             path: v.nullable(v.string()),
             kind: v.string(),
+            isOffice: v.boolean(),
+            round: v.nullable(v.number()),
             count: v.number(),
+            electors: v.nullable(
+              v.object({
+                rows: v.array(
+                  v.object({
+                    key: v.string(),
+                    label: v.string(),
+                    short: v.nullable(v.string()),
+                    color: v.nullable(v.string()),
+                    person: v.nullable(v.string()),
+                    party: v.nullable(v.string()),
+                    votes: v.number(),
+                  }),
+                ),
+                appointed: v.nullable(v.number()),
+                link: v.object({
+                  path: v.nullable(v.string()),
+                  date: v.nullable(v.string()),
+                  popular: v.boolean(),
+                }),
+              }),
+            ),
             size: v.nullable(v.number()),
             measure: v.string(),
             valid: v.number(),
@@ -2678,8 +2817,11 @@ export const elections = {
         elections: v.array(
           v.object({
             name: v.string(),
+            place: v.nullable(v.string()),
+            noun: v.nullable(v.string()),
             path: v.nullable(v.string()),
             date: v.nullable(v.string()),
+            isStage: v.boolean(),
           }),
         ),
       }),
@@ -2701,22 +2843,37 @@ export const elections = {
       const [contestRows, electionRows, notes, crumbs, raced] =
         await Promise.all([
           db.execute<{ id: string; children: number }>(sql`
-          select c.id, (select count(*)::int from contest x where x.allocation_parent_id = c.id) as children
-          from contest c where c.election_id = ${input.id}::uuid and c.allocation_parent_id is null
-        `),
-          db.execute<{ id: string; date: string | null }>(sql`
-          select id, date_from::text as date from election where parent_id = ${input.id}::uuid
-        `),
+            select c.id, (select count(*)::int from contest x where x.allocation_parent_id = c.id) as children
+            from contest c where c.election_id = ${input.id}::uuid and c.allocation_parent_id is null
+          `),
+          db.execute<{
+            id: string;
+            date: string | null;
+            kind: string;
+            polity: string | null;
+            noun: string | null;
+          }>(sql`
+            select e.id, e.date_from::text as date, e.kind::text as kind,
+              nullif(e.polity_id, p.polity_id) as polity, sc.noun
+            from election e
+            join election p on p.id = e.parent_id
+            left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            left join area a on a.id = pt.area_id
+            left join scheme sc on sc.code = a.scheme_code
+            where e.parent_id = ${input.id}::uuid
+          `),
           db.execute<{ kind: string; body: string }>(sql`
-          select kind::text, body_md as body from note where entity_id = ${input.id}::uuid
-        `),
+            select kind::text, body_md as body from note where entity_id = ${input.id}::uuid
+          `),
           breadcrumbs(election.polity),
           races(input.id, election.polity, election.date),
         ]);
       const ids = [
         input.id,
         ...contestRows.rows.map((row) => row.id),
-        ...electionRows.rows.map((row) => row.id),
+        ...electionRows.rows.flatMap((row) =>
+          row.polity == null ? [row.id] : [row.id, row.polity],
+        ),
         ...(election.parent == null ? [] : [election.parent]),
       ];
       const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
@@ -2744,8 +2901,11 @@ export const elections = {
         elections: electionRows.rows
           .map((row) => ({
             name: labels.full.get(row.id) ?? "",
+            place: labels.full.get(row.polity ?? "") ?? null,
+            noun: row.polity == null ? null : row.noun,
             path: slugs.get(row.id) ?? null,
             date: row.date,
+            isStage: row.kind === "runoff" || row.kind === "indirect",
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
       };
@@ -2826,9 +2986,10 @@ export const polities = {
           select distinct polity_id as id from polity_parent where parent_id = ${input.id}::uuid
         `),
         db.execute<{ id: string; date: string | null; status: string }>(sql`
-          select id, date_from::text as date, status::text as status from election
-          where polity_id = ${input.id}::uuid
-          order by date_from desc nulls last
+          select e.id, e.date_from::text as date, e.status::text as status from election e
+          where e.polity_id = ${input.id}::uuid
+            and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
+          order by e.date_from desc nulls last
         `),
         breadcrumbs(input.id),
       ]);
