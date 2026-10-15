@@ -1,6 +1,6 @@
 import type { Match, Option, Relation, Side } from "@ea/analytics";
 import type { SQL } from "drizzle-orm";
-import { compare } from "@ea/analytics";
+import { ancestry, compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
 import { ORPCError, os } from "@orpc/server";
 import { sql } from "drizzle-orm";
@@ -728,9 +728,245 @@ async function load(
   return loaded;
 }
 
+type Split = Map<
+  number,
+  Array<{ name: string; path: string | null; seats: number }>
+>;
+
+type Holder = {
+  contest: string;
+  area: string | null;
+  path: string | null;
+  k: number;
+  kind: string;
+  party: string | null;
+  seats: number;
+  people: Array<{ person: string; position: number | null; isSeated: boolean }>;
+};
+
+async function units(
+  contest: string,
+  area: { id: string; k: number },
+  date: string,
+  base: string | null,
+) {
+  const kids = await children(contest, area, true, date);
+  const found = await db.execute<{
+    area: number;
+    option: number;
+    seats: number;
+  }>(sql`
+    select r.area_k as area, r.option_k as option, sum(r.value)::int as seats
+    from result_rollup r join result_set rs on rs.k = r.result_set_k
+    where rs.contest_id = ${contest}::uuid and rs.is_default and r.measure = 16 and r.count_round = 0
+      and r.area_k = any(${sql.param(kids.map((kid) => kid.k))}::int[])
+    group by r.area_k, r.option_k
+    having sum(r.value) > 0
+  `);
+  const kid = new Map(kids.map((entry) => [entry.k, entry]));
+  const totals = new Map<string, number>();
+  for (const row of found.rows) {
+    const scheme = kid.get(row.area)?.scheme ?? "";
+    totals.set(scheme, (totals.get(scheme) ?? 0) + row.seats);
+  }
+  const scheme = [...totals].toSorted((a, b) => b[1] - a[1])[0]?.[0];
+  const split: Split = new Map();
+  for (const row of found.rows) {
+    const entry = kid.get(row.area);
+    if (entry == null || entry.scheme !== scheme) {
+      continue;
+    }
+    const list = split.get(row.option) ?? [];
+    list.push({
+      name: entry.name,
+      path: base == null ? null : `${base}/${entry.segment}`,
+      seats: row.seats,
+    });
+    split.set(row.option, list);
+  }
+  return split;
+}
+
+function slots(
+  option: Holder,
+  labels: Awaited<ReturnType<typeof names>>,
+  split: Split | null,
+) {
+  const isSeated = option.people.some((entry) => entry.isSeated);
+  const chosen = option.people
+    .filter((entry) =>
+      isSeated ? entry.isSeated : option.people.length <= option.seats,
+    )
+    .toSorted((a, b) => (a.position ?? Infinity) - (b.position ?? Infinity));
+  const own = {
+    id: option.contest,
+    name: labels.full.get(option.area ?? option.contest) ?? "",
+    path: option.path,
+  };
+  const result = chosen.map((entry) => ({
+    place: own,
+    name: labels.full.get(entry.person) ?? null,
+    position: entry.position,
+  }));
+  const units = chosen.length === 0 ? (split?.get(option.k) ?? []) : [];
+  for (const unit of units) {
+    const place = {
+      id: unit.path ?? unit.name,
+      name: unit.name,
+      path: unit.path,
+    };
+    const end = Math.min(option.seats, result.length + unit.seats);
+    while (result.length < end) {
+      result.push({ place, name: null, position: null });
+    }
+  }
+  while (result.length < option.seats) {
+    result.push({ place: own, name: null, position: null });
+  }
+  return result;
+}
+
+function assign(
+  options: Array<Holder>,
+  labels: Awaited<ReturnType<typeof names>>,
+  lineage: Array<Relation>,
+  keys: Set<string>,
+  split: Split | null,
+) {
+  const root = ancestry(lineage, "party");
+  const seats = new Map<string, ReturnType<typeof slots>>();
+  for (const option of options) {
+    const loose = keys
+      .values()
+      .filter((key) => key.startsWith(`kind:${option.kind}`))
+      .toArray();
+    const key = [
+      option.party == null ? null : `party:${root(option.party)}`,
+      option.people.length === 1 ? `person:${option.people[0]?.person}` : null,
+      option.party == null && loose.length === 1 ? loose[0] : null,
+    ].find((entry) => entry != null && keys.has(entry));
+    if (key != null) {
+      seats.set(key, [
+        ...(seats.get(key) ?? []),
+        ...slots(option, labels, split),
+      ]);
+    }
+  }
+  const places = new Map(
+    seats
+      .values()
+      .flatMap((list) =>
+        list.map((slot) => [slot.place.id, slot.place] as const),
+      ),
+  );
+  const at = new Map(places.keys().map((id, index) => [id, index]));
+  return {
+    places: places.values().toArray(),
+    seats: new Map(
+      seats
+        .entries()
+        .map(([key, list]) => [
+          key,
+          list
+            .toSorted(
+              (a, b) =>
+                a.place.name.localeCompare(b.place.name) ||
+                (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
+            )
+            .map((slot) => ({
+              place: at.get(slot.place.id) ?? 0,
+              name: slot.name,
+              position: slot.position,
+            })),
+        ]),
+    ),
+  };
+}
+
+async function holders(
+  ids: Array<string>,
+  date: string | null,
+  lineage: Array<Relation>,
+  keys: Set<string>,
+  split: Split | null,
+) {
+  const leaves = await db.execute<{ id: string }>(sql`
+    with recursive tree(id) as (
+      select unnest(${sql.param(ids)}::uuid[])
+      union all
+      select c.id from contest c join tree on c.allocation_parent_id = tree.id
+    )
+    select id from tree where not exists (select from contest k where k.allocation_parent_id = tree.id)
+  `);
+  const found = await db.execute<{
+    contest: string;
+    area: string | null;
+    path: string | null;
+    k: number;
+    kind: string;
+    party: string | null;
+    seats: number;
+    person: string | null;
+    position: number | null;
+    isSeated: boolean;
+  }>(sql`
+    select c.id as contest, c.district_area_id as area, s.path, o.k, o.kind::text as kind,
+      coalesce(pm.into_id, o.party_id) as party, coalesce(x.seats, 1) as seats,
+      coalesce(m.into_id, y.person_id) as person, y.list_position as position,
+      coalesce(y.seated, false) as "isSeated"
+    from contest c
+    left join slug s on s.entity_id = c.id and s.is_current
+    join result_set rs on rs.contest_id = c.id and rs.is_default
+    join outcome x on x.result_set_id = rs.id and (x.seats > 0 or (x.seats is null and x.kind in ('elected', 'won')))
+    join contest_option o on o.id = x.option_id
+    left join entity_merge pm on pm.entity_id = o.party_id
+    left join lateral (
+      select cy.person_id, cy.list_position,
+        exists (
+          select from tenure t
+          where t.person_id = cy.person_id and t.contest_id = c.id and t.acquired_via = 'elected'
+        ) as seated
+      from candidacy cy where cy.option_id = o.id and cy.role in ('head', 'list_member')
+    ) y on true
+    left join entity_merge m on m.entity_id = y.person_id
+    where c.id = any(${sql.param(leaves.rows.map((row) => row.id))}::uuid[])
+  `);
+  const options = new Map<string, Holder>();
+  for (const row of found.rows) {
+    const id = `${row.contest}:${row.k}`;
+    const option = options.get(id) ?? { ...row, people: [] };
+    option.seats = Math.max(option.seats, row.seats);
+    if (
+      row.person != null &&
+      option.people.every((entry) => entry.person !== row.person)
+    ) {
+      option.people.push({
+        person: row.person,
+        position: row.position,
+        isSeated: row.isSeated,
+      });
+    }
+    options.set(id, option);
+  }
+  const labels = await names(
+    [
+      ...new Set(
+        options
+          .values()
+          .flatMap((option) => [
+            option.area ?? option.contest,
+            ...option.people.map((entry) => entry.person),
+          ]),
+      ),
+    ],
+    date,
+  );
+  return assign(options.values().toArray(), labels, lineage, keys, split);
+}
+
 async function chamber(
   contest: Found,
-  area: number,
+  area: { id: string; k: number },
   now: ReturnType<typeof load>,
   lineage: Array<Relation>,
   isRoot: boolean,
@@ -743,6 +979,7 @@ async function chamber(
     nation: number | null;
     area: string | null;
     path: string | null;
+    base: string | null;
   }>(sql`
     select z.seats as size, exists (select from contest k where k.allocation_parent_id = c.id) as "isParent",
       case when c.id = r.id then z.seats end as need,
@@ -756,7 +993,8 @@ async function chamber(
         )
       end as roots,
       a.k as nation, a.id as area,
-      (select path from slug where entity_id = case when c.id = r.id then c.election_id else r.id end and is_current) as path
+      (select path from slug where entity_id = case when c.id = r.id then c.election_id else r.id end and is_current) as path,
+      (select path from slug where entity_id = c.id and is_current) as base
     from contest c
     join contest r on r.id = ${contest.root}::uuid
     join election e on e.id = c.election_id
@@ -791,7 +1029,7 @@ async function chamber(
       : compare(entry.side, null, lineage, "party").filter(
           (row) => (row.current?.seats ?? 0) > 0,
         );
-  const own = seated(shape == null ? undefined : current.get(area));
+  const own = seated(shape == null ? undefined : current.get(area.k));
   const wide = seated(loaded?.get(shape?.nation ?? 0));
   let [owned, held] = [0, 0];
   for (const row of own) {
@@ -804,27 +1042,48 @@ async function chamber(
   const isComplete =
     own.length > 1 &&
     owned === (shape?.isParent === true ? owned : shape?.size);
+  if (!isFocus && !isComplete) {
+    return null;
+  }
   const here = new Map(own.map((row) => [row.key, row]));
-  return isFocus || isComplete
-    ? {
-        link: isFocus
-          ? {
-              name: named.full.get(shape?.area ?? "") ?? "",
-              path: shape?.path ?? null,
-            }
-          : null,
-        size: shape?.size ?? null,
-        parties: (isFocus ? wide : own).map((row) => ({
-          key: row.key,
-          label: row.label,
-          short: row.short,
-          color: here.get(row.key)?.color ?? row.color,
-          lean: row.lean,
-          seats: row.current?.seats ?? 0,
-          here: here.get(row.key)?.current?.seats ?? 0,
-        })),
-      }
-    : null;
+  const rows = isFocus ? wide : own;
+  const isAlone = shape == null || shape.roots.length === 0;
+  const { places, seats } = await holders(
+    isAlone ? [contest.id] : shape.roots,
+    contest.date,
+    lineage,
+    new Set(rows.map((row) => row.key)),
+    isAlone && shape?.isParent !== true
+      ? await units(
+          contest.id,
+          area,
+          contest.date ?? "infinity",
+          shape?.base ?? null,
+        )
+      : null,
+  );
+  const at = places.findIndex((place) => place.id === contest.id);
+  return {
+    link: isFocus
+      ? {
+          name: named.full.get(shape?.area ?? "") ?? "",
+          path: shape?.path ?? null,
+        }
+      : null,
+    size: shape?.size ?? null,
+    places: places.map((place) => ({ name: place.name, path: place.path })),
+    here: at === -1 ? null : at,
+    parties: rows.map((row) => ({
+      key: row.key,
+      label: row.label,
+      short: row.short,
+      color: here.get(row.key)?.color ?? row.color,
+      lean: row.lean,
+      seats: row.current?.seats ?? 0,
+      here: here.get(row.key)?.current?.seats ?? 0,
+      members: seats.get(row.key) ?? [],
+    })),
+  };
 }
 
 async function places(
@@ -1269,6 +1528,8 @@ export const contests = {
           v.object({
             link: v.nullable(Link),
             size: v.nullable(v.number()),
+            places: v.array(Link),
+            here: v.nullable(v.number()),
             parties: v.array(
               v.object({
                 key: v.string(),
@@ -1278,6 +1539,13 @@ export const contests = {
                 lean: v.nullable(v.number()),
                 seats: v.number(),
                 here: v.number(),
+                members: v.array(
+                  v.object({
+                    place: v.number(),
+                    name: v.nullable(v.string()),
+                    position: v.nullable(v.number()),
+                  }),
+                ),
               }),
             ),
           }),
@@ -1914,7 +2182,7 @@ export const contests = {
         counterpart?.indirect === true
           ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
           : null,
-        chamber(contest, area.k, loading, lineage, isRoot),
+        chamber(contest, area, loading, lineage, isRoot),
       ]);
       const current = now.get(area.k);
       if (current == null) {

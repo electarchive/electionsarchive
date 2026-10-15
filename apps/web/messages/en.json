@@ -108,6 +108,8 @@
   "seats_majority": "{count} for a majority",
   "seats_focus": "{place} provided {count} of the {total} seats.",
   "seats_of": "of {count}",
+  "seats_position": "No. {position} on the list",
+  "seats_keys": "Use arrow keys to move between seats; press Enter to open a seat's district.",
   "seats_whole": "All of {place}",
   "seats_part": "Shows {count} of the {total} total seats.",
   "electors_title": "Electoral votes",

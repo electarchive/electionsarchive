@@ -61,7 +61,7 @@ const LINEAGE = new Set([
 
 type Group = { lead: Option; cell: Cell };
 
-function lineage(relations: Array<Relation>, match: Match) {
+export function ancestry(relations: Array<Relation>, match: Match) {
   const parent = new Map<string, string>();
   const root = (party: string): string => {
     let node = party;
@@ -129,7 +129,7 @@ export function compare(
   relations: Array<Relation>,
   match: Match = "party",
 ): Array<Row> {
-  const root = lineage(relations, match);
+  const root = ancestry(relations, match);
   const options = (earlier == null ? [current] : [current, earlier]).flatMap(
     (side) => side.options,
   );

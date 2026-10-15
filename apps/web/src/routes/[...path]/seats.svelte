@@ -1,4 +1,8 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
+  import { page } from "$app/state";
+  import { on } from "svelte/events";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -7,6 +11,8 @@
 
   const {
     parties,
+    places,
+    here,
     place,
     link,
     size,
@@ -19,13 +25,23 @@
       lean: number | null;
       seats: number;
       here: number;
+      members: Array<{
+        place: number;
+        name: string | null;
+        position: number | null;
+      }>;
     }>;
+    places: Array<{ name: string; path: string | null }>;
+    here: number | null;
     place: string;
     link: { name: string; path: string | null } | null;
     size: number | null;
   } = $props();
 
   let hovered = $state<string | null>(null);
+  let active = $state<number | null>(null);
+  let pointer = "mouse";
+  let pressed: number | null = null;
 
   const ordered = $derived(
     parties.toSorted(
@@ -77,6 +93,7 @@
   });
   const dot = $derived(Math.min(0.42 * layout.gap, 0.5) * 96);
   const scale = $derived(Math.min(1, (0.06 * 96) / dot));
+  const ring = $derived(Math.max(0.45, 0.24 * dot));
   const seats = $derived.by(() => {
     const positions: Array<{ angle: number; radius: number }> = [];
     for (const [row, radius] of layout.radii.entries()) {
@@ -99,6 +116,7 @@
       party: "",
       local: false,
       index,
+      member: null as (typeof parties)[number]["members"][number] | null,
     }));
     let start = 0;
     for (const party of ordered) {
@@ -116,6 +134,19 @@
         .slice(0, link == null ? 0 : party.here)) {
         seat.local = true;
       }
+      const local = party.members.filter(
+        (member) => link != null && member.place === here,
+      );
+      const rest = party.members.filter(
+        (member) => link == null || member.place !== here,
+      );
+      for (const seat of block) {
+        seat.member =
+          (seat.local ? local.shift() : rest.shift()) ??
+          local.shift() ??
+          rest.shift() ??
+          null;
+      }
     }
     return placed;
   });
@@ -123,6 +154,9 @@
     new Map(
       parties.map((party) => [party.key, swatch(party.color, party.key)]),
     ),
+  );
+  const labels = $derived(
+    new Map(parties.map((party) => [party.key, party.label])),
   );
   const majorityAngle = $derived.by(() => {
     const before = seats[majority - 2];
@@ -166,6 +200,68 @@
       ? m.seats_majority({ count: count(majority) })
       : m.seats_part({ count: count(totals.all), total: count(size ?? 0) });
   });
+  const tip = $derived.by(() => {
+    const seat = active == null ? undefined : seats[active];
+    if (seat == null) {
+      return null;
+    }
+    const where =
+      seat.member == null || places.length < 2
+        ? null
+        : (places[seat.member.place] ?? null);
+    return {
+      seat,
+      color: colors.get(seat.party),
+      party: labels.get(seat.party) ?? "",
+      name: seat.member?.name ?? null,
+      place: where?.name ?? null,
+      path:
+        where?.path == null ||
+        resolve("/[...path]", { path: where.path }) === page.url.pathname
+          ? null
+          : where.path,
+      position: seat.member?.position ?? null,
+      x: (seat.x - (100 - reach)) / (2 * reach),
+      y: (seat.y - dot - (100 - top)) / (top + dot + 2),
+    };
+  });
+  const lead = $derived(
+    tip == null ? hovered : (seats[active ?? -1]?.party ?? null),
+  );
+
+  const track = (
+    event: PointerEvent & { currentTarget: EventTarget & SVGSVGElement },
+  ) => {
+    if (event.type === "pointerdown") {
+      pointer = event.pointerType;
+      pressed = active;
+    }
+    const matrix = event.currentTarget.getScreenCTM();
+    if (matrix == null) {
+      return;
+    }
+    const { x, y } = new DOMPoint(event.clientX, event.clientY).matrixTransform(
+      matrix.inverse(),
+    );
+    const radius = Math.hypot(x - 100, y - 100);
+    const pad = dot + 0.5 * layout.gap * 96;
+    if (
+      radius < (layout.radii[0] ?? 1) * 96 - pad ||
+      radius > (layout.radii.at(-1) ?? 1) * 96 + pad ||
+      y > 100 + pad
+    ) {
+      active = null;
+      return;
+    }
+    let best = { index: -1, distance: Infinity };
+    for (const seat of seats) {
+      const distance = (seat.x - x) ** 2 + (seat.y - y) ** 2;
+      if (distance < best.distance) {
+        best = { index: seat.index, distance };
+      }
+    }
+    active = best.index < 0 ? null : best.index;
+  };
 </script>
 
 <section
@@ -178,65 +274,195 @@
   >
     {m.seats_title()}
   </h2>
-  <svg
-    class="mx-auto block overflow-visible inline-full"
+  <div
+    class="relative mx-auto inline-full"
     style:max-inline-size="{26 * scale}rem"
-    viewBox="{100 - reach} {100 - top} {2 * reach} {top + dot + 2}"
-    role="img"
-    aria-label={whole ? `${count(totals.all)} ${m.seats_title()}` : caption}
   >
-    {#if link != null}
-      <g class="fill-foreground opacity-16" aria-hidden="true">
-        {#each seats.filter((seat) => seat.local) as seat (seat.index)}
-          <circle cx={seat.x} cy={seat.y} r={dot + 0.5 * layout.gap * 96} />
-        {/each}
-      </g>
-    {/if}
-    {#each seats as seat (seat.index)}
-      {const lit = $derived(
-        hovered == null ? link == null || seat.local : hovered === seat.party,
+    <svg
+      {@attach (svg: SVGSVGElement) =>
+        on(window, "pointerdown", (event) => {
+          if (!(event.target instanceof Node && svg.contains(event.target))) {
+            active = null;
+          }
+        })}
+      class={cn(
+        "block touch-pan-y overflow-visible rounded-sm outline-none inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring",
+        { "cursor-pointer": tip?.path != null },
       )}
-      <circle
-        class="transition-[fill] duration-150 motion-reduce:transition-none"
-        cx={seat.x}
-        cy={seat.y}
-        r={dot}
-        style:fill={lit
-          ? colors.get(seat.party)
-          : `color-mix(in oklab, ${colors.get(seat.party)} 24%, var(--card))`}
-        role="presentation"
-        onpointerenter={() => (hovered = seat.party)}
-        onpointerleave={() => (hovered = null)}
-      />
-    {/each}
-    {#if whole}
-      <line
-        class="stroke-foreground"
-        stroke-width="1.4"
-        stroke-linecap="round"
-        x1={100 + (96 + dot + 3) * Math.cos(majorityAngle)}
-        y1={100 - (96 + dot + 3) * Math.sin(majorityAngle)}
-        x2={100 + (96 + dot + 11) * Math.cos(majorityAngle)}
-        y2={100 - (96 + dot + 11) * Math.sin(majorityAngle)}
-      />
-    {/if}
-    <text
-      class="fill-foreground font-serif tabular-nums"
-      style:font-size="{font}px"
-      x="100"
-      y={center.of == null ? 98 : 99 - 0.38 * font}
-      text-anchor="middle">{count(center.value)}</text
+      viewBox="{100 - reach} {100 - top} {2 * reach} {top + dot + 2}"
+      role="listbox"
+      tabindex="0"
+      aria-label={whole ? `${count(totals.all)} ${m.seats_title()}` : caption}
+      aria-describedby="seats-keys"
+      aria-activedescendant={active == null ? undefined : `seat-${active}`}
+      onpointermove={track}
+      onpointerdown={track}
+      onmousedown={(event) => event.preventDefault()}
+      onpointerleave={(event) => {
+        if (event.pointerType === "mouse") {
+          active = null;
+        }
+      }}
+      onclick={() => {
+        if (tip?.path != null && (pointer === "mouse" || pressed === active)) {
+          void goto(resolve("/[...path]", { path: tip.path }));
+        }
+      }}
+      onkeydown={(event) => {
+        const moves: Record<string, number> = {
+          ArrowRight: 1,
+          ArrowDown: 1,
+          ArrowLeft: -1,
+          ArrowUp: -1,
+          Home: -Infinity,
+          End: Infinity,
+        };
+        const move = moves[event.key];
+        if (move != null) {
+          event.preventDefault();
+          active = Math.min(
+            seats.length - 1,
+            Math.max(0, (active ?? (move > 0 ? -1 : seats.length)) + move),
+          );
+        } else if (event.key === "Escape") {
+          active = null;
+        } else if (event.key === "Enter" && tip?.path != null) {
+          void goto(resolve("/[...path]", { path: tip.path }));
+        }
+      }}
+      onfocus={(event) => {
+        if (event.currentTarget.matches(":focus-visible")) {
+          active ??= 0;
+        }
+      }}
+      onblur={() => (active = null)}
     >
-    {#if center.of != null}
+      {#if link != null}
+        <g class="fill-foreground opacity-16" aria-hidden="true">
+          {#each seats.filter((seat) => seat.local) as seat (seat.index)}
+            <circle cx={seat.x} cy={seat.y} r={dot + 0.5 * layout.gap * 96} />
+          {/each}
+        </g>
+      {/if}
+      {#each seats as seat (seat.index)}
+        {const lit = $derived(
+          lead == null ? link == null || seat.local : lead === seat.party,
+        )}
+        {const where = $derived(
+          seat.member == null || places.length < 2
+            ? null
+            : places[seat.member.place]?.name,
+        )}
+        <circle
+          id="seat-{seat.index}"
+          class="transition-[fill] duration-150 motion-reduce:transition-none"
+          cx={seat.x}
+          cy={seat.y}
+          r={dot}
+          role="option"
+          aria-selected={active === seat.index}
+          aria-label={[
+            seat.member?.name,
+            labels.get(seat.party),
+            where,
+            seat.member?.position == null
+              ? null
+              : m.seats_position({ position: seat.member.position }),
+          ]
+            .filter((part) => part != null)
+            .join(", ")}
+          style:fill={lit
+            ? colors.get(seat.party)
+            : `color-mix(in oklab, ${colors.get(seat.party)} 24%, var(--card))`}
+        />
+      {/each}
+      {#if tip != null}
+        <g
+          class="pointer-events-none fill-none stroke-foreground"
+          aria-hidden="true"
+        >
+          {#if tip.place != null}
+            {#each seats.filter((seat) => seat.index !== tip.seat.index && seat.member != null && seat.member.place === tip.seat.member?.place) as seat (seat.index)}
+              <circle
+                class="opacity-55"
+                cx={seat.x}
+                cy={seat.y}
+                r={dot + 0.6 * ring}
+                stroke-width={0.6 * ring}
+              />
+            {/each}
+          {/if}
+          <circle
+            cx={tip.seat.x}
+            cy={tip.seat.y}
+            r={dot + ring}
+            stroke-width={ring}
+          />
+        </g>
+      {/if}
+      {#if whole}
+        <line
+          class="stroke-foreground"
+          stroke-width="1.4"
+          stroke-linecap="round"
+          x1={100 + (96 + dot + 3) * Math.cos(majorityAngle)}
+          y1={100 - (96 + dot + 3) * Math.sin(majorityAngle)}
+          x2={100 + (96 + dot + 11) * Math.cos(majorityAngle)}
+          y2={100 - (96 + dot + 11) * Math.sin(majorityAngle)}
+        />
+      {/if}
       <text
-        class="fill-muted-foreground tabular-nums"
-        style:font-size="{0.34 * font}px"
+        class="pointer-events-none fill-foreground font-serif tabular-nums"
+        style:font-size="{font}px"
         x="100"
-        y="99"
-        text-anchor="middle">{m.seats_of({ count: count(center.of) })}</text
+        y={center.of == null ? 98 : 99 - 0.38 * font}
+        text-anchor="middle">{count(center.value)}</text
       >
+      {#if center.of != null}
+        <text
+          class="pointer-events-none fill-muted-foreground tabular-nums"
+          style:font-size="{0.34 * font}px"
+          x="100"
+          y="99"
+          text-anchor="middle">{m.seats_of({ count: count(center.of) })}</text
+        >
+      {/if}
+    </svg>
+    {#if tip != null}
+      <div
+        class={cn(
+          "pointer-events-none absolute z-10 grid -translate-y-[calc(100%+0.5rem)] gap-0.5 rounded-sm bg-foreground px-2 py-1.5 text-[0.8125rem] leading-tight text-background shadow-sm inline-max max-inline-60",
+          {
+            "-translate-x-1/2": tip.x >= 0.25 && tip.x <= 0.75,
+            "-translate-x-3": tip.x < 0.25,
+            "-translate-x-[calc(100%-0.75rem)]": tip.x > 0.75,
+          },
+        )}
+        style:left="{tip.x * 100}%"
+        style:top="{tip.y * 100}%"
+        aria-hidden="true"
+      >
+        <span class="flex items-center gap-1.5 font-semibold">
+          <span
+            class="shrink-0 rounded-xs block-2 inline-2"
+            style:background-color={tip.color}
+          ></span>
+          {tip.name ?? tip.party}
+        </span>
+        {#if tip.name != null}
+          <span class="opacity-75">{tip.party}</span>
+        {/if}
+        {#if tip.place != null}
+          <span class="opacity-75"
+            >{tip.place}{#if tip.position != null}, {m.seats_position({
+                position: tip.position,
+              })}{/if}</span
+          >
+        {/if}
+      </div>
     {/if}
-  </svg>
+  </div>
+  <p id="seats-keys" class="sr-only">{m.seats_keys()}</p>
   <p class="text-center text-[0.8125rem] text-pretty text-muted-foreground">
     {caption}
     {#if link?.path != null}
@@ -251,7 +477,7 @@
       <li
         class={cn(
           "flex items-center gap-2 rounded-xs px-1.5 py-1",
-          { "bg-secondary": hovered === party.key },
+          { "bg-secondary": lead === party.key },
           { "text-muted-foreground": link != null && party.here === 0 },
         )}
         style:--party={colors.get(party.key)}

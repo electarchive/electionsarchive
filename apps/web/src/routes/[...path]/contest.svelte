@@ -715,6 +715,8 @@
   {#if contest.chamber != null}
     <Seats
       parties={contest.chamber.parties}
+      places={contest.chamber.places}
+      here={contest.chamber.here}
       place={contest.scope.name}
       link={contest.chamber.link}
       size={contest.chamber.size}
