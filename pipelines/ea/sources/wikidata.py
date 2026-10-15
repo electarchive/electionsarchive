@@ -1,4 +1,5 @@
 import json
+import math
 import re
 import unicodedata
 from collections import Counter, defaultdict
@@ -12,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "3"
+VERSION = "4"
 TITLE = "Political parties and their colors"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
@@ -117,6 +118,37 @@ INHERITED: dict[tuple[str, str], str] = {
     ("CH-ZH", "Partei der Arbeit"): "Q661771",
 }
 CHOSEN = {"Q47729": "EF1C27", "Q113168799": "56B45D"}
+PAINTED: dict[tuple[str, str, int | None], str] = {
+    ("BR", "Republicanos", None): "41A9D0",
+    ("DE", "Die PARTEI", None): "A73A1A",
+    ("DE", "FAMILIE", None): "FF987D",
+    ("DE", "PdF", None): "C49209",
+    ("DE", "Tierschutzpartei", None): "006D42",
+    ("FR", "DVC", None): "FAAF5F",
+    ("FR", "LR", None): "3D8FE0",
+    ("FR", "SOC", None): "C62C57",
+    ("FR", "UDI", None): "32B6FE",
+    ("FR", "UXD", None): "5A3B5C",
+    ("IT", "Azione – Italia Viva", None): "392CAA",
+    ("IT", "Lega per Salvini Premier", None): "008000",
+    ("TR", "Adalet Partisi", 1961): "D360BC",
+    ("TR", "Cumhuriyetçi Güven Partisi", None): "FF4500",
+    ("TR", "Cumhuriyetçi Millet Partisi", None): "7A1F2B",
+    ("TR", "Demokrat Parti", None): "CD42B2",
+    ("TR", "Demokratik Parti", None): "FFA500",
+    ("TR", "Fazilet Partisi", None): "FF2E84",
+    ("TR", "Güven Partisi", None): "FF4500",
+    ("TR", "Halkçı Parti", None): "D40000",
+    ("TR", "Milli Selamet Partisi", None): "FF2E84",
+    ("TR", "Millet Partisi", 1950): "7A1F2B",
+    ("TR", "Millet Partisi", 1965): "C65E1F",
+    ("TR", "Milliyetçi Hareket Partisi", None): "7A1F2B",
+    ("TR", "Refah Partisi", None): "FF2E84",
+    ("TR", "Türkiye Birlik Partisi", None): "B7006D",
+    ("TR", "Türkiye İşçi Partisi", None): "CD0668",
+    ("TR", "Yeni Türkiye Partisi", 1961): "00B0F0",
+    ("TR", "Yeniden Refah Partisi", None): "474647",
+}
 PLACED: dict[tuple[str, str], tuple[int, int]] = {
     ("BR", "Partido dos Trabalhadores"): (-2, -1),
     ("BR", "Progressistas"): (1, 1),
@@ -462,6 +494,7 @@ def emit() -> Path:
         for url in _placed():
             cs.artifact(raw.cached(SOURCE, url), positioned)
         report: Counter[tuple[str, str]] = Counter()
+        shades: defaultdict[UUID, list[tuple[str, date | None, date | None]]] = defaultdict(list)
         for party, iso, kind, full, short, first, last, options in parties:
             if party not in found:
                 continue
@@ -490,7 +523,16 @@ def emit() -> Path:
             if party in painted:
                 report[scope, "painted"] += options
                 continue
-            ranges = colors(linked.get(party)) or colors(inherited)
+            hand = next(
+                (
+                    PAINTED[key]
+                    for name in full + short
+                    for key in ((iso, name, first), (iso, name, None))
+                    if key in PAINTED
+                ),
+                None,
+            )
+            ranges = [(hand, None, "day", None, "day")] if hand else colors(linked.get(party)) or colors(inherited)
             for color, start, start_precision, end, end_precision in ranges:
                 cs.add(
                     "party_color",
@@ -500,8 +542,9 @@ def emit() -> Path:
                     valid_from_precision=start_precision,
                     valid_to=end,
                     valid_to_precision=end_precision,
-                    source_id=wikidata,
+                    source_id=None if hand else wikidata,
                 )
+                shades[party].append((f"#{color.lower()}", start, end))
             if ranges:
                 report[scope, "painted"] += options
             elif options >= 50:
@@ -512,4 +555,59 @@ def emit() -> Path:
                 f"{report[scope, 'painted']} of {report[scope, 'options']} options colored, "
                 f"{report[scope, 'positioned']} positioned"
             )
+        for party, color, start, end in conn.execute(
+            """select pc.party_id, pc.color, pc.valid_from, pc.valid_to from party_color pc
+               join changeset c on c.id = pc.changeset_id where c.pipeline <> %s""",
+            [SOURCE],
+        ).fetchall():
+            shades[party].append((color, start, end))
+        lab: dict[str, tuple[float, float, float]] = {}
+        for color in {color for ranges in shades.values() for color, _, _ in ranges}:
+            rgb = [int(color[i : i + 2], 16) / 255 for i in (1, 3, 5)]
+            r, g, b = [v / 12.92 if v <= 0.04045 else ((v + 0.055) / 1.055) ** 2.4 for v in rgb]
+            l_, m_, s_ = (
+                (0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b) ** (1 / 3),
+                (0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b) ** (1 / 3),
+                (0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b) ** (1 / 3),
+            )
+            lab[color] = (
+                min(0.86, max(0.52, 0.2104542553 * l_ + 0.793617785 * m_ - 0.0040720468 * s_)),
+                1.9779984951 * l_ - 2.428592205 * m_ + 0.4505937099 * s_,
+                0.0259040371 * l_ + 0.7827717662 * m_ - 0.808675766 * s_,
+            )
+        labels: dict[UUID, str] = {party: (full + short)[0] for party, _, _, full, short, *_ in parties}
+        seated: defaultdict[tuple[str, date], dict[UUID, str | None]] = defaultdict(dict)
+        for iso, day, party, principal in conn.execute(
+            """select distinct coalesce(po.iso_code, (select n.text from name n where n.entity_id = po.id
+                                                 order by n.is_preferred desc limit 1)),
+                      e.date_from, coalesce(m.into_id, o.party_id),
+                      (select coalesce(tm.into_id, r.to_party_id) from party_relation r
+                       left join entity_merge fm on fm.entity_id = r.from_party_id
+                       left join entity_merge tm on tm.entity_id = r.to_party_id
+                       where r.kind = 'list_vehicle_for' and r.election_id = e.id
+                         and coalesce(fm.into_id, r.from_party_id) = coalesce(m.into_id, o.party_id) limit 1)
+               from outcome x join contest_option o on o.id = x.option_id
+               join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+               join polity po on po.id = e.polity_id
+               left join entity_merge m on m.entity_id = o.party_id
+               where x.kind::text in ('elected', 'won') and o.party_id is not null and e.date_from is not null"""
+        ).fetchall():
+            shade = next(
+                (
+                    color
+                    for owner in (party, principal)
+                    for color, start, end in shades.get(owner, [])
+                    if (start is None or start <= day) and (end is None or day < end)
+                ),
+                None,
+            )
+            seated[iso, day][party] = shade
+        for iso, day in sorted(seated):
+            winners = sorted(seated[iso, day].items(), key=lambda item: labels.get(item[0], ""))
+            for place, (one, color) in enumerate(winners):
+                for other, shade in winners[place + 1 :]:
+                    if color and shade and (gap := math.dist(lab[color], lab[shade])) < 0.1:
+                        print(f"close: {iso} {day} {labels.get(one)} {color} ~ {labels.get(other)} {shade} ({gap:.3f})")
+            if bare := [labels.get(party, str(party)) for party, color in winners if color is None]:
+                print(f"no color: {iso} {day} seat winners {', '.join(bare)}")
         return cs.write()
