@@ -4521,12 +4521,6 @@ def emit() -> Path:
             cs.merge(duplicate, survivor)
         fec_persons = {key: cs.survivors.get(person, person) for key, person in fec_persons.items()}
         figures = {text: cs.survivors.get(person, person) for text, person in figures.items()}
-        if fec_persons["H2CA46073"] != fec_persons["H2CA39128"]:
-            cs.renamed[str(fec_persons["H2CA39128"])] = str(fec_persons["H2CA46073"])
-            cs.merge(fec_persons["H2CA46073"], cs.key(f"{SOURCE}.person", "CA:richard-b-owens"))
-            fec_persons["H2CA46073"] = fec_persons["H2CA39128"]
-            cs.add("external_id", entity_id=fec_persons["H2CA39128"], scheme="fec.candidate", value="H2CA46073")
-        cs.renamed[str(fec_persons["H2NY14037"])] = str(fec_persons["H2NY22139"])
 
         elections: dict[str, UUID] = {}
 
