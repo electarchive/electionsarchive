@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "de.bundeswahlleiterin"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BWL = "https://www.bundeswahlleiterin.de"
 OPENDATA = f"{BWL}/bundestagswahlen/2025/ergebnisse/opendata/btw25"
@@ -1124,9 +1124,12 @@ def emit() -> Path:
                     member_of_party_id=party_ids[row["wk_group"]],
                 )
             if row["land"] is not None:
+                candidacy = cs.key(
+                    "de.candidacy", f"{ELECTION}:list:{row['land']}:{row['list_group']}:{row['position']}"
+                )
                 cs.add(
                     "candidacy",
-                    id=cs.key("de.candidacy", f"{ELECTION}:list:{row['land']}:{row['list_group']}:{row['position']}"),
+                    id=candidacy,
                     person_id=person,
                     option_id=UUID(options[f"2:{row['land']}:{row['list_group']}"]),
                     role="list_member",
@@ -1134,6 +1137,14 @@ def emit() -> Path:
                     ballot_name=row["ballot_name"],
                     member_of_party_id=party_ids[row["list_group"]],
                 )
+                if row["seat"] == "list":
+                    cs.add(
+                        "outcome",
+                        result_set_id=default_sets[f"list:{row['land']}"],
+                        option_id=UUID(options[f"2:{row['land']}:{row['list_group']}"]),
+                        candidacy_id=candidacy,
+                        kind="elected",
+                    )
 
         set_key = (
             pl.when(pl.col("ballot") == 0)
@@ -1295,20 +1306,35 @@ def emit() -> Path:
                     birth_precision="year",
                 )
                 name(person, row["name"])
+            candidacy = cs.key(
+                "de.candidacy", f"{EUROPEAN}:european-parliament:{row['land']}:{row['list_group']}:{row['position']}"
+            )
+            is_national = row["land"] == "99"
+            option = (
+                UUID(european_option_ids[row["list_group"]])
+                if is_national
+                else land_options[f"{row['land']}:{row['list_group']}"]
+            )
             cs.add(
                 "candidacy",
-                id=cs.key(
-                    "de.candidacy",
-                    f"{EUROPEAN}:european-parliament:{row['land']}:{row['list_group']}:{row['position']}",
-                ),
+                id=candidacy,
                 person_id=person,
-                option_id=UUID(european_option_ids[row["list_group"]])
-                if row["land"] == "99"
-                else land_options[f"{row['land']}:{row['list_group']}"],
+                option_id=option,
                 role="list_member",
                 list_position=row["position"],
                 ballot_name=row["ballot_name"],
                 member_of_party_id=european_party_ids[row["list_group"]],
+            )
+            cs.add(
+                "outcome",
+                result_set_id=european_set
+                if is_national
+                else cs.key(
+                    f"{SOURCE}.result_set", f"{EUROPEAN}:european-parliament:{row['list_group']}:{row['land']}"
+                ),
+                option_id=option,
+                candidacy_id=candidacy,
+                kind="elected",
             )
 
         kreis_units: dict[str, str] = {}
