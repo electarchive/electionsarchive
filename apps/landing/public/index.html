@@ -105,14 +105,6 @@
         src: url("/fonts/sofia-sans-semi-condensed.woff2")
           format("woff2-variations");
       }
-      @font-face {
-        font-family: "Martian Mono Variable";
-        font-style: normal;
-        font-display: swap;
-        font-weight: 100 800;
-        font-stretch: 75% 112.5%;
-        src: url("/fonts/martian-mono.woff2") format("woff2-variations");
-      }
 
       :root {
         --background: #f1efea;
@@ -127,8 +119,6 @@
           "Sofia Sans Semi Condensed Variable", "Noto Sans", system-ui,
           sans-serif;
         --serif: "Piazzolla Variable", "Noto Serif", Georgia, serif;
-        --mono:
-          "Martian Mono Variable", "Noto Sans Mono", ui-monospace, monospace;
       }
 
       @media (prefers-color-scheme: dark) {
@@ -279,79 +269,20 @@
         overflow: visible;
       }
 
-      .counts {
-        display: grid;
-        gap: 1px;
-      }
-
-      .counts dl {
-        display: grid;
-        grid-template-columns: repeat(3, minmax(0, 1fr));
-        gap: 1px;
-      }
-
-      .count {
-        display: flex;
-        flex-direction: column-reverse;
-        gap: 0.25rem;
-        padding-block: 1rem 0.875rem;
-      }
-
-      .count dd {
-        font-family: var(--mono);
-        font-stretch: 75%;
-        font-size: clamp(1.375rem, 4.2vw, 2.25rem);
-        font-weight: 500;
-        font-variant-numeric: tabular-nums;
-        line-height: 1;
-        letter-spacing: -0.02em;
-      }
-
-      .count dt,
-      .caption,
       .foot {
         color: var(--muted-foreground);
         font-size: 0.875rem;
       }
 
-      .caption {
-        padding-block: 0.5rem;
-        font-size: 0.8125rem;
+      .foot a {
+        color: inherit;
+        text-decoration-color: var(--border);
+        text-underline-offset: 0.2em;
       }
 
-      .polities {
-        display: grid;
-        gap: 1px;
-      }
-
-      h2 {
-        font-size: 0.875rem;
-        font-weight: 700;
-      }
-
-      .polities ul {
-        display: grid;
-        grid-template-columns: repeat(5, minmax(0, 1fr));
-        gap: 1px;
-        list-style: none;
-      }
-
-      .polities li {
-        padding-block: 0.875rem;
-        font-weight: 600;
-      }
-
-      .foot {
-        display: flex;
-        flex-wrap: wrap;
-        justify-content: space-between;
-        gap: 0.25rem 1rem;
-      }
-
-      @media (width < 48rem) {
-        .polities ul {
-          grid-template-columns: repeat(2, minmax(0, 1fr));
-        }
+      .foot a:hover {
+        color: var(--foreground);
+        text-decoration-color: currentColor;
       }
 
       @media (width < 40rem) {
@@ -503,45 +434,8 @@
         </svg>
       </section>
 
-      <section class="counts" aria-labelledby="counts-caption">
-        <dl>
-          <div class="cell count">
-            <dt>elections</dt>
-            <dd>3,074</dd>
-          </div>
-          <div class="cell count">
-            <dt>contests</dt>
-            <dd>42,871</dd>
-          </div>
-          <div class="cell count">
-            <dt>candidacies</dt>
-            <dd>133,765</dd>
-          </div>
-        </dl>
-        <p class="cell caption" id="counts-caption">
-          Archive totals as of October 15, 2026
-        </p>
-      </section>
-
-      <section class="polities" aria-labelledby="polities-heading">
-        <h2 class="cell" id="polities-heading">Launching with ten polities</h2>
-        <ul>
-          <li class="cell">Brazil</li>
-          <li class="cell">Canada</li>
-          <li class="cell">European Union</li>
-          <li class="cell">France</li>
-          <li class="cell">Germany</li>
-          <li class="cell">Italy</li>
-          <li class="cell">Switzerland</li>
-          <li class="cell">Türkiye</li>
-          <li class="cell">United Kingdom</li>
-          <li class="cell">United States</li>
-        </ul>
-      </section>
-
       <footer class="cell foot">
-        <p>Free forever, with no paid tier.</p>
-        <p>© 2026 Elections Archive</p>
+        <p>Built by <a href="https://firatciftci.com">Firat Ciftci</a></p>
       </footer>
     </main>
   </body>
