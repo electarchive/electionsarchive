@@ -16,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "it.interno"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 OPENDATA = "https://elezionistorico.interno.gov.it/daithome/documenti/opendata"
 CAMERA = f"{OPENDATA}/camera/camera-20220925.zip"
@@ -1067,6 +1067,8 @@ def emit() -> Path:
 
         contests: dict[str, UUID] = {}
         options: dict[str, str] = {}
+        declared: dict[str, UUID] = {}
+        recounted: dict[str, tuple[UUID, dict[str, str]]] = {}
         exhausted = {
             (college, label): EXHAUSTED_NOTE.format(college=college_names[single])
             for college, label, single in members.filter(pl.col("position").is_null())
@@ -1100,6 +1102,9 @@ def emit() -> Path:
                 if revision is None
                 else result_set(f"{contest_key}:revised", general, contests[code], "court_revised", camera, 0)
             )
+            declared[code] = official
+            if revised is not None and revision is not None:
+                recounted[code] = (revised, revision)
             for option in sorted(offered.filter(pl.col("college") == code)["option"]):
                 group = option.removeprefix("legend:")
                 legend = option != group
@@ -1140,20 +1145,35 @@ def emit() -> Path:
                         if option in annulled["label"]
                         else None,
                     )
-        for college, label, position, surname, forename, person in (
-            members.filter(pl.col("position").is_not_null())
-            .select("college", "label", "position", "surname", "forename", "person")
-            .iter_rows()
-        ):
-            cs.add(
-                "candidacy",
-                id=cs.key("it.candidacy", f"{GENERAL}:camera:{college}:{slug(label)}:{position}"),
-                person_id=person_ids[person],
-                option_id=UUID(options[f"{college}:{label}"]),
-                role="list_member",
-                list_position=position,
-                ballot_name=f"{surname} {forename}",
-            )
+        for college, label, position, surname, forename, person, elected, single in members.select(
+            "college", "label", "position", "surname", "forename", "person", "elected", "single"
+        ).iter_rows():
+            option = UUID(options[f"{college}:{label}"])
+            if position is None:
+                candidacy = cs.key("it.candidacy", f"{GENERAL}:camera:{single}:{person}")
+            else:
+                candidacy = cs.key("it.candidacy", f"{GENERAL}:camera:{college}:{slug(label)}:{position}")
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person_ids[person],
+                    option_id=option,
+                    role="list_member",
+                    list_position=position,
+                    ballot_name=f"{surname} {forename}",
+                )
+            if elected:
+                cs.add(
+                    "outcome", result_set_id=declared[college], option_id=option, candidacy_id=candidacy, kind="elected"
+                )
+            if college not in recounted:
+                continue
+            revised, revision = recounted[college]
+            if (elected and person != revision["annulled"]) or (
+                person == revision["displaced"]
+                and label in set(members.filter(pl.col("person") == revision["annulled"])["label"])
+            ):
+                cs.add("outcome", result_set_id=revised, option_id=option, candidacy_id=candidacy, kind="elected")
 
         for code, label in (
             colleges.filter(pl.col("scheme") == "it.uninominale_camera").select("code", "name").iter_rows()
