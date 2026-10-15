@@ -90,6 +90,7 @@
     {/snippet}
   </HoverCard.Trigger>
   <HoverCard.Content
+    collisionPadding={8}
     align="start"
     class="p-0 text-start font-sans text-sm font-normal tracking-normal text-foreground normal-case inline-[min(20rem,calc(100vw-2rem))]"
   >
