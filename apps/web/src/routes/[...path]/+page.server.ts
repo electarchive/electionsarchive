@@ -1,4 +1,4 @@
-import { call } from "@orpc/server";
+import { call, ORPCError } from "@orpc/server";
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { db } from "#lib/server/db/index.js";
@@ -22,25 +22,38 @@ export const load: PageServerLoad = async ({ params, url }) => {
     limit 1
   `);
   const slug = found.rows[0];
-  if (slug?.path !== params.path) {
+  if (slug == null || (slug.path !== params.path && slug.type !== "contest")) {
     error(404);
   }
+  const unit = params.path.slice(slug.path.length + 1);
   if (!slug.is_current && slug.current != null) {
-    redirect(308, `/${slug.current}${url.search}`);
+    redirect(
+      308,
+      `/${[slug.current, unit].filter((part) => part !== "").join("/")}${url.search}`,
+    );
   }
   const requested = url.searchParams.get("match");
   const match =
     requested === "person" || requested === "family" ? requested : "party";
   if (slug.type === "contest") {
-    return {
-      kind: "contest" as const,
-      contest: await call(router.contests.get, {
-        id: slug.entity_id,
-        vs: url.searchParams.get("vs") ?? undefined,
+    try {
+      return {
+        kind: "contest" as const,
+        contest: await call(router.contests.get, {
+          id: slug.entity_id,
+          unit,
+          by: url.searchParams.get("by") ?? undefined,
+          vs: url.searchParams.get("vs") ?? undefined,
+          match,
+        }),
         match,
-      }),
-      match,
-    };
+      };
+    } catch (error_) {
+      if (error_ instanceof ORPCError && error_.code === "NOT_FOUND") {
+        error(404);
+      }
+      throw error_;
+    }
   }
   if (slug.type === "election") {
     return {

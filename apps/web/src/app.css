@@ -37,6 +37,8 @@
   --accent: color-mix(in oklab, #ffe03a 72%, transparent);
   --accent-foreground: #191816;
   --destructive: #b3261e;
+  --yes: #2e7d4f;
+  --no: #c2410c;
   --border: #cfcac0;
   --input: color-mix(in oklab, #191816 40%, transparent);
   --ring: #8a6a00;
@@ -67,6 +69,8 @@
   --accent: color-mix(in oklab, #e8c547 28%, transparent);
   --accent-foreground: #ece9e2;
   --destructive: #f2675e;
+  --yes: #5bb57e;
+  --no: #f07a45;
   --border: #3b3934;
   --input: color-mix(in oklab, #ece9e2 38%, transparent);
   --ring: #e8c547;
@@ -268,6 +272,16 @@
     cursor: not-allowed;
     opacity: 0.5;
   }
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 160ms;
+}
+
+::view-transition-group(scope-title) {
+  animation-duration: 360ms;
+  animation-timing-function: cubic-bezier(0.2, 0.8, 0.2, 1);
 }
 
 @layer base {

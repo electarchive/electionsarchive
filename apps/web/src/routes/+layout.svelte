@@ -2,6 +2,7 @@
   // eslint-disable-next-line no-restricted-imports
   import "../app.css";
   import type { Snippet } from "svelte";
+  import { onNavigate } from "$app/navigation";
   import { ProgressBar } from "@prgm/sveltekit-progress-bar";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -21,6 +22,22 @@
   const queryClient = makeQueryClient();
 
   setConfirmationContext(new ConfirmationStore());
+
+  onNavigate(async (navigation) => {
+    if (
+      !("startViewTransition" in document) ||
+      navigation.from?.url.pathname === navigation.to?.url.pathname ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      return;
+    }
+    return new Promise((resolve) => {
+      document.startViewTransition(async () => {
+        resolve();
+        await navigation.complete;
+      });
+    });
+  });
 </script>
 
 <svelte:head>

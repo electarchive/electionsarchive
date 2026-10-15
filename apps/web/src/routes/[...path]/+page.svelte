@@ -26,7 +26,11 @@
   );
   const title = $derived(
     data.kind === "contest"
-      ? `${data.contest.name}, ${data.contest.election.name}`
+      ? data.contest.scope.noun == null
+        ? data.contest.name.includes(data.contest.election.name)
+          ? data.contest.name
+          : `${data.contest.name}, ${data.contest.election.name}`
+        : `${data.contest.scope.name}, ${data.contest.name}`
       : data.kind === "election"
         ? data.election.name
         : data.polity.name,

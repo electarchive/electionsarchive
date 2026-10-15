@@ -145,6 +145,9 @@ export function compare(
     ) {
       return `person:${option.person}`;
     }
+    if (option.kind === "answer") {
+      return `answer:${option.label.toLowerCase()}`;
+    }
     return party == null ? `kind:${option.kind}` : `party:${party}`;
   };
   const now = tally(current, identify);

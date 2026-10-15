@@ -40,6 +40,7 @@
   "col_votes": "Votes",
   "col_share": "Share",
   "col_seats": "Seats",
+  "col_electors": "Electoral votes",
   "col_earlier": "In {year}",
   "col_change": "Change",
   "didnt_run": "Did not run",
@@ -86,6 +87,58 @@
   "election_canceled": "Canceled",
   "election_annulled": "Annulled",
   "children_title": "Contests that make up this result",
+  "scope_in": "{noun} in {parent}",
+  "scope_path": "Geographic path of results",
+  "series_label": "This race in other years",
+  "series_annulled": "{year} (annulled)",
+  "places_title": "Results by {noun}",
+  "places_level": "Show results by",
+  "places_filter": "Filter by name",
+  "places_filter_empty": "No place matches “{query}”.",
+  "places_leads": "{label} leads in {count}",
+  "places_flipped": "Changed hands",
+  "places_flipped_from": "Flipped from {label}",
+  "places_show_all": "Show all {count}",
+  "places_sources": "These results come from {publisher}.",
+  "col_result": "Result",
+  "col_leader": "Leader",
+  "col_margin": "Margin",
+  "sort_by": "Sort by {column}",
+  "results_more": "{count} more under 1%",
+  "results_fewer": "Show fewer",
+  "seats_title": "Seats",
+  "seats_majority": "{count} for a majority",
+  "electors_title": "Electoral votes",
+  "electors_majority": "{count} to win",
+  "siblings_open": "Go to another {noun}",
+  "siblings_search": "Search places",
+  "siblings_loading": "Loading places…",
+  "siblings_empty": "No place matches.",
+  "sources_caption": "{stage}: {publisher}",
+  "citations_title": "Also cited",
+  "checks_title": "Consistency checks",
+  "check_turnout_unit": "{name}: {ballots} ballots cast, {registered} registered voters",
+  "check_votes_valid_unit": "{name}: votes add up to {votes}, but {valid} valid ballots are reported",
+  "checks_turnout": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} unit reports more ballots than registered voters",
+        "countPlural=*": "{count} units report more ballots than registered voters"
+      }
+    }
+  ],
+  "checks_votes_valid": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} unit reports votes that don't add up to its valid ballots",
+        "countPlural=*": "{count} units report votes that don't add up to their valid ballots"
+      }
+    }
+  ],
   "election_contests": "Contests",
   "election_parts": [
     {
