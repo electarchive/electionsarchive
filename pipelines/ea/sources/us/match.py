@@ -10,7 +10,7 @@ from ea.sources.us import fec
 from ea.store import connect
 
 SOURCE = "us.match"
-VERSION = "2"
+VERSION = "3"
 TITLE = "Candidate Master Files, 1982–2000"
 NOMINEES = {
     "P20000642": "william-j-clinton",
@@ -80,7 +80,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="People matched by FEC candidate ID across the FEC's books, its filings, and the Electoral College",
+            summary="People matched by FEC candidate ID across the FEC's books, its filings, and the Electoral College, and each Electoral College vote placed under the general election that chose its electors",
             polity="US",
             kind="match",
         )
@@ -165,6 +165,33 @@ def emit() -> Path:
                 if node.startswith("f:") and (("fec.candidate", node[2:]) not in keyed or node[2:] in moved):
                     cs.add("external_id", entity_id=survivor, scheme="fec.candidate", value=node[2:])
                     attached += 1
+        stages = conn.execute(
+            """select k.id, k.polity_id, k.kind::text, k.date_from, k.date_to, k.status::text,
+                 coalesce(
+                   (select p.election_id from contest c join contest p on p.id = c.previous_round_id
+                    where c.election_id = k.id and p.election_id <> k.id limit 1),
+                   (select g.id from election g
+                    where g.polity_id = k.polity_id and g.kind = 'general' and g.parent_id is null
+                      and g.date_from between k.date_from - 75 and k.date_from - 1
+                    order by g.date_from desc limit 1))
+               from election k join external_id x on x.entity_id = k.id and x.scheme = 'us.nara.election'
+               where k.kind = 'indirect'"""
+        ).fetchall()
+        linked = 0
+        for election, polity, kind, start, end, status, umbrella in stages:
+            if umbrella is not None:
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    parent_id=umbrella,
+                    kind=kind,
+                    date_from=start,
+                    date_to=end,
+                    status=status,
+                )
+                linked += 1
+        print(f"{linked} of {len(stages)} Electoral College votes and contingent elections placed under their cycle")
         print(f"{merges} merges, {attached} FEC IDs attached, {len(conflicts)} groups with several FEC people skipped")
         for conflict in conflicts[:40]:
             print(conflict)
