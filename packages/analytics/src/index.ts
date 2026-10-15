@@ -55,6 +55,7 @@ const LINEAGE = new Set([
   "refounded_as",
   "list_vehicle_for",
   "merged_into",
+  "absorbed_by",
   "regional_branch",
 ]);
 
