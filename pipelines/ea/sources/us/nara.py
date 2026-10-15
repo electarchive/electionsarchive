@@ -1,3 +1,4 @@
+import html
 import json
 import re
 import time
@@ -14,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nara"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = [1789, *range(1792, 2025, 4)]
 PAGE = "https://www.archives.gov/electoral-college/{year}"
@@ -323,6 +324,20 @@ BODIES = {
     "house": ("lower_house", "United States House of Representatives"),
     "senate": ("upper_house", "United States Senate"),
 }
+CONGRESSES = range(1, 120)
+PROFILES = {
+    congress: "https://history.house.gov/Congressional-Overview/Profiles/"
+    f"{congress}{'th' if 10 <= congress % 100 <= 20 else {1: 'st', 2: 'nd', 3: 'rd'}.get(congress % 10, 'th')}/"
+    for congress in CONGRESSES
+}
+PARTY_DIVISION = "https://www.senate.gov/history/partydiv.htm"
+SIZES = {
+    "house": ("Office of the Historian, U.S. House of Representatives", "Congressional Profiles"),
+    "senate": ("U.S. Senate Historical Office", "Party Division"),
+}
+JOINED = {
+    ("house", 86): (date(1959, 8, 21), 437, "Hawaii's Representative did not join Congress until August 21, 1959"),
+}
 
 
 class Tables(HTMLParser):
@@ -376,9 +391,37 @@ def fetch() -> None:
             time.sleep(1)
     for url in (TICKETS, NAMES, MEMBERSHIPS, PARTY_ITEMS):
         raw.fetch(SOURCE, url, suffix=".json")
+    for url in (*PROFILES.values(), PARTY_DIVISION):
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.fetch(SOURCE, url, suffix=".html")
+            time.sleep(1)
 
 
 def parse() -> None:
+    sizes: list[tuple[str, int, date, int]] = []
+    starts = {congress: date(1787 + 2 * congress, *((3, 4) if congress <= 73 else (1, 3))) for congress in CONGRESSES}
+    for congress, url in PROFILES.items():
+        text = html.unescape(re.sub(r"\s+", " ", re.sub("<[^>]+>", " ", raw.cached(SOURCE, url).path.read_text())))
+        found = re.search(r"Total Membership: (\d+) Representatives", text)
+        if found is None:
+            raise ValueError(f"{url}: no total membership")
+        sizes.append(("house", congress, starts[congress], int(found.group(1))))
+        if ("house", congress) in JOINED and JOINED[("house", congress)][2] not in text:
+            raise ValueError(f"{url}: the footnote on a late member is gone")
+    text = html.unescape(
+        re.sub(r"\s+", " ", re.sub("<[^>]+>", " ", raw.cached(SOURCE, PARTY_DIVISION).path.read_text()))
+    )
+    divisions = {
+        int(congress): int(seats)
+        for congress, seats in re.findall(r"(\d+)(?:st|nd|rd|th) Congress \(\d{4}[^)]*\).*?Total Seats: (\d+)", text)
+    }
+    if divisions.keys() != set(CONGRESSES):
+        raise ValueError(f"party division: Congresses {sorted(set(CONGRESSES) ^ divisions.keys())} are missing")
+    sizes.extend(("senate", congress, starts[congress], seats) for congress, seats in divisions.items())
+    sizes.extend((body, congress, day, seats) for (body, congress), (day, seats, _) in JOINED.items())
+
     votes: list[tuple[int, str, str, str, int, int]] = []
     electors: list[tuple[int, str, int, int]] = []
     printed: list[tuple[int, str, str]] = []
@@ -642,6 +685,9 @@ def parse() -> None:
         schema={"party": pl.String, "color": pl.String, "start": pl.Int64, "end": pl.Int64, "statement": pl.String},
         orient="row",
     ).write_parquet(PARSED / "colors.parquet")
+    pl.DataFrame(
+        sizes, schema={"body": pl.String, "congress": pl.Int64, "start": pl.Date, "seats": pl.Int64}, orient="row"
+    ).sort("body", "start").write_parquet(PARSED / "sizes.parquet")
 
 
 def emit() -> Path:
@@ -775,6 +821,25 @@ def emit() -> Path:
                 valid_from=meetings[year],
                 valid_to=None if following is None else meetings[following],
             )
+        for (body,), rows in pl.read_parquet(PARSED / "sizes.parquet").group_by("body", maintain_order=True):
+            publisher, title = SIZES[body]
+            source = cs.source(publisher, title)
+            url = PARTY_DIVISION if body == "senate" else PROFILES[1].rsplit("/", 2)[0] + "/"
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license="Public domain",
+            )
+            for page in [PARTY_DIVISION] if body == "senate" else PROFILES.values():
+                cs.artifact(raw.cached(SOURCE, page), source)
+            cs.add("citation", entity_id=bodies[body], source_id=source, locator={"url": url})
+            starts = rows["start"].to_list()
+            for start, following, seats in zip(starts, [*starts[1:], None], rows["seats"], strict=True):
+                cs.add("body_size", body_id=bodies[body], seats=seats, valid_from=start, valid_to=following)
 
         persons: dict[str, UUID] = {}
         for year in YEARS:
