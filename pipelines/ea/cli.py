@@ -1,0 +1,36 @@
+import argparse
+import importlib
+from pathlib import Path
+
+from ea import fixtures
+from ea.apply import apply, publish, revert
+from ea.store import connect
+
+
+def main() -> None:
+    parser = argparse.ArgumentParser(prog="ea")
+    commands = parser.add_subparsers(dest="command", required=True)
+    for step in ("fetch", "parse", "emit"):
+        commands.add_parser(step).add_argument("source", help="registry name, such as ca.elections")
+    commands.add_parser("apply").add_argument("changeset", type=Path, help="changeset artifact directory")
+    commands.add_parser("publish").add_argument("changeset_id", help="a changeset in pending_review")
+    reverting = commands.add_parser("revert", help="reject an unpublished changeset or undo the latest published one")
+    reverting.add_argument("changeset_id")
+    reverting.add_argument("reason")
+    commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")
+    args = parser.parse_args()
+    match args.command:
+        case "apply":
+            print(apply(args.changeset))
+        case "fixtures":
+            print(fixtures.export())
+        case "publish":
+            with connect() as conn:
+                publish(conn, args.changeset_id)
+        case "revert":
+            with connect() as conn:
+                revert(conn, args.changeset_id, args.reason)
+        case step:
+            result = getattr(importlib.import_module(f"ea.sources.{args.source}"), step)()
+            if result is not None:
+                print(result)

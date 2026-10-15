@@ -1,0 +1,31 @@
+[project]
+name = "ea-pipelines"
+version = "0.1.0"
+requires-python = ">=3.14"
+dependencies = [
+  "fastexcel>=0.21.0",
+  "httpx>=0.28.1",
+  "jsonschema==4.26.0",
+  "numpy>=2.5.4",
+  "pillow>=12.3.0",
+  "polars>=2.0.0",
+  "psycopg[binary]>=3.3.6",
+  "pyshp>=3.1.6",
+]
+
+[project.scripts]
+ea = "ea.cli:main"
+
+[build-system]
+requires = ["uv_build>=0.9.24,<0.10"]
+build-backend = "uv_build"
+
+[tool.uv.build-backend]
+module-root = ""
+module-name = "ea"
+
+[tool.ruff]
+line-length = 120
+
+[dependency-groups]
+dev = ["ruff>=0.17.0", "ty>=0.0.87"]
