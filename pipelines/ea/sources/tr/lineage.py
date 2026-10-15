@@ -8,7 +8,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "tr.lineage"
-VERSION = "2"
+VERSION = "3"
 COURT = "https://anayasa.gov.tr/media/3617/tulensiyasipartilerinkapatilmasi.pdf"
 COURT_PUBLISHER = "Anayasa Mahkemesi"
 COURT_TITLE = "Son Üç Kararı Çerçevesinde Anayasa Mahkemesinin Siyasi Partilerin Kapatılmasına İlişkin İçtihadı"
@@ -31,6 +31,7 @@ MINTED: dict[str, tuple[str, list[tuple[str, str | None, date | None, date | Non
     "halkin-emek-partisi": ("Q3674950", [("Halkın Emek Partisi", "HEP", None, None)]),
     "demokrasi-partisi": ("Q3366313", [("Demokrasi Partisi", "DEP", None, None)]),
     "demokratik-toplum-partisi": ("Q1138606", [("Demokratik Toplum Partisi", "DTP", None, None)]),
+    "sosyalist-demokrasi-partisi": ("Q7551546", [("Sosyalist Demokrasi Partisi", "SDP", None, None)]),
     "baris-ve-demokrasi-partisi": (
         "Q809719",
         [
@@ -272,6 +273,16 @@ RELATIONS: list[tuple[str, str, str | None, date, str, tuple[str, str] | str]] =
 VEHICLES = [
     ("demokratik-halk-partisi", "halkin-demokrasi-partisi", date(2002, 11, 3), ("tr", "2002 Türkiye genel seçimleri")),
 ]
+JOINT_LISTS = [
+    (date(1991, 10, 20), "refah-partisi", ("milliyetci-hareket-partisi", "millet-partisi")),
+    (date(1991, 10, 20), "sosyaldemokrat-halkci-parti", ("halkin-emek-partisi",)),
+    (date(2002, 11, 3), "dogru-yol-partisi", ("demokrat-turkiye-partisi", "aydinlik-turkiye-partisi")),
+    (
+        date(2002, 11, 3),
+        "demokratik-halk-partisi",
+        ("halkin-demokrasi-partisi", "emek-partisi", "sosyalist-demokrasi-partisi"),
+    ),
+]
 ARTICLES = sorted(
     {cite for *_, cite in RELATIONS if isinstance(cite, tuple)}
     | {cite for *_, cite in VEHICLES}
@@ -293,7 +304,8 @@ def emit() -> Path:
             summary=(
                 "Turkish party lineage from 1946 to 2025: court closures, mergers, parties that joined another, "
                 "successors, and splits within a tradition, with the renames of ÖDP to Sol Parti and Yeniden Doğuş "
-                "Partisi to Genç Parti merged into one party each"
+                "Partisi to Genç Parti merged into one party each, and the joint lists of 1991 and 2002 that carried other "
+                "parties' candidates"
             ),
             polity="TR",
             kind="edit",
@@ -351,9 +363,11 @@ def emit() -> Path:
         known: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'tr.party'").fetchall()
         )
-        for key in {key for relation in RELATIONS for key in (relation[0], relation[2]) if key is not None} | {
-            key for vehicle in VEHICLES for key in vehicle[:2]
-        }:
+        for key in (
+            {key for relation in RELATIONS for key in (relation[0], relation[2]) if key is not None}
+            | {key for vehicle in VEHICLES for key in vehicle[:2]}
+            | {key for _, host, guests in JOINT_LISTS for key in (host, *guests)}
+        ):
             if key not in parties:
                 parties[key] = known[key]
 
@@ -385,4 +399,10 @@ def emit() -> Path:
                 election_id=elections[str(day)],
                 source_id=sources[cite],
             )
+        for day, host, guests in JOINT_LISTS:
+            alliance = cs.key("tr.alliance", f"{day}:joint-list:{host}")
+            cs.add("alliance", id=alliance, kind="joint_list", election_id=elections[str(day)])
+            cs.add("alliance_member", alliance_id=alliance, party_id=parties[host], role="list")
+            for guest in guests:
+                cs.add("alliance_member", alliance_id=alliance, party_id=parties[guest], role="guest")
         return cs.write()

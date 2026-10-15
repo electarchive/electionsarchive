@@ -269,6 +269,11 @@ JOINT_LISTS_1991 = (
     "The Welfare Party's lists carried candidates of the Nationalist Work Party and the Reformist Democracy Party; the "
     "Social Democratic Populist Party's lists carried candidates of the People's Labor Party (HEP)."
 )
+JOINT_LISTS_2002 = (
+    "The True Path Party's lists carried candidates of the Democrat Turkey Party and the Bright Turkey Party; the "
+    "Democratic People's Party's (DEHAP) lists carried candidates of the People's Democracy Party (HADEP), the Labor "
+    "Party (EMEP), and the Socialist Democracy Party (SDP)."
+)
 COMBINED_CAVEAT = (
     "THEA gives the Workers' Party of Turkey (TİP) and the Unity Party the same code in this election, so where both "
     "ran their rows cannot be told apart. Each province shows the two parties' votes and seats together on one line."
@@ -559,6 +564,8 @@ def emit() -> Path:
                 cs.add("note", entity_id=election, kind="caveat", body_md=COMBINED_CAVEAT)
             if year == 1991:
                 cs.add("note", entity_id=election, kind="context", body_md=JOINT_LISTS_1991)
+            if year == 2002:
+                cs.add("note", entity_id=election, kind="context", body_md=JOINT_LISTS_2002)
 
             if year >= 1983:
                 contest_key = f"{day}:parliament"
