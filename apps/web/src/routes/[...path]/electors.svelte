@@ -1,6 +1,8 @@
 <script lang="ts">
+  import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
-  import { count, date } from "#lib/format.js";
+  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import Preview from "./preview.svelte";
@@ -39,7 +41,37 @@
     ...others,
     ...(second == null ? [] : [second]),
   ]);
+  const tether = TooltipPrimitive.createTether<number>();
 </script>
+
+{#snippet about(row: (typeof electors.rows)[number] | undefined)}
+  {#if row != null}
+    <Tooltip.Content
+      collisionPadding={8}
+      class="grid gap-0.5 leading-snug inline-[min(16rem,calc(100vw-2rem))]"
+    >
+      <span class="flex items-baseline gap-1.5">
+        <span
+          class="shrink-0 self-center rounded-xs block-2 inline-2"
+          style:background-color={swatch(row.color, row.key)}
+        ></span>
+        <span class="font-semibold">{row.label}</span>
+      </span>
+      {#if row.short != null && row.short !== row.label}
+        <span class="text-xs opacity-80">{row.short}</span>
+      {/if}
+      <span
+        class="flex items-baseline justify-between gap-3 font-mono text-xs tabular-nums"
+        >{m.series_electoral({
+          votes: count(row.votes),
+          total: count(electors.appointed ?? total),
+        })}<span class="opacity-70"
+          >{percent(row.votes / (electors.appointed ?? total))}</span
+        ></span
+      >
+    </Tooltip.Content>
+  {/if}
+{/snippet}
 
 {#snippet side(row: (typeof electors.rows)[number] | undefined)}
   {#if row != null}
@@ -93,15 +125,24 @@
         .map((row) => `${row.label} ${count(row.votes)}`)
         .join(", ")}
     >
-      {#each order as row (row.key)}
-        <span
-          class="block shrink-0"
-          style:background-color={swatch(row.color, row.key)}
-          style:width="{(row.votes / total) * 100}%"
-          title="{row.label} {count(row.votes)}"
-        ></span>
+      {#each order as row, index (row.key)}
+        <Tooltip.Trigger {tether} payload={index} tabindex={-1}>
+          {#snippet child({ props })}
+            <span
+              {...props}
+              class="block shrink-0"
+              style:background-color={swatch(row.color, row.key)}
+              style:width="{(row.votes / total) * 100}%"
+            ></span>
+          {/snippet}
+        </Tooltip.Trigger>
       {/each}
     </div>
+    <Tooltip.Root {tether} delayDuration={150}>
+      {#snippet children({ payload })}
+        {@render about(payload == null ? undefined : order.at(Number(payload)))}
+      {/snippet}
+    </Tooltip.Root>
     <span
       class="absolute inset-bs-0 -translate-x-1/2 bg-foreground block-[calc(100%-1.125rem)] inline-0.5"
       style:inset-inline-start="{Math.min(1, majority / total) * 100}%"
