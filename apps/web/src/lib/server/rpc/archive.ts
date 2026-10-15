@@ -2329,9 +2329,19 @@ async function refs(ids: Array<string>) {
   const [labels, colors] = await Promise.all([
     names(unique),
     db.execute<{ party: string; color: string }>(sql`
-      select distinct on (party_id) party_id as party, color from party_color
-      where party_id = any(${sql.param(unique)}::uuid[])
-      order by party_id, upper(valid) desc nulls first
+      select distinct on (party) party, color from (
+        select party_id as party, color, false as lent, upper(valid) as until from party_color
+        where party_id = any(${sql.param(unique)}::uuid[])
+        union all
+        select coalesce(fm.into_id, r.from_party_id), pc.color, true, e.date_from
+        from party_relation r
+        left join entity_merge fm on fm.entity_id = r.from_party_id
+        left join entity_merge tm on tm.entity_id = r.to_party_id
+        left join election e on e.id = r.election_id
+        join party_color pc on pc.party_id = coalesce(tm.into_id, r.to_party_id) and (e.id is null or pc.valid @> e.date_from)
+        where r.kind = 'list_vehicle_for' and coalesce(fm.into_id, r.from_party_id) = any(${sql.param(unique)}::uuid[])
+      ) x
+      order by party, lent, until desc nulls first
     `),
   ]);
   const palette = new Map(colors.rows.map((row) => [row.party, row.color]));

@@ -6,7 +6,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
 
-  const { id }: { id: string } = $props();
+  const { id, color = null }: { id: string; color?: string | null } = $props();
 
   const KINDS: Record<string, () => string> = {
     party: m.party_kind_party,
@@ -85,7 +85,7 @@
     >
       <span
         class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
-        style:background-color={swatch(party.color, `party:${id}`)}
+        style:background-color={color ?? swatch(party.color, `party:${id}`)}
       ></span>
       <span>
         {party.name}

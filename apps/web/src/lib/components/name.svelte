@@ -60,7 +60,7 @@
       class="p-0 text-start font-sans text-sm font-normal tracking-normal text-foreground normal-case inline-[min(21rem,calc(100vw-2rem))]"
     >
       {#if person == null}
-        <PartyCard id={party ?? ""} />
+        <PartyCard id={party ?? ""} {color} />
       {:else}
         <PersonCard id={person} />
       {/if}
