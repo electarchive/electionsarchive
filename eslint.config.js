@@ -167,7 +167,12 @@ export default antfu({
     name: "local/better-tailwindcss",
     files: ["**/*.svelte", "**/*.?([cm])[jt]s?(x)"],
     plugins: { "better-tailwindcss": betterTailwindcss },
-    settings: { "better-tailwindcss": { entryPoint: "apps/web/src/app.css" } },
+    settings: {
+      "better-tailwindcss": {
+        entryPoint: "apps/web/src/app.css",
+        rootFontSize: 16,
+      },
+    },
     rules: {
       "better-tailwindcss/enforce-consistent-variant-order": "error",
       "better-tailwindcss/enforce-consistent-variable-syntax": "error",
