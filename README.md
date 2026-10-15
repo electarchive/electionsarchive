@@ -1,6 +1,6 @@
 # electionsarchive.com
 
-An election archive for people and agents. It covers every election in ten polities (the United States, the United Kingdom, France, Brazil, Germany, Canada, Italy, Turkey, the European Union, and Switzerland), down to the smallest reporting unit and back to each polity's first election. One Postgres and PostGIS database is the source of truth behind the website, a REST API, an MCP server, Markdown and JSON versions of every page, and bulk data releases.
+This is an election archive for people and agents, meant ultimately to cover every election in the world. It starts with ten polities at full depth: the United States, the United Kingdom, France, Brazil, Germany, Canada, Italy, Turkey, the European Union, and Switzerland. For each, the data goes down to the smallest reporting unit and back to the first election. One Postgres and PostGIS database is the source of truth. It feeds the website, a REST API, an MCP server, Markdown and JSON versions of every page, and bulk data releases.
 
 ## Repository
 
