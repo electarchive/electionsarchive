@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
+  import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, date, percent, points } from "#lib/format.js";
@@ -38,6 +39,18 @@
     court_revised: m.stage_court_revised,
     recount: m.stage_recount,
     alternative: m.stage_alternative,
+  };
+  const DEFINITIONS: Record<string, () => string> = {
+    list_votes: m.term_list_votes,
+    electoral_votes: m.term_electoral_votes,
+    state_delegate_equivalents: m.term_state_delegate_equivalents,
+    live: m.term_stage_live,
+    preliminary: m.term_stage_preliminary,
+    official: m.term_stage_official,
+    certified: m.term_stage_certified,
+    court_revised: m.term_stage_court_revised,
+    recount: m.term_stage_recount,
+    alternative: m.term_stage_alternative,
   };
   const DECLARED: Record<string, () => string> = {
     tacit: m.declared_tacit,
@@ -424,7 +437,11 @@
   <dl class="col-span-12 grid grid-cols-12 gap-px">
     <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-4">
       <dt class="text-[0.8125rem] text-muted-foreground">
-        {counted ?? m.stat_valid()}
+        <Term
+          label={counted ?? m.stat_valid()}
+          definition={DEFINITIONS[contest.current.measure]?.() ??
+            m.term_valid()}
+        />
       </dt>
       <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
         {count(contest.current.valid)}
@@ -432,7 +449,7 @@
     </div>
     <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-4">
       <dt class="text-[0.8125rem] text-muted-foreground">
-        {m.stat_options()}
+        <Term label={m.stat_options()} definition={m.term_options()} />
       </dt>
       <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
         {contest.rows.filter((row) => row.current != null).length}
@@ -441,7 +458,7 @@
     <div class="col-span-12 bg-card px-3.5 py-3 md:col-span-4">
       {#if lead != null}
         <dt class="text-[0.8125rem] text-muted-foreground">
-          {m.col_margin()}
+          <Term label={m.col_margin()} definition={m.term_margin()} />
         </dt>
         <dd
           class="mbs-0.5 flex items-baseline gap-2.5 min-inline-0"
@@ -702,13 +719,23 @@
           {#each contest.sets as set, index (index)}
             <li class="grid gap-0.5">
               <span class="flex flex-wrap items-baseline gap-x-2">
-                <span class="font-semibold"
-                  >{STAGES[set.stage]?.() ?? set.stage}</span
-                >
-                {#if set.isDefault}
-                  <span class="highlighter px-1 text-xs font-semibold"
-                    >{m.source_shown()}</span
+                {#if DEFINITIONS[set.stage] == null}
+                  <span class="font-semibold"
+                    >{STAGES[set.stage]?.() ?? set.stage}</span
                   >
+                {:else}
+                  <Term
+                    class="font-semibold"
+                    label={STAGES[set.stage]?.() ?? set.stage}
+                    definition={DEFINITIONS[set.stage]?.() ?? ""}
+                  />
+                {/if}
+                {#if set.isDefault}
+                  <Term
+                    class="highlighter px-1 text-xs font-semibold"
+                    label={m.source_shown()}
+                    definition={m.term_shown()}
+                  />
                 {/if}
                 {#if set.status !== "active"}
                   <span class="text-xs font-semibold text-destructive"
@@ -770,7 +797,9 @@
     {/if}
     {#if checks.length > 0}
       <div>
-        <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.checks_title()}</h2>
+        <h2 class="mbe-1.5 text-[0.8125rem] font-bold">
+          <Term label={m.checks_title()} definition={m.term_checks()} />
+        </h2>
         <ul class="grid gap-1.5 text-sm/snug">
           {#each checks as check (check.code)}
             <li>

@@ -16,6 +16,7 @@
 
 <script lang="ts">
   import Name from "#lib/components/name.svelte";
+  import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, percent, points } from "#lib/format.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -253,11 +254,11 @@
               {/each}
             </span>
           </th>
-          <th
-            class="px-2 py-1.5 text-end align-bottom font-medium"
-            scope="col"
-            title={m.change_title({ from: span.from, to: span.to })}
-            >{m.col_change()}</th
+          <th class="px-2 py-1.5 text-end align-bottom font-medium" scope="col"
+            ><Term
+              label={m.col_change()}
+              definition={m.change_title({ from: span.from, to: span.to })}
+            /></th
           >
         {/if}
       </tr>

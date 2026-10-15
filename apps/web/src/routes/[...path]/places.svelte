@@ -3,8 +3,10 @@
   import { page } from "$app/state";
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
+  import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
+  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -68,6 +70,10 @@
       const from = span?.forward === true ? row.leader : row.prior;
       const to = span?.forward === true ? row.prior : row.leader;
       return {
+        before,
+        after,
+        from,
+        to,
         shift:
           before == null || after == null || second == null
             ? null
@@ -78,6 +84,7 @@
       };
     }),
   );
+  const tether = TooltipPrimitive.createTether<number>();
   const flips = $derived(moves.filter((move) => move.flip != null).length);
   const widest = $derived.by(() => {
     const sizes = moves
@@ -143,16 +150,101 @@
   const columns = $derived([
     { key: "name" as const, label: heading, numeric: false },
     { key: "leader" as const, label: m.col_leader(), numeric: false },
-    { key: "margin" as const, label: m.col_margin(), numeric: true },
+    {
+      key: "margin" as const,
+      label: m.col_margin(),
+      numeric: true,
+      definition: m.term_margin(),
+    },
     { key: "valid" as const, label: votes, numeric: true },
-    ...(comparing
-      ? [{ key: "shift" as const, label: m.col_shift(), numeric: true }]
+    ...(comparing && span != null
+      ? [
+          {
+            key: "shift" as const,
+            label: m.col_shift(),
+            numeric: true,
+            definition: m.shift_title({
+              first: first?.short ?? first?.label ?? "",
+              second: second?.short ?? second?.label ?? "",
+              from: span.from,
+              to: span.to,
+            }),
+          },
+        ]
       : []),
   ]);
   const foreign = $derived(
     places.sources.filter((publisher) => !publishers.includes(publisher)),
   );
 </script>
+
+{#snippet about(row: (typeof visible)[number] | undefined)}
+  {#if row?.move?.before != null && row.move.after != null && row.move.shift != null && span != null}
+    {const move = $derived(row.move)}
+    {const toward = $derived(row.move.shift >= 0 ? first : second)}
+    <Tooltip.Content
+      collisionPadding={8}
+      side="left"
+      class="grid gap-1.5 leading-snug inline-[min(19rem,calc(100vw-2rem))]"
+    >
+      <span class="font-semibold">{row.name}</span>
+      <span
+        class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-baseline gap-x-3 gap-y-0.5 text-xs"
+      >
+        <span></span>
+        <span class="text-end font-mono opacity-70">{span.from}</span>
+        <span class="text-end font-mono opacity-70">{span.to}</span>
+        {#each new Set([0, 1, move.from ?? 0, move.to ?? 0]) as index (index)}
+          {#if places.legend[index] != null}
+            <span class="flex items-baseline gap-1.5 min-inline-0">
+              <span
+                class="shrink-0 self-center rounded-xs block-2 inline-2"
+                style:background-color={colors[index]}
+              ></span>
+              <span class="truncate"
+                >{places.legend[index].short ??
+                  places.legend[index].label}</span
+              >
+            </span>
+            <span
+              class={cn("text-end font-mono tabular-nums", {
+                "font-semibold": index === move.from,
+              })}>{percent(move.before?.[index] ?? 0)}</span
+            >
+            <span
+              class={cn("text-end font-mono tabular-nums", {
+                "font-semibold": index === move.to,
+              })}>{percent(move.after?.[index] ?? 0)}</span
+            >
+          {/if}
+        {/each}
+      </span>
+      <span class="text-xs opacity-80"
+        >{m.fact_shift({
+          points: points(Math.abs(move.shift ?? 0)).replace("+", ""),
+          name: toward?.short ?? toward?.label ?? "",
+        })}</span
+      >
+      {#if move.flip != null}
+        <span class="flex flex-wrap items-baseline gap-x-1.5 text-xs">
+          <span class="font-semibold">{m.places_flipped()}</span>
+          <span class="opacity-80"
+            >{m.flip_label({
+              from:
+                places.legend[move.flip.from]?.short ??
+                places.legend[move.flip.from]?.label ??
+                "",
+              to:
+                places.legend[move.flip.to]?.short ??
+                places.legend[move.flip.to]?.label ??
+                "",
+            })}</span
+          >
+        </span>
+      {/if}
+    </Tooltip.Content>
+  {/if}
+{/snippet}
 
 <section
   class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-2"
@@ -216,7 +308,8 @@
         style:--party={colors[index]}
         aria-pressed={only === index}
         aria-label={m.places_leads({
-          label: places.legend[index]?.label ?? "",
+          label:
+            places.legend[index]?.short ?? places.legend[index]?.label ?? "",
           count: won,
         })}
         onclick={() => {
@@ -234,25 +327,35 @@
       </button>
     {/each}
     {#if comparing && flips > 0}
-      <button
-        type="button"
-        class={cn(
-          "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card px-2 text-[0.8125rem] block-7 hover:bg-secondary",
-          { "marked bg-secondary": only === "flip" },
-        )}
-        aria-pressed={only === "flip"}
-        onclick={() => {
-          only = only === "flip" ? null : "flip";
-          all = false;
-        }}
-      >
-        <span class="highlighter px-0.5 font-semibold"
-          >{m.places_flipped()}</span
+      <Tooltip.Root disableCloseOnTriggerClick delayDuration={400}>
+        <Tooltip.Trigger>
+          {#snippet child({ props })}
+            <button
+              {...props}
+              type="button"
+              class={cn(
+                "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card px-2 text-[0.8125rem] block-7 hover:bg-secondary",
+                { "marked bg-secondary": only === "flip" },
+              )}
+              aria-pressed={only === "flip"}
+              onclick={() => {
+                only = only === "flip" ? null : "flip";
+                all = false;
+              }}
+            >
+              <span class="highlighter px-0.5 font-semibold"
+                >{m.places_flipped()}</span
+              >
+              <span class="font-mono text-xs text-muted-foreground tabular-nums"
+                >{flips}</span
+              >
+            </button>
+          {/snippet}
+        </Tooltip.Trigger>
+        <Tooltip.Content collisionPadding={8} class="leading-snug max-inline-64"
+          >{m.term_flips()}</Tooltip.Content
         >
-        <span class="font-mono text-xs text-muted-foreground tabular-nums"
-          >{flips}</span
-        >
-      </button>
+      </Tooltip.Root>
     {/if}
   </div>
 
@@ -275,55 +378,78 @@
                   : "ascending"
                 : undefined}
             >
-              <button
-                type="button"
-                class={cn(
-                  "inline-flex items-center gap-1 rounded-xs hover:text-foreground",
-                  { "font-semibold text-foreground": column === entry.key },
-                )}
-                aria-label={m.sort_by({ column: entry.label })}
-                onclick={() => {
-                  if (column === entry.key) {
-                    descending = !descending;
-                  } else {
-                    column = entry.key;
-                    descending = entry.key !== "name";
-                  }
-                }}
+              <Tooltip.Root
+                disabled={!("definition" in entry)}
+                disableCloseOnTriggerClick
+                delayDuration={400}
               >
-                {entry.label}
-                {#if entry.key === "shift" && span != null}
-                  <span
-                    class="flex items-center gap-1 font-mono text-[0.6875rem] font-normal"
-                    >{span.from}→{span.to}
-                    <span class="flex items-center gap-px" aria-hidden="true">
-                      <span class="text-[0.625rem]">◀</span>
-                      <span
-                        class="rounded-xs block-2 inline-2"
-                        style:background-color={swatch(
-                          second?.color,
-                          second?.key ?? "",
-                        )}
-                      ></span>
-                      <span
-                        class="rounded-xs block-2 inline-2"
-                        style:background-color={swatch(
-                          first?.color,
-                          first?.key ?? "",
-                        )}
-                      ></span>
-                      <span class="text-[0.625rem]">▶</span>
-                    </span>
-                  </span>
+                <Tooltip.Trigger>
+                  {#snippet child({ props })}
+                    <button
+                      {...props}
+                      type="button"
+                      class={cn(
+                        "inline-flex items-center gap-1 rounded-xs hover:text-foreground",
+                        {
+                          "font-semibold text-foreground": column === entry.key,
+                        },
+                      )}
+                      aria-label={m.sort_by({ column: entry.label })}
+                      onclick={() => {
+                        if (column === entry.key) {
+                          descending = !descending;
+                        } else {
+                          column = entry.key;
+                          descending = entry.key !== "name";
+                        }
+                      }}
+                    >
+                      {entry.label}
+                      {#if entry.key === "shift" && span != null}
+                        <span
+                          class="flex items-center gap-1 font-mono text-[0.6875rem] font-normal"
+                          >{span.from}→{span.to}
+                          <span
+                            class="flex items-center gap-px"
+                            aria-hidden="true"
+                          >
+                            <span class="text-[0.625rem]">◀</span>
+                            <span
+                              class="rounded-xs block-2 inline-2"
+                              style:background-color={swatch(
+                                second?.color,
+                                second?.key ?? "",
+                              )}
+                            ></span>
+                            <span
+                              class="rounded-xs block-2 inline-2"
+                              style:background-color={swatch(
+                                first?.color,
+                                first?.key ?? "",
+                              )}
+                            ></span>
+                            <span class="text-[0.625rem]">▶</span>
+                          </span>
+                        </span>
+                      {/if}
+                      {#if column === entry.key}
+                        {#if descending}
+                          <ArrowDownIcon class="block-3 inline-3" />
+                        {:else}
+                          <ArrowUpIcon class="block-3 inline-3" />
+                        {/if}
+                      {/if}
+                    </button>
+                  {/snippet}
+                </Tooltip.Trigger>
+                {#if "definition" in entry}
+                  <Tooltip.Content
+                    collisionPadding={8}
+                    class="leading-snug max-inline-64"
+                    >{entry.definition}</Tooltip.Content
+                  >
                 {/if}
-                {#if column === entry.key}
-                  {#if descending}
-                    <ArrowDownIcon class="block-3 inline-3" />
-                  {:else}
-                    <ArrowUpIcon class="block-3 inline-3" />
-                  {/if}
-                {/if}
-              </button>
+              </Tooltip.Root>
             </th>
             {#if entry.key === "name"}
               <th
@@ -335,7 +461,7 @@
         </tr>
       </thead>
       <tbody>
-        {#each visible as row (row.path ?? row.name)}
+        {#each visible as row, index (row.path ?? row.name)}
           <tr
             class="group relative border-be border-border/60 last:border-be-0 hover:bg-secondary/70"
           >
@@ -428,80 +554,92 @@
                   {const shift = $derived(row.move.shift)}
                   {const toward = $derived(shift >= 0 ? first : second)}
                   {const flip = $derived(row.move.flip)}
-                  <span
-                    class="flex items-center justify-end gap-2"
-                    style:--party={swatch(toward?.color, toward?.key ?? "")}
-                  >
-                    {#if flip != null}
-                      <span
-                        class="flex shrink-0 items-center gap-0.5 highlighter px-1"
-                        title={m.flip_label({
-                          from: places.legend[flip.from]?.label ?? "",
-                          to: places.legend[flip.to]?.label ?? "",
-                        })}
+                  <Tooltip.Trigger {tether} payload={index} tabindex={-1}>
+                    {#snippet child({ props })}
+                      <svelte:element
+                        this={row.path == null ? "span" : "a"}
+                        {...props}
+                        type={undefined}
+                        class="relative z-1 flex items-center justify-end gap-2"
+                        href={row.path == null
+                          ? undefined
+                          : resolve("/[...path]", { path: row.path })}
+                        style:--party={swatch(toward?.color, toward?.key ?? "")}
                       >
+                        {#if flip != null}
+                          <span
+                            class="flex shrink-0 items-center gap-0.5 highlighter px-1"
+                          >
+                            <span class="sr-only"
+                              >{m.flip_label({
+                                from:
+                                  places.legend[flip.from]?.short ??
+                                  places.legend[flip.from]?.label ??
+                                  "",
+                                to:
+                                  places.legend[flip.to]?.short ??
+                                  places.legend[flip.to]?.label ??
+                                  "",
+                              })}</span
+                            >
+                            <span
+                              class="rounded-xs block-2 inline-2"
+                              style:background-color={colors[flip.from]}
+                            ></span>
+                            <span class="text-[0.6875rem]" aria-hidden="true"
+                              >→</span
+                            >
+                            <span
+                              class="rounded-xs block-2 inline-2"
+                              style:background-color={colors[flip.to]}
+                            ></span>
+                          </span>
+                        {/if}
                         <span
-                          class="rounded-xs block-2 inline-2"
-                          style:background-color={colors[flip.from]}
-                        ></span>
-                        <span class="text-[0.6875rem]" aria-hidden="true"
-                          >→</span
+                          class="relative flex-1 block-3 max-inline-32 min-inline-16 max-md:hidden"
+                          aria-hidden="true"
                         >
+                          <span
+                            class="absolute -inset-y-0.5 inset-s-1/2 bg-border inline-px"
+                          ></span>
+                          <span
+                            class="absolute inset-bs-1/2 -translate-y-1/2 bg-(--party) block-0.75"
+                            style:inset-inline-start={shift >= 0 ? "50%" : null}
+                            style:inset-inline-end={shift < 0 ? "50%" : null}
+                            style:inline-size="calc({Math.min(
+                              1,
+                              Math.abs(shift) / widest,
+                            ) * 50}% - 3px)"
+                          ></span>
+                          <span
+                            class={cn(
+                              "absolute inset-bs-1/2 -translate-y-1/2 bg-(--party) block-2.5 inline-1.75",
+                              {
+                                "[clip-path:polygon(0_0,100%_50%,0_100%)]":
+                                  shift >= 0,
+                                "[clip-path:polygon(100%_0,0_50%,100%_100%)]":
+                                  shift < 0,
+                              },
+                            )}
+                            style:inset-inline-start={shift >= 0
+                              ? `calc(50% + ${Math.min(1, Math.abs(shift) / widest) * 50}% - 7px)`
+                              : null}
+                            style:inset-inline-end={shift < 0
+                              ? `calc(50% + ${Math.min(1, Math.abs(shift) / widest) * 50}% - 7px)`
+                              : null}
+                          ></span>
+                        </span>
                         <span
-                          class="rounded-xs block-2 inline-2"
-                          style:background-color={colors[flip.to]}
-                        ></span>
-                      </span>
-                    {/if}
-                    <span
-                      class="relative flex-1 block-3 max-inline-32 min-inline-16 max-md:hidden"
-                      aria-hidden="true"
-                    >
-                      <span
-                        class="absolute -inset-y-0.5 inset-s-1/2 bg-border inline-px"
-                      ></span>
-                      <span
-                        class="absolute inset-bs-1/2 -translate-y-1/2 bg-(--party) block-0.75"
-                        style:inset-inline-start={shift >= 0 ? "50%" : null}
-                        style:inset-inline-end={shift < 0 ? "50%" : null}
-                        style:inline-size="calc({Math.min(
-                          1,
-                          Math.abs(shift) / widest,
-                        ) * 50}% - 3px)"
-                      ></span>
-                      <span
-                        class={cn(
-                          "absolute inset-bs-1/2 -translate-y-1/2 bg-(--party) block-2.5 inline-1.75",
-                          {
-                            "[clip-path:polygon(0_0,100%_50%,0_100%)]":
-                              shift >= 0,
-                            "[clip-path:polygon(100%_0,0_50%,100%_100%)]":
-                              shift < 0,
-                          },
-                        )}
-                        style:inset-inline-start={shift >= 0
-                          ? `calc(50% + ${Math.min(1, Math.abs(shift) / widest) * 50}% - 7px)`
-                          : null}
-                        style:inset-inline-end={shift < 0
-                          ? `calc(50% + ${Math.min(1, Math.abs(shift) / widest) * 50}% - 7px)`
-                          : null}
-                      ></span>
-                    </span>
-                    <span
-                      class="flex shrink-0 items-center justify-end gap-1 font-mono text-[0.8125rem] tabular-nums inline-16"
-                      title={m.shift_title({
-                        first: first?.label ?? "",
-                        second: second?.label ?? "",
-                        from: span?.from ?? "",
-                        to: span?.to ?? "",
-                      })}
-                    >
-                      <span
-                        class="rounded-xs bg-(--party) block-2 inline-2 md:hidden"
-                      ></span>
-                      {points(Math.abs(shift))}
-                    </span>
-                  </span>
+                          class="flex shrink-0 items-center justify-end gap-1 font-mono text-[0.8125rem] tabular-nums inline-16"
+                        >
+                          <span
+                            class="rounded-xs bg-(--party) block-2 inline-2 md:hidden"
+                          ></span>
+                          {points(Math.abs(shift))}
+                        </span>
+                      </svelte:element>
+                    {/snippet}
+                  </Tooltip.Trigger>
                 {/if}
               </td>
             {/if}
@@ -518,6 +656,12 @@
       </tbody>
     </table>
   </div>
+
+  <Tooltip.Root {tether} delayDuration={250}>
+    {#snippet children({ payload })}
+      {@render about(payload == null ? undefined : visible.at(Number(payload)))}
+    {/snippet}
+  </Tooltip.Root>
 
   {#if !all && filtered.length > LIMIT}
     <button

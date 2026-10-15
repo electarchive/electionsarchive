@@ -1,5 +1,7 @@
 <script lang="ts">
   import Name from "#lib/components/name.svelte";
+  import Term from "#lib/components/term.svelte";
+  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -256,7 +258,7 @@
         )}
       >
         <dt class="text-[0.8125rem] text-muted-foreground">
-          {m.fact_margin()}
+          <Term label={m.fact_margin()} definition={m.term_margin()} />
         </dt>
         <dd
           class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-center gap-x-2.5 gap-y-1 text-sm/tight"
@@ -379,7 +381,7 @@
         )}
       >
         <dt class="text-[0.8125rem] text-muted-foreground">
-          {m.fact_flips()}
+          <Term label={m.fact_flips()} definition={m.term_flips()} />
         </dt>
         <dd class="font-mono text-[0.9375rem] tabular-nums">
           {flips.count === 0
@@ -392,43 +394,55 @@
         {#if flips.kinds.length > 0}
           <dd class="flex flex-wrap gap-1.5">
             {#each flips.kinds as kind (kind.value)}
-              <button
-                type="button"
-                class={cn(
-                  "flex keycap items-center gap-1 rounded-sm border border-input bg-card px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
-                  { "marked bg-secondary": picked === kind.value },
-                )}
-                aria-pressed={picked === kind.value}
-                aria-label={m.flip_label({
+              {const label = $derived(
+                m.flip_label({
                   from: kind.from?.label ?? "",
                   to: kind.to?.label ?? "",
-                })}
-                title={m.flip_label({
-                  from: kind.from?.label ?? "",
-                  to: kind.to?.label ?? "",
-                })}
-                onclick={() =>
-                  onpick(picked === kind.value ? null : kind.value)}
-              >
-                <span
-                  class="rounded-xs block-2.5 inline-2.5"
-                  style:background-color={swatch(
-                    kind.from?.color,
-                    kind.from?.key ?? "",
-                  )}
-                ></span>
-                <span class="text-muted-foreground" aria-hidden="true">→</span>
-                <span
-                  class="rounded-xs block-2.5 inline-2.5"
-                  style:background-color={swatch(
-                    kind.to?.color,
-                    kind.to?.key ?? "",
-                  )}
-                ></span>
-                <span class="ms-0.5 font-mono text-xs tabular-nums"
-                  >{kind.count}</span
+                }),
+              )}
+              <Tooltip.Root disableCloseOnTriggerClick delayDuration={250}>
+                <Tooltip.Trigger>
+                  {#snippet child({ props })}
+                    <button
+                      {...props}
+                      type="button"
+                      class={cn(
+                        "flex keycap items-center gap-1 rounded-sm border border-input bg-card px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
+                        { "marked bg-secondary": picked === kind.value },
+                      )}
+                      aria-pressed={picked === kind.value}
+                      aria-label={label}
+                      onclick={() =>
+                        onpick(picked === kind.value ? null : kind.value)}
+                    >
+                      <span
+                        class="rounded-xs block-2.5 inline-2.5"
+                        style:background-color={swatch(
+                          kind.from?.color,
+                          kind.from?.key ?? "",
+                        )}
+                      ></span>
+                      <span class="text-muted-foreground" aria-hidden="true"
+                        >→</span
+                      >
+                      <span
+                        class="rounded-xs block-2.5 inline-2.5"
+                        style:background-color={swatch(
+                          kind.to?.color,
+                          kind.to?.key ?? "",
+                        )}
+                      ></span>
+                      <span class="ms-0.5 font-mono text-xs tabular-nums"
+                        >{kind.count}</span
+                      >
+                    </button>
+                  {/snippet}
+                </Tooltip.Trigger>
+                <Tooltip.Content
+                  collisionPadding={8}
+                  class="leading-snug max-inline-64">{label}</Tooltip.Content
                 >
-              </button>
+              </Tooltip.Root>
             {/each}
           </dd>
         {/if}
