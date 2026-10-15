@@ -141,7 +141,7 @@ PARTIES = {
     "LIBERAL": ("Liberal Party of Canada", "LPC", "#d71920"),
     "CONSERVATIVE": ("Conservative Party of Canada", "CPC", "#1a4782"),
     "NDP-NEW DEMOCRATIC PARTY": ("New Democratic Party", "NDP", "#f37021"),
-    "BLOC QUÉBÉCOIS": ("Bloc Québécois", "BQ", "#0088ce"),
+    "BLOC QUÉBÉCOIS": ("Bloc Québécois", "BQ", "#21b9e3"),
     "GREEN PARTY": ("Green Party of Canada", "GPC", "#3d9b35"),
     "PEOPLE'S PARTY - PPC": ("People's Party of Canada", "PPC", "#4e2a84"),
     "NATIONAL ADVANCEMENT": ("National Advancement Party of Canada", None, None),

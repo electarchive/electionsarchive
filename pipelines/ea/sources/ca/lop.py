@@ -121,8 +121,8 @@ NUANCES = ("Government", "Opposition", "Opposition-Labour")
 COLORS = {
     "Conservative": "#1a4782",
     "Progressive Conservative": "#1a4782",
-    "National Government": "#1a4782",
-    "Liberal-Conservative": "#4a72b0",
+    "National Government": "#598bca",
+    "Liberal-Conservative": "#598bca",
     "Co-operative Commonwealth Federation": "#f37021",
     "Social Credit Party of Canada": "#6b8e23",
     "Ralliement Créditiste": "#9acd32",
@@ -447,8 +447,8 @@ def emit() -> Path:
                     kind = "nuance" if label.startswith("Independent ") or label in NUANCES else "party"
                     cs.add("party", id=party, kind=kind, polity_id=ca)
                     name(party, label)
-                    if label in COLORS:
-                        cs.add("party_color", party_id=party, color=COLORS[label])
+                if label in COLORS:
+                    cs.add("party_color", party_id=party, color=COLORS[label])
 
         persons: dict[str, UUID] = {}
         for identity, label, gender in (
