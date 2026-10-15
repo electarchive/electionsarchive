@@ -70,6 +70,7 @@ class Changeset:
         self._known: dict[str, dict[str, UUID]] = {}
         self._keyed: set[tuple[str, str]] = set()
         self.renamed: dict[str, str] = {}
+        self.survivors: dict[UUID, UUID] = {}
         self.merged = [
             (str(into), str(entity)) for entity, into in conn.execute("select entity_id, into_id from entity_merge")
         ]
@@ -101,8 +102,13 @@ class Changeset:
                     id = self._known[cache][value] = previous
                     break
             self._keyed.add((scheme, value))
-            self.add("external_id", entity_id=id, scheme=scheme, value=value)
-        return id
+            self.add("external_id", entity_id=self.survivors.get(id, id), scheme=scheme, value=value)
+        return self.survivors.get(id, id)
+
+    def merge(self, entity: UUID, into: UUID) -> None:
+        self.add("entity_merge", entity_id=entity, into_id=into)
+        self.survivors[entity] = into
+        self.merged.append((str(into), str(entity)))
 
     def polity(self, iso: str) -> UUID:
         return self._resolve("polity", iso, "select iso_code, id from polity where iso_code is not null")

@@ -232,6 +232,16 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    group by c.conrelid"""
             ).fetchall()
         )
+        keyed: dict[str, list[list[str]]] = {}
+        for owner, key in conn.execute(
+            """select c.conrelid::regclass::text, array_agg(a.attname order by k.ordinality)
+               from pg_constraint c
+               cross join lateral unnest(c.conkey) with ordinality k(attnum, ordinality)
+               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum
+               where c.contype in ('p', 'u') and not c.conperiod and c.connamespace = 'public'::regnamespace
+               group by c.oid, c.conrelid"""
+        ).fetchall():
+            keyed.setdefault(owner, []).append(key)
         for referencing, column in conn.execute(
             """select c.conrelid::regclass::text, a.attname from pg_constraint c
                join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
@@ -242,6 +252,23 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             [["entity", *types]],
         ).fetchall():
             moved = sql.Identifier(column)
+            for key in keyed.get(referencing, []):
+                if column in key and len(key) > 1:
+                    conn.execute(
+                        sql.SQL(
+                            """delete from public.{target} t using {staged} s where t.{moved} = s.entity_id
+                               and exists (select from public.{target} x where x.{moved} = s.into_id and {same})"""
+                        ).format(
+                            target=sql.Identifier(referencing),
+                            moved=moved,
+                            staged=staged,
+                            same=sql.SQL(" and ").join(
+                                sql.SQL("x.{0} is not distinct from t.{0}").format(sql.Identifier(other))
+                                for other in key
+                                if other != column
+                            ),
+                        )
+                    )
             conn.execute(
                 sql.SQL(
                     "update public.{target} t set {moved} = s.into_id{extra} from {staged} s where t.{moved} = s.entity_id{guard}"
@@ -303,6 +330,12 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                         merged=merged,
                         staged=staged,
                         current=sql.SQL(", ").join(sql.SQL("p.{}").format(column) for column in filled),
+                    )
+                )
+            if kind in ("contest_option", "candidacy"):
+                conn.execute(
+                    sql.SQL("delete from public.{} where id in (select entity_id from {})").format(
+                        sql.Identifier(kind), staged
                     )
                 )
         conn.execute(

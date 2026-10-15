@@ -4476,6 +4476,43 @@ def emit() -> Path:
                 )
                 cs.renamed[f"{state}:{slug(fixed)}"] = f"{state}:{slug(mangled)}"
 
+        twins: dict[frozenset[UUID], tuple[UUID, UUID]] = {}
+        for old, new, old_head, new_head, old_person, new_person, old_count, new_count, split in conn.execute(
+            """with line as (
+                 select o.id, o.k, o.contest_id, o.ballot_label, c.published_at, y.id as head, y.person,
+                        (select count(*) from candidacy z where z.person_id = y.person) as count,
+                        exists (select from external_id x where x.entity_id = y.person and x.scheme = 'fec.candidate'
+                                and x.value in ('H2NY22139', 'H2CA46073')) as split
+                 from contest_option o join changeset c on c.id = o.changeset_id
+                 left join lateral (
+                   select cy.id, coalesce(m.into_id, cy.person_id) as person from candidacy cy
+                   left join entity_merge m on m.entity_id = cy.person_id
+                   where cy.option_id = o.id and cy.role = 'head'
+                 ) y on true
+                 where c.pipeline = 'us.fec'
+               )
+               select a.id, b.id, a.head, b.head, a.person, b.person, a.count, b.count, a.split or b.split
+               from line a join line b on b.contest_id = a.contest_id and b.ballot_label = a.ballot_label
+                 and b.published_at > a.published_at
+               where not exists (select from result_value v join result_set r on r.k = v.result_set_k
+                                 where r.contest_id = b.contest_id and v.option_k = b.k)"""
+        ).fetchall():
+            cs.merge(new, old)
+            if old_head is not None and new_head is not None:
+                cs.merge(new_head, old_head)
+            if old_person is not None and new_person is not None and old_person != new_person and not split:
+                twins[frozenset((old_person, new_person))] = (
+                    (new_person, old_person)
+                    if (old_count, new_person) >= (new_count, old_person)
+                    else (old_person, new_person)
+                )
+        if len({person for pair in twins for person in pair}) != 2 * len(twins):
+            raise ValueError("a person pairs with two others")
+        for duplicate, survivor in twins.values():
+            cs.merge(duplicate, survivor)
+        fec_persons = {key: cs.survivors.get(person, person) for key, person in fec_persons.items()}
+        figures = {text: cs.survivors.get(person, person) for text, person in figures.items()}
+
         elections: dict[str, UUID] = {}
 
         def election(
@@ -4707,7 +4744,7 @@ def emit() -> Path:
         if ALIASES.keys() - variants.keys():
             raise ValueError(f"aliases never matched: {sorted(ALIASES.keys() - variants.keys())}")
         by_state: dict[tuple[str, str], UUID] = {}
-        for key in sorted(variants, key=lambda key: (key not in fec_ids, key)):
+        for key in sorted(variants, key=lambda key: (key not in fec_persons, key not in fec_ids, key)):
             state, text = variants[key][0]
             merged = next(
                 (
