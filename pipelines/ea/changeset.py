@@ -50,7 +50,7 @@ def slug(text: str) -> str:
 
 class Changeset:
     def __init__(
-        self, conn: Connection, *, pipeline: str, version: str, summary: str, polity: str, kind: str = "import"
+        self, conn: Connection, *, pipeline: str, version: str, summary: str, polity: str | None, kind: str = "import"
     ) -> None:
         self.id = uuid7()
         self.conn = conn
