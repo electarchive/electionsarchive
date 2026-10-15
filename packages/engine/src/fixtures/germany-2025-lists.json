@@ -1,0 +1,2525 @@
+[
+  {
+    "land": "Baden-Württemberg",
+    "party": "AfD",
+    "seats": 19,
+    "winners": [],
+    "members": [
+      { "id": "Alice Weidel", "rank": 1, "elected": true },
+      { "id": "Markus Frohnmaier", "rank": 2, "elected": true },
+      { "id": "Martin Hess", "rank": 3, "elected": true },
+      { "id": "Marc Bernhard", "rank": 4, "elected": true },
+      { "id": "Ruben Rupp", "rank": 5, "elected": true },
+      { "id": "Hans-Jürgen Goßner", "rank": 6, "elected": true },
+      { "id": "Jürgen Kögel", "rank": 7, "elected": true },
+      { "id": "Diana Zimmer", "rank": 8, "elected": true },
+      { "id": "Achim Köhler", "rank": 9, "elected": true },
+      { "id": "Lars Haise", "rank": 10, "elected": true },
+      { "id": "Alexander Arpaschi", "rank": 11, "elected": true },
+      { "id": "Malte Kaufmann", "rank": 12, "elected": true },
+      { "id": "Joachim Bloch", "rank": 13, "elected": true },
+      { "id": "Michael Blos", "rank": 14, "elected": true },
+      { "id": "Heinrich Koch", "rank": 15, "elected": true },
+      { "id": "Johann Martel", "rank": 16, "elected": true },
+      { "id": "Martina Kempf", "rank": 17, "elected": true },
+      { "id": "Sieghard Knodel", "rank": 18, "elected": true },
+      { "id": "Paul Schmidt", "rank": 19, "elected": true }
+    ]
+  },
+  {
+    "land": "Baden-Württemberg",
+    "party": "CDU",
+    "seats": 29,
+    "winners": [
+      { "id": "Marc Biadacz", "votes": 76033, "valid": 203582, "seated": true },
+      {
+        "id": "David Preisendanz",
+        "votes": 51329,
+        "valid": 138608,
+        "seated": true
+      },
+      {
+        "id": "Matthias Hiller",
+        "votes": 64951,
+        "valid": 172135,
+        "seated": true
+      },
+      {
+        "id": "Hermann Färber",
+        "votes": 52947,
+        "valid": 142684,
+        "seated": true
+      },
+      {
+        "id": "Christina Stumpp",
+        "votes": 69225,
+        "valid": 183741,
+        "seated": true
+      },
+      {
+        "id": "Steffen Bilger",
+        "votes": 65326,
+        "valid": 178806,
+        "seated": true
+      },
+      {
+        "id": "Fabian Gramling",
+        "votes": 76390,
+        "valid": 194624,
+        "seated": true
+      },
+      {
+        "id": "Alexander Throm",
+        "votes": 67516,
+        "valid": 193001,
+        "seated": true
+      },
+      {
+        "id": "Christian Freiherr von Stetten",
+        "votes": 67218,
+        "valid": 184694,
+        "seated": true
+      },
+      {
+        "id": "Ingeborg Gräßle",
+        "votes": 53064,
+        "valid": 145149,
+        "seated": true
+      },
+      {
+        "id": "Roderich Kiesewetter",
+        "votes": 74010,
+        "valid": 178828,
+        "seated": true
+      },
+      {
+        "id": "Nicolas Zippelius",
+        "votes": 68439,
+        "valid": 174777,
+        "seated": true
+      },
+      {
+        "id": "Kai Whittaker",
+        "votes": 63116,
+        "valid": 162457,
+        "seated": true
+      },
+      { "id": "Nina Warken", "votes": 72800, "valid": 169900, "seated": true },
+      { "id": "Olav Gutting", "votes": 58113, "valid": 160799, "seated": true },
+      {
+        "id": "Gunther Krichbaum",
+        "votes": 63762,
+        "valid": 172032,
+        "seated": true
+      },
+      { "id": "Klaus Mack", "votes": 63399, "valid": 162408, "seated": true },
+      { "id": "Yannick Bury", "votes": 66984, "valid": 180872, "seated": true },
+      {
+        "id": "Johannes Rothenberger",
+        "votes": 63492,
+        "valid": 166185,
+        "seated": true
+      },
+      {
+        "id": "Maria-Lena Weiss",
+        "votes": 62245,
+        "valid": 159828,
+        "seated": true
+      },
+      {
+        "id": "Thorsten Frei",
+        "votes": 55044,
+        "valid": 130078,
+        "seated": true
+      },
+      { "id": "Andreas Jung", "votes": 63922, "valid": 169574, "seated": true },
+      {
+        "id": "Felix Schreiner",
+        "votes": 54467,
+        "valid": 144405,
+        "seated": true
+      },
+      {
+        "id": "Michael Donth",
+        "votes": 63189,
+        "valid": 164202,
+        "seated": true
+      },
+      { "id": "Ronja Kemmer", "votes": 73225, "valid": 188780, "seated": true },
+      {
+        "id": "Wolfgang Dahler",
+        "votes": 58651,
+        "valid": 143512,
+        "seated": true
+      },
+      {
+        "id": "Volker Mayer-Lay",
+        "votes": 57658,
+        "valid": 144027,
+        "seated": true
+      },
+      { "id": "Axel Müller", "votes": 60702, "valid": 156776, "seated": true },
+      { "id": "Thomas Bareiß", "votes": 54656, "valid": 147189, "seated": true }
+    ],
+    "members": [
+      { "id": "Thorsten Frei", "rank": 1, "elected": false },
+      { "id": "Nina Warken", "rank": 2, "elected": false },
+      { "id": "Andreas Jung", "rank": 3, "elected": false },
+      { "id": "Ronja Kemmer", "rank": 4, "elected": false },
+      { "id": "Christina Stumpp", "rank": 5, "elected": false },
+      { "id": "Hermann Färber", "rank": 14, "elected": false }
+    ]
+  },
+  {
+    "land": "Baden-Württemberg",
+    "party": "Die Linke",
+    "seats": 6,
+    "winners": [],
+    "members": [
+      { "id": "Sahra Mirow", "rank": 1, "elected": true },
+      { "id": "Luigi Pantisano", "rank": 2, "elected": true },
+      { "id": "Gökay Akbulut", "rank": 3, "elected": true },
+      { "id": "Vinzenz Glaser", "rank": 4, "elected": true },
+      { "id": "Anne Zerr", "rank": 5, "elected": true },
+      { "id": "Marcel Bauer", "rank": 6, "elected": true }
+    ]
+  },
+  {
+    "land": "Baden-Württemberg",
+    "party": "GRÜNE",
+    "seats": 12,
+    "winners": [
+      {
+        "id": "Simone Fischer",
+        "votes": 45667,
+        "valid": 161195,
+        "seated": true
+      },
+      { "id": "Zoe Mayer", "votes": 51306, "valid": 167430, "seated": true },
+      { "id": "Chantal Kopf", "votes": 63281, "valid": 194763, "seated": true }
+    ],
+    "members": [
+      { "id": "Franziska Brantner", "rank": 1, "elected": true },
+      { "id": "Ricarda Lang", "rank": 2, "elected": true },
+      { "id": "Agnes Brugger", "rank": 3, "elected": true },
+      { "id": "Sebastian Schäfer", "rank": 4, "elected": true },
+      { "id": "Sandra Detzer", "rank": 5, "elected": true },
+      { "id": "Marcel Emmerich", "rank": 6, "elected": true },
+      { "id": "Zoe Mayer", "rank": 7, "elected": false },
+      { "id": "Harald Ebner", "rank": 8, "elected": true },
+      { "id": "Chantal Kopf", "rank": 9, "elected": false },
+      { "id": "Matthias Gastel", "rank": 10, "elected": true },
+      { "id": "Anja Reinalter", "rank": 11, "elected": true },
+      { "id": "Simone Fischer", "rank": 15, "elected": false }
+    ]
+  },
+  {
+    "land": "Baden-Württemberg",
+    "party": "SPD",
+    "seats": 13,
+    "winners": [],
+    "members": [
+      { "id": "Saskia Esken", "rank": 1, "elected": true },
+      { "id": "Nils Schmid", "rank": 2, "elected": true },
+      { "id": "Rita Schwarzelühr-Sutter", "rank": 3, "elected": true },
+      { "id": "Martin Gerster", "rank": 4, "elected": true },
+      { "id": "Katja Mast", "rank": 5, "elected": true },
+      { "id": "Johannes Fechner", "rank": 6, "elected": true },
+      { "id": "Jasmina Hostert", "rank": 7, "elected": true },
+      { "id": "Parsa Marvi", "rank": 8, "elected": true },
+      { "id": "Isabel Cademartori Dujisin", "rank": 9, "elected": true },
+      { "id": "Macit Karaahmetoğlu", "rank": 10, "elected": true },
+      { "id": "Derya Türk-Nachbaur", "rank": 11, "elected": true },
+      { "id": "Lars Castellucci", "rank": 12, "elected": true },
+      { "id": "Lina Seitzl", "rank": 13, "elected": true }
+    ]
+  },
+  {
+    "land": "Bayern",
+    "party": "AfD",
+    "seats": 22,
+    "winners": [],
+    "members": [
+      { "id": "Stephan Protschka", "rank": 1, "elected": true },
+      { "id": "Peter Boehringer", "rank": 2, "elected": true },
+      { "id": "Rainer Rothfuß", "rank": 3, "elected": true },
+      { "id": "Gerrit Huy", "rank": 4, "elected": true },
+      { "id": "Wolfgang Wiehle", "rank": 5, "elected": true },
+      { "id": "Manfred Schiller", "rank": 6, "elected": true },
+      { "id": "Tobias Peterka", "rank": 7, "elected": true },
+      { "id": "Gerold Otten", "rank": 8, "elected": true },
+      { "id": "Peter Felser", "rank": 9, "elected": true },
+      { "id": "Carina Schießl", "rank": 10, "elected": true },
+      { "id": "Tobias Teich", "rank": 11, "elected": true },
+      { "id": "Andreas Mayer", "rank": 12, "elected": true },
+      { "id": "Lukas Rehm", "rank": 13, "elected": true },
+      { "id": "Raimond Scheirich", "rank": 14, "elected": true },
+      { "id": "Bernd Schuhmann", "rank": 15, "elected": true },
+      { "id": "Ingo Jochen Hahn", "rank": 16, "elected": true },
+      { "id": "Christoph Birghan", "rank": 17, "elected": true },
+      { "id": "Bastian Treuheit", "rank": 18, "elected": true },
+      { "id": "Reinhard Mixl", "rank": 19, "elected": true },
+      { "id": "Karl Groß", "rank": 20, "elected": true },
+      { "id": "Rainer Kraft", "rank": 21, "elected": true },
+      { "id": "Erhard Brucker", "rank": 22, "elected": true }
+    ]
+  },
+  {
+    "land": "Bayern",
+    "party": "CSU",
+    "seats": 44,
+    "winners": [
+      {
+        "id": "Stephan Mayer",
+        "votes": 60164,
+        "valid": 136967,
+        "seated": true
+      },
+      { "id": "Andreas Lenz", "votes": 80087, "valid": 174443, "seated": true },
+      {
+        "id": "Christian Moser",
+        "votes": 88025,
+        "valid": 204067,
+        "seated": true
+      },
+      {
+        "id": "Katrin Staffler",
+        "votes": 84651,
+        "valid": 198599,
+        "seated": true
+      },
+      {
+        "id": "Reinhard Brandl",
+        "votes": 91839,
+        "valid": 195087,
+        "seated": true
+      },
+      { "id": "Hans Theiss", "votes": 59875, "valid": 184655, "seated": true },
+      {
+        "id": "Wolfgang Stefinger",
+        "votes": 74027,
+        "valid": 204003,
+        "seated": true
+      },
+      {
+        "id": "Stephan Pilsinger",
+        "votes": 72200,
+        "valid": 208136,
+        "seated": true
+      },
+      { "id": "Florian Hahn", "votes": 88204, "valid": 204769, "seated": true },
+      {
+        "id": "Daniela Ludwig",
+        "votes": 82023,
+        "valid": 200689,
+        "seated": true
+      },
+      {
+        "id": "Alexander Radwan",
+        "votes": 65481,
+        "valid": 141146,
+        "seated": true
+      },
+      {
+        "id": "Michael Kießling",
+        "votes": 80441,
+        "valid": 187546,
+        "seated": true
+      },
+      {
+        "id": "Siegfried Walch",
+        "votes": 80507,
+        "valid": 171750,
+        "seated": true
+      },
+      {
+        "id": "Alexander Dobrindt",
+        "votes": 65409,
+        "valid": 142916,
+        "seated": true
+      },
+      { "id": "Thomas Erndl", "votes": 58347, "valid": 134810, "seated": true },
+      {
+        "id": "Florian Oßner",
+        "votes": 70986,
+        "valid": 207304,
+        "seated": true
+      },
+      {
+        "id": "Johann Koller",
+        "votes": 58538,
+        "valid": 143520,
+        "seated": true
+      },
+      {
+        "id": "Günter Baumgartner",
+        "votes": 49582,
+        "valid": 142070,
+        "seated": true
+      },
+      { "id": "Alois Rainer", "votes": 65291, "valid": 140943, "seated": true },
+      {
+        "id": "Susanne Hierl",
+        "votes": 80626,
+        "valid": 181133,
+        "seated": true
+      },
+      { "id": "Peter Aumer", "votes": 81105, "valid": 211967, "seated": true },
+      {
+        "id": "Martina Englhardt-Kopf",
+        "votes": 77717,
+        "valid": 184150,
+        "seated": true
+      },
+      {
+        "id": "Albert Rupprecht",
+        "votes": 59268,
+        "valid": 136146,
+        "seated": true
+      },
+      {
+        "id": "Thomas Silberhorn",
+        "votes": 61044,
+        "valid": 154868,
+        "seated": true
+      },
+      {
+        "id": "Silke Launert",
+        "votes": 59366,
+        "valid": 133465,
+        "seated": true
+      },
+      {
+        "id": "Jonas Geissler",
+        "votes": 53725,
+        "valid": 128177,
+        "seated": true
+      },
+      { "id": "Heiko Hain", "votes": 51926, "valid": 128662, "seated": true },
+      { "id": "Emmi Zeulner", "votes": 69446, "valid": 140765, "seated": true },
+      {
+        "id": "Artur Auernhammer",
+        "votes": 84723,
+        "valid": 202816,
+        "seated": true
+      },
+      {
+        "id": "Konrad Körner",
+        "votes": 57971,
+        "valid": 161420,
+        "seated": true
+      },
+      {
+        "id": "Tobias Winkler",
+        "votes": 77512,
+        "valid": 207133,
+        "seated": true
+      },
+      {
+        "id": "Michael Frieser",
+        "votes": 48913,
+        "valid": 135854,
+        "seated": true
+      },
+      {
+        "id": "Ralph Edelhäußer",
+        "votes": 84151,
+        "valid": 196205,
+        "seated": true
+      },
+      {
+        "id": "Andrea Lindholz",
+        "votes": 67597,
+        "valid": 154337,
+        "seated": true
+      },
+      { "id": "Dorothee Bär", "votes": 87357, "valid": 172919, "seated": true },
+      {
+        "id": "Alexander Hoffmann",
+        "votes": 74896,
+        "valid": 164539,
+        "seated": true
+      },
+      {
+        "id": "Anja Weisgerber",
+        "votes": 70455,
+        "valid": 162497,
+        "seated": true
+      },
+      { "id": "Hülya Düber", "votes": 74917, "valid": 191416, "seated": true },
+      {
+        "id": "Hansjörg Durz",
+        "votes": 88388,
+        "valid": 198616,
+        "seated": true
+      },
+      { "id": "Ulrich Lange", "votes": 73296, "valid": 162644, "seated": true },
+      {
+        "id": "Alexander Engelhard",
+        "votes": 75359,
+        "valid": 177392,
+        "seated": true
+      },
+      { "id": "Florian Dorn", "votes": 58479, "valid": 133601, "seated": true },
+      {
+        "id": "Mechthilde Wittmann",
+        "votes": 70226,
+        "valid": 190708,
+        "seated": true
+      },
+      {
+        "id": "Stephan Stracke",
+        "votes": 61899,
+        "valid": 135925,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Alexander Dobrindt", "rank": 1, "elected": false },
+      { "id": "Andrea Lindholz", "rank": 2, "elected": false },
+      { "id": "Daniela Ludwig", "rank": 4, "elected": false },
+      { "id": "Alois Rainer", "rank": 5, "elected": false },
+      { "id": "Dorothee Bär", "rank": 6, "elected": false },
+      { "id": "Florian Hahn", "rank": 7, "elected": false },
+      { "id": "Emmi Zeulner", "rank": 8, "elected": false },
+      { "id": "Stephan Pilsinger", "rank": 9, "elected": false },
+      { "id": "Martina Englhardt-Kopf", "rank": 10, "elected": false },
+      { "id": "Anja Weisgerber", "rank": 12, "elected": false },
+      { "id": "Michael Frieser", "rank": 13, "elected": false },
+      { "id": "Mechthilde Wittmann", "rank": 14, "elected": false },
+      { "id": "Katrin Staffler", "rank": 16, "elected": false },
+      { "id": "Günter Baumgartner", "rank": 17, "elected": false },
+      { "id": "Hans Theiss", "rank": 19, "elected": false },
+      { "id": "Silke Launert", "rank": 20, "elected": false },
+      { "id": "Konrad Körner", "rank": 21, "elected": false },
+      { "id": "Susanne Hierl", "rank": 22, "elected": false },
+      { "id": "Albert Rupprecht", "rank": 25, "elected": false },
+      { "id": "Hülya Düber", "rank": 26, "elected": false },
+      { "id": "Heiko Hain", "rank": 31, "elected": false },
+      { "id": "Christian Moser", "rank": 33, "elected": false },
+      { "id": "Johann Koller", "rank": 35, "elected": false }
+    ]
+  },
+  {
+    "land": "Bayern",
+    "party": "Die Linke",
+    "seats": 7,
+    "winners": [],
+    "members": [
+      { "id": "Ates Gürpinar", "rank": 1, "elected": true },
+      { "id": "Nicole Gohlke", "rank": 2, "elected": true },
+      { "id": "Sarah Vollath", "rank": 3, "elected": true },
+      { "id": "Luke Hoß", "rank": 4, "elected": true },
+      { "id": "Evelyn Schötz", "rank": 5, "elected": true },
+      { "id": "Aaron Valent", "rank": 6, "elected": true },
+      { "id": "Agnes Conrad", "rank": 7, "elected": true }
+    ]
+  },
+  {
+    "land": "Bayern",
+    "party": "GRÜNE",
+    "seats": 14,
+    "winners": [],
+    "members": [
+      { "id": "Jamila Schäfer", "rank": 1, "elected": true },
+      { "id": "Anton Hofreiter", "rank": 2, "elected": true },
+      { "id": "Claudia Roth", "rank": 3, "elected": true },
+      { "id": "Sascha Müller", "rank": 4, "elected": true },
+      { "id": "Lisa Badum", "rank": 5, "elected": true },
+      { "id": "Karl Bär", "rank": 6, "elected": true },
+      { "id": "Tina Winklmann", "rank": 7, "elected": true },
+      { "id": "Niklas Wagener", "rank": 8, "elected": true },
+      { "id": "Marlene Schönberger", "rank": 9, "elected": true },
+      { "id": "Leon Eckert", "rank": 10, "elected": true },
+      { "id": "Rebecca Lenhard", "rank": 11, "elected": true },
+      { "id": "Johannes Wagner", "rank": 12, "elected": true },
+      { "id": "Victoria Broßart", "rank": 13, "elected": true },
+      { "id": "Stefan Schmidt", "rank": 14, "elected": true }
+    ]
+  },
+  {
+    "land": "Bayern",
+    "party": "SPD",
+    "seats": 14,
+    "winners": [],
+    "members": [
+      { "id": "Carsten Träger", "rank": 1, "elected": true },
+      { "id": "Bärbel Kofler", "rank": 2, "elected": true },
+      { "id": "Johannes Schätzl", "rank": 3, "elected": true },
+      { "id": "Anette Kramme", "rank": 4, "elected": true },
+      { "id": "Sebastian Roloff", "rank": 5, "elected": true },
+      { "id": "Sabine Dittmar", "rank": 6, "elected": true },
+      { "id": "Christoph Schmid", "rank": 7, "elected": true },
+      { "id": "Carolin Wagner", "rank": 8, "elected": true },
+      { "id": "Bernd Rützel", "rank": 9, "elected": true },
+      { "id": "Gabriela Heinrich", "rank": 10, "elected": true },
+      { "id": "Michael Schrodi", "rank": 11, "elected": true },
+      { "id": "Carmen Wegge", "rank": 12, "elected": true },
+      { "id": "Andreas Schwarz", "rank": 13, "elected": true },
+      { "id": "Heike Heubach", "rank": 14, "elected": true }
+    ]
+  },
+  {
+    "land": "Berlin",
+    "party": "AfD",
+    "seats": 4,
+    "winners": [
+      {
+        "id": "Gottfried Curio",
+        "votes": 43729,
+        "valid": 148205,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Beatrix von Storch", "rank": 1, "elected": true },
+      { "id": "Gottfried Curio", "rank": 2, "elected": false },
+      { "id": "Ronald Gläser", "rank": 3, "elected": true },
+      { "id": "Sebastian Maack", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Berlin",
+    "party": "CDU",
+    "seats": 5,
+    "winners": [
+      {
+        "id": "Marvin Schulz",
+        "votes": 40867,
+        "valid": 132350,
+        "seated": true
+      },
+      {
+        "id": "Adrian Grasse",
+        "votes": 55398,
+        "valid": 180189,
+        "seated": true
+      },
+      {
+        "id": "Lukas Albrecht Krieger",
+        "votes": 42273,
+        "valid": 160987,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Jan-Marco Luczak", "rank": 1, "elected": true },
+      { "id": "Ottilie Paola Klein", "rank": 2, "elected": true },
+      { "id": "Adrian Grasse", "rank": 3, "elected": false },
+      { "id": "Marvin Schulz", "rank": 4, "elected": false },
+      { "id": "Lukas Albrecht Krieger", "rank": 6, "elected": false }
+    ]
+  },
+  {
+    "land": "Berlin",
+    "party": "Die Linke",
+    "seats": 6,
+    "winners": [
+      { "id": "Ferat Koçak", "votes": 43413, "valid": 144837, "seated": true },
+      {
+        "id": "Pascal Meiser",
+        "votes": 62049,
+        "valid": 179057,
+        "seated": true
+      },
+      { "id": "Gregor Gysi", "votes": 70572, "valid": 168680, "seated": true },
+      {
+        "id": "Ines Schwerdtner",
+        "votes": 52378,
+        "valid": 154160,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Gregor Gysi", "rank": 1, "elected": false },
+      { "id": "Ines Schwerdtner", "rank": 2, "elected": false },
+      { "id": "Katalin Gennburg", "rank": 3, "elected": true },
+      { "id": "Pascal Meiser", "rank": 4, "elected": false },
+      { "id": "Stella Merendino", "rank": 5, "elected": true },
+      { "id": "Ferat Koçak", "rank": 6, "elected": false }
+    ]
+  },
+  {
+    "land": "Berlin",
+    "party": "GRÜNE",
+    "seats": 5,
+    "winners": [
+      {
+        "id": "Hanna Steinmüller",
+        "votes": 40672,
+        "valid": 160822,
+        "seated": true
+      },
+      {
+        "id": "Julia Schneider",
+        "votes": 50854,
+        "valid": 196813,
+        "seated": true
+      },
+      {
+        "id": "Moritz Heuberger",
+        "votes": 45639,
+        "valid": 185018,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Elisabeth Paus", "rank": 1, "elected": true },
+      { "id": "Andreas Audretsch", "rank": 2, "elected": true },
+      { "id": "Hanna Steinmüller", "rank": 4, "elected": false },
+      { "id": "Moritz Heuberger", "rank": 8, "elected": false },
+      { "id": "Julia Schneider", "rank": 11, "elected": false }
+    ]
+  },
+  {
+    "land": "Berlin",
+    "party": "SPD",
+    "seats": 4,
+    "winners": [
+      {
+        "id": "Helmut Kleebank",
+        "votes": 36200,
+        "valid": 131520,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Ruppert Stüwe", "rank": 1, "elected": true },
+      { "id": "Annika Klose", "rank": 2, "elected": true },
+      { "id": "Hakan Demir", "rank": 3, "elected": true },
+      { "id": "Helmut Kleebank", "rank": 5, "elected": false }
+    ]
+  },
+  {
+    "land": "Brandenburg",
+    "party": "AfD",
+    "seats": 8,
+    "winners": [
+      {
+        "id": "Götz Frömming",
+        "votes": 51213,
+        "valid": 131724,
+        "seated": true
+      },
+      {
+        "id": "Hannes Gnauck",
+        "votes": 53912,
+        "valid": 140583,
+        "seated": true
+      },
+      {
+        "id": "René Springer",
+        "votes": 69020,
+        "valid": 191125,
+        "seated": true
+      },
+      { "id": "Arne Raue", "votes": 53611, "valid": 159351, "seated": true },
+      {
+        "id": "Steffen Kotré",
+        "votes": 66815,
+        "valid": 198791,
+        "seated": true
+      },
+      { "id": "Rainer Galla", "votes": 56620, "valid": 148204, "seated": true },
+      {
+        "id": "Lars Schieske",
+        "votes": 54980,
+        "valid": 130910,
+        "seated": true
+      },
+      { "id": "Birgit Bessin", "votes": 57194, "valid": 133078, "seated": true }
+    ],
+    "members": [
+      { "id": "René Springer", "rank": 1, "elected": false },
+      { "id": "Hannes Gnauck", "rank": 2, "elected": false },
+      { "id": "Götz Frömming", "rank": 4, "elected": false },
+      { "id": "Lars Schieske", "rank": 5, "elected": false },
+      { "id": "Arne Raue", "rank": 6, "elected": false },
+      { "id": "Rainer Galla", "rank": 8, "elected": false }
+    ]
+  },
+  {
+    "land": "Brandenburg",
+    "party": "CDU",
+    "seats": 4,
+    "winners": [],
+    "members": [
+      { "id": "Uwe Feiler", "rank": 1, "elected": true },
+      { "id": "Knut Abraham", "rank": 2, "elected": true },
+      { "id": "Saskia Ludwig", "rank": 3, "elected": true },
+      { "id": "Sebastian Steineke", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Brandenburg",
+    "party": "Die Linke",
+    "seats": 3,
+    "winners": [],
+    "members": [
+      { "id": "Christian Görke", "rank": 1, "elected": true },
+      { "id": "Isabelle Vandre", "rank": 2, "elected": true },
+      { "id": "Christin Willnat", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "land": "Brandenburg",
+    "party": "GRÜNE",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Annalena Baerbock", "rank": 1, "elected": true },
+      { "id": "Michael Kellner", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Brandenburg",
+    "party": "SPD",
+    "seats": 4,
+    "winners": [
+      { "id": "Olaf Scholz", "votes": 43332, "valid": 199111, "seated": true }
+    ],
+    "members": [
+      { "id": "Olaf Scholz", "rank": 1, "elected": false },
+      { "id": "Maja Wallstein", "rank": 2, "elected": true },
+      { "id": "Stefan Zierke", "rank": 3, "elected": true },
+      { "id": "Sonja Eichwede", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Bremen",
+    "party": "AfD",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Sergej Minich", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Bremen",
+    "party": "CDU",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Thomas Röwekamp", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Bremen",
+    "party": "Die Linke",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Doris Achelwilm", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Bremen",
+    "party": "GRÜNE",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Kirsten Kappert-Gonther", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Bremen",
+    "party": "SPD",
+    "seats": 1,
+    "winners": [
+      { "id": "Uwe Schmidt", "votes": 46604, "valid": 153953, "seated": true }
+    ],
+    "members": [{ "id": "Uwe Schmidt", "rank": 2, "elected": false }]
+  },
+  {
+    "land": "Hamburg",
+    "party": "AfD",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Bernd Baumann", "rank": 1, "elected": true },
+      { "id": "Alexander Wolf", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Hamburg",
+    "party": "CDU",
+    "seats": 3,
+    "winners": [
+      {
+        "id": "Christoph Ploß",
+        "votes": 53108,
+        "valid": 189117,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Christoph Ploß", "rank": 1, "elected": false },
+      {
+        "id": "Franziska Christina Brigitte Hoppermann",
+        "rank": 2,
+        "elected": true
+      },
+      { "id": "Christoph de Vries", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "land": "Hamburg",
+    "party": "Die Linke",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Jan van Aken", "rank": 1, "elected": true },
+      { "id": "Cansu Özdemir", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Hamburg",
+    "party": "GRÜNE",
+    "seats": 3,
+    "winners": [
+      {
+        "id": "Linda Heitmann",
+        "votes": 43372,
+        "valid": 157644,
+        "seated": true
+      },
+      { "id": "Till Steffen", "votes": 45674, "valid": 164592, "seated": true }
+    ],
+    "members": [
+      { "id": "Katharina Beck", "rank": 1, "elected": true },
+      { "id": "Till Steffen", "rank": 2, "elected": false },
+      { "id": "Linda Heitmann", "rank": 3, "elected": false }
+    ]
+  },
+  {
+    "land": "Hamburg",
+    "party": "SPD",
+    "seats": 3,
+    "winners": [
+      {
+        "id": "Falko Droßmann",
+        "votes": 51554,
+        "valid": 187794,
+        "seated": true
+      },
+      { "id": "Aydan Özoğuz", "votes": 57629, "valid": 178285, "seated": true },
+      {
+        "id": "Metin Hakverdi",
+        "votes": 53073,
+        "valid": 164866,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Aydan Özoğuz", "rank": 2, "elected": false },
+      { "id": "Metin Hakverdi", "rank": 3, "elected": false },
+      { "id": "Falko Droßmann", "rank": 5, "elected": false }
+    ]
+  },
+  {
+    "land": "Hessen",
+    "party": "AfD",
+    "seats": 9,
+    "winners": [],
+    "members": [
+      { "id": "Jan Nolte", "rank": 1, "elected": true },
+      { "id": "Uwe Schulz", "rank": 2, "elected": true },
+      { "id": "Robin Jünger", "rank": 3, "elected": true },
+      { "id": "Julian Schmidt", "rank": 4, "elected": true },
+      { "id": "Pierre Lamely", "rank": 5, "elected": true },
+      { "id": "Christian Douglas", "rank": 6, "elected": true },
+      { "id": "Thomas Fetsch", "rank": 7, "elected": true },
+      { "id": "Jan Feser", "rank": 8, "elected": true },
+      { "id": "Nicole Claudia Hess", "rank": 9, "elected": true }
+    ]
+  },
+  {
+    "land": "Hessen",
+    "party": "CDU",
+    "seats": 15,
+    "winners": [
+      {
+        "id": "Jan-Wilhelm Pohlmann",
+        "votes": 46166,
+        "valid": 148440,
+        "seated": true
+      },
+      {
+        "id": "Wilhelm Gebhard",
+        "votes": 44173,
+        "valid": 136968,
+        "seated": true
+      },
+      {
+        "id": "Johannes Volkmann",
+        "votes": 56424,
+        "valid": 164394,
+        "seated": true
+      },
+      {
+        "id": "Frederik Bouffier",
+        "votes": 53851,
+        "valid": 176938,
+        "seated": true
+      },
+      {
+        "id": "Michael Brand",
+        "votes": 75039,
+        "valid": 173497,
+        "seated": true
+      },
+      {
+        "id": "Johannes Wiegelmann",
+        "votes": 49611,
+        "valid": 145304,
+        "seated": true
+      },
+      { "id": "Markus Koob", "votes": 57261, "valid": 151359, "seated": true },
+      { "id": "Thomas Pauls", "votes": 49929, "valid": 148355, "seated": true },
+      {
+        "id": "Klaus-Peter Willsch",
+        "votes": 66648,
+        "valid": 181064,
+        "seated": true
+      },
+      {
+        "id": "Stefan Korbach",
+        "votes": 44997,
+        "valid": 146762,
+        "seated": true
+      },
+      {
+        "id": "Pascal Reddig",
+        "votes": 45346,
+        "valid": 141899,
+        "seated": true
+      },
+      {
+        "id": "Norbert Altenkamp",
+        "votes": 65495,
+        "valid": 164564,
+        "seated": true
+      },
+      { "id": "Björn Simon", "votes": 53821, "valid": 172527, "seated": true },
+      {
+        "id": "Patricia Lips",
+        "votes": 65470,
+        "valid": 192624,
+        "seated": true
+      },
+      {
+        "id": "Michael Meister",
+        "votes": 59209,
+        "valid": 163201,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Patricia Lips", "rank": 1, "elected": false },
+      { "id": "Michael Brand", "rank": 2, "elected": false },
+      { "id": "Michael Meister", "rank": 3, "elected": false },
+      { "id": "Klaus-Peter Willsch", "rank": 8, "elected": false },
+      { "id": "Markus Koob", "rank": 9, "elected": false },
+      { "id": "Norbert Altenkamp", "rank": 11, "elected": false },
+      { "id": "Björn Simon", "rank": 12, "elected": false },
+      { "id": "Jan-Wilhelm Pohlmann", "rank": 14, "elected": false },
+      { "id": "Johannes Wiegelmann", "rank": 15, "elected": false },
+      { "id": "Frederik Bouffier", "rank": 17, "elected": false },
+      { "id": "Johannes Volkmann", "rank": 18, "elected": false },
+      { "id": "Pascal Reddig", "rank": 20, "elected": false },
+      { "id": "Wilhelm Gebhard", "rank": 23, "elected": false },
+      { "id": "Thomas Pauls", "rank": 24, "elected": false },
+      { "id": "Stefan Korbach", "rank": 26, "elected": false }
+    ]
+  },
+  {
+    "land": "Hessen",
+    "party": "Die Linke",
+    "seats": 4,
+    "winners": [],
+    "members": [
+      { "id": "Janine Wißler", "rank": 1, "elected": true },
+      { "id": "Jörg Cezanne", "rank": 2, "elected": true },
+      { "id": "Violetta Bock", "rank": 3, "elected": true },
+      { "id": "Desiree Becker", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Hessen",
+    "party": "GRÜNE",
+    "seats": 7,
+    "winners": [],
+    "members": [
+      { "id": "Anna Lührmann", "rank": 1, "elected": true },
+      { "id": "Omid Nouripour", "rank": 2, "elected": true },
+      { "id": "Deborah Düring", "rank": 3, "elected": true },
+      { "id": "Tarek Al-Wazir", "rank": 4, "elected": true },
+      { "id": "Awet Tesfaiesus", "rank": 5, "elected": true },
+      { "id": "Boris Mijatović", "rank": 6, "elected": true },
+      { "id": "Ayse Asar", "rank": 7, "elected": true }
+    ]
+  },
+  {
+    "land": "Hessen",
+    "party": "SPD",
+    "seats": 10,
+    "winners": [
+      {
+        "id": "Daniel Bettermann",
+        "votes": 47900,
+        "valid": 173095,
+        "seated": true
+      },
+      { "id": "Sören Bartol", "votes": 45774, "valid": 151167, "seated": true }
+    ],
+    "members": [
+      { "id": "Sören Bartol", "rank": 1, "elected": false },
+      { "id": "Dagmar Schmidt", "rank": 2, "elected": true },
+      { "id": "Armand Zorn", "rank": 3, "elected": true },
+      { "id": "Nancy Faeser", "rank": 4, "elected": true },
+      { "id": "Felix Döring", "rank": 5, "elected": true },
+      { "id": "Esther Dilcher", "rank": 6, "elected": true },
+      { "id": "Martin Rabanus", "rank": 7, "elected": true },
+      { "id": "Natalie Pawlik", "rank": 8, "elected": true },
+      { "id": "Philipp Rottwilm", "rank": 9, "elected": true },
+      { "id": "Daniel Bettermann", "rank": 15, "elected": false }
+    ]
+  },
+  {
+    "land": "Mecklenburg-Vorpommern",
+    "party": "AfD",
+    "seats": 5,
+    "winners": [
+      {
+        "id": "Leif-Erik Holm",
+        "votes": 60865,
+        "valid": 169758,
+        "seated": true
+      },
+      {
+        "id": "Christoph Grimm",
+        "votes": 59419,
+        "valid": 161231,
+        "seated": true
+      },
+      {
+        "id": "Dario Seifert",
+        "votes": 68848,
+        "valid": 184664,
+        "seated": true
+      },
+      {
+        "id": "Enrico Komning",
+        "votes": 75078,
+        "valid": 166076,
+        "seated": true
+      },
+      {
+        "id": "Ulrike Schielke-Ziesing",
+        "votes": 65039,
+        "valid": 158426,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Leif-Erik Holm", "rank": 1, "elected": false },
+      { "id": "Enrico Komning", "rank": 2, "elected": false },
+      { "id": "Dario Seifert", "rank": 3, "elected": false },
+      { "id": "Ulrike Schielke-Ziesing", "rank": 4, "elected": false }
+    ]
+  },
+  {
+    "land": "Mecklenburg-Vorpommern",
+    "party": "CDU",
+    "seats": 3,
+    "winners": [],
+    "members": [
+      { "id": "Philipp Amthor", "rank": 1, "elected": true },
+      { "id": "Simone Borchardt", "rank": 2, "elected": true },
+      { "id": "Georg Günther", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "land": "Mecklenburg-Vorpommern",
+    "party": "Die Linke",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Dietmar Bartsch", "rank": 1, "elected": true },
+      { "id": "Ina Latendorf", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Mecklenburg-Vorpommern",
+    "party": "GRÜNE",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Claudia Müller", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Mecklenburg-Vorpommern",
+    "party": "SPD",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Reem Alabali-Radovan", "rank": 1, "elected": true },
+      { "id": "Frank Junge", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Niedersachsen",
+    "party": "AfD",
+    "seats": 13,
+    "winners": [],
+    "members": [
+      { "id": "Dirk Brandes", "rank": 1, "elected": true },
+      { "id": "Jörn König", "rank": 2, "elected": true },
+      { "id": "Martin Sichert", "rank": 3, "elected": true },
+      { "id": "Danny Meiners", "rank": 4, "elected": true },
+      { "id": "Angela Rudzka", "rank": 5, "elected": true },
+      { "id": "Andreas Paul", "rank": 6, "elected": true },
+      { "id": "Micha Fehre", "rank": 7, "elected": true },
+      { "id": "Marcel Queckemeyer", "rank": 8, "elected": true },
+      { "id": "Stefan Henze", "rank": 9, "elected": true },
+      { "id": "Mirco Hanker", "rank": 10, "elected": true },
+      { "id": "Olaf Hilmer", "rank": 11, "elected": true },
+      { "id": "Rocco Kever", "rank": 12, "elected": true },
+      { "id": "Martina Uhr", "rank": 13, "elected": true }
+    ]
+  },
+  {
+    "land": "Niedersachsen",
+    "party": "CDU",
+    "seats": 21,
+    "winners": [
+      {
+        "id": "Gitta Connemann",
+        "votes": 79775,
+        "valid": 196844,
+        "seated": true
+      },
+      {
+        "id": "Bastian Ernst",
+        "votes": 53762,
+        "valid": 183544,
+        "seated": true
+      },
+      {
+        "id": "Christoph Frauenpreiß",
+        "votes": 50395,
+        "valid": 154032,
+        "seated": true
+      },
+      {
+        "id": "Vanessa-Kim Zobel",
+        "votes": 60307,
+        "valid": 165920,
+        "seated": true
+      },
+      {
+        "id": "Albert Stegeman",
+        "votes": 86995,
+        "valid": 198314,
+        "seated": true
+      },
+      {
+        "id": "Silvia Breher",
+        "votes": 85241,
+        "valid": 185977,
+        "seated": true
+      },
+      { "id": "Axel Knoerig", "votes": 56921, "valid": 160975, "seated": true },
+      {
+        "id": "Andreas Mattfeldt",
+        "votes": 59337,
+        "valid": 165089,
+        "seated": true
+      },
+      {
+        "id": "Cornell-Anette Babendererde",
+        "votes": 57718,
+        "valid": 173955,
+        "seated": true
+      },
+      {
+        "id": "Lutz Brinkmann",
+        "votes": 60952,
+        "valid": 166610,
+        "seated": true
+      },
+      {
+        "id": "Mathias Middelberg",
+        "votes": 47727,
+        "valid": 160519,
+        "seated": true
+      },
+      {
+        "id": "Hendrik Hoppenstedt",
+        "votes": 66485,
+        "valid": 190970,
+        "seated": true
+      },
+      { "id": "Henning Otte", "votes": 61127, "valid": 173651, "seated": true },
+      {
+        "id": "Alexander Jordan",
+        "votes": 44217,
+        "valid": 142937,
+        "seated": true
+      },
+      {
+        "id": "Fritz Güntzler",
+        "votes": 50736,
+        "valid": 174205,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Mathias Middelberg", "rank": 1, "elected": false },
+      { "id": "Gitta Connemann", "rank": 2, "elected": false },
+      { "id": "Hendrik Hoppenstedt", "rank": 3, "elected": false },
+      { "id": "Anne Janssen", "rank": 4, "elected": true },
+      { "id": "Fritz Güntzler", "rank": 5, "elected": false },
+      { "id": "Tilman Kuban", "rank": 6, "elected": true },
+      { "id": "Mareike Wulf", "rank": 7, "elected": true },
+      { "id": "Carsten Müller", "rank": 8, "elected": true },
+      { "id": "Andreas Mattfeldt", "rank": 9, "elected": false },
+      { "id": "Vivian Tauschwitz", "rank": 10, "elected": true },
+      { "id": "Stephan Albani", "rank": 11, "elected": true },
+      { "id": "Henning Otte", "rank": 12, "elected": false },
+      { "id": "Cornell-Anette Babendererde", "rank": 13, "elected": false },
+      { "id": "Vanessa-Kim Zobel", "rank": 15, "elected": false },
+      { "id": "Axel Knoerig", "rank": 18, "elected": false },
+      { "id": "Christoph Frauenpreiß", "rank": 20, "elected": false },
+      { "id": "Lutz Brinkmann", "rank": 21, "elected": false },
+      { "id": "Alexander Jordan", "rank": 22, "elected": false },
+      { "id": "Bastian Ernst", "rank": 25, "elected": false },
+      { "id": "Albert Stegeman", "rank": 29, "elected": false },
+      { "id": "Silvia Breher", "rank": 30, "elected": false }
+    ]
+  },
+  {
+    "land": "Niedersachsen",
+    "party": "Die Linke",
+    "seats": 6,
+    "winners": [],
+    "members": [
+      { "id": "Heidi Reichinnek", "rank": 1, "elected": true },
+      { "id": "Cem Ince", "rank": 2, "elected": true },
+      { "id": "Maren Kaminski", "rank": 3, "elected": true },
+      { "id": "Maik Brückner", "rank": 4, "elected": true },
+      { "id": "Anne-Mieke Bremer", "rank": 5, "elected": true },
+      { "id": "Jorrit Lucca Bosch", "rank": 6, "elected": true }
+    ]
+  },
+  {
+    "land": "Niedersachsen",
+    "party": "GRÜNE",
+    "seats": 8,
+    "winners": [],
+    "members": [
+      { "id": "Filiz Polat", "rank": 1, "elected": true },
+      { "id": "Helge Limburg", "rank": 2, "elected": true },
+      { "id": "Julia Verlinden", "rank": 3, "elected": true },
+      { "id": "Swantje Michaelsen", "rank": 4, "elected": true },
+      { "id": "Lena Gumnior", "rank": 5, "elected": true },
+      { "id": "Timon Dzienus", "rank": 6, "elected": true },
+      { "id": "Karoline Otte", "rank": 7, "elected": true },
+      { "id": "Alaa Alhamwi", "rank": 8, "elected": true }
+    ]
+  },
+  {
+    "land": "Niedersachsen",
+    "party": "SPD",
+    "seats": 17,
+    "winners": [
+      {
+        "id": "Johann Saathoff",
+        "votes": 63557,
+        "valid": 154424,
+        "seated": true
+      },
+      {
+        "id": "Siemtje Möller",
+        "votes": 52918,
+        "valid": 149649,
+        "seated": true
+      },
+      { "id": "Dennis Rohde", "votes": 66280, "valid": 192715, "seated": true },
+      {
+        "id": "Lars Klingbeil",
+        "votes": 58183,
+        "valid": 138258,
+        "seated": true
+      },
+      {
+        "id": "Jakob Blankenburg",
+        "votes": 42910,
+        "valid": 154076,
+        "seated": true
+      },
+      {
+        "id": "Marja-Liisa Völlers",
+        "votes": 49658,
+        "valid": 156424,
+        "seated": true
+      },
+      {
+        "id": "Adis Ahmetović",
+        "votes": 48667,
+        "valid": 142683,
+        "seated": true
+      },
+      {
+        "id": "Boris Pistorius",
+        "votes": 57217,
+        "valid": 158066,
+        "seated": true
+      },
+      {
+        "id": "Wolfgang-Hubertus Heil",
+        "votes": 61983,
+        "valid": 182646,
+        "seated": true
+      },
+      {
+        "id": "Johannes Schraps",
+        "votes": 47556,
+        "valid": 144137,
+        "seated": true
+      },
+      {
+        "id": "Matthias Miersch",
+        "votes": 62406,
+        "valid": 196496,
+        "seated": true
+      },
+      { "id": "Daniela Rump", "votes": 53926, "valid": 175377, "seated": true },
+      {
+        "id": "Dunja Kreiser",
+        "votes": 48410,
+        "valid": 158282,
+        "seated": true
+      },
+      {
+        "id": "Christos Pantazis",
+        "votes": 51553,
+        "valid": 154272,
+        "seated": true
+      },
+      {
+        "id": "Frauke Heiligenstadt",
+        "votes": 46875,
+        "valid": 154168,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Lars Klingbeil", "rank": 1, "elected": false },
+      { "id": "Siemtje Möller", "rank": 2, "elected": false },
+      { "id": "Boris Pistorius", "rank": 3, "elected": false },
+      { "id": "Anja Troff-Schaffarzyk", "rank": 4, "elected": true },
+      { "id": "Wolfgang-Hubertus Heil", "rank": 5, "elected": false },
+      { "id": "Svenja Stadler", "rank": 6, "elected": true },
+      { "id": "Matthias Miersch", "rank": 7, "elected": false },
+      { "id": "Frauke Heiligenstadt", "rank": 8, "elected": false },
+      { "id": "Dennis Rohde", "rank": 9, "elected": false },
+      { "id": "Marja-Liisa Völlers", "rank": 10, "elected": false },
+      { "id": "Johann Saathoff", "rank": 11, "elected": false },
+      { "id": "Dunja Kreiser", "rank": 12, "elected": false },
+      { "id": "Jakob Blankenburg", "rank": 13, "elected": false },
+      { "id": "Johannes Schraps", "rank": 15, "elected": false },
+      { "id": "Christos Pantazis", "rank": 19, "elected": false },
+      { "id": "Daniela Rump", "rank": 20, "elected": false },
+      { "id": "Adis Ahmetović", "rank": 25, "elected": false }
+    ]
+  },
+  {
+    "land": "Nordrhein-Westfalen",
+    "party": "AfD",
+    "seats": 26,
+    "winners": [],
+    "members": [
+      { "id": "Kay Gottschalk", "rank": 1, "elected": true },
+      { "id": "Fabian Jacobi", "rank": 2, "elected": true },
+      { "id": "Michael Espendiller", "rank": 3, "elected": true },
+      { "id": "Martin Erwin Renner", "rank": 4, "elected": true },
+      { "id": "Rüdiger Lucassen", "rank": 5, "elected": true },
+      { "id": "Matthias Helferich", "rank": 6, "elected": true },
+      { "id": "Sascha Lensing", "rank": 7, "elected": true },
+      { "id": "Tobias Ebenberger", "rank": 8, "elected": true },
+      { "id": "Jochen Haug", "rank": 9, "elected": true },
+      { "id": "Christian Zaum", "rank": 10, "elected": true },
+      { "id": "Anna Labitzke Rathert", "rank": 11, "elected": true },
+      { "id": "Stefan Keuter", "rank": 12, "elected": true },
+      { "id": "Daniel Zerbin", "rank": 13, "elected": true },
+      { "id": "Markus Matzerath", "rank": 14, "elected": true },
+      { "id": "Maximilian Kneller", "rank": 15, "elected": true },
+      { "id": "Knuth Meyer-Soltau", "rank": 16, "elected": true },
+      { "id": "Udo Hemmelgarn", "rank": 17, "elected": true },
+      { "id": "Hauke Finger", "rank": 18, "elected": true },
+      { "id": "Otto Strauß", "rank": 19, "elected": true },
+      { "id": "Peter Bohnhof", "rank": 20, "elected": true },
+      { "id": "Ulrich von Zons", "rank": 21, "elected": true },
+      { "id": "Denis Pauli", "rank": 22, "elected": true },
+      { "id": "Adam Balten", "rank": 23, "elected": true },
+      { "id": "Manuel Krauthausen", "rank": 24, "elected": true },
+      { "id": "Georg Schroeter", "rank": 25, "elected": true },
+      { "id": "Christian Wirth", "rank": 26, "elected": true }
+    ]
+  },
+  {
+    "land": "Nordrhein-Westfalen",
+    "party": "CDU",
+    "seats": 47,
+    "winners": [
+      {
+        "id": "Armin Laschet",
+        "votes": 45548,
+        "valid": 140952,
+        "seated": true
+      },
+      {
+        "id": "Catarina dos Santos-Wintz",
+        "votes": 70541,
+        "valid": 175998,
+        "seated": true
+      },
+      {
+        "id": "Wilfried Oellers",
+        "votes": 64624,
+        "valid": 155555,
+        "seated": true
+      },
+      {
+        "id": "Thomas Rachel",
+        "votes": 64996,
+        "valid": 163100,
+        "seated": true
+      },
+      {
+        "id": "Georg Kippels",
+        "votes": 71833,
+        "valid": 205356,
+        "seated": true
+      },
+      { "id": "Detlef Seif", "votes": 78883, "valid": 205520, "seated": true },
+      {
+        "id": "Hendrik Streeck",
+        "votes": 63973,
+        "valid": 192052,
+        "seated": true
+      },
+      {
+        "id": "Elisabeth Winkelmeier-Becker",
+        "votes": 70350,
+        "valid": 197596,
+        "seated": true
+      },
+      {
+        "id": "Norbert Röttgen",
+        "votes": 79639,
+        "valid": 181735,
+        "seated": true
+      },
+      {
+        "id": "Carsten Brodesser",
+        "votes": 62100,
+        "valid": 168260,
+        "seated": true
+      },
+      {
+        "id": "Caroline Bosbach",
+        "votes": 77301,
+        "valid": 183157,
+        "seated": true
+      },
+      { "id": "Jürgen Hardt", "votes": 55860, "valid": 172145, "seated": true },
+      { "id": "Klaus Wiener", "votes": 60813, "valid": 166222, "seated": true },
+      { "id": "Peter Beyer", "votes": 46152, "valid": 128626, "seated": true },
+      {
+        "id": "Thomas Jarzombek",
+        "votes": 67108,
+        "valid": 185665,
+        "seated": true
+      },
+      {
+        "id": "Johannes Winkel",
+        "votes": 43282,
+        "valid": 150605,
+        "seated": true
+      },
+      {
+        "id": "Carl-Philipp Sassenrath",
+        "votes": 62250,
+        "valid": 171560,
+        "seated": true
+      },
+      {
+        "id": "Günter Krings",
+        "votes": 50331,
+        "valid": 138447,
+        "seated": true
+      },
+      {
+        "id": "Ansgar Heveling",
+        "votes": 61543,
+        "valid": 162680,
+        "seated": true
+      },
+      { "id": "Martin Plum", "votes": 73676, "valid": 184152, "seated": true },
+      {
+        "id": "Stefan Rouenhoff",
+        "votes": 74631,
+        "valid": 181024,
+        "seated": true
+      },
+      {
+        "id": "Sascha van Beek",
+        "votes": 58854,
+        "valid": 169035,
+        "seated": true
+      },
+      {
+        "id": "Kerstin Radomski",
+        "votes": 44412,
+        "valid": 138969,
+        "seated": true
+      },
+      {
+        "id": "Matthias Hauer",
+        "votes": 55807,
+        "valid": 156166,
+        "seated": true
+      },
+      { "id": "Lars Ehm", "votes": 46217, "valid": 146156, "seated": true },
+      { "id": "Jens Spahn", "votes": 70066, "valid": 167573, "seated": true },
+      {
+        "id": "Nicklas Kappe",
+        "votes": 49625,
+        "valid": 156619,
+        "seated": true
+      },
+      { "id": "Anne König", "votes": 82000, "valid": 171323, "seated": true },
+      {
+        "id": "Marc Henrichmann",
+        "votes": 76819,
+        "valid": 168529,
+        "seated": true
+      },
+      {
+        "id": "Anja Karliczek",
+        "votes": 62253,
+        "valid": 164468,
+        "seated": true
+      },
+      {
+        "id": "Henning Rehbaum",
+        "votes": 72720,
+        "valid": 174527,
+        "seated": true
+      },
+      {
+        "id": "Ralph Brinkhaus",
+        "votes": 79373,
+        "valid": 190902,
+        "seated": true
+      },
+      {
+        "id": "Joachim Ebmeyer",
+        "votes": 54253,
+        "valid": 180095,
+        "seated": true
+      },
+      { "id": "Oliver Vogt", "votes": 51975, "valid": 161692, "seated": true },
+      {
+        "id": "Kerstin Vieregge",
+        "votes": 56640,
+        "valid": 180757,
+        "seated": true
+      },
+      {
+        "id": "Christian Haase",
+        "votes": 60581,
+        "valid": 140437,
+        "seated": true
+      },
+      {
+        "id": "Carsten Linnemann",
+        "votes": 86833,
+        "valid": 190870,
+        "seated": true
+      },
+      {
+        "id": "Tijen Ataoğlu",
+        "votes": 44170,
+        "valid": 152872,
+        "seated": true
+      },
+      {
+        "id": "Katja Strauss-Köster",
+        "votes": 43775,
+        "valid": 141685,
+        "seated": true
+      },
+      {
+        "id": "Oliver Pöpsel",
+        "votes": 70487,
+        "valid": 189021,
+        "seated": true
+      },
+      {
+        "id": "Friedrich Merz",
+        "votes": 78259,
+        "valid": 163998,
+        "seated": true
+      },
+      {
+        "id": "Benedikt Büdenbender",
+        "votes": 56827,
+        "valid": 166792,
+        "seated": true
+      },
+      {
+        "id": "Florian Müller",
+        "votes": 68241,
+        "valid": 161932,
+        "seated": true
+      },
+      { "id": "Paul Ziemiak", "votes": 58968, "valid": 151800, "seated": true }
+    ],
+    "members": [
+      { "id": "Friedrich Merz", "rank": 1, "elected": false },
+      { "id": "Elisabeth Winkelmeier-Becker", "rank": 2, "elected": false },
+      { "id": "Paul Ziemiak", "rank": 3, "elected": false },
+      { "id": "Anja Karliczek", "rank": 4, "elected": false },
+      { "id": "Günter Krings", "rank": 5, "elected": false },
+      { "id": "Serap Güler", "rank": 6, "elected": true },
+      { "id": "Armin Laschet", "rank": 7, "elected": false },
+      { "id": "Astrid Timmermann-Fechter", "rank": 8, "elected": true },
+      { "id": "Thomas Rachel", "rank": 9, "elected": false },
+      { "id": "Matthias Hauer", "rank": 10, "elected": false },
+      { "id": "Kerstin Vieregge", "rank": 11, "elected": false },
+      { "id": "Johannes Winkel", "rank": 12, "elected": false },
+      { "id": "Thomas Jarzombek", "rank": 13, "elected": false },
+      { "id": "Stefan Nacke", "rank": 14, "elected": true },
+      { "id": "Kerstin Radomski", "rank": 15, "elected": false },
+      { "id": "Oliver Vogt", "rank": 16, "elected": false },
+      { "id": "Catarina dos Santos-Wintz", "rank": 17, "elected": false },
+      { "id": "Ansgar Heveling", "rank": 19, "elected": false },
+      { "id": "Jürgen Hardt", "rank": 21, "elected": false },
+      { "id": "Joachim Ebmeyer", "rank": 22, "elected": false },
+      { "id": "Stefan Rouenhoff", "rank": 24, "elected": false },
+      { "id": "Georg Kippels", "rank": 27, "elected": false },
+      { "id": "Martin Plum", "rank": 28, "elected": false },
+      { "id": "Benedikt Büdenbender", "rank": 29, "elected": false },
+      { "id": "Katja Strauss-Köster", "rank": 30, "elected": false },
+      { "id": "Peter Beyer", "rank": 32, "elected": false },
+      { "id": "Oliver Pöpsel", "rank": 33, "elected": false },
+      { "id": "Carsten Brodesser", "rank": 34, "elected": false },
+      { "id": "Detlef Seif", "rank": 35, "elected": false },
+      { "id": "Tijen Ataoğlu", "rank": 36, "elected": false },
+      { "id": "Wilfried Oellers", "rank": 40, "elected": false },
+      { "id": "Caroline Bosbach", "rank": 41, "elected": false },
+      { "id": "Klaus Wiener", "rank": 42, "elected": false },
+      { "id": "Sascha van Beek", "rank": 46, "elected": false },
+      { "id": "Carl-Philipp Sassenrath", "rank": 48, "elected": false },
+      { "id": "Lars Ehm", "rank": 53, "elected": false },
+      { "id": "Nicklas Kappe", "rank": 59, "elected": false }
+    ]
+  },
+  {
+    "land": "Nordrhein-Westfalen",
+    "party": "Die Linke",
+    "seats": 13,
+    "winners": [],
+    "members": [
+      { "id": "Sascha Wagner", "rank": 1, "elected": true },
+      { "id": "Cansin Köktürk", "rank": 2, "elected": true },
+      { "id": "Lea Reisner", "rank": 3, "elected": true },
+      { "id": "Ulrich Thoden", "rank": 4, "elected": true },
+      { "id": "Sonja Lemke", "rank": 5, "elected": true },
+      { "id": "Mirze Edis", "rank": 6, "elected": true },
+      { "id": "Kathrin Gebel", "rank": 7, "elected": true },
+      { "id": "Fabian Fahl", "rank": 8, "elected": true },
+      { "id": "Katrin Fey", "rank": 9, "elected": true },
+      { "id": "Uwe Foullong", "rank": 10, "elected": true },
+      { "id": "Mareike Hermeier", "rank": 11, "elected": true },
+      { "id": "Jan Köstering", "rank": 12, "elected": true },
+      { "id": "Charlotte Antonia Neuhäuser", "rank": 13, "elected": true }
+    ]
+  },
+  {
+    "land": "Nordrhein-Westfalen",
+    "party": "GRÜNE",
+    "seats": 19,
+    "winners": [
+      { "id": "Sven Lehmann", "votes": 72858, "valid": 213387, "seated": true },
+      {
+        "id": "Katharina Dröge",
+        "votes": 43697,
+        "valid": 167822,
+        "seated": true
+      },
+      {
+        "id": "Sylvia Rietenberg",
+        "votes": 64528,
+        "valid": 206815,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Britta Haßelmann", "rank": 1, "elected": true },
+      { "id": "Katharina Dröge", "rank": 2, "elected": false },
+      { "id": "Irene Mihalic", "rank": 3, "elected": true },
+      { "id": "Sven Lehmann", "rank": 4, "elected": false },
+      { "id": "Ursula Schauws", "rank": 5, "elected": true },
+      { "id": "Felix Banaszak", "rank": 6, "elected": true },
+      { "id": "Katrin Uhlig", "rank": 7, "elected": true },
+      { "id": "Jan-Niclas Gesenhues", "rank": 8, "elected": true },
+      { "id": "Ophelia Nick", "rank": 9, "elected": true },
+      { "id": "Robin Wagener", "rank": 10, "elected": true },
+      { "id": "Nyke Slawik", "rank": 11, "elected": true },
+      { "id": "Max Lucks", "rank": 12, "elected": true },
+      { "id": "Sylvia Rietenberg", "rank": 13, "elected": false },
+      { "id": "Lukas Benner", "rank": 14, "elected": true },
+      { "id": "Schahina Gambir", "rank": 15, "elected": true },
+      { "id": "Sara Nanni", "rank": 16, "elected": true },
+      { "id": "Lamya Kaddor", "rank": 17, "elected": true },
+      { "id": "Janosch Dahmen", "rank": 18, "elected": true },
+      { "id": "Sandra Stein", "rank": 19, "elected": true }
+    ]
+  },
+  {
+    "land": "Nordrhein-Westfalen",
+    "party": "SPD",
+    "seats": 31,
+    "winners": [
+      { "id": "Sanae Abdi", "votes": 37717, "valid": 151595, "seated": true },
+      {
+        "id": "Karl Lauterbach",
+        "votes": 53574,
+        "valid": 163771,
+        "seated": true
+      },
+      { "id": "Helge Lindh", "votes": 50907, "valid": 151672, "seated": true },
+      { "id": "Bärbel Bas", "votes": 49116, "valid": 125873, "seated": true },
+      {
+        "id": "Mahmut Özdemir",
+        "votes": 36731,
+        "valid": 110430,
+        "seated": true
+      },
+      { "id": "Dirk Vöpel", "votes": 48434, "valid": 154307, "seated": true },
+      {
+        "id": "Sebastian Fiedler",
+        "votes": 47047,
+        "valid": 144356,
+        "seated": true
+      },
+      { "id": "Ingo Vogel", "votes": 34227, "valid": 112923, "seated": true },
+      {
+        "id": "Frank Schwabe",
+        "votes": 42356,
+        "valid": 128043,
+        "seated": true
+      },
+      { "id": "Markus Töns", "votes": 38118, "valid": 121453, "seated": true },
+      { "id": "Wiebke Esdar", "votes": 53130, "valid": 195394, "seated": true },
+      {
+        "id": "Serdar Yüksel",
+        "votes": 53007,
+        "valid": 162128,
+        "seated": true
+      },
+      {
+        "id": "Hendrik Bollmann",
+        "votes": 43832,
+        "valid": 130681,
+        "seated": true
+      },
+      { "id": "Jens Peick", "votes": 50260, "valid": 164087, "seated": true },
+      {
+        "id": "Sabine Poschmann",
+        "votes": 49553,
+        "valid": 152770,
+        "seated": true
+      },
+      {
+        "id": "Oliver Kaczmarek",
+        "votes": 49685,
+        "valid": 156059,
+        "seated": true
+      },
+      { "id": "Michael Thews", "votes": 58097, "valid": 180238, "seated": true }
+    ],
+    "members": [
+      { "id": "Rolf Mützenich", "rank": 1, "elected": true },
+      { "id": "Bärbel Bas", "rank": 2, "elected": false },
+      { "id": "Sebastian Hartmann", "rank": 3, "elected": true },
+      { "id": "Svenja Schulze", "rank": 4, "elected": true },
+      { "id": "Dirk Wiese", "rank": 5, "elected": true },
+      { "id": "Nadine Heselhaus", "rank": 6, "elected": true },
+      { "id": "Daniel Rinkert", "rank": 7, "elected": true },
+      { "id": "Sanae Abdi", "rank": 8, "elected": false },
+      { "id": "Stefan Schwartze", "rank": 9, "elected": true },
+      { "id": "Kerstin Griese", "rank": 10, "elected": true },
+      { "id": "Oliver Kaczmarek", "rank": 11, "elected": false },
+      { "id": "Wiebke Esdar", "rank": 12, "elected": false },
+      { "id": "Daniel Walter", "rank": 13, "elected": true },
+      { "id": "Bettina Lugk", "rank": 14, "elected": true },
+      { "id": "Jürgen Coße", "rank": 15, "elected": true },
+      { "id": "Sabine Poschmann", "rank": 16, "elected": false },
+      { "id": "Jan Dieren", "rank": 17, "elected": true },
+      { "id": "Claudia Moll", "rank": 18, "elected": true },
+      { "id": "Jens Behrens", "rank": 19, "elected": true },
+      { "id": "Frank Schwabe", "rank": 23, "elected": false },
+      { "id": "Sebastian Fiedler", "rank": 29, "elected": false },
+      { "id": "Markus Töns", "rank": 39, "elected": false },
+      { "id": "Helge Lindh", "rank": 41, "elected": false },
+      { "id": "Michael Thews", "rank": 43, "elected": false },
+      { "id": "Serdar Yüksel", "rank": 52, "elected": false },
+      { "id": "Jens Peick", "rank": 55, "elected": false },
+      { "id": "Hendrik Bollmann", "rank": 56, "elected": false },
+      { "id": "Ingo Vogel", "rank": 59, "elected": false },
+      { "id": "Mahmut Özdemir", "rank": 60, "elected": false },
+      { "id": "Dirk Vöpel", "rank": 63, "elected": false }
+    ]
+  },
+  {
+    "land": "Rheinland-Pfalz",
+    "party": "AfD",
+    "seats": 7,
+    "winners": [],
+    "members": [
+      { "id": "Sebastian Münzenmaier", "rank": 1, "elected": true },
+      { "id": "Nicole Höchst", "rank": 2, "elected": true },
+      { "id": "Andreas Bleck", "rank": 3, "elected": true },
+      { "id": "Bernd Schattner", "rank": 4, "elected": true },
+      { "id": "Thomas Stephan", "rank": 5, "elected": true },
+      { "id": "Iris Nieland", "rank": 6, "elected": true },
+      { "id": "Jörg Zirwes", "rank": 7, "elected": true }
+    ]
+  },
+  {
+    "land": "Rheinland-Pfalz",
+    "party": "CDU",
+    "seats": 11,
+    "winners": [
+      { "id": "Ellen Demuth", "votes": 68501, "valid": 192393, "seated": true },
+      {
+        "id": "Mechthild Heil",
+        "votes": 62011,
+        "valid": 157949,
+        "seated": true
+      },
+      { "id": "Josef Oster", "votes": 55097, "valid": 154292, "seated": true },
+      { "id": "Marlon Bröhr", "votes": 53505, "valid": 140185, "seated": true },
+      {
+        "id": "Julia Klöckner",
+        "votes": 46768,
+        "valid": 144936,
+        "seated": true
+      },
+      {
+        "id": "Patrick Schnieder",
+        "votes": 53459,
+        "valid": 132975,
+        "seated": true
+      },
+      {
+        "id": "Harald Orthey",
+        "votes": 61574,
+        "valid": 172324,
+        "seated": true
+      },
+      { "id": "Jan Metzler", "votes": 62290, "valid": 176255, "seated": true },
+      {
+        "id": "Johannes Steiniger",
+        "votes": 62590,
+        "valid": 180422,
+        "seated": true
+      },
+      {
+        "id": "Florian Bilic",
+        "votes": 45682,
+        "valid": 137227,
+        "seated": true
+      },
+      {
+        "id": "Thomas Gebhart",
+        "votes": 68124,
+        "valid": 178186,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Julia Klöckner", "rank": 1, "elected": false },
+      { "id": "Patrick Schnieder", "rank": 2, "elected": false },
+      { "id": "Thomas Gebhart", "rank": 3, "elected": false },
+      { "id": "Mechthild Heil", "rank": 4, "elected": false },
+      { "id": "Jan Metzler", "rank": 5, "elected": false },
+      { "id": "Johannes Steiniger", "rank": 6, "elected": false },
+      { "id": "Josef Oster", "rank": 8, "elected": false },
+      { "id": "Marlon Bröhr", "rank": 9, "elected": false },
+      { "id": "Ellen Demuth", "rank": 10, "elected": false },
+      { "id": "Florian Bilic", "rank": 11, "elected": false },
+      { "id": "Harald Orthey", "rank": 15, "elected": false }
+    ]
+  },
+  {
+    "land": "Rheinland-Pfalz",
+    "party": "Die Linke",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Gerhard Trabert", "rank": 1, "elected": true },
+      { "id": "Julia-Christina Stange", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Rheinland-Pfalz",
+    "party": "GRÜNE",
+    "seats": 4,
+    "winners": [],
+    "members": [
+      { "id": "Misbah Khan", "rank": 1, "elected": true },
+      { "id": "Armin Jürgen Grau", "rank": 2, "elected": true },
+      { "id": "Corinna Rüffer", "rank": 3, "elected": true },
+      { "id": "Julian Joswig", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Rheinland-Pfalz",
+    "party": "SPD",
+    "seats": 7,
+    "winners": [
+      {
+        "id": "Matthias Mieves",
+        "votes": 49464,
+        "valid": 176885,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Tanja Machalet", "rank": 1, "elected": true },
+      { "id": "Matthias Mieves", "rank": 2, "elected": false },
+      { "id": "Verena Hubertz", "rank": 3, "elected": true },
+      { "id": "Daniel Baldy", "rank": 4, "elected": true },
+      { "id": "Isabel Mackensen-Geis", "rank": 5, "elected": true },
+      { "id": "Thorsten Rudolph", "rank": 6, "elected": true },
+      { "id": "Angelika Glöckner", "rank": 7, "elected": true }
+    ]
+  },
+  {
+    "land": "Saarland",
+    "party": "AfD",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Carsten Becker", "rank": 1, "elected": true },
+      { "id": "Boris Gamanov", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Saarland",
+    "party": "CDU",
+    "seats": 2,
+    "winners": [
+      {
+        "id": "Philip Hoffmann",
+        "votes": 51704,
+        "valid": 162392,
+        "seated": true
+      },
+      { "id": "Roland Theis", "votes": 47875, "valid": 141323, "seated": true }
+    ],
+    "members": [
+      { "id": "Roland Theis", "rank": 1, "elected": false },
+      { "id": "Philip Hoffmann", "rank": 4, "elected": false }
+    ]
+  },
+  {
+    "land": "Saarland",
+    "party": "Die Linke",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Michael Arndt", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Saarland",
+    "party": "GRÜNE",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Jeanne Dillschneider", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Saarland",
+    "party": "SPD",
+    "seats": 2,
+    "winners": [
+      {
+        "id": "Josephine Ortleb",
+        "votes": 47772,
+        "valid": 147516,
+        "seated": true
+      },
+      {
+        "id": "Esra Limbacher",
+        "votes": 44557,
+        "valid": 146011,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Esra Limbacher", "rank": 1, "elected": false },
+      { "id": "Josephine Ortleb", "rank": 2, "elected": false }
+    ]
+  },
+  {
+    "land": "Sachsen",
+    "party": "AfD",
+    "seats": 14,
+    "winners": [
+      {
+        "id": "René Bochmann",
+        "votes": 55024,
+        "valid": 125726,
+        "seated": true
+      },
+      { "id": "Edgar Naujok", "votes": 65318, "valid": 171024, "seated": true },
+      {
+        "id": "Christian Reck",
+        "votes": 70572,
+        "valid": 155698,
+        "seated": true
+      },
+      {
+        "id": "Karsten Hilse",
+        "votes": 77339,
+        "valid": 160216,
+        "seated": true
+      },
+      {
+        "id": "Tino Chrupalla",
+        "votes": 75147,
+        "valid": 153777,
+        "seated": true
+      },
+      {
+        "id": "Steffen Janich",
+        "votes": 77901,
+        "valid": 158742,
+        "seated": true
+      },
+      {
+        "id": "Thomas Ladzinski",
+        "votes": 53853,
+        "valid": 183065,
+        "seated": true
+      },
+      {
+        "id": "Matthias Rentzsch",
+        "votes": 58238,
+        "valid": 194778,
+        "seated": true
+      },
+      {
+        "id": "Carolin Bachmann",
+        "votes": 66688,
+        "valid": 147028,
+        "seated": true
+      },
+      {
+        "id": "Alexander Gauland",
+        "votes": 46401,
+        "valid": 144147,
+        "seated": true
+      },
+      {
+        "id": "Maximilian Krah",
+        "votes": 61027,
+        "valid": 138182,
+        "seated": true
+      },
+      { "id": "Thomas Dietz", "votes": 75876, "valid": 162637, "seated": true },
+      {
+        "id": "Matthias Moosdorf",
+        "votes": 59725,
+        "valid": 149640,
+        "seated": true
+      },
+      {
+        "id": "Mathias Weiser",
+        "votes": 60672,
+        "valid": 139990,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Tino Chrupalla", "rank": 1, "elected": false },
+      { "id": "Karsten Hilse", "rank": 2, "elected": false },
+      { "id": "Carolin Bachmann", "rank": 3, "elected": false },
+      { "id": "Thomas Ladzinski", "rank": 4, "elected": false },
+      { "id": "Alexander Gauland", "rank": 6, "elected": false },
+      { "id": "Steffen Janich", "rank": 7, "elected": false },
+      { "id": "Matthias Moosdorf", "rank": 9, "elected": false },
+      { "id": "René Bochmann", "rank": 10, "elected": false },
+      { "id": "Mathias Weiser", "rank": 14, "elected": false }
+    ]
+  },
+  {
+    "land": "Sachsen",
+    "party": "CDU",
+    "seats": 7,
+    "winners": [],
+    "members": [
+      { "id": "Carsten Körber", "rank": 1, "elected": true },
+      { "id": "Christiane Schenderlein", "rank": 2, "elected": true },
+      { "id": "Markus Reichel", "rank": 3, "elected": true },
+      { "id": "Jens Lehmann", "rank": 4, "elected": true },
+      { "id": "Nora Seitz", "rank": 5, "elected": true },
+      { "id": "Lars Rohwer", "rank": 6, "elected": true },
+      { "id": "Florian Oest", "rank": 7, "elected": true }
+    ]
+  },
+  {
+    "land": "Sachsen",
+    "party": "Die Linke",
+    "seats": 4,
+    "winners": [
+      {
+        "id": "Sören Pellmann",
+        "votes": 71811,
+        "valid": 195163,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Sören Pellmann", "rank": 1, "elected": false },
+      { "id": "Caren Lay", "rank": 2, "elected": true },
+      { "id": "Clara Bünger", "rank": 3, "elected": true },
+      { "id": "Zada Salihović", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Sachsen",
+    "party": "GRÜNE",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Paula Piechotta", "rank": 1, "elected": true },
+      { "id": "Kassem Saleh", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Sachsen",
+    "party": "SPD",
+    "seats": 3,
+    "winners": [],
+    "members": [
+      { "id": "Kathrin Michel", "rank": 1, "elected": true },
+      { "id": "Holger Mann", "rank": 2, "elected": true },
+      { "id": "Rasha Nasr", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "land": "Sachsen-Anhalt",
+    "party": "AfD",
+    "seats": 7,
+    "winners": [
+      {
+        "id": "Thomas Korell",
+        "votes": 69054,
+        "valid": 176206,
+        "seated": true
+      },
+      {
+        "id": "Jan Wenzel Schmidt",
+        "votes": 72651,
+        "valid": 168205,
+        "seated": true
+      },
+      {
+        "id": "Christina Baum",
+        "votes": 59302,
+        "valid": 152021,
+        "seated": true
+      },
+      {
+        "id": "Claudia Weiss",
+        "votes": 55457,
+        "valid": 172048,
+        "seated": true
+      },
+      {
+        "id": "Volker Scheurell",
+        "votes": 67245,
+        "valid": 174318,
+        "seated": true
+      },
+      {
+        "id": "Martin Reichardt",
+        "votes": 69074,
+        "valid": 155590,
+        "seated": true
+      },
+      {
+        "id": "Kay-Uwe Ziegler",
+        "votes": 70305,
+        "valid": 160666,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Martin Reichardt", "rank": 1, "elected": false },
+      { "id": "Jan Wenzel Schmidt", "rank": 2, "elected": false },
+      { "id": "Thomas Korell", "rank": 4, "elected": false },
+      { "id": "Claudia Weiss", "rank": 5, "elected": false }
+    ]
+  },
+  {
+    "land": "Sachsen-Anhalt",
+    "party": "CDU",
+    "seats": 4,
+    "winners": [],
+    "members": [
+      { "id": "Sepp Müller", "rank": 1, "elected": true },
+      { "id": "Dieter Stier", "rank": 2, "elected": true },
+      { "id": "Anna Aeikens", "rank": 3, "elected": true },
+      { "id": "Tino Sorge", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Sachsen-Anhalt",
+    "party": "Die Linke",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Janina Böttger", "rank": 1, "elected": true },
+      { "id": "David Schliesing", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Sachsen-Anhalt",
+    "party": "GRÜNE",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Steffi Lemke", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Sachsen-Anhalt",
+    "party": "SPD",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Martin Kröber", "rank": 1, "elected": true },
+      { "id": "Franziska Kersten", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Schleswig-Holstein",
+    "party": "AfD",
+    "seats": 5,
+    "winners": [],
+    "members": [
+      { "id": "Kurt Kleinschmidt", "rank": 1, "elected": true },
+      { "id": "Gereon Bollmann", "rank": 2, "elected": true },
+      { "id": "Volker Schnurrbusch", "rank": 3, "elected": true },
+      { "id": "Kerstin Przygodda", "rank": 4, "elected": true },
+      { "id": "Sven Wendorf", "rank": 5, "elected": true }
+    ]
+  },
+  {
+    "land": "Schleswig-Holstein",
+    "party": "CDU",
+    "seats": 8,
+    "winners": [
+      {
+        "id": "Leif Erik Bodin",
+        "votes": 49866,
+        "valid": 152717,
+        "seated": true
+      },
+      {
+        "id": "Mark Helfrich",
+        "votes": 50887,
+        "valid": 145247,
+        "seated": true
+      },
+      {
+        "id": "Johann David Wadephul",
+        "votes": 56163,
+        "valid": 171367,
+        "seated": true
+      },
+      {
+        "id": "Sandra Carstensen",
+        "votes": 46370,
+        "valid": 141713,
+        "seated": true
+      },
+      { "id": "Daniel Kölbl", "votes": 63232, "valid": 199102, "seated": true },
+      {
+        "id": "Melanie Bernstein",
+        "votes": 67880,
+        "valid": 210047,
+        "seated": true
+      },
+      {
+        "id": "Sebastian Schmidt",
+        "votes": 52024,
+        "valid": 149672,
+        "seated": true
+      },
+      { "id": "Henri Schmidt", "votes": 67642, "valid": 206631, "seated": true }
+    ],
+    "members": [
+      { "id": "Johann David Wadephul", "rank": 1, "elected": false },
+      { "id": "Mark Helfrich", "rank": 3, "elected": false },
+      { "id": "Melanie Bernstein", "rank": 4, "elected": false },
+      { "id": "Leif Erik Bodin", "rank": 5, "elected": false },
+      { "id": "Sebastian Schmidt", "rank": 7, "elected": false },
+      { "id": "Sandra Carstensen", "rank": 8, "elected": false },
+      { "id": "Daniel Kölbl", "rank": 9, "elected": false },
+      { "id": "Henri Schmidt", "rank": 11, "elected": false }
+    ]
+  },
+  {
+    "land": "Schleswig-Holstein",
+    "party": "Die Linke",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Lorenz Gösta Beutin", "rank": 1, "elected": true },
+      { "id": "Tamara Mazzi", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "land": "Schleswig-Holstein",
+    "party": "GRÜNE",
+    "seats": 4,
+    "winners": [
+      {
+        "id": "Luise Amtsberg",
+        "votes": 43281,
+        "valid": 166196,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Luise Amtsberg", "rank": 1, "elected": false },
+      { "id": "Robert Habeck", "rank": 2, "elected": true },
+      { "id": "Denise Loop", "rank": 3, "elected": true },
+      { "id": "Konstantin von Notz", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Schleswig-Holstein",
+    "party": "SPD",
+    "seats": 5,
+    "winners": [
+      {
+        "id": "Tim Klüssendorf",
+        "votes": 39809,
+        "valid": 141752,
+        "seated": true
+      }
+    ],
+    "members": [
+      { "id": "Tim Klüssendorf", "rank": 1, "elected": false },
+      { "id": "Nina Scheer", "rank": 2, "elected": true },
+      { "id": "Ralf Stegner", "rank": 3, "elected": true },
+      { "id": "Bettina Hagedorn", "rank": 4, "elected": true },
+      { "id": "Truels Reichardt", "rank": 5, "elected": true }
+    ]
+  },
+  {
+    "land": "Schleswig-Holstein",
+    "party": "SSW",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Stefan Seidler", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Thüringen",
+    "party": "AfD",
+    "seats": 8,
+    "winners": [
+      {
+        "id": "Christopher Drößler",
+        "votes": 65033,
+        "valid": 164518,
+        "seated": true
+      },
+      {
+        "id": "Stefan Möller",
+        "votes": 61095,
+        "valid": 158649,
+        "seated": true
+      },
+      {
+        "id": "Stefan Schröder",
+        "votes": 52003,
+        "valid": 160088,
+        "seated": true
+      },
+      { "id": "Marcus Bühl", "votes": 60354, "valid": 146632, "seated": true },
+      {
+        "id": "Stephan Brandner",
+        "votes": 77161,
+        "valid": 172278,
+        "seated": true
+      },
+      {
+        "id": "Michael Kaufmann",
+        "votes": 76204,
+        "valid": 171334,
+        "seated": true
+      },
+      { "id": "Robert Teske", "votes": 73608, "valid": 174860, "seated": true }
+    ],
+    "members": [
+      { "id": "Stephan Brandner", "rank": 1, "elected": false },
+      { "id": "Stefan Möller", "rank": 2, "elected": false },
+      { "id": "Torben Braga", "rank": 3, "elected": true },
+      { "id": "Robert Teske", "rank": 5, "elected": false },
+      { "id": "Christopher Drößler", "rank": 6, "elected": false },
+      { "id": "Michael Kaufmann", "rank": 8, "elected": false },
+      { "id": "Stefan Schröder", "rank": 9, "elected": false }
+    ]
+  },
+  {
+    "land": "Thüringen",
+    "party": "CDU",
+    "seats": 4,
+    "winners": [],
+    "members": [
+      { "id": "Christian Hirte", "rank": 1, "elected": true },
+      { "id": "Diana Herbstreuth", "rank": 2, "elected": true },
+      { "id": "David Gregosz", "rank": 3, "elected": true },
+      { "id": "Michael Hose", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "land": "Thüringen",
+    "party": "Die Linke",
+    "seats": 3,
+    "winners": [
+      { "id": "Bodo Ramelow", "votes": 64390, "valid": 174867, "seated": true }
+    ],
+    "members": [
+      { "id": "Bodo Ramelow", "rank": 1, "elected": false },
+      { "id": "Donata Vogtschmidt", "rank": 2, "elected": true },
+      { "id": "Mandy Eißing", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "land": "Thüringen",
+    "party": "GRÜNE",
+    "seats": 1,
+    "winners": [],
+    "members": [{ "id": "Katrin Göring-Eckardt", "rank": 1, "elected": true }]
+  },
+  {
+    "land": "Thüringen",
+    "party": "SPD",
+    "seats": 2,
+    "winners": [],
+    "members": [
+      { "id": "Carsten Schneider", "rank": 1, "elected": true },
+      { "id": "Elisabeth Kaiser", "rank": 2, "elected": true }
+    ]
+  }
+]

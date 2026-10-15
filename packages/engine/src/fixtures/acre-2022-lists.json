@@ -1,0 +1,1051 @@
+{
+  "valid": 434256,
+  "lists": [
+    {
+      "list": "AGIR",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Emilson Chaves da Silva",
+          "rank": null,
+          "votes": 30,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Raimundo Jinkings de Melo",
+          "rank": null,
+          "votes": 50,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Leoneide Oliveira dos Santos",
+          "rank": null,
+          "votes": 0,
+          "elected": false,
+          "disqualified": true
+        },
+        {
+          "id": "Nilva Maria Santos Daniel",
+          "rank": null,
+          "votes": 16,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jhonathan Martins da Costa",
+          "rank": null,
+          "votes": 52,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Francisco Saraiva Gama de Souza",
+          "rank": null,
+          "votes": 105,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Soraia Ramalho do Nascimento",
+          "rank": null,
+          "votes": 13,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Uzir Santos de Lima",
+          "rank": null,
+          "votes": 26,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jose Carlos de Souza Oliveira",
+          "rank": null,
+          "votes": 0,
+          "elected": false,
+          "disqualified": true
+        }
+      ]
+    },
+    {
+      "list": "MDB",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Alda Radine Castro de Andrade Nery",
+          "rank": null,
+          "votes": 32,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Amaraldo Pascoal Uchoa Pinheiro",
+          "rank": null,
+          "votes": 353,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Edith Montes do Nascimento de Queirois",
+          "rank": null,
+          "votes": 88,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Flaviano Flavio Baptista de Melo",
+          "rank": null,
+          "votes": 7406,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Francisco Hamilton D Avila Lucena",
+          "rank": null,
+          "votes": 694,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jefferson Monteiro Soares",
+          "rank": null,
+          "votes": 201,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jessica Rojas Sales",
+          "rank": null,
+          "votes": 20500,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Wherles Fernandes da Rocha",
+          "rank": null,
+          "votes": 5632,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Raphael Luiz Bastos Junior",
+          "rank": null,
+          "votes": 3017,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PATRIOTA",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Manoel do Carmo Silva",
+          "rank": null,
+          "votes": 44,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jorge Henrique Melo Mulato",
+          "rank": null,
+          "votes": 57,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Nazare Gonçalves Peixoto",
+          "rank": null,
+          "votes": 21,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Antonio José da Silva Santana",
+          "rank": null,
+          "votes": 595,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Renildo Souza de Jesus",
+          "rank": null,
+          "votes": 307,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Clara Regina Dutra da Silva",
+          "rank": null,
+          "votes": 127,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PCO",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Maria Ieda da Silva Coelho",
+          "rank": null,
+          "votes": 0,
+          "elected": false,
+          "disqualified": true
+        }
+      ]
+    },
+    {
+      "list": "PDT",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Adriana da Silva Melo",
+          "rank": null,
+          "votes": 420,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria de Jesus Gomes da Silva Cavalcante",
+          "rank": null,
+          "votes": 681,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Emir Jose Nogueira Mendonça",
+          "rank": null,
+          "votes": 524,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jesus Sergio de Menezes",
+          "rank": null,
+          "votes": 9536,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jorge Luis Silva e Silva",
+          "rank": null,
+          "votes": 883,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Orleilson Gonçalves Cameli",
+          "rank": null,
+          "votes": 5973,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Ralph Luis do Nascimento Fernandes",
+          "rank": null,
+          "votes": 1087,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rayner de Araujo Neri",
+          "rank": null,
+          "votes": 314,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Rosilene Dantas Barros",
+          "rank": null,
+          "votes": 165,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PMN",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Antonio Dantas da Silva",
+          "rank": null,
+          "votes": 50,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "José Ribamar Fernandes de Lima",
+          "rank": null,
+          "votes": 40,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rozana Sousa do Nascimento",
+          "rank": null,
+          "votes": 29,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PODE",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Artur Liborinio dos Santos Lima Neto",
+          "rank": null,
+          "votes": 3328,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Bruno Moraes Cardoso",
+          "rank": null,
+          "votes": 5373,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Israel Aquila Rodrigues da Silva",
+          "rank": null,
+          "votes": 372,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Izabelle Araújo do Nascimento",
+          "rank": null,
+          "votes": 1921,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Leila Maria Holanda da Conceição",
+          "rank": null,
+          "votes": 1061,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Luiz Gonzaga de Lima Rego",
+          "rank": null,
+          "votes": 731,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Ludmilla Cristina Fernandes Cavalcante",
+          "rank": null,
+          "votes": 1153,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Marcelo Alexandre Ganum Bimbi",
+          "rank": null,
+          "votes": 381,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rodrigo Damasceno Catao",
+          "rank": null,
+          "votes": 5919,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PP",
+      "seats": 3,
+      "members": [
+        {
+          "id": "Edson Braga Rodrigues",
+          "rank": null,
+          "votes": 4097,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Eliatian da Silva Nogueira",
+          "rank": null,
+          "votes": 2258,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Gehlen Diniz Andrade",
+          "rank": null,
+          "votes": 19560,
+          "elected": true,
+          "disqualified": false
+        },
+        {
+          "id": "Girlene da Silva Teixeira",
+          "rank": null,
+          "votes": 647,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "José Adriano Ribeiro da Silva",
+          "rank": null,
+          "votes": 10623,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Samir Figueiredo Bestene",
+          "rank": null,
+          "votes": 7436,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Socorro Soares de Oliveira",
+          "rank": null,
+          "votes": 883,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria do Socorro Neri Medeiros de Souza",
+          "rank": null,
+          "votes": 25842,
+          "elected": true,
+          "disqualified": false
+        },
+        {
+          "id": "José Estephan Barbary Filho",
+          "rank": null,
+          "votes": 19958,
+          "elected": true,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PROS",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Ana Paula dos Santos Silva",
+          "rank": null,
+          "votes": 85,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jonilson Cabral dos Santos",
+          "rank": null,
+          "votes": 36,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Dalva Santos do Nascimento",
+          "rank": null,
+          "votes": 0,
+          "elected": false,
+          "disqualified": true
+        },
+        {
+          "id": "Edna Aparecida Nantes de Castro",
+          "rank": null,
+          "votes": 22,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Marcos Fabricio do Nascimento Telles",
+          "rank": null,
+          "votes": 217,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Ramão Vieira de Oliveira",
+          "rank": null,
+          "votes": 230,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rogerio Barros de Lima",
+          "rank": null,
+          "votes": 206,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Willington de Morais Ferreira",
+          "rank": null,
+          "votes": 129,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PSB",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Thor Oliveira Dantas",
+          "rank": null,
+          "votes": 3424,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Francisco Evandro Rosas da Costa",
+          "rank": null,
+          "votes": 682,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Quele Cristina Oliveira da Silva",
+          "rank": null,
+          "votes": 245,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Lúbia Araújo de Lima",
+          "rank": null,
+          "votes": 248,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Rosineia da Silva Frota",
+          "rank": null,
+          "votes": 367,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rizomar dos Santos de Araújo",
+          "rank": null,
+          "votes": 338,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rubby da Silva Rodrigues",
+          "rank": null,
+          "votes": 512,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PSC",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Jece Luiz da Silva Ferreira",
+          "rank": null,
+          "votes": 246,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Luana Welly da Silva Araujo",
+          "rank": null,
+          "votes": 107,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Carlos Alberto Silva do Nascimento",
+          "rank": null,
+          "votes": 327,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PSD",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Clerton Gaspar de Souza",
+          "rank": null,
+          "votes": 1372,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Francisco da Silva Piyãko",
+          "rank": null,
+          "votes": 2206,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Gessi Nascimento da Silva",
+          "rank": null,
+          "votes": 1686,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Jesuita Arruda da Silva",
+          "rank": null,
+          "votes": 6148,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jose Juarez Leitão dos Santos",
+          "rank": null,
+          "votes": 1497,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Sirlene Oliveira da Cunha",
+          "rank": null,
+          "votes": 3270,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Moises Barros de Medeiros",
+          "rank": null,
+          "votes": 933,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rosana Sousa do Nascimento",
+          "rank": null,
+          "votes": 3925,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Suellen Carlos da Silva Morais",
+          "rank": null,
+          "votes": 2448,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PSDB/CIDADANIA",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Carlos Leandro da Costa Sousa",
+          "rank": null,
+          "votes": 273,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Lanna Carmen Vaz de Araujo",
+          "rank": null,
+          "votes": 4711,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Marcia Maria Souza da Silva",
+          "rank": null,
+          "votes": 253,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Minoru Martins Kinpara",
+          "rank": null,
+          "votes": 19077,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Normando Rodrigues Sales",
+          "rank": null,
+          "votes": 3887,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Odete Oliveira da Conceição Sampaio",
+          "rank": null,
+          "votes": 119,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Sérgio Sebastião de Barros",
+          "rank": null,
+          "votes": 3491,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "João Ricardo Peres Leorne",
+          "rank": null,
+          "votes": 668,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "José Manoel dos Santos",
+          "rank": null,
+          "votes": 609,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PSOL/REDE",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Ana Paula Rodrigues Feitosa do Nascimento",
+          "rank": null,
+          "votes": 0,
+          "elected": false,
+          "disqualified": true
+        },
+        {
+          "id": "Jose de Souza Rocha",
+          "rank": null,
+          "votes": 120,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Cristina Lima Caruta",
+          "rank": null,
+          "votes": 114,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Iuna Barros Chaves",
+          "rank": null,
+          "votes": 107,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Luciano Bandeira Madeira",
+          "rank": null,
+          "votes": 0,
+          "elected": false,
+          "disqualified": true
+        },
+        {
+          "id": "Maria Nilda Rosa Saul",
+          "rank": null,
+          "votes": 175,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Ninawa Inu Pereira Nunes Huni Kui",
+          "rank": null,
+          "votes": 2794,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rogério da Silva e Silva",
+          "rank": null,
+          "votes": 176,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Willian dos Santos Franca",
+          "rank": null,
+          "votes": 217,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "PT/PC do B/PV",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Claudio Ezequiel Passamani",
+          "rank": null,
+          "votes": 1941,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Francimar Fernandes de Albuquerque",
+          "rank": null,
+          "votes": 3893,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Henry Antônio Silva Nogueira",
+          "rank": null,
+          "votes": 1042,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Irení Herculano Uchôa Moura",
+          "rank": null,
+          "votes": 464,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Leonardo Cunha de Brito",
+          "rank": null,
+          "votes": 12304,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Santiago de Lima",
+          "rank": null,
+          "votes": 899,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Perpetua de Almeida",
+          "rank": null,
+          "votes": 14914,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maura Maria de Aquino Penha",
+          "rank": null,
+          "votes": 89,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "José Nunes da Cruz",
+          "rank": null,
+          "votes": 140,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "REPUBLICANOS",
+      "seats": 2,
+      "members": [
+        {
+          "id": "Antônia Lucileia Cruz Ramos Camara",
+          "rank": null,
+          "votes": 16280,
+          "elected": true,
+          "disqualified": false
+        },
+        {
+          "id": "Eudemir Gomes Bezerra",
+          "rank": null,
+          "votes": 1649,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Geraldo Israel Milani de Nogueira",
+          "rank": null,
+          "votes": 13464,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Katianny da Silva Araújo",
+          "rank": null,
+          "votes": 90,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Keiliane Nunes de Melo Cordeiro",
+          "rank": null,
+          "votes": 10092,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Roberto Duarte Junior",
+          "rank": null,
+          "votes": 14522,
+          "elected": true,
+          "disqualified": false
+        },
+        {
+          "id": "Diego Pablo Paz Gomes",
+          "rank": null,
+          "votes": 1478,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "SOLIDARIEDADE",
+      "seats": 0,
+      "members": [
+        {
+          "id": "Anderson Lima de Andrade Brito",
+          "rank": null,
+          "votes": 200,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Damaira Aguiar de Souza",
+          "rank": null,
+          "votes": 172,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Edigley de Souza Rosendo",
+          "rank": null,
+          "votes": 120,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Isnailda de Souza da Silva Gondim",
+          "rank": null,
+          "votes": 379,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "José Janes Gomes da Silva",
+          "rank": null,
+          "votes": 1636,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Jesus Rodrigues da Silva",
+          "rank": null,
+          "votes": 398,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Licia Mara Nascimento de Vasconcelos Fidelis",
+          "rank": null,
+          "votes": 367,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Mauricio Diniz Lima",
+          "rank": null,
+          "votes": 193,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Maria Mirle do Nascimento Cesar de Sousa",
+          "rank": null,
+          "votes": 520,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    },
+    {
+      "list": "UNIÃO",
+      "seats": 3,
+      "members": [
+        {
+          "id": "Emilio Virgilio Lima de Oliveira",
+          "rank": null,
+          "votes": 2336,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Ulysses Freitas Pereira de Araujo",
+          "rank": null,
+          "votes": 21075,
+          "elected": true,
+          "disqualified": false
+        },
+        {
+          "id": "Eduardo Ovidio Borges de Velloso Vianna",
+          "rank": null,
+          "votes": 16786,
+          "elected": true,
+          "disqualified": false
+        },
+        {
+          "id": "Fabio Gonçalves de Rueda",
+          "rank": null,
+          "votes": 12608,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Hiamar de Paiva Pinheiro",
+          "rank": null,
+          "votes": 1371,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Luiz Anute dos Santos",
+          "rank": null,
+          "votes": 1332,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Rozimeire Ribeiro Andrade",
+          "rank": null,
+          "votes": 21285,
+          "elected": true,
+          "disqualified": false
+        },
+        {
+          "id": "Mirla Moraes Miranda Mariano",
+          "rank": null,
+          "votes": 4238,
+          "elected": false,
+          "disqualified": false
+        },
+        {
+          "id": "Pedro Valerio de Araujo",
+          "rank": null,
+          "votes": 2164,
+          "elected": false,
+          "disqualified": false
+        }
+      ]
+    }
+  ]
+}

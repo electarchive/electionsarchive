@@ -32,6 +32,37 @@
           "required": ["percent", "level"]
         },
         "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
+        "lists": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "enum": ["closed", "open", "flexible"],
+              "type": "string"
+            },
+            "quota": { "type": "number", "minimum": 0 },
+            "individual": { "type": "number", "minimum": 0, "maximum": 1 },
+            "constituencies": {
+              "enum": ["skip", "all", "covered"],
+              "type": "string"
+            },
+            "multiple": { "enum": ["lowest_share"], "type": "string" },
+            "exhausted": {
+              "enum": ["vacant", "elsewhere"],
+              "type": "string",
+              "default": "vacant"
+            },
+            "vacancy": {
+              "enum": [
+                "next_on_list",
+                "next_by_votes",
+                "substitute",
+                "by_election"
+              ],
+              "type": "string"
+            }
+          },
+          "required": ["order", "vacancy"]
+        },
         "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
       },
       "required": ["formula"]
@@ -60,6 +91,37 @@
           "required": ["percent", "level"]
         },
         "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
+        "lists": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "enum": ["closed", "open", "flexible"],
+              "type": "string"
+            },
+            "quota": { "type": "number", "minimum": 0 },
+            "individual": { "type": "number", "minimum": 0, "maximum": 1 },
+            "constituencies": {
+              "enum": ["skip", "all", "covered"],
+              "type": "string"
+            },
+            "multiple": { "enum": ["lowest_share"], "type": "string" },
+            "exhausted": {
+              "enum": ["vacant", "elsewhere"],
+              "type": "string",
+              "default": "vacant"
+            },
+            "vacancy": {
+              "enum": [
+                "next_on_list",
+                "next_by_votes",
+                "substitute",
+                "by_election"
+              ],
+              "type": "string"
+            }
+          },
+          "required": ["order", "vacancy"]
+        },
         "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
       },
       "required": ["formula"]
@@ -90,6 +152,37 @@
           "required": ["percent", "level"]
         },
         "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
+        "lists": {
+          "type": "object",
+          "properties": {
+            "order": {
+              "enum": ["closed", "open", "flexible"],
+              "type": "string"
+            },
+            "quota": { "type": "number", "minimum": 0 },
+            "individual": { "type": "number", "minimum": 0, "maximum": 1 },
+            "constituencies": {
+              "enum": ["skip", "all", "covered"],
+              "type": "string"
+            },
+            "multiple": { "enum": ["lowest_share"], "type": "string" },
+            "exhausted": {
+              "enum": ["vacant", "elsewhere"],
+              "type": "string",
+              "default": "vacant"
+            },
+            "vacancy": {
+              "enum": [
+                "next_on_list",
+                "next_by_votes",
+                "substitute",
+                "by_election"
+              ],
+              "type": "string"
+            }
+          },
+          "required": ["order", "vacancy"]
+        },
         "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
       },
       "required": ["formula"]

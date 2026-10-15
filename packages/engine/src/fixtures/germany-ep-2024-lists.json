@@ -1,0 +1,228 @@
+[
+  {
+    "list": "AfD",
+    "seats": 15,
+    "members": [
+      { "id": "Maximilian Krah", "rank": 1, "elected": true },
+      { "id": "Petr Bystron", "rank": 2, "elected": true },
+      { "id": "René Aust", "rank": 3, "elected": true },
+      { "id": "Christine Anderson", "rank": 4, "elected": true },
+      { "id": "Alexander Jungbluth", "rank": 5, "elected": true },
+      { "id": "Marc Jongen", "rank": 6, "elected": true },
+      { "id": "Markus Buchheit", "rank": 7, "elected": true },
+      { "id": "Hans Ludwig Neuhoff", "rank": 8, "elected": true },
+      { "id": "Irmhild Boßdorf", "rank": 9, "elected": true },
+      { "id": "Arno Bausemer", "rank": 10, "elected": true },
+      { "id": "Siegbert Frank Droese", "rank": 11, "elected": true },
+      { "id": "Thomas Froelich", "rank": 12, "elected": true },
+      { "id": "Anja Regine Arndt", "rank": 13, "elected": true },
+      { "id": "Mary Fatima Khan-Hohloch", "rank": 14, "elected": true },
+      { "id": "Alexander Sell", "rank": 15, "elected": true }
+    ]
+  },
+  {
+    "list": "BSW",
+    "seats": 6,
+    "members": [
+      { "id": "Fabio De Masi", "rank": 1, "elected": true },
+      { "id": "Thomas Geisel", "rank": 2, "elected": true },
+      { "id": "Michael von der Schulenburg", "rank": 3, "elected": true },
+      { "id": "Ruth Firmenich", "rank": 4, "elected": true },
+      { "id": "Jan-Peter Warnke", "rank": 5, "elected": true },
+      { "id": "Friedrich Pürner", "rank": 6, "elected": true }
+    ]
+  },
+  {
+    "list": "CDU Baden-Württemberg",
+    "seats": 4,
+    "members": [
+      { "id": "Andrea Wechsler", "rank": 1, "elected": true },
+      { "id": "Daniel Caspary", "rank": 2, "elected": true },
+      { "id": "Andreas Schwab", "rank": 3, "elected": true },
+      { "id": "Norbert Lins", "rank": 4, "elected": true }
+    ]
+  },
+  {
+    "list": "CDU Berlin",
+    "seats": 1,
+    "members": [{ "id": "Hildegard Bentele", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "CDU Brandenburg",
+    "seats": 1,
+    "members": [{ "id": "Jan Christian Ehler", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "CDU Hessen",
+    "seats": 2,
+    "members": [
+      { "id": "Sven Simon", "rank": 1, "elected": true },
+      { "id": "Michael Gahler", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "list": "CDU Niedersachsen",
+    "seats": 3,
+    "members": [
+      { "id": "David McAllister", "rank": 1, "elected": true },
+      { "id": "Lena Düpont", "rank": 2, "elected": true },
+      { "id": "Jens Gieseke", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "list": "CDU Nordrhein-Westfalen",
+    "seats": 6,
+    "members": [
+      { "id": "Hans-Peter Liese", "rank": 1, "elected": true },
+      { "id": "Sabine Verheyen", "rank": 2, "elected": true },
+      { "id": "Dennis Radtke", "rank": 3, "elected": true },
+      { "id": "Verena Mertens", "rank": 4, "elected": true },
+      { "id": "Axel Voss", "rank": 5, "elected": true },
+      { "id": "Stefan Berger", "rank": 6, "elected": true }
+    ]
+  },
+  {
+    "list": "CDU Rheinland-Pfalz",
+    "seats": 2,
+    "members": [
+      { "id": "Christine Schneider", "rank": 1, "elected": true },
+      { "id": "Ralf Seekatz", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "list": "CDU Sachsen",
+    "seats": 1,
+    "members": [{ "id": "Oliver Schenk", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "CDU Sachsen-Anhalt",
+    "seats": 1,
+    "members": [{ "id": "Alexandra Mehnert", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "CDU Schleswig-Holstein",
+    "seats": 1,
+    "members": [{ "id": "Niclas Herbst", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "CDU Thüringen",
+    "seats": 1,
+    "members": [{ "id": "Marion Erika Walsmann", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "CSU Bayern",
+    "seats": 6,
+    "members": [
+      { "id": "Manfred Weber", "rank": 1, "elected": true },
+      { "id": "Angelika Niebler", "rank": 2, "elected": true },
+      { "id": "Christian Doleschal", "rank": 3, "elected": true },
+      { "id": "Monika Hohlmeier", "rank": 4, "elected": true },
+      { "id": "Markus Ferber", "rank": 5, "elected": true },
+      { "id": "Stefan Köhler", "rank": 6, "elected": true }
+    ]
+  },
+  {
+    "list": "DIE LINKE",
+    "seats": 3,
+    "members": [
+      { "id": "Martin Simon Schirdewan", "rank": 1, "elected": true },
+      { "id": "Carola Rackete", "rank": 2, "elected": true },
+      { "id": "Özlem Alev Demirel-Böhlke", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "list": "Die PARTEI",
+    "seats": 2,
+    "members": [
+      { "id": "Martin Sonneborn", "rank": 1, "elected": true },
+      { "id": "Sibylle Berg", "rank": 2, "elected": true }
+    ]
+  },
+  {
+    "list": "FAMILIE",
+    "seats": 1,
+    "members": [{ "id": "Helmut Julius Geuking", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "FDP",
+    "seats": 5,
+    "members": [
+      { "id": "Marie-Agnes Strack-Zimmermann", "rank": 1, "elected": true },
+      { "id": "Svenja Hahn", "rank": 2, "elected": true },
+      { "id": "Andreas Glück", "rank": 3, "elected": true },
+      { "id": "Moritz Körner", "rank": 4, "elected": true },
+      { "id": "Jan-Christoph Oetjen", "rank": 5, "elected": true }
+    ]
+  },
+  {
+    "list": "FREIE WÄHLER",
+    "seats": 3,
+    "members": [
+      { "id": "Christine Singer", "rank": 1, "elected": true },
+      { "id": "Engin Eroglu", "rank": 2, "elected": true },
+      { "id": "Joachim Streit", "rank": 3, "elected": true }
+    ]
+  },
+  {
+    "list": "GRÜNE",
+    "seats": 12,
+    "members": [
+      { "id": "Theresa Reintke", "rank": 1, "elected": true },
+      { "id": "Sergey Lagodinsky", "rank": 2, "elected": true },
+      { "id": "Anna Cavazzini", "rank": 3, "elected": true },
+      { "id": "Michael Bloss", "rank": 4, "elected": true },
+      { "id": "Hannah Neumann", "rank": 5, "elected": true },
+      { "id": "Martin Häusling", "rank": 6, "elected": true },
+      { "id": "Katrin Langensiepen", "rank": 7, "elected": true },
+      { "id": "Erik Marquardt", "rank": 8, "elected": true },
+      { "id": "Jutta Paulus", "rank": 9, "elected": true },
+      { "id": "Daniel Freund", "rank": 10, "elected": true },
+      { "id": "Alexandra Geese", "rank": 11, "elected": true },
+      { "id": "Rasmus Andresen", "rank": 12, "elected": true }
+    ]
+  },
+  {
+    "list": "ÖDP",
+    "seats": 1,
+    "members": [{ "id": "Manuela Ripa", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "PdF",
+    "seats": 1,
+    "members": [{ "id": "Lukas Sieper", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "SPD",
+    "seats": 14,
+    "members": [
+      { "id": "Katarina Barley", "rank": 1, "elected": true },
+      { "id": "Jens Geier", "rank": 2, "elected": true },
+      { "id": "Maria Noichl", "rank": 3, "elected": true },
+      { "id": "Bernd Lange", "rank": 4, "elected": true },
+      { "id": "Birgit Sippel", "rank": 5, "elected": true },
+      { "id": "René Repasi", "rank": 6, "elected": true },
+      { "id": "Gabriele Bischoff", "rank": 7, "elected": true },
+      { "id": "Udo Bullmann", "rank": 8, "elected": true },
+      { "id": "Delara Burkhardt", "rank": 9, "elected": true },
+      { "id": "Matthias Ecke", "rank": 10, "elected": true },
+      { "id": "Sabrina Repp", "rank": 11, "elected": true },
+      { "id": "Tiemo Wölken", "rank": 12, "elected": true },
+      { "id": "Vivien Costanzo", "rank": 13, "elected": true },
+      { "id": "Tobias Cremer", "rank": 14, "elected": true }
+    ]
+  },
+  {
+    "list": "Tierschutzpartei",
+    "seats": 1,
+    "members": [{ "id": "Sebastian Everding", "rank": 1, "elected": true }]
+  },
+  {
+    "list": "Volt",
+    "seats": 3,
+    "members": [
+      { "id": "Damian Freiherr von Boeselager", "rank": 1, "elected": true },
+      { "id": "Nela Riehl", "rank": 2, "elected": true },
+      { "id": "Kai Tegethoff", "rank": 3, "elected": true }
+    ]
+  }
+]
