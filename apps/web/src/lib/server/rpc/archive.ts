@@ -37,6 +37,8 @@ const ResultSet = v.object({
 const Cell = v.nullable(
   v.object({
     label: v.string(),
+    person: v.nullable(v.string()),
+    party: v.nullable(v.string()),
     votes: v.number(),
     share: v.number(),
     outcome: v.nullable(v.string()),
@@ -56,6 +58,8 @@ const Places = v.nullable(
         label: v.string(),
         short: v.nullable(v.string()),
         color: v.nullable(v.string()),
+        person: v.nullable(v.string()),
+        party: v.nullable(v.string()),
       }),
     ),
     rows: v.array(
@@ -644,6 +648,8 @@ async function places(
       label: string;
       short: string | null;
       color: string | null;
+      person: string | null;
+      party: string | null;
       votes: number;
       lead: boolean;
     }
@@ -679,9 +685,13 @@ async function places(
         label: entry.label,
         short: entry.short,
         color: entry.color,
+        person: null,
+        party: null,
         votes: 0,
         lead: false,
       };
+      item.person ??= (entry.current ?? entry.earlier)?.person ?? null;
+      item.party ??= (entry.current ?? entry.earlier)?.party ?? null;
       item.votes += entry.current?.votes ?? 0;
       item.lead ||=
         entry.key === leader?.key ||
@@ -709,6 +719,8 @@ async function places(
       label: item.label,
       short: item.key.startsWith("person:") ? null : item.short,
       color: item.color,
+      person: item.key.startsWith("person:") ? item.person : null,
+      party: item.party,
     })),
     rows: compared.map(({ row, result, leader, before, valid }) => {
       const runner = result.find(
@@ -957,6 +969,8 @@ export const contests = {
                 label: v.string(),
                 short: v.nullable(v.string()),
                 color: v.nullable(v.string()),
+                person: v.nullable(v.string()),
+                party: v.nullable(v.string()),
                 outcome: v.string(),
               }),
             ),
@@ -978,6 +992,8 @@ export const contests = {
                 label: v.string(),
                 short: v.nullable(v.string()),
                 color: v.nullable(v.string()),
+                person: v.nullable(v.string()),
+                party: v.nullable(v.string()),
                 votes: v.number(),
               }),
             ),
@@ -1263,6 +1279,8 @@ export const contests = {
                     declaredLabels.full.get(row.party ?? "") ??
                     null,
                   color: declaredColor.get(row.party ?? "") ?? null,
+                  person: row.person,
+                  party: row.party,
                   outcome: row.outcome,
                 })),
               },
@@ -1691,13 +1709,18 @@ export const contests = {
       );
       const electors = (
         ballots == null
-          ? rows.map((row) => ({ ...row, votes: row.current?.seats ?? 0 }))
+          ? rows.map((row) => ({
+              ...row,
+              party: row.current?.party ?? null,
+              votes: row.current?.seats ?? 0,
+            }))
           : compare(ballots.side, null, lineage, "person").map((row) => {
               const line = lines.get(row.key.slice("person:".length))?.[0];
               return {
                 ...row,
                 short: line?.short ?? null,
                 color: line?.color ?? null,
+                party: line?.party ?? null,
                 votes: row.current?.votes ?? 0,
               };
             })
@@ -1708,6 +1731,8 @@ export const contests = {
           label: row.label,
           short: row.short,
           color: row.color,
+          person: row.current?.person ?? null,
+          party: row.party,
           votes: row.votes,
         }))
         .toSorted((a, b) => b.votes - a.votes);
@@ -1989,6 +2014,354 @@ export const polities = {
           date: row.date,
           status: row.status,
         })),
+      };
+    }),
+};
+
+const PartyRef = v.object({
+  id: v.string(),
+  label: v.string(),
+  short: v.nullable(v.string()),
+  color: v.nullable(v.string()),
+});
+
+async function refs(ids: Array<string>) {
+  const unique = [...new Set(ids)];
+  const [labels, colors] = await Promise.all([
+    names(unique),
+    db.execute<{ party: string; color: string }>(sql`
+      select distinct on (party_id) party_id as party, color from party_color
+      where party_id = any(${sql.param(unique)}::uuid[])
+      order by party_id, upper(valid) desc nulls first
+    `),
+  ]);
+  const palette = new Map(colors.rows.map((row) => [row.party, row.color]));
+  return new Map(
+    unique.map((id) => [
+      id,
+      {
+        id,
+        label: labels.full.get(id) ?? "",
+        short: labels.short.get(id) ?? null,
+        color: palette.get(id) ?? null,
+      },
+    ]),
+  );
+}
+
+export const people = {
+  get: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/people/{id}",
+        summary: "Get a person and their election record",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        name: v.string(),
+        born: v.nullable(v.string()),
+        precision: v.nullable(v.string()),
+        wikidata: v.nullable(v.string()),
+        party: v.nullable(PartyRef),
+        record: v.array(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            date: v.string(),
+            kind: v.string(),
+            measure: v.string(),
+            votes: v.nullable(v.number()),
+            total: v.nullable(v.number()),
+            outcome: v.nullable(v.string()),
+            electoral: v.nullable(
+              v.object({ votes: v.number(), total: v.number() }),
+            ),
+            party: v.nullable(PartyRef),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        born: string | null;
+        precision: string | null;
+        wikidata: string | null;
+      }>(sql`
+        select p.id, p.birth_date::text as born, p.birth_precision::text as precision,
+          (select x.value from external_id x where x.entity_id = p.id and x.scheme = 'wikidata' limit 1) as wikidata
+        from person p
+        where p.id = coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+      `);
+      const person = found.rows[0];
+      if (person == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const rows = await db.execute<{
+        root: string;
+        date: string;
+        kind: string;
+        measure: number | null;
+        votes: number | null;
+        total: number | null;
+        outcome: string | null;
+        party: string | null;
+      }>(sql`
+        with recursive ids(id) as (
+          select ${person.id}::uuid
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        ),
+        mine as materialized (
+          select o.id as option, o.contest_id, coalesce(pm.into_id, cd.member_of_party_id, o.party_id) as party
+          from candidacy cd join contest_option o on o.id = cd.option_id
+          left join entity_merge pm on pm.entity_id = coalesce(cd.member_of_party_id, o.party_id)
+          where cd.person_id in (select id from ids) and cd.role = 'head'
+        ),
+        lines as materialized (
+          select o.k from contest_option o
+          where o.id in (select option from mine) or o.parent_option_id in (select option from mine)
+        ),
+        up(id, parent) as (
+          select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
+          union
+          select c.id, c.allocation_parent_id from up join contest c on c.id = up.parent
+        ),
+        grp(root, id) as (
+          select id, id from up where parent is null
+          union all
+          select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
+        ),
+        placed as materialized (
+          select c.id as root, a.k as area, e.date_from as date, e.kind::text as kind
+          from contest c join election e on e.id = c.election_id
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+          where c.id in (select id from up where parent is null)
+        ),
+        picked as (
+          select distinct on (rs.contest_id) grp.root, rs.k, p.area
+          from grp join result_set rs on rs.contest_id = grp.id join placed p on p.root = grp.root
+          join lateral (
+            select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = p.area and r.measure = any(${COUNTED}) limit 1
+          ) hit on true
+          order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
+        ),
+        fetched as (
+          select p.root, r.* from picked p cross join lateral (
+            select r.option_k as option, r.measure, r.value::float8 as value, r.count_round,
+              min(r.count_round) over (partition by r.measure) as first
+            from result_rollup r
+            where r.result_set_k = p.k and r.area_k = p.area and r.count_round <= 1
+              and (r.measure = any(${COUNTED}) and r.option_k <> 0 or r.measure = 2 and r.option_k = 0)
+          ) r
+        ),
+        mains as (
+          select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main,
+            sum(value) filter (where measure = 2 and count_round = first) as appointed
+          from fetched group by root
+        ),
+        totals as (
+          select f.root, m.main, m.appointed, sum(f.value) as total,
+            coalesce(sum(f.value) filter (where f.option in (select k from lines)), 0) as votes
+          from fetched f join mains m on m.root = f.root and m.main = f.measure
+          where f.count_round = f.first and f.option <> 0
+          group by f.root, m.main, m.appointed
+        )
+        select p.root, p.date::text as date, p.kind, t.main::int as measure, t.votes,
+          case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
+          (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
+            from mine m join outcome x on x.option_id = m.option join result_set rs on rs.id = x.result_set_id and rs.is_default
+            where m.contest_id = p.root) as outcome,
+          (select m.party from mine m join grp g on g.id = m.contest_id and g.root = p.root where m.party is not null limit 1) as party
+        from placed p left join totals t on t.root = p.root
+        order by p.date desc
+      `);
+      const roots = rows.rows.map((row) => row.root);
+      const [labels, slugs, parties] = await Promise.all([
+        names([person.id, ...roots]),
+        paths(roots),
+        refs(
+          rows.rows.flatMap((row) => (row.party == null ? [] : [row.party])),
+        ),
+      ]);
+      const record = rows.rows
+        .filter(
+          (row) =>
+            row.kind !== "indirect" ||
+            rows.rows.every(
+              (peer) =>
+                !(
+                  peer.kind === "general" &&
+                  peer.date.slice(0, 4) === row.date.slice(0, 4)
+                ),
+            ),
+        )
+        .map((row) => {
+          const indirect =
+            row.kind === "general"
+              ? rows.rows.find(
+                  (peer) =>
+                    peer.kind === "indirect" &&
+                    peer.date.slice(0, 4) === row.date.slice(0, 4),
+                )
+              : undefined;
+          return {
+            name: labels.full.get(row.root) ?? "",
+            path: slugs.get(row.root) ?? null,
+            date: row.date,
+            kind: row.kind,
+            measure: MEASURES.get(row.measure ?? 1) ?? "votes",
+            votes: row.votes,
+            total: row.total,
+            outcome: indirect == null ? row.outcome : indirect.outcome,
+            electoral:
+              indirect?.votes == null || indirect.total == null
+                ? null
+                : { votes: indirect.votes, total: indirect.total },
+            party: row.party == null ? null : (parties.get(row.party) ?? null),
+          };
+        });
+      return {
+        name: labels.full.get(person.id) ?? "",
+        born: person.born,
+        precision: person.precision,
+        wikidata: person.wikidata,
+        party: record.find((entry) => entry.party != null)?.party ?? null,
+        record,
+      };
+    }),
+};
+
+export const parties = {
+  get: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/parties/{id}",
+        summary: "Get a party, its lineage, and its years on the ballot",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        name: v.string(),
+        short: v.nullable(v.string()),
+        color: v.nullable(v.string()),
+        kind: v.string(),
+        polity: v.nullable(Link),
+        wikidata: v.nullable(v.string()),
+        span: v.nullable(
+          v.object({ from: v.string(), to: v.string(), contests: v.number() }),
+        ),
+        relations: v.array(
+          v.object({
+            kind: v.string(),
+            outgoing: v.boolean(),
+            date: v.nullable(v.string()),
+            party: PartyRef,
+          }),
+        ),
+        parents: v.array(v.object({ kind: v.string(), party: PartyRef })),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        kind: string;
+        polity: string | null;
+        wikidata: string | null;
+        from: string | null;
+        to: string | null;
+        contests: number;
+      }>(sql`
+        with target as (
+          select p.id, p.kind::text as kind, p.polity_id as polity from party p
+          where p.id = coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+        ),
+        ids as (
+          select id from target union select entity_id from entity_merge where into_id = (select id from target)
+        )
+        select t.id, t.kind, t.polity,
+          (select x.value from external_id x where x.entity_id = t.id and x.scheme = 'wikidata' limit 1) as wikidata,
+          s.from, s.to, s.contests
+        from target t cross join lateral (
+          select min(e.date_from)::text as from, max(e.date_from)::text as to, count(distinct o.contest_id)::int as contests
+          from contest_option o join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+          where o.party_id in (select id from ids)
+        ) s
+      `);
+      const party = found.rows[0];
+      if (party == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const [relations, parents] = await Promise.all([
+        db.execute<{
+          kind: string;
+          outgoing: boolean;
+          date: string | null;
+          other: string;
+        }>(sql`
+          select r.kind::text, r.from_party_id = ${party.id}::uuid as outgoing, r.date::text,
+            case when r.from_party_id = ${party.id}::uuid then r.to_party_id else r.from_party_id end as other
+          from party_relation r
+          where (r.from_party_id = ${party.id}::uuid or r.to_party_id = ${party.id}::uuid) and r.to_party_id is not null
+          order by r.date nulls last
+        `),
+        db.execute<{ kind: string; parent: string }>(sql`
+          select distinct on (parent_party_id) kind::text, parent_party_id as parent
+          from party_affiliation where party_id = ${party.id}::uuid
+          order by parent_party_id, upper(valid) desc nulls first
+        `),
+      ]);
+      const polity = party.polity == null ? [] : [party.polity];
+      const [entities, slugs] = await Promise.all([
+        refs([
+          party.id,
+          ...polity,
+          ...relations.rows.map((row) => row.other),
+          ...parents.rows.map((row) => row.parent),
+        ]),
+        paths(polity),
+      ]);
+      const self = entities.get(party.id);
+      return {
+        name: self?.label ?? "",
+        short: self?.short ?? null,
+        color: self?.color ?? null,
+        kind: party.kind,
+        polity:
+          party.polity == null
+            ? null
+            : {
+                name: entities.get(party.polity)?.label ?? "",
+                path: slugs.get(party.polity) ?? null,
+              },
+        wikidata: party.wikidata,
+        span:
+          party.from == null || party.to == null
+            ? null
+            : { from: party.from, to: party.to, contests: party.contests },
+        relations: relations.rows.flatMap((row) => {
+          const other = entities.get(row.other);
+          return other == null
+            ? []
+            : [
+                {
+                  kind: row.kind,
+                  outgoing: row.outgoing,
+                  date: row.date,
+                  party: other,
+                },
+              ];
+        }),
+        parents: parents.rows.flatMap((row) => {
+          const other = entities.get(row.parent);
+          return other == null ? [] : [{ kind: row.kind, party: other }];
+        }),
       };
     }),
 };

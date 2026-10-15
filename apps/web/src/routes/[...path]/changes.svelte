@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Name from "#lib/components/name.svelte";
   import { count, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -34,6 +35,8 @@
             ? row.short
             : row.label,
         color: swatch(row.color, row.key),
+        person: row.key.startsWith("person:") ? row.key.slice(7) : null,
+        party: (row.current ?? row.earlier)?.party ?? null,
         before: span.forward ? row.current : row.earlier,
         after: span.forward ? row.earlier : row.current,
       })),
@@ -49,6 +52,11 @@
             key: top.row.key,
             name: top[side]?.label ?? top.name,
             party: top.name,
+            color: top.color,
+            ids: {
+              person: top[side]?.person ?? null,
+              party: top[side]?.party ?? top.party,
+            },
             margin: (top[side]?.share ?? 0) - (next?.[side]?.share ?? 0),
           };
     }),
@@ -64,19 +72,34 @@
       first: points(first.margin).replace("+", ""),
       second: points(second.margin).replace("+", ""),
     };
-    return first.key === second.key
-      ? m.lede_same({
-          ...margins,
-          name: first.name === second.name ? first.name : first.party,
-        })
-      : m.lede_changed({
-          from: span.from,
-          to: span.to,
-          first: first.name,
-          second: second.name,
-          firstMargin: margins.first,
-          secondMargin: margins.second,
-        });
+    const same = first.name === second.name;
+    const text =
+      first.key === second.key
+        ? m.lede_same({ ...margins, name: "\u00010\u0001" })
+        : m.lede_changed({
+            from: span.from,
+            to: span.to,
+            first: "\u00010\u0001",
+            second: "\u00011\u0001",
+            firstMargin: margins.first,
+            secondMargin: margins.second,
+          });
+    const names =
+      first.key === second.key
+        ? [
+            {
+              label: same ? first.name : first.party,
+              color: first.color,
+              person: same ? first.ids.person : null,
+              party: first.ids.party,
+            },
+          ]
+        : [first, second].map((lead) => ({
+            label: lead.name,
+            color: lead.color,
+            ...lead.ids,
+          }));
+    return { parts: text.split("\u0001"), names };
   });
   const both = $derived(
     cells.filter((cell) => cell.before != null && cell.after != null),
@@ -155,19 +178,24 @@
 
 {#snippet line(
   year: string,
-  lead: { name: string; color: string },
+  lead: {
+    name: string;
+    color: string;
+    person: string | null;
+    party: string | null;
+  },
   value: string,
 )}
   <span class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums"
     >{year}</span
   >
-  <span
-    class="flex items-center gap-1.5 min-inline-0"
-    style:--party={lead.color}
-  >
-    <span class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
-    <span class="truncate font-semibold">{lead.name}</span>
-  </span>
+  <Name
+    class="truncate font-semibold min-inline-0"
+    label={lead.name}
+    color={lead.color}
+    person={lead.person}
+    party={lead.party}
+  />
   <span class="text-end font-mono text-[0.8125rem] tabular-nums">{value}</span>
 {/snippet}
 
@@ -186,7 +214,16 @@
       <p
         class="mbs-1 font-serif text-[1.1875rem]/snug font-[560] tracking-[-0.005em] text-balance max-inline-[64ch]"
       >
-        {lede}
+        {#each lede.parts as part, index (index)}
+          {#if index % 2 === 1}
+            {const entity = $derived(lede.names[Number(part)])}
+            {#if entity != null}
+              <Name {...entity} />
+            {/if}
+          {:else}
+            {part}
+          {/if}
+        {/each}
       </p>
     {/if}
     {#if span.race != null}
@@ -222,10 +259,21 @@
           {/each}
         </dd>
         <dd class="text-[0.8125rem] text-muted-foreground">
-          {m.fact_shift({
-            points: points(margin.shift).replace("+", ""),
-            name: margin.toward.name,
-          })}
+          {const parts = $derived(
+            m
+              .fact_shift({
+                points: points(margin.shift).replace("+", ""),
+                name: "\u0001",
+              })
+              .split("\u0001"),
+          )}
+          {parts[0]}<Name
+            class="text-foreground"
+            label={margin.toward.name}
+            color={margin.toward.color}
+            person={margin.toward.person}
+            party={margin.toward.party}
+          />{parts[1]}
         </dd>
       </div>
     {/if}
@@ -247,12 +295,13 @@
           <ul class="grid gap-1 text-sm/tight">
             {#each movers as mover (mover.row.key)}
               <li class="flex items-center gap-2" style:--party={mover.color}>
-                <span
-                  class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
-                ></span>
-                <span class="flex-1 truncate font-semibold min-inline-0"
-                  >{mover.name}</span
-                >
+                <Name
+                  class="flex-1 truncate font-semibold min-inline-0"
+                  label={mover.name}
+                  color={mover.color}
+                  person={mover.person}
+                  party={mover.party}
+                />
                 <span
                   class="relative block-1.5 inline-12 max-sm:hidden"
                   aria-hidden="true"

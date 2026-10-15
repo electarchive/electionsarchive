@@ -28,8 +28,11 @@ export function makeQueryClient() {
       },
     },
     queryCache: new QueryCache({
-      onError: (error) => {
+      onError: (error, query) => {
         console.error(error);
+        if (query.meta?.quiet === true) {
+          return;
+        }
 
         toast.dismiss();
         toast.error(error.message || "an unknown error occurred", {

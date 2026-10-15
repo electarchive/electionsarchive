@@ -3,6 +3,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import Name from "#lib/components/name.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, date, percent, points } from "#lib/format.js";
@@ -476,11 +477,18 @@
             class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
           ></span>
           <span class="min-inline-0">
-            <span class="font-semibold">{row.label}</span>
+            <Name
+              class="font-semibold"
+              label={row.label}
+              person={row.person}
+              party={row.party}
+            />
             {#if row.short != null && row.short !== row.label}
-              <span class="ms-1 text-[0.8125rem] text-muted-foreground"
-                >{row.short}</span
-              >
+              <Name
+                class="text-[0.8125rem] text-muted-foreground"
+                label={row.short}
+                party={row.party}
+              />
             {/if}
             <span
               class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
@@ -528,11 +536,13 @@
           <span class="font-mono text-2xl tracking-[-0.02em] tabular-nums"
             >{points(lead.margin)}</span
           >
-          <span class="flex items-center gap-1.5 truncate text-sm min-inline-0">
-            <span class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
-            ></span>
-            <span class="truncate font-semibold">{lead.row.label}</span>
-          </span>
+          <Name
+            class="truncate text-sm font-semibold min-inline-0"
+            label={lead.row.label}
+            color={swatch(lead.row.color, lead.row.key)}
+            person={lead.row.current?.person}
+            party={lead.row.current?.party}
+          />
         </dd>
       {/if}
     </div>

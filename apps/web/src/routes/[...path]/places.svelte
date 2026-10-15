@@ -3,6 +3,7 @@
   import { page } from "$app/state";
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
+  import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import { count, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -391,17 +392,16 @@
             </td>
             <td class="px-2 py-1.5 whitespace-nowrap">
               {#if row.leader != null}
-                <span
-                  class="flex items-center gap-1.5"
-                  style:--party={colors[row.leader]}
-                >
-                  <span
-                    class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
-                  ></span>
-                  <span class="truncate font-semibold max-inline-40"
-                    >{places.legend[row.leader]?.short ??
-                      places.legend[row.leader]?.label}</span
-                  >
+                <span class="flex items-center gap-1.5">
+                  <Name
+                    class="relative z-1 truncate font-semibold max-inline-40"
+                    label={places.legend[row.leader]?.short ??
+                      places.legend[row.leader]?.label ??
+                      ""}
+                    color={colors[row.leader]}
+                    person={places.legend[row.leader]?.person}
+                    party={places.legend[row.leader]?.party}
+                  />
                   <span
                     class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums"
                     >{percent(row.shares[row.leader] ?? 0)}</span

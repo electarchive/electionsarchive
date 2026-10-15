@@ -10,6 +10,7 @@
 </script>
 
 <script lang="ts">
+  import Name from "#lib/components/name.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, percent, points } from "#lib/format.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -276,11 +277,18 @@
                 class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
               ></span>
               <span class="flex-1 min-inline-0">
-                <span class="font-semibold text-foreground">{row.label}</span>
+                <Name
+                  class="font-semibold text-foreground"
+                  label={row.label}
+                  person={(page ?? other)?.person}
+                  party={(page ?? other)?.party}
+                />
                 {#if row.short != null && row.short !== row.label}
-                  <span class="ms-1 text-[0.8125rem] text-muted-foreground"
-                    >{row.short}</span
-                  >
+                  <Name
+                    class="text-[0.8125rem] text-muted-foreground"
+                    label={row.short}
+                    party={(page ?? other)?.party}
+                  />
                 {/if}
                 {#if page?.outcome != null && seats == null}
                   <span
@@ -298,8 +306,17 @@
                       >{m.compare_absent({ year: there })}</span
                     >
                   {:else if other.label !== page.label}
+                    {const parts = $derived(
+                      m
+                        .compare_in({ year: there, name: "\u0001" })
+                        .split("\u0001"),
+                    )}
                     <span class="block text-[0.8125rem] text-muted-foreground"
-                      >{m.compare_in({ year: there, name: other.label })}</span
+                      >{parts[0]}<Name
+                        label={other.label}
+                        person={other.person}
+                        party={other.party}
+                      />{parts[1]}</span
                     >
                   {/if}
                 {/if}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -13,6 +14,8 @@
         label: string;
         short: string | null;
         color: string | null;
+        person: string | null;
+        party: string | null;
         votes: number;
       }>;
       appointed: number | null;
@@ -49,12 +52,19 @@
         >{count(row.votes)}</span
       >
       <span class="truncate text-sm">
-        <span
-          class="me-1 inline-block rounded-xs bg-(--party) align-[-1px] block-2.5 inline-2.5"
-        ></span>
-        <span class="font-semibold">{row.label}</span>
+        <Name
+          class="font-semibold"
+          label={row.label}
+          color={swatch(row.color, row.key)}
+          person={row.person}
+          party={row.party}
+        />
         {#if row.short != null && row.short !== row.label}
-          <span class="text-muted-foreground max-sm:hidden">{row.short}</span>
+          <Name
+            class="text-muted-foreground max-sm:hidden"
+            label={row.short}
+            party={row.party}
+          />
         {/if}
       </span>
     </div>
@@ -109,12 +119,14 @@
     >
       <ul class="flex flex-wrap gap-x-4 gap-y-1">
         {#each others as row (row.key)}
-          <li class="flex items-center gap-1.5">
-            <span
-              class="rounded-xs block-2.5 inline-2.5"
-              style:background-color={swatch(row.color, row.key)}
-            ></span>
-            <span class="font-semibold">{row.label}</span>
+          <li class="flex items-baseline gap-1.5">
+            <Name
+              class="font-semibold"
+              label={row.label}
+              color={swatch(row.color, row.key)}
+              person={row.person}
+              party={row.party}
+            />
             <span class="font-mono tabular-nums">{count(row.votes)}</span>
           </li>
         {/each}
