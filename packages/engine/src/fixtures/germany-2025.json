@@ -1,0 +1,70 @@
+{
+  "seats": 630,
+  "valid": 49649512,
+  "parties": [
+    { "id": "CDU", "votes": 11196374, "constituencies": 143, "declared": 164 },
+    { "id": "AfD", "votes": 10328780, "constituencies": 46, "declared": 152 },
+    { "id": "SPD", "votes": 8149124, "constituencies": 45, "declared": 120 },
+    { "id": "GRÜNE", "votes": 5762380, "constituencies": 12, "declared": 85 },
+    {
+      "id": "Die Linke",
+      "votes": 4356532,
+      "constituencies": 6,
+      "declared": 64
+    },
+    { "id": "CSU", "votes": 2964028, "constituencies": 47, "declared": 44 },
+    { "id": "BSW", "votes": 2472947, "constituencies": 0, "declared": 0 },
+    { "id": "FDP", "votes": 2148757, "constituencies": 0, "declared": 0 },
+    {
+      "id": "FREIE WÄHLER",
+      "votes": 769279,
+      "constituencies": 0,
+      "declared": 0
+    },
+    {
+      "id": "Tierschutzpartei",
+      "votes": 482201,
+      "constituencies": 0,
+      "declared": 0
+    },
+    { "id": "Volt", "votes": 355262, "constituencies": 0, "declared": 0 },
+    { "id": "Die PARTEI", "votes": 242741, "constituencies": 0, "declared": 0 },
+    { "id": "dieBasis", "votes": 85373, "constituencies": 0, "declared": 0 },
+    {
+      "id": "BÜNDNIS DEUTSCHLAND",
+      "votes": 76372,
+      "constituencies": 0,
+      "declared": 0
+    },
+    { "id": "SSW", "votes": 76138, "constituencies": 0, "declared": 1 },
+    { "id": "ÖDP", "votes": 49764, "constituencies": 0, "declared": 0 },
+    {
+      "id": "Team Todenhöfer",
+      "votes": 24553,
+      "constituencies": 0,
+      "declared": 0
+    },
+    { "id": "PdF", "votes": 21388, "constituencies": 0, "declared": 0 },
+    { "id": "MLPD", "votes": 19551, "constituencies": 0, "declared": 0 },
+    { "id": "PdH", "votes": 14294, "constituencies": 0, "declared": 0 },
+    { "id": "PIRATEN", "votes": 13800, "constituencies": 0, "declared": 0 },
+    { "id": "BP", "votes": 12278, "constituencies": 0, "declared": 0 },
+    { "id": "Bündnis C", "votes": 11768, "constituencies": 0, "declared": 0 },
+    { "id": "MERA25", "votes": 6994, "constituencies": 0, "declared": 0 },
+    { "id": "WerteUnion", "votes": 6736, "constituencies": 0, "declared": 0 },
+    {
+      "id": "MENSCHLICHE WELT",
+      "votes": 694,
+      "constituencies": 0,
+      "declared": 0
+    },
+    { "id": "BüSo", "votes": 676, "constituencies": 0, "declared": 0 },
+    { "id": "SGP", "votes": 425, "constituencies": 0, "declared": 0 },
+    {
+      "id": "Verjüngungsforschung",
+      "votes": 303,
+      "constituencies": 0,
+      "declared": 0
+    }
+  ]
+}

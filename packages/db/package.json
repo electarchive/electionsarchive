@@ -1,0 +1,26 @@
+{
+  "name": "@ea/db",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    "./schema": "./src/schema.ts",
+    "./core": "./src/core.ts",
+    "./core-relations": "./src/core-relations.ts"
+  },
+  "scripts": {
+    "check": "tsc",
+    "generate": "drizzle-kit generate",
+    "migrate": "drizzle-kit migrate",
+    "pull": "drizzle-kit pull --config drizzle.pull.config.ts && node pull.ts"
+  },
+  "dependencies": {
+    "drizzle-orm": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "drizzle-kit": "catalog:",
+    "pg": "catalog:",
+    "typescript": "catalog:"
+  }
+}

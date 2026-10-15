@@ -1,0 +1,19 @@
+{
+  "name": "@ea/view-spec",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts"
+  },
+  "scripts": {
+    "check": "tsc"
+  },
+  "dependencies": {
+    "@valibot/to-json-schema": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "typescript": "catalog:"
+  }
+}

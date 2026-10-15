@@ -1,0 +1,239 @@
+{
+  "oneOf": [
+    {
+      "type": "object",
+      "properties": {
+        "formula": {
+          "enum": [
+            "dhondt",
+            "hagenbach_bischoff",
+            "sainte_lague",
+            "sainte_lague_schepers",
+            "imperiali"
+          ],
+          "type": "string"
+        },
+        "threshold": {
+          "type": "object",
+          "properties": {
+            "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+            "level": {
+              "enum": ["list", "party", "alliance", "coalition"],
+              "type": "string"
+            },
+            "scope": {
+              "enum": ["contest", "national"],
+              "type": "string",
+              "default": "contest"
+            },
+            "constituencies": { "type": "integer", "minimum": 1 },
+            "exempt": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["percent", "level"]
+        },
+        "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "modified_sainte_lague" },
+        "firstDivisor": { "type": "number", "minimum": 1, "default": 1.4 },
+        "threshold": {
+          "type": "object",
+          "properties": {
+            "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+            "level": {
+              "enum": ["list", "party", "alliance", "coalition"],
+              "type": "string"
+            },
+            "scope": {
+              "enum": ["contest", "national"],
+              "type": "string",
+              "default": "contest"
+            },
+            "constituencies": { "type": "integer", "minimum": 1 },
+            "exempt": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["percent", "level"]
+        },
+        "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": {
+          "enum": ["hare", "droop", "imperiali_quota"],
+          "type": "string"
+        },
+        "threshold": {
+          "type": "object",
+          "properties": {
+            "percent": { "type": "number", "minimum": 0, "maximum": 100 },
+            "level": {
+              "enum": ["list", "party", "alliance", "coalition"],
+              "type": "string"
+            },
+            "scope": {
+              "enum": ["contest", "national"],
+              "type": "string",
+              "default": "contest"
+            },
+            "constituencies": { "type": "integer", "minimum": 1 },
+            "exempt": { "type": "array", "items": { "type": "string" } }
+          },
+          "required": ["percent", "level"]
+        },
+        "pooling": { "enum": ["alliance", "coalition"], "type": "string" },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": {
+          "enum": [
+            "fptp",
+            "winner_take_all",
+            "block",
+            "sntv",
+            "limited",
+            "cumulative",
+            "approval"
+          ],
+          "type": "string"
+        },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "two_round" },
+        "majority": {
+          "type": "number",
+          "minimum": 0,
+          "maximum": 1,
+          "default": 0.5
+        },
+        "advance": { "type": "integer", "minimum": 2, "default": 2 },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "top_two" },
+        "advance": { "type": "integer", "minimum": 2, "default": 2 },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "irv" },
+        "maxRankings": { "type": "integer", "minimum": 1 },
+        "batchElimination": { "type": "boolean", "default": false },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "stv" },
+        "quota": {
+          "enum": ["droop", "hare"],
+          "type": "string",
+          "default": "droop"
+        },
+        "surplus": {
+          "enum": [
+            "last_parcel",
+            "gregory",
+            "weighted_inclusive_gregory",
+            "meek"
+          ],
+          "type": "string",
+          "default": "gregory"
+        },
+        "tieBreak": { "enum": ["votes", "lot"], "type": "string" }
+      },
+      "required": ["formula"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "repeated_ballot" },
+        "majorities": {
+          "type": "array",
+          "items": {
+            "type": "object",
+            "properties": {
+              "fromRound": { "type": "integer", "minimum": 1 },
+              "share": { "type": "number", "minimum": 0, "maximum": 1 },
+              "strict": { "type": "boolean", "default": false }
+            },
+            "required": ["fromRound", "share"]
+          },
+          "minItems": 1
+        },
+        "required": { "type": "integer", "minimum": 1 }
+      },
+      "required": ["formula", "majorities"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "caucus" },
+        "viability": { "type": "number", "minimum": 0, "maximum": 1 },
+        "alignments": { "type": "integer", "minimum": 1, "default": 2 }
+      },
+      "required": ["formula", "viability"]
+    },
+    {
+      "type": "object",
+      "properties": {
+        "formula": { "const": "referendum" },
+        "quorum": { "type": "number", "minimum": 0, "maximum": 1 },
+        "doubleMajority": {
+          "type": "object",
+          "properties": {
+            "scheme": { "type": "string" },
+            "weights": {
+              "type": "object",
+              "propertyNames": { "type": "string" },
+              "additionalProperties": { "type": "number", "minimum": 0 }
+            },
+            "types": {
+              "type": "array",
+              "items": {
+                "enum": [
+                  "initiative",
+                  "mandatory_referendum",
+                  "optional_referendum",
+                  "counter_proposal",
+                  "plebiscite",
+                  "recall_question"
+                ],
+                "type": "string"
+              }
+            }
+          },
+          "required": ["scheme"]
+        }
+      },
+      "required": ["formula"]
+    }
+  ],
+  "$schema": "http://json-schema.org/draft-07/schema#"
+}

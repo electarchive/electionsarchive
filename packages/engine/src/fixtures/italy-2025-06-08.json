@@ -1,0 +1,52 @@
+[
+  {
+    "question": "Citizenship: residence requirement halved from 10 to 5 years",
+    "type": "optional_referendum",
+    "won": null,
+    "notes": "Turnout was 29.85 percent of registered voters, short of the quorum of more than half. Yes won 65.34 percent of valid votes, so the law stays in force.",
+    "registered": 51301377,
+    "voters": 15315092,
+    "yes": 9748806,
+    "no": 5172207
+  },
+  {
+    "question": "Contractor liability for workplace accidents: repeal",
+    "type": "optional_referendum",
+    "won": null,
+    "notes": "Turnout was 29.84 percent of registered voters, short of the quorum of more than half. Yes won 85.78 percent of valid votes, so the law stays in force.",
+    "registered": 51301377,
+    "voters": 15309321,
+    "yes": 12763732,
+    "no": 2115055
+  },
+  {
+    "question": "Dismissals under the Jobs Act: repeal",
+    "type": "optional_referendum",
+    "won": null,
+    "notes": "Turnout was 29.83 percent of registered voters, short of the quorum of more than half. Yes won 87.57 percent of valid votes, so the law stays in force.",
+    "registered": 51301377,
+    "voters": 15304453,
+    "yes": 13031443,
+    "no": 1850524
+  },
+  {
+    "question": "Fixed-term contracts: partial repeal",
+    "type": "optional_referendum",
+    "won": null,
+    "notes": "Turnout was 29.83 percent of registered voters, short of the quorum of more than half. Yes won 87.53 percent of valid votes, so the law stays in force.",
+    "registered": 51301377,
+    "voters": 15304525,
+    "yes": 12997453,
+    "no": 1852027
+  },
+  {
+    "question": "Small businesses, dismissals, and severance: partial repeal",
+    "type": "optional_referendum",
+    "won": null,
+    "notes": "Turnout was 29.83 percent of registered voters, short of the quorum of more than half. Yes won 86.02 percent of valid votes, so the law stays in force.",
+    "registered": 51301377,
+    "voters": 15303111,
+    "yes": 12790318,
+    "no": 2078242
+  }
+]

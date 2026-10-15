@@ -1,0 +1,4797 @@
+{
+  "valid": 50137175,
+  "groups": [
+    { "id": "Cumhur İttifakı", "votes": 26904024 },
+    { "id": "Millet İttifakı", "votes": 17019808 },
+    { "id": "Halkların Demokratik Partisi", "votes": 5867302 },
+    { "id": "Hür Dava Partisi", "votes": 155539 },
+    { "id": "Vatan Partisi", "votes": 114872 }
+  ],
+  "districts": [
+    {
+      "name": "Grand National Assembly, Adana",
+      "seats": 15,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 461191,
+          "declared": 5
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 346425,
+          "declared": 4
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 179742,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 161497,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 156257,
+          "declared": 2
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 14118,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 7042,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2502,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Adıyaman",
+      "seats": 5,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 191079,
+          "declared": 4
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 53444,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 41796,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 31716,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 18278,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 5626,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 4262,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 599,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Afyonkarahisar",
+      "seats": 6,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 255430,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 66700,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 64342,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 61684,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 5780,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 5102,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1175,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 994,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Ağrı",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 143885,
+          "declared": 3
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 66624,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 6729,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 5800,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 3834,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1892,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1740,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 421,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Aksaray",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 131386,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 48064,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 24660,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 23160,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 3678,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1952,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 648,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 460,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Amasya",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 106937,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 56313,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 28240,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 27555,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 5165,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2535,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 465,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 368,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Ankara 1",
+      "seats": 13,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 450518,
+          "declared": 5
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 391457,
+          "declared": 4
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 156592,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 136050,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 112080,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 17368,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 3280,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1194,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Ankara 2",
+      "seats": 11,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 547713,
+          "declared": 6
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 187834,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 160089,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 111787,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 45211,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 16464,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2038,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1266,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Ankara 3",
+      "seats": 12,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 494955,
+          "declared": 5
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 286991,
+          "declared": 3
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 168827,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 160862,
+          "declared": 2
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 69942,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 19101,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2331,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1370,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Antalya",
+      "seats": 16,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 517530,
+          "declared": 6
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 431675,
+          "declared": 5
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 250294,
+          "declared": 3
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 149777,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 108479,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 14207,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 3917,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 3187,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Ardahan",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 21704,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 15115,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 13662,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 3957,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 2994,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 585,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 207,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 205,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Artvin",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 46769,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 36973,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 11825,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 11774,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 5676,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1679,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 432,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 329,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Aydın",
+      "seats": 8,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 248359,
+          "declared": 3
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 237734,
+          "declared": 4
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 108144,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 68447,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 59212,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 5138,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2653,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1823,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Balıkesir",
+      "seats": 9,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 357932,
+          "declared": 5
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 262566,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 127213,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 65380,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 36770,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 10073,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2881,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1533,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bartın",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 59687,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 32331,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 21604,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 7411,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2690,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 2162,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 672,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 350,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Batman",
+      "seats": 5,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 181841,
+          "declared": 4
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 72948,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 9166,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 5357,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 3561,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 3530,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 444,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 11,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bayburt",
+      "seats": 1,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 28216,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 13463,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 3020,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2097,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1593,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 593,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 79,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 51,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bilecik",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 61261,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 39824,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 19960,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 13213,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 4776,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1583,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 459,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 386,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bingöl",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 80022,
+          "declared": 2
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 38803,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 8502,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 6301,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 5909,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3312,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1570,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 344,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bitlis",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 73706,
+          "declared": 2
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 69965,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 6716,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 5397,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 4495,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1824,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1815,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 539,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bolu",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 105102,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 40954,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 30123,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 17235,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 4188,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3069,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 578,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 382,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Burdur",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 76123,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 35690,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 35155,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 22059,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 3385,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2699,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 750,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 571,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bursa 1",
+      "seats": 10,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 433129,
+          "declared": 5
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 258159,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 142512,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 99469,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 47685,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 16504,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2393,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1722,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Bursa 2",
+      "seats": 10,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 468401,
+          "declared": 6
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 185234,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 109992,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 100503,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 63345,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 16986,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 2778,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2324,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Çanakkale",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 139798,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 126498,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 62716,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 25938,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 14014,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2888,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1245,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 713,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Çankırı",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 70533,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 23375,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 14143,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 7982,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 1321,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1310,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 251,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 207,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Çorum",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 186915,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 72945,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 50387,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 30215,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 13096,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3909,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 869,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 634,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Denizli",
+      "seats": 8,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 278925,
+          "declared": 4
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 192012,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 112713,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 63105,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 27588,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 5723,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2176,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1740,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Diyarbakır",
+      "seats": 12,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 558601,
+          "declared": 9
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 182763,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 23860,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 21306,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 14303,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 11981,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1223,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 32,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Düzce",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 138507,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 46227,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 35925,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 16672,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 5103,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3674,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 644,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 312,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Edirne",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 125476,
+          "declared": 2
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 78982,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 43214,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 13958,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 10181,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2846,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 885,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 617,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Elazığ",
+      "seats": 5,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 191626,
+          "declared": 4
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 47558,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 37751,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 35460,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 26987,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 6199,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 5210,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 587,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Erzincan",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 66465,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 37865,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 27652,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 8387,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 6194,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1629,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 160,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 144,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Erzurum",
+      "seats": 6,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 238941,
+          "declared": 4
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 80780,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 52151,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 35504,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 19280,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 7689,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 849,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 715,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Eskişehir",
+      "seats": 7,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 225551,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 187676,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 76784,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 57747,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 24821,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 6452,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1445,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 780,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Gaziantep",
+      "seats": 14,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 540735,
+          "declared": 8
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 158769,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 133202,
+          "declared": 2
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 124858,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 70179,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 12576,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 8743,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2031,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Giresun",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 156447,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 51840,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 41997,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 31556,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 4499,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3634,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 835,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 813,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Gümüşhane",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 46224,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 16712,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 9218,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 6057,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1604,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 1077,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 223,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 185,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Hakkari",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 98064,
+          "declared": 2
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 28048,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 5167,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 4833,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 1826,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 797,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 746,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 282,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Hatay",
+      "seats": 11,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 340122,
+          "declared": 5
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 287438,
+          "declared": 4
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 135667,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 103530,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 61380,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 8449,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1546,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1365,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Iğdır",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 41545,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 22448,
+          "declared": 1
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 19466,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 5518,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2669,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1877,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 211,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 202,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Isparta",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 133707,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 51509,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 46224,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 36767,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 5959,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 4211,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 919,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 721,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, İstanbul 1",
+      "seats": 35,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 1432502,
+          "declared": 15
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 997889,
+          "declared": 10
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 390752,
+          "declared": 4
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 283016,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 282001,
+          "declared": 3
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 53545,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 7599,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 4896,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, İstanbul 2",
+      "seats": 28,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 1218889,
+          "declared": 13
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 668333,
+          "declared": 8
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 331407,
+          "declared": 3
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 218727,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 204598,
+          "declared": 2
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 41941,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 5422,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 5242,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, İstanbul 3",
+      "seats": 35,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 1378027,
+          "declared": 15
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 832342,
+          "declared": 9
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 473364,
+          "declared": 5
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 278199,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 268798,
+          "declared": 3
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 44384,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 6638,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 6002,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, İzmir 1",
+      "seats": 14,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 581342,
+          "declared": 7
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 407119,
+          "declared": 4
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 177358,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 148318,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 83005,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 11152,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 4337,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 2329,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, İzmir 2",
+      "seats": 14,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 623028,
+          "declared": 7
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 429462,
+          "declared": 4
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 168774,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 157616,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 100307,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 12114,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 4845,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 2506,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kahramanmaraş",
+      "seats": 8,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 391098,
+          "declared": 6
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 109216,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 65348,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 64494,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 25730,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 10060,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1556,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1377,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Karabük",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 83252,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 25772,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 21007,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 18829,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2660,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 2290,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 564,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 329,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Karaman",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 84410,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 25615,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 23620,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 18195,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 2491,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2482,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 534,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 362,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kars",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 55911,
+          "declared": 2
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 47052,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 21132,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 10853,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 10664,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1012,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 430,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 426,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kastamonu",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 130270,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 50072,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 38793,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 23251,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 2821,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2357,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1095,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 736,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kayseri",
+      "seats": 10,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 443015,
+          "declared": 6
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 187936,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 108268,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 96334,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 20742,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 15035,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1512,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1344,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kilis",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 38481,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 15405,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 11051,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 7690,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 1741,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1019,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 180,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 131,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kırıkkale",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 76851,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 42627,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 26888,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 24021,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 2796,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2117,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 314,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 299,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kırklareli",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 118168,
+          "declared": 2
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 66885,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 40604,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 12125,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 8417,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1499,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 695,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 367,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kırşehir",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 59471,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 36861,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 24418,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 14602,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 6779,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1437,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 295,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 259,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kocaeli",
+      "seats": 13,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 585313,
+          "declared": 7
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 243828,
+          "declared": 3
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 137708,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 125118,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 89162,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 26436,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2111,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1889,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Konya",
+      "seats": 15,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 804146,
+          "declared": 10
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 209722,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 130962,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 121356,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 50266,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 31614,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 2838,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2105,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Kütahya",
+      "seats": 5,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 213353,
+          "declared": 3
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 71847,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 49250,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 41281,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 6984,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 4701,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 931,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 826,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Malatya",
+      "seats": 6,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 265833,
+          "declared": 4
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 82651,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 79588,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 34647,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 21056,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 7400,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1638,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 695,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Manisa",
+      "seats": 10,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 385078,
+          "declared": 5
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 252578,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 130009,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 109812,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 67184,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 8943,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2816,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 2581,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Mardin",
+      "seats": 6,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 235722,
+          "declared": 4
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 120854,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 13153,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 10429,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 8268,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 4483,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3278,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 673,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Mersin",
+      "seats": 13,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 325518,
+          "declared": 4
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 304232,
+          "declared": 3
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 192573,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 154145,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 145029,
+          "declared": 2
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 7814,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 4529,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2482,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Muğla",
+      "seats": 7,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 264842,
+          "declared": 4
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 182679,
+          "declared": 2
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 106862,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 43648,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 42033,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3958,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 2667,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1402,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Muş",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 102725,
+          "declared": 3
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 61197,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 8165,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 7047,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 4667,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 2791,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1707,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 406,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Nevşehir",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 101552,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 34118,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 31705,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 17192,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 3329,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2233,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 558,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 433,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Niğde",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 93223,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 44131,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 42974,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 25190,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 3530,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2549,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 630,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 451,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Ordu",
+      "seats": 6,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 236392,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 110237,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 81680,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 41032,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 6789,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 5530,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1784,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1262,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Osmaniye",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 113323,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 98996,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 42321,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 41699,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 11210,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3076,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1169,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 677,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Rize",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 145412,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 29234,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 27831,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 13479,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 4187,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 3214,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 372,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 236,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Sakarya",
+      "seats": 7,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 375397,
+          "declared": 4
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 88486,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 88022,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 60586,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 17403,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 13240,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1232,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 880,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Samsun",
+      "seats": 9,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 443537,
+          "declared": 5
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 147454,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 138480,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 92817,
+          "declared": 1
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 15082,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 12140,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1816,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1313,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Şanlıurfa",
+      "seats": 14,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 458246,
+          "declared": 8
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 251779,
+          "declared": 4
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 80810,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 33791,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 16174,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 13528,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 11218,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 997,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Siirt",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 77009,
+          "declared": 2
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 58760,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 5314,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3841,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 2399,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 1782,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1410,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 281,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Sinop",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 77085,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 33789,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 12952,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 10064,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 2790,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1561,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 789,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 449,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Sivas",
+      "seats": 5,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 223575,
+          "declared": 3
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 77772,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 62345,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 27987,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 8991,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 7196,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 648,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 547,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Şırnak",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 164184,
+          "declared": 3
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 42516,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 9370,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 6363,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 4856,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 4629,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 1069,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 363,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Tekirdağ",
+      "seats": 7,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 253708,
+          "declared": 3
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 230731,
+          "declared": 3
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 78022,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 50255,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 43729,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 5203,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1642,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 929,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Tokat",
+      "seats": 5,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 192946,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 79873,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 63390,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 36119,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 8009,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 4946,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 695,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 630,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Trabzon",
+      "seats": 6,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 287302,
+          "declared": 4
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 77656,
+          "declared": 1
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 69424,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 57325,
+          "declared": 1
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 12708,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 6941,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 957,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 634,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Tunceli",
+      "seats": 2,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 28510,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 14704,
+          "declared": 1
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 8216,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 3203,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 920,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 178,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 67,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 59,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Uşak",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 105783,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 68725,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 30984,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 25667,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 7460,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3338,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 744,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 613,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Van",
+      "seats": 8,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 313017,
+          "declared": 5
+        },
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 167667,
+          "declared": 3
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 16245,
+          "declared": 0
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 13914,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 6720,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 4773,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 4208,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 850,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Yalova",
+      "seats": 3,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 69369,
+          "declared": 2
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 44986,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 15386,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 12530,
+          "declared": 0
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 12244,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 2046,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 335,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 292,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Yozgat",
+      "seats": 4,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 138261,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 64026,
+          "declared": 1
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 30138,
+          "declared": 1
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 19162,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 3447,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 3046,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 453,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 451,
+          "declared": 0
+        }
+      ]
+    },
+    {
+      "name": "Grand National Assembly, Zonguldak",
+      "seats": 5,
+      "independents": 0,
+      "lists": [
+        {
+          "id": "Adalet ve Kalkınma Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 178995,
+          "declared": 3
+        },
+        {
+          "id": "Cumhuriyet Halk Partisi",
+          "group": "Millet İttifakı",
+          "votes": 119800,
+          "declared": 2
+        },
+        {
+          "id": "Milliyetçi Hareket Partisi",
+          "group": "Cumhur İttifakı",
+          "votes": 42316,
+          "declared": 0
+        },
+        {
+          "id": "İYİ Parti",
+          "group": "Millet İttifakı",
+          "votes": 30388,
+          "declared": 0
+        },
+        {
+          "id": "Halkların Demokratik Partisi",
+          "group": "Halkların Demokratik Partisi",
+          "votes": 7406,
+          "declared": 0
+        },
+        {
+          "id": "Saadet Partisi",
+          "group": "Millet İttifakı",
+          "votes": 6866,
+          "declared": 0
+        },
+        {
+          "id": "Vatan Partisi",
+          "group": "Vatan Partisi",
+          "votes": 1553,
+          "declared": 0
+        },
+        {
+          "id": "Hür Dava Partisi",
+          "group": "Hür Dava Partisi",
+          "votes": 830,
+          "declared": 0
+        }
+      ]
+    }
+  ]
+}

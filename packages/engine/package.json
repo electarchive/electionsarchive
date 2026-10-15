@@ -1,0 +1,24 @@
+{
+  "name": "@ea/engine",
+  "version": "0.0.0",
+  "private": true,
+  "type": "module",
+  "exports": {
+    ".": "./src/index.ts",
+    "./rules.schema.json": "./rules.schema.json"
+  },
+  "scripts": {
+    "check": "tsc",
+    "test": "vitest run",
+    "schema": "node schema.ts"
+  },
+  "dependencies": {
+    "@valibot/to-json-schema": "catalog:",
+    "valibot": "catalog:"
+  },
+  "devDependencies": {
+    "@types/node": "catalog:",
+    "typescript": "catalog:",
+    "vitest": "catalog:"
+  }
+}
