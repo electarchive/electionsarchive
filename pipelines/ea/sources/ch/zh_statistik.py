@@ -444,7 +444,7 @@ def emit() -> Path:
                 ballot_label=label,
             )
             if seats:
-                cs.add("outcome", result_set_id=result_set, option_id=options[number], kind="elected", seats=seats)
+                cs.add("outcome", result_set_id=result_set, option_id=options[number], kind="won", seats=seats)
 
         for row in candidates.iter_rows(named=True):
             candidate = row["Liste_KandID"]

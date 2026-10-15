@@ -464,7 +464,7 @@ def export() -> list[str]:
                     join result_set rs on rs.contest_id = c.id and rs.is_default
                     join contest_option o on o.contest_id = c.id and o.kind = 'list'
                     left join outcome w on w.option_id = o.id and w.result_set_id = rs.id and w.candidacy_id is null
-                      and w.kind in ('won', 'elected') and w.seats is not null
+                      and w.kind = 'won'
                     where exists (select from contest_option co where co.parent_option_id = o.id)
                     order by 1""",
                 {"iso": iso, "measure": measure},
