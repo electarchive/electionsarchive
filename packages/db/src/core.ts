@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, smallint, uuid, text, integer, date, numeric, boolean, timestamp, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, text, integer, smallint, date, boolean, numeric, jsonb, timestamp, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -550,10 +550,11 @@ export const outcome = pgTable("outcome", {
 	notes: text(),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	candidacyId: uuid("candidacy_id").references(() => candidacy.id, { onDelete: "cascade" } ),
 }, (table) => [
-	primaryKey({ columns: [table.resultSetId, table.optionId, table.kind], name: "outcome_pkey"}),
+	index("outcome_candidacy_idx").using("btree", table.candidacyId.asc().nullsLast()).where(sql`(candidacy_id IS NOT NULL)`),
 	index("outcome_option_idx").using("btree", table.optionId.asc().nullsLast()),
-]);
+	unique("outcome_key").on(table.resultSetId, table.optionId, table.candidacyId, table.kind).nullsNotDistinct(),]);
 
 export const party = pgTable("party", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),

@@ -551,6 +551,7 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.person.id
 		}),
 		candidacyNominations: r.many.candidacyNomination(),
+		outcomes: r.many.outcome(),
 	},
 	contestOption: {
 		candidacies: r.many.candidacy(),
@@ -826,6 +827,10 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 	},
 	outcome: {
+		candidacy: r.one.candidacy({
+			from: r.outcome.candidacyId,
+			to: r.candidacy.id
+		}),
 		changeset: r.one.changeset({
 			from: r.outcome.changesetId,
 			to: r.changeset.id

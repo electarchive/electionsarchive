@@ -55,7 +55,7 @@ def export() -> list[str]:
                        join name n on n.entity_id = c.id and n.is_preferred
                        join result_set rs on rs.contest_id = c.id and rs.is_default
                        left join contest_option o on o.contest_id = c.id and o.kind = 'others'
-                       left join outcome x on x.result_set_id = rs.id and x.option_id = o.id
+                       left join outcome x on x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null
                        where c.allocation_parent_id = %(national)s group by 1""",
                     tree,
                 ).fetchall()
@@ -113,7 +113,7 @@ def export() -> list[str]:
         declared = dict(
             conn.execute(
                 """select o.ballot_label, x.seats from outcome x join contest_option o on o.id = x.option_id
-                   where x.result_set_id = %(rs)s""",
+                   where x.result_set_id = %(rs)s and x.candidacy_id is null""",
                 election,
             ).fetchall()
         )
@@ -121,7 +121,7 @@ def export() -> list[str]:
             conn.execute(
                 """select p.ballot_label, count(*) from contest c
                    join result_set rs on rs.contest_id = c.id and rs.is_default
-                   join outcome x on x.result_set_id = rs.id and x.kind in ('won', 'elected')
+                   join outcome x on x.result_set_id = rs.id and x.kind in ('won', 'elected') and x.candidacy_id is null
                    join contest_option o on o.id = x.option_id
                    join contest_option p on p.party_id = o.party_id and p.contest_id = %(allocation)s
                    where c.kind = 'body_seats'
@@ -158,7 +158,7 @@ def export() -> list[str]:
         declared = dict(
             conn.execute(
                 """select o.ballot_label, x.seats from outcome x join contest_option o on o.id = x.option_id
-                   where x.result_set_id = %s""",
+                   where x.result_set_id = %s and x.candidacy_id is null""",
                 [european_rs],
             ).fetchall()
         )

@@ -571,7 +571,7 @@ async function load(
         max(x.seats) as seats
       from outcome x join result_set rs on rs.id = x.result_set_id
       where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and rs.is_default
-        and x.kind in ('elected', 'won', 'advanced', 'tied')
+        and x.kind in ('elected', 'won', 'advanced', 'tied') and x.candidacy_id is null
     ) oc on true
     where (o.k = any(${sql.param([...optionKs])}::int[]) or o.contest_id = any(${sql.param(outcomes)}::uuid[]))
       and (o.k = any(${sql.param([...optionKs])}::int[]) or oc.kind is not null)
@@ -917,7 +917,7 @@ async function holders(
     from contest c
     left join slug s on s.entity_id = c.id and s.is_current
     join result_set rs on rs.contest_id = c.id and rs.is_default
-    join outcome x on x.result_set_id = rs.id and (x.seats > 0 or (x.seats is null and x.kind in ('elected', 'won')))
+    join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and (x.seats > 0 or (x.seats is null and x.kind in ('elected', 'won')))
     join contest_option o on o.id = x.option_id
     left join entity_merge pm on pm.entity_id = o.party_id
     left join lateral (
@@ -1707,7 +1707,7 @@ export const contests = {
              order by cy.option_id = o.id desc, cy.id limit 1) as person,
             x.kind::text as outcome
           from result_set rs
-          join outcome x on x.result_set_id = rs.id
+          join outcome x on x.result_set_id = rs.id and x.candidacy_id is null
           join contest_option o on o.id = x.option_id
           left join entity_merge pm on pm.entity_id = o.party_id
           where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and rs.is_default and rs.kind <> 'counted'
@@ -2757,7 +2757,7 @@ export const people = {
         select p.root, p.date::text as date, p.year, p.kind, t.main::int as measure, t.votes,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
           (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
-            from mine m join outcome x on x.option_id = m.option join result_set rs on rs.id = x.result_set_id and rs.is_default
+            from mine m join outcome x on x.option_id = m.option and x.candidacy_id is null join result_set rs on rs.id = x.result_set_id and rs.is_default
             where m.contest_id = p.root) as outcome,
           lead.party,
           (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
