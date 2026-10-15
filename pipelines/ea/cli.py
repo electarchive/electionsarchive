@@ -2,7 +2,7 @@ import argparse
 import importlib
 from pathlib import Path
 
-from ea import fixtures
+from ea import fixtures, tiles
 from ea.apply import apply, publish, revert
 from ea.store import connect
 
@@ -20,12 +20,17 @@ def main() -> None:
     reverting.add_argument("changeset_id")
     reverting.add_argument("reason")
     commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")
+    commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
+        "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
+    )
     args = parser.parse_args()
     match args.command:
         case "apply":
             print(apply(args.changeset))
         case "fixtures":
             print(fixtures.export())
+        case "tiles":
+            print(tiles.build(args.scheme))
         case "publish":
             with connect() as conn:
                 publish(conn, args.changeset_id)
