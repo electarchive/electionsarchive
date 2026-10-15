@@ -10,7 +10,7 @@
     "preview": "vite preview",
     "start": "node build/index.js",
     "sync": "svelte-kit sync",
-    "compile-paraglide": "pnpm dlx @inlang/paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide",
+    "compile-paraglide": "paraglide-js compile --project ./project.inlang --outdir ./src/lib/paraglide",
     "check": "svelte-kit sync && svelte-check --tsconfig ./tsconfig.json"
   },
   "dependencies": {

@@ -14,12 +14,14 @@
     places,
     comparing,
     publishers,
+    votes,
   }: {
     places: NonNullable<
       Extract<PageData, { kind: "contest" }>["contest"]["places"]
     >;
     comparing: boolean;
     publishers: Array<string>;
+    votes: string;
   } = $props();
 
   const LIMIT = 100;
@@ -106,7 +108,7 @@
     { key: "name" as const, label: heading, numeric: false },
     { key: "leader" as const, label: m.col_leader(), numeric: false },
     { key: "margin" as const, label: m.col_margin(), numeric: true },
-    { key: "valid" as const, label: m.col_votes(), numeric: true },
+    { key: "valid" as const, label: votes, numeric: true },
     ...(comparing
       ? [{ key: "change" as const, label: m.col_change(), numeric: true }]
       : []),

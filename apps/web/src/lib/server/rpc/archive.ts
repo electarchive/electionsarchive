@@ -10,6 +10,14 @@ const STAGES = sql.raw(
   "array['court_revised','recount','certified','official','preliminary','live','alternative']::stage[]",
 );
 
+const MEASURES = new Map([
+  [1, "votes"],
+  [8, "list_votes"],
+  [11, "electoral_votes"],
+  [12, "state_delegate_equivalents"],
+]);
+const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
+
 const Link = v.object({ name: v.string(), path: v.nullable(v.string()) });
 
 const ResultSet = v.object({
@@ -69,6 +77,7 @@ const Places = v.nullable(
 type Found = {
   id: string;
   kind: string;
+  indirect: boolean;
   series: string;
   root: string;
   election: string;
@@ -150,7 +159,8 @@ async function find(id: string) {
     )
     select c.id, c.kind::text as kind, case when r.kind = 'ballot_question' then r.id::text
       else concat_ws(':', r.office_id, r.body_id, r.kind, r.round_number, r.party_scope_id) end as series,
-      r.id as root, e.id as election, e.polity_id as polity, e.date_from::text as date, e.status::text as status,
+      r.id as root, e.id as election, e.kind = 'indirect' as indirect, e.polity_id as polity, e.date_from::text as date,
+      e.status::text as status,
       case when a.id is not null then json_build_object('id', a.id, 'k', a.k) end as place
     from contest c
     join up on up.parent is null
@@ -190,7 +200,7 @@ async function children(
     from area_parent p join area a on a.id = p.area_id
     where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date and exists (
       select 1 from result_rollup r
-      where r.result_set_k = any(${sql.param(ks)}::int[]) and r.area_k = a.k and r.measure = 1
+      where r.result_set_k = any(${sql.param(ks)}::int[]) and r.area_k = a.k and r.measure = any(${COUNTED})
     )
   `);
   if (isRoot && found.rows.length < 2) {
@@ -203,7 +213,7 @@ async function children(
       select a.id, a.k, a.scheme_code as scheme
       from (
         select distinct area_k from result_rollup
-        where result_set_k = any(${sql.param(ks)}::int[]) and measure = 1
+        where result_set_k = any(${sql.param(ks)}::int[]) and measure = any(${COUNTED})
       ) r
       join area a on a.k = r.area_k
       where a.id not in (select id from anc)
@@ -277,6 +287,8 @@ async function load(
     number,
     {
       side: Side;
+      measure: string;
+      appointed: number | null;
       exact: boolean;
       ks: Array<number>;
       sets: Array<v.InferOutput<typeof ResultSet>>;
@@ -309,7 +321,7 @@ async function load(
       from result_set rs join grp on grp.id = rs.contest_id
       cross join unnest(${sql.param(areaKs)}::int[]) as a(k)
       join lateral (
-        select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = a.k and r.measure = 1 limit 1
+        select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED}) limit 1
       ) hit on true
       order by rs.contest_id, a.k, rs.is_default desc, array_position(${STAGES}, rs.stage),
         rs.completeness desc nulls last
@@ -325,47 +337,66 @@ async function load(
     set: number;
     area: number;
     option: number;
-    measure: number;
+    role: string;
+    main: number;
     value: number;
     exact: boolean;
   }>(sql`
-    select r.set, r.area, r.option, r.measure, r.value, r.exact
-    from (
+    with fetched as (
       select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
         r.value::float8 as value, r.exact,
         min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as first
       from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[]) as p(set, area)
       join result_rollup r on r.result_set_k = p.set and r.area_k = p.area
-      where r.count_round <= 1 and r.measure in (1, 4)
-    ) r
-    where r.count_round = r.first
+      where r.count_round <= 1 and (r.measure = any(${COUNTED}) or r.option_k = 0 and r.measure in (2, 4))
+    ),
+    mains as (
+      select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
+    ),
+    kept as (
+      select distinct f.set, f.area from fetched f join mains m on m.area = f.area and m.main = f.measure
+    )
+    select r.set, r.area, r.option, x.role, m.main, r.value, r.exact
+    from fetched r
+    join mains m on m.area = r.area
+    join kept k on k.set = r.set and k.area = r.area
+    cross join lateral (
+      select case
+        when r.measure = m.main then 'votes'
+        when r.measure = 4 and m.main = 1 then 'valid'
+        when r.measure = 2 and m.main = 11 then 'appointed'
+      end as role
+    ) x
+    where r.count_round = r.first and x.role is not null
   `);
+  const kept = new Set(rollup.rows.map((row) => `${row.set}:${row.area}`));
+  const tallies = new Map<number, number>();
   const areas = new Map<
     number,
     {
       votes: Map<number, number>;
-      valid: Map<number, number>;
-      counted: Map<number, number>;
+      sums: Map<string, number>;
+      main: number;
       exact: boolean;
     }
   >();
   for (const row of rollup.rows) {
     const area = areas.get(row.area) ?? {
       votes: new Map<number, number>(),
-      valid: new Map<number, number>(),
-      counted: new Map<number, number>(),
+      sums: new Map<string, number>(),
+      main: row.main,
       exact: true,
     };
     areas.set(row.area, area);
     area.exact &&= row.exact;
-    if (row.measure === 1) {
+    const sum = `${row.role}:${row.set}`;
+    area.sums.set(sum, (area.sums.get(sum) ?? 0) + row.value);
+    if (row.role === "votes") {
       area.votes.set(row.option, (area.votes.get(row.option) ?? 0) + row.value);
-      area.counted.set(row.set, (area.counted.get(row.set) ?? 0) + row.value);
-    } else if (row.option === 0) {
-      area.valid.set(row.set, (area.valid.get(row.set) ?? 0) + row.value);
+      tallies.set(row.option, (tallies.get(row.option) ?? 0) + row.value);
     }
   }
-  const optionKs = new Set(areas.values().flatMap((area) => area.votes.keys()));
+  const optionKs = new Set(tallies.keys());
 
   const options = await db.execute<{
     k: number;
@@ -379,7 +410,8 @@ async function load(
   }>(sql`
     select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-       where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
+       where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
+       order by cy.option_id = o.id desc, cy.id limit 1) as person,
       oc.kind::text as outcome, oc.seats
     from contest_option o
     left join entity_merge pm on pm.entity_id = o.party_id
@@ -427,21 +459,59 @@ async function load(
     `),
   ]);
   const color = new Map(colors.rows.map((row) => [row.party_id, row.color]));
+  const sharing = Map.groupBy(
+    options.rows.filter((row) => row.person != null && row.party != null),
+    (row) => row.party ?? "",
+  );
+  const tints = new Map(
+    sharing.entries().flatMap(([party, rows]) => {
+      const base = color.get(party);
+      const order = [
+        ...new Set(
+          rows
+            .toSorted(
+              (a, b) => (tallies.get(b.k) ?? 0) - (tallies.get(a.k) ?? 0),
+            )
+            .map((row) => row.person),
+        ),
+      ];
+      return rows.flatMap((row) => {
+        const rank = order.indexOf(row.person);
+        const step =
+          (rank % 2 === 1 ? 1 : -1) * (0.06 + 0.08 * Math.ceil(rank / 2));
+        if (base == null || rank < 1) {
+          return [];
+        }
+        return [
+          [
+            row.k,
+            sharing.size === 1
+              ? `oklch(from ${base} l max(c, 0.1) calc(h + ${rank * 137.5}))`
+              : `oklch(from ${base} calc(l + ${step}) c h)`,
+          ] as const,
+        ];
+      });
+    }),
+  );
   const backers = backing.rows.map((row) => ({
     party: row.party,
     candidate: labels.full.get(row.person) ?? "",
   }));
   for (const [k, area] of areas) {
-    const sets = picked.rows.filter((row) => row.area === k);
+    const sets = picked.rows.filter(
+      (row) => row.area === k && kept.has(`${row.k}:${row.area}`),
+    );
     const isAnswers = options.rows.every(
       (row) => !area.votes.has(row.k) || row.kind === "answer",
     );
     let total = 0;
+    let appointed = 0;
     for (const set of sets) {
       total +=
-        (isAnswers ? null : area.valid.get(set.k)) ??
-        area.counted.get(set.k) ??
+        (isAnswers ? null : area.sums.get(`valid:${set.k}`)) ??
+        area.sums.get(`votes:${set.k}`) ??
         0;
+      appointed += area.sums.get(`appointed:${set.k}`) ?? 0;
     }
     loaded.set(k, {
       side: {
@@ -466,13 +536,15 @@ async function load(
               labels.short.get(row.party ?? "") ??
               (row.person == null ? null : labels.full.get(row.party ?? "")) ??
               null,
-            color: color.get(row.party ?? "") ?? null,
+            color: tints.get(row.k) ?? color.get(row.party ?? "") ?? null,
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
             seats: row.seats,
           })),
         backing: backers,
       },
+      measure: MEASURES.get(area.main) ?? "votes",
+      appointed: appointed > 0 ? appointed : null,
       exact: area.exact,
       ks: sets.map((set) => set.k),
       sets: sets.map((row) => ({
@@ -634,7 +706,7 @@ async function places(
     legend: kept.map((item) => ({
       key: item.key,
       label: item.label,
-      short: item.short,
+      short: item.key.startsWith("person:") ? null : item.short,
       color: item.color,
     })),
     rows: compared.map(({ row, result, leader, before, valid }) => {
@@ -875,8 +947,28 @@ export const contests = {
         current: v.nullable(
           v.object({
             valid: v.number(),
+            measure: v.string(),
             exact: v.boolean(),
             sets: v.array(ResultSet),
+          }),
+        ),
+        electors: v.nullable(
+          v.object({
+            rows: v.array(
+              v.object({
+                key: v.string(),
+                label: v.string(),
+                short: v.nullable(v.string()),
+                color: v.nullable(v.string()),
+                votes: v.number(),
+              }),
+            ),
+            appointed: v.nullable(v.number()),
+            link: v.object({
+              path: v.nullable(v.string()),
+              date: v.nullable(v.string()),
+              popular: v.boolean(),
+            }),
           }),
         ),
         target: v.nullable(
@@ -1027,7 +1119,8 @@ export const contests = {
         }>(sql`
           select o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
             (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
-             where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
+             where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
+             order by cy.option_id = o.id desc, cy.id limit 1) as person,
             x.kind::text as outcome
           from result_set rs
           join outcome x on x.result_set_id = rs.id
@@ -1156,6 +1249,7 @@ export const contests = {
                 })),
               },
         current: null,
+        electors: null,
         target: null,
         comparison: { label: null, notes: [] },
         rows: [],
@@ -1169,6 +1263,7 @@ export const contests = {
         id: string;
         series: string;
         election: string;
+        indirect: boolean;
         date: string | null;
         status: string;
       }>(sql`
@@ -1180,7 +1275,7 @@ export const contests = {
         roots as (
           select c.id, case when c.kind = 'ballot_question' then c.id::text
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
-            e.id as election, e.date_from, e.status
+            e.id as election, e.kind = 'indirect' as indirect, e.date_from, e.status
           from contest c
           join election e on e.id = c.election_id
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
@@ -1191,12 +1286,12 @@ export const contests = {
           union all
           select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
         )
-        select r.id, r.series, r.election, r.date_from::text as date, r.status::text as status
+        select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.status::text as status
         from roots r
         where r.id <> ${contest.root}::uuid and exists (
           select 1 from grp join result_set rs on rs.contest_id = grp.id
           where grp.root = r.id and exists (
-            select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = 1
+            select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED})
           )
         )
         order by r.date_from desc nulls last, r.id
@@ -1204,6 +1299,16 @@ export const contests = {
       const rootIds = covering.rows.map((row) => row.id);
       const sameRace = covering.rows.filter(
         (row) => row.series === contest.series,
+      );
+      const comparable = covering.rows.filter(
+        (row) => row.indirect === contest.indirect,
+      );
+      const counterpart = sameRace.find(
+        (row) =>
+          isRoot &&
+          contest.kind === "office" &&
+          row.indirect !== contest.indirect &&
+          row.date?.slice(0, 4) === contest.date?.slice(0, 4),
       );
       const [rootLabels, rootSlugs, located] = await Promise.all([
         names(rootIds),
@@ -1246,7 +1351,7 @@ export const contests = {
       const bySegment = new Map(
         chain.map((entry) => [entry.id, entry.segment]),
       );
-      const series = [
+      const entries = [
         ...sameRace.map((row) => {
           const spot = located.rows.find((entry) => entry.root === row.id);
           const base =
@@ -1265,6 +1370,7 @@ export const contests = {
             date: row.date,
             path: base == null ? null : [base, ...below].join("/"),
             current: false,
+            indirect: row.indirect,
             annulled: row.status === "annulled",
           };
         }),
@@ -1272,10 +1378,23 @@ export const contests = {
           date: contest.date,
           path: scopePath,
           current: true,
+          indirect: contest.indirect,
           annulled: contest.status === "annulled",
         },
-      ].toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
-      const targets = covering.rows.map((row) => ({
+      ];
+      const series = entries
+        .filter(
+          (entry) =>
+            entry.current ||
+            entries.every(
+              (peer) =>
+                peer === entry ||
+                peer.date?.slice(0, 4) !== entry.date?.slice(0, 4) ||
+                (!peer.current && (!entry.indirect || peer.indirect)),
+            ),
+        )
+        .toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? ""));
+      const targets = comparable.map((row) => ({
         value: rootSlugs.get(row.id) ?? row.id,
         label: rootLabels.full.get(row.id) ?? "",
         detail: row.date,
@@ -1284,7 +1403,7 @@ export const contests = {
       }));
 
       const { chosen, notes: picked } = await pick(
-        covering.rows,
+        comparable,
         contest,
         input.vs,
       );
@@ -1298,6 +1417,12 @@ export const contests = {
         left join entity_merge fm on fm.entity_id = r.from_party_id
         left join entity_merge tm on tm.entity_id = r.to_party_id
         where r.to_party_id is not null
+        union all
+        select coalesce(fm.into_id, a.party_id), coalesce(tm.into_id, a.parent_party_id), a.kind::text
+        from party_affiliation a
+        left join entity_merge fm on fm.entity_id = a.party_id
+        left join entity_merge tm on tm.entity_id = a.parent_party_id
+        where a.kind = 'regional_branch' and a.valid @> ${contest.date ?? "infinity"}::date
       `);
       const relationLabels = await names([
         ...new Set(relations.rows.map((row) => row.to)),
@@ -1309,7 +1434,7 @@ export const contests = {
           relationLabels.full.get(row.to) ??
           "",
       }));
-      const [now, before, grid] = await Promise.all([
+      const [now, before, grid, cast] = await Promise.all([
         load(
           contest.root,
           [area.k],
@@ -1329,6 +1454,9 @@ export const contests = {
           lineage,
           input.match,
         ),
+        counterpart?.indirect === true
+          ? load(counterpart.id, [area.k], counterpart.date ?? "infinity", null)
+          : null,
       ]);
       const current = now.get(area.k);
       if (current == null) {
@@ -1406,6 +1534,41 @@ export const contests = {
               exact: earlier.exact,
               sets: earlier.sets,
             };
+      const rows = compare(
+        current.side,
+        earlier?.side ?? null,
+        lineage,
+        input.match,
+      );
+      const ballots = [current, cast?.get(area.k)].find(
+        (entry) => entry?.measure === "electoral_votes",
+      );
+      const lines = Map.groupBy(
+        current.side.options.toSorted((a, b) => b.votes - a.votes),
+        (option) => option.person ?? "",
+      );
+      const electors = (
+        ballots == null
+          ? rows.map((row) => ({ ...row, votes: row.current?.seats ?? 0 }))
+          : compare(ballots.side, null, lineage, "person").map((row) => {
+              const line = lines.get(row.key.slice("person:".length))?.[0];
+              return {
+                ...row,
+                short: line?.short ?? null,
+                color: line?.color ?? null,
+                votes: row.current?.votes ?? 0,
+              };
+            })
+      )
+        .filter((row) => isRoot && contest.kind === "office" && row.votes > 0)
+        .map((row) => ({
+          key: row.key,
+          label: row.label,
+          short: row.short,
+          color: row.color,
+          votes: row.votes,
+        }))
+        .toSorted((a, b) => b.votes - a.votes);
       return {
         ...page,
         series,
@@ -1413,9 +1576,22 @@ export const contests = {
         checks,
         current: {
           valid: current.side.valid,
+          measure: current.measure,
           exact: current.exact,
           sets: current.sets,
         },
+        electors:
+          electors.length === 0
+            ? null
+            : {
+                rows: electors,
+                appointed: ballots?.appointed ?? null,
+                link: {
+                  path: rootSlugs.get(counterpart?.id ?? "") ?? null,
+                  date: counterpart?.date ?? null,
+                  popular: counterpart?.indirect === false,
+                },
+              },
         target,
         comparison: {
           label:
@@ -1426,12 +1602,7 @@ export const contests = {
                 : "estimated",
           notes: notesOut,
         },
-        rows: compare(
-          current.side,
-          earlier?.side ?? null,
-          lineage,
-          input.match,
-        ),
+        rows,
         targets,
       };
     }),

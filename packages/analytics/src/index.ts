@@ -50,6 +50,7 @@ const LINEAGE = new Set([
   "refounded_as",
   "list_vehicle_for",
   "merged_into",
+  "regional_branch",
 ]);
 
 type Group = { lead: Option; cell: Cell };
@@ -76,25 +77,6 @@ function lineage(relations: Array<Relation>, match: Match) {
     }
   }
   return root;
-}
-
-function crowd(sides: Array<Side>, root: (party: string) => string) {
-  const crowded = new Set<string>();
-  for (const side of sides) {
-    const heads = new Map<string, string>();
-    for (const option of side.options) {
-      if (option.party == null || option.person == null) {
-        continue;
-      }
-      const party = root(option.party);
-      const seat = `${option.contest}:${party}`;
-      if ((heads.get(seat) ?? option.person) !== option.person) {
-        crowded.add(party);
-      }
-      heads.set(seat, option.person);
-    }
-  }
-  return crowded;
 }
 
 function tally(side: Side, identify: (option: Option) => string) {
@@ -136,12 +118,51 @@ export function compare(
   match: Match = "party",
 ): Array<Row> {
   const root = lineage(relations, match);
-  const crowded = crowd(earlier == null ? [current] : [current, earlier], root);
-  const identify = (option: Option) => {
-    const party = option.party == null ? null : root(option.party);
+  const options = (earlier == null ? [current] : [current, earlier]).flatMap(
+    (side) => side.options,
+  );
+  const lines = new Map<string, Option>();
+  const totals = new Map<string, number>();
+  for (const option of options) {
+    const seat = `${option.contest}:${option.person}`;
+    totals.set(
+      option.contest,
+      (totals.get(option.contest) ?? 0) + option.votes,
+    );
     if (
       option.person != null &&
-      (match === "person" || party == null || crowded.has(party))
+      option.party != null &&
+      (lines.get(seat)?.votes ?? -1) < option.votes
+    ) {
+      lines.set(seat, option);
+    }
+  }
+  const heads = new Map<string, Option>();
+  for (const line of lines.values()) {
+    const seat = `${line.contest}:${root(line.party ?? "")}`;
+    if ((heads.get(seat)?.votes ?? -1) < line.votes) {
+      heads.set(seat, line);
+    }
+  }
+  const crowded = new Set(
+    lines
+      .values()
+      .filter(
+        (line) =>
+          heads.get(`${line.contest}:${root(line.party ?? "")}`)?.person !==
+            line.person && line.votes >= 0.01 * (totals.get(line.contest) ?? 0),
+      )
+      .map((line) => root(line.party ?? "")),
+  );
+  const identify = (option: Option) => {
+    const line = lines.get(`${option.contest}:${option.person}`) ?? option;
+    const party = line.party == null ? null : root(line.party);
+    if (
+      option.person != null &&
+      (match === "person" ||
+        party == null ||
+        crowded.has(party) ||
+        heads.get(`${option.contest}:${party}`)?.person !== option.person)
     ) {
       return `person:${option.person}`;
     }

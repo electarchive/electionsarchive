@@ -1,31 +1,36 @@
 <script lang="ts">
-  import { count } from "#lib/format.js";
+  import { resolve } from "$app/paths";
+  import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
 
   const {
-    parties,
+    electors,
   }: {
-    parties: Array<{
-      key: string;
-      label: string;
-      short: string | null;
-      color: string | null;
-      seats: number;
-    }>;
+    electors: {
+      rows: Array<{
+        key: string;
+        label: string;
+        short: string | null;
+        color: string | null;
+        votes: number;
+      }>;
+      appointed: number | null;
+      link: { path: string | null; date: string | null; popular: boolean };
+    };
   } = $props();
 
   const total = $derived.by(() => {
     let sum = 0;
-    for (const party of parties) {
-      sum += party.seats;
+    for (const row of electors.rows) {
+      sum += row.votes;
     }
     return sum;
   });
-  const majority = $derived(Math.floor(total / 2) + 1);
-  const first = $derived(parties[0]);
-  const second = $derived(parties[1]);
-  const others = $derived(parties.slice(2));
+  const majority = $derived(Math.floor((electors.appointed ?? total) / 2) + 1);
+  const first = $derived(electors.rows[0]);
+  const second = $derived(electors.rows[1]);
+  const others = $derived(electors.rows.slice(2));
   const order = $derived([
     ...(first == null ? [] : [first]),
     ...others,
@@ -33,23 +38,23 @@
   ]);
 </script>
 
-{#snippet side(party: (typeof parties)[number] | undefined)}
-  {#if party != null}
+{#snippet side(row: (typeof electors.rows)[number] | undefined)}
+  {#if row != null}
     <div
       class="grid gap-0.5 min-inline-0 last:text-end"
-      style:--party={swatch(party.color, party.key)}
+      style:--party={swatch(row.color, row.key)}
     >
       <span
         class="font-serif text-4xl/none font-[640] tracking-[-0.01em] tabular-nums max-sm:text-3xl/none"
-        >{count(party.seats)}</span
+        >{count(row.votes)}</span
       >
       <span class="truncate text-sm">
         <span
           class="me-1 inline-block rounded-xs bg-(--party) align-[-1px] block-2.5 inline-2.5"
         ></span>
-        <span class="font-semibold">{party.label}</span>
-        {#if party.short != null && party.short !== party.label}
-          <span class="text-muted-foreground max-sm:hidden">{party.short}</span>
+        <span class="font-semibold">{row.label}</span>
+        {#if row.short != null && row.short !== row.label}
+          <span class="text-muted-foreground max-sm:hidden">{row.short}</span>
         {/if}
       </span>
     </div>
@@ -74,42 +79,55 @@
     <div
       class="flex gap-px overflow-hidden rounded-xs bg-card block-6"
       role="img"
-      aria-label={parties
-        .map((party) => `${party.label} ${count(party.seats)}`)
+      aria-label={electors.rows
+        .map((row) => `${row.label} ${count(row.votes)}`)
         .join(", ")}
     >
-      {#each order as party (party.key)}
+      {#each order as row (row.key)}
         <span
           class="block shrink-0"
-          style:background-color={swatch(party.color, party.key)}
-          style:width="{(party.seats / total) * 100}%"
-          title="{party.label} {count(party.seats)}"
+          style:background-color={swatch(row.color, row.key)}
+          style:width="{(row.votes / total) * 100}%"
+          title="{row.label} {count(row.votes)}"
         ></span>
       {/each}
     </div>
     <span
-      class="absolute inset-bs-0 -translate-x-1/2 bg-foreground block-[calc(100%-1rem)] inline-0.5"
-      style:inset-inline-start="{(majority / total) * 100}%"
+      class="absolute inset-bs-0 -translate-x-1/2 bg-foreground block-[calc(100%-1.125rem)] inline-0.5"
+      style:inset-inline-start="{Math.min(1, majority / total) * 100}%"
       aria-hidden="true"
     ></span>
     <span
       class="absolute inset-be-0 -translate-x-1/2 text-[0.8125rem] whitespace-nowrap text-muted-foreground"
-      style:inset-inline-start="{(majority / total) * 100}%"
+      style:inset-inline-start="{Math.min(1, majority / total) * 100}%"
       >{m.electors_majority({ count: count(majority) })}</span
     >
   </div>
-  {#if others.length > 0}
-    <ul class="flex flex-wrap justify-center gap-x-4 gap-y-1 text-[0.8125rem]">
-      {#each others as party (party.key)}
-        <li class="flex items-center gap-1.5">
-          <span
-            class="rounded-xs block-2.5 inline-2.5"
-            style:background-color={swatch(party.color, party.key)}
-          ></span>
-          <span class="font-semibold">{party.label}</span>
-          <span class="font-mono tabular-nums">{count(party.seats)}</span>
-        </li>
-      {/each}
-    </ul>
+  {#if others.length > 0 || electors.link.path != null}
+    <div
+      class="flex flex-wrap items-baseline justify-between gap-x-6 gap-y-1.5 text-[0.8125rem]"
+    >
+      <ul class="flex flex-wrap gap-x-4 gap-y-1">
+        {#each others as row (row.key)}
+          <li class="flex items-center gap-1.5">
+            <span
+              class="rounded-xs block-2.5 inline-2.5"
+              style:background-color={swatch(row.color, row.key)}
+            ></span>
+            <span class="font-semibold">{row.label}</span>
+            <span class="font-mono tabular-nums">{count(row.votes)}</span>
+          </li>
+        {/each}
+      </ul>
+      {#if electors.link.path != null}
+        <a
+          class="text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+          href={resolve("/[...path]", { path: electors.link.path })}
+          >{electors.link.popular
+            ? m.electors_popular({ date: date(electors.link.date) })
+            : m.electors_cast({ date: date(electors.link.date) })}</a
+        >
+      {/if}
+    </div>
   {/if}
 </section>

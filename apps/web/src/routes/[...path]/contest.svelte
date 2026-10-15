@@ -47,14 +47,22 @@
     annulled: m.status_annulled,
     withdrawn: m.status_withdrawn,
   };
+  const MEASURES: Record<string, () => string> = {
+    list_votes: m.measure_list_votes,
+    electoral_votes: m.measure_electoral_votes,
+    state_delegate_equivalents: m.measure_state_delegate_equivalents,
+  };
+  const SEATS: Record<string, () => string> = {
+    office: m.col_electors,
+    elector_slate: m.col_electors,
+    delegate_allocation: m.col_delegates,
+  };
 
   let expanded = $state(false);
 
   const here = $derived(page.url.pathname.slice(1));
   const drilled = $derived(contest.scope.noun != null);
-  const electoral = $derived(
-    contest.kind === "office" || contest.kind === "elector_slate",
-  );
+  const counted = $derived(MEASURES[contest.current?.measure ?? ""]?.());
   const question = $derived(
     contest.rows.some((row) => row.key.startsWith("answer:")),
   );
@@ -112,7 +120,11 @@
     for (const party of parties) {
       total += party.seats;
     }
-    return !electoral && parties.length > 1 && total >= 15;
+    return (
+      (contest.kind === "body_seats" || contest.kind === "list_allocation") &&
+      parties.length > 1 &&
+      total >= 15
+    );
   });
   const years = $derived.by(() => {
     const seen = Object.groupBy(
@@ -273,10 +285,28 @@
   </div>
   {#if years.length > 1}
     <nav
-      class="max-md:-mx-3.5 max-md:overflow-x-auto max-md:px-3.5"
+      class={cn(
+        "-mx-3.5 flex scrollbar-thin flex-row-reverse overflow-x-auto px-3.5 md:mx-0 md:px-0",
+        { "md:col-span-2": years.length > 8 },
+      )}
       aria-label={m.series_label()}
+      {@attach (strip: HTMLElement) => {
+        const current =
+          strip.querySelectorAll("li")[
+            years.findIndex((entry) => entry.current)
+          ];
+        void document.fonts.ready.then(() => {
+          if (current != null) {
+            const box = current.getBoundingClientRect();
+            strip.scrollLeft +=
+              box.left -
+              strip.getBoundingClientRect().left -
+              (strip.clientWidth - box.width) / 2;
+          }
+        });
+      }}
     >
-      <ol class="flex inline-max">
+      <ol class="me-auto flex inline-max">
         {#each years as entry (entry.path ?? entry.label)}
           <li class="-ms-px first:ms-0">
             {#if entry.current || entry.path == null}
@@ -382,12 +412,14 @@
     {m.no_results()}
   </p>
 {:else}
-  {#if contest.kind === "office" && !drilled && parties.length > 0}
-    <Electors {parties} />
+  {#if contest.electors != null}
+    <Electors electors={contest.electors} />
   {/if}
   <dl class="col-span-12 grid grid-cols-12 gap-px">
     <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-3">
-      <dt class="text-[0.8125rem] text-muted-foreground">{m.stat_valid()}</dt>
+      <dt class="text-[0.8125rem] text-muted-foreground">
+        {counted ?? m.stat_valid()}
+      </dt>
       <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
         {count(contest.current.valid)}
       </dd>
@@ -403,7 +435,7 @@
     {#if contest.target != null}
       <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-3">
         <dt class="text-[0.8125rem] text-muted-foreground">
-          {m.stat_earlier_valid({ year })}
+          {m.stat_in({ label: counted ?? m.stat_valid(), year })}
         </dt>
         <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
           {count(contest.target.valid)}
@@ -504,14 +536,14 @@
               class={cn("px-2 py-1.5 text-end font-medium", {
                 "max-sm:hidden": contest.target != null,
               })}
-              scope="col">{m.col_votes()}</th
+              scope="col">{counted ?? m.col_votes()}</th
             >
             <th class="px-2 py-1.5 text-end font-medium" scope="col"
               >{m.col_share()}</th
             >
             {#if seated}
               <th class="px-2 py-1.5 text-end font-medium" scope="col"
-                >{electoral ? m.col_electors() : m.col_seats()}</th
+                >{SEATS[contest.kind]?.() ?? m.col_seats()}</th
               >
             {/if}
             {#if contest.target != null}
@@ -693,6 +725,7 @@
       places={contest.places}
       comparing={contest.target != null}
       {publishers}
+      votes={counted ?? m.col_votes()}
     />
   {/key}
 {:else if contest.children.length > 0}
