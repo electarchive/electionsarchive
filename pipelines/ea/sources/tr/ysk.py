@@ -23,7 +23,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "15"
+VERSION = "16"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -32,6 +32,9 @@ GAZETTE = "https://www.resmigazete.gov.tr/eskiler"
 PRESIDENT = {1: f"{GAZETTE}/2023/05/20230519M1-1.pdf", 2: f"{GAZETTE}/2023/06/20230601M1-1.pdf"}
 PARLIAMENT = f"{GAZETTE}/2023/05/20230530M1-1.pdf"
 LISTS = f"{GAZETTE}/2023/04/20230419M1-1.pdf"
+LISTS_2018 = "https://www.ysk.gov.tr/doc/dosyalar/docs/24Haziran2018/2018CBMV-MVKesinAdayListesi.pdf"
+WITHDREW_2018 = "https://www.hurriyet.com.tr/gundem/iyi-parti-edirne-1inci-sira-adayi-istifa-etti-40855957"
+WITHDRAWN_2018 = ("22", "İYİ Parti", 1)
 PRESIDENT_2018 = f"{GAZETTE}/2018/07/20180704M1-1.pdf"
 PARLIAMENT_2018 = f"{GAZETTE}/2018/07/20180704M1-2.pdf"
 PARLIAMENT_2015 = f"{GAZETTE}/2015/11/20151112M1-1.pdf"
@@ -121,6 +124,17 @@ OZONDER_CAVEAT = (
     "Özönder. He died in a traffic accident on July 26, 2007, four days after the election, while traveling to "
     "collect his certificate of election. The gazette was published on July 30. His name comes from Wikidata, and "
     "the account of his death comes from a Son Dakika report of July 27, 2007."
+)
+WITHDREW_2018_SOURCE = (
+    "DHA report published by Hürriyet on June 2, 2018, regarding the withdrawal of İmren Çakırlar, first on the İYİ "
+    "Parti list in Edirne, and Orhan Çakırlar moving up to first place."
+)
+WITHDREW_2018_NOTE = "Withdrew on June 2, 2018, after the final lists were published."
+EDIRNE_2018_CAVEAT = (
+    "İmren Çakırlar was first on the İYİ Parti list, replacing Mehmet Akalın, whose candidacy YSK struck off because "
+    "Mehmet Akalın had not resigned from public office in time. İmren Çakırlar withdrew on June 2, 2018, after the "
+    "final lists were published, so the name remained on the printed list. İYİ Parti won one seat in this district, "
+    "which went to the second candidate on the list, Orhan Çakırlar."
 )
 MPS_2018_SOURCE = (
     "Members of the 27th term of the Grand National Assembly, with the electoral district each represented and the "
@@ -543,6 +557,17 @@ DECISIONS = {
             "scanned images. Each cell was read three times by OCR and checked against the printed sums, and every count "
             "carries a page and bounding-box locator. The gazette prints Karaman's page twice (pages 63 and 65) and "
             "leaves out Kahramanmaraş."
+        ),
+    ),
+    LISTS_2018: (
+        "24 Haziran 2018 Milletvekili Seçimleri kesin aday listesi",
+        (
+            "YSK's final candidate lists for the June 24, 2018 parliamentary election, published on its website in PDF "
+            "form alongside decision 2018/668 (Resmî Gazete 30436, Mükerrer, May 30, 2018). The lists show every "
+            "party's ranked candidates and independent candidates for each of the 87 electoral districts. We read the "
+            "rank and name of each candidate directly from the PDF text layer; we do not use OCR. Education and "
+            "occupation columns are not read and are blanked in the page images. Every candidate has a page and "
+            "bounding-box locator."
         ),
     ),
     PARLIAMENT_2015: (
@@ -1188,6 +1213,7 @@ def fetch() -> None:
         PARLIAMENT,
         LISTS,
         PARLIAMENT_2018,
+        LISTS_2018,
         ISTANBUL,
         REFERENDUM_2017,
         REFERENDUM_2010,
@@ -1200,6 +1226,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, PARLIAMENT_2007, suffix=".doc")
     raw.fetch(SOURCE, COURT_2010, suffix=".htm")
     raw.fetch(SOURCE, OZONDER_PRESS, suffix=".htm")
+    raw.fetch(SOURCE, WITHDREW_2018, suffix=".htm")
     for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS):
         raw.fetch(SOURCE, url, suffix=".rtf")
     for url in (MAYORS, MPS_2018, MPS_2015, MPS_JUNE_2015, MPS_2011, OZONDER_ITEM):
@@ -1715,42 +1742,15 @@ def parse() -> None:
                     "position": position,
                     "name": " ".join(parts),
                     "sequence": None,
+                    "url": LISTS,
+                    "withdrew": False,
                     "page": page,
                     "box": [x0 / list_width, top / list_height, x1 / list_width, bottom / list_height],
                 }
             )
     if unread or used != set(NAMES_LISTS):
         raise ValueError(f"lists: unread names {unread}, unused readings {set(NAMES_LISTS) - used}")
-    lists: dict[tuple[str, str], list[dict[str, object]]] = {}
-    for row in candidates:
-        lists.setdefault((str(row["code"]), str(row["party"])), []).append(row)
-    magnitudes = {str(row["code"]): int(str(row["magnitude"])) for row in districts}
-    voted = {
-        (code, option)
-        for code, option in frame.filter(
-            pl.col("measure") == VOTES, pl.col("option").is_not_null(), pl.col("value") > 0
-        )
-        .select("code", "option")
-        .iter_rows()
-    }
-    if set(lists) != voted:
-        raise ValueError(f"lists: lists without votes {set(lists) - voted}, votes without lists {voted - set(lists)}")
-    if wrong := [
-        (pair, len(rows))
-        for pair, rows in lists.items()
-        if pair[1] != INDEPENDENTS and len(rows) != magnitudes[pair[0]]
-    ]:
-        raise ValueError(f"lists: lists whose length is not the district magnitude {wrong}")
-    winners: dict[tuple[str, str], list[dict[str, object]]] = {}
-    for row in elected:
-        winners.setdefault((str(row["code"]), str(row["party"])), []).append(row)
-    for pair, won_members in winners.items():
-        ranked = lists[pair][: len(won_members)]
-        if [row["name"] for row in ranked] != [member["name"] for member in won_members]:
-            raise ValueError(f"lists: {pair} elected members are not the first on the list")
-        for row, member in zip(ranked, won_members, strict=True):
-            row["sequence"] = member["sequence"]
-    print(f"lists: {len(candidates)} candidates on {len(lists)} lists, {len(NAMES_LISTS)} names read by eye")
+    print(f"lists: {len(candidates)} candidates, {len(NAMES_LISTS)} names read by eye")
     for page in sorted({int(str(row["page"])) for row in candidates}):
         image = PAGES / f"{pdf.sha256}-{page}.png"
         if not image.exists():
@@ -2802,6 +2802,127 @@ def parse() -> None:
     ]
     parliaments[DAY_2007] = parsed_2007
 
+    pdf = raw.cached(SOURCE, LISTS_2018)
+    edge = 322.0
+    district_headings = {f"{upper(province)} İLİ": f"{plate:02}" for plate, province in enumerate(PROVINCES, 1)} | {
+        f"{upper(province)}-{number} NOLU": f"{plate:02}-{number}"
+        for plate, province in enumerate(PROVINCES, 1)
+        for number in range(1, SPLIT.get(province, 0) + 1)
+    }
+    list_headings = {upper(full): full for full, *_ in PARTIES_2018} | {"BAĞIMSIZ": INDEPENDENTS}
+    candidates_2018: list[dict[str, object]] = []
+    district_2018: str | None = None
+    ticket_2018: str | None = None
+    layout = subprocess.run(["pdftotext", "-bbox", str(pdf.path), "-"], capture_output=True, check=True).stdout.decode()
+    for page, text in enumerate(layout.split("<page ")[1:], 1):
+        page_width, page_height = (float(value) for value in re.findall(r'(?:width|height)="([\d.]+)"', text)[:2])
+        lines: dict[float, list[tuple[float, float, float, float, str]]] = {}
+        for x0, y0, x1, y1, word in re.findall(
+            r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', text
+        ):
+            lines.setdefault(round(float(y0), 1), []).append((float(x0), float(y0), float(x1), float(y1), word))
+        kept: list[tuple[float, float]] = []
+        for _, words in sorted(lines.items()):
+            words.sort()
+            if words[0][0] >= edge:
+                continue
+            if words[0][0] >= 53:
+                kept.append((words[0][1], max(word[3] for word in words)))
+                line = " ".join(word[4] for word in words)
+                if line.endswith(" SEÇİM ÇEVRESİ"):
+                    district_2018 = district_headings[line.removesuffix(" SEÇİM ÇEVRESİ")]
+                elif line in list_headings:
+                    ticket_2018 = list_headings[line]
+                elif line != "MİLLETVEKİLİ SEÇİMLERİ KESİN ADAY LİSTESİ" and not re.fullmatch(r"\d+ / \d+", line):
+                    raise ValueError(f"lists 2018, page {page}: unknown heading {line!r}")
+                continue
+            if words[0][4] == "S.":
+                continue
+            if district_2018 is None or ticket_2018 is None:
+                raise ValueError(f"lists 2018, page {page}: a candidate row before any district or party heading")
+            position = int(words[0][4])
+            candidates_2018.append(
+                {
+                    "code": district_2018,
+                    "party": ticket_2018,
+                    "position": position,
+                    "name": " ".join(word[4] for word in words[1:] if word[2] <= edge),
+                    "sequence": None,
+                    "url": LISTS_2018,
+                    "withdrew": (district_2018, ticket_2018, position) == WITHDRAWN_2018,
+                    "page": page,
+                    "box": [
+                        (words[0][0] - 2) / page_width,
+                        (words[0][1] - 2) / page_height,
+                        edge / page_width,
+                        (max(word[3] for word in words) + 2) / page_height,
+                    ],
+                }
+            )
+        image = PAGES / f"{pdf.sha256}-{page}.png"
+        if not image.exists():
+            PAGES.mkdir(parents=True, exist_ok=True)
+            with tempfile.TemporaryDirectory() as folder:
+                subprocess.run(
+                    ["pdftoppm", "-r", "100", "-png", "-gray", "-f", str(page), "-l", str(page), "-singlefile"]
+                    + [str(pdf.path), f"{folder}/page"],
+                    check=True,
+                )
+                pixels = np.asarray(Image.open(f"{folder}/page.png").convert("L")).copy()
+            ratio = pixels.shape[1] / page_width
+            keep = np.zeros(pixels.shape[0], dtype=bool)
+            for top, bottom in kept:
+                keep[int((top - 2) * ratio) : int((bottom + 2) * ratio) + 1] = True
+            pixels[~keep, int(edge * ratio) :] = 255
+            Image.fromarray(pixels).save(image)
+        width, height = Image.open(image).size
+        pages.append(
+            {"url": LISTS_2018, "page": page, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height}
+        )
+
+    folding = str.maketrans("ÇĞİÖŞÜÂÎÛ", "CGIOSUAIU")
+    for list_url, list_rows, list_districts, list_values, list_elected in (
+        (LISTS, candidates, districts, values, elected),
+        (
+            LISTS_2018,
+            candidates_2018,
+            parliaments[DAY_2018]["districts"],
+            parliaments[DAY_2018]["district_values"],
+            parliaments[DAY_2018]["elected"],
+        ),
+    ):
+        lists: dict[tuple[str, str], list[dict[str, object]]] = {}
+        for row in list_rows:
+            lists.setdefault((str(row["code"]), str(row["party"])), []).append(row)
+        magnitudes = {str(row["code"]): int(str(row["magnitude"])) for row in list_districts}
+        voted = {
+            (str(row["code"]), str(row["option"]))
+            for row in list_values
+            if row["measure"] == VOTES and row["option"] is not None and int(str(row["value"])) > 0
+        }
+        if set(lists) != voted:
+            raise ValueError(
+                f"lists {list_url}: lists without votes {set(lists) - voted}, votes without lists {voted - set(lists)}"
+            )
+        if wrong := [
+            (pair, len(rows))
+            for pair, rows in lists.items()
+            if [row["position"] for row in rows] != list(range(1, len(rows) + 1))
+            or (pair[1] != INDEPENDENTS and len(rows) != magnitudes[pair[0]])
+        ]:
+            raise ValueError(f"lists {list_url}: lists out of order or not the district magnitude long {wrong}")
+        winners: dict[tuple[str, str], dict[str, object]] = {}
+        for row in list_elected:
+            folded = re.sub(r"[^A-Z]", "", upper(str(row["name"])).translate(folding))
+            winners.setdefault((str(row["code"]), str(row["party"])), {})[folded] = row["sequence"]
+        for pair, sequences in winners.items():
+            for row in [row for row in lists[pair] if not row["withdrew"]][: len(sequences)]:
+                folded = re.sub(r"[^A-Z]", "", upper(str(row["name"])).translate(folding))
+                if folded not in sequences:
+                    raise ValueError(f"lists {list_url}: {pair} elected members are not the first on the list")
+                row["sequence"] = sequences.pop(folded)
+        print(f"lists: {len(list_rows)} candidates on {len(lists)} lists from {list_url}")
+
     tables = [
         [
             line.strip()
@@ -2857,9 +2978,9 @@ def parse() -> None:
     frame.write_parquet(PARSED / "district_values.parquet")
     pl.DataFrame(seats).write_parquet(PARSED / "seats.parquet")
     pl.DataFrame(elected, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "elected.parquet")
-    pl.DataFrame(candidates, schema_overrides={"box": pl.List(pl.Float32), "sequence": pl.Int64}).write_parquet(
-        PARSED / "lists.parquet"
-    )
+    pl.DataFrame(
+        [*candidates, *candidates_2018], schema_overrides={"box": pl.List(pl.Float32), "sequence": pl.Int64}
+    ).write_parquet(PARSED / "lists.parquet")
     pl.DataFrame(pool, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "pool.parquet")
     for day, frames in parliaments.items():
         for kind, rows in frames.items():
@@ -2913,7 +3034,7 @@ def emit() -> Path:
             summary=(
                 "2014, 2018, and 2023 Turkish presidential elections, the 2007, 2011, June 2015, November 2015, 2018, and "
                 "2023 parliamentary elections, the 2007, 2010, and 2017 constitutional referendums, "
-                "the 2023 parliamentary candidate lists, and the June 2019 İstanbul mayoral election, from YSK decisions in the "
+                "the 2018 and 2023 parliamentary candidate lists, and the June 2019 İstanbul mayoral election, from YSK decisions in the "
                 "Resmî Gazete"
             ),
             polity="TR",
@@ -3564,6 +3685,17 @@ def emit() -> Path:
             notes=OZONDER_PRESS_SOURCE,
         )
         cs.artifact(raw.cached(SOURCE, OZONDER_PRESS), ozonder_press)
+        withdrew_press = cs.source("Hürriyet", "İYİ Parti Edirne 1'inci sıra adayı istifa etti")
+        cs.add(
+            "source",
+            id=withdrew_press,
+            kind="news_agency",
+            publisher="Hürriyet",
+            title="İYİ Parti Edirne 1'inci sıra adayı istifa etti",
+            url=WITHDREW_2018,
+            notes=WITHDREW_2018_SOURCE,
+        )
+        cs.artifact(raw.cached(SOURCE, WITHDREW_2018), withdrew_press)
         members_2011 = cs.source("Wikidata", "Members of the 24th Grand National Assembly")
         cs.add(
             "source",
@@ -3811,7 +3943,8 @@ def emit() -> Path:
                     if full in won:
                         cs.add("outcome", result_set_id=declared, option_id=option, kind="won", seats=won[full])
                 collect(district_values.filter(pl.col("code") == code), contest_key, url, str(district_units[code]))
-                listed = ranked.filter(pl.col("code") == code).to_dicts() if day == ROUND_DAYS[1] else []
+                list_url = {ROUND_DAYS[1]: LISTS, DAY_2018: LISTS_2018}.get(day, "")
+                listed = ranked.filter(pl.col("url") == list_url, pl.col("code") == code).to_dicts()
                 ranks = {row["sequence"]: row for row in listed if row["sequence"] is not None}
                 for row in listed:
                     if row["sequence"] is not None:
@@ -3841,12 +3974,24 @@ def emit() -> Path:
                     cs.add(
                         "citation",
                         entity_id=candidacy,
-                        source_id=sources[LISTS],
+                        source_id=sources[list_url],
                         locator={
-                            "page_id": page_ids[(LISTS, row["page"])],
+                            "page_id": page_ids[(list_url, row["page"])],
                             "bbox": [round(value, 6) for value in row["box"]],
                         },
                     )
+                    if row["withdrew"]:
+                        cs.add(
+                            "outcome",
+                            result_set_id=declared,
+                            option_id=options[f"{contest_key}:{party}"],
+                            candidacy_id=candidacy,
+                            kind="withdrew",
+                            notes=WITHDREW_2018_NOTE,
+                        )
+                        cs.add("citation", entity_id=candidacy, source_id=withdrew_press, locator=None)
+                        cs.add("note", entity_id=contest, kind="caveat", body_md=EDIRNE_2018_CAVEAT)
+                        cs.add("citation", entity_id=contest, source_id=withdrew_press, locator=None)
                 for row in elected.filter(pl.col("code") == code).iter_rows(named=True):
                     member = f"{day}:{code}:{row['sequence']}"
                     party = row["party"]
@@ -3927,9 +4072,9 @@ def emit() -> Path:
                         cs.add(
                             "citation",
                             entity_id=candidacy,
-                            source_id=sources[LISTS],
+                            source_id=sources[list_url],
                             locator={
-                                "page_id": page_ids[(LISTS, ranks[row["sequence"]]["page"])],
+                                "page_id": page_ids[(list_url, ranks[row["sequence"]]["page"])],
                                 "bbox": [round(value, 6) for value in ranks[row["sequence"]]["box"]],
                             },
                         )
