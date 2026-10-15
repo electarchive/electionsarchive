@@ -10,27 +10,31 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
-  const {
+  let {
     places,
-    comparing,
+    span,
     publishers,
     votes,
+    only = $bindable(null),
   }: {
     places: NonNullable<
       Extract<PageData, { kind: "contest" }>["contest"]["places"]
     >;
-    comparing: boolean;
+    span: {
+      from: string;
+      to: string;
+      forward: boolean;
+      race: string | null;
+    } | null;
     publishers: Array<string>;
     votes: string;
+    only?: number | string | null;
   } = $props();
 
   const LIMIT = 100;
 
   let query = $state("");
-  let only = $state<number | "flip" | null>(null);
-  let column = $state<"name" | "leader" | "margin" | "valid" | "change">(
-    "name",
-  );
+  let column = $state<"name" | "leader" | "margin" | "valid" | "shift">("name");
   let descending = $state(false);
   let all = $state(false);
 
@@ -51,7 +55,35 @@
       .toArray()
       .toSorted((a, b) => b[1] - a[1]),
   );
-  const flips = $derived(places.rows.filter((row) => row.flip != null).length);
+  const comparing = $derived(
+    span != null && places.rows.some((row) => row.earlier != null),
+  );
+  const first = $derived(places.legend[0]);
+  const second = $derived(places.legend[1]);
+  const moves = $derived(
+    places.rows.map((row) => {
+      const before = span?.forward === true ? row.shares : row.earlier;
+      const after = span?.forward === true ? row.earlier : row.shares;
+      const from = span?.forward === true ? row.leader : row.prior;
+      const to = span?.forward === true ? row.prior : row.leader;
+      return {
+        shift:
+          before == null || after == null || second == null
+            ? null
+            : (after[0] ?? 0) -
+              (after[1] ?? 0) -
+              ((before[0] ?? 0) - (before[1] ?? 0)),
+        flip: from == null || to == null || from === to ? null : { from, to },
+      };
+    }),
+  );
+  const flips = $derived(moves.filter((move) => move.flip != null).length);
+  const widest = $derived.by(() => {
+    const sizes = moves
+      .map((move) => Math.abs(move.shift ?? 0))
+      .toSorted((a, b) => a - b);
+    return Math.max(0.0001, sizes[Math.floor(sizes.length * 0.9)] ?? 0);
+  });
   const filtered = $derived.by(() => {
     const [needle = "", ...names] = [
       query.trim(),
@@ -66,6 +98,7 @@
     return places.rows
       .map((row, index) => ({
         row,
+        move: moves[index],
         value:
           column === "leader"
             ? row.leader == null
@@ -75,11 +108,13 @@
               ? (row.margin ?? -1)
               : column === "valid"
                 ? row.valid
-                : (row.change ?? -Infinity),
+                : (moves[index]?.shift ?? -Infinity),
         match:
           (names[index] ?? "").includes(needle) &&
           (only == null ||
-            (only === "flip" ? row.flip != null : row.leader === only)),
+            (only === "flip" && moves[index]?.flip != null) ||
+            only === row.leader ||
+            only === `${moves[index]?.flip?.from}>${moves[index]?.flip?.to}`),
       }))
       .filter((entry) => entry.match)
       .toSorted((a, b) => {
@@ -89,7 +124,7 @@
             : a.value - b.value;
         return descending ? -order : order;
       })
-      .map((entry) => entry.row);
+      .map((entry) => ({ ...entry.row, move: entry.move }));
   });
   const visible = $derived(all ? filtered : filtered.slice(0, LIMIT));
   const levels = $derived(
@@ -110,7 +145,7 @@
     { key: "margin" as const, label: m.col_margin(), numeric: true },
     { key: "valid" as const, label: votes, numeric: true },
     ...(comparing
-      ? [{ key: "change" as const, label: m.col_change(), numeric: true }]
+      ? [{ key: "shift" as const, label: m.col_shift(), numeric: true }]
       : []),
   ]);
   const foreign = $derived(
@@ -163,6 +198,11 @@
       />
     {/if}
   </div>
+  {#if span != null && !comparing}
+    <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
+      {m.places_no_earlier({ year: span.forward ? span.to : span.from })}
+    </p>
+  {/if}
 
   <div class="flex flex-wrap gap-1.5">
     {#each leads as [index, won] (index)}
@@ -251,6 +291,30 @@
                 }}
               >
                 {entry.label}
+                {#if entry.key === "shift" && span != null}
+                  <span
+                    class="flex items-center gap-1 font-mono text-[0.6875rem] font-normal"
+                    >{span.from}→{span.to}
+                    <span class="flex items-center gap-px" aria-hidden="true">
+                      <span class="text-[0.625rem]">◀</span>
+                      <span
+                        class="rounded-xs block-2 inline-2"
+                        style:background-color={swatch(
+                          second?.color,
+                          second?.key ?? "",
+                        )}
+                      ></span>
+                      <span
+                        class="rounded-xs block-2 inline-2"
+                        style:background-color={swatch(
+                          first?.color,
+                          first?.key ?? "",
+                        )}
+                      ></span>
+                      <span class="text-[0.625rem]">▶</span>
+                    </span>
+                  </span>
+                {/if}
                 {#if column === entry.key}
                   {#if descending}
                     <ArrowDownIcon class="block-3 inline-3" />
@@ -359,27 +423,85 @@
               {count(row.valid)}
             </td>
             {#if comparing}
-              <td class="px-2 py-1.5 text-end whitespace-nowrap">
-                {#if row.change != null}
+              <td class="px-2 py-1.5">
+                {#if row.move?.shift != null}
+                  {const shift = $derived(row.move.shift)}
+                  {const toward = $derived(shift >= 0 ? first : second)}
+                  {const flip = $derived(row.move.flip)}
                   <span
-                    class={cn("font-mono text-[0.8125rem] tabular-nums", {
-                      "highlighter px-1 font-semibold": row.flip != null,
-                    })}>{points(row.change)}</span
+                    class="flex items-center justify-end gap-2"
+                    style:--party={swatch(toward?.color, toward?.key ?? "")}
                   >
-                {/if}
-                {#if row.flip != null}
-                  <span
-                    class="block text-[0.6875rem]/tight text-muted-foreground"
-                    title={m.places_flipped_from({
-                      label: places.legend[row.flip]?.label ?? "",
-                    })}
-                    >{m.places_flipped_from({
-                      label:
-                        places.legend[row.flip]?.short ??
-                        places.legend[row.flip]?.label ??
-                        "",
-                    })}</span
-                  >
+                    {#if flip != null}
+                      <span
+                        class="flex shrink-0 items-center gap-0.5 highlighter px-1"
+                        title={m.flip_label({
+                          from: places.legend[flip.from]?.label ?? "",
+                          to: places.legend[flip.to]?.label ?? "",
+                        })}
+                      >
+                        <span
+                          class="rounded-xs block-2 inline-2"
+                          style:background-color={colors[flip.from]}
+                        ></span>
+                        <span class="text-[0.6875rem]" aria-hidden="true"
+                          >→</span
+                        >
+                        <span
+                          class="rounded-xs block-2 inline-2"
+                          style:background-color={colors[flip.to]}
+                        ></span>
+                      </span>
+                    {/if}
+                    <span
+                      class="relative flex-1 block-3 max-inline-32 min-inline-16 max-md:hidden"
+                      aria-hidden="true"
+                    >
+                      <span
+                        class="absolute -inset-y-0.5 inset-s-1/2 bg-border inline-px"
+                      ></span>
+                      <span
+                        class="absolute inset-bs-1/2 -translate-y-1/2 bg-(--party) block-0.75"
+                        style:inset-inline-start={shift >= 0 ? "50%" : null}
+                        style:inset-inline-end={shift < 0 ? "50%" : null}
+                        style:inline-size="calc({Math.min(
+                          1,
+                          Math.abs(shift) / widest,
+                        ) * 50}% - 3px)"
+                      ></span>
+                      <span
+                        class={cn(
+                          "absolute inset-bs-1/2 -translate-y-1/2 bg-(--party) block-2.5 inline-1.75",
+                          {
+                            "[clip-path:polygon(0_0,100%_50%,0_100%)]":
+                              shift >= 0,
+                            "[clip-path:polygon(100%_0,0_50%,100%_100%)]":
+                              shift < 0,
+                          },
+                        )}
+                        style:inset-inline-start={shift >= 0
+                          ? `calc(50% + ${Math.min(1, Math.abs(shift) / widest) * 50}% - 7px)`
+                          : null}
+                        style:inset-inline-end={shift < 0
+                          ? `calc(50% + ${Math.min(1, Math.abs(shift) / widest) * 50}% - 7px)`
+                          : null}
+                      ></span>
+                    </span>
+                    <span
+                      class="flex shrink-0 items-center justify-end gap-1 font-mono text-[0.8125rem] tabular-nums inline-16"
+                      title={m.shift_title({
+                        first: first?.label ?? "",
+                        second: second?.label ?? "",
+                        from: span?.from ?? "",
+                        to: span?.to ?? "",
+                      })}
+                    >
+                      <span
+                        class="rounded-xs bg-(--party) block-2 inline-2 md:hidden"
+                      ></span>
+                      {points(Math.abs(shift))}
+                    </span>
+                  </span>
                 {/if}
               </td>
             {/if}

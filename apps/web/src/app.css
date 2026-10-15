@@ -289,6 +289,9 @@
     @apply border-border;
     corner-shape: squircle;
   }
+  .rounded-full {
+    corner-shape: round;
+  }
   body {
     @apply bg-background text-foreground;
     container-type: inline-size;

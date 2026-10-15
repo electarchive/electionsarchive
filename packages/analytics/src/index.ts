@@ -27,6 +27,7 @@ export type Relation = {
 };
 
 export type Cell = {
+  label: string;
   votes: number;
   share: number;
   outcome: string | null;
@@ -88,6 +89,7 @@ function tally(side: Side, identify: (option: Option) => string) {
       groups.set(key, {
         lead: option,
         cell: {
+          label: option.label,
           votes: option.votes,
           share: 0,
           outcome: option.outcome,
@@ -103,6 +105,7 @@ function tally(side: Side, identify: (option: Option) => string) {
     }
     if (option.votes > group.lead.votes) {
       group.lead = option;
+      group.cell.label = option.label;
     }
   }
   for (const group of groups.values()) {

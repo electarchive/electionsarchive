@@ -1,0 +1,462 @@
+<script lang="ts" module>
+  import { m } from "#lib/paraglide/messages.js";
+
+  export const OUTCOMES: Record<string, () => string> = {
+    elected: m.outcome_elected,
+    won: m.outcome_won,
+    advanced: m.outcome_advanced,
+    tied: m.outcome_tied,
+  };
+</script>
+
+<script lang="ts">
+  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import { count, percent, points } from "#lib/format.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
+  import { swatch } from "#lib/party.js";
+  import { cn } from "#lib/utils.js";
+  import type { PageData } from "./$types";
+
+  const {
+    rows,
+    span,
+    votes,
+    seats,
+  }: {
+    rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
+    span: {
+      from: string;
+      to: string;
+      forward: boolean;
+      race: string | null;
+    } | null;
+    votes: string;
+    seats: string | null;
+  } = $props();
+
+  let expanded = $state(false);
+
+  const here = $derived(span?.forward === true ? span.from : span?.to);
+  const there = $derived(span?.forward === true ? span.to : span?.from);
+  const lines = $derived(
+    rows.map((row) => {
+      const before = span?.forward === true ? row.current : row.earlier;
+      const after = span?.forward === true ? row.earlier : row.current;
+      return {
+        row,
+        before,
+        after,
+        change:
+          before == null || after == null ? null : after.share - before.share,
+        gained:
+          before?.seats == null || after?.seats == null
+            ? null
+            : after.seats - before.seats,
+      };
+    }),
+  );
+  const paired = $derived(
+    lines.some(
+      (line) => line.change != null && !line.row.key.startsWith("kind:"),
+    ),
+  );
+  const topShare = $derived(
+    Math.max(0.0001, ...rows.map((row) => row.current?.share ?? 0)),
+  );
+  const scale = $derived(
+    Math.max(
+      0.1,
+      Math.ceil(
+        Math.max(
+          ...rows.flatMap((row) => [
+            row.current?.share ?? 0,
+            row.earlier?.share ?? 0,
+          ]),
+        ) * 10,
+      ) / 10,
+    ),
+  );
+  const step = $derived(scale > 0.5 ? 0.2 : 0.1);
+  const ticks = $derived(
+    Array.from(
+      { length: Math.floor(scale / step + 1e-9) + 1 },
+      (_, index) => index * step,
+    ),
+  );
+  const whole = $derived(
+    new Intl.NumberFormat(getLocale(), {
+      style: "percent",
+      maximumFractionDigits: 0,
+    }),
+  );
+  const folded = $derived.by(() => {
+    const tail = rows.filter(
+      (row, index) =>
+        index >= 5 &&
+        (row.current?.share ?? 0) < 0.01 &&
+        (row.earlier?.share ?? 0) < 0.01 &&
+        row.current?.outcome == null &&
+        row.current?.seats == null,
+    );
+    return new Set(tail.length > 2 ? tail.map((row) => row.key) : []);
+  });
+  const shown = $derived(
+    expanded ? lines : lines.filter((line) => !folded.has(line.row.key)),
+  );
+  const tail = $derived.by(() => {
+    let total = 0;
+    let current = 0;
+    let earlier = 0;
+    for (const row of rows) {
+      if (folded.has(row.key)) {
+        total += row.current?.votes ?? 0;
+        current += row.current?.share ?? 0;
+        earlier += row.earlier?.share ?? 0;
+      }
+    }
+    return {
+      votes: total,
+      before: span?.forward === true ? current : earlier,
+      after: span?.forward === true ? earlier : current,
+      current,
+    };
+  });
+</script>
+
+{#snippet trend(
+  before: { share: number } | null,
+  after: { share: number } | null,
+)}
+  <span
+    class="relative block bg-[linear-gradient(to_right,var(--border)_1px,transparent_1px)] bg-repeat-x block-4"
+    style:background-size="calc(100% / {scale / step}) 100%"
+  >
+    {#if after != null}
+      <span
+        class="absolute inset-y-0.75 inset-s-0 rounded-e-xs bg-(--party)"
+        style:inline-size="{(after.share / scale) * 100}%"
+      ></span>
+    {/if}
+    {#if before != null && (after?.share ?? 0) < before.share}
+      <span
+        class="absolute inset-y-0.75 rounded-e-xs bg-(--party)/25"
+        style:inset-inline-start="{((after?.share ?? 0) / scale) * 100}%"
+        style:inline-size="{((before.share - (after?.share ?? 0)) / scale) *
+          100}%"
+      ></span>
+    {/if}
+    {#if before != null}
+      <span
+        class="absolute inset-y-0 -translate-x-1/2 bg-foreground ring-1 ring-card inline-0.5"
+        style:inset-inline-start="{(before.share / scale) * 100}%"
+      ></span>
+    {/if}
+  </span>
+{/snippet}
+
+{#snippet year(label: string, bar: boolean)}
+  <span
+    class={cn("flex items-center gap-1 px-0.5", {
+      "highlighter font-semibold text-foreground": label === here,
+    })}
+  >
+    <span
+      class={cn("bg-current", {
+        "rounded-xs block-2 inline-3": bar,
+        "block-3 inline-0.5": !bar,
+      })}
+    ></span>
+    {label}
+  </span>
+{/snippet}
+
+{#if span != null && !paired}
+  <p class="px-2 pbs-1 text-[0.8125rem] text-muted-foreground">
+    {m.compare_unpaired()}
+  </p>
+{/if}
+<div class="overflow-x-auto">
+  <table class="border-collapse text-sm/tight inline-full">
+    <thead>
+      <tr class="border-be text-[0.8125rem] text-muted-foreground">
+        <th class="px-2 py-1.5 text-start font-medium" scope="col"
+          >{m.col_option()}</th
+        >
+        <th
+          class={cn("px-2 py-1.5 text-end font-medium", {
+            "max-sm:hidden": span != null,
+          })}
+          scope="col">{votes}</th
+        >
+        {#if span == null}
+          <th class="px-2 py-1.5 text-end font-medium" scope="col"
+            >{m.col_share()}</th
+          >
+        {:else}
+          {#each [span.from, span.to] as label (label)}
+            <th
+              class="px-2 py-1.5 text-end font-medium whitespace-nowrap"
+              scope="col"
+            >
+              <span
+                class={cn("px-0.5", {
+                  "highlighter font-semibold text-foreground": label === here,
+                })}
+                ><span class="max-sm:sr-only"
+                  >{m.col_share_in({ year: label })}</span
+                ><span class="sm:hidden" aria-hidden="true">{label}</span></span
+              >
+            </th>
+          {/each}
+        {/if}
+        {#if seats != null}
+          <th
+            class={cn("px-2 py-1.5 text-end font-medium", {
+              "max-sm:hidden": span != null,
+            })}
+            scope="col"
+          >
+            {seats}
+          </th>
+        {/if}
+        {#if span != null && paired}
+          <th
+            class="px-2 pbs-1.5 pbe-1 text-start align-bottom font-medium inline-[26%] max-md:hidden"
+            scope="col"
+          >
+            <span class="sr-only"
+              >{m.trend_label({ from: span.from, to: span.to })}</span
+            >
+            <span class="flex items-center gap-2.5" aria-hidden="true">
+              {@render year(span.from, false)}
+              {@render year(span.to, true)}
+            </span>
+            <span
+              class="relative mbs-1 block font-mono text-[0.6875rem] font-normal tabular-nums block-3.5"
+              aria-hidden="true"
+            >
+              {#each ticks as tick, index (index)}
+                <span
+                  class={cn("absolute inset-bs-0", {
+                    "-translate-x-1/2": index > 0 && tick < scale - 1e-9,
+                    "-translate-x-full": index > 0 && tick >= scale - 1e-9,
+                  })}
+                  style:inset-inline-start="{(tick / scale) * 100}%"
+                  >{whole.format(tick)}</span
+                >
+              {/each}
+            </span>
+          </th>
+          <th
+            class="px-2 py-1.5 text-end align-bottom font-medium"
+            scope="col"
+            title={m.change_title({ from: span.from, to: span.to })}
+            >{m.col_change()}</th
+          >
+        {/if}
+      </tr>
+    </thead>
+    <tbody>
+      {#each shown as line (line.row.key)}
+        {const row = $derived(line.row)}
+        {const page = $derived(row.current)}
+        {const other = $derived(row.earlier)}
+        <tr
+          class={cn("border-be border-border/60", {
+            "text-muted-foreground": page == null,
+            "animate-in fade-in motion-reduce:animate-none": folded.has(
+              row.key,
+            ),
+          })}
+          style:--party={swatch(row.color, row.key)}
+        >
+          <th class="px-2 py-1.5 text-start font-normal" scope="row">
+            <span class="flex items-baseline gap-2">
+              <span
+                class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
+              ></span>
+              <span class="flex-1 min-inline-0">
+                <span class="font-semibold text-foreground">{row.label}</span>
+                {#if row.short != null && row.short !== row.label}
+                  <span class="ms-1 text-[0.8125rem] text-muted-foreground"
+                    >{row.short}</span
+                  >
+                {/if}
+                {#if page?.outcome != null && seats == null}
+                  <span
+                    class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
+                    >{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+                  >
+                {/if}
+                {#if span != null && there != null}
+                  {#if page == null}
+                    <span class="block text-[0.8125rem] text-muted-foreground"
+                      >{m.compare_absent({ year: here ?? "" })}</span
+                    >
+                  {:else if other == null}
+                    <span class="block text-[0.8125rem] text-muted-foreground"
+                      >{m.compare_absent({ year: there })}</span
+                    >
+                  {:else if other.label !== page.label}
+                    <span class="block text-[0.8125rem] text-muted-foreground"
+                      >{m.compare_in({ year: there, name: other.label })}</span
+                    >
+                  {/if}
+                {/if}
+                {#if row.backed != null}
+                  <span class="block text-[0.8125rem] text-muted-foreground"
+                    >{m.backed({ name: row.backed })}</span
+                  >
+                {/if}
+                {#if row.origin != null}
+                  <span class="block text-[0.8125rem] text-muted-foreground"
+                    >{m.split_from({ name: row.origin })}</span
+                  >
+                {/if}
+              </span>
+            </span>
+          </th>
+          <td
+            class={cn(
+              "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
+              { "max-sm:hidden": span != null },
+            )}
+          >
+            {page == null ? "" : count(page.votes)}
+          </td>
+          {#if span == null}
+            <td
+              class="relative px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums"
+            >
+              {page == null ? "" : percent(page.share)}
+              <span
+                class="absolute inset-e-2 inset-be-0.5 bg-(--party) block-0.5"
+                style:width="calc({((page?.share ?? 0) / topShare) * 100}% -
+                1rem)"
+              ></span>
+            </td>
+          {:else}
+            {#each [line.before, line.after] as cell, index (index)}
+              <td
+                class={cn(
+                  "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
+                  {
+                    "font-semibold text-foreground":
+                      cell != null && cell === page,
+                    "text-muted-foreground": cell == null || cell !== page,
+                  },
+                )}
+              >
+                {cell == null ? "–" : percent(cell.share)}
+              </td>
+            {/each}
+          {/if}
+          {#if seats != null}
+            <td
+              class={cn(
+                "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
+                { "max-sm:hidden": span != null },
+              )}
+            >
+              <span class="font-semibold">{page?.seats ?? ""}</span>
+              {#if line.gained != null && line.gained !== 0}
+                <span class="ms-1 text-[0.75rem] text-muted-foreground"
+                  >{new Intl.NumberFormat(getLocale(), {
+                    signDisplay: "exceptZero",
+                  }).format(line.gained)}</span
+                >
+              {/if}
+            </td>
+          {/if}
+          {#if span != null && paired}
+            <td class="px-2 py-1 max-md:hidden">
+              {#if line.before != null || line.after != null}
+                <Tooltip.Root>
+                  <Tooltip.Trigger
+                    class="block cursor-default inline-full"
+                    aria-label={m.trend_label({ from: span.from, to: span.to })}
+                  >
+                    {@render trend(line.before, line.after)}
+                  </Tooltip.Trigger>
+                  <Tooltip.Content
+                    class="grid grid-cols-[auto_auto_minmax(0,1fr)_auto] items-baseline gap-x-2 gap-y-1 py-1.5 max-inline-80"
+                    style="--party: {swatch(row.color, row.key)}"
+                  >
+                    {#each [{ year: span.from, cell: line.before, bar: false }, { year: span.to, cell: line.after, bar: true }] as side, index (index)}
+                      <span
+                        class={cn("self-center bg-(--party)", {
+                          "rounded-xs block-2 inline-3": side.bar,
+                          "bg-background block-3 inline-0.5": !side.bar,
+                        })}
+                      ></span>
+                      <span class="font-mono tabular-nums opacity-70"
+                        >{side.year}</span
+                      >
+                      {#if side.cell == null}
+                        <span class="col-span-2 opacity-70"
+                          >{m.compare_absent({ year: side.year })}</span
+                        >
+                      {:else}
+                        <span class="truncate">{side.cell.label}</span>
+                        <span class="text-end font-mono tabular-nums"
+                          >{percent(side.cell.share)}</span
+                        >
+                      {/if}
+                    {/each}
+                    {#if line.change != null}
+                      <span
+                        class="col-span-4 border-bs border-background/20 pbs-1 text-end font-mono font-semibold tabular-nums"
+                        >{m.trend_change({ points: points(line.change) })}</span
+                      >
+                    {/if}
+                  </Tooltip.Content>
+                </Tooltip.Root>
+              {/if}
+            </td>
+            <td
+              class="px-2 py-1.5 text-end font-mono text-[0.8125rem] font-semibold whitespace-nowrap tabular-nums"
+            >
+              {line.change == null ? "" : points(line.change)}
+            </td>
+          {/if}
+        </tr>
+      {/each}
+      {#if folded.size > 0}
+        <tr>
+          <th class="px-2 py-1.5 text-start font-normal" scope="row">
+            <button
+              type="button"
+              class="flex keycap items-center rounded-sm border border-input bg-card px-2 text-[0.8125rem] font-semibold whitespace-nowrap block-7 hover:bg-secondary"
+              aria-expanded={expanded}
+              onclick={() => (expanded = !expanded)}
+              >{expanded
+                ? m.results_fewer()
+                : m.results_more({ count: folded.size })}</button
+            >
+          </th>
+          {#if !expanded}
+            <td
+              class={cn(
+                "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums",
+                { "max-sm:hidden": span != null },
+              )}>{count(tail.votes)}</td
+            >
+            {#if span == null}
+              <td
+                class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+                >{percent(tail.current)}</td
+              >
+            {:else}
+              {#each [tail.before, tail.after] as share, index (index)}
+                <td
+                  class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+                  >{percent(share)}</td
+                >
+              {/each}
+            {/if}
+          {/if}
+        </tr>
+      {/if}
+    </tbody>
+  </table>
+</div>

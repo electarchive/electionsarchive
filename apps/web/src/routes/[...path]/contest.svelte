@@ -3,15 +3,19 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
+  import * as HoverCard from "#lib/components/ui/hover-card/index.js";
+  import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, date, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Changes from "./changes.svelte";
   import Electors from "./electors.svelte";
   import PlaceSwitcher from "./place-switcher.svelte";
   import Places from "./places.svelte";
+  import Results, { OUTCOMES } from "./results.svelte";
   import Seats from "./seats.svelte";
 
   const {
@@ -22,12 +26,6 @@
     match: string;
   } = $props();
 
-  const OUTCOMES: Record<string, () => string> = {
-    elected: m.outcome_elected,
-    won: m.outcome_won,
-    advanced: m.outcome_advanced,
-    tied: m.outcome_tied,
-  };
   const STAGES: Record<string, () => string> = {
     live: m.stage_live,
     preliminary: m.stage_preliminary,
@@ -58,50 +56,76 @@
     delegate_allocation: m.col_delegates,
   };
 
-  let expanded = $state(false);
+  let filter = $state<{ at: string; value: number | string | null }>({
+    at: "",
+    value: null,
+  });
 
   const here = $derived(page.url.pathname.slice(1));
+  const only = $derived(filter.at === page.url.href ? filter.value : null);
   const drilled = $derived(contest.scope.noun != null);
   const counted = $derived(MEASURES[contest.current?.measure ?? ""]?.());
   const question = $derived(
     contest.rows.some((row) => row.key.startsWith("answer:")),
   );
-  const year = $derived(contest.target?.date?.slice(0, 4) ?? "");
-  const seated = $derived(
-    contest.rows.some((row) => row.current?.seats != null),
-  );
-  const topShare = $derived(
-    Math.max(0.0001, ...contest.rows.map((row) => row.current?.share ?? 0)),
-  );
-  const topDelta = $derived(
-    Math.max(0.0001, ...contest.rows.map((row) => Math.abs(row.delta ?? 0))),
-  );
-  const folded = $derived.by(() => {
-    const tail = contest.rows.filter(
-      (row, index) =>
-        index >= 5 &&
-        (row.current?.share ?? 0) < 0.01 &&
-        (row.earlier?.share ?? 0) < 0.01 &&
-        row.current?.outcome == null &&
-        row.current?.seats == null,
-    );
-    return new Set(tail.length > 2 ? tail.map((row) => row.key) : []);
-  });
-  const shown = $derived(
-    expanded
-      ? contest.rows
-      : contest.rows.filter((row) => !folded.has(row.key)),
-  );
-  const tail = $derived.by(() => {
-    let votes = 0;
-    let share = 0;
+  const seated = $derived.by(() => {
+    let total = 0;
     for (const row of contest.rows) {
-      if (folded.has(row.key)) {
-        votes += row.current?.votes ?? 0;
-        share += row.current?.share ?? 0;
-      }
+      total += row.current?.seats ?? 0;
     }
-    return { votes, share };
+    return total > 1;
+  });
+  const span = $derived.by(() => {
+    const target = contest.target?.date;
+    const own = contest.election.date;
+    if (contest.target == null || target == null || own == null) {
+      return null;
+    }
+    const [mine = [], theirs = []] = [contest.name, contest.target.name].map(
+      (name) => name.replace(/^\d{4}\s+/u, "").split(" "),
+    );
+    const shared = Math.min(mine.length, theirs.length);
+    let start = 0;
+    while (start < shared && mine[start] === theirs[start]) {
+      start += 1;
+    }
+    let end = 0;
+    while (end < shared - start && mine.at(-1 - end) === theirs.at(-1 - end)) {
+      end += 1;
+    }
+    const race = contest.comparison.notes.some(
+      (note) => note.code === "different_race",
+    )
+      ? theirs.slice(start, theirs.length - end).join(" ")
+      : "";
+    const label = (value: string) =>
+      value.slice(0, 4) === target.slice(0, 4) &&
+      value.slice(0, 4) === own.slice(0, 4)
+        ? new Intl.DateTimeFormat(getLocale(), {
+            month: "short",
+            year: "numeric",
+            timeZone: "UTC",
+          }).format(new Date(`${value}T00:00:00Z`))
+        : value.slice(0, 4);
+    const forward = target > own;
+    const [from, to] = forward ? [own, target] : [target, own];
+    return {
+      from: label(from),
+      to: label(to),
+      forward,
+      race: race === "" ? null : race,
+    };
+  });
+  const lead = $derived.by(() => {
+    const [top, next] = contest.rows
+      .filter((row) => row.current != null && !row.key.startsWith("kind:"))
+      .toSorted((a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0));
+    return top == null || next == null
+      ? null
+      : {
+          row: top,
+          margin: (top.current?.share ?? 0) - (next.current?.share ?? 0),
+        };
   });
   const parties = $derived(
     contest.rows
@@ -166,9 +190,21 @@
   ]);
   const matches = $derived(
     [
-      { value: "party", label: m.match_party() },
-      { value: "person", label: m.match_person() },
-      { value: "family", label: m.match_family() },
+      {
+        value: "party",
+        label: m.match_party(),
+        detail: m.match_party_detail(),
+      },
+      {
+        value: "person",
+        label: m.match_person(),
+        detail: m.match_person_detail(),
+      },
+      {
+        value: "family",
+        label: m.match_family(),
+        detail: m.match_family_detail(),
+      },
     ].map((option) => ({
       ...option,
       query: new URLSearchParams({
@@ -193,26 +229,28 @@
     ),
   ]);
   const notes = $derived([
-    ...contest.comparison.notes.map((note) => {
-      if (note.code === "partial") {
-        const value = percent(Number(note.value));
-        return note.side === "target"
-          ? m.note_partial_target({ percent: value })
-          : m.note_partial_current({ percent: value });
-      }
-      if (note.code === "alternative") {
-        const publisher = note.value ?? "";
-        return note.side === "target"
-          ? m.note_alternative_target({ publisher })
-          : m.note_alternative_current({ publisher });
-      }
-      return {
-        no_target: m.note_no_target,
-        not_covered: m.note_not_covered,
-        different_race: m.note_different_race,
-        annulled: m.note_annulled,
-      }[note.code]();
-    }),
+    ...contest.comparison.notes
+      .filter((note) => span == null || note.code !== "different_race")
+      .map((note) => {
+        if (note.code === "partial") {
+          const value = percent(Number(note.value));
+          return note.side === "target"
+            ? m.note_partial_target({ percent: value })
+            : m.note_partial_current({ percent: value });
+        }
+        if (note.code === "alternative") {
+          const publisher = note.value ?? "";
+          return note.side === "target"
+            ? m.note_alternative_target({ publisher })
+            : m.note_alternative_current({ publisher });
+        }
+        return {
+          no_target: m.note_no_target,
+          not_covered: m.note_not_covered,
+          different_race: m.note_different_race,
+          annulled: m.note_annulled,
+        }[note.code]();
+      }),
     ...contest.notes.map((note) => note.body),
   ]);
   const checks = $derived(
@@ -416,7 +454,7 @@
     <Electors electors={contest.electors} />
   {/if}
   <dl class="col-span-12 grid grid-cols-12 gap-px">
-    <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-3">
+    <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-4">
       <dt class="text-[0.8125rem] text-muted-foreground">
         {counted ?? m.stat_valid()}
       </dt>
@@ -424,7 +462,7 @@
         {count(contest.current.valid)}
       </dd>
     </div>
-    <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-3">
+    <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-4">
       <dt class="text-[0.8125rem] text-muted-foreground">
         {m.stat_options()}
       </dt>
@@ -432,35 +470,26 @@
         {contest.rows.filter((row) => row.current != null).length}
       </dd>
     </div>
-    {#if contest.target != null}
-      <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-3">
+    <div class="col-span-12 bg-card px-3.5 py-3 md:col-span-4">
+      {#if lead != null}
         <dt class="text-[0.8125rem] text-muted-foreground">
-          {m.stat_in({ label: counted ?? m.stat_valid(), year })}
+          {m.col_margin()}
         </dt>
-        <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
-          {count(contest.target.valid)}
-        </dd>
-      </div>
-      <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-3">
-        <dt class="text-[0.8125rem] text-muted-foreground">
-          {m.stat_comparison()}
-        </dt>
-        <dd class="mbs-1">
-          <span class="highlighter px-1 text-lg font-bold">
-            {contest.comparison.label === "exact"
-              ? m.label_exact()
-              : m.label_estimated()}
-          </span>
-          <span class="mbs-1 block text-[0.8125rem] text-muted-foreground">
-            {contest.comparison.label === "exact"
-              ? m.label_exact_detail()
-              : m.label_estimated_detail()}
+        <dd
+          class="mbs-0.5 flex items-baseline gap-2.5 min-inline-0"
+          style:--party={swatch(lead.row.color, lead.row.key)}
+        >
+          <span class="font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            >{points(lead.margin)}</span
+          >
+          <span class="flex items-center gap-1.5 truncate text-sm min-inline-0">
+            <span class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
+            ></span>
+            <span class="truncate font-semibold">{lead.row.label}</span>
           </span>
         </dd>
-      </div>
-    {:else}
-      <div class="col-span-6 bg-card max-md:hidden"></div>
-    {/if}
+      {/if}
+    </div>
   </dl>
 
   <div
@@ -489,6 +518,22 @@
           });
         }}
       />
+      {#if contest.target != null}
+        <Tooltip.Root>
+          <Tooltip.Trigger
+            class="shrink-0 rounded-xs highlighter px-1 text-[0.8125rem] font-semibold"
+          >
+            {contest.comparison.label === "exact"
+              ? m.quality_exact()
+              : m.quality_estimated()}
+          </Tooltip.Trigger>
+          <Tooltip.Content class="leading-snug max-inline-64">
+            {contest.comparison.label === "exact"
+              ? m.quality_exact_detail()
+              : m.quality_estimated_detail()}
+          </Tooltip.Content>
+        </Tooltip.Root>
+      {/if}
     </div>
     {#if !question}
       <div
@@ -501,23 +546,49 @@
         >
         <div class="flex">
           {#each matches as option (option.value)}
-            <a
-              class={cn(
-                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                {
-                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                    option.value === match,
-                },
-              )}
-              href={resolve(`/[...path]?${option.query}`, { path: here })}
-              aria-current={option.value === match ? "true" : undefined}
-              data-sveltekit-reset="false">{option.label}</a
-            >
+            <HoverCard.Root openDelay={350} closeDelay={60}>
+              <HoverCard.Trigger
+                class={cn(
+                  "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                  {
+                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                      option.value === match,
+                  },
+                )}
+                href={resolve(`/[...path]?${option.query}`, { path: here })}
+                aria-current={option.value === match ? "true" : undefined}
+                data-sveltekit-reset="false">{option.label}</HoverCard.Trigger
+              >
+              <HoverCard.Content
+                side="top"
+                class="text-[0.8125rem] leading-snug inline-64"
+                >{option.detail}</HoverCard.Content
+              >
+            </HoverCard.Root>
           {/each}
         </div>
       </div>
     {/if}
   </div>
+
+  {#if span != null && contest.target != null}
+    <Changes
+      rows={contest.rows}
+      {span}
+      valid={span.forward
+        ? { before: contest.current.valid, after: contest.target.valid }
+        : { before: contest.target.valid, after: contest.current.valid }}
+      counted={counted ?? m.stat_valid()}
+      places={contest.places}
+      picked={only}
+      onpick={(value) => {
+        filter = { at: page.url.href, value };
+        if (value != null) {
+          document.querySelector("#places-title")?.scrollIntoView();
+        }
+      }}
+    />
+  {/if}
 
   <div
     class={cn(
@@ -525,185 +596,12 @@
       { "lg:col-span-8": chamber },
     )}
   >
-    <div class="overflow-x-auto">
-      <table class="border-collapse text-sm/tight inline-full">
-        <thead>
-          <tr class="border-be text-[0.8125rem] text-muted-foreground">
-            <th class="px-2 py-1.5 text-start font-medium" scope="col"
-              >{m.col_option()}</th
-            >
-            <th
-              class={cn("px-2 py-1.5 text-end font-medium", {
-                "max-sm:hidden": contest.target != null,
-              })}
-              scope="col">{counted ?? m.col_votes()}</th
-            >
-            <th class="px-2 py-1.5 text-end font-medium" scope="col"
-              >{m.col_share()}</th
-            >
-            {#if seated}
-              <th class="px-2 py-1.5 text-end font-medium" scope="col"
-                >{SEATS[contest.kind]?.() ?? m.col_seats()}</th
-              >
-            {/if}
-            {#if contest.target != null}
-              <th class="px-2 py-1.5 text-end font-medium" scope="col"
-                >{m.col_earlier({ year })}</th
-              >
-              <th
-                class="px-2 py-1.5 text-end font-medium inline-[28%] max-md:inline-auto"
-                scope="col">{m.col_change()}</th
-              >
-            {/if}
-          </tr>
-        </thead>
-        <tbody>
-          {#each shown as row (row.key)}
-            <tr
-              class={cn("border-be border-border/60", {
-                "text-muted-foreground": row.current == null,
-                "animate-in fade-in motion-reduce:animate-none": folded.has(
-                  row.key,
-                ),
-              })}
-              style:--party={swatch(row.color, row.key)}
-            >
-              <th class="px-2 py-1.5 text-start font-normal" scope="row">
-                <span class="flex items-baseline gap-2">
-                  <span
-                    class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
-                  ></span>
-                  <span class="min-inline-0">
-                    <span class="font-semibold text-foreground"
-                      >{row.label}</span
-                    >
-                    {#if row.short != null && row.short !== row.label}
-                      <span class="ms-1 text-[0.8125rem] text-muted-foreground"
-                        >{row.short}</span
-                      >
-                    {/if}
-                    {#if row.current?.outcome != null && row.current.seats == null}
-                      <span
-                        class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
-                        >{OUTCOMES[row.current.outcome]?.() ??
-                          row.current.outcome}</span
-                      >
-                    {/if}
-                    {#if row.backed != null}
-                      <span class="block text-[0.8125rem] text-muted-foreground"
-                        >{m.backed({ name: row.backed })}</span
-                      >
-                    {/if}
-                    {#if row.origin != null}
-                      <span class="block text-[0.8125rem] text-muted-foreground"
-                        >{m.split_from({ name: row.origin })}</span
-                      >
-                    {/if}
-                  </span>
-                </span>
-              </th>
-              <td
-                class={cn(
-                  "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
-                  { "max-sm:hidden": contest.target != null },
-                )}
-              >
-                {row.current == null ? "" : count(row.current.votes)}
-              </td>
-              {#if row.current == null}
-                <td
-                  class="px-2 py-1.5 text-end text-[0.8125rem] whitespace-nowrap italic"
-                  colspan={seated ? 2 : 1}>{m.didnt_run()}</td
-                >
-              {:else}
-                <td
-                  class="relative px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums"
-                >
-                  {percent(row.current.share)}
-                  <span
-                    class="absolute inset-e-2 inset-be-0.5 bg-(--party) block-0.5"
-                    style:width="calc({(row.current.share / topShare) * 100}% -
-                    1rem)"
-                  ></span>
-                </td>
-                {#if seated}
-                  <td
-                    class="px-2 py-1.5 text-end font-mono text-[0.8125rem] font-semibold tabular-nums"
-                    >{row.current.seats ?? ""}</td
-                  >
-                {/if}
-              {/if}
-              {#if contest.target != null}
-                <td
-                  class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
-                >
-                  {#if row.earlier == null}
-                    <span class="font-sans font-semibold text-foreground"
-                      >{m.new_option()}</span
-                    >
-                  {:else}
-                    {percent(row.earlier.share)}
-                  {/if}
-                </td>
-                <td class="px-2 py-1.5">
-                  {#if row.delta != null}
-                    <span class="flex items-center justify-end gap-2">
-                      <span
-                        class="relative flex-1 block-2.5 min-inline-16 max-md:hidden"
-                        aria-hidden="true"
-                      >
-                        <span
-                          class="absolute inset-y-[-3px] inset-s-1/2 bg-border inline-px"
-                        ></span>
-                        <span
-                          class="absolute inset-y-0 rounded-xs bg-(--party)"
-                          style:inset-inline-start={row.delta >= 0
-                            ? "50%"
-                            : null}
-                          style:inset-inline-end={row.delta < 0 ? "50%" : null}
-                          style:width="{(Math.abs(row.delta) / topDelta) * 50}%"
-                        ></span>
-                      </span>
-                      <span
-                        class="shrink-0 text-end font-mono text-[0.8125rem] font-semibold tabular-nums inline-14"
-                        >{points(row.delta)}</span
-                      >
-                    </span>
-                  {/if}
-                </td>
-              {/if}
-            </tr>
-          {/each}
-          {#if folded.size > 0}
-            <tr>
-              <th class="px-2 py-1.5 text-start font-normal" scope="row">
-                <button
-                  type="button"
-                  class="flex keycap items-center rounded-sm border border-input bg-card px-2 text-[0.8125rem] font-semibold block-7 hover:bg-secondary"
-                  aria-expanded={expanded}
-                  onclick={() => (expanded = !expanded)}
-                  >{expanded
-                    ? m.results_fewer()
-                    : m.results_more({ count: folded.size })}</button
-                >
-              </th>
-              {#if !expanded}
-                <td
-                  class={cn(
-                    "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums",
-                    { "max-sm:hidden": contest.target != null },
-                  )}>{count(tail.votes)}</td
-                >
-                <td
-                  class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
-                  >{percent(tail.share)}</td
-                >
-              {/if}
-            </tr>
-          {/if}
-        </tbody>
-      </table>
-    </div>
+    <Results
+      rows={contest.rows}
+      {span}
+      votes={counted ?? m.col_votes()}
+      seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}
+    />
     {#if captions.length > 0}
       <p class="px-2 text-[0.8125rem] text-muted-foreground">
         <a
@@ -723,9 +621,14 @@
   {#key here}
     <Places
       places={contest.places}
-      comparing={contest.target != null}
+      {span}
       {publishers}
       votes={counted ?? m.col_votes()}
+      bind:only={
+        () => only,
+        (value: number | string | null) =>
+          (filter = { at: page.url.href, value })
+      }
     />
   {/key}
 {:else if contest.children.length > 0}
