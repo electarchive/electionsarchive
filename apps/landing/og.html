@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="en">
+  <head>
+    <meta charset="utf-8" />
+    <title>Elections Archive share image</title>
+    <style>
+      @font-face {
+        font-family: "Piazzolla Variable";
+        font-weight: 100 900;
+        src: url("public/fonts/piazzolla.woff2") format("woff2-variations");
+      }
+      @font-face {
+        font-family: "Sofia Sans Semi Condensed Variable";
+        font-weight: 1 1000;
+        src: url("public/fonts/sofia-sans-semi-condensed.woff2")
+          format("woff2-variations");
+      }
+
+      * {
+        box-sizing: border-box;
+        margin: 0;
+        padding: 0;
+      }
+
+      body {
+        inline-size: 1200px;
+        block-size: 630px;
+        padding: 40px;
+        overflow: hidden;
+        background: #f1efea;
+        color: #191816;
+        font-family: "Sofia Sans Semi Condensed Variable", sans-serif;
+        -webkit-font-smoothing: antialiased;
+      }
+
+      .sheet {
+        block-size: 100%;
+        display: grid;
+        grid-template-rows: 76px 1fr 64px;
+        gap: 1px;
+        overflow: hidden;
+        border: 1px solid #cfcac0;
+        border-radius: 12px;
+        background: #cfcac0;
+      }
+
+      .sheet > * {
+        background: #fbfaf7;
+        padding-inline: 32px;
+      }
+
+      .brand,
+      .foot {
+        display: flex;
+        align-items: center;
+        justify-content: space-between;
+      }
+
+      .lockup {
+        display: flex;
+        align-items: center;
+        gap: 14px;
+        font-size: 30px;
+        font-weight: 780;
+        letter-spacing: -0.015em;
+      }
+
+      .status {
+        padding-inline: 6px;
+        background-image: linear-gradient(
+          178deg,
+          transparent 12%,
+          color-mix(in oklab, #ffe03a 72%, transparent) 12% 88%,
+          transparent 88%
+        );
+        font-size: 22px;
+        font-weight: 600;
+      }
+
+      .hero {
+        display: grid;
+        grid-template-columns: minmax(0, 1fr) auto;
+        align-items: center;
+        gap: 48px;
+      }
+
+      h1 {
+        max-inline-size: 15ch;
+        font-family: "Piazzolla Variable", serif;
+        font-optical-sizing: auto;
+        font-size: 74px;
+        font-weight: 640;
+        line-height: 1.02;
+        letter-spacing: -0.01em;
+        text-wrap: balance;
+      }
+
+      .tally {
+        inline-size: 250px;
+        block-size: auto;
+        overflow: visible;
+      }
+
+      .foot {
+        color: #67635b;
+        font-size: 22px;
+      }
+
+      .box {
+        fill: #fbfaf7;
+        stroke: #191816;
+      }
+
+      .marker {
+        fill: #ffe03a;
+      }
+
+      .bars {
+        fill: none;
+        stroke: #191816;
+        stroke-linecap: round;
+      }
+    </style>
+  </head>
+  <body>
+    <main class="sheet">
+      <header class="brand">
+        <span class="lockup">
+          <svg width="42" height="42" viewBox="0 0 32 32" aria-hidden="true">
+            <rect
+              class="box"
+              x="1"
+              y="1"
+              width="30"
+              height="30"
+              rx="4"
+              stroke-width="1.5"
+            />
+            <path class="marker" d="M5 12.6 L27 11.4 L27 19.4 L5 20.6 Z" />
+            <path
+              class="bars"
+              d="M9 8 V24 M13 8 V24 M17 8 V24 M21 8 V24 M6 21.5 L26 12"
+              stroke-width="2.2"
+            />
+          </svg>
+          Elections Archive
+        </span>
+        <span class="status">In preparation</span>
+      </header>
+      <section class="hero">
+        <h1>Every election in the world, down to the ballot box.</h1>
+        <svg class="tally" viewBox="3.5 6.5 25 19" aria-hidden="true">
+          <path class="marker" d="M5 12.6 L27 11.4 L27 19.4 L5 20.6 Z" />
+          <path
+            class="bars"
+            d="M9 8 V24 M13 8 V24 M17 8 V24 M21 8 V24 M6 21.5 L26 12"
+            stroke-width="2.2"
+          />
+        </svg>
+      </section>
+      <footer class="foot">www.electionsarchive.com</footer>
+    </main>
+  </body>
+</html>
