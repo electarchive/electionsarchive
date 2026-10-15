@@ -9,8 +9,8 @@
     "compile-paraglide": "pnpm --filter @ea/web compile-paraglide",
     "check": "pnpm --recursive --workspace-concurrency=1 run check",
     "test": "pnpm --filter @ea/engine test",
-    "lint": "knip && SVELTE_ESLINT_PARSER_EXPERIMENTAL_TS_SYS_HOOK=1 eslint --concurrency auto .",
-    "lint:fix": "knip --fix && SVELTE_ESLINT_PARSER_EXPERIMENTAL_TS_SYS_HOOK=1 eslint --concurrency auto --fix .",
+    "lint": "knip && SVELTE_ESLINT_PARSER_EXPERIMENTAL_TS_SYS_HOOK=1 eslint .",
+    "lint:fix": "knip --fix && SVELTE_ESLINT_PARSER_EXPERIMENTAL_TS_SYS_HOOK=1 eslint --fix .",
     "format": "oxfmt --check",
     "format:fix": "oxfmt",
     "ci": "pnpm run compile-paraglide && pnpm run check && pnpm run test && pnpm run format && pnpm run lint"
