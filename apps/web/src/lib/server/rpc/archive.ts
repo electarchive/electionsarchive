@@ -17,6 +17,14 @@ const MEASURES = new Map([
   [12, "state_delegate_equivalents"],
 ]);
 const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
+const CYCLE = sql`
+  extract(year from e.date_from)::int - (
+    e.kind = 'indirect' and extract(month from e.date_from) = 1 and exists (
+      select from contest x join body b on b.id = x.body_id join polity y on y.id = b.polity_id
+      where x.election_id = e.id and b.kind = 'electoral_college' and y.iso_code = 'US'
+    )
+  )::int
+`;
 
 const Link = v.object({ name: v.string(), path: v.nullable(v.string()) });
 
@@ -88,6 +96,7 @@ type Found = {
   election: string;
   polity: string;
   date: string | null;
+  year: number | null;
   status: string;
   place: { id: string; k: number } | null;
 };
@@ -165,7 +174,7 @@ async function find(id: string) {
     select c.id, c.kind::text as kind, case when r.kind = 'ballot_question' then r.id::text
       else concat_ws(':', r.office_id, r.body_id, r.kind, r.round_number, r.party_scope_id) end as series,
       r.id as root, e.id as election, e.kind = 'indirect' as indirect, e.polity_id as polity, e.date_from::text as date,
-      e.status::text as status,
+      ${CYCLE} as year, e.status::text as status,
       case when a.id is not null then json_build_object('id', a.id, 'k', a.k) end as place
     from contest c
     join up on up.parent is null
@@ -805,6 +814,7 @@ async function pick(
     series: string;
     election: string;
     date: string | null;
+    year: number | null;
     status: string;
   }>,
   contest: { series: string; date: string | null },
@@ -895,6 +905,7 @@ export const contests = {
           name: v.string(),
           path: v.nullable(v.string()),
           date: v.nullable(v.string()),
+          year: v.nullable(v.number()),
           status: v.string(),
         }),
         area: v.string(),
@@ -920,6 +931,7 @@ export const contests = {
         series: v.array(
           v.object({
             date: v.nullable(v.string()),
+            year: v.nullable(v.number()),
             path: v.nullable(v.string()),
             name: v.string(),
             current: v.boolean(),
@@ -1010,6 +1022,7 @@ export const contests = {
             name: v.string(),
             path: v.nullable(v.string()),
             date: v.nullable(v.string()),
+            year: v.nullable(v.number()),
             status: v.string(),
             valid: v.number(),
             exact: v.boolean(),
@@ -1051,6 +1064,7 @@ export const contests = {
             value: v.string(),
             label: v.string(),
             detail: v.nullable(v.string()),
+            year: v.nullable(v.number()),
             series: v.boolean(),
             annulled: v.boolean(),
           }),
@@ -1229,6 +1243,7 @@ export const contests = {
           name: labels.full.get(contest.election) ?? "",
           path: slugs.get(contest.election) ?? null,
           date: contest.date,
+          year: contest.year,
           status: contest.status,
         },
         area: labels.full.get(contest.place?.id ?? "") ?? "",
@@ -1301,6 +1316,7 @@ export const contests = {
         election: string;
         indirect: boolean;
         date: string | null;
+        year: number | null;
         status: string;
       }>(sql`
         with recursive anc(id) as (
@@ -1311,7 +1327,7 @@ export const contests = {
         roots as (
           select c.id, case when c.kind = 'ballot_question' then c.id::text
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
-            e.id as election, e.kind = 'indirect' as indirect, e.date_from, e.status
+            e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status
           from contest c
           join election e on e.id = c.election_id
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
@@ -1322,7 +1338,7 @@ export const contests = {
           union all
           select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
         )
-        select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.status::text as status
+        select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status
         from roots r
         where r.id <> ${contest.root}::uuid and exists (
           select 1 from grp join result_set rs on rs.contest_id = grp.id
@@ -1344,7 +1360,7 @@ export const contests = {
           isRoot &&
           contest.kind === "office" &&
           row.indirect !== contest.indirect &&
-          row.date?.slice(0, 4) === contest.date?.slice(0, 4),
+          row.year === contest.year,
       );
       const [rootLabels, rootSlugs, located, tops] = await Promise.all([
         names(rootIds),
@@ -1514,6 +1530,7 @@ export const contests = {
             );
           return {
             date: row.date,
+            year: row.year,
             path: base == null ? null : [base, ...below].join("/"),
             name: rootLabels.full.get(row.id) ?? "",
             current: false,
@@ -1524,6 +1541,7 @@ export const contests = {
         }),
         {
           date: contest.date,
+          year: contest.year,
           path: scopePath,
           name: labels.full.get(contest.id) ?? "",
           current: true,
@@ -1539,7 +1557,7 @@ export const contests = {
             entries.every(
               (peer) =>
                 peer.indirect === entry.indirect ||
-                peer.date?.slice(0, 4) !== entry.date?.slice(0, 4) ||
+                peer.year !== entry.year ||
                 (!peer.current && !entry.indirect),
             ),
         )
@@ -1549,15 +1567,14 @@ export const contests = {
           winner:
             entries.find(
               (peer) =>
-                !entry.indirect &&
-                peer.indirect &&
-                peer.date?.slice(0, 4) === entry.date?.slice(0, 4),
+                !entry.indirect && peer.indirect && peer.year === entry.year,
             )?.winner ?? entry.winner,
         }));
       const targets = comparable.map((row) => ({
         value: rootSlugs.get(row.id) ?? row.id,
         label: rootLabels.full.get(row.id) ?? "",
         detail: row.date,
+        year: row.year,
         series: row.series === contest.series,
         annulled: row.status === "annulled",
       }));
@@ -1689,6 +1706,7 @@ export const contests = {
               name: rootLabels.full.get(chosen.id) ?? "",
               path: rootSlugs.get(chosen.id) ?? null,
               date: chosen.date,
+              year: chosen.year,
               status: chosen.status,
               valid: earlier.side.valid,
               exact: earlier.exact,
@@ -2071,6 +2089,7 @@ export const people = {
             name: v.string(),
             path: v.nullable(v.string()),
             date: v.string(),
+            year: v.number(),
             kind: v.string(),
             measure: v.string(),
             votes: v.nullable(v.number()),
@@ -2103,6 +2122,7 @@ export const people = {
       const rows = await db.execute<{
         root: string;
         date: string;
+        year: number;
         kind: string;
         measure: number | null;
         votes: number | null;
@@ -2136,7 +2156,7 @@ export const people = {
           select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
         ),
         placed as materialized (
-          select c.id as root, a.k as area, e.date_from as date, e.kind::text as kind
+          select c.id as root, a.k as area, e.date_from as date, ${CYCLE} as year, e.kind::text as kind
           from contest c join election e on e.id = c.election_id
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           join area a on a.id = coalesce(c.district_area_id, pt.area_id)
@@ -2171,7 +2191,7 @@ export const people = {
           where f.count_round = f.first and f.option <> 0
           group by f.root, m.main, m.appointed
         )
-        select p.root, p.date::text as date, p.kind, t.main::int as measure, t.votes,
+        select p.root, p.date::text as date, p.year, p.kind, t.main::int as measure, t.votes,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
           (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
             from mine m join outcome x on x.option_id = m.option join result_set rs on rs.id = x.result_set_id and rs.is_default
@@ -2193,26 +2213,21 @@ export const people = {
           (row) =>
             row.kind !== "indirect" ||
             rows.rows.every(
-              (peer) =>
-                !(
-                  peer.kind === "general" &&
-                  peer.date.slice(0, 4) === row.date.slice(0, 4)
-                ),
+              (peer) => !(peer.kind === "general" && peer.year === row.year),
             ),
         )
         .map((row) => {
           const indirect =
             row.kind === "general"
               ? rows.rows.find(
-                  (peer) =>
-                    peer.kind === "indirect" &&
-                    peer.date.slice(0, 4) === row.date.slice(0, 4),
+                  (peer) => peer.kind === "indirect" && peer.year === row.year,
                 )
               : undefined;
           return {
             name: labels.full.get(row.root) ?? "",
             path: slugs.get(row.root) ?? null,
             date: row.date,
+            year: row.year,
             kind: row.kind,
             measure: MEASURES.get(row.measure ?? 1) ?? "votes",
             votes: row.votes,

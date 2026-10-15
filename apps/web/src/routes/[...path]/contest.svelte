@@ -112,30 +112,35 @@
     );
   });
   const span = $derived.by(() => {
-    const target = contest.target?.date;
-    const own = contest.election.date;
-    if (contest.target == null || target == null || own == null) {
+    const target = contest.target;
+    const own = contest.election;
+    if (
+      target?.date == null ||
+      target.year == null ||
+      own.date == null ||
+      own.year == null
+    ) {
       return null;
     }
     const race = contest.comparison.notes.some(
       (note) => note.code === "different_race",
     )
-      ? (phrases.get(contest.target.path ?? "")?.phrase ?? "")
+      ? (phrases.get(target.path ?? "")?.phrase ?? "")
       : "";
-    const label = (value: string) =>
-      value.slice(0, 4) === target.slice(0, 4) &&
-      value.slice(0, 4) === own.slice(0, 4)
+    const label = (date: string, year: number) =>
+      target.year === own.year
         ? new Intl.DateTimeFormat(getLocale(), {
             month: "short",
             year: "numeric",
             timeZone: "UTC",
-          }).format(new Date(`${value}T00:00:00Z`))
-        : value.slice(0, 4);
-    const forward = target > own;
-    const [from, to] = forward ? [own, target] : [target, own];
+          }).format(new Date(`${date}T00:00:00Z`))
+        : String(year);
+    const mine = label(own.date, own.year);
+    const theirs = label(target.date, target.year);
+    const forward = target.date > own.date;
     return {
-      from: label(from),
-      to: label(to),
+      from: forward ? mine : theirs,
+      to: forward ? theirs : mine,
       forward,
       race: race === "" ? null : race,
     };
@@ -183,6 +188,10 @@
       day: "numeric",
       timeZone: "UTC",
     });
+    const dated = new Intl.DateTimeFormat(getLocale(), {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    });
     return [
       {
         value: "none",
@@ -203,7 +212,7 @@
           return {
             value: target.value,
             label: target.label,
-            year: target.detail?.slice(0, 4) ?? null,
+            year: target.year?.toString() ?? null,
             phrase:
               target.series || words == null || words.phrase === ""
                 ? (words?.whole ?? target.label)
@@ -211,7 +220,10 @@
             when:
               target.detail == null
                 ? ""
-                : day.format(new Date(`${target.detail}T00:00:00Z`)),
+                : (target.detail.startsWith(`${target.year}`)
+                    ? day
+                    : dated
+                  ).format(new Date(`${target.detail}T00:00:00Z`)),
             winner,
             annulled: target.annulled,
             group: target.series ? m.compare_series() : m.compare_other(),

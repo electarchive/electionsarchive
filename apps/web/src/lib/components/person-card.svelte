@@ -101,7 +101,7 @@
                 : resolve("/[...path]", { path: entry.path })}
             >
               <span class="font-mono text-xs text-muted-foreground tabular-nums"
-                >{entry.date.slice(0, 4)}</span
+                >{entry.year}</span
               >
               <span class="line-clamp-2">
                 {entry.name.replace(/^\d{4}\s+/u, "")}

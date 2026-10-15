@@ -33,7 +33,7 @@
   const years = $derived.by(() => {
     const seen = Object.groupBy(
       series,
-      (entry) => entry.date?.slice(0, 4) ?? "",
+      (entry) => entry.year?.toString() ?? "",
     );
     const month = new Intl.DateTimeFormat(getLocale(), {
       month: "short",
@@ -41,7 +41,7 @@
       timeZone: "UTC",
     });
     return series.map((entry) => {
-      const year = entry.date?.slice(0, 4) ?? "";
+      const year = entry.year?.toString() ?? "";
       return {
         ...entry,
         year,
@@ -73,6 +73,10 @@
       day: "numeric",
       timeZone: "UTC",
     });
+    const dated = new Intl.DateTimeFormat(getLocale(), {
+      dateStyle: "medium",
+      timeZone: "UTC",
+    });
     return years
       .toReversed()
       .flatMap((entry) =>
@@ -87,7 +91,9 @@
                 when:
                   entry.date == null
                     ? ""
-                    : day.format(new Date(`${entry.date}T00:00:00Z`)),
+                    : (entry.date.startsWith(entry.year) ? day : dated).format(
+                        new Date(`${entry.date}T00:00:00Z`),
+                      ),
                 annulled: entry.annulled,
                 keywords: [entry.date ?? "", entry.winner?.label ?? ""],
               },
