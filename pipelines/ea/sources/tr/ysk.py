@@ -20,7 +20,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "13"
+VERSION = "14"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -3392,6 +3392,13 @@ def emit() -> Path:
                         cs.add(
                             "candidacy_nomination", candidacy_id=candidacy, party_id=parties[party], kind="nominated"
                         )
+                    cs.add(
+                        "outcome",
+                        result_set_id=declared,
+                        option_id=options[f"{contest_key}:{party}"],
+                        candidacy_id=candidacy,
+                        kind="elected",
+                    )
                     if day == DAY_2018 and row["page"] is None and qid is not None:
                         cs.add("citation", entity_id=candidacy, source_id=members_source, locator={"item": qid})
                     else:
