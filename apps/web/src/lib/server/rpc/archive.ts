@@ -467,14 +467,19 @@ async function load(
   const parties = [
     ...new Set(options.rows.map((row) => row.party).filter((id) => id != null)),
   ];
-  const [labels, colors] = await Promise.all([
+  const [labels, colors, positions] = await Promise.all([
     names(entities, date),
     db.execute<{ party_id: string; color: string }>(sql`
       select party_id, color from party_color
       where party_id = any(${sql.param(parties)}::uuid[]) and valid @> ${date}::date
     `),
+    db.execute<{ party_id: string; lean: number }>(sql`
+      select party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+      where party_id = any(${sql.param(parties)}::uuid[]) and valid @> ${date}::date
+    `),
   ]);
   const color = new Map(colors.rows.map((row) => [row.party_id, row.color]));
+  const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
   const sharing = Map.groupBy(
     options.rows.filter((row) => row.person != null && row.party != null),
     (row) => row.party ?? "",
@@ -553,6 +558,7 @@ async function load(
               (row.person == null ? null : labels.full.get(row.party ?? "")) ??
               null,
             color: tints.get(row.k) ?? color.get(row.party ?? "") ?? null,
+            lean: lean.get(row.party ?? "") ?? null,
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
             seats: row.seats,
@@ -1055,6 +1061,7 @@ export const contests = {
             label: v.string(),
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
+            lean: v.nullable(v.number()),
             current: Cell,
             earlier: Cell,
             delta: v.nullable(v.number()),

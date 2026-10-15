@@ -8,6 +8,7 @@ export type Option = {
   label: string;
   short: string | null;
   color: string | null;
+  lean: number | null;
   votes: number;
   outcome: string | null;
   seats: number | null;
@@ -41,6 +42,7 @@ export type Row = {
   label: string;
   short: string | null;
   color: string | null;
+  lean: number | null;
   current: Cell | null;
   earlier: Cell | null;
   delta: number | null;
@@ -215,6 +217,7 @@ export function compare(
       label: lead.label,
       short: lead.short,
       color: lead.color,
+      lean: lead.lean,
       current: present?.cell ?? null,
       earlier: past?.cell ?? null,
       delta:

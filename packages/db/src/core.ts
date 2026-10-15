@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, integer, text, smallint, date, numeric, boolean, timestamp, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, smallint, uuid, text, integer, date, numeric, boolean, timestamp, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -590,6 +590,23 @@ export const partyColor = pgTable("party_color", {
 }, (table) => [
 	primaryKey({ columns: [table.partyId, table.valid], name: "party_color_pkey"}),
 check("party_color_color_check", sql`(color ~ '^#[0-9a-f]{6}$'::text)`),]);
+
+export const partyPosition = pgTable("party_position", {
+	partyId: uuid("party_id").notNull().references(() => party.id, { onDelete: "cascade" } ),
+	low: smallint().notNull(),
+	high: smallint().notNull(),
+	rank: smallint(),
+	validFrom: date("valid_from"),
+	validFromPrecision: datePrecision("valid_from_precision").default("day").notNull(),
+	validTo: date("valid_to"),
+	validToPrecision: datePrecision("valid_to_precision").default("day").notNull(),
+	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
+	sourceId: uuid("source_id").references(() => source.id),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.partyId, table.valid], name: "party_position_pkey"}),
+check("party_position_check", sql`((high >= low) AND (high <= 3))`),check("party_position_low_check", sql`((low >= '-3'::integer) AND (low <= 3))`),]);
 
 export const partyRelation = pgTable("party_relation", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),

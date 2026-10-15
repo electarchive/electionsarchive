@@ -164,9 +164,13 @@
         label: row.label,
         short: row.short,
         color: row.color,
+        lean: row.lean,
         seats: row.current?.seats ?? 0,
       }))
-      .toSorted((a, b) => b.seats - a.seats),
+      .toSorted(
+        (a, b) =>
+          (a.lean ?? Infinity) - (b.lean ?? Infinity) || b.seats - a.seats,
+      ),
   );
   const chamber = $derived.by(() => {
     let total = 0;

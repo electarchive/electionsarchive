@@ -12,8 +12,9 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "1"
+VERSION = "2"
 TITLE = "Political parties and their colors"
+POSITIONED = "Political positions of parties"
 COUNTRIES = {
     "US": "Q30",
     "CA": "Q16",
@@ -48,6 +49,21 @@ COLORS = """SELECT DISTINCT ?item ?statement ?color ?rank ?start ?startPrecision
   OPTIONAL {{ ?statement pqv:P580 [ wikibase:timeValue ?start ; wikibase:timePrecision ?startPrecision ] }}
   OPTIONAL {{ ?statement pqv:P582 [ wikibase:timeValue ?end ; wikibase:timePrecision ?endPrecision ] }}
 }}"""
+POSITIONS = """SELECT DISTINCT ?item ?statement ?position ?rank WHERE {{
+  {scope}
+  ?item p:P1387 ?statement . ?statement ps:P1387 ?position ; wikibase:rank ?rank .
+}}"""
+STEPS = {
+    "Q1129409": -3,
+    "Q15141601": -3,
+    "Q164597": -2,
+    "Q737014": -1,
+    "Q6587194": 0,
+    "Q844072": 1,
+    "Q76074": 2,
+    "Q127869500": 3,
+    "Q204481": 3,
+}
 WEIGHTS = {"label": 3, "short": 2, "alias": 1}
 THRESHOLD = 4
 SPLIT = r"\s[-–—]\s"
@@ -89,6 +105,7 @@ MATCHES: dict[tuple[str, str], str | None] = {
     ("IT", "Azione – Italia Viva"): "Q114246565",
     ("IT", "Italia Sovrana e Popolare"): "Q113490502",
     ("IT", "Unione Popolare"): None,
+    ("TR", "Yeşiller ve Sol Gelecek Partisi"): "Q725173",
 }
 INHERITED: dict[tuple[str, str], str] = {
     ("FR", "ENS"): "Q109929254",
@@ -101,6 +118,76 @@ INHERITED: dict[tuple[str, str], str] = {
     ("CH-ZH", "Partei der Arbeit"): "Q661771",
 }
 CHOSEN = {"Q47729": "EF1C27", "Q113168799": "56B45D"}
+PLACED: dict[tuple[str, str], tuple[int, int]] = {
+    ("BR", "Partido dos Trabalhadores"): (-2, -1),
+    ("BR", "Progressistas"): (1, 1),
+    ("BR", "Republicanos"): (2, 2),
+    ("CA", "Canadian Alliance"): (1, 2),
+    ("CA", "Conservative"): (2, 2),
+    ("CA", "Reform Party of Canada"): (2, 2),
+    ("CA", "Social Credit Party of Canada"): (2, 2),
+    ("CH", "Die Mitte"): (0, 1),
+    ("CH", "Eidgenössisch-Demokratische Union"): (2, 3),
+    ("CH", "Evangelische Volkspartei der Schweiz"): (0, 0),
+    ("DE", "BSW"): (-2, -2),
+    ("DE", "Die PARTEI"): (-2, -1),
+    ("DE", "FAMILIE"): (2, 2),
+    ("DE", "PdF"): (-1, -1),
+    ("DE", "SSW"): (-1, -1),
+    ("DE", "Tierschutzpartei"): (-2, -2),
+    ("DE", "Volt"): (-1, 0),
+    ("IT", "Azione – Italia Viva"): (0, 0),
+    ("IT", "Movimento 5 Stelle"): (-1, -1),
+    ("TR", "Adalet Partisi"): (1, 1),
+    ("TR", "Demokratik Parti"): (1, 1),
+    ("TR", "Demokratik Sol Parti"): (-1, -1),
+    ("TR", "Fazilet Partisi"): (3, 3),
+    ("TR", "Güven Partisi"): (0, 1),
+    ("TR", "Halkçı Parti"): (-1, -1),
+    ("TR", "Milli Selamet Partisi"): (3, 3),
+    ("TR", "Millet Partisi"): (2, 2),
+    ("TR", "Milliyetçi Demokrasi Partisi"): (2, 2),
+    ("TR", "Milliyetçi Hareket Partisi"): (2, 3),
+    ("TR", "Sosyaldemokrat Halkçı Parti"): (-1, -1),
+    ("TR", "Türkiye İşçi Partisi"): (-2, -2),
+    ("TR", "Yeni Türkiye Partisi"): (1, 1),
+    ("US", "Democratic-Republican Party"): (-2, -2),
+    ("US", "Socialist Workers Party"): (-3, -3),
+    ("US-MN", "Minnesota Democratic–Farmer–Labor Party"): (-1, -1),
+}
+ORDER = {
+    "CH": ["GLP", "EVP"],
+    "DE": [
+        "Die Linke",
+        "BSW",
+        "Tierschutzpartei",
+        "SPD",
+        "GRÜNE",
+        "SSW",
+        "PdF",
+        "FDP",
+        "FREIE WÄHLER",
+        "CDU",
+        "ÖDP",
+        "CSU",
+    ],
+    "IT": [
+        "Partito Democratico – Italia Democratica e Progressista",
+        "Movimento 5 Stelle",
+        "Azione – Italia Viva",
+        "Südtiroler Volkspartei – PATT",
+    ],
+    "TR": [
+        "Cumhuriyet Halk Partisi",
+        "Sosyaldemokrat Halkçı Parti",
+        "Demokratik Sol Parti",
+        "Yeni Türkiye Partisi",
+        "Adalet Partisi",
+        "Demokratik Parti",
+        "Doğru Yol Partisi",
+        "Anavatan Partisi",
+    ],
+}
 
 
 def _scope(country: str | None) -> str:
@@ -115,15 +202,19 @@ def _url(template: str, scope: str) -> str:
     )
 
 
-def _extra() -> str:
+def _extra(template: str) -> str:
     items = sorted({*(item for item in MATCHES.values() if item is not None), *INHERITED.values()})
-    return _url(COLORS, "VALUES ?item { " + " ".join(f"wd:{item}" for item in items) + " }")
+    return _url(template, "VALUES ?item { " + " ".join(f"wd:{item}" for item in items) + " }")
 
 
 def _urls() -> list[str]:
     return [
         _url(template, _scope(country)) for country in COUNTRIES.values() for template in (NAMES, SPANS, COLORS)
-    ] + [_extra()]
+    ] + [_extra(COLORS)]
+
+
+def _placed() -> list[str]:
+    return [_url(POSITIONS, _scope(country)) for country in COUNTRIES.values()] + [_extra(POSITIONS)]
 
 
 def _rows(url: str) -> list[dict[str, str]]:
@@ -151,7 +242,7 @@ def _day(value: str | None, precision: str | None) -> tuple[date | None, str]:
 
 
 def fetch() -> None:
-    for url in _urls():
+    for url in _urls() + _placed():
         raw.fetch(SOURCE, url, suffix=".json")
 
 
@@ -159,6 +250,7 @@ def emit() -> Path:
     index: dict[str, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(dict))
     spans: dict[str, tuple[int | None, int | None, int]] = {}
     statements: dict[str, list[dict[str, str]]] = defaultdict(list)
+    stances: dict[str, list[dict[str, str]]] = defaultdict(list)
     for scope, country in COUNTRIES.items():
         for row in _rows(_url(NAMES, _scope(country))):
             item = row["item"].rsplit("/", 1)[1]
@@ -179,11 +271,23 @@ def emit() -> Path:
                 int(row["links"]),
             )
     seen: set[str] = set()
-    for url in [_url(COLORS, _scope(country)) for country in COUNTRIES.values()] + [_extra()]:
+    for url in [_url(COLORS, _scope(country)) for country in COUNTRIES.values()] + [_extra(COLORS)] + _placed():
         for row in _rows(url):
             if row["statement"] not in seen:
                 seen.add(row["statement"])
-                statements[row["item"].rsplit("/", 1)[1]].append(row)
+                (stances if "position" in row else statements)[row["item"].rsplit("/", 1)[1]].append(row)
+
+    def spectrum(item: str | None) -> tuple[int, int] | None:
+        rows = [
+            row
+            for row in stances.get(item or "", [])
+            if not row["rank"].endswith("DeprecatedRank") and row["position"].rsplit("/", 1)[1] in STEPS
+        ]
+        steps = [
+            STEPS[row["position"].rsplit("/", 1)[1]]
+            for row in [row for row in rows if row["rank"].endswith("PreferredRank")] or rows
+        ]
+        return (min(steps), max(steps)) if steps else None
 
     def colors(item: str | None) -> list[tuple[str, date | None, str, date | None, str]]:
         if item is None:
@@ -317,7 +421,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Parties matched to Wikidata items by name within each country and period, with each item's colors "
-                "for parties that have no color from another source"
+                "for parties that have no color from another source and each item's political position, placed by "
+                "hand for seat winners Wikidata leaves blank"
             ),
             polity=None,
         )
@@ -332,8 +437,21 @@ def emit() -> Path:
             license="CC0 1.0",
             license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         )
+        positioned = cs.source("Wikidata", POSITIONED)
+        cs.add(
+            "source",
+            id=positioned,
+            kind="wikidata",
+            publisher="Wikidata",
+            title=POSITIONED,
+            url="https://www.wikidata.org/wiki/Property:P1387",
+            license="CC0 1.0",
+            license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+        )
         for url in _urls():
             cs.artifact(raw.cached(SOURCE, url), wikidata)
+        for url in _placed():
+            cs.artifact(raw.cached(SOURCE, url), positioned)
         report: Counter[tuple[str, str]] = Counter()
         for party, iso, kind, full, short, first, last, options in parties:
             if party not in found:
@@ -346,6 +464,20 @@ def emit() -> Path:
                 cs.add("external_id", entity_id=party, scheme="wikidata", value=linked[party])
             if party in linked:
                 report[scope, "linked"] += 1
+            sourced = spectrum(linked.get(party)) or spectrum(inherited)
+            span = sourced or next((PLACED[iso, name] for name in full + short if (iso, name) in PLACED), None)
+            if span is not None:
+                cs.add(
+                    "party_position",
+                    party_id=party,
+                    low=span[0],
+                    high=span[1],
+                    rank=min(
+                        (ORDER[iso].index(name) for name in full + short if name in ORDER.get(iso, [])), default=None
+                    ),
+                    source_id=None if sourced is None else positioned,
+                )
+                report[scope, "positioned"] += options
             if party in painted:
                 report[scope, "painted"] += options
                 continue
@@ -368,6 +500,7 @@ def emit() -> Path:
         for scope in sorted({scope for scope, _ in report}):
             print(
                 f"{scope}: {report[scope, 'linked']} of {report[scope, 'parties']} parties linked, "
-                f"{report[scope, 'painted']} of {report[scope, 'options']} options colored"
+                f"{report[scope, 'painted']} of {report[scope, 'options']} options colored, "
+                f"{report[scope, 'positioned']} positioned"
             )
         return cs.write()
