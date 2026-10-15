@@ -178,7 +178,12 @@ export function compare(
     if (option.kind === "answer") {
       return `answer:${option.label.toLowerCase()}`;
     }
-    return party == null ? `kind:${option.kind}` : `party:${party}`;
+    if (party != null) {
+      return `party:${party}`;
+    }
+    return option.kind === "others"
+      ? `kind:others:${option.label.toLowerCase()}`
+      : `kind:${option.kind}`;
   };
   const now = tally(current, identify);
   const then =

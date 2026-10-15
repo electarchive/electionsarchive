@@ -779,6 +779,11 @@
                   >{m.source_license({ license: set.source.license })}</span
                 >
               {/if}
+              {#if set.source.attribution != null}
+                <span class="text-[0.8125rem] text-muted-foreground"
+                  >{set.source.attribution}</span
+                >
+              {/if}
             </li>
           {/each}
         </ul>

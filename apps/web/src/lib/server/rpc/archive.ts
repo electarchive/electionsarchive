@@ -39,6 +39,7 @@ const ResultSet = v.object({
     title: v.string(),
     url: v.nullable(v.string()),
     license: v.nullable(v.string()),
+    attribution: v.nullable(v.string()),
   }),
 });
 
@@ -323,6 +324,7 @@ async function load(
     title: string;
     url: string | null;
     license: string | null;
+    attribution: string | null;
   }>(sql`
     with recursive grp(id) as (
       select ${root}::uuid
@@ -341,7 +343,7 @@ async function load(
         rs.completeness desc nulls last
     )
     select p.area, p.k, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
-      s.kind::text, s.publisher, s.title, s.url, s.license
+      s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution
     from picked p join source s on s.id = p.source_id
   `);
   if (picked.rows.length === 0) {
@@ -572,6 +574,7 @@ async function load(
           title: row.title,
           url: row.url,
           license: row.license,
+          attribution: row.attribution,
         },
       })),
     });
@@ -1150,9 +1153,10 @@ export const contests = {
           title: string;
           url: string | null;
           license: string | null;
+          attribution: string | null;
         }>(sql`
           select rs.stage::text, rs.status::text, rs.completeness::float8 as completeness, rs.is_default,
-            s.kind::text, s.publisher, s.title, s.url, s.license
+            s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution
           from result_set rs join source s on s.id = rs.source_id
           where rs.contest_id = ${contest.id}::uuid
           order by rs.is_default desc, array_position(${STAGES}, rs.stage)
@@ -1273,6 +1277,7 @@ export const contests = {
             title: row.title,
             url: row.url,
             license: row.license,
+            attribution: row.attribution,
           },
         })),
         citations: cited.rows,
@@ -1394,6 +1399,8 @@ export const contests = {
           votes: number;
           total: number;
           color: string | null;
+          party_label: string | null;
+          party_short: string | null;
         }>(sql`
           with recursive grp(root, id) as (
             select id, id from contest where id = any(${sql.param([...sameRace.map((row) => row.id), contest.root])}::uuid[])
@@ -1453,7 +1460,13 @@ export const contests = {
             select distinct on (root) * from grouped order by root, votes desc
           )
           select t.root, t.person, t.label, t.kind, t.measure, t.votes, case when t.measure = 11 then coalesce(t.appointed, t.total) else t.total end as total, x.party,
-            (select pc.color from party_color pc where pc.party_id = x.party and pc.valid @> e.date_from) as color
+            (select pc.color from party_color pc where pc.party_id = x.party and pc.valid @> e.date_from) as color,
+            (select n.text from name n where n.entity_id = x.party and n.kind in ('official', 'english')
+              order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
+                (n.kind = 'official') desc limit 1) as party_label,
+            (select n.text from name n where n.entity_id = x.party and n.kind = 'abbreviation'
+              order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc
+              limit 1) as party_short
           from tops t
           join contest c on c.id = t.root
           join election e on e.id = c.election_id
@@ -1472,9 +1485,7 @@ export const contests = {
         `),
       ]);
       const leaders = await names(
-        tops.rows.flatMap((row) =>
-          [row.person, row.party].filter((id) => id != null),
-        ),
+        tops.rows.flatMap((row) => (row.person == null ? [] : [row.person])),
       );
       const winners = new Map(
         tops.rows.map((row) => [
@@ -1483,10 +1494,10 @@ export const contests = {
             key: row.party == null ? `kind:${row.kind}` : `party:${row.party}`,
             label:
               leaders.full.get(row.person ?? "") ??
-              leaders.full.get(row.party ?? "") ??
+              row.party_label ??
               row.label ??
               row.kind,
-            short: leaders.short.get(row.party ?? "") ?? null,
+            short: row.party_short,
             color: row.color,
             votes: row.votes,
             share: row.total > 0 ? row.votes / row.total : 0,
@@ -2129,6 +2140,9 @@ export const people = {
         total: number | null;
         outcome: string | null;
         party: string | null;
+        party_label: string | null;
+        party_short: string | null;
+        party_color: string | null;
       }>(sql`
         with recursive ids(id) as (
           select ${person.id}::uuid
@@ -2196,17 +2210,25 @@ export const people = {
           (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
             from mine m join outcome x on x.option_id = m.option join result_set rs on rs.id = x.result_set_id and rs.is_default
             where m.contest_id = p.root) as outcome,
-          (select m.party from mine m join grp g on g.id = m.contest_id and g.root = p.root where m.party is not null limit 1) as party
+          lead.party,
+          (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
+            order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
+              (n.kind = 'official') desc limit 1) as party_label,
+          (select n.text from name n where n.entity_id = lead.party and n.kind = 'abbreviation'
+            order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc
+            limit 1) as party_short,
+          (select pc.color from party_color pc where pc.party_id = lead.party
+            order by pc.valid @> p.date desc, upper(pc.valid) desc nulls first limit 1) as party_color
         from placed p left join totals t on t.root = p.root
+        left join lateral (
+          select m.party from mine m join grp g on g.id = m.contest_id and g.root = p.root where m.party is not null limit 1
+        ) lead on true
         order by p.date desc
       `);
       const roots = rows.rows.map((row) => row.root);
-      const [labels, slugs, parties] = await Promise.all([
+      const [labels, slugs] = await Promise.all([
         names([person.id, ...roots]),
         paths(roots),
-        refs(
-          rows.rows.flatMap((row) => (row.party == null ? [] : [row.party])),
-        ),
       ]);
       const record = rows.rows
         .filter(
@@ -2237,7 +2259,15 @@ export const people = {
               indirect?.votes == null || indirect.total == null
                 ? null
                 : { votes: indirect.votes, total: indirect.total },
-            party: row.party == null ? null : (parties.get(row.party) ?? null),
+            party:
+              row.party == null
+                ? null
+                : {
+                    id: row.party,
+                    label: row.party_label ?? "",
+                    short: row.party_short,
+                    color: row.party_color,
+                  },
           };
         });
       return {
