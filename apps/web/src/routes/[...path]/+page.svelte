@@ -1,10 +1,10 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageData } from "./$types";
   import Contest from "./contest.svelte";
   import Election from "./election.svelte";
   import Polity from "./polity.svelte";
+  import Preview from "./preview.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -57,9 +57,9 @@
           {#if crumb.path == null}
             <span>{crumb.name}</span>
           {:else}
-            <a
+            <Preview
               class="hover:highlighter hover:text-foreground"
-              href={resolve("/[...path]", { path: crumb.path })}>{crumb.name}</a
+              path={crumb.path}>{crumb.name}</Preview
             >
           {/if}
         {/each}

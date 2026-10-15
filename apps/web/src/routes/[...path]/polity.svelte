@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Preview from "./preview.svelte";
 
   const {
     polity,
@@ -47,10 +47,8 @@
             {#if election.path == null}
               <span>{election.name}</span>
             {:else}
-              <a
-                class="hover:highlighter"
-                href={resolve("/[...path]", { path: election.path })}
-                >{election.name}</a
+              <Preview class="hover:highlighter" path={election.path}
+                >{election.name}</Preview
               >
             {/if}
             {#if STATUSES[election.status] != null}
@@ -76,9 +74,8 @@
           {#if child.path == null}
             {child.name}
           {:else}
-            <a
-              class="hover:highlighter"
-              href={resolve("/[...path]", { path: child.path })}>{child.name}</a
+            <Preview class="hover:highlighter" path={child.path}
+              >{child.name}</Preview
             >
           {/if}
         </li>

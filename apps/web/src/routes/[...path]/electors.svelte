@@ -1,9 +1,9 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import Name from "#lib/components/name.svelte";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import Preview from "./preview.svelte";
 
   const {
     electors,
@@ -132,12 +132,12 @@
         {/each}
       </ul>
       {#if electors.link.path != null}
-        <a
+        <Preview
           class="text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
-          href={resolve("/[...path]", { path: electors.link.path })}
+          path={electors.link.path}
           >{electors.link.popular
             ? m.electors_popular({ date: date(electors.link.date) })
-            : m.electors_cast({ date: date(electors.link.date) })}</a
+            : m.electors_cast({ date: date(electors.link.date) })}</Preview
         >
       {/if}
     </div>

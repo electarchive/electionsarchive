@@ -1,8 +1,8 @@
 <script lang="ts">
-  import { resolve } from "$app/paths";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageData } from "./$types";
+  import Preview from "./preview.svelte";
 
   const {
     election,
@@ -45,10 +45,8 @@
         {#if contest.path == null}
           <span class="font-semibold">{contest.name}</span>
         {:else}
-          <a
-            class="font-semibold hover:highlighter"
-            href={resolve("/[...path]", { path: contest.path })}
-            >{contest.name}</a
+          <Preview class="font-semibold hover:highlighter" path={contest.path}
+            >{contest.name}</Preview
           >
         {/if}
         {#if contest.children > 0}
@@ -74,9 +72,8 @@
           {#if child.path == null}
             <span>{child.name}</span>
           {:else}
-            <a
-              class="hover:highlighter"
-              href={resolve("/[...path]", { path: child.path })}>{child.name}</a
+            <Preview class="hover:highlighter" path={child.path}
+              >{child.name}</Preview
             >
           {/if}
           <time

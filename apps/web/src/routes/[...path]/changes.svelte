@@ -117,7 +117,17 @@
   );
   const margin = $derived.by(() => {
     const [a, b] = pair;
-    if (a == null || b == null) {
+    if (
+      a == null ||
+      b == null ||
+      (["before", "after"] as const).some((side) =>
+        cells
+          .filter((cell) => cell[side] != null)
+          .toSorted((x, y) => (y[side]?.share ?? 0) - (x[side]?.share ?? 0))
+          .slice(0, 2)
+          .some((cell) => cell !== a && cell !== b),
+      )
+    ) {
       return null;
     }
     const sides = (["before", "after"] as const).map((side) => {
@@ -136,6 +146,7 @@
         ...cell,
         change: (cell.after?.share ?? 0) - (cell.before?.share ?? 0),
       }))
+      .filter((cell) => Math.abs(cell.change) >= 0.0005)
       .toSorted((a, b) => Math.abs(b.change) - Math.abs(a.change))
       .slice(0, 3),
   );

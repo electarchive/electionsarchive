@@ -7,6 +7,11 @@
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
   };
+  export const MEASURES: Record<string, () => string> = {
+    list_votes: m.measure_list_votes,
+    electoral_votes: m.measure_electoral_votes,
+    state_delegate_equivalents: m.measure_state_delegate_equivalents,
+  };
 </script>
 
 <script lang="ts">

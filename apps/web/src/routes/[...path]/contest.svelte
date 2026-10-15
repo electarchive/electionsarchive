@@ -17,7 +17,8 @@
   import Electors from "./electors.svelte";
   import PlaceSwitcher from "./place-switcher.svelte";
   import Places from "./places.svelte";
-  import Results, { OUTCOMES } from "./results.svelte";
+  import Preview from "./preview.svelte";
+  import Results, { MEASURES, OUTCOMES } from "./results.svelte";
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
 
@@ -47,11 +48,6 @@
     superseded: m.status_superseded,
     annulled: m.status_annulled,
     withdrawn: m.status_withdrawn,
-  };
-  const MEASURES: Record<string, () => string> = {
-    list_votes: m.measure_list_votes,
-    electoral_votes: m.measure_electoral_votes,
-    state_delegate_equivalents: m.measure_state_delegate_equivalents,
   };
   const SEATS: Record<string, () => string> = {
     office: m.col_electors,
@@ -167,7 +163,7 @@
   });
   const items = $derived.by(() => {
     const winners = new Map(
-      contest.series.map((entry) => [entry.path, entry.winner]),
+      contest.series.map((entry) => [entry.date, entry.winner]),
     );
     const day = new Intl.DateTimeFormat(getLocale(), {
       month: "short",
@@ -188,7 +184,7 @@
         .toSorted((a, b) => Number(b.series) - Number(a.series))
         .map((target) => {
           const winner = target.series
-            ? (winners.get(target.value) ?? null)
+            ? (winners.get(target.detail) ?? null)
             : null;
           const words = phrases.get(target.value);
           return {
@@ -305,9 +301,9 @@
 >
   <div class="grid gap-1.5 min-inline-0">
     {#if drilled && contest.path != null}
-      <a
+      <Preview
         class="justify-self-start text-[0.9375rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
-        href={resolve("/[...path]", { path: contest.path })}>{contest.name}</a
+        path={contest.path}>{contest.name}</Preview
       >
     {/if}
     <h1
@@ -329,10 +325,9 @@
       {:else if contest.election.path == null}
         <span>{contest.election.name}</span>
       {:else}
-        <a
+        <Preview
           class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-          href={resolve("/[...path]", { path: contest.election.path })}
-          >{contest.election.name}</a
+          path={contest.election.path}>{contest.election.name}</Preview
         >
       {/if}
       <time datetime={contest.election.date}>{date(contest.election.date)}</time
@@ -358,10 +353,8 @@
               >
             {/if}
             {#if index < contest.scope.trail.length - 1 && crumb.path != null}
-              <a
-                class="hover:highlighter"
-                href={resolve("/[...path]", { path: crumb.path })}
-                >{crumb.name}</a
+              <Preview class="hover:highlighter" path={crumb.path}
+                >{crumb.name}</Preview
               >
             {:else}
               <span class="font-semibold" aria-current="page">{crumb.name}</span
@@ -674,9 +667,8 @@
           {#if child.path == null}
             {child.name}
           {:else}
-            <a
-              class="hover:highlighter"
-              href={resolve("/[...path]", { path: child.path })}>{child.name}</a
+            <Preview class="hover:highlighter" path={child.path}
+              >{child.name}</Preview
             >
           {/if}
         </li>
