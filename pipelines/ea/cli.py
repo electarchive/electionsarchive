@@ -14,7 +14,9 @@ def main() -> None:
         commands.add_parser(step).add_argument("source", help="registry name, such as ca.elections")
     commands.add_parser("apply").add_argument("changeset", type=Path, help="changeset artifact directory")
     commands.add_parser("publish").add_argument("changeset_id", help="a changeset in pending_review")
-    reverting = commands.add_parser("revert", help="reject an unpublished changeset or undo the latest published one")
+    reverting = commands.add_parser(
+        "revert", help="reject an unpublished changeset or undo a published one no later changeset builds on"
+    )
     reverting.add_argument("changeset_id")
     reverting.add_argument("reason")
     commands.add_parser("fixtures", help="export the engine's golden-test fixtures from the database")

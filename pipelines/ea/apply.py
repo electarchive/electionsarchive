@@ -50,7 +50,19 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         ).fetchall()
         if table in tables and "id" not in tables[table]
     }
-    return Stage(schema, tables, entities, pipeline, polity, temporal)
+    parents: dict[str, str] = {
+        table: parent
+        for table, parent in conn.execute(
+            """select distinct on (c.conrelid) c.conrelid::regclass::text, a.attname from pg_constraint c
+               join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+               where c.contype in ('p', 'u') and c.connamespace = 'public'::regnamespace
+                 and not exists (select from pg_attribute i
+                                 where i.attrelid = c.conrelid and i.attname = 'id' and not i.attisdropped)
+               order by c.conrelid, c.contype"""
+        ).fetchall()
+        if table in tables and table not in temporal and table not in (*FACTS, "external_id", "slug", "entity_merge")
+    }
+    return Stage(schema, tables, entities, pipeline, polity, temporal, parents)
 
 
 def _not_null(conn: Connection, table: str) -> set[str]:
@@ -98,7 +110,15 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
             ).format(present=_present(conn, table, columns), staged=staged)
         row = conn.execute(query).fetchone()
         assert row is not None
-        diff[table] = {"insert": row[0], "update": row[1], "unchanged": row[2]}
+        diff[table] = {"insert": row[0], "update": row[1], "unchanged": row[2], "delete": 0}
+        if table in stage.parents:
+            deleted = conn.execute(
+                sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
+                    sql.Identifier(table), stage.stale(table)
+                )
+            ).fetchone()
+            assert deleted is not None
+            diff[table]["delete"] = deleted[0]
     return diff
 
 
@@ -302,6 +322,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                    where c.id = p.changeset_id and c.pipeline = {pipeline} and {overlaps}"""
             ).format(target=target, staged=staged, pipeline=sql.Literal(stage.pipeline), overlaps=stage.overlaps(table))
         )
+    if table in stage.parents:
+        conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.stale(table)))
     conn.execute(
         sql.SQL("insert into public.{} ({}) select distinct {} from {} s where not {}").format(
             target, listed, listed, staged, _present(conn, table, columns)
@@ -390,11 +412,6 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 [f"Rejected: {reason}", changeset_id],
             )
         return
-    latest = conn.execute(
-        "select id::text from changeset where status = 'published' order by published_at desc limit 1"
-    ).fetchone()
-    if latest is None or latest[0] != changeset_id:
-        raise ValueError(f"{changeset_id} is not the latest published changeset")
     stamped = [
         table
         for (table,) in conn.execute(
@@ -410,6 +427,72 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
         ).fetchall()
     }
     histories = [table for table in stamped if table in versioned]
+    later: set[str] = set()
+    for table in histories:
+        later.update(
+            superseder
+            for (superseder,) in conn.execute(
+                sql.SQL(
+                    "select distinct superseded_by::text from {} where changeset_id = %s and superseded_by <> %s"
+                ).format(sql.Identifier(f"{table}_history")),
+                [changeset_id, changeset_id],
+            ).fetchall()
+        )
+    for child, column, parent, key in conn.execute(
+        """select c.conrelid::regclass::text, a.attname, c.confrelid::regclass::text, p.attname from pg_constraint c
+           join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+           join pg_attribute p on p.attrelid = c.confrelid and p.attnum = c.confkey[1]
+           where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+             and c.conrelid::regclass::text = any(%s) and c.confrelid::regclass::text = any(%s)""",
+        [stamped, stamped],
+    ).fetchall():
+        later.update(
+            writer
+            for (writer,) in conn.execute(
+                sql.SQL(
+                    """select distinct t.changeset_id::text from {child} t join {parent} p on p.{key} = t.{column}
+                       where p.changeset_id = %(id)s and t.changeset_id <> %(id)s {inserted}"""
+                ).format(
+                    child=sql.Identifier(child),
+                    parent=sql.Identifier(parent),
+                    key=sql.Identifier(key),
+                    column=sql.Identifier(column),
+                    inserted=sql.SQL(
+                        "and not exists (select from {} h where h.{} = p.{} and h.superseded_by = %(id)s)"
+                    ).format(sql.Identifier(f"{parent}_history"), sql.Identifier(key), sql.Identifier(key))
+                    if parent in versioned
+                    else sql.SQL(""),
+                ),
+                {"id": changeset_id},
+            ).fetchall()
+        )
+    for table, column, parent in (
+        *((fact, key, KEYS[f"{key.removesuffix('_k')}_id"]) for fact in FACTS for key in ("unit_k", "option_k")),
+        ("result_flow", "from_option_k", "contest_option"),
+        ("result_rollup", "option_k", "contest_option"),
+        ("result_rollup", "area_k", "area"),
+    ):
+        inserted = sql.SQL(
+            """select p.k from {} p where p.changeset_id = %(id)s
+               and not exists (select from {} h where h.id = p.id and h.superseded_by = %(id)s)"""
+        ).format(sql.Identifier(parent), sql.Identifier(f"{parent}_history"))
+        if conn.execute(sql.SQL("select exists ({})").format(inserted), {"id": changeset_id}).fetchone() == (True,):
+            later.update(
+                writer
+                for (writer,) in conn.execute(
+                    sql.SQL(
+                        """select distinct rs.changeset_id::text from {} v join result_set rs on rs.k = v.result_set_k
+                           where rs.changeset_id <> %(id)s and v.{} in ({})"""
+                    ).format(sql.Identifier(table), sql.Identifier(column), inserted),
+                    {"id": changeset_id},
+                ).fetchall()
+            )
+    if later:
+        dependents = conn.execute(
+            "select pipeline || ' ' || id::text from changeset where id = any(%s::uuid[]) order by published_at",
+            [list(later)],
+        ).fetchall()
+        raise ValueError(f"{changeset_id} has later changesets built on it: {', '.join(row for (row,) in dependents)}")
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
         for table in (*FACTS, "result_rollup"):
@@ -462,17 +545,11 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                     [changeset_id],
                 )
         conn.execute("set local session_replication_role = origin")
-        entities = {
-            table
-            for (table,) in conn.execute(
-                "select tgrelid::regclass::text from pg_trigger where tgname = 'ea_entity'"
-            ).fetchall()
-        }
         edges = conn.execute(
             """select conrelid::regclass::text, confrelid::regclass::text from pg_constraint
                where contype = 'f' and connamespace = 'public'::regnamespace and conrelid <> confrelid"""
         ).fetchall()
-        remaining = [table for table in stamped if table not in entities and table != "entity"]
+        remaining = [table for table in stamped if table != "entity"]
         while remaining:
             leaves = [
                 table
@@ -558,7 +635,9 @@ def apply(folder: Path) -> str:
         stage = _stage(conn, changeset_id)
         findings = checks.run(conn, stage)
         diff = _diff(conn, stage)
-        if not findings and all(change["insert"] == change["update"] == 0 for change in diff.values()):
+        if not findings and all(
+            change["insert"] == change["update"] == change["delete"] == 0 for change in diff.values()
+        ):
             conn.rollback()
             return "unchanged"
         counts = Counter(finding.code for finding in findings)

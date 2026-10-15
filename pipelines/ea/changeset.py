@@ -5,7 +5,7 @@ from collections.abc import Sequence
 from datetime import date, datetime
 from pathlib import Path
 from typing import LiteralString
-from uuid import UUID, uuid7
+from uuid import NAMESPACE_URL, UUID, uuid5, uuid7
 
 import polars as pl
 
@@ -13,6 +13,7 @@ from ea.checks import FACTS, KEYS
 from ea.raw import Artifact
 from ea.store import DATA, Connection
 
+NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
 LATE = ("name", "slug", "external_id", "note", "citation", "entity_merge")
 TRANSLITERATION = str.maketrans(
     {
@@ -86,7 +87,7 @@ class Changeset:
             self._known[cache] = {str(k): v for k, v in self.conn.execute(query, params).fetchall()}
         known = self._known[cache]
         if key not in known:
-            known[key] = uuid7()
+            known[key] = uuid5(NAMESPACE, f"{cache}\x1f{key}")
             self.minted.add(known[key])
         return known[key]
 

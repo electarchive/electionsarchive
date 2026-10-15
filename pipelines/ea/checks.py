@@ -36,6 +36,7 @@ class Stage:
     pipeline: str
     polity: str
     temporal: dict[str, list[str]]
+    parents: dict[str, str]
 
     def staged(self, table: str) -> sql.Composable:
         return sql.SQL("{}.{}").format(sql.Identifier(self.schema), sql.Identifier(table))
@@ -54,6 +55,22 @@ class Stage:
             staged=self.staged(table),
             same=sql.SQL(" and ").join(
                 sql.SQL("x.{0} is not distinct from p.{0}").format(sql.Identifier(column)) for column in columns
+            ),
+        )
+
+    def stale(self, table: str) -> sql.Composable:
+        parent = sql.Identifier(self.parents[table])
+        return sql.SQL(
+            """c.id = p.changeset_id and c.pipeline = {pipeline}
+               and p.{parent} in (select {parent} from {staged})
+               and not exists (select from {staged} x where {same})"""
+        ).format(
+            pipeline=sql.Literal(self.pipeline),
+            parent=parent,
+            staged=self.staged(table),
+            same=sql.SQL(" and ").join(
+                sql.SQL("x.{0} is not distinct from p.{0}").format(sql.Identifier(column))
+                for column in self.tables[table]
             ),
         )
 
