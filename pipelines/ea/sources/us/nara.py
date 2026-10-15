@@ -1,8 +1,10 @@
+import json
 import re
 import time
 from datetime import date, timedelta
 from html.parser import HTMLParser
 from pathlib import Path
+from urllib.parse import urlencode
 from uuid import UUID
 
 import polars as pl
@@ -12,12 +14,175 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nara"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = [1789, *range(1792, 2025, 4)]
 PAGE = "https://www.archives.gov/electoral-college/{year}"
 PUBLISHER = "National Archives and Records Administration"
 TITLE = "Electoral College results"
+WIKIDATA_TITLE = "Candidates and parties in United States presidential elections"
+WIKIDATA_NOTE = (
+    "Tickets (candidate, running mate, and the party each represented) on Wikidata's items for United States "
+    "presidential elections, the party memberships of everyone who received electoral votes, and the parties' "
+    "founding, dissolution, and colors. An Electoral College option takes the party the National Archives prints "
+    "for its candidate, else its Wikidata ticket's, else the person's own party on the day, for votes cast outside "
+    "any ticket. A party counts only in the years Wikidata dates it to, so the 1789 vote, held before the first "
+    "parties formed, carries none."
+)
+SPARQL = "https://query.wikidata.org/sparql?"
+TICKETS_QUERY = """
+SELECT ?date ?statement ?candidate ?mate ?party ?represents WHERE {
+  ?election wdt:P31 wd:Q47566; wdt:P585 ?date; p:P726 ?statement.
+  ?statement ps:P726 ?candidate.
+  OPTIONAL { ?statement pq:P6149 ?mate }
+  OPTIONAL { ?statement pq:P102 ?party }
+  OPTIONAL { ?statement pq:P1268 ?represents }
+}
+"""
+NAMES_QUERY = """
+SELECT DISTINCT ?person ?name WHERE {
+  ?election wdt:P31 wd:Q47566; p:P726 ?statement.
+  { ?statement ps:P726 ?person } UNION { ?statement pq:P6149 ?person }
+  { ?person rdfs:label ?name } UNION { ?person skos:altLabel ?name }
+  FILTER(LANG(?name) = "en")
+}
+"""
+MEMBERSHIPS_QUERY = """
+SELECT DISTINCT ?person ?statement ?party ?start ?end WHERE {
+  { ?election wdt:P31 wd:Q47566; p:P726 ?ticket. { ?ticket ps:P726 ?person } UNION { ?ticket pq:P6149 ?person } }
+  UNION { VALUES ?person { %s } }
+  ?person p:P102 ?statement. ?statement ps:P102 ?party.
+  OPTIONAL { ?statement pq:P580 ?start }
+  OPTIONAL { ?statement pq:P582 ?end }
+}
+"""
+PARTIES_QUERY = """
+SELECT ?party ?inception ?dissolved ?statement ?color ?start ?end WHERE {
+  VALUES ?party { %s }
+  OPTIONAL { ?party wdt:P571 ?inception }
+  OPTIONAL { ?party wdt:P576 ?dissolved }
+  OPTIONAL {
+    ?party p:P465 ?statement. ?statement ps:P465 ?color.
+    OPTIONAL { ?statement pq:P580 ?start }
+    OPTIONAL { ?statement pq:P582 ?end }
+  }
+}
+"""
+PARTIES = {
+    "federalist-party": ("Q42189", "Federalist Party"),
+    "democratic-republican-party": ("Q42186", "Democratic-Republican Party"),
+    "national-republican-party": ("Q1541747", "National Republican Party"),
+    "anti-masonic-party": ("Q574701", "Anti-Masonic Party"),
+    "nullifier-party": ("Q3440208", "Nullifier Party"),
+    "democratic-party": ("Q29552", "Democratic Party"),
+    "whig-party": ("Q42183", "Whig Party"),
+    "know-nothing-party": ("Q550678", "Know Nothing Party"),
+    "republican-party": ("Q29468", "Republican Party"),
+    "southern-democrats": ("Q7569861", "Southern Democrats"),
+    "constitutional-union-party": ("Q1128268", "Constitutional Union Party"),
+    "liberal-republican-party": ("Q6540796", "Liberal Republican Party"),
+    "peoples-party": ("Q337794", "People's Party"),
+    "progressive-party-1912": ("Q1363538", "Progressive Party"),
+    "progressive-party-1924": ("Q1638786", "Progressive Party"),
+    "states-rights-democratic-party": ("Q1231756", "States' Rights Democratic Party"),
+    "american-independent-party": ("Q465099", "American Independent Party"),
+    "libertarian-party": ("Q558334", "Libertarian Party"),
+    "green-party": ("Q849158", "Green Party"),
+}
+STAND_INS = {"Q327591": None, "Q1290162": None, "Q5440576": "federalist-party"}
+LABELS = {
+    "Independent": (),
+    "F": ("federalist-party",),
+    "Federalist": ("federalist-party",),
+    "Democratic-Republican": ("democratic-republican-party",),
+    "D-R": ("democratic-republican-party",),
+    "Independent D-R": ("democratic-republican-party",),
+    "Federalist/Independent D-R": ("federalist-party", "democratic-republican-party"),
+    "National Republican": ("national-republican-party",),
+    "D": ("democratic-party",),
+    "Whig": ("whig-party",),
+    "Whig-American": ("whig-party", "know-nothing-party"),
+    "R": ("republican-party",),
+    "D-P": ("democratic-party", "peoples-party"),
+    "P": ("progressive-party-1912",),
+}
+PEOPLE = {
+    "Aaron Burr": "Q179090",
+    "Alfred H. Colquitt": "Q262319",
+    "Barry M. Goldwater": "Q319129",
+    "Benjamin Lincoln": "Q817605",
+    "Bernie Sanders": "Q359442",
+    "Carly Fiorina": "Q256380",
+    "Charles C. Pinckney": "Q405463",
+    "Charles J. Jenkins": "Q885230",
+    "Colin Powell": "Q150851",
+    "Daniel D. Tompkins": "Q223545",
+    "David Davis": "Q374427",
+    "Edward Telfair": "Q1293842",
+    "Elbridge Gerry": "Q219797",
+    "Elizabeth Warren": "Q434706",
+    "Faith Spotted Eagle": "Q28037026",
+    "George Clinton": "Q201646",
+    "George W. Julian": "Q1508542",
+    "George Washington": "Q23",
+    "Harry F. Byrd": "Q775382",
+    "Hillary Clinton": "Q6294",
+    "J. Strom Thurmond": "Q324719",
+    "James Armstrong": None,
+    "James Iredell": "Q956007",
+    "James Madison": "Q11813",
+    "James Monroe": "Q11815",
+    "James Ross": "Q503524",
+    "Jared Ingersoll": "Q2622320",
+    "John Adams": "Q11806",
+    "John E. Howard": "Q653713",
+    "John Hancock": "Q272774",
+    "John Henry": "Q202950",
+    "John Jay": "Q310847",
+    "John Kasich": "Q69319",
+    "John Langdon": "Q554454",
+    "John M. Palmer": "Q880367",
+    "John Marshall": "Q310829",
+    "John Milton": "Q6248888",
+    "John Rutledge": "Q370781",
+    "Joseph R. Biden Jr.": "Q6279",
+    "Kamala D. Harris": "Q10853588",
+    "Maria Cantwell": "Q22250",
+    "Nathaniel Prentice Banks": "Q714106",
+    "Oliver Ellsworth": "Q515858",
+    "Richard B. Cheney": "Q48259",
+    "Robert G. Harper": "Q465273",
+    "Robert H. Harrison": "Q437855",
+    "Ron Paul": "Q15257",
+    "Ronald Reagan": "Q9960",
+    "Rufus King": "Q456794",
+    "Samuel Adams": "Q212963",
+    "Samuel Huntington": "Q887130",
+    "Samuel Johnston": "Q730149",
+    "Susan Collins": "Q22279",
+    "Thomas A. Hendricks": "Q310843",
+    "Thomas E. Bramlette": "Q886933",
+    "Thomas Pinckney": "Q881165",
+    "William S. Groesbeck": "Q1650370",
+    "Willis B. Machen": "Q5970761",
+    "Winona LaDuke": "Q118969",
+}
+PICKS = {
+    (1872, "David Davis"): None,
+    (1872, "George W. Julian"): None,
+    (1872, "John M. Palmer"): None,
+    (1872, "Nathaniel Prentice Banks"): "liberal-republican-party",
+    (1892, "James B. Weaver"): "peoples-party",
+    (1892, "James G. Field"): "peoples-party",
+}
+TICKETS = SPARQL + urlencode({"query": TICKETS_QUERY, "format": "json"})
+NAMES = SPARQL + urlencode({"query": NAMES_QUERY, "format": "json"})
+MEMBERSHIPS = SPARQL + urlencode(
+    {"query": MEMBERSHIPS_QUERY % " ".join(f"wd:{qid}" for qid in PEOPLE.values() if qid), "format": "json"}
+)
+PARTY_ITEMS = SPARQL + urlencode(
+    {"query": PARTIES_QUERY % " ".join(f"wd:{qid}" for qid, _ in PARTIES.values()), "format": "json"}
+)
 DISPUTED = 16
 LABEL = re.compile(r"\*|,? of .*|, Esq.*")
 ALIASES = {
@@ -209,14 +374,23 @@ def fetch() -> None:
         except LookupError:
             raw.fetch(SOURCE, PAGE.format(year=year), suffix=".html")
             time.sleep(1)
+    for url in (TICKETS, NAMES, MEMBERSHIPS, PARTY_ITEMS):
+        raw.fetch(SOURCE, url, suffix=".json")
 
 
 def parse() -> None:
     votes: list[tuple[int, str, str, str, int, int]] = []
     electors: list[tuple[int, str, int, int]] = []
+    printed: list[tuple[int, str, str]] = []
     for year in YEARS:
         parser = Tables()
         parser.feed(raw.cached(SOURCE, PAGE.format(year=year)).path.read_text(encoding="utf-8"))
+        printed.extend(
+            (year, name.strip(), label)
+            for row in parser.tables[0]
+            for cell, _ in row
+            for name, label in re.findall(r"([^\[\];()]+?)\s*\[([^\]]+)\]", cell)
+        )
         table = [[text for text, _ in row] for row in parser.tables[1]]
         found: dict[tuple[str, str, str], tuple[int, int]] = {}
         if year == 1789:
@@ -283,6 +457,166 @@ def parse() -> None:
                 found[(office, state, candidate)] = (n, DISPUTED)
         votes.extend((year, *key, *value) for key, value in found.items())
 
+    def bindings(url: str) -> list[dict[str, str]]:
+        return [
+            {
+                field: value["value"].rsplit("/", 1)[-1].replace("-", "$", 1)
+                if field == "statement"
+                else value["value"].rsplit("/", 1)[-1]
+                for field, value in binding.items()
+            }
+            for binding in json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8"))["results"]["bindings"]
+        ]
+
+    def year_of(row: dict[str, str], field: str) -> int | None:
+        return int(row[field][:4]) if re.match(r"\d{4}-", row.get(field, "")) else None
+
+    def words(text: str) -> list[str]:
+        return [word for word in slug(text).split("-") if word not in ("jr", "sr", "ii", "iii")]
+
+    def same(a: str, b: str) -> bool:
+        x, y = words(a), words(b)
+        return bool(x and y) and x[-1] == y[-1] and x[0][0] == y[0][0]
+
+    items = {qid: key for key, (qid, _) in PARTIES.items()}
+    keys: dict[str, str | None] = items | STAND_INS
+    founded: dict[str, int] = {}
+    dissolved: dict[str, int] = {}
+    colors: set[tuple[str, str, int | None, int | None, str]] = set()
+    for row in bindings(PARTY_ITEMS):
+        key = items[row["party"]]
+        if (start := year_of(row, "inception")) is not None:
+            founded[key] = min(founded.get(key, start), start)
+        if (end := year_of(row, "dissolved")) is not None:
+            dissolved[key] = max(dissolved.get(key, end), end)
+        if "color" in row:
+            colors.add((key, f"#{row['color'].lower()}", year_of(row, "start"), year_of(row, "end"), row["statement"]))
+    tickets: dict[str, tuple[int, str, set[str], set[str], set[str]]] = {}
+    for row in bindings(TICKETS):
+        ticket = tickets.setdefault(row["statement"], (int(row["date"][:4]), row["candidate"], set(), set(), set()))
+        for field, values in zip(("mate", "party", "represents"), ticket[2:], strict=True):
+            if field in row:
+                values.add(row[field])
+    names: dict[str, set[str]] = {}
+    for row in bindings(NAMES):
+        names.setdefault(row["person"], set()).add(row["name"])
+    memberships: dict[str, list[tuple[str, str, int | None, int | None]]] = {}
+    for row in bindings(MEMBERSHIPS):
+        memberships.setdefault(row["person"], []).append(
+            (row["statement"], row["party"], year_of(row, "start"), year_of(row, "end"))
+        )
+
+    def valid(key: str | None, year: int) -> bool:
+        return key is None or founded.get(key, year) <= year <= dissolved.get(key, year)
+
+    def party(qid: str) -> str | None:
+        if qid not in keys:
+            raise ValueError(f"Wikidata party {qid} is not in PARTIES or STAND_INS")
+        return keys[qid]
+
+    options = list(dict.fromkeys((year, office, candidate) for year, office, _, candidate, _, _ in votes))
+    people: dict[tuple[int, str], str | None] = {}
+    for year, _, candidate in options:
+        canonical = ALIASES.get(candidate, candidate)
+        matched = {
+            person
+            for ticket_year, head, mates, _, _ in tickets.values()
+            if ticket_year == year
+            for person in (head, *mates)
+            if any(same(canonical, text) for text in names.get(person, ()))
+        }
+        if len(matched) > 1:
+            raise ValueError(f"{year}: {canonical} matches several Wikidata people {sorted(matched)}")
+        if not matched and canonical not in PEOPLE:
+            raise ValueError(f"{year}: {canonical} is on no Wikidata ticket and not in PEOPLE")
+        people[(year, canonical)] = matched.pop() if matched else PEOPLE[canonical]
+    for canonical in {canonical for _, canonical in people}:
+        if len({person for (_, name), person in people.items() if name == canonical}) > 1:
+            raise ValueError(f"{canonical} resolves to several Wikidata people")
+
+    labels: dict[tuple[int, str | None], tuple[str, str]] = {}
+    for year, name, label in printed:
+        cast = {canonical for cast_year, canonical in people if cast_year == year}
+        placed = [canonical for canonical in cast if same(name, canonical)] or [
+            canonical for canonical in cast if words(canonical)[-1] == words(name)[-1]
+        ]
+        if len(placed) != 1 or label not in LABELS:
+            raise ValueError(f"{year}: cannot place the National Archives label {name} [{label}]")
+        if labels.setdefault((year, people[(year, placed[0])]), (label, f"{name} [{label}]"))[0] != label:
+            raise ValueError(f"{year}: {name} has several National Archives labels")
+
+    def ticket_party(statement: str) -> tuple[str | None, list[str], list[str]] | None:
+        year, head, _, members, represents = tickets[statement]
+        if not represents | members:
+            return None
+        label, text = labels.get((year, head), ("Independent", ""))
+        listed = [key for key in LABELS[label] if valid(key, year)]
+        if len(LABELS[label]) == 1 and listed:
+            return listed[0], [text], [statement]
+        found = {party(qid) for qid in represents or members}
+        if len(found) > 1:
+            raise ValueError(f"{year}: ticket {statement} has several parties")
+        own = found.pop()
+        if not valid(own, year):
+            return None
+        return own, [text] if own in listed else [], [statement]
+
+    def settle(year: int, statements: list[str]) -> tuple[str | None, list[str], list[str]] | None:
+        found: dict[str | None, tuple[str | None, list[str], list[str]]] = {}
+        for statement in statements:
+            if (result := ticket_party(statement)) is not None:
+                _, texts, cited = found.setdefault(result[0], (result[0], [], []))
+                texts.extend(text for text in result[1] if text not in texts)
+                cited.extend(result[2])
+        if len(found) > 1:
+            raise ValueError(f"{year}: tickets {statements} disagree on the party: {sorted(map(str, found))}")
+        return found.popitem()[1] if found else None
+
+    resolved: list[tuple[int, str, str, str | None, str | None, list[str], list[str]]] = []
+    for year, office, candidate in options:
+        canonical = ALIASES.get(candidate, candidate)
+        person = people[(year, canonical)]
+        headed = [statement for statement, ticket in tickets.items() if ticket[0] == year and ticket[1] == person]
+        headed = [statement for statement in headed if tickets[statement][4]] or headed
+        result = None
+        if (printed_label := labels.get((year, person))) is not None:
+            label, text = printed_label
+            listed = [key for key in LABELS[label] if valid(key, year)]
+            if not LABELS[label]:
+                result = (None, [text], [])
+            elif len(LABELS[label]) == 1 and listed:
+                result = (listed[0], [text], [])
+            elif len(LABELS[label]) > 1:
+                result = settle(year, headed)
+                if result is None or result[0] not in listed:
+                    raise ValueError(f"{year}: {canonical}'s tickets do not settle {text}")
+        if result is None and person is not None:
+            result = settle(year, headed) or settle(
+                year, [statement for statement, ticket in tickets.items() if ticket[0] == year and person in ticket[2]]
+            )
+        if result is None and person is not None:
+            held: dict[str | None, list[str]] = {}
+            for statement, qid, start, end in memberships.get(person, []):
+                if (start is None or start <= year) and (end is None or year < end) and valid(party(qid), year):
+                    held.setdefault(party(qid), []).append(statement)
+            if (year, canonical) in PICKS:
+                pick = PICKS[(year, canonical)]
+                cited = held.get(pick) or [
+                    statement
+                    for statement, (ticket_year, head, mates, _, _) in tickets.items()
+                    if ticket_year == year and person in (head, *mates)
+                ]
+                if pick is not None and not cited:
+                    raise ValueError(f"{year}: nothing on Wikidata ties {canonical} to {pick}")
+                result = (pick, [], [] if pick is None else cited)
+            elif len(held) > 1:
+                raise ValueError(f"{year}: {canonical} belonged to several parties {sorted(map(str, held))}")
+            elif held:
+                key, cited = held.popitem()
+                result = (key, [], [] if key is None else cited)
+        key, texts, cited = result or (None, [], [])
+        resolved.append((year, office, candidate, person, key, texts, cited))
+
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(votes, schema=["year", "office", "state", "candidate", "votes", "flags"], orient="row").write_parquet(
         PARSED / "votes.parquet"
@@ -290,11 +624,34 @@ def parse() -> None:
     pl.DataFrame(electors, schema=["year", "state", "electors", "flags"], orient="row").write_parquet(
         PARSED / "electors.parquet"
     )
+    pl.DataFrame(
+        resolved,
+        schema={
+            "year": pl.Int64,
+            "office": pl.String,
+            "candidate": pl.String,
+            "person": pl.String,
+            "party": pl.String,
+            "labels": pl.List(pl.String),
+            "statements": pl.List(pl.String),
+        },
+        orient="row",
+    ).write_parquet(PARSED / "parties.parquet")
+    pl.DataFrame(
+        sorted(colors, key=str),
+        schema={"party": pl.String, "color": pl.String, "start": pl.Int64, "end": pl.Int64, "statement": pl.String},
+        orient="row",
+    ).write_parquet(PARSED / "colors.parquet")
 
 
 def emit() -> Path:
     votes = pl.read_parquet(PARSED / "votes.parquet")
     electors = pl.read_parquet(PARSED / "electors.parquet")
+    colors = pl.read_parquet(PARSED / "colors.parquet")
+    choices = {
+        (year, office, candidate): rest
+        for year, office, candidate, *rest in pl.read_parquet(PARSED / "parties.parquet").iter_rows()
+    }
 
     with connect() as conn:
         states: dict[str, UUID] = {
@@ -311,7 +668,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Electoral College votes by state, 1789–2024, and the three contingent elections",
+            summary="Electoral College votes by state, 1789–2024, and the three contingent elections, with each "
+            "option's party",
             polity="US",
         )
 
@@ -330,8 +688,42 @@ def emit() -> Path:
         )
         for year in YEARS:
             cs.artifact(raw.cached(SOURCE, PAGE.format(year=year)), nara)
+        wikidata = cs.source("Wikidata", WIKIDATA_TITLE)
+        cs.add(
+            "source",
+            id=wikidata,
+            kind="wikidata",
+            publisher="Wikidata",
+            title=WIKIDATA_TITLE,
+            url="https://www.wikidata.org/wiki/Q47566",
+            license="CC0 1.0",
+            license_url="https://creativecommons.org/publicdomain/zero/1.0/",
+            notes=WIKIDATA_NOTE,
+        )
+        for url in (TICKETS, NAMES, MEMBERSHIPS, PARTY_ITEMS):
+            cs.artifact(raw.cached(SOURCE, url), wikidata)
 
         us = cs.polity("US")
+        parties: dict[str, UUID] = {}
+        for key in sorted({party for _, party, _, _ in choices.values() if party is not None}):
+            qid, text = PARTIES[key]
+            parties[key] = cs.key("us.party", key)
+            cs.add("external_id", entity_id=parties[key], scheme="wikidata", value=qid)
+            if parties[key] not in cs.minted:
+                continue
+            cs.add("party", id=parties[key], kind="party", polity_id=us)
+            name(parties[key], text)
+            for color, start, end in colors.filter(pl.col("party") == key).select("color", "start", "end").iter_rows():
+                cs.add(
+                    "party_color",
+                    party_id=parties[key],
+                    color=color,
+                    valid_from=None if start is None else date(start, 1, 1),
+                    valid_from_precision="year",
+                    valid_to=None if end is None else date(end, 1, 1),
+                    valid_to_precision="year",
+                    source_id=wikidata,
+                )
         offices: dict[str, UUID] = {}
         for key, kind, text in (
             ("president", "head_of_state", "President of the United States"),
@@ -510,19 +902,37 @@ def emit() -> Path:
                     for unit, candidate, measure, value, flags in values:
                         if candidate is not None and candidate not in options:
                             canonical = ALIASES.get(candidate, candidate)
+                            qid, party, printed, statements = choices[(year, office, candidate)]
                             person = slug(canonical)
                             if person not in persons:
                                 persons[person] = cs.key("us.person", person)
                                 cs.add("person", id=persons[person])
                                 name(persons[person], canonical)
+                                if qid is not None:
+                                    cs.add("external_id", entity_id=persons[person], scheme="wikidata", value=qid)
                             options[candidate] = cs.key(f"{SOURCE}.option", f"{key}:{person}")
                             cs.add(
                                 "contest_option",
                                 id=options[candidate],
                                 contest_id=contest,
                                 kind="candidate",
+                                party_id=None if party is None else parties[party],
                                 ballot_label=candidate,
                             )
+                            for label in printed:
+                                cs.add(
+                                    "citation",
+                                    entity_id=options[candidate],
+                                    source_id=nara,
+                                    locator={"url": PAGE.format(year=year), "text": label},
+                                )
+                            for statement in statements:
+                                cs.add(
+                                    "citation",
+                                    entity_id=options[candidate],
+                                    source_id=wikidata,
+                                    locator={"statement": statement},
+                                )
                             cs.add(
                                 "candidacy",
                                 id=cs.key(f"{SOURCE}.candidacy", f"{key}:{person}"),
@@ -531,6 +941,8 @@ def emit() -> Path:
                                 role="head",
                                 ballot_name=candidate,
                             )
+                        if result_set not in cs.minted:
+                            continue
                         cs.add(
                             "result_value",
                             result_set_id=result_set,
