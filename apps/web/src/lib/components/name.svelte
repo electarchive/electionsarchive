@@ -7,12 +7,14 @@
   const {
     label,
     color = null,
+    hasSwatch = true,
     person = null,
     party = null,
     class: className,
   }: {
     label: string;
     color?: string | null;
+    hasSwatch?: boolean;
     person?: string | null;
     party?: string | null;
     class?: string;
@@ -22,7 +24,7 @@
 </script>
 
 {#snippet face()}
-  {#if color != null}
+  {#if hasSwatch && color != null}
     <span
       class="me-[0.35em] inline-block shrink-0 rounded-[0.15em] bg-(--swatch) align-[-0.02em] block-[0.62em] inline-[0.62em]"
       style:--swatch={color}

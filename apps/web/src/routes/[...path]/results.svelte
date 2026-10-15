@@ -286,6 +286,8 @@
                 <Name
                   class="font-semibold text-foreground"
                   label={row.label}
+                  color={swatch(row.color, row.key)}
+                  hasSwatch={false}
                   person={(page ?? other)?.person}
                   party={(page ?? other)?.party}
                 />
@@ -293,6 +295,8 @@
                   <Name
                     class="text-[0.8125rem] text-muted-foreground"
                     label={row.short}
+                    color={swatch(row.color, row.key)}
+                    hasSwatch={false}
                     party={(page ?? other)?.party}
                   />
                 {/if}

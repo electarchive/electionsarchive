@@ -95,6 +95,8 @@
           <Name
             class="text-muted-foreground max-sm:hidden"
             label={row.short}
+            color={swatch(row.color, row.key)}
+            hasSwatch={false}
             party={row.party}
           />
         {/if}
