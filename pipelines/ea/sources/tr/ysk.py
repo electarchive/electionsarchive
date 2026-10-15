@@ -1,8 +1,11 @@
+import csv
 import difflib
+import io
 import json
 import re
 import struct
 import subprocess
+import tempfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
@@ -20,7 +23,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "14"
+VERSION = "15"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -28,6 +31,7 @@ OCR = PARSED / "ocr"
 GAZETTE = "https://www.resmigazete.gov.tr/eskiler"
 PRESIDENT = {1: f"{GAZETTE}/2023/05/20230519M1-1.pdf", 2: f"{GAZETTE}/2023/06/20230601M1-1.pdf"}
 PARLIAMENT = f"{GAZETTE}/2023/05/20230530M1-1.pdf"
+LISTS = f"{GAZETTE}/2023/04/20230419M1-1.pdf"
 PRESIDENT_2018 = f"{GAZETTE}/2018/07/20180704M1-1.pdf"
 PARLIAMENT_2018 = f"{GAZETTE}/2018/07/20180704M1-2.pdf"
 PARLIAMENT_2015 = f"{GAZETTE}/2015/11/20151112M1-1.pdf"
@@ -187,6 +191,178 @@ NAMES_PARLIAMENT = {
     (DAY_JUNE_2015, "38", 2): "ALİ KİLCİ",
     (DAY_JUNE_2015, "65", 7): "REMZİ ÖZGÖKÇE",
 }
+NAMES_LISTS = {
+    ("01", "MP", 12, "forename"): "HAKKI",
+    ("01", "MP", 14, "surname"): "ÇİNAR",
+    ("01", "TKH", 11, "surname"): "KIRHAN",
+    ("01", "Zafer", 8, "surname"): "ÇİTCİ",
+    ("02", "Vatan", 4, "surname"): "KARĞİLİ",
+    ("03", "CHP", 6, "forename"): "ANIL HALİS",
+    ("04", "AP", 2, "forename"): "ABDULMECİT",
+    ("04", "SOL Parti", 4, "forename"): "REMZİ",
+    ("05", "Yenilik", 3, "surname"): "YIL",
+    ("06-1", "Bağımsız", 4, "surname"): "İLİ",
+    ("06-1", "CHP", 1, "forename"): "GAMZE",
+    ("06-1", "Milli Yol", 2, "forename"): "FIRAT",
+    ("06-1", "TKH", 1, "surname"): "KILÇER",
+    ("06-2", "HAK-PAR", 3, "surname"): "ÇİFCİ",
+    ("06-2", "Zafer", 11, "surname"): "ÖNALAN",
+    ("06-3", "YSP", 12, "surname"): "OTİ",
+    ("07", "ABP", 8, "surname"): "İRCİ",
+    ("07", "SOL Parti", 9, "forename"): "REMZİYE GÖKÇE",
+    ("07", "SOL Parti", 16, "forename"): "DURALİ",
+    ("07", "TKH", 3, "forename"): "HAYATİ",
+    ("07", "TKP", 1, "forename"): "NAZLI ECE",
+    ("07", "TKP", 13, "forename"): "DURALİ",
+    ("07", "Vatan", 9, "surname"): "YİĞİT",
+    ("07", "YSP", 9, "forename"): "FIRAT",
+    ("09", "ANAP", 7, "surname"): "ÖNGAY",
+    ("09", "YSP", 3, "surname"): "ÇAKMAKÇİ",
+    ("10", "Genç Parti", 1, "surname"): "ÖZULUS",
+    ("10", "MHP", 3, "surname"): "ÖZIŞIKLIOĞLU",
+    ("10", "MHP", 5, "surname"): "SIKICIKOĞLU",
+    ("10", "TKH", 5, "surname"): "AÇİM",
+    ("12", "İYİ Parti", 2, "surname"): "TANİN",
+    ("12", "İYİ Parti", 3, "surname"): "ARPA",
+    ("13", "AP", 2, "surname"): "NAZLİ",
+    ("14", "Yenilik", 3, "forename"): "SEMAHAT",
+    ("16-1", "AP", 2, "surname"): "SAYGILIER",
+    ("16-1", "Milli Yol", 1, "surname"): "ÇİFCİ",
+    ("16-2", "BBP", 7, "forename"): "SONER",
+    ("16-2", "HAK-PAR", 10, "surname"): "DEMİR",
+    ("16-2", "İYİ Parti", 2, "surname"): "ALAGÖZ",
+    ("17", "ABP", 1, "surname"): "PİLİÇÇİ",
+    ("17", "AP", 1, "surname"): "YILDEMİR",
+    ("17", "AP", 2, "forename"): "GÖKHAN",
+    ("17", "MHP", 1, "forename"): "SITKI",
+    ("17", "TKH", 2, "surname"): "DEMİR",
+    ("19", "CHP", 4, "surname"): "GÜHER",
+    ("19", "Yenilik", 3, "surname"): "GÜRLAN",
+    ("20", "GBP", 7, "forename"): "GEYLANİ",
+    ("20", "YSP", 7, "forename"): "HAVVA",
+    ("21", "MHP", 9, "forename"): "ABDURRAHMAN MUSTAFA UĞURLU",
+    ("21", "YRP", 10, "surname"): "DEMİR",
+    ("22", "Milli Yol", 2, "surname"): "İNĞ",
+    ("22", "TİP", 1, "surname"): "MUHÇU",
+    ("25", "SOL Parti", 5, "forename"): "ÜNAL",
+    ("27", "AK Parti", 1, "forename"): "ABDULHAMİT",
+    ("27", "Milli Yol", 7, "surname"): "ORHAN",
+    ("30", "Yenilik", 1, "surname"): "İLCİ",
+    ("31", "Memleket", 6, "surname"): "ÖKSÜZAŞIKI",
+    ("32", "HKP", 1, "surname"): "GÜLAY",
+    ("32", "Vatan", 1, "forename"): "MELAHAT",
+    ("32", "Vatan", 3, "surname"): "CANITEZ",
+    ("33", "AK Parti", 8, "forename"): "HAKKI",
+    ("33", "Vatan", 4, "surname"): "ÇAMLI",
+    ("33", "Zafer", 7, "forename"): "KAZIM CİHAT",
+    ("34-1", "ABP", 14, "surname"): "DALĞIÇ",
+    ("34-1", "AK Parti", 23, "surname"): "AHIAKIN",
+    ("34-1", "GBP", 31, "surname"): "ÇİFÇİ",
+    ("34-1", "TKH", 11, "surname"): "İROÇ",
+    ("34-1", "TKH", 34, "forename"): "HAYATİ",
+    ("34-1", "TİP", 21, "surname"): "PINAR",
+    ("34-1", "YRP", 23, "surname"): "YİĞİT",
+    ("34-2", "ABP", 24, "surname"): "DEMİR",
+    ("34-2", "Bağımsız", 6, "surname"): "KONANCİ",
+    ("34-2", "Genç Parti", 5, "forename"): "ÖMER IŞIK",
+    ("34-2", "HAK-PAR", 19, "surname"): "ERKIRAN",
+    ("34-2", "Memleket", 3, "surname"): "HACIGÜZELLER",
+    ("34-2", "TKH", 1, "surname"): "KILÇER",
+    ("34-2", "TİP", 3, "surname"): "ÖZADIKTİ",
+    ("34-2", "Vatan", 26, "surname"): "YİĞİT",
+    ("34-2", "Vatan", 27, "surname"): "ÇİRCİ",
+    ("34-2", "YSP", 13, "surname"): "SAYMADİ",
+    ("34-2", "YSP", 14, "surname"): "KIZILDERE",
+    ("34-2", "Zafer", 24, "forename"): "YİĞİT CAN",
+    ("34-2", "İYİ Parti", 25, "forename"): "AFFAN MAHMUT",
+    ("34-3", "BBP", 12, "surname"): "ÖZCAN",
+    ("34-3", "BBP", 19, "forename"): "CELAL RIDVAN",
+    ("34-3", "CHP", 17, "forename"): "HÜSEYİN REMZİ",
+    ("34-3", "Genç Parti", 1, "forename"): "REHA FERHUN",
+    ("34-3", "HAK-PAR", 35, "surname"): "ÇİFTÇİ",
+    ("34-3", "MHP", 27, "forename"): "BEKİR SITKI",
+    ("34-3", "Milli Yol", 32, "surname"): "ÖZ",
+    ("34-3", "SOL Parti", 19, "forename"): "İLAYDA",
+    ("34-3", "YRP", 14, "surname"): "BAHÇİVAN",
+    ("35-1", "ABP", 2, "forename"): "TİJEN",
+    ("35-1", "GBP", 1, "surname"): "ÖNALAN",
+    ("35-1", "HAK-PAR", 4, "surname"): "TOPCİ",
+    ("35-1", "MHP", 8, "surname"): "KIZILÖRENLİ",
+    ("35-1", "MP", 3, "surname"): "PINAR",
+    ("35-1", "YSP", 1, "forename"): "BURCUGÜL",
+    ("35-2", "ABP", 10, "surname"): "YİĞİTOĞLU",
+    ("35-2", "Vatan", 14, "surname"): "İZGİ",
+    ("36", "ABP", 3, "surname"): "YİĞİT",
+    ("36", "SOL Parti", 2, "surname"): "KARABAG",
+    ("36", "SOL Parti", 3, "surname"): "KARABAG",
+    ("38", "Bağımsız", 4, "surname"): "ÇAKMAKÇİ",
+    ("38", "MP", 1, "surname"): "İDİZ",
+    ("41", "CHP", 12, "forename"): "BELKIZA",
+    ("41", "Genç Parti", 4, "forename"): "SEBAHATTİN",
+    ("41", "Yenilik", 1, "surname"): "YILDIZTEKİN",
+    ("41", "Yenilik", 5, "surname"): "DEMİRKIYIK",
+    ("41", "Yenilik", 9, "forename"): "BATUHAN",
+    ("42", "ANAP", 1, "surname"): "İZGİ",
+    ("42", "YRP", 13, "surname"): "CAMGÖZ",
+    ("43", "Genç Parti", 1, "surname"): "GÜN",
+    ("43", "Genç Parti", 2, "surname"): "KÜÇÜKSATICI",
+    ("43", "YSP", 1, "forename"): "AYŞEGÜL",
+    ("44", "Zafer", 4, "surname"): "AKÇİL",
+    ("45", "MP", 2, "surname"): "BINARCI",
+    ("45", "Yenilik", 4, "surname"): "KALAYCI",
+    ("46", "GBP", 6, "forename"): "HALİL",
+    ("46", "GBP", 8, "surname"): "KAYĞUSUZ",
+    ("46", "YSP", 8, "surname"): "YILDIZ",
+    ("47", "BBP", 3, "surname"): "YALÇİN",
+    ("47", "GBP", 2, "surname"): "ÇİFÇİ",
+    ("47", "GBP", 5, "surname"): "ÇİFÇİ",
+    ("47", "MP", 1, "forename"): "ABDULAZİZ",
+    ("48", "SOL Parti", 2, "surname"): "AKGÜL AKALAN",
+    ("49", "AK Parti", 3, "surname"): "İŞIK",
+    ("49", "YRP", 1, "forename"): "HAKI",
+    ("49", "YSP", 3, "forename"): "SERHAT",
+    ("50", "MHP", 2, "surname"): "ÇİFTCİ",
+    ("52", "Vatan", 4, "forename"): "İSMAİL",
+    ("52", "Vatan", 4, "surname"): "KÜÇÜKKARAHAN",
+    ("52", "Vatan", 5, "surname"): "SÜMBÜL",
+    ("54", "Vatan", 5, "surname"): "DİV",
+    ("54", "Yenilik", 7, "surname"): "İRĞA",
+    ("55", "ANAP", 3, "surname"): "BAKIR",
+    ("55", "HKP", 5, "surname"): "GÜRTAN",
+    ("56", "YRP", 2, "forename"): "ATAULLAH",
+    ("58", "MP", 3, "surname"): "ÇAKIRELİ",
+    ("59", "ABP", 1, "surname"): "ÇİL",
+    ("59", "Vatan", 2, "surname"): "İÇÖZ",
+    ("59", "Vatan", 5, "surname"): "İNCİ",
+    ("59", "YSP", 3, "forename"): "GAMZE",
+    ("61", "Memleket", 1, "surname"): "ARMUTCI",
+    ("61", "Zafer", 2, "forename"): "HAVVA",
+    ("63", "HKP", 4, "forename"): "FIRAT",
+    ("63", "MHP", 5, "surname"): "ARPACİ",
+    ("63", "Memleket", 7, "surname"): "ÇİFTÇİ",
+    ("63", "SOL Parti", 10, "surname"): "ATICI",
+    ("63", "TKH", 7, "surname"): "ÇAĞLİ",
+    ("63", "YRP", 13, "surname"): "GENĞEÇ YAŞAR",
+    ("63", "YSP", 13, "forename"): "MIZGİN",
+    ("64", "BBP", 1, "forename"): "REMZİ",
+    ("65", "YSP", 5, "surname"): "VARLİ",
+    ("67", "Genç Parti", 2, "forename"): "BATUHAN",
+    ("67", "İYİ Parti", 4, "forename"): "YİĞİTCAN",
+    ("70", "Memleket", 2, "surname"): "YİĞİTOĞLU",
+    ("73", "İYİ Parti", 2, "surname"): "İLÇİ",
+    ("76", "ABP", 1, "surname"): "YILDIZ",
+    ("76", "AK Parti", 1, "surname"): "ALAGÖZ",
+    ("76", "Vatan", 2, "surname"): "TAŞCİ",
+    ("76", "Yenilik", 2, "surname"): "ÇİFCİ",
+    ("77", "HKP", 3, "surname"): "ÇINĞI OLKUN",
+    ("77", "Milli Yol", 1, "forename"): "FIRAT",
+    ("77", "Milli Yol", 2, "surname"): "YİLDIRIM",
+    ("78", "AK Parti", 2, "surname"): "KESKİNKILIÇ",
+    ("78", "MHP", 2, "surname"): "ORHAN",
+    ("79", "SOL Parti", 1, "surname"): "KIZILER",
+    ("80", "ABP", 4, "surname"): "İRCİ",
+    ("80", "TKP", 3, "forename"): "SONER",
+}
 ITEMS_PARLIAMENT = {(DAY_2015, "43", 4): "Q106644100"}
 VOTES_PARLIAMENT = {(DAY_2011, "30", "Millet Partisi"): 41}
 TURNOUT_PARLIAMENT = {
@@ -345,6 +521,17 @@ DECISIONS = {
             "party's votes and its share of the votes cast abroad, the seats won, and the members elected. The tables are "
             "scanned images. Each cell was read three times by OCR and checked against the printed sums, and every count "
             "carries a page and bounding-box locator."
+        ),
+    ),
+    LISTS: (
+        "Karar no. 2023/643: 28. Dönem Milletvekili Genel Seçimi kesin aday listeleri",
+        (
+            "YSK decision 2023/643, published in Resmî Gazete 32168 (Mükerrer) on April 19, 2023: final candidate lists "
+            "for the May 14, 2023 parliamentary election, including each party's ranked list and independent candidates "
+            "in each of the 87 electoral districts. The lists are scanned images. We read only each candidate's rank and "
+            "name; the education and occupation columns were blanked before OCR, and we only kept the blanked pages. "
+            "Each name was read four times by OCR. We checked by eye any names where the readings disagreed or where "
+            "accents did not match the marks on the scan. Every candidate carries a page and bounding-box locator."
         ),
     ),
     PARLIAMENT_2018: (
@@ -999,6 +1186,7 @@ def fetch() -> None:
         *PRESIDENT.values(),
         PRESIDENT_2018,
         PARLIAMENT,
+        LISTS,
         PARLIAMENT_2018,
         ISTANBUL,
         REFERENDUM_2017,
@@ -1313,6 +1501,266 @@ def parse() -> None:
     if sum(common for *_, common, _ in PARTIES if common) != sum(common for _, common in ALLIANCES):
         raise ValueError("distributed alliance votes do not match the alliance totals")
     pages += [render(pdf, page) for page in sorted({3, *(int(str(row["page"])) for row in (*values, *elected))})]
+
+    pdf = raw.cached(SOURCE, LISTS)
+
+    def recognize(image: Image.Image, cell: scan.Box, factor: float, psm: str) -> str:
+        crop = image.crop(cell)
+        if factor != 1:
+            crop = crop.resize((round(crop.width * factor), round(crop.height * factor)), Image.Resampling.LANCZOS)
+        padded = Image.new("L", (crop.width + 40, crop.height + 40), 255)
+        padded.paste(crop, (20, 20))
+        buffer = io.BytesIO()
+        padded.save(buffer, "PNG")
+        return (
+            subprocess.run(
+                ["tesseract", "stdin", "stdout", "--psm", psm, "-l", "tur"],
+                input=buffer.getvalue(),
+                capture_output=True,
+                check=True,
+            )
+            .stdout.decode()
+            .strip()
+        )
+
+    def masked_page(
+        page: int,
+    ) -> tuple[list[tuple[str, int, list[int], list[str], list[str]]], list[tuple[float, float, str]]]:
+        image = SCANS / f"{pdf.sha256}-{page}.png"
+        if not image.exists():
+            with tempfile.TemporaryDirectory() as folder:
+                subprocess.run(
+                    [
+                        "pdftoppm",
+                        "-r",
+                        "300",
+                        "-gray",
+                        "-png",
+                        "-f",
+                        str(page),
+                        "-l",
+                        str(page),
+                        "-singlefile",
+                        str(pdf.path),
+                        f"{folder}/page",
+                    ],
+                    check=True,
+                )
+                pixels = np.asarray(Image.open(f"{folder}/page.png").convert("L")).copy()
+            dark = pixels < 160
+            width = pixels.shape[1]
+            bands: list[list[int]] = []
+            for y in np.flatnonzero(dark.any(axis=1)):
+                if bands and y - bands[-1][1] <= 3:
+                    bands[-1][1] = int(y)
+                else:
+                    bands.append([int(y), int(y)])
+            for top, bottom in bands:
+                xs = np.flatnonzero(dark[top : bottom + 1].any(axis=0))
+                if dark[top : bottom + 1, int(width * 0.07) : int(width * 0.115)].any() or not (
+                    width * 0.15 < xs[0] < width * 0.36
+                ):
+                    pixels[top : bottom + 1, int(width * 0.385) :] = 255
+            Image.fromarray(pixels).save(image)
+        cache = OCR / f"{image.stem}.json"
+        if not cache.exists():
+            masked = Image.open(image).convert("L")
+            dark = np.asarray(masked) < 160
+            width = dark.shape[1]
+            lines: list[list[int]] = []
+            for y in np.flatnonzero(dark.any(axis=1)):
+                if lines and y - lines[-1][1] <= 3:
+                    lines[-1][1] = int(y)
+                else:
+                    lines.append([int(y), int(y)])
+            lines = [line for line in lines if line[0] >= 230 and line[1] - line[0] >= 12]
+            numbered = [
+                bool(dark[top : bottom + 1, int(width * 0.07) : int(width * 0.115)].any()) for top, bottom in lines
+            ]
+            profile = np.zeros(width, dtype=int)
+            for (top, bottom), flag in zip(lines, numbered, strict=True):
+                if flag:
+                    profile += dark[top : bottom + 1].any(axis=0)
+            gaps: list[list[int]] = []
+            for x in range(int(width * 0.08), int(width * 0.13)):
+                if profile[x] == 0:
+                    if gaps and gaps[-1][1] == x - 1:
+                        gaps[-1][1] = x
+                    else:
+                        gaps.append([x, x])
+            shift = max(gaps, key=lambda gap: gap[1] - gap[0])[1] + 1 - 293
+            items: list[list[object]] = []
+            for (top, bottom), flag in zip(lines, numbered, strict=True):
+                xs = np.flatnonzero(dark[top : bottom + 1].any(axis=0))
+                if flag:
+                    cut = 604 + shift
+                    items.append(
+                        [
+                            "row",
+                            shift,
+                            [173 + shift, top - 8, int(xs[-1]) + 10, bottom + 8],
+                            [
+                                recognize(masked, (280 + shift, top - 8, cut, bottom + 8), f, "7")
+                                for f in (1, 1.25, 1.5)
+                            ],
+                            [
+                                recognize(masked, (cut - 4, top - 8, 958 + shift, bottom + 8), f, "7")
+                                for f in (1, 1.25, 1.5)
+                            ],
+                        ]
+                    )
+                else:
+                    cell = (int(xs[0]) - 10, top - 8, int(xs[-1]) + 10, bottom + 8)
+                    items.append(["heading", 0, list(cell), [recognize(masked, cell, 1, "6")], []])
+            table = subprocess.run(
+                ["tesseract", str(image), "stdout", "--psm", "6", "-l", "tur", "tsv"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
+            words = [
+                [int(row["left"]) + int(row["width"]) / 2, int(row["top"]) + int(row["height"]) / 2, row["text"]]
+                for row in csv.DictReader(io.StringIO(table), delimiter="\t", quoting=csv.QUOTE_NONE)
+                if row["level"] == "5" and row["text"].strip()
+            ]
+            cache.write_text(json.dumps({"items": items, "words": words}, ensure_ascii=False))
+        data = json.loads(cache.read_text())
+        return [tuple(item) for item in data["items"]], [tuple(word) for word in data["words"]]
+
+    with ThreadPoolExecutor(12) as executor:
+        list_pages = list(executor.map(masked_page, range(3, 426)))
+    first_scan = Image.open(SCANS / f"{pdf.sha256}-3.png")
+    list_width, list_height = first_scan.width, first_scan.height
+
+    def normal(text: str) -> str:
+        return " ".join(re.sub(r"[^A-ZÇĞİÖŞÜÂÎÛ ]", " ", upper(text)).split())
+
+    ballot_headings = {upper(full): full for full, *_ in PARTIES} | {"BAĞIMSIZ": INDEPENDENTS}
+    abbreviations = {full: short for full, short, *_ in PARTIES} | {INDEPENDENTS: "Bağımsız"}
+    squeezed_provinces = {upper(province).replace(" ", ""): province for province in PROVINCES}
+    candidates: list[dict[str, object]] = []
+    unread: list[tuple[object, ...]] = []
+    used: set[tuple[str, str, int, str]] = set()
+    constituency: tuple[str, int] | None = None
+    ticket: str | None = None
+    listed_here: set[str] = set()
+    skip_header = False
+    position = 0
+    for page, (items, words) in enumerate(list_pages, 3):
+        for kind, shift, cell, forenames, surnames in items:
+            if kind == "heading":
+                for line in forenames[0].split("\n"):
+                    squeezed = re.sub(r"[^A-ZÇĞİÖŞÜ0-9]", "", upper(line))
+                    if not squeezed or "LİSTES" in squeezed or "MİLLETVEK" in squeezed:
+                        continue
+                    if "SEÇİM" in squeezed or "NOLU" in squeezed or "ÇEVRES" in squeezed:
+                        head = re.sub(r"(-?.?NOLU|İLİ|İL)$", "", re.split(r"SEÇ", squeezed)[0])
+                        match = difflib.get_close_matches(head, squeezed_provinces, 1, 0.6)
+                        if not match:
+                            raise ValueError(f"lists, page {page}: unknown district heading {line!r}")
+                        province = squeezed_provinces[match[0]]
+                        if constituency is None or constituency[0] != province:
+                            constituency = (province, 1 if province in SPLIT else 0)
+                            listed_here = set()
+                            ticket = None
+                        continue
+                    match = difflib.get_close_matches(normal(line), ballot_headings, 1, 0.75)
+                    if not match:
+                        raise ValueError(f"lists, page {page}: unknown party heading {line!r}")
+                    ticket = ballot_headings[match[0]]
+                    if constituency is not None and ticket in listed_here:
+                        if not constituency[1]:
+                            raise ValueError(f"lists, page {page}: {ticket} listed twice in {constituency[0]}")
+                        constituency = (constituency[0], constituency[1] + 1)
+                        listed_here = set()
+                    listed_here.add(ticket)
+                    position = 0
+                    skip_header = True
+                continue
+            if skip_header or (normal(forenames[0]) == "ADI" and normal(surnames[0]) == "SOYADI"):
+                skip_header = False
+                continue
+            if constituency is None or ticket is None:
+                raise ValueError(f"lists, page {page}: a candidate row before any district or party heading")
+            position += 1
+            plate = PROVINCES.index(constituency[0]) + 1
+            code = f"{plate:02}-{constituency[1]}" if constituency[1] else f"{plate:02}"
+            x0, top, x1, bottom = cell
+            parts = []
+            for field, readings, (left, right) in (
+                ("forename", forenames, (270, 607)),
+                ("surname", surnames, (607, 960)),
+            ):
+                third = " ".join(
+                    text
+                    for x, y, text in sorted(words, key=lambda word: (word[0], word[1]))
+                    if left + shift <= x < right + shift and top <= y < bottom
+                )
+                texts = [normal(text) for text in readings] + [normal(third)]
+                best, count = Counter(text.replace(" ", "") for text in texts).most_common(1)[0]
+                override = (code, abbreviations[ticket], position, field)
+                if override in NAMES_LISTS:
+                    used.add(override)
+                    parts.append(NAMES_LISTS[override])
+                elif count >= 3 and best:
+                    parts.append(
+                        max((text for text in texts if text.replace(" ", "") == best), key=lambda t: t.count(" "))
+                    )
+                else:
+                    unread.append((*override, page, texts))
+            candidates.append(
+                {
+                    "code": code,
+                    "party": ticket,
+                    "position": position,
+                    "name": " ".join(parts),
+                    "sequence": None,
+                    "page": page,
+                    "box": [x0 / list_width, top / list_height, x1 / list_width, bottom / list_height],
+                }
+            )
+    if unread or used != set(NAMES_LISTS):
+        raise ValueError(f"lists: unread names {unread}, unused readings {set(NAMES_LISTS) - used}")
+    lists: dict[tuple[str, str], list[dict[str, object]]] = {}
+    for row in candidates:
+        lists.setdefault((str(row["code"]), str(row["party"])), []).append(row)
+    magnitudes = {str(row["code"]): int(str(row["magnitude"])) for row in districts}
+    voted = {
+        (code, option)
+        for code, option in frame.filter(
+            pl.col("measure") == VOTES, pl.col("option").is_not_null(), pl.col("value") > 0
+        )
+        .select("code", "option")
+        .iter_rows()
+    }
+    if set(lists) != voted:
+        raise ValueError(f"lists: lists without votes {set(lists) - voted}, votes without lists {voted - set(lists)}")
+    if wrong := [
+        (pair, len(rows))
+        for pair, rows in lists.items()
+        if pair[1] != INDEPENDENTS and len(rows) != magnitudes[pair[0]]
+    ]:
+        raise ValueError(f"lists: lists whose length is not the district magnitude {wrong}")
+    winners: dict[tuple[str, str], list[dict[str, object]]] = {}
+    for row in elected:
+        winners.setdefault((str(row["code"]), str(row["party"])), []).append(row)
+    for pair, won_members in winners.items():
+        ranked = lists[pair][: len(won_members)]
+        if [row["name"] for row in ranked] != [member["name"] for member in won_members]:
+            raise ValueError(f"lists: {pair} elected members are not the first on the list")
+        for row, member in zip(ranked, won_members, strict=True):
+            row["sequence"] = member["sequence"]
+    print(f"lists: {len(candidates)} candidates on {len(lists)} lists, {len(NAMES_LISTS)} names read by eye")
+    for page in sorted({int(str(row["page"])) for row in candidates}):
+        image = PAGES / f"{pdf.sha256}-{page}.png"
+        if not image.exists():
+            PAGES.mkdir(parents=True, exist_ok=True)
+            masked = Image.open(SCANS / f"{pdf.sha256}-{page}.png")
+            masked.resize((masked.width // 3, masked.height // 3), Image.Resampling.LANCZOS).save(image)
+        width, height = Image.open(image).size
+        pages.append(
+            {"url": LISTS, "page": page, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height}
+        )
 
     parliaments: dict[date, dict[str, list[dict[str, object]]]] = {}
     for day, url, standing, split, totals, independents, won_seats, query in (
@@ -2409,6 +2857,9 @@ def parse() -> None:
     frame.write_parquet(PARSED / "district_values.parquet")
     pl.DataFrame(seats).write_parquet(PARSED / "seats.parquet")
     pl.DataFrame(elected, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "elected.parquet")
+    pl.DataFrame(candidates, schema_overrides={"box": pl.List(pl.Float32), "sequence": pl.Int64}).write_parquet(
+        PARSED / "lists.parquet"
+    )
     pl.DataFrame(pool, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "pool.parquet")
     for day, frames in parliaments.items():
         for kind, rows in frames.items():
@@ -2453,6 +2904,7 @@ def emit() -> Path:
     president = pl.read_parquet(PARSED / "president.parquet")
     istanbul = pl.read_parquet(PARSED / "istanbul.parquet")
     tenures_2018 = pl.read_parquet(PARSED / f"tenures_{DAY_2018}.parquet")
+    ranked = pl.read_parquet(PARSED / "lists.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -2461,7 +2913,8 @@ def emit() -> Path:
             summary=(
                 "2014, 2018, and 2023 Turkish presidential elections, the 2007, 2011, June 2015, November 2015, 2018, and "
                 "2023 parliamentary elections, the 2007, 2010, and 2017 constitutional referendums, "
-                "and the June 2019 İstanbul mayoral election, from YSK decisions in the Resmî Gazete"
+                "the 2023 parliamentary candidate lists, and the June 2019 İstanbul mayoral election, from YSK decisions in the "
+                "Resmî Gazete"
             ),
             polity="TR",
         )
@@ -3358,6 +3811,42 @@ def emit() -> Path:
                     if full in won:
                         cs.add("outcome", result_set_id=declared, option_id=option, kind="won", seats=won[full])
                 collect(district_values.filter(pl.col("code") == code), contest_key, url, str(district_units[code]))
+                listed = ranked.filter(pl.col("code") == code).to_dicts() if day == ROUND_DAYS[1] else []
+                ranks = {row["sequence"]: row for row in listed if row["sequence"] is not None}
+                for row in listed:
+                    if row["sequence"] is not None:
+                        continue
+                    party = row["party"]
+                    member = f"{day}:{code}:{slug(party)}:{row['position']}"
+                    person = cs.key(f"{SOURCE}.person", member)
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, title(row["name"]))
+                    candidacy = cs.key("tr.candidacy", member)
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=options[f"{contest_key}:{party}"],
+                        role="head" if party == INDEPENDENTS else "list_member",
+                        list_position=None if party == INDEPENDENTS else row["position"],
+                        ballot_name=None,
+                        member_of_party_id=None,
+                        is_independent=party == INDEPENDENTS,
+                    )
+                    if party != INDEPENDENTS:
+                        cs.add(
+                            "candidacy_nomination", candidacy_id=candidacy, party_id=parties[party], kind="nominated"
+                        )
+                    cs.add(
+                        "citation",
+                        entity_id=candidacy,
+                        source_id=sources[LISTS],
+                        locator={
+                            "page_id": page_ids[(LISTS, row["page"])],
+                            "bbox": [round(value, 6) for value in row["box"]],
+                        },
+                    )
                 for row in elected.filter(pl.col("code") == code).iter_rows(named=True):
                     member = f"{day}:{code}:{row['sequence']}"
                     party = row["party"]
@@ -3400,6 +3889,9 @@ def emit() -> Path:
                         person_id=person,
                         option_id=options[f"{contest_key}:{party}"],
                         role="head" if party == INDEPENDENTS else "list_member",
+                        list_position=ranks[row["sequence"]]["position"]
+                        if row["sequence"] in ranks and party != INDEPENDENTS
+                        else None,
                         ballot_name=row["name"]
                         if day != ROUND_DAYS[1] and (row["page"] is not None or qid is None)
                         else None,
@@ -3429,6 +3921,16 @@ def emit() -> Path:
                             else {
                                 "page_id": page_ids[(url, row["page"])],
                                 "bbox": [round(value, 6) for value in row["box"]],
+                            },
+                        )
+                    if row["sequence"] in ranks:
+                        cs.add(
+                            "citation",
+                            entity_id=candidacy,
+                            source_id=sources[LISTS],
+                            locator={
+                                "page_id": page_ids[(LISTS, ranks[row["sequence"]]["page"])],
+                                "bbox": [round(value, 6) for value in ranks[row["sequence"]]["box"]],
                             },
                         )
                     if qid == OZONDER:
