@@ -14,7 +14,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "fr.ign"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ADMIN_EXPRESS = (
     "https://data.geopf.fr/telechargement/download/ADMIN-EXPRESS-COG-CARTO/"
@@ -25,6 +25,7 @@ LAYERS = (
     "1_DONNEES_LIVRAISON_2024-03-00171/ADECOGC_3-2_SHP_WGS84G_FRA-ED2024-02-22/"
 )
 COMMUNES = "https://etalab-datasets.geo.data.gouv.fr/contours-administratifs/2024/geojson/communes-5m.geojson.gz"
+CADASTRE = "https://cadastre.data.gouv.fr/data/etalab-cadastre/2026-09-01/geojson/communes/50/50592/cadastre-50592-sections.json.gz"
 SRIDS = {
     "metro": 2154,
     "971": 32620,
@@ -43,9 +44,9 @@ OSM = ("975", "977", "978", "986")
 DEPARTMENTS = {"977": "ZX", "978": "ZX"}
 CODES = {"97701": "ZX701", "97801": "ZX801"}
 DETACHED = {"51664": "02899", "49382": "44060", "44225": "49144"}
-UNSHAPED = {"14513"}
+PONT_FARCY = ("14513", "649")
 CONSTITUENCIES = {"986": "98601", "977": "ZX01", "978": "ZX01"}
-COUNTS = {"commune": 35021, "detached": 3, "departement": 106, "circonscription": 7, "nation": 1}
+COUNTS = {"commune": 35021, "detached": 4, "departement": 106, "circonscription": 7, "nation": 1}
 TOLERANCE = 10
 ELECTION = date(2024, 6, 30)
 REDISTRICTING = date(2012, 6, 10)
@@ -66,12 +67,21 @@ SOURCES = {
         "https://opendatacommons.org/licenses/odbl/1-0/",
         "Etalab, Contours administratifs 2024. Contains OpenStreetMap data © OpenStreetMap contributors.",
     ),
+    CADASTRE: (
+        "Direction générale des Finances publiques",
+        "Plan cadastral informatisé: sections of Tessy-Bocage (50592)",
+        "https://cadastre.data.gouv.fr/datasets/cadastre-etalab",
+        "Licence Ouverte v2.0",
+        "https://www.etalab.gouv.fr/licence-ouverte-open-licence",
+        "DGFiP, plan cadastral informatisé, 2026-09-01, via Etalab",
+    ),
 }
 
 
 def fetch() -> None:
     raw.fetch(SOURCE, ADMIN_EXPRESS, suffix=".7z")
     raw.fetch(SOURCE, COMMUNES, suffix=".geojson.gz")
+    raw.fetch(SOURCE, CADASTRE, suffix=".json.gz")
 
 
 def parse() -> None:
@@ -100,6 +110,10 @@ def parse() -> None:
         if record is not None and shape is not None and str(record["INSEE_CAD"]) in DETACHED:
             code = DETACHED[str(record["INSEE_CAD"])]
             features.append(("detached", code, code[:2], "metro", json.dumps(shape.__geo_interface__)))
+    code, prefix = PONT_FARCY
+    for feature in json.loads(gzip.decompress(raw.cached(SOURCE, CADASTRE).path.read_bytes()))["features"]:
+        if feature["properties"]["prefixe"] == prefix:
+            features.append(("detached", code, code[:2], "metro", json.dumps(feature["geometry"])))
     for feature in json.loads(gzip.decompress(raw.cached(SOURCE, COMMUNES).path.read_bytes()))["features"]:
         part = feature["properties"]["code"][:3]
         if part in (*OSM, "987", "988"):
@@ -187,8 +201,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "France's communes, départements, and national outline from IGN's ADMIN EXPRESS COG CARTO 2024, "
-                "the overseas collectivities' communes from Etalab, and the seven overseas constituencies "
-                "without a shape as unions of their communes"
+                "the overseas collectivities' communes from Etalab, Pont-Farcy from Tessy-Bocage's cadastral sections, "
+                "and the seven overseas constituencies without a shape as unions of their communes"
             ),
             polity="FR",
         )
@@ -226,11 +240,9 @@ def emit() -> Path:
             if scheme == "fr.circonscription":
                 known = [(code, area) for code, area in known if code in shapes]
             missing = {code for code, _ in known if code not in shapes}
-            if missing != (UNSHAPED if scheme == "fr.commune" else set()):
+            if missing:
                 raise ValueError(f"{scheme}: no shape for {sorted(missing)}")
             for code, area in known:
-                if code in missing:
-                    continue
                 part, geom, point = shapes[code]
                 cs.add(
                     "area_geometry",
@@ -240,7 +252,13 @@ def emit() -> Path:
                     geom=geom,
                     label_point=point,
                     quality="osm" if part in OSM else "official",
-                    source_id=sources[COMMUNES if part in (*OSM, "987", "988") else ADMIN_EXPRESS],
+                    source_id=sources[
+                        CADASTRE
+                        if code == PONT_FARCY[0]
+                        else COMMUNES
+                        if part in (*OSM, "987", "988")
+                        else ADMIN_EXPRESS
+                    ],
                 )
         for scheme in ("fr.commune", "fr.departement"):
             cs.add("boundary_set", scheme_code=scheme, vintage="2024", valid_from=None, valid_to=None, as_of=ELECTION)
