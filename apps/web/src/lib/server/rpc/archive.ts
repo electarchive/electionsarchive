@@ -428,10 +428,10 @@ function separate(
 }
 
 async function load(
-  root: string,
+  roots: Array<string>,
   areaKs: Array<number>,
   date: string,
-  outcomes: string | null,
+  outcomes: Array<string>,
 ) {
   const loaded = new Map<
     number,
@@ -462,7 +462,7 @@ async function load(
     attribution: string | null;
   }>(sql`
     with recursive grp(id) as (
-      select ${root}::uuid
+      select unnest(${sql.param(roots)}::uuid[])
       union all
       select c.id from contest c join grp on c.allocation_parent_id = grp.id
     ),
@@ -570,15 +570,15 @@ async function load(
       select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1] as kind,
         max(x.seats) as seats
       from outcome x join result_set rs on rs.id = x.result_set_id
-      where x.option_id = o.id and o.contest_id = ${outcomes}::uuid and rs.is_default
+      where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and rs.is_default
         and x.kind in ('elected', 'won', 'advanced', 'tied')
     ) oc on true
-    where o.k = any(${sql.param([...optionKs])}::int[])
-      or o.contest_id = ${outcomes}::uuid and oc.kind is not null
+    where (o.k = any(${sql.param([...optionKs])}::int[]) or o.contest_id = any(${sql.param(outcomes)}::uuid[]))
+      and (o.k = any(${sql.param([...optionKs])}::int[]) or oc.kind is not null)
   `);
   const backing = await db.execute<{ party: string; person: string }>(sql`
     with recursive grp(id) as (
-      select ${root}::uuid
+      select unnest(${sql.param(roots)}::uuid[])
       union all
       select c.id from contest c join grp on c.allocation_parent_id = grp.id
     )
@@ -606,7 +606,7 @@ async function load(
     names(entities, date),
     db.execute<{ party_id: string; color: string }>(sql`
       select p.id as party_id, c.color from unnest(${sql.param(parties)}::uuid[]) p(id),
-        lateral (select ${paint(sql`p.id`, sql`select election_id from contest where id = ${root}::uuid`, sql`${date}::date`)} as color) c
+        lateral (select ${paint(sql`p.id`, sql`select election_id from contest where id = any(${sql.param(roots)}::uuid[])`, sql`${date}::date`)} as color) c
       where c.color is not null
     `),
     db.execute<{ party_id: string; lean: number }>(sql`
@@ -681,7 +681,7 @@ async function load(
           .filter(
             (row) =>
               area.votes.has(row.k) ||
-              (row.outcome != null && row.contest === outcomes),
+              (row.outcome != null && outcomes.includes(row.contest)),
           )
           .map((row): Option => ({
             contest: row.contest,
@@ -726,6 +726,105 @@ async function load(
     });
   }
   return loaded;
+}
+
+async function chamber(
+  contest: Found,
+  area: number,
+  now: ReturnType<typeof load>,
+  lineage: Array<Relation>,
+  isRoot: boolean,
+) {
+  const found = await db.execute<{
+    size: number | null;
+    isParent: boolean;
+    need: number | null;
+    roots: Array<string>;
+    nation: number | null;
+    area: string | null;
+    path: string | null;
+  }>(sql`
+    select z.seats as size, exists (select from contest k where k.allocation_parent_id = c.id) as "isParent",
+      case when c.id = r.id then z.seats end as need,
+      case
+        when exists (select from contest k where k.allocation_parent_id = c.id) then '{}'
+        when c.id <> r.id then array[r.id]
+        else (
+          select case when count(*) > 1 then array_agg(s.id) else '{}' end from contest s
+          where s.election_id = c.election_id and s.body_id = c.body_id and s.allocation_parent_id is null
+            and s.party_scope_id is not distinct from c.party_scope_id and s.kind in ('body_seats', 'list_allocation')
+        )
+      end as roots,
+      a.k as nation, a.id as area,
+      (select path from slug where entity_id = case when c.id = r.id then c.election_id else r.id end and is_current) as path
+    from contest c
+    join contest r on r.id = ${contest.root}::uuid
+    join election e on e.id = c.election_id
+    left join lateral (
+      select z.seats from body_size z
+      where z.body_id = c.body_id and (z.valid @> e.date_from or z.valid_from between e.date_from and e.date_from + 150)
+      order by z.valid_from desc nulls last limit 1
+    ) z on true
+    left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+    left join area a on a.id = case when c.id = r.id then pt.area_id else coalesce(r.district_area_id, pt.area_id) end
+    where c.id = ${contest.id}::uuid and ${isRoot}::boolean and c.kind in ('body_seats', 'list_allocation')
+  `);
+  const shape = found.rows[0];
+  const [loaded, named, current] = await Promise.all([
+    shape?.nation == null || shape.roots.length === 0
+      ? null
+      : load(
+          shape.roots,
+          [shape.nation],
+          contest.date ?? "infinity",
+          shape.roots,
+        ),
+    names(
+      [shape?.area].filter((id) => id != null),
+      contest.date,
+    ),
+    now,
+  ]);
+  const seated = (entry: { side: Side } | undefined) =>
+    entry == null
+      ? []
+      : compare(entry.side, null, lineage, "party").filter(
+          (row) => (row.current?.seats ?? 0) > 0,
+        );
+  const own = seated(shape == null ? undefined : current.get(area));
+  const wide = seated(loaded?.get(shape?.nation ?? 0));
+  let [owned, held] = [0, 0];
+  for (const row of own) {
+    owned += row.current?.seats ?? 0;
+  }
+  for (const row of wide) {
+    held += row.current?.seats ?? 0;
+  }
+  const isFocus = owned > 0 && held > 0 && held === (shape?.need ?? held);
+  const isComplete =
+    own.length > 1 &&
+    owned === (shape?.isParent === true ? owned : shape?.size);
+  const here = new Map(own.map((row) => [row.key, row]));
+  return isFocus || isComplete
+    ? {
+        link: isFocus
+          ? {
+              name: named.full.get(shape?.area ?? "") ?? "",
+              path: shape?.path ?? null,
+            }
+          : null,
+        size: shape?.size ?? null,
+        parties: (isFocus ? wide : own).map((row) => ({
+          key: row.key,
+          label: row.label,
+          short: row.short,
+          color: here.get(row.key)?.color ?? row.color,
+          lean: row.lean,
+          seats: row.current?.seats ?? 0,
+          here: here.get(row.key)?.current?.seats ?? 0,
+        })),
+      }
+    : null;
 }
 
 async function places(
@@ -794,10 +893,10 @@ async function places(
   const rows = kids.filter((kid) => kid.scheme === level.code);
   const ks = rows.map((row) => row.k);
   const [now, then] = await Promise.all([
-    load(contest.root, ks, contest.date ?? "infinity", null),
+    load([contest.root], ks, contest.date ?? "infinity", []),
     chosen == null
       ? null
-      : load(chosen.id, ks, chosen.date ?? "infinity", null),
+      : load([chosen.id], ks, chosen.date ?? "infinity", []),
   ]);
   const legend = new Map<
     string,
@@ -1166,6 +1265,23 @@ export const contests = {
             }),
           }),
         ),
+        chamber: v.nullable(
+          v.object({
+            link: v.nullable(Link),
+            size: v.nullable(v.number()),
+            parties: v.array(
+              v.object({
+                key: v.string(),
+                label: v.string(),
+                short: v.nullable(v.string()),
+                color: v.nullable(v.string()),
+                lean: v.nullable(v.number()),
+                seats: v.number(),
+                here: v.number(),
+              }),
+            ),
+          }),
+        ),
         target: v.nullable(
           v.object({
             name: v.string(),
@@ -1454,6 +1570,7 @@ export const contests = {
               },
         current: null,
         electors: null,
+        chamber: null,
         target: null,
         comparison: { label: null, notes: [] },
         rows: [],
@@ -1772,16 +1889,17 @@ export const contests = {
           relationLabels.full.get(row.to) ??
           "",
       }));
-      const [now, before, grid, cast] = await Promise.all([
-        load(
-          contest.root,
-          [area.k],
-          contest.date ?? "infinity",
-          isRoot ? contest.id : null,
-        ),
+      const loading = load(
+        [contest.root],
+        [area.k],
+        contest.date ?? "infinity",
+        isRoot ? [contest.id] : [],
+      );
+      const [now, before, grid, cast, seats] = await Promise.all([
+        loading,
         chosen == null
           ? null
-          : load(chosen.id, [area.k], chosen.date ?? "infinity", null),
+          : load([chosen.id], [area.k], chosen.date ?? "infinity", []),
         places(
           contest,
           area,
@@ -1793,8 +1911,9 @@ export const contests = {
           input.match,
         ),
         counterpart?.indirect === true
-          ? load(counterpart.id, [area.k], counterpart.date ?? "infinity", null)
+          ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
           : null,
+        chamber(contest, area.k, loading, lineage, isRoot),
       ]);
       const current = now.get(area.k);
       if (current == null) {
@@ -1938,6 +2057,7 @@ export const contests = {
                   popular: counterpart?.indirect === false,
                 },
               },
+        chamber: seats,
         target,
         comparison: {
           label:

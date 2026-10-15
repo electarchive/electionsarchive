@@ -310,6 +310,7 @@ export const contest = pgTable("contest", {
 		foreignColumns: [table.id],
 		name: "contest_previous_round_id_fkey"
 	}),
+	index("contest_allocation_parent_idx").using("btree", table.allocationParentId.asc().nullsLast()),
 	index("contest_election_idx").using("btree", table.electionId.asc().nullsLast()),
 	index("contest_office_idx").using("btree", table.officeId.asc().nullsLast()),
 ]);
@@ -551,6 +552,7 @@ export const outcome = pgTable("outcome", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.resultSetId, table.optionId, table.kind], name: "outcome_pkey"}),
+	index("outcome_option_idx").using("btree", table.optionId.asc().nullsLast()),
 ]);
 
 export const party = pgTable("party", {

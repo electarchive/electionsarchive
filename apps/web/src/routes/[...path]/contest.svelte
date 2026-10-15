@@ -156,33 +156,6 @@
           margin: (top.current?.share ?? 0) - (next.current?.share ?? 0),
         };
   });
-  const parties = $derived(
-    contest.rows
-      .filter((row) => (row.current?.seats ?? 0) > 0)
-      .map((row) => ({
-        key: row.key,
-        label: row.label,
-        short: row.short,
-        color: row.color,
-        lean: row.lean,
-        seats: row.current?.seats ?? 0,
-      }))
-      .toSorted(
-        (a, b) =>
-          (a.lean ?? Infinity) - (b.lean ?? Infinity) || b.seats - a.seats,
-      ),
-  );
-  const chamber = $derived.by(() => {
-    let total = 0;
-    for (const party of parties) {
-      total += party.seats;
-    }
-    return (
-      (contest.kind === "body_seats" || contest.kind === "list_allocation") &&
-      parties.length > 1 &&
-      total >= 15
-    );
-  });
   const items = $derived.by(() => {
     const winners = new Map(
       contest.series.map((entry) => [entry.date, entry.winner]),
@@ -653,7 +626,7 @@
   <div
     class={cn(
       "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-      { "lg:col-span-8": chamber },
+      { "lg:col-span-8": contest.chamber != null },
     )}
   >
     <Results
@@ -672,8 +645,13 @@
     {/if}
   </div>
 
-  {#if chamber}
-    <Seats {parties} />
+  {#if contest.chamber != null}
+    <Seats
+      parties={contest.chamber.parties}
+      place={contest.scope.name}
+      link={contest.chamber.link}
+      size={contest.chamber.size}
+    />
   {/if}
 {/if}
 
