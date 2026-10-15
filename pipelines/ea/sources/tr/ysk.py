@@ -34,7 +34,22 @@ PARLIAMENT = f"{GAZETTE}/2023/05/20230530M1-1.pdf"
 LISTS = f"{GAZETTE}/2023/04/20230419M1-1.pdf"
 LISTS_2018 = "https://www.ysk.gov.tr/doc/dosyalar/docs/24Haziran2018/2018CBMV-MVKesinAdayListesi.pdf"
 WITHDREW_2018 = "https://www.hurriyet.com.tr/gundem/iyi-parti-edirne-1inci-sira-adayi-istifa-etti-40855957"
-WITHDRAWN_2018 = ("22", "İYİ Parti", 1)
+LISTS_2015 = "https://www.ysk.gov.tr/doc/dosyalar/docs/Milletvekili/1Kasim2015/2015MVES-KesinAdayListesi.pdf"
+LISTS_JUNE_2015 = "https://www.ysk.gov.tr/doc/dosyalar/docs/Milletvekili/7Haziran2015/2015MV-KesinAdayListesi.pdf"
+LISTS_2011 = "https://www.ysk.gov.tr/doc/dosyalar/docs/2011MilletvekiliSecimi/KesinAdayListesi2011.pdf"
+WITHDREW_2011 = "https://www.memurlar.net/haber/196377/"
+WITHDREW_EARLY_2011 = "https://www.yenisafak.com/gundem/kaset-skandali-mhpde-9-yoneticiyi-goturdu-320288"
+WITHDRAWN = {
+    (LISTS_2018, "22", "İYİ Parti", 1): (WITHDREW_2018, "June 2, 2018"),
+    (LISTS_2011, "01", "Milliyetçi Hareket Partisi", 1): (WITHDREW_EARLY_2011, None),
+    (LISTS_2011, "06-2", "Milliyetçi Hareket Partisi", 1): (WITHDREW_2011, "May 21, 2011"),
+    (LISTS_2011, "06-2", "Milliyetçi Hareket Partisi", 2): (WITHDREW_2011, "May 21, 2011"),
+    (LISTS_2011, "34-1", "Milliyetçi Hareket Partisi", 2): (WITHDREW_EARLY_2011, None),
+    (LISTS_2011, "34-2", "Milliyetçi Hareket Partisi", 2): (WITHDREW_2011, "May 21, 2011"),
+    (LISTS_2011, "34-3", "Milliyetçi Hareket Partisi", 3): (WITHDREW_2011, "May 21, 2011"),
+    (LISTS_2011, "55", "Milliyetçi Hareket Partisi", 1): (WITHDREW_2011, "May 21, 2011"),
+    (LISTS_2011, "66", "Milliyetçi Hareket Partisi", 1): (WITHDREW_2011, "May 21, 2011"),
+}
 PRESIDENT_2018 = f"{GAZETTE}/2018/07/20180704M1-1.pdf"
 PARLIAMENT_2018 = f"{GAZETTE}/2018/07/20180704M1-2.pdf"
 PARLIAMENT_2015 = f"{GAZETTE}/2015/11/20151112M1-1.pdf"
@@ -60,6 +75,7 @@ DAY_2014 = date(2014, 8, 10)
 DAY_2015 = date(2015, 11, 1)
 DAY_JUNE_2015 = date(2015, 6, 7)
 DAY_2011 = date(2011, 6, 12)
+LIST_URLS = {DAY_2018: LISTS_2018, DAY_2015: LISTS_2015, DAY_JUNE_2015: LISTS_JUNE_2015, DAY_2011: LISTS_2011}
 DAY_2007 = date(2007, 7, 22)
 DAY_REFERENDUM_2007 = date(2007, 10, 21)
 INAUGURATED_2014 = date(2014, 8, 28)
@@ -125,11 +141,38 @@ OZONDER_CAVEAT = (
     "collect his certificate of election. The gazette was published on July 30. His name comes from Wikidata, and "
     "the account of his death comes from a Son Dakika report of July 27, 2007."
 )
-WITHDREW_2018_SOURCE = (
-    "DHA report published by Hürriyet on June 2, 2018, regarding the withdrawal of İmren Çakırlar, first on the İYİ "
-    "Parti list in Edirne, and Orhan Çakırlar moving up to first place."
+WITHDREW_SOURCES = {
+    WITHDREW_2018: (
+        "Hürriyet",
+        "İYİ Parti Edirne 1'inci sıra adayı istifa etti",
+        (
+            "DHA report published by Hürriyet on June 2, 2018, regarding the withdrawal of İmren Çakırlar, first on the İYİ "
+            "Parti list in Edirne, and Orhan Çakırlar moving up to first place."
+        ),
+    ),
+    WITHDREW_2011: (
+        "Memurlar.net",
+        "MHP'de kaset depremi: 6 yönetici birden istifa etti!",
+        (
+            "Anadolu Ajansı report of May 21, 2011, republished by Memurlar.net, regarding the withdrawal of six MHP "
+            "officials: Deniz Bölükbaşı, Cihan Paçacı, Osman Çakır, Mehmet Ekici, Ümit Şafak, and Mehmet Taytak."
+        ),
+    ),
+    WITHDREW_EARLY_2011: (
+        "Yeni Şafak",
+        "Kaset skandalı MHP'de 9 yöneticiyi götürdü",
+        (
+            "Yeni Şafak report of May 21, 2011, regarding MHP officials who withdrew their candidacies, including Recai "
+            "Yıldırım and Bülent Didinmez, who had withdrawn earlier."
+        ),
+    ),
+}
+WITHDREW_NOTE = "Withdrew from the race on {date} after final lists were set."
+WITHDREW_UNDATED_NOTE = "Withdrew from the race after final lists were set."
+WITHDREW_CAVEAT = (
+    "{name}, number {position} on the {party} list, withdrew from the race after final lists were set. The name "
+    "remained on the printed list, and the party's seats went to the next candidates on the list."
 )
-WITHDREW_2018_NOTE = "Withdrew on June 2, 2018, after the final lists were published."
 EDIRNE_2018_CAVEAT = (
     "İmren Çakırlar was first on the İYİ Parti list, replacing Mehmet Akalın, whose candidacy YSK struck off because "
     "Mehmet Akalın had not resigned from public office in time. İmren Çakırlar withdrew on June 2, 2018, after the "
@@ -566,6 +609,38 @@ DECISIONS = {
             "form alongside decision 2018/668 (Resmî Gazete 30436, Mükerrer, May 30, 2018). The lists show every "
             "party's ranked candidates and independent candidates for each of the 87 electoral districts. We read the "
             "rank and name of each candidate directly from the PDF text layer; we do not use OCR. Education and "
+            "occupation columns are not read and are blanked in the page images. Every candidate has a page and "
+            "bounding-box locator."
+        ),
+    ),
+    LISTS_2015: (
+        "1 Kasım 2015 Milletvekili Seçimleri kesin aday listesi",
+        (
+            "YSK's final candidate lists for the November 1, 2015 parliamentary election, published on its website in "
+            "PDF form. The lists show every party's ranked candidates and independent candidates for each of the 85 "
+            "electoral districts; independent candidates are printed with the number 0 instead of a rank. We read the "
+            "rank and name of each candidate directly from the PDF text layer; we do not use OCR. Education and "
+            "occupation columns are not read and are blanked in the page images. Every candidate has a page and "
+            "bounding-box locator."
+        ),
+    ),
+    LISTS_JUNE_2015: (
+        "7 Haziran 2015 Milletvekili Seçimleri kesin aday listesi",
+        (
+            "YSK's final candidate lists for the June 7, 2015 parliamentary election, published on its website in PDF "
+            "form. The lists show every party's ranked candidates and independent candidates for each of the 85 "
+            "electoral districts. We read the rank and name of each candidate directly from the PDF text layer; we do "
+            "not use OCR. Education and occupation columns are not read and are blanked in the page images. Every "
+            "candidate has a page and bounding-box locator."
+        ),
+    ),
+    LISTS_2011: (
+        "12 Haziran 2011 Milletvekili Seçimleri kesin aday listesi",
+        (
+            "YSK's final candidate lists for the June 12, 2011 parliamentary election, published on its website in PDF "
+            "form. The lists show every party's ranked candidates and independent candidates for each of the 85 "
+            "electoral districts. We read the rank and name of each candidate directly from the PDF text layer; we do "
+            "not use OCR. Long names that wrap onto multiple lines are joined into a single name. Education and "
             "occupation columns are not read and are blanked in the page images. Every candidate has a page and "
             "bounding-box locator."
         ),
@@ -1214,6 +1289,9 @@ def fetch() -> None:
         LISTS,
         PARLIAMENT_2018,
         LISTS_2018,
+        LISTS_2015,
+        LISTS_JUNE_2015,
+        LISTS_2011,
         ISTANBUL,
         REFERENDUM_2017,
         REFERENDUM_2010,
@@ -1226,7 +1304,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, PARLIAMENT_2007, suffix=".doc")
     raw.fetch(SOURCE, COURT_2010, suffix=".htm")
     raw.fetch(SOURCE, OZONDER_PRESS, suffix=".htm")
-    raw.fetch(SOURCE, WITHDREW_2018, suffix=".htm")
+    for url in WITHDREW_SOURCES:
+        raw.fetch(SOURCE, url, suffix=".htm")
     for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS):
         raw.fetch(SOURCE, url, suffix=".rtf")
     for url in (MAYORS, MPS_2018, MPS_2015, MPS_JUNE_2015, MPS_2011, OZONDER_ITEM):
@@ -2802,93 +2881,132 @@ def parse() -> None:
     ]
     parliaments[DAY_2007] = parsed_2007
 
-    pdf = raw.cached(SOURCE, LISTS_2018)
     edge = 322.0
-    district_headings = {f"{upper(province)} İLİ": f"{plate:02}" for plate, province in enumerate(PROVINCES, 1)} | {
-        f"{upper(province)}-{number} NOLU": f"{plate:02}-{number}"
-        for plate, province in enumerate(PROVINCES, 1)
-        for number in range(1, SPLIT.get(province, 0) + 1)
-    }
-    list_headings = {upper(full): full for full, *_ in PARTIES_2018} | {"BAĞIMSIZ": INDEPENDENTS}
-    candidates_2018: list[dict[str, object]] = []
-    district_2018: str | None = None
-    ticket_2018: str | None = None
-    layout = subprocess.run(["pdftotext", "-bbox", str(pdf.path), "-"], capture_output=True, check=True).stdout.decode()
-    for page, text in enumerate(layout.split("<page ")[1:], 1):
-        page_width, page_height = (float(value) for value in re.findall(r'(?:width|height)="([\d.]+)"', text)[:2])
-        lines: dict[float, list[tuple[float, float, float, float, str]]] = {}
-        for x0, y0, x1, y1, word in re.findall(
-            r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', text
-        ):
-            lines.setdefault(round(float(y0), 1), []).append((float(x0), float(y0), float(x1), float(y1), word))
-        kept: list[tuple[float, float]] = []
-        for _, words in sorted(lines.items()):
-            words.sort()
-            if words[0][0] >= edge:
-                continue
-            if words[0][0] >= 53:
-                kept.append((words[0][1], max(word[3] for word in words)))
-                line = " ".join(word[4] for word in words)
-                if line.endswith(" SEÇİM ÇEVRESİ"):
-                    district_2018 = district_headings[line.removesuffix(" SEÇİM ÇEVRESİ")]
-                elif line in list_headings:
-                    ticket_2018 = list_headings[line]
-                elif line != "MİLLETVEKİLİ SEÇİMLERİ KESİN ADAY LİSTESİ" and not re.fullmatch(r"\d+ / \d+", line):
-                    raise ValueError(f"lists 2018, page {page}: unknown heading {line!r}")
-                continue
-            if words[0][4] == "S.":
-                continue
-            if district_2018 is None or ticket_2018 is None:
-                raise ValueError(f"lists 2018, page {page}: a candidate row before any district or party heading")
-            position = int(words[0][4])
-            candidates_2018.append(
+    printed: list[dict[str, object]] = []
+    for day, standing, split in (
+        (DAY_2018, PARTIES_2018, SPLIT),
+        (DAY_2015, PARTIES_2015, SPLIT_2015),
+        (DAY_JUNE_2015, PARTIES_JUNE_2015, SPLIT_2015),
+        (DAY_2011, PARTIES_2011, SPLIT_2015),
+    ):
+        list_url = LIST_URLS[day]
+        pdf = raw.cached(SOURCE, list_url)
+        district_headings = {f"{upper(province)} İLİ": f"{plate:02}" for plate, province in enumerate(PROVINCES, 1)} | {
+            f"{upper(province)}-{number} NOLU": f"{plate:02}-{number}"
+            for plate, province in enumerate(PROVINCES, 1)
+            for number in range(1, split.get(province, 0) + 1)
+        }
+        list_headings = {upper(full): full for full, *_ in standing} | {"BAĞIMSIZ": INDEPENDENTS}
+        printed_district: str | None = None
+        printed_ticket: str | None = None
+        position = 0
+        layout = subprocess.run(
+            ["pdftotext", "-bbox", str(pdf.path), "-"], capture_output=True, check=True
+        ).stdout.decode()
+        for page, text in enumerate(layout.split("<page ")[1:], 1):
+            page_width, page_height = (float(value) for value in re.findall(r'(?:width|height)="([\d.]+)"', text)[:2])
+            lines: dict[float, list[tuple[float, float, float, float, str]]] = {}
+            for x0, y0, x1, y1, word in re.findall(
+                r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', text
+            ):
+                lines.setdefault(round(float(y0), 1), []).append((float(x0), float(y0), float(x1), float(y1), word))
+            numbered = [y for y, words in lines.items() if min(words)[0] < 51 and min(words)[4].isdigit()]
+            for y, words in list(lines.items()):
+                if (50 <= min(words)[0] < 56 or 176 <= min(words)[0] < 181) and not min(words)[4].isdigit():
+                    nearest = min(numbered, key=lambda row: abs(row - y))
+                    if abs(nearest - y) > 8:
+                        raise ValueError(f"lists {list_url}, page {page}: a wrapped name far from any row at {y}")
+                    lines[nearest] += lines.pop(y)
+            kept: list[tuple[float, float]] = []
+            for _, words in sorted(lines.items()):
+                words.sort()
+                if words[0][0] >= edge:
+                    continue
+                if words[0][0] >= 53:
+                    kept.append((words[0][1], max(word[3] for word in words)))
+                    line = " ".join(word[4] for word in words)
+                    if line.endswith(" SEÇİM ÇEVRESİ"):
+                        printed_district = district_headings[line.removesuffix(" SEÇİM ÇEVRESİ")]
+                    elif line in list_headings:
+                        printed_ticket = list_headings[line]
+                        position = 0
+                    elif line != "MİLLETVEKİLİ SEÇİMLERİ KESİN ADAY LİSTESİ" and not re.fullmatch(
+                        r"\d+ / \d+( \S+ \S+)?", line
+                    ):
+                        raise ValueError(f"lists {list_url}, page {page}: unknown heading {line!r}")
+                    continue
+                if words[0][4] == "S.":
+                    continue
+                if printed_district is None or printed_ticket is None:
+                    raise ValueError(
+                        f"lists {list_url}, page {page}: a candidate row before any district or party heading"
+                    )
+                position += 1
+                if printed_ticket != INDEPENDENTS and int(words[0][4]) != position:
+                    raise ValueError(
+                        f"lists {list_url}, page {page}: rank {words[0][4]} printed at position {position}"
+                    )
+                printed.append(
+                    {
+                        "code": printed_district,
+                        "party": printed_ticket,
+                        "position": position,
+                        "name": " ".join(
+                            word[4]
+                            for word in sorted(words[1:], key=lambda word: (word[0] >= 175, word[1], word[0]))
+                            if word[2] <= edge
+                        ),
+                        "sequence": None,
+                        "url": list_url,
+                        "withdrew": (list_url, printed_district, printed_ticket, position) in WITHDRAWN,
+                        "page": page,
+                        "box": [
+                            (words[0][0] - 2) / page_width,
+                            (min(word[1] for word in words) - 2) / page_height,
+                            edge / page_width,
+                            (max(word[3] for word in words) + 2) / page_height,
+                        ],
+                    }
+                )
+            image = PAGES / f"{pdf.sha256}-{page}.png"
+            if not image.exists():
+                PAGES.mkdir(parents=True, exist_ok=True)
+                with tempfile.TemporaryDirectory() as folder:
+                    subprocess.run(
+                        ["pdftoppm", "-r", "100", "-png", "-gray", "-f", str(page), "-l", str(page), "-singlefile"]
+                        + [str(pdf.path), f"{folder}/page"],
+                        check=True,
+                    )
+                    pixels = np.asarray(Image.open(f"{folder}/page.png").convert("L")).copy()
+                ratio = pixels.shape[1] / page_width
+                keep = np.zeros(pixels.shape[0], dtype=bool)
+                for top, bottom in kept:
+                    keep[int((top - 2) * ratio) : int((bottom + 2) * ratio) + 1] = True
+                pixels[~keep, int(edge * ratio) :] = 255
+                Image.fromarray(pixels).save(image)
+            width, height = Image.open(image).size
+            pages.append(
                 {
-                    "code": district_2018,
-                    "party": ticket_2018,
-                    "position": position,
-                    "name": " ".join(word[4] for word in words[1:] if word[2] <= edge),
-                    "sequence": None,
-                    "url": LISTS_2018,
-                    "withdrew": (district_2018, ticket_2018, position) == WITHDRAWN_2018,
+                    "url": list_url,
                     "page": page,
-                    "box": [
-                        (words[0][0] - 2) / page_width,
-                        (words[0][1] - 2) / page_height,
-                        edge / page_width,
-                        (max(word[3] for word in words) + 2) / page_height,
-                    ],
+                    "image": f"pages/{SOURCE}/{image.name}",
+                    "width": width,
+                    "height": height,
                 }
             )
-        image = PAGES / f"{pdf.sha256}-{page}.png"
-        if not image.exists():
-            PAGES.mkdir(parents=True, exist_ok=True)
-            with tempfile.TemporaryDirectory() as folder:
-                subprocess.run(
-                    ["pdftoppm", "-r", "100", "-png", "-gray", "-f", str(page), "-l", str(page), "-singlefile"]
-                    + [str(pdf.path), f"{folder}/page"],
-                    check=True,
-                )
-                pixels = np.asarray(Image.open(f"{folder}/page.png").convert("L")).copy()
-            ratio = pixels.shape[1] / page_width
-            keep = np.zeros(pixels.shape[0], dtype=bool)
-            for top, bottom in kept:
-                keep[int((top - 2) * ratio) : int((bottom + 2) * ratio) + 1] = True
-            pixels[~keep, int(edge * ratio) :] = 255
-            Image.fromarray(pixels).save(image)
-        width, height = Image.open(image).size
-        pages.append(
-            {"url": LISTS_2018, "page": page, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height}
-        )
 
     folding = str.maketrans("ÇĞİÖŞÜÂÎÛ", "CGIOSUAIU")
     for list_url, list_rows, list_districts, list_values, list_elected in (
         (LISTS, candidates, districts, values, elected),
-        (
-            LISTS_2018,
-            candidates_2018,
-            parliaments[DAY_2018]["districts"],
-            parliaments[DAY_2018]["district_values"],
-            parliaments[DAY_2018]["elected"],
+        *(
+            (
+                list_url,
+                [row for row in printed if row["url"] == list_url],
+                parliaments[day]["districts"],
+                parliaments[day]["district_values"],
+                parliaments[day]["elected"],
+            )
+            for day, list_url in LIST_URLS.items()
         ),
     ):
         lists: dict[tuple[str, str], list[dict[str, object]]] = {}
@@ -2907,21 +3025,25 @@ def parse() -> None:
         if wrong := [
             (pair, len(rows))
             for pair, rows in lists.items()
-            if [row["position"] for row in rows] != list(range(1, len(rows) + 1))
-            or (pair[1] != INDEPENDENTS and len(rows) != magnitudes[pair[0]])
+            if pair[1] != INDEPENDENTS and len(rows) != magnitudes[pair[0]]
         ]:
-            raise ValueError(f"lists {list_url}: lists out of order or not the district magnitude long {wrong}")
+            raise ValueError(f"lists {list_url}: lists whose length is not the district magnitude {wrong}")
         winners: dict[tuple[str, str], dict[str, object]] = {}
         for row in list_elected:
             folded = re.sub(r"[^A-Z]", "", upper(str(row["name"])).translate(folding))
             winners.setdefault((str(row["code"]), str(row["party"])), {})[folded] = row["sequence"]
         for pair, sequences in winners.items():
-            for row in [row for row in lists[pair] if not row["withdrew"]][: len(sequences)]:
+            standing_rows = [row for row in lists[pair] if not row["withdrew"]]
+            for row in standing_rows if pair[1] == INDEPENDENTS else standing_rows[: len(sequences)]:
                 folded = re.sub(r"[^A-Z]", "", upper(str(row["name"])).translate(folding))
-                if folded not in sequences:
-                    raise ValueError(f"lists {list_url}: {pair} elected members are not the first on the list")
-                row["sequence"] = sequences.pop(folded)
+                match = difflib.get_close_matches(folded, sequences, 1, 0.9)
+                if match:
+                    row["sequence"] = sequences.pop(match[0])
+            if sequences:
+                raise ValueError(f"lists {list_url}: {pair} elected members not first on the list {sorted(sequences)}")
         print(f"lists: {len(list_rows)} candidates on {len(lists)} lists from {list_url}")
+    if sum(bool(row["withdrew"]) for row in printed) != len(WITHDRAWN):
+        raise ValueError("lists: a withdrawn candidate is missing from the lists")
 
     tables = [
         [
@@ -2979,7 +3101,7 @@ def parse() -> None:
     pl.DataFrame(seats).write_parquet(PARSED / "seats.parquet")
     pl.DataFrame(elected, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "elected.parquet")
     pl.DataFrame(
-        [*candidates, *candidates_2018], schema_overrides={"box": pl.List(pl.Float32), "sequence": pl.Int64}
+        [*candidates, *printed], schema_overrides={"box": pl.List(pl.Float32), "sequence": pl.Int64}
     ).write_parquet(PARSED / "lists.parquet")
     pl.DataFrame(pool, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "pool.parquet")
     for day, frames in parliaments.items():
@@ -3685,17 +3807,19 @@ def emit() -> Path:
             notes=OZONDER_PRESS_SOURCE,
         )
         cs.artifact(raw.cached(SOURCE, OZONDER_PRESS), ozonder_press)
-        withdrew_press = cs.source("Hürriyet", "İYİ Parti Edirne 1'inci sıra adayı istifa etti")
-        cs.add(
-            "source",
-            id=withdrew_press,
-            kind="news_agency",
-            publisher="Hürriyet",
-            title="İYİ Parti Edirne 1'inci sıra adayı istifa etti",
-            url=WITHDREW_2018,
-            notes=WITHDREW_2018_SOURCE,
-        )
-        cs.artifact(raw.cached(SOURCE, WITHDREW_2018), withdrew_press)
+        withdrew_sources: dict[str, UUID] = {}
+        for url, (publisher, heading, note) in WITHDREW_SOURCES.items():
+            withdrew_sources[url] = cs.source(publisher, heading)
+            cs.add(
+                "source",
+                id=withdrew_sources[url],
+                kind="news_agency",
+                publisher=publisher,
+                title=heading,
+                url=url,
+                notes=note,
+            )
+            cs.artifact(raw.cached(SOURCE, url), withdrew_sources[url])
         members_2011 = cs.source("Wikidata", "Members of the 24th Grand National Assembly")
         cs.add(
             "source",
@@ -3943,7 +4067,7 @@ def emit() -> Path:
                     if full in won:
                         cs.add("outcome", result_set_id=declared, option_id=option, kind="won", seats=won[full])
                 collect(district_values.filter(pl.col("code") == code), contest_key, url, str(district_units[code]))
-                list_url = {ROUND_DAYS[1]: LISTS, DAY_2018: LISTS_2018}.get(day, "")
+                list_url = ({ROUND_DAYS[1]: LISTS} | LIST_URLS).get(day, "")
                 listed = ranked.filter(pl.col("url") == list_url, pl.col("code") == code).to_dicts()
                 ranks = {row["sequence"]: row for row in listed if row["sequence"] is not None}
                 for row in listed:
@@ -3981,17 +4105,27 @@ def emit() -> Path:
                         },
                     )
                     if row["withdrew"]:
+                        report, withdrawn_on = WITHDRAWN[(list_url, code, party, row["position"])]
                         cs.add(
                             "outcome",
                             result_set_id=declared,
                             option_id=options[f"{contest_key}:{party}"],
                             candidacy_id=candidacy,
                             kind="withdrew",
-                            notes=WITHDREW_2018_NOTE,
+                            notes=WITHDREW_UNDATED_NOTE
+                            if withdrawn_on is None
+                            else WITHDREW_NOTE.format(date=withdrawn_on),
                         )
-                        cs.add("citation", entity_id=candidacy, source_id=withdrew_press, locator=None)
-                        cs.add("note", entity_id=contest, kind="caveat", body_md=EDIRNE_2018_CAVEAT)
-                        cs.add("citation", entity_id=contest, source_id=withdrew_press, locator=None)
+                        cs.add("citation", entity_id=candidacy, source_id=withdrew_sources[report], locator=None)
+                        cs.add(
+                            "note",
+                            entity_id=contest,
+                            kind="caveat",
+                            body_md=EDIRNE_2018_CAVEAT
+                            if day == DAY_2018
+                            else WITHDREW_CAVEAT.format(name=title(row["name"]), position=row["position"], party=party),
+                        )
+                        cs.add("citation", entity_id=contest, source_id=withdrew_sources[report], locator=None)
                 for row in elected.filter(pl.col("code") == code).iter_rows(named=True):
                     member = f"{day}:{code}:{row['sequence']}"
                     party = row["party"]
