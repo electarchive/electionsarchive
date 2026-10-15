@@ -2642,6 +2642,7 @@ def emit() -> Path:
         name(office, "President of Türkiye", "en")
         name(office, "Türkiye Cumhurbaşkanı", kind="native")
         systems: dict[str, UUID] = {}
+        lists = {"order": "closed", "vacancy": "by_election"}
         for code, rules, label, methodology in (
             (
                 "president",
@@ -2651,7 +2652,11 @@ def emit() -> Path:
             ),
             (
                 "parliament",
-                {"formula": "dhondt", "threshold": {"percent": 7, "level": "alliance", "scope": "national"}},
+                {
+                    "formula": "dhondt",
+                    "threshold": {"percent": 7, "level": "alliance", "scope": "national"},
+                    "lists": lists,
+                },
                 "Grand National Assembly proportional representation since 2022",
                 PARLIAMENT_METHODOLOGY,
             ),
@@ -2661,25 +2666,38 @@ def emit() -> Path:
                     "formula": "dhondt",
                     "threshold": {"percent": 10, "level": "alliance", "scope": "national"},
                     "pooling": "alliance",
+                    "lists": lists,
                 },
                 "Grand National Assembly proportional representation, 2018 to 2022",
                 PARLIAMENT_2018_METHODOLOGY,
             ),
             (
                 "parliament_2015",
-                {"formula": "dhondt", "threshold": {"percent": 10, "level": "party", "scope": "national"}},
+                {
+                    "formula": "dhondt",
+                    "threshold": {"percent": 10, "level": "party", "scope": "national"},
+                    "lists": lists,
+                },
                 "Grand National Assembly proportional representation, 2015 to 2018",
                 PARLIAMENT_2015_METHODOLOGY,
             ),
             (
                 "parliament_2011",
-                {"formula": "dhondt", "threshold": {"percent": 10, "level": "party", "scope": "national"}},
+                {
+                    "formula": "dhondt",
+                    "threshold": {"percent": 10, "level": "party", "scope": "national"},
+                    "lists": lists,
+                },
                 "Grand National Assembly proportional representation in 2011",
                 PARLIAMENT_2011_METHODOLOGY,
             ),
             (
                 "parliament_2007",
-                {"formula": "dhondt", "threshold": {"percent": 10, "level": "party", "scope": "national"}},
+                {
+                    "formula": "dhondt",
+                    "threshold": {"percent": 10, "level": "party", "scope": "national"},
+                    "lists": lists,
+                },
                 "Grand National Assembly proportional representation in 2007",
                 PARLIAMENT_2011_METHODOLOGY,
             ),

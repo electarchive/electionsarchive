@@ -136,9 +136,31 @@ def _accounting(stage: Stage) -> list[tuple[str, sql.Composed]]:
 
 
 def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
-    if "outcome" not in stage.tables or "result_value" not in stage.tables:
+    if "outcome" not in stage.tables:
         return []
+    members = (
+        [
+            (
+                "outcomes.list_members",
+                sql.SQL(
+                    """with m as (
+                 select result_set_id, option_id, count(*) as members from {outcomes}
+                 where candidacy_id is not null and kind = 'elected' group by 1, 2
+               )
+               select m.option_id, m.result_set_id, jsonb_build_object('members', m.members, 'seats', w.seats)
+               from m join {outcomes} w on w.result_set_id = m.result_set_id and w.option_id = m.option_id
+                 and w.candidacy_id is null and w.seats is not null
+               where m.members > w.seats"""
+                ).format(outcomes=stage.staged("outcome")),
+            )
+        ]
+        if "candidacy_id" in stage.tables["outcome"]
+        else []
+    )
+    if "result_value" not in stage.tables:
+        return members
     return [
+        *members,
         (
             "outcomes.winner",
             sql.SQL(
@@ -174,7 +196,7 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
                 contests=stage.either("contest", "id", "magnitude", "electoral_system_id"),
                 systems=stage.either("electoral_system", "id", "rules"),
             ),
-        )
+        ),
     ]
 
 

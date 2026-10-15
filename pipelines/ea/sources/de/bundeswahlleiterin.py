@@ -930,7 +930,16 @@ def emit() -> Path:
         for key, rules, label, methodology in (
             (
                 "bundestag-lists",
-                {"formula": "sainte_lague_schepers", "threshold": THRESHOLD},
+                {
+                    "formula": "sainte_lague_schepers",
+                    "threshold": THRESHOLD,
+                    "lists": {
+                        "order": "closed",
+                        "constituencies": "covered",
+                        "exhausted": "vacant",
+                        "vacancy": "next_on_list",
+                    },
+                },
                 "Bundestag second-vote allocation since the 2023 reform",
                 LISTS_METHODOLOGY,
             ),
@@ -942,7 +951,7 @@ def emit() -> Path:
             ),
             (
                 "european-parliament",
-                {"formula": "sainte_lague_schepers"},
+                {"formula": "sainte_lague_schepers", "lists": {"order": "closed", "vacancy": "next_on_list"}},
                 "European Parliament elections in Germany since 2014",
                 EUROPEAN_METHODOLOGY,
             ),

@@ -339,7 +339,7 @@ def emit() -> Path:
             "electoral_system",
             id=system,
             polity_id=switzerland,
-            rules={"formula": "hagenbach_bischoff"},
+            rules={"formula": "hagenbach_bischoff", "lists": {"order": "open", "vacancy": "next_by_votes"}},
             rules_version=1,
         )
         name(system, "Swiss National Council proportional representation")

@@ -604,7 +604,12 @@ def emit() -> Path:
         systems: dict[str, UUID] = {}
         for key, rules, label, methodology in (
             ("presidential-two-round", {"formula": "two_round"}, "Brazilian presidential two-round system", PRESIDENT),
-            ("chamber-open-list", {"formula": "dhondt"}, "Brazilian open-list proportional representation", CHAMBER),
+            (
+                "chamber-open-list",
+                {"formula": "dhondt", "lists": {"order": "open", "individual": 0.1, "vacancy": "next_by_votes"}},
+                "Brazilian open-list proportional representation",
+                CHAMBER,
+            ),
         ):
             systems[key] = cs.key("br.electoral_system", key)
             cs.add("electoral_system", id=systems[key], polity_id=brazil, rules=rules, rules_version=1)

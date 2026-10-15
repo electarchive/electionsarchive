@@ -415,6 +415,7 @@ def emit() -> Path:
         )
 
         systems: dict[str, UUID] = {}
+        lists = {"order": "closed", "vacancy": "by_election"}
         for code, rules, label, methodology in (
             (
                 "parliament_1946",
@@ -424,26 +425,34 @@ def emit() -> Path:
             ),
             (
                 "parliament_1961",
-                {"formula": "dhondt"},
+                {"formula": "dhondt", "lists": lists},
                 "National Assembly D'Hondt with a provincial quota, 1961",
                 QUOTA_METHODOLOGY,
             ),
             (
                 "parliament_1965",
-                {"formula": "hare"},
+                {"formula": "hare", "lists": lists},
                 "National Assembly national remainder, 1965",
                 REMAINDER_METHODOLOGY,
             ),
-            ("parliament_1969", {"formula": "dhondt"}, "National Assembly D'Hondt, 1969 to 1977", None),
+            ("parliament_1969", {"formula": "dhondt", "lists": lists}, "National Assembly D'Hondt, 1969 to 1977", None),
             (
                 "parliament_1983",
-                {"formula": "dhondt", "threshold": {"percent": 10, "level": "party", "scope": "national"}},
+                {
+                    "formula": "dhondt",
+                    "threshold": {"percent": 10, "level": "party", "scope": "national"},
+                    "lists": lists,
+                },
                 "Grand National Assembly proportional representation with district quotas, 1983",
                 DOUBLE_METHODOLOGY,
             ),
             (
                 "parliament_1987",
-                {"formula": "dhondt", "threshold": {"percent": 10, "level": "party", "scope": "national"}},
+                {
+                    "formula": "dhondt",
+                    "threshold": {"percent": 10, "level": "party", "scope": "national"},
+                    "lists": lists,
+                },
                 (
                     "Grand National Assembly proportional representation with district quotas and kontenjan seats, "
                     "1987 to 1991"
@@ -452,7 +461,11 @@ def emit() -> Path:
             ),
             (
                 "parliament_1995",
-                {"formula": "dhondt", "threshold": {"percent": 10, "level": "party", "scope": "national"}},
+                {
+                    "formula": "dhondt",
+                    "threshold": {"percent": 10, "level": "party", "scope": "national"},
+                    "lists": lists,
+                },
                 "Grand National Assembly proportional representation, 1995 to 2002",
                 PROVINCIAL_METHODOLOGY,
             ),

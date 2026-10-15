@@ -997,7 +997,17 @@ def emit() -> Path:
             ),
             (
                 "camera-proportional",
-                {"formula": "hare", "threshold": {"percent": 3, "level": "list", "scope": "national"}},
+                {
+                    "formula": "hare",
+                    "threshold": {"percent": 3, "level": "list", "scope": "national"},
+                    "lists": {
+                        "order": "closed",
+                        "constituencies": "skip",
+                        "multiple": "lowest_share",
+                        "exhausted": "elsewhere",
+                        "vacancy": "next_on_list",
+                    },
+                },
                 "Chamber of Deputies proportional seats since 2017",
                 METHODOLOGY,
             ),
