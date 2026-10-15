@@ -251,6 +251,15 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     else sql.SQL(""),
                 )
             )
+        if "area" in types:
+            conn.execute(
+                sql.SQL(
+                    """update public.result_rollup r set area_k = survivor.k
+                       from {} s join area duplicate on duplicate.id = s.entity_id
+                       join area survivor on survivor.id = s.into_id
+                       where r.area_k = duplicate.k"""
+                ).format(staged)
+            )
         for kind in types:
             filled = [
                 sql.Identifier(attribute)
