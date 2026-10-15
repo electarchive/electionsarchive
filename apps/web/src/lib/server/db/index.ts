@@ -1,9 +1,9 @@
 import { DATABASE_URL } from "$app/env/private";
+import * as schema from "@ea/db/schema";
 import { defineRelations } from "drizzle-orm";
 import { drizzle } from "drizzle-orm/node-postgres";
 import pg from "pg";
 import { PROJECT } from "#lib/constants.js";
-import * as schema from "#lib/server/db/schema.js";
 
 const pool = new pg.Pool({
   connectionString: DATABASE_URL,

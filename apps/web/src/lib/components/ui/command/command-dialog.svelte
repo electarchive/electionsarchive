@@ -37,10 +37,7 @@
     <Dialog.Description>{description}</Dialog.Description>
   </Dialog.Header>
   <Dialog.Content
-    class={cn(
-      "top-1/3 translate-y-0 overflow-hidden rounded-xl! p-0",
-      className,
-    )}
+    class={cn("top-1/3 translate-y-0 overflow-hidden p-0", className)}
     {showCloseButton}
     {portalProps}
   >

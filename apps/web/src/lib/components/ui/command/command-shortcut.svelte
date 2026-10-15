@@ -11,14 +11,11 @@
   }: WithElementRef<HTMLAttributes<HTMLSpanElement>> = $props();
 </script>
 
-<span
+<kbd
   bind:this={ref}
   data-slot="command-shortcut"
-  class={cn(
-    "ml-auto text-xs tracking-widest text-muted-foreground group-data-selected/command-item:text-foreground",
-    className,
-  )}
+  class={cn("ms-auto", className)}
   {...restProps}
 >
   {@render children?.()}
-</span>
+</kbd>

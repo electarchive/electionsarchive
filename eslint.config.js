@@ -8,6 +8,7 @@ import antfu, {
 import pluginQuery from "@tanstack/eslint-plugin-query";
 import betterTailwindcss from "eslint-plugin-better-tailwindcss";
 import { recommended as inlineUtilities } from "eslint-plugin-inline-utilities";
+import path from "node:path";
 
 /**
  * Syntax-only TypeScript rules, safe in `typescript.overrides` (the base,
@@ -52,6 +53,13 @@ const tsTypeAwareOverrides = {
     { considerDefaultExhaustiveForUnions: true },
   ],
   "ts/use-unknown-in-catch-callback-variable": "error",
+};
+
+const sortImports = {
+  internalPattern: ["^#lib(/.+)?$"],
+  newlinesBetween: 0,
+  order: "asc",
+  type: "natural",
 };
 
 export default antfu({
@@ -111,18 +119,7 @@ export default antfu({
     },
   },
   imports: {
-    overrides: {
-      "perfectionist/sort-imports": [
-        "error",
-        {
-          tsconfig: { rootDir: import.meta.dirname, filename: "tsconfig.json" },
-          internalPattern: ["^#lib(/.+)?$"],
-          newlinesBetween: 0,
-          order: "asc",
-          type: "natural",
-        },
-      ],
-    },
+    overrides: { "perfectionist/sort-imports": ["error", sortImports] },
   },
   rules: {
     "antfu/no-top-level-await": ["off"],
@@ -135,9 +132,12 @@ export default antfu({
     "prefer-const": "off",
   },
   ignores: [
-    "src/lib/paraglide/**/*",
-    "src/lib/components/ui/**/*",
-    "project.inlang/**/*",
+    "apps/web/src/lib/paraglide/**/*",
+    "apps/web/src/lib/components/ui/**/*",
+    "apps/web/project.inlang/**/*",
+    "packages/db/migrations/**/*",
+    "packages/db/src/core.ts",
+    "packages/db/src/core-relations.ts",
   ],
 })
   .append(pluginQuery.configs["flat/recommended-strict"])
@@ -148,10 +148,26 @@ export default antfu({
   })
   .append(inlineUtilities)
   .append({
+    name: "local/sort-imports-web",
+    files: ["apps/web/**/*.{js,ts,svelte}"],
+    rules: {
+      "perfectionist/sort-imports": [
+        "error",
+        {
+          ...sortImports,
+          tsconfig: {
+            rootDir: path.join(import.meta.dirname, "apps/web"),
+            filename: "tsconfig.json",
+          },
+        },
+      ],
+    },
+  })
+  .append({
     name: "local/better-tailwindcss",
     files: ["**/*.svelte", "**/*.?([cm])[jt]s?(x)"],
     plugins: { "better-tailwindcss": betterTailwindcss },
-    settings: { "better-tailwindcss": { entryPoint: "src/app.css" } },
+    settings: { "better-tailwindcss": { entryPoint: "apps/web/src/app.css" } },
     rules: {
       "better-tailwindcss/enforce-consistent-variant-order": "error",
       "better-tailwindcss/enforce-consistent-variable-syntax": "error",

@@ -12,6 +12,7 @@ export default defineConfig({
     sveltekit({
       preprocess: [vitePreprocess()],
       adapter: adapter(),
+      env: { dir: "../.." },
       compilerOptions: { experimental: { async: true } },
       inspector: { toggleKeyCombo: "control-o" },
     }),

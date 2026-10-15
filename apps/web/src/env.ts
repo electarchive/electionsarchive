@@ -1,6 +1,13 @@
 import { defineEnvVars } from "@sveltejs/kit/env";
 import * as v from "valibot";
 
+const oauth = v.optional(
+  v.pipe(
+    v.string(),
+    v.transform((value) => (value === "" ? undefined : value)),
+  ),
+);
+
 export const variables = defineEnvVars({
   DATABASE_URL: {
     static: true,
@@ -20,6 +27,26 @@ export const variables = defineEnvVars({
     static: true,
     schema: v.pipe(v.string(), v.url("Invalid URL")),
     description: "Better Auth URL",
+  },
+  GITHUB_CLIENT_ID: {
+    static: true,
+    schema: oauth,
+    description: "GitHub OAuth client ID",
+  },
+  GITHUB_CLIENT_SECRET: {
+    static: true,
+    schema: oauth,
+    description: "GitHub OAuth client secret",
+  },
+  GOOGLE_CLIENT_ID: {
+    static: true,
+    schema: oauth,
+    description: "Google OAuth client ID",
+  },
+  GOOGLE_CLIENT_SECRET: {
+    static: true,
+    schema: oauth,
+    description: "Google OAuth client secret",
   },
   RESEND_API_KEY: {
     static: true,

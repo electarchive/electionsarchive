@@ -1,7 +1,13 @@
 import type { KnipConfig } from "knip";
 
 const config: KnipConfig = {
-  entry: ["src/env.ts", "src/hooks.ts", "src/lib/**/*.{svelte,ts}"],
+  workspaces: {
+    ".": {},
+    "apps/web": {
+      entry: ["src/env.ts", "src/hooks.ts", "src/lib/**/*.{svelte,ts}"],
+    },
+    "packages/db": { entry: ["drizzle.pull.config.ts"] },
+  },
   treatConfigHintsAsErrors: true,
 };
 

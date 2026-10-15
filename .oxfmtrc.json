@@ -5,7 +5,7 @@
   "sortPackageJson": false,
   "objectWrap": "collapse",
   "sortTailwindcss": {
-    "stylesheet": "./src/app.css",
+    "stylesheet": "./apps/web/src/app.css",
     "functions": ["tv", "cn"],
     "attributes": ["triggerClass", "contentClass"]
   },
@@ -14,7 +14,10 @@
     "pnpm-lock.yaml",
     "pnpm-workspace.yaml",
     ".svelte-kit",
-    "src/lib/paraglide",
-    "project.inlang"
+    "apps/web/src/lib/paraglide",
+    "apps/web/project.inlang",
+    "packages/db/migrations",
+    "packages/db/src/core.ts",
+    "packages/db/src/core-relations.ts"
   ]
 }

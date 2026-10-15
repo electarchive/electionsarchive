@@ -10,11 +10,11 @@
   import Header from "#lib/components/header.svelte";
   import { Toaster } from "#lib/components/ui/sonner/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import { makeQueryClient } from "#lib/query-client.js";
   import {
     ConfirmationStore,
     setConfirmationContext,
   } from "#lib/stores/confirmation.svelte.js";
-  import { makeQueryClient } from "#lib/trpc/query-client.js";
 
   const { children }: { children: Snippet } = $props();
 
@@ -24,8 +24,11 @@
 </script>
 
 <svelte:head>
-  <title>Template for SvelteKit projects</title>
-  <meta name="description" content="Template for building SvelteKit projects" />
+  <title>electionsarchive.com</title>
+  <meta
+    name="description"
+    content="Every election in ten polities, down to the finest reporting unit, with a source for every number."
+  />
 </svelte:head>
 
 <QueryClientProvider client={queryClient}>

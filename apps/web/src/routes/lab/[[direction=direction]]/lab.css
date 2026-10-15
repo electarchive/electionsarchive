@@ -1,0 +1,325 @@
+@property --reflect {
+  syntax: "<color>";
+  inherits: true;
+  initial-value: transparent;
+}
+
+.lab {
+  --k: 1;
+  --radius-sm: calc(var(--r1) * var(--k));
+  --radius: calc(var(--r2) * var(--k));
+  --radius-lg: calc(var(--r3) * var(--k));
+  --reflect: var(--accent);
+
+  --p-cdu: #2a2926;
+  --p-csu: #0f6cb6;
+  --p-afd: #23a7e0;
+  --p-spd: #d7141a;
+  --p-gruene: #3e9b2f;
+  --p-linke: #be2f72;
+  --p-bsw: #7b2a5c;
+  --p-fdp: #e2bd00;
+  --p-fw: #ee8a00;
+  --p-ssw: #1c3f94;
+  --p-tier: #1e8f82;
+  --p-volt: #502379;
+  --p-other: #9a958b;
+
+  position: fixed;
+  inset: 0;
+  z-index: 40;
+  overflow: auto;
+  background: var(--ground);
+  color: var(--ink);
+  font-family: var(--font-ui);
+  -webkit-font-smoothing: antialiased;
+  color-scheme: light;
+}
+
+.lab[data-theme="dark"] {
+  --p-cdu: #d9d4ca;
+  --p-csu: #3e8fd6;
+  --p-afd: #4cc0ef;
+  --p-spd: #f0444a;
+  --p-gruene: #5dbb4c;
+  --p-linke: #e0508f;
+  --p-bsw: #b05a8e;
+  --p-fdp: #f5d63a;
+  --p-fw: #f7a23b;
+  --p-ssw: #6c8fe0;
+  --p-tier: #3db8a8;
+  --p-volt: #9a6bd0;
+  --p-other: #77736b;
+
+  color-scheme: dark;
+}
+
+.lab[data-squircles] {
+  --k: 1.8;
+}
+
+.lab[data-squircles] * {
+  corner-shape: squircle;
+}
+
+.lab ::selection {
+  background: var(--hl);
+}
+
+.lab[data-direction="indelible"] {
+  --ground: #eeede8;
+  --surface: #f7f6f2;
+  --surface-2: #e8e6e0;
+  --ink: #1b1a2e;
+  --muted: #5f5d6b;
+  --rule: #d6d3cb;
+  --accent: #5b34d6;
+  --accent-ink: #f7f6f2;
+  --hl: color-mix(in oklab, #5b34d6 9%, transparent);
+  --map-base: #f7f6f2;
+  --map-stroke: #f7f6f2;
+  --map-land: color-mix(in oklab, #1b1a2e 60%, transparent);
+  --map-ramp: #1b1a2e;
+  --halo: #f7f6f2;
+  --font-display: "Literata", "Noto Serif", serif;
+  --font-ui: "IBM Plex Sans", "Noto Sans", system-ui, sans-serif;
+  --font-num: "IBM Plex Mono", "Noto Sans Mono", ui-monospace, monospace;
+  --display-weight: 470;
+  --display-tracking: -0.022em;
+  --r1: 4px;
+  --r2: 8px;
+  --r3: 12px;
+}
+
+.lab[data-direction="indelible"][data-theme="dark"] {
+  --ground: #1d1c1a;
+  --surface: #262522;
+  --surface-2: #2e2d29;
+  --ink: #eae6de;
+  --muted: #a39e95;
+  --rule: #3a3834;
+  --accent: #b8a4ff;
+  --accent-ink: #1d1c1a;
+  --hl: color-mix(in oklab, #b8a4ff 13%, transparent);
+  --map-base: #2a2926;
+  --map-stroke: #1d1c1a;
+  --map-land: color-mix(in oklab, #eae6de 55%, transparent);
+  --map-ramp: #eae6de;
+  --halo: #1d1c1a;
+}
+
+.lab[data-direction="tally"] {
+  --ground: #f1efea;
+  --surface: #fbfaf7;
+  --surface-2: #f1efea;
+  --ink: #191816;
+  --muted: #67635b;
+  --rule: #cfcac0;
+  --accent: #8a6a00;
+  --accent-ink: #191816;
+  --marker: #ffe03a;
+  --hl: color-mix(in oklab, #ffe03a 72%, transparent);
+  --map-base: #fbfaf7;
+  --map-stroke: #fbfaf7;
+  --map-land: #191816;
+  --map-ramp: #191816;
+  --halo: #ffe03a;
+  --font-display: "Piazzolla", "Noto Serif", serif;
+  --font-ui: "Sofia Sans Semi Condensed", "Noto Sans", system-ui, sans-serif;
+  --font-num: "Martian Mono", "Noto Sans Mono", ui-monospace, monospace;
+  --display-weight: 640;
+  --display-tracking: -0.01em;
+  --r1: 3px;
+  --r2: 5px;
+  --r3: 7px;
+
+  font-stretch: 75%;
+}
+
+.lab[data-direction="tally"][data-theme="dark"] {
+  --ground: #1a1917;
+  --surface: #22211e;
+  --surface-2: #1a1917;
+  --ink: #ece9e2;
+  --muted: #a09b91;
+  --rule: #3b3934;
+  --accent: #e8c547;
+  --marker: #e8c547;
+  --hl: color-mix(in oklab, #e8c547 28%, transparent);
+  --map-base: #2a2925;
+  --map-stroke: #22211e;
+  --map-land: #ece9e2;
+  --map-ramp: #ece9e2;
+  --halo: #e8c547;
+}
+
+.lab[data-direction="chamber"] {
+  --ground: #e9e7e1;
+  --surface: #f6f5f1;
+  --surface-2: #ecebe5;
+  --glass: rgb(250 249 246 / 0.66);
+  --glass-edge: rgb(255 255 255 / 0.75);
+  --glass-hi: rgb(255 255 255 / 0.85);
+  --ink: #1e1f1c;
+  --muted: #6e6b63;
+  --rule: #d5d2ca;
+  --accent: #1e8574;
+  --accent-ink: #f6f5f1;
+  --hl: color-mix(in oklab, #1e8574 12%, transparent);
+  --map-base: #f4f3ef;
+  --map-stroke: #e9e7e1;
+  --map-land: rgb(30 31 28 / 0.5);
+  --map-ramp: #1e1f1c;
+  --halo: #f6f5f1;
+  --font-display: "Source Serif 4", "Noto Serif", serif;
+  --font-ui: "Inter", "Noto Sans", system-ui, sans-serif;
+  --font-num: "JetBrains Mono", "Noto Sans Mono", ui-monospace, monospace;
+  --display-weight: 600;
+  --display-tracking: -0.018em;
+  --r1: 6px;
+  --r2: 12px;
+  --r3: 22px;
+}
+
+.lab[data-direction="chamber"][data-theme="dark"] {
+  --ground: #1c1b19;
+  --surface: #262522;
+  --surface-2: #2c2b27;
+  --glass: rgb(38 36 33 / 0.62);
+  --glass-edge: rgb(255 255 255 / 0.09);
+  --glass-hi: rgb(255 255 255 / 0.07);
+  --ink: #edeae3;
+  --muted: #a8a398;
+  --rule: #3a3833;
+  --accent: #63d2be;
+  --accent-ink: #13221f;
+  --hl: color-mix(in oklab, #63d2be 14%, transparent);
+  --map-base: #2b2a26;
+  --map-stroke: #1c1b19;
+  --map-land: rgb(237 234 227 / 0.45);
+  --map-ramp: #edeae3;
+  --halo: #1c1b19;
+}
+
+.lab .btn {
+  display: inline-flex;
+  align-items: center;
+  gap: 6px;
+  padding: 7px 13px;
+  border-radius: var(--radius-sm);
+  color: var(--ink);
+  font: 500 13.5px/1.2 var(--font-ui);
+  cursor: pointer;
+  transition:
+    transform 90ms ease,
+    box-shadow 90ms ease,
+    border-width 90ms ease;
+}
+
+.lab .btn:focus-visible {
+  outline: 2px solid var(--accent);
+  outline-offset: 2px;
+}
+
+.lab[data-direction="indelible"] .btn {
+  border: 1.5px solid var(--ink);
+  background: var(--surface);
+}
+
+.lab[data-direction="indelible"] .btn-primary {
+  border-color: color-mix(in oklab, var(--accent) 70%, var(--ink));
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.lab[data-direction="indelible"][data-buttons] .btn {
+  box-shadow: 0 2px 0 var(--ink);
+}
+
+.lab[data-direction="indelible"][data-buttons] .btn-primary {
+  box-shadow: 0 2px 0 color-mix(in oklab, var(--accent) 55%, var(--ink));
+}
+
+.lab[data-direction="indelible"][data-buttons] .btn:hover {
+  transform: translateY(-1px);
+  box-shadow: 0 3px 0 var(--ink);
+}
+
+.lab[data-direction="indelible"][data-buttons] .btn:active {
+  transform: translateY(2px);
+  box-shadow: 0 0 0 var(--ink);
+}
+
+.lab[data-direction="tally"] .btn {
+  border: 1px solid color-mix(in oklab, var(--ink) 40%, transparent);
+  background: var(--surface);
+  font-weight: 600;
+}
+
+.lab[data-direction="tally"] .btn-primary {
+  border-color: var(--ink);
+  background: var(--marker);
+  color: #191816;
+}
+
+.lab[data-direction="tally"][data-buttons] .btn {
+  border-block-end-width: 3px;
+}
+
+.lab[data-direction="tally"][data-buttons] .btn:active {
+  transform: translateY(2px);
+  border-block-end-width: 1px;
+}
+
+.lab[data-direction="chamber"] .btn {
+  border: 1px solid var(--rule);
+  background: var(--surface);
+}
+
+.lab[data-direction="chamber"] .btn-primary {
+  border-color: color-mix(in oklab, var(--accent) 80%, var(--ink));
+  background: var(--accent);
+  color: var(--accent-ink);
+}
+
+.lab[data-direction="chamber"][data-buttons] .btn {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--surface) 100%, white 40%),
+    var(--surface)
+  );
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.5),
+    0 1px 0 color-mix(in oklab, var(--ink) 18%, transparent),
+    0 2px 4px -1px color-mix(in oklab, var(--ink) 18%, transparent);
+}
+
+.lab[data-direction="chamber"][data-buttons] .btn-primary {
+  background: linear-gradient(
+    to bottom,
+    color-mix(in oklab, var(--accent) 86%, white),
+    var(--accent)
+  );
+}
+
+.lab[data-direction="chamber"][data-buttons] .btn:active {
+  transform: translateY(1px);
+  box-shadow: inset 0 1px 2px color-mix(in oklab, var(--ink) 25%, transparent);
+}
+
+.lab[data-direction="chamber"][data-shadows] .btn-primary {
+  box-shadow:
+    inset 0 1px 0 rgb(255 255 255 / 0.35),
+    0 10px 22px -10px var(--accent);
+}
+
+::view-transition-old(root),
+::view-transition-new(root) {
+  animation-duration: 260ms;
+}
+
+@media (prefers-reduced-motion: reduce) {
+  .lab .btn {
+    transition: none;
+  }
+}

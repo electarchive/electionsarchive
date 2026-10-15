@@ -1,11 +1,17 @@
 import {
   BETTER_AUTH_SECRET,
   BETTER_AUTH_URL,
+  GITHUB_CLIENT_ID,
+  GITHUB_CLIENT_SECRET,
+  GOOGLE_CLIENT_ID,
+  GOOGLE_CLIENT_SECRET,
   RESEND_API_KEY,
 } from "$app/env/private";
 import { getRequestEvent } from "$app/server";
+import { apiKey } from "@better-auth/api-key";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
 import { i18n } from "@better-auth/i18n";
+import * as schema from "@ea/db/schema";
 import { betterAuth } from "better-auth/minimal";
 import { admin } from "better-auth/plugins";
 import { sveltekitCookies } from "better-auth/svelte-kit";
@@ -15,7 +21,6 @@ import { EMAIL_FROM, PROJECT } from "#lib/constants.js";
 import { m } from "#lib/paraglide/messages.js";
 import { baseLocale, getLocale, locales } from "#lib/paraglide/runtime.js";
 import { db } from "#lib/server/db/index.js";
-import * as schema from "#lib/server/db/schema.js";
 import { createRateLimiter } from "#lib/server/ratelimit.js";
 
 const authErrorMessages = {
@@ -100,7 +105,8 @@ export const auth = betterAuth({
   telemetry: { enabled: false },
   advanced: {
     database: {
-      generateId: ({ model }) => (model === "session" ? randomUUID() : false),
+      generateId: ({ model }) =>
+        model === "session" || model === "apikey" ? randomUUID() : false,
     },
   },
   rateLimit: {
@@ -122,9 +128,21 @@ export const auth = betterAuth({
     },
   },
   session: { cookieCache: { enabled: true, maxAge: 5 * 60 } },
-  disabledPaths: ["/sign-up/email"],
+  socialProviders: {
+    github: {
+      enabled: GITHUB_CLIENT_ID != null && GITHUB_CLIENT_SECRET != null,
+      clientId: GITHUB_CLIENT_ID ?? "",
+      clientSecret: GITHUB_CLIENT_SECRET ?? "",
+    },
+    google: {
+      enabled: GOOGLE_CLIENT_ID != null && GOOGLE_CLIENT_SECRET != null,
+      clientId: GOOGLE_CLIENT_ID ?? "",
+      clientSecret: GOOGLE_CLIENT_SECRET ?? "",
+    },
+  },
   plugins: [
     admin(),
+    apiKey({ defaultPrefix: "ea_", rateLimit: { enabled: false } }),
     i18n({
       translations,
       defaultLocale: baseLocale,

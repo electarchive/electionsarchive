@@ -1,3 +1,4 @@
-export const PROJECT = "template";
+export const PROJECT = "electionsarchive";
 
-export const EMAIL_FROM = "Template <no-reply@example.com>";
+export const EMAIL_FROM =
+  "electionsarchive.com <no-reply@electionsarchive.com>";

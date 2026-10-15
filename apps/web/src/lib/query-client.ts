@@ -5,7 +5,6 @@ import {
   QueryCache,
   QueryClient,
 } from "@tanstack/svelte-query";
-import SuperJSON from "superjson";
 import { toast } from "svelte-sonner";
 
 export function makeQueryClient() {
@@ -23,12 +22,10 @@ export function makeQueryClient() {
       },
       mutations: { retry: false, throwOnError: false },
       dehydrate: {
-        serializeData: SuperJSON.serialize,
         shouldDehydrateQuery: (query) =>
           defaultShouldDehydrateQuery(query) ||
           query.state.status === "pending",
       },
-      hydrate: { deserializeData: SuperJSON.deserialize },
     },
     queryCache: new QueryCache({
       onError: (error) => {
