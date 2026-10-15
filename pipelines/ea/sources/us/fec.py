@@ -998,6 +998,7 @@ SUMMARIZED: dict[object, str] = {"LIB": "LBT", "DFL": "D", (2012, "PA", "D"): "R
 SURNAMES = {"Bloomberg": "P00014530", "Romney": "P80003353"}
 NAMESAKES = {"H8CA52052", "P00014613"}
 MISATTRIBUTED = {"2020:Democratic:P60016342": "P00014613"}
+REUSED_IDS = {"2002:H2CA46073:Richard B. Owens": None, "2022:H2NY22139:Carolyn B. Maloney": "H2NY14037"}
 TWINS = {
     "P00003343": "S2NC00174",
     "P00003608": "S4GA11046",
@@ -4334,20 +4335,28 @@ def emit() -> Path:
         .then(None)
         .otherwise(pl.concat_str("state", pl.col("name").map_elements(slug, return_dtype=pl.String), separator=":"))
     )
-    primaries = pl.concat(
-        [pl.read_parquet(PARSED / "primaries.parquet"), pl.read_parquet(PARSED / "books_primaries.parquet")],
-        how="diagonal_relaxed",
-    ).with_columns(
-        key=pl.when(pl.col("fec_id").is_not_null())
-        .then(pl.col("fec_id"))
-        .when(
-            pl.col("name").is_in(
-                ["Scattered", "Scattered (Nonqualified Candidates)", "All Others", NOTA, "None of the Above"]
-            )
-            | pl.col("name").str.starts_with("Opportunity to Ballot")
+    primaries = (
+        pl.concat(
+            [pl.read_parquet(PARSED / "primaries.parquet"), pl.read_parquet(PARSED / "books_primaries.parquet")],
+            how="diagonal_relaxed",
         )
-        .then(None)
-        .otherwise(pl.concat_str("state", pl.col("name").map_elements(slug, return_dtype=pl.String), separator=":"))
+        .with_columns(
+            fec_id=pl.concat_str(pl.col("year").cast(pl.String), "fec_id", "name", separator=":").replace_strict(
+                REUSED_IDS, default=pl.col("fec_id"), return_dtype=pl.String
+            )
+        )
+        .with_columns(
+            key=pl.when(pl.col("fec_id").is_not_null())
+            .then(pl.col("fec_id"))
+            .when(
+                pl.col("name").is_in(
+                    ["Scattered", "Scattered (Nonqualified Candidates)", "All Others", NOTA, "None of the Above"]
+                )
+                | pl.col("name").str.starts_with("Opportunity to Ballot")
+            )
+            .then(None)
+            .otherwise(pl.concat_str("state", pl.col("name").map_elements(slug, return_dtype=pl.String), separator=":"))
+        )
     )
     nominations = (
         pl.read_parquet(PARSED / "nominations.parquet")
@@ -4512,6 +4521,12 @@ def emit() -> Path:
             cs.merge(duplicate, survivor)
         fec_persons = {key: cs.survivors.get(person, person) for key, person in fec_persons.items()}
         figures = {text: cs.survivors.get(person, person) for text, person in figures.items()}
+        if fec_persons["H2CA46073"] != fec_persons["H2CA39128"]:
+            cs.renamed[str(fec_persons["H2CA39128"])] = str(fec_persons["H2CA46073"])
+            cs.merge(fec_persons["H2CA46073"], cs.key(f"{SOURCE}.person", "CA:richard-b-owens"))
+            fec_persons["H2CA46073"] = fec_persons["H2CA39128"]
+            cs.add("external_id", entity_id=fec_persons["H2CA39128"], scheme="fec.candidate", value="H2CA46073")
+        cs.renamed[str(fec_persons["H2NY14037"])] = str(fec_persons["H2NY22139"])
 
         elections: dict[str, UUID] = {}
 
