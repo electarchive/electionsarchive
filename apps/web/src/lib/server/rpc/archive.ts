@@ -292,6 +292,129 @@ async function descend(contest: Found, unit: string | undefined) {
   return chain;
 }
 
+const VARIANTS = [
+  [0, 0],
+  [0.1, 0],
+  [0, 0.45],
+  [0, -0.45],
+  [-0.1, 0],
+  [0.2, 0],
+  [0.1, 0.45],
+  [0.1, -0.45],
+  [-0.2, 0],
+  [0.3, 0],
+  [0.2, 0.45],
+  [0.2, -0.45],
+] as const;
+
+function separate(
+  colors: Map<string, string>,
+  votes: Array<readonly [string | null, number]>,
+) {
+  const weight = new Map<string, number>();
+  for (const [party, count] of votes) {
+    if (party != null) {
+      weight.set(party, (weight.get(party) ?? 0) + count);
+    }
+  }
+  const order = weight
+    .keys()
+    .toArray()
+    .toSorted((a, b) => (weight.get(b) ?? 0) - (weight.get(a) ?? 0));
+  const placed: Array<Array<number>> = [];
+  for (const party of order) {
+    const hex = colors.get(party) ?? "";
+    if (!/^#[\da-f]{6}$/iu.test(hex)) {
+      continue;
+    }
+    const [r = 0, g = 0, b = 0] = [1, 3, 5].map((index) => {
+      const value = Number.parseInt(hex.slice(index, index + 2), 16) / 255;
+      return value <= 0.04045
+        ? value / 12.92
+        : ((value + 0.055) / 1.055) ** 2.4;
+    });
+    const [l, m, s] = [
+      0.4122214708 * r + 0.5363325363 * g + 0.0514459929 * b,
+      0.2119034982 * r + 0.6806995451 * g + 0.1073969566 * b,
+      0.0883024619 * r + 0.2817188376 * g + 0.6299787005 * b,
+    ].map((value) => Math.cbrt(value)) as [number, number, number];
+    const shown = Math.min(
+      0.86,
+      Math.max(0.52, 0.2104542553 * l + 0.793617785 * m - 0.0040720468 * s),
+    );
+    const green = 1.9779984951 * l - 2.428592205 * m + 0.4505937099 * s;
+    const blue = 0.0259040371 * l + 0.7827717662 * m - 0.808675766 * s;
+    const hue = Math.atan2(blue, green);
+    const candidates = VARIANTS.filter(
+      ([step]) => shown + step >= 0.52 && shown + step <= 0.86,
+    ).map(([step, turn]) => {
+      const lightness = shown + step;
+      let chroma = Math.hypot(green, blue);
+      let fitted = { at: [lightness, green, blue], rgb: [0, 0, 0] };
+      for (let attempt = 0; attempt < 24; attempt++) {
+        const at = [
+          lightness,
+          chroma * Math.cos(hue + turn),
+          chroma * Math.sin(hue + turn),
+        ];
+        const [cl = 0, cm = 0, cs = 0] = [
+          0.3963377774 * (at[1] ?? 0) + 0.2158037573 * (at[2] ?? 0),
+          -0.1055613458 * (at[1] ?? 0) - 0.0638541728 * (at[2] ?? 0),
+          -0.0894841775 * (at[1] ?? 0) - 1.291485548 * (at[2] ?? 0),
+        ].map((value) => (lightness + value) ** 3);
+        fitted = {
+          at,
+          rgb: [
+            4.0767416621 * cl - 3.3077115913 * cm + 0.2309699292 * cs,
+            -1.2684380046 * cl + 2.6097574011 * cm - 0.3413193965 * cs,
+            -0.0041960863 * cl - 0.7034186147 * cm + 1.707614701 * cs,
+          ],
+        };
+        if (fitted.rgb.every((value) => value >= -0.0005 && value <= 1.0005)) {
+          break;
+        }
+        chroma *= 0.9;
+      }
+      return {
+        ...fitted,
+        kept: step === 0 && turn === 0,
+        distance: Math.min(
+          ...placed.map((other) =>
+            Math.hypot(
+              ...fitted.at.map((value, index) => value - (other[index] ?? 0)),
+            ),
+          ),
+        ),
+      };
+    });
+    const best =
+      candidates.find((candidate) => candidate.distance >= 0.1) ??
+      candidates.toSorted((a, c) => c.distance - a.distance).at(0);
+    if (best == null) {
+      continue;
+    }
+    placed.push(best.at);
+    if (!best.kept) {
+      colors.set(
+        party,
+        `#${best.rgb
+          .map((value) => {
+            const clipped = Math.min(1, Math.max(0, value));
+            return Math.round(
+              255 *
+                (clipped <= 0.0031308
+                  ? 12.92 * clipped
+                  : 1.055 * clipped ** (1 / 2.4) - 0.055),
+            )
+              .toString(16)
+              .padStart(2, "0");
+          })
+          .join("")}`,
+      );
+    }
+  }
+}
+
 async function load(
   root: string,
   areaKs: Array<number>,
@@ -480,6 +603,10 @@ async function load(
   ]);
   const color = new Map(colors.rows.map((row) => [row.party_id, row.color]));
   const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
+  separate(
+    color,
+    options.rows.map((row) => [row.party, tallies.get(row.k) ?? 0] as const),
+  );
   const sharing = Map.groupBy(
     options.rows.filter((row) => row.person != null && row.party != null),
     (row) => row.party ?? "",
