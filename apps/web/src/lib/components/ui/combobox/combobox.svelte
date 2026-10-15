@@ -1,4 +1,8 @@
-<script lang="ts">
+<script
+  lang="ts"
+  generics="Item extends { value: string; label: string; detail?: string; group?: string; keywords?: Array<string> }"
+>
+  import type { Snippet } from "svelte";
   import ChevronsUpDownIcon from "@lucide/svelte/icons/chevrons-up-down";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Drawer from "#lib/components/ui/drawer/index.js";
@@ -15,15 +19,12 @@
     empty,
     clearable = false,
     class: className,
+    wide = false,
+    row,
+    selection,
     onValueChange,
   }: {
-    items: Array<{
-      value: string;
-      label: string;
-      detail?: string;
-      group?: string;
-      keywords?: Array<string>;
-    }>;
+    items: Array<Item>;
     value?: string | null;
     label: string;
     placeholder: string;
@@ -31,6 +32,9 @@
     empty: string;
     clearable?: boolean;
     class?: string;
+    wide?: boolean;
+    row?: Snippet<[Item]>;
+    selection?: Snippet<[Item]>;
     onValueChange?: (value: string | null) => void;
   } = $props();
 
@@ -39,7 +43,7 @@
   const narrow = $derived(isNarrowLayout());
   const selected = $derived(items.find((item) => item.value === value));
   const groups = $derived.by(() => {
-    const grouped = new Map<string, typeof items>();
+    const grouped = new Map<string, Array<Item>>();
     for (const item of items) {
       const group = grouped.get(item.group ?? "");
       if (group == null) {
@@ -63,13 +67,12 @@
     )}
   >
     <span class="sr-only">{label}:</span>
-    {#if selected != null}
-      <span class="min-w-0 flex-1 truncate">{selected.label}</span>
-      {#if selected.detail != null}
-        <span class="shrink-0 font-mono text-xs text-muted-foreground">
-          {selected.detail}
-        </span>
-      {/if}
+    {#if selected != null && selection != null}
+      {@render selection(selected)}
+    {:else if selected != null}
+      <span class="min-w-0 flex-1 truncate" title={selected.label}
+        >{selected.label}</span
+      >
     {:else}
       <span class="min-w-0 flex-1 truncate text-muted-foreground">
         {placeholder}
@@ -108,11 +111,17 @@
                 open = false;
               }}
             >
-              <span class="min-w-0 flex-1 truncate">{item.label}</span>
-              {#if item.detail != null}
-                <span class="shrink-0 font-mono text-xs text-muted-foreground">
-                  {item.detail}
-                </span>
+              {#if row == null}
+                <span class="min-w-0 flex-1 text-pretty">{item.label}</span>
+                {#if item.detail != null}
+                  <span
+                    class="shrink-0 font-mono text-xs text-muted-foreground"
+                  >
+                    {item.detail}
+                  </span>
+                {/if}
+              {:else}
+                {@render row(item)}
               {/if}
             </Command.Item>
           {/each}
@@ -147,7 +156,10 @@
     </Popover.Trigger>
     <Popover.Content
       align="start"
-      class="w-(--bits-popover-anchor-width) min-w-64 gap-0 overflow-hidden p-0"
+      class={cn("gap-0 overflow-hidden p-0", {
+        "w-(--bits-popover-anchor-width) min-w-64": !wide,
+        "w-[min(34rem,calc(100vw-2rem))]": wide,
+      })}
     >
       {@render picker()}
     </Popover.Content>
