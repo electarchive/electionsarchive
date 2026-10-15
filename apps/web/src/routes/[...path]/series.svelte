@@ -24,7 +24,9 @@
 
   const carried = $derived.by(() => {
     const query = new URLSearchParams(
-      [...page.url.searchParams].filter(([key]) => key !== "vs"),
+      [...page.url.searchParams].filter(
+        ([key, value]) => key !== "vs" || value === "previous",
+      ),
     )
       .toString()
       .replaceAll("%2F", "/");
@@ -282,7 +284,7 @@
                     {...props}
                     type={undefined}
                     class={cn(
-                      "relative flex items-center border border-input bg-card px-2.5 font-mono text-[0.8125rem] tabular-nums block-8",
+                      "relative flex items-center border border-input bg-card px-2.5 font-mono text-[0.8125rem] whitespace-nowrap tabular-nums block-8",
                       {
                         "z-10 border-foreground highlighter font-semibold":
                           entry.current,

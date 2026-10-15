@@ -31,10 +31,28 @@
     ) {
       return;
     }
+    const source =
+      document.querySelector<HTMLElement>("[data-scope-source]") ??
+      document.querySelector<HTMLElement>("[data-scope-title]");
+    for (const element of document.querySelectorAll<HTMLElement>(
+      "[data-scope-title], [data-scope-source]",
+    )) {
+      element.style.viewTransitionName =
+        element === source ? "scope-title" : "";
+      delete element.dataset.scopeSource;
+    }
     return new Promise((resolve) => {
       document.startViewTransition(async () => {
         resolve();
         await navigation.complete;
+        const title = document.querySelector<HTMLElement>("[data-scope-title]");
+        source?.style.removeProperty("view-transition-name");
+        for (const element of document.querySelectorAll<HTMLElement>(
+          "[data-scope-title]",
+        )) {
+          element.style.viewTransitionName =
+            element === title ? "scope-title" : "";
+        }
       });
     });
   });

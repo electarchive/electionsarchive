@@ -9,40 +9,56 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { cn } from "#lib/utils.js";
 
   const {
-    contest,
-    unit,
-    level,
+    source,
     noun,
     current,
   }: {
-    contest: string;
-    unit: string | null;
-    level: string;
+    source:
+      | NonNullable<Awaited<ReturnType<typeof orpc.contests.places.call>>>
+      | { contest: string; unit: string | null; level: string };
     noun: string;
-    current: string;
+    current: string | null;
   } = $props();
 
   let open = $state(false);
-  let places = $state<Awaited<
-    ReturnType<typeof orpc.contests.places.call>
-  > | null>(null);
+  let fetched = $state<{
+    key: string;
+    places: Awaited<ReturnType<typeof orpc.contests.places.call>>;
+  } | null>(null);
   let failed = $state(false);
 
+  const key = $derived(
+    "rows" in source
+      ? null
+      : `${source.contest}/${source.unit ?? ""}/${source.level}`,
+  );
+  const places = $derived(
+    "rows" in source ? source : fetched?.key === key ? fetched.places : null,
+  );
+  const isLoading = $derived(!("rows" in source) && fetched?.key !== key);
   const narrow = $derived(isNarrowLayout());
-  const label = $derived(m.siblings_open({ noun }));
+  const label = $derived(
+    current == null ? m.scope_below({ noun }) : m.siblings_open({ noun }),
+  );
 
   const toggle = (value: boolean) => {
     open = value;
-    if (!value || places != null) {
+    if (!value || "rows" in source || key == null || fetched?.key === key) {
       return;
     }
     failed = false;
+    const asked = key;
     orpc.contests.places
-      .call({ id: contest, unit: unit ?? undefined, by: level })
+      .call({
+        id: source.contest,
+        unit: source.unit ?? undefined,
+        by: source.level,
+      })
       .then((result) => {
-        places = result;
+        fetched = { key: asked, places: result };
       })
       .catch(() => {
         failed = true;
@@ -51,7 +67,7 @@
 </script>
 
 {#snippet picker()}
-  <Command.Root value={current} loop>
+  <Command.Root value={current ?? ""} loop>
     <Command.Input placeholder={m.siblings_search()} />
     <Command.List
       class="in-data-[slot=drawer-content]:max-block-[60dvh]"
@@ -61,10 +77,10 @@
           ?.scrollIntoView({ block: "center" });
       }}
     >
-      {#if places == null}
+      {#if isLoading || places == null}
         <Command.Loading>
           <p class="px-2 py-3 text-sm text-muted-foreground">
-            {failed ? m.siblings_empty() : m.siblings_loading()}
+            {failed || !isLoading ? m.siblings_empty() : m.siblings_loading()}
           </p>
         </Command.Loading>
       {:else}
@@ -105,9 +121,18 @@
 {#if narrow}
   <Drawer.Root bind:open={() => open, toggle}>
     <Drawer.Trigger
-      class="ms-0.5 grid place-items-center rounded-xs text-muted-foreground block-6 inline-5 hover:bg-secondary hover:text-foreground data-[state=open]:bg-secondary data-[state=open]:text-foreground"
+      class={cn(
+        "rounded-xs text-muted-foreground block-6 hover:bg-secondary hover:text-foreground data-[state=open]:bg-secondary data-[state=open]:text-foreground",
+        {
+          "ms-0.5 grid place-items-center inline-5": current != null,
+          "flex items-center gap-1 ps-1.5 pe-1": current == null,
+        },
+      )}
       aria-label={label}
     >
+      {#if current == null}
+        <span class="first-letter:uppercase">{noun}</span>
+      {/if}
       <ChevronDownIcon class="block-3.5 inline-3.5" />
     </Drawer.Trigger>
     <Drawer.Content>
@@ -122,9 +147,18 @@
 {:else}
   <Popover.Root bind:open={() => open, toggle}>
     <Popover.Trigger
-      class="ms-0.5 grid place-items-center rounded-xs text-muted-foreground block-6 inline-5 hover:bg-secondary hover:text-foreground data-[state=open]:bg-secondary data-[state=open]:text-foreground"
+      class={cn(
+        "rounded-xs text-muted-foreground block-6 hover:bg-secondary hover:text-foreground data-[state=open]:bg-secondary data-[state=open]:text-foreground",
+        {
+          "ms-0.5 grid place-items-center inline-5": current != null,
+          "flex items-center gap-1 ps-1.5 pe-1": current == null,
+        },
+      )}
       aria-label={label}
     >
+      {#if current == null}
+        <span class="first-letter:uppercase">{noun}</span>
+      {/if}
       <ChevronDownIcon class="block-3.5 inline-3.5" />
     </Popover.Trigger>
     <Popover.Content align="start" class="gap-0 overflow-hidden p-0 inline-80">

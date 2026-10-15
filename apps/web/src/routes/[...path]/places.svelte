@@ -473,13 +473,14 @@
                   class="font-semibold group-hover:underline group-hover:decoration-border group-hover:underline-offset-4 before:absolute before:inset-0"
                   href={resolve("/[...path]", { path: row.path })}
                   onclick={(event) => {
-                    document
-                      .querySelector<HTMLElement>("[data-scope-title]")
-                      ?.style.setProperty("view-transition-name", "none");
-                    event.currentTarget.style.setProperty(
-                      "view-transition-name",
-                      "scope-title",
-                    );
+                    if (
+                      !event.metaKey &&
+                      !event.ctrlKey &&
+                      !event.shiftKey &&
+                      !event.altKey
+                    ) {
+                      event.currentTarget.dataset.scopeSource = "";
+                    }
                   }}>{row.name}</a
                 >
               {/if}

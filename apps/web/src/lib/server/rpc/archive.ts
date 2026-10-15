@@ -1068,10 +1068,10 @@ async function pick(
   contest: { series: string; date: string | null },
   vs: string | undefined,
 ) {
-  if (vs === "none") {
+  if (vs == null || vs === "" || vs === "none") {
     return { chosen: null, notes: [] };
   }
-  if (vs == null || vs === "" || vs === "previous") {
+  if (vs === "previous") {
     const chosen =
       covering.find(
         (row) =>
@@ -1333,6 +1333,7 @@ export const contests = {
             year: v.nullable(v.number()),
             series: v.boolean(),
             annulled: v.boolean(),
+            previous: v.boolean(),
           }),
         ),
       }),
@@ -1846,6 +1847,11 @@ export const contests = {
                 !entry.indirect && peer.indirect && peer.year === entry.year,
             )?.winner ?? entry.winner,
         }));
+      const [{ chosen, notes: picked }, { chosen: previous }] =
+        await Promise.all([
+          pick(comparable, contest, input.vs),
+          pick(comparable, contest, "previous"),
+        ]);
       const targets = comparable.map((row) => ({
         value: rootSlugs.get(row.id) ?? row.id,
         label: rootLabels.full.get(row.id) ?? "",
@@ -1853,13 +1859,8 @@ export const contests = {
         year: row.year,
         series: row.series === contest.series,
         annulled: row.status === "annulled",
+        previous: row.id === previous?.id,
       }));
-
-      const { chosen, notes: picked } = await pick(
-        comparable,
-        contest,
-        input.vs,
-      );
       const relations = await db.execute<{
         from: string;
         to: string;

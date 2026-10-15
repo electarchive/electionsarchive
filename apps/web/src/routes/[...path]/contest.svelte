@@ -236,6 +236,30 @@
         .replaceAll("%2F", "/"),
     })),
   );
+  const below = $derived.by(() => {
+    const places = contest.places;
+    const level = places?.levels.find((entry) => entry.code === places.level);
+    return places == null ||
+      level == null ||
+      places.rows.every((row) => row.path == null)
+      ? null
+      : { places, noun: level.noun };
+  });
+  const previous = $derived(
+    contest.targets.find((target) => target.previous) ?? null,
+  );
+  const isPrevious = $derived(
+    previous != null && contest.target?.path === previous.value,
+  );
+  const toggled = $derived.by(() => {
+    const text = new URLSearchParams([
+      ...[...page.url.searchParams].filter(([key]) => key !== "vs"),
+      ...(isPrevious ? [] : [["vs", "previous"]]),
+    ])
+      .toString()
+      .replaceAll("%2F", "/");
+    return text === "" ? ("" as const) : (`?${text}` as const);
+  });
   const publishers = $derived([
     ...new Set(contest.current?.sets.map((set) => set.source.publisher) ?? []),
   ]);
@@ -309,7 +333,7 @@
       >
     {/if}
     <h1
-      class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance [view-transition-name:scope-title]"
+      class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
       data-scope-title
     >
       {drilled ? contest.scope.name : contest.name}
@@ -344,7 +368,7 @@
   {#if contest.series.length > 1}
     <Series series={contest.series} />
   {/if}
-  {#if contest.scope.trail.length > 1}
+  {#if contest.scope.trail.length > 1 || below != null}
     <nav class="md:col-span-2" aria-label={m.scope_path()}>
       <ol class="flex flex-wrap items-center gap-y-1 text-sm">
         {#each contest.scope.trail as crumb, index (index)}
@@ -364,15 +388,25 @@
             {/if}
             {#if crumb.siblings != null}
               <PlaceSwitcher
-                contest={crumb.siblings.contest}
-                unit={crumb.siblings.unit}
-                level={crumb.siblings.level}
+                source={crumb.siblings}
                 noun={crumb.siblings.noun}
                 current={crumb.name}
               />
             {/if}
           </li>
         {/each}
+        {#if below != null}
+          <li class="flex items-center">
+            <span class="px-1.5 text-muted-foreground" aria-hidden="true"
+              >/</span
+            >
+            <PlaceSwitcher
+              source={below.places}
+              noun={below.noun}
+              current={null}
+            />
+          </li>
+        {/if}
       </ol>
     </nav>
   {/if}
@@ -481,20 +515,21 @@
         class="flex-1 max-inline-md"
         wide
         {items}
-        value={contest.target?.path ??
-          (page.url.searchParams.get("vs") === "none" ? "none" : null)}
+        value={contest.target?.path ?? null}
         label={m.compare_label()}
         placeholder={m.compare_placeholder()}
         search={m.compare_search()}
         empty={m.compare_empty()}
         onValueChange={(value) => {
-          const query = new URLSearchParams({
-            ...Object.fromEntries(page.url.searchParams),
-            vs: value ?? "none",
-          })
-            .toString()
-            .replaceAll("%2F", "/");
-          void goto(resolve(`/[...path]?${query}`, { path: here }), {
+          const query = new URLSearchParams(page.url.search);
+          if (value == null || value === "none") {
+            query.delete("vs");
+          } else {
+            query.set("vs", value);
+          }
+          const text = query.toString().replaceAll("%2F", "/");
+          const suffix = text === "" ? ("" as const) : (`?${text}` as const);
+          void goto(resolve(`/[...path]${suffix}`, { path: here }), {
             reset: false,
           });
         }}
@@ -539,6 +574,38 @@
           {/if}
         {/snippet}
       </Combobox>
+      {#if previous != null}
+        <Tooltip.Root disableCloseOnTriggerClick delayDuration={300}>
+          <Tooltip.Trigger>
+            {#snippet child({ props })}
+              <a
+                {...props}
+                type={undefined}
+                class={cn(
+                  "flex shrink-0 keycap items-center gap-1.5 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary",
+                  {
+                    "bg-primary text-primary-foreground hover:bg-primary":
+                      isPrevious,
+                  },
+                )}
+                href={resolve(`/[...path]${toggled}`, { path: here })}
+                aria-current={isPrevious ? "true" : undefined}
+                data-sveltekit-reset="false"
+                >{m.compare_previous()}
+                {#if previous.year != null}
+                  <span class="font-mono tabular-nums">{previous.year}</span>
+                {/if}</a
+              >
+            {/snippet}
+          </Tooltip.Trigger>
+          <Tooltip.Content
+            collisionPadding={8}
+            class="leading-snug max-inline-64"
+          >
+            {isPrevious ? m.compare_previous_off() : m.compare_previous_on()}
+          </Tooltip.Content>
+        </Tooltip.Root>
+      {/if}
       {#if contest.target != null}
         <Tooltip.Root disableCloseOnTriggerClick>
           <Tooltip.Trigger
