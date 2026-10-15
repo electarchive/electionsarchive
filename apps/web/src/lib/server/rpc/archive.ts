@@ -1,4 +1,5 @@
 import type { Match, Option, Relation, Side } from "@ea/analytics";
+import type { SQL } from "drizzle-orm";
 import { compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
 import { ORPCError, os } from "@orpc/server";
@@ -24,6 +25,17 @@ const CYCLE = sql`
       where x.election_id = e.id and b.kind = 'electoral_college' and y.iso_code = 'US'
     )
   )::int
+`;
+const paint = (party: SQL, elections: SQL, date: SQL) => sql`
+  coalesce(
+    (select pc.color from party_color pc where pc.party_id = ${party} and pc.valid @> ${date}),
+    (select pc.color from party_relation r
+      left join entity_merge fm on fm.entity_id = r.from_party_id
+      left join entity_merge tm on tm.entity_id = r.to_party_id
+      join party_color pc on pc.party_id = coalesce(tm.into_id, r.to_party_id) and pc.valid @> ${date}
+      where r.kind = 'list_vehicle_for' and coalesce(fm.into_id, r.from_party_id) = ${party} and r.election_id in (${elections})
+      limit 1)
+  )
 `;
 
 const Link = v.object({ name: v.string(), path: v.nullable(v.string()) });
@@ -593,8 +605,9 @@ async function load(
   const [labels, colors, positions] = await Promise.all([
     names(entities, date),
     db.execute<{ party_id: string; color: string }>(sql`
-      select party_id, color from party_color
-      where party_id = any(${sql.param(parties)}::uuid[]) and valid @> ${date}::date
+      select p.id as party_id, c.color from unnest(${sql.param(parties)}::uuid[]) p(id),
+        lateral (select ${paint(sql`p.id`, sql`select election_id from contest where id = ${root}::uuid`, sql`${date}::date`)} as color) c
+      where c.color is not null
     `),
     db.execute<{ party_id: string; lean: number }>(sql`
       select party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
@@ -1332,8 +1345,9 @@ export const contests = {
           contest.date,
         ),
         db.execute<{ party_id: string; color: string }>(sql`
-          select party_id, color from party_color
-          where party_id = any(${sql.param(declaredParties)}::uuid[]) and valid @> ${contest.date ?? "infinity"}::date
+          select p.id as party_id, c.color from unnest(${sql.param(declaredParties)}::uuid[]) p(id),
+            lateral (select ${paint(sql`p.id`, sql`${contest.election}::uuid`, sql`${contest.date ?? "infinity"}::date`)} as color) c
+          where c.color is not null
         `),
       ]);
       const declaredColor = new Map(
@@ -1594,7 +1608,7 @@ export const contests = {
             select distinct on (root) * from grouped order by root, votes desc
           )
           select t.root, t.person, t.label, t.kind, t.measure, t.votes, case when t.measure = 11 then coalesce(t.appointed, t.total) else t.total end as total, x.party,
-            (select pc.color from party_color pc where pc.party_id = x.party and pc.valid @> e.date_from) as color,
+            ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,
             (select n.text from name n where n.entity_id = x.party and n.kind in ('official', 'english')
               order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
                 (n.kind = 'official') desc limit 1) as party_label,
@@ -2353,8 +2367,9 @@ export const people = {
           (select n.text from name n where n.entity_id = lead.party and n.kind = 'abbreviation'
             order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc
             limit 1) as party_short,
-          (select pc.color from party_color pc where pc.party_id = lead.party
-            order by pc.valid @> p.date desc, upper(pc.valid) desc nulls first limit 1) as party_color
+          coalesce(${paint(sql`lead.party`, sql`select election_id from contest where id = p.root`, sql`p.date`)},
+            (select pc.color from party_color pc where pc.party_id = lead.party
+              order by upper(pc.valid) desc nulls first limit 1)) as party_color
         from placed p left join totals t on t.root = p.root
         left join lateral (
           select m.party from mine m join grp g on g.id = m.contest_id and g.root = p.root where m.party is not null limit 1
