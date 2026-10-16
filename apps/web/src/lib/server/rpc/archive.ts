@@ -1283,7 +1283,7 @@ async function places(
       [contest.root],
       rows,
       contest.date,
-      chosen,
+      chosen == null ? null : { ids: [chosen.id], date: chosen.date },
       lineage,
       match,
       grouping,
@@ -1324,7 +1324,7 @@ async function tabulate(
     owner: string | null;
   }>,
   date: string | null,
-  chosen: { id: string; date: string | null } | null,
+  chosen: { ids: Array<string>; date: string | null } | null,
   lineage: Array<Relation>,
   match: Match,
   grouping: Grouping = "option",
@@ -1349,9 +1349,7 @@ async function tabulate(
         );
       }),
     ),
-    chosen == null
-      ? null
-      : load([chosen.id], ks, chosen.date ?? "infinity", []),
+    chosen == null ? null : load(chosen.ids, ks, chosen.date ?? "infinity", []),
   ]);
   const legend = new Map<
     string,
@@ -3583,22 +3581,59 @@ async function races(
             ),
         single != null || isBrief || first == null || districts.length < 2
           ? null
-          : tabulate(
-              roots,
-              districts.map((row) => ({
-                k: row.k ?? 0,
-                name: labels.full.get(row.area ?? "") ?? "",
-                path: slugs.get(row.id) ?? null,
-                isContest: true,
-                isRemainder: row.isRemainder,
-                owner: row.id,
-              })),
-              date,
-              null,
-              lineage,
-              "party",
-              grouping,
-            ),
+          : (async () => {
+              const prior = await db.execute<{ id: string; date: string }>(
+                sql`
+                  select distinct on (c.district_area_id) c.id, e.date_from::text as date
+                  from contest c join election e on e.id = c.election_id
+                  join contest h on h.id = ${first.id}::uuid
+                  where c.district_area_id = any(${sql.param(districts.flatMap((row) => (row.area == null ? [] : [row.area])))}::uuid[])
+                    and c.id <> all(${sql.param(roots)}::uuid[])
+                    and c.kind = h.kind
+                    and c.body_id is not distinct from h.body_id
+                    and c.office_id is not distinct from h.office_id
+                    and c.round_number is not distinct from h.round_number
+                    and c.party_scope_id is not distinct from h.party_scope_id
+                    and e.date_from < ${day}::date and e.status::text <> 'annulled'
+                  order by c.district_area_id, e.date_from desc
+                `,
+              );
+              const years = Map.groupBy(prior.rows, (row) =>
+                row.date.slice(0, 4),
+              );
+              const since =
+                years
+                  .entries()
+                  .toArray()
+                  .toSorted((a, b) => b[1].length - a[1].length)[0]?.[0] ??
+                null;
+              const latest =
+                prior.rows
+                  .map((row) => row.date)
+                  .toSorted((a, b) => a.localeCompare(b))
+                  .at(-1) ?? null;
+              return {
+                since,
+                ...(await tabulate(
+                  roots,
+                  districts.map((row) => ({
+                    k: row.k ?? 0,
+                    name: labels.full.get(row.area ?? "") ?? "",
+                    path: slugs.get(row.id) ?? null,
+                    isContest: true,
+                    isRemainder: row.isRemainder,
+                    owner: row.id,
+                  })),
+                  date,
+                  prior.rows.length === 0
+                    ? null
+                    : { ids: prior.rows.map((row) => row.id), date: latest },
+                  lineage,
+                  "party",
+                  grouping,
+                )),
+              };
+            })(),
         db.execute<{ from: string; to: string }>(sql`
           with recursive tree(id) as (
             select unnest(${sql.param(roots)}::uuid[])
@@ -3810,6 +3845,7 @@ async function races(
         election: head?.election ?? "",
         day: head?.day ?? null,
         count: group.length,
+        since: table?.since ?? null,
         size: head?.size ?? null,
         spread: spread.rows,
         measure: here?.measure ?? "votes",
@@ -3952,6 +3988,7 @@ export const elections = {
             body: v.nullable(v.string()),
             round: v.nullable(v.number()),
             count: v.number(),
+            since: v.nullable(v.string()),
             electors: v.nullable(
               v.object({
                 rows: v.array(

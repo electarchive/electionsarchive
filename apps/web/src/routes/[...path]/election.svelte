@@ -631,7 +631,16 @@
               item.person == null ? (item.short ?? item.label) : item.label,
             )}
         levels={[]}
-        span={swing?.span ?? null}
+        span={swing?.span ??
+          (race.count > 1 &&
+          race.since != null &&
+          race.places.rows.some((row) => row.prior != null)
+            ? {
+                from: race.since,
+                to: election.date?.slice(0, 4) ?? "",
+                forward: false,
+              }
+            : null)}
       />
     </div>
   {/if}
