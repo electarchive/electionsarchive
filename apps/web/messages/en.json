@@ -802,5 +802,12 @@
   "scrubber_next": "Next election",
   "export_embed": "Copy embed code",
   "export_embed_copied": "Embed code copied",
-  "embed_credit": "View on Elections Archive"
+  "embed_credit": "View on Elections Archive",
+  "download_menu": "Download data",
+  "download_csv": "Download CSV",
+  "download_json": "Download JSON",
+  "download_page": "Page: {url}",
+  "download_retrieved": "Retrieved: {date}",
+  "download_sources": "Sources: {sources}",
+  "col_outcome": "Outcome"
 }

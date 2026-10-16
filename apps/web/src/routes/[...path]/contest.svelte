@@ -1083,7 +1083,16 @@
                   >
                 {/if}
               </span>
-              <span>
+              <span
+                data-source={[
+                  set.source.publisher,
+                  set.source.title,
+                  set.source.url,
+                  set.source.license,
+                ]
+                  .filter((part) => part != null)
+                  .join(", ")}
+              >
                 {set.source.publisher}:
                 {#if set.source.url == null}
                   {set.source.title}

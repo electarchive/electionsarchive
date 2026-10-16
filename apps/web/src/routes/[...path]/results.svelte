@@ -15,6 +15,7 @@
 </script>
 
 <script lang="ts">
+  import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
@@ -182,6 +183,35 @@
     {m.compare_unpaired()}
   </p>
 {/if}
+<Download
+  class="-mbe-2 justify-end"
+  name="results"
+  columns={[
+    m.col_option(),
+    votes,
+    `${m.col_share()} (%)`,
+    ...(seats == null ? [] : [seats]),
+    m.col_outcome(),
+    ...(span == null ? [] : [`${there ?? ""} (%)`]),
+  ]}
+  rows={() =>
+    rows.map((row) => [
+      row.label,
+      row.current?.votes ?? null,
+      row.current == null ? null : Math.round(row.current.share * 1e6) / 1e4,
+      ...(seats == null ? [] : [row.current?.seats ?? null]),
+      row.current?.outcome == null
+        ? null
+        : (OUTCOMES[row.current.outcome]?.() ?? row.current.outcome),
+      ...(span == null
+        ? []
+        : [
+            row.earlier == null
+              ? null
+              : Math.round(row.earlier.share * 1e6) / 1e4,
+          ]),
+    ])}
+/>
 <div class="overflow-x-auto">
   <table class="border-collapse text-sm/tight inline-full">
     <thead>

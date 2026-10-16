@@ -4,6 +4,7 @@
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
@@ -293,6 +294,37 @@
         bind:value={query}
       />
     {/if}
+    <Download
+      class={cn({ "ms-auto": places.rows.length <= 12 })}
+      name="places"
+      columns={[
+        heading,
+        votes,
+        m.col_leader(),
+        `${m.col_margin()} (%)`,
+        ...titles.map((title) => `${title} (%)`),
+        ...(comparing ? [`${m.col_shift()} (%)`] : []),
+        "URL",
+      ]}
+      rows={() =>
+        places.rows.map((row, index) => [
+          row.name,
+          row.valid,
+          row.leader == null ? null : (titles[row.leader] ?? null),
+          row.margin == null ? null : Math.round(row.margin * 1e6) / 1e4,
+          ...titles.map((_title, at) =>
+            row.shares[at] == null
+              ? null
+              : Math.round((row.shares[at] ?? 0) * 1e6) / 1e4,
+          ),
+          ...(comparing
+            ? [moves[index]?.shift ?? null].map((value) =>
+                value == null ? null : Math.round(value * 1e6) / 1e4,
+              )
+            : []),
+          row.path == null ? null : `${page.url.origin}/${row.path}`,
+        ])}
+    />
   </div>
   {#if span != null && !comparing}
     <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
@@ -671,7 +703,10 @@
     >
   {/if}
   {#if foreign.length > 0}
-    <p class="text-[0.8125rem] text-muted-foreground">
+    <p
+      class="text-[0.8125rem] text-muted-foreground"
+      data-source={foreign.join("; ")}
+    >
       {m.places_sources({ publisher: foreign.join(", ") })}
     </p>
   {/if}

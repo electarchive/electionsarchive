@@ -1,5 +1,6 @@
 <script lang="ts">
   import { createQuery } from "@tanstack/svelte-query";
+  import Download from "#lib/components/download.svelte";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -118,10 +119,47 @@
         ),
   )}
   <section
-    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="{uid}-{at}"
   >
-    <div class="grid gap-0.5">
+    {const raw = $derived(regions.data?.[at])}
+    {#if raw != null}
+      {const parties = $derived(
+        [
+          ...new Set(
+            raw.regions.flatMap((region) =>
+              region.parties.map((entry) => entry.party),
+            ),
+          ),
+        ].map((party) => ({
+          party,
+          label:
+            party == null
+              ? m.record_none()
+              : (raw.parties.find((entry) => entry.id === party)?.label ?? ""),
+        })),
+      )}
+      <Download
+        class="absolute inset-e-2 inset-bs-2"
+        name="regions"
+        columns={[
+          chamber.noun ?? "",
+          m.col_seats(),
+          ...parties.map((party) => party.label),
+        ]}
+        rows={() =>
+          raw.regions.map((region) => [
+            region.name,
+            region.seats,
+            ...parties.map(
+              (party) =>
+                region.parties.find((entry) => entry.party === party.party)
+                  ?.seats ?? 0,
+            ),
+          ])}
+      />
+    {/if}
+    <div class="grid gap-0.5 pe-8">
       <h2
         id="{uid}-{at}"
         class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
