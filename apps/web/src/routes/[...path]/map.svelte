@@ -833,10 +833,14 @@
       role="group"
       aria-labelledby="{uid}-shading"
     >
-      <span id="{uid}-shading" class="text-sm font-semibold max-sm:sr-only"
+      <span
+        id="{uid}-shading"
+        class="shrink-0 self-start text-sm/7 font-semibold whitespace-nowrap max-sm:sr-only"
         >{m.map_color_by()}</span
       >
-      <div class="-my-1 flex gap-2 overflow-x-auto py-1 min-inline-0">
+      <div
+        class="-my-1 flex gap-2 py-1 min-inline-0 sm:flex-wrap max-sm:overflow-x-auto"
+      >
         {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
           {#if group.length > 0}
             <div class="flex shrink-0">
