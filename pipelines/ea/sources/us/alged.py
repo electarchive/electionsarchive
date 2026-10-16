@@ -204,7 +204,14 @@ def emit() -> Path:
             )
             if len(code) == 5 and text.startswith("City of "):
                 cities[(path.split("/")[1], text.removeprefix("City of "))] = code
-        taken = {path for (path,) in conn.execute("select path from slug where path like 'us/%'").fetchall()}
+        taken = {
+            path
+            for (path,) in conn.execute(
+                """select s.path from slug s join changeset c on c.id = s.changeset_id
+                   where s.path like 'us/%%' and c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         aliases: dict[str, str] = {}
         for code, text, usps, lsad, geom, point in places.iter_rows():
             text = re.sub(r"(?: city| (?:consolidated|unified|metro|metropolitan) government)? \(balance\)$", "", text)
@@ -255,6 +262,14 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=None,
             )
+        cs.add(
+            "boundary_set",
+            scheme_code="us.school_district",
+            vintage="2020",
+            valid_from=None,
+            valid_to=None,
+            as_of=date(2020, 1, 1),
+        )
         systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp and block systems must already exist")
