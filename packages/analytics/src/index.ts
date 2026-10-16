@@ -1,5 +1,7 @@
 export type Match = "party" | "person" | "family";
 
+export type Grouping = "option" | "alliance";
+
 export type Option = {
   contest: string;
   kind: string;
@@ -12,6 +14,7 @@ export type Option = {
   votes: number;
   outcome: string | null;
   seats: number | null;
+  alliance: { id: string; label: string } | null;
 };
 
 export type Side = {
@@ -123,16 +126,55 @@ function tally(side: Side, identify: (option: Option) => string) {
   return groups;
 }
 
+function alliances(options: Array<Option>) {
+  const members = new Map<
+    string,
+    Map<string, { option: Option; votes: number }>
+  >();
+  for (const option of options) {
+    const id = option.alliance?.id;
+    if (id == null || option.party == null) {
+      continue;
+    }
+    const parties =
+      members.get(id) ?? new Map<string, { option: Option; votes: number }>();
+    members.set(id, parties);
+    const member = parties.get(option.party) ?? { option, votes: 0 };
+    member.votes += option.votes;
+    parties.set(option.party, member);
+  }
+  return new Map(
+    members.entries().map(([id, parties]) => {
+      const ranked = parties
+        .values()
+        .filter((member) => member.votes > 0)
+        .toArray()
+        .toSorted((a, b) => b.votes - a.votes);
+      return [
+        id,
+        {
+          option: ranked[0]?.option ?? null,
+          roster: ranked
+            .map((member) => member.option.short ?? member.option.label)
+            .join(", "),
+        },
+      ] as const;
+    }),
+  );
+}
+
 export function compare(
   current: Side,
   earlier: Side | null,
   relations: Array<Relation>,
   match: Match = "party",
+  grouping: Grouping = "option",
 ): Array<Row> {
   const root = ancestry(relations, match);
   const options = (earlier == null ? [current] : [current, earlier]).flatMap(
     (side) => side.options,
   );
+  const anchors = alliances(options);
   const lines = new Map<string, Option>();
   const totals = new Map<string, number>();
   for (const option of options) {
@@ -167,6 +209,10 @@ export function compare(
       .map((line) => root(line.party ?? "")),
   );
   const identify = (option: Option) => {
+    if (grouping === "alliance" && option.alliance != null) {
+      const anchor = anchors.get(option.alliance.id)?.option?.party;
+      return `alliance:${anchor == null ? option.alliance.id : root(anchor)}`;
+    }
     const line = lines.get(`${option.contest}:${option.person}`) ?? option;
     const party = line.party == null ? null : root(line.party);
     if (
@@ -213,14 +259,31 @@ export function compare(
   const rows = pairs.map(({ key, lead, present, past }): Row => {
     const party = key.startsWith("party:") ? key.slice(6) : null;
     const absent = present == null ? current : past == null ? earlier : null;
+    const alliance = key.startsWith("alliance:") ? lead.alliance : null;
+    const name = (group: Group | null) => {
+      const own = group?.lead.alliance;
+      if (own == null) {
+        return null;
+      }
+      const roster = anchors.get(own.id)?.roster ?? "";
+      return { label: own.label === "" ? roster : own.label, roster };
+    };
+    const flatten = (group: Group | null) => {
+      const named = alliance == null ? null : name(group);
+      return group == null || named == null
+        ? (group?.cell ?? null)
+        : { ...group.cell, label: named.label, person: null, party: null };
+    };
+    const anchor = alliance == null ? null : anchors.get(alliance.id)?.option;
+    const named = alliance == null ? null : name(present ?? past);
     return {
       key,
-      label: lead.label,
-      short: lead.short,
-      color: lead.color,
-      lean: lead.lean,
-      current: present?.cell ?? null,
-      earlier: past?.cell ?? null,
+      label: named?.label ?? lead.label,
+      short: named == null ? lead.short : named.roster,
+      color: anchor?.color ?? lead.color,
+      lean: anchor?.lean ?? lead.lean,
+      current: flatten(present),
+      earlier: flatten(past),
       delta:
         present == null || past == null
           ? null

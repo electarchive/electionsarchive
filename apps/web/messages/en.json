@@ -368,5 +368,10 @@
   "boundaries_approximate": "Approximate",
   "term_boundaries_approximate": "These shapes are reconstructed from other geography, such as historic counties and town locations, instead of surveyed boundary maps. Borders are approximate.",
   "boundaries_missing": "No shape for {names}",
-  "boundaries_missing_more": "No shape for {names} and {count} others."
+  "boundaries_missing_more": "No shape for {names} and {count} others.",
+  "group_label": "Group by",
+  "group_option": "Party",
+  "group_option_detail": "Show each party or candidate on its own row.",
+  "group_alliance": "Alliance",
+  "group_alliance_detail": "Fold parties that ran together in an alliance or coalition into one row. Alliances that recur in other elections match by their largest party."
 }

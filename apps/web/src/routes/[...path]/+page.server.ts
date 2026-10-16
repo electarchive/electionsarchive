@@ -44,6 +44,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
           by: url.searchParams.get("by") ?? undefined,
           vs: url.searchParams.get("vs") ?? undefined,
           match,
+          group: url.searchParams.get("group") ?? undefined,
         }),
         call(router.contests.lists, { id: slug.entity_id }),
       ]);

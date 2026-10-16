@@ -241,6 +241,35 @@
         .replaceAll("%2F", "/"),
     })),
   );
+  const grouping = $derived(
+    page.url.searchParams.get("group") === "alliance" ? "alliance" : "option",
+  );
+  const groupings = $derived(
+    [
+      {
+        value: "option",
+        label: m.group_option(),
+        detail: m.group_option_detail(),
+      },
+      {
+        value: "alliance",
+        label: m.group_alliance(),
+        detail: m.group_alliance_detail(),
+      },
+    ].map((option) => {
+      const query = new URLSearchParams(
+        [...page.url.searchParams].filter(([key]) => key !== "group"),
+      );
+      if (option.value === "alliance") {
+        query.set("group", "alliance");
+      }
+      const text = query.toString().replaceAll("%2F", "/");
+      return {
+        ...option,
+        suffix: text === "" ? ("" as const) : (`?${text}` as const),
+      };
+    }),
+  );
   const below = $derived.by(() => {
     const places = contest.places;
     const level = places?.levels.find((entry) => entry.code === places.level);
@@ -664,6 +693,51 @@
                         path: here,
                       })}
                       aria-current={option.value === match ? "true" : undefined}
+                      data-sveltekit-reset="false">{option.label}</a
+                    >
+                  {/snippet}
+                </Tooltip.Trigger>
+              {/each}
+              <Tooltip.Content
+                collisionPadding={8}
+                class="leading-snug max-inline-64">{payload}</Tooltip.Content
+              >
+            {/snippet}
+          </Tooltip.Root>
+        </div>
+      </div>
+    {/if}
+    {#if contest.current.isAllied || grouping === "alliance"}
+      <div
+        class="flex items-center gap-2.5"
+        role="group"
+        aria-labelledby="group-label"
+      >
+        <span id="group-label" class="text-sm font-semibold"
+          >{m.group_label()}</span
+        >
+        <div class="flex">
+          <Tooltip.Root disableCloseOnTriggerClick {tether} delayDuration={300}>
+            {#snippet children({ payload })}
+              {#each groupings as option (option.value)}
+                <Tooltip.Trigger {tether} payload={option.detail}>
+                  {#snippet child({ props })}
+                    <a
+                      {...props}
+                      type={undefined}
+                      class={cn(
+                        "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                        {
+                          "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                            option.value === grouping,
+                        },
+                      )}
+                      href={resolve(`/[...path]${option.suffix}`, {
+                        path: here,
+                      })}
+                      aria-current={option.value === grouping
+                        ? "true"
+                        : undefined}
                       data-sveltekit-reset="false">{option.label}</a
                     >
                   {/snippet}
