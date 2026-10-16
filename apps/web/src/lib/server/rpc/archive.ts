@@ -119,6 +119,20 @@ const Places = v.nullable(
   }),
 );
 
+const Sketch = v.object({
+  tiles: v.string(),
+  own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
+  frames: v.array(
+    v.object({
+      west: v.number(),
+      south: v.number(),
+      east: v.number(),
+      north: v.number(),
+    }),
+  ),
+  isApproximate: v.boolean(),
+});
+
 type Found = {
   id: string;
   kind: string;
@@ -134,6 +148,16 @@ type Found = {
   isRemainder: boolean;
   place: { id: string; k: number } | null;
 };
+
+function depth(path: string) {
+  return path.split("/").length;
+}
+
+function key(row: { party: string | null; person: string | null }) {
+  return row.party == null
+    ? `person:${row.person ?? ""}`
+    : `party:${row.party}`;
+}
 
 function segment(text: string) {
   return (
@@ -4176,21 +4200,7 @@ export const elections = {
             before: v.nullable(
               v.array(v.object({ key: v.string(), seats: v.number() })),
             ),
-            map: v.nullable(
-              v.object({
-                tiles: v.string(),
-                own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
-                frames: v.array(
-                  v.object({
-                    west: v.number(),
-                    south: v.number(),
-                    east: v.number(),
-                    north: v.number(),
-                  }),
-                ),
-                isApproximate: v.boolean(),
-              }),
-            ),
+            map: v.nullable(Sketch),
           }),
         ),
         contests: v.array(
@@ -4488,6 +4498,7 @@ export const elections = {
       v.object({
         noun: v.nullable(v.string()),
         groups: v.array(v.object({ id: v.string(), name: v.string() })),
+        maps: v.array(v.object({ places: v.nonNullable(Places), map: Sketch })),
         rows: v.array(
           v.object({
             path: v.string(),
@@ -4505,6 +4516,7 @@ export const elections = {
       const found = await db.execute<{
         path: string;
         group: string | null;
+        area: string | null;
         date: string;
         person: string | null;
         party: string | null;
@@ -4516,7 +4528,7 @@ export const elections = {
           join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           where e.id = ${input.id}::uuid limit 1
         )
-        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, g.id as group
+        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, w.area, g.id as group
         from election k
         join slug s on s.entity_id = k.id and s.is_current
         left join lateral (
@@ -4546,15 +4558,16 @@ export const elections = {
         where k.parent_id = ${input.id}::uuid
       `);
       if (found.rows.length < 40) {
-        return { noun: null, groups: [], rows: [] };
+        return { noun: null, groups: [], maps: [], rows: [] };
       }
       const groups = [...new Set(found.rows.flatMap((row) => row.group ?? []))];
-      const [labels, nouns] = await Promise.all([
+      const date = found.rows[0]?.date ?? "infinity";
+      const [labels, nouns, areas, territory] = await Promise.all([
         names(
           [
             ...groups,
             ...found.rows.flatMap((row) =>
-              [row.person, row.party].filter((id) => id != null),
+              [row.person, row.party, row.area].filter((id) => id != null),
             ),
           ],
           found.rows[0]?.date ?? null,
@@ -4564,9 +4577,138 @@ export const elections = {
           where a.id = any(${sql.param(groups)}::uuid[])
           group by sc.noun order by count(*) desc limit 1
         `),
+        db.execute<{
+          id: string;
+          k: number;
+          scheme: string;
+          noun: string;
+          x: number | null;
+          y: number | null;
+        }>(sql`
+          select a.id, a.k, a.scheme_code as scheme, sc.noun,
+            ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
+            ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
+          from area a join scheme sc on sc.code = a.scheme_code
+          left join lateral (
+            select g.label_point, g.geom from area_geometry g
+            where g.area_id = a.id and g.valid @> ${date}::date limit 1
+          ) g on true
+          where a.id = any(${sql.param([...new Set([...groups, ...found.rows.flatMap((row) => row.area ?? [])])])}::uuid[])
+        `),
+        db.execute<{ id: string; k: number }>(sql`
+          select a.id, a.k from election e
+          join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = pt.area_id
+          where e.id = ${input.id}::uuid limit 1
+        `),
       ]);
+      const area = new Map(areas.rows.map((row) => [row.id, row]));
+      const top = area.get(groups[0] ?? "")?.scheme;
+      const levels = [
+        groups.flatMap((group) => {
+          const own = found.rows.filter((row) => row.group === group);
+          const pick =
+            own.find((row) => row.area === group) ??
+            own.find((row) => depth(row.path) === 3);
+          return pick == null ? [] : [{ row: pick, at: group }];
+        }),
+        Map.groupBy(
+          found.rows.filter(
+            (row) => row.area != null && area.get(row.area)?.scheme !== top,
+          ),
+          (row) => row.area ?? "",
+        )
+          .entries()
+          .flatMap(([at, rows]) => {
+            const row = rows.toSorted(
+              (a, b) => depth(a.path) - depth(b.path),
+            )[0];
+            return row == null ? [] : [{ row, at }];
+          })
+          .toArray(),
+      ].filter((level) => level.length > 1);
+      const legend = Map.groupBy(
+        levels.flat().map((entry) => entry.row),
+        key,
+      )
+        .entries()
+        .toArray()
+        .toSorted((a, b) => b[1].length - a[1].length)
+        .map(([entry, rows]) => ({
+          key: entry,
+          label:
+            labels.full.get(rows[0]?.party ?? rows[0]?.person ?? "") ??
+            rows[0]?.label ??
+            "",
+          short: labels.short.get(rows[0]?.party ?? "") ?? null,
+          color: rows[0]?.color ?? null,
+          person: rows[0]?.party == null ? (rows[0]?.person ?? null) : null,
+          party: rows[0]?.party ?? null,
+        }));
+      const position = new Map(legend.map((item, index) => [item.key, index]));
+      const nation = territory.rows[0];
+      const maps =
+        nation == null
+          ? []
+          : await Promise.all(
+              levels.map(async (level) => {
+                const first = area.get(level[0]?.at ?? "");
+                const map =
+                  first == null
+                    ? null
+                    : await sketch(nation, first.scheme, date);
+                return map == null || first == null
+                  ? []
+                  : [
+                      {
+                        map,
+                        places: {
+                          levels: [
+                            {
+                              code: first.scheme,
+                              noun: first.noun,
+                              count: level.length,
+                            },
+                          ],
+                          level: first.scheme,
+                          legend,
+                          sources: [],
+                          rows: level.flatMap(({ row, at }) => {
+                            const place = area.get(at);
+                            return place == null
+                              ? []
+                              : [
+                                  {
+                                    k: place.k,
+                                    at:
+                                      place.x == null || place.y == null
+                                        ? null
+                                        : ([place.x, place.y] as [
+                                            number,
+                                            number,
+                                          ]),
+                                    name: labels.full.get(at) ?? "",
+                                    path: row.path,
+                                    contest: true,
+                                    isRemainder: false,
+                                    valid: 0,
+                                    shares: legend.map(() => 0),
+                                    leader: position.get(key(row)) ?? null,
+                                    margin: null,
+                                    earlier: null,
+                                    prior: null,
+                                  },
+                                ];
+                          }),
+                        },
+                      },
+                    ];
+              }),
+            );
       return {
         noun: nouns.rows[0]?.noun ?? null,
+        maps: maps.flat(),
+
         groups: groups
           .map((id) => ({ id, name: labels.full.get(id) ?? "" }))
           .toSorted((a, b) => a.name.localeCompare(b.name, "tr")),
@@ -4607,21 +4749,7 @@ export const elections = {
         v.object({
           places: v.nonNullable(Places),
           since: v.nullable(v.string()),
-          map: v.nullable(
-            v.object({
-              tiles: v.string(),
-              own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
-              frames: v.array(
-                v.object({
-                  west: v.number(),
-                  south: v.number(),
-                  east: v.number(),
-                  north: v.number(),
-                }),
-              ),
-              isApproximate: v.boolean(),
-            }),
-          ),
+          map: v.nullable(Sketch),
         }),
       ),
     )

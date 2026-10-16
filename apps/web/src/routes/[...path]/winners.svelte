@@ -7,6 +7,7 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
+  import PlaceMap from "./map.svelte";
   import Preview from "./preview.svelte";
 
   const {
@@ -20,6 +21,7 @@
   const uid = $props.id();
   let query = $state("");
   let opened = $state<Array<string>>([]);
+  let level = $state<string | null>(null);
 
   const winners = createQuery(() => ({
     ...orpc.elections.winners.queryOptions({ input: { id } }),
@@ -31,6 +33,10 @@
     new Map(parts.map((part) => [part.path, part.place ?? part.name])),
   );
   const noun = $derived(winners.data?.noun ?? "");
+  const maps = $derived(winners.data?.maps ?? []);
+  const shape = $derived(
+    maps.find((entry) => entry.places.level === level) ?? maps[0],
+  );
   const groups = $derived(
     (winners.data?.groups ?? []).map((group) => {
       const rows = (winners.data?.rows ?? [])
@@ -125,6 +131,36 @@
           )}
       />
     </div>
+    {#if shape != null}
+      {#key shape.places.level}
+        <PlaceMap
+          places={shape.places}
+          colors={shape.places.legend.map((item) =>
+            swatch(item.color, item.key),
+          )}
+          tiles={shape.map.tiles}
+          own={shape.map.own}
+          frames={shape.map.frames}
+          isApproximate={shape.map.isApproximate}
+          noun={shape.places.levels[0]?.noun ?? ""}
+          votes=""
+          names={shape.places.legend.map((item) => item.short ?? item.label)}
+          levels={maps.map((entry) => {
+            const name = entry.places.levels[0]?.noun ?? "";
+            return {
+              code: entry.places.level,
+              label: name.charAt(0).toUpperCase() + name.slice(1),
+              count: entry.places.rows.length,
+              path: "",
+              query: "",
+              isCurrent: entry === shape,
+            };
+          })}
+          pick={(code) => (level = code)}
+          span={null}
+        />
+      {/key}
+    {/if}
     {#if shown.length === 0}
       <p class="py-3 text-sm text-muted-foreground">
         {m.places_filter_empty({ query })}

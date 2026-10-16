@@ -229,6 +229,7 @@
     ),
   });
   const biggest = $derived(Math.max(1, ...places.rows.map((row) => row.valid)));
+  const isDeclared = $derived(places.rows.every((row) => row.valid === 0));
   const current = $derived(focus == null ? null : (rows.get(focus) ?? null));
   const moved = $derived(
     focus == null || !isCompared ? null : (changes.get(focus) ?? null),
@@ -359,7 +360,11 @@
       }
       const dimmed =
         only != null && typeof only === "number" && only !== row.leader;
-      let strength = dimmed ? 10 : (STRENGTHS[bin(row.margin)] ?? 100);
+      let strength = dimmed
+        ? 10
+        : isDeclared
+          ? 100
+          : (STRENGTHS[bin(row.margin)] ?? 100);
       let tone = colors[row.leader] ?? "var(--muted-foreground)";
       if (view === "bubbles") {
         strength = dimmed ? 18 : 100;
@@ -912,64 +917,66 @@
     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
     data-export-skip
   >
-    <div
-      class="flex items-center gap-2.5 min-inline-0"
-      role="group"
-      aria-labelledby="{uid}-shading"
-    >
-      <span
-        id="{uid}-shading"
-        class="shrink-0 text-sm/7 font-semibold whitespace-nowrap sm:self-start"
-        >{m.map_color_by()}</span
-      >
-      <select
-        class="keycap rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold block-10 min-inline-0 sm:hidden"
+    {#if !isDeclared}
+      <div
+        class="flex items-center gap-2.5 min-inline-0"
+        role="group"
         aria-labelledby="{uid}-shading"
-        value={String(view)}
-        onchange={(event) => {
-          const value = event.currentTarget.value;
-          shading = MODES.find((choice) => choice === value) ?? Number(value);
-        }}
       >
-        <option value="winner">{m.map_mode_winner()}</option>
-        {#each options as option (option.index)}
-          <option value={String(option.index)}>{option.name}</option>
-        {/each}
-        <option value="bubbles">{m.map_mode_bubbles()}</option>
-        {#if isCompared}
-          <option value="swing">{m.map_mode_swing()}</option>
-          <option value="arrows">{m.map_mode_arrows()}</option>
-          <option value="flips">{m.map_mode_flips()}</option>
-        {/if}
-      </select>
-      <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
-        {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
-          {#if group.length > 0}
-            <div class="flex shrink-0">
-              {#each group as choice (choice.value)}
-                <button
-                  type="button"
-                  class={cn(
-                    "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-                    {
-                      "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                        view === choice.value,
-                    },
-                    {
-                      "truncate max-inline-36 max-sm:max-inline-24":
-                        typeof choice.value === "number",
-                    },
-                  )}
-                  aria-pressed={view === choice.value}
-                  onclick={() => (shading = choice.value)}
-                  >{choice.label}</button
-                >
-              {/each}
-            </div>
+        <span
+          id="{uid}-shading"
+          class="shrink-0 text-sm/7 font-semibold whitespace-nowrap sm:self-start"
+          >{m.map_color_by()}</span
+        >
+        <select
+          class="keycap rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold block-10 min-inline-0 sm:hidden"
+          aria-labelledby="{uid}-shading"
+          value={String(view)}
+          onchange={(event) => {
+            const value = event.currentTarget.value;
+            shading = MODES.find((choice) => choice === value) ?? Number(value);
+          }}
+        >
+          <option value="winner">{m.map_mode_winner()}</option>
+          {#each options as option (option.index)}
+            <option value={String(option.index)}>{option.name}</option>
+          {/each}
+          <option value="bubbles">{m.map_mode_bubbles()}</option>
+          {#if isCompared}
+            <option value="swing">{m.map_mode_swing()}</option>
+            <option value="arrows">{m.map_mode_arrows()}</option>
+            <option value="flips">{m.map_mode_flips()}</option>
           {/if}
-        {/each}
+        </select>
+        <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
+          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
+            {#if group.length > 0}
+              <div class="flex shrink-0">
+                {#each group as choice (choice.value)}
+                  <button
+                    type="button"
+                    class={cn(
+                      "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                      {
+                        "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                          view === choice.value,
+                      },
+                      {
+                        "truncate max-inline-36 max-sm:max-inline-24":
+                          typeof choice.value === "number",
+                      },
+                    )}
+                    aria-pressed={view === choice.value}
+                    onclick={() => (shading = choice.value)}
+                    >{choice.label}</button
+                  >
+                {/each}
+              </div>
+            {/if}
+          {/each}
+        </div>
       </div>
-    </div>
+    {/if}
     {#if levels.length > 1}
       <div class="flex" role="group" aria-label={m.map_level()}>
         {#each levels as level (level.code)}
@@ -1221,7 +1228,7 @@
           </button>
         {/each}
       </div>
-      {#if view === "bubbles"}
+      {#if isDeclared}{:else if view === "bubbles"}
         <span class="text-muted-foreground"
           >{m.map_bubbles_key({ votes: votes.toLowerCase() })}</span
         >
@@ -1375,10 +1382,22 @@
         </span>
       {/each}
     </span>
+    {#if isDeclared && current.leader != null}
+      <span
+        class="flex items-center gap-2 text-[0.8125rem]"
+        style:--party={colors[current.leader]}
+      >
+        <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+        <span class="font-semibold"
+          >{places.legend[current.leader]?.label ?? names[current.leader]}</span
+        >
+      </span>
+    {/if}
     <span class="flex items-baseline justify-between gap-3 text-xs">
       <span class="text-muted-foreground"
-        >{votes}
-        <span class="font-mono tabular-nums">{count(current.valid)}</span></span
+        >{#if !isDeclared}{votes}
+          <span class="font-mono tabular-nums">{count(current.valid)}</span
+          >{/if}</span
       >
       {#if current.path != null && !isSheet}
         <a
