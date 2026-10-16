@@ -2465,6 +2465,7 @@ export const contests = {
         year: number | null;
         status: string;
         isRemainder: boolean;
+        counted: boolean;
       }>(sql`
         with recursive anc(id) as (
           select ${area.id}::uuid
@@ -2486,14 +2487,23 @@ export const contests = {
           union all
           select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
         )
-        select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-          r."isRemainder"
-        from roots r
-        where r.id <> ${contest.root}::uuid and exists (
-          select 1 from grp join result_set rs on rs.contest_id = grp.id
-          where grp.root = r.id and exists (
-            select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED})
-          )
+        select * from (
+          select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
+            r."isRemainder", exists (
+              select 1 from grp join result_set rs on rs.contest_id = grp.id
+              where grp.root = r.id and exists (
+                select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED})
+              )
+            ) as counted, r.date_from
+          from roots r
+          where r.id <> ${contest.root}::uuid
+        ) r
+        where r.counted or exists (
+          select 1 from grp
+          join contest_option o on o.contest_id = grp.id
+          join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
+          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          where grp.root = r.id
         )
         order by r.date_from desc nulls last, r.id
       `);
@@ -2502,7 +2512,7 @@ export const contests = {
         (row) => row.series === contest.series,
       );
       const comparable = covering.rows.filter(
-        (row) => row.indirect === contest.indirect,
+        (row) => row.counted && row.indirect === contest.indirect,
       );
       const counterpart = sameRace.find(
         (row) =>
@@ -2601,8 +2611,28 @@ export const contests = {
                sum(value) as votes, sum(sum(value)) over (partition by root) as total
              from tallied group by root, key
            ),
+           declared as (
+             select distinct on (grp.root) grp.root, null::text as key, 1::int2 as measure, null::float8 as appointed,
+               head.person, coalesce(pm.into_id, o.party_id) as party, o.kind::text as kind, o.ballot_label as label,
+               0::float8 as votes, 0::float8 as total
+             from grp
+             join contest_option o on o.contest_id = grp.id
+             join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
+             join result_set rs on rs.id = x.result_set_id and rs.is_default
+             left join entity_merge pm on pm.entity_id = o.party_id
+             left join lateral (
+               select coalesce(em.into_id, cy.person_id) as person
+               from candidacy cy left join entity_merge em on em.entity_id = cy.person_id
+               where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
+               order by cy.option_id = o.id desc, cy.id limit 1
+             ) head on true
+             where grp.root not in (select root from grouped)
+             order by grp.root, o.k
+           ),
            tops as (
-             select distinct on (root) * from grouped order by root, votes desc
+             select * from (select distinct on (root) * from grouped order by root, votes desc) g
+             union all
+             select * from declared
            )
            select t.root, t.person, t.label, t.kind, t.measure, t.votes, case when t.measure = 11 then coalesce(t.appointed, t.total) else t.total end as total, x.party,
              ${paint(sql`x.party`, sql`e.id`, sql`e.date_from`)} as color,

@@ -151,14 +151,16 @@
         style:background-color={entry.color}
       ></span>
       <span class="flex-1">{entry.winner.label}</span>
-      <span class="font-figures text-xs tabular-nums opacity-70"
-        >{entry.winner.measure === "electoral_votes"
-          ? m.series_electoral({
-              votes: count(entry.winner.votes),
-              total: count(entry.winner.total),
-            })
-          : percent(entry.winner.share)}</span
-      >
+      {#if entry.winner.total > 0}
+        <span class="font-figures text-xs tabular-nums opacity-70"
+          >{entry.winner.measure === "electoral_votes"
+            ? m.series_electoral({
+                votes: count(entry.winner.votes),
+                total: count(entry.winner.total),
+              })
+            : percent(entry.winner.share)}</span
+        >
+      {/if}
     </span>
   {/if}
 {/snippet}

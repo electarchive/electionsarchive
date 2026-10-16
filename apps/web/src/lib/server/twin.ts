@@ -492,7 +492,7 @@ function contestMarkdown(
           contest.series
             .map(
               (entry) =>
-                `- ${entry.current ? entry.name : link(entry.name, entry.path)}${entry.winner == null ? "" : `: ${entry.winner.label}, ${percent(entry.winner.share)}`}`,
+                `- ${entry.current ? entry.name : link(entry.name, entry.path)}${entry.winner == null ? "" : `: ${entry.winner.label}${entry.winner.total > 0 ? `, ${percent(entry.winner.share)}` : ""}`}`,
             )
             .join("\n"),
         ]),

@@ -40,14 +40,16 @@
       ></span>
       <span class="text-pretty">{winner.label}</span>
     </span>
-    <span class="font-figures text-xs text-muted-foreground tabular-nums"
-      >{winner.measure === "electoral_votes"
-        ? m.series_electoral({
-            votes: count(winner.votes),
-            total: count(winner.total),
-          })
-        : percent(winner.share)}</span
-    >
+    {#if winner.total > 0}
+      <span class="font-figures text-xs text-muted-foreground tabular-nums"
+        >{winner.measure === "electoral_votes"
+          ? m.series_electoral({
+              votes: count(winner.votes),
+              total: count(winner.total),
+            })
+          : percent(winner.share)}</span
+      >
+    {/if}
   {/if}
   {#if annulled}
     <span class="highlighter px-1 text-xs font-semibold"

@@ -1210,7 +1210,7 @@
                     >{STATUSES[set.status]?.() ?? set.status}</span
                   >
                 {/if}
-                {#if set.completeness != null && set.completeness < 1}
+                {#if set.completeness != null && set.completeness > 0 && set.completeness < 1}
                   <span class="text-xs text-muted-foreground"
                     >{m.source_completeness({
                       percent: percent(set.completeness),
