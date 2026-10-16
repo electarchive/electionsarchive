@@ -4061,6 +4061,55 @@ async function races(
       ),
   );
   const stagePaths = await paths(stages.map((race) => race.election));
+  const loose = built.flatMap((race) =>
+    race.before == null &&
+    race.body == null &&
+    race.kind === "body_seats" &&
+    race.path != null
+      ? [race.path]
+      : [],
+  );
+  const tallied =
+    loose.length === 0
+      ? null
+      : await db.execute<{ path: string; party: string; seats: number }>(sql`
+        select s.path, coalesce(pm.into_id, o.party_id) as party, sum(x.seats)::int as seats
+        from slug s
+        join contest c on c.id = s.entity_id
+        join election e on e.id = c.election_id
+        join lateral (
+          select pc.id from contest pc
+          join election pe on pe.id = pc.election_id
+          join slug ps on ps.entity_id = pc.id and ps.is_current
+          where pe.polity_id = e.polity_id and pe.kind = e.kind and pe.date_from < e.date_from
+            and pc.kind = c.kind and pc.body_id is null and pc.office_id is null
+            and pc.allocation_parent_id is null
+            and substring(ps.path from '[^/]+$') = substring(s.path from '[^/]+$')
+          order by pe.date_from desc limit 1
+        ) pc on true
+        join contest_option o on o.contest_id = pc.id and o.party_id is not null
+        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+        join result_set rs on rs.id = x.result_set_id and rs.is_default
+        left join entity_merge pm on pm.entity_id = o.party_id
+        where s.is_current and s.path = any(${sql.param(loose)}::text[])
+        group by 1, 2
+      `);
+  const tallies = new Map(
+    Map.groupBy(tallied?.rows ?? [], (row) => row.path)
+      .entries()
+      .filter(([path, rows]) => {
+        const current = built.find((race) => race.path === path)?.results ?? [];
+        let now = 0;
+        for (const row of current) {
+          now += row.seats ?? 0;
+        }
+        let then = 0;
+        for (const row of rows) {
+          then += row.seats;
+        }
+        return then >= now * 0.9 && then <= now * 1.1;
+      }),
+  );
   return built
     .filter(
       (race) =>
@@ -4087,6 +4136,15 @@ async function races(
         )?.results;
         return {
           ...race,
+          before:
+            race.before ??
+            tallies
+              .get(race.path ?? "")
+              ?.map((row) => ({
+                key: `party:${parentOf.get(row.party) ?? row.party}`,
+                seats: row.seats,
+              })) ??
+            null,
           name:
             isNational && race.count === 1 && race.body != null
               ? (chamber ?? race.name)

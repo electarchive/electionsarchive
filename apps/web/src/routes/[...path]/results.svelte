@@ -446,7 +446,7 @@
             >
               <span class="font-semibold"
                 >{#if page?.seats != null}{@render cite(
-                    String(page.seats),
+                    count(page.seats),
                     "seats",
                     row,
                   )}{/if}</span
