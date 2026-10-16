@@ -3,6 +3,7 @@
   import { MonitorIcon, MoonIcon, SunIcon } from "@lucide/svelte";
   import { setMode, userPrefersMode } from "mode-watcher";
   import Monogram from "#lib/components/monogram.svelte";
+  import Search from "#lib/components/search.svelte";
   import { buttonVariants } from "#lib/components/ui/button/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -22,39 +23,43 @@
       <Monogram size={26} />
       <span class="text-lg font-[780] tracking-[-0.015em]">{m.wordmark()}</span>
     </a>
-    <DropdownMenu.Root>
-      <DropdownMenu.Trigger
-        class={buttonVariants({ variant: "ghost", size: "icon" })}
-      >
-        {#if userPrefersMode.current === "dark"}
-          <MoonIcon />
-        {:else if userPrefersMode.current === "light"}
-          <SunIcon />
-        {:else}
-          <MonitorIcon />
-        {/if}
-        <span class="sr-only">{m.theme_menu()}</span>
-      </DropdownMenu.Trigger>
-      <DropdownMenu.Content align="end" class="inline-40">
-        <DropdownMenu.RadioGroup
-          value={userPrefersMode.current}
-          onValueChange={(value) => {
-            const theme = THEMES.find((option) => option.value === value);
-            if (theme != null) {
-              setMode(theme.value);
-            }
-          }}
+    <div class="flex items-center gap-2">
+      <Search />
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger
+          class={buttonVariants({ variant: "ghost", size: "icon" })}
         >
-          <DropdownMenu.GroupHeading>{m.theme_menu()}</DropdownMenu.GroupHeading
+          {#if userPrefersMode.current === "dark"}
+            <MoonIcon />
+          {:else if userPrefersMode.current === "light"}
+            <SunIcon />
+          {:else}
+            <MonitorIcon />
+          {/if}
+          <span class="sr-only">{m.theme_menu()}</span>
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content align="end" class="inline-40">
+          <DropdownMenu.RadioGroup
+            value={userPrefersMode.current}
+            onValueChange={(value) => {
+              const theme = THEMES.find((option) => option.value === value);
+              if (theme != null) {
+                setMode(theme.value);
+              }
+            }}
           >
-          {#each THEMES as theme (theme.value)}
-            <DropdownMenu.RadioItem value={theme.value}>
-              <theme.icon class="text-muted-foreground" />
-              {theme.label}
-            </DropdownMenu.RadioItem>
-          {/each}
-        </DropdownMenu.RadioGroup>
-      </DropdownMenu.Content>
-    </DropdownMenu.Root>
+            <DropdownMenu.GroupHeading
+              >{m.theme_menu()}</DropdownMenu.GroupHeading
+            >
+            {#each THEMES as theme (theme.value)}
+              <DropdownMenu.RadioItem value={theme.value}>
+                <theme.icon class="text-muted-foreground" />
+                {theme.label}
+              </DropdownMenu.RadioItem>
+            {/each}
+          </DropdownMenu.RadioGroup>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+    </div>
   </div>
 </header>

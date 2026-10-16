@@ -2,7 +2,7 @@ import argparse
 import importlib
 from pathlib import Path
 
-from ea import fixtures, tiles
+from ea import fixtures, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import connect
 
@@ -23,6 +23,7 @@ def main() -> None:
     commands.add_parser("tiles", help="build one PMTiles archive per boundary set").add_argument(
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
     )
+    commands.add_parser("search", help="rebuild the search index from names and slugs")
     args = parser.parse_args()
     match args.command:
         case "apply":
@@ -31,6 +32,8 @@ def main() -> None:
             print(fixtures.export())
         case "tiles":
             print(tiles.build(args.scheme))
+        case "search":
+            print(search.build())
         case "publish":
             with connect() as conn:
                 publish(conn, args.changeset_id)

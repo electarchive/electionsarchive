@@ -4151,3 +4151,119 @@ export const parties = {
       };
     }),
 };
+
+export const search = {
+  query: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/search",
+        summary:
+          "Search polities, elections, contests, parties, and people by name, accents and case ignored",
+      }),
+    )
+    .input(
+      v.object({
+        q: v.pipe(v.string(), v.trim(), v.maxLength(200)),
+        limit: v.optional(
+          v.pipe(
+            v.union([v.number(), v.string()]),
+            v.transform(Number),
+            v.integer(),
+            v.minValue(1),
+            v.maxValue(50),
+          ),
+          12,
+        ),
+      }),
+    )
+    .output(
+      v.array(
+        v.object({
+          id: v.string(),
+          type: v.string(),
+          name: v.string(),
+          path: v.nullable(v.string()),
+          context: v.nullable(v.string()),
+          date: v.nullable(v.string()),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      if (input.q === "") {
+        return [];
+      }
+      const found = await db.execute<{
+        id: string;
+        type: string;
+        target: string | null;
+        context: string | null;
+        date: string | null;
+      }>(sql`
+        with q as (select lower(unaccent(${input.q})) as t),
+        terms as (
+          select to_tsquery('simple', string_agg(quote_literal(w) || ':*', ' & ')) as tq
+          from q, regexp_split_to_table(q.t, '\\s+') w where w <> ''
+        ),
+        hits as (
+          select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + word_similarity(q.t, d.text) + d.rank_boost * 0.15 as score
+          from search_document d, q, terms
+          where d.tsv @@ terms.tq
+          union all
+          select d.entity_id, d.type, word_similarity(q.t, d.text) + d.rank_boost * 0.15
+          from search_document d, q, terms
+          where q.t <% d.text and not d.tsv @@ terms.tq
+        ),
+        top as (select * from hits order by score desc limit ${input.limit * 2})
+        select top.entity_id as id, top.type::text as type, x.target, x.context,
+          coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date
+        from top
+        cross join lateral (
+          select
+            case top.type
+              when 'person' then (
+                select c.id from candidacy cy
+                join contest_option o on o.id = cy.option_id join contest c on c.id = o.contest_id
+                join election e on e.id = c.election_id
+                where cy.person_id = top.entity_id order by e.date_from desc nulls last limit 1)
+              when 'party' then (
+                select c.id from contest_option o join contest c on c.id = o.contest_id
+                join election e on e.id = c.election_id
+                where o.party_id = top.entity_id and c.allocation_parent_id is null
+                order by e.date_from desc nulls last limit 1)
+              else top.entity_id
+            end as target,
+            case top.type
+              when 'contest' then (select c.election_id from contest c where c.id = top.entity_id)
+              when 'election' then (select coalesce(e.parent_id, e.polity_id) from election e where e.id = top.entity_id)
+              when 'polity' then (select pp.parent_id from polity_parent pp where pp.polity_id = top.entity_id limit 1)
+              when 'party' then (select polity_id from party where id = top.entity_id)
+            end as context,
+            case top.type
+              when 'contest' then (select e.date_from from contest c join election e on e.id = c.election_id where c.id = top.entity_id)
+              when 'election' then (select date_from from election where id = top.entity_id)
+            end as date
+        ) x
+        order by top.score desc
+      `);
+      const rows = found.rows.filter((row) => row.target != null);
+      const ids = rows.flatMap((row) =>
+        [row.id, row.target, row.context].filter((id) => id != null),
+      );
+      const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
+      return rows
+        .map((row) => ({
+          id: row.id,
+          type: row.type,
+          name: labels.full.get(row.id) ?? "",
+          path: slugs.get(row.target ?? "") ?? null,
+          context:
+            labels.full.get(
+              (row.type === "person" ? row.target : row.context) ?? "",
+            ) ?? null,
+          date: row.date,
+        }))
+        .filter((row) => row.path != null && row.name !== "")
+        .slice(0, input.limit);
+    }),
+};

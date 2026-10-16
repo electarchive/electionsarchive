@@ -398,5 +398,17 @@
   "polity_span": "{first}–{last}",
   "polity_none_in_filter": "No elections of this kind.",
   "home_lede": "Archiving {elections} elections from {first} to {last}, starting with these countries.",
-  "home_latest": "Latest general election"
+  "home_latest": "Latest general election",
+  "search_open": "Search",
+  "search_title": "Search the archive",
+  "search_placeholder": "Search countries, elections, parties, or people",
+  "search_hint": "Try a place and a year, like Georgia 2022 Senate, or a candidate's name.",
+  "search_empty": "No results for “{query}”",
+  "search_loading": "Searching…",
+  "search_group_polity": "Places",
+  "search_group_election": "Elections",
+  "search_group_contest": "Contests",
+  "search_group_party": "Parties",
+  "search_group_person": "People",
+  "search_person_latest": "Latest: {contest}"
 }

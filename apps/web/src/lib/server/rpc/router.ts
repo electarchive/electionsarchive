@@ -4,8 +4,16 @@ import {
   parties,
   people,
   polities,
+  search,
 } from "#lib/server/rpc/archive.js";
 
-export const router = { contests, elections, parties, people, polities };
+export const router = {
+  contests,
+  elections,
+  parties,
+  people,
+  polities,
+  search,
+};
 
 export type Router = typeof router;
