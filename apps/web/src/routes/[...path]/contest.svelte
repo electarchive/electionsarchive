@@ -992,6 +992,7 @@
   {#key here}
     <Places
       places={contest.places}
+      trace={page.url.pathname.slice(1)}
       {span}
       {publishers}
       isMapped={drawn != null}

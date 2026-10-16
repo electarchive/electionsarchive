@@ -1691,14 +1691,14 @@ export const contests = {
         hits as (
           select vl.*, vl.unit_k = coalesce(${input.area}::int, (select k from top)) as exact, sets.source_id as set_source
           from value_locator vl join sets on sets.k = vl.result_set_k
-          where vl.option_k in (select k from options)
+          where (vl.option_k in (select k from options) or (${input.key}::text is null and vl.option_k = 0))
             and (${input.area}::int is null or vl.unit_k = ${input.area}::int)
         )
         select count(*) over ()::int as total, p.image_key as image, p.page_number as page, p.width, p.height,
           h.x0, h.y0, h.x1, h.y1, h.exact, s.publisher, s.title, s.url
         from hits h join source_page p on p.id = h.page_id
         join source s on s.id = coalesce(h.source_id, h.set_source)
-        order by h.exact desc, h.measure, p.page_number
+        order by h.exact desc, h.option_k = 0 desc, h.measure, p.page_number
         limit 3
       `);
       return {

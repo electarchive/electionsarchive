@@ -713,6 +713,7 @@
         ),
       }}
       span={null}
+      trace={race.count === 1 ? race.path : null}
       publishers={[]}
       votes={race.votes}
       {isMapped}

@@ -11,6 +11,7 @@
   import { count, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -21,6 +22,7 @@
     votes,
     isMapped = false,
     limit = 100,
+    trace = null,
     only = $bindable(null),
     focus = $bindable(null),
   }: {
@@ -37,6 +39,7 @@
     votes: string;
     isMapped?: boolean;
     limit?: number;
+    trace?: string | null;
     only?: number | string | null;
     focus?: number | null;
   } = $props();
@@ -189,6 +192,32 @@
     places.sources.filter((publisher) => !publishers.includes(publisher)),
   );
 </script>
+
+{#snippet cite(
+  text: string,
+  measure: "votes" | "share" | "margin",
+  row: (typeof visible)[number],
+  label: string,
+)}
+  <button
+    type="button"
+    class="relative z-1 cursor-help underline decoration-transparent decoration-dotted underline-offset-4 hover:decoration-current focus-visible:decoration-current"
+    onclick={() => {
+      provenance.value = {
+        label: `${row.name}, ${label.toLocaleLowerCase()}`,
+        figure: text,
+        measure,
+        path: trace,
+        key:
+          measure === "share" && row.leader != null
+            ? (places.legend[row.leader]?.key ?? null)
+            : null,
+        area: row.k,
+      };
+      provenance.isOpen = true;
+    }}>{text}</button
+  >
+{/snippet}
 
 {#snippet about(row: (typeof visible)[number] | undefined)}
   {#if row?.move?.before != null && row.move.after != null && row.move.shift != null && span != null}
@@ -567,7 +596,12 @@
                   />
                   <span
                     class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums"
-                    >{percent(row.shares[row.leader] ?? 0)}</span
+                    >{@render cite(
+                      percent(row.shares[row.leader] ?? 0),
+                      "share",
+                      row,
+                      `${titles[row.leader] ?? ""} ${m.col_share()}`,
+                    )}</span
                   >
                 </span>
               {/if}
@@ -578,12 +612,19 @@
                 { "max-md:hidden": comparing },
               )}
             >
-              {row.margin == null ? "" : points(row.margin)}
+              {#if row.margin != null}
+                {@render cite(
+                  points(row.margin),
+                  "margin",
+                  row,
+                  m.col_margin(),
+                )}
+              {/if}
             </td>
             <td
               class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums max-sm:hidden"
             >
-              {count(row.valid)}
+              {@render cite(count(row.valid), "votes", row, votes)}
             </td>
             {#if comparing}
               <td class="px-2 py-1.5">
