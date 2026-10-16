@@ -17,8 +17,9 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
+TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
 SHERIFF = ("sheriff", "Sheriff", "other")
 TREASURER = ("treasurer", "Treasurer", "other")
@@ -133,6 +134,37 @@ STATES = {
         {"25", "43", "47"},
         "Totals are the sums of the Secretary of State's precinct rows across every voting method.",
     ),
+    "CT": (
+        2015,
+        {
+            "Mayor": ("mayor", "Mayor", "mayor"),
+            "First Selectman": ("first-selectman", "First Selectman", "other"),
+            "Selectman": ("board-of-selectmen", "Board of Selectmen", None),
+            "City/Town Council": ("council", "Council", None),
+            "Board of Aldermen/women": ("board-of-aldermen", "Board of Aldermen", None),
+            "Representative Town Meeting": ("representative-town-meeting", "Representative Town Meeting", None),
+            "Board of Education": ("board-of-education", "Board of Education", None),
+            "Board of Finance": ("board-of-finance", "Board of Finance", None),
+            "Board of Assessment Appeals": ("board-of-assessment-appeals", "Board of Assessment Appeals", None),
+            "Planning and Zoning Commission": (
+                "planning-and-zoning-commission",
+                "Planning and Zoning Commission",
+                None,
+            ),
+            "Zoning Board of Appeals": ("zoning-board-of-appeals", "Zoning Board of Appeals", None),
+            "City/Town Clerk": ("clerk", "Town Clerk", "other"),
+            "City/Town Treasurer": ("treasurer", "Treasurer", "other"),
+            "Tax Collector": ("tax-collector", "Tax Collector", "other"),
+            "Constables": ("constables", "Constables", None),
+            "Library Trustees": ("library-trustees", "Library Trustees", None),
+        },
+        ["City/Town", "Board of Aldermen District", "Representative Town Meeting District"],
+        set(),
+        (
+            "Totals are the sums of the Secretary of the State's town rows, or of its polling place rows where the "
+            "archive has no town row, across election day and absentee ballots."
+        ),
+    ),
 }
 STAGES = {
     "General Election": "general",
@@ -141,6 +173,7 @@ STAGES = {
     "Regular Local Election": "local",
     "Special Election": "special",
     "Special": "special",
+    "Municipal": "municipal",
 }
 ALIASES = {
     "silver": "silvercity",
@@ -158,8 +191,10 @@ MUNICIPAL = {
     "Town Council District",
     "Town Commissioner District",
     "Village Council District",
+    "Board of Aldermen District",
+    "Representative Town Meeting District",
 }
-RANKS = {"Locality": 0, "County": 0, "City/Town": 1, "Ward": 1, "Precinct": 2}
+RANKS = {"Locality": 0, "County": 0, "City/Town": 1, "Ward": 1, "Precinct": 2, "Polling Place": 2}
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
@@ -169,6 +204,10 @@ PARTIES = {
 WINNERS = (
     " The archive marks winners only {unit} by {unit}, so the winners shown are the candidates with the most votes, "
     "as many as the contest elects."
+)
+FLAGGED = (
+    " The winners shown are the candidates the archive marks as elected in most of their rows, which can differ "
+    "from the top vote-getters where the town's minority representation rules apply."
 )
 DISTRICT = (
     "Only part of the {whole} votes in this contest. The archive has no boundary for the district yet, so the "
@@ -191,6 +230,7 @@ def url(state: str, year: int) -> str:
 
 
 def fetch() -> None:
+    raw.fetch(SOURCE, TOWNS, suffix=".zip")
     for state, (first, *_) in STATES.items():
         for year in range(first, 2026):
             raw.fetch(SOURCE, url(state, year), suffix=".csv")
@@ -211,7 +251,7 @@ def parse() -> None:
                     & pl.col("district_type").is_in(districts)
                     & pl.col("election_type").is_in(list(STAGES))
                     & pl.col("division_type").is_in(list(RANKS))
-                    & ~pl.col("candidate_name").str.contains(r"(?i)^total ")
+                    & ~pl.col("candidate_name").str.contains(r"(?i)^total |^unknown candidate$")
                 ).select(
                     pl.lit(state).alias("state"),
                     pl.col("contest_id").alias("contest"),
@@ -226,6 +266,7 @@ def parse() -> None:
                     pl.col("division_type").replace_strict(RANKS, return_dtype=pl.Int8).alias("rank"),
                     pl.col("number_seats").cast(pl.Int16).alias("magnitude"),
                     pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64).alias("votes"),
+                    (pl.col("is_winner") == "true").alias("winner"),
                 )
             )
     frame = pl.concat(frames).with_columns(
@@ -243,7 +284,7 @@ def parse() -> None:
     frame = (
         frame.filter(pl.col("rank") == pl.col("rank").min().over("state", "contest"))
         .group_by("state", "contest", "day", "stage", "office", "type", "district", "candidate", "name", "magnitude")
-        .agg(pl.col("party").drop_nulls().first(), pl.col("votes").sum())
+        .agg(pl.col("party").drop_nulls().first(), pl.col("votes").sum(), pl.col("winner").mean() > 0.5)
     )
     with zipfile.ZipFile(raw.cached(ALGED, SCHOOLS[0]).path) as archive:
         parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
@@ -260,7 +301,18 @@ def parse() -> None:
         if record is not None and usps in STATES and record["LSAD"] in STATES[usps][3]:
             for text in (str(record["NAME"]), re.sub(r" (City|Town)$", "", str(record["NAME"]))):
                 towns.setdefault(usps, {})[elstats.plain(text)] = str(record["GEOID"])
+    with zipfile.ZipFile(raw.cached(SOURCE, TOWNS).path) as archive:
+        parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
+    for record in shapefile.Reader(dbf=io.BytesIO(parts["dbf"])).iterRecords():
+        if record is not None and record["COUSUBFP"] != "00000":
+            towns.setdefault("CT", {})[elstats.plain(str(record["NAME"]))] = str(record["GEOID"])
     with connect() as conn:
+        for code, text in conn.execute(
+            """select u.code, n.text from reporting_unit u
+               join name n on n.entity_id = u.area_id and n.is_preferred
+               where u.scheme_code = 'us.place' and u.code like '09%'"""
+        ).fetchall():
+            towns["CT"][elstats.plain(text.removesuffix(", CT"))] = code
         counties: dict[str, dict[str, str]] = {}
         for code, text, iso in conn.execute(
             """select u.code, n.text, p.iso_code from reporting_unit u
@@ -325,8 +377,8 @@ def parse() -> None:
     frame.write_parquet(PARSED / "candidates.parquet")
     wanted = set(frame["code"])
     records = []
-    for prefix, shapes in (("", PLACES), ("sd", SCHOOLS[0])):
-        with zipfile.ZipFile(raw.cached(ALGED, shapes).path) as archive:
+    for prefix, shapes in (("", PLACES), ("sd", SCHOOLS[0]), ("", TOWNS)):
+        with zipfile.ZipFile(raw.cached(SOURCE if shapes == TOWNS else ALGED, shapes).path) as archive:
             parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
         reader = shapefile.Reader(
             shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
@@ -363,7 +415,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="County, city, town, and school board elections from the archives of Virginia, New Hampshire, Idaho, and New Mexico",
+            summary="County, city, town, and school board elections from the archives of Virginia, New Hampshire, Idaho, New Mexico, and Connecticut",
             polity="US",
         )
 
@@ -378,6 +430,8 @@ def emit() -> Path:
                     stored.add(artifact.storage_key)
                     cs.artifact(artifact, sources[state])
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
+        cs.artifact(raw.cached(SOURCE, TOWNS), census)
+        cs.add("scheme", code="us.town", polity_id=cs.polity("US"), kind="administrative", rank=3, noun="town")
         states = {
             iso[3:]: (polity, text)
             for iso, polity, text in conn.execute(
@@ -394,7 +448,7 @@ def emit() -> Path:
                join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality', 'school_district')
                join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                join slug s on s.entity_id = p.id and s.is_current
-               where a.scheme_code in ('us.county', 'us.place', 'us.school_district')"""
+               where a.scheme_code in ('us.county', 'us.place', 'us.school_district', 'us.town')"""
         ).fetchall():
             polities[f"sd{code}" if kind == "school_district" else code] = (polity, text.removeprefix("City of "), path)
         taken = {
@@ -419,12 +473,13 @@ def emit() -> Path:
         for code, text, usps, geom, point in places.iter_rows():
             if code in polities:
                 continue
-            school = code.startswith("sd")
-            geoid, scheme = code.removeprefix("sd"), "us.school_district" if school else "us.place"
-            polity = cs.key("us.polity", f"school:{geoid}" if school else f"place:{geoid}")
+            school, town = code.startswith("sd"), len(code) == 10
+            geoid = code.removeprefix("sd")
+            scheme = "us.school_district" if school else "us.town" if town else "us.place"
+            polity = cs.key("us.polity", f"school:{geoid}" if school else f"town:{geoid}" if town else f"place:{geoid}")
             path = f"us/{usps.lower()}/{slug(text)}"
             if path in taken:
-                path = f"{path}-{'town' if usps == 'VA' else 'city'}"
+                path = f"{path}-{'town' if usps in ('VA', 'CT') else 'city'}"
             if path in taken:
                 raise ValueError(f"{text} would take {path}")
             taken.add(path)
@@ -436,7 +491,11 @@ def emit() -> Path:
             area = cs.area(scheme, geoid)
             cs.add("area", id=area, scheme_code=scheme)
             cs.add("area_code", area_id=area, code=geoid, valid_from=None)
-            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", geoid[:2]))
+            cs.add(
+                "area_parent",
+                area_id=area,
+                parent_id=cs.area("us.county", geoid[:5]) if town else cs.area("us.state", geoid[:2]),
+            )
             name(area, f"{text}, {usps}")
             cs.add("polity_territory", polity_id=polity, area_id=area)
             cs.add(
@@ -501,20 +560,20 @@ def emit() -> Path:
             polity, place, path = polities[code]
             key, role, kind = STATES[state][1][office]
             geoid = code.removeprefix("sd")
-            scheme = {5: "us.county", 7: "us.place"}.get(len(code), "us.school_district")
+            scheme = {5: "us.county", 7: "us.place", 10: "us.town"}.get(len(code), "us.school_district")
             whole = (
                 "school district"
                 if code.startswith("sd")
                 else "town"
-                if len(code) == 7
+                if len(code) == 10 or len(code) == 7 and state != "CT"
                 else "city"
-                if state == "VA" and int(code[2:]) >= 500
+                if state == "CT" or state == "VA" and int(code[2:]) >= 500
                 else "county"
             )
             if key == "mayor":
                 title = f"Mayor of {place}"
             elif key == "council":
-                title = f"{place} {'Town' if state == 'VA' and len(code) == 7 else 'City'} Council"
+                title = f"{place} {'Town' if state == 'VA' and len(code) == 7 or len(code) == 10 else 'City'} Council"
             else:
                 title = f"{place} {role}"
             owner = cs.key("us.office" if kind else "us.body", f"{state}:{code}:{key}")
@@ -529,7 +588,7 @@ def emit() -> Path:
                 name(owner, title)
             owners.add(owner)
 
-            general = day.month == 11
+            general = day.month == 11 and stage != "municipal"
             parent = cs.key("us.election", f"{day}:{state}")
             if parent in cs.minted and parent not in elections:
                 elections.add(parent)
@@ -634,14 +693,18 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
+            flagged = state == "CT" and rows["winner"].any()
             cs.add(
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=STATES[state][4] + WINNERS.format(unit="town" if state == "NH" else "precinct"),
+                body_md=STATES[state][4]
+                + (FLAGGED if flagged else WINNERS.format(unit="town" if state == "NH" else "precinct")),
             )
             rank = 0
-            for candidate_id, ballot, party, votes in rows.select("candidate", "name", "party", "votes").iter_rows():
+            for candidate_id, ballot, party, votes, winner in rows.select(
+                "candidate", "name", "party", "votes", "winner"
+            ).iter_rows():
                 if candidate_id in ("write-ins", "others"):
                     option = cs.key("us.option", f"{contest_key}:{candidate_id}")
                     cs.add(
@@ -678,7 +741,7 @@ def emit() -> Path:
                         ballot_name=ballot,
                         is_independent=party == "Independent",
                     )
-                    if rank <= magnitude and votes > 0:
+                    if winner if flagged else rank <= magnitude and votes > 0:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
                 if result_set in cs.minted:
                     cs.add(
