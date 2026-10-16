@@ -71,6 +71,44 @@
   const bodies = $derived([
     ...new Set(election.races.flatMap((race) => race.body ?? [])),
   ]);
+  const swings = createQueries(() => ({
+    queries: election.races.map((race, index) => {
+      const path = race.path ?? "";
+      const by = race.places?.level;
+      return {
+        queryKey: ["swing", path, by],
+        enabled:
+          race.path != null &&
+          race.count === 1 &&
+          race.map != null &&
+          race.places != null &&
+          index < 4,
+        staleTime: Infinity,
+        queryFn: async () => {
+          const found = await orpc.contests.locate.call({ path });
+          const compared = await orpc.contests.get.call({
+            id: found.id,
+            vs: "previous",
+            by,
+          });
+          const year = election.date?.slice(0, 4);
+          return compared.places == null ||
+            compared.target?.year == null ||
+            year == null ||
+            !compared.places.rows.some((row) => row.earlier != null)
+            ? null
+            : {
+                places: compared.places,
+                span: {
+                  from: String(compared.target.year),
+                  to: year,
+                  forward: false,
+                },
+              };
+        },
+      };
+    }),
+  }));
   const sitting = createQueries(() => ({
     queries: bodies.map((body) =>
       orpc.bodies.get.queryOptions({ input: { id: body } }),
@@ -572,18 +610,26 @@
         "lg:col-span-7 xl:col-span-8": !isSeated,
       })}
     >
+      {const swing = $derived(swings[index]?.data ?? null)}
+      {const places = $derived(swing?.places ?? race.places)}
       <PlaceMap
-        places={race.places}
-        colors={race.tones}
+        {places}
+        colors={swing == null
+          ? race.tones
+          : places.legend.map((item) => swatch(item.color, item.key))}
         tiles={race.map.tiles}
         own={race.map.own}
         frames={race.map.frames}
         isApproximate={race.map.isApproximate}
         noun={race.places.levels[0]?.noun ?? ""}
         votes={race.votes}
-        names={race.titles}
+        names={swing == null
+          ? race.titles
+          : places.legend.map((item) =>
+              item.person == null ? (item.short ?? item.label) : item.label,
+            )}
         levels={[]}
-        span={null}
+        span={swing?.span ?? null}
       />
     </div>
   {/if}

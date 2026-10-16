@@ -1604,6 +1604,28 @@ const Input = v.object({
 });
 
 export const contests = {
+  locate: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/locate",
+        summary: "Find the contest a site path names",
+      }),
+    )
+    .input(v.object({ path: v.string() }))
+    .output(v.object({ id: v.string() }))
+    .handler(async ({ input }) => {
+      const found = await db.execute<{ id: string }>(sql`
+        select s.entity_id as id from slug s join entity e on e.id = s.entity_id
+        where s.path = ${input.path} and e.type = 'contest'
+        order by s.is_current desc limit 1
+      `);
+      const row = found.rows[0];
+      if (row == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      return row;
+    }),
   get: os
     .meta(
       openapi({
