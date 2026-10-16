@@ -5,6 +5,7 @@
   import { count, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -415,6 +416,9 @@
     </div>
     <ol class="flex gap-1 overflow-x-auto pbe-1 text-xs">
       {#each active.points.toReversed() as point, index (index)}
+        {const isTwin = $derived(
+          active.points.filter((other) => other.year === point.year).length > 1,
+        )}
         <li class="shrink-0">
           <svelte:element
             this={point.path == null ? "span" : "a"}
@@ -427,7 +431,13 @@
             )}
           >
             <span class="font-mono font-semibold tabular-nums"
-              >{point.year}</span
+              >{isTwin
+                ? new Intl.DateTimeFormat(getLocale(), {
+                    month: "short",
+                    year: "numeric",
+                    timeZone: "UTC",
+                  }).format(Date.parse(`${point.date}T00:00:00Z`))
+                : point.year}</span
             >
             <span class="font-mono text-muted-foreground tabular-nums"
               >{point.share == null ? "–" : percent(point.share)}</span
