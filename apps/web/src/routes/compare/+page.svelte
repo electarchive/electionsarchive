@@ -230,7 +230,11 @@
         aria-labelledby="rivals"
       >
         <h2 id="rivals" class="text-[0.8125rem] font-bold">
-          {m.versus_rivals()}
+          {sides[0]?.type === "person"
+            ? m.versus_opponents()
+            : sides[0]?.type === "polity"
+              ? m.versus_neighbors()
+              : m.versus_rivals()}
         </h2>
         <ul class="flex flex-wrap gap-2">
           {#each data.rivals as rival (rival.id)}

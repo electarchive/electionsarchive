@@ -463,23 +463,97 @@ export async function comparison(ids: Array<string>) {
         )
       : null;
   const [one, two] = sided ?? [];
+  const suggested =
+    second != null || first == null
+      ? null
+      : first.type === "party"
+        ? sql`
+          select o.party_id as id, sum(coalesce(x.seats, 1)) as rank, 0 as tie
+          from contest_option o
+          join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          where o.contest_id in (select contest_id from contest_option where party_id = ${first.id}::uuid)
+            and o.party_id <> ${first.id}::uuid
+          group by o.party_id
+          order by rank desc
+          limit 6
+        `
+        : first.type === "person"
+          ? sql`
+            with mine as materialized (
+              select distinct o.contest_id, o.id as option
+              from candidacy cy join contest_option o on o.id = cy.option_id
+              left join entity_merge m on m.entity_id = cy.person_id
+              where cy.role = 'head' and coalesce(m.into_id, cy.person_id) = ${first.id}::uuid
+            ),
+            places as materialized (
+              select c.id as contest_id, rs.k as set, a.k as area
+              from (select distinct contest_id from mine) x
+              join contest c on c.id = x.contest_id
+              join election e on e.id = c.election_id
+              join result_set rs on rs.contest_id = c.id and rs.is_default
+              join area a on a.id = coalesce(c.district_area_id, (
+                select t.area_id from polity_territory t where t.polity_id = e.polity_id and t.valid @> e.date_from
+              ))
+            ),
+            placed as materialized (
+              select contest_id, top, rank() over (partition by contest_id order by max(value) desc) as place
+              from (
+                select o.contest_id, coalesce(o.parent_option_id, o.id) as top, sum(r.value) as value
+                from places pl
+                join contest_option o on o.contest_id = pl.contest_id
+                join result_rollup r on r.result_set_k = pl.set and r.area_k = pl.area and r.option_k = o.k
+                  and r.measure = 1 and r.channel = 0
+                group by o.contest_id, top, r.count_round
+              ) rounds
+              group by contest_id, top
+            ),
+            close as materialized (
+              select y.contest_id from placed y join mine on mine.option = y.top where y.place <= 2
+            )
+            select coalesce(m.into_id, cy.person_id) as id,
+              count(distinct o.contest_id) filter (where x.place <= 2 and o.contest_id in (select contest_id from close)) as rank,
+              count(distinct o.contest_id) as tie
+            from contest_option o
+            join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+            left join entity_merge m on m.entity_id = cy.person_id
+            left join placed x on x.contest_id = o.contest_id and x.top = o.id
+            where o.contest_id in (select contest_id from mine) and coalesce(m.into_id, cy.person_id) <> ${first.id}::uuid
+            group by 1
+            order by rank desc, tie desc
+            limit 6
+          `
+          : sql`
+            with own as materialized (
+              select pp.parent_id, y.kind, g.geom
+              from polity y
+              join polity_parent pp on pp.polity_id = y.id and upper_inf(pp.valid)
+              join polity_territory t on t.polity_id = y.id and upper_inf(t.valid)
+              join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
+              where y.id = ${first.id}::uuid
+              limit 1
+            )
+            select s.id, -ST_Distance(g.geom, own.geom) as rank, ST_Area(g.geom) as tie
+            from own
+            join polity_parent pp on pp.parent_id = own.parent_id and upper_inf(pp.valid) and pp.polity_id <> ${first.id}::uuid
+            join polity s on s.id = pp.polity_id and s.kind = own.kind
+            join polity_territory t on t.polity_id = s.id and upper_inf(t.valid)
+            join area_geometry g on g.area_id = t.area_id and upper_inf(g.valid)
+            where exists (select from election e where e.polity_id = s.id)
+            order by rank desc, tie desc
+            limit 6
+          `;
   const rivals =
-    second == null && first?.type === "party"
-      ? await db.execute<{ id: string; name: string }>(sql`
-        select o.party_id as id, (
-          select n.text from name n where n.entity_id = o.party_id
+    suggested == null
+      ? null
+      : await db.execute<{ id: string; name: string }>(sql`
+        select r.id, (
+          select n.text from name n where n.entity_id = r.id
           order by n.is_preferred desc, (n.lang = 'en') desc limit 1
         ) as name
-        from contest_option o
-        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-        join result_set rs on rs.id = x.result_set_id and rs.is_default
-        where o.contest_id in (select contest_id from contest_option where party_id = ${first.id}::uuid)
-          and o.party_id <> ${first.id}::uuid
-        group by o.party_id
-        order by sum(coalesce(x.seats, 1)) desc
-        limit 6
-      `)
-      : null;
+        from (${suggested}) r
+        order by r.rank desc, r.tie desc
+      `);
   return {
     sides: found.rows,
     examples: examples?.rows ?? [],
