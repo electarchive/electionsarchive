@@ -600,7 +600,15 @@ def emit() -> Path:
         for code, (label, publisher, url, _) in SHEETS.items():
             title = f"European Parliament election 2024, {label}: declaration and result sheet"
             sources[code] = cs.source(publisher, title)
-            cs.add("source", id=sources[code], kind="official_body", publisher=publisher, title=title, url=url)
+            cs.add(
+                "source",
+                id=sources[code],
+                kind="official_body",
+                publisher=publisher,
+                title=title,
+                url=url,
+                license="Public record",
+            )
             artifacts[code] = cs.artifact(raw.cached(SOURCE, url), sources[code])
         wikipedia = cs.source("Wikipedia", "Midlands–North-West")
         cs.add(

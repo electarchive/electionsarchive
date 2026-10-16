@@ -5,6 +5,7 @@ from uuid import UUID
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.tr import ysk
 from ea.store import connect
 
 SOURCE = "tr.lineage"
@@ -321,6 +322,7 @@ def emit() -> Path:
             publisher=COURT_PUBLISHER,
             title=COURT_TITLE,
             url=COURT,
+            license=ysk.LICENSE,
             notes=COURT_NOTES,
         )
         for host, title in ARTICLES:

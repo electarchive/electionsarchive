@@ -31,7 +31,7 @@ CLASSES = [
         "attribution",
         re.compile(
             r"CC BY|Creative Commons Attribution|Licence Ouverte|Open Government|Open Parliament|Datenlizenz"
-            r"|reuse is authorized|2011/833/EU|Open use|free use",
+            r"|reuse is authorized|2011/833/EU|Open use|free use|free to distribute",
             re.IGNORECASE,
         ),
     ),
