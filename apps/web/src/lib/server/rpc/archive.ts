@@ -1324,7 +1324,11 @@ async function tabulate(
     owner: string | null;
   }>,
   date: string | null,
-  chosen: { ids: Array<string>; date: string | null } | null,
+  chosen: {
+    ids: Array<string>;
+    date: string | null;
+    pairs?: Array<{ k: number; id: string }>;
+  } | null,
   lineage: Array<Relation>,
   match: Match,
   grouping: Grouping = "option",
@@ -1349,7 +1353,15 @@ async function tabulate(
         );
       }),
     ),
-    chosen == null ? null : load(chosen.ids, ks, chosen.date ?? "infinity", []),
+    chosen == null
+      ? null
+      : load(
+          chosen.ids,
+          chosen.pairs?.map((pair) => pair.k) ?? ks,
+          chosen.date ?? "infinity",
+          [],
+          chosen.pairs?.map((pair) => pair.id),
+        ),
   ]);
   const legend = new Map<
     string,
@@ -3582,12 +3594,18 @@ async function races(
         single != null || isBrief || first == null || districts.length < 2
           ? null
           : (async () => {
-              const prior = await db.execute<{ id: string; date: string }>(
+              const prior = await db.execute<{
+                root: string;
+                id: string;
+                date: string;
+              }>(
                 sql`
-                  select distinct on (c.district_area_id) c.id, e.date_from::text as date
-                  from contest c join election e on e.id = c.election_id
-                  join contest h on h.id = ${first.id}::uuid
-                  where c.district_area_id = any(${sql.param(districts.flatMap((row) => (row.area == null ? [] : [row.area])))}::uuid[])
+                  select distinct on (h.id) h.id::text as root, c.id, e.date_from::text as date
+                  from contest h
+                  join contest c on (h.seat_id is not null and c.seat_id = h.seat_id)
+                    or (h.seat_id is null and c.district_area_id = h.district_area_id)
+                  join election e on e.id = c.election_id
+                  where h.id = any(${sql.param(districts.map((row) => row.id))}::uuid[])
                     and c.id <> all(${sql.param(roots)}::uuid[])
                     and c.kind = h.kind
                     and c.body_id is not distinct from h.body_id
@@ -3595,7 +3613,7 @@ async function races(
                     and c.round_number is not distinct from h.round_number
                     and c.party_scope_id is not distinct from h.party_scope_id
                     and e.date_from < ${day}::date and e.status::text <> 'annulled'
-                  order by c.district_area_id, e.date_from desc
+                  order by h.id, e.date_from desc
                 `,
               );
               const years = Map.groupBy(prior.rows, (row) =>
@@ -3627,7 +3645,18 @@ async function races(
                   date,
                   prior.rows.length === 0
                     ? null
-                    : { ids: prior.rows.map((row) => row.id), date: latest },
+                    : {
+                        ids: prior.rows.map((row) => row.id),
+                        date: latest,
+                        pairs: districts.flatMap((row) => {
+                          const match = prior.rows.find(
+                            (entry) => entry.root === row.id,
+                          );
+                          return match == null
+                            ? []
+                            : [{ k: row.k ?? 0, id: match.id }];
+                        }),
+                      },
                   lineage,
                   "party",
                   grouping,
