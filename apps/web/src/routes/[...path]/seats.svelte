@@ -18,6 +18,7 @@
     size,
     isComplete = true,
     change = null,
+    partners = [],
   }: {
     parties: Array<{
       key: string;
@@ -40,6 +41,7 @@
     size: number | null;
     isComplete?: boolean;
     change?: Record<string, number> | null;
+    partners?: Array<Array<string>>;
   } = $props();
 
   const uid = $props.id();
@@ -252,27 +254,51 @@
   });
 
   const paths = $derived.by(() => {
-    const holders = parties
-      .filter((party) => party.seats > 0)
+    const holders = Map.groupBy(
+      ordered.filter((party) => party.seats > 0),
+      (party) =>
+        partners.find((pair) => pair.includes(party.key))?.[0] ?? party.key,
+    )
+      .values()
+      .map((members) => {
+        let seats = 0;
+        for (const party of members) {
+          seats += party.seats;
+        }
+        return { members, seats };
+      })
+      .toArray()
       .toSorted((a, b) => b.seats - a.seats)
       .slice(0, 14);
-    const found: Array<{ keys: Array<string>; seats: number; span: number }> =
-      [];
+    const found: Array<{
+      keys: Array<string>;
+      units: Array<Array<string>>;
+      seats: number;
+      span: number;
+    }> = [];
     for (let mask = 1; mask < 1 << holders.length; mask++) {
-      const members = holders.filter((_, index) => mask & (1 << index));
+      const units = holders.filter((_, index) => mask & (1 << index));
       let held = 0;
-      for (const party of members) {
-        held += party.seats;
+      for (const unit of units) {
+        held += unit.seats;
       }
-      const smallest = Math.min(...members.map((party) => party.seats));
+      const smallest = Math.min(...units.map((unit) => unit.seats));
       if (held < majority || held - smallest >= majority) {
         continue;
       }
+      const members = units.flatMap((unit) => unit.members);
       const leans = members.map((party) => party.lean ?? Infinity);
       found.push({
         keys: ordered
           .filter((party) => members.includes(party))
           .map((party) => party.key),
+        units: units
+          .toSorted(
+            (a, b) =>
+              (a.members[0]?.lean ?? Infinity) -
+              (b.members[0]?.lean ?? Infinity),
+          )
+          .map((unit) => unit.members.map((party) => party.key)),
         seats: held,
         span: leans.length === 1 ? 0 : Math.max(...leans) - Math.min(...leans),
       });
@@ -666,7 +692,9 @@
               onclick={() => (picked = isPicked ? [] : [...path.keys])}
             >
               <span class="truncate text-[0.8125rem] font-semibold"
-                >{path.keys.map((key) => shorts.get(key)).join(" + ")}</span
+                >{path.units
+                  .map((unit) => unit.map((key) => shorts.get(key)).join("/"))
+                  .join(" + ")}</span
               >
               <span class="font-mono text-[0.8125rem] tabular-nums"
                 >{count(path.seats)}</span

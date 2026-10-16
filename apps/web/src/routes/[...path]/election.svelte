@@ -412,6 +412,7 @@
       size={race.size}
       change={race.change}
       isComplete={race.size != null || race.count === 1}
+      partners={race.partners}
     />
   {/if}
   <div

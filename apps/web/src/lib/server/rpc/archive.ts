@@ -3503,7 +3503,7 @@ async function races(
           )
           .map((row) => row.id),
       ];
-      const [totals, grid, table] = await Promise.all([
+      const [totals, grid, table, spread] = await Promise.all([
         load(roots, [place.k], day, counted.length > 0 ? counted : roots),
         single == null || isBrief
           ? null
@@ -3535,6 +3535,39 @@ async function races(
               "party",
               "party",
             ),
+        db.execute<{ from: string; to: string }>(sql`
+          with recursive tree(id) as (
+            select unnest(${sql.param(roots)}::uuid[])
+            union all
+            select c.id from contest c join tree on c.allocation_parent_id = tree.id
+          ),
+          lines as materialized (
+            select t.id as contest, o.id as option,
+              coalesce(bm.into_id, b.parent_party_id, pm.into_id, o.party_id) as party
+            from tree t
+            join contest_option o on o.contest_id = t.id and o.party_id is not null
+            left join entity_merge pm on pm.entity_id = o.party_id
+            left join party_affiliation b on b.party_id = coalesce(pm.into_id, o.party_id)
+              and b.kind = 'regional_branch' and b.valid @> ${day}::date
+            left join entity_merge bm on bm.entity_id = b.parent_party_id
+            where not exists (select from contest k where k.allocation_parent_id = t.id)
+          ),
+          reach as (
+            select l.party, array_agg(distinct l.contest) as contests, count(distinct l.contest) as n
+            from lines l
+            where exists (
+              select from lines w
+              join outcome x on x.option_id = w.option and x.kind in ('elected', 'won')
+              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              where w.party = l.party
+            )
+            group by l.party
+          )
+          select 'party:' || a.party as from, 'party:' || b.party as to
+          from reach a join reach b on a.party < b.party
+          where a.n + b.n = (select count(distinct contest) from lines)
+            and not a.contests && b.contests
+        `),
       ]);
       const here = totals.get(place.k);
       const rows = (
@@ -3711,6 +3744,7 @@ async function races(
         day: head?.day ?? null,
         count: group.length,
         size: head?.size ?? null,
+        spread: spread.rows,
         measure: here?.measure ?? "votes",
         valid: here?.side.valid ?? 0,
         results,
@@ -3762,13 +3796,14 @@ async function races(
     .toSorted(
       (a, b) => (a.day ?? "").localeCompare(b.day ?? "") || b.valid - a.valid,
     )
-    .map(({ isStage, office, election, day, ...race }) => {
+    .map(({ isStage, office, election, day, spread, ...race }) => {
       const stage = stages.find((entry) => entry.office === office);
       const rows = (
         stage == null && race.measure === "electoral_votes" ? race : stage
       )?.results;
       return {
         ...race,
+        partners: spread.map((row) => [row.from, row.to]),
         electors:
           rows == null
             ? null
@@ -3849,6 +3884,7 @@ export const elections = {
               }),
             ),
             size: v.nullable(v.number()),
+            partners: v.array(v.array(v.string())),
             measure: v.string(),
             valid: v.number(),
             results: v.array(
