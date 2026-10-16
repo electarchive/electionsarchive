@@ -772,5 +772,12 @@
   "home_scrub_key_held": "Held a general election",
   "home_scrub_key_record": "On record",
   "home_scrub_key_none": "Not yet on record",
-  "home_scrub_hint": "Drag the slider to see how the archive grows over time."
+  "home_scrub_hint": "Drag the slider to see how the archive grows over time.",
+  "export_menu": "Save or share figure",
+  "export_png": "Download PNG",
+  "export_svg": "Download SVG",
+  "export_link": "Copy link to view",
+  "export_copied": "Link copied",
+  "export_failed": "Couldn't create image. Try again.",
+  "export_credit": "Source: Elections Archive, {url}"
 }

@@ -9,6 +9,7 @@
   import { mode } from "mode-watcher";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
+  import Export from "#lib/components/export.svelte";
   import { count, percent, points } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -625,6 +626,7 @@
           fitBoundsOptions: { padding: index === 0 ? room : 6 },
           renderWorldCopies: false,
           attributionControl: false,
+          canvasContextAttributes: { preserveDrawingBuffer: true },
           interactive: index === 0,
           cooperativeGestures: index === 0,
           dragRotate: false,
@@ -844,6 +846,7 @@
 <div
   class="relative grid grid-cols-[minmax(0,1fr)] gap-2"
   data-map
+  data-export
   role="application"
   aria-roledescription="map"
   aria-label={m.map_label({ noun })}
@@ -851,7 +854,10 @@
   {@attach keys}
 >
   <p id="{uid}-hint" class="sr-only">{m.map_hint()}</p>
-  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+  <div
+    class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2"
+    data-export-skip
+  >
     <div
       class="flex items-center gap-2.5 min-inline-0"
       role="group"
@@ -915,6 +921,7 @@
         {/each}
       </div>
     {/if}
+    <Export name="map" class="ms-auto" />
   </div>
   <div
     class="relative overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full max-block-[min(38rem,70svh)]"
@@ -942,6 +949,7 @@
     {/if}
     <div
       class="absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border"
+      data-export-skip
     >
       <button
         type="button"

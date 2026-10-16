@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import Export from "#lib/components/export.svelte";
   import { count, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -105,11 +106,13 @@
 
 {#if dots.length >= 3}
   <section
-    class="col-span-12 grid grid-cols-12 gap-px bg-border"
+    class="relative col-span-12 grid grid-cols-12 gap-px bg-border"
     aria-labelledby="shift-title"
+    data-export
   >
+    <Export name="shift" class="absolute inset-e-2 inset-bs-2" />
     <div
-      class="col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-2 bg-card px-3.5 py-3 min-inline-0 lg:col-span-7"
+      class="col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-2 bg-card px-3.5 py-3 pe-8 min-inline-0 lg:col-span-7"
     >
       <div class="grid gap-0.5">
         <h2 id="shift-title" class="text-[0.8125rem] font-bold">

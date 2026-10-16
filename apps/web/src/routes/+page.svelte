@@ -5,6 +5,7 @@
   import PlayIcon from "@lucide/svelte/icons/play";
   import SearchIcon from "@lucide/svelte/icons/search";
   import XIcon from "@lucide/svelte/icons/x";
+  import Export from "#lib/components/export.svelte";
   import { count, date } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -248,10 +249,12 @@
     </header>
 
     <section
-      class="col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card px-3.5 pbs-3.5 pbe-3 lg:col-span-8"
+      class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card px-3.5 pbs-3.5 pbe-3 lg:col-span-8"
       aria-labelledby="atlas-title"
+      data-export
     >
-      <div class="grid gap-0.5">
+      <Export name="atlas" class="absolute inset-e-2 inset-bs-2" />
+      <div class="grid gap-0.5 pe-8">
         <h2
           id="atlas-title"
           class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"

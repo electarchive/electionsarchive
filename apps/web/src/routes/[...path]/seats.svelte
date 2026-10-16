@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
+  import Export from "#lib/components/export.svelte";
   import { count, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -371,12 +372,14 @@
 </script>
 
 <section
-  class="col-span-12 grid content-start gap-3 bg-card p-3.5 lg:col-span-4"
+  class="relative col-span-12 grid content-start gap-3 bg-card p-3.5 lg:col-span-4"
   aria-labelledby="{uid}-title"
+  data-export
 >
+  <Export name="seats" class="absolute inset-e-2 inset-bs-2" />
   <h2
     id="{uid}-title"
-    class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
+    class="pe-8 font-serif text-xl/tight font-[640] tracking-[-0.005em]"
   >
     {m.seats_title()}<span class="sr-only">, {place}</span>
   </h2>

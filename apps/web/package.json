@@ -38,6 +38,7 @@
     "@tanstack/svelte-query-devtools": "catalog:",
     "better-auth": "catalog:",
     "drizzle-orm": "catalog:",
+    "modern-screenshot": "catalog:",
     "pg": "catalog:",
     "resend": "catalog:",
     "satori": "catalog:",

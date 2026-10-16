@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -178,10 +179,12 @@
 
 {#if marks.length > 0}
   <section
-    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="shares"
+    data-export
   >
-    <div class="grid gap-0.5">
+    <Export name="shares" class="absolute inset-e-2 inset-bs-2" />
+    <div class="grid gap-0.5 pe-8">
       <h2
         id="shares"
         class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
@@ -301,10 +304,12 @@
 {/if}
 
 <section
-  class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3.5 pbe-3"
+  class="relative col-span-12 grid gap-2 bg-card px-3.5 pbs-3.5 pbe-3"
   aria-labelledby="head"
+  data-export
 >
-  <div class="grid gap-0.5">
+  <Export name="head-to-head" class="absolute inset-e-2 inset-bs-2" />
+  <div class="grid gap-0.5 pe-8">
     <h2
       id="head"
       class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"

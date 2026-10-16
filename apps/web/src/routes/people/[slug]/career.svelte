@@ -1,4 +1,5 @@
 <script lang="ts">
+  import Export from "#lib/components/export.svelte";
   import { percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -87,10 +88,12 @@
 
 {#if marks.length > 1}
   <section
-    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
+    class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="career-title"
+    data-export
   >
-    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+    <Export name="career" class="absolute inset-e-2 inset-bs-2" />
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
       <div class="grid gap-0.5">
         <h2
           id="career-title"

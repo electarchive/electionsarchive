@@ -9,6 +9,7 @@
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
+  import Export from "#lib/components/export.svelte";
   import { count, date, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -295,10 +296,12 @@
 
 {#if record.isPending || step != null}
   <section
-    class="col-span-12 grid gap-4 bg-card px-3.5 pbs-4 pbe-4"
+    class="relative col-span-12 grid gap-4 bg-card px-3.5 pbs-4 pbe-4"
     aria-labelledby="{uid}-title"
+    data-export
   >
-    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+    <Export name="history" class="absolute inset-e-2 inset-bs-2" />
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
       <div class="grid gap-0.5">
         <h2
           id="{uid}-title"
