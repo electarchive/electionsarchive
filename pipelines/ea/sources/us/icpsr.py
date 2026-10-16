@@ -18,12 +18,21 @@ SOURCE = "us.icpsr"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DOWNLOADS = Path.home() / "Downloads"
-STUDY = "https://www.icpsr.umich.edu/web/ICPSR/studies/13"
-ZIP = "ICPSR_00013-V2.zip"
+STUDY = "https://www.icpsr.umich.edu/web/ICPSR/studies/{study}"
 PUBLISHER = "Inter-university Consortium for Political and Social Research"
-TITLE = "General Election Data for the United States, 1950-1990 (ICPSR 13)"
 LICENSE = "ICPSR terms of use"
-DATASETS = ["0003", "0001", "0002", "0005", "0006", "0008", "0010", "0012", "0014", "0015"]
+STUDIES = {
+    "13": (
+        "ICPSR_00013-V2.zip",
+        "General Election Data for the United States, 1950-1990 (ICPSR 13)",
+        ["0003", "0001", "0002", "0005", "0006", "0008", "0010", "0012", "0014", "0015"],
+    ),
+    "1": (
+        "ICPSR_00001-V4.zip",
+        "United States Historical Election Returns, 1824-1968 (ICPSR 1)",
+        [f"{number:04d}" for number in range(1, 204)],
+    ),
+}
 STATES = {
     1: "CT", 2: "ME", 3: "MA", 4: "NH", 5: "RI", 6: "VT", 11: "DE", 12: "NJ", 13: "NY", 14: "PA",
     21: "IL", 22: "IN", 23: "MI", 24: "OH", 25: "WI", 31: "IA", 32: "KS", 33: "MN", 34: "MO", 35: "NE",
@@ -54,9 +63,9 @@ FORMER = {
     ("SD", "washabaugh"): ("Washabaugh", "46071", date(1983, 1, 1)),
     ("SD", "armstrong"): ("Armstrong", "46041", date(1952, 11, 5)),
 }
-OFFICES = {"PRES": "president", "CONG": "house", "SEN": "senate"}
-LABEL = re.compile(r"^\s*(?:VAR\s+0*(\d+)|V(\d+))\s+(.+?)\s*$")
-VOTE = re.compile(r"^(\d)(\d\d) (\d) G (PRES|CONG|SEN|GOV|STATE) (\d{4}|OTHER|TOTAL|WALLACE) VOTE$")
+OFFICES = {"PRES": "president", "CONG": "house", "SEN": "senate", "H AL": "house"}
+LABEL = re.compile(r"^\s*(?:VAR\s+0*(\d+)|V(\d+):?)\s+(.+?)\s*$")
+VOTE = re.compile(r"^(\d)(\d\d) (\d) ([GMS]) (PRES|CONG|SEN|GOV|STATE|H AL) (\d{4}|OTHER|TOTAL|WALLACE) VOTE$")
 PARTY = re.compile(r"Votes Cast for Party (\d{4}), (.+)$", re.MULTILINE)
 SUMMARY = re.compile(r"^(\d{4}) (DEM|REP|OTHR|WALLACE) VTS (PRES|SENATE|HOUSE)$")
 SUMMARIES = {
@@ -68,17 +77,18 @@ SUMMARIES = {
     "SENATE": "SEN",
     "HOUSE": "CONG",
 }
-DISTRICT = re.compile(r"^(?:DISTRICT|CONG DIST NUMBER, (\d{4})|(\d{4}) DIST NUMBR|CONGRESSIONAL DISTRICT)$")
+DISTRICT = re.compile(r"^(?:DISTRICT|CONG DIST NUMBER,? (\d{4})|(\d{4}) DIST NUMBR|CONGRESSIONAL DISTRICT)$")
 
 
-def _artifact() -> raw.Artifact:
+def _artifact(study: str) -> raw.Artifact:
+    url = f"{STUDY.format(study=study)}/{STUDIES[study][0]}"
     try:
-        return raw.cached(SOURCE, f"{STUDY}/{ZIP}")
+        return raw.cached(SOURCE, url)
     except LookupError:
-        path = DOWNLOADS / ZIP
+        path = DOWNLOADS / STUDIES[study][0]
         return raw.store(
             SOURCE,
-            f"{STUDY}/{ZIP}",
+            url,
             path.read_bytes(),
             suffix=".zip",
             retrieved_at=datetime.fromtimestamp(path.stat().st_mtime, UTC),
@@ -87,7 +97,8 @@ def _artifact() -> raw.Artifact:
 
 
 def fetch() -> None:
-    _artifact()
+    for study in STUDIES:
+        _artifact(study)
 
 
 def _day(year: int) -> date:
@@ -95,8 +106,6 @@ def _day(year: int) -> date:
 
 
 def parse() -> None:
-    archive = zipfile.ZipFile(_artifact().path)
-    names = archive.namelist()
     with connect() as conn:
         fips: dict[str, dict[str, str]] = {}
         for code, text, iso in conn.execute(
@@ -115,64 +124,81 @@ def parse() -> None:
             names_.setdefault(plain, code)
     parties: dict[str, str] = {}
     frames: list[pl.DataFrame] = []
-    for dataset in DATASETS:
-        with tempfile.TemporaryDirectory() as folder:
-            pdf = Path(folder) / "codebook.pdf"
-            pdf.write_bytes(
-                archive.read(next(n for n in names if n.endswith(f"DS{dataset}/00013-{dataset}-Codebook.pdf")))
-            )
-            text = subprocess.run(
-                ["pdftotext", "-layout", str(pdf), "-"], check=True, capture_output=True, text=True
-            ).stdout
-        labels: dict[int, str] = {}
-        for line in text.splitlines():
-            found = LABEL.match(line)
-            if found:
-                number = int(found[1] or found[2])
-                label = re.sub(r"\s{2,}.*$", "", found[3]).strip()
-                summary = SUMMARY.match(label)
-                if summary:
-                    label = f"{summary[1][1]}{summary[1][2:]} 0 G {SUMMARIES[summary[3]]} {SUMMARIES[summary[2]]} VOTE"
-                if number not in labels and (VOTE.match(label) or re.search(r"STATE|COUNTY|DIST", label)):
-                    labels[number] = label
-        for code, label in PARTY.findall(text):
-            parties.setdefault(code, re.sub(r"\s+", " ", label).strip())
-        frame = pl.read_csv(
-            io.BytesIO(archive.read(next(n for n in names if n.endswith(f"DS{dataset}/00013-{dataset}-Data.tsv")))),
-            separator="\t",
-            infer_schema_length=0,
-        )
-        state = next(n for n, label in labels.items() if re.fullmatch(r"(ICPR |ICPSR )?STATE( CODE)?", label))
-        county = next(n for n, label in labels.items() if label == "COUNTY NAME")
-        districts = {
-            int(found[1] or found[2] or 0): n
-            for n, label in labels.items()
-            if (found := DISTRICT.match(label)) is not None
-        }
-        votes = []
-        for number, label in labels.items():
-            found = VOTE.match(label)
-            if found is None or found[4] not in OFFICES or found[5] == "TOTAL":
-                continue
-            year = 1900 + int(found[2])
-            district = districts.get(year, districts.get(0))
-            votes.append(
-                frame.select(
-                    state=pl.col(f"V{state}").cast(pl.Int16, strict=False),
-                    county=pl.col(f"V{county}").str.strip_chars(),
-                    district=(pl.col(f"V{district}") if district else pl.lit(None, pl.String)).cast(
-                        pl.Int16, strict=False
-                    ),
-                    value=pl.col(f"V{number}").str.strip_chars().cast(pl.Int64, strict=False),
-                ).with_columns(
-                    dataset=pl.lit(dataset),
-                    year=pl.lit(year, pl.Int16),
-                    office=pl.lit(OFFICES[found[4]]),
-                    seat=pl.lit(int(found[3]), pl.Int16),
-                    party=pl.lit(found[5]),
+    for study, (_, _, datasets) in STUDIES.items():
+        archive = zipfile.ZipFile(_artifact(study).path)
+        names = archive.namelist()
+        for dataset in datasets:
+            with tempfile.TemporaryDirectory() as folder:
+                pdf = Path(folder) / "codebook.pdf"
+                pdf.write_bytes(
+                    archive.read(
+                        next(
+                            n
+                            for n in names
+                            if f"/DS{dataset}/" in n and n.endswith(("-Codebook.pdf", "-Codebook-ICPSR.pdf"))
+                        )
+                    )
                 )
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(pdf), "-"], check=True, capture_output=True, text=True
+                ).stdout
+            labels: dict[int, str] = {}
+            for line in text.splitlines():
+                found = LABEL.match(line)
+                if found:
+                    number = int(found[1] or found[2])
+                    label = re.sub(r"\s{2,}.*$", "", found[3]).strip()
+                    summary = SUMMARY.match(label)
+                    if summary:
+                        label = f"{summary[1][1:]} 0 G {SUMMARIES[summary[3]]} {SUMMARIES[summary[2]]} VOTE"
+                    if number not in labels and (VOTE.match(label) or re.search(r"STATE|COUNTY|DIST", label)):
+                        labels[number] = label
+            for code, label in PARTY.findall(text):
+                parties.setdefault(code, re.sub(r"\s+", " ", label).strip())
+            frame = pl.read_csv(
+                io.BytesIO(archive.read(next(n for n in names if f"/DS{dataset}/" in n and n.endswith("-Data.tsv")))),
+                separator="\t",
+                infer_schema_length=0,
             )
-        frames.append(pl.concat(votes))
+            state = next(n for n, label in labels.items() if re.fullmatch(r"(ICPR |ICPSR )?(STATE|COUNTY)( CODE)?", label) and label != "ICPSR COUNTY CODE")
+            county = next(n for n, label in labels.items() if label == "COUNTY NAME")
+            districts = {
+                int(found[1] or found[2] or 0): n
+                for n, label in labels.items()
+                if (found := DISTRICT.match(label)) is not None
+            }
+            votes = []
+            for number, label in labels.items():
+                found = VOTE.match(label)
+                if found is None or found[4] != "G" or found[5] not in OFFICES or found[6] == "TOTAL":
+                    continue
+                year = 1000 + int(found[1] + found[2])
+                if study == "1" and year >= 1950:
+                    continue
+                district = districts.get(year, districts.get(0))
+                votes.append(
+                    frame.select(
+                        state=pl.col(f"V{state}").cast(pl.Int16, strict=False),
+                        county=pl.col(f"V{county}").str.strip_chars(),
+                        district=(
+                            pl.lit("98")
+                            if found[5] == "H AL"
+                            else pl.col(f"V{district}")
+                            if district
+                            else pl.lit(None, pl.String)
+                        ).cast(pl.Int16, strict=False),
+                        value=pl.col(f"V{number}").str.strip_chars().cast(pl.Int64, strict=False),
+                    ).with_columns(
+                        study=pl.lit(study),
+                        dataset=pl.lit(dataset),
+                        year=pl.lit(year, pl.Int16),
+                        office=pl.lit(OFFICES[found[5]]),
+                        seat=pl.lit(int(found[3]), pl.Int16),
+                        party=pl.lit(found[6]),
+                    )
+                )
+            if votes:
+                frames.append(pl.concat(votes))
     frame = pl.concat(frames).filter(
         pl.col("value").is_not_null() & (pl.col("value") != 9999999) & (pl.col("value") > 0)
     )
@@ -224,20 +250,22 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House, Senate, and presidential results by county, 1950–1990, from ICPSR 13",
+            summary="House, Senate, and presidential results by county, 1824–1990, from ICPSR 1 and 13",
             polity="US",
         )
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add(
-            "source",
-            id=source,
-            kind="academic",
-            publisher=PUBLISHER,
-            title=TITLE,
-            url=STUDY,
-            license=LICENSE,
-        )
-        cs.artifact(_artifact(), source)
+        sources: dict[str, UUID] = {}
+        for study, (_, title, _) in STUDIES.items():
+            sources[study] = cs.source(PUBLISHER, title)
+            cs.add(
+                "source",
+                id=sources[study],
+                kind="academic",
+                publisher=PUBLISHER,
+                title=title,
+                url=STUDY.format(study=study),
+                license=LICENSE,
+            )
+            cs.artifact(_artifact(study), sources[study])
         cs.add(
             "scheme", code="us.former_county", polity_id=cs.polity("US"), kind="synthetic", rank=2, noun="former county"
         )
@@ -275,9 +303,24 @@ def emit() -> Path:
         filled = {
             contest
             for (contest,) in conn.execute(
-                "select distinct contest_id from result_set where not is_default and contest_id is not null"
+                """select distinct rs.contest_id from result_set rs join source s on s.id = rs.source_id
+                   where not rs.is_default and rs.contest_id is not null and s.publisher <> %s""",
+                [PUBLISHER],
             ).fetchall()
         }
+        dated: dict[tuple[int, str, str], list[str]] = {}
+        for key in contests:
+            found = re.fullmatch(r"(\d{4})(?:-\d\d){0,2}:([A-Z]{2}):(house:\d+|senate|senate:special|president)", key)
+            if found:
+                dated.setdefault((int(found[1]), found[2], found[3]), []).append(key)
+
+        def resolve(study: str, year: int, postal: str, rest: str) -> str | None:
+            if study == "13":
+                key = f"{_day(year)}:{postal}:{rest}"
+                return key if key in contests else None
+            found = dated.get((year, postal, rest), [])
+            return found[0] if len(found) == 1 else None
+
         single = {
             (int(year), postal)
             for year, postal in frame.filter(pl.col("office") == "house")
@@ -293,22 +336,22 @@ def emit() -> Path:
             seat=pl.when(pl.col("district") == 98).then(0).otherwise(pl.col("district")).cast(pl.Int16)
         )
         groups: list[tuple[str, pl.DataFrame]] = []
-        for (year, postal, seat), lines in house.group_by("year", "postal", "seat", maintain_order=True):
-            base = f"{_day(int(year))}:{postal}:house"
-            key = f"{base}:{seat}"
-            if key not in contests and (int(year), postal) in single:
-                key = f"{base}:0"
-            groups.append((key, lines))
+        for (study, year, postal, seat), lines in house.group_by(
+            "study", "year", "postal", "seat", maintain_order=True
+        ):
+            key = resolve(str(study), int(year), str(postal), f"house:{seat}")
+            if key is None and (int(year), postal) in single:
+                key = resolve(str(study), int(year), str(postal), "house:0")
+            groups.append((key or f"{year}:{postal}:house:{seat}", lines))
         statewide = frame.filter(pl.col("office") != "house")
-        for (year, postal, office), lines in statewide.group_by("year", "postal", "office", maintain_order=True):
-            base = f"{_day(int(year))}:{postal}:{office}"
+        for (study, year, postal, office), lines in statewide.group_by(
+            "study", "year", "postal", "office", maintain_order=True
+        ):
             seats = sorted(lines["seat"].unique())
-            if len(seats) == 1:
-                groups.append((base, lines))
-                continue
             sizes = sorted(seats, key=lambda seat: -int(lines.filter(pl.col("seat") == seat)["value"].sum()))
-            groups.append((base, lines.filter(pl.col("seat") == sizes[0])))
-            groups.append((f"{base}:special", lines.filter(pl.col("seat") == sizes[1])))
+            for seat, rest in zip(sizes, [str(office), f"{office}:special"], strict=False):
+                key = resolve(str(study), int(year), str(postal), rest)
+                groups.append((key or f"{year}:{postal}:{rest}", lines.filter(pl.col("seat") == seat)))
         skipped: dict[str, int] = {}
         values: list[pl.DataFrame] = []
         for key, lines in groups:
@@ -415,7 +458,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=sources[str(lines["study"][0])],
                 is_default=False,
                 completeness=round(counted / official, 4),
             )
