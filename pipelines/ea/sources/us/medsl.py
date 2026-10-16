@@ -9,7 +9,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.store import DATA, connect
+from ea.store import DATA, Connection, connect
 
 SOURCE = "us.medsl"
 VERSION = "2"
@@ -534,16 +534,6 @@ def emit() -> Path:
         )
 
         congress = pl.read_parquet(PARSED / "congress.parquet")
-        contests: dict[str, UUID] = dict(
-            conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall()
-        )
-        counties: dict[str, tuple[UUID, UUID]] = {
-            code: (unit, area)
-            for code, unit, area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code in ('us.county', 'us.place')"
-            ).fetchall()
-        }
-        cs.add("scheme", code="us.county_part", polity_id=cs.polity("US"), kind="synthetic", rank=3, noun="county part")
         sources: dict[tuple[str, int], UUID] = {}
         for (chamber, year), (file, doi) in PRECINCTS.items():
             title = (
@@ -582,209 +572,236 @@ def emit() -> Path:
                 valid_to=day + timedelta(days=1) if kind == "district" else None,
             )
 
-        unmatched: list[tuple[str, str, int, int]] = []
-        drifted: list[tuple[str, str, int, int]] = []
-        taken: set[str] = set()
-        values: list[pl.DataFrame] = []
-        for (year, chamber, day, special, state, district), lines in congress.group_by(
-            "year", "chamber", "day", "special", "state", "district", maintain_order=True
-        ):
-            base = f"{day}:{state}:{chamber}" + ("" if district is None else f":{district}")
-            tried = [*([f"{base}:special"] if special else []), base]
-            if chamber == "house":
-                tried.append(f"{day}:{state}:house:0")
-            key = next((k for k in tried if k in contests), None)
-            if key is None or key in taken:
-                print(
-                    f"{tried[0]}: {'no FEC contest' if key is None else 'already filled'}, {lines['votes'].sum()} skipped"
-                )
-                continue
-            taken.add(key)
-            contest = contests[key]
-            election, district_area, first, official = conn.execute(
-                """select c.election_id, c.district_area_id, v.count_round,
-                          coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
-                                   sum(v.value) filter (where v.measure = 1))::bigint
-                   from contest c join result_set rs on rs.contest_id = c.id and rs.is_default
-                   join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
-                   where c.id = %s group by 1, 2, 3 order by 3 limit 1""",
-                [contest],
-            ).fetchone() or (None, None, None, None)
-            if election is None or first is None or not official or first > 1:
-                print(f"{key}: no official total or first round, skipped")
-                continue
-            known = []
-            for option, kind, label, name, fec in conn.execute(
-                """select o.id, o.kind, o.ballot_label, n.text,
-                              (select sum(v.value)::bigint from result_value v
-                               where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1 and v.count_round = %s)
-                       from contest_option o
-                       join result_set rs on rs.contest_id = o.contest_id and rs.is_default
-                       left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
-                       left join name n on n.entity_id = cy.person_id and n.is_preferred
-                       where o.contest_id = %s and o.parent_option_id is null""",
-                [first, contest],
-            ).fetchall():
-                tokens = [slug(text).split("-") for text in (label, name) if text]
-                texts = {word for words in tokens for word in words} | {
-                    a + b for words in tokens for a, b in pairwise(words)
-                }
-                known.append((option, kind, label, texts, fec))
-            picked: dict[str, str] = {}
-            missing: list[tuple[str, str, int, int]] = []
-            for candidate, writein, votes in (
-                lines.filter(pl.col("measure") == 1)
-                .group_by("candidate", maintain_order=True)
-                .agg(pl.col("writein").any(), pl.col("votes").sum())
-                .iter_rows()
-            ):
-                words = [
-                    word
-                    for word in slug(candidate).split("-")
-                    if len(word) > 1 and word not in {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
-                ]
-                if candidate != "WRITE-INS" and words:
-                    surname = words[0] if "," in candidate else words[-1]
-                    scores = sorted(
-                        (
-                            (
-                                surname in texts or "".join(words[-2:]) in texts,
-                                len(set(words) & texts),
-                                kind != "write_in",
-                                option,
-                            )
-                            for option, kind, _, texts, _ in known
-                        ),
-                        key=lambda score: score[:3],
-                        reverse=True,
-                    )
-                    if scores and scores[0][0] and (len(scores) == 1 or scores[0][:3] != scores[1][:3]):
-                        picked[candidate] = str(scores[0][3])
-                        continue
-                    near = {
-                        option
-                        for option, kind, _, texts, _ in known
-                        if kind != "write_in"
-                        and any(
-                            SequenceMatcher(None, surname, text).ratio() >= 0.8
-                            or (
-                                min(len(surname), len(text)) >= 3
-                                and (text.startswith(surname) or surname.startswith(text))
-                            )
-                            for text in texts
-                        )
-                    }
-                    valued = {
-                        option
-                        for option, kind, _, _, fec in known
-                        if kind != "write_in" and fec and votes >= 1000 and abs(votes - fec) <= fec * 0.03
-                    }
-                    chosen = next((group for group in (near & valued, near, valued) if len(group) == 1), None)
-                    if chosen is not None:
-                        picked[candidate] = str(chosen.pop())
-                        continue
-                    if not writein:
-                        if votes:
-                            missing.append((key, candidate, votes, official))
-                        continue
-                picked[candidate] = "pool"
-            counted = lines.filter(pl.col("measure") == 1)
-            tallies = (
-                counted.with_columns(option=pl.col("candidate").replace_strict(picked, default=None))
-                .group_by("option")
-                .agg(pl.col("votes").sum())
-            )
-            overcounted = False
-            for option, kind, label, _, fec in known:
-                medsl = int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
-                if kind == "candidate" and fec and abs(medsl - fec) > max(100, fec * 0.02):
-                    drifted.append((key, label, medsl, fec))
-                    overcounted |= medsl > fec
-            if overcounted:
-                print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
-                continue
-            unmatched.extend(missing)
-            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
-            if result_set not in cs.minted:
-                continue
-            if "pool" in picked.values():
-                generic = [option for option, kind, label, _, _ in known if kind == "write_in" and label in GENERIC]
-                pool = generic[0] if len(generic) == 1 else cs.key("us.option", f"{key}:write_in:medsl")
-                if pool in cs.minted:
-                    cs.add("contest_option", id=pool, contest_id=contest, kind="write_in", ballot_label="Write-ins")
-                picked = {candidate: str(pool) if option == "pool" else option for candidate, option in picked.items()}
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=sources[(chamber, year)],
-                is_default=False,
-                completeness=round(
-                    float(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum()) / float(official), 4
-                ),
-            )
-            members: dict[str, str] = {}
-            for code, kind in lines.select("code", "kind").unique().iter_rows():
-                if kind in ("county", "place") and chamber == "house" and f"{day}:{state}:house:0" not in contests:
-                    part = f"{year}:{code}:{district}" + (":special" if special else "")
-                    members[code] = str(cs.unit("us.county_part", part))
-                    if code not in counties:
-                        raise ValueError(f"{key}: no county {code}")
-                    cs.add(
-                        "reporting_unit",
-                        id=UUID(members[code]),
-                        polity_id=states[state][0],
-                        scheme_code="us.county_part",
-                        code=part,
-                        parent_id=counties[code][0],
-                        area_relation="within",
-                        area_id=counties[code][1],
-                        kind="standard",
-                        valid_from=day,
-                        valid_to=day + timedelta(days=1),
-                    )
-                    cs.add(
-                        "reporting_unit_area",
-                        unit_id=UUID(members[code]),
-                        area_id=district_area,
-                        valid_from=day,
-                        valid_to=day + timedelta(days=1),
-                    )
-                elif kind in ("county", "place"):
-                    if code not in counties:
-                        raise ValueError(f"{key}: no county {code}")
-                    members[code] = str(counties[code][0])
-                else:
-                    members[code] = str(cs.unit("us.ak_house_district" if kind == "district" else "us.aggregate", code))
-            values.append(
-                lines.filter((pl.col("measure") != 1) | pl.col("candidate").is_in(list(picked)))
-                .select(
-                    result_set_id=pl.lit(str(result_set)),
-                    unit_id=pl.col("code").replace_strict(members),
-                    option_id=pl.when(pl.col("measure") == 1).then(
-                        pl.col("candidate").replace_strict(picked, default=None)
-                    ),
-                    channel=pl.lit(0, pl.Int16),
-                    measure=pl.col("measure"),
-                    count_round=pl.lit(first, pl.Int16),
-                    flags=pl.when(pl.col("kind") == "aggregate")
-                    .then(pl.lit(32, pl.Int16))
-                    .otherwise(pl.lit(0, pl.Int16)),
-                    value="votes",
-                )
-                .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
-                .agg(pl.col("value").sum())
-            )
-        for key, label, medsl, fec in drifted:
-            print(f"{key}: {label} {medsl} by county against {fec} from the FEC")
-        for key, candidate, votes, official in unmatched:
-            print(f"{key}: {candidate} ({votes} of {official}) matches no option, dropped")
-        if any(votes > official * 0.01 for _, _, votes, official in unmatched):
-            raise ValueError("a MEDSL candidate with over 1 percent of the vote matches no FEC option")
-        if values:
-            cs.frame("result_value", pl.concat(values))
+        attach(
+            cs,
+            conn,
+            congress.with_columns(source=pl.col("chamber") + ":" + pl.col("year").cast(pl.String)),
+            {f"{chamber}:{year}": source for (chamber, year), source in sources.items()},
+        )
         return cs.write()
+
+
+def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dict[str, UUID]) -> None:
+    tag = str(cs.manifest["pipeline"])
+    states: dict[str, UUID] = {
+        iso.removeprefix("US-"): polity
+        for iso, polity in conn.execute("select iso_code, id from polity where iso_code like 'US-%%'").fetchall()
+    }
+    contests: dict[str, UUID] = dict(
+        conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall()
+    )
+    counties: dict[str, tuple[UUID, UUID]] = {
+        code: (unit, area)
+        for code, unit, area in conn.execute(
+            "select code, id, area_id from reporting_unit where scheme_code in ('us.county', 'us.place')"
+        ).fetchall()
+    }
+    cs.add("scheme", code="us.county_part", polity_id=cs.polity("US"), kind="synthetic", rank=3, noun="county part")
+    unmatched: list[tuple[str, str, int, int]] = []
+    drifted: list[tuple[str, str, int, int]] = []
+    taken: set[str] = set()
+    values: list[pl.DataFrame] = []
+    for (year, chamber, day, special, state, district), lines in congress.group_by(
+        "year", "chamber", "day", "special", "state", "district", maintain_order=True
+    ):
+        base = f"{day}:{state}:{chamber}" + ("" if district is None else f":{district}")
+        tried = [*([f"{base}:special"] if special else []), base]
+        if chamber == "house":
+            tried.append(f"{day}:{state}:house:0")
+        key = next((k for k in tried if k in contests), None)
+        if key is None or key in taken:
+            print(
+                f"{tried[0]}: {'no FEC contest' if key is None else 'already filled'}, {lines['votes'].sum()} skipped"
+            )
+            continue
+        taken.add(key)
+        contest = contests[key]
+        election, district_area, first, official = conn.execute(
+            """select c.election_id, c.district_area_id, v.count_round,
+                      coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
+                               sum(v.value) filter (where v.measure = 1))::bigint
+               from contest c join result_set rs on rs.contest_id = c.id and rs.is_default
+               join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
+               where c.id = %s group by 1, 2, 3 order by 3 limit 1""",
+            [contest],
+        ).fetchone() or (None, None, None, None)
+        if election is None or first is None or not official or first > 1:
+            print(f"{key}: no official total or first round, skipped")
+            continue
+        known = []
+        for option, kind, label, name, fec in conn.execute(
+            """select o.id, o.kind, o.ballot_label, n.text,
+                          (select sum(v.value)::bigint from result_value v
+                           where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1 and v.count_round = %s)
+                   from contest_option o
+                   join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+                   left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+                   left join name n on n.entity_id = cy.person_id and n.is_preferred
+                   where o.contest_id = %s and o.parent_option_id is null""",
+            [first, contest],
+        ).fetchall():
+            tokens = [slug(text).split("-") for text in (label, name) if text]
+            texts = {word for words in tokens for word in words} | {
+                a + b for words in tokens for a, b in pairwise(words)
+            }
+            known.append((option, kind, label, texts, fec))
+        picked: dict[str, str] = {}
+        missing: list[tuple[str, str, int, int]] = []
+        for candidate, writein, votes in (
+            lines.filter(pl.col("measure") == 1)
+            .group_by("candidate", maintain_order=True)
+            .agg(pl.col("writein").any(), pl.col("votes").sum())
+            .iter_rows()
+        ):
+            words = [
+                word
+                for word in slug(candidate).split("-")
+                if len(word) > 1 and word not in {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
+            ]
+            if candidate != "WRITE-INS" and words:
+                surname = words[0] if "," in candidate else words[-1]
+                scores = sorted(
+                    (
+                        (
+                            surname in texts or "".join(words[-2:]) in texts,
+                            len(set(words) & texts),
+                            kind != "write_in",
+                            option,
+                        )
+                        for option, kind, _, texts, _ in known
+                    ),
+                    key=lambda score: score[:3],
+                    reverse=True,
+                )
+                if scores and scores[0][0] and (len(scores) == 1 or scores[0][:3] != scores[1][:3]):
+                    picked[candidate] = str(scores[0][3])
+                    continue
+                near = {
+                    option
+                    for option, kind, _, texts, _ in known
+                    if kind != "write_in"
+                    and any(
+                        SequenceMatcher(None, surname, text).ratio() >= 0.8
+                        or (
+                            min(len(surname), len(text)) >= 3 and (text.startswith(surname) or surname.startswith(text))
+                        )
+                        for text in texts
+                    )
+                }
+                valued = {
+                    option
+                    for option, kind, _, _, fec in known
+                    if kind != "write_in" and fec and votes >= 1000 and abs(votes - fec) <= fec * 0.03
+                }
+                chosen = next((group for group in (near & valued, near, valued) if len(group) == 1), None)
+                if chosen is not None:
+                    picked[candidate] = str(chosen.pop())
+                    continue
+                if not writein:
+                    if votes:
+                        missing.append((key, candidate, votes, official))
+                    continue
+            picked[candidate] = "pool"
+        counted = lines.filter(pl.col("measure") == 1)
+        tallies = (
+            counted.with_columns(option=pl.col("candidate").replace_strict(picked, default=None))
+            .group_by("option")
+            .agg(pl.col("votes").sum())
+        )
+        overcounted = False
+        for option, kind, label, _, fec in known:
+            medsl = int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
+            if kind == "candidate" and fec and abs(medsl - fec) > max(100, fec * 0.02):
+                drifted.append((key, label, medsl, fec))
+                overcounted |= medsl > fec
+        if overcounted:
+            print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
+            continue
+        if any(votes > official * 0.01 for _, _, votes, official in missing):
+            print(
+                f"{key}: {max(missing, key=lambda line: line[2])[1]} has over 1 percent of the vote and matches no option, skipped"
+            )
+            continue
+        if counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1:
+            print(f"{key}: the county sum exceeds the official total by over 10 percent, skipped")
+            continue
+        unmatched.extend(missing)
+        result_set = cs.key(f"{tag}.result_set", f"{key}:county")
+        if result_set not in cs.minted:
+            continue
+        if "pool" in picked.values():
+            generic = [option for option, kind, label, _, _ in known if kind == "write_in" and label in GENERIC]
+            pool = generic[0] if len(generic) == 1 else cs.key("us.option", f"{key}:write_in:{tag.removeprefix('us.')}")
+            if pool in cs.minted:
+                cs.add("contest_option", id=pool, contest_id=contest, kind="write_in", ballot_label="Write-ins")
+            picked = {candidate: str(pool) if option == "pool" else option for candidate, option in picked.items()}
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=election,
+            contest_id=contest,
+            stage="certified",
+            kind="counted",
+            status="active",
+            source_id=sources[lines["source"][0]],
+            is_default=False,
+            completeness=round(
+                float(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum()) / float(official), 4
+            ),
+        )
+        members: dict[str, str] = {}
+        for code, kind in lines.select("code", "kind").unique().iter_rows():
+            if kind in ("county", "place") and chamber == "house" and f"{day}:{state}:house:0" not in contests:
+                part = f"{year}:{code}:{district}" + (":special" if special else "")
+                members[code] = str(cs.unit("us.county_part", part))
+                if code not in counties:
+                    raise ValueError(f"{key}: no county {code}")
+                cs.add(
+                    "reporting_unit",
+                    id=UUID(members[code]),
+                    polity_id=states[state],
+                    scheme_code="us.county_part",
+                    code=part,
+                    parent_id=counties[code][0],
+                    area_relation="within",
+                    area_id=counties[code][1],
+                    kind="standard",
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=UUID(members[code]),
+                    area_id=district_area,
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+            elif kind in ("county", "place"):
+                if code not in counties:
+                    raise ValueError(f"{key}: no county {code}")
+                members[code] = str(counties[code][0])
+            else:
+                members[code] = str(cs.unit("us.ak_house_district" if kind == "district" else "us.aggregate", code))
+        values.append(
+            lines.filter((pl.col("measure") != 1) | pl.col("candidate").is_in(list(picked)))
+            .select(
+                result_set_id=pl.lit(str(result_set)),
+                unit_id=pl.col("code").replace_strict(members),
+                option_id=pl.when(pl.col("measure") == 1).then(
+                    pl.col("candidate").replace_strict(picked, default=None)
+                ),
+                channel=pl.lit(0, pl.Int16),
+                measure=pl.col("measure"),
+                count_round=pl.lit(first, pl.Int16),
+                flags=pl.when(pl.col("kind") == "aggregate").then(pl.lit(32, pl.Int16)).otherwise(pl.lit(0, pl.Int16)),
+                value="votes",
+            )
+            .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
+            .agg(pl.col("value").sum())
+        )
+    for key, label, medsl, fec in drifted:
+        print(f"{key}: {label} {medsl} by county against {fec} from the FEC")
+    for key, candidate, votes, official in unmatched:
+        print(f"{key}: {candidate} ({votes} of {official}) matches no option, dropped")
+    if values:
+        cs.frame("result_value", pl.concat(values))
