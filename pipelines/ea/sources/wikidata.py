@@ -148,6 +148,12 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("TR", "Türkiye İşçi Partisi", None): "CD0668",
     ("TR", "Yeni Türkiye Partisi", 1961): "00B0F0",
     ("TR", "Yeniden Refah Partisi", None): "474647",
+    ("US", "Natural Law Party", None): "D4A017",
+    ("US", "Reform Party", None): "6A287E",
+    ("US", "Socialist Workers Party", None): "AA0000",
+    ("US-NY", "Conservative Party", None): "FF8C00",
+    ("US-NY", "Independence Party", None): "8E7CC3",
+    ("US-NY", "Right To Life", None): "8B0A50",
 }
 PLACED: dict[tuple[str, str], tuple[int, int]] = {
     ("BR", "Partido dos Trabalhadores"): (-2, -1),

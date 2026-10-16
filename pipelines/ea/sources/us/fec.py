@@ -820,7 +820,16 @@ FOLDED = {
     "MN:democratic-farm-labor": "MN:minnesota-democratic-farmer-labor-party",
     "MN:ind-republican": "MN:republican-party-of-minnesota",
     "MN:independent-republican": "MN:republican-party-of-minnesota",
+    "MA:republican-democratic": "republican-party",
+    "PA:democratic-and-republican": "republican-party",
+    "CA:republican-write-in": "republican-party",
 }
+COMPOUND = {
+    "Republican/Democratic": ["Republican", "Democratic"],
+    "Democratic and Republican": ["Republican", "Democratic"],
+    "Republican (Write-In)": ["Republican"],
+}
+REORDERED = {(1984, "PA", "Gus Yatron"): ["Democratic", "Republican"]}
 LRL = "https://www.lrl.mn.gov/history/caucus.aspx"
 LRL_TITLE = "Party Control of the Minnesota House of Representatives and Senate"
 LINKS = {
@@ -4628,11 +4637,18 @@ def emit() -> Path:
         ],
         how="diagonal_relaxed",
     ).with_columns(
+        parties=pl.struct("year", "state", "name", "parties").map_elements(
+            lambda row: REORDERED.get(
+                (row["year"], row["state"], row["name"]),
+                [part for label in row["parties"] for part in COMPOUND.get(label, [label])],
+            ),
+            return_dtype=pl.List(pl.String),
+        ),
         key=pl.when(pl.col("fec_id").is_not_null())
         .then(pl.col("fec_id"))
         .when(pl.col("parties").list.contains("Write-In") | pl.col("name").is_in([NOTA, VACANCY, "Scattered"]))
         .then(None)
-        .otherwise(pl.concat_str("state", pl.col("name").map_elements(slug, return_dtype=pl.String), separator=":"))
+        .otherwise(pl.concat_str("state", pl.col("name").map_elements(slug, return_dtype=pl.String), separator=":")),
     )
     primaries = (
         pl.concat(
@@ -5045,7 +5061,8 @@ def emit() -> Path:
                     valid_from=None,
                 )
         for folded, into in FOLDED.items():
-            cs.merge(cs.key("us.party", folded), cs.key("us.party", into))
+            if cs.key("us.party", folded) != cs.key("us.party", into):
+                cs.merge(cs.key("us.party", folded), cs.key("us.party", into))
         cs.renamed["republican-party-of-minnesota"] = "independent-republican"
 
         persons: dict[str, UUID] = {}
