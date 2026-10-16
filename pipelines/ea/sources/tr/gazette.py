@@ -11,11 +11,12 @@ import polars as pl
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
-from ea.sources.tr.thea import FORMER_NAMES, MARAS_RENAMED, PARTIES
+from ea.sources.tr.thea import FORMER_NAMES, MARAS_RENAMED, PARTIES, REMAINDER_METHODOLOGY
 from ea.sources.tr.ysk import (
     ANSWERS_2017,
     DERIVED,
     DIGITIZED,
+    INDEPENDENTS,
     INVALID,
     LICENSE,
     PROVINCES,
@@ -682,11 +683,507 @@ INDEPENDENTS_1964 = """
 34 1117 Kaya Şahin
 49 3480 Ahmet Bingöl
 """
-PARTIES_1961 = {
+SENATE_1966 = """
+01 7 341622 211338 205214 108171 77347 5048 5699 6433 2516 0
+03 7 226505 125473 120932 86517 21234 2664 6398 2216 1903 0
+06 7 664886 415792 398463 203706 116725 11225 41326 17095 7758 627
+12 8 57440 43582 42485 17436 9992 0 668 2182 12207 0
+16 8 383275 221385 214155 152612 45168 3763 6809 5803 0 0
+20 8 220849 127355 122372 77103 37439 0 3885 2039 1906 0
+21 8 181945 99082 96455 43432 19369 1471 1578 11549 19055 0
+23 8 128600 67372 65479 36860 20971 1174 1702 3288 1484 0
+26 8 190829 122959 118442 73648 32633 2513 5445 2777 1452 8
+28 8 182348 105788 102916 59471 28410 2096 9511 1872 1556 0
+29 8 118408 76039 73443 38479 28897 0 4016 0 2051 0
+34 9 980081 425557 412932 229276 120344 8664 16853 32155 5640 0
+38 9 235991 151453 145487 82512 47409 4306 7099 4161 0 0
+41 9 141123 81163 77921 44281 20087 1263 9112 2195 696 287
+48 9 162747 101442 97947 62366 29638 1789 2096 2058 0 0
+51 9 154659 92749 87943 49700 25015 3238 5663 2263 2064 0
+54 9 186771 108775 104995 65510 23109 3796 5841 2006 4733 0
+46 9 178676 84718 82290 41426 29200 0 4894 5206 1564 0
+59 9 131658 83247 79573 49083 24499 972 2023 2857 0 38
+61 10 263183 131320 127885 67836 45597 1993 10667 1792 0 0
+62 10 60093 41089 40262 16141 20668 0 859 1394 1200 0
+63 10 179892 98238 95719 53475 32509 0 3299 4178 2258 0
+64 10 94701 56477 54021 29275 20806 1392 1672 856 0 20
+"""
+WINNERS_1966 = """
+01 AP Mehmet Ünaldı
+01 AP Mehmet Nuri Ademoğlu
+01 CHP Mukadder Öztekin
+01 CHP Muslihittin Yılmaz Mete
+03 AP Musa Kâzım Karaağaçlıoğlu
+03 AP Ahmet Karayiğit
+03 AP Yusuf Kemal Şenocak
+06 AP Turhan Kapanlı
+06 AP İsmail Yetiş
+06 AP Turgut Cebe
+06 AP Yiğit Köker
+06 CHP Mahmut Vural
+06 CHP Hıfzı Oğuz Bekata
+06 MP Mansur Ulusoy
+12 AP Arif Hikmet Yurtsever
+16 AP İhsan Sabri Çağlayangil
+16 AP Cahit Ortaç
+16 AP Şeref Kayalar
+16 CHP Saffet Ural
+20 AP Ali Kemal Turgut
+20 CHP Hüseyin Atmaca
+21 AP Selahattin Cizrelioğlu
+21 YTP Azmi Erdoğan
+23 AP Celal Ertuğ
+23 CHP M. Salim Hazerdağlı
+26 AP Ömer Ucuzal
+26 AP Gavsi Uçagök
+28 AP Sabahattin Orhon
+28 CHP Mehmet İhsan Topaloğlu
+29 AP Abbas Cilara
+34 AP M. Haluk Berkol
+38 AP Hüseyin Kalpaklıoğlu
+38 AP Hüsnü Dikeçligil
+38 CHP Sami Turan
+41 AP Lütfi Tokoğlu
+41 TİP* Fatma Hikmet İşmen
+46 AP Ahmet Tevfik Paksu
+48 AP Haldun Menteşeoğlu
+48 AP İlyas Karaöz
+51 AP Hüseyin Avni Göktürk
+51 CKMP Kudret Bayhan
+54 AP Osman Salihoğlu
+54 AP Mustafa Tığlı
+59 AP Ahmet Cemal Tarlan
+59 CHP Hayri Mumcuoğlu
+61 AP İbrahim Reşat Zaloğlu
+61 AP Ömer Lütfi Hocaoğlu
+61 CHP Ali Şakir Ağanoğlu
+62 CHP Aralan Bora
+63 AP Hasan Oral
+63 CHP İbrahim Etem Karakapıcı
+64 AP Mehmet Faik Atayurt
+"""
+SENATE_1968 = """
+02 12 119517 85462 82240 45457 32255 1063 0 1594 2045 0
+09 12 258180 162032 150678 94308 34366 2566 9047 3273 7118 0
+10 12 372505 231722 214959 129191 61278 5228 0 8386 10876 0
+11 12 74909 53084 49610 25421 16605 1522 3924 1101 1037 0
+13 12 57414 43671 41066 21966 16591 0 0 0 2456 53
+14 12 189929 137824 126134 83600 26596 3018 0 7131 4219 1429
+18 12 118342 84813 77283 38081 12590 6073 9086 7663 3790 0
+19 13 233020 143165 128701 53961 25227 3208 11365 8971 4319 21650
+22 13 140929 103509 95084 48985 29469 0 8492 3837 4301 0
+27 13 232224 153314 143001 61996 40172 1480 30602 2655 6096 0
+33 13 231510 151466 140922 71587 41904 3120 13343 5286 5682 0
+35 13 614015 362401 339282 185541 101104 4692 23192 7006 17744 0
+37 13 215596 149790 138783 66723 29208 5442 17414 13889 6107 0
+39 13 118456 90557 83585 44492 26850 0 6050 2519 3674 0
+40 13 85811 61772 57553 19664 8002 0 3837 23934 2116 0
+42 14 506065 317922 292590 145353 51349 7226 50527 29254 8881 0
+44 14 197205 126564 119796 31134 55893 0 8540 3311 20918 0
+45 14 358085 218394 203448 122271 50095 3526 13564 6339 7629 0
+46 14 203315 138714 129055 59479 32017 0 0 10276 6017 21283
+50 14 95284 57041 53398 22665 9803 0 3557 14981 1412 0
+52 14 244119 182095 166611 69063 57294 3706 19915 6454 10179 0
+57 14 128054 90988 82927 31007 25531 4109 9747 9380 3153 0
+58 14 304934 212953 195554 73175 64511 5105 12894 13688 9218 16972
+67 15 316735 237341 213912 112413 50562 4850 28652 9709 7695 0
+"""
+WINNERS_1968 = """
+02 AP Mehmet Sırrı Turanlı
+09 AP İskender Cenap Ege
+09 AP Ali Celâlettin Coşkun
+09 CHP Halil Goral
+10 AP Cemalettin İnkaya
+10 AP Nuri Demirel
+11 AP Mehmet Orhan Tuğrul
+13 AP Orhan Kürüm
+14 AP Aleattın Yılmaztürk
+14 AP Turgut Yaşar Gülez
+18 AP Gürhan Titrek
+19 AP Safa Yalçuk
+19 AP Mahmut Şevket Özçetin
+22 AP Mehmet Nafiz Ergeneli
+27 AP İbrahim Tevfik Kutlar
+27 CHP Salih Tanyeri
+33 AP Talip Özdolay
+33 CHP Lütfi Bilgen
+35 AP Mustafa Bozoklar
+35 AP Orhan Kor
+35 AP Beliğ Beler
+35 AP Mümin Kırlı
+35 CHP Necip Mırkelâmoğlu
+35 CHP Nazif Çağatay
+37 AP Ahmet Nusret Tuna
+37 AP Mehmet Çamlıca
+39 AP Ali Alkan
+40 MP Halil Özmen
+42 AP Mehmet Varışlı
+42 AP Feyzi Halıcı
+42 AP Osman Nuri Canpolat
+42 CHP Fakıh Özlen
+42 GP Sedat Çumralı
+44 AP Hamdi Özer
+44 CHP Nurettin Akyurt
+45 AP Oral Karaosmanoğlu
+45 AP A. Orhan Süersan
+45 AP Ruhi Tunakan
+45 CHP Doğan Barutçuoğlu
+46 AP Adnan Karaküçük
+46 CHP Hilmi Soydan
+50 AP İbrahim Şevki Atasagun
+52 AP Selâhattin Acar
+52 AP Bekir Sıtkı Baykal
+52 CHP Şevket Köksal
+57 AP Nazım İnebeyli
+58 AP Nurettin Ertürk
+58 AP Rıfat Öçten
+58 CHP Adil Altay
+58 CHP Hüseyin Öztürk
+67 AP Tarık Remzi Baltan
+67 AP Ahmet Demir Yüce
+67 CHP Mehmet Ali Pestilci
+"""
+SENATE_1973 = """
+04 8 111944 87666 80397 28190 15503 21376 2672 10131 2525 0 0
+05 8 142118 98456 91360 23753 23131 10770 4800 14601 3675 9625 1005
+07 9 268582 172527 162707 64369 48282 5461 27645 9019 6210 1721 0
+08 9 102190 66010 62783 23583 26800 3821 3543 5030 0 6 0
+10 9 408274 251583 240322 115012 77564 7765 14585 20682 4714 0 0
+13 10 67602 54454 51597 29784 0 907 667 1930 0 0 18308
+15 10 104885 61665 58217 14589 18093 7063 8745 5337 4390 0 0
+17 11 195402 128752 123630 55534 44066 2179 12127 6934 1703 1067 0
+24 12 109499 78052 75325 18385 35548 1959 1749 12388 2921 2375 0
+25 12 296190 200080 189608 42234 37384 6593 34717 59475 6374 2831 0
+26 13 233246 155070 148677 61125 47328 6132 12396 13650 5784 2262 0
+30 14 41533 32239 32062 10742 11823 934 7988 575 0 0 0
+31 14 251556 156446 148032 38780 56304 9528 23672 9656 7522 2570 0
+32 14 138450 86148 82039 50636 10097 1621 5090 5344 1177 485 7589
+34 15 1749970 1066382 1027597 297139 507334 29587 73175 86850 18838 14658 16
+36 15 266926 182827 173061 32392 82148 10038 27804 14657 3860 2162 0
+43 17 225170 132137 124194 54000 21067 6226 17780 18318 4245 2058 0
+47 18 191625 138080 133931 33870 26965 9007 24687 15066 673 0 23659
+49 18 90843 72382 68647 10056 11490 1312 4822 8836 314 166 31651
+53 19 146530 96853 93082 24108 32901 1918 11431 20805 1919 0 0
+55 19 378882 259464 244287 95155 75865 6593 25490 33061 4703 3420 0
+56 20 130141 90012 84522 18000 21483 18253 14451 11464 871 0 0
+58 20 307846 201353 191891 33394 59617 3676 12593 49136 8182 25293 0
+60 21 246468 176412 164371 35642 45647 5412 22078 30172 8216 17204 0
+63 21 217631 129327 124727 42307 35349 1768 22761 21365 1177 0 0
+65 22 126766 101114 96270 23726 4716 63010 992 3324 502 0 0
+66 22 210888 136236 128221 24276 35546 3979 19816 28516 14167 1921 0
+"""
+WINNERS_1973 = """
+04 AP Kasım Küfrevi
+05 AP Macit Zeren
+07 AP Şerafeddin Paker
+07 CHP Reşat Oğuz
+08 CHP Recai Kocaman
+10 AP Raif Eriş
+10 AP Hikmet Aslanoğlu
+10 CHP Nejat Sarlıcalı
+13 AP Kâmran İnan
+15 CHP Ekrem Kabay
+17 AP İsmail Kutluk
+17 CHP İmadettin Elmas
+24 CHP Niyazi Ünsal
+25 AP Sakıp Hatunoğlu
+25 CHP Hilmi Nalbantoğlu
+25 MSP Lütfi Doğan
+26 AP Hasan Ergeçen
+30 CHP Naci Cidal
+31 AP Mustafa Deliveli
+31 CHP Kemal Kılıçoğlu
+32 AP Dr. Mustafa Gülcügil
+34 AP Mehmet Tekin Arıburun
+34 AP Ahmet Vefa Poyraz
+34 AP Erdoğan Adalı
+34 CHP Fikret Gündoğan
+34 CHP Rahmi Erdem
+34 CHP Mehmet Feyyat
+34 CHP Solmaz Belül
+34 CHP Fevzi Hakkı Esatoğlu
+34 CHP Ayhan Peker
+34 MSP Ali Oğuz
+36 AP Yusuf Ziya Ayrım
+36 CHP Sırrı Atalay
+36 CHP Muzaffer Şamiloğlu
+43 AP Ahmet Özmumcu
+43 AP Osman Albayrak
+47 AP Sait Mehmetoğlu
+47 CHP Mehmet Ali Arıkan
+49 - İsmail İlhan
+53 CHP Talât Doğan
+55 AP Refet Rendeci
+55 AP Bahri Cömert
+55 CHP Ziya Gökalp Mülâyim
+55 CHP Fevzi Geveci
+56 CHP Süreyya Öner
+58 CHP Kâzım Kangal
+60 AP Dr. Cevdet Aykan
+60 CHP Zihni Betil
+63 AP İbrahim Halil Balkış
+65 CGP Ferit Melen
+66 CHP Veli Uyar
+66 MSP E. Süleyman Ergin
+"""
+SENATE_1975 = """
+01 11 572080 338894 330613 117554 147881 12420 21389 29682 1687 0
+03 11 258783 153937 148213 78842 41809 5734 14130 7698 0 0
+06 12 1118180 628654 608183 209318 303559 13883 38338 31262 8565 2422
+10 12 429622 275403 266965 141160 102963 6051 12384 3322 1085 0
+12 12 79603 58284 56664 19898 15624 372 20467 171 132 0
+16 12 502658 330366 319039 181929 109121 7229 17702 3058 0 0
+20 12 276963 170051 163444 74314 70669 9185 5789 2747 740 0
+21 12 234481 141239 137722 38783 55146 2276 40778 739 0 0
+23 13 176181 111249 108165 40217 32209 1602 29605 4120 412 0
+26 13 251250 152250 146873 72825 60959 3475 6377 2650 587 0
+28 13 213539 129763 126409 64297 43621 3603 8986 5902 0 0
+29 13 133201 87644 84294 45081 25554 1562 10470 1627 0 0
+34 13 1974487 987284 963008 326331 560423 13752 42741 9962 9394 428
+38 13 299475 178446 171693 72178 57321 3399 16154 21483 1158 0
+41 13 218292 129894 126439 53859 52155 3869 14804 1435 417 0
+42 14 617492 332676 321040 98094 109185 33127 62629 18005 0 0
+48 14 199818 145019 139711 71917 59709 3300 3055 1298 432 0
+51 14 199685 115662 108838 44075 40078 6309 7528 10028 817 0
+54 14 232589 140757 136441 61049 47889 7462 17058 2983 0 0
+55 14 406047 265319 254834 126400 102745 7389 13198 3837 1265 0
+59 14 152216 103576 100732 49411 45746 2308 2002 889 376 0
+61 14 325362 198347 193635 85389 76778 7726 19114 4709 0 0
+62 15 67951 45753 45324 5194 38220 335 353 0 1216 1
+63 15 236923 136248 132639 40604 47831 6449 36483 1269 0 0
+64 15 118141 73469 0 0 0 0 0 0 0 0
+"""
+WINNERS_1975 = """
+01 AP Mehmet Ünaldı
+01 AP M. Nuri Ademoğlu
+01 CHP Hayri Öner
+01 CHP Kemal Sarıibrahimoğlu
+03 AP Kâzım Karaağaçlıoğlu
+03 AP Ahmet Karayiğit
+03 CHP Mustafa Çelik
+06 AP Turhan Kapanlı
+06 AP Mehmet Atıf Benderlioğlu
+06 AP Yiğit Köker
+06 CHP Uğur Alacakaptan
+06 CHP İbrahim Öztürk
+06 CHP Ergün Ertem
+06 CHP Cengizhan Yorulmaz
+10 AP İ. Sıtkı Yırcalı
+12 MSP Mehmet Bilgin
+16 AP İhsan Sabri Çağlayangil
+16 AP Barlas Küntay
+16 AP Şeref Kayalar
+16 CHP Şebib Karamullaoğlu
+20 AP Baha Akşit
+20 CHP Hüseyin Atmaca
+21 CHP Selahattin Cızrelioğlu
+21 MSP Sabahattin Savcı
+23 AP M. Cahit Dalokay
+23 CHP Hasan İldan
+26 AP Ömer Ucuzal
+26 CHP Hikmet Savaş
+28 AP Hayrettin Erkmen
+28 CHP Ali Cüceoğlu
+29 AP Ömer Naci Bozkurt
+34 CHP Besim Üstünel
+38 AP İbrahim Kirazoğlu
+38 AP Sami Turan
+38 CHP Ziya Müezzinoğlu
+41 AP Lütfü Tokoğlu
+41 CHP Abdullah Köseoğlu
+42 CHP Erdoğan Bakkalbaşı
+48 AP Haldun Menteşeoğlu
+48 CHP Fevzi Özer
+51 AP Ergun Özkan
+51 CHP Abdullah Emre İleri
+54 AP Osman Salihoğlu
+54 CHP Hasan Fehmi Güneş
+55 AP Şaban Demirdağ
+59 AP Orhan Öztrak
+59 CHP M. Hayri Mumcuoğlu
+61 AP Ahmet İhsan Birincioğlu
+61 AP Ahmet Cemil Kara
+61 CHP Hasan Güven
+62 CHP Naim Taşan
+63 AP Hasan Oral
+63 CHP Abdulgani Demirkol
+"""
+SENATE_1977 = """
+02 4 160938 121075 117222 39436 47028 857 2170 3197 24534 0
+09 9 336157 266530 254160 133590 97639 3104 6185 6578 6835 306
+11 10 76444 61831 59859 29583 23457 1251 0 1674 3694 0
+14 12 234488 179803 172166 96309 48212 6001 0 5601 16043 0
+18 15 122935 91548 86313 40543 19797 2131 1314 13281 9247 0
+19 15 278754 217399 205968 76783 76118 3771 4093 26470 18235 0
+22 17 186570 143663 138898 54963 74869 1915 2631 1689 2852 0
+27 20 367858 253422 242912 83222 109437 3358 2985 23888 20022 0
+33 23 408732 269122 259885 104050 118135 3155 5988 21901 6647 0
+35 26 957630 751390 729605 291697 386681 8483 10212 21076 11456 0
+37 27 241385 178742 168485 84525 53087 7760 3380 11806 7493 0
+39 29 143157 116556 112422 52290 54590 1289 1672 989 1497 95
+40 29 112796 74360 70650 15561 32428 1018 4372 9479 7698 0
+42 31 706590 488701 468176 132995 147880 19189 26817 48725 92570 0
+44 32 286630 194709 188440 32249 101501 0 1772 12904 39934 0
+45 33 465400 377993 363732 177347 141521 4936 7908 13218 18802 0
+46 34 300701 218580 210409 63358 75115 1783 4979 31648 33526 0
+50 37 124307 88133 83658 35263 28986 1339 1299 8766 7971 0
+52 38 329292 228014 216436 63153 103461 4017 6569 22719 16517 0
+57 41 140470 100571 94044 35603 41941 3030 2954 3446 7070 0
+58 41 346706 257512 244327 60053 106601 3641 3534 30969 34306 0
+67 46 472806 340023 325786 139803 149401 7462 6444 6923 15753 0
+"""
+WINNERS_1977 = """
+02 CHP Yusuf Çetin
+09 AP A. Metin Taş
+09 AP İskender Cenap Ege
+09 CHP Sadettin Demirayak
+11 AP Mehmet Erdem
+14 AP Orhan Ataullah Çalış
+14 CHP Neşet Akmandor
+18 AP Gürhan Titrek
+19 AP Safa Yalçuk
+19 CHP Abdullah Ercan
+22 CHP Süleyman Sırrı Ergun
+27 AP Mehmet Kılıç
+27 CHP Selahattin Çolakoğlu
+33 AP Talip Özdolay
+33 CHP İsmail Çataloğlu
+35 AP Süleyman Tuncel
+35 AP Mehmet Münir Daldal
+35 AP Akın Özdemir
+35 CHP Şeref Bakşık
+35 CHP Kamran Erkmenoğlu
+35 CHP Nurhan Artemiz
+37 AP Ali Münif İslamoğlu
+37 CHP Mehmet Seydibeyoğlu
+39 CHP Beyti Arda
+40 CHP E. Akıp Aksaç
+42 AP Muzaffer Demirtaş
+42 AP Osman Nuri Canpolat
+42 CHP Erdoğan Bakkalbaşı
+42 CHP Mukbil Abay
+42 MSP Ahmet Remzi Hatip
+44 CHP Süleyman Efe
+44 CHP Hamdi Özer
+45 AP Oral Karaosmanoğlu
+45 AP Ruhi Tunakan
+45 CHP Mehmet Tevfik Elmasyazar
+45 CHP Mustafa Fahri Dayı
+46 AP Adnan Karakücük
+46 CHP Rıza Akgün
+50 AP Ragıp Üner
+52 AP Ata Bodur
+52 CHP Orhan Vural
+52 CHP İdris Gürsoy
+57 CHP Abdullah Vehbi Uğur
+58 AP Tahsin Türkay
+58 CHP Muhittin Taylan
+58 CHP Temel Kitapçı
+58 CHP Hüseyin Öztürk
+67 AP Ahmet Demir Yüce
+67 CHP Behiç Sonbay
+67 CHP Mehmet Ali Pestilci
+"""
+SENATE_1979 = """
+04 9 110829 83794 81267 39438 19707 770 18901 657 862 0 488 444 0
+05 10 142148 117404 114166 57467 37839 1988 6447 6202 778 1765 883 797 0
+07 10 308845 239895 233407 154259 53817 2981 6136 7731 1445 1433 1190 1313 3102
+08 11 95459 61874 60229 31496 24202 0 2268 713 477 435 314 324 0
+10 12 430243 327024 319212 188080 84912 6690 18394 13244 2399 1577 1943 1973 0
+13 12 63730 48818 47481 17482 8830 11449 8287 559 171 0 152 551 0
+15 13 108653 81253 78528 40345 22599 1395 3234 8994 505 497 392 567 0
+17 13 205032 159892 157030 93187 47119 2644 6815 3535 1154 738 843 995 0
+24 14 100996 84118 82440 34324 28629 781 3069 13794 633 464 399 347 0
+25 15 277284 223864 217922 109421 30116 2857 38175 34499 999 0 948 907 0
+30 15 41520 33201 32276 13307 10823 222 6784 0 148 0 236 1756 0
+31 16 299806 221457 216648 83822 89914 1564 11638 22097 916 801 1194 3310 1392
+32 16 143894 103088 99332 72086 11968 1383 3687 8147 696 481 388 498 0
+34 17 2173962 1300209 1274392 509463 483365 39590 110474 46682 13101 25869 12616 5523 27709
+36 17 227832 135719 131680 45750 52721 2166 7383 15064 1832 1333 1843 3588 0
+43 18 220575 174629 169223 103689 33098 3695 14954 10888 0 1123 1025 851 0
+45 19 435317 325176 315028 179099 89666 5353 17907 14823 2258 1473 2669 1780 0
+47 20 185255 123992 122486 33708 25485 301 21015 132 329 0 409 16679 24428
+49 21 75815 56916 55677 17858 13582 0 19535 1879 0 247 159 585 1962
+53 21 150941 107138 104753 55891 27066 1561 13058 5391 745 0 768 874 0
+55 22 386287 294472 288109 159422 73523 5185 25966 16317 1873 0 1821 1592 3410
+56 22 124757 89649 87462 22821 13198 603 36571 601 494 234 459 12481 0
+60 23 255196 207518 202483 80773 43828 2432 20588 33839 1045 16415 1184 1289 1090
+65 23 119165 94200 90853 28725 19634 20382 19530 1193 391 0 490 2508 0
+66 24 186996 153023 148617 44741 32675 1752 19336 46363 798 889 915 1148 0
+"""
+WINNERS_1979 = """
+04 AP Kasım Küfrevi
+05 AP Nevzat Şener
+07 AP Şerafeddin Paker
+07 AP Remzi Yılmaz
+08 AP Rasim Geçmiş
+10 AP Mithat Şükrü Çavdaroğlu
+10 AP Cemal Örgen
+10 CHP Nejat Sarıcalı
+13 AP Mehmet Sedat Özcan
+15 AP Faik Kırbağlı
+17 AP Refet Sezgin
+17 CHP İmadettin Elmas
+24 AP Orhan Özen
+25 AP Selahattin Deniz
+25 AP Naci Gacıroğlu
+25 MSP Lütfi Doğan
+30 AP Abdulhaluk Özdinç
+31 AP Mustafa Delivelli
+31 CHP Mehmet Sönmez
+32 AP Mustafa Gülçiğil
+34 AP Ahmet Vefa Poyraz
+34 AP Mehmet Sıtkı Sadık Batum
+34 AP Orhan Cemal Fersoy
+34 AP Mehmet Erdoğan Adalı
+34 AP Emin Uyansoy
+34 CHP Mehmet Emin Sungur
+34 CHP Rahmi Erdem
+34 CHP Besim Üstünel
+34 CHP Aysel Baykal
+34 MSP Ali Oğuz
+36 AP Halim Dursunoğlu
+36 CHP Sırrı Atalay
+36 CHP Halis Soylu
+43 AP Fevzi Ergün
+43 AP Mehmet Emin Alanyalı
+45 AP Erol Yavuz
+47 AP İsmet Muharremoğlu
+47 CHP Cemil Çeçen
+49 MSP İsmail Arslan
+53 AP Şükrü Meto
+55 AP Doğan Kitaplı
+55 AP Şaban Demirdağ
+55 AP Celal Aralan
+55 CHP Muharrem Bartın
+56 MSP İdris Arıkan
+60 AP Osman Çetin
+60 CHP Metin Sonuncu
+65 AP Fevzi Kartal
+66 AP Ünal Allıoğlu
+66 MHP Servet Bora
+"""
+SENATE_PARTIES = {
     "AP": "adalet-partisi-1961",
     "CHP": "cumhuriyet-halk-partisi",
     "CKMP": "cumhuriyetci-koylu-millet-partisi",
+    "MHP": "cumhuriyetci-koylu-millet-partisi",
     "YTP": "yeni-turkiye-partisi-1961",
+    "MP": "millet-partisi-1962",
+    "TİP": "turkiye-isci-partisi-1961",
+    "GP": "guven-partisi",
+    "CGP": "cumhuriyetci-guven-partisi",
+    "DP": "demokratik-parti",
+    "MSP": "milli-selamet-partisi",
+    "TBP": "turkiye-birlik-partisi",
+    "SDP": "sosyalist-devrim-partisi",
+    "TİP-1975": "turkiye-isci-partisi",
+    "TSİP": "turkiye-sosyalist-isci-partisi",
+}
+SENATE_LABELS = {
+    "SDP": "Sosyalist Devrim Partisi",
+    "TİP-1975": "Türkiye İşçi Partisi",
+    "TSİP": "Türkiye Sosyalist İşçi Partisi",
 }
 SENATE_COLUMNS = (REGISTERED, VOTERS, VALID)
 SENATE = {
@@ -701,7 +1198,7 @@ SENATE = {
             "layer misreads some counts, so every count was read from the page, checked against the printed totals, "
             "and carries a page and bounding-box locator."
         ),
-        PARTIES_1961,
+        ("AP", "CHP", "CKMP", "YTP"),
         SENATE_1961,
         {5: 36, 6: 37},
         (12926837, 10519659, 10032530, 3560675, 3734285, 1350892, 1401637, 39558),
@@ -723,7 +1220,7 @@ SENATE = {
             "sum of the provinces. Every count was read from the scan's text layer, checked against the printed "
             "totals, and carries a page and bounding-box locator."
         ),
-        PARTIES_1961,
+        ("AP", "CHP", "CKMP", "YTP"),
         SENATE_1964,
         {4: 26},
         (4767467, 2870491, 2852192, 1419858, 1173892, 85375, 108746, 64326),
@@ -733,8 +1230,156 @@ SENATE = {
         4,
         "senate_1964",
     ),
+    date(1966, 6, 5): (
+        12320,
+        "Yüksek Seçim Kurulundan bildirilmiştir: 5 Haziran 1966 Cumhuriyet Senatosu Üyeleri seçiminin kesin sonuçları",
+        (
+            "YSK's notice in Resmî Gazete 12320 on June 11, 1966 gives the final results of the June 5, 1966 Senate of "
+            "the Republic election, which renewed a third of the elected senators in 23 provinces and filled one vacant "
+            "seat each in İstanbul and Maraş: each province's voters, valid ballots, party votes, and combined "
+            "independent votes, the senators it elected, and a table of each party's provincial and national-remainder "
+            "seats. In Ankara, Diyarbakır, Eskişehir, and Tekirdağ the party votes do not add up to the printed valid "
+            "ballots, and the total of registered voters is 2 above the sum of the provinces; the archive keeps every "
+            "figure as printed. Every count was read from the page, checked against the printed totals, and carries a "
+            "page and bounding-box locator."
+        ),
+        ("AP", "CHP", "CKMP", "MP", "TİP", "YTP"),
+        SENATE_1966,
+        None,
+        (5466284, 3072393, 2967331, 1688316, 877066, 57367, 157115, 116375, 70043, 980),
+        WINNERS_1966,
+        {},
+        "",
+        0,
+        "senate_1966",
+    ),
+    date(1968, 6, 2): (
+        12922,
+        "Yüksek Seçim Kurulundan bildirilmiştir: 2 Haziran 1968 Cumhuriyet Senatosu Üyeleri seçiminin sonuçları",
+        (
+            "YSK's notice in Resmî Gazete 12922 on June 12, 1968 gives the results of the June 2, 1968 Senate of the "
+            "Republic election, which renewed a third of the elected senators in 24 provinces: each province's voters, "
+            "valid ballots, party votes, and combined independent votes, and the senators it elected. The same notice's "
+            "National Assembly by-elections are not loaded. In nine provinces the party votes do not add up to the "
+            "printed valid ballots, most of all in Nevşehir, where they fall 980 short, and the national totals of "
+            "valid ballots and Workers' Party votes differ from the sums of the provinces by 984 and 5; the archive "
+            "keeps every figure as printed. Every count was read from the page, checked against the printed totals, "
+            "and carries a page and bounding-box locator."
+        ),
+        ("AP", "CHP", "CKMP", "GP", "MP", "TİP"),
+        SENATE_1968,
+        None,
+        (5416153, 3596594, 3325188, 1657533, 899272, 65934, 283748, 200637, 156677, 61387),
+        WINNERS_1968,
+        {},
+        "",
+        0,
+        "senate_1968",
+    ),
+    date(1973, 10, 14): (
+        14698,
+        "Yüksek Seçim Kurulu: 14 Ekim 1973 Cumhuriyet Senatosu Üyeleri seçiminin sonuçları",
+        (
+            "YSK's notice in Resmî Gazete 14698 on October 31, 1973 gives the results of the October 14, 1973 Senate "
+            "of the Republic election, held with the National Assembly election, which renewed a third of the elected "
+            "senators in 27 provinces: each province's voters, valid ballots, party votes, and combined independent "
+            "votes, and the senators it elected. Hakkari's voters print 1,000 below what its turnout implies, and in "
+            "Çanakkale, Kütahya, Bitlis, and Mardin the party votes fall short of the valid ballots by 20, 500, 1, "
+            "and 4, which the national totals include; the archive keeps every figure as printed. Every count was "
+            "read from the page, checked against the printed totals, and carries a page and bounding-box locator."
+        ),
+        ("AP", "CHP", "CGP", "DP", "MSP", "MHP", "TBP"),
+        SENATE_1973,
+        None,
+        (6761157, 4412727, 4201557, 1300801, 1412051, 246888, 438276, 516822, 114662, 89824, 82233),
+        WINNERS_1973,
+        {},
+        "",
+        0,
+        "senate_1968",
+    ),
+    date(1975, 10, 12): (
+        15394,
+        "Karar no. 473: 12 Ekim 1975 Cumhuriyet Senatosu Üyeleri seçiminin sonuçları",
+        (
+            "YSK decision 473 (October 22, 1975), published in Resmî Gazete 15394 on October 25, 1975, gives the "
+            "results of the October 12, 1975 Senate of the Republic election, which renewed a third of the elected "
+            "senators in 25 provinces: each province's voters, valid ballots, party votes, and combined independent "
+            "votes, and the senators it elected. The same decision's National Assembly by-elections are not loaded. "
+            "Uşak's block stops after its registered voters, voters, and turnout, so its valid ballots, party votes, "
+            "and senator are not in the Gazette, though the national totals include them. In seven provinces the "
+            "party votes do not add up to the printed valid ballots; the archive keeps every figure as printed. Every "
+            "count was read from the page, checked against the printed totals, and carries a page and bounding-box "
+            "locator."
+        ),
+        ("AP", "CHP", "DP", "MSP", "MHP", "TBP"),
+        SENATE_1975,
+        None,
+        (9295019, 5430184, 5260888, 2147026, 2281470, 165170, 465731, 170357, 28283, 2851),
+        WINNERS_1975,
+        {},
+        "",
+        0,
+        "senate_1968",
+    ),
+    date(1977, 6, 5): (
+        15971,
+        "Karar no. 1507: 5 Haziran 1977 Cumhuriyet Senatosu Üyeleri seçiminin sonuçları",
+        (
+            "YSK decision 1507 (June 17, 1977), published in Resmî Gazete 15971 on June 19, 1977, gives the results "
+            "of the June 5, 1977 Senate of the Republic election, held with the National Assembly election, which "
+            "renewed a third of the elected senators in 22 provinces: each province's voters, valid ballots, party "
+            "votes, and combined independent votes, and the senators it elected. In ten provinces the party votes "
+            "do not add up to the printed valid ballots. Sivas prints no independent votes, though its party votes "
+            "fall 5,223 short of its valid ballots and the national total of independent votes is 5,223 above the "
+            "other provinces' sum. The scan is blotted in places, so a few digits in Aydın, Edirne, Gaziantep, "
+            "Kırşehir, Malatya, and Nevşehir are uncertain; the archive keeps every figure as read. Every count was "
+            "read from the page, checked against the printed totals, and carries a page and bounding-box locator."
+        ),
+        ("AP", "CHP", "CGP", "DP", "MHP", "MSP"),
+        SENATE_1977,
+        None,
+        (6800746, 5019677, 4812326, 1842396, 2037875, 89484, 107278, 326967, 402702, 5624),
+        WINNERS_1977,
+        {},
+        "",
+        0,
+        "senate_1968",
+    ),
+    date(1979, 10, 14): (
+        16803,
+        "Yüksek Seçim Kurulu: 14 Ekim 1979 Cumhuriyet Senatosu Üyeleri seçiminin sonuçları",
+        (
+            "YSK's notice in Resmî Gazete 16803 on November 8, 1979 gives the results of the October 14, 1979 Senate "
+            "of the Republic election, which renewed a third of the elected senators in 25 provinces: each "
+            "province's voters, valid ballots, party votes, and combined independent votes, and the senators it "
+            "elected. The same notice's National Assembly by-elections are not loaded. The scan is blurred, so some "
+            "digits were settled by the province's printed valid ballots and turnout. In seven provinces the party "
+            "votes still do not add up to the printed valid ballots, by 1,000 in Hakkari and Samsun and 2,000 in "
+            "Van, and the provinces' registered voters, voters, and party votes sum to more than the printed "
+            "national totals; the archive keeps every figure as read. Every count carries a page and bounding-box "
+            "locator."
+        ),
+        ("AP", "CHP", "CGP", "MSP", "MHP", "SDP", "TBP", "TİP-1975", "TSİP"),
+        SENATE_1979,
+        None,
+        (6868533, 4847156, 4730571, 2215053, 1378224, 117749, 459040, 312241, 33548, 55774, 33720, 62105, 63093),
+        WINNERS_1979,
+        {},
+        "",
+        0,
+        "senate_1968",
+    ),
 }
-MISADDED = {date(1964, 6, 7): {0}}
+MISADDED = {
+    date(1964, 6, 7): {0},
+    date(1966, 6, 5): {0},
+    date(1968, 6, 2): {2, 8},
+    date(1973, 10, 14): {1, 3, 7, 10},
+    date(1975, 10, 12): {2, 3, 4, 5, 6, 7, 8},
+    date(1977, 6, 5): {2, 3, 4, 5, 6, 7, 9},
+    date(1979, 10, 14): {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11},
+}
 SENATE_SYSTEMS = {
     "senate_1961": (
         {"formula": "block"},
@@ -753,12 +1398,36 @@ SENATE_SYSTEMS = {
             "province's seats went to party lists and independent candidates by D'Hondt."
         ),
     ),
+    "senate_1966": (
+        {"formula": "hare"},
+        "Senate of the Republic national remainder, 1966",
+        (
+            "The 1966 renewal used the national remainder the National Assembly adopted in 1965. "
+            + REMAINDER_METHODOLOGY
+            + " YSK's seat table gives each party's provincial and national-remainder seats but not which senators "
+            "took which, so each province's list is credited with all the senators it elected."
+        ),
+    ),
+    "senate_1968": (
+        {"formula": "dhondt"},
+        "Senate of the Republic D'Hondt, 1968 to 1979",
+        (
+            "Law 1036 of March 20, 1968 abolished the national remainder, so each province's seats again went to "
+            "party lists and independent candidates by D'Hondt."
+        ),
+    ),
 }
 SENATE_CAVEATS = {
     date(1961, 10, 15): (
         "YSK gives each party list the votes of its best-placed candidate, since voters could strike names and add "
         "candidates from other lists. The list figures can add up to more than the valid ballots, and in Hatay and "
         "Tokat the seats split between two lists."
+    ),
+}
+SENATE_CAVEATS_BY_UNIT = {
+    (date(1975, 10, 12), "64"): (
+        "The Gazette's block for Uşak stops after its registered voters, voters, and turnout, so its valid ballots, "
+        "party votes, and elected senator are not recorded here."
     ),
 }
 SWAPPED = {(date(1961, 10, 15), "25"), (date(1961, 10, 15), "26")}
@@ -819,20 +1488,23 @@ def parse() -> None:
             raise ValueError(f"{day}: the provinces do not sum to the printed totals")
         tables.append((day, issue, layout, rows))
     names = []
+    values = []
     for day, (issue, _, _, parties, table, layout, totals, winners, starts, independents, page, _) in SENATE.items():
-        rows = [
-            (unit, [int(value) for value in counts])
-            for unit, *counts in (line.split() for line in table.strip().splitlines())
-        ]
+        block = layout is None
+        fields = [line.split() for line in table.strip().splitlines()]
+        rows = [(unit, [int(value) for value in counts[block:]]) for unit, *counts in fields]
+        homes = {unit: int(counts[0]) for unit, *counts in fields} if block else {}
         for unit, (registered, voters, valid, *_) in rows:
             if not valid <= voters <= registered:
                 raise ValueError(f"{day}: {unit} does not add up")
-        if any(
-            sum(column) != total and index not in MISADDED.get(day, ())
+        if off := [
+            index
             for index, (column, total) in enumerate(zip(zip(*(counts for _, counts in rows)), totals, strict=True))
-        ):
-            raise ValueError(f"{day}: the Senate districts do not sum to the printed totals")
-        tables.append((day, issue, layout, [(unit, counts[:-1]) for unit, counts in rows]))
+            if sum(column) != total and index not in MISADDED.get(day, ())
+        ]:
+            raise ValueError(f"{day}: the Senate districts do not sum to the printed totals in columns {off}")
+        if not block:
+            tables.append((day, issue, layout, [(unit, counts[:-1]) for unit, counts in rows]))
         pdf = raw.cached(SOURCE, f"{ARCHIVE}/{issue}.pdf")
         listed = [line.split(maxsplit=2) for line in winners.strip().splitlines()]
         stood = [line.split(maxsplit=2) for line in independents.strip().splitlines()]
@@ -841,34 +1513,50 @@ def parse() -> None:
             independent_votes[unit] -= int(votes)
         alone = {(unit, name) for unit, party, name in listed if party == "-"}
         if (
-            any(independent_votes.values())
+            (not block and any(independent_votes.values()))
             or {party.rstrip("*") for _, party, _ in listed} - {*parties, "-"}
-            or alone - {(unit, name) for unit, _, name in stood}
+            or (not block and alone - {(unit, name) for unit, _, name in stood})
+            or (
+                block
+                and any(not independent_votes[unit] or [code for code, _ in alone].count(unit) > 1 for unit, _ in alone)
+            )
+            or {unit for unit, _, _ in listed} - set(independent_votes)
         ):
             raise ValueError(f"{day}: the Senate candidates do not match the vote table")
-        on = {at: scan.layer(pdf.path, at) for at in {*starts, page}}
+        on = {
+            at: scan.layer(pdf.path, at)
+            for at in ({near for at in homes.values() for near in (at - 1, at, at + 1)} if block else {*starts, page})
+        }
         sizes = {}
         for at in sorted(on):
             rendered = render(pdf, at)
             pages.append(rendered)
             sizes[at] = (int(str(rendered["width"])) * 3, int(str(rendered["height"])) * 3)
-        current = min(starts)
+        current = min(starts, default=0)
         for unit, party, name in listed:
-            current = max((at for at in starts if starts[at] <= unit), default=current)
+            if block:
+                current = homes[unit]
+            else:
+                current = max((at for at in starts if starts[at] <= unit), default=current)
             if party != "-":
                 names.append((day, unit, party.rstrip("*"), party.endswith("*"), True, name, None, current, None))
         for index, (day_, unit, party, independent, elected, name, votes, at, _) in enumerate(names):
             if day_ != day:
                 continue
-            matched = [
-                box for text, box in on[at] if slug(text) and any(slug(text) == slug(token) for token in name.split())
-            ]
-            lines: dict[int, list[scan.Box]] = {}
-            for box in matched:
-                lines.setdefault(next((y for y in lines if abs(y - box[1]) < 15), box[1]), []).append(box)
-            best = sorted(lines.values(), key=len, reverse=True)
-            if best and (len(best) == 1 or len(best[1]) < len(best[0])):
-                width, height = sizes[at]
+            lines: dict[tuple[int, bool, int], list[scan.Box]] = {}
+            for near in (at, at + 1) if block else (at,):
+                for text, box in on[near]:
+                    if slug(text) and any(slug(text) == slug(token) for token in name.split()):
+                        side = block and box[0] > sizes[near][0] / 2
+                        y = next(
+                            (y for at_, side_, y in lines if (at_, side_) == (near, side) and abs(y - box[1]) < 15),
+                            box[1],
+                        )
+                        lines.setdefault((near, side, y), []).append(box)
+            best = sorted(lines.items(), key=lambda line: len(line[1]), reverse=True)
+            if best and (len(best) == 1 or len(best[1][1]) < len(best[0][1])):
+                (near, _, _), boxes = best[0]
+                width, height = sizes[near]
                 names[index] = (
                     day_,
                     unit,
@@ -877,14 +1565,141 @@ def parse() -> None:
                     elected,
                     name,
                     votes,
-                    at,
+                    near,
                     [
-                        min(box[0] for box in best[0]) / width,
-                        min(box[1] for box in best[0]) / height,
-                        max(box[2] for box in best[0]) / width,
-                        max(box[3] for box in best[0]) / height,
+                        min(box[0] for box in boxes) / width,
+                        min(box[1] for box in boxes) / height,
+                        max(box[2] for box in boxes) / width,
+                        max(box[3] for box in boxes) / height,
                     ],
                 )
+        if block:
+            hits: dict[int, dict[int, list[scan.Box]]] = {}
+            for at, words in on.items():
+                hits[at] = {}
+                digits = [
+                    (re.sub(r"\D", "", text), box)
+                    for text, box in [
+                        *words,
+                        *((text, box) for text, box, *_ in scan.words(pdf.path, at, OCR / f"{issue}-{at}.tsv")),
+                    ]
+                ]
+                for (first, a), (second, b) in itertools.pairwise(digits):
+                    if first and second and abs(a[1] - b[1]) < 15 and 0 < b[0] - a[2] < 80 and len(second) == 3:
+                        hits[at].setdefault(int(first + second), []).append(
+                            (a[0], min(a[1], b[1]), b[2], max(a[3], b[3]))
+                        )
+                for text, box in digits:
+                    if text:
+                        hits[at].setdefault(int(text), []).append(box)
+            for unit, counts in rows:
+                home = homes[unit]
+                wanted = [(column, value) for column, value in enumerate(counts) if value]
+                spots = [
+                    [
+                        ((at - home) * 10**6 + (box[0] > sizes[at][0] / 2) * 10**5 + box[1], at, box)
+                        for at in (home - 1, home, home + 1)
+                        for box in hits[at].get(value, [])
+                    ]
+                    for _, value in wanted
+                ]
+                chains: list[tuple[int, int, list[tuple[int, int, int, scan.Box]]]] = [(0, 0, [])]
+                for index, candidates in enumerate(spots):
+                    grown = list(chains)
+                    for spot in candidates:
+                        linked = [
+                            (count + 1, start if links else spot[0], [*links, (index, *spot)])
+                            for count, start, links in chains
+                            if not links
+                            or (
+                                spot[0] > links[-1][1]
+                                and (spot[0] // 10**5 != links[-1][1] // 10**5 or spot[0] - links[-1][1] < 600)
+                            )
+                        ]
+                        if linked:
+                            grown.append(max(linked, key=lambda chain: (chain[0], chain[1])))
+                    chains = sorted(
+                        grown, key=lambda chain: (-chain[0], chain[2][-1][1] - chain[1] if chain[2] else 0)
+                    )[:50]
+                count, _, links = chains[0]
+                if count < min(3, len(wanted)):
+                    raise ValueError(f"{day}: {unit} is not on page {home}")
+                line = {index: column + (column >= 2) for index, (column, _) in enumerate(wanted)}
+                spread = {index: (at, box, (at, box[0] > sizes[at][0] / 2)) for index, _, at, box in links}
+                edges = {
+                    place: median(box[2] for at, box, where in spread.values() if where == place)
+                    for _, _, place in spread.values()
+                }
+                found = {
+                    index: (at, box) for index, (at, box, place) in spread.items() if abs(box[2] - edges[place]) < 60
+                }
+                glyph = median((box[2] - box[0]) / len(str(wanted[index][1])) for index, (_, box) in found.items())
+                pitch = median(
+                    (found[b][1][1] - found[a][1][1]) / (line[b] - line[a])
+                    for a, b in itertools.pairwise(sorted(found))
+                    if spread[a][2] == spread[b][2]
+                )
+                boxes = []
+                for index, (column, value) in enumerate(wanted):
+                    if index in found:
+                        at, box = found[index]
+                    else:
+                        below = max((known for known in found if known < index), default=None)
+                        above = min((known for known in found if known > index), default=None)
+                        step = pitch
+                        if below is not None and above is not None and spread[below][2] == spread[above][2]:
+                            step = (found[above][1][1] - found[below][1][1]) / (line[above] - line[below])
+                        guesses = []
+                        for anchor in sorted(
+                            (known for known in (below, above) if known is not None),
+                            key=lambda known: (abs(known - index), known > index),
+                        ):
+                            at, (_, y0, _, y1) = found[anchor]
+                            right = edges[spread[anchor][2]]
+                            middle = (y0 + y1) / 2 + step * (line[index] - line[anchor])
+                            colons = [box for text, box in on[at] if ":" in text and right - 1200 < box[0] < right - 50]
+                            aligned = [
+                                colon[0]
+                                for known, (where, (_, top, _, bottom)) in found.items()
+                                if spread[known][2] == spread[anchor][2]
+                                for colon in colons
+                                if abs((colon[1] + colon[3]) / 2 - (top + bottom) / 2) < 20
+                            ]
+                            colon = min(
+                                (
+                                    (box[1] + box[3]) / 2
+                                    for box in colons
+                                    if aligned and abs(box[0] - median(aligned)) < 40
+                                ),
+                                key=lambda y: abs(y - middle),
+                                default=None,
+                            )
+                            near = colon is not None and abs(colon - middle) < 25
+                            stack = [
+                                (box[1] + box[3]) / 2
+                                for text, box in on[at]
+                                if re.search(r"\d", text) and abs(box[2] - right) < 80
+                            ]
+                            inside = bool(stack) and min(stack) - 30 < middle < max(stack) + 30
+                            guesses.append((near, inside, at, right, colon if near else middle, (y1 - y0) / 2))
+                        _, _, at, right, middle, half = max(guesses, key=lambda guess: guess[:2])
+                        box = (
+                            round(right - glyph * len(str(value))),
+                            round(middle - half),
+                            round(right),
+                            round(middle + half),
+                        )
+                    width, height = sizes[at]
+                    boxes.append(
+                        (column, value, at, [box[0] / width, box[1] / height, box[2] / width, box[3] / height])
+                    )
+                lone = next((name for code, name in alone if code == unit), None)
+                for column, value, at, box in boxes:
+                    if lone is not None and column == len(counts) - 1:
+                        names.append((day, unit, None, True, True, lone, value, at, box))
+                    else:
+                        values.append((day, unit, column, value, at, box))
+            continue
         level = min(box[1] for text, box in on[page] if slug(text) == "miktari")
         cells = []
         for unit, votes, name in stood:
@@ -911,7 +1726,6 @@ def parse() -> None:
                     [box[0] / width, box[1] / height, box[2] / width, box[3] / height],
                 )
             )
-    values = []
     for day, issue, layout, rows in tables:
         pdf = raw.cached(SOURCE, f"{ARCHIVE}/{issue}.pdf")
         start = 0
@@ -1211,17 +2025,19 @@ def emit() -> Path:
                 name(vote, f"{day.year} Turkish Senate election", "en")
                 cs.add("slug", path=path, entity_id=vote)
             party_ids = {}
-            for short, key in parties.items():
-                party_ids[short] = cs.key("tr.party", key)
+            for short in parties:
+                party_ids[short] = cs.key("tr.party", SENATE_PARTIES[short])
                 if party_ids[short] in cs.minted:
                     raise ValueError("publish tr.thea before tr.gazette")
             labels = {
                 short: next(
                     full
-                    for full, _, start, end in PARTIES[key]
+                    for full, _, start, end in PARTIES[SENATE_PARTIES[short]]
                     if (start is None or start <= day) and (end is None or day < end)
                 )
-                for short, key in parties.items()
+                if SENATE_PARTIES[short] in PARTIES
+                else SENATE_LABELS[short]
+                for short in parties
             }
             counted = values.filter(pl.col("day") == day)
             named = people.filter(pl.col("day") == day)
@@ -1264,7 +2080,7 @@ def emit() -> Path:
                     kind="body_seats" if SENATE_SYSTEMS[system][0]["formula"] == "block" else "list_allocation",
                     body_id=senate,
                     district_area_id=cs.area("tr.il", plate),
-                    magnitude=elected.height,
+                    magnitude=elected.height or None,
                     round_number=1,
                     electoral_system_id=systems[system],
                     default_result_kind="counted",
@@ -1286,6 +2102,8 @@ def emit() -> Path:
                 )
                 if day in SENATE_CAVEATS:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=SENATE_CAVEATS[day])
+                if (day, unit) in SENATE_CAVEATS_BY_UNIT:
+                    cs.add("note", entity_id=declared, kind="caveat", body_md=SENATE_CAVEATS_BY_UNIT[(day, unit)])
                 if (day, unit) in SWAPPED:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=SWAPPED_CAVEAT)
                 fresh = declared in cs.minted
@@ -1312,6 +2130,21 @@ def emit() -> Path:
                         cells.append(
                             (declared, district, lists[short], VOTES, value, page_ids[(day, page)], box, fresh)
                         )
+                for _, value, page, box in (
+                    row.filter(pl.col("column") == len(SENATE_COLUMNS) + len(parties))
+                    .select("column", "value", "page", "box")
+                    .iter_rows()
+                ):
+                    others = cs.key("tr.option", f"{contest_key}:{slug(INDEPENDENTS)}")
+                    cs.add(
+                        "contest_option",
+                        id=others,
+                        contest_id=contest,
+                        kind="others",
+                        party_id=None,
+                        ballot_label=INDEPENDENTS,
+                    )
+                    cells.append((declared, district, others, VOTES, value, page_ids[(day, page)], box, fresh))
                 for _, column, value, page, box in (
                     row.filter(pl.col("column") < len(SENATE_COLUMNS))
                     .select("unit", "column", "value", "page", "box")
