@@ -131,13 +131,18 @@ NOVOTES = {
 }
 MISNAMED = {
     (1950, "AR", "senate", None): (
-        "The Clerk's statistics name John L. McClellan as the candidate in this race, but Arkansas elected J. William "
-        "Fulbright to this seat in 1950. McClellan held the state's other seat until 1955. We kept the name as printed."
+        (
+            "The Clerk's statistics name John L. McClellan as the candidate in this race; Arkansas elected J. William "
+            "Fulbright to this seat in 1950, and McClellan held the state's other seat until 1955. We show Fulbright as "
+            "the winner, using the vote counts printed beside McClellan's name."
+        ),
+        "F000401",
+        "J. William Fulbright",
     )
 }
+MISNAMED_NOTE = UUID("01a143c8-3322-7054-b36b-7dbd4af0c9ef")
 CLASSES = {(1950, "AR"): 3}
 RESEATED = {"1950-11-07:AR:senate": "1950-11-07:AR:senate:special"}
-ORPHANED = {"1950-11-07:AR:senate:special": ("F000401", "M000332")}
 SWAPPED_NOTE = (
     "The Clerk's statistics print these two candidates' votes against each other's names. We swapped them back to "
     "match the state's summary table and the member who took the seat."
@@ -866,9 +871,7 @@ def emit() -> Path:
         known: dict[str, dict[str, UUID]] = {}
         for scheme, value, entity in conn.execute(
             """select scheme, value, entity_id from external_id
-               where scheme in ('fec.candidate', 'wikidata', 'bioguide', 'us.fec.person')
-                  or (scheme in ('us.option', 'us.candidacy') and value like any(%s))""",
-            [[f"{key}:%" for key in ORPHANED]],
+               where scheme in ('fec.candidate', 'wikidata', 'bioguide', 'us.fec.person')"""
         ).fetchall():
             known.setdefault(scheme, {})[value] = entity
         identified = {(scheme, entity) for scheme, values in known.items() for entity in values.values()}
@@ -1193,7 +1196,7 @@ def emit() -> Path:
                 (
                     (year, state, chamber, district) in MISNAMED,
                     "caveat",
-                    MISNAMED.get((year, state, chamber, district), ""),
+                    MISNAMED.get((year, state, chamber, district), ("",))[0],
                 ),
                 (chamber == "house" and (year, state, district) in SWAPPED, "caveat", SWAPPED_NOTE),
                 (
@@ -1202,7 +1205,9 @@ def emit() -> Path:
                     TRANSCRIBED_NOTE,
                 ),
             ):
-                if applies:
+                if applies and body == MISNAMED.get((year, state, chamber, district), ("",))[0]:
+                    cs.add("note", id=MISNAMED_NOTE, entity_id=result_set, kind=kind, body_md=body)
+                elif applies:
                     cs.add("note", entity_id=result_set, kind=kind, body_md=body)
             values: list[tuple[UUID | None, int | None, int, dict | None]] = []
             roots: dict[UUID, UUID] = {}
@@ -1211,8 +1216,13 @@ def emit() -> Path:
             for row in rows:
                 if row["kind"] == "candidate":
                     people.setdefault(person_of(row), []).append(row)
-            for person, lines in people.items():
-                option_key = f"{contest_key}:{person}"
+            misnamed = MISNAMED.get((year, state, chamber, district))
+            for printed, lines in people.items():
+                option_key = f"{contest_key}:{printed}"
+                person = printed
+                printed_name = lines[0]["name"]
+                if misnamed is not None and any(row["elected"] for row in lines):
+                    person, printed_name = persons[misnamed[1]], misnamed[2]
                 root = cs.key("us.option", option_key)
                 found = [labels(row["party"]) for row in lines]
                 every = [label for found_labels, _ in found for label in found_labels]
@@ -1226,7 +1236,7 @@ def emit() -> Path:
                     contest_id=contest,
                     kind="write_in" if written else "candidate",
                     party_id=(nominated[0] if nominated else None) if len(lines) == 1 else None,
-                    ballot_label=lines[0]["name"],
+                    ballot_label=printed_name,
                 )
                 head = cs.key("us.candidacy", f"{option_key}:head")
                 cs.add(
@@ -1235,13 +1245,13 @@ def emit() -> Path:
                     person_id=person,
                     option_id=root,
                     role="head",
-                    ballot_name=lines[0]["name"],
+                    ballot_name=printed_name,
                     is_independent=not nominated and any(label in INDEPENDENT for label in every),
                     is_incumbent=None,
                 )
                 for party in nominated:
                     cs.add("candidacy_nomination", candidacy_id=head, party_id=party, kind="nominated")
-                roots[person] = root
+                roots[printed] = root
                 for row, (row_labels, row_written) in zip(lines, found, strict=True):
                     option = root
                     if len(lines) > 1:
@@ -1312,11 +1322,4 @@ def emit() -> Path:
                 raise ValueError(f"{contest_key}: {len(winners)} elected for {magnitude} seats")
             for person in winners:
                 cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="elected", seats=1)
-        for key, (orphan, printed) in ORPHANED.items():
-            for suffix, scheme in (("", "us.option"), (":head", "us.candidacy")):
-                if f"{key}:{persons[orphan]}{suffix}" in known.get(scheme, {}):
-                    cs.merge(
-                        known[scheme][f"{key}:{persons[orphan]}{suffix}"],
-                        cs.key(scheme, f"{key}:{persons[printed]}{suffix}"),
-                    )
         return cs.write()
