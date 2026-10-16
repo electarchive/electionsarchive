@@ -7,7 +7,8 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
 
-  const { id }: { id: string } = $props();
+  const { id, isExpected = false }: { id: string; isExpected?: boolean } =
+    $props();
 
   const uid = $props.id();
   const PAD = { top: 8, bottom: 22, side: 2 };
@@ -206,7 +207,23 @@
       : (parties.get(party)?.short ?? parties.get(party)?.label ?? "");
 </script>
 
-{#if current != null || cabinets.length > 0}
+{#if record.isPending && isExpected}
+  <section
+    class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
+    aria-busy="true"
+  >
+    <h2 class="font-serif text-xl/tight font-[640] tracking-[-0.005em]">
+      {m.record_title()}
+    </h2>
+    <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
+      {m.record_lede()}
+    </p>
+    <div
+      class="animate-pulse rounded-sm bg-muted block-65.5 motion-reduce:animate-none"
+    ></div>
+    <div class="block-10"></div>
+  </section>
+{:else if current != null || cabinets.length > 0}
   <section
     class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="{uid}-title"

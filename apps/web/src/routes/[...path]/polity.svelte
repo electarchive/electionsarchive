@@ -325,7 +325,12 @@
   </section>
 {/if}
 
-<Timeline {id} />
+<Timeline
+  {id}
+  isExpected={["sovereign_state", "supranational", "federal_unit"].includes(
+    polity.kind,
+  )}
+/>
 
 {#if polity.elections.length > 0 || polity.results.length === 0}
   <section
