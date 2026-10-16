@@ -72,6 +72,7 @@
     all: m.polity_filter_all,
     county: m.polity_kind_county,
     municipality: m.polity_kind_municipality,
+    school_district: m.polity_kind_school_district,
   };
   const kinds = $derived(
     Object.keys(KINDS).filter(
