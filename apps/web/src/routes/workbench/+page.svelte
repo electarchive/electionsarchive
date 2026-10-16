@@ -1,9 +1,13 @@
 <script lang="ts">
   import type { ViewSpec } from "@ea/view-spec";
-  import { replaceState } from "$app/navigation";
+  import { enhance } from "$app/forms";
+  import { goto, replaceState } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { decodeId, encodeId } from "@ea/view-spec";
+  import BookmarkIcon from "@lucide/svelte/icons/bookmark";
+  import DownloadIcon from "@lucide/svelte/icons/download";
+  import GripIcon from "@lucide/svelte/icons/grip";
   import LinkIcon from "@lucide/svelte/icons/link";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import SearchIcon from "@lucide/svelte/icons/search";
@@ -11,14 +15,17 @@
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
   import { toast } from "svelte-sonner";
-  import { SvelteSet } from "svelte/reactivity";
+  import { on } from "svelte/events";
+  import { MediaQuery, SvelteSet } from "svelte/reactivity";
   import { Button, buttonVariants } from "#lib/components/ui/button/index.js";
   import * as Command from "#lib/components/ui/command/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
+  import { Input } from "#lib/components/ui/input/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
+  import { getConfirmationContext } from "#lib/stores/confirmation.svelte.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Places from "./places.svelte";
@@ -32,14 +39,45 @@
     { value: "table", label: m.workbench_panel_places },
     { value: "scatter", label: m.workbench_panel_scatter },
   ] as const;
+  const COLUMNS = 12;
+  const ROW = 32;
+  const GAP = 16;
+
+  const confirmation = getConfirmationContext();
 
   let spec = $state<ViewSpec | null>(untrack(() => data.spec));
   let isPicking = $state(false);
+  let isSaving = $state(false);
+  let visibility = $state<"private" | "unlisted">(
+    untrack(() =>
+      data.view?.visibility === "unlisted" ? "unlisted" : "private",
+    ),
+  );
   let typed = $state("");
   let term = $state("");
   let focus = $state<string | null>(null);
   let hovered = $state<string | null>(null);
+  let active = $state(0);
+  let grid = $state<HTMLElement | null>(null);
   const picked = new SvelteSet<string>();
+  const wide = new MediaQuery("min-width: 64rem");
+
+  $effect(() => {
+    const next = data.spec;
+    const shared = data.view;
+    untrack(() => {
+      spec = next;
+      visibility = shared?.visibility === "unlisted" ? "unlisted" : "private";
+      picked.clear();
+      focus = null;
+    });
+  });
+
+  $effect(() => {
+    if (data.isMissing) {
+      toast.error(m.workbench_missing());
+    }
+  });
 
   $effect(() => {
     const next = typed.trim();
@@ -47,9 +85,15 @@
     return () => clearTimeout(timer);
   });
 
+  const isDirty = $derived(
+    spec != null &&
+      (data.view == null ||
+        JSON.stringify(spec) !== JSON.stringify(data.view.spec)),
+  );
+
   $effect(() => {
     const url = new URL(page.url.href);
-    if (spec == null) {
+    if (spec == null || !isDirty) {
       url.searchParams.delete("spec");
     } else {
       const bytes = new TextEncoder().encode(JSON.stringify(spec));
@@ -107,31 +151,365 @@
   const focused = $derived(
     legend.find((entry) => entry.key === focus) ?? legend[0] ?? null,
   );
+
+  const panels = $derived.by(() => {
+    const placed: Array<{ x: number; y: number; w: number; h: number }> = [];
+    return (spec?.panels ?? []).map((panel) => {
+      const kind =
+        panel.kind === "table"
+          ? "table"
+          : panel.kind === "chart"
+            ? panel.chart
+            : panel.kind;
+      let area = panel.area;
+      if (area == null) {
+        const w = kind === "table" ? COLUMNS : 6;
+        const h = kind === "table" ? 14 : 12;
+        let y = 0;
+        let x = 0;
+        for (; ; y += 1) {
+          const free = [0, 6].find(
+            (start) =>
+              start + w <= COLUMNS &&
+              placed.every(
+                (other) =>
+                  start + w <= other.x ||
+                  other.x + other.w <= start ||
+                  y + h <= other.y ||
+                  other.y + other.h <= y,
+              ),
+          );
+          if (free != null) {
+            x = free;
+            break;
+          }
+        }
+        area = { x, y, w, h };
+      }
+      placed.push(area);
+      return {
+        kind,
+        label: KINDS.find((entry) => entry.value === kind)?.label() ?? kind,
+        area,
+      };
+    });
+  });
+
+  const place = (
+    index: number,
+    next: { x: number; y: number; w: number; h: number },
+  ) => {
+    if (spec == null) {
+      return;
+    }
+    const areas = panels.map((panel) => ({ ...panel.area }));
+    const w = Math.min(Math.max(next.w, 3), COLUMNS);
+    areas[index] = {
+      w,
+      h: Math.max(next.h, 4),
+      x: Math.min(Math.max(next.x, 0), COLUMNS - w),
+      y: Math.max(next.y, 0),
+    };
+    const settled = [index];
+    const order = areas
+      .map((_, at) => at)
+      .filter((at) => at !== index)
+      .toSorted((a, b) => (areas[a]?.y ?? 0) - (areas[b]?.y ?? 0));
+    for (const at of order) {
+      const area = areas[at];
+      if (area == null) {
+        continue;
+      }
+      let isMoved = true;
+      while (isMoved) {
+        isMoved = false;
+        for (const other of settled) {
+          const fixed = areas[other];
+          if (
+            fixed != null &&
+            area.x < fixed.x + fixed.w &&
+            fixed.x < area.x + area.w &&
+            area.y < fixed.y + fixed.h &&
+            fixed.y < area.y + area.h
+          ) {
+            area.y = fixed.y + fixed.h;
+            isMoved = true;
+          }
+        }
+      }
+      settled.push(at);
+    }
+    for (const [at, panel] of spec.panels.entries()) {
+      panel.area = areas[at];
+    }
+  };
+
+  const drag = (
+    event: PointerEvent,
+    index: number,
+    mode: "move" | "resize",
+  ) => {
+    const start = panels[index]?.area;
+    if (grid == null || start == null || event.button !== 0) {
+      return;
+    }
+    const target = event.currentTarget;
+    if (!(target instanceof HTMLElement)) {
+      return;
+    }
+    event.preventDefault();
+    target.setPointerCapture(event.pointerId);
+    const column = (grid.clientWidth + GAP) / COLUMNS;
+    const row = ROW + GAP;
+    const origin = { x: event.clientX, y: event.clientY };
+    const onmove = (moved: PointerEvent) => {
+      const dx = Math.round((moved.clientX - origin.x) / column);
+      const dy = Math.round((moved.clientY - origin.y) / row);
+      const area = panels[index]?.area;
+      const next =
+        mode === "move"
+          ? { ...start, x: start.x + dx, y: start.y + dy }
+          : { ...start, w: start.w + dx, h: start.h + dy };
+      if (
+        area?.x !== next.x ||
+        area.y !== next.y ||
+        area.w !== next.w ||
+        area.h !== next.h
+      ) {
+        place(index, next);
+      }
+    };
+    const stops = [
+      on(target, "pointermove", onmove),
+      on(target, "pointerup", () => {
+        for (const stop of stops) {
+          stop();
+        }
+      }),
+      on(target, "pointercancel", () => {
+        for (const stop of stops) {
+          stop();
+        }
+      }),
+    ];
+  };
+
+  const download = (name: string, text: string, type: string) => {
+    const url = URL.createObjectURL(new Blob([text], { type }));
+    const link = document.createElement("a");
+    link.href = url;
+    link.download = name;
+    link.click();
+    URL.revokeObjectURL(url);
+  };
 </script>
 
 <svelte:head>
-  <title>{m.workbench_title()} | {m.wordmark()}</title>
+  <title>{spec?.title ?? m.workbench_title()} | {m.wordmark()}</title>
   <meta name="robots" content="noindex" />
 </svelte:head>
 
 <main class="grid content-start gap-4 px-4 pbs-6 pbe-16">
-  <header class="grid gap-1.5">
-    <h1
-      class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em]"
-    >
-      {m.workbench_title()}
-    </h1>
-    <p class="text-[0.9375rem] text-muted-foreground max-inline-[60ch]">
-      {m.workbench_lede()}
-    </p>
+  <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
+    <div class="grid gap-1.5">
+      <h1
+        class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em]"
+      >
+        {spec?.title ?? m.workbench_title()}
+      </h1>
+      <p class="text-[0.9375rem] text-muted-foreground max-inline-[60ch]">
+        {#if data.view != null && !data.view.isOwner}
+          {m.workbench_shared()}
+        {:else}
+          {m.workbench_lede()}
+        {/if}
+      </p>
+    </div>
+    <div class="flex flex-wrap items-center gap-2">
+      {#if spec != null && data.view?.isOwner === true}
+        <span
+          class={cn("text-[0.8125rem] text-muted-foreground", {
+            "highlighter px-1 font-semibold text-foreground": isDirty,
+          })}
+          aria-live="polite"
+          >{isDirty
+            ? m.workbench_status_dirty()
+            : m.workbench_status_saved()}</span
+        >
+      {/if}
+      <DropdownMenu.Root>
+        <DropdownMenu.Trigger
+          class={buttonVariants({ variant: "outline", size: "sm" })}
+        >
+          <BookmarkIcon />{m.workbench_views()}
+        </DropdownMenu.Trigger>
+        <DropdownMenu.Content align="end" class="max-inline-80">
+          {#if data.views.length === 0}
+            <p class="px-2 py-1.5 text-sm text-muted-foreground">
+              {m.workbench_views_empty()}
+            </p>
+          {/if}
+          {#each data.views as view (view.id)}
+            <DropdownMenu.Item
+              class={cn("grid gap-0.5", {
+                "bg-primary/15": view.id === data.view?.id,
+              })}
+              onSelect={async () => goto(resolve(`/workbench?view=${view.id}`))}
+            >
+              <span class="truncate font-semibold"
+                >{view.title ?? m.workbench_view_untitled()}</span
+              >
+              <span class="text-xs text-muted-foreground"
+                >{m.workbench_view_updated({
+                  date: date(view.updatedAt.slice(0, 10)),
+                })}{#if view.visibility === "unlisted"}, {m
+                    .workbench_unlisted()
+                    .toLocaleLowerCase()}{/if}</span
+              >
+            </DropdownMenu.Item>
+          {/each}
+          <DropdownMenu.Separator />
+          <DropdownMenu.Item onSelect={async () => goto(resolve("/workbench"))}>
+            <PlusIcon />{m.workbench_new()}
+          </DropdownMenu.Item>
+        </DropdownMenu.Content>
+      </DropdownMenu.Root>
+      {#if spec != null}
+        <Popover.Root bind:open={isSaving}>
+          <Popover.Trigger
+            class={buttonVariants({
+              variant:
+                isDirty || data.view?.isOwner !== true ? "default" : "outline",
+              size: "sm",
+            })}
+          >
+            {data.view == null
+              ? m.workbench_save()
+              : data.view.isOwner
+                ? m.workbench_save_changes()
+                : m.workbench_save_copy()}
+          </Popover.Trigger>
+          <Popover.Content
+            align="end"
+            class="inline-[min(22rem,calc(100vw-2rem))]"
+          >
+            <form
+              method="POST"
+              action="?/save"
+              class="grid gap-3"
+              use:enhance={() =>
+                async ({ result }) => {
+                  if (
+                    result.type === "success" &&
+                    typeof result.data?.id === "string"
+                  ) {
+                    isSaving = false;
+                    toast.success(m.workbench_saved());
+                    await goto(resolve(`/workbench?view=${result.data.id}`), {
+                      invalidateAll: true,
+                    });
+                  } else {
+                    toast.error(m.workbench_save_failed());
+                  }
+                }}
+            >
+              <input type="hidden" name="spec" value={JSON.stringify(spec)} />
+              {#if data.view?.isOwner === true}
+                <input type="hidden" name="id" value={data.view.id} />
+              {/if}
+              <label class="grid gap-1.5 text-[0.8125rem] font-semibold">
+                {m.workbench_title_label()}
+                <Input
+                  value={spec.title ?? ""}
+                  placeholder={m.workbench_title_placeholder()}
+                  maxlength={200}
+                  oninput={(event) => {
+                    if (spec != null) {
+                      const value = event.currentTarget.value.trim();
+                      spec.title = value === "" ? undefined : value;
+                    }
+                  }}
+                />
+              </label>
+              <fieldset class="grid gap-1.5">
+                <legend class="pbe-1.5 text-[0.8125rem] font-semibold"
+                  >{m.workbench_visibility()}</legend
+                >
+                <input type="hidden" name="visibility" value={visibility} />
+                <div class="flex" role="group">
+                  {#each [{ value: "private", label: m.workbench_private }, { value: "unlisted", label: m.workbench_unlisted }] as const as option (option.value)}
+                    <button
+                      type="button"
+                      class={cn(
+                        "-ms-px flex flex-1 keycap items-center justify-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                        {
+                          "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                            visibility === option.value,
+                        },
+                      )}
+                      aria-pressed={visibility === option.value}
+                      onclick={() => (visibility = option.value)}
+                      >{option.label()}</button
+                    >
+                  {/each}
+                </div>
+              </fieldset>
+              <div class="flex items-center justify-between gap-2">
+                {#if data.view?.isOwner === true}
+                  <Button
+                    variant="ghost"
+                    size="sm"
+                    class="text-destructive"
+                    onclick={async () => {
+                      const view = data.view;
+                      if (
+                        view == null ||
+                        !(await confirmation.confirm({
+                          title: m.workbench_delete_title(),
+                          description: m.workbench_delete_description(),
+                          confirmText: m.workbench_delete(),
+                          cancelText: m.workbench_cancel(),
+                          variant: "destructive",
+                        }))
+                      ) {
+                        return;
+                      }
+                      const body = new FormData();
+                      body.set("id", view.id);
+                      const response = await fetch("?/delete", {
+                        method: "POST",
+                        body,
+                        headers: { "x-sveltekit-action": "true" },
+                      });
+                      if (response.ok) {
+                        isSaving = false;
+                        toast.success(m.workbench_deleted());
+                        await goto(resolve("/workbench"), {
+                          invalidateAll: true,
+                        });
+                      }
+                    }}>{m.workbench_delete()}</Button
+                  >
+                {/if}
+                <Button type="submit" size="sm" class="ms-auto"
+                  >{data.view?.isOwner === true
+                    ? m.workbench_save_changes()
+                    : data.view == null
+                      ? m.workbench_save()
+                      : m.workbench_save_copy()}</Button
+                >
+              </div>
+            </form>
+          </Popover.Content>
+        </Popover.Root>
+      {/if}
+    </div>
   </header>
 
   <div class="flex flex-wrap items-center gap-2">
     <Popover.Root bind:open={isPicking}>
       <Popover.Trigger
-        class={cn(
-          "flex field items-center gap-2 ps-2.5 pe-2 text-start block-8 inline-full max-inline-md min-inline-0",
-        )}
+        class="flex field items-center gap-2 ps-2.5 pe-2 text-start block-8 inline-full max-inline-md min-inline-0"
       >
         <SearchIcon class="shrink-0 text-muted-foreground block-4 inline-4" />
         <span class="sr-only">{m.workbench_contest()}:</span>
@@ -160,6 +538,7 @@
                 onSelect={() => {
                   spec = {
                     version: 1,
+                    title: spec?.title,
                     data: {
                       contests: [encodeId("ct", hit.id)],
                       measure: "votes",
@@ -169,8 +548,8 @@
                     filters: [],
                     panels: spec?.panels ?? [
                       { kind: "chart", chart: "bar" },
-                      { kind: "table" },
                       { kind: "chart", chart: "scatter" },
+                      { kind: "table" },
                     ],
                   };
                   focus = null;
@@ -192,19 +571,20 @@
       </Popover.Content>
     </Popover.Root>
     {#if spec != null}
-      {const data = $derived(spec.data)}
+      {const selector = $derived(spec.data)}
       <button
         type="button"
         class={cn(
           "flex keycap items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary",
           {
             "bg-primary text-primary-foreground hover:bg-primary":
-              data.compare != null,
+              selector.compare != null,
           },
         )}
-        aria-pressed={data.compare != null}
+        aria-pressed={selector.compare != null}
         onclick={() => {
-          data.compare = data.compare == null ? { previous: true } : undefined;
+          selector.compare =
+            selector.compare == null ? { previous: true } : undefined;
         }}>{m.workbench_compare()}</button
       >
       {#if (current?.places?.levels.length ?? 0) > 1}
@@ -221,14 +601,14 @@
               )}
               aria-pressed={level.code === current?.places?.level}
               onclick={() => {
-                data.level = level.code;
+                selector.level = level.code;
                 picked.clear();
               }}>{level.noun}</button
             >
           {/each}
         </div>
       {/if}
-      <div class="ms-auto flex items-center gap-2">
+      <div class="ms-auto flex flex-wrap items-center gap-2">
         {#if picked.size > 0}
           <Button variant="ghost" size="sm" onclick={() => picked.clear()}>
             <XIcon />{m.workbench_selected({ count: picked.size })}
@@ -252,7 +632,7 @@
         >
         <DropdownMenu.Root>
           <DropdownMenu.Trigger
-            class={buttonVariants({ variant: "default", size: "sm" })}
+            class={buttonVariants({ variant: "outline", size: "sm" })}
           >
             <PlusIcon />{m.workbench_add()}
           </DropdownMenu.Trigger>
@@ -281,31 +661,329 @@
       {m.workbench_start()}
     </p>
   {:else if current != null}
+    {#if !wide.current}
+      <nav
+        class="flex gap-1.5 overflow-x-auto"
+        aria-label={m.workbench_panels()}
+      >
+        {#each panels as panel, index (index)}
+          <button
+            type="button"
+            class={cn(
+              "shrink-0 rounded-full border border-input px-3 text-[0.8125rem] font-semibold block-8",
+              { "bg-primary text-primary-foreground": active === index },
+            )}
+            aria-current={active === index ? "true" : undefined}
+            onclick={() => {
+              grid?.children[index]?.scrollIntoView({
+                behavior: "smooth",
+                block: "nearest",
+                inline: "start",
+              });
+            }}>{panel.label}</button
+          >
+        {/each}
+      </nav>
+    {/if}
     <div
-      class={cn("grid gap-4 lg:grid-cols-2", {
-        "opacity-60 transition-opacity": contest.isFetching,
-      })}
+      bind:this={grid}
+      class={cn(
+        {
+          "grid grid-cols-12 gap-4": wide.current,
+          "-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4":
+            !wide.current,
+        },
+        { "opacity-60 transition-opacity": contest.isFetching },
+      )}
+      style:grid-auto-rows={wide.current ? `${ROW}px` : undefined}
+      onscroll={(event) => {
+        const element = event.currentTarget;
+        active = Math.round(element.scrollLeft / (element.clientWidth - 16));
+      }}
     >
-      {#each spec.panels as panel, index (index)}
-        {const kind = $derived(
-          panel.kind === "table"
-            ? "table"
-            : panel.kind === "chart"
-              ? panel.chart
-              : panel.kind,
-        )}
+      {#each panels as panel, index (index)}
         <section
-          class={cn("grid content-start border bg-card min-inline-0", {
-            "lg:col-span-2": kind === "table",
-          })}
+          class={cn(
+            "relative grid grid-rows-[auto_minmax(0,1fr)] border bg-card min-inline-0",
+            {
+              "col-span-(--w) col-start-(--x) row-span-(--h) row-start-(--y)":
+                wide.current,
+              "shrink-0 snap-start content-start self-start inline-full":
+                !wide.current,
+            },
+          )}
+          style:--x={panel.area.x + 1}
+          style:--y={panel.area.y + 1}
+          style:--w={panel.area.w}
+          style:--h={panel.area.h}
           aria-labelledby="panel-{index}"
         >
           <header
-            class="flex items-center justify-between gap-2 border-be px-3.5 block-10"
+            class={cn(
+              "flex items-center gap-1 border-be ps-1.5 pe-1 block-10",
+              {
+                "cursor-grab touch-none active:cursor-grabbing": wide.current,
+                "ps-3.5": !wide.current,
+              },
+            )}
+            {@attach (header: HTMLElement) => {
+              const onpointerdown = (event: PointerEvent) => {
+                if (
+                  wide.current &&
+                  event.target instanceof Element &&
+                  event.target.closest("button, a, [role=menuitem]") == null
+                ) {
+                  drag(event, index, "move");
+                }
+              };
+              return on(header, "pointerdown", onpointerdown);
+            }}
           >
-            <h2 id="panel-{index}" class="text-[0.8125rem] font-bold">
-              {KINDS.find((entry) => entry.value === kind)?.label() ?? kind}
+            {#if wide.current}
+              <button
+                type="button"
+                class="grid place-items-center rounded-xs text-muted-foreground block-7 inline-6 hover:text-foreground"
+                title={m.workbench_arrange_hint()}
+                aria-label={m.workbench_arrange({ name: panel.label })}
+                onpointerdown={(event) => drag(event, index, "move")}
+                onkeydown={(event) => {
+                  const step = {
+                    ArrowLeft: [-1, 0],
+                    ArrowRight: [1, 0],
+                    ArrowUp: [0, -1],
+                    ArrowDown: [0, 1],
+                  }[event.key];
+                  if (step == null) {
+                    return;
+                  }
+                  event.preventDefault();
+                  const [dx = 0, dy = 0] = step;
+                  place(
+                    index,
+                    event.shiftKey
+                      ? {
+                          ...panel.area,
+                          w: panel.area.w + dx,
+                          h: panel.area.h + dy,
+                        }
+                      : {
+                          ...panel.area,
+                          x: panel.area.x + dx,
+                          y: panel.area.y + dy,
+                        },
+                  );
+                }}
+              >
+                <GripIcon class="block-3.5 inline-3.5" />
+              </button>
+            {/if}
+            <h2
+              id="panel-{index}"
+              class="flex-1 truncate text-[0.8125rem] font-bold"
+            >
+              {panel.label}
             </h2>
+            <DropdownMenu.Root>
+              <DropdownMenu.Trigger
+                class={buttonVariants({ variant: "ghost", size: "icon-sm" })}
+              >
+                <DownloadIcon />
+                <span class="sr-only">{m.workbench_export()}</span>
+              </DropdownMenu.Trigger>
+              <DropdownMenu.Content align="end">
+                {#if panel.kind === "bar" || panel.kind === "scatter"}
+                  <DropdownMenu.Item
+                    onSelect={() => {
+                      const at = legend.findIndex(
+                        (entry) => entry.key === focused?.key,
+                      );
+                      const chart =
+                        panel.kind === "bar"
+                          ? {
+                              data: {
+                                values: current.rows.flatMap((row) =>
+                                  row.current == null
+                                    ? []
+                                    : [
+                                        {
+                                          option: row.label,
+                                          share: row.current.share,
+                                          earlier: row.earlier?.share ?? null,
+                                          color: row.color ?? "#8a8578",
+                                        },
+                                      ],
+                                ),
+                              },
+                              encoding: {
+                                y: {
+                                  field: "option",
+                                  type: "nominal",
+                                  sort: "-x",
+                                  title: null,
+                                },
+                              },
+                              layer: [
+                                {
+                                  mark: "bar",
+                                  encoding: {
+                                    x: {
+                                      field: "share",
+                                      type: "quantitative",
+                                      axis: { format: ".0%" },
+                                      title: m.col_share(),
+                                    },
+                                    color: {
+                                      field: "color",
+                                      type: "nominal",
+                                      scale: null,
+                                    },
+                                  },
+                                },
+                                {
+                                  mark: { type: "tick", color: "black" },
+                                  encoding: {
+                                    x: {
+                                      field: "earlier",
+                                      type: "quantitative",
+                                    },
+                                  },
+                                },
+                              ],
+                            }
+                          : {
+                              data: {
+                                values: (current.places?.rows ?? []).flatMap(
+                                  (row) => {
+                                    const earlier = row.earlier?.[at];
+                                    const share = row.shares[at];
+                                    return earlier == null || share == null
+                                      ? []
+                                      : [
+                                          {
+                                            place: row.name,
+                                            before: earlier,
+                                            now: share,
+                                            leader:
+                                              row.leader == null
+                                                ? null
+                                                : (legend[row.leader]?.label ??
+                                                  null),
+                                          },
+                                        ];
+                                  },
+                                ),
+                              },
+                              layer: [
+                                {
+                                  mark: { type: "point", filled: true },
+                                  encoding: {
+                                    x: {
+                                      field: "before",
+                                      type: "quantitative",
+                                      axis: { format: ".0%" },
+                                    },
+                                    y: {
+                                      field: "now",
+                                      type: "quantitative",
+                                      axis: { format: ".0%" },
+                                    },
+                                    color: {
+                                      field: "leader",
+                                      type: "nominal",
+                                      scale: {
+                                        domain: legend.map(
+                                          (entry) => entry.label,
+                                        ),
+                                        range: legend.map(
+                                          (entry) => entry.color ?? "#8a8578",
+                                        ),
+                                      },
+                                    },
+                                    tooltip: [
+                                      { field: "place" },
+                                      { field: "before", format: ".1%" },
+                                      { field: "now", format: ".1%" },
+                                    ],
+                                  },
+                                },
+                              ],
+                            };
+                      download(
+                        `${current.path?.replaceAll("/", "-") ?? "view"}-${panel.kind}.vl.json`,
+                        JSON.stringify(
+                          {
+                            $schema:
+                              "https://vega.github.io/schema/vega-lite/v5.json",
+                            title: `${current.name}, ${current.scope.name}`,
+                            width: 480,
+                            ...chart,
+                          },
+                          null,
+                          2,
+                        ),
+                        "application/json",
+                      );
+                    }}>{m.workbench_export_vega()}</DropdownMenu.Item
+                  >
+                {/if}
+                {#if panel.kind === "table" || panel.kind === "bar"}
+                  <DropdownMenu.Item
+                    onSelect={() => {
+                      const quote = (value: string | number | null) =>
+                        value == null
+                          ? ""
+                          : typeof value === "number"
+                            ? String(value)
+                            : `"${value.replaceAll('"', '""')}"`;
+                      const lines =
+                        panel.kind === "bar"
+                          ? [
+                              [m.col_option(), m.col_votes(), m.col_share()],
+                              ...current.rows.flatMap((row) =>
+                                row.current == null
+                                  ? []
+                                  : [
+                                      [
+                                        row.label,
+                                        row.current.votes,
+                                        row.current.share,
+                                      ],
+                                    ],
+                              ),
+                            ]
+                          : [
+                              [
+                                current.places?.level ?? "",
+                                m.col_votes(),
+                                ...legend.map((entry) => entry.label),
+                              ],
+                              ...(current.places?.rows ?? []).map((row) => [
+                                row.name,
+                                row.valid,
+                                ...row.shares,
+                              ]),
+                            ];
+                      download(
+                        `${current.path?.replaceAll("/", "-") ?? "view"}-${panel.kind}.csv`,
+                        lines
+                          .map((line) => line.map(quote).join(","))
+                          .join("\n"),
+                        "text/csv",
+                      );
+                    }}>{m.workbench_export_csv()}</DropdownMenu.Item
+                  >
+                {/if}
+                <DropdownMenu.Item
+                  onSelect={() => {
+                    download(
+                      "view.json",
+                      JSON.stringify(spec, null, 2),
+                      "application/json",
+                    );
+                  }}>{m.workbench_export_spec()}</DropdownMenu.Item
+                >
+              </DropdownMenu.Content>
+            </DropdownMenu.Root>
             <Button
               variant="ghost"
               size="icon-sm"
@@ -315,17 +993,45 @@
               <span class="sr-only">{m.workbench_remove()}</span>
             </Button>
           </header>
-          {#if kind === "bar"}
-            <Results
-              contest={current}
-              focus={focused?.key ?? null}
-              {picked}
-              onfocus={(key) => (focus = key)}
-            />
-          {:else if kind === "table"}
-            <Places contest={current} focus={focused} {picked} bind:hovered />
-          {:else if kind === "scatter"}
-            <Scatter contest={current} focus={focused} {picked} bind:hovered />
+          <div class={cn({ "overflow-auto": wide.current })}>
+            {#if panel.kind === "bar"}
+              <Results
+                contest={current}
+                focus={focused?.key ?? null}
+                {picked}
+                onfocus={(key) => (focus = key)}
+              />
+            {:else if panel.kind === "table"}
+              <Places contest={current} focus={focused} {picked} bind:hovered />
+            {:else if panel.kind === "scatter"}
+              <Scatter
+                contest={current}
+                focus={focused}
+                {picked}
+                bind:hovered
+              />
+            {/if}
+          </div>
+          {#if wide.current}
+            <button
+              type="button"
+              class="absolute inset-e-0 inset-be-0 cursor-se-resize touch-none text-muted-foreground block-4 inline-4 hover:text-foreground"
+              aria-label={m.workbench_resize({ name: panel.label })}
+              tabindex={-1}
+              onpointerdown={(event) => drag(event, index, "resize")}
+            >
+              <svg
+                viewBox="0 0 16 16"
+                class="block-full inline-full"
+                aria-hidden="true"
+                ><path
+                  d="M14 6 6 14M14 10l-4 4"
+                  stroke="currentColor"
+                  stroke-width="1.25"
+                  fill="none"
+                /></svg
+              >
+            </button>
           {/if}
         </section>
       {/each}
