@@ -73,6 +73,22 @@ STATES = {
         set(),
         "Totals are the sums of the Secretary of State's town and ward rows.",
     ),
+    "VT": (
+        2010,
+        {
+            "County Sheriff": SHERIFF,
+            "District Attorney": ("district-attorney", "State's Attorney", "other"),
+            "Probate Judge": ("probate-judge", "Probate Judge", "other"),
+            "Assistant Judge": ("assistant-judges", "Assistant Judges", None),
+            "High Bailiff": ("high-bailiff", "High Bailiff", "other"),
+        },
+        ["County"],
+        set(),
+        (
+            "Totals are the sums of the Secretary of State's town rows, or of its ward rows where the archive has no "
+            "town row."
+        ),
+    ),
     "ID": (
         1990,
         {
@@ -415,7 +431,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="County, city, town, and school board elections from the archives of Virginia, New Hampshire, Idaho, New Mexico, and Connecticut",
+            summary="County, city, town, and school board elections from the archives of Virginia, New Hampshire, Idaho, New Mexico, Connecticut, and Vermont",
             polity="US",
         )
 
@@ -544,9 +560,9 @@ def emit() -> Path:
         districts: set[str] = set()
         paths: set[str] = set()
         skipped = 0
-        for (contest_id,), rows in frame.sort("contest", "votes", "name", descending=[False, True, False]).group_by(
-            "contest", maintain_order=True
-        ):
+        for (_, contest_id), rows in frame.sort(
+            "state", "contest", "votes", "name", descending=[False, False, True, False]
+        ).group_by("state", "contest", maintain_order=True):
             first = rows.row(0, named=True)
             state, code, office, day, stage = (
                 first["state"],
@@ -699,7 +715,7 @@ def emit() -> Path:
                 entity_id=result_set,
                 kind="methodology",
                 body_md=STATES[state][4]
-                + (FLAGGED if flagged else WINNERS.format(unit="town" if state == "NH" else "precinct")),
+                + (FLAGGED if flagged else WINNERS.format(unit="town" if state in ("NH", "VT") else "precinct")),
             )
             rank = 0
             for candidate_id, ballot, party, votes, winner in rows.select(
