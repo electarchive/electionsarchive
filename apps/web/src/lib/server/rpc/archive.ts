@@ -7521,36 +7521,116 @@ export const parties = {
         ...(row.races === 1 ? [row.root] : []),
         ...(row.grp == null ? [] : [row.grp]),
       ]);
+      const local = await db.execute<{
+        id: string;
+        election: string;
+        path: string;
+        tail: string;
+        date: string;
+        year: number;
+        votes: number | null;
+        total: number | null;
+        seats: number | null;
+        filled: number | null;
+      }>(sql`
+        with recursive ids(id) as (
+          select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        ),
+        roots as materialized (
+          select c.id, c.election_id as election, s.path, substring(s.path from '[^/]+$') as tail, e.date_from, a.k as area
+          from contest c join election e on e.id = c.election_id
+          join slug s on s.entity_id = c.id and s.is_current
+          join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = pt.area_id
+          where e.polity_id = (select polity_id from party where id = (select id from ids limit 1))
+            and e.kind = 'local' and c.kind = 'body_seats'
+            and c.body_id is null and c.office_id is null and c.allocation_parent_id is null
+        ),
+        counted as (
+          select r.id, sum(x.value) filter (where o.party_id in (select id from ids))::float8 as votes,
+            sum(x.value)::float8 as total
+          from roots r join result_set rs on rs.contest_id = r.id and rs.is_default
+          join result_rollup x on x.result_set_k = rs.k and x.area_k = r.area and x.measure = 1 and x.option_k <> 0
+          join contest_option o on o.k = x.option_k
+          group by r.id
+        ),
+        won as (
+          select o.contest_id as id, sum(x.seats) filter (where o.party_id in (select id from ids))::int as seats,
+            sum(x.seats)::int as filled
+          from roots r join contest_option o on o.contest_id = r.id
+          join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          group by o.contest_id
+        )
+        select r.id, r.election, r.path, r.tail, r.date_from::text as date, extract(year from r.date_from)::int as year,
+          c.votes, c.total, w.seats, w.filled
+        from roots r left join counted c on c.id = r.id left join won w on w.id = r.id
+        order by r.date_from
+      `);
       const [labels, slugs] = await Promise.all([
-        names([...seats, ...linked]),
+        names([
+          ...seats,
+          ...linked,
+          ...local.rows.flatMap((row) => [row.id, row.election]),
+        ]),
         paths(linked),
       ]);
-      return seats.map((seat) => ({
-        id: seat,
-        name: labels.full.get(seat) ?? "",
-        points: found.rows
-          .filter((row) => row.seat === seat)
-          .map((row) => {
-            const target = row.races === 1 ? row.root : row.grp;
-            return {
-              name:
-                (target == null ? null : labels.full.get(target)) ??
-                (row.grp == null ? null : labels.full.get(row.grp)) ??
-                `${row.year} ${labels.full.get(seat) ?? ""}`.trim(),
-              path:
-                (target == null ? null : slugs.get(target)) ??
-                (row.grp == null ? null : slugs.get(row.grp)) ??
-                null,
+      const tallies = Map.groupBy(local.rows, (row) => row.tail)
+        .entries()
+        .filter(([, rows]) => rows.some((row) => (row.votes ?? 0) > 0))
+        .map(([tail, rows]) => ({
+          id: tail,
+          name:
+            labels.full
+              .get(rows.at(-1)?.id ?? "")
+              ?.split(", ")
+              .at(-1) ?? tail,
+          points: rows
+            .filter((row) => row.votes != null)
+            .map((row) => ({
+              name: labels.full.get(row.election) ?? row.path,
+              path: row.path,
               date: row.date,
               year: row.year,
-              races: row.races,
+              races: 1,
               votes: row.total == null || row.total === 0 ? null : row.votes,
               total: row.total == null || row.total === 0 ? null : row.total,
-              seats: row.filled == null ? null : row.seats,
+              seats: row.filled == null ? null : (row.seats ?? 0),
               filled: row.filled,
-            };
-          }),
-      }));
+            })),
+        }))
+        .toArray();
+      return [
+        ...seats.map((seat) => ({
+          id: seat,
+          name: labels.full.get(seat) ?? "",
+          points: found.rows
+            .filter((row) => row.seat === seat)
+            .map((row) => {
+              const target = row.races === 1 ? row.root : row.grp;
+              return {
+                name:
+                  (target == null ? null : labels.full.get(target)) ??
+                  (row.grp == null ? null : labels.full.get(row.grp)) ??
+                  `${row.year} ${labels.full.get(seat) ?? ""}`.trim(),
+                path:
+                  (target == null ? null : slugs.get(target)) ??
+                  (row.grp == null ? null : slugs.get(row.grp)) ??
+                  null,
+                date: row.date,
+                year: row.year,
+                races: row.races,
+                votes: row.total == null || row.total === 0 ? null : row.votes,
+                total: row.total == null || row.total === 0 ? null : row.total,
+                seats: row.filled == null ? null : row.seats,
+                filled: row.filled,
+              };
+            }),
+        })),
+        ...tallies,
+      ];
     }),
   locate: os
     .meta(

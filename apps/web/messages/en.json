@@ -2,7 +2,7 @@
   "$schema": "https://inlang.com/schema/inlang-message-format",
   "party_history_best": "Best result",
   "party_history_latest": "Latest",
-  "party_history_lede": "{name}'s vote share in each general election, with the share of seats won shown behind.",
+  "party_history_lede": "{name}'s vote share in each election on record, and the resulting share of seats.",
   "party_history_majority": "Majority",
   "party_history_seats": "Seats won",
   "party_history_seats_of": "{seats} of {filled} seats",
