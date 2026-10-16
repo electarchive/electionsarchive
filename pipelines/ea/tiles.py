@@ -38,6 +38,8 @@ def build(prefix: str | None) -> str:
     summaries: list[str] = []
     with tempfile.TemporaryDirectory() as scratch:
         for scheme_code, vintage, as_of, features, attribution in sets:
+            if not features:
+                continue
             areas_path = Path(scratch) / "areas.geojsonl"
             labels_path = Path(scratch) / "labels.geojsonl"
             output = Path(scratch) / "out.pmtiles"
