@@ -280,6 +280,12 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '13%'"""
             ).fetchall()
         }
+        shaped: dict[str, UUID] = dict(
+            conn.execute(
+                """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
+                   where a.scheme_code = 'us.precinct'"""
+            ).fetchall()
+        )
         units: dict[str, UUID] = {}
         georgia = cs.polity("US-GA")
         for county, precinct in frame.select("county", "precinct").unique().sort("county", "precinct").iter_rows():
@@ -293,8 +299,8 @@ def emit() -> Path:
                 scheme_code="us.precinct",
                 code=code,
                 parent_id=parent,
-                area_relation="within",
-                area_id=area,
+                area_relation="equals" if code in shaped else "within",
+                area_id=shaped.get(code, area),
                 kind="standard",
                 valid_from=min(FILES),
                 valid_to=date(2021, 1, 6),
