@@ -306,8 +306,18 @@
       const isRound =
         race.round != null &&
         election.races.some(
-          (other) => other !== race && other.name === race.name,
+          (other) =>
+            other !== race &&
+            other.name === race.name &&
+            other.round !== race.round,
         );
+      const isSplit =
+        race.count > 1 &&
+        election.races.some(
+          (other) =>
+            other !== race && other.name === race.name && other.count === 1,
+        );
+      const noun = race.places?.levels[0]?.noun ?? "";
       return {
         ...race,
         change,
@@ -383,7 +393,9 @@
         isLater: isRound && (race.round ?? 1) > 1,
         name: isRound
           ? m.race_round({ name: race.name, round: race.round ?? 1 })
-          : race.name,
+          : isSplit
+            ? m.race_split({ name: race.name, noun })
+            : race.name,
         votes: MEASURES[race.measure]?.() ?? m.col_votes(),
         isSlate: race.kind === "elector_slate",
         seated: seated.map((row) => ({
@@ -449,32 +461,40 @@
                       seats: count(total),
                       count: count(race.count),
                     })
-                  : seated.length > 0 && !race.isOffice
-                    ? (isRound && race.round === 1
-                        ? m.race_lede_seats_first
-                        : m.race_lede_seats)({
+                  : seated.length > 0 && !race.isOffice && isSplit
+                    ? m.race_lede_split({
                         party: named(leader),
                         seats: count(leader.seats ?? 0),
-                        total: count(
-                          race.size != null && race.size <= total + 2
-                            ? race.size
-                            : total,
-                        ),
+                        total: count(race.count),
+                        noun,
                         share: percent(leader.share),
                       })
-                    : runner == null
-                      ? null
-                      : (seated.length > 0
-                          ? m.race_lede_won
-                          : m.race_lede_votes)({
+                    : seated.length > 0 && !race.isOffice
+                      ? (isRound && race.round === 1
+                          ? m.race_lede_seats_first
+                          : m.race_lede_seats)({
                           party: named(leader),
-                          share: percent(leader.share),
-                          margin: count(
-                            Math.round((leader.share - runner.share) * 1000) /
-                              10,
+                          seats: count(leader.seats ?? 0),
+                          total: count(
+                            race.size != null && race.size <= total + 2
+                              ? race.size
+                              : total,
                           ),
-                          runner: named(runner),
-                        }),
+                          share: percent(leader.share),
+                        })
+                      : runner == null
+                        ? null
+                        : (seated.length > 0
+                            ? m.race_lede_won
+                            : m.race_lede_votes)({
+                            party: named(leader),
+                            share: percent(leader.share),
+                            margin: count(
+                              Math.round((leader.share - runner.share) * 1000) /
+                                10,
+                            ),
+                            runner: named(runner),
+                          }),
       };
     }),
   );

@@ -4010,6 +4010,8 @@ async function races(
         office: head?.office ?? null,
         election: head?.election ?? "",
         day: head?.day ?? null,
+        chamber: labels.full.get(head?.owner ?? "") ?? null,
+        isNational: head?.area === nation.id,
         count: group.length,
         sample: table?.sample ?? null,
         since: table?.since ?? null,
@@ -4066,44 +4068,59 @@ async function races(
     .toSorted(
       (a, b) => (a.day ?? "").localeCompare(b.day ?? "") || b.valid - a.valid,
     )
-    .map(({ isStage, office, election, day, spread, ...race }) => {
-      const stage = stages.find((entry) => entry.office === office);
-      const rows = (
-        stage == null && race.measure === "electoral_votes" ? race : stage
-      )?.results;
-      return {
-        ...race,
-        partners: spread.map((row) => [row.from, row.to]),
-        electors:
-          rows == null
-            ? null
-            : {
-                rows: rows
-                  .filter((row) => row.votes > 0)
-                  .map((row) => {
-                    const line = race.results.find(
-                      (entry) =>
-                        entry.person != null && entry.person === row.person,
-                    );
-                    return {
-                      key: row.key,
-                      label: row.label,
-                      short: line?.short ?? row.short,
-                      color: line?.color ?? row.color,
-                      person: row.person,
-                      party: line?.party ?? row.party,
-                      votes: row.votes,
-                    };
-                  }),
-                appointed: stage?.size ?? race.size,
-                link: {
-                  path: stagePaths.get(stage?.election ?? "") ?? null,
-                  date: stage?.day ?? day,
-                  popular: false,
+    .map(
+      ({
+        isStage,
+        office,
+        election,
+        day,
+        spread,
+        chamber,
+        isNational,
+        ...race
+      }) => {
+        const stage = stages.find((entry) => entry.office === office);
+        const rows = (
+          stage == null && race.measure === "electoral_votes" ? race : stage
+        )?.results;
+        return {
+          ...race,
+          name:
+            isNational && race.count === 1 && race.body != null
+              ? (chamber ?? race.name)
+              : race.name,
+          partners: spread.map((row) => [row.from, row.to]),
+          electors:
+            rows == null
+              ? null
+              : {
+                  rows: rows
+                    .filter((row) => row.votes > 0)
+                    .map((row) => {
+                      const line = race.results.find(
+                        (entry) =>
+                          entry.person != null && entry.person === row.person,
+                      );
+                      return {
+                        key: row.key,
+                        label: row.label,
+                        short: line?.short ?? row.short,
+                        color: line?.color ?? row.color,
+                        person: row.person,
+                        party: line?.party ?? row.party,
+                        votes: row.votes,
+                      };
+                    }),
+                  appointed: stage?.size ?? race.size,
+                  link: {
+                    path: stagePaths.get(stage?.election ?? "") ?? null,
+                    date: stage?.day ?? day,
+                    popular: false,
+                  },
                 },
-              },
-      };
-    });
+        };
+      },
+    );
 }
 
 export const elections = {
