@@ -55,8 +55,57 @@ BOOKS = {
     1998: "1555/federalelections98.pdf",
     2000: "1556/federalelections00.pdf",
 }
-MASTERS = {year: f"https://www.fec.gov/files/bulk-downloads/{year}/cn{year % 100:02d}.zip" for year in BOOKS}
+MASTERS = {
+    year: f"https://www.fec.gov/files/bulk-downloads/{year}/cn{year % 100:02d}.zip" for year in (*BOOKS, 2024, 2026)
+}
 CLERK = {year: f"https://clerk.house.gov/member_info/electionInfo/{year}election.pdf" for year in range(1982, 1993, 2)}
+STATISTICS = "https://clerk.house.gov/member_info/electionInfo/2024/statistics2024.pdf"
+STATISTICS_TITLE = "Statistics of the Presidential and Congressional Election of November 5, 2024"
+STATISTICS_OFFICES = {
+    "FORUNITEDSTATESSENATOR": "senate",
+    "FORUNITEDSTATESREPRESENTATIVE": "house",
+    "FORDELEGATE": "house",
+    "FORRESIDENTCOMMISSIONER": "house",
+}
+STATISTICS_WRITE_INS = {
+    "Write-in",
+    "Write-in (Scattering)",
+    "Scattering",
+    "All Others",
+    "Miscellaneous",
+    "Other Write-ins",
+}
+STATISTICS_UNCOUNTED = {
+    "Blank",
+    "Blanks",
+    "Blank Votes",
+    "Void",
+    "Over Votes",
+    "Under Votes",
+    "Invalid",
+    "Continuing Ballots",
+    "Exhausted Ballots",
+}
+STATISTICS_LABELS = {
+    "Democrat": "Democratic",
+    "Common Sense": "Common Sense Party",
+    "Unity Party": "Unity Party of Colorado",
+    "United Utah": "United Utah Party",
+    "Labour": "Labour Party",
+    "Natural Law": "Natural Law Party",
+    "Independent American": "Independent American Party",
+    "American Constitution": "American Constitution Party",
+    "Popular Democratic Party": "Partido Popular Democrático (Popular Democratic Party)",
+    "New Progressive Party": "Partido Nuevo Progresista (New Progressive Party)",
+    "Puerto Rican Independence Party": "Partido Independentista Puertorriqueño (Puerto Rican Independence Party)",
+    "Citizen’s Victory Movement": "Movimiento Victoria Ciudadana (Citizens Victory Movement)",
+    "Project Dignity": "Proyecto Dignidad (Dignity Project)",
+}
+STATISTICS_NAMES = {"Idaho Law - Carta Sierra": "Carta Sierra"}
+STATISTICS_IDS = {"Aumua Amata Coleman Radewagen": "H4AS00036"}
+FINAL_ROUNDS = {("ME", 2)}
+RANKED_WINNERS = {("AK", 0): "Nick Begich"}
+OWNED = {("CA", "senate")}
 CANVASSES = {
     "2018-11-06:WI:house:4": (
         (
@@ -1128,6 +1177,7 @@ SEATS = {
     (2020, "GA"): 3,
     (2022, "CA"): 3,
     (2022, "OK"): 2,
+    (2024, "NE"): 2,
 }
 SYSTEMS = {
     "winner_take_all": ({"formula": "winner_take_all"}, "Winner take all"),
@@ -1199,6 +1249,21 @@ NOTES = {
     ),
     "2022-11-08:AK:senate": ("methodology", RANKED),
     "2022-11-08:AK:house:0": ("methodology", RANKED),
+    "2024-11-05:AK:house:0": (
+        "methodology",
+        (
+            "Alaska used ranked-choice voting for this race. The Clerk's statistics report first-choice votes only, "
+            "so later rounds are not shown here. Nick Begich led the first round and won the race."
+        ),
+    ),
+    "2024-11-05:ME:house:2": (
+        "methodology",
+        (
+            "Maine used ranked-choice voting for this race. The Clerk's statistics report only the second and final "
+            "round of the count, after write-in votes were set aside; first-choice votes are not shown here. The "
+            "Clerk lists 391,596 continuing ballots and 11,340 exhausted ballots in that round."
+        ),
+    ),
 }
 PRINTED_TOTAL = (
     "The FEC's book prints a total of {printed} votes, but the candidates' counts add up to {sum}. This page uses the "
@@ -1322,7 +1387,7 @@ def fetch() -> None:
         except LookupError:
             raw.fetch(SOURCE, DOCUMENTS + path, suffix="." + path.rsplit(".", 1)[1])
             time.sleep(1)
-    for url in (*MASTERS.values(), *CLERK.values(), *(url for url, *_ in CANVASSES.values())):
+    for url in (*MASTERS.values(), *CLERK.values(), STATISTICS, *(url for url, *_ in CANVASSES.values())):
         try:
             raw.cached(SOURCE, url)
         except LookupError:
@@ -1848,6 +1913,7 @@ def parse() -> None:
         )
     congress.write_parquet(PARSED / "congress.parquet")
     primary.write_parquet(PARSED / "primaries.parquet")
+    workbook_ids = set(congress["fec_id"].drop_nulls()) | set(primary["fec_id"].drop_nulls())
 
     schedule: list[tuple[int, str, str | None, date | None, date | None]] = []
     for year, place, *cells in calendars:
@@ -1901,6 +1967,7 @@ def parse() -> None:
         for number, reference in ((1, 2006), (2, 2002), (3, 2004))
     }
     books = {year: raw.cached(SOURCE, DOCUMENTS + path) for year, path in BOOKS.items()}
+    compendium = raw.cached(SOURCE, STATISTICS)
 
     def digitish(text: str) -> bool:
         core = text.strip('«»()"“”_~-—:;*')
@@ -2817,11 +2884,12 @@ def parse() -> None:
 
     def located(year: int, cell: Cell) -> tuple[int, list[float]]:
         if (year, cell.page) not in dimensions:
-            image = PAGES / f"{books[year].sha256}-{cell.page}.png"
+            pdf = books.get(year, compendium)
+            image = PAGES / f"{pdf.sha256}-{cell.page}.png"
             if not image.exists():
                 subprocess.run(
                     ["pdftoppm", "-r", "100", "-png", "-f", str(cell.page), "-l", str(cell.page), "-singlefile"]
-                    + [str(books[year].path), str(image.with_suffix(""))],
+                    + [str(pdf.path), str(image.with_suffix(""))],
                     check=True,
                 )
             width, height = struct.unpack(">II", image.read_bytes()[16:24])
@@ -4144,8 +4212,162 @@ def parse() -> None:
                 raise ValueError(f"{year} {where}: presidential total {whole} differs from {sum(amounts)}")
     if unmatched := {key for key in RENAMED if key[0] >= 1994} - renamed:
         raise ValueError(f"renamings never matched: {sorted(unmatched)}")
+    squeezed = {text.replace(" ", ""): code for text, code in named.items()}
+    clerk: list[dict[str, object]] = []
+    tallies: dict[tuple[str, str, int | None], int] = {}
+    state: str | None = None
+    office: str | None = None
+    term, district, last = (
+        "full",
+        None,
+        int(
+            re.findall(
+                r"Pages:\s+(\d+)",
+                subprocess.run(["pdfinfo", str(compendium.path)], capture_output=True, text=True, check=True).stdout,
+            )[0]
+        ),
+    )
+    for page in range(1, last + 1):
+        if page > last:
+            break
+        words = [
+            (text, box)
+            for text, box in scan.layer(compendium.path, page)
+            if not re.fullmatch(r"[.…]+", text) and (len(text) < 3 or box[3] - box[1] < box[2] - box[0])
+        ]
+        grouped: list[list[tuple[str, scan.Box]]] = []
+        for word in sorted(words, key=lambda word: (word[1][1] + word[1][3], word[1][0])):
+            if grouped and abs(word[1][1] + word[1][3] - grouped[-1][0][1][1] - grouped[-1][0][1][3]) < 24:
+                grouped[-1].append(word)
+            else:
+                grouped.append([word])
+        margin: int | None = None
+        for row in grouped:
+            row.sort(key=lambda word: word[1][0])
+            bare = re.sub(r"\s", "", " ".join(text for text, _ in row)).replace("—Continued", "")
+            if bare.replace("—CONTINUED", "") in squeezed:
+                if squeezed[bare.replace("—CONTINUED", "")] != state:
+                    state, office, term, district = squeezed[bare.replace("—CONTINUED", "")], None, "full", None
+                    if state == "VI":
+                        last = page
+                continue
+            if state is None:
+                continue
+            if bare.startswith(("RecapitulationofVotesCastin", "FOR")):
+                office = STATISTICS_OFFICES.get(bare.replace("—CONTINUED", ""))
+                district = 0 if office == "house" and state in ("AS", "DC", "GU", "MP", "PR", "VI") else district
+                continue
+            if office is None:
+                continue
+            if bare.startswith("(For"):
+                term = "unexpired" if bare.startswith("(Forunexpired") else "full"
+                continue
+            if bare == "ATLARGE":
+                district = 0
+                continue
+            text, box = row[-1]
+            label = " ".join(text for text, _ in row[:-1])
+            if (
+                box[2] < 2300
+                or not re.search(r"[A-Za-z]{2}", label)
+                or not re.fullmatch(r"\d{1,3}(,\d{3})*|\(1\)", text)
+            ):
+                if re.search(r"\d,\d", label + text):
+                    raise ValueError(f"Clerk 2024 page {page}: unread line {label} {text}")
+                continue
+            start = row[1 if re.fullmatch(r"\d+\.", row[0][0]) else 0][1][0]
+            if numbered := re.match(r"(\d+)\. (.*)", label):
+                district, label = int(numbered[1]), numbered[2]
+            votes = None if text == "(1)" else int(text.replace(",", ""))
+            contested = (state, office, district if office == "house" else None)
+            if label == "Total":
+                if votes != tallies.get(contested):
+                    raise ValueError(
+                        f"Clerk 2024 {contested}: the lines add up to {tallies.get(contested)}, not {votes}"
+                    )
+                continue
+            tallies[contested] = tallies.get(contested, 0) + (votes or 0)
+            if label in STATISTICS_UNCOUNTED or (state, office) in OWNED:
+                continue
+            segments = label.split(", ")
+            if label in STATISTICS_WRITE_INS:
+                name, segments = "Scattered", ["Write-in"]
+            elif label == NOTA:
+                name, segments = NOTA, []
+            elif margin is not None and start > margin + 20 or margin is None and len(segments) == 1:
+                name = str(clerk[-1]["name"])
+            else:
+                margin = start
+                split = next(
+                    index
+                    for index in range(1, len(segments) + 1)
+                    if index == len(segments) or segments[index].rstrip(".").lower() not in SUFFIXES
+                )
+                name, segments = ", ".join(segments[:split]), segments[split:]
+                name = STATISTICS_NAMES.get(name, name)
+            parties = [
+                "Write-In"
+                if party.startswith("Write-in")
+                else "Independent Party"
+                if (state, party) == ("CT", "Independent") and name == clerk[-1]["name"]
+                else STATISTICS_LABELS.get(party, party)
+                for party in segments
+            ]
+            final = (state, district) in FINAL_ROUNDS and office == "house"
+            figure, place = (votes, located(2024, Cell(page, box))) if votes is not None else (None, (None, None))
+            clerk.append(
+                {
+                    "year": 2024,
+                    "state": state,
+                    "chamber": office,
+                    "district": district if office == "house" else None,
+                    "term": term if office == "senate" else "full",
+                    "name": name,
+                    "parties": parties,
+                    "votes": None if final else figure,
+                    "unopposed": votes is None,
+                    "rcv2": figure if final else None,
+                    "flag": "W" if RANKED_WINNERS.get((state, district)) == name and office == "house" else None,
+                    "votes_page": None if final else place[0],
+                    "votes_box": None if final else place[1],
+                    "votes_flags": None if final or votes is None else DIGITIZED,
+                    "rcv2_page": place[0] if final else None,
+                    "rcv2_box": place[1] if final else None,
+                    "rcv2_flags": DIGITIZED if final else None,
+                    "total_flags": DERIVED,
+                    "is_incumbent": None,
+                }
+            )
+    layout = subprocess.run(
+        ["pdftotext", "-layout", str(compendium.path), "-"], capture_output=True, text=True, check=True
+    ).stdout
+    recapitulated: dict[tuple[str, str, int | None], int] = {}
+    state = None
+    for line in layout.splitlines():
+        if heading := re.match(r"RecapitulationofVotesCastin(.*?)(—Continued)?$", re.sub(r"\s", "", line)):
+            state = squeezed[heading[1].upper()]
+            continue
+        figures = [
+            figure for figure in re.findall(r"\d{1,3}(?:,\d{3})+|\b\d+\b", line) if "," in figure or int(figure) >= 100
+        ]
+        if state is None or not figures:
+            continue
+        if numeral := re.match(r"\s*(\d+)(?:st|d|th) district", line):
+            recapitulated[(state, "house", int(numeral[1]))] = int(figures[-1].replace(",", ""))
+        elif re.match(r"\s*At large", line):
+            recapitulated[(state, "house", 0)] = int(figures[-1].replace(",", ""))
+        elif re.match(r"\s*Senator", line):
+            recapitulated[(state, "senate", None)] = int(figures[-1].replace(",", ""))
+    for contested, printed_total in recapitulated.items():
+        if tallies.get(contested) != printed_total:
+            raise ValueError(
+                f"Clerk 2024 {contested}: the lines add up to {tallies.get(contested)}, not {printed_total}"
+            )
+    if [chamber for _, chamber, _ in tallies].count("house") != 441 or len(tallies) != 474:
+        raise ValueError(f"Clerk 2024: {len(tallies)} races read")
     registry: dict[tuple[int, str, str], list[tuple[str, int, int, str, str]]] = {}
     surnames: dict[str, list[set[str]]] = {}
+    roster: dict[tuple[str, str], list[tuple[str, int, set[str]]]] = {}
     for year, url in MASTERS.items():
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
             for record in archive.read("cn.txt").decode("latin-1").splitlines():
@@ -4154,7 +4376,11 @@ def parse() -> None:
                     surname, _, given_names = filed.partition(",")
                     family = [word for word in slug(surname).split("-") if word not in SUFFIXES]
                     surnames.setdefault(fec_id, []).append({*family, "".join(family)})
-                    registry.setdefault((year, place, office), []).append(
+                    if year >= 2024:
+                        roster.setdefault((place, office), []).append(
+                            (fec_id, int(numbered or 0), set(slug(re.sub(NICKNAME, " ", filed)).split("-")))
+                        )
+                    registry.setdefault((min(year, 2024), place, office), []).append(
                         (
                             fec_id,
                             int(numbered or 0),
@@ -4175,11 +4401,11 @@ def parse() -> None:
     }
     enrolled = 0
     repaired: list[tuple[str, str]] = []
-    for row in [*output, *book_primaries]:
+    for row in [*output, *book_primaries, *clerk]:
         if row["chamber"] == "president" or row["name"] in ("Scattered", NOTA, VACANCY):
             continue
         office = "S" if row["chamber"] == "senate" else "H"
-        if int(str(row["year"])) >= 1994:
+        if 1994 <= int(str(row["year"])) <= 2000:
             words = str(row["name"]).split(" ")
             known = {
                 (family, given)
@@ -4235,9 +4461,17 @@ def parse() -> None:
             reverse=True,
         ) or [(True, True, fec_id) for fec_id, _, current, same, exact in filings if current and same and exact]
         chosen_ids = {fec_id for current, same, fec_id in ranked if (current, same) == ranked[0][:2]}
-        row["fec_id"] = chosen_ids.pop() if len(chosen_ids) == 1 else None
+        if len(chosen_ids) > 1 and row["year"] == 2024:
+            chosen_ids = {min(chosen_ids & workbook_ids or chosen_ids)}
+        if not chosen_ids and row["year"] == 2024:
+            chosen_ids = {
+                fec_id
+                for fec_id, number, words in roster.get((str(row["state"]), office), [])
+                if number in numbers and spelled[-1] in words
+            }
+        row["fec_id"] = chosen_ids.pop() if len(chosen_ids) == 1 else STATISTICS_IDS.get(str(row["name"]))
         enrolled += row["fec_id"] is not None
-    print(f"{enrolled} of {len(output) + len(book_primaries)} book lines carry an FEC candidate ID")
+    print(f"{enrolled} of {len(output) + len(book_primaries) + len(clerk)} book lines carry an FEC candidate ID")
     print(f"{len(repaired)} misread surnames repaired: {sorted(set(repaired))}")
     pl.DataFrame(
         output,
@@ -4295,8 +4529,33 @@ def parse() -> None:
         },
     ).write_parquet(PARSED / "books_primaries.parquet")
     pl.DataFrame(
+        clerk,
+        schema={
+            "year": pl.Int64,
+            "state": pl.String,
+            "chamber": pl.String,
+            "district": pl.Int64,
+            "term": pl.String,
+            "fec_id": pl.String,
+            "name": pl.String,
+            "parties": pl.List(pl.String),
+            "votes": pl.Int64,
+            "unopposed": pl.Boolean,
+            "rcv2": pl.Int64,
+            "flag": pl.String,
+            "votes_page": pl.Int64,
+            "votes_box": pl.List(pl.Float64),
+            "votes_flags": pl.Int16,
+            "rcv2_page": pl.Int64,
+            "rcv2_box": pl.List(pl.Float64),
+            "rcv2_flags": pl.Int16,
+            "total_flags": pl.Int16,
+            "is_incumbent": pl.Boolean,
+        },
+    ).write_parquet(PARSED / "clerk.parquet")
+    pl.DataFrame(
         [
-            (year, page, f"pages/{SOURCE}/{books[year].sha256}-{page}.png", width, height)
+            (year, page, f"pages/{SOURCE}/{books.get(year, compendium).sha256}-{page}.png", width, height)
             for (year, page), (width, height) in sorted(dimensions.items())
         ],
         schema={"year": pl.Int64, "page": pl.Int64, "image": pl.String, "width": pl.Int64, "height": pl.Int64},
@@ -4326,7 +4585,11 @@ def emit() -> Path:
     pages = pl.read_parquet(PARSED / "pages.parquet")
     books = pl.read_parquet(PARSED / "books.parquet")
     congress = pl.concat(
-        [pl.read_parquet(PARSED / "congress.parquet"), books.filter(pl.col("chamber") != "president")],
+        [
+            pl.read_parquet(PARSED / "congress.parquet"),
+            books.filter(pl.col("chamber") != "president"),
+            pl.read_parquet(PARSED / "clerk.parquet"),
+        ],
         how="diagonal_relaxed",
     ).with_columns(
         key=pl.when(pl.col("fec_id").is_not_null())
@@ -4465,7 +4728,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Presidential results by state, 1984–2024, House and Senate general results, 1982–2022, and primaries, 1994–2022",
+            summary="Presidential results by state, 1984–2024, House and Senate general results, 1982–2024, and primaries, 1994–2022",
             polity="US",
         )
 
@@ -4556,7 +4819,10 @@ def emit() -> Path:
             name(systems[key], text)
         sources: dict[int, UUID] = {}
         artifacts: dict[int, UUID] = {}
-        for year, path in (*FILES.items(), *((year, BOOKS[year]) for year in sorted(set(pages["year"])))):
+        for year, path in (
+            *FILES.items(),
+            *((year, BOOKS[year]) for year in sorted(set(pages["year"]) & BOOKS.keys())),
+        ):
             title = (
                 "Official 2024 Presidential General Election Results"
                 if year == 2024
@@ -4590,6 +4856,17 @@ def emit() -> Path:
                 license="Public domain",
             )
             cs.artifact(raw.cached(SOURCE, url), clerk)
+        statistics = cs.source("Clerk of the House of Representatives", STATISTICS_TITLE)
+        cs.add(
+            "source",
+            id=statistics,
+            kind="official_body",
+            publisher="Clerk of the House of Representatives",
+            title=STATISTICS_TITLE,
+            url=STATISTICS,
+            license="Public domain",
+        )
+        printed = {**artifacts, 2024: cs.artifact(raw.cached(SOURCE, STATISTICS), statistics)}
         canvasses: dict[str, tuple[UUID, UUID, dict[str | None, tuple[int, list[float]]]]] = {}
         for contest_key, (url, title, number, columns) in CANVASSES.items():
             pdf = raw.cached(SOURCE, url)
@@ -4649,8 +4926,8 @@ def emit() -> Path:
         for year, number, image, width, height in pages.iter_rows():
             cs.add(
                 "source_page",
-                id=cs.page(artifacts[year], number),
-                artifact_id=artifacts[year],
+                id=cs.page(printed[year], number),
+                artifact_id=printed[year],
                 page_number=number,
                 image_key=image,
                 width=width,
@@ -5776,7 +6053,7 @@ def emit() -> Path:
                     stage="official" if annulled else "certified",
                     kind="tacit" if tacit else "counted",
                     status="annulled" if annulled else "superseded" if contest_key in canvasses else "active",
-                    source_id=sources[year],
+                    source_id=statistics if year == 2024 else sources[year],
                     is_default=contest_key not in canvasses,
                     completeness=None if tacit else 1,
                 )
@@ -5938,7 +6215,7 @@ def emit() -> Path:
                     first = rows.row(0, named=True)
                     column = counts[0][1]
                     values.append(
-                        (None, counts[0][0], int(rows[column].sum()))
+                        (None, counts[0][0], int(rows[column].sum()) if rows[column].is_not_null().any() else None)
                         + (
                             (first["total_flags"], first["total_page"], first["total_box"])
                             if column == "votes"
@@ -5968,7 +6245,7 @@ def emit() -> Path:
                                 channel=0,
                                 measure=1 if option else 4,
                                 count_round=count_round,
-                                page_id=cs.page(artifacts[year], page),
+                                page_id=cs.page(printed[year], page),
                                 source_id=None,
                                 x0=box[0],
                                 y0=box[1],
