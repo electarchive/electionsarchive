@@ -75,6 +75,14 @@
           first,
           second,
           rows,
+          sides: rows.every(
+            (row) =>
+              row.margins[0] == null ||
+              row.margins[2] == null ||
+              Math.abs(row.margins[0] - row.margins[2]) < 1e-6,
+          )
+            ? [1, 2]
+            : [0, 1, 2],
           top: Math.ceil(reach * 10) / 10,
           low: Math.min(...rows.map((row) => row.year)),
           high: Math.max(...rows.map((row) => row.year)),
@@ -185,7 +193,8 @@
       </p>
     </div>
     <div class="flex flex-wrap gap-x-5 gap-y-1 text-[0.8125rem]">
-      {#each names as name, side (side)}
+      {#each race.sides as side (side)}
+        {const name = $derived(names[side] ?? "")}
         <span class="inline-flex items-center gap-2">
           <svg
             class="block-2.5 inline-6"
@@ -296,7 +305,7 @@
             class="stroke-foreground/30"
           />
         {/if}
-        {#each [0, 1, 2] as side (side)}
+        {#each race.sides as side (side)}
           <polyline
             points={line(race, side)}
             fill="none"
@@ -344,7 +353,8 @@
             <th scope="col" class="py-1.5 pe-3 text-start font-semibold"
               >{m.versus_year()}</th
             >
-            {#each names as name, side (side)}
+            {#each race.sides as side (side)}
+              {const name = $derived(names[side] ?? "")}
               <th
                 scope="col"
                 class={cn("px-2 py-1.5 text-end font-semibold", {
@@ -377,7 +387,7 @@
                   >
                 {/if}
               </th>
-              {#each [0, 1, 2] as side (side)}
+              {#each race.sides as side (side)}
                 <td
                   class={cn("px-2 py-1.5 text-end font-mono text-[0.8125rem]", {
                     "max-sm:hidden": side === 0,
