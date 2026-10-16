@@ -19,6 +19,7 @@
   import Electors from "./electors.svelte";
   import Lists from "./lists.svelte";
   import PlaceMap from "./map.svelte";
+  import Members from "./members.svelte";
   import PlaceSwitcher from "./place-switcher.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
@@ -239,6 +240,19 @@
       forward,
       race: race === "" ? null : race,
     };
+  });
+  const change = $derived.by(() => {
+    if (span == null || contest.chamber == null) {
+      return null;
+    }
+    const moves = contest.rows.flatMap((row) => {
+      const before = span.forward ? row.current : row.earlier;
+      const after = span.forward ? row.earlier : row.current;
+      return before?.seats == null
+        ? []
+        : [[row.key, (after?.seats ?? 0) - before.seats] as const];
+    });
+    return moves.length === 0 ? null : Object.fromEntries(moves);
   });
   const lead = $derived.by(() => {
     const [top, next] = contest.rows
@@ -640,6 +654,7 @@
         place={contest.scope.name}
         link={contest.chamber.link}
         size={contest.chamber.size}
+        {change}
       />
     {/if}
     {#if keyed.length > 0}
@@ -954,12 +969,17 @@
       place={contest.scope.name}
       link={contest.chamber.link}
       size={contest.chamber.size}
+      {change}
     />
   {/if}
 {/if}
 
 {#if lists != null && !drilled}
   <Lists {lists} />
+{/if}
+
+{#if contest.chamber != null && contest.chamber.link == null && !drilled}
+  <Members parties={contest.chamber.parties} places={contest.chamber.places} />
 {/if}
 
 {#if contest.places != null}

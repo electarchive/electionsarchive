@@ -2373,7 +2373,12 @@ export const contests = {
         loading,
         chosen == null
           ? null
-          : load([chosen.id], [area.k], chosen.date ?? "infinity", []),
+          : load(
+              [chosen.id],
+              [area.k],
+              chosen.date ?? "infinity",
+              [chosen.id].filter(() => isRoot),
+            ),
         places(
           contest,
           area,

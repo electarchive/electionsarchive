@@ -559,5 +559,15 @@
   "scatter_movers_note": "Change in the margin between the top two from {from} to {to}, in points.",
   "scatter_toward": "Toward {name}",
   "scatter_change": "Margin shift",
-  "board_title": "{count} races"
+  "board_title": "{count} races",
+  "seats_coalition_hint": "Select parties to build a coalition.",
+  "seats_coalition_over": "seats, a majority with {spare} to spare",
+  "seats_coalition_under": "seats, {short} short of a majority",
+  "seats_coalition_clear": "Clear selection",
+  "seats_change_new": "New",
+  "members_title": "{count} members elected",
+  "members_filter": "Search by name or place",
+  "members_party": "Filter by party",
+  "members_none": "No members match the filter.",
+  "members_all": "Show all {count}"
 }

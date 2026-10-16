@@ -17,6 +17,7 @@
     link,
     size,
     isComplete = true,
+    change = null,
   }: {
     parties: Array<{
       key: string;
@@ -38,11 +39,13 @@
     link: { name: string; path: string | null } | null;
     size: number | null;
     isComplete?: boolean;
+    change?: Record<string, number> | null;
   } = $props();
 
   const uid = $props.id();
 
   let hovered = $state<string | null>(null);
+  let picked = $state<Array<string>>([]);
   let active = $state<number | null>(null);
   let pointer = "mouse";
   let pressed: number | null = null;
@@ -237,6 +240,15 @@
   const lead = $derived(
     tip == null ? hovered : (seats[active ?? -1]?.party ?? null),
   );
+  const coalition = $derived.by(() => {
+    let held = 0;
+    for (const party of parties) {
+      if (picked.includes(party.key)) {
+        held += party.seats;
+      }
+    }
+    return held;
+  });
 
   const track = (
     event: PointerEvent & { currentTarget: EventTarget & SVGSVGElement },
@@ -357,7 +369,11 @@
       {/if}
       {#each seats as seat (seat.index)}
         {const lit = $derived(
-          lead == null ? link == null || seat.local : lead === seat.party,
+          lead == null
+            ? picked.length > 0
+              ? picked.includes(seat.party)
+              : link == null || seat.local
+            : lead === seat.party,
         )}
         {const where = $derived(
           seat.member == null || places.length < 2
@@ -483,13 +499,54 @@
       >
     {/if}
   </p>
+  {#if whole && parties.length > 1}
+    <div class="grid gap-1.5" aria-live="polite">
+      <div class="flex items-baseline justify-between gap-3 text-[0.8125rem]">
+        <span class={cn({ "text-muted-foreground": picked.length === 0 })}>
+          {#if picked.length === 0}
+            {m.seats_coalition_hint()}
+          {:else if coalition >= majority}
+            <span class="font-semibold">{count(coalition)}</span>
+            {m.seats_coalition_over({ spare: count(coalition - majority) })}
+          {:else}
+            <span class="font-semibold">{count(coalition)}</span>
+            {m.seats_coalition_under({ short: count(majority - coalition) })}
+          {/if}
+        </span>
+        {#if picked.length > 0}
+          <button
+            type="button"
+            class="shrink-0 font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+            onclick={() => (picked = [])}>{m.seats_coalition_clear()}</button
+          >
+        {/if}
+      </div>
+      <span
+        class="relative flex overflow-hidden rounded-xs bg-muted block-2"
+        aria-hidden="true"
+      >
+        {#each ordered.filter( (party) => picked.includes(party.key) ) as party (party.key)}
+          <span
+            class="block block-full"
+            style:inline-size="{(party.seats / totals.all) * 100}%"
+            style:background-color={colors.get(party.key)}
+          ></span>
+        {/each}
+        <span
+          class="absolute inset-y-0 bg-foreground inline-0.5"
+          style:inset-inline-start="{(majority / totals.all) * 100}%"
+        ></span>
+      </span>
+    </div>
+  {/if}
   <ul class="grid gap-px text-sm/tight">
     {#each ordered as party (party.key)}
       <li
         class={cn(
-          "flex items-center gap-2 rounded-xs px-1.5 py-1",
+          "relative flex items-center gap-2 rounded-xs px-1.5 py-1",
           { "bg-secondary": lead === party.key },
           { "text-muted-foreground": link != null && party.here === 0 },
+          { "ring-1 ring-foreground ring-inset": picked.includes(party.key) },
         )}
         style:--party={colors.get(party.key)}
         onpointerenter={() => (hovered = party.key)}
@@ -500,10 +557,35 @@
             "opacity-35": link != null && party.here === 0,
           })}
         ></span>
-        <span class="flex-1 truncate font-semibold min-inline-0"
-          >{party.short ?? party.label}</span
-        >
+        {#if whole && parties.length > 1}
+          <button
+            type="button"
+            class="flex-1 truncate text-start font-semibold min-inline-0 after:absolute after:inset-0"
+            aria-pressed={picked.includes(party.key)}
+            onclick={() =>
+              (picked = picked.includes(party.key)
+                ? picked.filter((key) => key !== party.key)
+                : [...picked, party.key])}>{party.short ?? party.label}</button
+          >
+        {:else}
+          <span class="flex-1 truncate font-semibold min-inline-0"
+            >{party.short ?? party.label}</span
+          >
+        {/if}
         {#if link == null}
+          {#if change != null}
+            {const moved = $derived(change[party.key])}
+            <span
+              class={cn("text-end font-mono text-xs tabular-nums inline-10", {
+                "text-muted-foreground": moved == null || moved === 0,
+              })}
+              >{moved == null
+                ? m.seats_change_new()
+                : moved === 0
+                  ? "0"
+                  : `${moved > 0 ? "+" : "−"}${count(Math.abs(moved))}`}</span
+            >
+          {/if}
           <span class="font-mono text-[0.8125rem] font-semibold tabular-nums"
             >{count(party.seats)}</span
           >
