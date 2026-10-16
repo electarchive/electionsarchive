@@ -47,6 +47,40 @@ const paint = (party: SQL, elections: SQL, date: SQL) => sql`
   )
 `;
 
+const sisters = (roots: Array<string>, day: string) => sql`
+  with recursive tree(id) as (
+    select unnest(${sql.param(roots)}::uuid[])
+    union all
+    select c.id from contest c join tree on c.allocation_parent_id = tree.id
+  ),
+  lines as materialized (
+    select t.id as contest, o.id as option,
+      coalesce(bm.into_id, b.parent_party_id, pm.into_id, o.party_id) as party
+    from tree t
+    join contest_option o on o.contest_id = t.id and o.party_id is not null
+    left join entity_merge pm on pm.entity_id = o.party_id
+    left join party_affiliation b on b.party_id = coalesce(pm.into_id, o.party_id)
+      and b.kind = 'regional_branch' and b.valid @> ${day}::date
+    left join entity_merge bm on bm.entity_id = b.parent_party_id
+    where not exists (select from contest k where k.allocation_parent_id = t.id)
+  ),
+  reach as (
+    select l.party, array_agg(distinct l.contest) as contests, count(distinct l.contest) as n
+    from lines l
+    where exists (
+      select from lines w
+      join outcome x on x.option_id = w.option and x.kind in ('elected', 'won')
+      join result_set rs on rs.id = x.result_set_id and rs.is_default
+      where w.party = l.party
+    )
+    group by l.party
+  )
+  select 'party:' || a.party as from, 'party:' || b.party as to
+  from reach a join reach b on a.party < b.party
+  where a.n + b.n = (select count(distinct contest) from lines)
+    and not a.contests && b.contests
+`;
+
 const Link = v.object({ name: v.string(), path: v.nullable(v.string()) });
 
 const PartyRef = v.object({
@@ -1935,6 +1969,7 @@ export const contests = {
             ),
           }),
         ),
+        partners: v.array(v.array(v.string())),
         target: v.nullable(
           v.object({
             name: v.string(),
@@ -2236,6 +2271,7 @@ export const contests = {
         current: null,
         electors: null,
         chamber: null,
+        partners: [],
         target: null,
         comparison: { label: null, notes: [] },
         rows: [],
@@ -2580,7 +2616,7 @@ export const contests = {
         contest.date ?? "infinity",
         owned?.rows.map((row) => row.id) ?? [contest.id],
       );
-      const [now, before, grid, cast, seats] = await Promise.all([
+      const [now, before, grid, cast, seats, pairs] = await Promise.all([
         loading,
         chosen == null
           ? null
@@ -2605,6 +2641,11 @@ export const contests = {
           ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
           : null,
         chamber(contest, area, loading, lineage, isRoot),
+        isRoot
+          ? db.execute<{ from: string; to: string }>(
+              sisters([contest.root], contest.date ?? "infinity"),
+            )
+          : null,
       ]);
       const current = now.get(area.k);
       if (current == null) {
@@ -2759,6 +2800,7 @@ export const contests = {
                 },
               },
         chamber: seats,
+        partners: pairs?.rows.map((row) => [row.from, row.to]) ?? [],
         target,
         comparison: {
           label:
@@ -3802,39 +3844,7 @@ async function races(
                 )),
               };
             })(),
-        db.execute<{ from: string; to: string }>(sql`
-          with recursive tree(id) as (
-            select unnest(${sql.param(roots)}::uuid[])
-            union all
-            select c.id from contest c join tree on c.allocation_parent_id = tree.id
-          ),
-          lines as materialized (
-            select t.id as contest, o.id as option,
-              coalesce(bm.into_id, b.parent_party_id, pm.into_id, o.party_id) as party
-            from tree t
-            join contest_option o on o.contest_id = t.id and o.party_id is not null
-            left join entity_merge pm on pm.entity_id = o.party_id
-            left join party_affiliation b on b.party_id = coalesce(pm.into_id, o.party_id)
-              and b.kind = 'regional_branch' and b.valid @> ${day}::date
-            left join entity_merge bm on bm.entity_id = b.parent_party_id
-            where not exists (select from contest k where k.allocation_parent_id = t.id)
-          ),
-          reach as (
-            select l.party, array_agg(distinct l.contest) as contests, count(distinct l.contest) as n
-            from lines l
-            where exists (
-              select from lines w
-              join outcome x on x.option_id = w.option and x.kind in ('elected', 'won')
-              join result_set rs on rs.id = x.result_set_id and rs.is_default
-              where w.party = l.party
-            )
-            group by l.party
-          )
-          select 'party:' || a.party as from, 'party:' || b.party as to
-          from reach a join reach b on a.party < b.party
-          where a.n + b.n = (select count(distinct contest) from lines)
-            and not a.contests && b.contests
-        `),
+        db.execute<{ from: string; to: string }>(sisters(roots, day)),
       ]);
       const here = totals.get(place.k);
       const rows = (

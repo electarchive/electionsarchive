@@ -266,6 +266,95 @@
           margin: (top.current?.share ?? 0) - (next.current?.share ?? 0),
         };
   });
+  const verdict = $derived.by(() => {
+    if (contest.current == null || question) {
+      return null;
+    }
+    const named = (row: { label: string; short: string | null }) =>
+      row.label.length > 28 ? (row.short ?? row.label) : row.label;
+    const [elector, second] = contest.electors?.rows ?? [];
+    if (elector != null) {
+      let total = contest.electors?.appointed ?? 0;
+      if (contest.electors?.appointed == null) {
+        for (const row of contest.electors?.rows ?? []) {
+          total += row.votes;
+        }
+      }
+      const popular = contest.rows.find(
+        (row) =>
+          row.current?.person != null && row.current.person === elector.person,
+      );
+      return second?.votes === elector.votes
+        ? m.race_lede_electors_tied({
+            party: elector.label,
+            runner: second.label,
+            seats: count(elector.votes),
+            total: count(total),
+          })
+        : popular?.current == null
+          ? m.race_lede_electors_only({
+              party: elector.label,
+              seats: count(elector.votes),
+              total: count(total),
+            })
+          : m.race_lede_electors({
+              party: elector.label,
+              seats: count(elector.votes),
+              total: count(total),
+              share: percent(popular.current.share),
+            });
+    }
+    if (seated) {
+      let total = 0;
+      const blocs = new Map<
+        string,
+        { names: Array<string>; seats: number; share: number }
+      >();
+      for (const row of contest.rows) {
+        if (row.current == null) {
+          continue;
+        }
+        total += row.current.seats ?? 0;
+        const key =
+          contest.partners.find((pair) => pair.includes(row.key))?.[0] ??
+          row.key;
+        const bloc = blocs.get(key) ?? { names: [], seats: 0, share: 0 };
+        bloc.names.push(named(row));
+        bloc.seats += row.current.seats ?? 0;
+        bloc.share += row.current.share;
+        blocs.set(key, bloc);
+      }
+      const top = blocs
+        .values()
+        .toArray()
+        .toSorted((a, b) => b.seats - a.seats)[0];
+      return top == null
+        ? null
+        : (contest.kind === "office" || contest.kind === "elector_slate"
+            ? m.race_lede_electors
+            : m.race_lede_seats)({
+            party: top.names.join("/"),
+            seats: count(top.seats),
+            total: count(total),
+            share: percent(top.share),
+          });
+    }
+    const [top, next] = contest.rows
+      .filter((row) => row.current != null && !row.key.startsWith("kind:"))
+      .toSorted((a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0));
+    if (top?.current == null || next?.current == null) {
+      return null;
+    }
+    const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
+    return (isWon ? m.race_lede_won : m.race_lede_votes)({
+      party: named(top),
+      share: percent(top.current.share),
+      margin: count(
+        Math.round((top.current.share - next.current.share) * 1000) / 10,
+      ),
+      runner: named(next),
+    });
+  });
   const items = $derived.by(() => {
     const winners = new Map(
       contest.series.map((entry) => [entry.date, entry.winner]),
@@ -506,6 +595,13 @@
         >
       {/if}
     </p>
+    {#if verdict != null}
+      <p
+        class="mbs-1 font-serif text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
+      >
+        {verdict}
+      </p>
+    {/if}
   </div>
   {#if contest.series.length > 1}
     <Series series={contest.series} />
