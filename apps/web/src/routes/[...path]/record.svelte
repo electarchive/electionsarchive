@@ -248,7 +248,8 @@
     {#if current == null}
       <div class="min-inline-0" bind:clientWidth={width}>
         <svg
-          class="block overflow-visible"
+          class="block overflow-visible block-auto max-inline-full"
+          viewBox="0 0 {width} 60"
           {width}
           height="60"
           role="img"
@@ -302,7 +303,8 @@
     {:else}
       <div class="relative min-inline-0" bind:clientWidth={width}>
         <svg
-          class="block overflow-visible"
+          class="block overflow-visible block-auto max-inline-full"
+          viewBox="0 0 {width} {height}"
           {width}
           {height}
           role="img"

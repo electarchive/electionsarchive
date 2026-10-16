@@ -163,7 +163,8 @@
     </div>
     <div class="min-inline-0" bind:clientWidth={width}>
       <svg
-        class="block overflow-visible"
+        class="block overflow-visible block-auto max-inline-full"
+        viewBox="0 0 {width} {height}"
         {width}
         {height}
         role="img"

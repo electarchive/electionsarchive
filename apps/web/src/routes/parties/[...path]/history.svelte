@@ -233,7 +233,8 @@
     {/if}
     <div class="relative min-inline-0" bind:clientWidth={width}>
       <svg
-        class="block touch-pan-y overflow-visible"
+        class="block touch-pan-y overflow-visible block-auto max-inline-full"
+        viewBox="0 0 {width} {height}"
         {width}
         {height}
         role="img"
