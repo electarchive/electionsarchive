@@ -11,12 +11,14 @@ import polars as pl
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
+from ea.sources.tr.thea import FORMER_NAMES, MARAS_RENAMED, PARTIES
 from ea.sources.tr.ysk import (
     ANSWERS_2017,
     DERIVED,
     DIGITIZED,
     INVALID,
     LICENSE,
+    PROVINCES,
     PUBLISHER,
     REGISTERED,
     VALID,
@@ -26,7 +28,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.gazette"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 OCR = PARSED / "ocr"
@@ -341,6 +343,312 @@ NOTES = {
     ),
 }
 
+SENATE_1961 = """
+01 298138 252962 245066 128684 107131 9373 0 129
+02 103679 85183 81909 2255 29806 11082 38775 0
+03 218628 178355 166267 47459 43176 75978 0 0
+04 81545 69769 66467 5185 22747 27143 11392 0
+05 124211 108977 101241 56632 37264 6542 0 906
+06-1 226426 183281 178052 38386 64715 69057 5739 0
+06-2 123172 101437 97837 22450 30930 30083 14374 0
+06-3 243005 195327 190199 34477 85510 63172 6775 0
+07 193416 154916 146638 89908 51408 4278 0 1123
+08 91935 69557 65416 29132 30991 5293 0 0
+09 234007 199409 189662 128192 61446 0 0 0
+10 347790 295252 284116 169175 101842 10095 3892 0
+11 79753 70062 66997 34649 27494 4854 0 0
+12 52042 42148 40652 0 15776 3210 21666 0
+13 45840 37968 36149 0 13747 0 22397 0
+14 174741 144471 135964 32085 39232 24940 40115 0
+15 88218 71711 66892 23027 28937 0 14470 0
+16 365801 310996 296348 187613 87215 15238 5148 1626
+17 173744 145701 139548 44451 48545 13755 34555 0
+18 117525 94860 88221 12038 20512 55671 0 0
+19 214038 180791 168249 89042 51590 30851 0 0
+20 213016 170663 162974 95471 67431 0 0 0
+21 166461 126956 119503 24085 42452 4183 51086 0
+22 134063 115001 110004 29438 43537 9802 26229 998
+23 121303 89532 83976 35295 29036 21600 623 0
+24 101733 83519 79861 2612 35456 0 41793 0
+25 242181 193773 186843 13608 57025 33417 82287 0
+26 177632 152284 144765 55690 51270 35192 2794 0
+27 191794 163958 155811 48082 73344 2842 37550 0
+28 186354 144224 136762 4234 47958 33657 51530 7197
+29 116432 89626 86033 20623 32465 0 32945 0
+30 26376 21609 21299 742 7977 0 7684 4896
+31 186798 151492 143044 35531 53318 5469 51677 0
+32 113842 94250 89178 47081 30156 0 11279 517
+33 199824 169279 162804 90542 67486 4558 0 0
+34-1 457228 349100 339385 153370 127606 46394 12234 0
+34-2 285656 202380 197396 88857 77530 20700 8270 1875
+34-3 233560 174059 169954 67517 72617 22000 5097 2321
+35-1 230929 181510 175618 100007 66134 6827 2589 0
+35-2 132410 110955 107653 63047 40078 2905 1617 0
+35-3 183753 158426 154085 80243 69296 3097 1422 0
+36 222508 179949 171921 41483 87381 0 50473 0
+37 220286 178651 170836 15541 51783 41591 62264 0
+38 221579 182552 171821 80797 71881 15431 8159 0
+39 116321 99639 95192 14337 39088 7975 33742 0
+40 78598 65008 60918 8539 12997 39382 0 0
+41 140084 114629 109661 50113 42625 14895 2198 0
+42 448299 363486 345465 84664 121297 87783 52626 0
+43 188831 154390 146407 49675 39555 51748 0 4314
+44 175495 136096 131043 5230 89647 6119 30403 7
+45 325073 268923 259765 156330 84992 18269 0 0
+46 169792 130830 123451 68431 44210 7213 4294 18
+47 150006 119396 116437 0 51821 26214 39323 0
+48 153088 125673 119800 72732 50544 0 0 0
+49 66041 54773 51351 13904 14376 0 23071 0
+50 88653 75765 71679 23432 22607 24759 0 881
+51 146854 119353 108597 28868 32939 38030 10156 1729
+52 207331 162997 152511 36503 63271 10929 44938 0
+53 114354 91455 88775 47110 28548 12353 1179 0
+54 166675 139528 132175 49979 37238 15842 30114 0
+55 290415 252585 240796 143254 86778 10919 0 0
+56 94389 71610 69781 0 33009 0 36772 0
+57 121474 98834 91778 21628 36668 33482 0 0
+58 289962 238749 226340 11831 95467 20767 99740 0
+59 133035 112077 107723 7122 40352 7564 53155 213
+60 199946 173376 163894 26808 66132 7249 64899 0
+61 246601 178983 172337 90502 69281 11076 2015 0
+62 60256 46038 43877 0 13822 628 20909 8518
+63 167024 124113 118166 21840 53201 38 40915 0
+64 91036 73499 69947 13816 28799 25042 0 2290
+65 80998 66584 63305 5652 18556 14066 25082 0
+66 178245 151525 141834 17437 45108 61763 17206 0
+67 274589 232864 216109 122202 68126 26507 0 0
+"""
+WINNERS_1961 = """
+01 AP Sakıp Önal
+01 AP Mehmet Nuri Ademoğlu
+01 AP Mehmet Ünaldı
+01 AP Galip Afşar
+02 YTP Halil Ağar
+03 CKMP Celâl Tevfik Karasapan
+03 CKMP Rasim Hancıoğlu
+03 CKMP Mustafa Yılmaz İnceoğlu
+04 CKMP Veysi Yardımcı
+05 AP Macit Zeren
+06-1 CKMP Niyazi Ağırnaslı
+06-1 CKMP Rifat Etker
+06-1 CKMP Mansur Ulusoy
+06-2 CHP Sabit Kocabeyoğlu
+06-3 CHP Hıfzı Oğuz Bekata
+06-3 CHP Osman Alişiroğlu
+06-3 CHP İbrahim Saffet Omay
+07 AP Mustafa Özer
+07 AP Mehmet İlkuçan
+08 CHP Fehmi Alpaslan
+09 AP Osman Saim Sarıgöllü
+09 AP Fikret Turhangil
+09 AP İskender Cenap Ege
+10 AP Enver Aka
+10 AP Hasan Ali Türker
+10 AP Hamdi Oğuzbeyoğlu
+10 AP Kadri Öztaş
+11 AP Talât Oran
+12 YTP Sabri Topçuoğlu
+13 YTP Cevdet Geboloğlu
+14 YTP Sırrı Uzunhasanoğlu
+14 YTP Rahmi Arıkan
+15 CHP Hüseyin Otan
+16 AP Şeref Kayalar
+16 AP Cahit Ortaç
+16 AP İhsan Çağlıyangil
+16 AP Baki Güzey
+17 CHP Halit Sarıkaya
+17 CHP Ali Aksoy
+18 CKMP Hazım Dağlı
+19 AP Alâaddin Çetin
+19 AP Zeki Arısan
+20 AP Mehmet Emin Durul
+20 AP Cahit Akyar
+21 YTP Azmi Erdoğan
+21 YTP İhsan Hamit Tiğrel
+22 CHP Tahsin Banguoğlu
+23 AP Celâl Ertuğ
+23 AP Rasim Güray
+24 YTP Fehmi Baysoy
+25 YTP Nurettin Aynurksa
+25 YTP Rahmi Sanalan
+25 YTP Nihat Pasinli
+26 AP Naci Toros
+26 AP Gavsi Uçagök
+27 CHP Nizamettin Özgül
+27 CHP Zeki Islam
+28 YTP Mehmet İzmen
+28 YTP Sabahattin Orhon
+29 YTP Halit Zarbun
+30 CHP Adil Türkoğlu
+31 CHP Vehbi Aksoy
+31 YTP Sebahattin Adalı
+32 AP Suat Seren
+33 AP Talip Özdolay
+33 AP Cavit Okyayüz
+34-1 AP Ethem Menemencioğlu
+34-1 AP Fethi Başak
+34-1 AP Celil Cevherioğlu
+34-1 AP Şevket Akyürek
+34-1 AP Rifat Öztürkçine
+34-2 AP Sabahattin Tanman
+34-2 AP Özel Şahingiray
+34-2 AP Berç Turan
+34-3 CHP Şemsettin Günaltay
+34-3 CHP Nurullah Esat Sümer
+35-1 AP Nevzat Özdemirli
+35-1 AP İzzet Birand
+35-1 AP Enis Kansu
+35-2 AP Cahit Okurer
+35-3 AP Hilmi Onat
+35-3 AP Ömer Lütfi Bozcalı
+36 CHP Sırrı Atalay
+36 CHP Turgut Göle
+36 CHP Mehmet Hazer
+37 YTP Ahmet Nusret Tuna
+37 YTP Mehmet Çamlıca
+38 AP* Suat Hayri Ürgüplü
+38 AP Hüseyin Kalpaklıoğlu
+38 AP Hüsnü Dikeçligil
+39 CHP Ahmet Naci Arığ
+40 CKMP Ali Rıza Ulusman
+41 AP Lütfi Tokoğlu
+41 AP Rifat Özdeş
+42 CHP Ahmet Onar
+42 CHP Muammer Obuz
+42 CHP Muhittin Kılınç
+42 CHP Sedat Çumralı
+42 CHP Mustafa Dinekli
+43 CKMP Bahattin Özbek
+43 CKMP Osman Cevdet Erkut
+44 CHP Nüvit Yetkin
+44 CHP Mehmet Zeki Tülünay
+45 AP Emin Açar
+45 AP Orhan Süersan
+45 AP Ferit Alpiskender
+45 AP Refik Ulusoy
+46 AP Cenap Aksu
+46 AP Nedim Evliya
+47 CHP Abdulkerim Saracoğlu
+47 CHP Kemal Oral
+48 AP Haldun Menteşoğlu
+48 AP Muallâ Akarca
+49 YTP İhsan Akpolat
+50 CKMP İbrahim Şevki Atasağun
+51 CKMP İzzet Gener
+51 CKMP Kudret Bayhan
+52 CHP Zeki Kumrulu
+52 CHP Şevket Köksal
+52 CHP Eşref Ayhan
+53 AP Necip Danışoğlu
+54 AP Turhan Kapanlı
+54 AP Kâzım Yurdakul
+55 AP* Ali Fuat Başgil
+55 AP Cemalettin Bulak
+55 AP Fethi Tevetoğlu
+55 AP Cahit Tokgöz
+56 YTP Lâtif Aykut
+57 CHP Suphi Batur
+58 YTP Ziya Önder
+58 YTP Rifat Öçten
+58 YTP Hulûsi Söylemezoğlu
+58 YTP Ahmet Çekemoğlu
+59 YTP Selâmi Üren
+59 YTP Cemal Tarlan
+60 CHP Zihni Betil
+60 YTP Osman Hacıbaloğlu
+61 AP Yusuf Demirdağ
+61 AP Reşat Zaloğlu
+61 AP Şevket Buladoğlu
+62 YTP Mehmet Ali Demir
+63 CHP Vasfi Gerger
+63 CHP Esat Mahmut Karakurt
+64 CHP Mehmet Kâmil Tuğrul Coşkunoğlu
+65 YTP* Faruk Işık
+66 CKMP Neşet Çetintaş
+66 CKMP Sadık Artukmaç
+67 AP Tevfik İnci
+67 AP Tarık Remzi Baltan
+67 AP Akif İyidoğan
+"""
+INDEPENDENTS_1961 = """
+01 129 Celâl Tekiner
+05 906 Ömer Adil Dolay
+07 1123 Ferruh Niyazi Ayoğlu
+16 1626 Fehmi Albayrak
+22 998 Nafiz Ergeneli
+28 7197 Hüseyin Karakaya
+30 4896 Yahya Gürpınar
+32 517 Kemal Bölükbaşı
+34-2 1875 Seyfi Kipmen
+34-3 2289 Emin Erkul Seyitoğlu
+34-3 32 Hüsrev Gerede
+43 4314 Cemile Alayeli
+44 7 Mehmet Demiralp
+46 18 Sadi Seçmener
+50 881 Ahmet Doğan
+51 1043 Saadettin Ertür
+51 686 Mithat Özdoğan
+59 213 Ahmet Necati Özerbil
+62 4998 Abbas Altınkaş
+62 3520 Mehmet Soylu
+64 2290 Alâaddin Ergönenç
+"""
+PARTIES_1961 = {
+    "AP": "adalet-partisi-1961",
+    "CHP": "cumhuriyet-halk-partisi",
+    "CKMP": "cumhuriyetci-koylu-millet-partisi",
+    "YTP": "yeni-turkiye-partisi-1961",
+}
+SENATE_COLUMNS = (REGISTERED, VOTERS, VALID)
+SENATE = {
+    date(1961, 10, 15): (
+        10960,
+        "Karar no. 389: 15 Ekim 1961 Cumhuriyet Senatosu Üyeleri seçiminin kesin sonuçları",
+        (
+            "YSK decision 389 (November 8, 1961), published in Resmî Gazete 10960 on November 17, 1961, gives the "
+            "results of the October 15, 1961 Senate of the Republic election: the senators elected in each province "
+            "(table A), each independent candidate's votes (table B), and each province's voters, valid ballots, and "
+            "party votes (table C), with Ankara, İstanbul, and İzmir split into three districts each. The scan's text "
+            "layer misreads some counts, so every count was read from the page, checked against the printed totals, "
+            "and carries a page and bounding-box locator."
+        ),
+        PARTIES_1961,
+        SENATE_1961,
+        {5: 36, 6: 37},
+        (12926837, 10519659, 10032530, 3560675, 3734285, 1350892, 1401637, 39558),
+        WINNERS_1961,
+        {2: "01", 3: "25", 4: "47"},
+        INDEPENDENTS_1961,
+        4,
+        "senate_1961",
+    ),
+}
+SENATE_SYSTEMS = {
+    "senate_1961": (
+        {"formula": "block"},
+        "Senate of the Republic plurality, 1961",
+        (
+            "Each province, and each of the three districts of Ankara, İstanbul, and İzmir, elected its senators at "
+            "large by plurality from party lists, with independents standing on their own. Voters could strike names "
+            "from a list and write in candidates from other lists, so a district's seats could split between lists."
+        ),
+    ),
+}
+SENATE_CAVEATS = {
+    date(1961, 10, 15): (
+        "YSK gives each party list the votes of its best-placed candidate, since voters could strike names and add "
+        "candidates from other lists. The list figures can add up to more than the valid ballots, and in Hatay and "
+        "Tokat the seats split between two lists."
+    ),
+}
+SWAPPED = {(date(1961, 10, 15), "25"), (date(1961, 10, 15), "26")}
+SWAPPED_CAVEAT = (
+    "The decision's list of senators prints Erzurum's three winners as Justice Party (AP) members and "
+    "Eskişehir's two as New Turkey Party (YTP) members. Its vote table has the New Turkey Party far ahead in "
+    "Erzurum and the Justice Party ahead in Eskişehir, as in the same day's National Assembly vote, so the "
+    "archive follows the vote table and treats the two party labels as swapped."
+)
+
 
 def render(pdf: raw.Artifact, page: int) -> dict[str, object]:
     image = PAGES / f"{pdf.sha256}-{page}.png"
@@ -367,16 +675,15 @@ def render(pdf: raw.Artifact, page: int) -> dict[str, object]:
 
 
 def fetch() -> None:
-    for issue, *_ in REFERENDUMS.values():
+    for issue, *_ in [*REFERENDUMS.values(), *SENATE.values()]:
         raw.fetch(SOURCE, f"{ARCHIVE}/{issue}.pdf", suffix=".pdf")
 
 
 def parse() -> None:
     OCR.mkdir(parents=True, exist_ok=True)
     pages = []
-    values = []
+    tables = []
     for day, (issue, _, _, table, layout, totals, *_) in REFERENDUMS.items():
-        pdf = raw.cached(SOURCE, f"{ARCHIVE}/{issue}.pdf")
         rows = [
             (unit, [int(value.replace("-", "0")) for value in counts])
             for unit, *counts in (line.split() for line in table.strip().splitlines())
@@ -390,6 +697,92 @@ def parse() -> None:
             or [sum(column) for column in zip(*provinces, strict=True)] != list(totals)
         ):
             raise ValueError(f"{day}: the provinces do not sum to the printed totals")
+        tables.append((day, issue, layout, rows))
+    names = []
+    for day, (issue, _, _, parties, table, layout, totals, winners, starts, independents, page, _) in SENATE.items():
+        rows = [
+            (unit, [int(value) for value in counts])
+            for unit, *counts in (line.split() for line in table.strip().splitlines())
+        ]
+        for unit, (registered, voters, valid, *_) in rows:
+            if not valid <= voters <= registered:
+                raise ValueError(f"{day}: {unit} does not add up")
+        if [sum(column) for column in zip(*(counts for _, counts in rows), strict=True)] != list(totals):
+            raise ValueError(f"{day}: the Senate districts do not sum to the printed totals")
+        tables.append((day, issue, layout, rows))
+        pdf = raw.cached(SOURCE, f"{ARCHIVE}/{issue}.pdf")
+        listed = [line.split(maxsplit=2) for line in winners.strip().splitlines()]
+        stood = [line.split(maxsplit=2) for line in independents.strip().splitlines()]
+        independent_votes = {unit: counts[-1] for unit, counts in rows}
+        for unit, votes, _ in stood:
+            independent_votes[unit] -= int(votes)
+        if any(independent_votes.values()) or {party.rstrip("*") for _, party, _ in listed} - set(parties):
+            raise ValueError(f"{day}: the Senate candidates do not match the vote table")
+        on = {at: scan.layer(pdf.path, at) for at in {*starts, page}}
+        sizes = {}
+        for at in sorted(on):
+            rendered = render(pdf, at)
+            pages.append(rendered)
+            sizes[at] = (int(str(rendered["width"])) * 3, int(str(rendered["height"])) * 3)
+        current = min(starts)
+        for unit, party, name in listed:
+            current = max((at for at in starts if starts[at] <= unit), default=current)
+            names.append((day, unit, party.rstrip("*"), party.endswith("*"), name, None, current, None))
+        for index, (day_, unit, party, independent, name, votes, at, _) in enumerate(names):
+            matched = [
+                box
+                for text, box in on[at]
+                if day_ == day and slug(text) and any(slug(text) == slug(token) for token in name.split())
+            ]
+            lines: dict[int, list[scan.Box]] = {}
+            for box in matched:
+                lines.setdefault(next((y for y in lines if abs(y - box[1]) < 15), box[1]), []).append(box)
+            best = sorted(lines.values(), key=len, reverse=True)
+            if best and (len(best) == 1 or len(best[1]) < len(best[0])):
+                width, height = sizes[at]
+                names[index] = (
+                    day_,
+                    unit,
+                    party,
+                    independent,
+                    name,
+                    votes,
+                    at,
+                    [
+                        min(box[0] for box in best[0]) / width,
+                        min(box[1] for box in best[0]) / height,
+                        max(box[2] for box in best[0]) / width,
+                        max(box[3] for box in best[0]) / height,
+                    ],
+                )
+        level = min(box[1] for text, box in on[page] if slug(text) == "miktari")
+        cells = []
+        for unit, votes, name in stood:
+            spot = min(
+                (box for text, box in on[page] if re.sub(r"\D", "", text).startswith(votes) and box[1] > level + 10),
+                key=lambda box: (box[1] // 15, box[0]),
+            )
+            level = spot[1]
+            cells.append(spot)
+        if max(box[2] for box in cells) - min(box[2] for box in cells) > 120:
+            raise ValueError(f"{day}: the independents' votes are not in one column")
+        width, height = sizes[page]
+        for (unit, votes, name), box in zip(stood, cells, strict=True):
+            names.append(
+                (
+                    day,
+                    unit,
+                    None,
+                    True,
+                    name,
+                    int(votes),
+                    page,
+                    [box[0] / width, box[1] / height, box[2] / width, box[3] / height],
+                )
+            )
+    values = []
+    for day, issue, layout, rows in tables:
+        pdf = raw.cached(SOURCE, f"{ARCHIVE}/{issue}.pdf")
         start = 0
         for page, count in layout.items():
             rendered = render(pdf, page)
@@ -421,9 +814,10 @@ def parse() -> None:
                 for column, value in enumerate(counts)
                 if value and len(spots.get(value, [])) == 1
             }
+            columns = range(len(block[0][1]))
             across = {
                 column: median((box[0] + box[2]) / 2 for (_, at), box in single.items() if at == column)
-                for column in range(6)
+                for column in columns
             }
             found = {
                 cell: box for cell, box in single.items() if abs((box[0] + box[2]) / 2 - across[cell[1]]) < width * 0.04
@@ -450,13 +844,11 @@ def parse() -> None:
             known = sorted(levels)
             pitch = median((levels[b] - levels[a]) / (b - a) for a, b in itertools.pairwise(known))
             half = median((box[3] - box[1]) / 2 for box in found.values()) + 4
-            digits = 1 if issue == 17874 else 4 / 3
+            digits = 1 if issue in (17874, 10960) else 4 / 3
             glyph = median(
                 (box[2] - box[0]) / (len(str(block[at][1][column])) * digits) for (at, column), box in found.items()
             )
-            right = {
-                column: median(box[2] for (_, at), box in found.items() if at == column) + 4 for column in range(6)
-            }
+            right = {column: median(box[2] for (_, at), box in found.items() if at == column) + 4 for column in columns}
             for index, (unit, counts) in enumerate(block):
                 if index not in levels:
                     below = max((at for at in known if at < index), default=None)
@@ -496,20 +888,35 @@ def parse() -> None:
             "box": pl.List(pl.Float64),
         },
         orient="row",
-    ).write_parquet(PARSED / "referendums.parquet")
+    ).write_parquet(PARSED / "counts.parquet")
+    pl.DataFrame(
+        names,
+        schema={
+            "day": pl.Date,
+            "unit": pl.String,
+            "party": pl.String,
+            "independent": pl.Boolean,
+            "name": pl.String,
+            "votes": pl.Int64,
+            "page": pl.Int16,
+            "box": pl.List(pl.Float64),
+        },
+        orient="row",
+    ).write_parquet(PARSED / "names.parquet")
 
 
 def emit() -> Path:
     pages = pl.read_parquet(PARSED / "pages.parquet")
-    values = pl.read_parquet(PARSED / "referendums.parquet")
+    values = pl.read_parquet(PARSED / "counts.parquet")
+    people = pl.read_parquet(PARSED / "names.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "The 1961, 1982, 1987, and 1988 Turkish constitutional referendums, by province from 1982, from YSK "
-                "decisions in the Resmî Gazete"
+                "The 1961, 1982, 1987, and 1988 Turkish constitutional referendums, by province from 1982, and the "
+                "Senate of the Republic elections, from YSK decisions in the Resmî Gazete"
             ),
             polity="TR",
         )
@@ -532,7 +939,7 @@ def emit() -> Path:
         system = cs.key("tr.electoral_system", "referendum")
         units = {
             unit: cs.unit("tr.nation" if unit in ("domestic", "customs") else "tr.il", unit)
-            for unit in set(values["unit"])
+            for unit in set(values.filter(pl.col("day").is_in(list(REFERENDUMS)))["unit"])
         }
         if turkey in cs.minted or system in cs.minted or cs.minted & set(units.values()):
             raise ValueError("publish tr.ysk before tr.gazette")
@@ -618,6 +1025,234 @@ def emit() -> Path:
                 if (yes > no) == (position == 1):
                     cs.add("outcome", result_set_id=declared, option_id=option, kind="won")
 
+        cs.add(
+            "scheme",
+            code="tr.senato_cevresi",
+            polity_id=turkey,
+            kind="electoral_district",
+            rank=2,
+            noun="Senate district",
+        )
+        senate = cs.key("tr.body", "cumhuriyet-senatosu")
+        if senate in cs.minted:
+            cs.add("body", id=senate, polity_id=turkey, kind="upper_house")
+            name(senate, "Senate of the Republic", "en")
+            name(senate, "Cumhuriyet Senatosu", kind="native")
+        systems = {}
+        for code, (rules, label, methodology) in SENATE_SYSTEMS.items():
+            systems[code] = cs.key("tr.electoral_system", code)
+            if systems[code] in cs.minted:
+                cs.add("electoral_system", id=systems[code], polity_id=turkey, rules=rules, rules_version=1)
+                name(systems[code], label, "en")
+                cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
+        cells = []
+        for day, (issue, heading, notes, parties, *_, system) in SENATE.items():
+            url = f"{ARCHIVE}/{issue}.pdf"
+            source = cs.source(PUBLISHER, heading)
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=heading,
+                url=url,
+                license=LICENSE,
+                notes=notes,
+            )
+            artifact = cs.artifact(raw.cached(SOURCE, url), source)
+            for _, number, image, width, height in pages.filter(pl.col("url") == url).unique().sort("page").iter_rows():
+                page_ids[(day, number)] = cs.page(artifact, number)
+                cs.add(
+                    "source_page",
+                    id=page_ids[(day, number)],
+                    artifact_id=artifact,
+                    page_number=number,
+                    image_key=image,
+                    width=width,
+                    height=height,
+                )
+            vote = cs.key("tr.election", str(day))
+            general = vote not in cs.minted
+            path = f"tr/{day}-general/senate" if general else f"tr/{day}-senate"
+            if not general:
+                cs.add("election", id=vote, polity_id=turkey, kind="general", date_from=day, date_to=day, status="held")
+                name(vote, f"{day.year} Turkish Senate election", "en")
+                cs.add("slug", path=path, entity_id=vote)
+            party_ids = {}
+            for short, key in parties.items():
+                party_ids[short] = cs.key("tr.party", key)
+                if party_ids[short] in cs.minted:
+                    raise ValueError("publish tr.thea before tr.gazette")
+            labels = {
+                short: next(
+                    full
+                    for full, _, start, end in PARTIES[key]
+                    if (start is None or start <= day) and (end is None or day < end)
+                )
+                for short, key in parties.items()
+            }
+            counted = values.filter(pl.col("day") == day)
+            named = people.filter(pl.col("day") == day)
+            for unit in counted["unit"].unique(maintain_order=True):
+                plate, _, part = unit.partition("-")
+                place = (
+                    "Maraş"
+                    if plate == "46" and day < MARAS_RENAMED
+                    else FORMER_NAMES.get(int(plate), PROVINCES[int(plate) - 1])
+                )
+                label = f"{place} {'I' * int(part)}" if part else place
+                if part:
+                    district = cs.unit("tr.senato_cevresi", f"{day.year}:{unit}")
+                    if district in cs.minted:
+                        cs.add(
+                            "reporting_unit",
+                            id=district,
+                            polity_id=turkey,
+                            scheme_code="tr.senato_cevresi",
+                            code=f"{day.year}:{unit}",
+                            parent_id=cs.unit("tr.secim_cevresi", plate),
+                            area_relation="within",
+                            area_id=cs.area("tr.il", plate),
+                            kind="aggregate",
+                        )
+                        name(district, f"{place} {'I' * int(part)}. bölge")
+                else:
+                    district = cs.unit("tr.secim_cevresi", plate)
+                    if district in cs.minted:
+                        raise ValueError("publish tr.thea before tr.gazette")
+                elected = named.filter(pl.col("unit") == unit, pl.col("votes").is_null())
+                stood = named.filter(pl.col("unit") == unit, pl.col("votes").is_not_null())
+                contest_key = f"{day}:senate:{unit}"
+                contest = cs.key("tr.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=vote,
+                    kind="body_seats" if SENATE_SYSTEMS[system][0]["formula"] == "block" else "list_allocation",
+                    body_id=senate,
+                    district_area_id=cs.area("tr.il", plate),
+                    magnitude=elected.height,
+                    round_number=1,
+                    electoral_system_id=systems[system],
+                    default_result_kind="counted",
+                )
+                name(contest, f"Senate of the Republic, {label}", "en")
+                cs.add("slug", path=f"{path}/{slug(label)}", entity_id=contest)
+                declared = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=declared,
+                    election_id=vote,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=source,
+                    is_default=True,
+                    completeness=1,
+                )
+                if day in SENATE_CAVEATS:
+                    cs.add("note", entity_id=declared, kind="caveat", body_md=SENATE_CAVEATS[day])
+                if (day, unit) in SWAPPED:
+                    cs.add("note", entity_id=declared, kind="caveat", body_md=SWAPPED_CAVEAT)
+                fresh = declared in cs.minted
+                row = counted.filter(pl.col("unit") == unit)
+                lists = {}
+                for column, short in enumerate(parties, len(SENATE_COLUMNS)):
+                    seats = elected.filter(pl.col("party") == short).height
+                    if seats == 0 and row.filter(pl.col("column") == column).is_empty():
+                        continue
+                    lists[short] = cs.key("tr.option", f"{contest_key}:{slug(labels[short])}")
+                    cs.add(
+                        "contest_option",
+                        id=lists[short],
+                        contest_id=contest,
+                        kind="list",
+                        party_id=party_ids[short],
+                        ballot_label=labels[short],
+                    )
+                    if seats:
+                        cs.add("outcome", result_set_id=declared, option_id=lists[short], kind="won", seats=seats)
+                    for _, value, page, box in (
+                        row.filter(pl.col("column") == column).select("column", "value", "page", "box").iter_rows()
+                    ):
+                        cells.append(
+                            (declared, district, lists[short], VOTES, value, page_ids[(day, page)], box, fresh)
+                        )
+                for _, column, value, page, box in (
+                    row.filter(pl.col("column") < len(SENATE_COLUMNS))
+                    .select("unit", "column", "value", "page", "box")
+                    .iter_rows()
+                ):
+                    cells.append(
+                        (declared, district, None, SENATE_COLUMNS[column], value, page_ids[(day, page)], box, fresh)
+                    )
+                for index, (_, _, party, independent, person_name, votes, page, box) in enumerate(
+                    [*elected.iter_rows(), *stood.iter_rows()], 1
+                ):
+                    member = f"{day}:senate:{unit}:{index}"
+                    person = cs.key(f"{SOURCE}.person", member)
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, person_name)
+                    option = lists.get(party)
+                    if option is None:
+                        option = cs.key("tr.option", f"{contest_key}:{slug(person_name)}")
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind="candidate",
+                            party_id=None,
+                            ballot_label=person_name,
+                        )
+                        cells.append((declared, district, option, VOTES, votes, page_ids[(day, page)], box, fresh))
+                    candidacy = cs.key("tr.candidacy", member)
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=option,
+                        role="head" if party is None else "list_member",
+                        list_position=None,
+                        ballot_name=None,
+                        member_of_party_id=None,
+                        is_independent=independent,
+                    )
+                    if party is not None and not independent:
+                        cs.add(
+                            "candidacy_nomination", candidacy_id=candidacy, party_id=party_ids[party], kind="nominated"
+                        )
+                    if party is not None:
+                        cs.add(
+                            "outcome", result_set_id=declared, option_id=option, candidacy_id=candidacy, kind="elected"
+                        )
+                    cs.add(
+                        "citation",
+                        entity_id=candidacy,
+                        source_id=source,
+                        locator={"page_id": str(page_ids[(day, page)])}
+                        if box is None
+                        else {"page_id": str(page_ids[(day, page)]), "bbox": [round(value, 6) for value in box]},
+                    )
+        senate_cells = pl.DataFrame(
+            [
+                (str(result_set), str(unit), None if option is None else str(option), measure, value, str(page), box)
+                for result_set, unit, option, measure, value, page, box, fresh in cells
+                if fresh
+            ],
+            schema={
+                "result_set_id": pl.String,
+                "unit_id": pl.String,
+                "option_id": pl.String,
+                "measure": pl.Int16,
+                "value": pl.Int64,
+                "page_id": pl.String,
+                "box": pl.List(pl.Float64),
+            },
+            orient="row",
+        )
+
         located = values.filter(pl.col("day").is_in(list(result_sets))).with_columns(
             result_set_id=pl.col("day").replace_strict({day: str(id) for day, id in result_sets.items()}),
             unit_id=pl.col("unit").replace_strict({unit: str(id) for unit, id in units.items()}),
@@ -635,6 +1270,22 @@ def emit() -> Path:
                 ),
                 pl.Int16,
             ),
+        )
+        located = pl.concat(
+            [
+                located.select("result_set_id", "unit_id", "option_id", "measure", "flags", "value", "page_id", "box"),
+                senate_cells.select(
+                    "result_set_id",
+                    "unit_id",
+                    "option_id",
+                    "measure",
+                    flags=pl.lit(DIGITIZED, pl.Int16),
+                    value="value",
+                    page_id="page_id",
+                    box="box",
+                ),
+            ],
+            how="vertical_relaxed",
         )
         keys = {
             "result_set_id": "result_set_id",
