@@ -2641,11 +2641,9 @@ export const contests = {
           ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
           : null,
         chamber(contest, area, loading, lineage, isRoot),
-        isRoot
-          ? db.execute<{ from: string; to: string }>(
-              sisters([contest.root], contest.date ?? "infinity"),
-            )
-          : null,
+        db.execute<{ from: string; to: string }>(
+          sisters([contest.root], contest.date ?? "infinity"),
+        ),
       ]);
       const current = now.get(area.k);
       if (current == null) {
@@ -2800,7 +2798,7 @@ export const contests = {
                 },
               },
         chamber: seats,
-        partners: pairs?.rows.map((row) => [row.from, row.to]) ?? [],
+        partners: pairs.rows.map((row) => [row.from, row.to]),
         target,
         comparison: {
           label:

@@ -306,28 +306,26 @@
     }
     if (seated) {
       let total = 0;
-      const blocs = new Map<
-        string,
-        { names: Array<string>; seats: number; share: number }
-      >();
       for (const row of contest.rows) {
-        if (row.current == null) {
-          continue;
-        }
-        total += row.current.seats ?? 0;
-        const key =
-          contest.partners.find((pair) => pair.includes(row.key))?.[0] ??
-          row.key;
-        const bloc = blocs.get(key) ?? { names: [], seats: 0, share: 0 };
-        bloc.names.push(named(row));
-        bloc.seats += row.current.seats ?? 0;
-        bloc.share += row.current.share;
-        blocs.set(key, bloc);
+        total += row.current?.seats ?? 0;
       }
-      const top = blocs
+      const blocs = Map.groupBy(
+        contest.rows.filter((row) => row.current != null),
+        (row) =>
+          contest.partners.find((pair) => pair.includes(row.key))?.[0] ??
+          row.key,
+      )
         .values()
-        .toArray()
-        .toSorted((a, b) => b.seats - a.seats)[0];
+        .map((members) => {
+          let seats = 0;
+          let share = 0;
+          for (const row of members) {
+            seats += row.current?.seats ?? 0;
+            share += row.current?.share ?? 0;
+          }
+          return { names: members.map(named), seats, share };
+        });
+      const top = blocs.toArray().toSorted((a, b) => b.seats - a.seats)[0];
       return top == null
         ? null
         : (contest.kind === "office" || contest.kind === "elector_slate"
