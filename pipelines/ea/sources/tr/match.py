@@ -10,13 +10,23 @@ from ea.sources.tr import ysk
 from ea.store import connect
 
 SOURCE = "tr.match"
-VERSION = "3"
+VERSION = "4"
 PAIRS = (
     (ysk.ROUND_DAYS[1], ysk.DAY_2018, ()),
     (ysk.DAY_2015, ysk.DAY_2018, ("06",)),
     (ysk.DAY_JUNE_2015, ysk.DAY_2011, ()),
     (ysk.DAY_2015, ysk.DAY_2011, ()),
     (ysk.DAY_2011, ysk.DAY_2007, ()),
+)
+LISTED = (
+    *PAIRS,
+    (ysk.DAY_2015, ysk.DAY_JUNE_2015, ()),
+    (ysk.DAY_2007, ysk.DAY_2002, ()),
+    (ysk.DAY_2002, ysk.DAY_1999, ()),
+    (ysk.DAY_1999, ysk.DAY_1995, ()),
+    (ysk.DAY_1995, ysk.DAY_1991, ()),
+    (ysk.DAY_1991, ysk.DAY_1987, ()),
+    (ysk.DAY_1987, ysk.DAY_1983, ()),
 )
 
 
@@ -42,7 +52,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Members of the Grand National Assembly matched across consecutive elections by printed name and "
-                "electoral district"
+                "electoral district, and list candidates by printed name, electoral district, and party"
             ),
             polity="TR",
             kind="match",
@@ -84,6 +94,35 @@ def emit() -> Path:
             for place, person in members[later].items():
                 other = members[earlier].get(place)
                 if other is None or place[0].startswith(skipped) or root(person) == root(other):
+                    continue
+                parent[root(person)] = root(other)
+                matched[(later, earlier)] += 1
+
+        listed: dict[date, Counter[tuple[object, ...]]] = {}
+        keyed: dict[date, dict[tuple[object, ...], UUID]] = {}
+        for day, code, party, person, label, won in conn.execute(
+            """select split_part(x.value, ':', 1)::date, split_part(x.value, ':', 3), o.party_id, y.person_id, n.text,
+                      exists (select from outcome w where w.candidacy_id = y.id and w.kind = 'elected')
+               from candidacy y
+               join contest_option o on o.id = y.option_id
+               join external_id x on x.entity_id = o.contest_id and x.scheme = 'tr.contest'
+               join name n on n.entity_id = y.person_id and n.is_preferred
+               where x.value ~ ':parliament:.'"""
+        ).fetchall():
+            printed = " ".join(ysk.upper(label).split())
+            for key in ([(code, printed)] if won else []) + ([(code, printed, party)] if party is not None else []):
+                listed.setdefault(day, Counter())[key] += 1
+                keyed.setdefault(day, {})[key] = person
+        for later, earlier, skipped in LISTED:
+            for key, person in keyed[later].items():
+                other = keyed[earlier].get(key)
+                if (
+                    other is None
+                    or str(key[0]).startswith(skipped)
+                    or listed[later][key] > 1
+                    or listed[earlier][key] > 1
+                    or root(person) == root(other)
+                ):
                     continue
                 parent[root(person)] = root(other)
                 matched[(later, earlier)] += 1
