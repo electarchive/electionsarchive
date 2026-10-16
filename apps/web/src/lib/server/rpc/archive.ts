@@ -2260,13 +2260,13 @@ export const contests = {
       const owned = isRoot
         ? null
         : await db.execute<{ id: string }>(sql`
-            with recursive grp(id) as (
-              select ${contest.id}::uuid
-              union all
-              select c.id from contest c join grp on c.allocation_parent_id = grp.id
-            )
-            select c.id from contest c join grp on grp.id = c.id where c.district_area_id = ${area.id}::uuid
-          `);
+          with recursive grp(id) as (
+            select ${contest.id}::uuid
+            union all
+            select c.id from contest c join grp on c.allocation_parent_id = grp.id
+          )
+          select c.id from contest c join grp on grp.id = c.id where c.district_area_id = ${area.id}::uuid
+        `);
       const loading = load(
         [contest.root],
         [area.k],
@@ -2996,23 +2996,23 @@ async function races(election: string, polity: string, date: string | null) {
       const place = single?.place ?? nation;
       const districts = group.filter((row) => row.k != null);
       const first = districts[0];
-      const counted = group.flatMap((row) =>
-        row.isCounted ? [row.id, ...row.runoffs] : [],
-      );
-      if (head != null && !head.isRunoff) {
-        for (const row of found.rows) {
-          if (
-            row.isRunoff &&
-            row.isCounted &&
-            row.owner === head.owner &&
-            row.kind === head.kind &&
-            row.party === head.party &&
-            !found.rows.some((other) => other.id === row.previous)
-          ) {
-            counted.push(row.id);
-          }
-        }
-      }
+      const counted = [
+        ...group.flatMap((row) =>
+          row.isCounted ? [row.id, ...row.runoffs] : [],
+        ),
+        ...found.rows
+          .filter(
+            (row) =>
+              head?.isRunoff === false &&
+              row.isRunoff &&
+              row.isCounted &&
+              row.owner === head.owner &&
+              row.kind === head.kind &&
+              row.party === head.party &&
+              found.rows.every((other) => other.id !== row.previous),
+          )
+          .map((row) => row.id),
+      ];
       const [totals, grid, table] = await Promise.all([
         load(roots, [place.k], day, counted.length > 0 ? counted : roots),
         single == null
