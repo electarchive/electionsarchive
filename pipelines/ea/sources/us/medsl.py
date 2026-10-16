@@ -342,21 +342,21 @@ def parse() -> None:
             (pl.col("mode") == "TOTAL").any().over([*precinct, "district", "candidate"]).not_()
             | (pl.col("mode") == "TOTAL")
         )
-        .group_by(
-            "year",
-            "chamber",
-            "day",
-            "special",
-            "state",
-            "district",
-            "kind",
-            "code",
-            "candidate",
-            "measure",
-            maintain_order=True,
-        )
-        .agg(pl.col("writein").any(), pl.col("votes").sum())
     )
+    frame.filter(pl.col("year") == 2022).write_parquet(PARSED / "precincts.parquet")
+    frame = frame.group_by(
+        "year",
+        "chamber",
+        "day",
+        "special",
+        "state",
+        "district",
+        "kind",
+        "code",
+        "candidate",
+        "measure",
+        maintain_order=True,
+    ).agg(pl.col("writein").any(), pl.col("votes").sum())
     print(frame.filter(pl.col("kind") == "aggregate").group_by("code").agg(pl.col("votes").sum()).sort("code"))
     if frame["code"].null_count():
         raise ValueError(f"{frame['code'].null_count()} rows have no unit")
@@ -780,6 +780,8 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
                 if code not in counties:
                     raise ValueError(f"{key}: no county {code}")
                 members[code] = str(counties[code][0])
+            elif kind == "precinct":
+                members[code] = str(cs.unit("us.precinct", code))
             else:
                 members[code] = str(cs.unit("us.ak_house_district" if kind == "district" else "us.aggregate", code))
         values.append(
