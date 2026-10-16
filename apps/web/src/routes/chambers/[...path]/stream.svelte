@@ -183,7 +183,7 @@
         }
         d += "Z";
       }
-      return { party, d };
+      return { party, d: d.replaceAll(/(\.\d)\d+/g, "$1") };
     }),
   );
   const majority = $derived.by(() => {
