@@ -194,6 +194,8 @@
     }
   ],
   "election_contests": "Contests",
+  "election_unplaced": "Other contests",
+  "election_unplaced_detail": "These contests, such as university seats, have no geographic area and are excluded from the table and map.",
   "election_parts": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],

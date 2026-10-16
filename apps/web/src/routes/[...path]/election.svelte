@@ -79,6 +79,27 @@
       : null,
   );
 
+  const unplaced = $derived.by(() => {
+    const placed = new Set(
+      election.races.flatMap(
+        (race) => race.places?.rows.flatMap((row) => row.path ?? []) ?? [],
+      ),
+    );
+    if (placed.size === 0) {
+      return [];
+    }
+    for (const race of election.races) {
+      if (race.path != null) {
+        placed.add(race.path);
+      }
+    }
+    return election.contests.flatMap((contest) =>
+      contest.path == null || placed.has(contest.path)
+        ? []
+        : [{ name: contest.name, path: contest.path }],
+    );
+  });
+
   const governments = createQuery(() =>
     orpc.elections.governments.queryOptions({ input: { id } }),
   );
@@ -813,6 +834,24 @@
     />
   {/if}
 {/each}
+
+{#if unplaced.length > 0}
+  <section class="col-span-12 bg-card px-3.5 py-3">
+    <h2 class="text-[0.8125rem] font-bold">{m.election_unplaced()}</h2>
+    <p class="mbe-1.5 text-[0.8125rem] text-muted-foreground">
+      {m.election_unplaced_detail()}
+    </p>
+    <ul class="grid text-sm">
+      {#each unplaced as contest, index (index)}
+        <li class="border-be border-border/60 py-1.5 last:border-be-0">
+          <Preview class="font-semibold hover:highlighter" path={contest.path}
+            >{contest.name}</Preview
+          >
+        </li>
+      {/each}
+    </ul>
+  </section>
+{/if}
 
 {#if stages.length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
