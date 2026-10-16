@@ -1,3 +1,5 @@
+import re
+import unicodedata
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -34,6 +36,24 @@ COUNTRIES = {
     "Northern Ireland": "NIR",
 }
 NOT_PARTIES = ("Independent", "Speaker")
+SHAPED = date(2010, 5, 6)
+RENAMED = {
+    "Central Newcastle upon Tyne": "Newcastle upon Tyne Central",
+    "Central Stoke-on-Trent": "Stoke-on-Trent Central",
+    "East Kingston upon Hull": "Kingston upon Hull East",
+    "East Newcastle upon Tyne and Wallsend": "Newcastle upon Tyne East and Wallsend",
+    "North East Wolverhampton": "Wolverhampton North East",
+    "North Kingston upon Hull": "Kingston upon Hull North",
+    "North Newcastle upon Tyne": "Newcastle upon Tyne North",
+    "North Stoke-on-Trent": "Stoke-on-Trent North",
+    "Regent's Park and Kensington North": "Regent's Park and North Kensington",
+    "South East Wolverhampton": "Wolverhampton South East",
+    "South Middlesbrough and East Cleveland": "Middlesbrough South and East Cleveland",
+    "South Stoke-on-Trent": "Stoke-on-Trent South",
+    "South West Milton Keynes": "Milton Keynes South West",
+    "South West Wolverhampton": "Wolverhampton South West",
+    "West Kingston upon Hull and Hessle": "Kingston upon Hull West and Hessle",
+}
 EXISTING = {
     "conservative": ("wikidata", "Q9626"),
     "labour": ("wikidata", "Q9630"),
@@ -178,6 +198,11 @@ UNOPPOSED_CAVEAT = (
     "shown as elected."
 )
 STV = "Single transferable vote (university seats, 1918–1945)"
+
+
+def fold(text: str) -> str:
+    plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().lower().replace("&", "and")
+    return re.sub(r"[^a-z0-9]+", " ", plain).strip()
 
 
 def fetch() -> None:
@@ -349,6 +374,19 @@ def emit() -> Path:
                 cs.add("area_code", area_id=countries[code], code=code, valid_from=PARTITION)
                 cs.add("area_parent", area_id=countries[code], parent_id=nation, valid_from=PARTITION)
 
+        districts = {
+            (fold(text), country, start): area
+            for text, country, start, area in conn.execute(
+                """select n.text, p.code, lower(c.valid), a.id from area a
+                   join area_code c on c.area_id = a.id
+                   join name n on n.entity_id = a.id and n.is_preferred
+                   join area_parent ap on ap.area_id = a.id and ap.valid && c.valid
+                   join area_code p on p.area_id = ap.parent_id
+                   where a.scheme_code = 'gb.pcon' and lower(c.valid) is not null"""
+            ).fetchall()
+        }
+        shaped = sorted({start for _, _, start in districts})
+
         commons = cs.key("gb.body", "house-of-commons")
         systems = {system: cs.key("gb.electoral_system", system) for system in ("fptp", "block", "limited", "stv")}
         if commons in cs.minted or systems["fptp"] in cs.minted:
@@ -434,12 +472,22 @@ def emit() -> Path:
                     else "block"
                 )
                 tacit = status in ("tacit", "unopposed")
+                since = max((day for day in shaped if day <= start), default=None)
+                constituency = first["constituency"]
+                district = (
+                    None
+                    if since is None
+                    else districts.get((fold(RENAMED.get(constituency, constituency)), first["country"], since))
+                )
+                if since is not None and district is None and not (first["country"] == "NIR" and start < SHAPED):
+                    raise ValueError(f"{start}: no boundary for {constituency}")
                 cs.add(
                     "contest",
                     id=contest,
                     election_id=election,
                     kind="body_seats",
                     body_id=commons,
+                    district_area_id=district,
                     magnitude=seats,
                     round_number=1,
                     electoral_system_id=systems[system],
