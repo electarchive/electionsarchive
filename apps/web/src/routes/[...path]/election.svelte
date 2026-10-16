@@ -468,7 +468,17 @@
       {m.board_title({ count: races.length })}
     </h2>
     <ol
-      class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-px overflow-hidden rounded-sm bg-border ring-1 ring-border"
+      class={cn(
+        "grid gap-px overflow-hidden rounded-sm bg-border ring-1 ring-border",
+        {
+          "sm:grid-cols-2": races.length >= 2 && races.length <= 4,
+          "sm:*:last:col-span-2 lg:grid-cols-3 lg:*:last:col-span-1":
+            races.length === 3,
+          "lg:grid-cols-4": races.length === 4,
+          "grid-cols-[repeat(auto-fill,minmax(min(100%,17rem),1fr))]":
+            races.length > 4,
+        },
+      )}
     >
       {#each races as race, index (index)}
         <li class="grid">
