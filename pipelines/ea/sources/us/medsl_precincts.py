@@ -9,13 +9,14 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_precincts"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 METHOD = (
     "Precinct returns as compiled by the MIT Election Data and Science Lab from the states' and counties' official "
     "results. Absentee, early, and provisional ballots that a county reported only countywide stay in their own "
-    "countywide rows, so those votes are not spread among the precincts. The archive has no precinct shapes for "
-    "2022, so each precinct is placed within its county."
+    "countywide rows, so those votes are not spread among the precincts. Precincts take their shape from the "
+    "state's or county's official 2022 precinct file where one matches the precinct's county and code or name; "
+    "the others are placed within their county."
 )
 
 
@@ -78,6 +79,13 @@ def emit() -> Path:
                 "select code, id, area_id from reporting_unit where scheme_code in ('us.county', 'us.place')"
             ).fetchall()
         }
+        shaped: dict[str, str] = {
+            code: str(area)
+            for code, area in conn.execute(
+                """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
+                   where a.scheme_code = 'us.precinct' and c.code like '2022:%%'"""
+            ).fetchall()
+        }
         missing = set(units["county"]) - set(counties)
         if missing:
             raise ValueError(f"no county units for {sorted(missing)}")
@@ -91,8 +99,13 @@ def emit() -> Path:
                 scheme_code=pl.lit("us.precinct"),
                 code="code",
                 parent_id=pl.col("county").replace_strict({code: str(unit) for code, (unit, _) in counties.items()}),
-                area_relation=pl.lit("within"),
-                area_id=pl.col("county").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
+                area_relation=pl.when(pl.col("code").is_in(list(shaped)))
+                .then(pl.lit("equals"))
+                .otherwise(pl.lit("within")),
+                area_id=pl.col("code").replace_strict(
+                    shaped,
+                    default=pl.col("county").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
+                ),
                 kind=pl.lit("standard"),
                 valid_from="day",
                 valid_to=pl.col("day") + timedelta(days=1),
@@ -117,6 +130,21 @@ def emit() -> Path:
             ),
             sources,
         )
-        for result_set in list(cs.rows.get("result_set", [])):
-            cs.add("note", entity_id=result_set["id"], kind="methodology", body_md=METHOD)
+        notes = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'methodology'""",
+                [SOURCE],
+            ).fetchall()
+        )
+        for result_set in {*notes, *(row["id"] for row in cs.rows.get("result_set", []))}:
+            cs.add(
+                "note",
+                id=notes.get(result_set),
+                entity_id=result_set,
+                kind="methodology",
+                body_md=METHOD,
+                valid_from_precision="day",
+                valid_to_precision="day",
+            )
         return cs.write()
