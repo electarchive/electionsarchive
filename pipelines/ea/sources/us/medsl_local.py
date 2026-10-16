@@ -23,6 +23,33 @@ LISTING2020 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persist
 ACCESS = "https://dataverse.harvard.edu/api/access/datafile"
 LOCAL2016 = f"{ACCESS}/3345356?format=original"
 LOCAL2018 = f"{ACCESS}/6692669"
+OPENELECTIONS = (
+    "https://raw.githubusercontent.com/openelections/openelections-data-{state}/{commit}/{day:%Y}/"
+    "{day:%Y%m%d}__{state}__general__precinct.csv"
+)
+OPENELECTIONS_FILES = {
+    ("IN", date(2020, 11, 3)): "b130b78cd7b55e57e766623772424f60c0e640bd",
+    ("MN", date(2020, 11, 3)): "589a76681b2b1a8c23162a90fcc225eb066e23f5",
+    ("NV", date(2020, 11, 3)): "109e5c7d6be95f15c6bad5194b415ebcdf75d7fc",
+    ("TX", date(2020, 11, 3)): "c7185327aa987ecc23fefdde0ee53f5238f5da70",
+    ("WV", date(2020, 11, 3)): "49d32c279d0e02d740c8af4fcb5b5eee380fbed4",
+    ("FL", date(2022, 11, 8)): "cc8116224e23e9342658eda5d9b0b76cbf3c2912",
+    ("MN", date(2022, 11, 8)): "589a76681b2b1a8c23162a90fcc225eb066e23f5",
+    ("NV", date(2022, 11, 8)): "109e5c7d6be95f15c6bad5194b415ebcdf75d7fc",
+    ("SD", date(2022, 11, 8)): "9e01b9aea628e9ae17ada6656b649daf319fd212",
+    ("TX", date(2022, 11, 8)): "c7185327aa987ecc23fefdde0ee53f5238f5da70",
+    ("UT", date(2022, 11, 8)): "a023ab4d87c4a93f0913f505c6fcbad1a585db57",
+    ("WV", date(2022, 11, 8)): "49d32c279d0e02d740c8af4fcb5b5eee380fbed4",
+}
+OPENELECTIONS_PARTIES = {
+    "DEM": "DEMOCRAT",
+    "REP": "REPUBLICAN",
+    "LIB": "LIBERTARIAN",
+    "GRN": "GREEN",
+    "GRE": "GREEN",
+    "IND": "INDEPENDENT",
+    "CON": "CONSTITUTION",
+}
 DATASETS = {
     date(2024, 11, 5): ("Precinct-Level Returns 2024 by Individual State", "https://doi.org/10.7910/DVN/NYTPDU"),
     date(2022, 11, 8): ("Precinct-Level Returns 2022 by Individual State", "https://doi.org/10.7910/DVN/UYQIEP"),
@@ -209,6 +236,11 @@ METHOD = (
     "Totals are the sums of the precinct rows in MEDSL's 2024 precinct file for the state. The file does not mark "
     "winners, so the winners shown are the candidates with the most votes, as many as the contest elects."
 )
+CONTRIBUTED = (
+    "Totals are the sums of the precinct rows in OpenElections' precinct file for the state, which its volunteers "
+    "transcribed from county results. The file does not mark winners, so the winners shown are the candidates with "
+    "the most votes, as many as the contest elects."
+)
 MASKED = (
     "Some precincts in the source file hide small vote counts to protect voter privacy; "
     "these totals run slightly below the certified results."
@@ -301,6 +333,8 @@ def fetch() -> None:
         for state, url in _files(listing, local).items():
             raw.fetch(SOURCE, url, suffix=".zip" if state.endswith(".zip") else ".csv")
     raw.fetch(SOURCE, LOCAL2016, suffix=".csv")
+    for (state, day), commit in OPENELECTIONS_FILES.items():
+        raw.fetch(SOURCE, OPENELECTIONS.format(state=state.lower(), commit=commit, day=day), suffix=".csv")
     for fips in TOWNS.values():
         raw.fetch(SOURCE, SUBDIVISIONS.format(fips), suffix=".zip")
         raw.fetch(SOURCE, INCORPORATED.format(fips), suffix=".zip")
@@ -492,6 +526,18 @@ def parse() -> None:
             places.setdefault(code[:2], {})[
                 re.sub(r"[^A-Z]", "", re.sub(r"^(?:CITY|TOWN|VILLAGE) OF ", "", text.upper())).removesuffix("CITY")
             ] = (code, text)
+        counties = {
+            (
+                code[:2],
+                re.sub(r"[^A-Z]", "", re.sub(r" (?:COUNTY|PARISH)$", "", text.upper()).replace("SAINT", "ST")),
+            ): code
+            for code, text in conn.execute(
+                """select c.code, n.text from area a join area_code c on c.area_id = a.id
+                   join polity_territory t on t.area_id = a.id
+                   join name n on n.entity_id = t.polity_id and n.is_preferred and n.lang = 'en'
+                   where a.scheme_code = 'us.county'"""
+            ).fetchall()
+        }
         existing = {
             code
             for (code,) in conn.execute(
@@ -642,11 +688,82 @@ def parse() -> None:
             for state in sorted(scan.select("state_po").unique().collect()["state_po"])
         ),
     ]
-    for state, scan in inputs:
+    openelections = [
+        (
+            state,
+            pl.scan_csv(
+                raw.cached(SOURCE, OPENELECTIONS.format(state=state.lower(), commit=commit, day=day)).path,
+                infer_schema=False,
+                encoding="utf8-lossy",
+            )
+            .rename(lambda column: column.lstrip("\ufeff"))
+            .filter(
+                ~pl.col("candidate").str.contains(r"(?i)^(?:over|under) ?votes?$|^(?:rejected|unassigned) write|^total")
+            )
+            .with_columns(
+                county_fips=pl.col("county")
+                .str.to_uppercase()
+                .str.replace(r" (?:COUNTY|PARISH)$", "")
+                .str.replace("SAINT", "ST")
+                .str.replace_all(r"[^A-Z]", "")
+                .replace_strict(
+                    {
+                        name: code
+                        for (fips, name), code in counties.items()
+                        if fips
+                        == {
+                            **TOWNS,
+                            "FL": "12",
+                            "MT": "30",
+                            "NV": "32",
+                            "TX": "48",
+                            "UT": "49",
+                            "WV": "54",
+                            "WY": "56",
+                        }[state]
+                    },
+                    default=None,
+                )
+            )
+            .select(
+                pl.lit(day).alias("day"),
+                pl.lit(state).alias("state_po"),
+                office=pl.col("office").str.to_uppercase().str.replace(count, "").str.strip_chars(),
+                district=pl.when(~pl.col("district").is_in(["NA", ""])).then(pl.col("district").str.to_uppercase()),
+                special=pl.lit("FALSE"),
+                county_fips="county_fips",
+                county_name=pl.col("county").str.to_uppercase().str.replace(r" (?:COUNTY|PARISH)$", ""),
+                precinct="precinct",
+                jurisdiction_fips="county_fips",
+                stage=pl.lit("GEN"),
+                mode=pl.lit("TOTAL"),
+                candidate="candidate",
+                party_detailed=pl.col("party")
+                .str.to_uppercase()
+                .replace(OPENELECTIONS_PARTIES)
+                .pipe(lambda party: pl.when(~party.is_in(["NON", "NA", "NP", "NPA", ""])).then(party)),
+                writein=pl.when(pl.col("candidate").str.contains(r"(?i)write[- ]?in"))
+                .then(pl.lit("TRUE"))
+                .otherwise(pl.lit("FALSE")),
+                votes="votes",
+                magnitude=pl.col("office")
+                .str.extract(count)
+                .str.to_uppercase()
+                .replace(COUNTS)
+                .cast(pl.Int32, strict=False),
+            ),
+        )
+        for (state, day), commit in OPENELECTIONS_FILES.items()
+    ]
+    for state, origin, scan in [
+        *((state, "medsl", scan) for state, scan in inputs),
+        *((state, "openelections", scan) for state, scan in openelections),
+    ]:
         if state in COVERED:
             continue
         frame = (
             scan.with_columns(
+                pl.lit(origin).alias("origin"),
                 pl.col("candidate").str.strip_chars().str.replace_all(r"\s+", " "),
                 pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
             )
@@ -761,6 +878,7 @@ def parse() -> None:
             pl.col("title").first(),
             pl.col("body").first(),
             pl.col("stem").first(),
+            pl.col("origin").first(),
             pl.col("office").n_unique().alias("offices"),
             pl.col("office").first(),
             pl.col("magnitude").max(),
@@ -771,7 +889,9 @@ def parse() -> None:
         for row in doubled.iter_rows(named=True):
             problems.append(f"{year} {state}: {row['place']} {row['key']} {row['seat']} has several office labels")
         summary = summary.filter(pl.col("offices") == 1).with_columns(
-            magnitude=pl.when(pl.col("body") & pl.col("seat").is_null() & (year == 2016))
+            magnitude=pl.when(
+                pl.col("body") & pl.col("seat").is_null() & ((year == 2016) | (pl.col("origin") == "openelections"))
+            )
             .then("magnitude")
             .otherwise(pl.col("magnitude").fill_null(1)),
             district=pl.col("seat").is_not_null()
@@ -838,7 +958,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="County offices elected in November 2016, 2018, and 2024, from MEDSL's precinct files",
+            summary="County and municipal offices elected in November 2016 through 2024, from MEDSL's and OpenElections' "
+            "precinct files",
             polity="US",
         )
 
@@ -888,8 +1009,24 @@ def emit() -> Path:
         ):
             cs.artifact(raw.cached(SOURCE, listing), sources[day])
             files = {state.removesuffix(".zip"): url for state, url in _files(listing, local).items()}
-            for state in sorted(set(contests.filter(pl.col("day") == day)["state_po"])):
+            for state in sorted(set(contests.filter(pl.col("day") == day, pl.col("origin") == "medsl")["state_po"])):
                 cs.artifact(raw.cached(SOURCE, files[state]), sources[day])
+        contributed = {}
+        for (state, day), commit in OPENELECTIONS_FILES.items():
+            if state not in contributed:
+                source = contributed[state] = cs.source("OpenElections", f"{state} precinct-level results")
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="community",
+                    publisher="OpenElections",
+                    title=f"{state} precinct-level results",
+                    url=f"https://github.com/openelections/openelections-data-{state.lower()}",
+                )
+            cs.artifact(
+                raw.cached(SOURCE, OPENELECTIONS.format(state=state.lower(), commit=commit, day=day)),
+                contributed[state],
+            )
         cs.artifact(raw.cached(SOURCE, LOCAL2016), sources[date(2016, 11, 8)])
         cs.artifact(raw.cached(SOURCE, LOCAL2018), sources[date(2018, 11, 6)])
         taken = set(
@@ -900,7 +1037,7 @@ def emit() -> Path:
                    join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                      and x.scheme in ('us.office', 'us.body')
                    where e.date_from = any(%s) and r.source_id <> all(%s)""",
-                [list(DATASETS), list(sources.values())],
+                [list(DATASETS), [*sources.values(), *contributed.values()]],
             ).fetchall()
         )
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
@@ -1099,11 +1236,16 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources[day],
+                source_id=sources[day] if row["origin"] == "medsl" else contributed[state],
                 is_default=True,
                 completeness=None if row["masked"] else 1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.replace("2024", str(day.year)))
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=METHOD.replace("2024", str(day.year)) if row["origin"] == "medsl" else CONTRIBUTED,
+            )
             rows = (
                 grouped[(day, code, key, seat, row["remainder"])]
                 .group_by(pl.col("candidate").map_elements(slug, return_dtype=pl.String).alias("token"), "pooled")
