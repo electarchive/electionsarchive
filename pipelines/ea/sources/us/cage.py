@@ -155,19 +155,29 @@ def emit() -> Path:
             raise ValueError(f"missing parties: {[label for label, party in parties.items() if party in cs.minted]}")
 
         known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
+        official = {
+            value
+            for (value,) in conn.execute(
+                """select e.value from external_id e join contest c on c.id = e.entity_id
+                   join changeset s on s.id = c.changeset_id
+                   where e.scheme = 'us.contest' and e.value like '%%:governor%%' and s.pipeline <> %s""",
+                [SOURCE],
+            )
+        }
         offices: dict[str, UUID] = {}
         elections: dict[tuple[date, str, str], UUID] = {}
         persons: dict[tuple[str, str], UUID] = {}
         for (year, state, special), race in frame.group_by("year", "state", "special", maintain_order=True):
-            if (year, state) in DROPPED:
+            standard = date(year, 11, 2) + timedelta(days=(1 - date(year, 11, 2).weekday()) % 7)
+            day, kind = DAYS.get((year, state), (standard, "general"))
+            contest_key = f"{day}:{state}:governor" + (":special" if special else "")
+            if (year, state) in DROPPED or contest_key in official:
                 continue
             unit, area, state_name = states[state]
             if state not in offices:
                 offices[state] = cs.key("us.office", f"governor:{state}")
                 cs.add("office", id=offices[state], polity_id=cs.polity(f"US-{state}"), kind="governor")
                 name(offices[state], f"Governor of {state_name}")
-            standard = date(year, 11, 2) + timedelta(days=(1 - date(year, 11, 2).weekday()) % 7)
-            day, kind = DAYS.get((year, state), (standard, "general"))
             election_key = f"{day}:{state}" + ("" if kind == "general" else f":{kind}")
             if (day, state, kind) not in elections:
                 elections[(day, state, kind)] = cs.key("us.election", election_key)
@@ -190,7 +200,6 @@ def emit() -> Path:
                     cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=elections[(day, state, kind)])
             election = elections[(day, state, kind)]
 
-            contest_key = f"{day}:{state}:governor" + (":special" if special else "")
             contest = cs.key("us.contest", contest_key)
             cs.add(
                 "contest",
