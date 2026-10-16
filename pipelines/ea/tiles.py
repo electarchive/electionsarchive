@@ -26,6 +26,10 @@ def build(prefix: str | None) -> str:
         sets = conn.execute(
             """select bs.scheme_code, bs.vintage, bs.as_of,
                       (select count(*) from area a join area_geometry g on g.area_id = a.id
+                       where a.scheme_code = bs.scheme_code and g.valid @> bs.as_of),
+                      (select string_agg(distinct case when s.publisher = 'Eurostat'
+                                then '© EuroGeographics for the administrative boundaries' else s.publisher end, '; ')
+                       from area a join area_geometry g on g.area_id = a.id join source s on s.id = g.source_id
                        where a.scheme_code = bs.scheme_code and g.valid @> bs.as_of)
                from boundary_set bs where starts_with(bs.scheme_code, %s)
                order by bs.scheme_code, bs.vintage""",
@@ -33,7 +37,7 @@ def build(prefix: str | None) -> str:
         ).fetchall()
     summaries: list[str] = []
     with tempfile.TemporaryDirectory() as scratch:
-        for scheme_code, vintage, as_of, features in sets:
+        for scheme_code, vintage, as_of, features, attribution in sets:
             areas_path = Path(scratch) / "areas.geojsonl"
             labels_path = Path(scratch) / "labels.geojsonl"
             output = Path(scratch) / "out.pmtiles"
@@ -50,6 +54,7 @@ def build(prefix: str | None) -> str:
                     f"--output={output}",
                     "--force",
                     "--quiet",
+                    f"--attribution={attribution or ''}",
                     "--minimum-zoom=0",
                     f"--maximum-zoom={12 if features >= 5_000 else 10}",
                     "--simplification=4",
