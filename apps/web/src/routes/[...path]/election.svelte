@@ -69,29 +69,41 @@
   );
 
   const chamber = $derived.by(() => {
-    const best = election.races
+    const entries = election.races
       .filter((race) => !race.isOffice && race.size != null)
       .map((race) => {
         let filled = 0;
         for (const row of race.results) {
           filled += row.seats ?? 0;
         }
-        return { race, filled };
+        return { size: race.size ?? 0, filled, rows: race.results };
+      });
+    const joined = Map.groupBy(entries, (entry) => entry.size)
+      .entries()
+      .filter(([, group]) => group.length > 1)
+      .map(([size, group]) => {
+        let filled = 0;
+        for (const entry of group) {
+          filled += entry.filled;
+        }
+        return { size, filled, rows: group.flatMap((entry) => entry.rows) };
       })
-      .filter((entry) => entry.filled >= (entry.race.size ?? 0) * 0.9)
-      .toSorted((a, b) => b.filled - a.filled)[0];
-    return best == null
-      ? null
-      : {
-          size: best.race.size ?? best.filled,
-          seats: Object.fromEntries(
-            best.race.results.flatMap((row) =>
-              row.party == null || row.seats == null
-                ? []
-                : [[row.party, row.seats]],
-            ),
-          ),
-        };
+      .filter((entry) => entry.filled <= entry.size * 1.02)
+      .toArray();
+    const best = [
+      ...entries.toSorted((a, b) => b.filled - a.filled),
+      ...joined,
+    ].find((entry) => entry.filled >= entry.size * 0.9);
+    if (best == null) {
+      return null;
+    }
+    const seats: Record<string, number> = {};
+    for (const row of best.rows) {
+      if (row.party != null && row.seats != null) {
+        seats[row.party] = (seats[row.party] ?? 0) + row.seats;
+      }
+    }
+    return { size: best.size, seats };
   });
 
   const races = $derived(
