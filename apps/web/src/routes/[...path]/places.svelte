@@ -487,6 +487,10 @@
                   }}>{row.name}</a
                 >
               {/if}
+              {#if row.isRemainder}<span
+                  class="ms-1.5 text-xs font-normal text-muted-foreground"
+                  >{m.places_remainder()}</span
+                >{/if}
               <span
                 class="mbs-1.5 flex overflow-hidden rounded-xs bg-muted block-2 sm:hidden"
                 aria-hidden="true"

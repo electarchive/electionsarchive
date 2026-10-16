@@ -382,5 +382,7 @@
   "round_indirect": "Contingent vote",
   "round_number": "Round {round}",
   "round_ballot": "Ballot {round}",
-  "round_electoral": "Electoral College vote"
+  "round_electoral": "Electoral College vote",
+  "places_remainder": "Unexpired term",
+  "series_remainder": "{year} special"
 }

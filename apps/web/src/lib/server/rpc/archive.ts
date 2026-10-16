@@ -88,6 +88,7 @@ const Places = v.nullable(
         name: v.string(),
         path: v.nullable(v.string()),
         contest: v.boolean(),
+        isRemainder: v.boolean(),
         valid: v.number(),
         shares: v.array(v.number()),
         leader: v.nullable(v.number()),
@@ -112,6 +113,7 @@ type Found = {
   date: string | null;
   year: number | null;
   status: string;
+  isRemainder: boolean;
   place: { id: string; k: number } | null;
 };
 
@@ -190,7 +192,7 @@ async function find(id: string) {
       r.id as root, e.id as election, e.kind = 'indirect' as indirect,
       exists (select from body b where b.id = r.body_id and b.kind = 'electoral_college') as "isElectoral",
       e.polity_id as polity, e.date_from::text as date,
-      ${CYCLE} as year, e.status::text as status,
+      ${CYCLE} as year, e.status::text as status, r.term is not distinct from 'remainder' as "isRemainder",
       case when a.id is not null then json_build_object('id', a.id, 'k', a.k) end as place
     from contest c
     join up on up.parent is null
@@ -1227,6 +1229,7 @@ async function tabulate(
     name: string;
     path: string | null;
     isContest: boolean;
+    isRemainder?: boolean;
     owner: string | null;
   }>,
   date: string | null,
@@ -1351,6 +1354,7 @@ async function tabulate(
         name: row.name,
         path: row.path,
         contest: row.isContest,
+        isRemainder: row.isRemainder ?? false,
         valid,
         shares: kept.map(
           (item) =>
@@ -1550,6 +1554,7 @@ export const contests = {
             name: v.string(),
             current: v.boolean(),
             annulled: v.boolean(),
+            isRemainder: v.boolean(),
             winner: v.nullable(
               v.object({
                 key: v.string(),
@@ -1966,6 +1971,7 @@ export const contests = {
         date: string | null;
         year: number | null;
         status: string;
+        isRemainder: boolean;
       }>(sql`
         with recursive anc(id) as (
           select ${area.id}::uuid
@@ -1975,7 +1981,8 @@ export const contests = {
         roots as (
           select c.id, case when c.kind = 'ballot_question' then c.id::text
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
-            e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status
+            e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
+            c.term is not distinct from 'remainder' as "isRemainder"
           from contest c
           join election e on e.id = c.election_id
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
@@ -1986,7 +1993,8 @@ export const contests = {
           union all
           select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
         )
-        select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status
+        select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
+          r."isRemainder"
         from roots r
         where r.id <> ${contest.root}::uuid and exists (
           select 1 from grp join result_set rs on rs.contest_id = grp.id
@@ -2191,6 +2199,7 @@ export const contests = {
             current: false,
             indirect: row.indirect,
             annulled: row.status === "annulled",
+            isRemainder: row.isRemainder,
             winner: winners.get(row.id) ?? null,
           };
         }),
@@ -2202,6 +2211,7 @@ export const contests = {
           current: true,
           indirect: contest.indirect,
           annulled: contest.status === "annulled",
+          isRemainder: contest.isRemainder,
           winner: winners.get(contest.root) ?? null,
         },
       ];
@@ -3052,6 +3062,7 @@ async function races(election: string, polity: string, date: string | null) {
       previous: string | null;
       party: string | null;
       runoffs: Array<string>;
+      isRemainder: boolean;
       area: string | null;
       k: number | null;
       scheme: string | null;
@@ -3071,6 +3082,7 @@ async function races(election: string, polity: string, date: string | null) {
         c.term is distinct from 'remainder' and coalesce(st.voting, true) as "isCounted",
         e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
         array(select n.id from contest n join election ne on ne.id = n.election_id where n.previous_round_id = c.id and ne.kind = 'runoff') as runoffs,
+        c.term is not distinct from 'remainder' as "isRemainder",
         a.id as area, a.k, a.scheme_code as scheme, sc.noun
       from contest c
       join election e on e.id = c.election_id
@@ -3165,6 +3177,7 @@ async function races(election: string, polity: string, date: string | null) {
                 name: labels.full.get(row.area ?? "") ?? "",
                 path: slugs.get(row.id) ?? null,
                 isContest: true,
+                isRemainder: row.isRemainder,
                 owner: row.id,
               })),
               date,

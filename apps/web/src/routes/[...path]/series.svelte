@@ -48,9 +48,12 @@
         ...entry,
         year,
         label:
-          (seen[year]?.length ?? 0) > 1 && entry.date != null
-            ? month.format(new Date(`${entry.date}T00:00:00Z`))
-            : year,
+          (seen[year]?.length ?? 0) > 1 && entry.isRemainder
+            ? m.series_remainder({ year })
+            : (seen[year] ?? []).filter((peer) => !peer.isRemainder).length >
+                  1 && entry.date != null
+              ? month.format(new Date(`${entry.date}T00:00:00Z`))
+              : year,
         color:
           entry.winner == null
             ? null
