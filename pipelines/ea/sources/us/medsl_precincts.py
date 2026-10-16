@@ -9,24 +9,59 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_precincts"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
+PRESIDENT = ("13730901", "XDJYKC")
+PRESIDENT_TITLE = "U.S. President Precinct-Level Returns 2024"
 METHOD = (
     "Precinct returns as compiled by the MIT Election Data and Science Lab from the states' and counties' official "
     "results. Absentee, early, and provisional ballots that a county reported only countywide stay in their own "
     "countywide rows, so those votes are not spread among the precincts. Precincts take their shape from the "
-    "state's or county's official 2022 precinct file where one matches the precinct's county and code or name; "
+    "state's or county's official precinct file where one matches the precinct's county and code or name; "
     "the others are placed within their county."
 )
 
 
 def fetch() -> None:
     medsl.fetch()
+    try:
+        raw.cached(medsl.SOURCE, medsl.DATAVERSE + PRESIDENT[0])
+    except LookupError:
+        raw.fetch(medsl.SOURCE, medsl.DATAVERSE + PRESIDENT[0], suffix=".csv")
 
 
 def parse() -> None:
+    congress = pl.read_parquet(medsl.PARSED / "precincts.parquet").filter(
+        (pl.col("chamber") == "house") | (pl.col("year") >= 2022)
+    )
+    president = medsl.precincts({("president", 2024): raw.cached(medsl.SOURCE, medsl.DATAVERSE + PRESIDENT[0]).path})
+    districts = (
+        congress.filter((pl.col("year") == 2024) & (pl.col("chamber") == "house") & pl.col("state").is_in(["ME", "NE"]))
+        .group_by("state", "code", "jurisdiction", "precinct")
+        .agg(pl.col("district").unique())
+        .filter(pl.col("district").list.len() == 1)
+        .select("state", "code", "jurisdiction", "precinct", pl.col("district").list.first())
+    )
+    counties = (
+        districts.group_by("state", "code")
+        .agg(pl.col("district").unique())
+        .filter(pl.col("district").list.len() == 1)
+        .select("state", "code", county_district=pl.col("district").list.first())
+    )
+    split = (
+        president.filter(pl.col("state").is_in(["ME", "NE"]))
+        .drop("district")
+        .join(districts, on=["state", "code", "jurisdiction", "precinct"], how="left")
+        .join(counties, on=["state", "code"], how="left")
+        .with_columns(district=pl.coalesce("district", "county_district"))
+        .drop("county_district")
+    )
+    if split["district"].null_count():
+        print(
+            f"{split.filter(pl.col('district').is_null())['votes'].sum()} ME and NE presidential votes with no district"
+        )
     frame = (
-        pl.read_parquet(medsl.PARSED / "precincts.parquet")
+        pl.concat([congress, president, split.filter(pl.col("district").is_not_null())], how="diagonal_relaxed")
         .with_columns(
             precinct=pl.col("precinct").str.strip_chars(),
             jurisdiction=pl.col("jurisdiction").str.strip_chars(),
@@ -59,7 +94,7 @@ def parse() -> None:
         "candidate",
         "measure",
         maintain_order=True,
-    ).agg(pl.col("writein").any(), pl.col("votes").sum()).write_parquet(PARSED / "congress.parquet")
+    ).agg(pl.col("writein").any(), pl.col("votes").sum()).write_parquet(PARSED / "returns.parquet")
     print(f"{frame.filter(pl.col('kind') == 'precinct')['code'].n_unique()} precincts")
 
 
@@ -70,7 +105,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House and Senate results by precinct for 2022, from the MIT Election Data and Science Lab",
+            summary="House results by precinct 2016–2024, Senate results by precinct 2022–2024, and presidential results by precinct 2024, from the MIT Election Data and Science Lab",
             polity="US",
         )
         counties = {
@@ -83,12 +118,19 @@ def emit() -> Path:
             code: str(area)
             for code, area in conn.execute(
                 """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
-                   where a.scheme_code = 'us.precinct' and c.code like '2022:%%'"""
+                   where a.scheme_code = 'us.precinct' and c.code ~ '^20(16|18|20|22|24):'"""
             ).fetchall()
         }
         missing = set(units["county"]) - set(counties)
         if missing:
             raise ValueError(f"no county units for {sorted(missing)}")
+        existing = {
+            code
+            for (code,) in conn.execute(
+                "select code from reporting_unit where scheme_code = 'us.precinct' and code ~ '^20(16|18|20|22|24):'"
+            ).fetchall()
+        }
+        units = units.filter(~pl.col("code").is_in(list(existing)))
         cs.frame(
             "reporting_unit",
             units.select(
@@ -113,8 +155,6 @@ def emit() -> Path:
         )
         sources = {}
         for (chamber, year), (file, _) in medsl.PRECINCTS.items():
-            if year != 2022:
-                continue
             title = (
                 f"U.S. {'Senate' if chamber == 'senate' else 'House of Representatives'} Precinct-Level Returns {year}"
             )
@@ -122,10 +162,21 @@ def emit() -> Path:
             if sources[f"{chamber}:{year}"] in cs.minted:
                 raise ValueError(f"{title} must already be a source")
             cs.artifact(raw.cached(medsl.SOURCE, medsl.DATAVERSE + file), sources[f"{chamber}:{year}"])
+        sources["president:2024"] = cs.source("MIT Election Data and Science Lab", PRESIDENT_TITLE)
+        cs.add(
+            "source",
+            id=sources["president:2024"],
+            kind="academic",
+            publisher="MIT Election Data and Science Lab",
+            title=PRESIDENT_TITLE,
+            url=f"https://doi.org/10.7910/DVN/{PRESIDENT[1]}",
+            license="CC0 1.0",
+        )
+        cs.artifact(raw.cached(medsl.SOURCE, medsl.DATAVERSE + PRESIDENT[0]), sources["president:2024"])
         medsl.attach(
             cs,
             conn,
-            pl.read_parquet(PARSED / "congress.parquet").with_columns(
+            pl.read_parquet(PARSED / "returns.parquet").with_columns(
                 source=pl.col("chamber") + ":" + pl.col("year").cast(pl.String)
             ),
             sources,

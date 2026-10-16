@@ -196,10 +196,31 @@ def parse() -> None:
         print(uneven.group_by("year", "state_po").len().sort("year", "state_po"))
     counted.drop("totalvotes").rename({"state_po": "state"}).write_parquet(PARSED / "county.parquet")
 
+    frame = precincts({key: raw.cached(SOURCE, DATAVERSE + file).path for key, (file, _) in PRECINCTS.items()})
+    frame.write_parquet(PARSED / "precincts.parquet")
+    frame = frame.group_by(
+        "year",
+        "chamber",
+        "day",
+        "special",
+        "state",
+        "district",
+        "kind",
+        "code",
+        "candidate",
+        "measure",
+        maintain_order=True,
+    ).agg(pl.col("writein").any(), pl.col("votes").sum())
+    print(frame.filter(pl.col("kind") == "aggregate").group_by("code").agg(pl.col("votes").sum()).sort("code"))
+    if frame["code"].null_count():
+        raise ValueError(f"{frame['code'].null_count()} rows have no unit")
+    frame.write_parquet(PARSED / "congress.parquet")
+
+
+def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
     frames = []
-    for (chamber, year), (file, _) in PRECINCTS.items():
-        path = raw.cached(SOURCE, DATAVERSE + file).path
-        frame = pl.read_csv(path, separator="\t" if "\t" in path.open().readline() else ",", infer_schema_length=0)
+    for (chamber, year), path in files.items():
+        frame = pl.scan_csv(path, separator="\t" if "\t" in path.open().readline() else ",", infer_schema_length=0)
         if year == 2016:
             frame = frame.rename({"state_postal": "state_po", "jurisdiction": "jurisdiction_name"}).with_columns(
                 date=pl.lit("2016-11-08")
@@ -214,11 +235,16 @@ def parse() -> None:
             .filter(
                 pl.col("office")
                 .str.to_uppercase()
-                .str.contains("SENATE" if chamber == "senate" else r"U\.?S\.? HOUSE|HOUSE OF REP")
+                .str.contains(
+                    {"senate": "SENATE", "president": "^US PRESIDENT$", "state": "^STATE (HOUSE|SENATE)$"}.get(
+                        chamber, r"U\.?S\.? HOUSE|HOUSE OF REP"
+                    )
+                )
                 & (
                     (pl.col("state_po") != "DC")
                     | pl.col("office").str.to_uppercase().str.contains("DELEGATE")
                     | (year < 2018)
+                    | (chamber == "president")
                 )
             )
             .select(
@@ -243,10 +269,15 @@ def parse() -> None:
                 writein=pl.col("writein").str.to_uppercase() == "TRUE",
                 mode=pl.col("mode").fill_null("").str.to_uppercase(),
                 votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+                office=pl.col("office") if chamber == "state" else pl.lit(None, pl.String),
+                seat=pl.col("district") if chamber == "state" else pl.lit(None, pl.String),
+                party=pl.col("party_detailed") if chamber == "state" else pl.lit(None, pl.String),
+                stage=pl.col("stage") if chamber == "state" else pl.lit(None, pl.String),
             )
         )
     frame = (
         pl.concat(frames)
+        .collect()
         .filter(pl.col("votes").is_not_null())
         .with_columns(
             measure=pl.col("candidate").replace_strict(PSEUDO, default=1, return_dtype=pl.Int16),
@@ -309,7 +340,7 @@ def parse() -> None:
         print(f"{orphaned['votes'].sum()} House votes in precincts with no inferable district")
         print(orphaned.group_by("year", "state").agg(pl.col("votes").sum()).sort("year", "state"))
     frame = (
-        frame.filter((pl.col("chamber") == "senate") | pl.col("district").is_not_null())
+        frame.filter((pl.col("chamber") != "house") | pl.col("district").is_not_null())
         .with_columns(
             kind=pl.when(pl.col("state") == "AK")
             .then(pl.when(pl.col("ak") == 99).then(pl.lit("aggregate")).otherwise(pl.lit("district")))
@@ -339,28 +370,11 @@ def parse() -> None:
             .otherwise("fips")
         )
         .filter(
-            (pl.col("mode") == "TOTAL").any().over([*precinct, "district", "candidate"]).not_()
+            (pl.col("mode") == "TOTAL").any().over([*precinct, "district", "office", "seat", "candidate"]).not_()
             | (pl.col("mode") == "TOTAL")
         )
     )
-    frame.filter(pl.col("year") == 2022).write_parquet(PARSED / "precincts.parquet")
-    frame = frame.group_by(
-        "year",
-        "chamber",
-        "day",
-        "special",
-        "state",
-        "district",
-        "kind",
-        "code",
-        "candidate",
-        "measure",
-        maintain_order=True,
-    ).agg(pl.col("writein").any(), pl.col("votes").sum())
-    print(frame.filter(pl.col("kind") == "aggregate").group_by("code").agg(pl.col("votes").sum()).sort("code"))
-    if frame["code"].null_count():
-        raise ValueError(f"{frame['code'].null_count()} rows have no unit")
-    frame.write_parquet(PARSED / "congress.parquet")
+    return frame
 
 
 def emit() -> Path:
@@ -604,7 +618,11 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
     for (year, chamber, day, special, state, district), lines in congress.group_by(
         "year", "chamber", "day", "special", "state", "district", maintain_order=True
     ):
-        base = f"{day}:{state}:{chamber}" + ("" if district is None else f":{district}")
+        base = (
+            f"{day}:{state}-{district:02}:president"
+            if chamber == "president" and district is not None
+            else f"{day}:{state}:{chamber}" + ("" if district is None else f":{district}")
+        )
         tried = [*([f"{base}:special"] if special else []), base]
         if chamber == "house":
             tried.append(f"{day}:{state}:house:0")
@@ -711,7 +729,7 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
         overcounted = False
         for option, kind, label, _, fec in known:
             medsl = int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
-            if kind == "candidate" and fec and abs(medsl - fec) > max(100, fec * 0.02):
+            if kind in ("candidate", "ticket") and fec and abs(medsl - fec) > max(100, fec * 0.02):
                 drifted.append((key, label, medsl, fec))
                 overcounted |= medsl > fec
         if overcounted:
@@ -751,7 +769,11 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
         )
         members: dict[str, str] = {}
         for code, kind in lines.select("code", "kind").unique().iter_rows():
-            if kind in ("county", "place") and chamber == "house" and f"{day}:{state}:house:0" not in contests:
+            if (
+                kind in ("county", "place")
+                and district is not None
+                and (chamber == "president" or f"{day}:{state}:house:0" not in contests)
+            ):
                 part = f"{year}:{code}:{district}" + (":special" if special else "")
                 members[code] = str(cs.unit("us.county_part", part))
                 if code not in counties:
