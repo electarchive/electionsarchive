@@ -728,11 +728,58 @@
   </div>
 
   {#if spec == null}
-    <p
-      class="grid place-items-center border border-dashed border-border text-muted-foreground min-block-64"
+    <section
+      class="grid content-start gap-3 rounded-sm bg-card p-4 ring-1 ring-border"
+      aria-labelledby="examples-title"
     >
-      {m.workbench_start()}
-    </p>
+      <div class="grid gap-1">
+        <h2 id="examples-title" class="font-serif text-xl/tight font-[640]">
+          {m.workbench_examples()}
+        </h2>
+        <p class="text-sm text-muted-foreground max-inline-[60ch]">
+          {m.workbench_start()}
+        </p>
+      </div>
+      <ul
+        class="grid gap-px overflow-hidden rounded-sm bg-border ring-1 ring-border sm:grid-cols-2 lg:grid-cols-3"
+      >
+        {#each data.examples as example (example.id)}
+          <li class="grid">
+            <button
+              type="button"
+              class="grid content-start gap-1 bg-card p-3 text-start hover:bg-secondary/60 focus-visible:relative"
+              onclick={() => {
+                spec = {
+                  version: 1,
+                  data: {
+                    contests: [encodeId("ct", example.id)],
+                    measure: "votes",
+                    channel: "all",
+                    compare: { previous: true },
+                  },
+                  filters: [],
+                  panels: [
+                    { kind: "map", color: "winner" },
+                    { kind: "chart", chart: "bar" },
+                    { kind: "chart", chart: "scatter" },
+                    { kind: "table" },
+                  ],
+                };
+              }}
+            >
+              <span class="font-serif text-lg/tight font-[640] text-balance"
+                >{example.name}</span
+              >
+              <span class="text-[0.8125rem] text-muted-foreground"
+                >{example.election}{#if example.date != null}, {date(
+                    example.date,
+                  )}{/if}</span
+              >
+            </button>
+          </li>
+        {/each}
+      </ul>
+    </section>
   {:else if current != null}
     {#if !wide.current}
       <nav

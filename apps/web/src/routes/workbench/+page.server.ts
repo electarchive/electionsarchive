@@ -1,7 +1,7 @@
 import { savedView } from "@ea/db/schema";
 import { decodeId, encodeId, viewSpec } from "@ea/view-spec";
 import { fail, redirect } from "@sveltejs/kit";
-import { and, desc, eq } from "drizzle-orm";
+import { and, desc, eq, sql } from "drizzle-orm";
 import { Buffer } from "node:buffer";
 import * as v from "valibot";
 import { db } from "#lib/server/db/index.js";
@@ -9,6 +9,14 @@ import type { Actions, PageServerLoad } from "./$types";
 
 const VISIBILITIES = ["private", "unlisted"] as const;
 const VIEW_ID = /^vw_[0-7][0-9a-hjkmnp-tv-z]{25}$/u;
+const EXAMPLES = [
+  "us/pa/2024-11-05-general/president",
+  "us/ga/2020-11-03-general/senate",
+  "de/2025-02-23-general/bundestag",
+  "tr/2023-05-14-general/president",
+  "tr/istanbul/2019-06-23-local/mayor",
+  "ie/2024-06-07-european-parliament/dublin",
+];
 
 export const load: PageServerLoad = async ({ locals, url }) => {
   if (locals.user == null) {
@@ -18,7 +26,7 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     );
   }
   const requested = url.searchParams.get("view");
-  const [mine, opened] = await Promise.all([
+  const [mine, opened, examples] = await Promise.all([
     db
       .select({
         id: savedView.id,
@@ -40,6 +48,21 @@ export const load: PageServerLoad = async ({ locals, url }) => {
           })
           .from(savedView)
           .where(eq(savedView.id, decodeId(requested))),
+    db.execute<{
+      path: string;
+      id: string;
+      date: string | null;
+      name: string | null;
+      election: string | null;
+    }>(sql`
+      select s.path, s.entity_id as id, el.date_from::text as date,
+        (select n.text from name n where n.entity_id = s.entity_id and n.kind in ('official', 'english')
+          order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as name,
+        (select n.text from name n where n.entity_id = c.election_id and n.kind in ('official', 'english')
+          order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as election
+      from slug s join contest c on c.id = s.entity_id join election el on el.id = c.election_id
+      where s.is_current and s.path = any(${sql.param(EXAMPLES)}::text[])
+    `),
   ]);
   const row = opened.find(
     (entry) =>
@@ -69,6 +92,14 @@ export const load: PageServerLoad = async ({ locals, url }) => {
     spec: parsed.success ? parsed.output : (view?.spec ?? null),
     view,
     isMissing: requested != null && view == null,
+    examples: examples.rows
+      .toSorted((a, b) => EXAMPLES.indexOf(a.path) - EXAMPLES.indexOf(b.path))
+      .map((row) => ({
+        id: row.id,
+        name: row.name ?? "",
+        election: row.election,
+        date: row.date,
+      })),
     views: mine.map((entry) => ({
       id: encodeId("vw", entry.id),
       title:

@@ -508,7 +508,7 @@
   "workbench_contest": "Contest",
   "workbench_contest_placeholder": "Search for a contest",
   "workbench_contest_empty": "No contests match.",
-  "workbench_start": "Search for a contest to start.",
+  "workbench_start": "Search for a contest above or select an example to see how the panels interact.",
   "workbench_compare": "Compare with previous",
   "workbench_level": "Level",
   "workbench_add": "Add view",
@@ -734,5 +734,6 @@
   "board_after": "Chamber composition after election",
   "board_after_other": "Others",
   "race_after": "After the election, {party} held {seats} of the {total} seats.",
-  "race_after_tied": "After the election, {party} and {runner} held {seats} of the {total} seats each."
+  "race_after_tied": "After the election, {party} and {runner} held {seats} of the {total} seats each.",
+  "workbench_examples": "Examples"
 }
