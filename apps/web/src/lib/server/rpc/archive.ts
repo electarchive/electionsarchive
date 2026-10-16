@@ -282,7 +282,9 @@ async function children(
         rank: scheme.get(row.scheme)?.rank ?? 0,
       };
     })
-    .toSorted((a, b) => a.name.localeCompare(b.name));
+    .toSorted((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true }),
+    );
 }
 
 async function descend(contest: Found, unit: string | undefined) {
@@ -905,8 +907,9 @@ function assign(
           list
             .toSorted(
               (a, b) =>
-                a.place.name.localeCompare(b.place.name) ||
-                (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
+                a.place.name.localeCompare(b.place.name, undefined, {
+                  numeric: true,
+                }) || (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
             )
             .map((slot) => ({
               place: at.get(slot.place.id) ?? 0,
@@ -1913,7 +1916,9 @@ export const contests = {
             name: labels.full.get(id) ?? "",
             path: slugs.get(id) ?? null,
           }))
-          .toSorted((a, b) => a.name.localeCompare(b.name)),
+          .toSorted((a, b) =>
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
+          ),
         places: null,
         sets: sets.rows.map((row) => ({
           stage: row.stage,
@@ -2228,7 +2233,11 @@ export const contests = {
                 (!peer.current && !entry.indirect),
             ),
         )
-        .toSorted((a, b) => (a.date ?? "").localeCompare(b.date ?? ""))
+        .toSorted(
+          (a, b) =>
+            (a.date ?? "").localeCompare(b.date ?? "") ||
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
+        )
         .map((entry) => ({
           ...entry,
           winner:
@@ -2898,7 +2907,9 @@ export const contests = {
       );
       return built
         .filter((entry) => entry != null)
-        .toSorted((a, b) => a.name.localeCompare(b.name));
+        .toSorted((a, b) =>
+          a.name.localeCompare(b.name, undefined, { numeric: true }),
+        );
     }),
   lists: os
     .meta(
@@ -3142,7 +3153,7 @@ export const contests = {
         .toSorted(
           (a, b) =>
             Number(b.isElected) - Number(a.isElected) ||
-            a.name.localeCompare(b.name),
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
         );
       let seats = 0;
       for (const list of lists) {
@@ -3677,7 +3688,9 @@ export const elections = {
             path: slugs.get(row.id) ?? null,
             children: row.children,
           }))
-          .toSorted((a, b) => a.name.localeCompare(b.name)),
+          .toSorted((a, b) =>
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
+          ),
         elections: electionRows.rows
           .map((row) => ({
             name: labels.full.get(row.id) ?? "",
@@ -3687,7 +3700,9 @@ export const elections = {
             date: row.date,
             isStage: row.kind === "runoff" || row.kind === "indirect",
           }))
-          .toSorted((a, b) => a.name.localeCompare(b.name)),
+          .toSorted((a, b) =>
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
+          ),
       };
     }),
 };
@@ -3762,7 +3777,9 @@ export const polities = {
                   path: slugs.get(row.latest) ?? null,
                 },
         }))
-        .toSorted((a, b) => a.name.localeCompare(b.name));
+        .toSorted((a, b) =>
+          a.name.localeCompare(b.name, undefined, { numeric: true }),
+        );
     }),
   get: os
     .meta(
@@ -3899,7 +3916,9 @@ export const polities = {
             first: row.first,
             last: row.last,
           }))
-          .toSorted((a, b) => a.name.localeCompare(b.name)),
+          .toSorted((a, b) =>
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
+          ),
         within: children.rows[0]?.within ?? 0,
         elections: electionRows.rows.map((row) => ({
           name: labels.full.get(row.id) ?? "",

@@ -130,7 +130,7 @@
       .toSorted((a, b) => {
         const order =
           column === "name"
-            ? a.row.name.localeCompare(b.row.name)
+            ? a.row.name.localeCompare(b.row.name, undefined, { numeric: true })
             : a.value - b.value;
         return descending ? -order : order;
       })

@@ -29,7 +29,11 @@
   const parts = $derived(
     election.elections
       .filter((child) => !child.isStage)
-      .toSorted((a, b) => (a.place ?? a.name).localeCompare(b.place ?? b.name)),
+      .toSorted((a, b) =>
+        (a.place ?? a.name).localeCompare(b.place ?? b.name, undefined, {
+          numeric: true,
+        }),
+      ),
   );
   const partNoun = $derived(
     parts.every((child) => child.noun != null && child.noun === parts[0]?.noun)

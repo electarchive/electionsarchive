@@ -42,6 +42,7 @@
       year: "numeric",
       timeZone: "UTC",
     });
+    const days = Object.groupBy(series, (entry) => entry.date ?? "");
     return series.map((entry) => {
       const year = entry.year?.toString() ?? "";
       return {
@@ -50,10 +51,13 @@
         label:
           (seen[year]?.length ?? 0) > 1 && entry.isRemainder
             ? m.series_remainder({ year })
-            : (seen[year] ?? []).filter((peer) => !peer.isRemainder).length >
-                  1 && entry.date != null
-              ? month.format(new Date(`${entry.date}T00:00:00Z`))
-              : year,
+            : (days[entry.date ?? ""] ?? []).filter((peer) => !peer.isRemainder)
+                  .length > 1
+              ? `${year} ${entry.name.split(", ").at(-1) ?? ""}`
+              : (seen[year] ?? []).filter((peer) => !peer.isRemainder).length >
+                    1 && entry.date != null
+                ? month.format(new Date(`${entry.date}T00:00:00Z`))
+                : year,
         color:
           entry.winner == null
             ? null
