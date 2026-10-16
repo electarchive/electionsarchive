@@ -5080,6 +5080,16 @@ export const polities = {
             ),
           }),
         ),
+        governments: v.array(
+          v.object({
+            name: v.string(),
+            head: v.nullable(v.string()),
+            party: v.nullable(v.string()),
+            from: v.string(),
+            to: v.nullable(v.string()),
+            isCaretaker: v.boolean(),
+          }),
+        ),
         parties: v.array(
           v.object({
             id: v.string(),
@@ -5199,13 +5209,41 @@ export const polities = {
         group by r.seat, coalesce(r.link::text, r.year::text), w.party
         order by min(r.date)
       `);
+      const cabinets = await db.execute<{
+        id: string;
+        name: string | null;
+        head: string | null;
+        party: string | null;
+        from: string;
+        to: string | null;
+        isCaretaker: boolean;
+      }>(sql`
+        select g.id, g.head_person_id as head, g.from_date::text as from, g.to_date::text as to,
+          g.caretaker as "isCaretaker",
+          (select n.text from name n where n.entity_id = g.id
+            order by n.kind = 'short' desc, n.is_preferred desc limit 1) as name,
+          (select coalesce(pm.into_id, gp.party_id) from government_party gp
+            left join entity_merge pm on pm.entity_id = gp.party_id
+            where gp.government_id = g.id
+            order by gp.role = 'head' desc, gp.seats desc nulls last limit 1) as party
+        from government g where g.polity_id = ${input.id}::uuid
+        order by g.from_date
+      `);
       const seats = [...new Set(found.rows.map((row) => row.seat))];
       const parties = [
-        ...new Set(found.rows.flatMap((row) => row.party ?? [])),
+        ...new Set([
+          ...found.rows.flatMap((row) => row.party ?? []),
+          ...cabinets.rows.flatMap((row) => row.party ?? []),
+        ]),
       ];
       const links = [...new Set(found.rows.flatMap((row) => row.link ?? []))];
       const [labels, slugs, colors, positions] = await Promise.all([
-        names([...seats, ...links, ...parties]),
+        names([
+          ...seats,
+          ...links,
+          ...parties,
+          ...cabinets.rows.flatMap((row) => row.head ?? []),
+        ]),
         paths(links),
         refs(parties),
         db.execute<{ party_id: string; lean: number }>(sql`
@@ -5293,6 +5331,14 @@ export const polities = {
               Math.max(...b.points.map((point) => point.filled)) -
                 Math.max(...a.points.map((point) => point.filled)),
           ),
+        governments: cabinets.rows.map((row) => ({
+          name: row.name ?? "",
+          head: row.head == null ? null : (labels.full.get(row.head) ?? null),
+          party: row.party,
+          from: row.from,
+          to: row.to,
+          isCaretaker: row.isCaretaker,
+        })),
         parties: parties.map((id) => ({
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,
