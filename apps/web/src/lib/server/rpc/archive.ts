@@ -1,4 +1,4 @@
-import type { Match, Option, Relation, Side } from "@ea/analytics";
+import type { Grouping, Match, Option, Relation, Side } from "@ea/analytics";
 import type { SQL } from "drizzle-orm";
 import { ancestry, compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
@@ -509,7 +509,7 @@ async function load(
         min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as first
       from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[]) as p(set, area)
       join result_rollup r on r.result_set_k = p.set and r.area_k = p.area
-      where r.count_round <= 1 and (r.measure = any(${COUNTED}) or r.option_k = 0 and r.measure in (2, 4))
+      where (r.measure = any(${COUNTED}) or r.option_k = 0 and r.measure in (2, 4))
     ),
     mains as (
       select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
@@ -568,8 +568,10 @@ async function load(
     label: string | null;
     outcome: string | null;
     seats: number | null;
+    alliance: string | null;
   }>(sql`
     select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+      o.alliance_id as alliance,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
@@ -605,7 +607,7 @@ async function load(
   const entities = [
     ...new Set([
       ...options.rows.flatMap((row) =>
-        [row.party, row.person].filter((id) => id != null),
+        [row.party, row.person, row.alliance].filter((id) => id != null),
       ),
       ...backing.rows.map((row) => row.person),
     ]),
@@ -716,6 +718,13 @@ async function load(
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
             seats: row.seats,
+            alliance:
+              row.alliance == null
+                ? null
+                : {
+                    id: row.alliance,
+                    label: labels.full.get(row.alliance) ?? "",
+                  },
           })),
         backing: backers,
       },
@@ -887,22 +896,20 @@ function assign(
   return {
     places: places.values().toArray(),
     seats: new Map(
-      seats
-        .entries()
-        .map(([key, list]) => [
-          key,
-          list
-            .toSorted(
-              (a, b) =>
-                a.place.name.localeCompare(b.place.name) ||
-                (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
-            )
-            .map((slot) => ({
-              place: at.get(slot.place.id) ?? 0,
-              name: slot.name,
-              position: slot.position,
-            })),
-        ]),
+      seats.entries().map(([key, list]) => [
+        key,
+        list
+          .toSorted(
+            (a, b) =>
+              a.place.name.localeCompare(b.place.name) ||
+              (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
+          )
+          .map((slot) => ({
+            place: at.get(slot.place.id) ?? 0,
+            name: slot.name,
+            position: slot.position,
+          })),
+      ]),
     ),
   };
 }
@@ -1125,6 +1132,7 @@ async function places(
   chosen: { id: string; date: string | null } | null,
   lineage: Array<Relation>,
   match: Match,
+  grouping: Grouping = "option",
 ): Promise<v.InferOutput<typeof Places>> {
   const kids = await children(
     contest.id,
@@ -1205,6 +1213,7 @@ async function places(
       chosen,
       lineage,
       match,
+      grouping,
     )),
   };
 }
@@ -1222,6 +1231,7 @@ async function tabulate(
   chosen: { id: string; date: string | null } | null,
   lineage: Array<Relation>,
   match: Match,
+  grouping: Grouping = "option",
 ) {
   const ks = rows.map((row) => row.k);
   const [now, then] = await Promise.all([
@@ -1259,7 +1269,13 @@ async function tabulate(
     const result =
       current == null
         ? []
-        : compare(current.side, then?.get(row.k)?.side ?? null, lineage, match);
+        : compare(
+            current.side,
+            then?.get(row.k)?.side ?? null,
+            lineage,
+            match,
+            grouping,
+          );
     const running = result.find(
       (entry) => entry.current != null && !entry.key.startsWith("kind:"),
     );
@@ -1461,6 +1477,7 @@ const Input = v.object({
   by: v.optional(v.string()),
   vs: v.optional(v.string()),
   match: v.optional(v.picklist(["party", "person", "family"]), "party"),
+  group: v.optional(v.picklist(["option", "alliance"]), "option"),
 });
 
 export const contests = {
@@ -2032,7 +2049,7 @@ export const contests = {
                select r.option_k as option, r.measure, r.value::float8 as value, r.count_round,
                  min(r.count_round) over (partition by r.measure) as first
                from result_rollup r
-               where r.result_set_k = p.k and r.area_k = ${area.k} and r.count_round <= 1
+               where r.result_set_k = p.k and r.area_k = ${area.k}
                  and (r.measure = any(${COUNTED}) and r.option_k <> 0 or r.measure = 2 and r.option_k = 0)
              ) r
            ),
@@ -2252,6 +2269,7 @@ export const contests = {
           chosen,
           lineage,
           input.match,
+          input.group,
         ),
         counterpart?.indirect === true
           ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
@@ -2340,6 +2358,7 @@ export const contests = {
         earlier?.side ?? null,
         lineage,
         input.match,
+        input.group,
       );
       const ballots = [current, cast?.get(area.k)].find(
         (entry) => entry?.measure === "electoral_votes",
@@ -2453,6 +2472,7 @@ export const contests = {
         null,
         [],
         input.match,
+        input.group,
       );
     }),
   boundaries: os
@@ -3588,7 +3608,7 @@ export const people = {
             select r.option_k as option, r.measure, r.value::float8 as value, r.count_round,
               min(r.count_round) over (partition by r.measure) as first
             from result_rollup r
-            where r.result_set_k = p.k and r.area_k = p.area and r.count_round <= 1
+            where r.result_set_k = p.k and r.area_k = p.area
               and (r.measure = any(${COUNTED}) and r.option_k <> 0 or r.measure = 2 and r.option_k = 0)
           ) r
         ),
