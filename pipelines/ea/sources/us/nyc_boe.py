@@ -88,7 +88,18 @@ def parse() -> None:
                 or final.row(0) != (winner[1].strip(), rounds, int(winner[2].replace(",", "")))
             ):
                 raise ValueError(f"{day} {page}: rounds do not conserve ballots ({totals}) or the winner differs")
-            frames.append(frame.with_columns(date=pl.lit(day), page=pl.lit(page), contest=pl.lit(title[1])))
+            party_code, office_text = title[1].split(" ", 1)
+            if office_text != "Mayor Citywide":
+                raise ValueError(f"unknown contest {title[1]}")
+            frames.append(
+                frame.with_columns(
+                    date=pl.lit(day),
+                    page=pl.lit(page),
+                    contest=pl.lit(title[1]),
+                    party=pl.lit(party_code),
+                    key=pl.lit(f"{day}:new-york-city:mayor:{PARTIES[party_code][1].lower()}"),
+                )
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat(frames).write_parquet(PARSED / "rounds.parquet")
 
@@ -181,10 +192,7 @@ def emit() -> Path:
             cs.add("slug", path=f"us/ny/new-york-city/{day}-primary", entity_id=election)
             for (page,) in frame.filter(pl.col("date") == day).select("page").unique().sort("page").iter_rows():
                 rounds_frame = frame.filter((pl.col("date") == day) & (pl.col("page") == page))
-                title = rounds_frame["contest"][0]
-                party_code, office_text = title.split(" ", 1)
-                if office_text != "Mayor Citywide":
-                    raise ValueError(f"unknown contest {title}")
+                title, party_code, contest_key = rounds_frame.select("contest", "party", "key").row(0)
                 party_key, adjective = PARTIES[party_code]
                 party = cs.key("us.party", party_key)
                 if party in cs.minted:
@@ -203,7 +211,6 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, url(day, page)), source)
 
                 rounds = rounds_frame["round"].max()
-                contest_key = f"{day}:new-york-city:mayor:{adjective.lower()}"
                 contest = cs.key("us.contest", contest_key)
                 cs.add(
                     "contest",
