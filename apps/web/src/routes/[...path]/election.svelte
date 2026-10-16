@@ -258,10 +258,44 @@
         race.count === 1 && total <= 1 && race.kind !== "elector_slate"
           ? []
           : winners;
+      const units = Map.groupBy(
+        seated,
+        (row) =>
+          race.partners.find((pair) => pair.includes(row.key))?.[0] ?? row.key,
+      )
+        .values()
+        .map((rows) => {
+          const head = rows.toSorted(
+            (a, b) => (b.seats ?? 0) - (a.seats ?? 0),
+          )[0];
+          let seats = 0;
+          let share = 0;
+          for (const row of rows) {
+            seats += row.seats ?? 0;
+            share += row.share;
+          }
+          return head == null
+            ? null
+            : rows.length === 1
+              ? { ...head, keys: [head.key] }
+              : {
+                  ...head,
+                  label: rows.map((row) => row.short ?? row.label).join("/"),
+                  short: null,
+                  seats,
+                  share,
+                  keys: rows.map((row) => row.key),
+                };
+        })
+        .filter((row) => row != null)
+        .toArray();
       const leader =
-        seated.toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))[0] ??
+        units.toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))[0] ??
         race.results[0];
-      const runner = race.results.find((row) => row.key !== leader?.key);
+      const joined = units.find((unit) => unit === leader)?.keys ?? [];
+      const runner = race.results.find(
+        (row) => row.key !== leader?.key && !joined.includes(row.key),
+      );
       const elector = race.electors?.rows[0];
       const second = race.electors?.rows[1];
       let appointed = race.electors?.appointed ?? 0;
