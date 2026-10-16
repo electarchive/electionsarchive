@@ -3,6 +3,7 @@ import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
 import { db } from "#lib/server/db/index.js";
 import { router } from "#lib/server/rpc/router.js";
+import land from "#lib/server/world.txt?raw";
 
 async function found<T>(promise: Promise<T>) {
   try {
@@ -65,6 +66,7 @@ async function draw() {
   return {
     box: result.rows[0]?.box ?? "0 0 1 1",
     inset: result.rows[0]?.inset ?? "0 0 1 1",
+    land,
     shapes: result.rows.map((row) => ({
       id: row.id,
       path: row.path,
@@ -120,6 +122,7 @@ export async function home() {
   );
   const names = new Map(polities.map((polity) => [polity.id, polity.name]));
   const elections = dated.rows.map((row) => ({
+    id: row.id,
     name: row.name ?? "",
     path: row.path,
     date: row.date,

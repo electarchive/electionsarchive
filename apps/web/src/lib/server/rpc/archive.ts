@@ -3976,6 +3976,65 @@ export const elections = {
           ),
       };
     }),
+  lead: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/lead",
+        summary:
+          "Get an election's first race with its top three by seats won, else by share",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          name: v.string(),
+          contested: v.number(),
+          results: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              short: v.nullable(v.string()),
+              color: v.nullable(v.string()),
+              person: v.nullable(v.string()),
+              share: v.number(),
+              seats: v.nullable(v.number()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{ polity: string; date: string | null }>(
+        sql`select polity_id as polity, date_from::text as date from election where id = ${input.id}::uuid`,
+      );
+      const election = found.rows[0];
+      if (election == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const [race] = await races(
+        input.id,
+        election.polity,
+        election.date,
+        true,
+      );
+      if (race == null) {
+        return null;
+      }
+      let contested = 0;
+      for (const row of race.results) {
+        contested += row.seats ?? 0;
+      }
+      return {
+        name: race.name,
+        contested,
+        results: (contested > 1
+          ? race.results.toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))
+          : race.results
+        ).slice(0, 3),
+      };
+    }),
   tiers: os
     .meta(
       openapi({

@@ -7,6 +7,7 @@
   import { finder } from "#lib/search.svelte.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Lead from "./lead.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -64,6 +65,7 @@
 </script>
 
 {#snippet shapes(isInset: boolean)}
+  <path d={data.atlas.land} class="fill-muted-foreground/8" />
   {#each data.atlas.shapes as shape (shape.id)}
     {#if shape.isCovered}
       {const polity = $derived(byId.get(shape.id))}
@@ -305,11 +307,12 @@
                   <span class="font-serif text-lg/tight font-[640] text-balance"
                     >{election.name}</span
                   >
+                  <span
+                    class="font-mono text-xs text-muted-foreground tabular-nums"
+                    >{date(election.date)}</span
+                  >
                 </span>
-                <span
-                  class="font-mono text-xs text-muted-foreground tabular-nums"
-                  >{date(election.date)}</span
-                >
+                <Lead id={election.id} />
               </a>
             </li>
           {/each}
