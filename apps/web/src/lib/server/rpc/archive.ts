@@ -2455,6 +2455,281 @@ export const contests = {
         input.match,
       );
     }),
+  lists: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/lists",
+        summary:
+          "List a closed-list contest's ranked party lists, with each member's declared fate, the independents, and later list replacements",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.nullable(
+        v.object({
+          seats: v.number(),
+          lists: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              short: v.nullable(v.string()),
+              color: v.nullable(v.string()),
+              party: v.nullable(v.string()),
+              votes: v.nullable(v.number()),
+              seats: v.number(),
+              members: v.array(
+                v.object({
+                  position: v.number(),
+                  person: v.string(),
+                  name: v.string(),
+                  fate: v.nullable(
+                    v.picklist(["elected", "withdrew", "disqualified"]),
+                  ),
+                  note: v.nullable(v.string()),
+                  elsewhere: v.nullable(Link),
+                }),
+              ),
+            }),
+          ),
+          independents: v.array(
+            v.object({
+              person: v.string(),
+              name: v.string(),
+              isElected: v.boolean(),
+            }),
+          ),
+          replacements: v.array(
+            v.object({
+              list: v.string(),
+              date: v.nullable(v.string()),
+              person: v.string(),
+              name: v.string(),
+              replaced: v.object({
+                person: v.string(),
+                name: v.string(),
+                via: v.nullable(v.string()),
+              }),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const contest = await find(input.id);
+      const day = contest.date ?? "infinity";
+      const found = await db.execute<{
+        k: number;
+        kind: string;
+        party: string | null;
+        label: string | null;
+        color: string | null;
+        seats: number | null;
+        candidacy: string;
+        person: string;
+        role: string;
+        position: number | null;
+        fate: "elected" | "withdrew" | "disqualified" | null;
+        note: string | null;
+      }>(sql`
+        select o.k, o.kind::text as kind, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+          case when o.party_id is not null then
+            ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`${contest.election}::uuid`, sql`${day}::date`)}
+          end as color,
+          (select max(x.seats) from outcome x where x.result_set_id = rs.id and x.option_id = o.id and x.candidacy_id is null)::int as seats,
+          cy.id as candidacy, coalesce(m.into_id, cy.person_id) as person, cy.role::text as role, cy.list_position as position,
+          f.kind::text as fate, f.notes as note
+        from contest_option o
+        join candidacy cy on cy.option_id = o.id
+          and ((o.kind = 'list' and cy.role = 'list_member' and cy.list_position is not null) or (o.kind = 'others' and cy.role = 'head'))
+        left join entity_merge m on m.entity_id = cy.person_id
+        left join entity_merge pm on pm.entity_id = o.party_id
+        left join lateral (
+          select rs.id from result_set rs
+          where rs.contest_id = o.contest_id and rs.is_default
+          order by exists (select from outcome x where x.result_set_id = rs.id) desc, array_position(${STAGES}, rs.stage)
+          limit 1
+        ) rs on true
+        left join lateral (
+          select x.kind, x.notes from outcome x
+          where x.result_set_id = rs.id and x.candidacy_id = cy.id and x.kind in ('elected', 'withdrew', 'disqualified')
+          order by x.kind = 'elected' desc limit 1
+        ) f on true
+        where o.contest_id = ${contest.id}::uuid
+      `);
+      if (found.rows.every((row) => row.kind !== "list")) {
+        return null;
+      }
+      const people = [...new Set(found.rows.map((row) => row.person))];
+      const [votes, elsewhere, replaced] = await Promise.all([
+        db.execute<{ k: number; votes: number }>(sql`
+          with chosen as (
+            select rs.k from result_set rs
+            where rs.contest_id = ${contest.id}::uuid and rs.is_default and exists (
+              select from result_rollup r where r.result_set_k = rs.k and r.area_k = ${contest.place?.k ?? 0} and r.measure = any(${COUNTED})
+            )
+            order by array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
+            limit 1
+          ),
+          picked as (
+            select r.option_k, r.measure, r.count_round, r.value
+            from chosen
+            join result_rollup r on r.result_set_k = chosen.k and r.area_k = ${contest.place?.k ?? 0}
+            where r.measure = any(${COUNTED})
+          ),
+          main as (
+            select (${COUNTED})[min(array_position(${COUNTED}, measure))] as measure, min(count_round) as round from picked
+          )
+          select p.option_k as k, sum(p.value)::float8 as votes
+          from picked p join main on main.measure = p.measure and main.round = p.count_round
+          group by p.option_k
+        `),
+        db.execute<{ person: string; contest: string }>(sql`
+          select distinct on (coalesce(m.into_id, cy.person_id)) coalesce(m.into_id, cy.person_id) as person, c.id as contest
+          from candidacy cy
+          left join entity_merge m on m.entity_id = cy.person_id
+          join contest_option o on o.id = cy.option_id
+          join contest c on c.id = o.contest_id
+          join result_set rs on rs.contest_id = c.id and rs.is_default
+          join outcome x on x.result_set_id = rs.id and x.option_id = o.id and x.kind in ('elected', 'won')
+            and (x.candidacy_id = cy.id or (x.candidacy_id is null and cy.role = 'head'))
+          where c.election_id = ${contest.election}::uuid and c.id <> ${contest.id}::uuid
+            and coalesce(m.into_id, cy.person_id) = any(${sql.param(people)}::uuid[])
+          order by coalesce(m.into_id, cy.person_id), c.id
+        `),
+        db.execute<{
+          person: string;
+          date: string | null;
+          predecessor: string;
+          via: string | null;
+        }>(sql`
+          select coalesce(m.into_id, t.person_id) as person, t.from_date::text as date,
+            coalesce(pm.into_id, p.person_id) as predecessor, p.ended_via::text as via
+          from tenure t
+          join tenure p on p.id = t.succeeds_tenure_id
+          left join entity_merge m on m.entity_id = t.person_id
+          left join entity_merge pm on pm.entity_id = p.person_id
+          where t.contest_id = ${contest.id}::uuid and t.acquired_via = 'list_replacement'
+          order by t.from_date
+        `),
+      ]);
+      const seated = new Map(
+        elsewhere.rows.map((row) => [row.person, row.contest]),
+      );
+      const [labels, slugs] = await Promise.all([
+        names(
+          [
+            ...people,
+            ...seated.values(),
+            ...replaced.rows.map((row) => row.person),
+            ...found.rows.flatMap((row) =>
+              row.party == null ? [] : [row.party],
+            ),
+          ],
+          contest.date,
+        ),
+        paths(seated.values().toArray()),
+      ]);
+      const tallies = new Map(votes.rows.map((row) => [row.k, row.votes]));
+      const lists = Map.groupBy(
+        found.rows.filter((row) => row.kind === "list"),
+        (row) => row.k,
+      )
+        .entries()
+        .map(([k, members]) => {
+          const head = members[0];
+          const party = head?.party ?? null;
+          return {
+            key: String(k),
+            label:
+              labels.full.get(party ?? "") ??
+              head?.label ??
+              labels.short.get(party ?? "") ??
+              "",
+            short: labels.short.get(party ?? "") ?? null,
+            color: head?.color ?? null,
+            party,
+            votes: tallies.get(k) ?? null,
+            seats:
+              head?.seats ??
+              members.filter((row) => row.fate === "elected").length,
+            members: members
+              .toSorted((a, b) => (a.position ?? 0) - (b.position ?? 0))
+              .map((row) => {
+                const other =
+                  row.fate === "elected" ? null : seated.get(row.person);
+                return {
+                  position: row.position ?? 0,
+                  person: row.person,
+                  name: labels.full.get(row.person) ?? "",
+                  fate: row.fate,
+                  note: row.note,
+                  elsewhere:
+                    other == null
+                      ? null
+                      : {
+                          name: labels.full.get(other) ?? "",
+                          path: slugs.get(other) ?? null,
+                        },
+                };
+              }),
+          };
+        })
+        .toArray()
+        .toSorted(
+          (a, b) =>
+            b.seats - a.seats ||
+            (b.votes ?? 0) - (a.votes ?? 0) ||
+            a.label.localeCompare(b.label),
+        );
+      const owners = new Map(
+        lists.flatMap((list) =>
+          list.members.map((member) => [member.person, list.key] as const),
+        ),
+      );
+      const independents = found.rows
+        .filter((row) => row.kind === "others")
+        .map((row) => ({
+          person: row.person,
+          name: labels.full.get(row.person) ?? "",
+          isElected: row.fate === "elected",
+        }))
+        .toSorted(
+          (a, b) =>
+            Number(b.isElected) - Number(a.isElected) ||
+            a.name.localeCompare(b.name),
+        );
+      let seats = 0;
+      for (const list of lists) {
+        seats += list.seats;
+      }
+      for (const independent of independents) {
+        seats += Number(independent.isElected);
+      }
+      return {
+        seats,
+        lists,
+        independents,
+        replacements: replaced.rows.flatMap((row) => {
+          const list = owners.get(row.predecessor);
+          return list == null
+            ? []
+            : [
+                {
+                  list,
+                  date: row.date,
+                  person: row.person,
+                  name: labels.full.get(row.person) ?? "",
+                  replaced: {
+                    person: row.predecessor,
+                    name: labels.full.get(row.predecessor) ?? "",
+                    via: row.via,
+                  },
+                },
+              ];
+        }),
+      };
+    }),
 };
 
 async function races(election: string, polity: string, date: string | null) {

@@ -37,17 +37,17 @@ export const load: PageServerLoad = async ({ params, url }) => {
     requested === "person" || requested === "family" ? requested : "party";
   if (slug.type === "contest") {
     try {
-      return {
-        kind: "contest" as const,
-        contest: await call(router.contests.get, {
+      const [contest, lists] = await Promise.all([
+        call(router.contests.get, {
           id: slug.entity_id,
           unit,
           by: url.searchParams.get("by") ?? undefined,
           vs: url.searchParams.get("vs") ?? undefined,
           match,
         }),
-        match,
-      };
+        call(router.contests.lists, { id: slug.entity_id }),
+      ]);
+      return { kind: "contest" as const, contest, lists, match };
     } catch (error_) {
       if (error_ instanceof ORPCError && error_.code === "NOT_FOUND") {
         error(404);

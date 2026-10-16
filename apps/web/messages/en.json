@@ -293,5 +293,73 @@
   "aff_ep_group": "{name} group in the European Parliament",
   "aff_federation": "Part of {name}",
   "aff_international": "Member of {name}",
-  "aff_regional_branch": "Regional branch of {name}"
+  "aff_regional_branch": "Regional branch of {name}",
+  "lists_title": "Candidate lists",
+  "lists_summary": [
+    {
+      "declarations": ["input seats", "local seatsPlural = seats: plural"],
+      "selectors": ["seatsPlural"],
+      "match": {
+        "seatsPlural=one": "{seats} seat filled from ranked party lists",
+        "seatsPlural=*": "{seats} seats filled from ranked party lists"
+      }
+    }
+  ],
+  "lists_winners": "Lists that won seats",
+  "lists_all": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "All {count} list",
+        "countPlural=*": "All {count} lists"
+      }
+    }
+  ],
+  "lists_expand": "Show full lists",
+  "lists_collapse": "Show top of lists",
+  "lists_more": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} more candidate",
+        "countPlural=*": "{count} more candidates"
+      }
+    }
+  ],
+  "lists_seats": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} seat",
+        "countPlural=*": "{count} seats"
+      }
+    }
+  ],
+  "lists_votes": "{votes} votes",
+  "lists_elected": "Elected",
+  "lists_cut": "Cut line",
+  "lists_next": "Next in line",
+  "lists_withdrew": "Withdrew",
+  "lists_disqualified": "Disqualified",
+  "lists_elsewhere": "Elected elsewhere",
+  "lists_elsewhere_detail": "Took a seat in {contest} instead; this list skipped them.",
+  "lists_replaced": "Replaced",
+  "lists_seated": "Seated later",
+  "lists_changes": "Later changes",
+  "lists_change": "{successor} took the seat of {predecessor} on {date}.",
+  "lists_change_reason": "{successor} took the seat of {predecessor}, who {reason}, on {date}.",
+  "lists_reason_resigned": "resigned",
+  "lists_reason_died": "died",
+  "lists_reason_removed": "was removed",
+  "lists_reason_expelled": "was expelled",
+  "lists_reason_disqualified": "was disqualified",
+  "lists_reason_lost_seat": "lost the seat",
+  "lists_independents": "Independent candidates",
+  "lists_rank": "Rank {position}",
+  "term_cut": "The line after the last member elected from a list. Members above it took the list's seats in rank order.",
+  "term_next": "The first member below the cut line who stayed in the race. They would take the next seat this list won.",
+  "term_withdrew_fallback": "Left the race after the lists were final. Their name stayed on the list and the seat went to the next member."
 }

@@ -16,6 +16,7 @@
   import Changes from "./changes.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
+  import Lists from "./lists.svelte";
   import PlaceSwitcher from "./place-switcher.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
@@ -25,9 +26,11 @@
 
   const {
     contest,
+    lists,
     match,
   }: {
     contest: Extract<PageData, { kind: "contest" }>["contest"];
+    lists: Extract<PageData, { kind: "contest" }>["lists"];
     match: string;
   } = $props();
 
@@ -726,6 +729,10 @@
       size={contest.chamber.size}
     />
   {/if}
+{/if}
+
+{#if lists != null && !drilled}
+  <Lists {lists} />
 {/if}
 
 {#if contest.places != null}
