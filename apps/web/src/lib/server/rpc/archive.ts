@@ -3587,10 +3587,96 @@ async function races(
         .toArray()
         .toSorted((a, b) => b.votes - a.votes);
       const level = grid?.level ?? (table == null ? null : first?.scheme);
-      const map =
-        level == null || isBrief ? null : await sketch(place, level, day);
+      let filled = 0;
+      for (const row of results) {
+        filled += row.seats ?? 0;
+      }
+      const [map, previous] = await Promise.all([
+        level == null || isBrief ? null : sketch(place, level, day),
+        isBrief ||
+        date == null ||
+        head?.owner == null ||
+        head.isOffice ||
+        head.size == null ||
+        filled < head.size * 0.9
+          ? null
+          : db.execute<{ party: string | null; seats: number }>(sql`
+            with recursive last as (
+              select max(e.date_from) as day
+              from contest c join election e on e.id = c.election_id
+              where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
+                and c.allocation_parent_id is null and c.party_scope_id is null
+                and e.kind = 'general' and e.date_from < ${date}::date - 120
+            ),
+            roots as (
+              select c.id from contest c join election e on e.id = c.election_id
+              left join seat st on st.id = c.seat_id
+              where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
+                and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = 'general'
+                and c.term is distinct from 'remainder' and coalesce(st.voting, true)
+                and e.date_from between (select day from last) - 200 and (select day from last)
+                and not exists (
+                  select from contest pc join election pe on pe.id = pc.election_id
+                  where pc.id = c.previous_round_id and pe.kind = 'general'
+                )
+            ),
+            tree(id) as (
+              select id from roots
+              union all
+              select c.id from contest c join roots r on c.previous_round_id = r.id
+              union all
+              select c.id from contest c join tree on c.allocation_parent_id = tree.id
+            ),
+            winners as materialized (
+              select o.id, o.contest_id as contest, o.party_id, max(coalesce(x.seats, 1)) as seats
+              from tree t
+              join contest_option o on o.contest_id = t.id
+              join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              where not exists (select from contest k where k.allocation_parent_id = t.id)
+              group by o.id, o.contest_id, o.party_id
+            ),
+            leads as (
+              select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
+              from winners w
+              join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id and ch.party_id is not null
+              join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
+              join result_rollup y on y.result_set_k = rs.k and y.option_k = ch.k
+              where w.party_id is null
+              group by ch.parent_option_id, ch.party_id, ch.k
+              order by ch.parent_option_id, max(y.value) desc
+            )
+            select coalesce(pm.into_id, w.party_id, ld.party_id) as party, sum(w.seats)::int as seats
+            from winners w
+            left join leads ld on ld.parent = w.id
+            left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+            group by 1
+          `),
+      ]);
+      let earlier = 0;
+      for (const row of previous?.rows ?? []) {
+        earlier += row.seats;
+      }
+      const before =
+        previous == null || earlier < filled * 0.9 || earlier > filled * 1.1
+          ? null
+          : Map.groupBy(previous.rows, (row) =>
+              row.party == null
+                ? "none"
+                : `party:${parentOf.get(row.party) ?? row.party}`,
+            )
+              .entries()
+              .map(([key, rows]) => {
+                let seats = 0;
+                for (const row of rows) {
+                  seats += row.seats;
+                }
+                return { key, seats };
+              })
+              .toArray();
       return {
         map,
+        before,
         contest: single?.id ?? null,
         name:
           labels.full.get(
@@ -3761,6 +3847,9 @@ export const elections = {
               }),
             ),
             places: Places,
+            before: v.nullable(
+              v.array(v.object({ key: v.string(), seats: v.number() })),
+            ),
             map: v.nullable(
               v.object({
                 tiles: v.string(),

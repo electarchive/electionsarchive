@@ -73,12 +73,27 @@
               (row) => row.person != null && row.person === elector?.person,
             );
       const legend = race.places?.legend ?? [];
+      const before = new Map(
+        (race.before ?? []).map((entry) => [entry.key, entry.seats]),
+      );
+      const change =
+        race.before == null
+          ? null
+          : Object.fromEntries(
+              seated.flatMap((row) => {
+                const earlier = before.get(row.key);
+                return earlier == null
+                  ? []
+                  : [[row.key, (row.seats ?? 0) - earlier]];
+              }),
+            );
       const ordered = seated.toSorted(
         (a, b) =>
           (a.lean ?? 1e9) - (b.lean ?? 1e9) || (b.seats ?? 0) - (a.seats ?? 0),
       );
       return {
         ...race,
+        change,
         tones: legend.map((item) => swatch(item.color, item.key)),
         titles: legend.map((item) =>
           item.person == null ? (item.short ?? item.label) : item.label,
@@ -107,6 +122,8 @@
                     label: row.short ?? row.label,
                     color: swatch(row.color, row.key),
                     value: row.seats ?? 0,
+                    delta:
+                      change == null ? undefined : (change[row.key] ?? null),
                   })),
                   isCount: true,
                   isWhole: race.size != null && race.size <= total + 2,
@@ -380,6 +397,7 @@
       place={race.name}
       link={null}
       size={race.size}
+      change={race.change}
       isComplete={race.size != null || race.count === 1}
     />
   {/if}
@@ -490,7 +508,13 @@
 
 {#snippet balance(bar: {
   total: number;
-  parts: Array<{ key: string; label: string; color: string; value: number }>;
+  parts: Array<{
+    key: string;
+    label: string;
+    color: string;
+    value: number;
+    delta?: number | null;
+  }>;
   isCount: boolean;
   isWhole: boolean;
 })}
@@ -513,6 +537,18 @@
           <span class="shrink-0 font-mono text-xs tabular-nums"
             >{bar.isCount ? count(part.value) : percent(part.value)}</span
           >
+          {#if part.delta !== undefined}
+            <span
+              class={cn("shrink-0 font-mono text-[0.6875rem] tabular-nums", {
+                "text-muted-foreground": part.delta == null || part.delta === 0,
+              })}
+              >{part.delta == null
+                ? m.seats_change_new()
+                : part.delta === 0
+                  ? "±0"
+                  : `${part.delta > 0 ? "+" : "−"}${count(Math.abs(part.delta))}`}</span
+            >
+          {/if}
         </span>
       {/each}
     </span>
