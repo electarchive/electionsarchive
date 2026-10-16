@@ -14,7 +14,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.openelections"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 GEORGIA = "https://raw.githubusercontent.com/openelections/openelections-data-ga/"
 FILES = {
@@ -46,6 +46,7 @@ COMMITS = {
     "ID": "f950e6ac1c5e571d7bae0d1b01ddbb1606dcf126",
     "IL": "1fa096f60367a0fe22dc380cc9799abd5228b89c",
     "IN": "b130b78cd7b55e57e766623772424f60c0e640bd",
+    "KY": "025799258505414d62830ea75fd34b58cb2ee59b",
     "KS": "11acd83f630a1404cfa507671e3ccf579b2887d8",
     "LA": "dd8cf041685b466f0d32fab0ba1c3421f4fec2a5",
     "MA": "2bdb08c234c07f042925eacdad602326a72ecd94",
@@ -69,8 +70,10 @@ COMMITS = {
     "SD": "9e01b9aea628e9ae17ada6656b649daf319fd212",
     "TN": "4cb8cc5d0bb74b45dc05ad03c80c41b246301c1c",
     "TX": "c7185327aa987ecc23fefdde0ee53f5238f5da70",
+    "UT": "a023ab4d87c4a93f0913f505c6fcbad1a585db57",
     "VT": "d7605acb83071648ea78bbdf2cf9cee7c5b4ed56",
     "WA": "5ad56d3900dfe3678b827a6125e9c446fd32628b",
+    "WI": "f344a0ee7effcea4cf835750a3584a7fbb754b6d",
     "WV": "49d32c279d0e02d740c8af4fcb5b5eee380fbed4",
     "WY": "d4d430672e8823beeb7dbc9274362992739155c3",
 }
@@ -88,7 +91,7 @@ MISSPELLED = {
     ("SD", "bufaflo"): "buffalo",
     ("WA", "wahkiukum"): "wahkiakum",
 }
-LEVELS = {"__county": 0, "": 1, "__precinct": 2}
+LEVELS = {"__county": 0, "": 1, "__precinct": 2, "__ward": 3}
 SENATE = re.compile(r"\b(u\.?\s?s\.?|united states)\s*senat")
 HOUSE = re.compile(r"\b(u\.?\s?s\.?|united states)\s*(house|rep)|congress")
 NOT_COUNTED = (
@@ -100,17 +103,21 @@ def picks() -> list[tuple[str, int, str]]:
     chosen: list[tuple[str, int, str]] = []
     for state, commit in COMMITS.items():
         tree = json.loads(raw.cached(SOURCE, TREE.format(state=state.lower(), commit=commit)).path.read_text())
-        best: dict[int, tuple[int, str]] = {}
+        best: dict[int, tuple[int, list[str]]] = {}
         for entry in tree["tree"]:
             found = re.fullmatch(
-                rf"(?:.*/)?(\d{{4}})\d{{4}}__{state.lower()}__general(__county|__precinct)?\.csv", entry["path"]
+                rf"(?:.*/)?(\d{{4}})11\d{{2}}__{state.lower()}__general(__county|__precinct|__ward|__[a-z_]+__precinct)?\.csv",
+                entry["path"],
             )
             if entry["type"] != "blob" or found is None:
                 continue
-            year, level = int(found[1]), LEVELS[found[2] or ""]
-            if 2000 <= year <= 2014 and year % 2 == 0 and (year not in best or level < best[year][0]):
-                best[year] = (level, entry["path"])
-        chosen.extend((state, year, path) for year, (_, path) in sorted(best.items()))
+            year, level = int(found[1]), LEVELS.get(found[2] or "", 4)
+            if 2000 <= year <= 2014 and year % 2 == 0:
+                if year not in best or level < best[year][0]:
+                    best[year] = (level, [entry["path"]])
+                elif level == best[year][0] == 4:
+                    best[year][1].append(entry["path"])
+        chosen.extend((state, year, path) for year, (_, paths) in sorted(best.items()) for path in paths)
     return chosen
 
 
@@ -184,6 +191,8 @@ def parse() -> None:
             print(f"{path}: no county, office, candidate, or votes column, skipped")
             continue
         office = pl.col("office").fill_null("").str.to_lowercase()
+        if state == "WI":
+            office = office.replace({"house": "u.s. house", "senate": "u.s. senate"})
         chamber = (
             pl.when(office.str.contains(SENATE.pattern) & ~office.str.contains("state"))
             .then(pl.lit("senate"))
