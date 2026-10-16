@@ -435,9 +435,15 @@ def publish(conn: Connection, changeset_id: str) -> None:
                 for (area,) in conn.execute(
                     sql.SQL(
                         """select s.area_id from {} s where not exists (
-                             select 1 from public.area_parent p where p.area_id = s.area_id and p.parent_id = s.parent_id
-                             and p.valid_from is not distinct from s.valid_from and p.valid_to is not distinct from s.valid_to)"""
-                    ).format(stage.staged("area_parent"))
+                             select 1 from public.area_parent p where p.area_id = s.area_id and p.parent_id = s.parent_id{})"""
+                    ).format(
+                        stage.staged("area_parent"),
+                        sql.SQL("").join(
+                            sql.SQL(" and p.{column} is not distinct from s.{column}").format(column=sql.Identifier(column))
+                            for column in ("valid_from", "valid_to")
+                            if column in stage.tables["area_parent"]
+                        ),
+                    )
                 ).fetchall()
             ]
             if "area_parent" in stage.tables
@@ -562,6 +568,11 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
         raise ValueError(f"{changeset_id} has later changesets built on it: {', '.join(row for (row,) in dependents)}")
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
+        conn.execute(
+            """delete from search_document where entity_id in (select id from entity where changeset_id = %(id)s)
+               or polity_id in (select id from polity where changeset_id = %(id)s)""",
+            {"id": changeset_id},
+        )
         for table in (*FACTS, "result_rollup"):
             conn.execute(
                 sql.SQL(

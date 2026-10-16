@@ -280,7 +280,9 @@ export const citation = pgTable("citation", {
 	locator: jsonb(),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
-});
+}, (table) => [
+	index("citation_entity_idx").using("btree", table.entityId.asc().nullsLast()),
+]);
 
 export const contest = pgTable("contest", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
@@ -314,6 +316,10 @@ export const contest = pgTable("contest", {
 		name: "contest_previous_round_id_fkey"
 	}),
 	index("contest_allocation_parent_idx").using("btree", table.allocationParentId.asc().nullsLast()),
+	index("contest_previous_round_idx").using("btree", table.previousRoundId.asc().nullsLast()),
+	index("contest_body_idx").using("btree", table.bodyId.asc().nullsLast()),
+	index("contest_district_area_idx").using("btree", table.districtAreaId.asc().nullsLast()),
+	index("contest_seat_idx").using("btree", table.seatId.asc().nullsLast()),
 	index("contest_election_idx").using("btree", table.electionId.asc().nullsLast()),
 	index("contest_office_idx").using("btree", table.officeId.asc().nullsLast()),
 ]);
@@ -337,6 +343,7 @@ export const contestOption = pgTable("contest_option", {
 		name: "contest_option_parent_option_id_fkey"
 	}),
 	index("contest_option_contest_idx").using("btree", table.contestId.asc().nullsLast()),
+	index("contest_option_parent_option_idx").using("btree", table.parentOptionId.asc().nullsLast()),
 	unique("contest_option_k_key").on(table.k),]);
 
 export const crosswalk = pgTable("crosswalk", {
@@ -455,7 +462,9 @@ export const flag = pgTable("flag", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-check("flag_check", sql`(num_nonnulls(entity_id, result_set_id) >= 1)`),]);
+check("flag_check", sql`(num_nonnulls(entity_id, result_set_id) >= 1)`),
+	index("flag_entity_idx").using("btree", table.entityId.asc().nullsLast()),
+	index("flag_result_set_idx").using("btree", table.resultSetId.asc().nullsLast()),]);
 
 export const government = pgTable("government", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
@@ -796,6 +805,8 @@ export const reportingUnit = pgTable("reporting_unit", {
 	}),
 	index("reporting_unit_area_idx").using("btree", table.areaId.asc().nullsLast()),
 	index("reporting_unit_parent_idx").using("btree", table.parentId.asc().nullsLast()),
+	index("reporting_unit_counted_with_idx").using("btree", table.countedWithId.asc().nullsLast()),
+	index("reporting_unit_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 	unique("reporting_unit_k_key").on(table.k),	unique("reporting_unit_scheme_code_code_valid_key").on(table.schemeCode, table.code, table.valid),check("reporting_unit_check", sql`((area_relation = 'unlocated'::area_relation) = (area_id IS NULL))`),]);
 
 export const reportingUnitArea = pgTable("reporting_unit_area", {
@@ -862,6 +873,7 @@ export const resultSet = pgTable("result_set", {
 		name: "result_set_supersedes_id_fkey"
 	}),
 	index("result_set_contest_idx").using("btree", table.contestId.asc().nullsLast()),
+	index("result_set_supersedes_idx").using("btree", table.supersedesId.asc().nullsLast()),
 	uniqueIndex("result_set_default_idx").using("btree", table.electionId.asc().nullsLast(), table.contestId.asc().nullsLast(), table.stage.asc().nullsLast()).where(sql`is_default`),
 	unique("result_set_k_key").on(table.k),]);
 
@@ -899,6 +911,7 @@ export const searchDocument = pgTable("search_document", {
 }, (table) => [
 	index("search_document_trgm_idx").using("gin", table.text.asc().nullsLast().op("gin_trgm_ops")),
 	index("search_document_tsv_idx").using("gin", table.tsv.asc().nullsLast()),
+	index("search_document_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 ]);
 
 export const seat = pgTable("seat", {
@@ -923,6 +936,7 @@ export const slug = pgTable("slug", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
+	index("slug_entity_idx").using("btree", table.entityId.asc().nullsLast()),
 	uniqueIndex("slug_current_idx").using("btree", table.entityId.asc().nullsLast()).where(sql`is_current`),
 ]);
 
@@ -993,6 +1007,7 @@ export const tenure = pgTable("tenure", {
 		foreignColumns: [table.id],
 		name: "tenure_succeeds_tenure_id_fkey"
 	}),
+	index("tenure_contest_idx").using("btree", table.contestId.asc().nullsLast()),
 	index("tenure_office_idx").using("btree", table.officeId.asc().nullsLast()),
 	index("tenure_person_idx").using("btree", table.personId.asc().nullsLast()),
 check("tenure_check", sql`(num_nonnulls(office_id, body_id) >= 1)`),]);
