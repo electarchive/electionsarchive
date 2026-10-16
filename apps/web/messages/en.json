@@ -24,6 +24,17 @@
   "theme_dark": "Dark",
   "CREDENTIAL_ACCOUNT_NOT_FOUND": "The email and password don't match. Check them and try again.",
   "home_intro": "Every election in the world.",
+  "home_search_cta": "Search places, elections, parties, and people",
+  "home_search_try": "Try",
+  "home_map_title": "Archive depth by country",
+  "home_map_lede": "Color intensity indicates how far back the records go. Gray countries only include European Parliament elections. Hover or tap a country to see its record.",
+  "home_map_since": "Since {year}",
+  "home_map_older": "Older",
+  "home_map_newer": "Newer",
+  "home_recent": "Latest national elections",
+  "home_upcoming": "Upcoming elections",
+  "home_today": "This week in history",
+  "home_today_lede": "Elections held within a few days of today's date in previous years.",
   "home_polities": "Polities",
   "home_elections": [
     {

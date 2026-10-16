@@ -8,6 +8,7 @@
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { orpc } from "#lib/rpc.js";
+  import { finder } from "#lib/search.svelte.js";
 
   const GROUPS: Array<[string, () => string]> = [
     ["polity", m.search_group_polity],
@@ -17,12 +18,10 @@
     ["person", m.search_group_person],
   ];
 
-  let isOpen = $state(false);
-  let value = $state("");
   let term = $state("");
 
   $effect(() => {
-    const next = value.trim();
+    const next = finder.value.trim();
     const timer = setTimeout(() => (term = next), 140);
     return () => clearTimeout(timer);
   });
@@ -35,14 +34,14 @@
         !event.altKey
       ) {
         event.preventDefault();
-        isOpen = !isOpen;
+        finder.isOpen = !finder.isOpen;
       }
     }),
   );
 
   const query = createQuery(() => ({
     ...orpc.search.query.queryOptions({ input: { q: term, limit: 20 } }),
-    enabled: isOpen && term !== "",
+    enabled: finder.isOpen && term !== "",
     placeholderData: keepPreviousData,
     meta: { quiet: true },
   }));
@@ -63,7 +62,7 @@
 <button
   type="button"
   class="flex items-center gap-2 rounded-sm border border-input bg-card ps-2.5 pe-1.5 text-sm text-muted-foreground block-8 hover:bg-secondary hover:text-foreground"
-  onclick={() => (isOpen = true)}
+  onclick={() => (finder.isOpen = true)}
 >
   <SearchIcon class="block-4 inline-4" />
   <span class="max-sm:sr-only">{m.search_open()}</span>
@@ -74,23 +73,26 @@
 </button>
 
 <Command.Dialog
-  bind:open={isOpen}
+  bind:open={finder.isOpen}
   title={m.search_title()}
   description={m.search_placeholder()}
   shouldFilter={false}
   class="sm:max-inline-xl"
 >
-  <Command.Input placeholder={m.search_placeholder()} bind:value />
+  <Command.Input
+    placeholder={m.search_placeholder()}
+    bind:value={finder.value}
+  />
   <Command.List class="max-block-[min(28rem,60dvh)]">
-    {#if value.trim() === ""}
+    {#if finder.value.trim() === ""}
       <p class="px-3 py-4 text-sm text-pretty text-muted-foreground">
         {m.search_hint()}
       </p>
     {:else if groups.length === 0}
       <p class="px-3 py-4 text-sm text-muted-foreground">
-        {query.isFetching || term !== value.trim()
+        {query.isFetching || term !== finder.value.trim()
           ? m.search_loading()
-          : m.search_empty({ query: value.trim() })}
+          : m.search_empty({ query: finder.value.trim() })}
       </p>
     {/if}
     {#each groups as group (group.type)}
@@ -100,8 +102,8 @@
             value={hit.id}
             class="grid gap-0 py-1"
             onSelect={() => {
-              isOpen = false;
-              value = "";
+              finder.isOpen = false;
+              finder.value = "";
               if (hit.path != null) {
                 void goto(resolve("/[...path]", { path: hit.path }));
               }

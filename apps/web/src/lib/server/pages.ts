@@ -15,14 +15,127 @@ async function found<T>(promise: Promise<T>) {
   }
 }
 
+async function draw() {
+  const result = await db.execute<{
+    id: string;
+    path: string;
+    covered: boolean;
+    box: string;
+    inset: string;
+  }>(
+    sql`
+      with shapes as (
+        select distinct on (pt.polity_id) pt.polity_id as id, ag.geom
+        from polity_territory pt join polity y on y.id = pt.polity_id
+        join area_geometry ag on ag.area_id = pt.area_id
+        where y.kind = 'sovereign_state' and upper_inf(pt.valid)
+        order by pt.polity_id, upper(ag.valid) desc nulls first, lower(ag.valid) desc nulls last
+      ),
+      context as (
+        select distinct on (a.id) a.id, ag.geom
+        from area a join area_geometry ag on ag.area_id = a.id
+        where a.scheme_code = 'eu.member_state'
+        order by a.id, upper(ag.valid) desc nulls first
+      ),
+      projected as (
+        select id, ST_Scale(ST_Transform(geom, 8857), 0.001, 0.001) as geom, true as covered from shapes
+        union all
+        select id, ST_Scale(ST_Transform(geom, 8857), 0.001, 0.001), false from context
+      ),
+      cleaned as (
+        select id, covered, ST_SimplifyPreserveTopology(ST_Collect(d.geom), 12) as geom
+        from projected cross join lateral ST_Dump(projected.geom) d
+        where ST_Area(d.geom) > 600
+        group by id, covered
+      ),
+      bounds as (
+        select ST_Extent(geom) as box,
+          ST_Scale(ST_Transform(ST_Segmentize(ST_MakeEnvelope(-11, 35, 45, 61, 4326), 1), 8857), 0.001, 0.001) as europe
+        from cleaned
+      )
+      select c.id, ST_AsSVG(c.geom, 0, 0) as path, c.covered,
+        concat_ws(' ', floor(ST_XMin(b.box)) - 40, -ceil(ST_YMax(b.box)) - 40,
+          ceil(ST_XMax(b.box) - ST_XMin(b.box)) + 80, ceil(ST_YMax(b.box) - ST_YMin(b.box)) + 80) as box,
+        concat_ws(' ', floor(ST_XMin(b.europe)), -ceil(ST_YMax(b.europe)),
+          ceil(ST_XMax(b.europe) - ST_XMin(b.europe)), ceil(ST_YMax(b.europe) - ST_YMin(b.europe))) as inset
+      from cleaned c cross join bounds b
+      order by c.covered, c.id
+    `,
+  );
+  return {
+    box: result.rows[0]?.box ?? "0 0 1 1",
+    inset: result.rows[0]?.inset ?? "0 0 1 1",
+    shapes: result.rows.map((row) => ({
+      id: row.id,
+      path: row.path,
+      isCovered: row.covered,
+    })),
+  };
+}
+
+const atlas = new Map<string, ReturnType<typeof draw>>();
+
 export async function home() {
-  const polities = await call(router.polities.list, undefined);
+  const drawn = atlas.get("world") ?? draw();
+  atlas.set("world", drawn);
+  const [polities, shapes, dated] = await Promise.all([
+    call(router.polities.list, undefined),
+    drawn,
+    db.execute<{
+      id: string;
+      name: string | null;
+      path: string;
+      date: string;
+      kind: string;
+      polity: string;
+      when: string;
+    }>(sql`
+      with picked as (
+        (select e.id, e.date_from, e.kind, e.polity_id, 'recent' as when
+          from election e join polity y on y.id = e.polity_id
+          where e.parent_id is null and y.kind in ('sovereign_state', 'supranational')
+            and e.kind in ('general', 'referendum') and e.date_from <= current_date
+          order by e.date_from desc limit 6)
+        union all
+        (select e.id, e.date_from, e.kind, e.polity_id, 'upcoming'
+          from election e
+          where e.parent_id is null and e.date_from > current_date
+          order by e.date_from limit 4)
+        union all
+        (select e.id, e.date_from, e.kind, e.polity_id, 'today'
+          from election e
+          where e.parent_id is null and e.date_from < current_date - 300
+            and abs(extract(doy from e.date_from) - extract(doy from current_date)) <= 3
+          order by (e.kind = 'general') desc, e.date_from desc limit 8)
+      )
+      select p.id, p.date_from::text as date, p.kind::text as kind, p.polity_id as polity, p.when, s.path,
+        (select n.text from name n where n.entity_id = p.id and n.kind in ('official', 'english')
+          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as name
+      from picked p join slug s on s.entity_id = p.id and s.is_current
+    `),
+  ]);
+  const covered = polities.filter(
+    (polity) =>
+      polity.kind === "sovereign_state" || polity.kind === "supranational",
+  );
+  const names = new Map(polities.map((polity) => [polity.id, polity.name]));
+  const elections = dated.rows.map((row) => ({
+    name: row.name ?? "",
+    path: row.path,
+    date: row.date,
+    kind: row.kind,
+    polity: names.get(row.polity) ?? null,
+    when: row.when,
+  }));
   return {
     kind: "home" as const,
-    polities: polities.filter(
-      (polity) =>
-        polity.kind === "sovereign_state" || polity.kind === "supranational",
-    ),
+    polities: covered,
+    atlas: shapes,
+    recent: elections.filter((election) => election.when === "recent"),
+    upcoming: elections
+      .filter((election) => election.when === "upcoming")
+      .toSorted((a, b) => a.date.localeCompare(b.date)),
+    today: elections.filter((election) => election.when === "today"),
   };
 }
 

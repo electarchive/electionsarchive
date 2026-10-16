@@ -152,7 +152,10 @@ export async function twin({ request, url }: RequestEvent) {
       url.searchParams,
     );
     if (format === "json") {
-      return Response.json(data, { headers });
+      return Response.json(
+        data.kind === "home" ? { ...data, atlas: undefined } : data,
+        { headers },
+      );
     }
     const base = `${url.origin}${pathname === "/" ? "/index" : pathname}`;
     const link: Link = (name, path) =>
