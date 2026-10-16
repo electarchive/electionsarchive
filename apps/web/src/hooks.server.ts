@@ -4,6 +4,7 @@ import { sequence } from "@sveltejs/kit/hooks";
 import { svelteKitHandler } from "better-auth/svelte-kit";
 import { paraglideMiddleware } from "#lib/paraglide/server.js";
 import { auth } from "#lib/server/auth.js";
+import { twin } from "#lib/server/twin.js";
 
 const paraglideHandle: Handle = async ({ event, resolve }) =>
   paraglideMiddleware(
@@ -29,4 +30,12 @@ const authHandle: Handle = async ({ event, resolve }) => {
   return svelteKitHandler({ event, resolve, auth, building });
 };
 
-export const handle: Handle = sequence(paraglideHandle, authHandle);
+const twinHandle: Handle = async ({ event, resolve }) => {
+  const response = (await twin(event)) ?? (await resolve(event));
+  if (response.headers.get("content-type")?.startsWith("text/html") === true) {
+    response.headers.append("vary", "Accept");
+  }
+  return response;
+};
+
+export const handle: Handle = sequence(paraglideHandle, twinHandle, authHandle);

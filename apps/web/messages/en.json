@@ -425,5 +425,11 @@
   "party_relations": "Lineage and affiliations",
   "party_none": "No contests published for this party yet.",
   "party_won": "{count} won",
-  "party_elections": "Elections"
+  "party_elections": "Elections",
+  "twin_alternates": "Also available as HTML at {html} and JSON at {json}.",
+  "col_date": "Date",
+  "col_election": "Election",
+  "col_name": "Name",
+  "col_polity": "Polity",
+  "twin_not_found": "Page not found."
 }
