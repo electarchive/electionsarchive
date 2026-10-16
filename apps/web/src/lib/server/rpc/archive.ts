@@ -4960,7 +4960,13 @@ export const polities = {
         (row) => row.date != null && row.date <= today && row.status === "held",
       );
       const recent =
-        held.find((row) => row.kind === "general") ?? held[0] ?? null;
+        held.find(
+          (row) =>
+            row.kind === "general" &&
+            Date.parse(held[0]?.date ?? "") - Date.parse(row.date ?? "") < 9e10,
+        ) ??
+        held[0] ??
+        null;
       const parents = new Set(here.rows.map((row) => row.parent));
       const kept = here.rows.filter((row) => !parents.has(row.id));
       const [labels, slugs, raced, built] = await Promise.all([
