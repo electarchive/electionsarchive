@@ -208,21 +208,11 @@ export async function chamber(path: string) {
   });
   const isSeated =
     body.makeup.length > 0 && covered.length >= 0.8 * body.makeup.length;
-  const results = points.map((point) => {
-    const listed = point.parties
-      .filter((entry) => entry.listed > 0)
-      .map((entry) => ({ party: entry.party, seats: entry.listed }))
-      .toSorted((a, b) => b.seats - a.seats);
-    const seats = size(point.date) ?? point.filled;
-    return {
-      start: point.date,
-      parties:
-        total(point.parties) > seats && total(listed) >= 0.9 * seats
-          ? listed
-          : point.parties,
-      election: { name: point.name, path: point.path, date: point.date },
-    };
-  });
+  const results = points.map((point) => ({
+    start: point.date,
+    parties: point.parties,
+    election: { name: point.name, path: point.path, date: point.date },
+  }));
   const first = Date.parse(body.makeup[0]?.start ?? "9999-12-31") - 2e10;
   const earlier = results.filter((term) => Date.parse(term.start) < first);
   const raw = isSeated

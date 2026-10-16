@@ -5120,7 +5120,6 @@ export const polities = {
                   v.object({
                     party: v.nullable(v.string()),
                     seats: v.number(),
-                    listed: v.number(),
                   }),
                 ),
               }),
@@ -5160,7 +5159,6 @@ export const polities = {
         party: string | null;
         seats: number;
         share: number | null;
-        listed: number | null;
       }>(sql`
         with recursive roots as materialized (
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
@@ -5247,17 +5245,33 @@ export const polities = {
           left join won wn on wn.root = f.root and wn.id = f.top
           where f.count_round = f.first
           group by f.root
+        ),
+        seated as (
+          select r.seat, bool_or(r."isOffice") as "isOffice", coalesce(r.link::text, r.year::text) as bucket,
+            (array_agg(r.link))[1] as link,
+            min(r.date) as day, min(r.year) as year, count(distinct r.id)::int as races,
+            w.party, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
+            coalesce(sum(w.seats) filter (where r."isList"), 0)::int as listed
+          from roots r
+          join won w on w.root = r.id
+          left join shares sh on sh.root = r.id
+          group by r.seat, coalesce(r.link::text, r.year::text), w.party
+        ),
+        sized as (
+          select t.*, sum(t.seats) over b as total, sum(t.listed) over b as lists,
+            (select z.seats from body_size z
+              where z.body_id = t.seat and (z.valid @> t.day or lower(z.valid) between t.day and t.day + 400)
+              order by lower(z.valid) desc limit 1) as size
+          from seated t window b as (partition by t.seat, t.bucket)
+        ),
+        flagged as (
+          select s.*, coalesce(s.total > s.size * 1.02 and s.lists >= s.size * 0.9, false) as "isMixed" from sized s
         )
-        select r.seat, bool_or(r."isOffice") as "isOffice", coalesce(r.link::text, r.year::text) as bucket,
-          (array_agg(r.link))[1] as link,
-          min(r.date)::text as date, min(r.year) as year, count(distinct r.id)::int as races,
-          w.party, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
-          (sum(w.seats) filter (where r."isList"))::int as listed
-        from roots r
-        join won w on w.root = r.id
-        left join shares sh on sh.root = r.id
-        group by r.seat, coalesce(r.link::text, r.year::text), w.party
-        order by min(r.date)
+        select seat, "isOffice", bucket, link, day::text as date, year, races, party, share,
+          case when "isMixed" then listed else seats end as seats
+        from flagged
+        where not ("isMixed" and listed = 0)
+        order by day
       `);
       const cabinets = await db.execute<{
         id: string;
@@ -5346,11 +5360,7 @@ export const polities = {
                         ? first.share
                         : null,
                     parties: group
-                      .map((row) => ({
-                        party: row.party,
-                        seats: row.seats,
-                        listed: row.listed ?? 0,
-                      }))
+                      .map((row) => ({ party: row.party, seats: row.seats }))
                       .toSorted((a, b) => b.seats - a.seats),
                   };
                 })
@@ -5367,21 +5377,16 @@ export const polities = {
                     next.filled += point.filled;
                     next.share = null;
                     const merged = new Map(
-                      next.parties.map((entry) => [entry.party, { ...entry }]),
+                      next.parties.map((entry) => [entry.party, entry.seats]),
                     );
                     for (const entry of point.parties) {
-                      const held = merged.get(entry.party) ?? {
-                        party: entry.party,
-                        seats: 0,
-                        listed: 0,
-                      };
-                      held.seats += entry.seats;
-                      held.listed += entry.listed;
-                      merged.set(entry.party, held);
+                      merged.set(
+                        entry.party,
+                        (merged.get(entry.party) ?? 0) + entry.seats,
+                      );
                     }
-                    next.parties = merged
-                      .values()
-                      .toArray()
+                    next.parties = [...merged]
+                      .map(([party, seats]) => ({ party, seats }))
                       .toSorted((x, y) => y.seats - x.seats);
                     return [];
                   }
