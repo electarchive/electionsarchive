@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { count, date } from "#lib/format.js";
   import { palette } from "#lib/palette.svelte.js";
@@ -95,17 +96,26 @@
     <header
       class="col-span-12 grid gap-1.5 border-bs-[6px] border-(--party) bg-card px-3.5 pbs-4 pbe-3.5"
     >
-      <h1
-        class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-      >
-        {party.name}
-        {#if party.short != null && party.short !== party.name}
-          <span
-            class="ms-1 font-sans text-[0.5em] font-semibold tracking-normal text-muted-foreground"
-            >{party.short}</span
-          >
-        {/if}
-      </h1>
+      <div class="flex items-start justify-between gap-3">
+        <h1
+          class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
+        >
+          {party.name}
+          {#if party.short != null && party.short !== party.name}
+            <span
+              class="ms-1 font-sans text-[0.5em] font-semibold tracking-normal text-muted-foreground"
+              >{party.short}</span
+            >
+          {/if}
+        </h1>
+        <a
+          class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
+          href={resolve(`/compare?a=${data.id}`)}
+          ><ArrowLeftRightIcon
+            class="block-3.5 inline-3.5"
+          />{m.versus_action()}</a
+        >
+      </div>
       <p
         class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
       >
