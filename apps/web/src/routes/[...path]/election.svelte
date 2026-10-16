@@ -226,7 +226,11 @@
                     ? m.race_lede_seats({
                         party: leader.label,
                         seats: count(leader.seats ?? 0),
-                        total: count(race.size ?? total),
+                        total: count(
+                          race.size != null && race.size <= total + 2
+                            ? race.size
+                            : total,
+                        ),
                         share: percent(leader.share),
                       })
                     : runner == null
