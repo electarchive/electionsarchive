@@ -27,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "18"
+VERSION = "19"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -1437,6 +1437,176 @@ EARLY_PARTIES[SIIRT_2003] = {
     "cumhuriyet-halk-partisi": "Cumhuriyet Halk Partisi",
     "adalet-ve-kalkinma-partisi": "Adalet ve Kalkınma Partisi",
 }
+LISTS_EARLY = {
+    DAY_1983: (
+        f"{ARCHIVE}/18181.pdf",
+        range(15, 69),
+        0.44,
+        0.3,
+        {},
+        {68: 0.319},
+        (
+            "milliyetci-demokrasi-partisi",
+            "halkci-parti",
+            "anavatan-partisi-1983",
+        ),
+        False,
+        1,
+        False,
+        {},
+        "centered",
+    ),
+    DAY_1987: (
+        f"{YSK_DOCS}/Milletvekili/1983-2007/1987MV-KesinAdayListesi.pdf",
+        range(1, 153),
+        0.46,
+        0.3,
+        {},
+        {},
+        (
+            "anavatan-partisi-1983",
+            "demokratik-sol-parti",
+            "demokrat-parti",
+            "millet-partisi",
+            "milliyetci-hareket-partisi",
+            "refah-partisi",
+            "sosyaldemokrat-halkci-parti",
+        ),
+        True,
+        1,
+        False,
+        {},
+        None,
+    ),
+    DAY_1991: (
+        f"{YSK_DOCS}/Milletvekili/1983-2007/1991MV-KesinAdayListesi.pdf",
+        range(1, 185),
+        0.47,
+        0.3,
+        {},
+        {},
+        (
+            "anavatan-partisi-1983",
+            "demokratik-sol-parti",
+            "demokrat-parti",
+            "refah-partisi",
+            "sosyaldemokrat-halkci-parti",
+            "sosyalist-parti",
+        ),
+        True,
+        2,
+        False,
+        {},
+        "centered",
+    ),
+    DAY_1995: (
+        f"{ARCHIVE}/22485_1.pdf",
+        range(1, 221),
+        0.58,
+        0.45,
+        {},
+        {},
+        tuple(key for key in EARLY_PARTIES[DAY_1995] if key != INDEPENDENTS),
+        True,
+        1,
+        False,
+        {},
+        "centered",
+    ),
+    DAY_1999: (
+        f"{ARCHIVE}/23634.pdf",
+        range(9, 339),
+        0.55,
+        0.45,
+        {9: 0.5945, 107: 0.5335, 179: 0.5387},
+        {},
+        (
+            "sol-parti",
+            "isci-partisi",
+            "demokrasi-ve-baris-partisi",
+            "degisen-turkiye-partisi",
+            "anavatan-partisi-1983",
+            "emek-partisi",
+            "demokrat-turkiye-partisi",
+            "genc-parti",
+            "buyuk-birlik-partisi",
+            "demokrat-parti-1992",
+            "demokratik-sol-parti",
+            "fazilet-partisi",
+            "cumhuriyet-halk-partisi",
+            "liberal-demokrat-parti",
+            "baris-partisi",
+            "millet-partisi",
+            "demokrat-parti",
+            "turkiye-komunist-partisi",
+            "halkin-demokrasi-partisi",
+            "milliyetci-hareket-partisi",
+        ),
+        True,
+        1,
+        True,
+        {9: 0.25, 303: 0.13},
+        "wide",
+    ),
+    DAY_2002: (
+        f"{GAZETTE}/2002/09/20020926.htm",
+        range(1, 321),
+        0.58,
+        0.45,
+        {},
+        {},
+        tuple(key for key in EARLY_PARTIES[DAY_2002] if key != INDEPENDENTS),
+        True,
+        1,
+        True,
+        {},
+        None,
+    ),
+}
+UNLISTED_EARLY = {
+    (DAY_1999, "13", "degisen-turkiye-partisi"),
+    (DAY_1999, "72", "degisen-turkiye-partisi"),
+}
+OUT_OF_ORDER_EARLY = {
+    (DAY_1983, "51", "halkci-parti"),
+    (DAY_1983, "55-1", "halkci-parti"),
+    (DAY_1995, "38", "refah-partisi"),
+    (DAY_2002, "27", "adalet-ve-kalkinma-partisi"),
+    (DAY_2002, "77", "cumhuriyet-halk-partisi"),
+}
+PUBLISHED_LISTS_EARLY = {
+    DAY_1983: "in Resmî Gazete 18181 on October 4, 1983",
+    DAY_1987: "on YSK's website",
+    DAY_1991: "on YSK's website",
+    DAY_1995: "in Resmî Gazete 22485 on December 6, 1995",
+    DAY_1999: "in Resmî Gazete 23634 on March 9, 1999",
+    DAY_2002: "in the Resmî Gazete of September 26, 2002",
+}
+LISTS_EARLY_SOURCE = (
+    "YSK's final candidate lists for the {date} parliamentary election, published {published}. For each electoral "
+    "district, the lists include every party's ranked list and independent candidates. These are OCR transcriptions "
+    "of scanned pages where columns were blanked out before processing, leaving only rank and name. Each candidate "
+    "includes a page and bounding-box locator; names may be misspelled if the scan was unclear."
+)
+KONTENJAN_CAVEAT = (
+    "A candidate marked kontenjan is the party's candidate for the district's kontenjan seat, which went to the list "
+    "with the most votes. This candidate is shown without a list position."
+)
+PREFERENCE_1991_CAVEAT = (
+    "In 1991, voters could mark preferred candidates within a party's list, so elected members are not always the top "
+    "names on their list."
+)
+UNCOUNTED_INDEPENDENTS_CAVEAT = (
+    "The gazette's final lists include independent candidates in this district, but the official results record no "
+    "votes for independents here."
+)
+UNLISTED_CAVEAT = (
+    "The gazette prints no {party} list for this district, though official results credit the party with votes here."
+)
+OUT_OF_ORDER_CAVEAT = (
+    "The gazette's {party} list ranks {name} at number {position}, below the party's {seats} seats here, yet the "
+    "official results declare {name} elected."
+)
 ABBREVIATIONS_1999 = {
     "DSP": "demokratik-sol-parti",
     "MHP": "milliyetci-hareket-partisi",
@@ -1744,6 +1914,11 @@ def fetch() -> None:
             if name is not None:
                 raw.fetch(SOURCE, f"{YSK_DOCS}/{name}.pdf", suffix=".pdf")
         raw.fetch(SOURCE, MEMBER_LISTS[day], suffix=".wiki")
+    for list_url, list_pages, *_ in LISTS_EARLY.values():
+        raw.fetch(SOURCE, list_url, suffix=Path(list_url).suffix)
+        if list_url.endswith(".htm"):
+            for page in list_pages:
+                raw.fetch(SOURCE, list_url.replace(".htm", f"-{page}.gif"), suffix=".gif")
     raw.fetch(SOURCE, DISTRICTS_1999, suffix=".htm")
     raw.fetch(SOURCE, SIIRT_GAZETTE, suffix=".htm")
     raw.fetch(SOURCE, SIIRT_PAGE, suffix=".gif")
@@ -1763,6 +1938,853 @@ def fetch() -> None:
             f"{WIKIPEDIA}api.php?{urlencode({'action': 'query', 'prop': 'pageprops', 'ppprop': 'wikibase_item', 'redirects': 1, 'format': 'json', 'titles': '|'.join(titles[start : start + 50])})}",
             suffix=".json",
         )
+
+
+def flat(text: str) -> str:
+    return re.sub(r"[^A-Z0-9]", "", upper(text).translate(str.maketrans("ÇĞİÖŞÜÂÎÛ", "CGIOSUAIU")))
+
+
+@dataclass
+class ListLine:
+    kind: str
+    rank: str | None
+    text: str
+    box: list[float]
+
+
+@dataclass
+class ListEvent:
+    kind: str
+    page: int
+    y: float
+    party: str | None = None
+    district: tuple[int, int | None, int] | None = None
+    layer: bool = False
+    rank: str | None = None
+    kontenjan: bool = False
+    name: str = ""
+    box: list[float] = dataclasses.field(default_factory=list)
+
+
+@dataclass
+class ListRow:
+    rank: str | None
+    kontenjan: bool
+    name: str
+    page: int
+    y: float
+    boxes: list[list[float]]
+    sequence: int | None = None
+
+
+@dataclass
+class PrintedList:
+    party: str | None
+    district: tuple[int, int | None, int] | None
+    rows: list[ListRow]
+    inherited: bool = False
+
+
+def early_lists(parliaments: dict[date, dict[str, list[dict[str, object]]]], pages: list[dict[str, object]]) -> None:
+    capitals = "A-ZÇĞİÖŞÜÂÎÛ"
+    letters = "A-Za-zÇĞİÖŞÜçğıöşüÂâÎîÛû"
+    header = re.compile(
+        r"^(SIRA|Sıra|Şıra|NO ?:|ADI SOYADI|Adı ve Soyadı|Sayısı|SAYISI)|ADI SOYADI|Adı ve Soyadı", re.IGNORECASE
+    )
+    names = [(flat(province), index) for index, province in enumerate(PROVINCES)] + [
+        ("AFYON", 2),
+        ("ICEL", 32),
+        ("URFA", 62),
+        ("MARAS", 45),
+        ("KMARAS", 45),
+        ("ANTEP", 26),
+    ]
+
+    def masked(
+        page: int,
+        artifact: raw.Artifact,
+        scanned_gif: bool,
+        setting: tuple[float, float, dict[int, float], dict[int, float], dict[int, float]],
+    ) -> tuple[int, float, list[ListLine], dict[str, object]]:
+        fallback, low, guesses, stops, starts = setting
+        number = 1 if scanned_gif else page
+        image = SCANS / f"{artifact.sha256}-{number}.png"
+        cache = OCR / f"{artifact.sha256}-{number}-lines.json"
+        if not image.exists() or not cache.exists():
+            if scanned_gif:
+                small = Image.open(artifact.path).convert("L")
+                full = small.resize((small.width * 3, small.height * 3), Image.Resampling.LANCZOS)
+            else:
+                with tempfile.TemporaryDirectory() as folder:
+                    subprocess.run(
+                        ["pdftoppm", "-r", "300", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
+                        + [str(artifact.path), f"{folder}/page"],
+                        check=True,
+                    )
+                    full = Image.open(f"{folder}/page.png").convert("L")
+            pixels = np.asarray(full).copy()
+            height, width = pixels.shape
+            if page in stops:
+                pixels[int(stops[page] * height) - 10 :] = 255
+            dark = pixels < 150
+            bands: list[list[int]] = []
+            for y in np.flatnonzero(dark.any(axis=1)):
+                if bands and y - bands[-1][1] <= 3:
+                    bands[-1][1] = int(y)
+                else:
+                    bands.append([int(y), int(y)])
+            gaps: list[int] = []
+            counted = 0
+            for top, bottom in bands:
+                xs = np.flatnonzero(dark[top : bottom + 1].any(axis=0))
+                if bottom - top < 8 or xs[0] >= 0.18 * width:
+                    continue
+                counted += 1
+                gaps += [int(after) for before, after in pairwise(xs) if after - before > 0.012 * width]
+            step = max(1, int(0.004 * width))
+            histogram = np.bincount(np.array(gaps, dtype=int) // step, minlength=width // step + 2)
+            peaks = [
+                bucket * step
+                for bucket in range(len(histogram) - 1)
+                if low * width < bucket * step < (fallback + 0.06) * width
+                and histogram[bucket] + histogram[bucket + 1] >= max(3, 0.3 * counted)
+            ]
+            cut = int((min(peaks) if peaks else (guesses.get(page, fallback) - 0.03) * width) - 0.006 * width)
+            pixels[:, cut:] = 255
+            SCANS.mkdir(parents=True, exist_ok=True)
+            Image.fromarray(pixels).save(image)
+
+            dark = pixels[:, :cut] < 150
+            for y in range(height):
+                if dark[y].sum() > 0.12 * width:
+                    edges = np.flatnonzero(np.diff(np.concatenate(([0], dark[y].astype(np.int8), [0]))))
+                    if (edges[1::2] - edges[::2]).max() > 0.12 * width:
+                        dark[y] = False
+            clean = Image.fromarray(np.where(dark, pixels[:, :cut], 255).astype(np.uint8))
+            bands = []
+            for y in np.flatnonzero(dark.any(axis=1)):
+                if bands and y - bands[-1][1] <= 2:
+                    bands[-1][1] = int(y)
+                else:
+                    bands.append([int(y), int(y)])
+            bands = [band for band in bands if band[1] - band[0] >= 8]
+            split: list[list[int]] = []
+            if bands:
+                typical = float(np.median([bottom - top for top, bottom in bands]))
+                counts = dark.sum(axis=1)
+                while bands:
+                    top, bottom = bands.pop(0)
+                    lo, hi = int(top + 0.6 * typical), int(bottom - 0.6 * typical)
+                    if bottom - top > 1.7 * typical and hi > lo:
+                        middle = lo + int(np.argmin(counts[lo:hi]))
+                        bands[:0] = [[top, middle], [middle + 1, bottom]]
+                    else:
+                        split.append([top, bottom])
+            spans: list[tuple[int, int, int, int]] = []
+            for top, bottom in split:
+                xs = np.flatnonzero(dark[top : bottom + 1].any(axis=0))
+                spans.append((top, bottom, int(xs[0]), int(xs[-1])))
+            lefts = [x0 for _, _, x0, _ in spans if x0 < 0.2 * width]
+            profile = np.zeros(cut, dtype=int)
+            for top, bottom, x0, _ in spans:
+                if x0 < 0.2 * width:
+                    profile += dark[top : bottom + 1].any(axis=0)
+            rank_left = int(np.percentile(lefts, 10)) if lefts else int(0.1 * width)
+            name_start = None
+            blank = None
+            for x in range(rank_left, int(0.3 * width)):
+                if profile[x] <= max(1, len(lefts) * 0.03):
+                    blank = x if blank is None else blank
+                elif blank is not None and x - blank >= 0.008 * width and x > rank_left + 0.01 * width:
+                    name_start = x
+                    break
+                else:
+                    blank = None
+            name_start = int(starts[page] * width) if page in starts else name_start or int(0.16 * width)
+
+            def recognize(crop: scan.Box, numeric: bool) -> str:
+                piece = clean.crop(crop)
+                padded = Image.new("L", (piece.width + 40, piece.height + 40), 255)
+                padded.paste(piece, (20, 20))
+                buffer = io.BytesIO()
+                padded.save(buffer, "PNG")
+                language = ["-l", "eng", "-c", "tessedit_char_whitelist=0123456789"] if numeric else ["-l", "tur"]
+                return (
+                    subprocess.run(
+                        ["tesseract", "stdin", "stdout", "--psm", "7", *language],
+                        input=buffer.getvalue(),
+                        capture_output=True,
+                        check=True,
+                    )
+                    .stdout.decode()
+                    .strip()
+                )
+
+            lines: list[ListLine] = []
+            for top, bottom, x0, x1 in spans:
+                if x0 >= name_start + 0.04 * width:
+                    lines.append(
+                        ListLine(
+                            "head",
+                            None,
+                            recognize((x0 - 4, top - 4, x1 + 4, bottom + 4), False),
+                            [x0 / width, top / height, x1 / width, (bottom + 1) / height],
+                        )
+                    )
+                    continue
+                xs = np.flatnonzero(dark[top : bottom + 1].any(axis=0))
+                runs = [[int(xs[0]), int(xs[0])]]
+                for x in xs[1:]:
+                    if x - runs[-1][1] <= 0.015 * width:
+                        runs[-1][1] = int(x)
+                    else:
+                        runs.append([int(x), int(x)])
+                ranked = len(runs) > 1 and runs[0][1] < name_start + 0.01 * width
+                begin = runs[1][0] if ranked else runs[0][0]
+                lines.append(
+                    ListLine(
+                        "row" if ranked else "cont",
+                        recognize(
+                            (max(0, runs[0][0] - 6), top - 4, runs[0][1] + 6, bottom + 4),
+                            runs[0][1] - runs[0][0] < 0.04 * width,
+                        )
+                        if ranked
+                        else None,
+                        recognize((begin - 6, top - 4, x1 + 6, bottom + 4), False),
+                        [begin / width, top / height, x1 / width, (bottom + 1) / height],
+                    )
+                )
+            OCR.mkdir(parents=True, exist_ok=True)
+            cache.write_text(
+                json.dumps(
+                    {"cut": cut / width, "lines": [dataclasses.asdict(line) for line in lines]}, ensure_ascii=False
+                )
+            )
+        citation = PAGES / f"{artifact.sha256}-{number}.png"
+        if not citation.exists():
+            PAGES.mkdir(parents=True, exist_ok=True)
+            masked_image = Image.open(image)
+            masked_image.resize((masked_image.width // 3, masked_image.height // 3), Image.Resampling.LANCZOS).save(
+                citation
+            )
+        width, height = Image.open(citation).size
+        read = json.loads(cache.read_text())
+        return (
+            page,
+            float(read["cut"]),
+            [ListLine(**line) for line in read["lines"]],
+            {
+                "url": artifact.url,
+                "page": number,
+                "image": f"pages/{SOURCE}/{citation.name}",
+                "width": width,
+                "height": height,
+            },
+        )
+
+    def party_of(text: str, labels: dict[str, str]) -> str | None:
+        folded = flat(text)
+        if folded.startswith(("MILLETVEK", "KESIN", "ADAY")) or len(folded) < 2:
+            return None
+        if folded in ("BAGIMSIZ", "BAGIMSIZLAR"):
+            return INDEPENDENTS
+        if (
+            len(folded) >= 4
+            and ("BAGIMSIZMILLETVEKILI".startswith(folded) or folded.startswith(("BAGIMSIZM", "BAGIMSIZADAY")))
+            and not any(flat(label).startswith(folded) for label in labels.values())
+        ):
+            return INDEPENDENTS
+        hits = [
+            key
+            for key, label in labels.items()
+            if flat(label).startswith(folded) or (len(folded) >= 6 and folded.startswith(flat(label)[: len(folded)]))
+        ]
+        return hits[0] if len(hits) == 1 else None
+
+    def district_of(text: str) -> tuple[int, int | None, int] | None:
+        folded = flat(text)
+        found = None
+        for name, index in names:
+            if folded.startswith(name) and (found is None or len(name) > found[2]):
+                printed = re.search(r"\((\d)\)|İL[İI]\s*(\d)|ILI\s*(\d)", text)
+                found = (index, int(next(group for group in printed.groups() if group)) if printed else None, len(name))
+        return found
+
+    def similar(winner: str, name: str) -> bool:
+        a, b = winner.split(), name.split()
+        return (
+            difflib.SequenceMatcher(None, flat(winner), flat(name)).ratio() >= 0.8
+            or flat(a[-1]) == flat(b[-1])
+            or difflib.SequenceMatcher(None, flat(a[-1]), flat(b[-1])).ratio() >= 0.75
+            and bool({flat(word) for word in a[:-1]} & {flat(word) for word in b[:-1]})
+        )
+
+    for day, (
+        list_url,
+        list_pages,
+        fallback,
+        low,
+        guesses,
+        stops,
+        ballot,
+        headed,
+        stretch,
+        by_plate,
+        starts,
+        heading_lines,
+    ) in LISTS_EARLY.items():
+        labels = {key: label for key, label in EARLY_PARTIES[day].items() if key != INDEPENDENTS}
+        scanned_gif = list_url.endswith(".htm")
+        artifacts = [
+            raw.cached(SOURCE, list_url.replace(".htm", f"-{page}.gif") if scanned_gif else list_url)
+            for page in list_pages
+        ]
+        with ThreadPoolExecutor(12) as executor:
+            read = list(
+                executor.map(
+                    masked,
+                    list_pages,
+                    artifacts,
+                    repeat(scanned_gif),
+                    repeat((fallback, low, guesses, stops, starts)),
+                )
+            )
+        cuts = {page: cut for page, cut, _, _ in read}
+        page_lines = {page: lines for page, _, lines, _ in read}
+        pages += [citation for _, _, _, citation in read]
+        urls = {page: artifact.url for page, artifact in zip(list_pages, artifacts, strict=True)}
+
+        events: list[ListEvent] = []
+        if heading_lines is not None:
+            layer = subprocess.run(
+                [
+                    "pdftotext",
+                    "-bbox",
+                    "-f",
+                    str(list_pages[0]),
+                    "-l",
+                    str(list_pages[-1]),
+                    str(artifacts[0].path),
+                    "-",
+                ],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
+            reach = 20 if heading_lines == "wide" else 36
+            for page, body in zip(list_pages, layer.split("<page ")[1:], strict=True):
+                size = re.search(r'width="([\d.]+)" height="([\d.]+)"', body)
+                if size is None:
+                    raise ValueError(f"lists {day}: page {page} has no size in its text layer")
+                page_width, page_height = float(size[1]), float(size[2])
+                words = re.findall(r'xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)<', body)
+                grouped: list[tuple[float, list[int]]] = []
+                for index in sorted(
+                    range(len(words)), key=lambda index: (float(words[index][1]) + float(words[index][3])) / 2
+                ):
+                    middle = (float(words[index][1]) + float(words[index][3])) / 2
+                    if grouped and abs(grouped[-1][0] - middle) < 4:
+                        grouped[-1][1].append(index)
+                    else:
+                        grouped.append((middle, [index]))
+                spans = [
+                    (
+                        middle,
+                        members,
+                        min(float(words[index][0]) for index in members) / page_width,
+                        max(float(words[index][2]) for index in members) / page_width,
+                    )
+                    for middle, members in grouped
+                ]
+                crossing = [
+                    (middle, (left + right) / 2)
+                    for middle, _, left, right in spans
+                    if 0.2 < left < cuts[page] < right and abs((left + right) / 2 - 0.5) < 0.1
+                ]
+                kept: list[tuple[float, str]] = []
+                for middle, members, left, right in spans:
+                    if (
+                        left < cuts[page]
+                        and (
+                            (left > 0.2 and abs((left + right) / 2 - 0.5) < 0.1)
+                            or (heading_lines == "wide" and 0.12 < left < 0.3 and right > 0.5)
+                        )
+                    ) or (
+                        left >= cuts[page]
+                        and any(
+                            abs(middle - other) <= 30 and abs((left + right) / 2 - center) < 0.015
+                            for other, center in crossing
+                        )
+                    ):
+                        ordered = sorted(members, key=lambda index: float(words[index][0]))
+                        kept.append((middle, flat(html.unescape(" ".join(words[index][4] for index in ordered)))))
+                for anchor in [middle for middle, text in kept if text.endswith(("LISTESI", "LISTES"))]:
+                    near = [text for middle, text in kept if anchor - reach <= middle <= anchor]
+                    joined = "".join(near)
+                    district = None
+                    for name, index in names:
+                        if any(
+                            text.startswith(name)
+                            and (len(text) == len(name) or text[len(name) :].startswith(("ILI", "1LI", "TLI", "II")))
+                            for text in near
+                        ) and (district is None or len(name) > district[2]):
+                            printed = re.search(rf"{name}\w{{0,4}}?(\d)NUMARA", joined)
+                            district = (index, int(printed[1]) if printed else None, len(name))
+                    party = (
+                        INDEPENDENTS
+                        if "BAGIMSIZMILLETVEKILI" in joined
+                        else max(
+                            (key for key, label in labels.items() if flat(label) in joined),
+                            key=lambda key: len(flat(labels[key])),
+                            default=None,
+                        )
+                    )
+                    top = min(middle for middle, _ in kept if anchor - reach <= middle <= anchor)
+                    events.append(ListEvent("marker", page, (top - 6) / page_height, party, district, layer=True))
+
+        top_cut = 0 if scanned_gif else 0.08
+        stopped = False
+        for page in list_pages:
+            if stopped:
+                break
+            for line in page_lines[page]:
+                y = (line.box[1] + line.box[3]) / 2
+                text = line.text
+                if re.search(r"Karar No|Kurulu Başkanlığ|LİSTE \(", text) and any(
+                    event.kind == "row" and any(other.kind == "marker" and not other.layer for other in events[:k])
+                    for k, event in enumerate(events)
+                ):
+                    stopped = True
+                    break
+                if (
+                    y < top_cut
+                    and line.kind != "head"
+                    and not (headed and y > 0.06 and line.kind == "row" and re.fullmatch(r"\d{1,2}", line.rank or ""))
+                    and not (
+                        party_of(text, labels) is not None
+                        and text.upper() == text
+                        and re.search(r"(PART[İI]S?[İI]?|HAREKET[İI])$", text)
+                    )
+                ):
+                    continue
+                if (
+                    flat(text).startswith(("SRAN", "SIRAN", "STRAN"))
+                    or header.search(text)
+                    or text.split()[:1] == ["ADI"]
+                    or "SOYAD" in flat(text)
+                    or difflib.SequenceMatcher(None, flat(text), "ADISOYADI").ratio() >= 0.8
+                ):
+                    if headed:
+                        events.append(ListEvent("marker", page, y))
+                    continue
+                if line.kind == "head":
+                    if party_of(text, labels) is not None or district_of(text) is not None:
+                        events.append(ListEvent("marker", page, y, party_of(text, labels), district_of(text)))
+                    continue
+                if (
+                    not re.search(r"\d", line.rank or "")
+                    and re.search(r"[İI]L[İI]\b|NUMARAL|SEÇİM ÇEVRES", text)
+                    and district_of(text) is not None
+                ):
+                    events.append(ListEvent("marker", page, y, None, district_of(text)))
+                    continue
+                if re.search(r"SEÇ[İI]M ÇEVR|KES[İI]N ADAY|VEK[İI]L[İI]", text):
+                    continue
+                if header.search(line.rank or ""):
+                    if headed:
+                        events.append(ListEvent("marker", page, y))
+                    continue
+                name = re.sub(r"^[^\wÇĞİÖŞÜçğıöşü]+|[^\w-]+$", "", text).strip()
+                if (
+                    not re.search(rf"(^|\s)[{capitals}][\w{letters}'’.-]{{2,}}", name)
+                    or "SOYAD" in flat(name)
+                    or difflib.SequenceMatcher(None, flat(name), "ADISOYADI").ratio() >= 0.8
+                    or flat(name) in ("SIRA", "SAYISI", "NO")
+                ):
+                    continue
+                if (
+                    party_of(name, labels) is not None
+                    and name.upper() == name
+                    and re.search(r"(PART[İI]S?[İI]?|HAREKET[İI]|BAĞIMSIZ)(\s\S{1,3})?$", name)
+                ):
+                    events.append(ListEvent("marker", page, y, party_of(name, labels)))
+                    continue
+                name = " ".join(re.sub(r"[|\\#$>©{}<]", " ", name).split())
+                name = re.sub(rf"^(?:[^\s{capitals}0-9]{{1,2}}\s)+|(?:\s[^\s{capitals}0-9]{{1,3}})+$", "", name)
+                parts = re.split(r"\s(?=\d{1,2}\s+[A-ZÇĞİÖŞÜ])", name)
+                if line.kind == "row" and len(parts) > 1 and re.fullmatch(r"\d{1,2}", line.rank or ""):
+                    parts[0] = f"{line.rank} {parts[0]}"
+                if len(parts) > 1 and all(re.match(r"\d{1,2}\s", part) for part in parts):
+                    x0, y0, x1, y1 = line.box
+                    for k, part in enumerate(parts):
+                        numeral, rest = part.split(maxsplit=1)
+                        top = y0 + (y1 - y0) * k / len(parts)
+                        events.append(
+                            ListEvent(
+                                "row",
+                                page,
+                                top,
+                                rank=numeral,
+                                name=rest,
+                                box=[x0, top, x1, top + (y1 - y0) / len(parts)],
+                            )
+                        )
+                    continue
+                kind, rank = line.kind, line.rank
+                if kind == "cont" and (lead := re.match(r"(\d{1,2})\s+(?=[A-ZÇĞİÖŞÜ])", name)):
+                    kind, rank, name = "row", lead[1], name[lead.end() :]
+                tokens = name.split()
+                if (
+                    sum(len(token) <= 2 for token in tokens) > 0.5 * len(tokens)
+                    or re.fullmatch(r"(\w)\1{3,}\w*", flat(name))
+                    or re.search(r"(MA){3,}", flat(name))
+                    or "MILLETVEKIL" in flat(name)
+                    or "ADAYLISTES" in flat(name)
+                    or re.search(r"[—_.-]{3,}|[—_.-]\s?[—_.-]\s?[—_.-]", name)
+                    or len(re.sub(rf"[^{letters}]", "", name)) < 3
+                    or re.search(r"Sayfa|Sayı:|RESM|GAZETE|Ekim 19", name)
+                ):
+                    continue
+                kontenjan = (
+                    rank is not None
+                    and len(flat(rank)) >= 5
+                    and difflib.SequenceMatcher(None, flat(rank), "KONTENJAN").ratio() >= 0.6
+                )
+                if (
+                    rank
+                    and not kontenjan
+                    and not re.search(r"\d", rank)
+                    and re.fullmatch(r"[\W_]+|.{0,2}", rank) is None
+                ):
+                    continue
+                if rank and re.fullmatch(r"[—\-_=~. ]+\w{0,6}", rank):
+                    continue
+                events.append(ListEvent(kind, page, y, rank=rank, kontenjan=kontenjan, name=name, box=line.box))
+        events.sort(key=lambda event: (event.page, event.y))
+
+        found: list[PrintedList] = []
+        opening: PrintedList | None = None
+        for event in events:
+            if event.kind == "marker":
+                opening = opening or PrintedList(None, None, [])
+                if event.party is not None and (opening.party is None or event.layer):
+                    opening.party = event.party
+                district = event.district
+                if district is not None and district[1] == 0:
+                    district = (district[0], None, district[2])
+                if district is not None and (
+                    opening.district is None or event.layer or (opening.district[1] is None and district[1] is not None)
+                ):
+                    opening.district = district
+                continue
+            if opening is not None:
+                found.append(opening)
+                opening = None
+            if not found:
+                continue
+            current = found[-1]
+            kind = event.kind
+            if kind == "cont" and (
+                not current.rows or (current.party == INDEPENDENTS and not current.rows[-1].name.endswith("-"))
+            ):
+                kind = "row"
+            if kind == "row":
+                current.rows.append(ListRow(event.rank, event.kontenjan, event.name, event.page, event.y, [event.box]))
+            elif current.rows and event.page == current.rows[-1].page and event.y - current.rows[-1].y < 0.03:
+                previous = current.rows[-1]
+                previous.name = (
+                    previous.name[:-1] if previous.name.endswith("-") else previous.name + " "
+                ) + event.name
+                previous.boxes.append(event.box)
+                previous.y = event.y
+        found = [entry for entry in found if entry.rows]
+
+        every = [row.name for entry in found for row in entry.rows]
+        uppercase = sum(not re.search(r"[a-zçğıöşü]", name) for name in every) > 0.6 * len(every)
+        surnames = sum(bool(re.search(r"[a-zçğıöşü]\S*\s[A-ZÇĞİÖŞÜ]{3,}$", name)) for name in every) > 0.4 * len(every)
+        for entry in found:
+            rebuilt: list[ListRow] = []
+            for row in entry.rows:
+                tokens = row.name.split()
+                hit = next(
+                    (
+                        k
+                        for k, token in enumerate(tokens)
+                        if k
+                        and len(token) >= 7
+                        and difflib.SequenceMatcher(None, flat(token), "KONTENJAN").ratio() >= 0.75
+                    ),
+                    None,
+                )
+                pieces = (
+                    [(row.rank, row.kontenjan, row.name)]
+                    if hit is None
+                    else [
+                        (row.rank, row.kontenjan, " ".join(tokens[:hit])),
+                        ("Kontenjan", True, " ".join(tokens[hit + 1 :])),
+                    ]
+                )
+                split: list[tuple[str | None, bool, str]] = []
+                for rank, kontenjan, text in pieces:
+                    for k, part in enumerate(re.split(r"\s(?=\d{1,2}\.?\s+(?:\S{1,2}\s+)?[A-ZÇĞİÖŞÜ])", text)):
+                        inner = re.match(r"(\d{1,2})\.?\s+(?:[^\sA-ZÇĞİÖŞÜ]{1,2}\s+)?", part) if k else None
+                        split.append((inner[1], False, part[inner.end() :]) if inner else (rank, kontenjan, part))
+                if surnames:
+                    split = [
+                        (rank if k == 0 else None, kontenjan, part)
+                        for rank, kontenjan, text in split
+                        for k, part in enumerate(re.split(r"(?<=[A-ZÇĞİÖŞÜ]{3})\s+(?=[A-ZÇĞİÖŞÜ][a-zçğıöşü])", text))
+                    ]
+                x0, y0, x1, y1 = row.boxes[-1]
+                band = (y1 - y0) / len(split)
+                for k, (rank, kontenjan, text) in enumerate(split):
+                    lead = re.match(r"(\d{1,2})\.?\s+(?:[—-]\s+)?(?=\S)", text)
+                    if lead is not None and not re.search(r"\d", rank or ""):
+                        rank, text = lead[1], text[lead.end() :]
+                    text = re.sub(r"[,“”\"':;*»«&]", "", re.sub(r"[,.:;]{2,}.*$", "", text))
+                    text = "".join({"0": "O", "1": "I", "4": "A", "5": "S", "8": "B"}.get(c, c) for c in text)
+                    text = re.sub(r"(?<=[a-zçğıöşü])!", "i", text).replace("!", "İ")
+                    words = [
+                        word
+                        for word in text.split()
+                        if re.search(rf"[{letters}]", word)
+                        and not (
+                            re.search(r"[a-zçğıöşü]", word)
+                            and len(word) <= 2
+                            and (uppercase or not re.fullmatch(r"[A-ZÇĞİÖŞÜ][a-zçğıöşü]\.?", word))
+                            or re.fullmatch(r"[^\w]+\w?|o[—-].*", word)
+                        )
+                    ]
+                    if uppercase and (
+                        re.search(r"SEÇ|5EÇ|ÇEVR|CÇIM", " ".join(words)) and len(words) > 3 or len(words) >= 5
+                    ):
+                        words = (
+                            words[:2]
+                            + list(itertools.takewhile(lambda word: len(word) > 3, words[2:]))[
+                                : 1 if len(words) >= 5 else 0
+                            ]
+                        )
+                    unranked = not re.search(r"\d", rank or "")
+                    if uppercase and unranked and (len(words) < 2 or re.search(r"[a-zçğıöşü\d]", " ".join(words))):
+                        continue
+                    text = " ".join(words)
+                    if len(re.sub(rf"[^{letters}]", "", text)) < 3:
+                        continue
+                    if uppercase and unranked and sum(len(word) <= 2 for word in words) >= 2:
+                        continue
+                    rebuilt.append(
+                        ListRow(
+                            rank,
+                            kontenjan,
+                            text,
+                            row.page,
+                            row.y,
+                            [*row.boxes[:-1], [x0, y0 + band * k, x1, y0 + band * (k + 1)]]
+                            if len(split) > 1
+                            else row.boxes,
+                        )
+                    )
+            entry.rows = rebuilt
+        found = [entry for entry in found if entry.rows]
+        if headed:
+            pieces_of: list[PrintedList] = []
+            for entry in found:
+                digits = [re.sub(r"\D", "", row.rank or "") for row in entry.rows]
+                if entry.party != INDEPENDENTS and len(digits) > 1 and entry.rows[0].rank is None and digits[1] == "1":
+                    entry.rows, digits = entry.rows[1:], digits[1:]
+                bounds = [
+                    0,
+                    *(
+                        i
+                        for i in range(1, len(digits) - 1)
+                        if digits[i] == "1" and digits[i + 1] == "2" and digits[i - 1] not in ("", "10", "0")
+                    ),
+                    len(digits),
+                ]
+                for k, (a, b) in enumerate(pairwise(bounds)):
+                    pieces_of.append(
+                        PrintedList(None if k else entry.party, None if k else entry.district, entry.rows[a:b])
+                    )
+            found = pieces_of
+        merged: list[PrintedList] = []
+        carried: PrintedList | None = None
+        for entry in found:
+            if carried is not None:
+                entry.party = entry.party or carried.party
+                entry.district = entry.district or carried.district
+                carried = None
+            if (
+                entry.party not in (None, INDEPENDENTS)
+                and entry.district is not None
+                and len(entry.rows) == 1
+                and entry.rows[0].rank is None
+                and len(entry.rows[0].name) < 6
+            ):
+                carried = entry
+                continue
+            numbers = [int(digits) if (digits := re.sub(r"\D", "", row.rank or "")) else None for row in entry.rows[:2]]
+            leads = [
+                value - k
+                for k, value in enumerate(numbers)
+                if value is not None and (k == 1 or len(numbers) < 2 or numbers[1] is None or numbers[1] > value)
+            ]
+            if (
+                merged
+                and entry.party is None
+                and entry.district is None
+                and any(lead >= 2 and lead - len(merged[-1].rows) in (0, 1, 2) for lead in leads)
+                and not merged[-1].rows[-1].kontenjan
+            ):
+                merged[-1].rows.extend(entry.rows)
+            else:
+                merged.append(entry)
+        found = merged
+        inherited = None
+        for entry in found:
+            entry.inherited = entry.district is None
+            if entry.district is None:
+                entry.district = inherited
+            inherited = entry.district
+
+        parliament = parliaments[day]
+        votes_by: Counter[tuple[str, str]] = Counter()
+        for row in parliament["district_values"]:
+            if row["measure"] == VOTES and row["option"] is not None:
+                votes_by[(str(row["code"]), str(row["option"]))] += int(str(row["value"]))
+        districts = sorted(
+            parliament["districts"],
+            key=lambda row: (int(str(row["plate"])), int(str(row["number"]))) if by_plate else 0,
+        )
+        slots = [
+            (
+                str(row["code"]),
+                int(str(row["plate"])),
+                int(str(row["number"])),
+                party,
+                int(str(row["magnitude"])),
+                (str(row["code"]), party) in votes_by
+                and (party != INDEPENDENTS or votes_by[(str(row["code"]), party)] > 0),
+            )
+            for row in districts
+            for party in (*ballot, INDEPENDENTS)
+            if (str(row["code"]), party) in votes_by or party == INDEPENDENTS
+        ]
+        infinite = float("inf")
+        best = [[infinite] * (len(slots) + 1) for _ in range(len(found) + 1)]
+        back: list[list[tuple[str, int, int]]] = [[("", 0, 0)] * (len(slots) + 1) for _ in range(len(found) + 1)]
+        best[0][0] = 0.0
+        for i in range(len(found) + 1):
+            for j in range(len(slots) + 1):
+                here = best[i][j]
+                if here == infinite:
+                    continue
+                if j < len(slots) and here + (3.0 if slots[j][5] else 0.05) < best[i][j + 1]:
+                    best[i][j + 1], back[i][j + 1] = here + (3.0 if slots[j][5] else 0.05), ("slot", i, j)
+                if i == len(found):
+                    continue
+                if here + 6.0 < best[i + 1][j]:
+                    best[i + 1][j], back[i + 1][j] = here + 6.0, ("list", i, j)
+                if j == len(slots):
+                    continue
+                entry = found[i]
+                _, plate, number, party, magnitude, _ = slots[j]
+                district = entry.district
+                if entry.party is not None and entry.party != party:
+                    continue
+                if district is not None and plate != district[0] + 1 and not entry.inherited:
+                    continue
+                cost = (
+                    (0.3 if entry.party is None else 0.0)
+                    + (2.0 if party != INDEPENDENTS and len(entry.rows) > magnitude * stretch + 1 else 0.0)
+                    + (
+                        0.0
+                        if district is None
+                        else 1.5
+                        if plate != district[0] + 1
+                        else 0.0
+                        if district[1] is None or number == district[1]
+                        else 1.0
+                        if entry.inherited
+                        else 2.5
+                    )
+                )
+                if here + cost < best[i + 1][j + 1]:
+                    best[i + 1][j + 1], back[i + 1][j + 1] = here + cost, ("match", i, j)
+        assigned: dict[tuple[str, str], PrintedList] = {}
+        missing = set()
+        i, j = len(found), len(slots)
+        while (i, j) != (0, 0):
+            move, i, j = back[i][j]
+            if move == "match":
+                assigned[(slots[j][0], slots[j][3])] = found[i]
+            elif move == "slot" and slots[j][5]:
+                missing.add((slots[j][0], slots[j][3]))
+        if missing != {(code, party) for unlisted, code, party in UNLISTED_EARLY if unlisted == day}:
+            raise ValueError(f"lists {day}: voted parties without a list {sorted(missing)}")
+
+        magnitudes = {str(row["code"]): int(str(row["magnitude"])) for row in parliament["districts"]}
+        won = {(str(row["code"]), str(row["option"])): int(str(row["seats"])) for row in parliament["seats"]}
+        winners: dict[tuple[str, str], list[tuple[str, int]]] = {}
+        for row in parliament["elected"]:
+            winners.setdefault((str(row["code"]), str(row["party"])), []).append(
+                (str(row["name"]), int(str(row["sequence"])))
+            )
+        printed_rows: list[dict[str, object]] = []
+        for (code, party), entry in assigned.items():
+            members = entry.rows
+            allowed = magnitudes[code] * stretch + (1 if stretch > 1 else 0)
+            while (
+                party != INDEPENDENTS
+                and len(members) > allowed
+                and re.sub(r"\D", "", members[-1].rank or "") != str(len(members))
+                and not members[-1].kontenjan
+            ):
+                members.pop()
+            if party != INDEPENDENTS and not 0 < len(members) <= allowed:
+                raise ValueError(f"lists {day}: {code} {party} has {len(members)} names for {magnitudes[code]} seats")
+            pool = (
+                members
+                if party == INDEPENDENTS or stretch > 1 or (day, code, party) in OUT_OF_ORDER_EARLY
+                else [row for row in members if not row.kontenjan][: won.get((code, party), 0)]
+                + [row for row in members if row.kontenjan]
+            )
+            unmatched = []
+            for name, sequence in winners.get((code, party), []):
+                match = next((row for row in pool if row.sequence is None and similar(name, row.name)), None)
+                if match is None:
+                    unmatched.append((name, sequence))
+                else:
+                    match.sequence = sequence
+            left = [row for row in pool if row.sequence is None]
+            if len(unmatched) == 1 and len(left) == 1 and pool is not members:
+                left[0].sequence = unmatched.pop()[1]
+            if unmatched:
+                raise ValueError(
+                    f"lists {day}: {code} {party} elected members not where the list puts them {unmatched}"
+                )
+            position = 0
+            for row in members:
+                position += not row.kontenjan
+                printed_rows.append(
+                    {
+                        "code": code,
+                        "party": party,
+                        "position": None if party == INDEPENDENTS or row.kontenjan else position,
+                        "kontenjan": row.kontenjan,
+                        "name": row.name,
+                        "sequence": row.sequence,
+                        "url": urls[row.page],
+                        "page": 1 if scanned_gif else row.page,
+                        "box": [
+                            min(box[0] for box in row.boxes),
+                            min(box[1] for box in row.boxes),
+                            max(box[2] for box in row.boxes),
+                            max(box[3] for box in row.boxes),
+                        ],
+                    }
+                )
+        parliament["lists"] = printed_rows
+        print(f"lists {day}: {len(printed_rows)} candidates on {len(assigned)} lists")
 
 
 def parse() -> None:
@@ -3334,11 +4356,6 @@ def parse() -> None:
     ]
     parliaments[DAY_2007] = parsed_2007
 
-    folding = str.maketrans("ÇĞİÖŞÜÂÎÛ", "CGIOSUAIU")
-
-    def flat(text: str) -> str:
-        return re.sub(r"[^A-Z0-9]", "", text.replace("i", "İ").replace("ı", "I").upper().translate(folding))
-
     plates = {flat(province): plate for plate, province in enumerate(PROVINCES, 1)} | {
         "AFYON": 3,
         "ICEL": 33,
@@ -4697,6 +5714,8 @@ def parse() -> None:
     ):
         raise ValueError(f"{DAY_REFERENDUM_2007}: provinces and customs gates do not add up to the national totals")
 
+    early_lists(parliaments, pages)
+
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(pages).unique(["url", "page"]).write_parquet(PARSED / "pages.parquet")
     pl.DataFrame(president, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "president.parquet")
@@ -4717,7 +5736,11 @@ def parse() -> None:
                     rows,
                     schema_overrides={
                         column: dtype
-                        for column, dtype in (("box", pl.List(pl.Float32)), ("person", pl.String))
+                        for column, dtype in (
+                            ("box", pl.List(pl.Float32)),
+                            ("person", pl.String),
+                            ("sequence", pl.Int64),
+                        )
                         if column in rows[0]
                     },
                 ).write_parquet(PARSED / f"{kind}_{day}.parquet")
@@ -5942,6 +6965,20 @@ def emit() -> Path:
                     [f"{YSK_DOCS}/{name}.pdf" for name in (table_name, seats_name, customs_name) if name is not None],
                 ),
             ]
+            list_url, list_pages, *_ = LISTS_EARLY[day]
+            groups.append(
+                (
+                    PUBLISHER,
+                    "official_body",
+                    f"{day.day} {MONTHS_TR[day.month - 1]} {day.year} Milletvekili Genel Seçimi kesin aday listeleri",
+                    LISTS_EARLY_SOURCE.format(date=spelled, published=PUBLISHED_LISTS_EARLY[day]),
+                    list_url,
+                    [
+                        list_url,
+                        *(list_url.replace(".htm", f"-{page}.gif") for page in list_pages if list_url.endswith(".htm")),
+                    ],
+                )
+            )
         groups.append(
             (
                 PUBLISHER,
@@ -6021,6 +7058,7 @@ def emit() -> Path:
             district_values = pl.read_parquet(PARSED / f"district_values_{day}.parquet")
             seats = pl.read_parquet(PARSED / f"seats_{day}.parquet")
             elected = pl.read_parquet(PARSED / f"elected_{day}.parquet")
+            listed_early = None if rerun else pl.read_parquet(PARSED / f"lists_{day}.parquet")
             for code, plate, number, magnitude in pl.read_parquet(PARSED / f"districts_{day}.parquet").iter_rows():
                 province = PROVINCES[plate - 1]
                 area = provinces[f"{plate:02}"]
@@ -6099,7 +7137,8 @@ def emit() -> Path:
                 if declared in cs.minted:
                     result_sets[contest_key] = str(declared)
                 won = dict(seats.filter(pl.col("code") == code).select("option", "seats").iter_rows())
-                standing = {*rows["option"].drop_nulls(), *won}
+                listed = [] if listed_early is None else listed_early.filter(pl.col("code") == code).to_dicts()
+                standing = {*rows["option"].drop_nulls(), *won, *(row["party"] for row in listed)}
                 for key in (key for key in EARLY_PARTIES[day] if key in standing):
                     full = (
                         INDEPENDENTS
@@ -6147,6 +7186,79 @@ def emit() -> Path:
                             else 0,
                         }
                     )
+                ranks = {row["sequence"]: row for row in listed if row["sequence"] is not None}
+                list_url = LISTS_EARLY[day][0] if day in LISTS_EARLY else ""
+                for caveat, applies in (
+                    (KONTENJAN_CAVEAT, any(row["kontenjan"] for row in listed)),
+                    (PREFERENCE_1991_CAVEAT, day == DAY_1991 and bool(listed)),
+                    (
+                        UNCOUNTED_INDEPENDENTS_CAVEAT,
+                        INDEPENDENTS not in set(rows["option"].drop_nulls())
+                        and any(row["party"] == INDEPENDENTS for row in listed),
+                    ),
+                    *(
+                        (UNLISTED_CAVEAT.format(party=EARLY_PARTIES[day][party]), True)
+                        for unlisted, unlisted_code, party in sorted(UNLISTED_EARLY)
+                        if (unlisted, unlisted_code) == (day, code)
+                    ),
+                    *(
+                        (
+                            OUT_OF_ORDER_CAVEAT.format(
+                                name=title(row["name"]),
+                                position=row["position"],
+                                party=EARLY_PARTIES[day][row["party"]],
+                                seats=won[row["party"]],
+                            ),
+                            True,
+                        )
+                        for row in ranks.values()
+                        if (day, code, row["party"]) in OUT_OF_ORDER_EARLY
+                        and row["position"] is not None
+                        and row["position"] > won[row["party"]]
+                    ),
+                ):
+                    if applies:
+                        cs.add("note", entity_id=contest, kind="caveat", body_md=caveat)
+                        cs.add("citation", entity_id=contest, source_id=early_sources[list_url], locator=None)
+                order: Counter[str] = Counter()
+                for row in listed:
+                    party = row["party"]
+                    order[party] += 1
+                    if row["sequence"] is not None:
+                        continue
+                    member = f"{day}:{code}:{slug(party)}:{order[party]}"
+                    person = cs.key(f"{SOURCE}.person", member)
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, title(row["name"]))
+                    candidacy = cs.key("tr.candidacy", member)
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=options[f"{contest_key}:{party}"],
+                        role="head" if party == INDEPENDENTS else "list_member",
+                        list_position=row["position"],
+                        ballot_name=None,
+                        member_of_party_id=None,
+                        is_independent=party == INDEPENDENTS,
+                    )
+                    if party != INDEPENDENTS:
+                        cs.add(
+                            "candidacy_nomination",
+                            candidacy_id=candidacy,
+                            party_id=cs.key("tr.party", party),
+                            kind="nominated",
+                        )
+                    cs.add(
+                        "citation",
+                        entity_id=candidacy,
+                        source_id=early_sources[list_url],
+                        locator={
+                            "page_id": page_ids[(row["url"], row["page"])],
+                            "bbox": [round(value, 6) for value in row["box"]],
+                        },
+                    )
                 for row in elected.filter(pl.col("code") == code).iter_rows(named=True):
                     member = f"{day}:{code}:{row['sequence']}"
                     party = row["party"]
@@ -6170,7 +7282,7 @@ def emit() -> Path:
                         person_id=person,
                         option_id=options[f"{contest_key}:{party}"],
                         role="head" if party == INDEPENDENTS else "list_member",
-                        list_position=None,
+                        list_position=ranks[row["sequence"]]["position"] if row["sequence"] in ranks else None,
                         ballot_name=None,
                         member_of_party_id=None if party == INDEPENDENTS else cs.key("tr.party", party),
                         is_independent=party == INDEPENDENTS,
@@ -6200,6 +7312,17 @@ def emit() -> Path:
                             "bbox": [round(value, 6) for value in row["box"]],
                         },
                     )
+                    if row["sequence"] in ranks:
+                        printed = ranks[row["sequence"]]
+                        cs.add(
+                            "citation",
+                            entity_id=candidacy,
+                            source_id=early_sources[list_url],
+                            locator={
+                                "page_id": page_ids[(printed["url"], printed["page"])],
+                                "bbox": [round(value, 6) for value in printed["box"]],
+                            },
+                        )
 
         for day, url, native, law, law_native in (
             (
