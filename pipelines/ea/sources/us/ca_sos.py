@@ -123,7 +123,7 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '06%'"""
             ).fetchall()
         )
-        known: dict[str, UUID] = {}
+        known: dict[str, set[UUID]] = {}
         for text, person in conn.execute(
             """select distinct n.text, cy.person_id from external_id k
                join contest_option o on o.contest_id = k.entity_id
@@ -131,8 +131,7 @@ def emit() -> Path:
                join name n on n.entity_id = cy.person_id and n.is_preferred
                where k.scheme = 'us.contest' and k.value like '%:CA:%'"""
         ).fetchall():
-            if known.setdefault(slug(text), person) != person:
-                raise ValueError(f"two California candidates are named {text}")
+            known.setdefault(slug(text), set()).add(person)
         senate, seat, top_two = (
             cs.key("us.body", "senate"),
             cs.key("us.seat", "senate:CA:1"),
@@ -155,9 +154,18 @@ def emit() -> Path:
         cs.add("slug", path=f"us/ca/{PRIMARY}-primary", entity_id=primary)
 
         persons: dict[str, UUID] = {}
+        owned: dict[str, UUID] = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
+        )
         for text in frame["name"].unique().sort():
             if slug(text) in known:
-                persons[text] = known[slug(text)]
+                own = owned.get(slug(text))
+                others = {person for person in known[slug(text)] if person != own}
+                if len(others) > 1:
+                    raise ValueError(f"two California candidates are named {text}")
+                persons[text] = next(iter(others or known[slug(text)]))
+                if own is not None and own in known[slug(text)] and others:
+                    cs.merge(own, persons[text])
                 continue
             persons[text] = cs.key(f"{SOURCE}.person", slug(text))
             cs.add("person", id=persons[text])
