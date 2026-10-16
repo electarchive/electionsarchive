@@ -1026,6 +1026,7 @@ SWITCHES = {
     (2012, "S4VT00033"): "IND",
     (2020, "H0CT04211"): "IP",
 }
+SWAPPED = {(2006, "H8NY19058"): ("DEM", "WF"), (2008, "H8NY21203"): ("D", "WF")}
 SPECIALS = {(2002, "MO"), (2020, "AZ")}
 EXCLUDED = {(2010, "AK", "W (Challenged NOT Counted)")}
 STRAY = {(2004, "S4WA00474")}
@@ -1630,6 +1631,10 @@ def parse() -> None:
                     tokens = tokens[-1:] if tokens[-1] == "W" else tokens[1:]
                 if (switch := SWITCHES.get((year, fec_id or ""))) is not None:
                     tokens = switch.split("/")
+                if (pair := SWAPPED.get((year, fec_id or ""))) is not None:
+                    if tokens not in ([pair[0]], [pair[1]]):
+                        raise ValueError(f"{year} {fec_id}: no {pair[0]} or {pair[1]} line to swap in {tokens}")
+                    tokens = [pair[1] if tokens == [pair[0]] else pair[0]]
                 lines.append(
                     (
                         *key,
