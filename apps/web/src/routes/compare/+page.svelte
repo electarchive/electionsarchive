@@ -11,6 +11,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Parties from "./parties.svelte";
   import People from "./people.svelte";
   import Places from "./places.svelte";
 
@@ -77,7 +78,9 @@
     (values[index]?.trim() === "" ? [] : (finds[index]?.data ?? [])).filter(
       (hit) =>
         (kind == null
-          ? hit.type === "person" || hit.type === "polity"
+          ? hit.type === "person" ||
+            hit.type === "polity" ||
+            hit.type === "party"
           : hit.type === kind) && hit.id !== other?.id,
     ),
   )}
@@ -101,7 +104,9 @@
                 ? m.versus_pick_person()
                 : kind === "polity"
                   ? m.versus_pick_place()
-                  : m.versus_pick()}</span
+                  : kind === "party"
+                    ? m.versus_pick_party()
+                    : m.versus_pick()}</span
             >
           {:else}
             <span
@@ -123,7 +128,9 @@
             ? m.versus_search_person()
             : kind === "polity"
               ? m.versus_search_place()
-              : m.versus_search()}
+              : kind === "party"
+                ? m.versus_search_party()
+                : m.versus_search()}
           bind:value={values[index]}
         />
         <Command.List class="max-block-80">
@@ -232,6 +239,8 @@
       <People people={data.people} />
     {:else if data.places != null}
       <Places data={data.places} />
+    {:else if data.parties != null}
+      <Parties data={data.parties} />
     {/if}
   </article>
 </main>

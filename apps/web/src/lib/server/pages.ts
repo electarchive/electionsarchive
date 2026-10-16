@@ -406,7 +406,7 @@ export async function comparison(ids: Array<string>) {
       ), '') as name
       from unnest(${sql.param(ids.filter((id) => /^[0-9a-f-]{36}$/u.test(id)))}::uuid[]) with ordinality as x(asked, at)
       join entity e on e.id = coalesce((select into_id from entity_merge where entity_id = x.asked), x.asked)
-      where e.type in ('person', 'polity')
+      where e.type in ('person', 'polity', 'party')
       order by x.at
     `,
   );
@@ -426,13 +426,15 @@ export async function comparison(ids: Array<string>) {
               (3, 'Recep Tayyip Erdoğan', 'Kemal Kılıçdaroğlu', 'person'),
               (4, 'us/pa', 'us/wi', 'polity'),
               (5, 'Ekrem İmamoğlu', 'Binali Yıldırım', 'person'),
-              (6, 'us/mi', 'us/az', 'polity')
+              (6, 'Cumhuriyet Halk Partisi', 'Adalet ve Kalkınma Partisi', 'party')
           ),
           picked as (
             select p.at, x.side, coalesce(
               (select s.entity_id from slug s where p.kind = 'polity' and s.is_current and s.path = x.key limit 1),
               (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'person'
-                where p.kind = 'person' and n.text = x.key limit 1)
+                where p.kind = 'person' and n.text = x.key limit 1),
+              (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'party'
+                where p.kind = 'party' and n.text = x.key limit 1)
             ) as id
             from pairs p cross join lateral (values (1, p.a), (2, p.b)) x(side, key)
           )
@@ -443,6 +445,19 @@ export async function comparison(ids: Array<string>) {
           where a.side = 1 and a.id is not null and b.id is not null
           order by a.at
         `);
+  const sided =
+    first?.type === "party" && second?.type === "party"
+      ? await Promise.all(
+          [first, second].map(async (row) => {
+            const [party, history] = await Promise.all([
+              call(router.parties.get, { id: row.id }),
+              call(router.parties.history, { id: row.id }),
+            ]);
+            return { id: row.id, party, history };
+          }),
+        )
+      : null;
+  const [one, two] = sided ?? [];
   return {
     sides: found.rows,
     examples: examples?.rows ?? [],
@@ -459,5 +474,60 @@ export async function comparison(ids: Array<string>) {
       first?.type === "polity" && second?.type === "polity"
         ? await call(router.polities.compare, { a: first.id, b: second.id })
         : null,
+    parties:
+      sided == null
+        ? null
+        : {
+            parties: [one, two].map((side) => ({
+              id: side?.id ?? "",
+              name: side?.party.name ?? "",
+              short: side?.party.short ?? null,
+              color: side?.party.color ?? null,
+            })),
+            series: (one?.history ?? []).flatMap((series) => {
+              const other = two?.history.find(
+                (entry) => entry.id === series.id,
+              );
+              if (other == null) {
+                return [];
+              }
+              const dates = [
+                ...new Set(
+                  [...series.points, ...other.points].map(
+                    (point) => point.date,
+                  ),
+                ),
+              ].toSorted((a, b) => a.localeCompare(b));
+              const points = dates.map((date) => {
+                const sides = [series, other].map((entry) => {
+                  const point = entry.points.find(
+                    (candidate) => candidate.date === date,
+                  );
+                  return point?.votes == null || point.total == null
+                    ? null
+                    : {
+                        share: point.votes / point.total,
+                        seats: point.seats,
+                        filled: point.filled,
+                      };
+                });
+                const any =
+                  series.points.find((point) => point.date === date) ??
+                  other.points.find((point) => point.date === date);
+                return {
+                  date,
+                  year: any?.year ?? Number(date.slice(0, 4)),
+                  name: any?.name ?? "",
+                  path: any?.path ?? null,
+                  sides,
+                };
+              });
+              return points.some((point) =>
+                point.sides.every((side) => side != null),
+              )
+                ? [{ id: series.id, name: series.name, points }]
+                : [];
+            }),
+          },
   };
 }
