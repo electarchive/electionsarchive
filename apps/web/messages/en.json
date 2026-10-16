@@ -735,5 +735,14 @@
   "board_after_other": "Others",
   "race_after": "After the election, {party} held {seats} of the {total} seats.",
   "race_after_tied": "After the election, {party} and {runner} held {seats} of the {total} seats each.",
-  "workbench_examples": "Examples"
+  "workbench_examples": "Examples",
+  "error_404_title": "Page not found",
+  "error_404_body": "The link may be out of date, or the place or election may go by a different name. Search the archive or start from a country on the home page.",
+  "error_500_title": "Server error",
+  "error_500_body": "The page failed to load. Try again in a moment; if it keeps failing, search for what you were looking for.",
+  "error_429_title": "Too many requests",
+  "error_429_body": "You have made too many requests in a short time. Wait a minute and try again.",
+  "error_search": "Search the archive",
+  "error_home": "Go to home page",
+  "error_code": "Error {code}"
 }

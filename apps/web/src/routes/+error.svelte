@@ -1,18 +1,63 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { CircleAlertIcon } from "@lucide/svelte";
+  import { SearchIcon } from "@lucide/svelte";
+  import { m } from "#lib/paraglide/messages.js";
+  import { finder } from "#lib/search.svelte.js";
 
-  const ERROR_CODE_LABELS: Record<number, string> = {
-    404: "page not found",
-    500: "server error",
-    429: "too many requests",
+  const COPY: Record<number, [() => string, () => string]> = {
+    404: [m.error_404_title, m.error_404_body],
+    429: [m.error_429_title, m.error_429_body],
   };
+  const copy = $derived(
+    COPY[page.status] ?? [m.error_500_title, m.error_500_body],
+  );
+  const guess = $derived(
+    page.url.pathname
+      .split("/")
+      .findLast((part) => /[a-z]{3}/iu.test(part))
+      ?.replaceAll(/[-_]+/gu, " ")
+      .replaceAll(/\b(?:county|general|local|\d{4}(?: \d{2}){0,2})\b/giu, "")
+      .trim() ?? "",
+  );
 </script>
 
-<div class="grid justify-items-center gap-2 py-20 text-center sm:py-40">
-  <CircleAlertIcon class="text-destructive block-10 inline-10" />
-  <h1 class="text-3xl font-bold">{page.status}</h1>
-  <div class="text-muted-foreground">
-    {ERROR_CODE_LABELS[page.status] ?? "an error occurred"}
+<svelte:head>
+  <title>{copy[0]()} | {m.wordmark()}</title>
+</svelte:head>
+
+<section
+  class="grid content-start gap-4 px-4 pbs-16 pbe-24 max-inline-160 sm:pbs-28"
+  aria-labelledby="error-title"
+>
+  <p class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums">
+    {m.error_code({ code: String(page.status) })}
+  </p>
+  <h1
+    id="error-title"
+    class="font-serif text-[clamp(2.25rem,6vw,3.5rem)] leading-none font-[640] tracking-[-0.015em] text-balance"
+  >
+    {copy[0]()}
+  </h1>
+  <p class="text-[1.0625rem]/relaxed text-pretty text-muted-foreground">
+    {copy[1]()}
+  </p>
+  <div class="flex flex-wrap items-center gap-3 pbs-2">
+    {#if page.status !== 429}
+      <button
+        type="button"
+        class="flex items-center gap-2 rounded-sm bg-primary px-3.5 text-sm font-semibold text-primary-foreground block-10 hover:bg-primary/90"
+        onclick={() => {
+          finder.value = guess;
+          finder.isOpen = true;
+        }}
+      >
+        <SearchIcon class="block-4 inline-4" />{m.error_search()}
+      </button>
+    {/if}
+    <a
+      class="text-sm font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+      href={resolve("/")}>{m.error_home()}</a
+    >
   </div>
-</div>
+</section>
