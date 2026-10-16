@@ -1,3 +1,4 @@
+import io
 import itertools
 import re
 import zipfile
@@ -12,9 +13,20 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "it.storico"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://dait.interno.gov.it/documenti/opendata/camera"
+ELIGENDO = "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=I&tpe=A&lev0=0&levsut0=0&es0=S&ms=S"
+RIPARTIZIONE = (
+    "https://elezionistorico.interno.gov.it/index.php?tpel=C&dtel={day:%d/%m/%Y}&tpa=E&tpe=T&lev0=0&levsut0=0"
+    "&lev1={n}&levsut1=1&ne1={n}&es0=S&es1=S&ms=S"
+)
+RIPARTIZIONI = {
+    "EUROPA": ("europe", "Europe"),
+    "AMERICA MERIDIONALE": ("south-america", "South America"),
+    "AMERICA SETTENTRIONALE E CENTRALE": ("north-and-central-america", "North and Central America"),
+    "AFRICA ASIA OCEANIA ANTARTIDE": ("africa-asia-oceania-antarctica", "Africa, Asia, Oceania, and Antarctica"),
+}
 DAYS = [
     date(1948, 4, 18),
     date(1953, 6, 7),
@@ -299,6 +311,15 @@ SYSTEMS = {
         ),
     ),
     "camera-valle-d-aosta": ({"formula": "fptp"}, "Chamber of Deputies, Valle d'Aosta single-member seat", None),
+    "camera-estero": (
+        {"formula": "hare", "lists": {"order": "open", "vacancy": "next_by_votes"}},
+        "Chamber of Deputies, constituency abroad",
+        (
+            "Since 2006, Italians resident abroad elect twelve deputies in four ripartizioni: Europe; South America; "
+            "North and Central America; and Africa, Asia, Oceania, and Antarctica. Seats in each ripartizione go to "
+            "lists by the largest remainder of a Hare quota, and to candidates by preference votes."
+        ),
+    ),
 }
 LICENSE = (
     "No license stated. Data that Italian public bodies publish without a license are open by default (art. 52 of "
@@ -308,17 +329,20 @@ ELECTION_NOTE = (
     "List votes are the Interior Ministry's archive totals by municipality, summed into today's regions. Seats are "
     "the deputies the archive marks as elected on each list."
 )
-PARTIAL_SEATS = (
-    "The archive marks {elected} deputies as elected out of {seats} seats. Seats filled from the national remainder "
-    "college or by later substitution are missing, so the seat counts here fall short of the chamber's full "
-    "composition."
+NATIONAL_SEATS = (
+    "Seats are each list's national total from Eligendo's historical results, which count the deputies elected from "
+    "the national remainder college. The open-data archive marks only {elected} of the {seats} deputies as elected."
 )
 MIXED_SEATS = (
     "These are the {seats} proportional seats. The single-member deputies are counted in their own college contests."
 )
 ABROAD = (
-    "Valle d'Aosta's single seat is counted in its own contest. The twelve deputies elected by Italians abroad are "
-    "not included."
+    "Valle d'Aosta's single seat and the twelve seats elected by Italians abroad are counted in their own contests."
+)
+ABROAD_SEATS = (
+    "List votes are the Interior Ministry's archive totals by country. Seats are each list's seats in this "
+    "ripartizione, {source}. Deputies abroad were elected by preference votes within each list; who they were is "
+    "not loaded here."
 )
 MISSING_VOTES = (
     "The archive's candidate votes add up to {share} of this college's valid votes, because rows for part of its "
@@ -345,6 +369,11 @@ def region_of(circ: str) -> str:
 def fetch() -> None:
     for day in DAYS:
         raw.fetch(SOURCE, url(day), suffix=".zip")
+        if day < MATTARELLA:
+            raw.fetch(SOURCE, ELIGENDO.format(day=day), suffix=".html")
+        if CALDEROLI <= day < ROSATO:
+            for n in range(1, 5):
+                raw.fetch(SOURCE, RIPARTIZIONE.format(day=day, n=n), suffix=".html")
 
 
 def parse() -> None:
@@ -353,6 +382,9 @@ def parse() -> None:
     seats: list[pl.DataFrame] = []
     singles: list[pl.DataFrame] = []
     single_accounting: list[pl.DataFrame] = []
+    abroad: list[pl.DataFrame] = []
+    abroad_accounting: list[pl.DataFrame] = []
+    abroad_seats: list[pl.DataFrame] = []
     for day in DAYS:
         with zipfile.ZipFile(raw.cached(SOURCE, url(day)).path) as archive:
             names = archive.namelist()
@@ -413,10 +445,93 @@ def parse() -> None:
             if missing:
                 raise ValueError(f"{day}: elected lists without votes: {missing}")
             lists.append(votes.with_columns(day=pl.lit(day)))
+            won = won.with_columns(archived=pl.col("seats"))
+            if day < MATTARELLA:
+                page = raw.cached(SOURCE, ELIGENDO.format(day=day)).path.read_text(encoding="utf-8")
+                national = dict(votes.group_by("label").agg(pl.col("votes").sum()).iter_rows())
+                printed = []
+                for label, total, seated in re.findall(
+                    r'<th id="lista\d+"[^>]*>([^<]+)</th><td[^>]*>([\d.]+)</td><td[^>]*>[^<]*</td><td[^>]*>(\d+)</td>',
+                    page,
+                ):
+                    if seated == "0":
+                        continue
+                    label, total = label.replace("&#039;", "'").strip(), int(total.replace(".", ""))
+                    matched = (
+                        label
+                        if label in national
+                        else min(national, key=lambda known: abs(national[known] - total), default=None)
+                    )
+                    if matched is None or (matched != label and abs(national[matched] - total) > 0.05 * total):
+                        raise ValueError(f"{day}: Eligendo list {label} with {total} votes is not in the archive")
+                    printed.append((matched, int(seated)))
+                checked = pl.DataFrame(printed, schema={"label": pl.String, "seats": pl.Int64}, orient="row")
+                magnitude = {1948: 574, 1953: 590, 1958: 596}.get(day.year, 630)
+                if checked["seats"].sum() != magnitude:
+                    raise ValueError(f"{day}: Eligendo seats add up to {checked['seats'].sum()}, not {magnitude}")
+                won = checked.join(won.select("label", "archived"), on="label", how="full", coalesce=True)
+                if won.filter(pl.col("archived").fill_null(0) > pl.col("seats").fill_null(0)).height:
+                    raise ValueError(f"{day}: lists with more elected deputies than national seats")
+                won = won.with_columns(pl.col("seats", "archived").fill_null(0))
             seats.append(won.filter(pl.col("seats") > 0).with_columns(day=pl.lit(day)))
             totals = totals.join(votes.group_by("region").agg(valid=pl.col("votes").sum()), on="region")
             accounting.append(totals.with_columns(day=pl.lit(day)))
 
+            if day >= CALDEROLI:
+                estero = [name for name in names if re.search(r"estero", name, re.IGNORECASE)]
+
+                def sheet(pattern: str, estero: list[str] = estero) -> pl.DataFrame:
+                    member = next(name for name in estero if re.search(pattern, name, re.IGNORECASE))
+                    if member.endswith(".xlsx"):
+                        return pl.read_excel(io.BytesIO(archive.read(member)), infer_schema_length=0)
+                    return pl.read_csv(archive.read(member), separator=";", encoding="latin1", infer_schema=False)
+
+                listed = sheet(r"Liste_(Estero_)?Liv_?Naz")
+                abroad.append(
+                    listed.select(
+                        ripartizione=pl.col("RIPARTIZIONE").str.strip_chars(),
+                        country=pl.col("NAZIONE").str.strip_chars(),
+                        label=pl.col("LISTA" if "LISTA" in listed.columns else "DESCRLISTA").str.strip_chars(),
+                        votes=count("TOTVOTI"),
+                    ).with_columns(day=pl.lit(day))
+                )
+                scrutini = sheet(r"Scrutini_(Estero_)?Liv_?Naz")
+                abroad_accounting.append(
+                    scrutini.select(
+                        ripartizione=pl.col("RIPARTIZIONE").str.strip_chars(),
+                        country=pl.col("NAZIONE").str.strip_chars(),
+                        registered=count(
+                            "NUMELETTORITOTALI" if "NUMELETTORITOTALI" in scrutini.columns else "ELETTORITOTALI"
+                        ),
+                        voters=count("NUMVOTANTITOTALI"),
+                        blank=count("SKBIANCHE"),
+                        valid=count("VOTIVALIDI"),
+                    ).with_columns(day=pl.lit(day))
+                )
+                if day >= ROSATO:
+                    seated = sheet(r"Liste_Estero_Liv_Ripart").select(
+                        ripartizione=pl.col("RIPARTIZIONE").str.strip_chars(),
+                        label=pl.col("LISTA").str.strip_chars(),
+                        seats=count("SEGGI"),
+                    )
+                else:
+                    printed = []
+                    for n, ripartizione in enumerate(RIPARTIZIONI, 1):
+                        page = raw.cached(SOURCE, RIPARTIZIONE.format(day=day, n=n)).path.read_text(encoding="utf-8")
+                        if f"Ripartizione {ripartizione}" not in re.sub(r"\s+", " ", re.sub(r"<[^>]+>", " ", page)):
+                            raise ValueError(f"{day}: Eligendo page {n} is not {ripartizione}")
+                        for row, cell in re.findall(r'id="lista(\d+)"[^>]*>(.*?)</th>', page, re.DOTALL):
+                            seats_ = re.search(rf'headers="hseggi lista{row}">(\d*)</td>', page)
+                            label = re.sub(r"<[^>]+>", "", cell).replace("&#039;", "'").strip()
+                            printed.append((ripartizione, label, int(seats_.group(1) or 0) if seats_ else 0))
+                    seated = pl.DataFrame(
+                        printed, schema={"ripartizione": pl.String, "label": pl.String, "seats": pl.Int64}, orient="row"
+                    )
+                seated = seated.filter(pl.col("seats") > 0)
+                unknown = seated.join(abroad[-1], on=["ripartizione", "label"], how="anti")
+                if unknown.height or seated["seats"].sum() != 12:
+                    raise ValueError(f"{day}: abroad seats {seated['seats'].sum()}, unmatched {unknown}")
+                abroad_seats.append(seated.with_columns(day=pl.lit(day)))
             if day < MATTARELLA:
                 continue
             if day < CALDEROLI:
@@ -593,6 +708,9 @@ def parse() -> None:
     pl.concat(lists).write_parquet(PARSED / "lists.parquet")
     pl.concat(accounting, how="diagonal").write_parquet(PARSED / "accounting.parquet")
     pl.concat(seats).write_parquet(PARSED / "seats.parquet")
+    pl.concat(abroad).write_parquet(PARSED / "abroad.parquet")
+    pl.concat(abroad_accounting).write_parquet(PARSED / "abroad_accounting.parquet")
+    pl.concat(abroad_seats).write_parquet(PARSED / "abroad_seats.parquet")
     pl.concat(singles, how="diagonal").write_parquet(PARSED / "singles.parquet")
     pl.concat(single_accounting, how="diagonal").write_parquet(PARSED / "single_accounting.parquet")
 
@@ -601,6 +719,9 @@ def emit() -> Path:
     lists = pl.read_parquet(PARSED / "lists.parquet")
     accounting = pl.read_parquet(PARSED / "accounting.parquet")
     seats = pl.read_parquet(PARSED / "seats.parquet")
+    abroad = pl.read_parquet(PARSED / "abroad.parquet")
+    abroad_accounting = pl.read_parquet(PARSED / "abroad_accounting.parquet")
+    abroad_seats = pl.read_parquet(PARSED / "abroad_seats.parquet")
     singles = pl.read_parquet(PARSED / "singles.parquet")
     single_accounting = pl.read_parquet(PARSED / "single_accounting.parquet")
     with connect() as conn:
@@ -608,7 +729,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Italian Chamber of Deputies elections 1948–2018: list votes by region, seats, and single-member colleges",
+            summary="Italian Chamber of Deputies elections 1948–2018: list votes by region, seats, single-member colleges, and the constituency abroad",
             polity="IT",
         )
 
@@ -626,7 +747,21 @@ def emit() -> Path:
             raise ValueError("publish it.interno before it.storico")
         for day in DAYS:
             cs.artifact(raw.cached(SOURCE, url(day)), interno)
+            if day < MATTARELLA:
+                cs.artifact(raw.cached(SOURCE, ELIGENDO.format(day=day)), interno)
+            if CALDEROLI <= day < ROSATO:
+                for n in range(1, 5):
+                    cs.artifact(raw.cached(SOURCE, RIPARTIZIONE.format(day=day, n=n)), interno)
+        minted_countries: set[str] = set()
 
+        short = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'caveat'
+                     and (n.body_md like 'The archive marks %%' or n.body_md like 'Valle d''Aosta''s single seat is %%')""",
+                [SOURCE],
+            ).fetchall()
+        )
         italy = cs.polity("IT")
         nation = cs.area("it.nation", "IT")
         region_areas = {code: cs.area("it.regione", code) for code in REGIONS}
@@ -831,12 +966,20 @@ def emit() -> Path:
             cs.add("slug", path=f"{path}/chamber", entity_id=contest)
             counted = result_set(contest_key, election, contest)
             fresh = counted in cs.minted
-            won = dict(seats.filter(pl.col("day") == day).select("label", "seats").iter_rows())
+            day_seats = seats.filter(pl.col("day") == day)
+            won = dict(day_seats.select("label", "seats").iter_rows())
+            if day < MATTARELLA and day_seats["archived"].sum() < magnitude:
+                cs.add(
+                    "note",
+                    **({"id": short[counted]} if counted in short else {}),
+                    entity_id=counted,
+                    kind="methodology",
+                    body_md=NATIONAL_SEATS.format(elected=day_seats["archived"].sum(), seats=magnitude),
+                )
+            if day >= CALDEROLI and counted in short:
+                cs.add("note", id=short[counted], entity_id=counted, kind="caveat", body_md=ABROAD)
             if fresh:
-                elected = sum(won.values())
                 notes = []
-                if day < MATTARELLA and elected < magnitude:
-                    notes.append(PARTIAL_SEATS.format(elected=elected, seats=magnitude))
                 if MATTARELLA <= day:
                     notes.append(MIXED_SEATS.format(seats=magnitude) if day < CALDEROLI else ABROAD)
                 if day >= ROSATO:
@@ -882,6 +1025,93 @@ def emit() -> Path:
                         .iter_rows()
                     ):
                         value_row(counted, region_units[region], option, VOTES, votes)
+
+            day_abroad = abroad.filter(pl.col("day") == day)
+            for ripartizione, (code, english) in RIPARTIZIONI.items() if day >= CALDEROLI else ():
+                abroad_key = f"{day}:camera:estero:{code}"
+                abroad_contest = cs.key("it.contest", abroad_key)
+                abroad_won = dict(
+                    abroad_seats.filter((pl.col("day") == day) & (pl.col("ripartizione") == ripartizione))
+                    .select("label", "seats")
+                    .iter_rows()
+                )
+                cs.add(
+                    "contest",
+                    id=abroad_contest,
+                    election_id=election,
+                    kind="body_seats",
+                    body_id=chamber,
+                    magnitude=sum(abroad_won.values()),
+                    electoral_system_id=systems["camera-estero"],
+                    default_result_kind="counted",
+                )
+                name(abroad_contest, f"Chamber of Deputies, abroad: {english}")
+                cs.add("slug", path=f"{path}/chamber/abroad-{code}", entity_id=abroad_contest)
+                abroad_set = result_set(abroad_key, election, abroad_contest)
+                cs.add(
+                    "note",
+                    entity_id=abroad_set,
+                    kind="methodology",
+                    body_md=ABROAD_SEATS.format(
+                        source="as the archive gives them"
+                        if day >= ROSATO
+                        else "from Eligendo's historical results for the ripartizione"
+                    ),
+                )
+                rows = day_abroad.filter(pl.col("ripartizione") == ripartizione)
+                turnout_abroad = abroad_accounting.filter(
+                    (pl.col("day") == day) & (pl.col("ripartizione") == ripartizione)
+                )
+                units: dict[str, UUID] = {}
+                for country in sorted(set(rows["country"]) | set(turnout_abroad["country"])):
+                    units[country] = cs.unit("it.estero", country)
+                    if units[country] in cs.minted and country not in minted_countries:
+                        minted_countries.add(country)
+                        cs.add(
+                            "reporting_unit",
+                            id=units[country],
+                            polity_id=italy,
+                            scheme_code="it.estero",
+                            code=country,
+                            area_relation="unlocated",
+                            kind="abroad_mission",
+                        )
+                        name(units[country], country.title().replace(" E ", " e ").replace(" Di ", " di "), "it")
+                fresh_abroad = abroad_set in cs.minted
+                if fresh_abroad:
+                    for country, registered, voters, blank, valid in (
+                        turnout_abroad.select("country", "registered", "voters", "blank", "valid")
+                        .sort("country")
+                        .iter_rows()
+                    ):
+                        if registered >= voters:
+                            value_row(abroad_set, units[country], None, REGISTERED, registered)
+                        value_row(abroad_set, units[country], None, VOTERS, voters)
+                        value_row(abroad_set, units[country], None, BLANK, blank)
+                        value_row(abroad_set, units[country], None, VALID, valid)
+                for label in sorted(set(rows.filter(pl.col("votes") > 0)["label"])):
+                    option = cs.key("it.option", f"{abroad_key}:{slug(label)}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=abroad_contest,
+                        kind="list",
+                        party_id=party_of(label, year),
+                        ballot_label=label,
+                    )
+                    if label in abroad_won:
+                        cs.add(
+                            "outcome", result_set_id=abroad_set, option_id=option, kind="won", seats=abroad_won[label]
+                        )
+                    if fresh_abroad:
+                        for country, votes in (
+                            rows.filter((pl.col("label") == label) & (pl.col("votes") > 0))
+                            .group_by("country")
+                            .agg(pl.col("votes").sum())
+                            .sort("country")
+                            .iter_rows()
+                        ):
+                            value_row(abroad_set, units[country], option, VOTES, votes)
 
             day_singles = singles.filter(pl.col("day") == day)
             if day_singles.height == 0:

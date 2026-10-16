@@ -292,7 +292,15 @@ def parse() -> None:
             .filter(pl.col("total") == pl.col("total").any().over(*precinct, "office", "candidate"))
             .select(
                 "state",
-                office=pl.col("office").fill_null("").str.strip_chars(),
+                office=pl.when(pl.col("state").is_in(["GA", "LA"]))
+                .then(
+                    pl.col("office")
+                    .fill_null("")
+                    .str.strip_chars()
+                    .str.replace(r"^CA NO\. (\d+)\b.*$", "CONSTITUTIONAL AMENDMENT NO. $1")
+                    .str.replace(r"^(?:PROPOSED )?CONSTITUTIONAL AMENDMENT #?(\d+)$", "CONSTITUTIONAL AMENDMENT NO. $1")
+                )
+                .otherwise(pl.col("office").fill_null("").str.strip_chars()),
                 code=pl.when(pl.col("code").is_in(list(known))).then("code"),
                 candidate=pl.col("candidate").fill_null("").str.strip_chars(),
                 votes=pl.col("votes")
@@ -304,10 +312,14 @@ def parse() -> None:
             .collect()
         )
         for (state,), rows in frame.partition_by("state", as_dict=True).items():
-            if state in ARCHIVES or (state, year) in found or state not in sizes:
+            if state in ARCHIVES or state not in sizes:
                 continue
             result = questions(rows, sizes[state])
-            if result.height:
+            if result.height and (
+                (state, year) not in found
+                or year == 2022
+                and result["code"].n_unique() > found[(state, year)][1]["code"].n_unique()
+            ):
                 found[(state, year)] = ("medsl", result)
     text = json.loads(raw.cached(SOURCE, WIKIPEDIA_2022).path.read_text())["parse"]["wikitext"]
     text = re.sub(r"<ref[^>/]*/>|<ref[^>]*>.*?</ref>", "", text, flags=re.DOTALL)

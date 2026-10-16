@@ -54,6 +54,13 @@ UNEVEN = (
     "The lists' votes in the source add up to {listed:,} while its valid votes are {valid:,}; the archive keeps both "
     "as published."
 )
+FAR_LEFT = {
+    "94": (
+        " Every other list matches Sciences Po CDSP's tendency totals for the département, but Lutte ouvrière, the "
+        "MPPT, and the LCR add up to 8,626 against CDSP's far-left total of 7,235, exactly the 1,391-vote gap. Which "
+        "of the three figures is wrong cannot be told without the official list results."
+    )
+}
 
 
 def page(title: str) -> str:
@@ -259,6 +266,13 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
 
         source = cs.source(PUBLISHER, SOURCE_TITLE)
+        uneven = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'caveat' and n.body_md like 'The lists'' votes in the source%%'""",
+                [SOURCE],
+            ).fetchall()
+        )
         cs.add(
             "source",
             id=source,
@@ -372,7 +386,14 @@ def emit() -> Path:
             registered, voters, valid = accounting.get((code, number), (None, None, None))
             listed = int(lines["votes"].sum())
             if valid is not None and listed != valid:
-                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNEVEN.format(listed=listed, valid=valid))
+                body = UNEVEN.format(listed=listed, valid=valid) + FAR_LEFT.get(code, "")
+                cs.add(
+                    "note",
+                    **({"id": uneven[result_set]} if result_set in uneven else {}),
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=body,
+                )
             for measure, value in (
                 (cdsp.REGISTERED, registered),
                 (cdsp.VOTERS, voters),
