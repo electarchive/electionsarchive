@@ -154,7 +154,7 @@ def pin(source: str | None = None) -> str:
                 print(f"{folder.name}: {key}: {error}")
                 failed += 1
                 continue
-            time.sleep(0.1)
+            time.sleep(1)
         if not found:
             continue
         with raw.locked(folder.name) as current:

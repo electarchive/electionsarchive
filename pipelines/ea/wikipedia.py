@@ -1,5 +1,6 @@
 import hashlib
 import json
+import time
 from datetime import datetime
 from pathlib import Path
 from urllib.parse import parse_qsl, urlsplit
@@ -45,22 +46,26 @@ def revision(url: str, content: bytes, at: datetime) -> dict[str, str | int | No
     if title is None:
         return {}
     parts = urlsplit(url)
-    response = httpx.get(
-        f"{parts.scheme}://{parts.hostname}/w/api.php",
-        params={
-            "action": "query",
-            "prop": "revisions",
-            "titles": title,
-            "rvlimit": 1,
-            "rvdir": "older",
-            "rvstart": at.strftime("%Y-%m-%dT%H:%M:%SZ"),
-            "rvprop": "ids|sha1|timestamp",
-            "format": "json",
-            "formatversion": 2,
-        },
-        headers={"User-Agent": raw.USER_AGENT},
-        timeout=60,
-    )
+    for attempt in range(6):
+        response = httpx.get(
+            f"{parts.scheme}://{parts.hostname}/w/api.php",
+            params={
+                "action": "query",
+                "prop": "revisions",
+                "titles": title,
+                "rvlimit": 1,
+                "rvdir": "older",
+                "rvstart": at.strftime("%Y-%m-%dT%H:%M:%SZ"),
+                "rvprop": "ids|sha1|timestamp",
+                "format": "json",
+                "formatversion": 2,
+            },
+            headers={"User-Agent": raw.USER_AGENT},
+            timeout=60,
+        )
+        if response.status_code != 429 or attempt == 5:
+            break
+        time.sleep(float(response.headers.get("retry-after") or 5 * 2**attempt))
     response.raise_for_status()
     page = response.json()["query"]["pages"][0]
     if "revisions" not in page:
