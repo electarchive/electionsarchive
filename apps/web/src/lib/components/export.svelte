@@ -1,9 +1,11 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import CodeIcon from "@lucide/svelte/icons/code";
   import DownloadIcon from "@lucide/svelte/icons/download";
   import ImageIcon from "@lucide/svelte/icons/image";
   import LinkIcon from "@lucide/svelte/icons/link";
   import ShareIcon from "@lucide/svelte/icons/share";
+  import { getContext, onDestroy, untrack } from "svelte";
   import { toast } from "svelte-sonner";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -31,6 +33,18 @@
     "dominant-baseline",
   ];
   const CREDIT = 28;
+
+  const claimed = getContext<Set<string>>("figures");
+  const figure = untrack(() => {
+    let slot = 0;
+    while (claimed.has(`${name}:${slot}`)) {
+      slot += 1;
+    }
+    const key = `${name}:${slot}`;
+    claimed.add(key);
+    onDestroy(() => claimed.delete(key));
+    return slot === 0 ? name : `${name}-${slot + 1}`;
+  });
 
   let trigger = $state<HTMLElement | null>(null);
   let chart = $state<SVGSVGElement | null>(null);
@@ -163,7 +177,12 @@
   }
 </script>
 
-<div class={cn("flex", className)} data-export-skip>
+<div
+  class={cn("flex", className)}
+  data-export-skip
+  data-figure={figure}
+  data-embedded={page.url.searchParams.get("embed") === figure ? "" : undefined}
+>
   <DropdownMenu.Root
     onOpenChange={(isOpen) => {
       if (isOpen) {
@@ -204,6 +223,23 @@
             .then(() => toast.success(m.export_copied()))}
       >
         <LinkIcon class="text-muted-foreground" />{m.export_link()}
+      </DropdownMenu.Item>
+      <DropdownMenu.Item
+        onSelect={() => {
+          const url = new URL(page.url.href);
+          url.searchParams.set("embed", figure);
+          const root = trigger?.closest<HTMLElement>("[data-export]");
+          const title =
+            root?.querySelector("h2, h3")?.textContent.trim() ?? document.title;
+          const height = Math.ceil((root?.offsetHeight ?? 480) + 40);
+          void navigator.clipboard
+            .writeText(
+              `<iframe src="${url.href}" title="${title.replaceAll('"', "&quot;")}" loading="lazy" style="inline-size:100%;block-size:${height}px;border:0" data-ea-embed></iframe>\n<script>(()=>{if(window.eaEmbed)return;window.eaEmbed=1;const o=${JSON.stringify(url.origin)};const tone=f=>{for(let e=f.parentElement;e;e=e.parentElement){const c=getComputedStyle(e).backgroundColor.match(/[\\d.]+/g);if(c&&(c[3]===undefined||+c[3]>0))return .2126*c[0]+.7152*c[1]+.0722*c[2]<128?"dark":"light"}return"light"};addEventListener("message",e=>{if(e.origin!==o)return;for(const f of document.querySelectorAll("iframe[data-ea-embed]"))if(f.contentWindow===e.source){if(e.data?.type==="ea:height")f.style.blockSize=e.data.height+"px";if(e.data?.type==="ea:ready")e.source.postMessage({type:"ea:theme",mode:tone(f)},o)}})})()<\/script>`,
+            )
+            .then(() => toast.success(m.export_embed_copied()));
+        }}
+      >
+        <CodeIcon class="text-muted-foreground" />{m.export_embed()}
       </DropdownMenu.Item>
     </DropdownMenu.Content>
   </DropdownMenu.Root>

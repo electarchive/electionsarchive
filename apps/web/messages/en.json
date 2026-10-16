@@ -799,5 +799,8 @@
   "map_sheet_close": "Close",
   "map_pick_touch": "Tap a place to see its results.",
   "scrubber_previous": "Previous election",
-  "scrubber_next": "Next election"
+  "scrubber_next": "Next election",
+  "export_embed": "Copy embed code",
+  "export_embed_copied": "Embed code copied",
+  "embed_credit": "View on Elections Archive"
 }

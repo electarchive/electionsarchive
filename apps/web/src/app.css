@@ -348,3 +348,32 @@
     line-height: 1rem;
   }
 }
+
+html:has([data-embed]),
+html:has([data-embed]) body,
+[data-embed] [data-export]:has([data-embedded]) {
+  background: transparent !important;
+}
+
+html:has([data-embed]) {
+  color-scheme: normal !important;
+}
+
+[data-embed]
+  *:not(:has([data-embedded])):not([data-export]:has([data-embedded]) *) {
+  display: none !important;
+}
+
+[data-embed] :has([data-embedded]):not([data-export]) {
+  display: block !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  background: transparent !important;
+  box-shadow: none !important;
+  max-inline-size: none !important;
+}
+
+[data-embed] [data-figure] {
+  display: none !important;
+}
