@@ -632,5 +632,12 @@
   "seats_paths_title": "Paths to a majority",
   "seats_paths_lede": "Smallest combinations of parties that reach {count} seats, ordered by proximity on the left-right spectrum. Select a combination to highlight its seats.",
   "seats_paths_more": "Show all {count}",
-  "seats_paths_fewer": "Show fewer"
+  "seats_paths_fewer": "Show fewer",
+  "regions_title": "{name} seats by {noun}",
+  "regions_lede": "Seats won by each party in each {noun}. Select a party to sort by seat count.",
+  "regions_place": "Place",
+  "regions_total": "Total",
+  "regions_others": "Others",
+  "regions_more": "Show all {count}",
+  "regions_fewer": "Show fewer"
 }

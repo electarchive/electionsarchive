@@ -615,6 +615,8 @@
         });
         map.touchZoomRotate.disableRotation();
         map.keyboard.disable();
+        map.getCanvas().removeAttribute("role");
+        map.getCanvas().removeAttribute("aria-label");
         map.addImage(
           "arrow",
           {

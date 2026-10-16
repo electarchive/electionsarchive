@@ -4052,6 +4052,236 @@ export const elections = {
         ).slice(0, 3),
       };
     }),
+  regions: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/regions",
+        summary:
+          "Count the seats each party won in each region for an election's own chambers",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.array(
+        v.object({
+          name: v.string(),
+          noun: v.nullable(v.string()),
+          regions: v.array(
+            v.object({
+              name: v.string(),
+              seats: v.number(),
+              parties: v.array(
+                v.object({ party: v.nullable(v.string()), seats: v.number() }),
+              ),
+            }),
+          ),
+          parties: v.array(
+            v.object({
+              id: v.string(),
+              label: v.string(),
+              short: v.nullable(v.string()),
+              color: v.nullable(v.string()),
+              lean: v.nullable(v.number()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        body: string;
+        kind: string;
+        size: number | null;
+        leaf: string;
+        region: string;
+        scheme: string;
+        party: string | null;
+        seats: number;
+      }>(sql`
+        with recursive tree(id) as (
+          select ${input.id}::uuid
+          union all
+          select k.id from election k join tree on k.parent_id = tree.id where k.kind not in ('runoff', 'indirect')
+        ),
+        roots as materialized (
+          select c.id, c.body_id as body, c.kind::text as kind, e.date_from as day
+          from contest c
+          join tree on tree.id = c.election_id
+          join election e on e.id = c.election_id
+          join body b on b.id = c.body_id and b.polity_id = (select polity_id from election where id = ${input.id}::uuid)
+          left join seat st on st.id = c.seat_id
+          where c.allocation_parent_id is null and c.party_scope_id is null
+            and c.kind in ('body_seats', 'list_allocation')
+            and c.term is distinct from 'remainder' and coalesce(st.voting, true)
+        ),
+        grp(id, root) as (
+          select id, id from roots
+          union all
+          select c.id, grp.root from contest c join grp on c.allocation_parent_id = grp.id
+        ),
+        leaves as materialized (
+          select g.id, g.root, c.district_area_id as area, r.day
+          from grp g join contest c on c.id = g.id join roots r on r.id = g.root
+          where not exists (select from contest k where k.allocation_parent_id = g.id)
+        ),
+        winners as materialized (
+          select l.id as leaf, l.root, o.id, o.party_id, max(coalesce(x.seats, 1))::int as seats
+          from leaves l
+          join result_set rs on rs.contest_id = l.id and rs.is_default
+          join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
+          join contest_option o on o.id = x.option_id
+          group by l.id, l.root, o.id, o.party_id
+        ),
+        leads as (
+          select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
+          from winners w
+          join contest_option ch on ch.contest_id = w.leaf and ch.parent_option_id = w.id and ch.party_id is not null
+          join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
+          join result_rollup y on y.result_set_k = rs.k and y.option_k = ch.k
+          where w.party_id is null
+          group by ch.parent_option_id, ch.party_id, ch.k
+          order by ch.parent_option_id, max(y.value) desc
+        ),
+        up(leaf, area, day, depth) as (
+          select l.id, l.area, l.day, 0 from leaves l where l.area is not null
+          union all
+          select up.leaf, ap.parent_id, up.day, up.depth + 1
+          from up join area_parent ap on ap.area_id = up.area and ap.valid @> up.day
+          where up.depth < 6
+        )
+        select r.body, r.kind,
+          (select z.seats from body_size z where z.body_id = r.body
+            and (z.valid @> r.day or z.valid_from between r.day and r.day + 150)
+            order by z.valid_from desc nulls last limit 1) as size,
+          w.leaf, up.area as region, a.scheme_code as scheme,
+          coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party, w.seats
+        from winners w
+        join roots r on r.id = w.root
+        join up on up.leaf = w.leaf
+        join area a on a.id = up.area
+        left join leads ld on ld.parent = w.id
+        left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+        left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
+          and br.kind = 'regional_branch' and br.valid @> r.day
+        left join entity_merge bm on bm.entity_id = br.parent_party_id
+      `);
+      const chambers = Map.groupBy(
+        found.rows,
+        (row) => `${row.body}:${row.kind}`,
+      )
+        .values()
+        .flatMap((rows) => {
+          const leaves = new Set(rows.map((row) => row.leaf));
+          const schemes = Map.groupBy(rows, (row) => row.scheme)
+            .entries()
+            .map(([scheme, group]) => ({
+              scheme,
+              rows: group,
+              leaves: new Set(group.map((row) => row.leaf)).size,
+              regions: new Set(group.map((row) => row.region)).size,
+            }))
+            .filter(
+              (entry) => entry.leaves === leaves.size && entry.regions >= 4,
+            )
+            .toArray()
+            .toSorted((a, b) => a.regions - b.regions);
+          const chosen = schemes[0];
+          const counted = chosen?.rows ?? [];
+          let seats = 0;
+          for (const row of counted) {
+            seats += row.seats;
+          }
+          const size = rows[0]?.size ?? null;
+          return chosen == null || size == null || seats < size * 0.9
+            ? []
+            : [
+                {
+                  body: rows[0]?.body ?? "",
+                  scheme: chosen.scheme,
+                  seats,
+                  rows: chosen.rows,
+                },
+              ];
+        })
+        .toArray();
+      const best = Map.groupBy(chambers, (chamber) => chamber.body)
+        .values()
+        .flatMap((group) =>
+          group.toSorted((a, b) => b.seats - a.seats).slice(0, 1),
+        )
+        .toArray();
+      const parties = [
+        ...new Set(
+          best.flatMap((chamber) =>
+            chamber.rows.flatMap((row) => row.party ?? []),
+          ),
+        ),
+      ];
+      const [labels, colors, positions, nouns] = await Promise.all([
+        names(
+          [
+            ...best.map((chamber) => chamber.body),
+            ...best.flatMap((chamber) => chamber.rows.map((row) => row.region)),
+          ],
+          null,
+        ),
+        refs(parties),
+        db.execute<{ party_id: string; lean: number }>(sql`
+          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+          where party_id = any(${sql.param(parties)}::uuid[])
+          order by party_id, valid_from desc nulls last
+        `),
+        db.execute<{ code: string; noun: string | null }>(sql`
+          select code, noun from scheme where code = any(${sql.param(best.map((chamber) => chamber.scheme))}::text[])
+        `),
+      ]);
+      const lean = new Map(
+        positions.rows.map((row) => [row.party_id, row.lean]),
+      );
+      const noun = new Map(nouns.rows.map((row) => [row.code, row.noun]));
+      return best.map((chamber) => ({
+        name: labels.full.get(chamber.body) ?? "",
+        noun: noun.get(chamber.scheme) ?? null,
+        regions: Map.groupBy(chamber.rows, (row) => row.region)
+          .entries()
+          .map(([region, rows]) => {
+            const tally = Map.groupBy(rows, (row) => row.party ?? "")
+              .entries()
+              .map(([party, group]) => {
+                let won = 0;
+                for (const row of group) {
+                  won += row.seats;
+                }
+                return { party: party === "" ? null : party, seats: won };
+              })
+              .toArray()
+              .toSorted((a, b) => b.seats - a.seats);
+            let won = 0;
+            for (const entry of tally) {
+              won += entry.seats;
+            }
+            return {
+              name: labels.full.get(region) ?? "",
+              seats: won,
+              parties: tally,
+            };
+          })
+          .toArray()
+          .toSorted((a, b) =>
+            a.name.localeCompare(b.name, undefined, { numeric: true }),
+          ),
+        parties: [
+          ...new Set(chamber.rows.flatMap((row) => row.party ?? [])),
+        ].map((id) => ({
+          id,
+          label: colors.get(id)?.label ?? "",
+          short: colors.get(id)?.short ?? null,
+          color: colors.get(id)?.color ?? null,
+          lean: lean.get(id) ?? null,
+        })),
+      }));
+    }),
   tiers: os
     .meta(
       openapi({

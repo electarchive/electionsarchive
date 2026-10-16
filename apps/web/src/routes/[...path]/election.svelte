@@ -8,6 +8,7 @@
   import PlaceMap from "./map.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
+  import Regions from "./regions.svelte";
   import Results, { MEASURES } from "./results.svelte";
   import Seats from "./seats.svelte";
   import Tiers from "./tiers.svelte";
@@ -471,6 +472,8 @@
     </ul>
   </section>
 {/if}
+
+<Regions {id} />
 
 {#if isTiled}
   <Tiers

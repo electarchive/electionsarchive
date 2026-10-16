@@ -273,8 +273,11 @@
           href={tile.path == null
             ? undefined
             : resolve("/[...path]", { path: tile.path })}
-          class="grid place-items-center rounded-xs font-mono font-semibold tabular-nums ring-1 ring-border/70 transition-shadow outline-none block-full inline-full ring-inset hover:ring-2 hover:ring-foreground focus-visible:ring-2 focus-visible:ring-ring data-filled:text-background data-filled:ring-0 data-[size=large]:text-[0.6875rem] data-[size=small]:text-[0.5rem]"
+          class="grid place-items-center rounded-xs font-mono font-semibold tabular-nums ring-1 ring-border/70 transition-shadow outline-none block-full inline-full ring-inset hover:ring-2 hover:ring-foreground focus-visible:ring-2 focus-visible:ring-ring data-filled:ring-0 data-[size=large]:text-[0.6875rem] data-[size=small]:text-[0.5625rem]"
           style:background={tile.color ?? undefined}
+          style:color={tile.color == null
+            ? undefined
+            : `oklch(from ${tile.color} clamp(0.12, (0.6 - l) * 1000, 0.99) 0 0)`}
           data-filled={tile.color == null ? undefined : ""}
           data-size={size}
           title={tile.text}

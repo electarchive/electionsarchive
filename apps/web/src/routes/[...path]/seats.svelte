@@ -329,7 +329,7 @@
     id="{uid}-title"
     class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
   >
-    {m.seats_title()}
+    {m.seats_title()}<span class="sr-only">, {place}</span>
   </h2>
   <div
     class="relative mx-auto inline-full"
