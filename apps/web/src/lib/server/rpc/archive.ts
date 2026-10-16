@@ -527,7 +527,7 @@ async function load(
     value: number;
     exact: boolean;
   }>(sql`
-    with fetched as (
+    with fetched as materialized (
       select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
         r.value::float8 as value, r.exact,
         min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as first
@@ -535,24 +535,23 @@ async function load(
       join result_rollup r on r.result_set_k = p.set and r.area_k = p.area
       where (r.measure = any(${COUNTED}) or r.option_k = 0 and r.measure in (2, 4))
     ),
-    mains as (
+    mains as materialized (
       select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
     ),
-    kept as (
-      select distinct f.set, f.area from fetched f join mains m on m.area = f.area and m.main = f.measure
+    flagged as (
+      select f.*, m.main, bool_or(f.measure = m.main) over (partition by f.set, f.area) as kept
+      from fetched f join mains m on m.area = f.area
     )
-    select r.set, r.area, r.option, x.role, m.main, r.value, r.exact
-    from fetched r
-    join mains m on m.area = r.area
-    join kept k on k.set = r.set and k.area = r.area
+    select r.set, r.area, r.option, x.role, r.main, r.value, r.exact
+    from flagged r
     cross join lateral (
       select case
-        when r.measure = m.main then 'votes'
-        when r.measure = 4 and m.main = 1 then 'valid'
-        when r.measure = 2 and m.main = 11 then 'appointed'
+        when r.measure = r.main then 'votes'
+        when r.measure = 4 and r.main = 1 then 'valid'
+        when r.measure = 2 and r.main = 11 then 'appointed'
       end as role
     ) x
-    where r.count_round = r.first and x.role is not null
+    where r.kept and r.count_round = r.first and x.role is not null
   `);
   const kept = new Set(rollup.rows.map((row) => `${row.set}:${row.area}`));
   const tallies = new Map<number, number>();
@@ -2928,20 +2927,31 @@ export const contests = {
           select ${contest.root}::uuid
           union all
           select c.id from contest c join own on c.allocation_parent_id = own.id
+        ),
+        candidates as materialized (
+          select c.id, c.allocation_parent_id as parent
+          from contest c
+          join tree on tree.id = c.election_id
+          join election e on e.id = c.election_id and e.date_from = ${day}::date
+          where c.id not in (select id from own)
+        ),
+        grp(id, top) as (
+          select id, id from candidates
+          union all
+          select g.id, grp.top from contest g join grp on g.allocation_parent_id = grp.id
+        ),
+        hits as (
+          select distinct grp.top from grp
+          join result_set rs on rs.contest_id = grp.id
+          where exists (
+            select 1 from result_rollup r
+            where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
+          )
         )
-        select c.id, c.allocation_parent_id as parent, s.path
-        from contest c
-        join tree on tree.id = c.election_id
-        join election e on e.id = c.election_id and e.date_from = ${day}::date
+        select c.id, c.parent, s.path
+        from candidates c
+        join hits h on h.top = c.id
         join slug s on s.entity_id = c.id and s.is_current
-        where c.id not in (select id from own) and exists (
-          select 1 from result_set rs join result_rollup r on r.result_set_k = rs.k
-          where rs.contest_id in (
-            with recursive grp(id) as (
-              select c.id union all select g.id from contest g join grp on g.allocation_parent_id = grp.id
-            ) select id from grp
-          ) and r.area_k = ${area.k} and r.measure = any(${COUNTED})
-        )
       `);
       const parents = new Set(found.rows.map((row) => row.parent));
       const kept = found.rows.filter((row) => !parents.has(row.id));
@@ -3389,6 +3399,12 @@ async function races(
         select ${polity}::uuid
         union
         select p.parent_id from polity_parent p join anc on p.polity_id = anc.id
+      ),
+      runs as (
+        select n.previous_round_id as id, array_agg(n.id) as ids
+        from contest n join election ne on ne.id = n.election_id
+        where ne.kind = 'runoff' and n.previous_round_id is not null
+        group by n.previous_round_id
       )
       select c.id, c.kind::text as kind,
         coalesce(
@@ -3403,7 +3419,7 @@ async function races(
         c.kind = 'office' as "isOffice", tree.stage as "isStage", z.seats as size,
         c.term is distinct from 'remainder' and coalesce(st.voting, true) as "isCounted",
         e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
-        array(select n.id from contest n join election ne on ne.id = n.election_id where n.previous_round_id = c.id and ne.kind = 'runoff') as runoffs,
+        coalesce(runs.ids, '{}') as runoffs,
         c.term is not distinct from 'remainder' as "isRemainder",
         a.id as area, a.k, a.scheme_code as scheme, sc.noun
       from contest c
@@ -3417,6 +3433,7 @@ async function races(
         order by z.valid_from desc nulls last limit 1
       ) z on true
       join tree on tree.id = c.election_id
+      left join runs on runs.id = c.id
       where c.allocation_parent_id is null or not exists (
         select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
       )
