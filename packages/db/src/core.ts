@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, text, integer, smallint, date, boolean, numeric, jsonb, timestamp, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, smallint, uuid, text, integer, date, numeric, boolean, timestamp, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -49,6 +49,7 @@ export const noteKind = pgEnum("note_kind", ["context", "caveat", "methodology",
 export const labelKind = pgEnum("label_kind", ["recognition", "integrity", "data_quality"])
 export const flagSeverity = pgEnum("flag_severity", ["info", "warning", "error"])
 export const flagStatus = pgEnum("flag_status", ["open", "accepted", "resolved"])
+export const contestTerm = pgEnum("contest_term", ["full", "remainder"])
 
 
 export const alliance = pgTable("alliance", {
@@ -299,6 +300,7 @@ export const contest = pgTable("contest", {
 	defaultResultKind: resultKind("default_result_kind").default("counted").notNull(),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	term: contestTerm(),
 }, (table) => [
 	foreignKey({
 		columns: [table.allocationParentId],
@@ -873,6 +875,7 @@ export const seat = pgTable("seat", {
 	valid: daterange().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	voting: boolean().default(true).notNull(),
 });
 
 export const slug = pgTable("slug", {
