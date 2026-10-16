@@ -13,6 +13,7 @@
   import { on } from "svelte/events";
   import ConfirmationDialog from "#lib/components/confirmation-dialog.svelte";
   import Header from "#lib/components/header.svelte";
+  import Provenance from "#lib/components/provenance.svelte";
   import { Toaster } from "#lib/components/ui/sonner/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { palette } from "#lib/palette.svelte.js";
@@ -174,4 +175,5 @@
   </Tooltip.Provider>
   <ProgressBar class="text-primary" displayThresholdMs={300} />
   <ConfirmationDialog />
+  <Provenance />
 </QueryClientProvider>

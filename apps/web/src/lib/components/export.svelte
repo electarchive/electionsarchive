@@ -1,5 +1,6 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import BookOpenIcon from "@lucide/svelte/icons/book-open";
   import CodeIcon from "@lucide/svelte/icons/code";
   import DownloadIcon from "@lucide/svelte/icons/download";
   import ImageIcon from "@lucide/svelte/icons/image";
@@ -9,6 +10,7 @@
   import { toast } from "svelte-sonner";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
 
   const { name, class: className }: { name: string; class?: string } = $props();
@@ -240,6 +242,15 @@
         }}
       >
         <CodeIcon class="text-muted-foreground" />{m.export_embed()}
+      </DropdownMenu.Item>
+      <DropdownMenu.Separator />
+      <DropdownMenu.Item
+        onSelect={() => {
+          provenance.value = null;
+          provenance.isOpen = true;
+        }}
+      >
+        <BookOpenIcon class="text-muted-foreground" />{m.provenance_title()}
       </DropdownMenu.Item>
     </DropdownMenu.Content>
   </DropdownMenu.Root>

@@ -1614,6 +1614,113 @@ const Input = v.object({
 });
 
 export const contests = {
+  trace: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/trace",
+        summary:
+          "Find the printed page regions a contest's numbers were read from",
+      }),
+    )
+    .input(
+      v.object({
+        path: v.string(),
+        key: v.nullable(v.string()),
+        area: v.nullable(v.number()),
+      }),
+    )
+    .output(
+      v.object({
+        count: v.number(),
+        pages: v.array(
+          v.object({
+            image: v.string(),
+            page: v.number(),
+            width: v.number(),
+            height: v.number(),
+            box: v.tuple([v.number(), v.number(), v.number(), v.number()]),
+            isExact: v.boolean(),
+            publisher: v.string(),
+            title: v.string(),
+            url: v.nullable(v.string()),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        total: number;
+        image: string;
+        page: number;
+        width: number;
+        height: number;
+        x0: number;
+        y0: number;
+        x1: number;
+        y1: number;
+        exact: boolean;
+        publisher: string;
+        title: string;
+        url: string | null;
+      }>(sql`
+        with recursive head as (
+          select s.entity_id as id from slug s join entity e on e.id = s.entity_id
+          where s.path = ${input.path} and e.type = 'contest'
+          order by s.is_current desc limit 1
+        ),
+        tree(id) as (
+          select id from head
+          union all
+          select c.id from contest c join tree on c.allocation_parent_id = tree.id
+        ),
+        top as (
+          select a.k from head join contest c on c.id = head.id join area a on a.id = c.district_area_id
+        ),
+        sets as (
+          select rs.k, rs.source_id from result_set rs join tree on tree.id = rs.contest_id where rs.is_default
+        ),
+        options as (
+          select o.k from contest_option o join tree on tree.id = o.contest_id
+          left join candidacy cy on cy.option_id = o.id
+          left join entity_merge pm on pm.entity_id = o.party_id
+          where ${input.key}::text is null
+            or 'party:' || coalesce(pm.into_id, o.party_id)::text = ${input.key}
+            or 'person:' || cy.person_id::text = ${input.key}
+        ),
+        hits as (
+          select vl.*, vl.unit_k = coalesce(${input.area}::int, (select k from top)) as exact, sets.source_id as set_source
+          from value_locator vl join sets on sets.k = vl.result_set_k
+          where vl.option_k in (select k from options)
+            and (${input.area}::int is null or vl.unit_k = ${input.area}::int)
+        )
+        select count(*) over ()::int as total, p.image_key as image, p.page_number as page, p.width, p.height,
+          h.x0, h.y0, h.x1, h.y1, h.exact, s.publisher, s.title, s.url
+        from hits h join source_page p on p.id = h.page_id
+        join source s on s.id = coalesce(h.source_id, h.set_source)
+        order by h.exact desc, h.measure, p.page_number
+        limit 3
+      `);
+      return {
+        count: found.rows[0]?.total ?? 0,
+        pages: found.rows.map((row) => ({
+          image: row.image.replace(/^pages\//, ""),
+          page: row.page,
+          width: row.width,
+          height: row.height,
+          box: [row.x0, row.y0, row.x1, row.y1] as [
+            number,
+            number,
+            number,
+            number,
+          ],
+          isExact: row.exact,
+          publisher: row.publisher,
+          title: row.title,
+          url: row.url,
+        })),
+      };
+    }),
   locate: os
     .meta(
       openapi({

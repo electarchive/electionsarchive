@@ -22,6 +22,7 @@
   import { count, percent, points } from "#lib/format.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
+  import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -30,6 +31,7 @@
     span,
     votes,
     seats,
+    trace = null,
   }: {
     rows: Extract<PageData, { kind: "contest" }>["contest"]["rows"];
     span: {
@@ -40,6 +42,7 @@
     } | null;
     votes: string;
     seats: string | null;
+    trace?: string | null;
   } = $props();
 
   let expanded = $state(false);
@@ -176,6 +179,28 @@
     ></span>
     {label}
   </span>
+{/snippet}
+
+{#snippet cite(
+  text: string,
+  measure: "votes" | "share" | "seats",
+  row: (typeof rows)[number],
+)}
+  <button
+    type="button"
+    class="cursor-help underline decoration-transparent decoration-dotted underline-offset-4 hover:decoration-current focus-visible:decoration-current"
+    onclick={() => {
+      provenance.value = {
+        label: `${row.label}, ${{ votes, share: m.col_share(), seats: seats ?? "" }[measure].toLocaleLowerCase()}`,
+        figure: text,
+        measure,
+        path: trace,
+        key: row.key,
+        area: null,
+      };
+      provenance.isOpen = true;
+    }}>{text}</button
+  >
 {/snippet}
 
 {#if span != null && !paired}
@@ -379,13 +404,17 @@
               { "max-sm:hidden": span != null },
             )}
           >
-            {page == null ? "" : count(page.votes)}
+            {#if page != null}
+              {@render cite(count(page.votes), "votes", row)}
+            {/if}
           </td>
           {#if span == null}
             <td
               class="relative px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums"
             >
-              {page == null ? "" : percent(page.share)}
+              {#if page != null}
+                {@render cite(percent(page.share), "share", row)}
+              {/if}
               <span
                 class="absolute inset-e-2 inset-be-0.5 bg-(--party) block-0.5"
                 style:width="calc({((page?.share ?? 0) / topShare) * 100}% -
@@ -415,7 +444,13 @@
                 { "max-sm:hidden": span != null },
               )}
             >
-              <span class="font-semibold">{page?.seats ?? ""}</span>
+              <span class="font-semibold"
+                >{#if page?.seats != null}{@render cite(
+                    String(page.seats),
+                    "seats",
+                    row,
+                  )}{/if}</span
+              >
               {#if line.gained != null && line.gained !== 0}
                 <span class="ms-1 text-[0.75rem] text-muted-foreground"
                   >{new Intl.NumberFormat(getLocale(), {

@@ -693,6 +693,7 @@
   >
     <Results
       rows={race.rows}
+      trace={race.count === 1 ? race.path : null}
       span={null}
       votes={race.votes}
       seats={race.seated.length === 0 ||

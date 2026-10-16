@@ -1296,6 +1296,7 @@
   {#if contest.current != null}
     <Results
       rows={contest.rows}
+      trace={page.url.pathname.slice(1)}
       {span}
       votes={counted ?? m.col_votes()}
       seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}
