@@ -35,6 +35,19 @@
     ).length,
   );
   const years = $derived(entries.map((entry) => entry.year));
+  const today = new Date().toISOString().slice(0, 10);
+  const low = $derived(
+    Math.min(
+      ...person.served.flatMap((spell) =>
+        spell.from == null ? [] : [Date.parse(spell.from)],
+      ),
+      ...years.map((year) => Date.UTC(year, 0, 1)),
+      Date.parse(today),
+    ),
+  );
+  const at = (value: string | null) =>
+    ((value == null ? Date.parse(today) : Date.parse(value)) - low) /
+    Math.max(Date.parse(today) - low, 1);
 </script>
 
 <svelte:head>
@@ -51,6 +64,9 @@
 
 <main class="p-3.5 max-sm:p-0">
   <article
+    style:--party={person.party == null
+      ? "var(--foreground)"
+      : swatch(person.party.color, `party:${person.party.id}`)}
     class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
   >
     <header
@@ -102,44 +118,68 @@
       </p>
     </header>
 
-    {#if entries.length > 0}
-      <dl class="col-span-12 grid grid-cols-3 gap-px">
-        <div class="bg-card px-3.5 py-3">
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            {m.person_ran()}
-          </dt>
-          <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
+    {#if entries.length > 0 || person.served.length > 0}
+      <section class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5">
+        {#if entries.length > 0}
+          <p
+            class="font-serif text-[clamp(1.0625rem,1.6vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
           >
-            {count(entries.length)}
-          </dd>
-        </div>
-        <div class="bg-card px-3.5 py-3">
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            {m.person_won()}
-          </dt>
-          <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
-          >
-            {count(won)}
-          </dd>
-        </div>
-        <div class="bg-card px-3.5 py-3">
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            {m.person_years()}
-          </dt>
-          <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
-          >
-            {Math.min(...years) === Math.max(...years)
-              ? Math.min(...years)
-              : m.polity_span({
+            {entries.length === 1
+              ? m.person_lede_single({ year: String(years[0]) })
+              : m.person_lede({
+                  won: count(won),
+                  count: count(entries.length),
                   first: String(Math.min(...years)),
                   last: String(Math.max(...years)),
                 })}
-          </dd>
-        </div>
-      </dl>
+          </p>
+        {/if}
+        {#if person.served.length > 0}
+          <div class="grid gap-1.5">
+            <h2 class="text-[0.8125rem] font-bold">{m.person_served()}</h2>
+            <ul class="grid text-sm">
+              {#each person.served as spell, index (index)}
+                {const x0 = $derived(at(spell.from))}
+                {const x1 = $derived(at(spell.to))}
+                <li
+                  class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-4 gap-y-1 border-be border-border/60 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,18rem)_minmax(0,1fr)_auto]"
+                >
+                  {#if spell.isBody}
+                    <a
+                      class="truncate font-semibold hover:highlighter"
+                      href={resolve("/id/[id]", { id: spell.id })}
+                      >{spell.name}</a
+                    >
+                  {:else}
+                    <span class="truncate font-semibold">{spell.name}</span>
+                  {/if}
+                  <span
+                    class="relative block rounded-full bg-muted block-2 max-sm:col-span-2 max-sm:row-start-2"
+                    aria-hidden="true"
+                  >
+                    <span
+                      class="absolute inset-y-0 rounded-full bg-(--party)"
+                      style:inset-inline-start="{x0 * 100}%"
+                      style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
+                    ></span>
+                  </span>
+                  <span
+                    class="font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+                    >{spell.to == null
+                      ? m.person_served_now({
+                          from: spell.from?.slice(0, 4) ?? "",
+                        })
+                      : m.person_served_span({
+                          from: spell.from?.slice(0, 4) ?? "",
+                          to: spell.to.slice(0, 4),
+                        })}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+      </section>
     {/if}
 
     <Career record={person.record} />

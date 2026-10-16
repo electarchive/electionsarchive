@@ -6245,6 +6245,15 @@ export const people = {
         precision: v.nullable(v.string()),
         wikidata: v.nullable(v.string()),
         party: v.nullable(PartyRef),
+        served: v.array(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            isBody: v.boolean(),
+            from: v.nullable(v.string()),
+            to: v.nullable(v.string()),
+          }),
+        ),
         record: v.array(
           v.object({
             name: v.string(),
@@ -6384,8 +6393,47 @@ export const people = {
         order by p.date desc
       `);
       const roots = rows.rows.map((row) => row.root);
+      const tenures = await db.execute<{
+        owner: string;
+        isBody: boolean;
+        from: string | null;
+        to: string | null;
+      }>(sql`
+        with recursive ids(id) as (
+          select ${person.id}::uuid
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        )
+        select coalesce(t.body_id, t.office_id) as owner, t.body_id is not null as "isBody",
+          t.from_date::text as from, t.to_date::text as to
+        from tenure t where t.person_id in (select id from ids)
+        order by coalesce(t.body_id, t.office_id), t.from_date nulls first
+      `);
+      const spells: Array<{
+        owner: string;
+        isBody: boolean;
+        from: string | null;
+        to: string | null;
+      }> = [];
+      for (const row of tenures.rows) {
+        const last = spells.at(-1);
+        if (
+          last?.owner === row.owner &&
+          last.to != null &&
+          row.from != null &&
+          Date.parse(row.from) - Date.parse(last.to) < 90 * 864e5
+        ) {
+          last.to = row.to;
+        } else {
+          spells.push({ ...row });
+        }
+      }
       const [labels, slugs] = await Promise.all([
-        names([person.id, ...roots]),
+        names([
+          person.id,
+          ...roots,
+          ...new Set(spells.map((spell) => spell.owner)),
+        ]),
         paths(roots),
       ]);
       const record = rows.rows
@@ -6434,6 +6482,20 @@ export const people = {
         precision: person.precision,
         wikidata: person.wikidata,
         party: record.find((entry) => entry.party != null)?.party ?? null,
+        served: spells
+          .map((spell) => ({
+            id: spell.owner,
+            name: labels.full.get(spell.owner) ?? "",
+            isBody: spell.isBody,
+            from: spell.from,
+            to: spell.to,
+          }))
+          .toSorted(
+            (a, b) =>
+              Number(b.to == null) - Number(a.to == null) ||
+              (b.to ?? "").localeCompare(a.to ?? "") ||
+              (b.from ?? "").localeCompare(a.from ?? ""),
+          ),
         record,
       };
     }),
