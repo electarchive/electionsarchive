@@ -675,7 +675,7 @@
               <svelte:element
                 this={row.path == null ? "span" : "a"}
                 class={cn(
-                  "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
+                  "flex items-center gap-1.5 rounded-xs px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
                   { "bg-secondary": focus === row.k },
                 )}
                 href={row.path == null
@@ -1228,57 +1228,21 @@
 {#snippet stats(compact: boolean)}
   {#if contest.current != null}
     <dl
-      class={cn("grid grid-cols-12 gap-px", {
-        "col-span-12": !compact,
-        "bg-border": compact,
-      })}
+      class={cn(
+        "flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3",
+        { "col-span-12": !compact },
+      )}
     >
-      <div
-        class={cn("col-span-6 bg-card px-3.5 py-3", {
-          "md:col-span-4": !compact,
-        })}
-      >
-        <dt class="text-[0.8125rem] text-muted-foreground">
-          <Term
-            label={counted ?? m.stat_valid()}
-            definition={DEFINITIONS[contest.current.measure]?.() ??
-              m.term_valid()}
-          />
-        </dt>
-        <dd
-          class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
+      {#if lead != null}
+        <div
+          class="flex items-baseline gap-2 min-inline-0"
+          style:--party={swatch(lead.row.color, lead.row.key)}
         >
-          {count(contest.current.valid)}
-        </dd>
-      </div>
-      <div
-        class={cn("col-span-6 bg-card px-3.5 py-3", {
-          "md:col-span-4": !compact,
-        })}
-      >
-        <dt class="text-[0.8125rem] text-muted-foreground">
-          <Term label={m.stat_options()} definition={m.term_options()} />
-        </dt>
-        <dd
-          class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
-        >
-          {contest.rows.filter((row) => row.current != null).length}
-        </dd>
-      </div>
-      <div
-        class={cn("col-span-12 bg-card px-3.5 py-3", {
-          "md:col-span-4": !compact,
-        })}
-      >
-        {#if lead != null}
           <dt class="text-[0.8125rem] text-muted-foreground">
             <Term label={m.col_margin()} definition={m.term_margin()} />
           </dt>
-          <dd
-            class="mbs-0.5 flex items-baseline gap-2.5 min-inline-0"
-            style:--party={swatch(lead.row.color, lead.row.key)}
-          >
-            <span class="font-figures text-2xl tracking-[-0.02em] tabular-nums"
+          <dd class="flex items-baseline gap-2 min-inline-0">
+            <span class="font-figures text-xl font-[760] tracking-[-0.015em]"
               >{points(lead.margin)}</span
             >
             <Name
@@ -1289,7 +1253,27 @@
               party={lead.row.current?.party}
             />
           </dd>
-        {/if}
+        </div>
+      {/if}
+      <div class="flex items-baseline gap-2">
+        <dt class="text-[0.8125rem] text-muted-foreground">
+          <Term
+            label={counted ?? m.stat_valid()}
+            definition={DEFINITIONS[contest.current.measure]?.() ??
+              m.term_valid()}
+          />
+        </dt>
+        <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+          {count(contest.current.valid)}
+        </dd>
+      </div>
+      <div class="flex items-baseline gap-2">
+        <dt class="text-[0.8125rem] text-muted-foreground">
+          <Term label={m.stat_options()} definition={m.term_options()} />
+        </dt>
+        <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+          {contest.rows.filter((row) => row.current != null).length}
+        </dd>
       </div>
     </dl>
   {/if}

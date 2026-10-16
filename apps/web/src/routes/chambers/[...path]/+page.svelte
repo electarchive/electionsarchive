@@ -193,35 +193,33 @@
     </header>
 
     {#if latest != null}
-      <dl class="col-span-12 grid grid-cols-2 gap-px sm:grid-cols-4">
-        <div class="bg-card px-3.5 py-3">
+      <dl
+        class="col-span-12 flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3"
+      >
+        <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             {m.chamber_seats()}
           </dt>
-          <dd
-            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
-          >
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             {count(latest.size ?? latest.total)}
           </dd>
         </div>
-        <div class="bg-card px-3.5 py-3">
+        <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             {m.chamber_terms()}
           </dt>
-          <dd
-            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
-          >
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             {count(data.terms.length)}
             <span class="text-sm text-muted-foreground"
               >{span(data.terms[0]?.start ?? latest.start, null)}</span
             >
           </dd>
         </div>
-        <div class="bg-card px-3.5 py-3">
+        <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             {m.chamber_largest()}
           </dt>
-          <dd class="mbs-0.5 flex items-baseline gap-2 text-2xl">
+          <dd class="flex items-baseline gap-2">
             <span
               class="self-center rounded-xs block-3 inline-3"
               style:background={swatch(
@@ -229,7 +227,7 @@
                 `party:${latest.parties[0]?.party ?? ""}`,
               )}
             ></span>
-            <span class="heading"
+            <span class="text-xl font-[760] tracking-[-0.015em]"
               >{label(latest.parties[0]?.party ?? null)}</span
             >
             <span
@@ -238,16 +236,16 @@
             >
           </dd>
         </div>
-        <div class="bg-card px-3.5 py-3">
-          <dt class="text-[0.8125rem] text-muted-foreground">
-            {m.chamber_members_count()}
-          </dt>
-          <dd
-            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
-          >
-            {count(body.tenures)}
-          </dd>
-        </div>
+        {#if body.tenures > 0}
+          <div class="flex items-baseline gap-2">
+            <dt class="text-[0.8125rem] text-muted-foreground">
+              {m.chamber_members_count()}
+            </dt>
+            <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+              {count(body.tenures)}
+            </dd>
+          </div>
+        {/if}
       </dl>
 
       <Stream

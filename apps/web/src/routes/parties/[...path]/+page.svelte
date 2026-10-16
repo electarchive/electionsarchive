@@ -175,14 +175,14 @@
     </header>
 
     {#if party.span != null}
-      <dl class="col-span-12 grid grid-cols-3 gap-px">
-        <div class="bg-card px-3.5 py-3">
+      <dl
+        class="col-span-12 flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3"
+      >
+        <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             {m.party_ballot()}
           </dt>
-          <dd
-            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
-          >
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             {party.span.from.slice(0, 4) === party.span.to.slice(0, 4)
               ? party.span.from.slice(0, 4)
               : m.polity_span({
@@ -191,23 +191,19 @@
                 })}
           </dd>
         </div>
-        <div class="bg-card px-3.5 py-3">
+        <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             {m.party_elections()}
           </dt>
-          <dd
-            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
-          >
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             {count(data.record.count)}
           </dd>
         </div>
-        <div class="bg-card px-3.5 py-3">
+        <div class="flex items-baseline gap-2">
           <dt class="text-[0.8125rem] text-muted-foreground">
             {m.party_contests()}
           </dt>
-          <dd
-            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
-          >
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             {count(party.span.contests)}
           </dd>
         </div>

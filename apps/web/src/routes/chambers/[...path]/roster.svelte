@@ -239,7 +239,7 @@
         <button
           type="button"
           class={cn(
-            "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
+            "flex items-center gap-1.5 rounded-xs px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
             { "marked bg-secondary": party === entry },
           )}
           aria-pressed={party === entry}
