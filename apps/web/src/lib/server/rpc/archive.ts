@@ -3818,7 +3818,123 @@ async function refs(ids: Array<string>) {
   );
 }
 
+async function namesakes(
+  type: "person" | "party",
+  base: string,
+  polity: string | null,
+) {
+  const words = base.split("-").filter((word) => word !== "");
+  if (words.length === 0) {
+    return [];
+  }
+  const found = await db.execute<{ id: string }>(sql`
+    select entity_id as id from search_document
+    where type = ${type}::entity_type
+      and tsv @@ to_tsquery('simple', ${words.map((word) => `${word}:*`).join(" & ")})
+      and (${polity}::uuid is null or polity_id = ${polity}::uuid)
+    order by entity_id
+  `);
+  const ids = found.rows.map((row) => row.id);
+  const labels = await names(ids);
+  return ids.filter((id) => segment(labels.full.get(id) ?? "") === base);
+}
+
+async function locate(
+  type: "person" | "party",
+  slug: string,
+  polity: string | null,
+) {
+  const exact = await namesakes(type, slug, polity);
+  if (exact[0] != null) {
+    return exact[0];
+  }
+  const suffix = /^(.+)-(\d+)$/u.exec(slug);
+  if (suffix?.[1] == null) {
+    return null;
+  }
+  const peers = await namesakes(type, suffix[1], polity);
+  return peers[Number(suffix[2]) - 1] ?? null;
+}
+
+export const entities = {
+  path: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/entities/{id}/path",
+        summary:
+          "Resolve any entity's ID to its canonical page path: a polity's, election's, or contest's slug, /people/{slug} for a person, and /parties/{polity}/{slug} for a party",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(v.object({ path: v.nullable(v.string()) }))
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        type: string;
+        slug: string | null;
+        polity: string | null;
+      }>(sql`
+        select e.id, e.type::text as type,
+          (select s.path from slug s where s.entity_id = e.id and s.is_current) as slug,
+          (select s.path from party p join slug s on s.entity_id = p.polity_id and s.is_current where p.id = e.id) as polity
+        from entity e
+        where e.id = coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+      `);
+      const entity = found.rows[0];
+      if (entity == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      if (entity.slug != null) {
+        return { path: entity.slug };
+      }
+      if (entity.type !== "person" && entity.type !== "party") {
+        return { path: null };
+      }
+      const labels = await names([entity.id]);
+      const base = segment(labels.full.get(entity.id) ?? "");
+      const owner =
+        entity.type === "party"
+          ? await db.execute<{ polity: string | null }>(sql`
+            select polity_id as polity from party where id = ${entity.id}::uuid
+          `)
+          : null;
+      const peers = await namesakes(
+        entity.type,
+        base,
+        owner?.rows[0]?.polity ?? null,
+      );
+      const at = peers.indexOf(entity.id);
+      const slug = at > 0 ? `${base}-${at + 1}` : base;
+      return {
+        path:
+          entity.type === "person"
+            ? `people/${slug}`
+            : ["parties", entity.polity, slug]
+                .filter((part) => part != null)
+                .join("/"),
+      };
+    }),
+};
+
 export const people = {
+  locate: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/people/locate",
+        summary: "Find the person a /people/{slug} path names",
+      }),
+    )
+    .input(v.object({ slug: v.string() }))
+    .output(v.object({ id: v.string() }))
+    .handler(async ({ input }) => {
+      const id = await locate("person", input.slug, null);
+      if (id == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      return { id };
+    }),
   get: os
     .meta(
       openapi({
@@ -4023,6 +4139,111 @@ export const people = {
 };
 
 export const parties = {
+  elections: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/parties/{id}/elections",
+        summary:
+          "List the elections a party ran in, newest first, each with how many races it entered and the seats or offices it won",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        count: v.number(),
+        elections: v.array(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            date: v.nullable(v.string()),
+            year: v.nullable(v.number()),
+            races: v.number(),
+            won: v.number(),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        election: string;
+        date: string | null;
+        year: number | null;
+        races: number;
+        won: number;
+        total: number;
+      }>(sql`
+        with recursive ids(id) as (
+          select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        ),
+        mine as materialized (
+          select o.id as option, o.contest_id from contest_option o where o.party_id in (select id from ids)
+        ),
+        up(id, parent) as (
+          select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
+          union
+          select c.id, c.allocation_parent_id from up join contest c on c.id = up.parent
+        ),
+        won as (
+          select distinct m.contest_id from mine m
+          join outcome x on x.option_id = m.option and x.candidacy_id is null and x.kind in ('elected', 'won')
+          join result_set rs on rs.id = x.result_set_id and rs.is_default
+        )
+        select coalesce(e.parent_id, e.id) as election, min(e.date_from)::text as date, min(${CYCLE}) as year,
+          count(distinct up.id)::int as races,
+          count(distinct w.contest_id)::int as won,
+          count(*) over ()::int as total
+        from up join contest c on c.id = up.id join election e on e.id = c.election_id
+        left join won w on w.contest_id = up.id
+        where up.parent is null
+        group by coalesce(e.parent_id, e.id)
+        order by min(e.date_from) desc nulls last
+        limit 200
+      `);
+      const ids = found.rows.map((row) => row.election);
+      const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
+      return {
+        count: found.rows[0]?.total ?? 0,
+        elections: found.rows.map((row) => ({
+          name: labels.full.get(row.election) ?? "",
+          path: slugs.get(row.election) ?? null,
+          date: row.date,
+          year: row.year,
+          races: row.races,
+          won: row.won,
+        })),
+      };
+    }),
+  locate: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/parties/locate",
+        summary:
+          "Find the party a /parties/{polity}/{slug} path names, the polity given by its path",
+      }),
+    )
+    .input(v.object({ polity: v.optional(v.string()), slug: v.string() }))
+    .output(v.object({ id: v.string() }))
+    .handler(async ({ input }) => {
+      const owner =
+        input.polity == null
+          ? null
+          : await db.execute<{ id: string }>(sql`
+            select s.entity_id as id from slug s join polity p on p.id = s.entity_id
+            where s.path = ${input.polity} and s.is_current
+          `);
+      if (owner != null && owner.rows[0] == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const id = await locate("party", input.slug, owner?.rows[0]?.id ?? null);
+      if (id == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      return { id };
+    }),
   get: os
     .meta(
       openapi({
@@ -4256,7 +4477,10 @@ export const search = {
           id: row.id,
           type: row.type,
           name: labels.full.get(row.id) ?? "",
-          path: slugs.get(row.target ?? "") ?? null,
+          path:
+            row.type === "person" || row.type === "party"
+              ? `id/${row.id}`
+              : (slugs.get(row.target ?? "") ?? null),
           context:
             labels.full.get(
               (row.type === "person" ? row.target : row.context) ?? "",

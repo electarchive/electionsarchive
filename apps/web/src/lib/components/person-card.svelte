@@ -136,14 +136,20 @@
       {/if}
     {/if}
   </div>
-  {#if person.wikidata != null}
-    <div class="border-bs px-3 py-2 text-[0.8125rem]">
+  <div
+    class="flex flex-wrap items-center gap-x-4 gap-y-1 border-bs px-3 py-2 text-[0.8125rem]"
+  >
+    <a
+      class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+      href={resolve("/id/[id]", { id })}>{m.card_open()}</a
+    >
+    {#if person.wikidata != null}
       <a
         class="inline-flex items-center gap-1 underline decoration-border underline-offset-4 hover:decoration-foreground"
         href="https://www.wikidata.org/wiki/{person.wikidata}"
         rel="external noopener"
         >{m.card_wikidata()}<ArrowUpRightIcon class="block-3 inline-3" /></a
       >
-    </div>
-  {/if}
+    {/if}
+  </div>
 {/if}

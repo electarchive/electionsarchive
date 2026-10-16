@@ -1,6 +1,7 @@
 import {
   contests,
   elections,
+  entities,
   parties,
   people,
   polities,
@@ -10,6 +11,7 @@ import {
 export const router = {
   contests,
   elections,
+  entities,
   parties,
   people,
   polities,

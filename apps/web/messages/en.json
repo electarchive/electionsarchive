@@ -410,5 +410,20 @@
   "search_group_contest": "Contests",
   "search_group_party": "Parties",
   "search_group_person": "People",
-  "search_person_latest": "Latest: {contest}"
+  "search_person_latest": "Latest: {contest}",
+  "card_open": "View full page",
+  "person_ran": "Elections",
+  "person_won": "Won",
+  "person_years": "Years",
+  "person_record": "Election record",
+  "person_empty": "No results published for this person yet.",
+  "col_year": "Year",
+  "col_contest": "Contest",
+  "col_party": "Party",
+  "party_record": "Contests",
+  "party_record_more": "Showing the latest {shown} of {count}.",
+  "party_relations": "Lineage and affiliations",
+  "party_none": "No contests published for this party yet.",
+  "party_won": "{count} won",
+  "party_elections": "Elections"
 }
