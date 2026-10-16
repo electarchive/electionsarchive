@@ -12,16 +12,16 @@
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
-  import PlaceMap from "./map.svelte";
 
   let {
     places,
     span,
     publishers,
     votes,
-    boundaries = [],
+    isMapped = false,
     limit = 100,
     only = $bindable(null),
+    focus = $bindable(null),
   }: {
     places: NonNullable<
       Extract<PageData, { kind: "contest" }>["contest"]["places"]
@@ -34,9 +34,10 @@
     } | null;
     publishers: Array<string>;
     votes: string;
-    boundaries?: Extract<PageData, { kind: "contest" }>["boundaries"];
+    isMapped?: boolean;
     limit?: number;
     only?: number | string | null;
+    focus?: number | null;
   } = $props();
 
   const uid = $props.id();
@@ -45,12 +46,16 @@
   let column = $state<"name" | "leader" | "margin" | "valid" | "shift">("name");
   let descending = $state(false);
   let all = $state(false);
-  let focus = $state<number | null>(null);
 
   const noun = $derived(
     places.levels.find((level) => level.code === places.level)?.noun ?? "",
   );
   const heading = $derived(noun.charAt(0).toUpperCase() + noun.slice(1));
+  const titles = $derived(
+    places.legend.map((item) =>
+      item.person == null ? (item.short ?? item.label) : item.label,
+    ),
+  );
   const colors = $derived(
     places.legend.map((item) => swatch(item.color, item.key)),
   );
@@ -170,8 +175,8 @@
             label: m.col_shift(),
             numeric: true,
             definition: m.shift_title({
-              first: first?.short ?? first?.label ?? "",
-              second: second?.short ?? second?.label ?? "",
+              first: titles[0] ?? "",
+              second: titles[1] ?? "",
               from: span.from,
               to: span.to,
             }),
@@ -179,21 +184,6 @@
         ]
       : []),
   ]);
-  const drawn = $derived.by(() => {
-    const level = boundaries.find((entry) => entry.scheme === places.level);
-    const own = boundaries.find((entry) => entry.scheme !== places.level);
-    return level?.tiles == null || own == null || own.frames.length === 0
-      ? null
-      : {
-          tiles: level.tiles,
-          own:
-            own.tiles == null || own.k == null
-              ? null
-              : { tiles: own.tiles, k: own.k },
-          frames: own.frames,
-          isApproximate: level.isApproximate,
-        };
-  });
   const foreign = $derived(
     places.sources.filter((publisher) => !publishers.includes(publisher)),
   );
@@ -222,10 +212,7 @@
                 class="shrink-0 self-center rounded-xs block-2 inline-2"
                 style:background-color={colors[index]}
               ></span>
-              <span class="truncate"
-                >{places.legend[index].short ??
-                  places.legend[index].label}</span
-              >
+              <span class="truncate">{titles[index]}</span>
             </span>
             <span
               class={cn("text-end font-mono tabular-nums", {
@@ -243,7 +230,7 @@
       <span class="text-xs opacity-80"
         >{m.fact_shift({
           points: points(Math.abs(move.shift ?? 0)).replace("+", ""),
-          name: toward?.short ?? toward?.label ?? "",
+          name: (toward === first ? titles[0] : titles[1]) ?? "",
         })}</span
       >
       {#if move.flip != null}
@@ -251,14 +238,8 @@
           <span class="font-semibold">{m.places_flipped()}</span>
           <span class="opacity-80"
             >{m.flip_label({
-              from:
-                places.legend[move.flip.from]?.short ??
-                places.legend[move.flip.from]?.label ??
-                "",
-              to:
-                places.legend[move.flip.to]?.short ??
-                places.legend[move.flip.to]?.label ??
-                "",
+              from: titles[move.flip.from] ?? "",
+              to: titles[move.flip.to] ?? "",
             })}</span
           >
         </span>
@@ -279,7 +260,7 @@
     >
       {m.places_title({ noun })}
     </h2>
-    {#if levels.length > 1}
+    {#if levels.length > 1 && !isMapped}
       <div class="flex" role="group" aria-label={m.places_level()}>
         {#each levels as level (level.code)}
           <a
@@ -320,7 +301,7 @@
   {/if}
 
   <div class="flex flex-wrap gap-1.5">
-    {#each leads as [index, won] (index)}
+    {#each isMapped ? [] : leads as [index, won] (index)}
       <button
         type="button"
         class={cn(
@@ -329,20 +310,14 @@
         )}
         style:--party={colors[index]}
         aria-pressed={only === index}
-        aria-label={m.places_leads({
-          label:
-            places.legend[index]?.short ?? places.legend[index]?.label ?? "",
-          count: won,
-        })}
+        aria-label={m.places_leads({ label: titles[index] ?? "", count: won })}
         onclick={() => {
           only = only === index ? null : index;
           all = false;
         }}
       >
         <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
-        <span class="font-semibold"
-          >{places.legend[index]?.short ?? places.legend[index]?.label}</span
-        >
+        <span class="font-semibold">{titles[index]}</span>
         <span class="font-mono text-xs text-muted-foreground tabular-nums"
           >{won}</span
         >
@@ -380,21 +355,6 @@
       </Tooltip.Root>
     {/if}
   </div>
-
-  {#if drawn != null}
-    <PlaceMap
-      {places}
-      {colors}
-      tiles={drawn.tiles}
-      own={drawn.own}
-      frames={drawn.frames}
-      isApproximate={drawn.isApproximate}
-      {noun}
-      {votes}
-      {only}
-      bind:focus
-    />
-  {/if}
 
   <div class="-mx-2 overflow-x-auto">
     <table class="border-collapse text-sm/tight inline-full">
@@ -568,9 +528,7 @@
                 <span class="flex items-center gap-1.5">
                   <Name
                     class="relative z-1 truncate font-semibold max-inline-40"
-                    label={places.legend[row.leader]?.short ??
-                      places.legend[row.leader]?.label ??
-                      ""}
+                    label={titles[row.leader] ?? ""}
                     color={colors[row.leader]}
                     person={places.legend[row.leader]?.person}
                     party={places.legend[row.leader]?.party}
@@ -619,14 +577,8 @@
                           >
                             <span class="sr-only"
                               >{m.flip_label({
-                                from:
-                                  places.legend[flip.from]?.short ??
-                                  places.legend[flip.from]?.label ??
-                                  "",
-                                to:
-                                  places.legend[flip.to]?.short ??
-                                  places.legend[flip.to]?.label ??
-                                  "",
+                                from: titles[flip.from] ?? "",
+                                to: titles[flip.to] ?? "",
                               })}</span
                             >
                             <span

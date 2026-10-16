@@ -532,5 +532,15 @@
   "map_gesture_windows": "Hold Ctrl and scroll to zoom",
   "map_gesture_mac": "Hold ⌘ and scroll to zoom",
   "map_gesture_mobile": "Use two fingers to move the map",
-  "map_pick": "Hover over or tap a place to see its result."
+  "map_pick": "Hover over or tap a place to see its result.",
+  "map_color_by": "Color by",
+  "map_mode_winner": "Winner",
+  "map_mode_bubbles": "Votes",
+  "map_share_key": "{name} share",
+  "map_bubbles_key": "Circles sized by {votes}, colored by winner",
+  "map_level": "Level",
+  "key_places": "Key places",
+  "key_closest": "Closest",
+  "key_largest": "Largest",
+  "key_strongest": "Best for {name}"
 }

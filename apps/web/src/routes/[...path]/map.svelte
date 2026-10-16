@@ -26,7 +26,9 @@
     isApproximate,
     noun,
     votes,
-    only,
+    names,
+    levels,
+    only = $bindable(null),
     focus = $bindable(null),
   }: {
     places: Places;
@@ -37,17 +39,34 @@
     isApproximate: boolean;
     noun: string;
     votes: string;
-    only: number | string | null;
+    names: Array<string>;
+    levels: Array<{
+      code: string;
+      label: string;
+      count: number;
+      path: string;
+      query: string;
+      isCurrent: boolean;
+    }>;
+    only?: number | string | null;
     focus?: number | null;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
   const STRENGTHS = [34, 54, 76, 100];
+  const STEPS = [16, 36, 56, 78, 100];
 
   const uid = $props.id();
   let maps = $state<Array<Maplibre.Map>>([]);
   let isLoaded = $state(false);
   let pinned = $state<number | null>(null);
+  let shading = $state<"winner" | "bubbles" | number>("winner");
+  let fit: Maplibre.PaddingOptions = {
+    top: 24,
+    right: 24,
+    bottom: 24,
+    left: 24,
+  };
 
   const rows = $derived(new Map(places.rows.map((row) => [row.k, row])));
   const order = $derived(
@@ -68,6 +87,53 @@
     const tall = y(frame.north) - y(frame.south);
     return Math.min(2, Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04));
   });
+  const leads = $derived(
+    Map.groupBy(
+      places.rows.filter((row) => row.leader != null),
+      (row) => row.leader ?? 0,
+    )
+      .entries()
+      .map(([index, won]) => [index, won.length] as const)
+      .toArray()
+      .toSorted((a, b) => b[1] - a[1]),
+  );
+  const options = $derived(
+    places.legend
+      .map((item, index) => ({ index, name: names[index] ?? item.label }))
+      .slice(0, Math.min(3, places.legend.length))
+      .filter((option) =>
+        places.rows.some((row) => (row.shares[option.index] ?? 0) > 0),
+      ),
+  );
+  const edges = $derived.by(() => {
+    if (typeof shading !== "number") {
+      return [];
+    }
+    const index = shading;
+    const sorted = places.rows
+      .map((row) => row.shares[index] ?? 0)
+      .toSorted((a, b) => a - b);
+    const cuts = [0.2, 0.4, 0.6, 0.8].map(
+      (at) => sorted[Math.floor(at * (sorted.length - 1))] ?? 0,
+    );
+    return [...new Set(cuts)];
+  });
+  const dots = $derived({
+    type: "FeatureCollection" as const,
+    features: places.rows.flatMap((row) =>
+      row.at == null
+        ? []
+        : [
+            {
+              type: "Feature" as const,
+              id: row.k,
+              properties: {},
+              geometry: { type: "Point" as const, coordinates: row.at },
+            },
+          ],
+    ),
+  });
+  const biggest = $derived(Math.max(1, ...places.rows.map((row) => row.valid)));
   const current = $derived(focus == null ? null : (rows.get(focus) ?? null));
   const ranked = $derived(
     current == null
@@ -150,12 +216,25 @@
       }
       const dimmed =
         only != null && typeof only === "number" && only !== row.leader;
-      const strength = dimmed ? 10 : (STRENGTHS[bin(row.margin)] ?? 100);
+      let strength = dimmed ? 10 : (STRENGTHS[bin(row.margin)] ?? 100);
+      let tone = colors[row.leader] ?? "var(--muted-foreground)";
+      if (shading === "bubbles") {
+        strength = dimmed ? 18 : 100;
+      }
+      if (typeof shading === "number") {
+        const share = row.shares[shading] ?? 0;
+        let step = 0;
+        for (const edge of edges) {
+          if (share > edge) {
+            step += 1;
+          }
+        }
+        strength = STEPS[step] ?? 100;
+        tone = colors[shading] ?? "var(--muted-foreground)";
+      }
       result.push([
         row.k,
-        read(
-          `color-mix(in oklab, ${colors[row.leader] ?? "var(--muted-foreground)"} ${strength}%, var(--card))`,
-        ),
+        read(`color-mix(in oklab, ${tone} ${strength}%, var(--card))`),
       ]);
     }
     return result;
@@ -237,6 +316,13 @@
       const surfaces = [
         ...host.querySelectorAll<HTMLElement>("[data-map-surface]"),
       ];
+      const room = {
+        top: 20,
+        right: 52,
+        bottom: (surfaces[1]?.clientHeight ?? 0) + 20,
+        left: 20,
+      };
+      fit = room;
       for (const [index, surface] of surfaces.entries()) {
         const frame = frames[index];
         const map = new maplibre.Map({
@@ -248,6 +334,7 @@
                 type: "vector",
                 url: `pmtiles://${origin}/tiles/${tiles}.pmtiles`,
               },
+              dots: { type: "geojson", data: dots },
               ...(own == null
                 ? {}
                 : {
@@ -327,6 +414,27 @@
                     },
                   ]),
               {
+                id: "bubble",
+                type: "circle",
+                source: "dots",
+                paint: {
+                  "circle-radius": ["coalesce", ["feature-state", "radius"], 0],
+                  "circle-color": [
+                    "coalesce",
+                    ["feature-state", "color"],
+                    colorsNow.ground,
+                  ],
+                  "circle-opacity": 0.86,
+                  "circle-stroke-color": colorsNow.seam,
+                  "circle-stroke-width": [
+                    "case",
+                    [">", ["coalesce", ["feature-state", "radius"], 0], 0],
+                    0.75,
+                    0,
+                  ],
+                },
+              },
+              {
                 id: "focus",
                 type: "line",
                 source: "places",
@@ -348,7 +456,7 @@
             frame == null
               ? undefined
               : [frame.west, frame.south, frame.east, frame.north],
-          fitBoundsOptions: { padding: index === 0 ? 24 : 6 },
+          fitBoundsOptions: { padding: index === 0 ? room : 6 },
           renderWorldCopies: false,
           attributionControl: false,
           interactive: index === 0,
@@ -439,7 +547,7 @@
     const colorsNow = style(tones.read);
     const painted = fills(tones.read);
     tones.done();
-    for (const map of maps) {
+    for (const [index, map] of maps.entries()) {
       const apply = () => {
         map.setPaintProperty("paper", "background-color", colorsNow.paper);
         map.setPaintProperty("fill", "fill-color", [
@@ -452,12 +560,30 @@
         if (map.getLayer("outline") != null) {
           map.setPaintProperty("outline", "line-color", colorsNow.ink);
         }
+        map.setPaintProperty("bubble", "circle-stroke-color", colorsNow.seam);
+        const source = map.getSource("dots");
+        if (source?.type === "geojson") {
+          void (source as Maplibre.GeoJSONSource).setData(dots);
+        }
         map.removeFeatureState({ source: "places", sourceLayer: "areas" });
+        map.removeFeatureState({ source: "dots" });
         for (const [k, color] of painted) {
-          map.setFeatureState(
-            { source: "places", sourceLayer: "areas", id: k },
-            { color },
-          );
+          if (shading === "bubbles") {
+            map.setFeatureState(
+              { source: "dots", id: k },
+              {
+                color,
+                radius:
+                  Math.sqrt((rows.get(k)?.valid ?? 0) / biggest) *
+                  (index === 0 ? 28 : 9),
+              },
+            );
+          } else {
+            map.setFeatureState(
+              { source: "places", sourceLayer: "areas", id: k },
+              { color },
+            );
+          }
         }
         const k = untrack(() => focus);
         if (k != null) {
@@ -513,6 +639,60 @@
   {@attach keys}
 >
   <p id="{uid}-hint" class="sr-only">{m.map_hint()}</p>
+  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+    <div
+      class="flex items-center gap-2.5 min-inline-0"
+      role="group"
+      aria-labelledby="{uid}-shading"
+    >
+      <span id="{uid}-shading" class="text-sm font-semibold max-sm:sr-only"
+        >{m.map_color_by()}</span
+      >
+      <div class="-my-1 flex overflow-x-auto py-1 min-inline-0">
+        {#each [{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }] as choice (choice.value)}
+          <button
+            type="button"
+            class={cn(
+              "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+              {
+                "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                  shading === choice.value,
+              },
+              {
+                "truncate max-inline-36 max-sm:max-inline-24":
+                  typeof choice.value === "number",
+              },
+            )}
+            aria-pressed={shading === choice.value}
+            onclick={() => (shading = choice.value)}>{choice.label}</button
+          >
+        {/each}
+      </div>
+    </div>
+    {#if levels.length > 1}
+      <div class="flex" role="group" aria-label={m.map_level()}>
+        {#each levels as level (level.code)}
+          <a
+            class={cn(
+              "-ms-px flex keycap items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+              {
+                "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                  level.isCurrent,
+              },
+            )}
+            href={resolve(`/[...path]?${level.query}`, { path: level.path })}
+            aria-current={level.isCurrent ? "true" : undefined}
+            data-sveltekit-reset="false"
+            data-sveltekit-noscroll
+            >{level.label}
+            <span class="font-mono text-[0.6875rem] font-normal tabular-nums"
+              >{level.count}</span
+            ></a
+          >
+        {/each}
+      </div>
+    {/if}
+  </div>
   <div
     class="relative overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full max-block-[min(38rem,70svh)]"
     style:aspect-ratio={ratio}
@@ -530,7 +710,7 @@
       <div class="pointer-events-none absolute inset-s-2 inset-be-2 flex gap-2">
         {#each frames.slice(1) as _frame, index (index)}
           <div
-            class="pointer-events-auto relative overflow-hidden rounded-xs bg-card ring-1 ring-border block-14 inline-18 sm:block-20 sm:inline-28"
+            class="pointer-events-auto relative overflow-hidden rounded-xs bg-card ring-1 ring-border block-11 inline-15 sm:block-20 sm:inline-28"
           >
             <div class="block-full inline-full" data-map-surface></div>
           </div>
@@ -568,7 +748,7 @@
           if (frame != null) {
             maps[0]?.fitBounds(
               [frame.west, frame.south, frame.east, frame.north],
-              { padding: 24 },
+              { padding: fit },
             );
           }
         }}
@@ -589,22 +769,79 @@
   <div
     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-[0.8125rem]"
   >
-    <div class="flex items-center gap-2.5" aria-hidden="true">
-      <span class="text-muted-foreground">{m.map_margin()}</span>
-      <span class="flex items-center gap-1.5 font-mono text-xs tabular-nums">
-        <span>{m.map_margin_under({ points: "5" })}</span>
-        <span class="flex">
-          {#each STRENGTHS as strength (strength)}
-            <span
-              class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
-              style:background-color="color-mix(in oklab, var(--foreground) {strength *
-                0.85}%, var(--card))"
-            ></span>
-          {/each}
+    {#if typeof shading === "number"}
+      {const index = $derived(typeof shading === "number" ? shading : 0)}
+      <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">
+        <span class="text-muted-foreground"
+          >{m.map_share_key({ name: names[index] ?? "" })}</span
+        >
+        <span class="flex items-center gap-1.5 font-mono text-xs tabular-nums">
+          <span>{percent(edges[0] ?? 0)}</span>
+          <span class="flex">
+            {#each STEPS.slice(0, edges.length + 1) as strength (strength)}
+              <span
+                class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
+                style:background-color="color-mix(in oklab, {colors[index] ??
+                  'var(--muted-foreground)'}
+                {strength}%, var(--card))"
+              ></span>
+            {/each}
+          </span>
+          <span>{percent(edges.at(-1) ?? 0)}</span>
         </span>
-        <span>{m.map_margin_over({ points: "20" })}</span>
-      </span>
-    </div>
+      </div>
+    {:else}
+      <div class="flex flex-wrap gap-1.5">
+        {#each leads as [index, won] (index)}
+          <button
+            type="button"
+            class={cn(
+              "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+              { "marked bg-secondary": only === index },
+            )}
+            style:--party={colors[index]}
+            aria-pressed={only === index}
+            aria-label={m.places_leads({
+              label: names[index] ?? "",
+              count: won,
+            })}
+            onclick={() => {
+              only = only === index ? null : index;
+            }}
+          >
+            <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+            <span class="font-semibold">{names[index]}</span>
+            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+              >{won}</span
+            >
+          </button>
+        {/each}
+      </div>
+      {#if shading === "bubbles"}
+        <span class="text-muted-foreground"
+          >{m.map_bubbles_key({ votes: votes.toLowerCase() })}</span
+        >
+      {:else}
+        <div class="flex items-center gap-2.5" aria-hidden="true">
+          <span class="text-muted-foreground">{m.map_margin()}</span>
+          <span
+            class="flex items-center gap-1.5 font-mono text-xs tabular-nums"
+          >
+            <span>{m.map_margin_under({ points: "5" })}</span>
+            <span class="flex">
+              {#each STRENGTHS as strength (strength)}
+                <span
+                  class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
+                  style:background-color="color-mix(in oklab, var(--foreground) {strength *
+                    0.85}%, var(--card))"
+                ></span>
+              {/each}
+            </span>
+            <span>{m.map_margin_over({ points: "20" })}</span>
+          </span>
+        </div>
+      {/if}
+    {/if}
     {#if isApproximate}
       <span class="flex items-center gap-1.5 text-muted-foreground">
         <span
@@ -647,7 +884,7 @@
           <span
             class={cn("truncate", {
               "font-semibold": entry.index === current.leader,
-            })}>{option?.short ?? option?.label}</span
+            })}>{names[entry.index] ?? option?.label}</span
           >
           <span class="font-mono text-xs tabular-nums"
             >{percent(entry.share)}</span

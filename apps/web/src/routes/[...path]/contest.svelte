@@ -18,6 +18,7 @@
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
   import Lists from "./lists.svelte";
+  import PlaceMap from "./map.svelte";
   import PlaceSwitcher from "./place-switcher.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
@@ -86,7 +87,89 @@
     value: null,
   });
 
+  let focus = $state<number | null>(null);
+
   const here = $derived(page.url.pathname.slice(1));
+  const drawn = $derived.by(() => {
+    const places = contest.places;
+    const level = boundaries.find((entry) => entry.scheme === places?.level);
+    const own = boundaries.find((entry) => entry.scheme !== places?.level);
+    const noun = places?.levels.find(
+      (entry) => entry.code === places.level,
+    )?.noun;
+    return level?.tiles == null || own == null || own.frames.length === 0
+      ? null
+      : {
+          tiles: level.tiles,
+          own:
+            own.tiles == null || own.k == null
+              ? null
+              : { tiles: own.tiles, k: own.k },
+          frames: own.frames,
+          isApproximate: level.isApproximate,
+          noun: noun ?? level.noun,
+        };
+  });
+  const titles = $derived(
+    contest.places?.legend.map((item) =>
+      item.person == null ? (item.short ?? item.label) : item.label,
+    ) ?? [],
+  );
+  const tones = $derived(
+    contest.places?.legend.map((item) => swatch(item.color, item.key)) ?? [],
+  );
+  const levels = $derived(
+    contest.places?.levels.map((level) => {
+      const query = new URLSearchParams({
+        ...Object.fromEntries(page.url.searchParams),
+        by: level.code,
+      })
+        .toString()
+        .replaceAll("%2F", "/");
+      return {
+        code: level.code,
+        label: level.noun.charAt(0).toUpperCase() + level.noun.slice(1),
+        count: level.count,
+        path: here,
+        query,
+        isCurrent: level.code === contest.places?.level,
+      };
+    }) ?? [],
+  );
+  const keyed = $derived.by(() => {
+    const rows = (contest.places?.rows ?? []).filter(
+      (row) => row.leader != null && row.valid > 0,
+    );
+    if (rows.length < 6) {
+      return [];
+    }
+    const margin = (row: (typeof rows)[number]) =>
+      points(row.margin ?? 0).replace("+", "");
+    return [
+      {
+        label: m.key_closest(),
+        rows: rows
+          .toSorted((a, b) => (a.margin ?? 0) - (b.margin ?? 0))
+          .slice(0, 3),
+        value: margin,
+      },
+      {
+        label: m.key_largest(),
+        rows: rows.toSorted((a, b) => b.valid - a.valid).slice(0, 3),
+        value: (row: (typeof rows)[number]) => count(row.valid),
+      },
+      ...[0, 1]
+        .filter((index) => titles[index] != null)
+        .map((index) => ({
+          label: m.key_strongest({ name: titles[index] ?? "" }),
+          rows: rows
+            .toSorted((a, b) => (b.shares[index] ?? 0) - (a.shares[index] ?? 0))
+            .slice(0, 1),
+          value: (row: (typeof rows)[number]) =>
+            percent(row.shares[index] ?? 0),
+        })),
+    ];
+  });
   const only = $derived(filter.at === page.url.href ? filter.value : null);
   const drilled = $derived(contest.scope.noun != null);
   const counted = $derived(MEASURES[contest.current?.measure ?? ""]?.());
@@ -511,50 +594,96 @@
   {#if contest.electors != null}
     <Electors electors={contest.electors} />
   {/if}
-  <dl class="col-span-12 grid grid-cols-12 gap-px">
-    <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-4">
-      <dt class="text-[0.8125rem] text-muted-foreground">
-        <Term
-          label={counted ?? m.stat_valid()}
-          definition={DEFINITIONS[contest.current.measure]?.() ??
-            m.term_valid()}
+  {#if drawn != null && contest.places != null}
+    <div
+      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-8"
+    >
+      {#key `${here}:${drawn.tiles}`}
+        <PlaceMap
+          places={contest.places}
+          colors={tones}
+          tiles={drawn.tiles}
+          own={drawn.own}
+          frames={drawn.frames}
+          isApproximate={drawn.isApproximate}
+          noun={drawn.noun}
+          votes={counted ?? m.col_votes()}
+          names={titles}
+          {levels}
+          bind:only={
+            () => only,
+            (value: number | string | null) =>
+              (filter = { at: page.url.href, value })
+          }
+          bind:focus
         />
-      </dt>
-      <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
-        {count(contest.current.valid)}
-      </dd>
+      {/key}
     </div>
-    <div class="col-span-6 bg-card px-3.5 py-3 md:col-span-4">
-      <dt class="text-[0.8125rem] text-muted-foreground">
-        <Term label={m.stat_options()} definition={m.term_options()} />
-      </dt>
-      <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
-        {contest.rows.filter((row) => row.current != null).length}
-      </dd>
-    </div>
-    <div class="col-span-12 bg-card px-3.5 py-3 md:col-span-4">
-      {#if lead != null}
-        <dt class="text-[0.8125rem] text-muted-foreground">
-          <Term label={m.col_margin()} definition={m.term_margin()} />
-        </dt>
-        <dd
-          class="mbs-0.5 flex items-baseline gap-2.5 min-inline-0"
-          style:--party={swatch(lead.row.color, lead.row.key)}
+    {#if contest.chamber == null}
+      <div
+        class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-4"
+      >
+        {@render stats(true)}
+        <div
+          class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
         >
-          <span class="font-mono text-2xl tracking-[-0.02em] tabular-nums"
-            >{points(lead.margin)}</span
-          >
-          <Name
-            class="truncate text-sm font-semibold min-inline-0"
-            label={lead.row.label}
-            color={swatch(lead.row.color, lead.row.key)}
-            person={lead.row.current?.person}
-            party={lead.row.current?.party}
-          />
-        </dd>
-      {/if}
-    </div>
-  </dl>
+          {@render results()}
+        </div>
+      </div>
+    {:else}
+      <Seats
+        parties={contest.chamber.parties}
+        places={contest.chamber.places}
+        here={contest.chamber.here}
+        place={contest.scope.name}
+        link={contest.chamber.link}
+        size={contest.chamber.size}
+      />
+    {/if}
+    {#if keyed.length > 0}
+      <section
+        class="col-span-12 flex flex-wrap items-center gap-x-5 gap-y-2.5 bg-card px-3.5 py-3"
+        aria-labelledby="key-places"
+      >
+        <h2 id="key-places" class="text-sm font-semibold">{m.key_places()}</h2>
+        {#each keyed as group (group.label)}
+          <div class="flex flex-wrap items-center gap-1.5">
+            <span class="text-[0.8125rem] text-muted-foreground"
+              >{group.label}</span
+            >
+            {#each group.rows as row (row.k)}
+              <svelte:element
+                this={row.path == null ? "span" : "a"}
+                class={cn(
+                  "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+                  { "bg-secondary": focus === row.k },
+                )}
+                href={row.path == null
+                  ? undefined
+                  : resolve("/[...path]", { path: row.path })}
+                style:--party={tones[row.leader ?? 0]}
+                role={row.path == null ? "presentation" : undefined}
+                onpointerenter={() => (focus = row.k)}
+                onpointerleave={() => (focus = null)}
+                onfocus={() => (focus = row.k)}
+                onblur={() => (focus = null)}
+              >
+                <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"
+                ></span>
+                <span class="font-semibold">{row.name}</span>
+                <span
+                  class="font-mono text-xs text-muted-foreground tabular-nums"
+                  >{group.value(row)}</span
+                >
+              </svelte:element>
+            {/each}
+          </div>
+        {/each}
+      </section>
+    {/if}
+  {:else}
+    {@render stats(false)}
+  {/if}
 
   <div
     class="col-span-12 flex flex-wrap items-center gap-x-6 gap-y-3 bg-card px-3.5 py-3"
@@ -789,29 +918,21 @@
     />
   {/if}
 
-  <div
-    class={cn(
-      "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-      { "lg:col-span-8": contest.chamber != null },
-    )}
-  >
-    <Results
-      rows={contest.rows}
-      {span}
-      votes={counted ?? m.col_votes()}
-      seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}
-    />
-    {#if captions.length > 0}
-      <p class="px-2 text-[0.8125rem] text-muted-foreground">
-        <a
-          class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-          href="#sources">{captions.join("; ")}</a
-        >
-      </p>
+  {#if drawn == null || contest.chamber != null}
+    {#if drawn != null}
+      {@render stats(false)}
     {/if}
-  </div>
+    <div
+      class={cn(
+        "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
+        { "lg:col-span-8": contest.chamber != null && drawn == null },
+      )}
+    >
+      {@render results()}
+    </div>
+  {/if}
 
-  {#if contest.chamber != null}
+  {#if contest.chamber != null && drawn == null}
     <Seats
       parties={contest.chamber.parties}
       places={contest.chamber.places}
@@ -833,13 +954,14 @@
       places={contest.places}
       {span}
       {publishers}
-      {boundaries}
+      isMapped={drawn != null}
       votes={counted ?? m.col_votes()}
       bind:only={
         () => only,
         (value: number | string | null) =>
           (filter = { at: page.url.href, value })
       }
+      bind:focus
     />
   {/key}
 {:else if contest.children.length > 0 && !drilled}
@@ -1054,3 +1176,88 @@
     {/if}
   </section>
 {/if}
+
+{#snippet stats(compact: boolean)}
+  {#if contest.current != null}
+    <dl
+      class={cn("grid grid-cols-12 gap-px", {
+        "col-span-12": !compact,
+        "bg-border": compact,
+      })}
+    >
+      <div
+        class={cn("col-span-6 bg-card px-3.5 py-3", {
+          "md:col-span-4": !compact,
+        })}
+      >
+        <dt class="text-[0.8125rem] text-muted-foreground">
+          <Term
+            label={counted ?? m.stat_valid()}
+            definition={DEFINITIONS[contest.current.measure]?.() ??
+              m.term_valid()}
+          />
+        </dt>
+        <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
+          {count(contest.current.valid)}
+        </dd>
+      </div>
+      <div
+        class={cn("col-span-6 bg-card px-3.5 py-3", {
+          "md:col-span-4": !compact,
+        })}
+      >
+        <dt class="text-[0.8125rem] text-muted-foreground">
+          <Term label={m.stat_options()} definition={m.term_options()} />
+        </dt>
+        <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
+          {contest.rows.filter((row) => row.current != null).length}
+        </dd>
+      </div>
+      <div
+        class={cn("col-span-12 bg-card px-3.5 py-3", {
+          "md:col-span-4": !compact,
+        })}
+      >
+        {#if lead != null}
+          <dt class="text-[0.8125rem] text-muted-foreground">
+            <Term label={m.col_margin()} definition={m.term_margin()} />
+          </dt>
+          <dd
+            class="mbs-0.5 flex items-baseline gap-2.5 min-inline-0"
+            style:--party={swatch(lead.row.color, lead.row.key)}
+          >
+            <span class="font-mono text-2xl tracking-[-0.02em] tabular-nums"
+              >{points(lead.margin)}</span
+            >
+            <Name
+              class="truncate text-sm font-semibold min-inline-0"
+              label={lead.row.label}
+              color={swatch(lead.row.color, lead.row.key)}
+              person={lead.row.current?.person}
+              party={lead.row.current?.party}
+            />
+          </dd>
+        {/if}
+      </div>
+    </dl>
+  {/if}
+{/snippet}
+
+{#snippet results()}
+  {#if contest.current != null}
+    <Results
+      rows={contest.rows}
+      {span}
+      votes={counted ?? m.col_votes()}
+      seats={seated ? (SEATS[contest.kind]?.() ?? m.col_seats()) : null}
+    />
+    {#if captions.length > 0}
+      <p class="px-2 text-[0.8125rem] text-muted-foreground">
+        <a
+          class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+          href="#sources">{captions.join("; ")}</a
+        >
+      </p>
+    {/if}
+  {/if}
+{/snippet}

@@ -86,6 +86,7 @@ const Places = v.nullable(
     rows: v.array(
       v.object({
         k: v.number(),
+        at: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
         name: v.string(),
         path: v.nullable(v.string()),
         contest: v.boolean(),
@@ -311,6 +312,15 @@ async function descend(contest: Found, unit: string | undefined) {
   }
   return chain;
 }
+
+const UNAFFILIATED = [
+  "#0e8f7e",
+  "#8250c4",
+  "#b5651d",
+  "#c03a7a",
+  "#4a7d1f",
+  "#3f6fd1",
+];
 
 const VARIANTS = [
   [0, 0],
@@ -634,9 +644,26 @@ async function load(
   ]);
   const color = new Map(colors.rows.map((row) => [row.party_id, row.color]));
   const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
+  const top = Math.max(0, ...tallies.values());
+  const independents = options.rows.filter(
+    (row) =>
+      row.party == null &&
+      row.person != null &&
+      (tallies.get(row.k) ?? 0) >= top * 0.05,
+  );
+  for (const { person } of independents) {
+    color.set(
+      person ?? "",
+      UNAFFILIATED[
+        Number.parseInt((person ?? "").slice(-4), 16) % UNAFFILIATED.length
+      ] ?? "",
+    );
+  }
   separate(
     color,
-    options.rows.map((row) => [row.party, tallies.get(row.k) ?? 0] as const),
+    options.rows.map(
+      (row) => [row.party ?? row.person, tallies.get(row.k) ?? 0] as const,
+    ),
   );
   const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
   const sharing = Map.groupBy(
@@ -718,7 +745,10 @@ async function load(
               labels.short.get(row.party ?? "") ??
               (row.person == null ? null : labels.full.get(row.party ?? "")) ??
               null,
-            color: tints.get(row.k) ?? color.get(row.party ?? "") ?? null,
+            color:
+              tints.get(row.k) ??
+              color.get(row.party ?? row.person ?? "") ??
+              null,
             lean: lean.get(row.party ?? "") ?? null,
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
@@ -1207,14 +1237,8 @@ async function places(
         owner: null,
       };
     });
-  return {
-    levels: levels.map((entry) => ({
-      code: entry.code,
-      noun: entry.noun,
-      count: entry.count,
-    })),
-    level: level.code,
-    ...(await tabulate(
+  const [tabulated, points] = await Promise.all([
+    tabulate(
       [contest.root],
       rows,
       contest.date,
@@ -1222,7 +1246,29 @@ async function places(
       lineage,
       match,
       grouping,
-    )),
+    ),
+    db.execute<{ k: number; x: number; y: number }>(sql`
+      select distinct on (a.k) a.k,
+        ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
+        ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
+      from area a join area_geometry g on g.area_id = a.id
+      where a.k = any(${sql.param(rows.map((row) => row.k))}::int[])
+        and g.valid @> ${contest.date ?? "infinity"}::date
+      order by a.k
+    `),
+  ]);
+  const at = new Map(
+    points.rows.map((row) => [row.k, [row.x, row.y] as [number, number]]),
+  );
+  return {
+    levels: levels.map((entry) => ({
+      code: entry.code,
+      noun: entry.noun,
+      count: entry.count,
+    })),
+    level: level.code,
+    ...tabulated,
+    rows: tabulated.rows.map((row) => ({ ...row, at: at.get(row.k) ?? null })),
   };
 }
 
@@ -1277,6 +1323,7 @@ async function tabulate(
       party: string | null;
       votes: number;
       lead: boolean;
+      people: Set<string>;
     }
   >();
   const sources = new Set<string>();
@@ -1320,7 +1367,12 @@ async function tabulate(
         party: null,
         votes: 0,
         lead: false,
+        people: new Set<string>(),
       };
+      const person = entry.current?.person;
+      if (person != null) {
+        item.people.add(person);
+      }
       item.person ??= (entry.current ?? entry.earlier)?.person ?? null;
       item.party ??= (entry.current ?? entry.earlier)?.party ?? null;
       item.votes += entry.current?.votes ?? 0;
@@ -1344,7 +1396,10 @@ async function tabulate(
       label: item.label,
       short: item.key.startsWith("person:") ? null : item.short,
       color: item.color,
-      person: item.key.startsWith("person:") ? item.person : null,
+      person:
+        item.key.startsWith("person:") || item.people.size === 1
+          ? item.person
+          : null,
       party: item.party,
     })),
     rows: compared.map(({ row, result, leader, before, valid }) => {
