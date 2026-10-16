@@ -7,6 +7,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
+  import Career from "./career.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -51,7 +52,12 @@
   <article
     class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
   >
-    <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
+    <header
+      class="col-span-12 grid gap-1.5 border-bs-[6px] border-(--party) bg-card px-3.5 pbs-4 pbe-3.5"
+      style:--party={person.party == null
+        ? "var(--border)"
+        : swatch(person.party.color, `party:${person.party.id}`)}
+    >
       <h1
         class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
       >
@@ -125,6 +131,8 @@
         </div>
       </dl>
     {/if}
+
+    <Career record={person.record} />
 
     <section class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5">
       <h2 class="text-[0.8125rem] font-bold">{m.person_record()}</h2>

@@ -6,6 +6,8 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
+  import History from "./history.svelte";
+  import Lineage from "./lineage.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -174,6 +176,10 @@
         </div>
       </dl>
     {/if}
+
+    <History history={data.history} name={party.name} {color} />
+
+    <Lineage {party} {color} />
 
     {#if links.length > 0}
       <section class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5">

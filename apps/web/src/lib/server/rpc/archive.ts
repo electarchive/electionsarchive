@@ -4701,6 +4701,183 @@ export const parties = {
         })),
       };
     }),
+  history: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/parties/{id}/history",
+        summary:
+          "List a party's vote share and seats in each general election for its polity's chambers and offices, one series per chamber or office",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.array(
+        v.object({
+          id: v.string(),
+          name: v.string(),
+          points: v.array(
+            v.object({
+              name: v.string(),
+              path: v.nullable(v.string()),
+              date: v.string(),
+              year: v.number(),
+              races: v.number(),
+              votes: v.nullable(v.number()),
+              total: v.nullable(v.number()),
+              seats: v.nullable(v.number()),
+              filled: v.nullable(v.number()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        grp: string | null;
+        seat: string;
+        root: string;
+        date: string;
+        year: number;
+        races: number;
+        votes: number | null;
+        total: number | null;
+        seats: number | null;
+        filled: number | null;
+      }>(sql`
+        with recursive ids(id) as (
+          select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        ),
+        home as (
+          select polity_id as polity from party where id = (select id from ids limit 1)
+        ),
+        mine as materialized (
+          select o.id as option, o.contest_id from contest_option o where o.party_id in (select id from ids)
+        ),
+        up(id, parent) as (
+          select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
+          union
+          select c.id, c.allocation_parent_id from up join contest c on c.id = up.parent
+        ),
+        entered as materialized (
+          select distinct coalesce(e.parent_id, e.id) as grp, coalesce(c.body_id, c.office_id) as seat
+          from up join contest c on c.id = up.id join election e on e.id = c.election_id
+          where up.parent is null and coalesce(c.body_id, c.office_id) is not null
+            and c.party_scope_id is null and e.kind in ('general', 'local')
+            and ((select polity from home) is null or coalesce(
+              (select polity_id from body where id = c.body_id),
+              (select polity_id from office where id = c.office_id)
+            ) = (select polity from home))
+        ),
+        roots as materialized (
+          select c.id, n.grp, n.seat, e.date_from as date, ${CYCLE} as year, c.round_number, a.k as area,
+            case when g.polity_id = (select polity from home) then n.grp::text else (${CYCLE})::text end as bucket
+          from entered n join election g on g.id = n.grp join election e on coalesce(e.parent_id, e.id) = n.grp
+          join contest c on c.election_id = e.id and coalesce(c.body_id, c.office_id) = n.seat
+            and c.allocation_parent_id is null and c.party_scope_id is null
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+        ),
+        tree(root, id, area) as (
+          select id, id, area from roots where round_number = 1
+          union all
+          select tree.root, c.id, tree.area from contest c join tree on c.allocation_parent_id = tree.id
+        ),
+        picked as (
+          select distinct on (rs.contest_id) t.root, rs.k, t.area
+          from tree t join result_set rs on rs.contest_id = t.id
+          where exists (
+            select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = t.area and x.measure = any(${COUNTED}) limit 1
+          )
+          order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
+        ),
+        fetched as (
+          select p.root, x.option_k, x.measure, x.value::float8 as value, x.count_round,
+            min(x.count_round) over (partition by p.root, x.measure) as first
+          from picked p join result_rollup x on x.result_set_k = p.k and x.area_k = p.area
+            and x.measure = any(${COUNTED}) and x.option_k <> 0
+        ),
+        mains as (
+          select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by root
+        ),
+        tallied as (
+          select f.root, sum(f.value) as total,
+            coalesce(sum(f.value) filter (
+              where o.party_id in (select id from ids) or o.parent_option_id in (select option from mine)
+            ), 0) as votes
+          from fetched f join mains m on m.root = f.root and m.main = f.measure
+          join contest_option o on o.k = f.option_k
+          where f.count_round = f.first
+          group by f.root
+        ),
+        seated as (
+          select w.root, coalesce(sum(w.seats) filter (where w.mine), 0) as seats, sum(w.seats) as filled
+          from (
+            select r.id as root, o.id, bool_or(o.party_id in (select id from ids)) as mine,
+              max(coalesce(x.seats, 1)) as seats
+            from roots r
+            join lateral (
+              with recursive t(id) as (
+                select r.id union all select c.id from contest c join t on c.allocation_parent_id = t.id
+              )
+              select id from t
+            ) sub on true
+            join contest_option o on o.contest_id = sub.id
+            join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            where not exists (select from contest k where k.allocation_parent_id = sub.id)
+              or sub.id = r.id and not exists (select from contest k where k.allocation_parent_id = r.id)
+            group by r.id, o.id
+          ) w
+          group by w.root
+        )
+        select case when count(distinct r.grp) = 1 then min(r.grp::text) end as grp, r.seat,
+          (array_agg(r.id order by r.id))[1] as root, min(r.date)::text as date,
+          min(r.year) as year, count(distinct r.id)::int as races,
+          sum(t.votes)::float8 as votes, sum(t.total)::float8 as total,
+          sum(s.seats)::int as seats, sum(s.filled)::int as filled
+        from roots r left join tallied t on t.root = r.id left join seated s on s.root = r.id
+        group by r.bucket, r.seat
+        order by min(r.date)
+      `);
+      const seats = [...new Set(found.rows.map((row) => row.seat))];
+      const linked = found.rows.flatMap((row) => [
+        ...(row.races === 1 ? [row.root] : []),
+        ...(row.grp == null ? [] : [row.grp]),
+      ]);
+      const [labels, slugs] = await Promise.all([
+        names([...seats, ...linked]),
+        paths(linked),
+      ]);
+      return seats.map((seat) => ({
+        id: seat,
+        name: labels.full.get(seat) ?? "",
+        points: found.rows
+          .filter((row) => row.seat === seat)
+          .map((row) => {
+            const target = row.races === 1 ? row.root : row.grp;
+            return {
+              name:
+                (target == null ? null : labels.full.get(target)) ??
+                (row.grp == null ? null : labels.full.get(row.grp)) ??
+                `${row.year} ${labels.full.get(seat) ?? ""}`.trim(),
+              path:
+                (target == null ? null : slugs.get(target)) ??
+                (row.grp == null ? null : slugs.get(row.grp)) ??
+                null,
+              date: row.date,
+              year: row.year,
+              races: row.races,
+              votes: row.total == null || row.total === 0 ? null : row.votes,
+              total: row.total == null || row.total === 0 ? null : row.total,
+              seats: row.filled == null ? null : row.seats,
+              filled: row.filled,
+            };
+          }),
+      }));
+    }),
   locate: os
     .meta(
       openapi({
@@ -4755,6 +4932,7 @@ export const parties = {
             outgoing: v.boolean(),
             date: v.nullable(v.string()),
             party: PartyRef,
+            span: v.nullable(v.object({ from: v.string(), to: v.string() })),
           }),
         ),
         parents: v.array(v.object({ kind: v.string(), party: PartyRef })),
@@ -4810,7 +4988,8 @@ export const parties = {
         `),
       ]);
       const polity = party.polity == null ? [] : [party.polity];
-      const [entities, slugs] = await Promise.all([
+      const others = relations.rows.map((row) => row.other);
+      const [entities, slugs, spans] = await Promise.all([
         refs([
           party.id,
           ...polity,
@@ -4818,8 +4997,17 @@ export const parties = {
           ...parents.rows.map((row) => row.parent),
         ]),
         paths(polity),
+        db.execute<{ party: string; from: string; to: string }>(sql`
+          select coalesce(m.into_id, o.party_id) as party, min(e.date_from)::text as from, max(e.date_from)::text as to
+          from contest_option o
+          left join entity_merge m on m.entity_id = o.party_id
+          join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+          where coalesce(m.into_id, o.party_id) = any(${sql.param(others)}::uuid[])
+          group by 1
+        `),
       ]);
       const self = entities.get(party.id);
+      const ranges = new Map(spans.rows.map((row) => [row.party, row]));
       return {
         name: self?.label ?? "",
         short: self?.short ?? null,
@@ -4839,6 +5027,7 @@ export const parties = {
             : { from: party.from, to: party.to, contests: party.contests },
         relations: relations.rows.flatMap((row) => {
           const other = entities.get(row.other);
+          const range = ranges.get(row.other);
           return other == null
             ? []
             : [
@@ -4847,6 +5036,8 @@ export const parties = {
                   outgoing: row.outgoing,
                   date: row.date,
                   party: other,
+                  span:
+                    range == null ? null : { from: range.from, to: range.to },
                 },
               ];
         }),

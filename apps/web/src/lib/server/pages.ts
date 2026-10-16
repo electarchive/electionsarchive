@@ -43,11 +43,12 @@ export async function party(path: string) {
       slug: segments.at(-1) ?? "",
     }),
   );
-  const [party, record] = await Promise.all([
+  const [party, record, history] = await Promise.all([
     call(router.parties.get, { id }),
     call(router.parties.elections, { id }),
+    call(router.parties.history, { id }),
   ]);
-  return { kind: "party" as const, id, party, record };
+  return { kind: "party" as const, id, party, record, history };
 }
 
 export async function archive(path: string, search: URLSearchParams) {
