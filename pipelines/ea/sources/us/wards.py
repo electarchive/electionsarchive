@@ -26,6 +26,11 @@ PUBLISHERS = {
         "City of Chicago Data Portal Terms of Use",
         "https://www.chicago.gov/city/en/narr/foia/data_disclaimer.html",
     ),
+    "granit": (
+        "New Hampshire Office of Planning and Development",
+        "Public record; GRANIT lists no access or use constraints beyond not for legal use",
+        None,
+    ),
     "nyc": (
         "New York City Department of City Planning",
         "Public record; free download with DCP's disclaimer of warranty",
@@ -34,7 +39,44 @@ PUBLISHERS = {
 }
 NYC = "https://www.nyc.gov/assets/planning/download/zip/data-maps/open-data"
 NYC_NEW = "https://s-media.nyc.gov/agencies/dcp/assets/files/zip/data-tools/bytes/city-council"
+GRANIT = "https://ftp.granit.unh.edu/GRANIT_Data/Vector_Data/Administrative_and_Political_Boundaries/d-nhpolitdists"
 PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
+    "3345140": [
+        (
+            2013,
+            2023,
+            f"{GRANIT}/NHPolitDists.zip",
+            r"WARD~Manchester\s*-?\s*Ward (\d+)",
+            "granit",
+            "NH Political Districts (2012 wards)",
+        ),
+        (
+            2023,
+            None,
+            f"{GRANIT}/2022/NHPolitDists2022.zip",
+            r"DISTRICT~Manchester\s*-?\s*Ward (\d+)",
+            "granit",
+            "NH Political Districts 2022",
+        ),
+    ],
+    "3350260": [
+        (
+            2013,
+            2023,
+            f"{GRANIT}/NHPolitDists.zip",
+            r"WARD~Nashua\s*-?\s*Ward (\d+)",
+            "granit",
+            "NH Political Districts (2012 wards)",
+        ),
+        (
+            2023,
+            None,
+            f"{GRANIT}/2022/NHPolitDists2022.zip",
+            r"DISTRICT~Nashua\s*-?\s*Ward (\d+)",
+            "granit",
+            "NH Political Districts 2022",
+        ),
+    ],
     "1714000": [
         (2003, 2015, "socrata:data.cityofchicago.org/72b6-8fe8", "ward", "chicago", "Boundaries - Wards (2003-2015)"),
         (2015, 2023, "socrata:data.cityofchicago.org/k9yb-bpqx", "ward", "chicago", "Boundaries - Wards (2015-2023)"),
@@ -172,7 +214,11 @@ def parse() -> None:
             for geoid, plans in PLANS.items():
                 for start, _, url, field, _, _ in plans:
                     for properties, geometry, srid in features(url):
-                        label = properties.get(field)
+                        name, _, pattern = field.partition("~")
+                        label = properties.get(name)
+                        if label is not None and pattern:
+                            match = re.fullmatch(pattern, str(label).strip())
+                            label = match[1] if match else None
                         if label is not None and token(str(label)):
                             copy.write_row((geoid, start, token(str(label)), geometry, srid))
         rows = conn.execute(
@@ -226,22 +272,30 @@ def emit() -> Path:
             summary="City council districts and wards, current and past plans, from city open data portals",
             polity="US",
         )
+        foreign = {
+            id
+            for (id,) in conn.execute(
+                "select s.id from source s join changeset c on c.id = s.changeset_id where c.pipeline <> %s",
+                [SOURCE],
+            )
+        }
         sources = {}
         for geoid, plans in PLANS.items():
             for start, _, url, _, publisher, title in plans:
                 name, license, license_url = PUBLISHERS[publisher]
                 source = cs.source(name, title)
                 if source not in sources.values():
-                    cs.add(
-                        "source",
-                        id=source,
-                        kind="official_body",
-                        publisher=name,
-                        title=title,
-                        url=socrata(url) if url.startswith("socrata:") else layer(url),
-                        license=license,
-                        license_url=license_url,
-                    )
+                    if source not in foreign:
+                        cs.add(
+                            "source",
+                            id=source,
+                            kind="official_body",
+                            publisher=name,
+                            title=title,
+                            url=socrata(url) if url.startswith("socrata:") else layer(url),
+                            license=license,
+                            license_url=license_url,
+                        )
                     for link in links(url):
                         cs.artifact(raw.cached(SOURCE, link), source)
                 sources[(geoid, start)] = source
