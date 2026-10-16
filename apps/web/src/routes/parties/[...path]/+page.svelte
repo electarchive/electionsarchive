@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -72,6 +73,14 @@
 
 <svelte:head>
   <title>{party.name} | {m.wordmark()}</title>
+  <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
+  <meta property="og:type" content="profile" />
+  <meta property="og:title" content={party.name} />
+  <meta
+    property="og:image"
+    content="{page.url.origin}/og{page.url.pathname}.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
 <main class="p-3.5 max-sm:p-0">

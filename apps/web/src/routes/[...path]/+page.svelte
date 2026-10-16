@@ -114,6 +114,15 @@
   <title>{title} | {m.wordmark()}</title>
   <meta name="description" content={description} />
   <link rel="canonical" href={canonical} />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={title} />
+  <meta property="og:description" content={description} />
+  <meta property="og:url" content={canonical} />
+  <meta
+    property="og:image"
+    content="{page.url.origin}/og{page.url.pathname}.png"
+  />
+  <meta name="twitter:card" content="summary_large_image" />
   <link rel="alternate" type="application/json" href="{canonical}.json" />
   <link rel="alternate" type="text/markdown" href="{canonical}.md" />
   {#if data.kind === "contest" && data.contest.scope.isFine}

@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageData } from "./$types";
@@ -27,6 +28,14 @@
     ),
   );
 </script>
+
+<svelte:head>
+  <link rel="canonical" href="{page.url.origin}/" />
+  <meta property="og:type" content="website" />
+  <meta property="og:title" content={m.wordmark()} />
+  <meta property="og:image" content="{page.url.origin}/og/index.png" />
+  <meta name="twitter:card" content="summary_large_image" />
+</svelte:head>
 
 <main class="p-3.5 max-sm:p-0">
   <article
