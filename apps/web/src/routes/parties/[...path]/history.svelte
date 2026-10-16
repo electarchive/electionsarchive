@@ -185,10 +185,7 @@
     <Export name="history" class="absolute inset-e-2 inset-bs-2" />
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
       <div class="grid gap-0.5">
-        <h2
-          id="history-title"
-          class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-        >
+        <h2 id="history-title" class="heading">
           {m.party_history_title()}
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -201,7 +198,7 @@
             <dt class="text-xs text-muted-foreground">
               {m.party_history_latest()}, {latest.year}
             </dt>
-            <dd class="font-mono text-xl tracking-[-0.02em] tabular-nums">
+            <dd class="font-figures text-xl tracking-[-0.02em] tabular-nums">
               {percent(latest.share)}
             </dd>
           </div>
@@ -211,7 +208,7 @@
             <dt class="text-xs text-muted-foreground">
               {m.party_history_best()}, {best.year}
             </dt>
-            <dd class="font-mono text-xl tracking-[-0.02em] tabular-nums">
+            <dd class="font-figures text-xl tracking-[-0.02em] tabular-nums">
               {percent(best.share)}
             </dd>
           </div>
@@ -224,7 +221,7 @@
           <button
             type="button"
             class={cn(
-              "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card px-2 text-[0.8125rem] block-7 hover:bg-secondary",
+              "flex items-center gap-1.5 rounded-sm border border-input bg-card px-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
               { "marked bg-secondary font-semibold": entry === active },
             )}
             aria-pressed={entry === active}
@@ -234,7 +231,8 @@
             }}
           >
             {entry.name}
-            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
               >{entry.points.length}</span
             >
           </button>
@@ -267,7 +265,7 @@
             x={PAD.left - 6}
             y={sy(level) + 3.5}
             text-anchor="end"
-            class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
             >{Math.round(level * 100)}</text
           >
         {/each}
@@ -293,7 +291,7 @@
             x={sx(year)}
             y={height - 8}
             text-anchor="middle"
-            class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
             >{year}</text
           >
         {/each}
@@ -387,7 +385,7 @@
               <span class="text-muted-foreground"
                 >{m.party_history_votes()}</span
               >
-              <span class="font-mono font-semibold tabular-nums"
+              <span class="font-figures font-semibold tabular-nums"
                 >{percent(lit.share)}</span
               >
             </span>
@@ -402,7 +400,7 @@
                   : m.party_history_seats()}</span
               >
               {#if !isOffice}
-                <span class="font-mono tabular-nums"
+                <span class="font-figures tabular-nums"
                   >{m.party_history_seats_of({
                     seats: count(lit.seats),
                     filled: count(lit.filled),
@@ -430,7 +428,7 @@
               { "hover:bg-secondary": point.path != null },
             )}
           >
-            <span class="font-mono font-semibold tabular-nums"
+            <span class="font-figures font-semibold tabular-nums"
               >{isTwin
                 ? new Intl.DateTimeFormat(getLocale(), {
                     month: "short",
@@ -439,7 +437,7 @@
                   }).format(Date.parse(`${point.date}T00:00:00Z`))
                 : point.year}</span
             >
-            <span class="font-mono text-muted-foreground tabular-nums"
+            <span class="font-figures text-muted-foreground tabular-nums"
               >{point.share == null ? "–" : percent(point.share)}</span
             >
             {#if !isOffice && point.seats != null}

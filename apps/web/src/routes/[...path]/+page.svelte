@@ -133,10 +133,8 @@
   >
 </svelte:head>
 
-<main class="p-3.5 max-sm:p-0">
-  <article
-    class="grid grid-cols-12 gap-px overflow-clip rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
-  >
+<main class="pbe-16">
+  <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
     {#if crumbs.length > 0}
       <nav
         class="col-span-12 flex flex-wrap items-center gap-x-2 gap-y-1 bg-card px-3.5 py-2.5 text-sm text-muted-foreground"

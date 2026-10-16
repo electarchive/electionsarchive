@@ -151,7 +151,7 @@
         style:background-color={entry.color}
       ></span>
       <span class="flex-1">{entry.winner.label}</span>
-      <span class="font-mono text-xs tabular-nums opacity-70"
+      <span class="font-figures text-xs tabular-nums opacity-70"
         >{entry.winner.measure === "electoral_votes"
           ? m.series_electoral({
               votes: count(entry.winner.votes),
@@ -178,7 +178,7 @@
         {/if}
       </span>
       {#if entry.date != null}
-        <span class="font-mono text-xs opacity-70">{date(entry.date)}</span>
+        <span class="font-figures text-xs opacity-70">{date(entry.date)}</span>
       {/if}
       {@render winner(entry)}
     </Tooltip.Content>
@@ -203,7 +203,7 @@
           <a
             {...props}
             type={undefined}
-            class="flex shrink-0 keycap items-center justify-center rounded-sm border border-input bg-card block-8 inline-8 hover:bg-secondary max-sm:hidden"
+            class="flex shrink-0 items-center justify-center rounded-sm border border-input bg-card keycap block-8 inline-8 hover:bg-secondary max-sm:hidden"
             href={entry.href}
             aria-label={text({ label: entry.label })}
             aria-keyshortcuts={key}><Icon class="block-4 inline-4" /></a
@@ -217,7 +217,7 @@
         <span class="flex items-baseline justify-between gap-3">
           <span class="font-semibold">{text({ label: entry.label })}</span>
           <kbd
-            class="rounded-xs border border-current/30 px-1 font-mono text-[0.6875rem]"
+            class="rounded-xs border border-current/30 px-1 font-figures text-[0.6875rem]"
             >{key}</kbd
           >
         </span>
@@ -291,7 +291,7 @@
                     {...props}
                     type={undefined}
                     class={cn(
-                      "relative flex items-center border border-input bg-card px-2.5 font-mono text-[0.8125rem] whitespace-nowrap tabular-nums block-8",
+                      "relative flex items-center border border-input bg-card px-2.5 font-figures text-[0.8125rem] whitespace-nowrap tabular-nums block-8",
                       {
                         "z-10 border-foreground highlighter font-semibold":
                           entry.current,
@@ -339,7 +339,7 @@
       <button
         {...props}
         type="button"
-        class="flex shrink-0 keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-2.5 pe-2 text-[0.8125rem] font-semibold whitespace-nowrap block-8 hover:bg-secondary"
+        class="flex shrink-0 items-center gap-1.5 rounded-sm border border-input bg-card ps-2.5 pe-2 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-8 hover:bg-secondary"
         aria-label={m.series_all_label({ count: items.length })}
         >{m.series_all({ count: items.length })}<ChevronsUpDownIcon
           class="text-muted-foreground block-3.5 inline-3.5"

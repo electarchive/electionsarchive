@@ -299,10 +299,7 @@
   <Export name="makeup" class="absolute inset-e-2 inset-bs-2" />
   <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
     <div class="grid gap-0.5">
-      <h2
-        id="{uid}-title"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="{uid}-title" class="heading">
         {m.chamber_makeup_title()}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground max-inline-[68ch]">
@@ -318,7 +315,7 @@
         <button
           type="button"
           class={cn(
-            "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+            "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
             {
               "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                 isShare === share,
@@ -455,7 +452,7 @@
           x={year.x}
           y={height - 4}
           text-anchor="middle"
-          class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+          class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
           >{year.year}</text
         >
       {/each}
@@ -472,7 +469,7 @@
         <span class="text-[0.8125rem] font-semibold"
           >{lit.term.election?.name ?? date(lit.term.start)}</span
         >
-        <span class="font-mono text-muted-foreground tabular-nums"
+        <span class="font-figures text-muted-foreground tabular-nums"
           >{date(lit.term.start)} – {lit.term.end == null
             ? m.governments_present()
             : date(lit.term.end)}</span
@@ -487,7 +484,7 @@
                 ></span>
                 <span class="truncate">{label(entry.party)}</span>
               </span>
-              <span class="font-mono tabular-nums"
+              <span class="font-figures tabular-nums"
                 ><span class="font-semibold">{count(entry.seats)}</span>
                 <span class="text-muted-foreground"
                   >{percent(entry.seats / Math.max(lit.term.total, 1))}</span
@@ -526,7 +523,7 @@
         {#if sitting.head != null}
           <span>{m.record_governments_head({ name: sitting.head })}</span>
         {/if}
-        <span class="font-mono text-xs text-muted-foreground tabular-nums"
+        <span class="font-figures text-xs text-muted-foreground tabular-nums"
           >{date(sitting.from)} – {sitting.to == null
             ? m.governments_present()
             : date(sitting.to)}</span

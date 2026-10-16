@@ -20,9 +20,7 @@
 
 <main class="mx-auto grid gap-6 px-4 pbs-12 pbe-20 max-inline-sm">
   <header class="grid gap-1.5">
-    <h1
-      class="font-serif text-[2rem] leading-[1.02] font-[640] tracking-[-0.01em]"
-    >
+    <h1 class="title">
       {m.sign_in_title()}
     </h1>
     <p class="text-[0.9375rem] text-muted-foreground">{m.sign_in_lede()}</p>

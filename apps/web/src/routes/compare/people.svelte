@@ -148,7 +148,7 @@
       <dt class="flex items-center gap-2">
         {@render glyph(index, true, "var(--foreground)", 12)}
         <a
-          class="truncate font-serif text-lg font-[640] tracking-[-0.005em] hover:highlighter"
+          class="truncate text-lg font-[720] hover:highlighter"
           href={resolve("/id/[id]", { id: side.id })}>{side.name}</a
         >
       </dt>
@@ -166,7 +166,7 @@
             <span class="grid gap-0.5">
               <span class="text-xs text-muted-foreground">{label}</span>
               <span
-                class="font-mono text-xl tracking-[-0.02em] tabular-nums max-sm:text-base"
+                class="font-figures text-xl tracking-[-0.02em] tabular-nums max-sm:text-base"
                 >{value}</span
               >
             </span>
@@ -185,10 +185,7 @@
   >
     <Export name="shares" class="absolute inset-e-2 inset-bs-2" />
     <div class="grid gap-0.5 pe-8">
-      <h2
-        id="shares"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="shares" class="heading">
         {m.versus_shares_title()}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground">
@@ -209,7 +206,8 @@
           {@render glyph(focus.side, focus.isWon, focus.tint)}
           <span class="font-semibold">{sides[focus.side]?.name}</span>
           <span class="truncate text-muted-foreground">{focus.name}</span>
-          <span class="font-mono tabular-nums">{percent(focus.share ?? 0)}</span
+          <span class="font-figures tabular-nums"
+            >{percent(focus.share ?? 0)}</span
           >
         </span>
       {/if}
@@ -250,7 +248,7 @@
             x={PAD.left - 6}
             y={sy(tick) + 3.5}
             text-anchor="end"
-            class="fill-muted-foreground font-mono text-[0.625rem]"
+            class="fill-muted-foreground font-figures text-[0.625rem]"
             >{Math.round(tick * 100)}</text
           >
         {/each}
@@ -269,7 +267,8 @@
             x={sx(year)}
             y={height - 6}
             text-anchor="middle"
-            class="fill-muted-foreground font-mono text-[0.625rem]">{year}</text
+            class="fill-muted-foreground font-figures text-[0.625rem]"
+            >{year}</text
           >
         {/each}
         {#each sides as side, index (side.id)}
@@ -310,10 +309,7 @@
 >
   <Export name="head-to-head" class="absolute inset-e-2 inset-bs-2" />
   <div class="grid gap-0.5 pe-8">
-    <h2
-      id="head"
-      class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-    >
+    <h2 id="head" class="heading">
       {m.versus_head_title()}
     </h2>
     <p class="text-[0.8125rem] text-muted-foreground">
@@ -327,7 +323,7 @@
         <li
           class="grid grid-cols-[3rem_minmax(0,1fr)] gap-x-3 gap-y-1.5 border-be border-border/60 py-2 last:border-be-0"
         >
-          <span class="font-mono text-[0.8125rem] text-muted-foreground"
+          <span class="font-figures text-[0.8125rem] text-muted-foreground"
             >{first?.year}</span
           >
           <a
@@ -350,7 +346,7 @@
                   >
                 {/if}
               </span>
-              <span class="font-mono text-[0.8125rem] tabular-nums"
+              <span class="font-figures text-[0.8125rem] tabular-nums"
                 >{mark.share == null ? "–" : percent(mark.share)}</span
               >
               <span

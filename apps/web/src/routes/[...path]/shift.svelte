@@ -167,7 +167,7 @@
               y={sy(-lift) + 15}
               opacity={tick === across[0] ? 0 : 1}
               text-anchor="middle"
-              class="font-mono text-[0.625rem] tabular-nums"
+              class="font-figures text-[0.625rem] tabular-nums"
               fill={tick === 0
                 ? "var(--muted-foreground)"
                 : colors[tick > 0 ? 0 : 1]}
@@ -188,7 +188,7 @@
               x={sx(-reach) - 6}
               y={sy(tick) + 3.5}
               text-anchor="end"
-              class="font-mono text-[0.625rem] tabular-nums"
+              class="font-figures text-[0.625rem] tabular-nums"
               fill={tick === 0
                 ? "var(--muted-foreground)"
                 : colors[tick > 0 ? 0 : 1]}
@@ -252,14 +252,14 @@
             style:inset-block-start="{Math.max(0, sy(lit.swing) - 70)}px"
           >
             <span class="text-[0.8125rem] font-semibold">{lit.name}</span>
-            <span class="font-mono text-muted-foreground tabular-nums"
+            <span class="font-figures text-muted-foreground tabular-nums"
               >{span.from}: {label(lit.then)}</span
             >
-            <span class="font-mono tabular-nums"
+            <span class="font-figures tabular-nums"
               >{span.to}: {label(lit.now)}</span
             >
             <span
-              class="font-mono font-semibold tabular-nums"
+              class="font-figures font-semibold tabular-nums"
               style:color={colors[lit.swing >= 0 ? 0 : 1]}
               >{m.scatter_toward({ name: names[lit.swing >= 0 ? 0 : 1] ?? "" })}
               {points(Math.abs(lit.swing))}</span
@@ -294,7 +294,7 @@
               <span class="grid min-inline-0">
                 <span class="truncate font-semibold">{dot.name}</span>
                 <span
-                  class="font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
+                  class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
                   >{count(dot.valid)}</span
                 >
               </span>
@@ -320,7 +320,7 @@
                 </span>
               </span>
               <span
-                class="text-end font-mono text-xs tabular-nums inline-10"
+                class="text-end font-figures text-xs tabular-nums inline-10"
                 style:color={colors[dot.swing >= 0 ? 0 : 1]}
                 >{points(Math.abs(dot.swing))}</span
               >

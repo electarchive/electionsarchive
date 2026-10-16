@@ -117,7 +117,7 @@
                 <span class="min-w-0 flex-1 text-pretty">{item.label}</span>
                 {#if item.detail != null}
                   <span
-                    class="shrink-0 font-mono text-xs text-muted-foreground"
+                    class="shrink-0 font-figures text-xs text-muted-foreground"
                   >
                     {item.detail}
                   </span>

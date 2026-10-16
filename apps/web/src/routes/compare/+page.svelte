@@ -109,10 +109,7 @@
                     : m.versus_pick()}</span
             >
           {:else}
-            <span
-              class="truncate font-serif text-lg font-[640] tracking-[-0.005em]"
-              >{side.name}</span
-            >
+            <span class="truncate text-lg font-[720]">{side.name}</span>
           {/if}
           <ChevronsUpDownIcon class="text-muted-foreground block-4 inline-4" />
         </button>
@@ -159,15 +156,11 @@
   </Popover.Root>
 {/snippet}
 
-<main class="p-3.5 max-sm:p-0">
-  <article
-    class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
-  >
+<main class="pbe-16">
+  <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
     <header class="col-span-12 grid gap-3 bg-card px-3.5 pbs-4 pbe-3.5">
       <div class="grid gap-1">
-        <h1
-          class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-        >
+        <h1 class="title">
           {m.versus_title()}
         </h1>
         <p class="text-[0.9375rem] text-muted-foreground max-inline-[64ch]">
@@ -215,14 +208,14 @@
                   class="rounded-full bg-foreground block-2.5 inline-2.5"
                   aria-hidden="true"
                 ></span>
-                <span class="truncate font-serif text-base font-[640]"
+                <span class="truncate text-base font-[720]"
                   >{example.first}</span
                 >
                 <span
                   class="bg-foreground block-2.5 inline-2.5"
                   aria-hidden="true"
                 ></span>
-                <span class="truncate font-serif text-base font-[640]"
+                <span class="truncate text-base font-[720]"
                   >{example.second}</span
                 >
               </a>
@@ -243,7 +236,7 @@
           {#each data.rivals as rival (rival.id)}
             <li>
               <a
-                class="inline-flex items-center gap-2 rounded-sm border border-input px-3 font-serif text-base font-[640] block-10 hover:border-foreground hover:bg-secondary"
+                class="inline-flex items-center gap-2 rounded-sm border border-input px-3 text-base font-[720] block-10 hover:border-foreground hover:bg-secondary"
                 href={resolve(`/compare?a=${sides[0]?.id ?? ""}&b=${rival.id}`)}
                 ><span
                   class="bg-foreground block-2.5 inline-2.5"

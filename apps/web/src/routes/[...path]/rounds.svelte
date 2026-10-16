@@ -103,7 +103,7 @@
                   >
                 {/if}
               </span>
-              <span class="font-mono text-[0.8125rem] tabular-nums"
+              <span class="font-figures text-[0.8125rem] tabular-nums"
                 >{percent(leader.share)}</span
               >
             </li>

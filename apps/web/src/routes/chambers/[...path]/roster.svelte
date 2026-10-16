@@ -171,7 +171,7 @@
             class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[auto_minmax(0,1fr)_auto]"
           >
             <span
-              class="font-mono text-xs whitespace-nowrap text-muted-foreground tabular-nums sm:inline-34 max-sm:col-span-2"
+              class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums sm:inline-34 max-sm:col-span-2"
               >{date(event.on)}</span
             >
             <span class="flex items-baseline gap-1.5 truncate">
@@ -210,12 +210,9 @@
   >
     <div class="flex flex-wrap items-end justify-between gap-x-4 gap-y-2">
       <div class="grid gap-0.5">
-        <h2
-          id="{uid}-title"
-          class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-        >
+        <h2 id="{uid}-title" class="heading">
           {title}
-          <span class="font-mono text-base font-normal text-muted-foreground"
+          <span class="font-figures text-base font-normal text-muted-foreground"
             >{count(members.length)}</span
           >
         </h2>
@@ -242,7 +239,7 @@
         <button
           type="button"
           class={cn(
-            "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+            "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
             { "marked bg-secondary": party === entry },
           )}
           aria-pressed={party === entry}
@@ -253,7 +250,7 @@
             style:background={tint(entry)}
           ></span>
           <span class="font-semibold">{label(entry)}</span>
-          <span class="font-mono text-xs text-muted-foreground tabular-nums"
+          <span class="font-figures text-xs text-muted-foreground tabular-nums"
             >{members.filter((member) => member.party === entry).length}</span
           >
         </button>

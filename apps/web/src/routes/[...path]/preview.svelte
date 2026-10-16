@@ -40,7 +40,7 @@
           <span class="line-clamp-1">{entry.name}</span>
           {#if entry.date != null}
             <span
-              class="shrink-0 font-mono text-xs text-muted-foreground tabular-nums"
+              class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
               >{entry.date.slice(0, 4)}</span
             >
           {/if}
@@ -107,7 +107,7 @@
           .slice(0, 3),
       )}
       <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
-        <p class="font-serif text-[1.0625rem]/tight font-[620] text-balance">
+        <p class="text-[1.0625rem]/tight font-[720] text-balance">
           {contest.scope.noun == null ? contest.name : contest.scope.name}
         </p>
         <p class="text-[0.8125rem] text-muted-foreground">
@@ -136,7 +136,7 @@
                   >
                 {/if}
               </span>
-              <span class="font-mono text-xs tabular-nums"
+              <span class="font-figures text-xs tabular-nums"
                 >{contest.current?.measure === "electoral_votes"
                   ? count(row.current?.votes ?? 0)
                   : percent(row.current?.share ?? 0)}</span
@@ -159,14 +159,15 @@
           class="flex items-baseline justify-between gap-3 border-bs px-3 py-2 text-xs text-muted-foreground"
         >
           {MEASURES[contest.current.measure]?.() ?? m.stat_valid()}
-          <span class="font-mono text-[0.8125rem] text-foreground tabular-nums"
+          <span
+            class="font-figures text-[0.8125rem] text-foreground tabular-nums"
             >{count(contest.current.valid)}</span
           >
         </p>
       {/if}
     {:else if data.kind === "election"}
       <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
-        <p class="font-serif text-[1.0625rem]/tight font-[620] text-balance">
+        <p class="text-[1.0625rem]/tight font-[720] text-balance">
           {data.election.name}
         </p>
         {#if data.election.date != null}
@@ -180,7 +181,7 @@
       {/if}
     {:else}
       <div class="px-3 pbs-2.5 pbe-2">
-        <p class="font-serif text-[1.0625rem]/tight font-[620] text-balance">
+        <p class="text-[1.0625rem]/tight font-[720] text-balance">
           {data.polity.name}
         </p>
       </div>

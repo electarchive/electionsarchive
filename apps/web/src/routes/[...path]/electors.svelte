@@ -62,7 +62,7 @@
         <span class="text-xs opacity-80">{row.short}</span>
       {/if}
       <span
-        class="flex items-baseline justify-between gap-3 font-mono text-xs tabular-nums"
+        class="flex items-baseline justify-between gap-3 font-figures text-xs tabular-nums"
         >{m.series_electoral({
           votes: count(row.votes),
           total: count(electors.appointed ?? total),
@@ -81,7 +81,7 @@
       style:--party={swatch(row.color, row.key)}
     >
       <span
-        class="font-serif text-4xl/none font-[640] tracking-[-0.01em] tabular-nums max-sm:text-3xl/none"
+        class="font-figures text-4xl/none font-[780] tracking-[-0.02em] max-sm:text-3xl/none"
         >{count(row.votes)}</span
       >
       <span class="truncate text-sm">
@@ -171,7 +171,7 @@
               person={row.person}
               party={row.party}
             />
-            <span class="font-mono tabular-nums">{count(row.votes)}</span>
+            <span class="font-figures tabular-nums">{count(row.votes)}</span>
           </li>
         {/each}
       </ul>

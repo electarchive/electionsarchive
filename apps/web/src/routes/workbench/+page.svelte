@@ -382,9 +382,7 @@
 <main class="grid content-start gap-4 px-4 pbs-6 pbe-16">
   <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
     <div class="grid gap-1.5">
-      <h1
-        class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-      >
+      <h1 class="title">
         {spec?.title ?? m.workbench_title()}
       </h1>
       <p class="text-[0.9375rem] text-muted-foreground max-inline-[60ch]">
@@ -511,7 +509,7 @@
                     <button
                       type="button"
                       class={cn(
-                        "-ms-px flex flex-1 keycap items-center justify-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                        "-ms-px flex flex-1 items-center justify-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                         {
                           "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                             visibility === option.value,
@@ -646,7 +644,7 @@
       <button
         type="button"
         class={cn(
-          "flex keycap items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary",
+          "flex items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-8 hover:bg-secondary",
           {
             "bg-primary text-primary-foreground hover:bg-primary":
               selector.compare != null,
@@ -664,7 +662,7 @@
             <button
               type="button"
               class={cn(
-                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                 {
                   "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                     level.code === current?.places?.level,
@@ -733,7 +731,7 @@
       aria-labelledby="examples-title"
     >
       <div class="grid gap-1">
-        <h2 id="examples-title" class="font-serif text-xl/tight font-[640]">
+        <h2 id="examples-title" class="heading">
           {m.workbench_examples()}
         </h2>
         <p class="text-sm text-muted-foreground max-inline-[60ch]">
@@ -767,7 +765,7 @@
                 };
               }}
             >
-              <span class="font-serif text-lg/tight font-[640] text-balance"
+              <span class="text-lg/tight font-[720] text-balance"
                 >{example.name}</span
               >
               <span class="text-[0.8125rem] text-muted-foreground"

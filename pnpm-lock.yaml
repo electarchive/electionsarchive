@@ -176,9 +176,6 @@ catalogs:
     '@better-auth/i18n':
       specifier: ^1.7.7
       version: 1.7.7
-    '@fontsource-variable/martian-mono':
-      specifier: ^5.3.0
-      version: 5.3.0
     '@fontsource-variable/noto-naskh-arabic':
       specifier: ^5.3.0
       version: 5.3.0
@@ -436,9 +433,6 @@ importers:
       '@ea/view-spec':
         specifier: workspace:*
         version: link:../../packages/view-spec
-      '@fontsource-variable/martian-mono':
-        specifier: 'catalog:'
-        version: 5.3.0
       '@fontsource-variable/noto-naskh-arabic':
         specifier: 'catalog:'
         version: 5.3.0
@@ -1348,9 +1342,6 @@ packages:
 
   '@floating-ui/utils@0.2.12':
     resolution: {integrity: sha512-HpCo8tmWzLVad5s2d19EhAz5zqrrQ6s69qd6moPMQvkOuSwDT1YgRfWSVuc4ennqrgv3OHppiOGMQ7oC13yIww==}
-
-  '@fontsource-variable/martian-mono@5.3.0':
-    resolution: {integrity: sha512-0wVODx9ILwNnaYC4XCuSaFRYtj1Prd89MRVaSuv2ng6zLiQkS4SepaWEPefs7vqCZS8sbEOA8jb/4F5KNMnGdg==}
 
   '@fontsource-variable/noto-naskh-arabic@5.3.0':
     resolution: {integrity: sha512-Ot0G5iln5MeLPKp1WNt6AGi4KHbPIVm0GEow2ED6rZ+8Rao+OuswhX4D+RPerc3aQ6teneLdqXSL8VPGorJvGg==}
@@ -5823,8 +5814,6 @@ snapshots:
       '@floating-ui/utils': 0.2.12
 
   '@floating-ui/utils@0.2.12': {}
-
-  '@fontsource-variable/martian-mono@5.3.0': {}
 
   '@fontsource-variable/noto-naskh-arabic@5.3.0': {}
 

@@ -96,10 +96,7 @@
   >
     <div class="flex flex-wrap items-center gap-x-4 gap-y-2.5">
       <div class="grid gap-0.5">
-        <h2
-          id="{uid}-title"
-          class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-        >
+        <h2 id="{uid}-title" class="heading">
           {m.winners_title({ noun })}
         </h2>
         <p class="text-[0.8125rem] text-pretty text-muted-foreground">
@@ -175,7 +172,8 @@
         <li class="grid content-start gap-2 bg-card px-3 pbs-2.5 pbe-3">
           <div class="flex items-baseline justify-between gap-3">
             <h3 class="font-semibold">{group.name}</h3>
-            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
               >{count(total)}</span
             >
           </div>
@@ -202,7 +200,7 @@
                     ><span class="font-semibold text-foreground"
                       >{entry.short}</span
                     >
-                    <span class="font-mono tabular-nums"
+                    <span class="font-figures tabular-nums"
                       >{count(entry.wins)}</span
                     ></span
                   >

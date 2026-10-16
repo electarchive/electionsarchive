@@ -104,7 +104,8 @@
               ></span>
               <span class="flex-1 truncate min-inline-0">{row.name}</span>
               {#if row.leader != null}
-                <span class="shrink-0 font-mono text-xs text-muted-foreground"
+                <span
+                  class="shrink-0 font-figures text-xs text-muted-foreground"
                   >{places.legend[row.leader]?.short ??
                     places.legend[row.leader]?.label}
                   {percent(row.shares[row.leader] ?? 0)}</span

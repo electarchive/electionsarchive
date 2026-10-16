@@ -164,14 +164,14 @@
           x={sx(tick)}
           y={HEIGHT - PAD + 16}
           text-anchor="middle"
-          class="fill-muted-foreground font-mono text-[10px]"
+          class="fill-muted-foreground font-figures text-[10px]"
           >{percent(tick)}</text
         >
         <text
           x={PAD - 6}
           y={sy(tick) + 3}
           text-anchor="end"
-          class="fill-muted-foreground font-mono text-[10px]"
+          class="fill-muted-foreground font-figures text-[10px]"
           >{percent(tick)}</text
         >
       {/each}

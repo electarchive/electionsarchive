@@ -294,7 +294,7 @@
               {@render year(span.to, true)}
             </span>
             <span
-              class="relative mbs-1 block font-mono text-[0.6875rem] font-normal tabular-nums block-3.5"
+              class="relative mbs-1 block font-figures text-[0.6875rem] font-normal tabular-nums block-3.5"
               aria-hidden="true"
             >
               {#each ticks as tick, index (index)}
@@ -400,7 +400,7 @@
           </th>
           <td
             class={cn(
-              "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
+              "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
               { "max-sm:hidden": span != null },
             )}
           >
@@ -410,7 +410,7 @@
           </td>
           {#if span == null}
             <td
-              class="relative px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums"
+              class="relative px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
             >
               {#if page != null}
                 {@render cite(percent(page.share), "share", row)}
@@ -425,7 +425,7 @@
             {#each [line.before, line.after] as cell, index (index)}
               <td
                 class={cn(
-                  "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
+                  "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
                   {
                     "font-semibold text-foreground":
                       cell != null && cell === page,
@@ -440,7 +440,7 @@
           {#if seats != null}
             <td
               class={cn(
-                "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
+                "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
                 { "max-sm:hidden": span != null },
               )}
             >
@@ -482,7 +482,7 @@
                           "bg-background block-3 inline-0.5": !side.bar,
                         })}
                       ></span>
-                      <span class="font-mono tabular-nums opacity-70"
+                      <span class="font-figures tabular-nums opacity-70"
                         >{side.year}</span
                       >
                       {#if side.cell == null}
@@ -491,14 +491,14 @@
                         >
                       {:else}
                         <span class="truncate">{side.cell.label}</span>
-                        <span class="text-end font-mono tabular-nums"
+                        <span class="text-end font-figures tabular-nums"
                           >{percent(side.cell.share)}</span
                         >
                       {/if}
                     {/each}
                     {#if line.change != null}
                       <span
-                        class="col-span-4 border-bs border-background/20 pbs-1 text-end font-mono font-semibold tabular-nums"
+                        class="col-span-4 border-bs border-background/20 pbs-1 text-end font-figures font-semibold tabular-nums"
                         >{m.trend_change({ points: points(line.change) })}</span
                       >
                     {/if}
@@ -507,7 +507,7 @@
               {/if}
             </td>
             <td
-              class="px-2 py-1.5 text-end font-mono text-[0.8125rem] font-semibold whitespace-nowrap tabular-nums"
+              class="px-2 py-1.5 text-end font-figures text-[0.8125rem] font-semibold whitespace-nowrap tabular-nums"
             >
               {line.change == null ? "" : points(line.change)}
             </td>
@@ -519,7 +519,7 @@
           <th class="px-2 py-1.5 text-start font-normal" scope="row">
             <button
               type="button"
-              class="flex keycap items-center rounded-sm border border-input bg-card px-2 text-[0.8125rem] font-semibold whitespace-nowrap block-7 hover:bg-secondary"
+              class="flex items-center rounded-sm border border-input bg-card px-2 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 hover:bg-secondary"
               aria-expanded={expanded}
               onclick={() => (expanded = !expanded)}
               >{expanded
@@ -530,19 +530,19 @@
           {#if !expanded}
             <td
               class={cn(
-                "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums",
+                "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums",
                 { "max-sm:hidden": span != null },
               )}>{count(tail.votes)}</td
             >
             {#if span == null}
               <td
-                class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+                class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
                 >{percent(tail.current)}</td
               >
             {:else}
               {#each [tail.before, tail.after] as share, index (index)}
                 <td
-                  class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+                  class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
                   >{percent(share)}</td
                 >
               {/each}

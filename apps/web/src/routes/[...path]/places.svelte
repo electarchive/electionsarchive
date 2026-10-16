@@ -233,8 +233,8 @@
         class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-baseline gap-x-3 gap-y-0.5 text-xs"
       >
         <span></span>
-        <span class="text-end font-mono opacity-70">{span.from}</span>
-        <span class="text-end font-mono opacity-70">{span.to}</span>
+        <span class="text-end font-figures opacity-70">{span.from}</span>
+        <span class="text-end font-figures opacity-70">{span.to}</span>
         {#each new Set([0, 1, move.from ?? 0, move.to ?? 0]) as index (index)}
           {#if places.legend[index] != null}
             <span class="flex items-baseline gap-1.5 min-inline-0">
@@ -245,12 +245,12 @@
               <span class="truncate">{titles[index]}</span>
             </span>
             <span
-              class={cn("text-end font-mono tabular-nums", {
+              class={cn("text-end font-figures tabular-nums", {
                 "font-semibold": index === move.from,
               })}>{percent(move.before?.[index] ?? 0)}</span
             >
             <span
-              class={cn("text-end font-mono tabular-nums", {
+              class={cn("text-end font-figures tabular-nums", {
                 "font-semibold": index === move.to,
               })}>{percent(move.after?.[index] ?? 0)}</span
             >
@@ -284,10 +284,7 @@
   data-places
 >
   <div class="flex flex-wrap items-center gap-x-4 gap-y-2.5">
-    <h2
-      id="{uid}-title"
-      class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-    >
+    <h2 id="{uid}-title" class="heading">
       {m.places_title({ noun })}
     </h2>
     {#if levels.length > 1 && !isMapped}
@@ -295,7 +292,7 @@
         {#each levels as level (level.code)}
           <a
             class={cn(
-              "-ms-px flex keycap items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+              "-ms-px flex items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
               {
                 "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                   level.code === places.level,
@@ -307,7 +304,7 @@
             aria-current={level.code === places.level ? "true" : undefined}
             data-sveltekit-reset="false"
             >{level.label}
-            <span class="font-mono text-[0.6875rem] font-normal tabular-nums"
+            <span class="font-figures text-[0.6875rem] font-normal tabular-nums"
               >{level.count}</span
             ></a
           >
@@ -366,7 +363,7 @@
       <button
         type="button"
         class={cn(
-          "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+          "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
           { "marked bg-secondary": only === index },
         )}
         style:--party={colors[index]}
@@ -379,7 +376,7 @@
       >
         <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
         <span class="font-semibold">{titles[index]}</span>
-        <span class="font-mono text-xs text-muted-foreground tabular-nums"
+        <span class="font-figures text-xs text-muted-foreground tabular-nums"
           >{won}</span
         >
       </button>
@@ -392,7 +389,7 @@
               {...props}
               type="button"
               class={cn(
-                "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card px-2 text-[0.8125rem] block-7 hover:bg-secondary",
+                "flex items-center gap-1.5 rounded-sm border border-input bg-card px-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
                 { "marked bg-secondary": only === "flip" },
               )}
               aria-pressed={only === "flip"}
@@ -404,7 +401,8 @@
               <span class="highlighter px-0.5 font-semibold"
                 >{m.places_flipped()}</span
               >
-              <span class="font-mono text-xs text-muted-foreground tabular-nums"
+              <span
+                class="font-figures text-xs text-muted-foreground tabular-nums"
                 >{flips}</span
               >
             </button>
@@ -465,7 +463,7 @@
                       {entry.label}
                       {#if entry.key === "shift" && span != null}
                         <span
-                          class="flex items-center gap-1 font-mono text-[0.6875rem] font-normal"
+                          class="flex items-center gap-1 font-figures text-[0.6875rem] font-normal"
                           >{span.from}→{span.to}
                           <span
                             class="flex items-center gap-px"
@@ -595,7 +593,7 @@
                     party={places.legend[row.leader]?.party}
                   />
                   <span
-                    class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums"
+                    class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
                     >{@render cite(
                       percent(row.shares[row.leader] ?? 0),
                       "share",
@@ -608,7 +606,7 @@
             </td>
             <td
               class={cn(
-                "px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap tabular-nums",
+                "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
                 { "max-md:hidden": comparing },
               )}
             >
@@ -622,7 +620,7 @@
               {/if}
             </td>
             <td
-              class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums max-sm:hidden"
+              class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums max-sm:hidden"
             >
               {@render cite(count(row.valid), "votes", row, votes)}
             </td>
@@ -702,7 +700,7 @@
                           ></span>
                         </span>
                         <span
-                          class="flex shrink-0 items-center justify-end gap-1 font-mono text-[0.8125rem] tabular-nums inline-16"
+                          class="flex shrink-0 items-center justify-end gap-1 font-figures text-[0.8125rem] tabular-nums inline-16"
                         >
                           <span
                             class="rounded-xs bg-(--party) block-2 inline-2 md:hidden"
@@ -738,7 +736,7 @@
   {#if !all && filtered.length > limit}
     <button
       type="button"
-      class="flex keycap items-center justify-center rounded-sm border border-input bg-card text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
+      class="flex items-center justify-center rounded-sm border border-input bg-card text-[0.8125rem] font-semibold keycap block-8 hover:bg-secondary"
       onclick={() => (all = true)}
       >{m.places_show_all({ count: count(filtered.length) })}</button
     >

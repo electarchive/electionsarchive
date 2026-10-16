@@ -154,10 +154,7 @@
   >
     <Export name="lineage" class="absolute inset-e-2 inset-bs-2" />
     <div class="grid gap-0.5 pe-8">
-      <h2
-        id="lineage-title"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="lineage-title" class="heading">
         {m.party_lineage_title()}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -186,7 +183,7 @@
             x={sx(tick)}
             y={height - 6}
             text-anchor="middle"
-            class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
             >{tick}</text
           >
         {/each}

@@ -377,10 +377,7 @@
   data-export
 >
   <Export name="seats" class="absolute inset-e-2 inset-bs-2" />
-  <h2
-    id="{uid}-title"
-    class="pe-8 font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-  >
+  <h2 id="{uid}-title" class="pe-8 heading">
     {m.seats_title()}<span class="sr-only">, {place}</span>
   </h2>
   <div
@@ -530,7 +527,7 @@
         />
       {/if}
       <text
-        class="pointer-events-none fill-foreground font-serif tabular-nums"
+        class="pointer-events-none fill-foreground font-figures font-[780]"
         style:font-size="{font}px"
         x="100"
         y={center.of == null ? 98 : 99 - 0.38 * font}
@@ -667,9 +664,10 @@
           {#if change != null}
             {const moved = $derived(change[party.key])}
             <span
-              class={cn("text-end font-mono text-xs tabular-nums inline-10", {
-                "text-muted-foreground": moved == null || moved === 0,
-              })}
+              class={cn(
+                "text-end font-figures text-xs tabular-nums inline-10",
+                { "text-muted-foreground": moved == null || moved === 0 },
+              )}
               >{moved == null
                 ? m.seats_change_new()
                 : moved === 0
@@ -677,19 +675,19 @@
                   : `${moved > 0 ? "+" : "−"}${count(Math.abs(moved))}`}</span
             >
           {/if}
-          <span class="font-mono text-[0.8125rem] font-semibold tabular-nums"
+          <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
             >{count(party.seats)}</span
           >
           <span
-            class="text-end font-mono text-[0.8125rem] text-muted-foreground tabular-nums inline-14"
+            class="text-end font-figures text-[0.8125rem] text-muted-foreground tabular-nums inline-14"
             >{percent(party.seats / totals.all)}</span
           >
         {:else}
-          <span class="font-mono text-[0.8125rem] font-semibold tabular-nums"
+          <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
             >{count(party.here)}</span
           >
           <span
-            class="text-end font-mono text-[0.8125rem] text-muted-foreground tabular-nums inline-16"
+            class="text-end font-figures text-[0.8125rem] text-muted-foreground tabular-nums inline-16"
             >{m.seats_of({ count: count(party.seats) })}</span
           >
         {/if}
@@ -733,7 +731,7 @@
                   .map((unit) => unit.map((key) => shorts.get(key)).join("/"))
                   .join(" + ")}</span
               >
-              <span class="font-mono text-[0.8125rem] tabular-nums"
+              <span class="font-figures text-[0.8125rem] tabular-nums"
                 >{count(path.seats)}</span
               >
               <span

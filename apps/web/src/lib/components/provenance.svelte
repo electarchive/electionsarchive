@@ -64,15 +64,13 @@
     >
       <div class="flex items-start justify-between gap-3">
         <div class="grid gap-1">
-          <Drawer.Title
-            class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-          >
+          <Drawer.Title class="heading">
             {value == null ? m.provenance_title() : m.provenance_value_title()}
           </Drawer.Title>
           {#if value != null}
             <Drawer.Description class="flex items-baseline gap-2 text-sm">
               <span class="text-muted-foreground">{value.label}</span>
-              <span class="font-mono font-semibold tabular-nums"
+              <span class="font-figures font-semibold tabular-nums"
                 >{value.figure}</span
               >
             </Drawer.Description>

@@ -273,7 +273,7 @@
           href={tile.path == null
             ? undefined
             : resolve("/[...path]", { path: tile.path })}
-          class="grid place-items-center rounded-xs font-mono font-semibold tabular-nums ring-1 ring-border/70 transition-shadow outline-none block-full inline-full ring-inset hover:ring-2 hover:ring-foreground focus-visible:ring-2 focus-visible:ring-ring data-filled:ring-0 data-[size=large]:text-[0.6875rem] data-[size=small]:text-[0.5625rem]"
+          class="grid place-items-center rounded-xs font-figures font-semibold tabular-nums ring-1 ring-border/70 transition-shadow outline-none block-full inline-full ring-inset hover:ring-2 hover:ring-foreground focus-visible:ring-2 focus-visible:ring-ring data-filled:ring-0 data-[size=large]:text-[0.6875rem] data-[size=small]:text-[0.5625rem]"
           style:background={tile.color ?? undefined}
           style:color={tile.color == null
             ? undefined
@@ -294,10 +294,7 @@
     aria-labelledby="{uid}-title"
   >
     <div class="grid gap-0.5">
-      <h2
-        id="{uid}-title"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="{uid}-title" class="heading">
         {panels.length > 0 ? m.tiers_title() : m.election_places({ noun })}
       </h2>
       {#if panels.length > 0}
@@ -352,7 +349,7 @@
                 class="flex flex-wrap items-baseline justify-between gap-x-3"
               >
                 <span class="text-[0.8125rem] font-bold">{panel.title}</span>
-                <span class="font-mono text-xs text-muted-foreground"
+                <span class="font-figures text-xs text-muted-foreground"
                   >{panel.tally}</span
                 >
               </figcaption>
@@ -368,7 +365,7 @@
                     {/each}
                   </div>
                   <div
-                    class="flex justify-between gap-3 font-mono text-xs tabular-nums"
+                    class="flex justify-between gap-3 font-figures text-xs tabular-nums"
                   >
                     {#each panel.lead as part (part.party)}
                       <span

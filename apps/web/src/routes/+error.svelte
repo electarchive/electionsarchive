@@ -30,13 +30,10 @@
   class="grid content-start gap-4 px-4 pbs-16 pbe-24 max-inline-160 sm:pbs-28"
   aria-labelledby="error-title"
 >
-  <p class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums">
+  <p class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums">
     {m.error_code({ code: String(page.status) })}
   </p>
-  <h1
-    id="error-title"
-    class="font-serif text-[clamp(2.25rem,6vw,3.5rem)] leading-none font-[640] tracking-[-0.015em] text-balance"
-  >
+  <h1 id="error-title" class="title">
     {copy[0]()}
   </h1>
   <p class="text-[1.0625rem]/relaxed text-pretty text-muted-foreground">

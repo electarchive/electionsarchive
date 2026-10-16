@@ -25,7 +25,7 @@
 
 <span
   class={cn(
-    "shrink-0 self-start font-mono font-semibold tabular-nums inline-10",
+    "shrink-0 self-start font-figures font-semibold tabular-nums inline-10",
     { "line-through": annulled },
   )}>{year}</span
 >
@@ -40,7 +40,7 @@
       ></span>
       <span class="text-pretty">{winner.label}</span>
     </span>
-    <span class="font-mono text-xs text-muted-foreground tabular-nums"
+    <span class="font-figures text-xs text-muted-foreground tabular-nums"
       >{winner.measure === "electoral_votes"
         ? m.series_electoral({
             votes: count(winner.votes),
@@ -56,6 +56,6 @@
   {/if}
 </span>
 <span
-  class="shrink-0 self-start font-mono text-xs/5 text-muted-foreground tabular-nums"
+  class="shrink-0 self-start font-figures text-xs/5 text-muted-foreground tabular-nums"
   >{when}</span
 >

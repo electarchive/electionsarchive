@@ -81,9 +81,7 @@
 {:else}
   {const party = $derived(query.data)}
   <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
-    <p
-      class="flex items-baseline gap-2 font-serif text-[1.0625rem]/tight font-[620]"
-    >
+    <p class="flex items-baseline gap-2 text-[1.0625rem]/tight font-[720]">
       <span
         class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
         style:background-color={color ?? swatch(party.color, `party:${id}`)}
@@ -111,7 +109,7 @@
     <dl class="grid grid-cols-2 gap-px border-bs bg-border">
       <div class="bg-popover px-3 py-2">
         <dt class="text-xs text-muted-foreground">{m.party_ballot()}</dt>
-        <dd class="font-mono text-[0.9375rem] tabular-nums">
+        <dd class="font-figures text-[0.9375rem] tabular-nums">
           {party.span.from.slice(0, 4) === party.span.to.slice(0, 4)
             ? party.span.from.slice(0, 4)
             : `${party.span.from.slice(0, 4)}–${party.span.to.slice(0, 4)}`}
@@ -119,7 +117,7 @@
       </div>
       <div class="bg-popover px-3 py-2">
         <dt class="text-xs text-muted-foreground">{m.party_contests()}</dt>
-        <dd class="font-mono text-[0.9375rem] tabular-nums">
+        <dd class="font-figures text-[0.9375rem] tabular-nums">
           {count(party.span.contests)}
         </dd>
       </div>
@@ -138,7 +136,8 @@
           ></span>
           <span class="flex-1">{link.text}</span>
           {#if link.year != null}
-            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
               >{link.year}</span
             >
           {/if}

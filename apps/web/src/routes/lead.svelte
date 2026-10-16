@@ -41,7 +41,7 @@
                 : row.label}</span
             >
           </span>
-          <span class="font-mono text-xs font-semibold tabular-nums"
+          <span class="font-figures text-xs font-semibold tabular-nums"
             >{isSeated
               ? m.polity_seats({
                   seats: count(row.seats ?? 0),

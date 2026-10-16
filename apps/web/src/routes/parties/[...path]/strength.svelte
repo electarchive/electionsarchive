@@ -47,10 +47,7 @@
     aria-labelledby="strength-title"
   >
     <div class="grid gap-0.5">
-      <h2
-        id="strength-title"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="strength-title" class="heading">
         {m.party_strength_title({ party: name, noun })}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">

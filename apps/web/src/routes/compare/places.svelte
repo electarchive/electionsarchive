@@ -182,10 +182,7 @@
   >
     <Export name="trend" class="absolute inset-e-2 inset-bs-2" />
     <div class="grid gap-0.5 pe-8">
-      <h2
-        id="race-{index}"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="race-{index}" class="heading">
         {race.name}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground">
@@ -223,14 +220,14 @@
           </svg>
           <span class={cn({ "font-semibold": side > 0 })}>{name}</span>
           {#if focus != null}
-            <span class="font-mono text-xs tabular-nums"
+            <span class="font-figures text-xs tabular-nums"
               >{@render margin(race, focus.margins[side] ?? null)}</span
             >
           {/if}
         </span>
       {/each}
       {#if focus != null}
-        <span class="ms-auto font-mono text-xs text-muted-foreground"
+        <span class="ms-auto font-figures text-xs text-muted-foreground"
           >{focus.year}</span
         >
       {/if}
@@ -284,7 +281,7 @@
             x={PAD.left - 6}
             y={sy(race, tick) + 3.5}
             text-anchor="end"
-            class="fill-muted-foreground font-mono text-[0.625rem]"
+            class="fill-muted-foreground font-figures text-[0.625rem]"
             >{tick === 0 ? "0" : Math.round(Math.abs(tick) * 100)}</text
           >
         {/each}
@@ -293,7 +290,7 @@
             x={sx(race, row.year)}
             y={height - 6}
             text-anchor="middle"
-            class={cn("fill-muted-foreground font-mono text-[0.625rem]", {
+            class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
               "max-sm:hidden": point % 2 === 1 && race.rows.length > 6,
               "fill-foreground": focus === row,
             })}>{row.year}</text
@@ -381,10 +378,10 @@
             >
               <th scope="row" class="py-1.5 pe-3 text-start font-normal">
                 {#if row.path == null}
-                  <span class="font-mono">{row.year}</span>
+                  <span class="font-figures">{row.year}</span>
                 {:else}
                   <a
-                    class="font-mono hover:highlighter"
+                    class="font-figures hover:highlighter"
                     href={resolve("/[...path]", { path: row.path })}
                     title={row.name}>{row.year}</a
                   >
@@ -392,10 +389,13 @@
               </th>
               {#each race.sides as side (side)}
                 <td
-                  class={cn("px-2 py-1.5 text-end font-mono text-[0.8125rem]", {
-                    "max-sm:hidden": side === 0,
-                    "text-muted-foreground": side === 0,
-                  })}
+                  class={cn(
+                    "px-2 py-1.5 text-end font-figures text-[0.8125rem]",
+                    {
+                      "max-sm:hidden": side === 0,
+                      "text-muted-foreground": side === 0,
+                    },
+                  )}
                   >{@render margin(
                     race,
                     row.margins[side] ?? null,
@@ -403,7 +403,7 @@
                   )}</td
                 >
               {/each}
-              <td class="py-1.5 ps-2 text-end font-mono text-[0.8125rem]"
+              <td class="py-1.5 ps-2 text-end font-figures text-[0.8125rem]"
                 >{@render margin(
                   race,
                   a == null || b == null ? null : a - b,
@@ -427,10 +427,7 @@
   >
     <Export name="questions" class="absolute inset-e-2 inset-bs-2" />
     <div class="grid gap-0.5 pe-8">
-      <h2
-        id="questions"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="questions" class="heading">
         {m.versus_questions()}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground">
@@ -452,7 +449,7 @@
                 >{question.name}</a
               >
             {/if}
-            <span class="font-mono text-xs text-muted-foreground"
+            <span class="font-figures text-xs text-muted-foreground"
               >{question.year}</span
             >
           </span>
@@ -477,7 +474,7 @@
             {/each}
           </span>
           <span
-            class="col-start-2 flex justify-between font-mono text-xs tabular-nums max-sm:col-start-1"
+            class="col-start-2 flex justify-between font-figures text-xs tabular-nums max-sm:col-start-1"
           >
             {#each [1, 2] as side (side)}
               <span class="inline-flex items-center gap-1.5">

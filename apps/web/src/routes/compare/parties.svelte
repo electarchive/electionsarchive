@@ -124,10 +124,7 @@
   >
     <Export name="parties" class="absolute inset-e-2 inset-bs-2" />
     <div class="grid gap-0.5 pe-8">
-      <h2
-        id="party-series-{index}"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="party-series-{index}" class="heading">
         {chart.name}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground">
@@ -159,14 +156,14 @@
           </svg>
           <span class="font-semibold">{side.label}</span>
           {#if focus != null}
-            <span class="font-mono text-xs tabular-nums"
+            <span class="font-figures text-xs tabular-nums"
               >{@render share(focus.sides[at] ?? null)}</span
             >
           {/if}
         </span>
       {/each}
       {#if focus != null}
-        <span class="ms-auto font-mono text-xs text-muted-foreground"
+        <span class="ms-auto font-figures text-xs text-muted-foreground"
           >{focus.label}</span
         >
       {/if}
@@ -204,7 +201,7 @@
             x={PAD.left - 6}
             y={sy(chart, tick) + 3.5}
             text-anchor="end"
-            class="fill-muted-foreground font-mono text-[0.625rem]"
+            class="fill-muted-foreground font-figures text-[0.625rem]"
             >{Math.round(tick * 100)}</text
           >
         {/each}
@@ -213,7 +210,7 @@
             x={sx(chart, row.at)}
             y={height - 6}
             text-anchor="middle"
-            class={cn("fill-muted-foreground font-mono text-[0.625rem]", {
+            class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
               hidden: !(ticks[index] ?? []).includes(point),
               "fill-foreground": focus === row,
             })}>{row.year}</text
@@ -298,10 +295,10 @@
                 class="py-1.5 pe-3 text-start font-normal whitespace-nowrap"
               >
                 {#if row.path == null}
-                  <span class="font-mono">{row.label}</span>
+                  <span class="font-figures">{row.label}</span>
                 {:else}
                   <a
-                    class="font-mono hover:highlighter"
+                    class="font-figures hover:highlighter"
                     href={resolve("/[...path]", { path: row.path })}
                     title={row.name}>{row.label}</a
                   >
@@ -309,12 +306,12 @@
               </th>
               {#each sides as side, at (side.id)}
                 <td
-                  class="px-2 py-1.5 text-end font-mono text-[0.8125rem] whitespace-nowrap"
+                  class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap"
                   >{@render share(row.sides[at] ?? null, true)}</td
                 >
               {/each}
               <td
-                class="py-1.5 ps-2 text-end font-mono text-[0.8125rem] whitespace-nowrap"
+                class="py-1.5 ps-2 text-end font-figures text-[0.8125rem] whitespace-nowrap"
               >
                 {#if a == null || b == null || lead == null}
                   <span class="text-muted-foreground">–</span>

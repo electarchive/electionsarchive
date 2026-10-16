@@ -929,7 +929,7 @@
           >{m.map_color_by()}</span
         >
         <select
-          class="keycap rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold block-10 min-inline-0 sm:hidden"
+          class="rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold keycap block-10 min-inline-0 sm:hidden"
           aria-labelledby="{uid}-shading"
           value={String(view)}
           onchange={(event) => {
@@ -956,7 +956,7 @@
                   <button
                     type="button"
                     class={cn(
-                      "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                      "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                       {
                         "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                           view === choice.value,
@@ -983,7 +983,7 @@
           <svelte:element
             this={pick == null ? "a" : "button"}
             class={cn(
-              "-ms-px flex keycap items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
+              "-ms-px flex items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
               {
                 "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                   level.isCurrent,
@@ -1000,7 +1000,7 @@
             data-sveltekit-noscroll
             onclick={() => pick?.(level.code)}
             >{level.label}
-            <span class="font-mono text-[0.6875rem] font-normal tabular-nums"
+            <span class="font-figures text-[0.6875rem] font-normal tabular-nums"
               >{level.count}</span
             ></svelte:element
           >
@@ -1100,7 +1100,7 @@
         <span class="flex items-center gap-1.5 text-xs">
           <span class="font-semibold">{names[1]}</span>
           {#if view === "swing"}
-            <span class="flex font-mono tabular-nums">
+            <span class="flex font-figures tabular-nums">
               {#each [...STRENGTHS].toReversed() as strength, at (`b${at}`)}
                 <span
                   class="block-3 inline-5 first:rounded-s-xs"
@@ -1142,7 +1142,7 @@
           {/if}
           <span class="font-semibold">{names[0]}</span>
         </span>
-        <span class="font-mono text-xs text-muted-foreground tabular-nums"
+        <span class="font-figures text-xs text-muted-foreground tabular-nums"
           >{m.map_swing_scale({ low: "2", high: "10" })}</span
         >
       </div>
@@ -1157,7 +1157,7 @@
           <button
             type="button"
             class={cn(
-              "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+              "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
               { "marked bg-secondary": only === key },
             )}
             style:--party={colors[to]}
@@ -1174,7 +1174,8 @@
             <span aria-hidden="true" class="text-muted-foreground">›</span>
             <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
             <span class="font-semibold">{names[to]}</span>
-            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
               >{won}</span
             >
           </button>
@@ -1186,7 +1187,9 @@
         <span class="text-muted-foreground"
           >{m.map_share_key({ name: names[index] ?? "" })}</span
         >
-        <span class="flex items-center gap-1.5 font-mono text-xs tabular-nums">
+        <span
+          class="flex items-center gap-1.5 font-figures text-xs tabular-nums"
+        >
           <span>{percent(edges[0] ?? 0)}</span>
           <span class="flex">
             {#each STEPS.slice(0, edges.length + 1) as strength (strength)}
@@ -1207,7 +1210,7 @@
           <button
             type="button"
             class={cn(
-              "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+              "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
               { "marked bg-secondary": only === index },
             )}
             style:--party={colors[index]}
@@ -1222,7 +1225,8 @@
           >
             <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
             <span class="font-semibold">{names[index]}</span>
-            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
               >{won}</span
             >
           </button>
@@ -1236,7 +1240,7 @@
         <div class="flex items-center gap-2.5" aria-hidden="true">
           <span class="text-muted-foreground">{m.map_margin()}</span>
           <span
-            class="flex items-center gap-1.5 font-mono text-xs tabular-nums"
+            class="flex items-center gap-1.5 font-figures text-xs tabular-nums"
           >
             <span>{m.map_margin_under({ points: "5" })}</span>
             <span class="flex">
@@ -1343,7 +1347,7 @@
         >
       {:else if current.margin != null}
         <span
-          class="shrink-0 font-mono text-xs text-muted-foreground tabular-nums"
+          class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
           >{points(current.margin)}</span
         >
       {/if}
@@ -1361,7 +1365,7 @@
             })}>{names[entry.index] ?? option?.label}</span
           >
           <span
-            class="flex items-baseline gap-2 font-mono text-xs tabular-nums"
+            class="flex items-baseline gap-2 font-figures text-xs tabular-nums"
           >
             {#if moved != null}
               <span class="text-muted-foreground"
@@ -1396,7 +1400,7 @@
     <span class="flex items-baseline justify-between gap-3 text-xs">
       <span class="text-muted-foreground"
         >{#if !isDeclared}{votes}
-          <span class="font-mono tabular-nums">{count(current.valid)}</span
+          <span class="font-figures tabular-nums">{count(current.valid)}</span
           >{/if}</span
       >
       {#if current.path != null && !isSheet}

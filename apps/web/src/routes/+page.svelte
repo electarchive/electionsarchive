@@ -199,10 +199,8 @@
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
-<main class="p-3.5 max-sm:p-0">
-  <article
-    class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
-  >
+<main class="pbe-16">
+  <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
     <header
       class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-4 bg-card px-3.5 pbs-8 pbe-6 sm:px-6 sm:pbs-12 sm:pbe-8"
     >
@@ -231,7 +229,7 @@
           <SearchIcon class="shrink-0 text-foreground block-5 inline-5" />
           <span class="grow truncate">{m.home_search_cta()}</span>
           <kbd
-            class="keycap rounded-xs border border-input px-1.5 font-mono text-xs max-sm:hidden"
+            class="rounded-xs border border-input px-1.5 font-figures text-xs keycap max-sm:hidden"
             >⌘K</kbd
           >
         </button>
@@ -255,10 +253,7 @@
     >
       <Export name="atlas" class="absolute inset-e-2 inset-bs-2" />
       <div class="grid gap-0.5 pe-8">
-        <h2
-          id="atlas-title"
-          class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-        >
+        <h2 id="atlas-title" class="heading">
           {m.home_map_title()}
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -353,7 +348,7 @@
                   aria-hidden="true"
                 ></span>
                 <span
-                  class="pointer-events-none absolute inset-be-[calc(100%+0.25rem)] rounded-xs bg-foreground px-1.5 font-mono text-xs font-semibold text-background tabular-nums"
+                  class="pointer-events-none absolute inset-be-[calc(100%+0.25rem)] rounded-xs bg-foreground px-1.5 font-figures text-xs font-semibold text-background tabular-nums"
                   style:inset-inline-start="{along(year) * 100}%"
                   style:translate="{-along(year) * 100}% 0"
                   aria-hidden="true">{year}</span
@@ -361,7 +356,7 @@
               {/if}
             </div>
             <div
-              class="flex justify-between font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
+              class="flex justify-between font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
               aria-hidden="true"
             >
               <span>{span.first}</span><span>{span.last}</span>
@@ -435,7 +430,7 @@
               class="block rounded-xs block-2"
               style:background={`linear-gradient(to right, var(--primary), color-mix(in oklab, var(--primary) 22%, var(--card)))`}
             ></span>
-            <span class="flex justify-between font-mono tabular-nums">
+            <span class="flex justify-between font-figures tabular-nums">
               <span>{depth.low}</span><span>{depth.high}</span>
             </span>
           </div>
@@ -457,8 +452,7 @@
           <div
             class="pointer-events-none absolute inset-s-0 inset-be-2 grid gap-0.5 rounded-sm bg-card/95 px-3 py-2 text-xs shadow-menu ring-1 ring-border"
           >
-            <span class="font-serif text-base/tight font-[640]">{lit.name}</span
-            >
+            <span class="text-base/tight font-[720]">{lit.name}</span>
             <span class="text-muted-foreground"
               >{m.home_elections({
                 count: lit.elections,
@@ -514,7 +508,7 @@
                 >{polity.name}</span
               >
               <span
-                class="font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
+                class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
                 >{m.home_map_since({ year: String(polity.first) })}</span
               >
               <span
@@ -538,10 +532,7 @@
         class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3.5"
         aria-labelledby="recent-title"
       >
-        <h2
-          id="recent-title"
-          class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-        >
+        <h2 id="recent-title" class="heading">
           {m.home_recent()}
         </h2>
         <ul
@@ -557,11 +548,11 @@
                   <span class="text-xs font-semibold text-muted-foreground"
                     >{election.polity}</span
                   >
-                  <span class="font-serif text-lg/tight font-[640] text-balance"
+                  <span class="text-lg/tight font-[720] text-balance"
                     >{election.name}</span
                   >
                   <span
-                    class="font-mono text-xs text-muted-foreground tabular-nums"
+                    class="font-figures text-xs text-muted-foreground tabular-nums"
                     >{date(election.date)}</span
                   >
                 </span>
@@ -584,7 +575,7 @@
         <ul class="grid gap-1 text-sm">
           {#each data.upcoming as election (election.path)}
             <li class="flex flex-wrap items-baseline gap-x-3">
-              <span class="font-mono text-xs tabular-nums inline-28"
+              <span class="font-figures text-xs tabular-nums inline-28"
                 >{date(election.date)}</span
               >
               <a
@@ -604,10 +595,7 @@
         aria-labelledby="today-title"
       >
         <div class="grid gap-0.5">
-          <h2
-            id="today-title"
-            class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-          >
+          <h2 id="today-title" class="heading">
             {m.home_today()}
           </h2>
           <p class="text-[0.8125rem] text-muted-foreground">
@@ -621,7 +609,7 @@
             <li
               class="grid grid-cols-[4rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2"
             >
-              <span class="font-mono text-xl tracking-[-0.02em] tabular-nums"
+              <span class="font-figures text-xl tracking-[-0.02em] tabular-nums"
                 >{election.date.slice(0, 4)}</span
               >
               <span class="grid gap-0.5">

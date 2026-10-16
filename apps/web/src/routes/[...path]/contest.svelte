@@ -470,10 +470,7 @@
         path={contest.path}>{contest.name}</Preview
       >
     {/if}
-    <h1
-      class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-      data-scope-title
-    >
+    <h1 class="title" data-scope-title>
       {drilled ? contest.scope.name : contest.name}
     </h1>
     <p
@@ -678,7 +675,7 @@
               <svelte:element
                 this={row.path == null ? "span" : "a"}
                 class={cn(
-                  "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+                  "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
                   { "bg-secondary": focus === row.k },
                 )}
                 href={row.path == null
@@ -695,7 +692,7 @@
                 ></span>
                 <span class="font-semibold">{row.name}</span>
                 <span
-                  class="font-mono text-xs text-muted-foreground tabular-nums"
+                  class="font-figures text-xs text-muted-foreground tabular-nums"
                   >{group.value(row)}</span
                 >
               </svelte:element>
@@ -761,7 +758,7 @@
               class="flex flex-1 items-baseline gap-2 min-inline-0"
               title={item.label}
             >
-              <span class="shrink-0 font-mono font-semibold tabular-nums"
+              <span class="shrink-0 font-figures font-semibold tabular-nums"
                 >{item.year}</span
               >
               {#if item.winner == null}
@@ -788,7 +785,7 @@
                 {...props}
                 type={undefined}
                 class={cn(
-                  "flex shrink-0 keycap items-center gap-1.5 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary",
+                  "flex shrink-0 items-center gap-1.5 rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary",
                   {
                     "bg-primary text-primary-foreground hover:bg-primary":
                       isPrevious,
@@ -799,7 +796,7 @@
                 data-sveltekit-reset="false"
                 >{m.compare_previous()}
                 {#if previous.year != null}
-                  <span class="font-mono tabular-nums">{previous.year}</span>
+                  <span class="font-figures tabular-nums">{previous.year}</span>
                 {/if}</a
               >
             {/snippet}
@@ -851,7 +848,7 @@
                       {...props}
                       type={undefined}
                       class={cn(
-                        "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                        "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                         {
                           "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                             option.value === match,
@@ -894,7 +891,7 @@
                       {...props}
                       type={undefined}
                       class={cn(
-                        "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                        "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                         {
                           "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                             option.value === grouping,
@@ -1248,7 +1245,9 @@
               m.term_valid()}
           />
         </dt>
-        <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
+        <dd
+          class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
+        >
           {count(contest.current.valid)}
         </dd>
       </div>
@@ -1260,7 +1259,9 @@
         <dt class="text-[0.8125rem] text-muted-foreground">
           <Term label={m.stat_options()} definition={m.term_options()} />
         </dt>
-        <dd class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums">
+        <dd
+          class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
+        >
           {contest.rows.filter((row) => row.current != null).length}
         </dd>
       </div>
@@ -1277,7 +1278,7 @@
             class="mbs-0.5 flex items-baseline gap-2.5 min-inline-0"
             style:--party={swatch(lead.row.color, lead.row.key)}
           >
-            <span class="font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            <span class="font-figures text-2xl tracking-[-0.02em] tabular-nums"
               >{points(lead.margin)}</span
             >
             <Name

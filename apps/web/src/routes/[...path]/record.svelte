@@ -219,7 +219,7 @@
     class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-busy="true"
   >
-    <h2 class="font-serif text-xl/tight font-[640] tracking-[-0.005em]">
+    <h2 class="heading">
       {m.record_title()}
     </h2>
     <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -239,10 +239,7 @@
     <Export name="record" class="absolute inset-e-2 inset-bs-2" />
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
       <div class="grid gap-0.5">
-        <h2
-          id="{uid}-title"
-          class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-        >
+        <h2 id="{uid}-title" class="heading">
           {current == null ? m.record_governments() : m.record_title()}
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -262,7 +259,7 @@
             <button
               type="button"
               class={cn(
-                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                 {
                   "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                     entry.id === current?.id,
@@ -327,7 +324,7 @@
               x={year.x}
               y="54"
               text-anchor="middle"
-              class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+              class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
               >{year.year}</text
             >
           {/each}
@@ -412,7 +409,7 @@
                 : column.index === columns.length - 1
                   ? "end"
                   : "middle"}
-              class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+              class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
               >{column.year}</text
             >
           {/each}
@@ -437,7 +434,7 @@
                 {label(winner)}
               </span>
               {#if lit.share != null}
-                <span class="font-mono tabular-nums"
+                <span class="font-figures tabular-nums"
                   >{m.record_share({ share: percent(lit.share) })}</span
                 >
               {/if}
@@ -452,7 +449,7 @@
                       ></span>
                       <span class="truncate">{label(entry.party)}</span>
                     </span>
-                    <span class="font-mono font-semibold tabular-nums"
+                    <span class="font-figures font-semibold tabular-nums"
                       >{count(entry.seats)}</span
                     >
                   </li>
@@ -494,7 +491,7 @@
           {#if sitting.head != null}
             <span>{m.record_governments_head({ name: sitting.head })}</span>
           {/if}
-          <span class="font-mono text-xs text-muted-foreground tabular-nums"
+          <span class="font-figures text-xs text-muted-foreground tabular-nums"
             >{date(sitting.from)} – {sitting.to == null
               ? m.governments_present()
               : date(sitting.to)}</span

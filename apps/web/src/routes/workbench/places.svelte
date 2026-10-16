@@ -158,17 +158,17 @@
               </span>
             </td>
             <td
-              class="px-2.5 text-end font-mono text-[0.8125rem] tabular-nums sm:px-3.5"
+              class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5"
               >{percent(row.share)}</td
             >
             {#if contest.target != null}
               <td
-                class="px-2.5 text-end font-mono text-[0.8125rem] tabular-nums sm:px-3.5"
+                class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5"
                 >{row.change == null ? "" : points(row.change)}</td
               >
             {/if}
             <td
-              class="px-2.5 text-end font-mono text-[0.8125rem] tabular-nums sm:px-3.5 max-sm:hidden"
+              class="px-2.5 text-end font-figures text-[0.8125rem] tabular-nums sm:px-3.5 max-sm:hidden"
               >{count(row.valid)}</td
             >
           </tr>

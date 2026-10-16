@@ -199,7 +199,7 @@
   },
   value: string,
 )}
-  <span class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums"
+  <span class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
     >{year}</span
   >
   <Name
@@ -209,7 +209,9 @@
     person={lead.person}
     party={lead.party}
   />
-  <span class="text-end font-mono text-[0.8125rem] tabular-nums">{value}</span>
+  <span class="text-end font-figures text-[0.8125rem] tabular-nums"
+    >{value}</span
+  >
 {/snippet}
 
 <section class="col-span-12 grid gap-px" aria-labelledby="changes-title">
@@ -332,7 +334,7 @@
                   ></span>
                 </span>
                 <span
-                  class="text-end font-mono text-[0.8125rem] tabular-nums inline-11"
+                  class="text-end font-figures text-[0.8125rem] tabular-nums inline-11"
                   >{points(mover.change)}</span
                 >
               </li>
@@ -351,7 +353,7 @@
     >
       <dt class="text-[0.8125rem] text-muted-foreground">{counted}</dt>
       <dd
-        class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2.5 gap-y-1 font-mono text-[0.8125rem] tabular-nums"
+        class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2.5 gap-y-1 font-figures text-[0.8125rem] tabular-nums"
       >
         <span class="text-muted-foreground">{span.from}</span>
         <span class="text-end text-muted-foreground">{count(valid.before)}</span
@@ -360,7 +362,9 @@
         <span class="text-end font-semibold">{count(valid.after)}</span>
       </dd>
       {#if valid.before > 0}
-        <dd class="text-end font-mono text-[0.8125rem] text-muted-foreground">
+        <dd
+          class="text-end font-figures text-[0.8125rem] text-muted-foreground"
+        >
           {new Intl.NumberFormat(getLocale(), {
             style: "percent",
             signDisplay: "exceptZero",
@@ -383,7 +387,7 @@
         <dt class="text-[0.8125rem] text-muted-foreground">
           <Term label={m.fact_flips()} definition={m.term_flips()} />
         </dt>
-        <dd class="font-mono text-[0.9375rem] tabular-nums">
+        <dd class="font-figures text-[0.9375rem] tabular-nums">
           {flips.count === 0
             ? m.fact_flips_none()
             : m.fact_flips_count({
@@ -407,7 +411,7 @@
                       {...props}
                       type="button"
                       class={cn(
-                        "flex keycap items-center gap-1 rounded-sm border border-input bg-card px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
+                        "flex items-center gap-1 rounded-sm border border-input bg-card px-1.5 text-[0.8125rem] keycap block-7 hover:bg-secondary",
                         { "marked bg-secondary": picked === kind.value },
                       )}
                       aria-pressed={picked === kind.value}
@@ -432,7 +436,7 @@
                           kind.to?.key ?? "",
                         )}
                       ></span>
-                      <span class="ms-0.5 font-mono text-xs tabular-nums"
+                      <span class="ms-0.5 font-figures text-xs tabular-nums"
                         >{kind.count}</span
                       >
                     </button>

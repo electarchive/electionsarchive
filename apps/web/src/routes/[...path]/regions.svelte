@@ -160,10 +160,7 @@
       />
     {/if}
     <div class="grid gap-0.5 pe-8">
-      <h2
-        id="{uid}-{at}"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="{uid}-{at}" class="heading">
         {m.regions_title({ name: chamber.name, noun: chamber.noun ?? "" })}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -236,7 +233,7 @@
                 <td class="p-0.5">
                   <span
                     class={cn(
-                      "grid place-items-end rounded-xs px-2 font-mono text-[0.8125rem] block-7",
+                      "grid place-items-end rounded-xs px-2 font-figures text-[0.8125rem] block-7",
                       {
                         "text-muted-foreground/50": cell === 0,
                         "font-semibold": share >= 0.5,
@@ -252,12 +249,12 @@
               {/each}
               {#if chamber.isFolded}
                 <td
-                  class="px-2 py-1 text-end font-mono text-[0.8125rem] text-muted-foreground"
+                  class="px-2 py-1 text-end font-figures text-[0.8125rem] text-muted-foreground"
                   >{row.others === 0 ? "·" : count(row.others)}</td
                 >
               {/if}
               <td
-                class="py-1 ps-2 text-end font-mono text-[0.8125rem] font-semibold"
+                class="py-1 ps-2 text-end font-figures text-[0.8125rem] font-semibold"
                 >{count(row.seats)}</td
               >
             </tr>
@@ -273,18 +270,18 @@
             </th>
             {#each chamber.total as value, column (column)}
               <td
-                class="px-2 py-1.5 text-end font-mono text-[0.8125rem] font-semibold"
+                class="px-2 py-1.5 text-end font-figures text-[0.8125rem] font-semibold"
                 >{count(value)}</td
               >
             {/each}
             {#if chamber.isFolded}
               <td
-                class="px-2 py-1.5 text-end font-mono text-[0.8125rem] font-semibold"
+                class="px-2 py-1.5 text-end font-figures text-[0.8125rem] font-semibold"
                 >{count(chamber.others)}</td
               >
             {/if}
             <td
-              class="py-1.5 ps-2 text-end font-mono text-[0.8125rem] font-semibold"
+              class="py-1.5 ps-2 text-end font-figures text-[0.8125rem] font-semibold"
               >{count(chamber.all)}</td
             >
           </tr>

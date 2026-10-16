@@ -20,7 +20,6 @@
     "@ea/analytics": "workspace:*",
     "@ea/db": "workspace:*",
     "@ea/view-spec": "workspace:*",
-    "@fontsource-variable/martian-mono": "catalog:",
     "@fontsource-variable/noto-naskh-arabic": "catalog:",
     "@fontsource-variable/piazzolla": "catalog:",
     "@fontsource-variable/sofia-sans-semi-condensed": "catalog:",

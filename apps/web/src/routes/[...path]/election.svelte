@@ -537,9 +537,7 @@
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
-  <h1
-    class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-  >
+  <h1 class="title">
     {election.name}
   </h1>
   <p
@@ -627,12 +625,12 @@
           >
             <span class="flex items-baseline justify-between gap-3">
               <span
-                class="font-serif text-lg/tight font-[640] text-balance group-hover:underline group-hover:decoration-border group-hover:underline-offset-4"
+                class="text-lg/tight font-[720] text-balance group-hover:underline group-hover:decoration-border group-hover:underline-offset-4"
                 >{race.name}</span
               >
               {#if race.count > 1}
                 <span
-                  class="shrink-0 font-mono text-xs text-muted-foreground tabular-nums"
+                  class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
                   >{race.count}</span
                 >
               {/if}
@@ -660,7 +658,7 @@
   >
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
       <h2
-        class={cn("font-serif font-[640] tracking-[-0.005em] text-balance", {
+        class={cn("font-[760] tracking-[-0.015em] text-balance", {
           "text-[clamp(1.5rem,2.4vw,2rem)]/tight": index === 0,
           "text-2xl/tight": index > 0,
         })}
@@ -844,7 +842,7 @@
             >
           {/if}
           <time
-            class="shrink-0 font-mono text-xs text-muted-foreground"
+            class="shrink-0 font-figures text-xs text-muted-foreground"
             datetime={child.date}>{date(child.date)}</time
           >
         </li>
@@ -886,7 +884,7 @@
           {/if}
           {#if child.date !== election.date}
             <time
-              class="shrink-0 font-mono text-xs text-muted-foreground"
+              class="shrink-0 font-figures text-xs text-muted-foreground"
               datetime={child.date}>{date(child.date)}</time
             >
           {/if}
@@ -935,12 +933,12 @@
           })}
         >
           <span class="truncate font-semibold">{part.label}</span>
-          <span class="shrink-0 font-mono text-xs tabular-nums"
+          <span class="shrink-0 font-figures text-xs tabular-nums"
             >{bar.isCount ? count(part.value) : percent(part.value)}</span
           >
           {#if part.delta !== undefined}
             <span
-              class={cn("shrink-0 font-mono text-[0.6875rem] tabular-nums", {
+              class={cn("shrink-0 font-figures text-[0.6875rem] tabular-nums", {
                 "text-muted-foreground": part.delta == null || part.delta === 0,
               })}
               >{part.delta == null

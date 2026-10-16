@@ -103,7 +103,7 @@
           >
         {/if}
       </span>
-      <span class="font-mono text-[0.8125rem] tabular-nums"
+      <span class="font-figures text-[0.8125rem] tabular-nums"
         >{percent(bar.share)}</span
       >
       <span class="relative col-span-2 bg-muted block-1.5" aria-hidden="true">

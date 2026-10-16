@@ -308,7 +308,7 @@
       <div class="grid gap-0.5">
         <h2
           id="{uid}-title"
-          class="font-serif text-[clamp(1.375rem,2.2vw,1.75rem)]/tight font-[640] tracking-[-0.01em]"
+          class="text-[clamp(1.375rem,2.2vw,1.75rem)]/tight font-[760] tracking-[-0.015em]"
         >
           {steps.length > 1 ? m.scrubber_title({ place }) : m.polity_latest()}
         </h2>
@@ -404,7 +404,7 @@
           {/each}
           {#if step != null}
             <span
-              class="pointer-events-none absolute inset-be-[calc(100%+0.375rem)] rounded-xs bg-foreground px-1.5 font-mono text-xs font-semibold text-background tabular-nums transition-[inset-inline-start] duration-200 motion-reduce:transition-none"
+              class="pointer-events-none absolute inset-be-[calc(100%+0.375rem)] rounded-xs bg-foreground px-1.5 font-figures text-xs font-semibold text-background tabular-nums transition-[inset-inline-start] duration-200 motion-reduce:transition-none"
               style:inset-inline-start="{along(step.year) * 100}%"
               style:translate="{-along(step.year) * 100}% 0"
               aria-hidden="true">{step.year}</span
@@ -412,7 +412,7 @@
           {/if}
         </div>
         <div
-          class="flex justify-between font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
+          class="flex justify-between font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
           aria-hidden="true"
         >
           <span>{first}</span><span>{last}</span>
@@ -462,7 +462,7 @@
               aria-live="polite"
             >
               <span
-                class="font-serif text-4xl/none font-[640] tracking-[-0.03em] tabular-nums"
+                class="font-figures text-4xl/none font-[780] tracking-[-0.02em]"
                 >{step.year}</span
               >
               {#if hub.data != null}
@@ -524,7 +524,7 @@
       <div class="grid content-start gap-4">
         <div class="grid gap-1 max-lg:hidden">
           <p
-            class="font-serif text-[clamp(3rem,7vw,5.5rem)] leading-[0.85] font-[640] tracking-[-0.03em] tabular-nums"
+            class="font-figures text-[clamp(3rem,7vw,5.5rem)] leading-[0.85] font-[800] tracking-[-0.03em]"
             aria-live="polite"
           >
             {step?.year ?? ""}
@@ -551,7 +551,7 @@
                     style:background-color={row.color}
                   ></span>
                   <span class="truncate font-semibold">{row.label}</span>
-                  <span class="font-mono text-[0.8125rem] tabular-nums"
+                  <span class="font-figures text-[0.8125rem] tabular-nums"
                     >{row.value}</span
                   >
                 </li>
@@ -607,7 +607,8 @@
                       parties.get(row.party ?? "")?.label ??
                       m.record_none()}</span
                   >
-                  <span class="font-mono text-xs tabular-nums">{row.seats}</span
+                  <span class="font-figures text-xs tabular-nums"
+                    >{row.seats}</span
                   >
                 </li>
               {/each}

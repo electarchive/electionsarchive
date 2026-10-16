@@ -136,10 +136,8 @@
   <meta property="og:title" content={body.name} />
 </svelte:head>
 
-<main class="p-3.5 max-sm:p-0">
-  <article
-    class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
-  >
+<main class="pbe-16">
+  <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
     <header class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3.5 pbe-3.5">
       <nav aria-label={m.chamber_kind_other()}>
         <ol
@@ -163,9 +161,7 @@
       </nav>
       <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div class="grid gap-1">
-          <h1
-            class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-          >
+          <h1 class="title">
             {body.name}
           </h1>
           <p class="text-[0.9375rem] text-muted-foreground">
@@ -180,7 +176,7 @@
             {#each body.siblings as sibling (sibling.id)}
               <a
                 class={cn(
-                  "-ms-px flex keycap items-center justify-center border border-input bg-card px-2.5 py-1 text-center text-[0.8125rem]/tight font-semibold min-block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary max-sm:flex-1",
+                  "-ms-px flex items-center justify-center border border-input bg-card px-2.5 py-1 text-center text-[0.8125rem]/tight font-semibold keycap min-block-8 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary max-sm:flex-1",
                   {
                     "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                       sibling.id === data.id,
@@ -203,7 +199,7 @@
             {m.chamber_seats()}
           </dt>
           <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
           >
             {count(latest.size ?? latest.total)}
           </dd>
@@ -213,7 +209,7 @@
             {m.chamber_terms()}
           </dt>
           <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
           >
             {count(data.terms.length)}
             <span class="text-sm text-muted-foreground"
@@ -233,10 +229,11 @@
                 `party:${latest.parties[0]?.party ?? ""}`,
               )}
             ></span>
-            <span class="font-serif text-xl/tight font-[640]"
+            <span class="heading"
               >{label(latest.parties[0]?.party ?? null)}</span
             >
-            <span class="font-mono text-base text-muted-foreground tabular-nums"
+            <span
+              class="font-figures text-base text-muted-foreground tabular-nums"
               >{count(latest.parties[0]?.seats ?? 0)}</span
             >
           </dd>
@@ -246,7 +243,7 @@
             {m.chamber_members_count()}
           </dt>
           <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
           >
             {count(body.tenures)}
           </dd>
@@ -269,7 +266,7 @@
         <div class="flex items-center gap-1.5">
           <button
             type="button"
-            class="grid keycap place-items-center rounded-sm border border-input bg-card block-8 inline-8 hover:bg-secondary disabled:opacity-40"
+            class="grid place-items-center rounded-sm border border-input bg-card keycap block-8 inline-8 hover:bg-secondary disabled:opacity-40"
             aria-label={m.chamber_term_previous()}
             disabled={selected === 0}
             onclick={() => (selected = Math.max(0, selected - 1))}
@@ -278,7 +275,7 @@
           <label class="sr-only" for="term-pick">{m.chamber_term_pick()}</label>
           <select
             id="term-pick"
-            class="rounded-sm border border-input bg-card px-2 font-mono text-[0.9375rem] font-semibold tabular-nums block-8"
+            class="rounded-sm border border-input bg-card px-2 font-figures text-[0.9375rem] font-semibold tabular-nums block-8"
             bind:value={selected}
           >
             {#each data.terms as entry, index (entry.start)}
@@ -287,7 +284,7 @@
           </select>
           <button
             type="button"
-            class="grid keycap place-items-center rounded-sm border border-input bg-card block-8 inline-8 hover:bg-secondary disabled:opacity-40"
+            class="grid place-items-center rounded-sm border border-input bg-card keycap block-8 inline-8 hover:bg-secondary disabled:opacity-40"
             aria-label={m.chamber_term_next()}
             disabled={selected === data.terms.length - 1}
             onclick={() =>
@@ -311,7 +308,7 @@
                 >{term.election.name}</a
               >
             {/if}
-            <span class="font-mono text-xs tabular-nums"
+            <span class="font-figures text-xs tabular-nums"
               >{date(term.election.date)}</span
             >
           {/if}
@@ -385,7 +382,7 @@
                     {/if}
                   </span>
                   <span
-                    class="font-mono text-xs text-muted-foreground tabular-nums"
+                    class="font-figures text-xs text-muted-foreground tabular-nums"
                     >{date(cabinet.from)} – {cabinet.to == null
                       ? m.governments_present()
                       : date(cabinet.to)}</span

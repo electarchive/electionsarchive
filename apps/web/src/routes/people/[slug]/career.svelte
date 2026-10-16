@@ -95,10 +95,7 @@
     <Export name="career" class="absolute inset-e-2 inset-bs-2" />
     <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2 pe-8">
       <div class="grid gap-0.5">
-        <h2
-          id="career-title"
-          class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-        >
+        <h2 id="career-title" class="heading">
           {m.person_career_title()}
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -145,7 +142,7 @@
             x={PAD.left - 6}
             y={sy(level) + 3.5}
             text-anchor="end"
-            class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
             >{Math.round(level * 100)}</text
           >
         {/each}
@@ -154,7 +151,7 @@
             x={sx(year)}
             y={height - 8}
             text-anchor="middle"
-            class="fill-muted-foreground font-mono text-[0.625rem] tabular-nums"
+            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
             >{year}</text
           >
         {/each}
@@ -218,7 +215,7 @@
             <span class="text-muted-foreground">{lit.party.label}</span>
           {/if}
           <span class="flex justify-between gap-4">
-            <span class="font-mono font-semibold tabular-nums"
+            <span class="font-figures font-semibold tabular-nums"
               >{lit.share == null ? "–" : percent(lit.share)}</span
             >
             {#if lit.outcome != null}

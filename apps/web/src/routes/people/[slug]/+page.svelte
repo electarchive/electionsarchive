@@ -62,12 +62,12 @@
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
-<main class="p-3.5 max-sm:p-0">
+<main class="pbe-16">
   <article
     style:--party={person.party == null
       ? "var(--foreground)"
       : swatch(person.party.color, `party:${person.party.id}`)}
-    class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
+    class="grid grid-cols-12 gap-px overflow-clip border-be bg-border"
   >
     <header
       class="col-span-12 grid gap-1.5 border-bs-[6px] border-(--party) bg-card px-3.5 pbs-4 pbe-3.5"
@@ -76,9 +76,7 @@
         : swatch(person.party.color, `party:${person.party.id}`)}
     >
       <div class="flex items-start justify-between gap-3">
-        <h1
-          class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-        >
+        <h1 class="title">
           {person.name}
         </h1>
         <a
@@ -164,7 +162,7 @@
                     ></span>
                   </span>
                   <span
-                    class="font-mono text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
+                    class="font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums"
                     >{spell.to == null
                       ? m.person_served_now({
                           from: spell.from?.slice(0, 4) ?? "",
@@ -195,7 +193,7 @@
               class="grid grid-cols-[3rem_minmax(0,1fr)_7.5rem] items-baseline gap-x-3 border-be border-border/60 py-2 last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)_4rem]"
             >
               <span
-                class="font-mono text-[0.8125rem] text-muted-foreground tabular-nums"
+                class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
                 >{entry.year}</span
               >
               <span class="grid gap-0.5 min-inline-0">
@@ -226,7 +224,7 @@
                 {/if}
               </span>
               <span class="grid justify-items-end gap-1">
-                <span class="font-mono text-[0.8125rem] tabular-nums"
+                <span class="font-figures text-[0.8125rem] tabular-nums"
                   >{entry.share == null ? "–" : percent(entry.share)}</span
                 >
                 {#if entry.share != null}
@@ -246,7 +244,7 @@
                 {/if}
                 {#if entry.electoral != null}
                   <span
-                    class="font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
+                    class="font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
                     >{m.series_electoral({
                       votes: count(entry.electoral.votes),
                       total: count(entry.electoral.total),

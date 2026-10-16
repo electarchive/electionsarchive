@@ -81,10 +81,7 @@
     aria-labelledby="{uid}-title"
   >
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-2">
-      <h2
-        id="{uid}-title"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="{uid}-title" class="heading">
         {m.members_title({ count: count(everyone.length) })}
       </h2>
       <input
@@ -104,7 +101,7 @@
         <button
           type="button"
           class={cn(
-            "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+            "flex items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] keycap block-7 hover:bg-secondary",
             { "marked bg-secondary": party === entry.key },
           )}
           style:--party={colors.get(entry.key)}
@@ -113,7 +110,7 @@
         >
           <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
           <span class="font-semibold">{labels.get(entry.key)}</span>
-          <span class="font-mono text-xs text-muted-foreground tabular-nums"
+          <span class="font-figures text-xs text-muted-foreground tabular-nums"
             >{entry.members.filter((member) => member.name != null)
               .length}</span
           >
@@ -144,7 +141,7 @@
               {/if}
             {/if}
             {#if member.position != null}
-              <span class="shrink-0 font-mono text-[0.6875rem] tabular-nums"
+              <span class="shrink-0 font-figures text-[0.6875rem] tabular-nums"
                 >{m.seats_position({ position: member.position })}</span
               >
             {/if}

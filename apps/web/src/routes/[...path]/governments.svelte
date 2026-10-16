@@ -57,10 +57,7 @@
     aria-labelledby="{uid}-title"
   >
     <div class="grid gap-0.5">
-      <h2
-        id="{uid}-title"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="{uid}-title" class="heading">
         {m.governments_title()}
       </h2>
       <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
@@ -86,10 +83,7 @@
               : m.governments_formed()}</span
           >
           <span class="flex flex-wrap items-baseline gap-x-2 gap-y-1">
-            <span
-              class="font-serif text-lg/tight font-[640] tracking-[-0.005em]"
-              >{card.name}</span
-            >
+            <span class="text-lg/tight font-[720]">{card.name}</span>
             {#if card.isCaretaker}
               <span class="highlighter px-1 text-xs font-semibold"
                 >{m.governments_caretaker()}</span
@@ -106,7 +100,8 @@
                 ></span
               >
             {/if}
-            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+            <span
+              class="font-figures text-xs text-muted-foreground tabular-nums"
               >{date(card.from)} – {card.to == null
                 ? m.governments_present()
                 : date(card.to)}</span
@@ -154,14 +149,14 @@
                       >{m.governments_support()}</span
                     >{/if}</span
                 >
-                <span class="font-mono text-xs tabular-nums"
+                <span class="font-figures text-xs tabular-nums"
                   >{party.seats == null ? "" : count(party.seats)}</span
                 >
               </li>
             {/each}
           </ul>
           {#if card.seats > 0}
-            <span class="font-mono text-xs text-muted-foreground"
+            <span class="font-figures text-xs text-muted-foreground"
               >{card.size == null
                 ? m.governments_seats({ seats: count(card.seats) })
                 : m.polity_seats({

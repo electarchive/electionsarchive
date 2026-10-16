@@ -68,10 +68,7 @@
 >
   <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2.5">
     <div class="grid gap-0.5">
-      <h2
-        id="{uid}-title"
-        class="font-serif text-xl/tight font-[640] tracking-[-0.005em]"
-      >
+      <h2 id="{uid}-title" class="heading">
         {m.lists_title()}
       </h2>
       <p class="text-sm text-muted-foreground">
@@ -85,7 +82,7 @@
             <button
               type="button"
               class={cn(
-                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                 {
                   "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                     isAll === value,
@@ -103,7 +100,7 @@
       {#if isTruncated || isFull}
         <button
           type="button"
-          class="flex keycap items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary"
+          class="flex items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
           aria-expanded={isFull}
           onclick={() => (isFull = !isFull)}
           >{isFull ? m.lists_collapse() : m.lists_expand()}</button
@@ -158,7 +155,7 @@
             party={ladder.party}
           />
           <span
-            class="font-mono text-xl/none tracking-[-0.02em] tabular-nums"
+            class="font-figures text-xl/none tracking-[-0.02em] tabular-nums"
             aria-label={m.lists_seats({ count: ladder.seats })}
             >{ladder.seats}</span
           >
@@ -171,7 +168,7 @@
           >
           {#if ladder.votes != null}
             <span
-              class="font-mono text-xs text-muted-foreground tabular-nums"
+              class="font-figures text-xs text-muted-foreground tabular-nums"
               aria-label={m.lists_votes({ votes: count(ladder.votes) })}
               >{count(ladder.votes)}</span
             >
@@ -198,7 +195,7 @@
               )}
             >
               <span
-                class="text-end font-mono text-xs text-muted-foreground tabular-nums"
+                class="text-end font-figures text-xs text-muted-foreground tabular-nums"
                 aria-label={m.lists_rank({ position: member.position })}
                 >{member.position}</span
               >

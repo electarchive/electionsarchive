@@ -88,18 +88,16 @@
   <meta name="twitter:card" content="summary_large_image" />
 </svelte:head>
 
-<main class="p-3.5 max-sm:p-0">
+<main class="pbe-16">
   <article
-    class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
+    class="grid grid-cols-12 gap-px overflow-clip border-be bg-border"
     style:--party={color}
   >
     <header
       class="col-span-12 grid gap-1.5 border-bs-[6px] border-(--party) bg-card px-3.5 pbs-4 pbe-3.5"
     >
       <div class="flex items-start justify-between gap-3">
-        <h1
-          class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-        >
+        <h1 class="title">
           {party.name}
           {#if party.short != null && party.short !== party.name}
             <span
@@ -183,7 +181,7 @@
             {m.party_ballot()}
           </dt>
           <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
           >
             {party.span.from.slice(0, 4) === party.span.to.slice(0, 4)
               ? party.span.from.slice(0, 4)
@@ -198,7 +196,7 @@
             {m.party_elections()}
           </dt>
           <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
           >
             {count(data.record.count)}
           </dd>
@@ -208,7 +206,7 @@
             {m.party_contests()}
           </dt>
           <dd
-            class="mbs-0.5 font-mono text-2xl tracking-[-0.02em] tabular-nums"
+            class="mbs-0.5 font-figures text-2xl tracking-[-0.02em] tabular-nums"
           >
             {count(party.span.contests)}
           </dd>
@@ -243,7 +241,7 @@
               >
               {#if link.year != null}
                 <span
-                  class="font-mono text-xs text-muted-foreground tabular-nums"
+                  class="font-figures text-xs text-muted-foreground tabular-nums"
                   >{link.year}</span
                 >
               {/if}
@@ -264,7 +262,7 @@
               class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
             >
               <span
-                class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
+                class="font-figures text-[0.9375rem] tracking-[-0.02em] tabular-nums"
                 >{year ?? ""}</span
               >
               <ul class="grid gap-1 text-sm">

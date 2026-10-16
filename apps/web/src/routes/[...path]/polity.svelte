@@ -232,9 +232,7 @@
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
   <div class="flex items-start justify-between gap-3">
-    <h1
-      class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-    >
+    <h1 class="title">
       {polity.name}
     </h1>
     <a
@@ -264,7 +262,7 @@
     >
       <h2
         id="{uid}-versus"
-        class="font-serif text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[640] tracking-[-0.005em]"
+        class="text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[760] tracking-[-0.015em]"
       >
         {m.polity_versus_title({ place: polity.name })}
       </h2>
@@ -330,12 +328,10 @@
         {m.polity_latest()}
       </h2>
       {#if polity.latest.path == null}
-        <span class="font-serif text-xl/tight font-[640]"
-          >{polity.latest.name}</span
-        >
+        <span class="heading">{polity.latest.name}</span>
       {:else}
         <Preview
-          class="font-serif text-xl/tight font-[640] underline decoration-border underline-offset-4 hover:decoration-foreground"
+          class="heading underline decoration-border underline-offset-4 hover:decoration-foreground"
           path={polity.latest.path}>{polity.latest.name}</Preview
         >
       {/if}
@@ -386,7 +382,7 @@
                   person={row.person}
                   party={row.party}
                 />
-                <span class="font-mono text-[0.8125rem] tabular-nums"
+                <span class="font-figures text-[0.8125rem] tabular-nums"
                   >{isSeated
                     ? m.polity_seats({
                         seats: count(row.seats ?? 0),
@@ -427,7 +423,7 @@
             <button
               type="button"
               class={cn(
-                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                 {
                   "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                     filter === key,
@@ -451,7 +447,7 @@
             class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
           >
             <span
-              class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
+              class="font-figures text-[0.9375rem] tracking-[-0.02em] tabular-nums"
               >{year ?? ""}</span
             >
             <ul class="grid gap-1 text-sm">
@@ -506,7 +502,7 @@
             <button
               type="button"
               class={cn(
-                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
                 {
                   "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                     kind === key,
@@ -549,7 +545,7 @@
               >{m.home_elections({
                 count: child.elections,
               })}{#if child.first != null && child.last != null}<span
-                  class="ms-2 font-mono text-[0.6875rem]"
+                  class="ms-2 font-figures text-[0.6875rem]"
                   >{child.first === child.last
                     ? child.first
                     : m.polity_span({
@@ -585,7 +581,7 @@
             class="grid items-baseline gap-x-3 gap-y-1.5 border-be border-border/60 py-2 last:border-be-0 sm:grid-cols-[4.5rem_minmax(0,1fr)]"
           >
             <time
-              class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
+              class="font-figures text-[0.9375rem] tracking-[-0.02em] tabular-nums"
               datetime={group.date}>{group.year ?? ""}</time
             >
             <ul class="grid gap-2">
@@ -631,7 +627,7 @@
                             person={row.person}
                             party={row.party}
                           />
-                          <span class="font-mono text-xs tabular-nums"
+                          <span class="font-figures text-xs tabular-nums"
                             >{percent(row.share)}</span
                           >
                         </span>
@@ -647,7 +643,7 @@
       {#if preview.length < polity.results.length}
         <button
           type="button"
-          class="keycap justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary"
+          class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
           aria-expanded={isAllYears}
           onclick={() => (isAllYears = !isAllYears)}
           >{isAllYears

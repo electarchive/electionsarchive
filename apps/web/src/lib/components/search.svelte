@@ -237,7 +237,7 @@
   <SearchIcon class="block-4 inline-4" />
   <span class="max-sm:sr-only">{m.search_open()}</span>
   <kbd
-    class="keycap rounded-xs border border-input px-1 font-mono text-[0.6875rem] max-sm:hidden"
+    class="rounded-xs border border-input px-1 font-figures text-[0.6875rem] keycap max-sm:hidden"
     >⌘K</kbd
   >
 </button>
@@ -341,7 +341,7 @@
     {#each [["↑↓", m.search_keys_move()], ["↵", m.search_keys_open()], ["esc", m.search_keys_close()]] as [keys, label] (keys)}
       <span class="flex items-center gap-1.5">
         <kbd
-          class="keycap rounded-xs border border-input px-1 font-mono text-[0.6875rem]"
+          class="rounded-xs border border-input px-1 font-figures text-[0.6875rem] keycap"
           >{keys}</kbd
         >{label}
       </span>

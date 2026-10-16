@@ -52,7 +52,7 @@
 {:else}
   {const person = $derived(query.data)}
   <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
-    <p class="font-serif text-[1.0625rem]/tight font-[620]">{person.name}</p>
+    <p class="text-[1.0625rem]/tight font-[720]">{person.name}</p>
     <p
       class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.8125rem] text-muted-foreground"
     >
@@ -100,7 +100,8 @@
                 ? undefined
                 : resolve("/[...path]", { path: entry.path })}
             >
-              <span class="font-mono text-xs text-muted-foreground tabular-nums"
+              <span
+                class="font-figures text-xs text-muted-foreground tabular-nums"
                 >{entry.year}</span
               >
               <span class="line-clamp-2">
@@ -113,7 +114,7 @@
                 {/if}
               </span>
               <span
-                class="grid justify-items-end font-mono text-xs tabular-nums"
+                class="grid justify-items-end font-figures text-xs tabular-nums"
               >
                 <span>{entry.share == null ? "–" : percent(entry.share)}</span>
                 {#if entry.electoral != null}

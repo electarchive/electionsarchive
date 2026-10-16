@@ -1,7 +1,6 @@
 @import "tailwindcss";
 @import "tw-animate-css";
 @import "shadcn-svelte/tailwind.css";
-@import "@fontsource-variable/martian-mono/standard.css";
 @import "@fontsource-variable/noto-naskh-arabic";
 @import "@fontsource-variable/piazzolla/opsz.css";
 @import "@fontsource-variable/sofia-sans-semi-condensed";
@@ -22,67 +21,54 @@
 @custom-variant max-lg (@container (width < 64rem));
 
 :root {
-  --background: #f1efea;
-  --foreground: #191816;
-  --card: #fbfaf7;
-  --card-foreground: #191816;
-  --popover: #fbfaf7;
-  --popover-foreground: #191816;
-  --primary: #ffe03a;
-  --primary-foreground: #191816;
-  --secondary: #f1efea;
-  --secondary-foreground: #191816;
-  --muted: #f1efea;
-  --muted-foreground: #67635b;
-  --accent: color-mix(in oklab, #ffe03a 72%, transparent);
-  --accent-foreground: #191816;
+  --background: #ffffff;
+  --foreground: #15171a;
+  --card: #ffffff;
+  --card-foreground: #15171a;
+  --popover: #ffffff;
+  --popover-foreground: #15171a;
+  --primary: #15171a;
+  --primary-foreground: #ffffff;
+  --secondary: #f2f3f5;
+  --secondary-foreground: #15171a;
+  --muted: #f2f3f5;
+  --muted-foreground: #5b616a;
+  --accent: #e8eaee;
+  --accent-foreground: #15171a;
   --destructive: #b3261e;
   --yes: #2e7d4f;
   --no: #c2410c;
-  --border: #cfcac0;
-  --input: color-mix(in oklab, #191816 40%, transparent);
-  --ring: #8a6a00;
-  --radius: 5px;
-  --highlight-stroke: linear-gradient(
-    178deg,
-    transparent 12%,
-    var(--accent) 12% 88%,
-    transparent 88%
-  );
+  --border: #dadde2;
+  --input: #b9bec6;
+  --ring: #15171a;
+  --radius: 3px;
   --menu-shadow:
-    0 1px 2px rgb(25 24 22 / 0.08), 0 18px 36px -18px rgb(25 24 22 / 0.42);
+    0 1px 2px rgb(21 23 26 / 0.08), 0 12px 28px -12px rgb(21 23 26 / 0.3);
 }
 
 .dark {
-  --background: #1a1917;
-  --foreground: #ece9e2;
-  --card: #22211e;
-  --card-foreground: #ece9e2;
-  --popover: #22211e;
-  --popover-foreground: #ece9e2;
-  --primary: #e8c547;
-  --primary-foreground: #191816;
-  --secondary: #1a1917;
-  --secondary-foreground: #ece9e2;
-  --muted: #1a1917;
-  --muted-foreground: #a09b91;
-  --accent: color-mix(in oklab, #e8c547 28%, transparent);
-  --accent-foreground: #ece9e2;
+  --background: #111315;
+  --foreground: #e8eaed;
+  --card: #111315;
+  --card-foreground: #e8eaed;
+  --popover: #1a1d20;
+  --popover-foreground: #e8eaed;
+  --primary: #e8eaed;
+  --primary-foreground: #111315;
+  --secondary: #1b1e21;
+  --secondary-foreground: #e8eaed;
+  --muted: #1b1e21;
+  --muted-foreground: #9aa0a9;
+  --accent: #262a2f;
+  --accent-foreground: #e8eaed;
   --destructive: #f2675e;
   --yes: #5bb57e;
   --no: #f07a45;
-  --border: #3b3934;
-  --input: color-mix(in oklab, #ece9e2 38%, transparent);
-  --ring: #e8c547;
-  --menu-shadow:
-    0 1px 2px rgb(0 0 0 / 0.45), 0 18px 36px -14px rgb(0 0 0 / 0.75);
+  --border: #2b2f34;
+  --input: #474d55;
+  --ring: #e8eaed;
+  --menu-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 28px -10px rgb(0 0 0 / 0.8);
   color-scheme: dark;
-}
-
-@supports (corner-shape: squircle) {
-  :root {
-    --radius: 9px;
-  }
 }
 
 @theme inline {
@@ -91,9 +77,9 @@
     "Noto Sans", system-ui, sans-serif;
   --font-serif:
     "Piazzolla Variable", "Noto Naskh Arabic Variable", "Noto Serif", serif;
-  --font-mono:
-    "Martian Mono Variable", "Noto Sans Mono", ui-monospace, monospace;
-  --font-mono--font-variation-settings: "wdth" 75;
+  --font-figures:
+    "Sofia Sans Semi Condensed Variable", "Noto Sans", system-ui, sans-serif;
+  --font-figures--font-feature-settings: "tnum" 1, "lnum" 1;
   --color-ring: var(--ring);
   --color-input: var(--input);
   --color-border: var(--border);
@@ -134,25 +120,34 @@
   }
 }
 
+@utility title {
+  font-size: clamp(2rem, 1.4rem + 2.2vw, 3.25rem);
+  line-height: 0.98;
+  font-weight: 780;
+  letter-spacing: -0.022em;
+  text-wrap: balance;
+}
+
+@utility heading {
+  font-size: 1.375rem;
+  line-height: 1.15;
+  font-weight: 740;
+  letter-spacing: -0.012em;
+}
+
 @utility highlighter {
-  background-image: var(--highlight-stroke);
+  background-color: var(--accent);
 }
 
 @utility marked {
   border-color: var(--foreground);
-  box-shadow: inset 0 -3px 0 var(--primary);
+  box-shadow: inset 0 -2px 0 var(--foreground);
   outline: none;
 }
 
 @utility keycap {
-  border-block-end-width: 3px;
-  transition-property: translate, border-width, background-color;
+  transition-property: background-color, color, border-color;
   transition-duration: 80ms;
-
-  &:active:not(:disabled, [aria-disabled="true"]) {
-    border-block-end-width: 1px;
-    translate: 0 2px;
-  }
 
   @media (prefers-reduced-motion: reduce) {
     transition: none;
@@ -209,7 +204,7 @@
   outline: none;
 
   &:where([data-highlighted]) {
-    background-image: var(--highlight-stroke);
+    background-color: var(--accent);
     color: var(--accent-foreground);
   }
 
@@ -310,10 +305,6 @@
 @layer base {
   * {
     @apply border-border;
-    corner-shape: squircle;
-  }
-  .rounded-full {
-    corner-shape: round;
   }
   body {
     @apply bg-background text-foreground;
@@ -342,9 +333,8 @@
     border-radius: calc(var(--radius) * 0.4);
     padding-inline: 0.25rem;
     color: var(--muted-foreground);
-    font-family: var(--font-mono);
+    font-family: var(--font-figures);
     font-size: 0.6875rem;
-    font-variation-settings: "wdth" 75;
     line-height: 1rem;
   }
 }
