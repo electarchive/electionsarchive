@@ -767,18 +767,19 @@ async function load(
   const color = new Map(colors.rows.map((row) => [row.party_id, row.color]));
   const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
   const top = Math.max(0, ...tallies.values());
-  const independents = options.rows.filter(
-    (row) =>
-      stand(row) == null &&
-      row.person != null &&
-      (tallies.get(row.k) ?? 0) >= top * 0.05,
-  );
-  for (const { person } of independents) {
+  const independents = options.rows
+    .filter(
+      (row) =>
+        !color.has(stand(row) ?? "") &&
+        row.person != null &&
+        (tallies.get(row.k) ?? 0) >= top * 0.05,
+    )
+    .map((row) => stand(row) ?? row.person ?? "");
+  for (const id of independents) {
     color.set(
-      person ?? "",
-      UNAFFILIATED[
-        Number.parseInt((person ?? "").slice(-4), 16) % UNAFFILIATED.length
-      ] ?? "",
+      id,
+      UNAFFILIATED[Number.parseInt(id.slice(-4), 16) % UNAFFILIATED.length] ??
+        "",
     );
   }
   separate(
