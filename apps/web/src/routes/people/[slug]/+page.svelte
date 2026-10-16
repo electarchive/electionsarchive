@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
@@ -58,11 +59,20 @@
         ? "var(--border)"
         : swatch(person.party.color, `party:${person.party.id}`)}
     >
-      <h1
-        class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-      >
-        {person.name}
-      </h1>
+      <div class="flex items-start justify-between gap-3">
+        <h1
+          class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
+        >
+          {person.name}
+        </h1>
+        <a
+          class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
+          href={resolve(`/compare?a=${data.id}`)}
+          ><ArrowLeftRightIcon
+            class="block-3.5 inline-3.5"
+          />{m.versus_action()}</a
+        >
+      </div>
       <p
         class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
       >

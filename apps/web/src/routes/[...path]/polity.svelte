@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
+  import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -181,11 +183,18 @@
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
-  <h1
-    class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
-  >
-    {polity.name}
-  </h1>
+  <div class="flex items-start justify-between gap-3">
+    <h1
+      class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
+    >
+      {polity.name}
+    </h1>
+    <a
+      class="inline-flex shrink-0 items-center gap-1.5 rounded-sm border border-input px-2.5 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
+      href={resolve(`/compare?a=${id}`)}
+      ><ArrowLeftRightIcon class="block-3.5 inline-3.5" />{m.versus_action()}</a
+    >
+  </div>
   {#if span != null}
     <p class="text-[0.9375rem] text-muted-foreground">
       {m.polity_lede({

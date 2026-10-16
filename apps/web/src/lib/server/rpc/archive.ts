@@ -49,6 +49,13 @@ const paint = (party: SQL, elections: SQL, date: SQL) => sql`
 
 const Link = v.object({ name: v.string(), path: v.nullable(v.string()) });
 
+const PartyRef = v.object({
+  id: v.string(),
+  label: v.string(),
+  short: v.nullable(v.string()),
+  color: v.nullable(v.string()),
+});
+
 const ResultSet = v.object({
   stage: v.string(),
   status: v.string(),
@@ -5177,14 +5184,222 @@ export const polities = {
         })),
       };
     }),
+  compare: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/polities/{a}/compare/{b}",
+        summary:
+          "Compare two places in every contest both voted in, with the top results in each place and in the contest's own area",
+      }),
+    )
+    .input(
+      v.object({
+        a: v.pipe(v.string(), v.uuid()),
+        b: v.pipe(v.string(), v.uuid()),
+      }),
+    )
+    .output(
+      v.object({
+        parties: v.array(PartyRef),
+        places: v.array(Link),
+        series: v.array(
+          v.object({
+            name: v.nullable(v.string()),
+            isQuestion: v.boolean(),
+            points: v.array(
+              v.object({
+                name: v.string(),
+                path: v.nullable(v.string()),
+                date: v.string(),
+                year: v.number(),
+                sides: v.array(
+                  v.array(
+                    v.object({
+                      key: v.string(),
+                      label: v.string(),
+                      color: v.nullable(v.string()),
+                      party: v.nullable(v.string()),
+                      share: v.number(),
+                    }),
+                  ),
+                ),
+              }),
+            ),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        series: string;
+        owner: string | null;
+        isQuestion: boolean;
+        date: string;
+        year: number;
+        own: number | null;
+        a: number;
+        b: number;
+      }>(sql`
+        with recursive upa(id) as (
+          select ${input.a}::uuid
+          union
+          select p.parent_id from polity_parent p join upa on p.polity_id = upa.id
+        ),
+        upb(id) as (
+          select ${input.b}::uuid
+          union
+          select p.parent_id from polity_parent p join upb on p.polity_id = upb.id
+        ),
+        place as (
+          select distinct on (t.polity_id) t.polity_id as polity, a.id as area, a.k
+          from polity_territory t join area a on a.id = t.area_id
+          where t.polity_id in (${input.a}::uuid, ${input.b}::uuid)
+          order by t.polity_id, upper(t.valid) desc nulls first
+        ),
+        ups(polity, area, depth) as (
+          select polity, area, 0 from place
+          union
+          select ups.polity, ap.parent_id, ups.depth + 1
+          from ups join area_parent ap on ap.area_id = ups.area
+          where ups.depth < 8
+        ),
+        common as (
+          select area from ups group by area having count(distinct polity) = 2
+        ),
+        roots as materialized (
+          select c.id from election e join contest c on c.election_id = e.id
+          where e.polity_id in (select id from upa intersect select id from upb) and e.date_from is not null
+            and e.status = 'held' and e.kind not in ('runoff', 'indirect')
+            and c.allocation_parent_id is null and c.party_scope_id is null
+            and (c.district_area_id is null or c.district_area_id in (select area from common))
+        ),
+        tree(id, root) as (
+          select id, id from roots
+          union all
+          select c.id, tree.root from contest c join tree on c.allocation_parent_id = tree.id
+        ),
+        cand as materialized (
+          select t.root, pl.polity, rs.k as set_k, pl.k as area_k
+          from tree t
+          join contest c on c.id = t.id
+          join result_set rs on rs.contest_id = t.id and rs.status = 'active'
+          join place pl on c.district_area_id is null
+            or c.district_area_id in (select u.area from ups u where u.polity = pl.polity)
+        ),
+        hits as (
+          select cand.root from cand
+          cross join lateral (
+            select from result_rollup r
+            where r.result_set_k = cand.set_k and r.area_k = cand.area_k and r.measure = any(${COUNTED})
+            limit 1
+          ) r
+          group by cand.root
+          having count(distinct cand.polity) = 2
+        )
+        select c.id,
+          case when c.kind = 'ballot_question' then 'question'
+            else concat_ws(':', coalesce(c.office_id, c.body_id), c.kind, c.round_number) end as series,
+          coalesce(c.office_id, c.body_id) as owner, c.kind = 'ballot_question' as "isQuestion",
+          e.date_from::text as date, ${CYCLE} as year, coalesce(own.k, home.k) as own,
+          (select k from place where polity = ${input.a}::uuid) as a,
+          (select k from place where polity = ${input.b}::uuid) as b
+        from hits h
+        join contest c on c.id = h.root
+        join election e on e.id = c.election_id
+        left join area own on own.id = c.district_area_id
+        left join lateral (
+          select a.k from polity_territory t join area a on a.id = t.area_id
+          where t.polity_id = e.polity_id
+          order by t.valid @> e.date_from desc, upper(t.valid) desc nulls first
+          limit 1
+        ) home on true
+        order by e.date_from
+      `);
+      const [labels, slugs, loaded] = await Promise.all([
+        names(
+          [
+            input.a,
+            input.b,
+            ...found.rows.flatMap((row) =>
+              row.owner == null ? [row.id] : [row.id, row.owner],
+            ),
+          ],
+          null,
+        ),
+        paths([input.a, input.b, ...found.rows.map((row) => row.id)]),
+        Promise.all(
+          found.rows.map(async (row) =>
+            load(
+              [row.id],
+              [row.own, row.a, row.b].filter((k) => k != null),
+              row.date,
+              [row.id],
+            ),
+          ),
+        ),
+      ]);
+      const points = found.rows.map((row, index) => ({
+        ...row,
+        sides: [row.own, row.a, row.b].map((k) => {
+          const here = k == null ? null : loaded[index]?.get(k);
+          return here == null
+            ? []
+            : compare(here.side, null, [], "party")
+                .flatMap((entry) =>
+                  entry.current == null
+                    ? []
+                    : [
+                        {
+                          key: entry.key,
+                          label: entry.label,
+                          color: entry.color,
+                          party: entry.current.party,
+                          share: entry.current.share,
+                        },
+                      ],
+                )
+                .toSorted((first, second) => second.share - first.share)
+                .slice(0, 4);
+        }),
+      }));
+      const parties = await refs(
+        points.flatMap((point) =>
+          point.sides.flatMap((side) =>
+            side.flatMap((entry) => entry.party ?? []),
+          ),
+        ),
+      );
+      return {
+        parties: parties.values().toArray(),
+        places: [input.a, input.b].map((id) => ({
+          name: labels.full.get(id) ?? "",
+          path: slugs.get(id) ?? null,
+        })),
+        series: Map.groupBy(points, (point) => point.series)
+          .values()
+          .map((group) => ({
+            name:
+              group[0]?.owner == null
+                ? null
+                : (labels.full.get(group[0].owner) ?? null),
+            isQuestion: group[0]?.isQuestion ?? false,
+            points: group.map((point) => ({
+              name: labels.full.get(point.id) ?? "",
+              path: slugs.get(point.id) ?? null,
+              date: point.date,
+              year: point.year,
+              sides: point.sides,
+            })),
+          }))
+          .toArray()
+          .toSorted(
+            (first, second) => second.points.length - first.points.length,
+          ),
+      };
+    }),
 };
-
-const PartyRef = v.object({
-  id: v.string(),
-  label: v.string(),
-  short: v.nullable(v.string()),
-  color: v.nullable(v.string()),
-});
 
 async function refs(ids: Array<string>) {
   const unique = [...new Set(ids)];

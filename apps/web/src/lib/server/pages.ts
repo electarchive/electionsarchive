@@ -245,3 +245,35 @@ export async function archive(path: string, search: URLSearchParams) {
   }
   error(404);
 }
+
+export async function comparison(ids: Array<string>) {
+  const found = await db.execute<{ id: string; type: string; name: string }>(
+    sql`
+      select e.id, e.type::text as type, coalesce((
+        select n.text from name n where n.entity_id = e.id and n.kind in ('official', 'english')
+        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1
+      ), '') as name
+      from unnest(${sql.param(ids.filter((id) => /^[0-9a-f-]{36}$/u.test(id)))}::uuid[]) with ordinality as x(asked, at)
+      join entity e on e.id = coalesce((select into_id from entity_merge where entity_id = x.asked), x.asked)
+      where e.type in ('person', 'polity')
+      order by x.at
+    `,
+  );
+  const [first, second] = found.rows;
+  return {
+    sides: found.rows,
+    people:
+      first?.type === "person" && second?.type === "person"
+        ? await Promise.all(
+            [first, second].map(async (row) => ({
+              id: row.id,
+              ...(await call(router.people.get, { id: row.id })),
+            })),
+          )
+        : null,
+    places:
+      first?.type === "polity" && second?.type === "polity"
+        ? await call(router.polities.compare, { a: first.id, b: second.id })
+        : null,
+  };
+}
