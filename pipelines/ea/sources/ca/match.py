@@ -8,7 +8,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "ca.match"
-VERSION = "6"
+VERSION = "7"
 PAIRS = (
     ("2006-01-23", "2004-06-28"),
     ("2008-10-14", "2006-01-23"),
@@ -18,6 +18,7 @@ PAIRS = (
     ("2021-09-20", "2019-10-21"),
     ("2025-04-28", "2021-09-20"),
 )
+SAME = (("2003:35041:jeanie warnock", "2013:35102:jeanie warnock"),)
 SEATED = "2000-11-27"
 FIRST_POLL = "2004-06-28"
 
@@ -31,7 +32,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Candidates matched across consecutive Canadian elections by printed name, ignoring middle initials, and overlapping ridings, and 2004 incumbents matched with members of the 37th Parliament",
+            summary="Candidates matched across consecutive Canadian elections by printed name, ignoring middle initials, and overlapping ridings, 2004 incumbents matched with members of the 37th Parliament, and candidates joined by hand on published evidence",
             polity="CA",
             kind="match",
         )
@@ -120,6 +121,19 @@ def emit() -> Path:
                 parent[root(person)] = root(member)
                 matched += 1
         print(f"{FIRST_POLL} incumbents with members seated from {SEATED}: {len(found)} pairs, {matched} matched")
+
+        for keys in SAME:
+            people = [
+                person
+                for (person,) in conn.execute(
+                    "select entity_id from external_id where scheme = 'ca.elections.person' and value = any(%s)",
+                    [list(keys)],
+                ).fetchall()
+            ]
+            if len(people) != len(keys):
+                raise ValueError(f"ca.match: {keys} name {len(people)} people")
+            for person in people[1:]:
+                parent[root(person)] = root(people[0])
 
         groups: dict[UUID, list[UUID]] = {}
         for node in list(parent):

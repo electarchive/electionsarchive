@@ -15,7 +15,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "ca.elections"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 MAPS = "https://ftp.maps.canada.ca/pub/elections_elections/Electoral-districts_Circonscription-electorale"
 RESULTS = "https://www.elections.ca/res/rep/off"
@@ -145,9 +145,10 @@ PARTIES = {
     "GREEN PARTY": ("Green Party of Canada", "GPC", "#3d9b35"),
     "PEOPLE'S PARTY - PPC": ("People's Party of Canada", "PPC", "#4e2a84"),
     "NATIONAL ADVANCEMENT": ("National Advancement Party of Canada", None, None),
-    "COMMUNIST": ("Communist Party of Canada", None, None),
-    "LIBERTARIAN": ("Libertarian Party of Canada", None, None),
-    "MARXIST-LENINIST": ("Marxist-Leninist Party of Canada", None, None),
+    "COMMUNIST": ("Communist Party of Canada", None, "#ff6347"),
+    "LIBERTARIAN": ("Libertarian Party of Canada", None, "#f2ba00"),
+    "MARXIST-LENINIST": ("Marxist-Leninist Party of Canada", None, "#f5191a"),
+    "PARTI RHINOCÉROS PARTY": ("Parti Rhinocéros Party", None, "#d8bfd8"),
     "CHRISTIAN HERITAGE PARTY": ("Christian Heritage Party of Canada", None, None),
     "CENTRIST": ("Centrist Party of Canada", None, None),
     "ANIMAL PROTECTION PARTY": ("Animal Protection Party of Canada", None, None),

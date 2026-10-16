@@ -18,7 +18,7 @@ from ea.sources.ca.elections import PROVINCES
 from ea.store import DATA, connect
 
 SOURCE = "ca.lop"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 DATASET = "https://open.canada.ca/data/en/dataset/ea8f2c37-90b6-4fee-857e-984d3060184e"
 HFER = "https://open.canada.ca/data/dataset/ea8f2c37-90b6-4fee-857e-984d3060184e/resource/5c8ab22c-4a5e-494b-879a-e0611bc10a95/download/hfer_e.csv"
@@ -129,6 +129,7 @@ COLORS = {
     "Progressive": "#c9a227",
     "Reform Party of Canada": "#3cb371",
     "Canadian Alliance": "#5f9ea0",
+    "Parti Rhinocéros": "#d8bfd8",
 }
 HONORIFICS = re.compile(r"^(?:(?:Rt\.|Right|Hon\.|Sir|Dr\.|Rev\.|Major|Gen\.|Lt\.|Col\.|Capt\.)\s+)+")
 SOURCE_NOTE = "Candidates, parties, votes, and winners for every federal general election and by-election from 1867 to 2010, compiled by the Library of Parliament. It has no counts of electors or rejected ballots. From 2004 on, the archive uses Elections Canada's poll-by-poll results instead."
