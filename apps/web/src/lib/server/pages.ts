@@ -260,8 +260,41 @@ export async function comparison(ids: Array<string>) {
     `,
   );
   const [first, second] = found.rows;
+  const examples =
+    ids.length > 0
+      ? null
+      : await db.execute<{
+          a: string;
+          b: string;
+          first: string;
+          second: string;
+        }>(sql`
+          with pairs(at, a, b, kind) as (
+            values (1, 'Donald J. Trump', 'Kamala D. Harris', 'person'),
+              (2, 'us/ga', 'us/nc', 'polity'),
+              (3, 'Recep Tayyip Erdoğan', 'Kemal Kılıçdaroğlu', 'person'),
+              (4, 'us/pa', 'us/wi', 'polity'),
+              (5, 'Ekrem İmamoğlu', 'Binali Yıldırım', 'person'),
+              (6, 'us/mi', 'us/az', 'polity')
+          ),
+          picked as (
+            select p.at, x.side, coalesce(
+              (select s.entity_id from slug s where p.kind = 'polity' and s.is_current and s.path = x.key limit 1),
+              (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'person'
+                where p.kind = 'person' and n.text = x.key limit 1)
+            ) as id
+            from pairs p cross join lateral (values (1, p.a), (2, p.b)) x(side, key)
+          )
+          select a.id as a, b.id as b,
+            (select n.text from name n where n.entity_id = a.id order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as first,
+            (select n.text from name n where n.entity_id = b.id order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as second
+          from picked a join picked b on b.at = a.at and b.side = 2
+          where a.side = 1 and a.id is not null and b.id is not null
+          order by a.at
+        `);
   return {
     sides: found.rows,
+    examples: examples?.rows ?? [],
     people:
       first?.type === "person" && second?.type === "person"
         ? await Promise.all(

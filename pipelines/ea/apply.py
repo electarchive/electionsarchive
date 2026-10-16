@@ -370,16 +370,30 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
     )
 
 
-def _rollup(conn: Connection, stage: Stage) -> None:
-    if "result_value" not in stage.tables:
+def _rollup(conn: Connection, stage: Stage, moved: list[str]) -> None:
+    if "result_value" not in stage.tables and not moved:
         return
+    stale = [
+        key
+        for (key,) in conn.execute(
+            """select distinct result_set_k from result_rollup
+               where area_k in (select k from area where id = any(%s::uuid[]))""",
+            [moved],
+        ).fetchall()
+    ]
+    conn.execute("delete from result_rollup where result_set_k = any(%s)", [stale])
+    facts = (
+        sql.SQL("select distinct result_set_id from {}").format(stage.staged("result_value"))
+        if "result_value" in stage.tables
+        else sql.SQL("select null::uuid")
+    )
     conn.execute(
         sql.SQL(
             """with recursive
             rs as (
               select r.k, e.date_from as on_date
               from result_set r join election e on e.id = r.election_id
-              where r.id in (select distinct result_set_id from {facts})
+              where r.id in ({facts}) or r.k = any({stale})
             ),
             units as (
               select rs.k as result_set_k, ru.k as unit_k, ru.id as unit_id,
@@ -406,7 +420,7 @@ def _rollup(conn: Connection, stage: Stage) -> None:
             join area on area.id = a.area_id
             where v.result_set_k in (select k from rs)
             group by v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round"""
-        ).format(facts=stage.staged("result_value"))
+        ).format(facts=facts, stale=sql.Literal(stale))
     )
 
 
@@ -415,9 +429,23 @@ def publish(conn: Connection, changeset_id: str) -> None:
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
         findings = checks.run(conn, stage)
+        moved = (
+            [
+                str(area)
+                for (area,) in conn.execute(
+                    sql.SQL(
+                        """select s.area_id from {} s where not exists (
+                             select 1 from public.area_parent p where p.area_id = s.area_id and p.parent_id = s.parent_id
+                             and p.valid_from is not distinct from s.valid_from and p.valid_to is not distinct from s.valid_to)"""
+                    ).format(stage.staged("area_parent"))
+                ).fetchall()
+            ]
+            if "area_parent" in stage.tables
+            else []
+        )
         for table in stage.tables:
             _publish_table(conn, stage, table)
-        _rollup(conn, stage)
+        _rollup(conn, stage, moved)
         with (
             conn.cursor() as cursor,
             cursor.copy("copy flag (entity_id, result_set_id, check_code, severity, details) from stdin") as copy,

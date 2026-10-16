@@ -189,6 +189,41 @@
       </div>
     </header>
 
+    {#if data.examples.length > 0}
+      <section
+        class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5"
+        aria-labelledby="examples"
+      >
+        <h2 id="examples" class="text-[0.8125rem] font-bold">
+          {m.versus_examples()}
+        </h2>
+        <ul class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-2">
+          {#each data.examples as example (example.a)}
+            <li>
+              <a
+                class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1 rounded-sm border border-input px-3 py-2.5 hover:border-foreground hover:bg-secondary"
+                href={resolve(`/compare?a=${example.a}&b=${example.b}`)}
+              >
+                <span
+                  class="rounded-full bg-foreground block-2.5 inline-2.5"
+                  aria-hidden="true"
+                ></span>
+                <span class="truncate font-serif text-base font-[640]"
+                  >{example.first}</span
+                >
+                <span
+                  class="bg-foreground block-2.5 inline-2.5"
+                  aria-hidden="true"
+                ></span>
+                <span class="truncate font-serif text-base font-[640]"
+                  >{example.second}</span
+                >
+              </a>
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
     {#if isMismatch}
       <p class="col-span-12 bg-card px-3.5 py-4 text-sm text-muted-foreground">
         {m.versus_mismatch()}

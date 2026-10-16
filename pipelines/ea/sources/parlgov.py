@@ -352,10 +352,11 @@ def emit() -> Path:
                 cs.add("name", entity_id=office, text=name, lang="en", kind="english", is_preferred=True)
         offices[("TR", "president")] = cs.key("tr.office", "president")
 
-        def election(iso: str, day: date | None) -> UUID | None:
+        def election(iso: str, day: date | None, start: date) -> UUID | None:
             if day is None:
                 return None
-            return next((found for held, found in elections[iso] if abs((held - day).days) <= 14), None)
+            held = [(held, found) for held, found in elections[iso] if day - timedelta(days=45) <= held <= start]
+            return max(held, default=(None, None))[1]
 
         governments: list[
             tuple[str, str, date, bool, date | None, list[tuple[UUID, str, int | None]], tuple[str, str]]
@@ -439,7 +440,7 @@ def emit() -> Path:
                 from_precision="day",
                 to_date=end,
                 to_precision="day",
-                election_id=election(iso, followed),
+                election_id=election(iso, followed, start),
                 previous_government_id=previous.get(iso),
                 caretaker=caretaker,
                 source_id=source if key[0] == "parlgov.cabinet" else wikidata,

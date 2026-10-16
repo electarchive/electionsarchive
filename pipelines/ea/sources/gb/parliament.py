@@ -13,10 +13,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.gb.os import BOROUGHS, COUNTIES, DIRECTIONS, IRISH, RIDINGS
 from ea.store import DATA, connect
 
 SOURCE = "gb.parliament"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://api.parliament.uk/uk-general-elections"
 INDEX = f"{BASE}/general-elections/10"
@@ -42,6 +43,62 @@ GENERAL_ELECTION = "Q2074525"
 PETITION_SEATED = "Q56123417"
 PETITION = "election petition"
 NOT_PARTIES = ("Independent", "Speaker")
+WALES = {
+    "Anglesey",
+    "Brecknockshire",
+    "Cardiganshire",
+    "Carmarthenshire",
+    "Carnarvonshire",
+    "Denbighshire",
+    "Flintshire",
+    "Glamorgan",
+    "Merionethshire",
+    "Monmouthshire",
+    "Montgomeryshire",
+    "Pembrokeshire",
+    "Radnorshire",
+}
+SCOTLAND = {
+    "Aberdeen",
+    "Aberdeenshire",
+    "Angus",
+    "Argyllshire",
+    "Ayrshire",
+    "Banffshire",
+    "Berwickshire",
+    "Buteshire",
+    "Caithness",
+    "Clackmannanshire",
+    "Dumfriesshire",
+    "Dunbartonshire",
+    "Dundee",
+    "East Lothian",
+    "Edinburgh",
+    "Fife",
+    "Glasgow",
+    "Inverness-shire",
+    "Kincardineshire",
+    "Kirkcudbrightshire",
+    "Lanarkshire",
+    "Midlothian",
+    "Nairn",
+    "Orkney",
+    "Peebleshire",
+    "Perthshire",
+    "Renfrewshire",
+    "Ross and Cromarty",
+    "Roxburghshire",
+    "Stirlingshire",
+    "Sutherland",
+    "West Lothian",
+    "Wigtownshire",
+}
+NATIONS = {
+    "ENG": ("England", "Q21"),
+    "WLS": ("Wales", "Q25"),
+    "SCT": ("Scotland", "Q22"),
+    "IRL": ("Ireland", None),
+}
 ENDED_VIA = {
     "dissolution of parliament": "dissolved",
     "death in office": "died",
@@ -363,6 +420,7 @@ def emit() -> Path:
         cs.add("slug", path="gb", entity_id=gb)
         cs.add("external_id", entity_id=gb, scheme="wikidata", value="Q145")
         cs.add("scheme", code="gb.nation", polity_id=gb, kind="administrative", rank=0, noun="country")
+        cs.add("scheme", code="gb.country", polity_id=gb, kind="administrative", rank=1, noun="nation")
         cs.add("scheme", code="gb.pcon", polity_id=gb, kind="electoral_district", rank=1, noun="constituency")
         nation = cs.area("gb.nation", "GBI")
         cs.add("area", id=nation, scheme_code="gb.nation")
@@ -370,6 +428,17 @@ def emit() -> Path:
         name(nation, "United Kingdom of Great Britain and Ireland")
         cs.add("external_id", entity_id=nation, scheme="wikidata", value="Q174193")
         cs.add("polity_territory", polity_id=gb, area_id=nation, valid_from=UNION, valid_to=PARTITION)
+        countries: dict[str, UUID] = {}
+        for code, (label, item) in NATIONS.items():
+            countries[code] = cs.area("gb.country", code)
+            cs.add("area", id=countries[code], scheme_code="gb.country")
+            cs.add("area_code", area_id=countries[code], code=code, valid_from=UNION, valid_to=PARTITION)
+            cs.add("area_parent", area_id=countries[code], parent_id=nation, valid_from=UNION, valid_to=PARTITION)
+            if countries[code] in cs.minted:
+                name(countries[code], label)
+            if item is not None:
+                cs.add("external_id", entity_id=countries[code], scheme="wikidata", value=item)
+        located = {borough: county for county, boroughs in BOROUGHS.items() for borough in boroughs}
 
         commons = cs.key("gb.body", "house-of-commons")
         cs.add("body", id=commons, polity_id=gb, kind="lower_house")
@@ -447,7 +516,15 @@ def emit() -> Path:
                 area = cs.area("gb.pcon", constituency)
                 cs.add("area", id=area, scheme_code="gb.pcon")
                 cs.add("area_code", area_id=area, code=constituency, valid_from=None)
-                cs.add("area_parent", area_id=area, parent_id=nation, valid_from=None)
+                prefix = next((word for word in DIRECTIONS if label.startswith(f"{word} ")), None)
+                stripped = label.removeprefix(f"{prefix} ") if prefix else label
+                county = located.get(label) or (
+                    "Yorkshire" if label in RIDINGS else COUNTIES.get(stripped, (stripped,))[0]
+                )
+                country = (
+                    "IRL" if county in IRISH else "WLS" if county in WALES else "SCT" if county in SCOTLAND else "ENG"
+                )
+                cs.add("area_parent", area_id=area, parent_id=countries[country], valid_from=None)
                 name(area, label)
                 cs.add("external_id", entity_id=area, scheme="wikidata", value=district)
             unit = cs.unit("gb.pcon", constituency)
