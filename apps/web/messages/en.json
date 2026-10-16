@@ -384,5 +384,19 @@
   "round_ballot": "Ballot {round}",
   "round_electoral": "Electoral College vote",
   "places_remainder": "Unexpired term",
-  "series_remainder": "{year} special"
+  "series_remainder": "{year} special",
+  "polity_lede": "{elections} from {first} to {last}",
+  "polity_within": "and {count} more in subdivisions",
+  "polity_latest": "Latest election",
+  "polity_filter_label": "Show",
+  "polity_filter_all": "All",
+  "polity_filter_general": "General",
+  "polity_filter_primary": "Primaries",
+  "polity_filter_runoff": "Runoffs",
+  "polity_filter_other": "Other",
+  "polity_seats": "{seats} of {size}",
+  "polity_span": "{first}–{last}",
+  "polity_none_in_filter": "No elections of this kind.",
+  "home_lede": "Archiving {elections} elections from {first} to {last}, starting with these countries.",
+  "home_latest": "Latest general election"
 }

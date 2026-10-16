@@ -3042,7 +3042,12 @@ export const contests = {
     }),
 };
 
-async function races(election: string, polity: string, date: string | null) {
+async function races(
+  election: string,
+  polity: string,
+  date: string | null,
+  isBrief = false,
+) {
   const day = date ?? "infinity";
   const [found, territory] = await Promise.all([
     db.execute<{
@@ -3156,7 +3161,7 @@ async function races(election: string, polity: string, date: string | null) {
       ];
       const [totals, grid, table] = await Promise.all([
         load(roots, [place.k], day, counted.length > 0 ? counted : roots),
-        single == null
+        single == null || isBrief
           ? null
           : places(
               single,
@@ -3168,7 +3173,7 @@ async function races(election: string, polity: string, date: string | null) {
               lineage,
               "party",
             ),
-        single != null || first == null || districts.length < 2
+        single != null || isBrief || first == null || districts.length < 2
           ? null
           : tabulate(
               roots,
@@ -3543,6 +3548,10 @@ export const polities = {
           name: v.string(),
           path: v.nullable(v.string()),
           elections: v.number(),
+          within: v.number(),
+          first: v.nullable(v.number()),
+          last: v.nullable(v.number()),
+          latest: v.nullable(Link),
         }),
       ),
     )
@@ -3552,11 +3561,29 @@ export const polities = {
         kind: string;
         iso_code: string | null;
         elections: number;
+        within: number;
+        first: number | null;
+        last: number | null;
+        latest: string | null;
       }>(sql`
-        select p.id, p.kind::text, p.iso_code, (select count(*)::int from election e where e.polity_id = p.id) as elections
+        with recursive below(id, top) as (
+          select polity_id, parent_id from polity_parent
+          union
+          select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
+        )
+        select p.id, p.kind::text, p.iso_code,
+          (select count(*)::int from election e where e.polity_id = p.id) as elections,
+          (select count(*)::int from election e join below b on b.id = e.polity_id and b.top = p.id) as within,
+          (select min(extract(year from e.date_from))::int from election e where e.polity_id = p.id) as first,
+          (select max(extract(year from e.date_from))::int from election e where e.polity_id = p.id) as last,
+          (select e.id from election e where e.polity_id = p.id and e.status = 'held' and e.date_from <= current_date
+             and not exists (select from election x where x.id = e.parent_id and x.polity_id = e.polity_id)
+           order by e.kind = 'general' desc, e.date_from desc limit 1) as latest
         from polity p
       `);
-      const ids = result.rows.map((row) => row.id);
+      const ids = result.rows.flatMap((row) =>
+        row.latest == null ? [row.id] : [row.id, row.latest],
+      );
       const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
       return result.rows
         .map((row) => ({
@@ -3566,6 +3593,16 @@ export const polities = {
           name: labels.full.get(row.id) ?? "",
           path: slugs.get(row.id) ?? null,
           elections: row.elections,
+          within: row.within,
+          first: row.first,
+          last: row.last,
+          latest:
+            row.latest == null
+              ? null
+              : {
+                  name: labels.full.get(row.latest) ?? "",
+                  path: slugs.get(row.latest) ?? null,
+                },
         }))
         .toSorted((a, b) => a.name.localeCompare(b.name));
     }),
@@ -3583,13 +3620,53 @@ export const polities = {
         name: v.string(),
         kind: v.string(),
         breadcrumbs: v.array(Link),
-        polities: v.array(Link),
+        polities: v.array(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            elections: v.number(),
+            first: v.nullable(v.number()),
+            last: v.nullable(v.number()),
+          }),
+        ),
+        within: v.number(),
         elections: v.array(
           v.object({
             name: v.string(),
             path: v.nullable(v.string()),
             date: v.nullable(v.string()),
+            year: v.nullable(v.number()),
+            kind: v.string(),
             status: v.string(),
+          }),
+        ),
+        latest: v.nullable(
+          v.object({
+            name: v.string(),
+            path: v.nullable(v.string()),
+            date: v.nullable(v.string()),
+            races: v.array(
+              v.object({
+                name: v.string(),
+                path: v.nullable(v.string()),
+                count: v.number(),
+                contested: v.number(),
+                measure: v.string(),
+                results: v.array(
+                  v.object({
+                    key: v.string(),
+                    label: v.string(),
+                    short: v.nullable(v.string()),
+                    color: v.nullable(v.string()),
+                    person: v.nullable(v.string()),
+                    party: v.nullable(v.string()),
+                    votes: v.number(),
+                    share: v.number(),
+                    seats: v.nullable(v.number()),
+                  }),
+                ),
+              }),
+            ),
           }),
         ),
       }),
@@ -3599,11 +3676,33 @@ export const polities = {
         db.execute<{ kind: string }>(
           sql`select kind::text from polity where id = ${input.id}::uuid`,
         ),
-        db.execute<{ id: string }>(sql`
-          select distinct polity_id as id from polity_parent where parent_id = ${input.id}::uuid
+        db.execute<{
+          id: string;
+          elections: number;
+          first: number | null;
+          last: number | null;
+          within: number;
+        }>(sql`
+          with recursive below(id, top) as (
+            select distinct polity_id, polity_id from polity_parent where parent_id = ${input.id}::uuid
+            union
+            select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
+          )
+          select below.top as id, count(e.id)::int as elections,
+            min(extract(year from e.date_from))::int as first, max(extract(year from e.date_from))::int as last,
+            sum(count(e.id)) over ()::int as within
+          from below left join election e on e.polity_id = below.id
+            and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
+          group by below.top
         `),
-        db.execute<{ id: string; date: string | null; status: string }>(sql`
-          select e.id, e.date_from::text as date, e.status::text as status from election e
+        db.execute<{
+          id: string;
+          date: string | null;
+          year: number | null;
+          kind: string;
+          status: string;
+        }>(sql`
+          select e.id, e.date_from::text as date, ${CYCLE} as year, e.kind::text as kind, e.status::text as status from election e
           where e.polity_id = ${input.id}::uuid
             and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
           order by e.date_from desc nulls last
@@ -3619,7 +3718,17 @@ export const polities = {
         ...children.rows.map((row) => row.id),
         ...electionRows.rows.map((row) => row.id),
       ];
-      const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
+      const today = new Date().toISOString().slice(0, 10);
+      const held = electionRows.rows.filter(
+        (row) => row.date != null && row.date <= today && row.status === "held",
+      );
+      const recent =
+        held.find((row) => row.kind === "general") ?? held[0] ?? null;
+      const [labels, slugs, raced] = await Promise.all([
+        names(ids),
+        paths(ids),
+        recent == null ? [] : races(recent.id, input.id, recent.date, true),
+      ]);
       return {
         name: labels.full.get(input.id) ?? "",
         kind: polity.kind,
@@ -3628,14 +3737,42 @@ export const polities = {
           .map((row) => ({
             name: labels.full.get(row.id) ?? "",
             path: slugs.get(row.id) ?? null,
+            elections: row.elections,
+            first: row.first,
+            last: row.last,
           }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
+        within: children.rows[0]?.within ?? 0,
         elections: electionRows.rows.map((row) => ({
           name: labels.full.get(row.id) ?? "",
           path: slugs.get(row.id) ?? null,
           date: row.date,
+          year: row.year,
+          kind: row.kind,
           status: row.status,
         })),
+        latest:
+          recent == null
+            ? null
+            : {
+                name: labels.full.get(recent.id) ?? "",
+                path: slugs.get(recent.id) ?? null,
+                date: recent.date,
+                races: raced.map((race) => {
+                  let contested = 0;
+                  for (const row of race.results) {
+                    contested += row.seats ?? 0;
+                  }
+                  return {
+                    name: race.name,
+                    path: race.path,
+                    count: race.count,
+                    contested,
+                    measure: race.measure,
+                    results: race.results.slice(0, 3),
+                  };
+                }),
+              },
       };
     }),
 };
