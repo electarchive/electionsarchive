@@ -11,7 +11,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_cvr"
-VERSION = "1"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 RESULTS = "https://www.vote.nyc/sites/default/files/pdf/election_results"
 CVRS = {
@@ -193,7 +193,9 @@ def parse() -> None:
 
 def emit() -> Path:
     tally = pl.read_parquet(PARSED / "rounds.parquet").join(
-        pl.read_parquet(DATA / "parsed" / "us.nyc_boe" / "rounds.parquet").select("date", "page", "key").unique(),
+        pl.read_parquet(DATA / "parsed" / "us.nyc_boe" / "rounds.parquet")
+        .select("date", "page", "key", "office", "district")
+        .unique(),
         on=["date", "page"],
     )
     with connect() as conn:
@@ -253,6 +255,34 @@ def emit() -> Path:
                         "valid_from": day,
                         "valid_to": day + timedelta(days=1),
                     }
+                ),
+            )
+            cs.frame(
+                "reporting_unit_area",
+                pl.DataFrame(
+                    {
+                        "unit_id": [str(units[code]) for code in codes],
+                        "area_id": str(cs.area("us.place", "3651000")),
+                        "valid_from": day,
+                        "valid_to": day + timedelta(days=1),
+                    }
+                ),
+            )
+            councils = frame.filter(pl.col("office") == "council").select("ed", "district").unique().sort("ed")
+            if councils["ed"].is_duplicated().any():
+                raise ValueError(f"{day}: an election district votes in two council districts")
+            cs.frame(
+                "reporting_unit_area",
+                councils.select(
+                    unit_id=pl.col("ed").replace_strict({code: str(unit) for code, unit in units.items()}),
+                    area_id=pl.col("district").replace_strict(
+                        {
+                            district: str(cs.area("us.local_district", f"36:3651000:council:district-{district}"))
+                            for district in councils["district"].unique()
+                        }
+                    ),
+                    valid_from=pl.lit(day),
+                    valid_to=pl.lit(day + timedelta(days=1)),
                 ),
             )
             for (contest_key,) in frame.select("key").unique().sort("key").iter_rows():

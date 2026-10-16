@@ -9,7 +9,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.nyc_general"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 RESULTS = "https://www.vote.nyc/sites/default/files/pdf/election_results"
 GENERALS = {
@@ -138,6 +138,7 @@ def emit() -> Path:
 
         city = cs.key("us.polity", "new-york-city")
         office = cs.key("us.office", "NY:3651000:mayor")
+        place = cs.area("us.place", "3651000")
         if city in cs.minted or office in cs.minted:
             raise ValueError("New York City and its mayor must already exist")
         parties: dict[str, UUID | None] = {}
@@ -212,6 +213,13 @@ def emit() -> Path:
                     valid_from=day,
                     valid_to=day + timedelta(days=1),
                 )
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=units[code],
+                    area_id=place,
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
 
             if day.year == 2021:
                 contest_key = ALGED_CONTEST
@@ -248,7 +256,7 @@ def emit() -> Path:
                     election_id=election,
                     kind="office",
                     office_id=office,
-                    district_area_id=cs.area("us.place", "3651000"),
+                    district_area_id=place,
                     magnitude=1,
                     round_number=1,
                     electoral_system_id=cs.key("us.electoral_system", "fptp"),

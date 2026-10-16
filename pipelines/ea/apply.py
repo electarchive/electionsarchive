@@ -467,6 +467,13 @@ def publish(conn: Connection, changeset_id: str) -> None:
             if "reporting_unit" in stage.tables and "area_id" in stage.tables["reporting_unit"]
             else []
         )
+        if "reporting_unit_area" in stage.tables:
+            repointed += [
+                str(unit)
+                for (unit,) in conn.execute(
+                    sql.SQL("select distinct unit_id from {}").format(stage.staged("reporting_unit_area"))
+                ).fetchall()
+            ]
         for table in stage.tables:
             _publish_table(conn, stage, table)
         _rollup(conn, stage, moved, repointed)
