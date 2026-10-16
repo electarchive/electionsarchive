@@ -37,6 +37,7 @@ WITHDREW_2018 = "https://www.hurriyet.com.tr/gundem/iyi-parti-edirne-1inci-sira-
 LISTS_2015 = "https://www.ysk.gov.tr/doc/dosyalar/docs/Milletvekili/1Kasim2015/2015MVES-KesinAdayListesi.pdf"
 LISTS_JUNE_2015 = "https://www.ysk.gov.tr/doc/dosyalar/docs/Milletvekili/7Haziran2015/2015MV-KesinAdayListesi.pdf"
 LISTS_2011 = "https://www.ysk.gov.tr/doc/dosyalar/docs/2011MilletvekiliSecimi/KesinAdayListesi2011.pdf"
+LISTS_2007 = f"{GAZETTE}/2007/06/20070620M1-2.rtf"
 WITHDREW_2011 = "https://www.memurlar.net/haber/196377/"
 WITHDREW_EARLY_2011 = "https://www.yenisafak.com/gundem/kaset-skandali-mhpde-9-yoneticiyi-goturdu-320288"
 WITHDRAWN = {
@@ -75,8 +76,14 @@ DAY_2014 = date(2014, 8, 10)
 DAY_2015 = date(2015, 11, 1)
 DAY_JUNE_2015 = date(2015, 6, 7)
 DAY_2011 = date(2011, 6, 12)
-LIST_URLS = {DAY_2018: LISTS_2018, DAY_2015: LISTS_2015, DAY_JUNE_2015: LISTS_JUNE_2015, DAY_2011: LISTS_2011}
 DAY_2007 = date(2007, 7, 22)
+LIST_URLS = {
+    DAY_2018: LISTS_2018,
+    DAY_2015: LISTS_2015,
+    DAY_JUNE_2015: LISTS_JUNE_2015,
+    DAY_2011: LISTS_2011,
+    DAY_2007: LISTS_2007,
+}
 DAY_REFERENDUM_2007 = date(2007, 10, 21)
 INAUGURATED_2014 = date(2014, 8, 28)
 INAUGURATED_2018 = date(2018, 7, 9)
@@ -632,6 +639,16 @@ DECISIONS = {
             "electoral districts. We read the rank and name of each candidate directly from the PDF text layer; we do "
             "not use OCR. Education and occupation columns are not read and are blanked in the page images. Every "
             "candidate has a page and bounding-box locator."
+        ),
+    ),
+    LISTS_2007: (
+        "22 Temmuz 2007 Milletvekili Genel Seçimi kesin aday listeleri",
+        (
+            "YSK announcement published in Resmî Gazete 26558 (Mükerrer) on June 20, 2007: final candidate lists for the "
+            "July 22, 2007 parliamentary election. The lists show every party's ranked candidates and independent "
+            "candidates for each of the 85 electoral districts. The gazette published them as an RTF document; we read "
+            "the rank and name of each candidate from its text. Education and occupation columns are not read. Because "
+            "the document has no fixed pages, candidates are cited to the document as a whole."
         ),
     ),
     LISTS_2011: (
@@ -1306,7 +1323,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, OZONDER_PRESS, suffix=".htm")
     for url in WITHDREW_SOURCES:
         raw.fetch(SOURCE, url, suffix=".htm")
-    for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS):
+    for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS, LISTS_2007):
         raw.fetch(SOURCE, url, suffix=".rtf")
     for url in (MAYORS, MPS_2018, MPS_2015, MPS_JUNE_2015, MPS_2011, OZONDER_ITEM):
         raw.fetch(SOURCE, url, suffix=".json")
@@ -2995,6 +3012,64 @@ def parse() -> None:
                 }
             )
 
+    document = raw.cached(SOURCE, LISTS_2007).path.read_text(encoding="latin-1")
+    list_headings = {upper(full): full for full, *_ in PARTIES_2007} | {"BAĞIMSIZ": INDEPENDENTS}
+    district_headings = {f"{upper(province)} İLİ": f"{plate:02}" for plate, province in enumerate(PROVINCES, 1)} | {
+        f"{upper(province)}-{number} NOLU": f"{plate:02}-{number}"
+        for plate, province in enumerate(PROVINCES, 1)
+        for number in range(1, SPLIT_2015.get(province, 0) + 1)
+    }
+    printed_district = None
+    printed_ticket = None
+    position = 0
+    current: dict[str, object] | None = None
+    for chunk in re.split(r"(?=\\pard[^a-z])", document):
+        anchor = re.search(r"\\posx(\d+)\\posy\d+\\absh-?\d+\\absw(\d+)", chunk[:400])
+        if anchor is None or (int(anchor[1]), int(anchor[2])) not in (
+            (600, 700),
+            (1360, 2740),
+            (4140, 2780),
+            (600, 10640),
+        ):
+            current = None
+            continue
+        while (stripped := re.sub(r"\{\\(?:\*|shp|sp|sn|sv|pn)[^{}]*\}", "", chunk)) != chunk:
+            chunk = stripped
+        chunk = re.sub(r"\\'([0-9a-f]{2})", lambda escape: bytes([int(escape[1], 16)]).decode("cp1254"), chunk)
+        chunk = re.sub(r"\\u(-?\d+) ?.", lambda escape: chr(int(escape[1]) % 65536), chunk)
+        line = " ".join(re.sub(r"\\[a-z]+-?\d* ?|[{}\r\n]", "", chunk).split())
+        if anchor[2] == "10640":
+            if line.endswith(" SEÇİM ÇEVRESİ"):
+                printed_district = district_headings[line.removesuffix(" SEÇİM ÇEVRESİ")]
+            elif line in list_headings:
+                printed_ticket = list_headings[line]
+                position = 0
+            elif line != "MİLLETVEKİLİ SEÇİMLERİ KESİN ADAY LİSTESİ":
+                raise ValueError(f"lists {LISTS_2007}: unknown heading {line!r}")
+        elif anchor[1] == "600":
+            current = None
+            if line == "S. NO":
+                continue
+            if printed_district is None or printed_ticket is None:
+                raise ValueError(f"lists {LISTS_2007}: a candidate row before any district or party heading")
+            position += 1
+            if printed_ticket != INDEPENDENTS and int(line) != position:
+                raise ValueError(f"lists {LISTS_2007}: rank {line} printed at position {position}")
+            current = {
+                "code": printed_district,
+                "party": printed_ticket,
+                "position": position,
+                "name": "",
+                "sequence": None,
+                "url": LISTS_2007,
+                "withdrew": False,
+                "page": None,
+                "box": None,
+            }
+            printed.append(current)
+        elif current is not None:
+            current["name"] = " ".join(filter(None, [str(current["name"]), line]))
+
     folding = str.maketrans("ÇĞİÖŞÜÂÎÛ", "CGIOSUAIU")
     for list_url, list_rows, list_districts, list_values, list_elected in (
         (LISTS, candidates, districts, values, elected),
@@ -3030,7 +3105,11 @@ def parse() -> None:
             raise ValueError(f"lists {list_url}: lists whose length is not the district magnitude {wrong}")
         winners: dict[tuple[str, str], dict[str, object]] = {}
         for row in list_elected:
-            folded = re.sub(r"[^A-Z]", "", upper(str(row["name"])).translate(folding))
+            folded = re.sub(
+                r"[^A-Z]",
+                "",
+                upper(str(row["label"] if row.get("person") == OZONDER else row["name"])).translate(folding),
+            )
             winners.setdefault((str(row["code"]), str(row["party"])), {})[folded] = row["sequence"]
         for pair, sequences in winners.items():
             standing_rows = [row for row in lists[pair] if not row["withdrew"]]
@@ -4099,7 +4178,9 @@ def emit() -> Path:
                         "citation",
                         entity_id=candidacy,
                         source_id=sources[list_url],
-                        locator={
+                        locator=None
+                        if row["page"] is None
+                        else {
                             "page_id": page_ids[(list_url, row["page"])],
                             "bbox": [round(value, 6) for value in row["box"]],
                         },
@@ -4207,7 +4288,9 @@ def emit() -> Path:
                             "citation",
                             entity_id=candidacy,
                             source_id=sources[list_url],
-                            locator={
+                            locator=None
+                            if ranks[row["sequence"]]["page"] is None
+                            else {
                                 "page_id": page_ids[(list_url, ranks[row["sequence"]]["page"])],
                                 "bbox": [round(value, 6) for value in ranks[row["sequence"]]["box"]],
                             },
