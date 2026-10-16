@@ -6034,6 +6034,19 @@ def emit() -> Path:
                     )
                     title = f"{year} U.S. {office_name} {'special election' if special else 'election'} in {place}"
                 else:
+                    completes = (
+                        parent
+                        if number
+                        else election(
+                            f"{JUNGLE[year]}:{state}",
+                            polity,
+                            "general",
+                            JUNGLE[year],
+                            f"{JUNGLE[year]:%B %Y} {state_name} general election",
+                            f"us/{state.lower()}/{JUNGLE[year]}-general",
+                            umbrella,
+                        )
+                    )
                     parent = election(
                         f"{day}:{state}:runoff",
                         polity,
@@ -6041,6 +6054,7 @@ def emit() -> Path:
                         day,
                         f"{day.year} {state_name} runoff election",
                         f"us/{state.lower()}/{day}-runoff",
+                        completes,
                     )
                     title = (
                         f"{day.year} U.S. {office_name} {'special election runoff' if special else 'runoff'} in {place}"
