@@ -3910,6 +3910,7 @@ async function races(
             seats,
           };
         })
+        .filter((row) => !row.key.startsWith("kind:") || row.votes > 0)
         .toArray()
         .toSorted((a, b) => b.votes - a.votes);
       const level = grid?.level ?? (table == null ? null : first?.scheme);

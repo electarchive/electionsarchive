@@ -97,6 +97,10 @@ export async function home() {
           from election e join polity y on y.id = e.polity_id
           where e.parent_id is null and y.kind in ('sovereign_state', 'supranational')
             and e.kind in ('general', 'referendum') and e.date_from <= current_date
+            and exists (
+              select from contest c join election x on x.id = c.election_id
+              where x.id = e.id or (x.parent_id = e.id and y.kind = 'sovereign_state')
+            )
           order by e.date_from desc limit 6)
         union all
         (select e.id, e.date_from, e.kind, e.polity_id, 'upcoming'
