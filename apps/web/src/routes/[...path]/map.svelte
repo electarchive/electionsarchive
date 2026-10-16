@@ -1,6 +1,6 @@
 <script lang="ts">
   import type * as Maplibre from "maplibre-gl";
-  import { goto } from "$app/navigation";
+  import { goto, preloadData } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import MinusIcon from "@lucide/svelte/icons/minus";
@@ -247,9 +247,54 @@
 
   function open(k: number) {
     const path = rows.get(k)?.path;
-    if (path != null) {
-      void goto(resolve("/[...path]", { path }));
+    if (path == null) {
+      return;
     }
+    const href = resolve("/[...path]", { path });
+    const map = maps[0];
+    const parts =
+      map?.querySourceFeatures("places", {
+        sourceLayer: "areas",
+        filter: ["==", ["id"], k],
+      }) ?? [];
+    const box = [Infinity, Infinity, -Infinity, -Infinity];
+    for (const part of parts) {
+      for (const pair of JSON.stringify(part.geometry).matchAll(
+        /\[([\d.e-]+),([\d.e-]+)\]/g,
+      )) {
+        const x = Number(pair[1]);
+        const y = Number(pair[2]);
+        box[0] = Math.min(box[0] ?? x, x);
+        box[1] = Math.min(box[1] ?? y, y);
+        box[2] = Math.max(box[2] ?? x, x);
+        box[3] = Math.max(box[3] ?? y, y);
+      }
+    }
+    if (
+      map == null ||
+      !Number.isFinite(box[0]) ||
+      matchMedia("(prefers-reduced-motion: reduce)").matches
+    ) {
+      void goto(href);
+      return;
+    }
+    const loading = preloadData(href);
+    let isGone = false;
+    const leave = () => {
+      if (!isGone) {
+        isGone = true;
+        void loading.finally(() => void goto(href));
+      }
+    };
+    map.once("moveend", leave);
+    setTimeout(leave, 1200);
+    map.fitBounds(
+      [
+        [box[0] ?? 0, box[1] ?? 0],
+        [box[2] ?? 0, box[3] ?? 0],
+      ],
+      { padding: fit, duration: 650, essential: false },
+    );
   }
 
   function paint(host: HTMLElement) {
@@ -928,7 +973,13 @@
     style:aspect-ratio={ratio}
     {@attach mount}
   >
-    <div class="block-full inline-full" data-map-surface></div>
+    <div
+      class={cn(
+        "transition-opacity duration-500 ease-out block-full inline-full motion-reduce:transition-none",
+        { "opacity-0": !isLoaded },
+      )}
+      data-map-surface
+    ></div>
     {#if !isLoaded}
       <p
         class="absolute inset-0 grid place-items-center text-[0.8125rem] text-muted-foreground"
