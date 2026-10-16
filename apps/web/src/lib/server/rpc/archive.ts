@@ -3516,6 +3516,7 @@ async function races(
               null,
               lineage,
               "party",
+              "party",
             ),
       ]);
       const here = totals.get(place.k);

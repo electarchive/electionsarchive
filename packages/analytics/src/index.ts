@@ -1,6 +1,6 @@
 export type Match = "party" | "person" | "family";
 
-export type Grouping = "option" | "alliance";
+export type Grouping = "option" | "alliance" | "party";
 
 export type Option = {
   contest: string;
@@ -217,6 +217,7 @@ export function compare(
     const party = line.party == null ? null : root(line.party);
     if (
       option.person != null &&
+      (grouping !== "party" || party == null) &&
       (match === "person" ||
         party == null ||
         crowded.has(party) ||
