@@ -4392,9 +4392,8 @@ export const elections = {
                 seats += row.seats;
               }
               return chosen == null ||
-                size == null ||
-                seats < size * 0.9 ||
-                seats > size * 1.02
+                seats < (size ?? seats) * 0.9 ||
+                seats > (size ?? seats) * 1.02
                 ? []
                 : [
                     {
