@@ -19,7 +19,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 ARCGIS = "/query?where=1%3D1&outFields=*&outSR=4326&f=geojson&resultOffset={offset}&resultRecordCount={count}"
 LAST = 2026
-FREE = "No license stated; free download from the city's open data portal"
+FREE = "Public record; free download from the city's open data portal, no license stated"
 PUBLISHERS = {
     "chicago": (
         "City of Chicago",
@@ -86,7 +86,7 @@ PUBLISHERS = {
     "moreno-valley": ("City of Moreno Valley", FREE, None),
     "nashville": (
         "Metropolitan Government of Nashville and Davidson County",
-        "Metro Nashville Open Data policy (Executive Order FO-018)",
+        "Public record; Metro Nashville Open Data policy (Executive Order FO-018)",
         None,
     ),
     "new-orleans": ("City of New Orleans", "Public domain", None),
