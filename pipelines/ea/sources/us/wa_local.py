@@ -374,7 +374,7 @@ def emit() -> Path:
             publisher=PUBLISHER,
             title=TITLE,
             url="https://results.vote.wa.gov/results/",
-            license=None,
+            license="Public record",
         )
         for url in FILES.values():
             cs.artifact(raw.cached(SOURCE, url), source)

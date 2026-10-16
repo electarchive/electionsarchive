@@ -4934,7 +4934,7 @@ def emit() -> Path:
                 publisher="Wisconsin Elections Commission",
                 title=title,
                 url=url,
-                license="No license stated.",
+                license="Public record",
                 notes=CANVASS_SOURCE,
             )
             artifact = cs.artifact(pdf, canvass)
@@ -5002,7 +5002,7 @@ def emit() -> Path:
             publisher="Minnesota Legislative Reference Library",
             title=LRL_TITLE,
             url=LRL,
-            license="No license stated.",
+            license="Public record",
         )
         for state, label in (
             pl.concat(
