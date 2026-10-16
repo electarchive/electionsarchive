@@ -693,6 +693,11 @@
       {/each}
     </ul>
   </section>
+{:else if contest.current == null && contest.turnout != null}
+  {@render stats(false)}
+  <p class="col-span-12 bg-card px-3.5 py-6 text-muted-foreground">
+    {m.no_counts()}
+  </p>
 {:else if contest.current == null}
   <p class="col-span-12 bg-card px-3.5 py-6 text-muted-foreground">
     {m.no_results()}
@@ -1320,7 +1325,7 @@
 {/if}
 
 {#snippet stats(compact: boolean)}
-  {#if contest.current != null}
+  {#if contest.current != null || contest.turnout != null}
     <dl
       class={cn(
         "flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3",
@@ -1349,26 +1354,56 @@
           </dd>
         </div>
       {/if}
-      <div class="flex items-baseline gap-2">
-        <dt class="text-[0.8125rem] text-muted-foreground">
-          <Term
-            label={counted ?? m.stat_valid()}
-            definition={DEFINITIONS[contest.current.measure]?.() ??
-              m.term_valid()}
-          />
-        </dt>
-        <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-          {count(contest.current.valid)}
-        </dd>
-      </div>
-      <div class="flex items-baseline gap-2">
-        <dt class="text-[0.8125rem] text-muted-foreground">
-          <Term label={m.stat_options()} definition={m.term_options()} />
-        </dt>
-        <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-          {contest.rows.filter((row) => row.current != null).length}
-        </dd>
-      </div>
+      {#if contest.current != null}
+        <div class="flex items-baseline gap-2">
+          <dt class="text-[0.8125rem] text-muted-foreground">
+            <Term
+              label={counted ?? m.stat_valid()}
+              definition={DEFINITIONS[contest.current.measure]?.() ??
+                m.term_valid()}
+            />
+          </dt>
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+            {count(contest.current.valid)}
+          </dd>
+        </div>
+        <div class="flex items-baseline gap-2">
+          <dt class="text-[0.8125rem] text-muted-foreground">
+            <Term label={m.stat_options()} definition={m.term_options()} />
+          </dt>
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+            {contest.rows.filter((row) => row.current != null).length}
+          </dd>
+        </div>
+      {/if}
+      {#if contest.turnout != null}
+        {#if contest.current == null}
+          <div class="flex items-baseline gap-2">
+            <dt class="text-[0.8125rem] text-muted-foreground">
+              {m.stat_registered()}
+            </dt>
+            <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+              {count(contest.turnout.registered)}
+            </dd>
+          </div>
+          <div class="flex items-baseline gap-2">
+            <dt class="text-[0.8125rem] text-muted-foreground">
+              {m.stat_voters()}
+            </dt>
+            <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+              {count(contest.turnout.voters)}
+            </dd>
+          </div>
+        {/if}
+        <div class="flex items-baseline gap-2">
+          <dt class="text-[0.8125rem] text-muted-foreground">
+            <Term label={m.stat_turnout()} definition={m.term_turnout()} />
+          </dt>
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+            {percent(contest.turnout.voters / contest.turnout.registered)}
+          </dd>
+        </div>
+      {/if}
     </dl>
   {/if}
 {/snippet}

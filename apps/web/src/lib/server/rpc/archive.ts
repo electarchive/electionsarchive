@@ -1913,6 +1913,9 @@ export const contests = {
             ),
           }),
         ),
+        turnout: v.nullable(
+          v.object({ registered: v.number(), voters: v.number() }),
+        ),
         current: v.nullable(
           v.object({
             valid: v.number(),
@@ -2033,7 +2036,7 @@ export const contests = {
       const isRoot = scoped == null;
       const area = scoped ?? contest.place;
       const unit = chain.map((entry) => entry.segment);
-      const [parts, ancestors, cited, home] = await Promise.all([
+      const [parts, ancestors, cited, home, roll] = await Promise.all([
         db.execute<{ id: string }>(sql`
           select id from contest where allocation_parent_id = ${contest.id}::uuid
         `),
@@ -2074,6 +2077,15 @@ export const contests = {
           select s.path from polity_territory t join slug s on s.entity_id = t.polity_id and s.is_current
           where t.area_id = ${area?.id}::uuid and t.polity_id <> ${contest.polity}::uuid
           order by upper(t.valid) desc nulls first limit 1
+        `),
+        db.execute<{ registered: number; voters: number }>(sql`
+          select * from (
+            select nullif(max(r.value) filter (where r.measure = 2), 0)::float8 as registered,
+              coalesce(max(r.value) filter (where r.measure = 14), max(r.value) filter (where r.measure = 3))::float8 as voters
+            from result_set rs join result_rollup r on r.result_set_k = rs.k
+            where rs.contest_id = ${contest.id}::uuid and rs.is_default and r.area_k = ${area?.k ?? null}::int
+              and r.option_k = 0 and r.measure in (2, 3, 14) and r.count_round = 0
+          ) t where registered is not null and voters is not null
         `),
       ]);
       const childIds = parts.rows.map((row) => row.id);
@@ -2268,6 +2280,7 @@ export const contests = {
                   outcome: row.outcome,
                 })),
               },
+        turnout: roll.rows[0] ?? null,
         current: null,
         electors: null,
         chamber: null,
