@@ -3450,7 +3450,9 @@ async function races(
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
         e.date_from::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", tree.stage as "isStage", z.seats as size,
-        c.term is distinct from 'remainder' and coalesce(st.voting, true) as "isCounted",
+        (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
+          select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
+        ))) and coalesce(st.voting, true) as "isCounted",
         e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
         coalesce(runs.ids, '{}') as runoffs,
         c.term is not distinct from 'remainder' as "isRemainder",
@@ -3702,7 +3704,9 @@ async function races(
               left join seat st on st.id = c.seat_id
               where coalesce(c.body_id, c.office_id) = ${head.owner}::uuid
                 and c.allocation_parent_id is null and c.party_scope_id is null and e.kind = 'general'
-                and c.term is distinct from 'remainder' and coalesce(st.voting, true)
+                and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
+                  select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
+                ))) and coalesce(st.voting, true)
                 and e.date_from between (select day from last) - 200 and (select day from last)
                 and not exists (
                   select from contest pc join election pe on pe.id = pc.election_id
@@ -4302,7 +4306,9 @@ export const elections = {
           left join seat st on st.id = c.seat_id
           where c.allocation_parent_id is null and c.party_scope_id is null
             and c.kind in ('body_seats', 'list_allocation')
-            and c.term is distinct from 'remainder' and coalesce(st.voting, true)
+            and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
+              select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
+            ))) and coalesce(st.voting, true)
         ),
         grp(id, root) as (
           select id, id from roots
