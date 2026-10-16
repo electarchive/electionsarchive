@@ -4423,17 +4423,19 @@ export const people = {
           select em.entity_id from entity_merge em join ids on em.into_id = ids.id
         ),
         mine as materialized (
-          select o.id as option, o.contest_id, coalesce(pm.into_id, cd.member_of_party_id, o.party_id) as party
+          select o.id as option, o.contest_id, cd.id as candidacy, cd.role,
+            coalesce(pm.into_id, cd.member_of_party_id, o.party_id) as party
           from candidacy cd join contest_option o on o.id = cd.option_id
           left join entity_merge pm on pm.entity_id = coalesce(cd.member_of_party_id, o.party_id)
-          where cd.person_id in (select id from ids) and cd.role = 'head'
+          where cd.person_id in (select id from ids) and cd.role in ('head', 'list_member')
         ),
         lines as materialized (
           select o.k from contest_option o
           where o.id in (select option from mine) or o.parent_option_id in (select option from mine)
         ),
         up(id, parent) as (
-          select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
+          select c.id, case when c.kind = 'list_allocation' then null else c.allocation_parent_id end
+          from contest c where c.id in (select contest_id from mine)
           union
           select c.id, c.allocation_parent_id from up join contest c on c.id = up.parent
         ),
@@ -4481,7 +4483,9 @@ export const people = {
         select p.root, p.date::text as date, p.year, p.kind, t.main::int as measure, t.votes,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
           (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
-            from mine m join outcome x on x.option_id = m.option and x.candidacy_id is null join result_set rs on rs.id = x.result_set_id and rs.is_default
+            from mine m join outcome x on x.option_id = m.option
+              and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
+            join result_set rs on rs.id = x.result_set_id and rs.is_default
             where m.contest_id = p.root) as outcome,
           lead.party,
           (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
