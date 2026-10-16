@@ -3700,7 +3700,9 @@ async function races(
   const groups = Map.groupBy(owned, (row) => row.series)
     .values()
     .flatMap((group) =>
-      group.length > 1 && new Set(group.map((row) => row.area)).size === 1
+      group.length > 1 &&
+      group[0]?.area != null &&
+      new Set(group.map((row) => row.area)).size === 1
         ? group.map((row) => [row])
         : [group],
     )

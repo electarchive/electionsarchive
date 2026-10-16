@@ -516,10 +516,16 @@
               span={null}
             />
           {/key}
-        {:else}
+        {:else if hub.isPending || isStale}
           <div
             class="animate-pulse rounded-sm bg-muted block-[min(32rem,60svh)] motion-reduce:animate-none"
           ></div>
+        {:else}
+          <p
+            class="grid place-items-center border border-dashed border-border px-4 text-center text-sm text-muted-foreground block-[min(32rem,60svh)]"
+          >
+            {m.scrubber_no_map({ year: String(step?.year ?? "") })}
+          </p>
         {/if}
       </div>
 

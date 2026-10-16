@@ -80,16 +80,12 @@
   );
 
   const unplaced = $derived.by(() => {
-    const inside = election.races.flatMap(
-      (race) => race.places?.rows.flatMap((row) => row.path ?? []) ?? [],
+    const placed = new Set(
+      election.races.flatMap((race) => [
+        ...(race.places?.rows.flatMap((row) => row.path ?? []) ?? []),
+        ...(race.path == null ? [] : [race.path]),
+      ]),
     );
-    if (inside.length === 0) {
-      return [];
-    }
-    const placed = new Set([
-      ...inside,
-      ...election.races.flatMap((race) => race.path ?? []),
-    ]);
     return election.contests.flatMap((contest) =>
       contest.path == null || placed.has(contest.path)
         ? []
@@ -838,7 +834,7 @@
     <p class="mbe-1.5 text-[0.8125rem] text-muted-foreground">
       {m.election_unplaced_detail()}
     </p>
-    <ul class="grid text-sm">
+    <ul class="grid gap-x-6 text-sm sm:grid-cols-2 lg:grid-cols-3">
       {#each unplaced as contest, index (index)}
         <li class="border-be border-border/60 py-1.5 last:border-be-0">
           <Preview class="font-semibold hover:highlighter" path={contest.path}

@@ -775,6 +775,7 @@
   "scrubber_slider": "Election year",
   "scrubber_chamber": "{chamber} after the election",
   "scrubber_majority": "{seats} for a majority",
+  "scrubber_no_map": "No map available: the archive has no boundaries for {year}",
   "scrubber_government": "Government that followed",
   "scrubber_open": "Open election",
   "home_scrub_slider": "Year shown on the map",
