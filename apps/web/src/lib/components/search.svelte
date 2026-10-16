@@ -12,6 +12,7 @@
 
   const GROUPS: Array<[string, () => string]> = [
     ["polity", m.search_group_polity],
+    ["body", m.search_group_body],
     ["election", m.search_group_election],
     ["contest", m.search_group_contest],
     ["party", m.search_group_party],

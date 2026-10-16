@@ -729,5 +729,6 @@
   "chamber_nonvoting": "Non-voting",
   "chamber_switched": "Later {party}",
   "chamber_open": "Chamber history",
-  "chamber_makeup_mixed": "Seats each party held at the start of every term: from records of those who actually sat where available, and from election results otherwise. The dashed line marks a majority. Select a term to view details below."
+  "chamber_makeup_mixed": "Seats each party held at the start of every term: from records of those who actually sat where available, and from election results otherwise. The dashed line marks a majority. Select a term to view details below.",
+  "search_group_body": "Chambers"
 }

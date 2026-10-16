@@ -6865,7 +6865,7 @@ export const search = {
         method: "GET",
         path: "/search",
         summary:
-          "Search polities, elections, contests, parties, and people by name, accents and case ignored",
+          "Search polities, chambers, elections, contests, parties, and people by name, accents and case ignored",
       }),
     )
     .input(
@@ -6899,6 +6899,18 @@ export const search = {
       if (input.q === "") {
         return [];
       }
+      const chambers = db.execute<{ id: string; polity: string }>(sql`
+        with q as (select lower(unaccent(${input.q})) as t)
+        select b.id, b.polity_id as polity
+        from body b join name n on n.entity_id = b.id, q
+        where b.kind <> 'electoral_college' and (
+          lower(unaccent(n.text)) like '%' || q.t || '%' or q.t <% lower(unaccent(n.text))
+        )
+        group by b.id, b.polity_id
+        order by max(word_similarity(q.t, lower(unaccent(n.text)))) desc,
+          (select count(*) from tenure t where t.body_id = b.id) desc
+        limit 4
+      `);
       const found = await db.execute<{
         id: string;
         type: string;
@@ -6952,7 +6964,18 @@ export const search = {
         ) x
         order by top.score desc
       `);
-      const rows = found.rows.filter((row) => row.target != null);
+      const matched = await chambers;
+      const bodies = matched.rows.map((row) => ({
+        id: row.id,
+        type: "body",
+        target: row.id,
+        context: row.polity,
+        date: null,
+      }));
+      const rows = [
+        ...bodies,
+        ...found.rows.filter((row) => row.target != null),
+      ];
       const ids = rows.flatMap((row) =>
         [row.id, row.target, row.context].filter((id) => id != null),
       );
@@ -6962,10 +6985,9 @@ export const search = {
           id: row.id,
           type: row.type,
           name: labels.full.get(row.id) ?? "",
-          path:
-            row.type === "person" || row.type === "party"
-              ? `id/${row.id}`
-              : (slugs.get(row.target ?? "") ?? null),
+          path: ["person", "party", "body"].includes(row.type)
+            ? `id/${row.id}`
+            : (slugs.get(row.target ?? "") ?? null),
           context:
             labels.full.get(
               (row.type === "person" ? row.target : row.context) ?? "",
