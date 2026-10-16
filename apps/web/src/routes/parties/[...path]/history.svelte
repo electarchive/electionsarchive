@@ -423,10 +423,9 @@
             href={point.path == null
               ? undefined
               : resolve("/[...path]", { path: point.path })}
-            class={cn(
-              "grid rounded-xs border-s-2 border-(--party) bg-secondary/50 px-2 py-1",
-              { "hover:bg-secondary": point.path != null },
-            )}
+            class={cn("grid border-s-2 border-(--party) px-2 py-1", {
+              "hover:bg-secondary": point.path != null,
+            })}
           >
             <span class="font-figures font-semibold tabular-nums"
               >{isTwin
@@ -442,7 +441,7 @@
             >
             {#if !isOffice && point.seats != null}
               <span class="text-muted-foreground"
-                >{m.lists_seats({ count: point.seats })}</span
+                >{m.party_history_won({ count: count(point.seats) })}</span
               >
             {/if}
           </svelte:element>

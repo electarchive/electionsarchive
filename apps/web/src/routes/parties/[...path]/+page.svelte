@@ -93,9 +93,7 @@
     class="grid grid-cols-12 gap-px overflow-clip border-be bg-border"
     style:--party={color}
   >
-    <header
-      class="col-span-12 grid gap-1.5 border-bs-[6px] border-(--party) bg-card px-3.5 pbs-4 pbe-3.5"
-    >
+    <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
       <div class="flex items-start justify-between gap-3">
         <h1 class="title">
           {party.name}
