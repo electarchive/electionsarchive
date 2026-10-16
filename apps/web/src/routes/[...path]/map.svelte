@@ -38,6 +38,7 @@
     focus = $bindable(null),
     shade = "winner",
     isLinked = false,
+    pick,
   }: {
     places: Places;
     colors: Array<string>;
@@ -61,6 +62,7 @@
     focus?: number | null;
     shade?: "winner" | number;
     isLinked?: boolean;
+    pick?: (code: string) => void;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -971,22 +973,29 @@
     {#if levels.length > 1}
       <div class="flex" role="group" aria-label={m.map_level()}>
         {#each levels as level (level.code)}
-          <a
+          <svelte:element
+            this={pick == null ? "a" : "button"}
             class={cn(
-              "-ms-px flex keycap items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+              "-ms-px flex keycap items-center gap-1.5 border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
               {
                 "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
                   level.isCurrent,
               },
             )}
-            href={resolve(`/[...path]?${level.query}`, { path: level.path })}
-            aria-current={level.isCurrent ? "true" : undefined}
+            href={pick == null
+              ? resolve(`/[...path]?${level.query}`, { path: level.path })
+              : undefined}
+            type={pick == null ? undefined : "button"}
+            role={pick == null ? undefined : "button"}
+            aria-current={pick == null && level.isCurrent ? "true" : undefined}
+            aria-pressed={pick == null ? undefined : level.isCurrent}
             data-sveltekit-reset="false"
             data-sveltekit-noscroll
+            onclick={() => pick?.(level.code)}
             >{level.label}
             <span class="font-mono text-[0.6875rem] font-normal tabular-nums"
               >{level.count}</span
-            ></a
+            ></svelte:element
           >
         {/each}
       </div>

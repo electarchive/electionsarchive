@@ -132,6 +132,21 @@
       };
     }),
   }));
+  const regional = $state<Record<number, boolean>>({});
+  const regionals = createQueries(() => ({
+    queries: election.races.map((race, index) => ({
+      ...orpc.elections.regional.queryOptions({
+        input: { id, contest: race.sample ?? "" },
+      }),
+      enabled:
+        race.sample != null &&
+        race.map != null &&
+        race.places != null &&
+        index < 4,
+      staleTime: Infinity,
+      meta: { quiet: true },
+    })),
+  }));
   const sitting = createQueries(() => ({
     queries: bodies.map((body) =>
       orpc.bodies.get.queryOptions({ input: { id: body } }),
@@ -635,36 +650,60 @@
         "lg:col-span-7 xl:col-span-8": !isSeated,
       })}
     >
+      {const option = $derived(regionals[index]?.data ?? null)}
+      {const region = $derived(regional[index] === true ? option : null)}
       {const swing = $derived(swings[index]?.data ?? null)}
-      {const places = $derived(swing?.places ?? race.places)}
-      <PlaceMap
-        {places}
-        colors={swing == null
-          ? race.tones
-          : places.legend.map((item) => swatch(item.color, item.key))}
-        tiles={race.map.tiles}
-        own={race.map.own}
-        frames={race.map.frames}
-        isApproximate={race.map.isApproximate}
-        noun={race.places.levels[0]?.noun ?? ""}
-        votes={race.votes}
-        names={swing == null
-          ? race.titles
-          : places.legend.map((item) =>
-              item.person == null ? (item.short ?? item.label) : item.label,
-            )}
-        levels={[]}
-        span={swing?.span ??
-          (race.count > 1 &&
-          race.since != null &&
-          race.places.rows.some((row) => row.prior != null)
-            ? {
-                from: race.since,
-                to: election.date?.slice(0, 4) ?? "",
-                forward: false,
-              }
-            : null)}
-      />
+      {const places = $derived(region?.places ?? swing?.places ?? race.places)}
+      {const shape = $derived(region?.map ?? race.map)}
+      {#key places.level}
+        <PlaceMap
+          {places}
+          colors={swing == null && region == null
+            ? race.tones
+            : places.legend.map((item) => swatch(item.color, item.key))}
+          tiles={shape.tiles}
+          own={shape.own}
+          frames={shape.frames}
+          isApproximate={shape.isApproximate}
+          noun={places.levels[0]?.noun ?? ""}
+          votes={race.votes}
+          names={swing == null && region == null
+            ? race.titles
+            : places.legend.map((item) =>
+                item.person == null ? (item.short ?? item.label) : item.label,
+              )}
+          levels={option?.map == null
+            ? []
+            : [race.places, option.places].map((entry) => {
+                const noun = entry.levels[0]?.noun ?? "";
+                return {
+                  code: entry.level,
+                  label: noun.charAt(0).toUpperCase() + noun.slice(1),
+                  count: entry.rows.length,
+                  path: "",
+                  query: "",
+                  isCurrent: entry.level === places.level,
+                };
+              })}
+          pick={(code) => (regional[index] = code === option?.places.level)}
+          span={swing?.span ??
+            (region?.since != null
+              ? {
+                  from: region.since,
+                  to: election.date?.slice(0, 4) ?? "",
+                  forward: false,
+                }
+              : race.count > 1 &&
+                  race.since != null &&
+                  race.places.rows.some((row) => row.prior != null)
+                ? {
+                    from: race.since,
+                    to: election.date?.slice(0, 4) ?? "",
+                    forward: false,
+                  }
+                : null)}
+        />
+      {/key}
     </div>
   {/if}
   {#if isSeated}
@@ -705,12 +744,15 @@
     />
   </div>
   {#if race.places != null}
+    {const shown = $derived(
+      regional[index] === true
+        ? (regionals[index]?.data?.places ?? race.places)
+        : race.places,
+    )}
     <Places
       places={{
-        ...race.places,
-        levels: race.places.levels.filter(
-          (level) => level.code === race.places?.level,
-        ),
+        ...shown,
+        levels: shown.levels.filter((level) => level.code === shown.level),
       }}
       span={null}
       trace={race.count === 1 ? race.path : null}

@@ -503,14 +503,18 @@ async function load(
       union all
       select c.id, grp.root from contest c join grp on c.allocation_parent_id = grp.id
     ),
-    picked as (
-      select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.contest_id as contest, grp.root, rs.stage, rs.status,
-        rs.completeness, rs.is_default, rs.source_id
+    sets as materialized (
+      select rs.k, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
       from result_set rs join grp on grp.id = rs.contest_id
+    ),
+    picked as (
+      select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.contest_id as contest, rs.root, rs.stage, rs.status,
+        rs.completeness, rs.is_default, rs.source_id
+      from sets rs
       ${
         owners.length === 0
           ? sql`cross join unnest(${sql.param(areaKs)}::int[]) as a(k)`
-          : sql`join unnest(${sql.param(areaKs)}::int[], ${sql.param(owners)}::uuid[]) as a(k, owner) on a.owner = grp.root`
+          : sql`join unnest(${sql.param(areaKs)}::int[], ${sql.param(owners)}::uuid[]) as a(k, owner) on a.owner = rs.root`
       }
       join lateral (
         select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED}) limit 1
@@ -3739,6 +3743,7 @@ async function races(
                   .at(-1) ?? null;
               return {
                 since,
+                sample: first.id,
                 ...(await tabulate(
                   roots,
                   districts.map((row) => ({
@@ -3981,6 +3986,7 @@ async function races(
         election: head?.election ?? "",
         day: head?.day ?? null,
         count: group.length,
+        sample: table?.sample ?? null,
         since: table?.since ?? null,
         size: head?.size ?? null,
         spread: spread.rows,
@@ -4124,6 +4130,7 @@ export const elections = {
             body: v.nullable(v.string()),
             round: v.nullable(v.number()),
             count: v.number(),
+            sample: v.nullable(v.string()),
             since: v.nullable(v.string()),
             electors: v.nullable(
               v.object({
@@ -4465,6 +4472,243 @@ export const elections = {
               (b.seats ?? 0) - (a.seats ?? 0),
           ),
       }));
+    }),
+  regional: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/regional",
+        summary:
+          "Add up a multi-district race's votes by region, against the chamber's previous general election",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        contest: v.pipe(v.string(), v.uuid()),
+      }),
+    )
+    .output(
+      v.nullable(
+        v.object({
+          places: v.nonNullable(Places),
+          since: v.nullable(v.string()),
+          map: v.nullable(
+            v.object({
+              tiles: v.string(),
+              own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
+              frames: v.array(
+                v.object({
+                  west: v.number(),
+                  south: v.number(),
+                  east: v.number(),
+                  north: v.number(),
+                }),
+              ),
+              isApproximate: v.boolean(),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        date: string;
+        grouping: "alliance" | "party";
+      }>(sql`
+        with recursive tree(id) as (
+          select ${input.id}::uuid
+          union all
+          select k.id from election k join tree on k.parent_id = tree.id
+        ),
+        s as (
+          select c.*, e.date_from, e.kind as election_kind from contest c join election e on e.id = c.election_id
+          where c.id = ${input.contest}::uuid
+        )
+        select c.id, e.date_from::text as date,
+          case when exists (
+            select from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null
+          ) then 'alliance' else 'party' end as grouping
+        from s, contest c
+        join tree on tree.id = c.election_id
+        join election e on e.id = c.election_id
+        left join seat st on st.id = c.seat_id
+        where c.kind = s.kind and c.body_id is not distinct from s.body_id
+          and c.office_id is not distinct from s.office_id
+          and c.party_scope_id is not distinct from s.party_scope_id
+          and c.round_number is not distinct from s.round_number
+          and e.date_from = s.date_from and c.district_area_id is not null
+          and (c.allocation_parent_id is null or not exists (
+            select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
+          ))
+          and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
+            select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
+          ))) and coalesce(st.voting, true)
+      `);
+      const roots = found.rows.map((row) => row.id);
+      const date = found.rows[0]?.date;
+      if (date == null || roots.length < 2) {
+        return null;
+      }
+      const [levels, territory, previous, branches] = await Promise.all([
+        db.execute<{ scheme: string; noun: string; ks: Array<number> }>(sql`
+          with hits as (
+            select distinct r.area_k
+            from result_set rs
+            cross join lateral (
+              select distinct x.area_k from result_rollup x where x.result_set_k = rs.k
+            ) r
+            where rs.contest_id = any(${sql.param(roots)}::uuid[]) and rs.is_default
+          )
+          select a.scheme_code as scheme, sc.noun, array_agg(a.k order by a.k) as ks
+          from hits h join area a on a.k = h.area_k join scheme sc on sc.code = a.scheme_code
+          where a.scheme_code not in (
+            select d.scheme_code from contest c join area d on d.id = c.district_area_id
+            where c.id = any(${sql.param(roots)}::uuid[])
+          )
+          group by 1, 2 having count(*) between 2 and ${roots.length - 1}
+          order by count(*) limit 1
+        `),
+        db.execute<{ id: string; k: number; polity: string }>(sql`
+          select a.id, a.k, e.polity_id as polity
+          from election e join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> ${date}::date
+          join area a on a.id = pt.area_id
+          where e.id = ${input.id}::uuid limit 1
+        `),
+        db.execute<{ id: string; date: string }>(sql`
+          with s as (
+            select c.*, e.kind as election_kind from contest c join election e on e.id = c.election_id
+            where c.id = ${input.contest}::uuid
+          ),
+          pool as (
+            select c.id, e.date_from from s, contest c
+            join election e on e.id = c.election_id
+            left join seat st on st.id = c.seat_id
+            where c.kind = s.kind and c.body_id is not distinct from s.body_id
+              and c.office_id is not distinct from s.office_id
+              and c.party_scope_id is not distinct from s.party_scope_id
+              and c.round_number is not distinct from s.round_number
+              and e.kind = s.election_kind and c.district_area_id is not null
+              and e.date_from < ${date}::date - 120 and e.status::text <> 'annulled'
+              and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
+                select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
+              ))) and coalesce(st.voting, true)
+              and (c.allocation_parent_id is null) = (s.allocation_parent_id is null)
+          )
+          select id, date_from::text as date from pool
+          where date_from between (select max(date_from) from pool) - 200 and (select max(date_from) from pool)
+        `),
+        db.execute<{ from: string; to: string; kind: string }>(sql`
+          select coalesce(fm.into_id, a.party_id) as from, coalesce(tm.into_id, a.parent_party_id) as to, a.kind::text
+          from party_affiliation a
+          left join entity_merge fm on fm.entity_id = a.party_id
+          left join entity_merge tm on tm.entity_id = a.parent_party_id
+          where a.kind = 'regional_branch' and a.valid @> ${date}::date
+        `),
+      ]);
+      const level = levels.rows[0];
+      const nation = territory.rows[0];
+      if (level == null || nation == null) {
+        return null;
+      }
+      const areas = await db.execute<{
+        id: string;
+        k: number;
+        x: number | null;
+        y: number | null;
+      }>(sql`
+        select a.id, a.k,
+          ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
+          ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
+        from area a
+        left join lateral (
+          select g.label_point, g.geom from area_geometry g
+          where g.area_id = a.id and g.valid @> ${date}::date limit 1
+        ) g on true
+        where a.k = any(${sql.param(level.ks)}::int[])
+      `);
+      const [labels, slugs] = await Promise.all([
+        names(
+          areas.rows.map((row) => row.id),
+          date,
+        ),
+        db.execute<{ id: string; path: string }>(sql`
+          select pt.area_id as id, s.path
+          from polity_territory pt
+          join election e on e.polity_id = pt.polity_id
+          join slug s on s.entity_id = e.id and s.is_current
+          where pt.area_id = any(${sql.param(areas.rows.map((row) => row.id))}::uuid[])
+            and pt.valid @> ${date}::date and e.parent_id = ${input.id}::uuid
+        `),
+      ]);
+      const linked = new Map(slugs.rows.map((row) => [row.id, row.path]));
+      const prior = previous.rows
+        .map((row) => row.date)
+        .toSorted((a, b) => a.localeCompare(b))
+        .at(-1);
+      const lineage = branches.rows.map((row) => ({ ...row, toLabel: "" }));
+      const [table, map] = await Promise.all([
+        tabulate(
+          roots,
+          areas.rows
+            .map((row) => ({
+              k: row.k,
+              name: labels.full.get(row.id) ?? "",
+              path: linked.get(row.id) ?? null,
+              isContest: false,
+              owner: null,
+            }))
+            .toSorted((a, b) => a.name.localeCompare(b.name)),
+          date,
+          previous.rows.length === 0
+            ? null
+            : { ids: previous.rows.map((row) => row.id), date: prior ?? null },
+          lineage,
+          "party",
+          found.rows.find((row) => row.grouping === "alliance")?.grouping ??
+            "party",
+        ),
+        sketch(nation, level.scheme, date),
+      ]);
+      const parties = await names(
+        table.legend.flatMap((item) =>
+          item.key.startsWith("party:") ? [item.key.slice(6)] : [],
+        ),
+        date,
+      );
+      const at = new Map(
+        areas.rows.map((row) => [
+          row.k,
+          row.x == null || row.y == null
+            ? null
+            : ([row.x, row.y] as [number, number]),
+        ]),
+      );
+      return {
+        since: prior?.slice(0, 4) ?? null,
+        map,
+        places: {
+          levels: [
+            { code: level.scheme, noun: level.noun, count: areas.rows.length },
+          ],
+          level: level.scheme,
+          ...table,
+          legend: table.legend.map((item) =>
+            item.key.startsWith("party:")
+              ? {
+                  ...item,
+                  label: parties.full.get(item.key.slice(6)) ?? item.label,
+                  short: parties.short.get(item.key.slice(6)) ?? null,
+                }
+              : item,
+          ),
+          rows: table.rows.map((row) => ({
+            ...row,
+            at: at.get(row.k) ?? null,
+          })),
+        },
+      };
     }),
   regions: os
     .meta(
