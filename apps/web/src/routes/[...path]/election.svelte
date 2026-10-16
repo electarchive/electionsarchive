@@ -1,5 +1,5 @@
 <script lang="ts">
-  import { createQuery } from "@tanstack/svelte-query";
+  import { createQueries, createQuery } from "@tanstack/svelte-query";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -65,6 +65,68 @@
       )?.parties ?? []
     ).flatMap((party) =>
       party.role === "support" ? [] : [`party:${party.id}`],
+    ),
+  );
+
+  const bodies = $derived([
+    ...new Set(election.races.flatMap((race) => race.body ?? [])),
+  ]);
+  const sitting = createQueries(() => ({
+    queries: bodies.map((body) =>
+      orpc.bodies.get.queryOptions({ input: { id: body } }),
+    ),
+  }));
+  const after = $derived(
+    new Map(
+      bodies.flatMap((body, index) => {
+        const data = sitting[index]?.data;
+        const held = Date.parse(election.date ?? "");
+        const term = data?.makeup.find(
+          (entry) =>
+            Date.parse(entry.start) > held &&
+            Date.parse(entry.start) - held < 1.2e10,
+        );
+        if (data == null || term == null) {
+          return [];
+        }
+        const info = new Map(data.parties.map((party) => [party.id, party]));
+        let total = 0;
+        for (const party of term.parties) {
+          total += party.seats;
+        }
+        const size =
+          data.sizes.find(
+            (entry) =>
+              (entry.from == null || entry.from <= term.start) &&
+              (entry.to == null || entry.to > term.start),
+          )?.seats ?? total;
+        return [
+          [
+            body,
+            {
+              total: Math.max(size, total),
+              isWhole: total <= size,
+              parts: term.parties
+                .map((entry) => {
+                  const party = info.get(entry.party ?? "");
+                  return {
+                    key: entry.party ?? "none",
+                    name: party?.label ?? m.board_after_other(),
+                    label:
+                      party?.short ?? party?.label ?? m.board_after_other(),
+                    color: swatch(
+                      party?.color ?? null,
+                      `party:${entry.party ?? ""}`,
+                    ),
+                    value: entry.seats,
+                    lean: entry.party == null ? Infinity : (party?.lean ?? 1e9),
+                  };
+                })
+                .toSorted((a, b) => a.lean - b.lean),
+            },
+          ],
+        ];
+      }),
     ),
   );
 
@@ -155,9 +217,32 @@
         (a, b) =>
           (a.lean ?? 1e9) - (b.lean ?? 1e9) || (b.seats ?? 0) - (a.seats ?? 0),
       );
+      const whole =
+        race.body == null || race.electors != null
+          ? null
+          : after.get(race.body);
+      const isPartial =
+        whole != null && race.count > 1 && whole.total > total * 1.25;
+      const top = whole?.parts.toSorted((a, b) => b.value - a.value) ?? [];
       return {
         ...race,
         change,
+        whole: isPartial ? whole : null,
+        sequel:
+          !isPartial || top[0] == null || top[0].key === "none"
+            ? null
+            : top[1]?.value === top[0].value
+              ? m.race_after_tied({
+                  party: top[0].name,
+                  runner: top[1].name,
+                  seats: count(top[0].value),
+                  total: count(whole.total),
+                })
+              : m.race_after({
+                  party: top[0].name,
+                  seats: count(top[0].value),
+                  total: count(whole.total),
+                }),
         tones: legend.map((item) => swatch(item.color, item.key)),
         titles: legend.map((item) =>
           item.person == null ? (item.short ?? item.label) : item.label,
@@ -328,6 +413,24 @@
       >
     {/if}
   </p>
+  {#if races.length > 1}
+    <ul class="mbs-2 grid gap-2 max-inline-[72ch]">
+      {#each races.slice(0, 3) as race, index (index)}
+        {#if race.lede != null}
+          <li class="grid gap-0.5 border-s-2 border-border ps-3">
+            <a
+              class="text-[0.8125rem] font-semibold text-muted-foreground hover:text-foreground"
+              href="#race-{index}">{race.name}</a
+            >
+            <span
+              class="font-serif text-[clamp(1.0625rem,1.6vw,1.25rem)]/snug text-pretty"
+              >{race.sequel ?? race.lede}</span
+            >
+          </li>
+        {/if}
+      {/each}
+    </ul>
+  {/if}
 </header>
 
 {#if races.length === 0}
@@ -386,6 +489,14 @@
               {/if}
             </span>
             {@render balance(race.balance)}
+            {#if race.whole != null}
+              <span class="grid gap-1.5 border-bs border-border/60 pbs-2">
+                <span class="text-xs text-muted-foreground"
+                  >{m.board_after()}</span
+                >
+                {@render balance({ ...race.whole, isCount: true })}
+              </span>
+            {/if}
           </a>
         </li>
       {/each}
@@ -421,7 +532,7 @@
         {/if}
       </p>
     </div>
-    {#if race.lede != null}
+    {#if race.lede != null && (races.length === 1 || index >= 3 || race.sequel != null)}
       <p
         class={cn("text-pretty max-inline-[64ch]", {
           "text-[1.0625rem]": index === 0,
