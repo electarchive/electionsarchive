@@ -373,10 +373,18 @@ export async function archive(path: string, search: URLSearchParams) {
     };
   }
   if (slug.type === "election") {
+    const input = { id: slug.entity_id };
+    const [election, governments, regions, tiers] = await Promise.all([
+      call(router.elections.get, input),
+      call(router.elections.governments, input),
+      call(router.elections.regions, input),
+      call(router.elections.tiers, input),
+    ]);
     return {
       kind: "election" as const,
       id: slug.entity_id,
-      election: await call(router.elections.get, { id: slug.entity_id }),
+      election,
+      sections: { governments, regions, tiers },
     };
   }
   if (slug.type === "polity") {

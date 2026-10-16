@@ -1,5 +1,10 @@
 <script lang="ts">
-  import { createQueries, createQuery } from "@tanstack/svelte-query";
+  import {
+    createQueries,
+    createQuery,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
+  import { untrack } from "svelte";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -19,10 +24,28 @@
   const {
     id,
     election,
+    sections,
   }: {
     id: string;
     election: Extract<PageData, { kind: "election" }>["election"];
+    sections: Extract<PageData, { kind: "election" }>["sections"];
   } = $props();
+
+  const client = useQueryClient();
+  untrack(() => {
+    client.setQueryData(
+      orpc.elections.governments.queryKey({ input: { id } }),
+      sections.governments,
+    );
+    client.setQueryData(
+      orpc.elections.regions.queryKey({ input: { id } }),
+      sections.regions,
+    );
+    client.setQueryData(
+      orpc.elections.tiers.queryKey({ input: { id } }),
+      sections.tiers,
+    );
+  });
 
   const STATUSES: Record<string, () => string> = {
     scheduled: m.election_scheduled,
