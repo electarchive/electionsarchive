@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { page } from "$app/state";
+  import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import type { PageData } from "./$types";
   import Contest from "./contest.svelte";
@@ -35,10 +37,91 @@
         ? data.election.name
         : data.polity.name,
   );
+  const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
+  const years = $derived(
+    data.kind === "polity"
+      ? data.polity.elections.flatMap((election) =>
+          election.year == null ? [] : [election.year],
+        )
+      : [],
+  );
+  const description = $derived(
+    data.kind === "contest"
+      ? m.meta_contest({ name: title, date: date(data.contest.election.date) })
+      : data.kind === "election"
+        ? m.meta_election({
+            name: data.election.name,
+            date: date(data.election.date),
+          })
+        : m.meta_polity({
+            name: data.polity.name,
+            first: String(Math.min(...years)),
+            last: String(Math.max(...years)),
+          }),
+  );
+  const dataset = $derived({
+    "@context": "https://schema.org",
+    "@type": "Dataset",
+    name: title,
+    description,
+    url: canonical,
+    isAccessibleForFree: true,
+    creator: {
+      "@type": "Organization",
+      name: m.wordmark(),
+      url: page.url.origin,
+    },
+    spatialCoverage: {
+      "@type": "Place",
+      name:
+        data.kind === "contest"
+          ? data.contest.scope.name
+          : data.kind === "election"
+            ? (data.election.breadcrumbs.at(-1)?.name ?? data.election.name)
+            : data.polity.name,
+    },
+    temporalCoverage:
+      data.kind === "contest"
+        ? data.contest.election.date
+        : data.kind === "election"
+          ? data.election.date
+          : years.length === 0
+            ? null
+            : `${Math.min(...years)}/${Math.max(...years)}`,
+    isBasedOn:
+      data.kind === "contest"
+        ? data.contest.sets.flatMap(({ source }) =>
+            source.url == null ? [] : [source.url],
+          )
+        : undefined,
+    distribution: [
+      ["application/json", "json"],
+      ["text/markdown", "md"],
+    ].map(([type, suffix]) => ({
+      "@type": "DataDownload",
+      encodingFormat: type,
+      contentUrl: `${canonical}.${suffix}`,
+    })),
+  });
+  const jsonld = $derived(
+    JSON.stringify(dataset)
+      .replaceAll("<", String.raw`\u003c`)
+      .replaceAll("&", String.raw`\u0026`),
+  );
 </script>
 
 <svelte:head>
   <title>{title} | {m.wordmark()}</title>
+  <meta name="description" content={description} />
+  <link rel="canonical" href={canonical} />
+  <link rel="alternate" type="application/json" href="{canonical}.json" />
+  <link rel="alternate" type="text/markdown" href="{canonical}.md" />
+  {#if data.kind === "contest" && data.contest.scope.isFine}
+    <meta name="robots" content="noindex" />
+  {/if}
+  <svelte:element this={"script"} type="application/ld+json"
+    >{jsonld}</svelte:element
+  >
 </svelte:head>
 
 <main class="p-3.5 max-sm:p-0">

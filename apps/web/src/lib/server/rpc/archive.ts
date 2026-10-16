@@ -1530,6 +1530,7 @@ export const contests = {
         scope: v.object({
           name: v.string(),
           noun: v.nullable(v.string()),
+          isFine: v.boolean(),
           parent: v.nullable(v.string()),
           trail: v.array(
             v.object({
@@ -1901,6 +1902,7 @@ export const contests = {
         scope: {
           name: trail.at(-1)?.name ?? "",
           noun: scoped?.noun ?? null,
+          isFine: scoped?.kind === "precinct" || scoped?.kind === "synthetic",
           parent: isRoot ? null : (trail.at(-2)?.name ?? null),
           trail,
         },
