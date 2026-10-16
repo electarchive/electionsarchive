@@ -1244,7 +1244,7 @@ async function tabulate(
   });
   const [now, then] = await Promise.all([
     Promise.all(
-      Array.from({ length: Math.max(0, ...tier) + 1 }, (_, n) => {
+      Array.from({ length: Math.max(0, ...tier) + 1 }, async (_, n) => {
         const batch = rows.filter((_row, index) => tier[index] === n);
         return load(
           roots,
@@ -2637,6 +2637,123 @@ export const contests = {
       );
       return drawn.flat();
     }),
+  rounds: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/rounds",
+        summary:
+          "List every round of a contest, from a primary or first round through its runoff, with each round's leader at the contest's place or the scoped place within it",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        unit: v.optional(v.string()),
+      }),
+    )
+    .output(
+      v.array(
+        v.object({
+          id: v.string(),
+          path: v.nullable(v.string()),
+          round: v.number(),
+          kind: v.string(),
+          date: v.nullable(v.string()),
+          isCurrent: v.boolean(),
+          leaders: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              color: v.nullable(v.string()),
+              person: v.nullable(v.string()),
+              party: v.nullable(v.string()),
+              share: v.number(),
+              outcome: v.nullable(v.string()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        path: string | null;
+        round: number;
+        kind: string;
+        date: string | null;
+      }>(sql`
+        with recursive back(id) as (
+          select ${input.id}::uuid
+          union
+          select c.previous_round_id from contest c join back on c.id = back.id where c.previous_round_id is not null
+        ),
+        chain(id) as (
+          select id from back
+          union
+          select c.id from contest c join chain on c.previous_round_id = chain.id
+        )
+        select c.id, (select s.path from slug s where s.entity_id = c.id and s.is_current) as path,
+          c.round_number as round, e.kind::text as kind, e.date_from::text as date
+        from chain join contest c on c.id = chain.id join election e on e.id = c.election_id
+        order by e.date_from, c.round_number
+      `);
+      if (found.rows.length < 2) {
+        return [];
+      }
+      const contest = await find(input.id);
+      const chain = await descend(contest, input.unit);
+      const area = chain.at(-1) ?? contest.place;
+      const unit = chain.map((entry) => entry.segment).join("/");
+      return Promise.all(
+        found.rows.map(async (row) => {
+          const all =
+            area == null
+              ? null
+              : await load([row.id], [area.k], row.date ?? "infinity", [
+                  row.id,
+                ]);
+          const loaded = area == null ? undefined : all?.get(area.k);
+          const leaders =
+            loaded == null
+              ? []
+              : compare(loaded.side, null, [], "party")
+                  .flatMap((entry) =>
+                    entry.current == null
+                      ? []
+                      : [
+                          {
+                            key: entry.key,
+                            label: entry.label,
+                            color: entry.color,
+                            person: entry.current.person,
+                            party: entry.current.party,
+                            votes: entry.current.votes,
+                            share: entry.current.share,
+                            outcome: chain.length > 0 ? null : entry.current.outcome,
+                          },
+                        ],
+                  )
+                  .toSorted((a, b) => b.votes - a.votes)
+                  .slice(0, 2);
+          return {
+            id: row.id,
+            path:
+              row.path == null
+                ? null
+                : [
+                    row.path,
+                    ...(loaded == null || unit === "" ? [] : [unit]),
+                  ].join("/"),
+            round: row.round,
+            kind: row.kind,
+            date: row.date,
+            isCurrent: row.id === input.id,
+            leaders,
+          };
+        }),
+      );
+    }),
   lists: os
     .meta(
       openapi({
@@ -3088,8 +3205,11 @@ async function races(election: string, polity: string, date: string | null) {
       const results = folded
         .entries()
         .map(([key, members]) => {
-          const lead = members.find((row) => row.key === key) ?? members[0];
           const party = key.startsWith("party:") ? key.slice(6) : null;
+          const lead =
+            members.find((row) => row.key === key) ??
+            members.find((row) => row.cell.party === party) ??
+            members[0];
           let [votes, share, seats] = [0, 0, null as number | null];
           for (const row of members) {
             votes += row.cell.votes;
