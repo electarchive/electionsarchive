@@ -231,6 +231,30 @@
         </ul>
       </section>
     {/if}
+    {#if data.rivals.length > 0}
+      <section
+        class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5"
+        aria-labelledby="rivals"
+      >
+        <h2 id="rivals" class="text-[0.8125rem] font-bold">
+          {m.versus_rivals()}
+        </h2>
+        <ul class="flex flex-wrap gap-2">
+          {#each data.rivals as rival (rival.id)}
+            <li>
+              <a
+                class="inline-flex items-center gap-2 rounded-sm border border-input px-3 font-serif text-base font-[640] block-10 hover:border-foreground hover:bg-secondary"
+                href={resolve(`/compare?a=${sides[0]?.id ?? ""}&b=${rival.id}`)}
+                ><span
+                  class="bg-foreground block-2.5 inline-2.5"
+                  aria-hidden="true"
+                ></span>{rival.name}</a
+              >
+            </li>
+          {/each}
+        </ul>
+      </section>
+    {/if}
     {#if isMismatch}
       <p class="col-span-12 bg-card px-3.5 py-4 text-sm text-muted-foreground">
         {m.versus_mismatch()}

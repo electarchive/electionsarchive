@@ -458,9 +458,27 @@ export async function comparison(ids: Array<string>) {
         )
       : null;
   const [one, two] = sided ?? [];
+  const rivals =
+    second == null && first?.type === "party"
+      ? await db.execute<{ id: string; name: string }>(sql`
+        select o.party_id as id, (
+          select n.text from name n where n.entity_id = o.party_id
+          order by n.is_preferred desc, (n.lang = 'en') desc limit 1
+        ) as name
+        from contest_option o
+        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+        join result_set rs on rs.id = x.result_set_id and rs.is_default
+        where o.contest_id in (select contest_id from contest_option where party_id = ${first.id}::uuid)
+          and o.party_id <> ${first.id}::uuid
+        group by o.party_id
+        order by sum(coalesce(x.seats, 1)) desc
+        limit 6
+      `)
+      : null;
   return {
     sides: found.rows,
     examples: examples?.rows ?? [],
+    rivals: rivals?.rows ?? [],
     people:
       first?.type === "person" && second?.type === "person"
         ? await Promise.all(
