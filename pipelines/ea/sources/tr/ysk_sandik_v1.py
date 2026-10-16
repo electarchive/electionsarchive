@@ -12,7 +12,7 @@ import polars as pl
 
 from ea import changeset, raw
 from ea.changeset import Changeset
-from ea.sources.tr import oveo, ysk
+from ea.sources.tr import oveo, ysk, ysk_local
 from ea.sources.tr.ysk import (
     ALLIANCES,
     ALLIANCES_2018,
@@ -52,7 +52,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_sandik"
-VERSION = "12"
+VERSION = "13"
 PARSED = DATA / "parsed" / SOURCE
 EXPORT = Path.home() / "Developer/nisanyan/scripts/data/ysk_sandik/export"
 SITE = "[mirror URL removed]"
@@ -68,7 +68,9 @@ NOTE = (
     "include them. We count the difference as votes for independents, which brings the province to the gazette's "
     "total. For 2011, YSK ballot-box data has no neighborhood results for 19 districts, most of them central districts that were "
     "later split or renamed, so those votes are missing here. Neighborhoods are matched to Oy ve Ötesi's neighborhood "
-    "list by province and district."
+    "list by province and district. In the 2019 local elections YSK ballot-box data lists independent candidates by name; in "
+    "2024 it reports every party it does not list together with the independents as one total. Towns whose ballot "
+    "boxes YSK ballot-box data reports only as a whole are kept as one unit."
 )
 ABOLISHED = date(2014, 3, 30)
 ABSORBED_NOTE = (
@@ -89,7 +91,12 @@ CONTESTS = {
     "2023-cumhurbaskanlıgı-ikinci-tur-secimleri": (str(ROUND_DAYS[2]), f"{ROUND_DAYS[2]}:president"),
     "2023-milletvekilligi-genel-secimleri": (str(ROUND_DAYS[1]), f"{ROUND_DAYS[1]}:parliament"),
 }
-URLS = {slug: f"{SITE}/elections/{quote(slug)}" for slug in CONTESTS}
+LOCAL = [
+    f"{year}-yerel-{office}-secimleri"
+    for year in (2019, 2024)
+    for office in ("buyuksehir-baskanlık", "belediye-baskanlık", "belediye-meclis", "il-genel-meclis-uyeligi")
+]
+URLS = {slug: f"{SITE}/elections/{quote(slug)}" for slug in [*CONTESTS, *LOCAL]}
 NEW_PARTIES = {"Demokratik Sol Parti": "DSP", "Bağımsız Türkiye Partisi": "BTP", "Demokrat Parti": "DP"}
 LABELS = (
     {upper(short): full for full, short, *_ in PARTIES}
@@ -158,7 +165,7 @@ def fetch() -> None:
         return
     except LookupError:
         pass
-    bundles = {slug: [] for slug in CONTESTS}
+    bundles = {slug: [] for slug in URLS}
     for folder, _, files in os.walk(EXPORT):
         for file in files:
             if (slug := unicodedata.normalize("NFC", file.removesuffix(".json"))) in bundles:
@@ -207,7 +214,7 @@ def parse() -> None:
         raise ValueError("a label repeats within a place")
     places = ["slug", "scope", "plate", "district"]
     missing = (
-        frame.filter((pl.col("scope") == "district") & pl.col("slug").str.starts_with("2011"))
+        frame.filter(pl.col("scope") == "district")
         .select(places)
         .unique()
         .join(
@@ -219,7 +226,10 @@ def parse() -> None:
             how="anti",
         )
     )
-    print(f"2011 districts without neighborhoods: {sorted(missing.select('plate', 'district').iter_rows())}")
+    print(
+        "2011 districts without neighborhoods:",
+        sorted(missing.filter(pl.col("slug").str.starts_with("2011")).select("plate", "district").iter_rows()),
+    )
     if (
         frame.filter(
             (pl.col("scope") == "province")
@@ -245,8 +255,14 @@ def parse() -> None:
         if not coarse.equals(fine):
             raise ValueError(f"{finer} votes do not add up to {coarser} votes")
     PARSED.mkdir(parents=True, exist_ok=True)
-    neighborhoods = frame.filter(pl.col("scope") == "neighborhood").drop("scope")
+    neighborhoods = frame.filter(pl.col("scope") == "neighborhood", pl.col("slug").is_in(list(CONTESTS))).drop("scope")
     neighborhoods.write_parquet(PARSED / "neighborhoods.parquet")
+    pl.concat(
+        [
+            frame.filter(pl.col("scope") == "neighborhood"),
+            frame.join(missing.filter(pl.col("slug").str.contains("yerel")), on=places, how="semi"),
+        ]
+    ).filter(pl.col("slug").is_in(LOCAL)).drop("scope").write_parquet(PARSED / "local.parquet")
     print(
         neighborhoods.group_by("slug").agg(
             pl.col("votes").sum(), places=pl.struct("plate", "district", "neighborhood").n_unique()
@@ -265,9 +281,17 @@ def emit() -> Path:
         (district, upper(name)): id
         for id, district, name in pl.read_parquet(oveo.PARSED / "mahalle.parquet").iter_rows()
     }
-    slugs: dict[tuple[str, str, str], set[str]] = {}
+    local = pl.read_parquet(ysk_local.PARSED / "municipal.parquet")
+    slugs: dict[tuple[str, str, str | None], set[str]] = {}
     for plate, district, neighborhood, slug in (
-        frame.select("plate", "district", "neighborhood", "slug").unique().iter_rows()
+        pl.concat(
+            [
+                frame.select("plate", "district", "neighborhood", "slug"),
+                local.select("plate", "district", "neighborhood", "slug"),
+            ]
+        )
+        .unique()
+        .iter_rows()
     ):
         slugs.setdefault((plate, district, neighborhood), set()).add(slug)
     sorted_into = {
@@ -303,6 +327,18 @@ def emit() -> Path:
             .select("code", "value")
             .iter_rows()
         },
+        **{
+            f"{ysk_local.DAYS[year]}:{ysk_local.OFFICES[office][0]}": value
+            for year, office, value in pl.read_parquet(ysk_local.PARSED / "values.parquet")
+            .filter(
+                pl.col("year").is_in([2019, 2024]),
+                pl.col("office").is_in(["il_genel", "belediye_meclisi"]),
+                pl.col("unit") == "domestic",
+                pl.col("column") == "valid",
+            )
+            .select("year", "office", "value")
+            .iter_rows()
+        },
     }
     with connect() as conn:
         cs = Changeset(
@@ -312,7 +348,7 @@ def emit() -> Path:
             summary=(
                 "Neighborhood results of Turkey's 2014 presidential election, its 2011, June 2015, and "
                 "November 2015 parliamentary elections, its 2017 constitutional referendum, its 2018 and 2023 general elections, "
-                "and İstanbul's 2019 mayoral elections, from YSK ballot-box data"
+                "İstanbul's 2019 mayoral elections, and the 2019 and 2024 local elections, from YSK ballot-box data"
             ),
             polity="TR",
         )
@@ -335,6 +371,7 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), source)
         turkey = cs.polity("TR")
         cs.add("scheme", code="tr.cezaevi", polity_id=turkey, kind="precinct", rank=3, noun="prison")
+        cs.add("scheme", code="tr.belde", polity_id=turkey, kind="administrative", rank=3, noun="town")
 
         events: dict[UUID, UUID] = dict(
             conn.execute(
@@ -351,9 +388,11 @@ def emit() -> Path:
         added: list[str] = []
         rows: list[dict[str, object]] = []
         for plate, district, neighborhood in (
-            frame.select("plate", "district", "neighborhood")
+            pl.concat(
+                [frame.select("plate", "district", "neighborhood"), local.select("plate", "district", "neighborhood")]
+            )
             .unique()
-            .sort("plate", "district", "neighborhood")
+            .sort("plate", "district", "neighborhood", nulls_last=False)
             .iter_rows()
         ):
             label = DISTRICTS.get((plate, district)) or (
@@ -361,6 +400,24 @@ def emit() -> Path:
             )
             ilce_id = districts[(plate, OVO_DISTRICTS.get(label, label))]
             parent = cs.key("tr.oveo.ilce", str(ilce_id))
+            if neighborhood is None:
+                town = title(district.split(" - ")[1])
+                unit = cs.unit("tr.belde", f"{plate}:{title(label)}:{town}")
+                units[f"{plate}\x1f{district}\x1f"] = str(unit)
+                rows.append(
+                    {
+                        "id": str(unit),
+                        "polity_id": str(turkey),
+                        "scheme_code": "tr.belde",
+                        "code": f"{plate}:{title(label)}:{town}",
+                        "parent_id": None,
+                        "area_relation": "within",
+                        "area_id": str(parent),
+                        "kind": "aggregate",
+                    }
+                )
+                name(unit, town)
+                continue
             bare = [
                 f"{neighborhood} {suffix}"
                 for suffix in ("MAH.", "KÖYÜ")
@@ -439,7 +496,7 @@ def emit() -> Path:
                 cs.add("area_event_member", event_id=event, area_id=area, role="from")
         print(f"{len(units)} units, {len(added)} neighborhoods not in Oy ve Ötesi's list: {added}")
 
-        place = pl.concat_str("plate", "district", "neighborhood", separator="\x1f")
+        place = pl.concat_str("plate", "district", pl.col("neighborhood").fill_null(""), separator="\x1f")
         parliament = pl.col("slug").str.contains("milletvekilligi")
         frame = frame.with_columns(
             unit=place.replace_strict(units),
@@ -540,12 +597,30 @@ def emit() -> Path:
             else:
                 raise ValueError(f"{contest_key}: no option for {option}")
 
-        valid = frame.group_by("contest", "unit").agg(pl.col("votes").sum())
+        local = local.with_columns(unit=place.replace_strict(units))
+        for contest_key, option in local.select("contest", "option").unique().iter_rows():
+            options[f"{contest_key}\x1f{option}"] = str(cs.key("tr.option", option))
+        votes = pl.concat([votes, local.group_by("contest", "unit", "option").agg(pl.col("votes").sum())])
+        valid = (
+            pl.concat([frame, local.select(frame.columns)], how="diagonal_relaxed")
+            .group_by("contest", "unit")
+            .agg(pl.col("votes").sum())
+        )
+        elections = {
+            contest_key: contest_key if contest_key.endswith("-mayor") else f"{contest_key[:10]}:local"
+            for contest_key in local["contest"].unique()
+        } | {contest_key: election for election, contest_key in CONTESTS.values()}
         result_sets: dict[str, str] = {}
         for contest_key, counted in valid.group_by("contest").agg(pl.col("votes").sum()).sort("contest").iter_rows():
-            election_key = next(election for election, prefix in CONTESTS.values() if contest_key.startswith(prefix))
+            election_key = elections.get(contest_key) or next(
+                election for election, prefix in CONTESTS.values() if contest_key.startswith(prefix)
+            )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
-            denominator = official[contest_key]
+            denominator = official.get(contest_key)
+            annulled = contest_key.split(":")[1].removesuffix("-mayor") in {
+                str(MARCH): ysk_local.ANNULLED[2019] | {"istanbul"},
+                str(ysk_local.DAYS[2024]): ysk_local.ANNULLED[2024],
+            }.get(contest_key[:10], set())
             cs.add(
                 "result_set",
                 id=result_set,
@@ -553,7 +628,7 @@ def emit() -> Path:
                 contest_id=cs.key("tr.contest", contest_key),
                 stage="alternative",
                 kind="counted",
-                status="annulled" if contest_key.startswith(str(MARCH)) else "active",
+                status="annulled" if annulled else "active",
                 source_id=source,
                 is_default=False,
                 completeness=None if denominator is None else round(counted / denominator, 4),

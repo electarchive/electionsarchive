@@ -13,6 +13,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.tr import ysk_sandik
 from ea.sources.tr.ysk import (
     INDEPENDENTS,
     LICENSE,
@@ -28,7 +29,7 @@ from ea.sources.tr.ysk import (
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk_local"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs/"
@@ -45,6 +46,8 @@ DAYS = {
     2004: date(2004, 3, 28),
     2009: date(2009, 3, 29),
     2014: date(2014, 3, 30),
+    2019: date(2019, 3, 31),
+    2024: date(2024, 3, 31),
 }
 OLD = {
     (1963, "il_genel"): "Mahalli/1963/KesinSecimSonuclari/1963_İl_Genel_Meclisi_Uyeligi_Secimleri_Sonucu.pdf",
@@ -121,6 +124,14 @@ NATIONAL = {
     (2014, "buyuksehir"): "2014MahalliIdareler/Buyuksehir2014.pdf",
     (2014, "belediye_baskani"): "2014MahalliIdareler/BelediyeBaskanligi2014.pdf",
     (2014, "belediye_meclisi"): "2014MahalliIdareler/BelediyeMeclisUyeligi2014.pdf",
+    (2019, "il_genel"): "2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Liste-1.pdf",
+    (2019, "buyuksehir"): "2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Liste-2.pdf",
+    (2019, "belediye_baskani"): "2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Liste-3.pdf",
+    (2019, "belediye_meclisi"): "2019MahalliIdareler/KesinSecimSonuclari/2019Mahalli-Liste-4.pdf",
+    (2024, "il_genel"): "2024MahalliIdareler/2024KesinSecimSonucları/ILGENELMECLISUYELIGI.pdf",
+    (2024, "buyuksehir"): "2024MahalliIdareler/2024KesinSecimSonucları/BUYUKSEHIRBELEDIYEBASKANLIGI.pdf",
+    (2024, "belediye_baskani"): "2024MahalliIdareler/2024KesinSecimSonucları/BELEDIYEBASKANLIGI.pdf",
+    (2024, "belediye_meclisi"): "2024MahalliIdareler/2024KesinSecimSonucları/BELEDIYEMECLISUYELIGI.pdf",
 }
 SEAT_GRIDS = {
     (2004, "il_genel"): (
@@ -207,6 +218,14 @@ TABLES_2014 = {
     "belediye_baskani_winners": "2014MahalliIdareler/BelediyeBsk-KazananAdaylar.xlsx",
 }
 CANDIDATES_2009 = "2009MahalliIdareler/2009Buyuksehir-AdayListesi.pdf"
+CANDIDATES = {
+    (2019, "buyuksehir"): "2019MahalliIdareler/2019Buyuksehir-AdayListesi.pdf",
+    (2019, "ilce"): "2019MahalliIdareler/2019ilceBelediyeBsk-AdayListesi.pdf",
+    (2019, "belde"): "2019MahalliIdareler/2019BeldeBelediyeBsk-AdayListesi.pdf",
+    (2024, "buyuksehir"): "2024MahalliIdareler/2024KesinAdayListeleri/Büyükşehir.pdf",
+    (2024, "ilce"): "2024MahalliIdareler/2024KesinAdayListeleri/ilce belediye başkanı.pdf",
+    (2024, "belde"): "2024MahalliIdareler/2024KesinAdayListeleri/belde belediye başkanı.pdf",
+}
 PLATES = {upper(name): f"{plate:02}" for plate, name in enumerate(PROVINCES, 1)} | {
     "AFYON": "03",
     "İÇEL": "33",
@@ -214,6 +233,9 @@ PLATES = {upper(name): f"{plate:02}" for plate, name in enumerate(PROVINCES, 1)}
     "İÇEL(Mersin)": "33",
     "TOPLAM": "domestic",
 }
+HEADERS = {"İL": "province", "İLÇE": "district", "BELDE": "town", "SOYADI": "family", "MESLEĞİ": "rest"}
+CANONICAL = {"BAHŞİLİ": "BAHŞILI", "19.May": "19 MAYIS"}
+TOWNS = {(2019, "80", "TÜRKMEN"): "TÜYSÜZ", (2019, "32", "SAV"): "SAVKÖY"}
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')
 GLUED = re.compile(r"^(\D+?)(\d{1,3}(?:\.\d{3})+|\d+)$")
 NUMBER = re.compile(r"^(?:\d{1,3}(?:\.\d{3})+|\d+)(?:,0)?$|^-$")
@@ -237,7 +259,7 @@ def number(text: str) -> int:
 
 
 def fetch() -> None:
-    paths = {*OLD.values(), *NATIONAL.values(), *TABLES_2014.values(), CANDIDATES_2009}
+    paths = {*OLD.values(), *NATIONAL.values(), *TABLES_2014.values(), CANDIDATES_2009, *CANDIDATES.values()}
     paths |= {path for path, _ in GRIDS.values()} | {path for path, _ in SEAT_GRIDS.values()}
     for path in sorted(paths):
         for attempt in range(5):
@@ -453,11 +475,17 @@ def national(pdf: raw.Artifact, year: int, office: str, rows: list[dict[str, obj
             close(numbered, names, page, width, height)
     if not tables:
         raise ValueError(f"{pdf.url}: no party table")
-    table = tables[1 if (year, office) == (2004, "belediye_meclisi") else 0]
+    table = (
+        tables[1]
+        if (year, office) == (2004, "belediye_meclisi")
+        else [row for part in tables for row in part]
+        if year == 2024
+        else tables[0]
+    )
     for column, (value, page, word, width, height) in fields.items():
         rows.append(cell(year, office, "domestic", column, value, pdf.url, page, word, width, height))
     for name, votes, seats, page, width, height in table:
-        name = "TOPLAM" if re.fullmatch(r"(T ?O ?P ?L ?A ?M)?", name) else name
+        name = "TOPLAM" if re.fullmatch(r"(T ?O ?P ?L ?A ?M)?", name) or name.startswith("GENEL TOPLAM") else name
         rows.append(cell(year, office, "domestic", name, number(votes[4]), pdf.url, page, votes, width, height))
         rows.append(
             cell(
@@ -558,7 +586,7 @@ def parse() -> None:
         city = next((name for name in sorted(PLATES, key=len, reverse=True) if line.startswith(f"{name} ")), None)
         if city is None:
             continue
-        party, given, family = re.split(r"\s{2,}", line[len(city) :].strip())[:3]
+        label, given, family = re.split(r"\s{2,}", line[len(city) :].strip())[:3]
         mayors.append(
             {
                 "year": 2009,
@@ -566,7 +594,7 @@ def parse() -> None:
                 "plate": PLATES[city],
                 "district": None,
                 "town": None,
-                "party": party,
+                "party": label,
                 "name": f"{given} {family}",
                 "url": url(CANDIDATES_2009),
             }
@@ -574,7 +602,7 @@ def parse() -> None:
     for key in ("buyuksehir_winners", "belediye_baskani_winners"):
         sheet = pl.read_excel(raw.cached(SOURCE, url(TABLES_2014[key])).path, has_header=False)
         for values in sheet.slice(3).iter_rows():
-            *place, party, given, family = (None if value is None else str(value).strip() for value in values)
+            *place, label, given, family = (None if value is None else str(value).strip() for value in values)
             mayors.append(
                 {
                     "year": 2014,
@@ -582,30 +610,199 @@ def parse() -> None:
                     "plate": PLATES[str(place[0])],
                     "district": place[1] if len(place) > 1 else None,
                     "town": place[2] if len(place) > 2 else None,
-                    "party": party,
+                    "party": label,
                     "name": f"{given} {family}",
                     "url": url(TABLES_2014[key]),
                 }
             )
+    for (year, office), path in CANDIDATES.items():
+        for _, _, found in words(raw.cached(SOURCE, url(path))):
+            starts: dict[str, float] = {}
+            for line in lines(found):
+                texts = [word[4] for word in line]
+                if "SOYADI" in texts:
+                    starts = {
+                        field: word[0]
+                        for index, word in enumerate(line)
+                        if (
+                            field := "party"
+                            if word[4].startswith("PARTİ")
+                            else "given"
+                            if word[4] == "ADI" and texts[index - 1] not in ("İL", "İLÇE", "BELDE", "PARTİ")
+                            else HEADERS.get(word[4])
+                        )
+                        is not None
+                    }
+                    continue
+                cells: dict[str, list[str]] = {}
+                for word in line:
+                    column = max(((x, field) for field, x in starts.items() if word[0] >= x - 4), default=None)
+                    if column is not None and column[1] != "rest":
+                        cells.setdefault(column[1], []).append(word[4])
+                if "party" not in cells or "family" not in cells:
+                    continue
+                text = {field: " ".join(parts) for field, parts in cells.items()}
+                mayors.append(
+                    {
+                        "year": year,
+                        "office": "buyuksehir" if office == "buyuksehir" else "belediye_baskani",
+                        "plate": PLATES[text["province"]],
+                        "district": CANONICAL.get(text.get("district", ""), text.get("district")),
+                        "town": text.get("town"),
+                        "party": text["party"],
+                        "name": f"{text['given']} {text['family']}",
+                        "url": url(path),
+                    }
+                )
+    district = pl.col("district").str.split("/").list.first()
+    central = district.str.ends_with(" MERKEZ")
+    province = pl.col("plate").replace_strict({f"{plate:02}": slug(name) for plate, name in enumerate(PROVINCES, 1)})
+    named = (
+        pl.DataFrame(mayors, infer_schema_length=None)
+        .with_columns(
+            parts=pl.when(pl.col("office") == "buyuksehir")
+            .then(pl.concat_list([province]))
+            .otherwise(
+                pl.concat_list(
+                    [
+                        province,
+                        pl.when(central & pl.col("town").is_null())
+                        .then(None)
+                        .when(central)
+                        .then(pl.lit("merkez"))
+                        .otherwise(district.map_elements(slug, pl.String)),
+                        pl.col("town").map_elements(slug, pl.String),
+                    ]
+                ).list.drop_nulls()
+            )
+        )
+        .with_columns(key=pl.col("parts").list.join("-"), path="tr/" + pl.col("parts").list.join("/"))
+        .drop("parts")
+    )
+    lists: dict[tuple[object, ...], tuple[str, list[tuple[str | None, str, str]]]] = {}
+    for row in named.filter(pl.col("year") >= 2019).iter_rows(named=True):
+        owner = party(str(row["party"]), int(row["year"]))
+        contest = f"{DAYS[row['year']]}:{row['key']}-mayor"
+        entry = lists.setdefault(
+            (row["year"], row["office"], row["plate"], row["district"], row["town"]), (contest, [])
+        )
+        if any(option.endswith(f":{owner or slug(str(row['name']))}") for _, _, option in entry[1]):
+            raise ValueError(f"{contest}: two candidates share an option")
+        entry[1].append((owner, str(row["name"]), f"{contest}:{owner or slug(str(row['name']))}"))
+    towns = {(year, plate, district, town) for year, _, plate, district, town in lists if town is not None}
+    local = pl.read_parquet(ysk_sandik.PARSED / "local.parquet").with_columns(
+        year=pl.col("slug").str.slice(0, 4).cast(pl.Int64),
+        office=pl.col("slug").replace_strict(
+            {
+                f"{year}-yerel-{name}-secimleri": office
+                for year in (2019, 2024)
+                for name, office in (
+                    ("buyuksehir-baskanlık", "buyuksehir"),
+                    ("belediye-baskanlık", "belediye_baskani"),
+                    ("belediye-meclis", "belediye_meclisi"),
+                    ("il-genel-meclis-uyeligi", "il_genel"),
+                )
+            }
+        ),
+    )
+    local = local.filter(~((pl.col("year") == 2019) & (pl.col("office") == "buyuksehir") & (pl.col("plate") == "34")))
+    places: dict[tuple[object, ...], str] = {}
+    for year, office, plate, place, neighborhood in (
+        local.filter(pl.col("office").is_in(["buyuksehir", "belediye_baskani"]))
+        .select("year", "office", "plate", "district", "neighborhood")
+        .unique()
+        .iter_rows()
+    ):
+        if office == "buyuksehir":
+            places[(year, office, plate, place, neighborhood)] = lists[(year, office, plate, None, None)][0]
+            continue
+        base, _, own = place.partition(" - ")
+        ilce = (
+            "MERKEZEFENDİ"
+            if (plate, base) == ("20", "MERKEZ")
+            else f"{upper(PROVINCES[int(plate) - 1])} MERKEZ"
+            if base == "MERKEZ"
+            else CANONICAL.get(base, base)
+        )
+        prefix = neighborhood.split("-")[0] if neighborhood is not None and "-" in neighborhood else None
+        town = (
+            TOWNS.get((year, plate, own), own)
+            if own
+            else TOWNS.get((year, plate, prefix), prefix)
+            if (year, plate, ilce, TOWNS.get((year, plate, prefix), prefix)) in towns
+            else None
+        )
+        places[(year, office, plate, place, neighborhood)] = lists[(year, office, plate, ilce, town)][0]
+    local = local.with_columns(
+        contest=pl.struct("year", "office", "plate", "district", "neighborhood").map_elements(
+            lambda place: places.get(tuple(place.values())) or f"{DAYS[place['year']]}:{OFFICES[place['office']][0]}",
+            pl.String,
+        )
+    )
+    candidates = {contest: entry for contest, entry in lists.values()}
+    listed = {
+        party(label, 2024) for label in local.filter(pl.col("year") == 2024)["label"].unique() if label in LABELS
+    } - {None}
+    options: dict[tuple[str, str], tuple[str, str]] = {}
+    for contest, label, year, votes in (
+        local.group_by("contest", "label", "year").agg(pl.col("votes").sum()).sort("contest", "label").iter_rows()
+    ):
+        lumped = year == 2024 and label == "BAĞIMSIZ"
+        if contest not in candidates:
+            option = "others" if lumped else (party(label, year) if label in LABELS else None) or "independents"
+            options[(contest, label)] = (f"{contest}:{option}", "others" if lumped else "list")
+            continue
+        running = candidates[contest]
+        found = (
+            [option for owner, _, option in running if owner not in listed]
+            if lumped
+            else [option for owner, _, option in running if owner == party(label, year)]
+            if label in LABELS
+            else [option for owner, name, option in running if owner is None and name == label]
+        )
+        if len(found) == 1:
+            options[(contest, label)] = (found[0], "candidate")
+        elif len(found) > 1:
+            options[(contest, label)] = (f"{contest}:others", "others")
+        elif label in LABELS and not lumped and votes:
+            options[(contest, label)] = (f"{contest}:{party(label, year)}", "unlisted")
+        elif votes:
+            raise ValueError(f"{contest}: no candidate for {label}")
+    local = local.join(
+        pl.DataFrame(
+            [(contest, label, option, kind) for (contest, label), (option, kind) in options.items()],
+            schema=["contest", "label", "option", "kind"],
+            orient="row",
+        ),
+        on=["contest", "label"],
+    )
     frame = pl.DataFrame(rows)
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "values.parquet")
-    pl.DataFrame(mayors, infer_schema_length=None).write_parquet(PARSED / "mayors.parquet")
+    named.write_parquet(PARSED / "mayors.parquet")
+    local.write_parquet(PARSED / "municipal.parquet")
+    print(
+        local.group_by("year", "office", "kind")
+        .agg(pl.col("contest").n_unique(), pl.col("votes").sum())
+        .sort("year", "office", "kind")
+    )
     print(frame.group_by("year", "office").agg(pl.col("unit").n_unique(), pl.len()).sort("year", "office"))
 
 
 PAGES_HTML = {
-    1963: "17-kasim-1963-mahalli-i̇dareler-genel-secimleri/80092",
-    1968: "2-haziran-1968-mahalli-i̇dareler-genel-secimleri/80091",
-    1973: "9-aralik-1973-mahalli-i̇dareler-genel-secimleri/80090",
-    1977: "11-aralik-1977-mahalli-i̇dareler-genel-secimleri/80089",
-    1984: "25-mart-1984-mahalli-idareler-genel-secimi/80065",
-    1989: "26-mart-1989-mahalli-idareler-genel-secimi/80064",
-    1994: "27-mart-1994-mahalli-idareler-genel-secimi/2804",
-    1999: "18-nisan-1999-mahalli-idareler-genel-secimi/2805",
-    2004: "28-mart-2004-mahalli-idareler-genel-secimleri/2818",
-    2009: "29-mart-2009-mahalli-idareler-genel-secimleri/2820",
-    2014: "30-mart-2014-mahalli-idareler-genel-secimleri/2853",
+    1963: "https://www.ysk.gov.tr/doc/sayfa/17-kasim-1963-mahalli-i̇dareler-genel-secimleri/80092.html",
+    1968: "https://www.ysk.gov.tr/doc/sayfa/2-haziran-1968-mahalli-i̇dareler-genel-secimleri/80091.html",
+    1973: "https://www.ysk.gov.tr/doc/sayfa/9-aralik-1973-mahalli-i̇dareler-genel-secimleri/80090.html",
+    1977: "https://www.ysk.gov.tr/doc/sayfa/11-aralik-1977-mahalli-i̇dareler-genel-secimleri/80089.html",
+    1984: "https://www.ysk.gov.tr/doc/sayfa/25-mart-1984-mahalli-idareler-genel-secimi/80065.html",
+    1989: "https://www.ysk.gov.tr/doc/sayfa/26-mart-1989-mahalli-idareler-genel-secimi/80064.html",
+    1994: "https://www.ysk.gov.tr/doc/sayfa/27-mart-1994-mahalli-idareler-genel-secimi/2804.html",
+    1999: "https://www.ysk.gov.tr/doc/sayfa/18-nisan-1999-mahalli-idareler-genel-secimi/2805.html",
+    2004: "https://www.ysk.gov.tr/doc/sayfa/28-mart-2004-mahalli-idareler-genel-secimleri/2818.html",
+    2009: "https://www.ysk.gov.tr/doc/sayfa/29-mart-2009-mahalli-idareler-genel-secimleri/2820.html",
+    2014: "https://www.ysk.gov.tr/doc/sayfa/30-mart-2014-mahalli-idareler-genel-secimleri/2853.html",
+    2019: "https://www.ysk.gov.tr/tr/secim-arsivi/2612",
+    2024: "https://www.ysk.gov.tr/tr/secim-arsivi/2612",
 }
 LABELS = {
     "Adalet Partisi": "adalet-partisi-1961",
@@ -708,6 +905,33 @@ LABELS = {
     "YURT PARTİSİ": "yurt-partisi",
     "ÖZGÜRLÜK VE DAYANIŞMA PARTİSİ": "sol-parti",
     "İŞÇİ PARTİSİ": "isci-partisi",
+    "ADALET BİRLİK PARTİSİ": "adalet-birlik-partisi",
+    "ADALET PARTİSİ": "adalet-partisi",
+    "ANADOLU BİRLİĞİ PARTİSİ": "anadolu-birligi-partisi",
+    "AYDINLIK DEMOKRASİ PARTİSİ": "aydinlik-demokrasi-partisi",
+    "DEMOKRASİ VE ATILIM PARTİSİ": "demokrasi-ve-atilim-partisi",
+    "GELECEK PARTİSİ": "gelecek-partisi",
+    "GÜÇ BİRLİĞİ PARTİSİ": "guc-birligi-partisi",
+    "HALKLARIN EŞİTLİK VE DEMOKRASİ PARTİSİ": "halklarin-esitlik-ve-demokrasi-partisi",
+    "MEMLEKET PARTİSİ": "memleket-partisi",
+    "MİLLİ YOL PARTİSİ": "milli-yol-partisi",
+    "OCAK PARTİSİ": "ocak-partisi",
+    "SOL PARTİ": "sol-parti",
+    "TÜRKİYE KOMÜNİST HAREKETİ": "turkiye-komunist-hareketi",
+    "TÜRKİYE İŞÇİ PARTİSİ": "turkiye-isci-partisi",
+    "VATAN PARTİSİ": "vatan-partisi",
+    "YENİDEN REFAH PARTİSİ": "yeniden-refah-partisi",
+    "ZAFER PARTİSİ": "zafer-partisi",
+    "İYİ PARTİ": "iyi-parti",
+    "AB PARTİ": "adalet-birlik-partisi",
+    "ABP": "anadolu-birligi-partisi",
+    "DEM Parti": "halklarin-esitlik-ve-demokrasi-partisi",
+    "DEVA PARTİSİ": "demokrasi-ve-atilim-partisi",
+    "MEMLEKET": "memleket-partisi",
+    "MİLLİ YOL": "milli-yol-partisi",
+    "TKH": "turkiye-komunist-hareketi",
+    "TİP": "turkiye-isci-partisi",
+    "YENİDEN REFAH": "yeniden-refah-partisi",
 }
 DATED = {
     ("Türkiye İşçi Partisi", 1977): "turkiye-isci-partisi-1961",
@@ -720,6 +944,10 @@ DATED = {
     ("DEMOKRAT PARTİ", 2014): "demokrat-parti",
     ("DYP", 2014): "dogru-yol-partisi",
     ("DOĞRU YOL PARTİSİ", 2014): "dogru-yol-partisi",
+    **{(label, year): "demokrat-parti" for label in ("DP", "DEMOKRAT PARTİ") for year in (2019, 2024)},
+    ("ANAP", 2024): "anavatan-partisi",
+    ("ANAVATAN PARTİSİ", 2024): "anavatan-partisi",
+    ("YENİ TÜRKİYE PARTİSİ", 2024): "yeni-turkiye-partisi-2024",
 }
 MINTED = {
     "sosyalist-devrim-partisi": ("Sosyalist Devrim Partisi", None),
@@ -729,6 +957,13 @@ MINTED = {
     "sosyaldemokrat-halk-partisi": ("Sosyaldemokrat Halk Partisi", "SHP"),
     "alternatif-parti": ("Alternatif Parti", None),
     "muhafazakar-yukselis-partisi": ("Muhafazakâr Yükseliş Partisi", None),
+    "halklarin-esitlik-ve-demokrasi-partisi": ("Halkların Eşitlik ve Demokrasi Partisi", "DEM Parti"),
+    "gelecek-partisi": ("Gelecek Partisi", None),
+    "demokrasi-ve-atilim-partisi": ("Demokrasi ve Atılım Partisi", "DEVA"),
+    "ocak-partisi": ("Ocak Partisi", None),
+    "anadolu-birligi-partisi": ("Anadolu Birliği Partisi", None),
+    "aydinlik-demokrasi-partisi": ("Aydınlık Demokrasi Partisi", None),
+    "yeni-turkiye-partisi-2024": ("Yeni Türkiye Partisi", "YTP"),
 }
 ANAGRAMS = {"".join(sorted(label.replace(" ", ""))): label for label in LABELS if " " in label}
 OFFICES = {
@@ -763,7 +998,12 @@ RENAMED_DISTRICTS = {
     ("71", "BAHŞİLİ"): "BAHŞILI",
 }
 DISPUTED_CITIES = {(1999, "01")}
-SHORTFALL = {(1963, "belediye_meclisi"): -4, (1973, "belediye_baskani"): 5, (2014, "belediye_meclisi"): 2}
+SHORTFALL = {
+    (1963, "belediye_meclisi"): -4,
+    (1973, "belediye_baskani"): 5,
+    (2014, "belediye_meclisi"): 2,
+    (2024, "belediye_meclisi"): 1,
+}
 MISSING_1999 = {"30", "31", "61", "62"}
 WHOLE = {"34": date(2004, 3, 28), "41": date(2004, 3, 28)}
 AGGREGATE = (
@@ -794,6 +1034,66 @@ CITY_DISPUTED = (
     "printed and marks them as disputed."
 )
 WINNER_CAVEAT = "YSK publishes the party that won this race, but not its votes."
+OTHERS = "Diğer partiler ve bağımsızlar"
+ANNULLED = {
+    2019: {"kirikkale-keskin", "artvin-yusufeli", "denizli-honaz", "adiyaman-besni-kesmetepe"},
+    2024: {
+        "aksaray-guzelyurt",
+        "kayseri-pinarbasi",
+        "sanliurfa-hilvan",
+        "sivas-yildizeli-guneykaya",
+        "tunceli-mazgirt-akpazar",
+        "kirklareli-luleburgaz-buyukkaristiran",
+        "aksaray-merkez-saglik",
+    },
+}
+MANDATES = {"diyarbakir-baglar", "van-edremit", "van-tusba", "van-caldiran", "erzurum-tekman"}
+UNLISTED = {
+    "2019-03-31:denizli-pamukkale-mayor:halklarin-demokratik-partisi",
+    "2024-03-31:kars-susuz-mayor:iyi-parti",
+    "2024-03-31:konya-guneysinir-mayor:demokrasi-ve-atilim-partisi",
+    "2024-03-31:ordu-gulyali-mayor:yeniden-refah-partisi",
+    "2024-03-31:osmaniye-toprakkale-mayor:gelecek-partisi",
+    "2024-03-31:sivas-divrigi-mayor:bagimsiz-turkiye-partisi",
+    "2024-03-31:tekirdag-corlu-mayor:demokrat-parti",
+    "2024-03-31:yozgat-sorgun-yeniyer-mayor:milliyetci-hareket-partisi",
+}
+RESIDUAL: dict[tuple[int, str], dict[str | None, int]] = {
+    (2019, "belediye_baskani"): {"milliyetci-hareket-partisi": 1, "saadet-partisi": -1},
+    (2024, "belediye_baskani"): {None: -8, "adalet-ve-kalkinma-partisi": -3, "buyuk-birlik-partisi": -6},
+}
+RESIDUAL_CAVEAT = {
+    (2019, "belediye_baskani"): (
+        "The mayors named in each municipality add up to these mayoralties by party with one exception: YSK's table "
+        "gives Saadet one more mayoralty and MHP one fewer than the ballot-box results do, and the archive has not "
+        "found the decision behind the difference."
+    ),
+    (2024, "belediye_baskani"): (
+        "The mayors named in each municipality add up to these mayoralties by party except in 17 races: 16 where "
+        "YSK ballot-box data reports the leading candidate's votes together with other small parties' and independents', and a "
+        "tie in Çıldır. Those races have no winner named, so the named mayors fall short of YSK's table by 3 AKP, "
+        "6 BBP, and 8 independent mayoralties."
+    ),
+}
+DERIVED_WINNER = (
+    "YSK publishes the 2019 and 2024 mayoral winners only as mayoralties by party nationwide, not by municipality. "
+    "The winner named here is the candidate with the most votes in YSK's ballot-box results, which YSK ballot-box data "
+    "republishes by neighborhood; those votes are on the YSK ballot-box files' result set for this race."
+)
+ANNULLED_CAVEAT = {
+    2019: "YSK annulled this race and held it again on June 2, 2019. The archive does not hold the rerun yet.",
+    2024: "YSK annulled this race and held it again on June 2, 2024. The archive does not hold the rerun yet.",
+}
+TIED_CAVEAT = "The two leading candidates have the same number of votes in YSK's ballot-box results, so the archive does not name a winner."
+LUMPED_CAVEAT = (
+    "YSK ballot-box data reports several of this race's candidates as one total, and that total leads, so the archive cannot tell "
+    "which candidate won."
+)
+MANDATE_CAVEAT = (
+    "In April 2019 YSK refused the mandate to the candidate with the most votes, who had been dismissed from public "
+    "service by emergency decree, and gave it to the runner-up."
+)
+MANDATE_NOTE = "Refused the mandate by YSK as a public servant dismissed by emergency decree."
 NAMED_2009 = (
     "YSK publishes the 2009 metropolitan results as the party that won each city, not the winner's name. The mayor "
     "named here is that party's candidate on YSK's final candidate list for the city."
@@ -810,6 +1110,7 @@ def emit() -> Path:
         raise ValueError("two party labels share their letters")
     values = pl.read_parquet(PARSED / "values.parquet")
     mayors = pl.read_parquet(PARSED / "mayors.parquet")
+    municipal = pl.read_parquet(PARSED / "municipal.parquet")
     totals = ("registered", "voters", "valid", "boxes", "magnitude", "TOPLAM")
     votes = values.filter(~pl.col("office").str.ends_with(":seats"), ~pl.col("column").str.ends_with(":seats"))
     checked = votes.group_by("year", "office", "unit").agg(
@@ -939,7 +1240,7 @@ def emit() -> Path:
                 kind="official_body",
                 publisher=PUBLISHER,
                 title=title_text,
-                url=f"https://www.ysk.gov.tr/doc/sayfa/{PAGES_HTML[year]}.html",
+                url=PAGES_HTML[year],
                 license=LICENSE,
             )
         for link in sorted({*values["url"], *mayors["url"]}):
@@ -1027,6 +1328,7 @@ def emit() -> Path:
                     (ADANA_CAVEAT, DROPPED[:2] == (year, office)),
                     (MISSING_CAVEAT, (year, office) == (1999, "belediye_meclisi")),
                     (SEATS_CAVEAT, year in (2004, 2009)),
+                    (RESIDUAL_CAVEAT.get((year, office)), (year, office) in RESIDUAL_CAVEAT),
                 ):
                     if applies:
                         cs.add("note", entity_id=declared, kind="caveat", body_md=caveat)
@@ -1063,6 +1365,27 @@ def emit() -> Path:
                             ballot_label=label(key, day),
                         )
                     options[column] = str(option)
+                for option_key, kind in (
+                    municipal.filter(pl.col("contest") == contest_key)
+                    .select("option", "kind")
+                    .unique()
+                    .sort("option")
+                    .iter_rows()
+                ):
+                    option = cs.key("tr.option", option_key)
+                    if str(option) not in options.values():
+                        owner = option_key.rsplit(":", 1)[1]
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=contest,
+                            kind=kind,
+                            party_id=parties.get(owner),
+                            ballot_label=OTHERS
+                            if kind == "others"
+                            else label(owner if owner in parties else None, day),
+                        )
+                        options[option_key] = str(option)
                 rows = rows.with_columns(
                     flags=pl.when(
                         pl.col("unit").is_in([unit for *held_in, unit in DISPUTED if tuple(held_in) == (year, office)])
@@ -1208,6 +1531,8 @@ def emit() -> Path:
             cs.add("outcome", result_set_id=declared, option_id=option, kind="elected")
 
         for year, day in DAYS.items():
+            if year >= 2019:
+                continue
             grid_rows = values.filter(
                 pl.col("year") == year, pl.col("office") == "buyuksehir", pl.col("unit") != "domestic"
             )
@@ -1302,7 +1627,7 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=declared, option_id=option, kind="elected")
 
         day = DAYS[2014]
-        towns = mayors.filter(pl.col("office") == "belediye_baskani")
+        towns = mayors.filter(pl.col("year") == 2014, pl.col("office") == "belediye_baskani")
         districts = {
             (plate, upper(text)): id
             for plate, text, id in conn.execute(
@@ -1325,38 +1650,52 @@ def emit() -> Path:
         )
         if set(counted.iter_rows()) != set(expected.with_columns(pl.col("len").cast(pl.UInt32)).iter_rows()):
             raise ValueError("2014 mayors' names disagree with the mayoralties by province")
-        for row in towns.sort("plate", "district", "town", nulls_last=False).to_dicts():
-            plate = str(row["plate"])
-            province = slug(PROVINCES[int(plate) - 1])
-            district = str(row["district"]).split("/")[0]
-            central = district.endswith(" MERKEZ")
-            parts = [province] + ([] if central and row["town"] is None else ["merkez" if central else slug(district)])
-            if row["town"] is not None:
-                parts.append(slug(str(row["town"])))
-            label_text = title(str(row["town"] or (PROVINCES[int(plate) - 1] if central else district)))
-            key = "-".join(parts)
-            polity = cs.key("tr.polity", key)
-            cs.add("polity", id=polity, kind="municipality", iso_code=None)
-            name(polity, f"{label_text} Municipality", "en")
-            name(polity, f"{label_text} Belediyesi", kind="native")
-            cs.add("polity_parent", polity_id=polity, parent_id=metropolises.get(plate, turkey))
-            path = "tr/" + "/".join(parts)
-            cs.add("slug", path=path, entity_id=polity)
-            office = cs.key("tr.office", f"{key}-mayor")
-            cs.add("office", id=office, polity_id=polity, kind="mayor")
-            name(office, f"Mayor of {label_text}", "en")
-            name(office, f"{label_text} Belediye Başkanı", kind="native")
-            election, contest, contest_key = mayor_contest(
-                key,
-                polity,
-                office,
-                path,
-                label_text,
-                label_text,
-                day,
-                districts[(plate, RENAMED_DISTRICTS.get((plate, district), district))],
-            )
+        tallies: dict[str, list[tuple[str, str, int]]] = {}
+        for contest_key, option_key, kind, votes in (
+            municipal.group_by("contest", "option", "kind")
+            .agg(pl.col("votes").sum())
+            .sort("votes", descending=True)
+            .iter_rows()
+        ):
+            tallies.setdefault(contest_key, []).append((option_key, kind, votes))
+        people: set[UUID] = set()
+        seen: set[str] = set()
+        won_by: dict[tuple[int, str, str | None], int] = {}
+        unlisted: set[str] = set()
+        for (year, office_kind, plate, district, town, key, path), candidates in sorted(
+            mayors.filter(
+                (pl.col("year") >= 2014) & pl.col("office").eq("belediye_baskani") | (pl.col("year") >= 2019),
+                ~((pl.col("year") == 2019) & (pl.col("office") == "buyuksehir") & (pl.col("plate") == "34")),
+            ).group_by("year", "office", "plate", "district", "town", "key", "path"),
+            key=lambda group: tuple(str(part) for part in group[0]),
+        ):
+            day = DAYS[year]
+            metro = office_kind == "buyuksehir"
+            district_text = str(district).split("/")[0]
+            central = district_text.endswith(" MERKEZ")
+            label_text = title(str(town or (PROVINCES[int(plate) - 1] if metro or central else district_text)))
+            if metro:
+                polity = metropolises[plate]
+                office = cs.key("tr.office", f"{key}-mayor")
+                english, native, area = label_text, f"{label_text} Büyükşehir", provinces[plate]
+            else:
+                polity = cs.key("tr.polity", key)
+                office = cs.key("tr.office", f"{key}-mayor")
+                english, native = label_text, label_text
+                area = districts[(plate, RENAMED_DISTRICTS.get((plate, district_text), district_text))]
+                if key not in seen:
+                    seen.add(key)
+                    cs.add("polity", id=polity, kind="municipality", iso_code=None)
+                    name(polity, f"{label_text} Municipality", "en")
+                    name(polity, f"{label_text} Belediyesi", kind="native")
+                    cs.add("polity_parent", polity_id=polity, parent_id=metropolises.get(plate, turkey))
+                    cs.add("slug", path=path, entity_id=polity)
+                    cs.add("office", id=office, polity_id=polity, kind="mayor")
+                    name(office, f"Mayor of {label_text}", "en")
+                    name(office, f"{label_text} Belediye Başkanı", kind="native")
+            election, contest, contest_key = mayor_contest(key, polity, office, path, english, native, day, area)
             declared = cs.key(f"{SOURCE}.result_set", contest_key)
+            annulled = key in ANNULLED.get(year, set())
             cs.add(
                 "result_set",
                 id=declared,
@@ -1364,15 +1703,123 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="official",
                 kind="counted",
-                status="active",
-                source_id=sources[2014],
+                status="annulled" if annulled else "active",
+                source_id=sources[year],
                 is_default=True,
                 completeness=0,
             )
-            cs.add("note", entity_id=declared, kind="caveat", body_md=WINNER_CAVEAT)
-            elect(contest, contest_key, declared, row, day)
+            if year == 2014:
+                cs.add("note", entity_id=declared, kind="caveat", body_md=WINNER_CAVEAT)
+                elect(contest, contest_key, declared, candidates.row(0, named=True), day)
+                continue
+            options: dict[str, UUID] = {}
+            for row in candidates.to_dicts():
+                owner = party(str(row["party"]), year)
+                option_key = f"{contest_key}:{owner or slug(str(row['name']))}"
+                options[option_key] = cs.key("tr.option", option_key)
+                cs.add(
+                    "contest_option",
+                    id=options[option_key],
+                    contest_id=contest,
+                    kind="candidate",
+                    party_id=None if owner is None else parties[owner],
+                    ballot_label=title(str(row["name"])) if owner is None else label(owner, day),
+                )
+                namesake = (candidates["name"] == row["name"]).sum() > 1
+                person = cs.key(f"{SOURCE}.person", f"{option_key if namesake else key}:{slug(str(row['name']))}")
+                if person not in people:
+                    people.add(person)
+                    cs.add("person", id=person)
+                    name(person, title(str(row["name"])))
+                candidacy = cs.key("tr.candidacy", f"{option_key}:{slug(str(row['name']))}")
+                cs.add(
+                    "candidacy",
+                    id=candidacy,
+                    person_id=person,
+                    option_id=options[option_key],
+                    role="head",
+                    member_of_party_id=None if owner is None else parties[owner],
+                    is_independent=owner is None,
+                )
+                if owner is not None:
+                    cs.add("candidacy_nomination", candidacy_id=candidacy, party_id=parties[owner], kind="nominated")
+            ranked = tallies[contest_key]
+            for option_key, kind, _ in ranked:
+                if option_key in options:
+                    continue
+                owner = option_key.rsplit(":", 1)[1]
+                if kind == "unlisted":
+                    unlisted.add(option_key)
+                options[option_key] = cs.key("tr.option", option_key)
+                cs.add(
+                    "contest_option",
+                    id=options[option_key],
+                    contest_id=contest,
+                    kind="others" if kind == "others" else "candidate",
+                    party_id=None if kind == "others" else parties[owner],
+                    ballot_label=OTHERS if kind == "others" else label(owner, day),
+                )
+            cs.add("note", entity_id=declared, kind="methodology", body_md=DERIVED_WINNER)
+            if annulled:
+                cs.add("note", entity_id=declared, kind="caveat", body_md=ANNULLED_CAVEAT[year])
+                continue
+            leader, second = ranked[0], ranked[1] if len(ranked) > 1 else None
+            if second is not None and leader[2] == second[2] or leader[1] == "others":
+                cs.add(
+                    "note",
+                    entity_id=declared,
+                    kind="caveat",
+                    body_md=TIED_CAVEAT if leader[1] != "others" else LUMPED_CAVEAT,
+                )
+                continue
+            winner = leader[0]
+            if year == 2019 and key in MANDATES:
+                if (
+                    second is None
+                    or not second[0].endswith(":adalet-ve-kalkinma-partisi")
+                    or not leader[0].endswith(":halklarin-demokratik-partisi")
+                ):
+                    raise ValueError(f"{contest_key}: the runner-up is not the AKP candidate")
+                cs.add(
+                    "outcome",
+                    result_set_id=declared,
+                    option_id=options[leader[0]],
+                    kind="disqualified",
+                    notes=MANDATE_NOTE,
+                )
+                cs.add("note", entity_id=declared, kind="caveat", body_md=MANDATE_CAVEAT)
+                winner = second[0]
+            cs.add("outcome", result_set_id=declared, option_id=options[winner], kind="elected")
+            owner = winner.rsplit(":", 1)[1]
+            winning = (year, office_kind, owner if owner in parties else None)
+            won_by[winning] = won_by.get(winning, 0) + 1
+        if unlisted != UNLISTED:
+            raise ValueError(f"parties with votes but no candidate differ: {sorted(unlisted ^ UNLISTED)}")
+        for year in (2019, 2024):
+            for office_kind in ("belediye_baskani", "buyuksehir"):
+                declared_seats = {
+                    party(column.removesuffix(":seats"), year): value
+                    for column, value in values.filter(
+                        pl.col("year") == year,
+                        pl.col("office") == office_kind,
+                        pl.col("unit") == "domestic",
+                        pl.col("column").str.ends_with(":seats"),
+                        pl.col("column") != "TOPLAM:seats",
+                    )
+                    .select("column", "value")
+                    .iter_rows()
+                }
+                residual = {
+                    owner: count
+                    for owner in {*declared_seats, *(owner for y, o, owner in won_by if (y, o) == (year, office_kind))}
+                    if (count := won_by.get((year, office_kind, owner), 0) - declared_seats.get(owner, 0))
+                }
+                if residual != RESIDUAL.get((year, office_kind), {}):
+                    raise ValueError(f"{year} {office_kind}: derived winners differ from YSK's by {residual}")
 
-        located = pl.concat(frames, how="diagonal_relaxed")
+        located = pl.concat(frames, how="diagonal_relaxed").filter(
+            pl.col("result_set_id").is_in([str(id) for id in cs.minted])
+        )
         keys = {
             "result_set_id": "result_set_id",
             "unit_id": "unit_id",
