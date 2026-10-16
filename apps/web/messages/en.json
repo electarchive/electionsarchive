@@ -763,5 +763,14 @@
   "scrubber_chamber": "{chamber} after the election",
   "scrubber_majority": "{seats} for a majority",
   "scrubber_government": "Government that followed",
-  "scrubber_open": "Open election"
+  "scrubber_open": "Open election",
+  "home_scrub_slider": "Year shown on the map",
+  "home_scrub_all": "Show all years",
+  "home_scrub_held": "General elections in {places}",
+  "home_scrub_quiet": "No general elections on record this year",
+  "home_scrub_record": "{count} of {total} countries on record",
+  "home_scrub_key_held": "Held a general election",
+  "home_scrub_key_record": "On record",
+  "home_scrub_key_none": "Not yet on record",
+  "home_scrub_hint": "Drag the slider to see how the archive grows over time."
 }

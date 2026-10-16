@@ -80,7 +80,7 @@ const atlas = new Map<string, ReturnType<typeof draw>>();
 export async function home() {
   const drawn = atlas.get("world") ?? draw();
   atlas.set("world", drawn);
-  const [polities, shapes, dated] = await Promise.all([
+  const [polities, shapes, dated, held] = await Promise.all([
     call(router.polities.list, undefined),
     drawn,
     db.execute<{
@@ -115,11 +115,22 @@ export async function home() {
           order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as name
       from picked p join slug s on s.entity_id = p.id and s.is_current
     `),
+    db.execute<{ id: string; years: Array<number> }>(sql`
+      select e.polity_id as id,
+        array_agg(distinct extract(year from e.date_from)::int) as years
+      from election e join polity y on y.id = e.polity_id
+      where e.parent_id is null and y.kind in ('sovereign_state', 'supranational')
+        and e.kind = 'general' and e.date_from <= current_date
+      group by e.polity_id
+    `),
   ]);
-  const covered = polities.filter(
-    (polity) =>
-      polity.kind === "sovereign_state" || polity.kind === "supranational",
-  );
+  const years = new Map(held.rows.map((row) => [row.id, row.years]));
+  const covered = polities
+    .filter(
+      (polity) =>
+        polity.kind === "sovereign_state" || polity.kind === "supranational",
+    )
+    .map((polity) => ({ ...polity, years: years.get(polity.id) ?? [] }));
   const names = new Map(polities.map((polity) => [polity.id, polity.name]));
   const elections = dated.rows.map((row) => ({
     id: row.id,
