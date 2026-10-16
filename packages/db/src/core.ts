@@ -1,11 +1,11 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, smallint, uuid, text, integer, date, numeric, boolean, timestamp, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, integer, text, smallint, date, numeric, boolean, timestamp, jsonb, customType, real, char, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
 export const calendar = pgEnum("calendar", ["gregorian", "julian", "rumi", "hijri", "french_republican"])
-export const entityType = pgEnum("entity_type", ["polity", "area", "reporting_unit", "election", "contest", "contest_option", "result_set", "electoral_system", "party", "alliance", "person", "candidacy", "body", "office", "seat", "tenure", "source", "saved_view"])
+export const entityType = pgEnum("entity_type", ["polity", "area", "reporting_unit", "election", "contest", "contest_option", "result_set", "electoral_system", "party", "alliance", "person", "candidacy", "body", "office", "seat", "tenure", "source", "saved_view", "government"])
 export const authorKind = pgEnum("author_kind", ["pipeline", "user", "agent", "system"])
 export const changesetKind = pgEnum("changeset_kind", ["import", "edit", "correction", "match", "digitization", "live"])
 export const changesetStatus = pgEnum("changeset_status", ["draft", "pending_review", "published", "rejected", "superseded"])
@@ -50,6 +50,7 @@ export const labelKind = pgEnum("label_kind", ["recognition", "integrity", "data
 export const flagSeverity = pgEnum("flag_severity", ["info", "warning", "error"])
 export const flagStatus = pgEnum("flag_status", ["open", "accepted", "resolved"])
 export const contestTerm = pgEnum("contest_term", ["full", "remainder"])
+export const governmentPartyRole = pgEnum("government_party_role", ["head", "member", "support"])
 
 
 export const alliance = pgTable("alliance", {
@@ -455,6 +456,43 @@ export const flag = pgTable("flag", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
 check("flag_check", sql`(num_nonnulls(entity_id, result_set_id) >= 1)`),]);
+
+export const government = pgTable("government", {
+	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
+	polityId: uuid("polity_id").notNull().references(() => polity.id),
+	officeId: uuid("office_id").references(() => office.id),
+	headPersonId: uuid("head_person_id").references(() => person.id),
+	fromDate: date("from_date").notNull(),
+	fromPrecision: datePrecision("from_precision").default("day").notNull(),
+	toDate: date("to_date"),
+	toPrecision: datePrecision("to_precision").default("day").notNull(),
+	electionId: uuid("election_id").references(() => election.id),
+	previousGovernmentId: uuid("previous_government_id"),
+	caretaker: boolean().default(false).notNull(),
+	sourceId: uuid("source_id").references(() => source.id),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	foreignKey({
+		columns: [table.previousGovernmentId],
+		foreignColumns: [table.id],
+		name: "government_previous_government_id_fkey"
+	}),
+	index("government_election_idx").using("btree", table.electionId.asc().nullsLast()),
+	index("government_polity_idx").using("btree", table.polityId.asc().nullsLast(), table.fromDate.asc().nullsLast()),
+check("government_check", sql`((to_date IS NULL) OR (to_date >= from_date))`),]);
+
+export const governmentParty = pgTable("government_party", {
+	governmentId: uuid("government_id").notNull().references(() => government.id, { onDelete: "cascade" } ),
+	partyId: uuid("party_id").notNull().references(() => party.id),
+	role: governmentPartyRole().notNull(),
+	seats: integer(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.governmentId, table.partyId], name: "government_party_pkey"}),
+	index("government_party_party_idx").using("btree", table.partyId.asc().nullsLast()),
+check("government_party_seats_check", sql`(seats >= 0)`),]);
 
 export const indicator = pgTable("indicator", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),

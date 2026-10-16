@@ -80,6 +80,8 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		financeSummaries: r.many.financeSummary(),
 		flags: r.many.flag(),
+		governments: r.many.government(),
+		governmentParties: r.many.governmentParty(),
 		sourcesViaIndicator: r.many.source({
 			from: r.changeset.id.through(r.indicator.changesetId),
 			to: r.source.id.through(r.indicator.sourceId),
@@ -180,6 +182,7 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "election_rerunOfId_election_id"
 		}),
 		financeSummaries: r.many.financeSummary(),
+		governments: r.many.government(),
 		partyRelations: r.many.partyRelation(),
 		resultSets: r.many.resultSet(),
 	},
@@ -209,6 +212,7 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		financeSummaries: r.many.financeSummary(),
 		flags: r.many.flag(),
+		governments: r.many.government(),
 		labels: r.many.label(),
 		names: r.many.name(),
 		changesetsViaNote: r.many.changeset({
@@ -257,6 +261,7 @@ export const relations = defineRelations(schema, (r) => ({
 		candidacyNominations: r.many.candidacyNomination(),
 		contests: r.many.contest(),
 		contestOptions: r.many.contestOption(),
+		governmentParties: r.many.governmentParty(),
 		changeset: r.one.changeset({
 			from: r.party.changesetId,
 			to: r.changeset.id
@@ -333,6 +338,7 @@ export const relations = defineRelations(schema, (r) => ({
 		bodyEvents: r.many.bodyEvent(),
 		citations: r.many.citation(),
 		financeSummaries: r.many.financeSummary(),
+		governments: r.many.government(),
 		changesetsViaIndicator: r.many.changeset({
 			alias: "changeset_id_source_id_via_indicator"
 		}),
@@ -491,6 +497,7 @@ export const relations = defineRelations(schema, (r) => ({
 		bodies: r.many.body(),
 		elections: r.many.election(),
 		electoralSystems: r.many.electoralSystem(),
+		governments: r.many.government(),
 		offices: r.many.office(),
 		parties: r.many.party(),
 		polityParentsParentId: r.many.polityParent({
@@ -587,6 +594,7 @@ export const relations = defineRelations(schema, (r) => ({
 	},
 	person: {
 		candidacies: r.many.candidacy(),
+		governments: r.many.government(),
 		personPartyMemberships: r.many.personPartyMembership(),
 		tenures: r.many.tenure(),
 	},
@@ -644,6 +652,7 @@ export const relations = defineRelations(schema, (r) => ({
 	},
 	office: {
 		contests: r.many.contest(),
+		governments: r.many.government(),
 		body: r.one.body({
 			from: r.office.bodyId,
 			to: r.body.id
@@ -787,6 +796,59 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		resultSets: r.many.resultSet({
 			alias: "resultSet_supersedesId_resultSet_id"
+		}),
+	},
+	government: {
+		changeset: r.one.changeset({
+			from: r.government.changesetId,
+			to: r.changeset.id
+		}),
+		election: r.one.election({
+			from: r.government.electionId,
+			to: r.election.id
+		}),
+		person: r.one.person({
+			from: r.government.headPersonId,
+			to: r.person.id
+		}),
+		entity: r.one.entity({
+			from: r.government.id,
+			to: r.entity.id
+		}),
+		office: r.one.office({
+			from: r.government.officeId,
+			to: r.office.id
+		}),
+		polity: r.one.polity({
+			from: r.government.polityId,
+			to: r.polity.id
+		}),
+		government: r.one.government({
+			from: r.government.previousGovernmentId,
+			to: r.government.id,
+			alias: "government_previousGovernmentId_government_id"
+		}),
+		governments: r.many.government({
+			alias: "government_previousGovernmentId_government_id"
+		}),
+		source: r.one.source({
+			from: r.government.sourceId,
+			to: r.source.id
+		}),
+		governmentParties: r.many.governmentParty(),
+	},
+	governmentParty: {
+		changeset: r.one.changeset({
+			from: r.governmentParty.changesetId,
+			to: r.changeset.id
+		}),
+		government: r.one.government({
+			from: r.governmentParty.governmentId,
+			to: r.government.id
+		}),
+		party: r.one.party({
+			from: r.governmentParty.partyId,
+			to: r.party.id
 		}),
 	},
 	indicatorValue: {
