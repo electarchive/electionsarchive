@@ -207,7 +207,7 @@
                     style:background={cell === 0 ? undefined : fill}
                     style:color={cell === 0
                       ? undefined
-                      : `oklch(from ${fill} clamp(0.12, (0.6 - l) * 1000, 0.99) 0 0)`}
+                      : `color(from ${fill} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
                     >{cell === 0 ? "·" : count(cell)}</span
                   >
                 </td>

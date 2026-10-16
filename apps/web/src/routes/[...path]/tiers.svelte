@@ -264,7 +264,7 @@
   >
     {#each tiles as tile (tile.code)}
       <li
-        class="aspect-square"
+        class="aspect-square min-inline-0"
         style:grid-column={tile.at[0] + 1}
         style:grid-row={tile.at[1] + 1}
       >
@@ -277,7 +277,7 @@
           style:background={tile.color ?? undefined}
           style:color={tile.color == null
             ? undefined
-            : `oklch(from ${tile.color} clamp(0.12, (0.6 - l) * 1000, 0.99) 0 0)`}
+            : `color(from ${tile.color} xyz-d65 calc(0.9505 * clamp(0, (0.179 - y) * 1e6, 1)) clamp(0, (0.179 - y) * 1e6, 1) calc(1.089 * clamp(0, (0.179 - y) * 1e6, 1)))`}
           data-filled={tile.color == null ? undefined : ""}
           data-size={size}
           title={tile.text}
@@ -339,12 +339,15 @@
       {#if panels.length > 0}
         <div
           class={cn({
-            "grid content-start gap-6  sm:grid-cols-2": isTopped,
+            "grid content-start gap-6 sm:grid-cols-2 lg:grid-cols-1 xl:grid-cols-2":
+              isTopped,
             contents: !isTopped,
           })}
         >
           {#each panels as panel (panel.kind)}
-            <figure class="grid content-start gap-2 min-inline-0">
+            <figure
+              class="grid grid-cols-[minmax(0,1fr)] content-start gap-2 min-inline-0"
+            >
               <figcaption
                 class="flex flex-wrap items-baseline justify-between gap-x-3"
               >
@@ -368,7 +371,9 @@
                     class="flex justify-between gap-3 font-mono text-xs tabular-nums"
                   >
                     {#each panel.lead as part (part.party)}
-                      <span class="flex items-center gap-1.5 truncate">
+                      <span
+                        class="flex items-center gap-1.5 truncate min-inline-0"
+                      >
                         <span
                           class="shrink-0 rounded-xs block-2 inline-2"
                           style:background={tint(part.party)}
