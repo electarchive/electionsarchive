@@ -50,10 +50,10 @@
   "home_map_since": "Since {year}",
   "home_map_older": "Older",
   "home_map_newer": "Newer",
-  "home_recent": "Latest national elections",
+  "home_recent": "Latest national results",
   "home_upcoming": "Upcoming elections",
   "home_today": "This week in history",
-  "home_today_lede": "Elections held within a few days of today's date in previous years.",
+  "home_today_lede": "Elections held around this date in previous years.",
   "home_polities": "Polities",
   "home_elections": [
     {
@@ -450,7 +450,7 @@
   "polity_seats": "{seats} of {size}",
   "polity_span": "{first}–{last}",
   "polity_none_in_filter": "No elections of this kind.",
-  "home_lede": "Archiving {elections} elections from {first} to {last}, starting with these countries.",
+  "home_title": "{elections} elections from {first} to {last}, every number traced to its source",
   "home_latest": "Latest general election",
   "search_open": "Search",
   "search_title": "Search the archive",

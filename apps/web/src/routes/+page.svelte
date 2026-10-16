@@ -110,13 +110,13 @@
 
   function fill(id: string, first: number | null | undefined) {
     if (year == null) {
-      return `color-mix(in oklab, var(--primary) ${strength(first)}%, var(--card))`;
+      return `color-mix(in oklab, var(--marker) ${strength(first)}%, var(--card))`;
     }
     if (heldIds.has(id)) {
-      return "var(--primary)";
+      return "var(--marker)";
     }
     return (first ?? Infinity) <= year
-      ? "color-mix(in oklab, var(--primary) 22%, var(--card))"
+      ? "color-mix(in oklab, var(--marker) 22%, var(--card))"
       : "color-mix(in oklab, var(--muted-foreground) 8%, var(--card))";
   }
 
@@ -202,49 +202,80 @@
 <main class="pbe-16">
   <article class="grid grid-cols-12 gap-px overflow-clip border-be bg-border">
     <header
-      class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-4 bg-card px-3.5 pbs-8 pbe-6 sm:px-6 sm:pbs-12 sm:pbe-8"
+      class="col-span-12 grid gap-5 bg-card px-3.5 pbs-7 pbe-6 sm:pbs-10 lg:grid-cols-[minmax(0,7fr)_minmax(0,5fr)] lg:items-end lg:gap-10"
     >
       <h1
-        class="font-serif text-[clamp(2.25rem,6vw,4.75rem)] leading-[0.96] font-[680] tracking-tight text-balance max-inline-[14ch]"
+        class="title text-[clamp(2rem,1.2rem+2.6vw,3.5rem)] max-inline-[20ch]"
       >
-        {m.home_intro()}
+        {totals.first == null || totals.last == null
+          ? m.home_intro()
+          : m.home_title({
+              elections: count(totals.elections),
+              first: String(totals.first),
+              last: String(totals.last),
+            })}
       </h1>
-      {#if totals.first != null && totals.last != null}
-        <p
-          class="text-[clamp(1rem,1.4vw,1.1875rem)] text-pretty text-muted-foreground max-inline-[52ch]"
-        >
-          {m.home_lede({
-            elections: count(totals.elections),
-            first: String(totals.first),
-            last: String(totals.last),
-          })}
-        </p>
-      {/if}
-      <div class="grid gap-2.5 max-inline-160">
+      <div class="grid gap-2">
         <button
           type="button"
-          class="flex items-center gap-3 rounded-md border-2 border-foreground bg-card ps-3.5 pe-2 text-start text-[1.0625rem] text-muted-foreground shadow-[4px_4px_0_var(--primary)] block-13 min-inline-0 hover:bg-secondary hover:text-foreground"
+          class="flex items-center gap-3 rounded-sm border border-foreground bg-card ps-3 pe-2 text-start text-base text-muted-foreground block-12 min-inline-0 hover:bg-secondary hover:text-foreground"
           onclick={() => seek("")}
         >
           <SearchIcon class="shrink-0 text-foreground block-5 inline-5" />
           <span class="grow truncate">{m.home_search_cta()}</span>
-          <kbd
-            class="rounded-xs border border-input px-1.5 font-figures text-xs keycap max-sm:hidden"
-            >⌘K</kbd
-          >
+          <kbd class="max-sm:hidden">⌘K</kbd>
         </button>
-        <p class="flex flex-wrap items-center gap-1.5 text-[0.8125rem]">
+        <p
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.8125rem]"
+        >
           <span class="text-muted-foreground">{m.home_search_try()}</span>
           {#each EXAMPLES as example (example)}
             <button
               type="button"
-              class="rounded-full border border-input px-2.5 block-7 hover:border-foreground hover:bg-secondary"
+              class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
               onclick={() => seek(example)}>{example}</button
             >
           {/each}
         </p>
       </div>
     </header>
+
+    {#if data.recent.length > 0}
+      <section
+        class="col-span-12 grid gap-1 bg-card px-3.5 pbs-4 pbe-2"
+        aria-labelledby="recent-title"
+      >
+        <h2 id="recent-title" class="heading">
+          {m.home_recent()}
+        </h2>
+        <ol class="grid gap-x-10 lg:grid-cols-2">
+          {#each data.recent as election (election.path)}
+            <li
+              class="border-be border-border last:border-be-0 lg:[&:nth-last-child(2):nth-child(odd)]:border-be-0"
+            >
+              <a
+                class="group grid gap-3 py-4"
+                href={resolve("/[...path]", { path: election.path })}
+              >
+                <span
+                  class="flex flex-wrap items-baseline justify-between gap-x-4"
+                >
+                  <span
+                    class="text-lg/tight font-[740] tracking-[-0.012em] text-balance underline decoration-transparent underline-offset-4 group-hover:decoration-foreground"
+                    >{election.name}</span
+                  >
+                  <time
+                    class="font-figures text-[0.8125rem] text-muted-foreground"
+                    datetime={election.date}>{date(election.date)}</time
+                  >
+                </span>
+                <Lead id={election.id} />
+              </a>
+            </li>
+          {/each}
+        </ol>
+      </section>
+    {/if}
 
     <section
       class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card px-3.5 pbs-3.5 pbe-3 lg:col-span-8"
@@ -333,7 +364,7 @@
                     "absolute inset-be-0 -translate-x-1/2 rounded-t-[1px] transition-colors duration-150 inline-0.5 motion-reduce:transition-none",
                     {
                       "bg-muted-foreground/45": value !== year,
-                      "bg-primary": value === year,
+                      "bg-foreground": value === year,
                     },
                   )}
                   style:inset-inline-start="{along(value) * 100}%"
@@ -384,7 +415,7 @@
       {#if year != null}
         <div class="grid gap-0.5" aria-live="polite">
           <p
-            class="flex flex-wrap items-baseline gap-x-3 gap-y-1 font-serif text-[clamp(2rem,4vw,3rem)] leading-none font-[640] tracking-[-0.03em] tabular-nums"
+            class="flex flex-wrap items-baseline gap-x-3 gap-y-1 font-figures text-[clamp(2rem,4vw,3rem)] leading-none font-[780] tracking-[-0.03em]"
           >
             {year}
             <span
@@ -428,7 +459,7 @@
           >
             <span
               class="block rounded-xs block-2"
-              style:background={`linear-gradient(to right, var(--primary), color-mix(in oklab, var(--primary) 22%, var(--card)))`}
+              style:background={`linear-gradient(to right, var(--marker), color-mix(in oklab, var(--marker) 22%, var(--card)))`}
             ></span>
             <span class="flex justify-between font-figures tabular-nums">
               <span>{depth.low}</span><span>{depth.high}</span>
@@ -438,7 +469,7 @@
           <ul
             class="absolute inset-e-0 inset-bs-0 grid gap-1 text-[0.6875rem] text-muted-foreground max-sm:static max-sm:mbs-2 max-sm:flex max-sm:flex-wrap max-sm:gap-x-3"
           >
-            {#each [{ key: "held", label: m.home_scrub_key_held(), color: "var(--primary)" }, { key: "record", label: m.home_scrub_key_record(), color: "color-mix(in oklab, var(--primary) 22%, var(--card))" }, { key: "none", label: m.home_scrub_key_none(), color: "color-mix(in oklab, var(--muted-foreground) 8%, var(--card))" }] as item (item.key)}
+            {#each [{ key: "held", label: m.home_scrub_key_held(), color: "var(--marker)" }, { key: "record", label: m.home_scrub_key_record(), color: "color-mix(in oklab, var(--marker) 22%, var(--card))" }, { key: "none", label: m.home_scrub_key_none(), color: "color-mix(in oklab, var(--muted-foreground) 8%, var(--card))" }] as item (item.key)}
               <li class="flex items-center gap-1.5">
                 <span
                   class="rounded-xs ring-1 ring-border block-2.5 inline-2.5"
@@ -512,13 +543,13 @@
                 >{m.home_map_since({ year: String(polity.first) })}</span
               >
               <span
-                class="relative col-span-2 block overflow-hidden rounded-full bg-muted block-1.5"
+                class="relative col-span-2 block overflow-hidden bg-muted block-1"
                 aria-hidden="true"
               >
                 <span
-                  class="absolute inset-y-0 inset-e-0 rounded-full min-inline-1"
+                  class="absolute inset-y-0 inset-e-0 min-inline-1"
                   style:inset-inline-start="{from}%"
-                  style:background-color={`color-mix(in oklab, var(--primary) ${strength(polity.first)}%, var(--muted))`}
+                  style:background-color={`color-mix(in oklab, var(--marker) ${strength(polity.first)}%, var(--muted))`}
                 ></span>
               </span>
             </svelte:element>
@@ -526,43 +557,6 @@
         {/each}
       </ol>
     </aside>
-
-    {#if data.recent.length > 0}
-      <section
-        class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-3.5"
-        aria-labelledby="recent-title"
-      >
-        <h2 id="recent-title" class="heading">
-          {m.home_recent()}
-        </h2>
-        <ul
-          class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,15rem),1fr))] gap-2"
-        >
-          {#each data.recent as election (election.path)}
-            <li>
-              <a
-                class="grid content-between gap-3 rounded-md border bg-card px-3 pbs-2.5 pbe-3 block-full hover:border-foreground"
-                href={resolve("/[...path]", { path: election.path })}
-              >
-                <span class="grid gap-0.5">
-                  <span class="text-xs font-semibold text-muted-foreground"
-                    >{election.polity}</span
-                  >
-                  <span class="text-lg/tight font-[720] text-balance"
-                    >{election.name}</span
-                  >
-                  <span
-                    class="font-figures text-xs text-muted-foreground tabular-nums"
-                    >{date(election.date)}</span
-                  >
-                </span>
-                <Lead id={election.id} />
-              </a>
-            </li>
-          {/each}
-        </ul>
-      </section>
-    {/if}
 
     {#if data.upcoming.length > 0}
       <section
@@ -609,14 +603,14 @@
             <li
               class="grid grid-cols-[4rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2"
             >
-              <span class="font-figures text-xl tracking-[-0.02em] tabular-nums"
+              <span class="font-figures text-xl font-[760] tracking-[-0.02em]"
                 >{election.date.slice(0, 4)}</span
               >
               <span class="grid gap-0.5">
                 <a
                   class="justify-self-start text-[0.9375rem] font-semibold hover:highlighter"
                   href={resolve("/[...path]", { path: election.path })}
-                  >{election.name}</a
+                  >{election.name.replace(/^\d{4} /, "")}</a
                 >
                 <span class="text-xs text-muted-foreground"
                   >{[election.polity, date(election.date)]

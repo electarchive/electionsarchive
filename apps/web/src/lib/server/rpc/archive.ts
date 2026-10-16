@@ -4393,7 +4393,7 @@ export const elections = {
         method: "GET",
         path: "/elections/{id}/lead",
         summary:
-          "Get an election's first race with its top three by seats won, else by share",
+          "Get an election's first race with its top six by seats won, else by share, with sister parties counted together",
       }),
     )
     .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
@@ -4437,13 +4437,42 @@ export const elections = {
       for (const row of race.results) {
         contested += row.seats ?? 0;
       }
+      const joined = Map.groupBy(
+        race.results,
+        (row) =>
+          race.partners.find((pair) => pair.includes(row.key))?.[0] ?? row.key,
+      )
+        .values()
+        .map((rows) => {
+          const [head] = rows.toSorted(
+            (a, b) => (b.seats ?? 0) - (a.seats ?? 0) || b.share - a.share,
+          );
+          if (head == null || rows.length === 1) {
+            return head;
+          }
+          let seats = 0;
+          let share = 0;
+          for (const row of rows) {
+            seats += row.seats ?? 0;
+            share += row.share;
+          }
+          return {
+            ...head,
+            label: rows.map((row) => row.short ?? row.label).join("/"),
+            short: null,
+            seats,
+            share,
+          };
+        })
+        .filter((row) => row != null)
+        .toArray();
       return {
         name: race.name,
         contested,
         results: (contested > 1
-          ? race.results.toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))
-          : race.results
-        ).slice(0, 3),
+          ? joined.toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))
+          : joined
+        ).slice(0, 6),
       };
     }),
   governments: os

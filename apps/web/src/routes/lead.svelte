@@ -4,6 +4,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
+  import { cn } from "#lib/utils.js";
 
   const { id }: { id: string } = $props();
 
@@ -15,9 +16,28 @@
   const isSeated = $derived(race != null && race.contested > 1);
 </script>
 
-<span class="grid gap-1.5 block-17">
+<span class="grid gap-1.5 block-19">
   {#if race != null}
-    <span class="flex overflow-hidden rounded-xs bg-muted block-1.5">
+    <span class="flex items-end justify-between gap-4">
+      {#each race.results.slice(0, 2) as row, at (row.key)}
+        <span
+          class={cn("grid min-inline-0", {
+            "justify-items-end text-end": at === 1,
+          })}
+        >
+          <span
+            class="font-figures text-[1.75rem] leading-none font-[780] tracking-[-0.02em]"
+            >{isSeated ? count(row.seats ?? 0) : percent(row.share)}</span
+          >
+          <span class="truncate text-[0.875rem] font-semibold max-inline-full"
+            >{isSeated && row.person == null
+              ? (row.short ?? row.label)
+              : row.label}</span
+          >
+        </span>
+      {/each}
+    </span>
+    <span class="relative flex overflow-hidden bg-muted block-3">
       {#each race.results as row (row.key)}
         <span
           style:inline-size="{(isSeated
@@ -26,33 +46,24 @@
           style:background={swatch(row.color, row.key)}
         ></span>
       {/each}
+      {#if isSeated}
+        <span
+          class="absolute -inset-y-px bg-foreground inline-0.5"
+          style:inset-inline-start="{((Math.floor(race.contested / 2) + 1) /
+            race.contested) *
+            100}%"
+        ></span>
+      {/if}
     </span>
-    <span class="grid gap-0.5 text-[0.8125rem]">
-      {#each race.results.slice(0, 2) as row (row.key)}
-        <span class="grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3">
-          <span class="flex items-center gap-1.5 min-inline-0">
-            <span
-              class="shrink-0 rounded-xs block-2 inline-2"
-              style:background={swatch(row.color, row.key)}
-            ></span>
-            <span class="truncate"
-              >{isSeated && row.person == null
-                ? (row.short ?? row.label)
-                : row.label}</span
-            >
-          </span>
-          <span class="font-figures text-xs font-semibold tabular-nums"
-            >{isSeated
-              ? m.polity_seats({
-                  seats: count(row.seats ?? 0),
-                  size: count(race.contested),
-                })
-              : percent(row.share)}</span
-          >
-        </span>
-      {/each}
-    </span>
+    {#if isSeated}
+      <span class="sr-only"
+        >{m.polity_seats({
+          seats: count(race.results[0]?.seats ?? 0),
+          size: count(race.contested),
+        })}</span
+      >
+    {/if}
   {:else if lead.isPending}
-    <span class="animate-pulse rounded-xs bg-muted block-1.5"></span>
+    <span class="animate-pulse bg-muted block-3"></span>
   {/if}
 </span>
