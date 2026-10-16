@@ -26,6 +26,7 @@
   import Rounds from "./rounds.svelte";
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
+  import Shift from "./shift.svelte";
 
   const {
     contest,
@@ -610,6 +611,7 @@
           votes={counted ?? m.col_votes()}
           names={titles}
           {levels}
+          {span}
           bind:only={
             () => only,
             (value: number | string | null) =>
@@ -916,6 +918,18 @@
         }
       }}
     />
+    {#if contest.places != null}
+      <Shift
+        places={contest.places}
+        {span}
+        colors={tones}
+        names={titles}
+        noun={contest.places.levels.find(
+          (level) => level.code === contest.places?.level,
+        )?.noun ?? ""}
+        bind:focus
+      />
+    {/if}
   {/if}
 
   {#if drawn == null || contest.chamber != null}

@@ -28,6 +28,7 @@
     votes,
     names,
     levels,
+    span,
     only = $bindable(null),
     focus = $bindable(null),
   }: {
@@ -48,6 +49,7 @@
       query: string;
       isCurrent: boolean;
     }>;
+    span: { from: string; to: string; forward: boolean } | null;
     only?: number | string | null;
     focus?: number | null;
   } = $props();
@@ -55,12 +57,16 @@
   const BINS = [0.05, 0.1, 0.2];
   const STRENGTHS = [34, 54, 76, 100];
   const STEPS = [16, 36, 56, 78, 100];
+  const SWINGS = [0.02, 0.05, 0.1];
+  const COMPARED = new Set(["swing", "arrows", "flips"]);
 
   const uid = $props.id();
   let maps = $state<Array<Maplibre.Map>>([]);
   let isLoaded = $state(false);
   let pinned = $state<number | null>(null);
-  let shading = $state<"winner" | "bubbles" | number>("winner");
+  let shading = $state<
+    "winner" | "bubbles" | "swing" | "arrows" | "flips" | number
+  >("winner");
   let fit: Maplibre.PaddingOptions = {
     top: 24,
     right: 24,
@@ -69,6 +75,61 @@
   };
 
   const rows = $derived(new Map(places.rows.map((row) => [row.k, row])));
+  const isCompared = $derived(
+    span != null && places.rows.some((row) => row.earlier != null),
+  );
+  const changes = $derived(
+    new Map(
+      places.rows.flatMap((row) => {
+        if (row.earlier == null) {
+          return [];
+        }
+        const isForward = span?.forward === true;
+        const before = isForward ? row.shares : row.earlier;
+        const after = isForward ? row.earlier : row.shares;
+        return [
+          [
+            row.k,
+            {
+              swing:
+                (after[0] ?? 0) -
+                (after[1] ?? 0) -
+                ((before[0] ?? 0) - (before[1] ?? 0)),
+              from: isForward ? row.leader : row.prior,
+              to: isForward ? row.prior : row.leader,
+              before,
+              after,
+            },
+          ] as const,
+        ];
+      }),
+    ),
+  );
+  const view = $derived(
+    !isCompared && typeof shading === "string" && COMPARED.has(shading)
+      ? "winner"
+      : shading,
+  );
+  const flips = $derived(
+    Map.groupBy(
+      changes
+        .values()
+        .filter(
+          (change) =>
+            change.from != null &&
+            change.to != null &&
+            change.from !== change.to,
+        ),
+      (change) => `${change.from}>${change.to}`,
+    )
+      .entries()
+      .map(
+        ([key, won]) =>
+          [key, won[0]?.from ?? 0, won[0]?.to ?? 0, won.length] as const,
+      )
+      .toArray()
+      .toSorted((a, b) => b[3] - a[3]),
+  );
   const order = $derived(
     places.rows
       .toSorted((a, b) =>
@@ -106,10 +167,10 @@
       ),
   );
   const edges = $derived.by(() => {
-    if (typeof shading !== "number") {
+    if (typeof view !== "number") {
       return [];
     }
-    const index = shading;
+    const index = view;
     const sorted = places.rows
       .map((row) => row.shares[index] ?? 0)
       .toSorted((a, b) => a - b);
@@ -135,6 +196,9 @@
   });
   const biggest = $derived(Math.max(1, ...places.rows.map((row) => row.valid)));
   const current = $derived(focus == null ? null : (rows.get(focus) ?? null));
+  const moved = $derived(
+    focus == null || !isCompared ? null : (changes.get(focus) ?? null),
+  );
   const ranked = $derived(
     current == null
       ? []
@@ -218,11 +282,46 @@
         only != null && typeof only === "number" && only !== row.leader;
       let strength = dimmed ? 10 : (STRENGTHS[bin(row.margin)] ?? 100);
       let tone = colors[row.leader] ?? "var(--muted-foreground)";
-      if (shading === "bubbles") {
+      if (view === "bubbles") {
         strength = dimmed ? 18 : 100;
       }
-      if (typeof shading === "number") {
-        const share = row.shares[shading] ?? 0;
+      if (view === "arrows") {
+        continue;
+      }
+      if (view === "swing" || view === "flips") {
+        const change = changes.get(row.k);
+        if (change == null) {
+          continue;
+        }
+        const isFlip =
+          change.from != null && change.to != null && change.from !== change.to;
+        let size = 0;
+        for (const edge of SWINGS) {
+          if (Math.abs(change.swing) >= edge) {
+            size += 1;
+          }
+        }
+        strength =
+          view === "flips"
+            ? isFlip &&
+              (only == null ||
+                only === "flip" ||
+                only === change.to ||
+                only === `${change.from}>${change.to}`)
+              ? 100
+              : 13
+            : (STRENGTHS[size] ?? 100);
+        tone =
+          colors[
+            view === "flips"
+              ? (change.to ?? row.leader)
+              : change.swing >= 0
+                ? 0
+                : 1
+          ] ?? "var(--muted-foreground)";
+      }
+      if (typeof view === "number") {
+        const share = row.shares[view] ?? 0;
         let step = 0;
         for (const edge of edges) {
           if (share > edge) {
@@ -230,7 +329,7 @@
           }
         }
         strength = STEPS[step] ?? 100;
-        tone = colors[shading] ?? "var(--muted-foreground)";
+        tone = colors[view] ?? "var(--muted-foreground)";
       }
       result.push([
         row.k,
@@ -313,6 +412,25 @@
         pen.lineTo(8, 0);
         pen.stroke();
       }
+      const shaft = document.createElement("canvas");
+      shaft.width = 64;
+      shaft.height = 24;
+      const arrow = shaft.getContext("2d");
+      if (arrow != null) {
+        arrow.fillStyle = "#fff";
+        arrow.shadowColor = "#fff";
+        arrow.shadowBlur = 3;
+        arrow.beginPath();
+        arrow.moveTo(4, 9.5);
+        arrow.lineTo(40, 9.5);
+        arrow.lineTo(40, 3.5);
+        arrow.lineTo(59, 12);
+        arrow.lineTo(40, 20.5);
+        arrow.lineTo(40, 14.5);
+        arrow.lineTo(4, 14.5);
+        arrow.closePath();
+        arrow.fill();
+      }
       const surfaces = [
         ...host.querySelectorAll<HTMLElement>("[data-map-surface]"),
       ];
@@ -335,6 +453,10 @@
                 url: `pmtiles://${origin}/tiles/${tiles}.pmtiles`,
               },
               dots: { type: "geojson", data: dots },
+              arrows: {
+                type: "geojson",
+                data: { type: "FeatureCollection", features: [] },
+              },
               ...(own == null
                 ? {}
                 : {
@@ -435,6 +557,26 @@
                 },
               },
               {
+                id: "arrow",
+                type: "symbol",
+                source: "arrows",
+                layout: {
+                  "icon-image": "arrow",
+                  "icon-size": ["get", "size"],
+                  "icon-rotate": ["get", "rotate"],
+                  "icon-rotation-alignment": "map",
+                  "icon-anchor": "left",
+                  "icon-allow-overlap": true,
+                  "icon-ignore-placement": true,
+                  "symbol-sort-key": ["get", "order"],
+                },
+                paint: {
+                  "icon-color": ["get", "color"],
+                  "icon-halo-color": colorsNow.seam,
+                  "icon-halo-width": 1,
+                },
+              },
+              {
                 id: "focus",
                 type: "line",
                 source: "places",
@@ -473,6 +615,18 @@
         });
         map.touchZoomRotate.disableRotation();
         map.keyboard.disable();
+        map.addImage(
+          "arrow",
+          {
+            width: 64,
+            height: 24,
+            data: new Uint8Array(
+              arrow?.getImageData(0, 0, 64, 24).data.buffer ??
+                new ArrayBuffer(6144),
+            ),
+          },
+          { sdf: true },
+        );
         map.addImage("hatch", {
           width: 8,
           height: 8,
@@ -546,6 +700,30 @@
     const tones = paint(host);
     const colorsNow = style(tones.read);
     const painted = fills(tones.read);
+    const tips = [0, 1].map((index) =>
+      tones.read(colors[index] ?? "var(--muted-foreground)"),
+    );
+    const arrows = (scale: number) =>
+      places.rows.flatMap((row) => {
+        const change = changes.get(row.k)?.swing;
+        if (row.at == null || change == null || Math.abs(change) < 0.001) {
+          return [];
+        }
+        const size = Math.min(1, Math.abs(change) / 0.2);
+        const tilt = 12 + size * 48;
+        return [
+          {
+            type: "Feature" as const,
+            properties: {
+              color: tips[change >= 0 ? 0 : 1] ?? "",
+              size: (0.35 + size * 0.95) * scale,
+              rotate: change >= 0 ? -tilt : 180 + tilt,
+              order: size,
+            },
+            geometry: { type: "Point" as const, coordinates: row.at },
+          },
+        ];
+      });
     tones.done();
     for (const [index, map] of maps.entries()) {
       const apply = () => {
@@ -561,14 +739,22 @@
           map.setPaintProperty("outline", "line-color", colorsNow.ink);
         }
         map.setPaintProperty("bubble", "circle-stroke-color", colorsNow.seam);
+        map.setPaintProperty("arrow", "icon-halo-color", colorsNow.seam);
         const source = map.getSource("dots");
         if (source?.type === "geojson") {
           void (source as Maplibre.GeoJSONSource).setData(dots);
         }
+        const pointers = map.getSource("arrows");
+        if (pointers?.type === "geojson") {
+          void (pointers as Maplibre.GeoJSONSource).setData({
+            type: "FeatureCollection",
+            features: view === "arrows" ? arrows(index === 0 ? 1 : 0.4) : [],
+          });
+        }
         map.removeFeatureState({ source: "places", sourceLayer: "areas" });
         map.removeFeatureState({ source: "dots" });
         for (const [k, color] of painted) {
-          if (shading === "bubbles") {
+          if (view === "bubbles") {
             map.setFeatureState(
               { source: "dots", id: k },
               {
@@ -630,7 +816,7 @@
 </script>
 
 <div
-  class="relative grid gap-2"
+  class="relative grid grid-cols-[minmax(0,1fr)] gap-2"
   data-map
   role="application"
   aria-roledescription="map"
@@ -648,24 +834,31 @@
       <span id="{uid}-shading" class="text-sm font-semibold max-sm:sr-only"
         >{m.map_color_by()}</span
       >
-      <div class="-my-1 flex overflow-x-auto py-1 min-inline-0">
-        {#each [{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }] as choice (choice.value)}
-          <button
-            type="button"
-            class={cn(
-              "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-              {
-                "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                  shading === choice.value,
-              },
-              {
-                "truncate max-inline-36 max-sm:max-inline-24":
-                  typeof choice.value === "number",
-              },
-            )}
-            aria-pressed={shading === choice.value}
-            onclick={() => (shading = choice.value)}>{choice.label}</button
-          >
+      <div class="-my-1 flex gap-2 overflow-x-auto py-1 min-inline-0">
+        {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
+          {#if group.length > 0}
+            <div class="flex shrink-0">
+              {#each group as choice (choice.value)}
+                <button
+                  type="button"
+                  class={cn(
+                    "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                    {
+                      "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                        view === choice.value,
+                    },
+                    {
+                      "truncate max-inline-36 max-sm:max-inline-24":
+                        typeof choice.value === "number",
+                    },
+                  )}
+                  aria-pressed={view === choice.value}
+                  onclick={() => (shading = choice.value)}
+                  >{choice.label}</button
+                >
+              {/each}
+            </div>
+          {/if}
         {/each}
       </div>
     </div>
@@ -769,8 +962,96 @@
   <div
     class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2 text-[0.8125rem]"
   >
-    {#if typeof shading === "number"}
-      {const index = $derived(typeof shading === "number" ? shading : 0)}
+    {#if (view === "swing" || view === "arrows") && span != null}
+      <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">
+        <span class="text-muted-foreground"
+          >{m.map_swing_key({ year: span.from })}</span
+        >
+        <span class="flex items-center gap-1.5 text-xs">
+          <span class="font-semibold">{names[1]}</span>
+          {#if view === "swing"}
+            <span class="flex font-mono tabular-nums">
+              {#each [...STRENGTHS].toReversed() as strength, at (`b${at}`)}
+                <span
+                  class="block-3 inline-5 first:rounded-s-xs"
+                  style:background-color="color-mix(in oklab, {colors[1] ??
+                    'var(--muted-foreground)'}
+                  {strength}%, var(--card))"
+                ></span>
+              {/each}
+              {#each STRENGTHS as strength, at (`a${at}`)}
+                <span
+                  class="block-3 inline-5 last:rounded-e-xs"
+                  style:background-color="color-mix(in oklab, {colors[0] ??
+                    'var(--muted-foreground)'}
+                  {strength}%, var(--card))"
+                ></span>
+              {/each}
+            </span>
+          {:else}
+            <span class="flex items-center gap-1">
+              <svg
+                class="rotate-180 block-3 inline-6"
+                viewBox="0 0 64 24"
+                style:color={colors[1]}
+                ><path
+                  fill="currentColor"
+                  d="M4 9.5h36v-6l19 8.5-19 8.5v-6H4z"
+                /></svg
+              >
+              <svg
+                class="block-3 inline-6"
+                viewBox="0 0 64 24"
+                style:color={colors[0]}
+                ><path
+                  fill="currentColor"
+                  d="M4 9.5h36v-6l19 8.5-19 8.5v-6H4z"
+                /></svg
+              >
+            </span>
+          {/if}
+          <span class="font-semibold">{names[0]}</span>
+        </span>
+        <span class="font-mono text-xs text-muted-foreground tabular-nums"
+          >{m.map_swing_scale({ low: "2", high: "10" })}</span
+        >
+      </div>
+    {:else if view === "flips" && span != null}
+      <div class="flex flex-wrap items-center gap-1.5">
+        {#if flips.length === 0}
+          <span class="text-muted-foreground"
+            >{m.map_flips_none({ year: span.from })}</span
+          >
+        {/if}
+        {#each flips as [key, from, to, won] (key)}
+          <button
+            type="button"
+            class={cn(
+              "flex keycap items-center gap-1.5 rounded-sm border border-input bg-card ps-1.5 pe-2 text-[0.8125rem] block-7 hover:bg-secondary",
+              { "marked bg-secondary": only === key },
+            )}
+            style:--party={colors[to]}
+            aria-pressed={only === key}
+            onclick={() => {
+              only = only === key ? null : key;
+            }}
+          >
+            <span
+              class="rounded-xs block-2.5 inline-2.5"
+              style:background-color={colors[from]}
+            ></span>
+            <span class="text-muted-foreground">{names[from]}</span>
+            <span aria-hidden="true" class="text-muted-foreground">›</span>
+            <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+            <span class="font-semibold">{names[to]}</span>
+            <span class="font-mono text-xs text-muted-foreground tabular-nums"
+              >{won}</span
+            >
+          </button>
+        {/each}
+      </div>
+    {:else if typeof view === "number"}
+      {const index = $derived(typeof view === "number" ? view : 0)}
       <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">
         <span class="text-muted-foreground"
           >{m.map_share_key({ name: names[index] ?? "" })}</span
@@ -817,7 +1098,7 @@
           </button>
         {/each}
       </div>
-      {#if shading === "bubbles"}
+      {#if view === "bubbles"}
         <span class="text-muted-foreground"
           >{m.map_bubbles_key({ votes: votes.toLowerCase() })}</span
         >
@@ -867,7 +1148,14 @@
   {#if current != null}
     <span class="flex items-baseline justify-between gap-3">
       <span class="font-semibold text-pretty">{current.name}</span>
-      {#if current.margin != null}
+      {#if moved?.from != null && moved.to != null && moved.from !== moved.to}
+        <span
+          class="flex shrink-0 items-center gap-1 rounded-xs bg-secondary px-1.5 text-xs font-semibold"
+          style:--party={colors[moved.to]}
+          ><span class="rounded-xs bg-(--party) block-2 inline-2"
+          ></span>{m.map_flipped()}</span
+        >
+      {:else if current.margin != null}
         <span
           class="shrink-0 font-mono text-xs text-muted-foreground tabular-nums"
           >{points(current.margin)}</span
@@ -886,8 +1174,18 @@
               "font-semibold": entry.index === current.leader,
             })}>{names[entry.index] ?? option?.label}</span
           >
-          <span class="font-mono text-xs tabular-nums"
-            >{percent(entry.share)}</span
+          <span
+            class="flex items-baseline gap-2 font-mono text-xs tabular-nums"
+          >
+            {#if moved != null}
+              <span class="text-muted-foreground"
+                >{points(
+                  (moved.after[entry.index] ?? 0) -
+                    (moved.before[entry.index] ?? 0),
+                )}</span
+              >
+            {/if}
+            {percent(entry.share)}</span
           >
           <span class="col-span-2 rounded-xs bg-muted block-1.5">
             <span
