@@ -137,7 +137,9 @@
                     total: count(total),
                     share: percent(leader.share),
                   })
-                : seated.length > 0 && race.count > 1 && leader.person != null
+                : seated.length > 0 &&
+                    race.count > 1 &&
+                    leader.key.startsWith("person:")
                   ? m.race_lede_districts({
                       seats: count(total),
                       count: count(race.count),
