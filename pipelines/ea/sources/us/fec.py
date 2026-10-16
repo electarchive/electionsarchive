@@ -744,6 +744,10 @@ PARTIES = {
     "Workers World": "Workers World Party",
     "Alaskan Independence": "Alaskan Independence Party",
     "Democratic-Farmer-Labor": "Minnesota Democratic–Farmer–Labor Party",
+    "Dem. Farmer Labor": "Minnesota Democratic–Farmer–Labor Party",
+    "Democratic-Farm-Labor": "Minnesota Democratic–Farmer–Labor Party",
+    "Ind. Republican": "Republican Party of Minnesota",
+    "Independent-Republican": "Republican Party of Minnesota",
     "Socialist Workers": "Socialist Workers Party",
     "Socialist Equality": "Socialist Equality Party",
     "Legal Marijuana Now Party": "Legal Marijuana Now",
@@ -805,7 +809,20 @@ COLORS = {
 AFFILIATES = {
     "Minnesota Democratic–Farmer–Labor Party": "Democratic Party",
     "North Dakota Democratic–Nonpartisan League Party": "Democratic Party",
+    "Republican Party of Minnesota": "Republican Party",
+    "NMI Republican Party Association": "Republican Party",
 }
+FORMER_NAMES = {
+    "Republican Party of Minnesota": ("Independent-Republicans of Minnesota", date(1975, 11, 15), date(1995, 9, 23))
+}
+FOLDED = {
+    "MN:dem-farmer-labor": "MN:minnesota-democratic-farmer-labor-party",
+    "MN:democratic-farm-labor": "MN:minnesota-democratic-farmer-labor-party",
+    "MN:ind-republican": "MN:republican-party-of-minnesota",
+    "MN:independent-republican": "MN:republican-party-of-minnesota",
+}
+LRL = "https://www.lrl.mn.gov/history/caucus.aspx"
+LRL_TITLE = "Party Control of the Minnesota House of Representatives and Senate"
 LINKS = {
     "ronald-reagan": "ronald-reagan",
     "walter-f-mondale": "walter-f-mondale",
@@ -4956,6 +4973,16 @@ def emit() -> Path:
         titles: dict[tuple[str, str], str] = {}
         slogans: set[tuple[str, str]] = set()
         created: set[UUID] = set()
+        lrl = cs.source("Minnesota Legislative Reference Library", LRL_TITLE)
+        cs.add(
+            "source",
+            id=lrl,
+            kind="official_body",
+            publisher="Minnesota Legislative Reference Library",
+            title=LRL_TITLE,
+            url=LRL,
+            license="No license stated.",
+        )
         for state, label in (
             pl.concat(
                 [
@@ -4991,6 +5018,19 @@ def emit() -> Path:
             name(party, canonical)
             if canonical in COLORS:
                 cs.add("party_color", party_id=party, color=COLORS[canonical], valid_from=None)
+            if canonical in FORMER_NAMES:
+                former, start, end = FORMER_NAMES[canonical]
+                cs.add(
+                    "name",
+                    entity_id=party,
+                    text=former,
+                    lang="en",
+                    kind="official",
+                    is_preferred=False,
+                    valid_from=start,
+                    valid_to=end,
+                    source_id=lrl,
+                )
             if canonical in AFFILIATES:
                 cs.add(
                     "party_affiliation",
@@ -4999,6 +5039,9 @@ def emit() -> Path:
                     kind="regional_branch",
                     valid_from=None,
                 )
+        for folded, into in FOLDED.items():
+            cs.merge(cs.key("us.party", folded), cs.key("us.party", into))
+        cs.renamed["republican-party-of-minnesota"] = "independent-republican"
 
         persons: dict[str, UUID] = {}
         by_name: dict[str, UUID] = {}
