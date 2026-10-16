@@ -53,6 +53,81 @@ NAMES = {
     "socialist-party-of-america": "Socialist Party of America",
 }
 UNAFFILIATED = {"Independent", "Nonpartisan", "Unknown", "AL", "Ind. Republican-Democrat"}
+ADMITTED = {
+    "VT": date(1791, 3, 4),
+    "KY": date(1792, 6, 1),
+    "TN": date(1796, 6, 1),
+    "OH": date(1803, 3, 1),
+    "LA": date(1812, 4, 30),
+    "IN": date(1816, 12, 11),
+    "MS": date(1817, 12, 10),
+    "IL": date(1818, 12, 3),
+    "AL": date(1819, 12, 14),
+    "ME": date(1820, 3, 15),
+    "MO": date(1821, 8, 10),
+    "AR": date(1836, 6, 15),
+    "MI": date(1837, 1, 26),
+    "FL": date(1845, 3, 3),
+    "TX": date(1845, 12, 29),
+    "IA": date(1846, 12, 28),
+    "WI": date(1848, 5, 29),
+    "CA": date(1850, 9, 9),
+    "MN": date(1858, 5, 11),
+    "OR": date(1859, 2, 14),
+    "KS": date(1861, 1, 29),
+    "WV": date(1863, 6, 20),
+    "NV": date(1864, 10, 31),
+    "NE": date(1867, 3, 1),
+    "CO": date(1876, 8, 1),
+    "ND": date(1889, 11, 2),
+    "SD": date(1889, 11, 2),
+    "MT": date(1889, 11, 8),
+    "WA": date(1889, 11, 11),
+    "ID": date(1890, 7, 3),
+    "WY": date(1890, 7, 10),
+    "UT": date(1896, 1, 4),
+    "OK": date(1907, 11, 16),
+    "NM": date(1912, 1, 6),
+    "AZ": date(1912, 2, 14),
+    "AK": date(1959, 1, 3),
+    "HI": date(1959, 8, 21),
+    "DK": date(1889, 11, 2),
+    "OL": date(1812, 4, 30),
+    "PI": date(1946, 7, 4),
+}
+TERRITORIES = {
+    "OH": "Delegate from the Northwest Territory",
+    "TN": "Delegate from the Southwest Territory",
+    "MS": "Delegate from the Mississippi Territory",
+    "IN": "Delegate from the Indiana Territory",
+    "OL": "Delegate from the Territory of Orleans",
+    "MI": "Delegate from the Michigan Territory",
+    "IL": "Delegate from the Illinois Territory",
+    "AL": "Delegate from the Alabama Territory",
+    "MO": "Delegate from the Missouri Territory",
+    "AR": "Delegate from the Arkansas Territory",
+    "FL": "Delegate from the Florida Territory",
+    "WI": "Delegate from the Wisconsin Territory",
+    "IA": "Delegate from the Iowa Territory",
+    "MN": "Delegate from the Minnesota Territory",
+    "OR": "Delegate from the Oregon Territory",
+    "KS": "Delegate from the Kansas Territory",
+    "NE": "Delegate from the Nebraska Territory",
+    "NM": "Delegate from the New Mexico Territory",
+    "UT": "Delegate from the Utah Territory",
+    "WA": "Delegate from the Washington Territory",
+    "CO": "Delegate from the Colorado Territory",
+    "NV": "Delegate from the Nevada Territory",
+    "DK": "Delegate from the Dakota Territory",
+    "ID": "Delegate from the Idaho Territory",
+    "MT": "Delegate from the Montana Territory",
+    "AZ": "Delegate from the Arizona Territory",
+    "WY": "Delegate from the Wyoming Territory",
+    "OK": "Delegate from the Oklahoma Territory",
+    "AK": "Delegate from the Alaska Territory",
+    "HI": "Delegate from the Hawaii Territory",
+    "PI": "Resident Commissioner of the Philippines",
+}
 
 
 def emit() -> Path:
@@ -111,6 +186,15 @@ def emit() -> Path:
                 cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         created: set[UUID] = set()
+        seated: set[UUID] = set()
+        areas: dict[str, UUID] = {
+            iso.removeprefix("US-"): area
+            for iso, area in conn.execute(
+                """select p.iso_code, u.area_id from reporting_unit u
+                   join polity p on p.id = u.polity_id
+                   where u.scheme_code = 'us.state'"""
+            ).fetchall()
+        }
         for member in members:
             ids = member["id"]
             person = next(
@@ -159,7 +243,22 @@ def emit() -> Path:
                     seat = cs.key("us.seat", f"senate:{term['state']}:{term['class']}")
                 elif term["state"] in ("AS", "DC", "GU", "MP", "PR", "VI"):
                     seat = cs.key("us.seat", f"house:{term['state']}")
-                if seat in cs.minted:
+                elif end <= ADMITTED.get(term["state"], date.min):
+                    seat = cs.key("us.seat", f"house:{term['state']}:territory")
+                    if seat not in seated:
+                        seated.add(seat)
+                        cs.add(
+                            "seat",
+                            id=seat,
+                            body_id=bodies["house"],
+                            district_area_id=areas.get(term["state"]),
+                            label=TERRITORIES[term["state"]],
+                            voting=False,
+                            valid_from=None,
+                            valid_to=ADMITTED[term["state"]],
+                            valid_to_precision="day",
+                        )
+                if seat in cs.minted and seat not in seated:
                     raise ValueError(f"{ids['bioguide']}: no seat for {term}")
                 window = (start - timedelta(days=800), start + timedelta(days=60))
                 contest = max(
