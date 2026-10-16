@@ -397,6 +397,13 @@
       {/if}
       <time datetime={contest.election.date}>{date(contest.election.date)}</time
       >
+      {#if contest.scope.home != null}
+        <Preview
+          class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+          path={contest.scope.home}
+          >{m.scope_home({ place: contest.scope.name })}</Preview
+        >
+      {/if}
       {#if contest.election.status === "annulled"}
         <span class="highlighter px-1 font-semibold text-foreground"
           >{m.election_annulled()}</span

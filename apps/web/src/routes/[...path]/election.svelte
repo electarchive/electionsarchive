@@ -137,17 +137,23 @@
                     total: count(total),
                     share: percent(leader.share),
                   })
-                : seated.length > 0 && !race.isOffice
-                  ? m.race_lede_seats({
-                      party: leader.label,
-                      seats: count(leader.seats ?? 0),
-                      total: count(race.size ?? total),
-                      share: percent(leader.share),
+                : seated.length > 0 && race.count > 1 && leader.person != null
+                  ? m.race_lede_districts({
+                      seats: count(total),
+                      count: count(race.count),
                     })
-                  : runner == null
-                    ? null
-                    : (seated.length > 0 ? m.race_lede_won : m.race_lede_votes)(
-                        {
+                  : seated.length > 0 && !race.isOffice
+                    ? m.race_lede_seats({
+                        party: leader.label,
+                        seats: count(leader.seats ?? 0),
+                        total: count(race.size ?? total),
+                        share: percent(leader.share),
+                      })
+                    : runner == null
+                      ? null
+                      : (seated.length > 0
+                          ? m.race_lede_won
+                          : m.race_lede_votes)({
                           party: leader.label,
                           share: percent(leader.share),
                           margin: count(
@@ -155,8 +161,7 @@
                               10,
                           ),
                           runner: runner.label,
-                        },
-                      ),
+                        }),
       };
     }),
   );

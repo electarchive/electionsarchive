@@ -349,6 +349,22 @@ function polityMarkdown(
             link(election.name, election.path),
           ]),
         ),
+    ...(polity.results.length === 0
+      ? []
+      : [
+          `## ${m.polity_results_title({ place: polity.name })}`,
+          table(
+            [m.col_date(), m.col_contest(), m.col_leader(), m.col_share()],
+            polity.results.flatMap((group) =>
+              group.races.map((race) => [
+                group.date,
+                link(race.name, race.path),
+                race.leaders[0]?.label ?? null,
+                race.leaders[0] == null ? null : percent(race.leaders[0].share),
+              ]),
+            ),
+          ),
+        ]),
     ...(polity.polities.length === 0
       ? []
       : [

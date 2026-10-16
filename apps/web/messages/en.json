@@ -165,6 +165,7 @@
   "race_lede_electors": "{party} won {seats} of the {total} electoral votes, with {share} of the popular vote.",
   "race_lede_electors_only": "{party} won {seats} of the {total} electoral votes.",
   "race_lede_electors_tied": "{party} and {runner} tied with {seats} of the {total} electoral votes each.",
+  "race_lede_districts": "{seats} seats filled in {count} separate district races.",
   "race_lede_won": "{party} won with {share} of the vote, {margin} points ahead of {runner}.",
   "race_lede_votes": "{party} led with {share} of the vote, {margin} points ahead of {runner}.",
   "race_contests": [
@@ -477,5 +478,13 @@
   "workbench_open": "Open page",
   "workbench_copy": "Copy link",
   "workbench_copied": "Link copied",
-  "workbench_no_places": "This contest has no results below its own level."
+  "workbench_no_places": "This contest has no results below its own level.",
+  "polity_results_title": "Results in {place}",
+  "polity_results_lede": "State and national races in {place}. Each one opens at {place}.",
+  "polity_results_more": "Show all {count} years",
+  "polity_results_fewer": "Show fewer years",
+  "polity_kind_county": "Counties",
+  "polity_kind_municipality": "Municipalities",
+  "polity_kind_label": "Place type",
+  "scope_home": "Everything in {place}"
 }

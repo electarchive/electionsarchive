@@ -40,8 +40,8 @@
   const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
   const years = $derived(
     data.kind === "polity"
-      ? data.polity.elections.flatMap((election) =>
-          election.year == null ? [] : [election.year],
+      ? [...data.polity.elections, ...data.polity.results].flatMap((entry) =>
+          entry.year == null ? [] : [entry.year],
         )
       : [],
   );

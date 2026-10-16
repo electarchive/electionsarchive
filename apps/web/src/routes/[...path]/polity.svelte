@@ -29,6 +29,8 @@
 
   let filter = $state("all");
   let query = $state("");
+  let picked = $state<string | null>(null);
+  let isAllYears = $state(false);
 
   const sorts = $derived(
     polity.elections.map((election) => ({
@@ -64,11 +66,46 @@
       ? null
       : { first: Math.min(...dated), last: Math.max(...dated) };
   });
-  const children = $derived(
-    polity.polities.filter((child) =>
-      child.name.toLocaleLowerCase().includes(query.trim().toLocaleLowerCase()),
+  const KINDS: Record<string, () => string> = {
+    all: m.polity_filter_all,
+    county: m.polity_kind_county,
+    municipality: m.polity_kind_municipality,
+  };
+  const kinds = $derived(
+    Object.keys(KINDS).filter(
+      (key) =>
+        key === "all" || polity.polities.some((child) => child.kind === key),
     ),
   );
+  const kind = $derived(
+    picked != null && kinds.includes(picked)
+      ? picked
+      : kinds.includes("county")
+        ? "county"
+        : "all",
+  );
+  const children = $derived(
+    polity.polities.filter(
+      (child) =>
+        (kind === "all" || child.kind === kind) &&
+        child.name
+          .toLocaleLowerCase()
+          .includes(query.trim().toLocaleLowerCase()),
+    ),
+  );
+  const preview = $derived.by(() => {
+    const shown = [];
+    let races = 0;
+    for (const group of polity.results) {
+      if (shown.length > 0 && races + group.races.length > 16) {
+        break;
+      }
+      shown.push(group);
+      races += group.races.length;
+    }
+    return shown;
+  });
+  const results = $derived(isAllYears ? polity.results : preview);
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -173,89 +210,204 @@
   </section>
 {/if}
 
-<section
-  class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
-    "lg:col-span-8": polity.polities.length > 0,
-  })}
-  aria-labelledby="{uid}-elections"
->
-  <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-    <h2 id="{uid}-elections" class="text-[0.8125rem] font-bold">
-      {m.polity_elections()}
-    </h2>
-    {#if present.length > 2}
-      <div class="flex" role="group" aria-label={m.polity_filter_label()}>
-        {#each present as key (key)}
-          <button
-            type="button"
-            class={cn(
-              "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
-              {
-                "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
-                  filter === key,
-              },
-            )}
-            aria-pressed={filter === key}
-            onclick={() => (filter = key)}>{FILTERS[key]?.()}</button
+{#if polity.elections.length > 0 || polity.results.length === 0}
+  <section
+    class={cn("col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3", {
+      "lg:col-span-8": polity.polities.length > 0,
+    })}
+    aria-labelledby="{uid}-elections"
+  >
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <h2 id="{uid}-elections" class="text-[0.8125rem] font-bold">
+        {m.polity_elections()}
+      </h2>
+      {#if present.length > 2}
+        <div class="flex" role="group" aria-label={m.polity_filter_label()}>
+          {#each present as key (key)}
+            <button
+              type="button"
+              class={cn(
+                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                {
+                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                    filter === key,
+                },
+              )}
+              aria-pressed={filter === key}
+              onclick={() => (filter = key)}>{FILTERS[key]?.()}</button
+            >
+          {/each}
+        </div>
+      {/if}
+    </div>
+    {#if polity.elections.length === 0}
+      <p class="text-sm text-muted-foreground">{m.polity_no_elections()}</p>
+    {:else if years.length === 0}
+      <p class="text-sm text-muted-foreground">{m.polity_none_in_filter()}</p>
+    {:else}
+      <ol class="grid">
+        {#each years as [year, entries] (year)}
+          <li
+            class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
           >
-        {/each}
-      </div>
-    {/if}
-  </div>
-  {#if polity.elections.length === 0}
-    <p class="text-sm text-muted-foreground">{m.polity_no_elections()}</p>
-  {:else if years.length === 0}
-    <p class="text-sm text-muted-foreground">{m.polity_none_in_filter()}</p>
-  {:else}
-    <ol class="grid">
-      {#each years as [year, entries] (year)}
-        <li
-          class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
-        >
-          <span
-            class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
-            >{year ?? ""}</span
-          >
-          <ul class="grid gap-1 text-sm">
-            {#each entries as election, index (index)}
-              <li
-                class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
-              >
-                <span class="flex flex-wrap items-baseline gap-x-2">
-                  {#if election.path == null}
-                    <span>{election.name}</span>
-                  {:else}
-                    <Preview class="hover:highlighter" path={election.path}
-                      >{election.name}</Preview
-                    >
-                  {/if}
-                  {#if STATUSES[election.status] != null}
-                    <span class="highlighter px-1 text-xs font-semibold"
-                      >{STATUSES[election.status]?.()}</span
-                    >
-                  {/if}
-                </span>
-                <time
-                  class="text-xs text-muted-foreground tabular-nums max-sm:hidden"
-                  datetime={election.date}>{date(election.date)}</time
+            <span
+              class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
+              >{year ?? ""}</span
+            >
+            <ul class="grid gap-1 text-sm">
+              {#each entries as election, index (index)}
+                <li
+                  class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
                 >
+                  <span class="flex flex-wrap items-baseline gap-x-2">
+                    {#if election.path == null}
+                      <span>{election.name}</span>
+                    {:else}
+                      <Preview class="hover:highlighter" path={election.path}
+                        >{election.name}</Preview
+                      >
+                    {/if}
+                    {#if STATUSES[election.status] != null}
+                      <span class="highlighter px-1 text-xs font-semibold"
+                        >{STATUSES[election.status]?.()}</span
+                      >
+                    {/if}
+                  </span>
+                  <time
+                    class="text-xs text-muted-foreground tabular-nums max-sm:hidden"
+                    datetime={election.date}>{date(election.date)}</time
+                  >
+                </li>
+              {/each}
+            </ul>
+          </li>
+        {/each}
+      </ol>
+    {/if}
+  </section>
+{/if}
+
+{#if polity.results.length > 0}
+  <section
+    class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3"
+    aria-labelledby="{uid}-results"
+  >
+    <div class="grid gap-0.5">
+      <h2 id="{uid}-results" class="text-[0.8125rem] font-bold">
+        {m.polity_results_title({ place: polity.name })}
+      </h2>
+      <p class="text-[0.8125rem] text-muted-foreground">
+        {m.polity_results_lede({ place: polity.name })}
+      </p>
+    </div>
+    <ol class="grid">
+      {#each results as group (group.date)}
+        <li
+          class="grid items-baseline gap-x-3 gap-y-1.5 border-be border-border/60 py-2 last:border-be-0 sm:grid-cols-[4.5rem_minmax(0,1fr)]"
+        >
+          <time
+            class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
+            datetime={group.date}>{group.year ?? ""}</time
+          >
+          <ul class="grid gap-2">
+            {#each group.races as race (race.id)}
+              {const leader = $derived(race.leaders[0])}
+              {const runner = $derived(race.leaders[1])}
+              <li
+                class="grid items-center gap-x-4 gap-y-1 text-sm sm:grid-cols-[minmax(0,1fr)_6rem_minmax(0,15rem)]"
+              >
+                <Preview
+                  class="text-pretty first-letter:uppercase hover:highlighter"
+                  path={race.path}
+                  >{group.year != null && race.name.startsWith(`${group.year} `)
+                    ? race.name.slice(String(group.year).length + 1)
+                    : race.name}</Preview
+                >
+                <div
+                  class="flex overflow-hidden rounded-xs bg-muted block-2 max-sm:hidden"
+                  aria-hidden="true"
+                >
+                  {#each race.leaders as row (row.key)}
+                    <span
+                      class="block-full"
+                      style:inline-size="{row.share * 100}%"
+                      style:background-color={swatch(row.color, row.key)}
+                    ></span>
+                  {/each}
+                </div>
+                <div class="grid gap-0.5 text-[0.8125rem]">
+                  {#each [leader, runner] as row, index (index)}
+                    {#if row != null}
+                      <span
+                        class={cn(
+                          "grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3",
+                          { "text-muted-foreground": index > 0 },
+                        )}
+                      >
+                        <Name
+                          class="truncate min-inline-0"
+                          label={row.label}
+                          color={swatch(row.color, row.key)}
+                          person={row.person}
+                          party={row.party}
+                        />
+                        <span class="font-mono text-xs tabular-nums"
+                          >{percent(row.share)}</span
+                        >
+                      </span>
+                    {/if}
+                  {/each}
+                </div>
               </li>
             {/each}
           </ul>
         </li>
       {/each}
     </ol>
-  {/if}
-</section>
+    {#if preview.length < polity.results.length}
+      <button
+        type="button"
+        class="keycap justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary"
+        aria-expanded={isAllYears}
+        onclick={() => (isAllYears = !isAllYears)}
+        >{isAllYears
+          ? m.polity_results_fewer()
+          : m.polity_results_more({
+              count: String(polity.results.length),
+            })}</button
+      >
+    {/if}
+  </section>
+{/if}
 
 {#if polity.polities.length > 0}
   <section
     class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3 lg:col-span-4"
     aria-labelledby="{uid}-places"
   >
-    <h2 id="{uid}-places" class="text-[0.8125rem] font-bold">
-      {m.polity_subdivisions()}
-    </h2>
+    <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+      <h2 id="{uid}-places" class="text-[0.8125rem] font-bold">
+        {m.polity_subdivisions()}
+      </h2>
+      {#if kinds.length > 2}
+        <div class="flex" role="group" aria-label={m.polity_kind_label()}>
+          {#each kinds as key (key)}
+            <button
+              type="button"
+              class={cn(
+                "-ms-px flex keycap items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                {
+                  "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                    kind === key,
+                },
+              )}
+              aria-pressed={kind === key}
+              onclick={() => (picked = key)}>{KINDS[key]?.()}</button
+            >
+          {/each}
+        </div>
+      {/if}
+    </div>
     {#if polity.polities.length > 12}
       <input
         class="rounded-sm border border-input bg-card px-2.5 text-sm block-8 placeholder:text-muted-foreground"
