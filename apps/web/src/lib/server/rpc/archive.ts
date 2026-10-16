@@ -3203,6 +3203,7 @@ async function races(
       party: string | null;
       runoffs: Array<string>;
       isRemainder: boolean;
+      isOwn: boolean;
       area: string | null;
       k: number | null;
       scheme: string | null;
@@ -3212,8 +3213,18 @@ async function races(
         select ${election}::uuid, false
         union all
         select k.id, tree.stage or k.kind = 'indirect' from election k join tree on k.parent_id = tree.id
+      ),
+      anc(id) as (
+        select ${polity}::uuid
+        union
+        select p.parent_id from polity_parent p join anc on p.polity_id = anc.id
       )
       select c.id, c.kind::text as kind,
+        coalesce(
+          (select b.polity_id from body b where b.id = c.body_id),
+          (select o.polity_id from office o where o.id = c.office_id),
+          e.polity_id
+        ) in (select id from anc) as "isOwn",
         case when c.kind = 'ballot_question' then c.id::text
           else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, c.party_scope_id, tree.stage) end as series,
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
@@ -3245,7 +3256,10 @@ async function races(
     `),
   ]);
   const nation = territory.rows[0];
-  const groups = Map.groupBy(found.rows, (row) => row.series)
+  const owned = found.rows.some((row) => row.isOwn)
+    ? found.rows.filter((row) => row.isOwn)
+    : found.rows;
+  const groups = Map.groupBy(owned, (row) => row.series)
     .values()
     .flatMap((group) =>
       group.length > 1 && new Set(group.map((row) => row.area)).size === 1
@@ -3464,6 +3478,9 @@ async function races(
         !stages.includes(race) &&
         stages.every((stage) => stage.election !== race.election),
     )
+    .toSorted(
+      (a, b) => (a.day ?? "").localeCompare(b.day ?? "") || b.valid - a.valid,
+    )
     .map(({ isStage, office, election, day, ...race }) => {
       const stage = stages.find((entry) => entry.office === office);
       const rows = (
@@ -3500,8 +3517,7 @@ async function races(
                 },
               },
       };
-    })
-    .toSorted((a, b) => b.valid - a.valid);
+    });
 }
 
 export const elections = {
