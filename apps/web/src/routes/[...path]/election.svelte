@@ -1,10 +1,13 @@
 <script lang="ts">
+  import { createQuery } from "@tanstack/svelte-query";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Electors from "./electors.svelte";
+  import Governments from "./governments.svelte";
   import PlaceMap from "./map.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
@@ -51,6 +54,45 @@
       ? parts[0]?.noun
       : null,
   );
+
+  const governments = createQuery(() =>
+    orpc.elections.governments.queryOptions({ input: { id } }),
+  );
+  const governing = $derived(
+    (
+      (governments.data ?? []).find(
+        (government) => !government.isBefore && !government.isCaretaker,
+      )?.parties ?? []
+    ).flatMap((party) =>
+      party.role === "support" ? [] : [`party:${party.id}`],
+    ),
+  );
+
+  const chamber = $derived.by(() => {
+    const best = election.races
+      .filter((race) => !race.isOffice && race.size != null)
+      .map((race) => {
+        let filled = 0;
+        for (const row of race.results) {
+          filled += row.seats ?? 0;
+        }
+        return { race, filled };
+      })
+      .filter((entry) => entry.filled >= (entry.race.size ?? 0) * 0.9)
+      .toSorted((a, b) => b.filled - a.filled)[0];
+    return best == null
+      ? null
+      : {
+          size: best.race.size ?? best.filled,
+          seats: Object.fromEntries(
+            best.race.results.flatMap((row) =>
+              row.party == null || row.seats == null
+                ? []
+                : [[row.party, row.seats]],
+            ),
+          ),
+        };
+  });
 
   const races = $derived(
     election.races.map((race) => {
@@ -413,6 +455,7 @@
       change={race.change}
       isComplete={race.size != null || race.count === 1}
       partners={race.partners}
+      governing={race.size === chamber?.size ? governing : []}
     />
   {/if}
   <div
@@ -478,6 +521,7 @@
   </section>
 {/if}
 
+<Governments {id} {chamber} />
 <Regions {id} />
 
 {#if isTiled}

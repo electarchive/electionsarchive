@@ -664,5 +664,15 @@
   "versus_shares_title": "Vote share over time",
   "versus_shares_lede": "Every recorded race for both. Filled marks are wins and hollow marks are losses.",
   "versus_action": "Compare",
-  "versus_even": "Even"
+  "versus_even": "Even",
+  "governments_title": "Governments",
+  "governments_lede": "The government in office on election day and all governments formed before the next general election.",
+  "governments_before": "In office on election day",
+  "governments_formed": "Formed after the election",
+  "governments_caretaker": "Caretaker",
+  "governments_present": "Present",
+  "governments_support": "Support",
+  "governments_head": "Led by {name}",
+  "governments_seats": "{seats} seats",
+  "seats_paths_governed": "Formed government"
 }

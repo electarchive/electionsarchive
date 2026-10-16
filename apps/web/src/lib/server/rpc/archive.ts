@@ -4095,6 +4095,121 @@ export const elections = {
         ).slice(0, 3),
       };
     }),
+  governments: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/governments",
+        summary:
+          "List the government in office on an election's day and every government formed before the next general election, with their heads and parties",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.array(
+        v.object({
+          name: v.string(),
+          head: v.nullable(v.object({ id: v.string(), name: v.string() })),
+          from: v.string(),
+          to: v.nullable(v.string()),
+          isCaretaker: v.boolean(),
+          isBefore: v.boolean(),
+          parties: v.array(
+            v.object({
+              ...PartyRef.entries,
+              role: v.string(),
+              seats: v.nullable(v.number()),
+              lean: v.nullable(v.number()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        id: string;
+        name: string | null;
+        head: string | null;
+        from: string;
+        to: string | null;
+        isCaretaker: boolean;
+        isBefore: boolean;
+      }>(sql`
+        with here as (
+          select e.id, e.polity_id, e.date_from,
+            (select min(n.date_from) from election n
+              where n.polity_id = e.polity_id and n.kind = 'general' and n.status = 'held'
+                and n.parent_id is null and n.date_from > e.date_from) as next
+          from election e where e.id = ${input.id}::uuid and e.kind = 'general'
+        )
+        select g.id, g.head_person_id as head, g.from_date::text as from, g.to_date::text as to,
+          g.caretaker as "isCaretaker",
+          g.from_date <= here.date_from and g.election_id is distinct from here.id as "isBefore",
+          (select n.text from name n where n.entity_id = g.id
+            order by n.kind = 'short' desc, n.is_preferred desc limit 1) as name
+        from here join government g on g.polity_id = here.polity_id
+        where g.election_id = here.id
+          or (g.from_date > here.date_from and g.from_date < coalesce(here.next, here.date_from + 2200))
+          or (g.from_date <= here.date_from and coalesce(g.to_date, 'infinity') >= here.date_from
+            and g.election_id is distinct from here.id)
+        order by g.from_date
+      `);
+      const ids = found.rows.map((row) => row.id);
+      const members = await db.execute<{
+        government: string;
+        party: string;
+        role: string;
+        seats: number | null;
+      }>(sql`
+        select gp.government_id as government, coalesce(pm.into_id, gp.party_id) as party,
+          gp.role::text as role, gp.seats
+        from government_party gp left join entity_merge pm on pm.entity_id = gp.party_id
+        where gp.government_id = any(${sql.param(ids)}::uuid[])
+      `);
+      const parties = members.rows.map((row) => row.party);
+      const [labels, colors, positions] = await Promise.all([
+        names(found.rows.flatMap((row) => row.head ?? [])),
+        refs(parties),
+        db.execute<{ party_id: string; lean: number }>(sql`
+          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+          where party_id = any(${sql.param(parties)}::uuid[])
+          order by party_id, valid_from desc nulls last
+        `),
+      ]);
+      const lean = new Map(
+        positions.rows.map((row) => [row.party_id, row.lean]),
+      );
+      const ROLES = ["head", "member", "support"];
+      return found.rows.map((row) => ({
+        name: row.name ?? "",
+        head:
+          row.head == null
+            ? null
+            : { id: row.head, name: labels.full.get(row.head) ?? "" },
+        from: row.from,
+        to: row.to,
+        isCaretaker: row.isCaretaker,
+        isBefore: row.isBefore,
+        parties: members.rows
+          .filter((member) => member.government === row.id)
+          .map((member) => ({
+            ...(colors.get(member.party) ?? {
+              id: member.party,
+              label: "",
+              short: null,
+              color: null,
+            }),
+            role: member.role,
+            seats: member.seats,
+            lean: lean.get(member.party) ?? null,
+          }))
+          .toSorted(
+            (a, b) =>
+              ROLES.indexOf(a.role) - ROLES.indexOf(b.role) ||
+              (b.seats ?? 0) - (a.seats ?? 0),
+          ),
+      }));
+    }),
   regions: os
     .meta(
       openapi({

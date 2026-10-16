@@ -19,6 +19,7 @@
     isComplete = true,
     change = null,
     partners = [],
+    governing = [],
   }: {
     parties: Array<{
       key: string;
@@ -42,6 +43,7 @@
     isComplete?: boolean;
     change?: Record<string, number> | null;
     partners?: Array<Array<string>>;
+    governing?: Array<string>;
   } = $props();
 
   const uid = $props.id();
@@ -691,8 +693,16 @@
               aria-pressed={isPicked}
               onclick={() => (picked = isPicked ? [] : [...path.keys])}
             >
+              {const isGoverning = $derived(
+                governing.length > 0 &&
+                  governing.every((key) => path.keys.includes(key)) &&
+                  path.keys.every((key) => governing.includes(key)),
+              )}
               <span class="truncate text-[0.8125rem] font-semibold"
-                >{path.units
+                >{#if isGoverning}<span
+                    class="me-1.5 highlighter px-1 text-xs font-semibold"
+                    >{m.seats_paths_governed()}</span
+                  >{/if}{path.units
                   .map((unit) => unit.map((key) => shorts.get(key)).join("/"))
                   .join(" + ")}</span
               >
