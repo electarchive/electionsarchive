@@ -2472,6 +2472,8 @@ async function races(election: string, polity: string, date: string | null) {
       isOffice: boolean;
       isStage: boolean;
       size: number | null;
+      isCounted: boolean;
+      runoffs: Array<string>;
       area: string | null;
       k: number | null;
       scheme: string | null;
@@ -2488,9 +2490,12 @@ async function races(election: string, polity: string, date: string | null) {
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
         e.date_from::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", tree.stage as "isStage", z.seats as size,
+        c.term is distinct from 'remainder' and coalesce(st.voting, true) as "isCounted",
+        array(select n.id from contest n join election ne on ne.id = n.election_id where n.previous_round_id = c.id and ne.kind = 'runoff') as runoffs,
         a.id as area, a.k, a.scheme_code as scheme, sc.noun
       from contest c
       join election e on e.id = c.election_id
+      left join seat st on st.id = c.seat_id
       left join area a on a.id = c.district_area_id
       left join scheme sc on sc.code = a.scheme_code
       left join lateral (
@@ -2541,8 +2546,11 @@ async function races(election: string, polity: string, date: string | null) {
       const place = single?.place ?? nation;
       const districts = group.filter((row) => row.k != null);
       const first = districts[0];
+      const counted = group
+        .filter((row) => row.isCounted)
+        .flatMap((row) => [row.id, ...row.runoffs]);
       const [totals, grid, table] = await Promise.all([
-        load(roots, [place.k], day, roots),
+        load(roots, [place.k], day, counted.length > 0 ? counted : roots),
         single == null
           ? null
           : places(
