@@ -790,6 +790,23 @@
           if (index === 0) {
             isLoaded = true;
           }
+          const box = map.getCanvas();
+          const side = Math.sqrt(
+            (box.clientWidth * box.clientHeight) /
+              Math.max(1, places.rows.length),
+          );
+          const fit = map.getZoom();
+          if (side < 16) {
+            map.setPaintProperty("seam", "line-width", [
+              "interpolate",
+              ["exponential", 2],
+              ["zoom"],
+              fit,
+              Math.max(0.15, side / 16),
+              fit + 4,
+              1.6,
+            ]);
+          }
         });
         built.push(map);
       }
