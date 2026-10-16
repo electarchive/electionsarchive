@@ -649,8 +649,14 @@ async function load(
   const anchor = new Map(
     coalitions.rows.map((row) => [row.alliance, row.party]),
   );
-  const stand = (row: { party: string | null; alliance: string | null }) =>
-    row.party ?? anchor.get(row.alliance ?? "") ?? null;
+  const stand = (row: {
+    party: string | null;
+    person: string | null;
+    alliance: string | null;
+  }) =>
+    row.party ??
+    (row.person == null ? null : anchor.get(row.alliance ?? "")) ??
+    null;
   const entities = [
     ...new Set([
       ...options.rows.flatMap((row) =>
