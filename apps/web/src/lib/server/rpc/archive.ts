@@ -5461,16 +5461,25 @@ export const polities = {
           select polity_id, parent_id from polity_parent
           union
           select p.polity_id, below.top from polity_parent p join below on p.parent_id = below.id
+        ),
+        own as materialized (
+          select polity_id, count(*)::int as n, min(extract(year from date_from))::int as first,
+            max(extract(year from date_from))::int as last
+          from election group by polity_id
+        ),
+        nested as materialized (
+          select b.top, sum(o.n)::int as n from below b join own o on o.polity_id = b.id group by b.top
         )
-        select p.id, p.kind::text, p.iso_code,
-          (select count(*)::int from election e where e.polity_id = p.id) as elections,
-          (select count(*)::int from election e join below b on b.id = e.polity_id and b.top = p.id) as within,
-          (select min(extract(year from e.date_from))::int from election e where e.polity_id = p.id) as first,
-          (select max(extract(year from e.date_from))::int from election e where e.polity_id = p.id) as last,
-          (select e.id from election e where e.polity_id = p.id and e.status = 'held' and e.date_from <= current_date
-             and not exists (select from election x where x.id = e.parent_id and x.polity_id = e.polity_id)
-           order by e.kind = 'general' desc, e.date_from desc limit 1) as latest
+        select p.id, p.kind::text, p.iso_code, coalesce(o.n, 0) as elections, coalesce(i.n, 0) as within,
+          o.first, o.last,
+          case when o.n is not null then (
+            select e.id from election e where e.polity_id = p.id and e.status = 'held' and e.date_from <= current_date
+              and not exists (select from election x where x.id = e.parent_id and x.polity_id = e.polity_id)
+            order by e.kind = 'general' desc, e.date_from desc limit 1
+          ) end as latest
         from polity p
+        left join own o on o.polity_id = p.id
+        left join nested i on i.top = p.id
       `);
       const ids = result.rows.flatMap((row) =>
         row.latest == null ? [row.id] : [row.id, row.latest],
