@@ -1,6 +1,9 @@
 import csv
+import dataclasses
 import difflib
+import html
 import io
+import itertools
 import json
 import re
 import struct
@@ -8,6 +11,7 @@ import subprocess
 import tempfile
 from collections import Counter
 from concurrent.futures import ThreadPoolExecutor
+from dataclasses import dataclass
 from datetime import date
 from itertools import pairwise, repeat
 from pathlib import Path
@@ -23,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "16"
+VERSION = "17"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -1263,6 +1267,376 @@ SEATS_2018 = {
 }
 KAHRAMANMARAS = (46, 0)
 POOL_COLUMNS = [204, 682, 885, 1089, 1292, 1496, 1615]
+ARCHIVE = "https://www.resmigazete.gov.tr/arsiv"
+YSK_DOCS = "https://www.ysk.gov.tr/doc/dosyalar/docs"
+TBMM_1999 = "https://www5.tbmm.gov.tr/develop/owa/secim_sorgu.secim_cevresi_partiler?p_secim_yili=1999&p_il_kodu="
+DISTRICTS_1999 = "https://www5.tbmm.gov.tr/develop/owa/secim_sorgu.secim_cevreleri?p_secim_yili=1999"
+WIKIPEDIA = "https://tr.wikipedia.org/w/"
+DAY_1983, DAY_1987, DAY_1991, DAY_1995, DAY_1999, DAY_2002 = (
+    date(1983, 11, 6),
+    date(1987, 11, 29),
+    date(1991, 10, 20),
+    date(1995, 12, 24),
+    date(1999, 4, 18),
+    date(2002, 11, 3),
+)
+EARLY = {
+    DAY_1983: (
+        f"{ARCHIVE}/18221_1.pdf",
+        range(13, 60),
+        "1983MilletvekiliSecimi/1983_Secim_Sonuclari",
+        "1983MilletvekiliSecimi/1983_Milletvekili_Sayisi",
+        None,
+    ),
+    DAY_1987: (
+        f"{ARCHIVE}/19659.pdf",
+        range(5, 61),
+        "1987MilletvekiliSecimi/1987_Secim_Sonuclari",
+        "1987MilletvekiliSecimi/1987_Milletvekili_Sayisi",
+        "1987MilletvekiliSecimi/1987_Gumruk_Sonuclari",
+    ),
+    DAY_1991: (
+        f"{ARCHIVE}/21038_1.pdf",
+        range(3, 69),
+        "1991MilletvekiliSecimi/1991_Secim_Sonuclari",
+        "1991MilletvekiliSecimi/1991_Milletvekili_Sayisi",
+        "1991MilletvekiliSecimi/1991_Gumruk_Sonuclari",
+    ),
+    DAY_1995: (
+        f"{ARCHIVE}/22512_1.pdf",
+        range(4, 61),
+        "1995MilletvekiliSecimi/1995_secim_sonuclari",
+        "1995MilletvekiliSecimi/1995_milletvekili_sayisi",
+        "1995MilletvekiliSecimi/1995_gumruk_sonuclari",
+    ),
+    DAY_1999: (
+        f"{ARCHIVE}/23678_1.pdf",
+        range(5, 89),
+        "1999MilletvekiliSecimi/1999_secim_sonuclari",
+        "1999MilletvekiliSecimi/1999_milletvekili_sayisi",
+        None,
+    ),
+    DAY_2002: (
+        f"{GAZETTE}/2002/11/20021110.htm",
+        [n for n in range(14, 99) if n != 71],
+        "2002MilletvekiliSecimi/2002_secim%20_sonuclari",
+        "2002MilletvekiliSecimi/2002_milletvekili_sayisi",
+        "2002MilletvekiliSecimi/2002_gumruk_sonuclari",
+    ),
+}
+MEMBER_LISTS = {
+    day: f"{WIKIPEDIA}index.php?{urlencode({'action': 'raw', 'title': f'TBMM {term}. dönem milletvekilleri listesi'})}"
+    for term, day in enumerate(EARLY, 17)
+}
+EARLY_PARTIES = {
+    DAY_1983: {
+        "anavatan-partisi-1983": "Anavatan Partisi",
+        "halkci-parti": "Halkçı Parti",
+        "milliyetci-demokrasi-partisi": "Milliyetçi Demokrasi Partisi",
+        INDEPENDENTS: "Bağımsız Aday",
+    },
+    DAY_1987: {
+        "anavatan-partisi-1983": "Anavatan Partisi",
+        "sosyaldemokrat-halkci-parti": "Sosyaldemokrat Halkçı Parti",
+        "demokrat-parti": "Doğru Yol Partisi",
+        "demokratik-sol-parti": "Demokratik Sol Parti",
+        "refah-partisi": "Refah Partisi",
+        "milliyetci-hareket-partisi": "Milliyetçi Çalışma Partisi",
+        "millet-partisi": "Islahatçı Demokrasi Partisi",
+        INDEPENDENTS: INDEPENDENTS,
+    },
+    DAY_1991: {
+        "demokrat-parti": "Doğru Yol Partisi",
+        "anavatan-partisi-1983": "Anavatan Partisi",
+        "sosyaldemokrat-halkci-parti": "Sosyaldemokrat Halkçı Parti",
+        "refah-partisi": "Refah Partisi",
+        "demokratik-sol-parti": "Demokratik Sol Parti",
+        "sosyalist-parti": "Sosyalist Parti",
+        INDEPENDENTS: INDEPENDENTS,
+    },
+    DAY_1995: {
+        "demokrat-parti": "Doğru Yol Partisi",
+        "genc-parti": "Yeniden Doğuş Partisi",
+        "anavatan-partisi-1983": "Anavatan Partisi",
+        "millet-partisi": "Millet Partisi",
+        "isci-partisi": "İşçi Partisi",
+        "halkin-demokrasi-partisi": "Halkın Demokrasi Partisi",
+        "demokratik-sol-parti": "Demokratik Sol Parti",
+        "yeni-demokrasi-hareketi": "Yeni Demokrasi Hareketi",
+        "refah-partisi": "Refah Partisi",
+        "cumhuriyet-halk-partisi": "Cumhuriyet Halk Partisi",
+        "milliyetci-hareket-partisi": "Milliyetçi Hareket Partisi",
+        "yeni-parti": "Yeni Parti",
+        INDEPENDENTS: INDEPENDENTS,
+    },
+    DAY_1999: {
+        "demokratik-sol-parti": "Demokratik Sol Parti",
+        "milliyetci-hareket-partisi": "Milliyetçi Hareket Partisi",
+        "cumhuriyet-halk-partisi": "Cumhuriyet Halk Partisi",
+        "fazilet-partisi": "Fazilet Partisi",
+        "anavatan-partisi-1983": "Anavatan Partisi",
+        "demokrat-parti": "Doğru Yol Partisi",
+        "sol-parti": "Özgürlük ve Dayanışma Partisi",
+        "halkin-demokrasi-partisi": "Halkın Demokrasi Partisi",
+        "buyuk-birlik-partisi": "Büyük Birlik Partisi",
+        "demokrat-turkiye-partisi": "Demokrat Türkiye Partisi",
+        "liberal-demokrat-parti": "Liberal Demokrat Parti",
+        "isci-partisi": "İşçi Partisi",
+        "baris-partisi": "Barış Partisi",
+        "demokrat-parti-1992": "Demokrat Parti",
+        "emek-partisi": "Emeğin Partisi",
+        "millet-partisi": "Millet Partisi",
+        "demokrasi-ve-baris-partisi": "Demokrasi ve Barış Partisi",
+        "genc-parti": "Yeniden Doğuş Partisi",
+        "degisen-turkiye-partisi": "Değişen Türkiye Partisi",
+        "turkiye-komunist-partisi": "Sosyalist İktidar Partisi",
+        INDEPENDENTS: INDEPENDENTS,
+    },
+    DAY_2002: {
+        "demokratik-sol-parti": "Demokratik Sol Parti",
+        "demokratik-halk-partisi": "Demokratik Halk Partisi",
+        "yurt-partisi": "Yurt Partisi",
+        "milliyetci-hareket-partisi": "Milliyetçi Hareket Partisi",
+        "demokrat-parti": "Doğru Yol Partisi",
+        "millet-partisi": "Millet Partisi",
+        "buyuk-birlik-partisi": "Büyük Birlik Partisi",
+        "anavatan-partisi-1983": "Anavatan Partisi",
+        "liberal-demokrat-parti": "Liberal Demokrat Parti",
+        "saadet-partisi": "Saadet Partisi",
+        "bagimsiz-turkiye-partisi": "Bağımsız Türkiye Partisi",
+        "sol-parti": "Özgürlük ve Dayanışma Partisi",
+        "turkiye-komunist-partisi": "Türkiye Komünist Partisi",
+        "genc-parti": "Genç Parti",
+        "isci-partisi": "İşçi Partisi",
+        "cumhuriyet-halk-partisi": "Cumhuriyet Halk Partisi",
+        "adalet-ve-kalkinma-partisi": "Adalet ve Kalkınma Partisi",
+        "yeni-turkiye-partisi": "Yeni Türkiye Partisi",
+        INDEPENDENTS: INDEPENDENTS,
+    },
+}
+ABBREVIATIONS_1999 = {
+    "DSP": "demokratik-sol-parti",
+    "MHP": "milliyetci-hareket-partisi",
+    "CHP": "cumhuriyet-halk-partisi",
+    "FP": "fazilet-partisi",
+    "ANAP": "anavatan-partisi-1983",
+    "DYP": "demokrat-parti",
+    "ÖDP": "sol-parti",
+    "HADEP": "halkin-demokrasi-partisi",
+    "BBP": "buyuk-birlik-partisi",
+    "DTP": "demokrat-turkiye-partisi",
+    "LDP": "liberal-demokrat-parti",
+    "İP": "isci-partisi",
+    "BP": "baris-partisi",
+    "DP": "demokrat-parti-1992",
+    "EMEP": "emek-partisi",
+    "MP": "millet-partisi",
+    "DBP": "demokrasi-ve-baris-partisi",
+    "YDP": "genc-parti",
+    "DEPAR": "degisen-turkiye-partisi",
+    "SİP": "turkiye-komunist-partisi",
+    "BAĞIMSIZ": INDEPENDENTS,
+}
+EARLY_SEATS = {
+    DAY_1983: {"anavatan-partisi-1983": 211, "halkci-parti": 117, "milliyetci-demokrasi-partisi": 71},
+    DAY_1987: {"anavatan-partisi-1983": 292, "sosyaldemokrat-halkci-parti": 99, "demokrat-parti": 59},
+    DAY_1991: {
+        "demokrat-parti": 178,
+        "anavatan-partisi-1983": 115,
+        "sosyaldemokrat-halkci-parti": 88,
+        "refah-partisi": 62,
+        "demokratik-sol-parti": 7,
+    },
+    DAY_1995: {
+        "refah-partisi": 158,
+        "demokrat-parti": 135,
+        "anavatan-partisi-1983": 132,
+        "demokratik-sol-parti": 76,
+        "cumhuriyet-halk-partisi": 49,
+    },
+    DAY_1999: {
+        "demokratik-sol-parti": 136,
+        "milliyetci-hareket-partisi": 129,
+        "fazilet-partisi": 111,
+        "anavatan-partisi-1983": 86,
+        "demokrat-parti": 85,
+        INDEPENDENTS: 3,
+    },
+    DAY_2002: {"adalet-ve-kalkinma-partisi": 363, "cumhuriyet-halk-partisi": 178, INDEPENDENTS: 9},
+}
+UNSEEN = {(DAY_1991, "02"): "sosyaldemokrat-halkci-parti", (DAY_2002, "54"): "adalet-ve-kalkinma-partisi"}
+READ_EARLY = {
+    (DAY_1983, "04", "milliyetci-demokrasi-partisi"): 30489,
+    (DAY_1983, "57", "milliyetci-demokrasi-partisi"): 36664,
+    (DAY_1983, "65", "milliyetci-demokrasi-partisi"): 54161,
+    (DAY_1983, "59", "milliyetci-demokrasi-partisi"): 39503,
+    (DAY_1983, "16-1", "halkci-parti"): 108770,
+    (DAY_1983, "45-2", "milliyetci-demokrasi-partisi"): 41974,
+    (DAY_1999, "34-1", REGISTERED): 2161385,
+    (DAY_1999, "34-3", REGISTERED): 2029773,
+    (DAY_1999, "35-1", REGISTERED): 1104320,
+}
+TRIPLES_EARLY = {
+    (DAY_1999, "06-2", "isci-partisi"): (1693, 3, 1695),
+    (DAY_1999, "09", "genc-parti"): (551, 1, 552),
+    (DAY_1999, "13", "degisen-turkiye-partisi"): (201, 0, 201),
+    (DAY_1999, "13", "demokrasi-ve-baris-partisi"): (0, 0, 0),
+    (DAY_1999, "17", "demokrat-parti"): (45691, 38, 45729),
+    (DAY_1999, "31", INDEPENDENTS): (1314, 0, 1314),
+    (DAY_1999, "34-3", INDEPENDENTS): (3063, 0, 3063),
+    (DAY_1999, "66", "emek-partisi"): (388, 1, 389),
+    (DAY_1999, "76", "cumhuriyet-halk-partisi"): (7592, 11, 7603),
+    (DAY_2002, "17", "demokratik-sol-parti"): (4063, 21, 4084),
+    (DAY_2002, "50", "demokratik-halk-partisi"): (1690, 4, 1694),
+    (DAY_2002, "55", "anavatan-partisi-1983"): (31167, 193, 31360),
+    (DAY_2002, "65", "saadet-partisi"): (9016, 48, 9064),
+    (DAY_2002, "70", "yeni-turkiye-partisi"): (468, 4, 472),
+}
+NAMES_EARLY = {
+    (DAY_1987, "21-2", 3): "Ferit Bora",
+    (DAY_1987, "67-1", 1): "Tınaz Titiz",
+    (DAY_1991, "34-6", 4): "Recep Tayyip Erdoğan",
+    (DAY_1991, "52", 4): "Mustafa Bahri Kibar",
+    (DAY_1995, "34-3", 14): "Gürcan Dağdaş",
+    (DAY_2002, "03", 7): "Reyhan Balandı",
+    (DAY_2002, "34-3", 9): "Sıdıka Aydoğan",
+    (DAY_2002, "47", 4): "Selahattin Dağ",
+    (DAY_2002, "56", 1): "Ekrem Bilek",
+    (DAY_2002, "56", 2): "Mervan Gül",
+    (DAY_2002, "56", 3): "Memet Fadıl Akgündüz",
+}
+RELABEL_EARLY = {
+    DAY_1995: {"YALOVA": "KARABÜK", "KARABÜK": "YALOVA"},
+    DAY_2002: {"KARABÜK": "YALOVA", "KİLİS": "KARABÜK", "YALOVA": "KİLİS"},
+}
+CODES_1999 = [plate for plate in range(1, 81) if plate not in (6, 34, 35)] + [601, 602, 3401, 3402, 3403, 3501, 3502]
+MONTHS_TR = (
+    "Ocak",
+    "Şubat",
+    "Mart",
+    "Nisan",
+    "Mayıs",
+    "Haziran",
+    "Temmuz",
+    "Ağustos",
+    "Eylül",
+    "Ekim",
+    "Kasım",
+    "Aralık",
+)
+ISSUES_EARLY = {DAY_1983: "18221", DAY_1987: "19659", DAY_1991: "21038", DAY_1995: "22512", DAY_1999: "23678"}
+GAZETTE_EARLY = (
+    "YSK's decision on the final results of the {date} parliamentary election, published in Resmî Gazete {issue}. "
+    "For each electoral district it gives registered voters, voters, valid votes, each party's and each independent "
+    "candidate's votes, the seats won, and the names of the elected members. The pages are scans, so every count was "
+    "read with OCR and checked against YSK's own results table; counts carry a page and bounding-box locator where "
+    "the scan could be read."
+)
+GAZETTE_SHARE_EARLY = (
+    "District party votes include the district's share of the votes cast at customs gates, which the gazette also "
+    "prints separately."
+)
+GAZETTE_TRIPLE_EARLY = (
+    "Each party's line gives its votes in the district, the customs-gate votes apportioned to the district, and "
+    "their sum. We store the first two separately."
+)
+GAZETTE_2002 = (
+    "YSK's decision on the final results of the November 3, 2002 parliamentary election, published in the Resmî "
+    "Gazete of November 10, 2002, whose pages are online only as scanned images. For each electoral district it gives "
+    "registered voters, voters, valid votes, each party's and each independent candidate's votes, the seats won, and "
+    "the names of the elected members. Every count was read with OCR and checked against YSK's own results table; "
+    "counts carry a page and bounding-box locator where the scan could be read."
+)
+TABLES_EARLY = (
+    "YSK's results tables for the {date} parliamentary election, published on its website: votes by electoral "
+    "district, seats per district, and, where YSK publishes one, the customs-gate votes apportioned to each district. "
+    "They check every count read from the gazette, and counts the gazette scan does not show legibly cite these "
+    "tables instead."
+)
+TBMM_1999_SOURCE = (
+    "The Grand National Assembly's election results database for 1999: registered voters, voters, and valid and "
+    "invalid votes for each electoral district, and each party's votes there. YSK publishes no 1999 results table by "
+    "district, so this database checks the gazette, and counts the gazette scan does not show legibly cite it."
+)
+MEMBERS_EARLY_SOURCE = (
+    "Turkish Wikipedia's lists of the members of the 17th to 22nd terms of the Grand National Assembly, and the "
+    "Wikidata items of the linked articles. We use them to spell members' names and to link members to Wikidata. The "
+    "gazette remains the source for who was elected."
+)
+CAVEATS_EARLY = {
+    (DAY_1983, "16-1"): (
+        "The gazette's count of HP votes in this district is a misprint. We store 108,770, which agrees with the "
+        "district's valid votes and with TÜİK's figures."
+    ),
+    (DAY_1983, "45-2"): (
+        "The gazette prints 47,974 votes for MDP. The district's valid votes and the other parties' counts imply "
+        "41,974, which TÜİK's figures also give, so we store 41,974."
+    ),
+    (DAY_1987, "34-7"): (
+        "The gazette prints 45,435 valid votes. YSK's results table gives 450,435, which matches the party votes, so "
+        "we store 450,435."
+    ),
+    (DAY_1991, "34-6"): (
+        "The gazette lists Recep Tayyip Erdoğan among the members elected here. Turkish Wikipedia's list of the 19th "
+        "term gives this seat to Mustafa Baş, of the same party, instead."
+    ),
+    (DAY_2002, "03"): (
+        "The gazette lists Reyhan Balandı among the members elected here. Turkish Wikipedia's list of the 22nd term "
+        "gives this AKP seat to Reyhan Tugay instead. We store the name the gazette printed and have not linked this "
+        "member to Wikidata."
+    ),
+    (DAY_2002, "47"): (
+        "The gazette lists Selahattin Dağ among the members elected here. Turkish Wikipedia's list of the 22nd term "
+        "gives this AKP seat to Selahattin Cebeli instead. We store the name the gazette printed and have not linked "
+        "this member to Wikidata."
+    ),
+    (DAY_2002, "56"): (
+        "YSK annulled Siirt's election, and a new election was held there on March 9, 2003. These are the results and "
+        "members of November 3, 2002, as the gazette printed them; the 2003 rerun is not stored."
+    ),
+}
+UNSEEN_CAVEAT = (
+    "The gazette scan does not include this district's results. Its counts come from YSK's results table, and its "
+    "members from Turkish Wikipedia's list of the term."
+)
+DERIVED_EARLY_CAVEAT = (
+    "If a party's vote count cannot be read from the gazette, its votes and its apportioned customs-gate votes are "
+    "computed from the district's totals and the other parties' counts; these are marked as derived."
+)
+
+
+@dataclass
+class Chunk:
+    lines: list[tuple[int, str, list[scan.Word]]]
+    plate: int | None = None
+    code: str | None = None
+
+
+@dataclass
+class Reading:
+    page: int
+    line: list[int]
+    box: list[int] | None = None
+    values: list[int] = dataclasses.field(default_factory=list)
+    triples: list[tuple[tuple[int, int, int], list[list[int]]]] = dataclasses.field(default_factory=list)
+
+
+@dataclass
+class Resolved:
+    page: int | None
+    boxes: list[list[int]]
+    value: int | None = None
+    values: tuple[int, int, int] | None = None
+
+
+@dataclass
+class Unread:
+    code: str
+    key: str | int
+    value: int
+    page: int | None = None
+    box: list[int] | None = None
+    read: list[str] = dataclasses.field(default_factory=list)
 
 
 def upper(text: str) -> str:
@@ -1327,6 +1701,32 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".rtf")
     for url in (MAYORS, MPS_2018, MPS_2015, MPS_JUNE_2015, MPS_2011, OZONDER_ITEM):
         raw.fetch(SOURCE, url, suffix=".json")
+    for day, (gazette, read_pages, table, seats, customs) in EARLY.items():
+        raw.fetch(SOURCE, gazette, suffix=Path(gazette).suffix)
+        if gazette.endswith(".htm"):
+            for page in read_pages:
+                raw.fetch(SOURCE, gazette.replace(".htm", f"-{page}.gif"), suffix=".gif")
+        for name in (table, seats, customs):
+            if name is not None:
+                raw.fetch(SOURCE, f"{YSK_DOCS}/{name}.pdf", suffix=".pdf")
+        raw.fetch(SOURCE, MEMBER_LISTS[day], suffix=".wiki")
+    raw.fetch(SOURCE, DISTRICTS_1999, suffix=".htm")
+    for code in CODES_1999:
+        raw.fetch(SOURCE, f"{TBMM_1999}{code}", suffix=".htm")
+    titles = sorted(
+        {
+            link
+            for url in MEMBER_LISTS.values()
+            for text in [raw.cached(SOURCE, url).path.read_text()]
+            for link in re.findall(r"\[\[([^\]|]+)", text[text.index("Seçim Bölgesi") :])
+        }
+    )
+    for start in range(0, len(titles), 50):
+        raw.fetch(
+            SOURCE,
+            f"{WIKIPEDIA}api.php?{urlencode({'action': 'query', 'prop': 'pageprops', 'ppprop': 'wikibase_item', 'redirects': 1, 'format': 'json', 'titles': '|'.join(titles[start : start + 50])})}",
+            suffix=".json",
+        )
 
 
 def parse() -> None:
@@ -2898,6 +3298,1050 @@ def parse() -> None:
     ]
     parliaments[DAY_2007] = parsed_2007
 
+    folding = str.maketrans("ÇĞİÖŞÜÂÎÛ", "CGIOSUAIU")
+
+    def flat(text: str) -> str:
+        return re.sub(r"[^A-Z0-9]", "", text.replace("i", "İ").replace("ı", "I").upper().translate(folding))
+
+    plates = {flat(province): plate for plate, province in enumerate(PROVINCES, 1)} | {
+        "AFYON": 3,
+        "ICEL": 33,
+        "URFA": 63,
+        "MARAS": 46,
+        "KMARAS": 46,
+    }
+
+    def coded(labels: list[str]) -> list[str]:
+        seen_numbers: Counter[int] = Counter()
+        got = []
+        for label in labels:
+            match = re.fullmatch(r"(.*?)[\s(-]*0?(\d)?\)?", label.strip())
+            if match is None:
+                raise ValueError(f"unreadable district label {label}")
+            head = flat(match[1])
+            plate = plates.get(head) or plates[difflib.get_close_matches(head, plates, 1, 0.8)[0]]
+            seen_numbers[plate] += 1
+            plate_number = int(match[2]) if match[2] else seen_numbers[plate]
+            got.append((plate, seen_numbers[plate] if (plate, plate_number) in got else plate_number))
+        return [
+            f"{plate:02}-{plate_number}" if seen_numbers[plate] > 1 else f"{plate:02}" for plate, plate_number in got
+        ]
+
+    def pdf_layout(url: str) -> list[tuple[int, list[list[tuple[str, list[float]]]]]]:
+        text = subprocess.run(
+            ["pdftotext", "-bbox", str(raw.cached(SOURCE, url).path), "-"], capture_output=True, check=True, text=True
+        ).stdout
+        pages = []
+        for plate_number, (width, height, body) in enumerate(
+            re.findall(r'<page width="([\d.]+)" height="([\d.]+)">(.*?)</page>', text, re.DOTALL), 1
+        ):
+            words = sorted(
+                (
+                    (
+                        html.unescape(word),
+                        [
+                            float(x0) / float(width),
+                            float(y0) / float(height),
+                            float(x1) / float(width),
+                            float(y1) / float(height),
+                        ],
+                    )
+                    for x0, y0, x1, y1, word in re.findall(
+                        r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', body
+                    )
+                ),
+                key=lambda word: (word[1][1] + word[1][3]) / 2,
+            )
+            block_lines: list[list[tuple[str, list[float]]]] = []
+            for word in words:
+                middle = (word[1][1] + word[1][3]) / 2
+                if block_lines and middle - (block_lines[-1][0][1][1] + block_lines[-1][0][1][3]) / 2 < 0.006:
+                    block_lines[-1].append(word)
+                else:
+                    block_lines.append([word])
+            pages.append((plate_number, [sorted(line, key=lambda word: word[1][0]) for line in block_lines]))
+        return pages
+
+    def column_of(url: str, relabel: dict[str, str]) -> dict[str, tuple[int, int, list[float]]]:
+        table_rows = [
+            (" ".join(word for word, _ in line[:-1]), int(line[-1][0].replace(".", "")), page, line[-1][1])
+            for page, block_lines in pdf_layout(url)
+            for line in block_lines
+            if len(line) > 1
+            and re.fullmatch(r"\d{1,3}(\.\d{3})*", line[-1][0])
+            and not re.fullmatch(r"[\d.]+", line[0][0])
+            and "TOPLAM" not in line[0][0]
+        ]
+        return dict(
+            zip(
+                coded([relabel.get(label, label) for label, *_ in table_rows]),
+                [(value, page, bbox) for _, value, page, bbox in table_rows],
+                strict=True,
+            )
+        )
+
+    titles = sorted(
+        {
+            link
+            for url in MEMBER_LISTS.values()
+            for text in [raw.cached(SOURCE, url).path.read_text()]
+            for link in re.findall(r"\[\[([^\]|]+)", text[text.index("Seçim Bölgesi") :])
+        }
+    )
+    qids: dict[str, str] = {}
+    wikipedia = [*MEMBER_LISTS.values()]
+    for offset in range(0, len(titles), 50):
+        wikipedia.append(
+            f"{WIKIPEDIA}api.php?{urlencode({'action': 'query', 'prop': 'pageprops', 'ppprop': 'wikibase_item', 'redirects': 1, 'format': 'json', 'titles': '|'.join(titles[offset : offset + 50])})}"
+        )
+        answer = json.loads(raw.cached(SOURCE, wikipedia[-1]).path.read_text())["query"]
+        got = {
+            page["title"]: page["pageprops"]["wikibase_item"]
+            for page in answer["pages"].values()
+            if "pageprops" in page
+        }
+        for moved in [*answer.get("normalized", []), *answer.get("redirects", [])][::-1]:
+            if moved["to"] in got:
+                got[moved["from"]] = got[moved["to"]]
+        qids |= got
+    for day, (gazette, read_pages, table_name, seats_name, customs_name) in EARLY.items():
+        names = EARLY_PARTIES[day]
+        triple = day in (DAY_1999, DAY_2002)
+        table_url = DISTRICTS_1999 if day == DAY_1999 else f"{YSK_DOCS}/{table_name}.pdf"
+        reference: dict[str, dict[str | int, int]] = {}
+        cited: dict[tuple[str, str | int], tuple[str, int | None, list[float] | None]] = {}
+        registered_1999: dict[str, int] = {}
+        if day == DAY_1999:
+
+            def html_cells(url: str) -> list[str]:
+                text = re.sub(
+                    r"(?is)<script.*?</script>|<style.*?</style>",
+                    "",
+                    raw.cached(SOURCE, url).path.read_bytes().decode("windows-1254"),
+                )
+                return [
+                    got
+                    for cell in re.findall(r"(?is)<td[^>]*>(.*?)</td>", text)
+                    if (got := html.unescape(re.sub(r"<[^>]+>", "", cell)).strip())
+                ]
+
+            wiki_rows = html_cells(DISTRICTS_1999)
+            starts = [
+                index
+                for index, cell in enumerate(wiki_rows)
+                if re.fullmatch(r"[A-ZÇĞİÖŞÜ.\- ]+(-\d)?", cell)
+                and all(re.fullmatch(r"[\d.]+", value) for value in wiki_rows[index + 1 : index + 4])
+            ]
+            for code, index in zip(coded([wiki_rows[index] for index in starts]), starts, strict=True):
+                reference[code] = {
+                    measure: int(wiki_rows[index + offset].replace(".", ""))
+                    for measure, offset in ((VOTERS, 1), (VALID, 2), (INVALID, 3))
+                }
+            for plate_number in CODES_1999:
+                url = f"{TBMM_1999}{plate_number}"
+                got = html_cells(url)
+                code = f"{plate_number // 100:02}-{plate_number % 100}" if plate_number > 100 else f"{plate_number:02}"
+                for index, cell in enumerate(got[:-1]):
+                    if cell in ABBREVIATIONS_1999 and re.fullmatch(r"[\d.]+", got[index + 1]):
+                        reference[code][ABBREVIATIONS_1999[cell]] = int(got[index + 1].replace(".", ""))
+                        cited[(code, ABBREVIATIONS_1999[cell])] = (url, None, None)
+            provinces = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, f"{YSK_DOCS}/{table_name}.pdf").path), "-"],
+                capture_output=True,
+                check=True,
+                text=True,
+            ).stdout
+            for line in provinces.splitlines():
+                if match := re.match(r"\s*([A-ZÇĞİÖŞÜ.]+(?: [A-ZÇĞİÖŞÜ]+)?)\s+([\d.]+)\s+([\d.]+)\s+[\d.]+", line):
+                    code = f"{plates[flat(match[1])]:02}" if flat(match[1]) in plates else None
+                    if code is not None and code not in registered_1999:
+                        registered_1999[code] = int(match[2].replace(".", ""))
+                    if code in reference and REGISTERED not in reference[code]:
+                        if int(match[3].replace(".", "")) != reference[code][VOTERS]:
+                            raise ValueError(f"{day}: {code}'s voters differ between YSK and TBMM")
+                        reference[code][REGISTERED] = int(match[2].replace(".", ""))
+                        cited[(code, REGISTERED)] = (f"{YSK_DOCS}/{table_name}.pdf", None, None)
+            for code in reference:
+                for measure in (VOTERS, VALID, INVALID):
+                    cited[(code, measure)] = (DISTRICTS_1999, None, None)
+        else:
+            keys = list(names)
+            parts = [keys[:10], keys[10:]] if day == DAY_2002 else [keys]
+            halves: dict[int, list[tuple[str, list[tuple[int, list[float], int]]]]] = {}
+            for page, block_lines in pdf_layout(table_url):
+                headers = [line[0][1][1] for line in block_lines if any(word == "ADI" for word, _ in line)]
+                accounting = [
+                    line[0][1][1] for line in block_lines if any(word in ("SEÇMEN", "SAYISI") for word, _ in line)
+                ]
+                for line in block_lines:
+                    label = " ".join(word for word, bbox in line if bbox[0] < 0.14)
+                    figures = [
+                        (int(word.replace(".", "")), bbox, page)
+                        for word, bbox in line
+                        if bbox[0] >= 0.14 and re.fullmatch(r"\d{1,3}(\.\d{3})*|\d+", word)
+                    ]
+                    above = [header for header in headers if header < line[0][1][1]]
+                    if not figures or not above or not label or label.startswith("TOPLAM") or "TÜRKİYE" in label:
+                        continue
+                    part = 0 if any(abs(top - above[-1]) < 0.02 for top in accounting) else 1
+                    halves.setdefault(part, []).append((label, figures))
+            if len(halves) != len(parts):
+                raise ValueError(f"{day}: the YSK table has {len(halves)} parts, not {len(parts)}")
+            table_rows: list[tuple[str, dict[str | int, tuple[int, list[float], int]]]] = []
+            for part, got in sorted(halves.items()):
+                table_columns: list[str | int] = [
+                    *([REGISTERED, VOTERS, VALID, INVALID] if part == 0 else []),
+                    *parts[part],
+                ]
+                rights = sorted(bbox[2] for _, figures in got for _, bbox, _ in figures)
+                clusters = [[rights[0]]]
+                for edge in rights[1:]:
+                    if edge - clusters[-1][-1] > 0.006:
+                        clusters.append([edge])
+                    else:
+                        clusters[-1].append(edge)
+                clusters = [cluster for cluster in clusters if len(cluster) >= 5]
+                if len(clusters) != len(table_columns):
+                    raise ValueError(f"{day}: the YSK table has {len(clusters)} columns for {len(table_columns)}")
+                centers = [sum(cluster) / len(cluster) for cluster in clusters]
+                for index, (label, figures) in enumerate(got):
+                    placed = {
+                        table_columns[min(range(len(centers)), key=lambda i: abs(centers[i] - bbox[2]))]: (
+                            value,
+                            bbox,
+                            page,
+                        )
+                        for value, bbox, page in figures
+                    }
+                    if len(placed) != len(figures):
+                        raise ValueError(f"{day}: two figures share a column in {label}")
+                    if part == 0:
+                        table_rows.append((label, placed))
+                    elif flat(table_rows[index][0]) != flat(label):
+                        raise ValueError(f"{day}: the YSK table's halves disagree at {label}")
+                    else:
+                        table_rows[index][1].update(placed)
+            labels = [
+                (RELABEL_EARLY.get(day, {}) if day == DAY_2002 else {}).get(label, label) for label, _ in table_rows
+            ]
+            for code, (_, placed) in zip(coded(labels), table_rows, strict=True):
+                reference[code] = {key: value for key, (value, _, _) in placed.items()}
+                for key, (_, bbox, page) in placed.items():
+                    cited[(code, key)] = (table_url, page, bbox)
+            if customs_name is not None:
+                for code, (value, page, bbox) in column_of(
+                    f"{YSK_DOCS}/{customs_name}.pdf", RELABEL_EARLY.get(day, {}) if day == DAY_2002 else {}
+                ).items():
+                    reference[code]["share"] = value
+                    cited[(code, "share")] = (f"{YSK_DOCS}/{customs_name}.pdf", page, bbox)
+        magnitudes = column_of(f"{YSK_DOCS}/{seats_name}.pdf", RELABEL_EARLY.get(day, {}))
+        if day == DAY_1999:
+            if set(magnitudes) != {code[:2] for code in reference}:
+                raise ValueError(f"{day}: provinces differ between seats and votes")
+        elif set(magnitudes) != set(reference):
+            raise ValueError(f"{day}: districts differ between seats and votes {set(magnitudes) ^ set(reference)}")
+        order = list(reference)
+        spellings = {flat(name): key for key, name in names.items()}
+        scan_images: dict[int, Path] = {}
+        caches: dict[int, Path] = {}
+        for page in read_pages:
+            if day == DAY_2002:
+                gif = raw.cached(SOURCE, gazette.replace(".htm", f"-{page}.gif"))
+                scan_images[page], caches[page] = SCANS / f"{gif.sha256}.png", OCR / f"{gif.sha256}.tsv"
+                if not scan_images[page].exists():
+                    small = Image.open(gif.path).convert("L")
+                    small.resize((small.width * 4, small.height * 4), Image.Resampling.LANCZOS).save(scan_images[page])
+                if not caches[page].exists():
+                    caches[page].write_text(
+                        subprocess.run(
+                            ["tesseract", str(scan_images[page]), "stdout", "--psm", "6", "-l", "tur", "tsv"],
+                            capture_output=True,
+                            text=True,
+                            check=True,
+                        ).stdout
+                    )
+            else:
+                pdf = raw.cached(SOURCE, gazette)
+                scan_images[page], caches[page] = SCANS / f"{pdf.sha256}-{page}.png", OCR / f"{pdf.sha256}-{page}.tsv"
+                if not scan_images[page].exists():
+                    subprocess.run(
+                        ["pdftoppm", "-r", "300", "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
+                        + [str(pdf.path), str(scan_images[page].with_suffix(""))],
+                        check=True,
+                    )
+        with ThreadPoolExecutor(8) as executor:
+            scanned = dict(
+                zip(
+                    read_pages,
+                    executor.map(
+                        scan.words,
+                        repeat(scan_images[read_pages[0]]),
+                        read_pages,
+                        [caches[page] for page in read_pages],
+                        repeat("tur"),
+                    ),
+                    strict=True,
+                )
+            )
+        chunks: list[Chunk] = []
+        in_members = True
+        for page in read_pages:
+            slope = scan.skew(scanned[page])
+            for line in scan.lines(scanned[page], slope, 18):
+                text = flat(" ".join(word[0] for word in line))
+                heading = (
+                    re.search(r"(?:ILI|IJI|IKI|IL|LI)\d*(?:NUMARALI|NO?LU)?SE[CG]IMCE?[VY]RES", text)
+                    and "INDEN" not in text
+                )
+                if (
+                    in_members
+                    and re.search(r"^.{0,4}(KAY\w{0,4}SE[CG]MEN|KAY[IT]{1,2}L|SE[CG]MENSAY|OYKULLANAN|GECERLIOY)", text)
+                    and "BARAJ" not in text
+                ) or (heading and not (chunks and len(chunks[-1].lines) < 3)):
+                    chunks.append(Chunk([]))
+                    in_members = False
+                if re.search(r"SECILEN|SOYADLARI", text):
+                    in_members = True
+                if chunks:
+                    chunks[-1].lines.append((page, text, line))
+                    match = re.search(
+                        r"^(.*?)(?:ILI|ILLI|IKI|IJI|IL|LI|JI)((?:\d+NUMARALI|\d*NO?LU|\d)?)SE[CG]IMCE?[VY]RES", text
+                    )
+                    if match and chunks[-1].plate is None and "INDEN" not in text:
+                        head = match[1][-16:]
+                        name = max(
+                            plates,
+                            key=lambda p: (round(difflib.SequenceMatcher(None, p, head[-len(p) :]).ratio(), 2), len(p)),
+                        )
+                        if difflib.SequenceMatcher(None, name, head[-len(name) :]).ratio() >= 0.75:
+                            chunks[-1].plate = plates[name]
+        chunks = [block for block in chunks if len(re.sub(r"\D", "", block.lines[0][1])) < 8]
+
+        def tail(line: list[scan.Word]) -> list[scan.Word]:
+            kept: list[scan.Word] = []
+            for word in reversed(line):
+                if not re.search(r"\d", word[0]) and not (kept and word[0] in "oO©"):
+                    break
+                kept.insert(0, word)
+            return [word for word in kept if re.search(r"\d", word[0])]
+
+        for block in chunks:
+            seen_numbers: set[int] = set()
+            for _, _, line in block.lines:
+                digits = tail(line)
+                for offset in range(len(digits)):
+                    for end in range(offset + 1, min(len(digits), offset + 3) + 1):
+                        seen_numbers |= set(scan.numbers(" ".join(word[0] for word in digits[offset:end])))
+            scores = Counter(
+                {
+                    code: sum(1 for value in reference[code].values() if value >= 100 and value in seen_numbers)
+                    for code in order
+                }
+            )
+            (best, top), *rest = scores.most_common(2)
+            need = max(3, sum(1 for value in reference[best].values() if value >= 100) // 2)
+            block.code = (
+                best
+                if top >= need and (not rest or rest[0][1] < top) and block.plate in (None, int(best[:2]))
+                else None
+            )
+        unclaimed = sorted(set(order) - {block.code for block in chunks})
+        for block in chunks:
+            if block.code is None and (options := [code for code in unclaimed if int(code[:2]) == block.plate]):
+                block.code = options[0]
+                unclaimed.remove(options[0])
+        known = [index for index, block in enumerate(chunks) if block.code]
+        for left, right in zip([-1, *known], [*known, len(chunks)], strict=True):
+            gap = list(range(left + 1, right))
+            low = order.index(str(chunks[left].code)) if left >= 0 else -1
+            high = order.index(str(chunks[right].code)) if right < len(chunks) else len(order)
+            if gap and len(gap) == high - low - 1 and all(order[k] in unclaimed for k in range(low + 1, high)):
+                for index, k in zip(gap, range(low + 1, high), strict=True):
+                    chunks[index].code = order[k]
+        unclaimed = sorted(set(order) - {block.code for block in chunks})
+        stray = [block for block in chunks if block.code is None and len(block.lines) > 8]
+        if len(unclaimed) == 1 and len(stray) == 1:
+            stray[0].code = unclaimed[0]
+        for prefix in {code[:2] for code in order if "-" in code}:
+            split = [block for block in chunks if block.code is not None and block.code[:2] == prefix]
+            for block, code in zip(
+                split, sorted((str(block.code) for block in split), key=lambda code: int(code[3:])), strict=True
+            ):
+                block.code = code
+        chunks = [block for block in chunks if block.code]
+        codes = Counter(block.code for block in chunks)
+        if [code for code, count in codes.items() if count > 1]:
+            raise ValueError(
+                f"{day}: gazette blocks repeat districts {[code for code, count in codes.items() if count > 1]}"
+            )
+
+        def union(words: list[scan.Word]) -> list[int]:
+            return [
+                min(w[1][0] for w in words),
+                min(w[1][1] for w in words),
+                max(w[1][2] for w in words),
+                max(w[1][3] for w in words),
+            ]
+
+        def triples(parts: list[str]) -> list[tuple[int, int, int, int, int]]:
+            return [
+                (a, b, c, i, j)
+                for i, j in itertools.combinations(range(1, len(parts)), 2)
+                for a in scan.numbers(" ".join(parts[:i]))
+                for b in scan.numbers(" ".join(parts[i:j]))
+                for c in scan.numbers(" ".join(parts[j:]))
+                if abs(a + b - c) <= 1 and b < max(a, 1) * 0.05 + 5
+            ]
+
+        accounts = [
+            ("KAYIT", REGISTERED),
+            ("KULLANAN", VOTERS),
+            ("GUMRUK", "share"),
+            ("^.{0,2}T.?PLAM", "total"),
+            ("GECERSIZ", INVALID),
+            ("GECERLIOY", VALID),
+            ("MILLETVEKILISAYISI", "magnitude"),
+        ]
+        read_by_code: dict[str, dict[str | int, list[Reading]]] = {}
+        elected_lines: dict[str, list[tuple[int, list[scan.Word]]]] = {}
+        for block in chunks:
+            code = str(block.code)
+            section = "accounting"
+            got = read_by_code.setdefault(code, {})
+            for page, text, line in block.lines:
+                if "DAGILIM" in text:
+                    section = "votes"
+                    continue
+                if section == "votes" and ("KAZAND" in text or "BARAJINI" in text):
+                    section = "seats"
+                if "SECILEN" in text or "SOYADLARI" in text:
+                    section = "members"
+                    continue
+                if section == "members":
+                    elected_lines.setdefault(code, []).append((page, line))
+                if section not in ("accounting", "votes"):
+                    continue
+                digits = tail(line)
+                label = flat(" ".join(word[0] for word in line[: len(line) - len(digits)]))
+                if (
+                    section == "accounting"
+                    and len(label) > 8
+                    and max(difflib.SequenceMatcher(None, name, label).ratio() for name in spellings) >= 0.8
+                ):
+                    section = "votes"
+                if section == "accounting":
+                    key = next((key for pattern, key in accounts if re.search(pattern, label)), None)
+                else:
+                    best = max(spellings, key=lambda name: difflib.SequenceMatcher(None, name, label).ratio())
+                    key = spellings[best] if difflib.SequenceMatcher(None, best, label).ratio() >= 0.6 else None
+                if key is None:
+                    continue
+                entry = Reading(page, union(line))
+                if digits:
+                    entry.box = union(digits)
+                    entry.values = list(scan.numbers(" ".join(word[0] for word in digits)))
+                    if section == "votes" and triple:
+                        entry.triples = [
+                            ((a, b, c), [union(digits[:i]), union(digits[i:j]), union(digits[j:])])
+                            for a, b, c, i, j in triples([word[0] for word in digits])
+                        ]
+                got.setdefault(key, []).append(entry)
+        if triple:
+            cells_layout = [REGISTERED, VOTERS, "rate", VALID, "share", "total", "magnitude"]
+            for block in chunks:
+                block_lines = block.lines
+                top = next(
+                    ((page, line) for page, text, line in block_lines if re.search(r"SE[CG]IMCE?[VY]RES", text)),
+                    (block_lines[0][0], block_lines[0][2]),
+                )
+                bottom = next(((page, line) for page, text, line in block_lines if "DAGILIM" in text), None)
+                if bottom is None or bottom[0] != top[0]:
+                    continue
+                page = top[0]
+                dark = np.asarray(Image.open(scan_images[page]).convert("L")) < 160
+                width = dark.shape[1]
+                y0 = max(word[1][3] for word in top[1]) + 3
+                y1 = min(word[1][1] for word in bottom[1]) - 3
+                span = (0.68, 0.92) if day == DAY_1999 else (0.745, 0.985)
+                labeled: dict[str | int, tuple[int, int]] = {}
+                for where, text, line in block_lines:
+                    if where == page and y0 <= line[0][1][1] <= y1:
+                        key = next(
+                            (
+                                key
+                                for pattern, key in [
+                                    ("KAYIT", REGISTERED),
+                                    ("KULLANAN", VOTERS),
+                                    ("KATILMA", "rate"),
+                                    ("GUMRUK", "share"),
+                                    ("TOPLAM", "total"),
+                                    ("GECERLIOY", VALID),
+                                    ("MILLETVEKIL", "magnitude"),
+                                ]
+                                if pattern in text[:24]
+                            ),
+                            None,
+                        )
+                        if key is not None and key not in labeled:
+                            labeled[key] = (min(word[1][1] for word in line), max(word[1][3] for word in line))
+                crops: list[tuple[str | int, scan.Box]] = []
+                if len(labeled) >= 5:
+                    crops += [
+                        (key, (int(width * span[0]), a - 10, int(width * span[1]), b + 10))
+                        for key, (a, b) in labeled.items()
+                    ]
+                dark_runs: list[list[int]] = []
+                for y in np.flatnonzero(dark[y0:y1].mean(axis=1) > 0.45).tolist():
+                    if dark_runs and y - dark_runs[-1][-1] <= 3:
+                        dark_runs[-1].append(y)
+                    else:
+                        dark_runs.append([y])
+                bands = [(a[-1] + 1, b[0]) for a, b in pairwise(dark_runs) if b[0] - a[-1] > 8]
+                if len(bands) == 7:
+                    crops += [
+                        (key, (int(width * span[0]), y0 + a, int(width * span[1]), y0 + b + 1))
+                        for key, (a, b) in zip(cells_layout, bands, strict=True)
+                    ]
+                if not crops:
+                    continue
+                cache = OCR / f"{scan_images[page].stem}-accounting.json"
+                asked = [list(bbox) for _, bbox in crops]
+                if not cache.exists() or json.loads(cache.read_text())["requests"] != asked:
+                    cache.write_text(
+                        json.dumps(
+                            {
+                                "requests": asked,
+                                "read": scan.read(scan_images[page], [(bbox, True) for _, bbox in crops]),
+                            }
+                        )
+                    )
+                for (key, bbox), passes in zip(crops, json.loads(cache.read_text())["read"], strict=True):
+                    read_by_code.setdefault(str(block.code), {}).setdefault(key, []).insert(
+                        0,
+                        Reading(
+                            page,
+                            list(bbox),
+                            list(bbox),
+                            sorted({value for text in passes for value in scan.numbers(text)}),
+                        ),
+                    )
+        position = 2 if day == DAY_1999 else 0
+        resolved: dict[str, dict[str | int, Resolved]] = {}
+        jobs: list[tuple[str, str | int, int, list[Reading]]] = []
+        for code, expected in reference.items():
+            got = read_by_code.get(code, {})
+            for key, value in expected.items():
+                if key == INVALID or (value == 0 and key not in got):
+                    continue
+                entries = got.get(key, [])
+                if value == 0 and not any(entry.values or entry.triples for entry in entries):
+                    continue
+                party = isinstance(key, str) and key not in ("share", "total")
+                hit: Resolved | None = None
+                for entry in entries:
+                    if triple and party:
+                        matched = next((t for t in entry.triples if t[0][position] == value), None)
+                        if matched is not None:
+                            hit = Resolved(entry.page, matched[1], values=matched[0])
+                            break
+                    elif value in entry.values and entry.box is not None:
+                        hit = Resolved(entry.page, [entry.box], value=value)
+                        break
+                if hit is not None:
+                    resolved.setdefault(code, {})[key] = hit
+                elif (
+                    len(entries) > 1
+                    and not triple
+                    and sum(
+                        max(e.values, default=0) if len(e.values) == 1 else (e.values[0] if e.values else 0)
+                        for e in entries
+                    )
+                    == value
+                ):
+                    resolved.setdefault(code, {})[key] = Resolved(
+                        entries[0].page, [e.box for e in entries if e.box is not None], value=value
+                    )
+                else:
+                    jobs.append((code, key, value, entries))
+        bands: dict[str | int, list[tuple[int, int]]] = {}
+        for done in resolved.values():
+            for key, item in done.items():
+                if isinstance(key, int) and item.value is not None:
+                    bands.setdefault(key, []).append((item.boxes[0][0], item.boxes[0][2]))
+        middles = {
+            key: (sorted(a for a, _ in got)[len(got) // 2], sorted(b for _, b in got)[len(got) // 2])
+            for key, got in bands.items()
+        }
+        pending: dict[int, list[tuple[str, str | int, int, list[int]]]] = {}
+        unresolved = [Unread(code, key, value) for code, key, value, entries in jobs if not entries]
+        for code, key, value, entries in jobs:
+            party = isinstance(key, str) and key not in ("share", "total")
+            for entry in entries:
+                line = entry.line
+                if triple and party:
+                    bbox = [line[0] + (line[2] - line[0]) * 45 // 100, line[1], line[2] + 20, line[3]]
+                elif entry.box is not None:
+                    bbox = entry.box
+                elif key in middles:
+                    bbox = [middles[key][0] - 60, line[1], middles[key][1] + 60, line[3]]
+                else:
+                    bbox = [line[2], line[1], line[2] + 900, line[3]]
+                pending.setdefault(entry.page, []).append(
+                    (code, key, value, [bbox[0] - 25, bbox[1] - 12, bbox[2] + 25, bbox[3] + 12])
+                )
+        for page, crop_cells in sorted(pending.items()):
+            cache = OCR / f"{scan_images[page].stem}-cells.json"
+            asked = [cell[3] for cell in crop_cells]
+            if not cache.exists() or json.loads(cache.read_text())["requests"] != asked:
+                cache.write_text(
+                    json.dumps(
+                        {
+                            "requests": asked,
+                            "read": scan.read(
+                                scan_images[page], [((bbox[0], bbox[1], bbox[2], bbox[3]), True) for bbox in asked]
+                            ),
+                        }
+                    )
+                )
+            for (code, key, value, bbox), passes in zip(crop_cells, json.loads(cache.read_text())["read"], strict=True):
+                if key in resolved.get(code, {}):
+                    continue
+                if triple and isinstance(key, str) and key not in ("share", "total"):
+                    hits = [
+                        (a, b, c)
+                        for text in passes
+                        for a, b, c, _, _ in triples([part for part in text.split() if re.search(r"\d", part)])
+                        if (a, b, c)[position] == value
+                    ]
+                    if hits:
+                        resolved.setdefault(code, {})[key] = Resolved(page, [bbox], values=hits[0])
+                        continue
+                elif any(value in scan.numbers(text) for text in passes):
+                    resolved.setdefault(code, {})[key] = Resolved(page, [bbox], value=value)
+                    continue
+                unresolved.append(Unread(code, key, value, page, bbox, passes))
+        groups: dict[tuple[str, str | int], list[Unread]] = {}
+        for item in unresolved:
+            groups.setdefault((item.code, item.key), []).append(item)
+        for (code, key), items in groups.items():
+            if key in resolved.get(code, {}) or len(items) < 2 or not all(item.read for item in items):
+                continue
+            summed_reads = [
+                max(scan.numbers(item.read[0]).items(), key=lambda pair: pair[1], default=(None, 0))[0]
+                for item in items
+            ]
+            readable = [read for read in summed_reads if read is not None]
+            if len(readable) == len(items) and sum(readable) == items[0].value:
+                resolved.setdefault(code, {})[key] = Resolved(
+                    items[0].page, [item.box for item in items if item.box is not None], value=items[0].value
+                )
+        for item in unresolved:
+            code, key = item.code, item.key
+            if key in resolved.get(code, {}):
+                continue
+            if (
+                triple
+                and isinstance(key, int)
+                and item.read
+                and any(
+                    difflib.SequenceMatcher(None, re.sub(r"\D", "", text), str(item.value)).ratio() >= 0.8
+                    for text in item.read
+                )
+            ):
+                resolved.setdefault(code, {})[key] = Resolved(
+                    item.page, [] if item.box is None else [item.box], value=item.value
+                )
+                continue
+            parties = [k for k in reference[code] if isinstance(k, str) and k not in ("share", "total")]
+            total = sum(reference[code][k] for k in parties)
+            got = read_by_code.get(code, {})
+            shown = {v for r in got.get(VALID if day == DAY_1983 else "total", []) for v in r.values}
+            if not triple and day != DAY_1983:
+                shown |= {
+                    v + w for r in got.get(VALID, []) for v in r.values for q in got.get("share", []) for w in q.values
+                }
+            if isinstance(key, str) and key not in ("share", "total") and total in shown:
+                resolved.setdefault(code, {})[key] = Resolved(
+                    item.page, [] if item.box is None else [item.box], value=item.value
+                )
+        if day == DAY_1999:
+            for prefix in ("06", "34", "35"):
+                split = sorted(code for code in reference if code[:2] == prefix)
+                options = [
+                    [READ_EARLY[(day, code, REGISTERED)]]
+                    if (day, code, REGISTERED) in READ_EARLY
+                    else sorted(
+                        {
+                            value
+                            for entry in read_by_code[code].get(REGISTERED, [])
+                            for value in entry.values
+                            if value >= reference[code][VOTERS]
+                        }
+                    )
+                    for code in split
+                ]
+                fits = [pick for pick in itertools.product(*options) if sum(pick) == registered_1999[prefix]]
+                if len(fits) != 1:
+                    raise ValueError(
+                        f"{day}: {prefix}'s districts' registered voters do not add up to YSK's {registered_1999[prefix]}"
+                    )
+                for code, value in zip(split, fits[0], strict=True):
+                    reference[code][REGISTERED] = value
+                    block_lines = [
+                        (page, line) for block in chunks if block.code == code for page, _, line in block.lines
+                    ]
+                    page, line = next(
+                        (
+                            (page, line)
+                            for page, line in block_lines
+                            if "KAYIT" in flat(" ".join(word[0] for word in line))
+                            and (
+                                value in scan.numbers(" ".join(word[0] for word in tail(line)))
+                                or (day, code, REGISTERED) in READ_EARLY
+                            )
+                        ),
+                        (block_lines[0][0], None),
+                    )
+                    resolved.setdefault(code, {})[REGISTERED] = Resolved(
+                        page, [] if line is None else [union(tail(line) or line)], value=value
+                    )
+        sizes: dict[int, tuple[int, int]] = {}
+
+        def locate(
+            code: str,
+            key: str | int,
+            boxes: list[list[int]] | None = None,
+            page: int | None = None,
+            resolved: dict[str, dict[str | int, Resolved]] = resolved,
+            scan_images: dict[int, Path] = scan_images,
+            sizes: dict[int, tuple[int, int]] = sizes,
+            gazette: str = gazette,
+            day: date = day,
+            cited: dict[tuple[str, str | int], tuple[str, int | None, list[float] | None]] = cited,
+        ) -> dict[str, object]:
+            item = resolved.get(code, {}).get(key)
+            if boxes is None and item is not None and item.boxes:
+                boxes, page = item.boxes, item.page
+            if boxes and page is not None:
+                if page not in sizes:
+                    sizes[page] = struct.unpack(">II", scan_images[page].read_bytes()[16:24])
+                width, height = sizes[page]
+                return {
+                    "url": gazette.replace(".htm", f"-{page}.gif") if day == DAY_2002 else gazette,
+                    "page": 1 if day == DAY_2002 else page,
+                    "box": [
+                        min(b[0] for b in boxes) / width,
+                        min(b[1] for b in boxes) / height,
+                        max(b[2] for b in boxes) / width,
+                        max(b[3] for b in boxes) / height,
+                    ],
+                }
+            if item is not None:
+                return {
+                    "url": gazette.replace(".htm", f"-{item.page}.gif") if day == DAY_2002 else gazette,
+                    "page": 1 if day == DAY_2002 else item.page,
+                    "box": None,
+                }
+            url, where, bbox = cited[(code, key)]
+            return {"url": url, "page": where, "box": bbox}
+
+        values_rows: list[dict[str, object]] = []
+        problems: list[tuple[object, ...]] = []
+        for code, expected in reference.items():
+            got = read_by_code.get(code, {})
+            for measure in (REGISTERED, VOTERS, VALID):
+                values_rows.append(
+                    {
+                        "code": code,
+                        "option": None,
+                        "measure": measure,
+                        "value": expected[measure],
+                        **locate(code, measure),
+                    }
+                )
+            parties = [key for key in names if key in expected]
+            votes = shares = 0
+            missing_parties: list[str] = []
+            for key in parties:
+                pin = READ_EARLY.get((day, code, key))
+                fixed = TRIPLES_EARLY.get((day, code, key))
+                entry = next(iter(got.get(key, [])), None)
+                pinned = None if (pin is None and fixed is None) or entry is None else ([entry.line], entry.page)
+                if triple and (day, code) not in UNSEEN:
+                    item = resolved.get(code, {}).get(key)
+                    read = fixed if fixed is not None else None if item is None else item.values
+                    if read is None:
+                        if expected[key] == 0:
+                            continue
+                        missing_parties.append(key)
+                        continue
+                    a, b, c = read
+                    if fixed is None and read[position] != expected[key]:
+                        problems.append((code, key, expected[key], read))
+                    for measure, value in ((VOTES, a), (APPORTIONED, b)):
+                        values_rows.append(
+                            {
+                                "code": code,
+                                "option": key,
+                                "measure": measure,
+                                "value": value,
+                                **(locate(code, key, *pinned) if pinned else locate(code, key)),
+                            }
+                        )
+                    votes += a
+                    shares += b
+                else:
+                    value = expected[key] if pin is None else pin
+                    if value == 0 and key not in got:
+                        continue
+                    values_rows.append(
+                        {
+                            "code": code,
+                            "option": key,
+                            "measure": VOTES,
+                            "value": value,
+                            **(locate(code, key, *pinned) if pinned else locate(code, key)),
+                        }
+                    )
+                    votes += value
+            if len(missing_parties) == 1:
+                key = missing_parties[0]
+                a = expected[VALID] - votes if day == DAY_1999 else expected[key]
+                b = expected[key] - a if day == DAY_1999 else expected["share"] - shares
+                if not 0 <= b <= a * 0.05 + 5:
+                    problems.append((code, key, "derived", a, b))
+                for measure, value in ((VOTES, a), (APPORTIONED, b)):
+                    values_rows.append(
+                        {
+                            "code": code,
+                            "option": key,
+                            "measure": measure,
+                            "value": value,
+                            "derived": True,
+                            **locate(code, key),
+                        }
+                    )
+                votes += a
+                shares += b
+            elif missing_parties:
+                problems.append((code, "no gazette reading", missing_parties))
+            share = expected.get("share", shares)
+            if day != DAY_1983:
+                values_rows.append(
+                    {
+                        "code": code,
+                        "option": None,
+                        "measure": APPORTIONED,
+                        "value": share,
+                        **(
+                            locate(code, "share")
+                            if (code, "share") in cited or "share" in resolved.get(code, {})
+                            else {"url": None, "page": None, "box": None}
+                        ),
+                    }
+                )
+            if not expected[REGISTERED] >= expected[VOTERS] > expected[VALID]:
+                problems.append((code, "accounting", expected))
+            if day == DAY_1983 and votes != expected[VALID]:
+                problems.append((code, "votes", votes, expected[VALID]))
+            if day in (DAY_1987, DAY_1991, DAY_1995) and votes != expected[VALID] + share:
+                problems.append((code, "votes and share", votes, expected[VALID], share))
+            if triple and (day, code) in UNSEEN and votes != expected[VALID]:
+                problems.append((code, "unseen votes", votes, expected[VALID]))
+            if (
+                triple
+                and (day, code) not in UNSEEN
+                and (abs(votes - expected[VALID]) > len(parties) or abs(shares - share) > len(parties))
+            ):
+                problems.append((code, "votes or shares", votes, expected[VALID], shares, share))
+        if problems:
+            for problem in problems:
+                print(problem)
+            raise ValueError(f"{day}: {len(problems)} district problems")
+        listing = raw.cached(SOURCE, MEMBER_LISTS[day]).path.read_text()
+        wiki_rows: list[tuple[int, str | None, str]] = []
+        province = None
+        for row in re.split(r"\n\|-", listing[listing.index("Seçim Bölgesi") :])[1:]:
+            row_cells = [cell.strip() for cell in re.split(r"\|\||\n\|", row.strip().lstrip("|"))]
+            if row_cells[0].startswith("}"):
+                break
+            if row_cells[0].startswith("!"):
+                continue
+            if match := re.search(r"\[\[([^\]|]+) milletvekilleri listesi", row_cells[0]):
+                province = match[1]
+                row_cells = row_cells[1:]
+            cell = re.sub(r"<ref.*?(</ref>|/>)", "", row_cells[0])
+            link = re.fullmatch(r"\[\[([^\]|]+)(?:\|([^\]]+))?\]\].*", cell)
+            text = (link[2] or link[1]) if link else cell
+            if text:
+                wiki_rows.append((plates[flat(str(province))], link[1] if link else None, text))
+        elected_rows: list[dict[str, object]] = []
+        taken: set[int] = set()
+        won_by: Counter[tuple[str, str]] = Counter()
+        for code in reference:
+            plate = int(code[:2])
+            people: list[tuple[str, str, int, list[int]]] = []
+            if (day, code) in UNSEEN:
+                people = [
+                    (text, UNSEEN[(day, code)], 0, [])
+                    for _, _, text in (entry for entry in wiki_rows if entry[0] == plate)
+                ]
+            carried: list[scan.Word] = []
+            for page, line in elected_lines.get(code, []):
+                words = carried + [word for word in line if re.search(r"[A-Za-zÇĞİÖŞÜçğıöşü]", word[0])]
+                carried = []
+                best = max(
+                    (
+                        (
+                            difflib.SequenceMatcher(
+                                None, name, flat(" ".join(word[0] for word in words[cut:]))
+                            ).ratio(),
+                            cut,
+                            key,
+                        )
+                        for cut in range(1, len(words))
+                        for name, key in spellings.items()
+                    ),
+                    default=(0, 0, None),
+                )
+                colon = next((index for index, word in enumerate(line) if word[0] == ":"), None)
+                if best[0] < 0.75 and colon is not None:
+                    tail_text = flat(" ".join(word[0] for word in line[colon + 1 :]))
+                    ratio, key = max(
+                        (difflib.SequenceMatcher(None, name, tail_text).ratio(), key) for name, key in spellings.items()
+                    )
+                    named = [word for word in line[:colon] if re.search(r"[A-Za-zÇĞİÖŞÜçğıöşü]", word[0])]
+                    if ratio >= 0.5 and named:
+                        best = (0.75, len(named), key)
+                        words = named
+                if best[0] < 0.75 and re.match(r"\W*\d+\s*[—-]", " ".join(word[0] for word in line)):
+                    carried = words
+                if best[0] >= 0.75:
+                    people.append(
+                        (
+                            " ".join(word[0] for word in words[: best[1]]).strip(" :;—-"),
+                            str(best[2]),
+                            page,
+                            union(words[: best[1]]),
+                        )
+                    )
+            for sequence, (text, party, page, bbox) in enumerate(people, 1):
+                text = NAMES_EARLY.get((day, code, sequence), text)
+                written = [flat(word) for word in text.split() if flat(word)]
+                contenders = []
+                for index, (where, _, name) in enumerate(wiki_rows):
+                    if where != plate or index in taken:
+                        continue
+                    wiki_tokens = [flat(word) for word in re.sub(r"\(.*?\)", "", name).split() if flat(word)]
+                    hits = [
+                        any(difflib.SequenceMatcher(None, token, word).ratio() >= 0.75 for word in written)
+                        for token in wiki_tokens
+                    ]
+                    contenders.append(
+                        (
+                            hits[-1],
+                            sum(hits) / len(hits),
+                            difflib.SequenceMatcher(None, "".join(written), "".join(wiki_tokens)).ratio(),
+                            index,
+                        )
+                    )
+                surname, share, score, index = max(contenders, default=(False, 0, 0, -1))
+                if (
+                    share == 1
+                    or (surname and (share >= 0.5 or sum(entry[0] for entry in contenders) == 1))
+                    or score >= 0.8
+                ):
+                    taken.add(index)
+                    _, page_title, name = wiki_rows[index]
+                elif (
+                    len(ranked := sorted((score, index) for *_, score, index in contenders)[::-1]) > 0
+                    and ranked[0][0] >= 0.55
+                    and (len(ranked) == 1 or ranked[0][0] - ranked[1][0] >= 0.1)
+                    and (day, code, sequence) not in NAMES_EARLY
+                ):
+                    print(day, "member read loosely:", code, text, "->", wiki_rows[ranked[0][1]][2])
+                    taken.add(ranked[0][1])
+                    _, page_title, name = wiki_rows[ranked[0][1]]
+                elif (day, code, sequence) in NAMES_EARLY:
+                    page_title, name = next((entry for entry in titles if entry == text), None), text
+                else:
+                    problems.append((code, sequence, "unmatched member", text, party))
+                    continue
+                won_by[(code, party)] += 1
+                elected_rows.append(
+                    {
+                        "code": code,
+                        "sequence": sequence,
+                        "name": name,
+                        "party": party,
+                        "person": qids.get(page_title or ""),
+                        "label": name,
+                        **(locate(code, "", [bbox], page) if bbox else {"url": None, "page": None, "box": None}),
+                    }
+                )
+        national = Counter()
+        for (code, party), count in won_by.items():
+            national[party] += count
+        magnitude = Counter(code for code, _ in won_by.elements())
+        if day == DAY_1999:
+            wrong = {
+                prefix: count
+                for prefix, (count, *_) in magnitudes.items()
+                if sum(n for code, n in magnitude.items() if code[:2] == prefix) != count
+            }
+        else:
+            wrong = {
+                code: (count, magnitude[code])
+                for code, (count, *_) in magnitudes.items()
+                if magnitude[code] != count and (day, code) != (DAY_1983, "12")
+            }
+        if wrong:
+            problems.append(("magnitudes", wrong))
+        if national != Counter(EARLY_SEATS[day]):
+            problems.append(
+                (
+                    "national seats",
+                    dict(national - Counter(EARLY_SEATS[day])),
+                    dict(Counter(EARLY_SEATS[day]) - national),
+                )
+            )
+        if problems:
+            for problem in problems:
+                print(problem)
+            raise ValueError(f"{day}: {len(problems)} member problems")
+        parliaments[day] = {
+            "districts": [
+                {
+                    "code": code,
+                    "plate": int(code[:2]),
+                    "number": int(code[3:]) if "-" in code else 0,
+                    "magnitude": magnitude[code] if day == DAY_1999 else magnitudes[code][0],
+                }
+                for code in reference
+            ],
+            "district_values": [{"derived": False} | row for row in values_rows],
+            "seats": [{"code": code, "option": party, "seats": count} for (code, party), count in won_by.items()],
+            "elected": elected_rows,
+        }
+        cited_pages = {
+            (str(row["url"]), int(str(row["page"])))
+            for row in (*values_rows, *elected_rows)
+            if row["url"] is not None and row["page"] is not None
+        }
+        for url, page in sorted(cited_pages):
+            if url.endswith(".gif"):
+                gif = raw.cached(SOURCE, url)
+                image = PAGES / f"{gif.sha256}-1.png"
+                if not image.exists():
+                    PAGES.mkdir(parents=True, exist_ok=True)
+                    Image.open(gif.path).convert("L").save(image)
+                width, height = Image.open(image).size
+                pages.append(
+                    {"url": url, "page": 1, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height}
+                )
+            else:
+                pages.append(render(raw.cached(SOURCE, url), page))
+
     edge = 322.0
     printed: list[dict[str, object]] = []
     for day, standing, split in (
@@ -3183,6 +4627,7 @@ def parse() -> None:
         [*candidates, *printed], schema_overrides={"box": pl.List(pl.Float32), "sequence": pl.Int64}
     ).write_parquet(PARSED / "lists.parquet")
     pl.DataFrame(pool, schema_overrides={"box": pl.List(pl.Float32)}).write_parquet(PARSED / "pool.parquet")
+    pl.DataFrame({"url": wikipedia}).write_parquet(PARSED / "wikipedia.parquet")
     for day, frames in parliaments.items():
         for kind, rows in frames.items():
             if rows:
@@ -3234,7 +4679,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "2014, 2018, and 2023 Turkish presidential elections, the 2007, 2011, June 2015, November 2015, 2018, and "
-                "2023 parliamentary elections, the 2007, 2010, and 2017 constitutional referendums, "
+                "2023 parliamentary elections, the 1983–2002 parliaments by electoral district, the 2007, 2010, and 2017 "
+                "constitutional referendums, "
                 "the 2018 and 2023 parliamentary candidate lists, and the June 2019 İstanbul mayoral election, from YSK decisions in the "
                 "Resmî Gazete"
             ),
@@ -4365,6 +5811,269 @@ def emit() -> Path:
                             )
                         previous = tenure
 
+        from ea.sources.tr import thea
+
+        early_sources: dict[str, UUID] = {}
+        groups: list[tuple[str, str, str, str, str, list[str]]] = [
+            (
+                "Vikipedi",
+                "community",
+                "TBMM 17.–22. dönem milletvekilleri listeleri",
+                MEMBERS_EARLY_SOURCE,
+                MEMBER_LISTS[DAY_1983],
+                pl.read_parquet(PARSED / "wikipedia.parquet")["url"].to_list(),
+            ),
+            (
+                "Türkiye Büyük Millet Meclisi",
+                "official_body",
+                "1999 Milletvekili Genel Seçimi sonuçları, seçim çevreleri",
+                TBMM_1999_SOURCE,
+                DISTRICTS_1999,
+                [DISTRICTS_1999, *(f"{TBMM_1999}{number}" for number in CODES_1999)],
+            ),
+        ]
+        for day, (gazette, read_pages, table_name, seats_name, customs_name) in EARLY.items():
+            spelled = f"{day:%B} {day.day}, {day.year}"
+            groups += [
+                (
+                    PUBLISHER,
+                    "official_body",
+                    f"{day.day} {MONTHS_TR[day.month - 1]} {day.year} Milletvekili Genel Seçimi kesin sonuçları",
+                    " ".join(
+                        [
+                            GAZETTE_2002
+                            if day == DAY_2002
+                            else GAZETTE_EARLY.format(date=spelled, issue=ISSUES_EARLY[day]),
+                            *([GAZETTE_TRIPLE_EARLY] if day in (DAY_1999, DAY_2002) else []),
+                            *([GAZETTE_SHARE_EARLY] if customs_name is not None and day != DAY_2002 else []),
+                        ]
+                    ),
+                    gazette,
+                    [gazette, *(gazette.replace(".htm", f"-{page}.gif") for page in read_pages if day == DAY_2002)],
+                ),
+                (
+                    PUBLISHER,
+                    "official_body",
+                    f"{day.year} Milletvekili Genel Seçimi sonuçları",
+                    TABLES_EARLY.format(date=spelled),
+                    f"{YSK_DOCS}/{table_name}.pdf",
+                    [f"{YSK_DOCS}/{name}.pdf" for name in (table_name, seats_name, customs_name) if name is not None],
+                ),
+            ]
+        for publisher, kind, heading, note, home, urls in groups:
+            source = cs.source(publisher, heading)
+            cs.add(
+                "source",
+                id=source,
+                kind=kind,
+                publisher=publisher,
+                title=heading,
+                url=home,
+                license="CC BY-SA 4.0" if kind == "community" else LICENSE,
+                notes=note,
+            )
+            for url in urls:
+                early_sources[url] = source
+                artifact = cs.artifact(raw.cached(SOURCE, url), source)
+                for _, number, image, width, height in pages.filter(pl.col("url") == url).sort("page").iter_rows():
+                    page_ids[(url, number)] = str(cs.page(artifact, number))
+                    cs.add(
+                        "source_page",
+                        id=cs.page(artifact, number),
+                        artifact_id=artifact,
+                        page_number=number,
+                        image_key=image,
+                        width=width,
+                        height=height,
+                    )
+        members_early = early_sources[MEMBER_LISTS[DAY_1983]]
+        ready = conn.execute(
+            "select count(*) from external_id where scheme = 'tr.contest' and value = any(%s)",
+            [[f"{day}:parliament" for day in EARLY]],
+        ).fetchone() == (len(EARLY),)
+        if not ready:
+            print("tr.thea has not published the 1983–2002 parliaments, so their districts are skipped")
+        for day, (gazette, *_) in EARLY.items() if ready else ():
+            election = cs.key("tr.election", str(day))
+            national_key = f"{day}:parliament"
+            national = cs.key("tr.contest", national_key)
+            system = cs.key(
+                "tr.electoral_system",
+                "parliament_1983" if day == DAY_1983 else "parliament_1987" if day < DAY_1995 else "parliament_1995",
+            )
+            district_values = pl.read_parquet(PARSED / f"district_values_{day}.parquet")
+            seats = pl.read_parquet(PARSED / f"seats_{day}.parquet")
+            elected = pl.read_parquet(PARSED / f"elected_{day}.parquet")
+            for code, plate, number, magnitude in pl.read_parquet(PARSED / f"districts_{day}.parquet").iter_rows():
+                province = PROVINCES[plate - 1]
+                area = provinces[f"{plate:02}"]
+                native = f"{province} {number}. seçim çevresi" if number else f"{province} seçim çevresi"
+                if number:
+                    area = cs.area("tr.secim_cevresi", code)
+                if code not in district_units:
+                    if number and area in cs.minted:
+                        cs.add("area", id=area, scheme_code="tr.secim_cevresi")
+                        cs.add("area_code", area_id=area, code=code, valid_from=None)
+                        cs.add("area_parent", area_id=area, parent_id=provinces[f"{plate:02}"], valid_from=None)
+                        name(area, native)
+                    district_units[code] = cs.unit("tr.secim_cevresi", code)
+                    if district_units[code] in cs.minted:
+                        cs.add(
+                            "reporting_unit",
+                            id=district_units[code],
+                            polity_id=turkey,
+                            scheme_code="tr.secim_cevresi",
+                            code=code,
+                            parent_id=None,
+                            area_relation="equals",
+                            area_id=area,
+                            kind="aggregate",
+                        )
+                        name(district_units[code], native)
+                label = f"{province} {number}" if number else province
+                contest_key = f"{national_key}:{code}"
+                contest = cs.key("tr.contest", contest_key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="list_allocation",
+                    body_id=assembly,
+                    district_area_id=area,
+                    magnitude=magnitude,
+                    round_number=1,
+                    allocation_parent_id=national,
+                    electoral_system_id=system,
+                    default_result_kind="counted",
+                )
+                name(contest, f"Grand National Assembly, {label}", "en")
+                cs.add("slug", path=f"tr/{day}-general/parliament/{slug(label)}", entity_id=contest)
+                rows = district_values.filter(pl.col("code") == code)
+                for caveat, applies in (
+                    (CAVEATS_EARLY.get((day, code)), True),
+                    (UNSEEN_CAVEAT, (day, code) in UNSEEN),
+                    (DERIVED_EARLY_CAVEAT, rows["derived"].any()),
+                ):
+                    if caveat is not None and applies:
+                        cs.add("note", entity_id=contest, kind="caveat", body_md=caveat)
+                declared = cs.key(f"{SOURCE}.result_set", contest_key)
+                cs.add(
+                    "result_set",
+                    id=declared,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="annulled" if (day, code) == (DAY_2002, "56") else "active",
+                    source_id=early_sources[gazette],
+                    is_default=True,
+                    completeness=1,
+                )
+                if declared in cs.minted:
+                    result_sets[contest_key] = str(declared)
+                won = dict(seats.filter(pl.col("code") == code).select("option", "seats").iter_rows())
+                standing = {*rows["option"].drop_nulls(), *won}
+                for key in (key for key in EARLY_PARTIES[day] if key in standing):
+                    full = (
+                        INDEPENDENTS
+                        if key == INDEPENDENTS
+                        else next(
+                            full
+                            for full, _, start, end in thea.PARTIES[key]
+                            if (start is None or start <= day) and (end is None or day < end)
+                        )
+                    )
+                    option = cs.key("tr.option", f"{contest_key}:{slug(full)}")
+                    options[f"{contest_key}:{key}"] = str(option)
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="others" if key == INDEPENDENTS else "list",
+                        party_id=None if key == INDEPENDENTS else cs.key("tr.party", key),
+                        ballot_label=full,
+                    )
+                    if key in won:
+                        cs.add("outcome", result_set_id=declared, option_id=option, kind="won", seats=won[key])
+                for row in rows.iter_rows(named=True):
+                    url = row["url"]
+                    page = (
+                        None
+                        if url is None or row["page"] is None or row["box"] is None
+                        else page_ids[(url, row["page"])]
+                    )
+                    facts.append(
+                        {
+                            "set": contest_key,
+                            "unit": str(district_units[code]),
+                            "option": None if row["option"] is None else options[f"{contest_key}:{row['option']}"],
+                            "channel": 0,
+                            "measure": row["measure"],
+                            "value": row["value"],
+                            "page": page,
+                            "box": row["box"],
+                            "source": None if url is None or page is not None else str(early_sources[url]),
+                            "flags": DERIVED
+                            if row["derived"] or url is None
+                            else DIGITIZED
+                            if url == gazette or url.endswith(".gif")
+                            else 0,
+                        }
+                    )
+                for row in elected.filter(pl.col("code") == code).iter_rows(named=True):
+                    member = f"{day}:{code}:{row['sequence']}"
+                    party = row["party"]
+                    qid = row["person"]
+                    known = next((uuid for label, uuid in persons.items() if slug(label) == slug(row["label"])), None)
+                    if known is not None:
+                        person = known
+                        if qid is not None:
+                            cs.add("external_id", entity_id=person, scheme="wikidata", value=qid)
+                    elif qid is not None:
+                        person = cs.key("wikidata", qid)
+                    else:
+                        person = cs.key(f"{SOURCE}.person", member)
+                    if person in cs.minted:
+                        cs.add("person", id=person)
+                        name(person, row["label"])
+                    candidacy = cs.key("tr.candidacy", member)
+                    cs.add(
+                        "candidacy",
+                        id=candidacy,
+                        person_id=person,
+                        option_id=options[f"{contest_key}:{party}"],
+                        role="head" if party == INDEPENDENTS else "list_member",
+                        list_position=None,
+                        ballot_name=None,
+                        member_of_party_id=None if party == INDEPENDENTS else cs.key("tr.party", party),
+                        is_independent=party == INDEPENDENTS,
+                    )
+                    if party != INDEPENDENTS:
+                        cs.add(
+                            "candidacy_nomination",
+                            candidacy_id=candidacy,
+                            party_id=cs.key("tr.party", party),
+                            kind="nominated",
+                        )
+                    cs.add(
+                        "outcome",
+                        result_set_id=declared,
+                        option_id=options[f"{contest_key}:{party}"],
+                        candidacy_id=candidacy,
+                        kind="elected",
+                    )
+                    cs.add(
+                        "citation",
+                        entity_id=candidacy,
+                        source_id=members_early if row["url"] is None else early_sources[row["url"]],
+                        locator=None
+                        if row["url"] is None
+                        else {
+                            "page_id": page_ids[(row["url"], row["page"])],
+                            "bbox": [round(value, 6) for value in row["box"]],
+                        },
+                    )
+
         for day, url, native, law, law_native in (
             (
                 DAY_2017,
@@ -4635,6 +6344,8 @@ def emit() -> Path:
                 "value": pl.Int64,
                 "page": pl.String,
                 "box": pl.List(pl.Float64),
+                "source": pl.String,
+                "flags": pl.Int16,
             },
         ).filter(pl.col("set").is_in(list(result_sets)))
         keys = {
@@ -4649,15 +6360,21 @@ def emit() -> Path:
             "result_value",
             located.select(
                 **keys,
-                flags=pl.when(pl.col("page").is_null()).then(DERIVED).otherwise(DIGITIZED).cast(pl.Int16),
+                flags=pl.when(pl.col("flags").is_not_null())
+                .then("flags")
+                .when(pl.col("page").is_null())
+                .then(DERIVED)
+                .otherwise(DIGITIZED)
+                .cast(pl.Int16),
                 value="value",
             ),
         )
         cs.frame(
             "value_locator",
-            located.filter(pl.col("page").is_not_null()).select(
+            located.filter(pl.col("page").is_not_null() | pl.col("source").is_not_null()).select(
                 **keys,
                 page_id="page",
+                source_id="source",
                 x0=pl.col("box").list.get(0),
                 y0=pl.col("box").list.get(1),
                 x1=pl.col("box").list.get(2),
