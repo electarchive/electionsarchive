@@ -14,13 +14,16 @@ type Node = {
 };
 type Bar = { key: string; label: string; color: string | null; share: number };
 
-const INK = "#191816";
-const MUTED = "#67635b";
-const PAPER = "#fbfaf7";
-const FRAME = "#f1efea";
-const RULE = "#cfcac0";
-const HIGHLIGHT = "#ffe03a";
-const NEUTRALS = ["#8f8a81", "#aba69d", "#c8c3ba"];
+const INK = "#15171a";
+const MUTED = "#5b616a";
+const PAPER = "#ffffff";
+const FILL = "#f2f3f5";
+const RULE = "#dadde2";
+const MARKER = "#ffe03a";
+const NEUTRALS = ["#8a9099", "#a9aeb6", "#c6cad0"];
+const MONOGRAM = `data:image/svg+xml;utf8,${encodeURIComponent(
+  `<svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 32 32"><rect width="32" height="32" rx="3" fill="${MARKER}"/><path fill="none" stroke="${INK}" stroke-width="2.4" stroke-linecap="square" d="M9.5 7 V25 M13.75 7 V25 M18 7 V25 M22.25 7 V25 M5.5 21 L26.5 11"/></svg>`,
+)}`;
 const ANSWERS: Record<string, string> = {
   "answer:yes": "#2e7d4f",
   "answer:sì": "#2e7d4f",
@@ -33,10 +36,10 @@ const require = createRequire(import.meta.url);
 const fonts = Promise.all(
   (
     [
-      ["Piazzolla", "piazzolla", 600],
+      ["Piazzolla", "piazzolla", 400],
       ["Sofia", "sofia-sans-semi-condensed", 400],
       ["Sofia", "sofia-sans-semi-condensed", 600],
-      ["Martian", "martian-mono", 400],
+      ["Sofia", "sofia-sans-semi-condensed", 800],
     ] as const
   ).flatMap(([name, family, weight]) =>
     ["latin", "latin-ext"].map(async (subset) => ({
@@ -142,7 +145,8 @@ async function card(segments: Array<string>, search: URLSearchParams) {
         : [
             {
               key: row.key,
-              label: row.label,
+              label:
+                row.label.length > 24 ? (row.short ?? row.label) : row.label,
               color: row.color,
               share: row.current.share,
             },
@@ -175,151 +179,162 @@ export const GET: RequestHandler = async ({ params, url }) => {
     throw error_;
   }
   const bars = found.bars.slice(0, 3);
-  const accent = "color" in found ? found.color : null;
   const svg = await satori(
     h(
       "div",
       {
         display: "flex",
-        width: "100%",
-        height: "100%",
-        padding: 28,
-        backgroundColor: FRAME,
+        flexDirection: "column",
+        width: 1200,
+        height: 630,
+        boxSizing: "border-box",
+        padding: "52px 72px 40px",
+        backgroundColor: PAPER,
         fontFamily: "Sofia latin, Sofia latin-ext",
         color: INK,
       },
-      h(
-        "div",
-        {
-          display: "flex",
-          flexDirection: "column",
-          width: 1012,
-          height: 474,
-          padding: "44px 64px 40px",
-          backgroundColor: PAPER,
-          border: `2px solid ${RULE}`,
-          borderTop: `14px solid ${accent ?? INK}`,
-          borderRadius: 10,
-        },
-        [
-          h(
-            "div",
-            { display: "flex", fontSize: 26, color: MUTED },
-            found.kicker,
-          ),
-          h(
-            "div",
-            {
-              display: "flex",
-              marginTop: 18,
-              fontFamily: "Piazzolla latin, Piazzolla latin-ext",
-              fontWeight: 600,
-              fontSize: found.title.length > 60 ? 54 : 68,
-              lineHeight: 1.04,
-              letterSpacing: "-0.01em",
-            },
-            found.title,
-          ),
-          h(
-            "div",
-            { display: "flex", marginTop: 16, fontSize: 30, color: MUTED },
-            found.line,
-          ),
-          h(
-            "div",
-            {
-              display: "flex",
-              flexDirection: "column",
-              flexGrow: 1,
-              justifyContent: "flex-end",
-            },
-            bars.length === 0
-              ? []
-              : [
-                  h(
-                    "div",
-                    {
-                      display: "flex",
-                      height: 22,
-                      borderRadius: 3,
-                      overflow: "hidden",
-                      backgroundColor: FRAME,
-                    },
-                    found.bars.map((bar, index) =>
-                      h("div", {
-                        width: `${bar.share * 100}%`,
-                        height: "100%",
-                        backgroundColor: tint(bar, index),
-                      }),
+      [
+        h("div", { display: "flex", fontSize: 26, color: MUTED }, found.kicker),
+        h(
+          "div",
+          {
+            display: "flex",
+            width: 1056,
+            marginTop: 14,
+            fontWeight: 800,
+            fontSize: found.title.length > 60 ? 60 : 76,
+            lineHeight: 0.98,
+            letterSpacing: "-0.022em",
+          },
+          found.title,
+        ),
+        h(
+          "div",
+          {
+            display: "flex",
+            width: 1056,
+            marginTop: 18,
+            fontFamily: "Piazzolla latin, Piazzolla latin-ext",
+            fontSize: 30,
+            color: MUTED,
+          },
+          found.line,
+        ),
+        h(
+          "div",
+          {
+            display: "flex",
+            flexDirection: "column",
+            width: 1056,
+            flexGrow: 1,
+            justifyContent: "flex-end",
+          },
+          bars.length === 0
+            ? []
+            : [
+                h(
+                  "div",
+                  {
+                    display: "flex",
+                    alignItems: "flex-end",
+                    gap: 56,
+                    overflow: "hidden",
+                  },
+                  bars.map((bar, index) =>
+                    h(
+                      "div",
+                      {
+                        display: "flex",
+                        flexDirection: "column",
+                        flexShrink: 0,
+                        maxWidth: 320,
+                      },
+                      [
+                        h(
+                          "div",
+                          {
+                            display: "flex",
+                            fontWeight: 800,
+                            fontSize: index === 0 ? 64 : 48,
+                            lineHeight: 1,
+                            letterSpacing: "-0.02em",
+                            color: index === 0 ? INK : MUTED,
+                          },
+                          percent(bar.share),
+                        ),
+                        h(
+                          "div",
+                          {
+                            display: "flex",
+                            alignItems: "center",
+                            gap: 10,
+                            marginTop: 8,
+                            fontSize: 24,
+                            fontWeight: 600,
+                          },
+                          [
+                            h("div", {
+                              width: 14,
+                              height: 14,
+                              flexShrink: 0,
+                              borderRadius: 2,
+                              backgroundColor: tint(bar, index),
+                            }),
+                            h(
+                              "div",
+                              {
+                                display: "block",
+                                overflow: "hidden",
+                                whiteSpace: "nowrap",
+                                textOverflow: "ellipsis",
+                              },
+                              bar.label,
+                            ),
+                          ],
+                        ),
+                      ],
                     ),
                   ),
-                  h(
-                    "div",
-                    {
-                      display: "flex",
-                      marginTop: 18,
-                      gap: 28,
-                      overflow: "hidden",
-                    },
-                    bars.map((bar, index) =>
-                      h(
-                        "div",
-                        {
-                          display: "flex",
-                          alignItems: "center",
-                          flexShrink: 0,
-                          gap: 12,
-                          fontSize: 28,
-                          fontWeight: index === 0 ? 600 : 400,
-                        },
-                        [
-                          h("div", {
-                            width: 16,
-                            height: 16,
-                            borderRadius: 3,
-                            backgroundColor: tint(bar, index),
-                          }),
-                          h(
-                            "div",
-                            {
-                              display: "block",
-                              maxWidth: 260,
-                              overflow: "hidden",
-                              whiteSpace: "nowrap",
-                              textOverflow: "ellipsis",
-                            },
-                            bar.label,
-                          ),
-                          h(
-                            "div",
-                            {
-                              display: "flex",
-                              fontFamily: "Martian latin, Martian latin-ext",
-                              fontSize: 24,
-                            },
-                            percent(bar.share),
-                          ),
-                        ],
-                      ),
-                    ),
+                ),
+                h(
+                  "div",
+                  {
+                    display: "flex",
+                    marginTop: 20,
+                    height: 16,
+                    backgroundColor: FILL,
+                  },
+                  found.bars.map((bar, index) =>
+                    h("div", {
+                      width: `${bar.share * 100}%`,
+                      height: "100%",
+                      borderRight: `2px solid ${PAPER}`,
+                      backgroundColor: tint(bar, index),
+                    }),
                   ),
-                ],
-          ),
-          h(
-            "div",
-            { display: "flex", marginTop: 30, fontSize: 24, fontWeight: 600 },
-            h(
-              "div",
-              {
-                display: "flex",
-                padding: "2px 8px",
-                backgroundColor: HIGHLIGHT,
-              },
-              m.wordmark(),
-            ),
-          ),
-        ],
-      ),
+                ),
+              ],
+        ),
+        h(
+          "div",
+          {
+            display: "flex",
+            alignItems: "center",
+            width: 1056,
+            gap: 12,
+            marginTop: 28,
+            paddingTop: 22,
+            borderTop: `1px solid ${RULE}`,
+            fontSize: 26,
+            fontWeight: 800,
+            letterSpacing: "-0.01em",
+          },
+          [
+            { type: "img", props: { src: MONOGRAM, width: 34, height: 34 } },
+            m.wordmark(),
+          ],
+        ),
+      ],
     ) as Parameters<typeof satori>[0],
     { width: 1200, height: 630, fonts: await fonts },
   );
