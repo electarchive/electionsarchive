@@ -2767,6 +2767,139 @@ export const contests = {
         }),
       );
     }),
+  ballot: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/ballot",
+        summary:
+          "List the other contests decided on the same day with results for the scoped place, each linked at that place with its top two",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        unit: v.optional(v.string()),
+      }),
+    )
+    .output(
+      v.array(
+        v.object({
+          id: v.string(),
+          name: v.string(),
+          path: v.string(),
+          leaders: v.array(
+            v.object({
+              key: v.string(),
+              label: v.string(),
+              color: v.nullable(v.string()),
+              person: v.nullable(v.string()),
+              party: v.nullable(v.string()),
+              share: v.number(),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const contest = await find(input.id);
+      const chain = await descend(contest, input.unit);
+      const area = chain.at(-1);
+      if (area == null) {
+        return [];
+      }
+      const day = contest.date ?? "infinity";
+      const found = await db.execute<{
+        id: string;
+        parent: string | null;
+        path: string;
+      }>(sql`
+        with recursive up(id, parent) as (
+          select e.id, e.parent_id from contest c join election e on e.id = c.election_id where c.id = ${contest.id}::uuid
+          union all
+          select e.id, e.parent_id from election e join up on e.id = up.parent
+        ),
+        tree(id) as (
+          select id from up where parent is null
+          union all
+          select k.id from election k join tree on k.parent_id = tree.id
+        ),
+        own(id) as (
+          select ${contest.root}::uuid
+          union all
+          select c.id from contest c join own on c.allocation_parent_id = own.id
+        )
+        select c.id, c.allocation_parent_id as parent, s.path
+        from contest c
+        join tree on tree.id = c.election_id
+        join election e on e.id = c.election_id and e.date_from = ${day}::date
+        join slug s on s.entity_id = c.id and s.is_current
+        where c.id not in (select id from own) and exists (
+          select 1 from result_set rs join result_rollup r on r.result_set_k = rs.k
+          where rs.contest_id in (
+            with recursive grp(id) as (
+              select c.id union all select g.id from contest g join grp on g.allocation_parent_id = grp.id
+            ) select id from grp
+          ) and r.area_k = ${area.k} and r.measure = any(${COUNTED})
+        )
+      `);
+      const parents = new Set(found.rows.map((row) => row.parent));
+      const kept = found.rows.filter((row) => !parents.has(row.id));
+      const labels = await names(
+        kept.map((row) => row.id),
+        contest.date,
+      );
+      const built = await Promise.all(
+        kept.map(async (row) => {
+          const other = await find(row.id);
+          if (other.place == null) {
+            return null;
+          }
+          const kids =
+            other.place.k === area.k
+              ? []
+              : await children(row.id, other.place, true, day);
+          const unit =
+            other.place.k === area.k
+              ? ""
+              : kids.find((kid) => kid.k === area.k)?.segment;
+          if (unit == null) {
+            return null;
+          }
+          const totals = await load([row.id], [area.k], day, [row.id]);
+          const loaded = totals.get(area.k);
+          return {
+            id: row.id,
+            name: labels.full.get(row.id) ?? "",
+            path: [row.path, unit].filter((part) => part !== "").join("/"),
+            leaders:
+              loaded == null
+                ? []
+                : compare(loaded.side, null, [], "party")
+                    .flatMap((entry) =>
+                      entry.current == null
+                        ? []
+                        : [
+                            {
+                              key: entry.key,
+                              label: entry.label,
+                              color: entry.color,
+                              person: entry.current.person,
+                              party: entry.current.party,
+                              votes: entry.current.votes,
+                              share: entry.current.share,
+                            },
+                          ],
+                    )
+                    .toSorted((a, b) => b.votes - a.votes)
+                    .slice(0, 2),
+          };
+        }),
+      );
+      return built
+        .filter((entry) => entry != null)
+        .toSorted((a, b) => a.name.localeCompare(b.name));
+    }),
   lists: os
     .meta(
       openapi({
@@ -3102,7 +3235,9 @@ async function races(
         order by z.valid_from desc nulls last limit 1
       ) z on true
       join tree on tree.id = c.election_id
-      where c.allocation_parent_id is null
+      where c.allocation_parent_id is null or not exists (
+        select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
+      )
     `),
     db.execute<{ id: string; k: number }>(sql`
       select a.id, a.k from polity_territory pt join area a on a.id = pt.area_id
@@ -3112,6 +3247,11 @@ async function races(
   const nation = territory.rows[0];
   const groups = Map.groupBy(found.rows, (row) => row.series)
     .values()
+    .flatMap((group) =>
+      group.length > 1 && new Set(group.map((row) => row.area)).size === 1
+        ? group.map((row) => [row])
+        : [group],
+    )
     .toArray();
   if (nation == null || groups.length === 0) {
     return [];

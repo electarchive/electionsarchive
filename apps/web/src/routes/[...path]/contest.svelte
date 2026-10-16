@@ -13,6 +13,7 @@
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Ballot from "./ballot.svelte";
   import Changes from "./changes.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
@@ -29,12 +30,14 @@
     contest,
     lists,
     rounds,
+    ballot,
     boundaries,
     match,
   }: {
     contest: Extract<PageData, { kind: "contest" }>["contest"];
     lists: Extract<PageData, { kind: "contest" }>["lists"];
     rounds: Extract<PageData, { kind: "contest" }>["rounds"];
+    ballot: Extract<PageData, { kind: "contest" }>["ballot"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     match: string;
   } = $props();
@@ -831,7 +834,7 @@
       }
     />
   {/key}
-{:else if contest.children.length > 0}
+{:else if contest.children.length > 0 && !drilled}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.children_title()}</h2>
     <ul class="columns-2 gap-6 text-sm md:columns-4">
@@ -848,6 +851,10 @@
       {/each}
     </ul>
   </section>
+{/if}
+
+{#if ballot.length > 0}
+  <Ballot {ballot} place={contest.scope.name} />
 {/if}
 
 {#if notes.length > 0}

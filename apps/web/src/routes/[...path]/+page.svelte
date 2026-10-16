@@ -162,6 +162,7 @@
         contest={data.contest}
         lists={data.lists}
         rounds={data.rounds}
+        ballot={data.ballot}
         boundaries={data.boundaries}
         match={data.match}
       />

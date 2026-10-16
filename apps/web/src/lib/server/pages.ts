@@ -82,7 +82,7 @@ export async function archive(path: string, search: URLSearchParams) {
   const match =
     requested === "person" || requested === "family" ? requested : "party";
   if (slug.type === "contest") {
-    const [contest, lists, rounds] = await found(
+    const [contest, lists, rounds, ballot] = await found(
       Promise.all([
         call(router.contests.get, {
           id: slug.entity_id,
@@ -94,6 +94,7 @@ export async function archive(path: string, search: URLSearchParams) {
         }),
         call(router.contests.lists, { id: slug.entity_id }),
         call(router.contests.rounds, { id: slug.entity_id, unit }),
+        call(router.contests.ballot, { id: slug.entity_id, unit }),
       ]),
     );
     const boundaries = await call(router.contests.boundaries, {
@@ -106,6 +107,7 @@ export async function archive(path: string, search: URLSearchParams) {
       contest,
       lists,
       rounds,
+      ballot,
       boundaries,
       match,
     };

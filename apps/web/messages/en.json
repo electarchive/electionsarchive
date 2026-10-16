@@ -434,5 +434,6 @@
   "twin_not_found": "Page not found.",
   "meta_contest": "Results of the {name} on {date} by candidate and party, broken down by location, with a source for every number.",
   "meta_election": "Results of every contest in the {name} on {date}, with a source for every number.",
-  "meta_polity": "Every election in {name} from {first} to {last}, with results by the smallest reporting unit and a source for every number."
+  "meta_polity": "Every election in {name} from {first} to {last}, with results by the smallest reporting unit and a source for every number.",
+  "ballot_title": "Other races in {place}"
 }

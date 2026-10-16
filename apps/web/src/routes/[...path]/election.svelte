@@ -39,11 +39,15 @@
 
   const races = $derived(
     election.races.map((race) => {
-      const seated = race.results.filter((row) => (row.seats ?? 0) > 0);
+      const winners = race.results.filter((row) => (row.seats ?? 0) > 0);
       let total = 0;
-      for (const row of seated) {
+      for (const row of winners) {
         total += row.seats ?? 0;
       }
+      const seated =
+        race.count === 1 && total <= 1 && race.kind !== "elector_slate"
+          ? []
+          : winners;
       const leader =
         seated.toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0))[0] ??
         race.results[0];
@@ -72,6 +76,7 @@
             ? m.race_round({ name: race.name, round: race.round })
             : race.name,
         votes: MEASURES[race.measure]?.() ?? m.col_votes(),
+        isSlate: race.kind === "elector_slate",
         seated: seated.map((row) => ({
           ...row,
           seats: row.seats ?? 0,
@@ -121,23 +126,33 @@
                   })
             : leader == null
               ? null
-              : seated.length > 0 && !race.isOffice
-                ? m.race_lede_seats({
+              : race.kind === "elector_slate" && seated.length > 0
+                ? m.race_lede_electors({
                     party: leader.label,
                     seats: count(leader.seats ?? 0),
-                    total: count(race.size ?? total),
+                    total: count(total),
                     share: percent(leader.share),
                   })
-                : runner == null
-                  ? null
-                  : (seated.length > 0 ? m.race_lede_won : m.race_lede_votes)({
+                : seated.length > 0 && !race.isOffice
+                  ? m.race_lede_seats({
                       party: leader.label,
+                      seats: count(leader.seats ?? 0),
+                      total: count(race.size ?? total),
                       share: percent(leader.share),
-                      margin: count(
-                        Math.round((leader.share - runner.share) * 1000) / 10,
+                    })
+                  : runner == null
+                    ? null
+                    : (seated.length > 0 ? m.race_lede_won : m.race_lede_votes)(
+                        {
+                          party: leader.label,
+                          share: percent(leader.share),
+                          margin: count(
+                            Math.round((leader.share - runner.share) * 1000) /
+                              10,
+                          ),
+                          runner: runner.label,
+                        },
                       ),
-                      runner: runner.label,
-                    }),
       };
     }),
   );
@@ -197,7 +212,10 @@
       "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
       {
         "lg:col-span-8":
-          race.seated.length > 0 && race.electors == null && !race.isOffice,
+          race.seated.length > 0 &&
+          race.electors == null &&
+          !race.isOffice &&
+          !race.isSlate,
       },
     )}
   >
@@ -208,12 +226,12 @@
       seats={race.seated.length === 0 ||
       (race.isOffice && race.electors == null)
         ? null
-        : race.electors == null
+        : race.electors == null && !race.isSlate
           ? m.col_seats()
           : m.col_electors()}
     />
   </div>
-  {#if race.seated.length > 0 && race.electors == null && !race.isOffice}
+  {#if race.seated.length > 0 && race.electors == null && !race.isOffice && !race.isSlate}
     <Seats
       parties={race.seated}
       places={[]}
