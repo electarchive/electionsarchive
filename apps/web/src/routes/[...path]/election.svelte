@@ -128,7 +128,8 @@
         (race.before ?? []).map((entry) => [entry.key, entry.seats]),
       );
       const change =
-        race.before == null
+        race.before == null ||
+        seated.some((row) => row.key.startsWith("alliance:"))
           ? null
           : Object.fromEntries(
               seated.flatMap((row) => {
@@ -155,7 +156,8 @@
                 total: appointed,
                 parts: race.electors.rows.map((row) => ({
                   key: row.key,
-                  label: row.short ?? row.label,
+                  label:
+                    row.person == null ? (row.short ?? row.label) : row.label,
                   color: swatch(row.color, row.key),
                   value: row.votes,
                 })),
@@ -170,7 +172,9 @@
                       : total,
                   parts: ordered.map((row) => ({
                     key: row.key,
-                    label: row.short ?? row.label,
+                    label: row.key.startsWith("alliance:")
+                      ? row.label
+                      : (row.short ?? row.label),
                     color: swatch(row.color, row.key),
                     value: row.seats ?? 0,
                     delta:
@@ -185,7 +189,10 @@
                     .slice(0, 2)
                     .map((row) => ({
                       key: row.key,
-                      label: row.short ?? row.label,
+                      label:
+                        row.person == null
+                          ? (row.short ?? row.label)
+                          : row.label,
                       color: swatch(row.color, row.key),
                       value: row.share,
                     })),
