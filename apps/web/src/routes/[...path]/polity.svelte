@@ -13,6 +13,7 @@
   import PlaceMap from "./map.svelte";
   import Preview from "./preview.svelte";
   import Timeline from "./record.svelte";
+  import Scrubber from "./scrubber.svelte";
 
   const {
     id,
@@ -146,8 +147,13 @@
     return shown;
   });
   const results = $derived(isAllYears ? polity.results : preview);
+  const isNational = $derived(
+    ["sovereign_state", "supranational"].includes(polity.kind),
+  );
   const headline = $derived(
-    polity.latest?.races.find((race) => race.contest != null) ?? null,
+    isNational
+      ? null
+      : (polity.latest?.races.find((race) => race.contest != null) ?? null),
   );
 
   let loaded = $state<{
@@ -299,7 +305,9 @@
   </div>
 {/if}
 
-{#if polity.latest != null && polity.latest.races.length > 0}
+{#if isNational}
+  <Scrubber {id} place={polity.name} latest={polity.latest} />
+{:else if polity.latest != null && polity.latest.races.length > 0}
   <section
     class={cn(
       "col-span-12 grid content-start gap-3 bg-card px-3.5 pbs-3 pbe-3.5",

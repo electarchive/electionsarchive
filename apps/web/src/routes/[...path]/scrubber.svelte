@@ -1,0 +1,570 @@
+<script lang="ts">
+  import { resolve } from "$app/paths";
+  import PauseIcon from "@lucide/svelte/icons/pause";
+  import PlayIcon from "@lucide/svelte/icons/play";
+  import {
+    createQuery,
+    keepPreviousData,
+    useQueryClient,
+  } from "@tanstack/svelte-query";
+  import { count, date, percent } from "#lib/format.js";
+  import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
+  import { cn } from "#lib/utils.js";
+  import PlaceMap from "./map.svelte";
+
+  const {
+    id,
+    place,
+    latest,
+  }: {
+    id: string;
+    place: string;
+    latest: { path: string | null; date: string | null } | null;
+  } = $props();
+
+  const uid = $props.id();
+  const client = useQueryClient();
+
+  const record = createQuery(() =>
+    orpc.polities.record.queryOptions({ input: { id } }),
+  );
+
+  let at = $state<number | null>(null);
+  let isPlaying = $state(false);
+  let isDragging = $state(false);
+  let settled = $state<string | null>(null);
+
+  const parties = $derived(
+    new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
+  );
+  const tint = (party: string | null) =>
+    party == null
+      ? swatch(null, "")
+      : swatch(parties.get(party)?.color ?? null, `party:${party}`);
+  const lean = (party: string | null) =>
+    (party == null ? null : parties.get(party)?.lean) ?? Infinity;
+
+  const chamber = $derived(
+    (record.data?.series ?? [])
+      .filter((series) => !series.isOffice)
+      .toSorted((a, b) => b.points.length - a.points.length)[0] ?? null,
+  );
+  const office = $derived(
+    (record.data?.series ?? [])
+      .filter((series) => series.isOffice)
+      .toSorted((a, b) => b.points.length - a.points.length)[0] ?? null,
+  );
+  const steps = $derived(
+    Map.groupBy(
+      (record.data?.series ?? []).flatMap((series) =>
+        series.points.flatMap((point) =>
+          point.path == null
+            ? []
+            : [{ path: point.path, year: point.year, date: point.date }],
+        ),
+      ),
+      (point) => point.path,
+    )
+      .values()
+      .map((group) => group[0])
+      .filter((point) => point != null)
+      .toArray()
+      .toSorted((a, b) => a.date.localeCompare(b.date))
+      .map((point) => {
+        const seated = chamber?.points.find(
+          (entry) => entry.path === point.path,
+        );
+        const held = office?.points.find((entry) => entry.path === point.path);
+        const top = (seated ?? held)?.parties.toSorted(
+          (a, b) => b.seats - a.seats,
+        )[0];
+        return { ...point, tone: tint(top?.party ?? null) };
+      }),
+  );
+  const index = $derived(Math.min(at ?? steps.length - 1, steps.length - 1));
+  const step = $derived(
+    steps[index] ??
+      (latest?.path == null || latest.date == null || record.isPending
+        ? null
+        : {
+            path: latest.path,
+            date: latest.date,
+            year: Number(latest.date.slice(0, 4)),
+            tone: "",
+          }),
+  );
+  const first = $derived(steps[0]?.year ?? 0);
+  const last = $derived(steps.at(-1)?.year ?? 0);
+  const along = (year: number) =>
+    last === first ? 0.5 : (year - first) / (last - first);
+
+  $effect(() => {
+    const path = step?.path ?? null;
+    const timer = setTimeout(() => (settled = path), isDragging ? 260 : 0);
+    return () => clearTimeout(timer);
+  });
+
+  $effect(() => {
+    if (isDragging) {
+      return;
+    }
+    for (const near of [steps[index - 1], steps[index + 1]]) {
+      if (near != null) {
+        void client
+          .ensureQueryData(
+            orpc.elections.locate.queryOptions({ input: { path: near.path } }),
+          )
+          .then(async (found) =>
+            client.prefetchQuery(
+              orpc.elections.get.queryOptions({ input: { id: found.id } }),
+            ),
+          );
+      }
+    }
+  });
+
+  $effect(() => {
+    if (!isPlaying) {
+      return;
+    }
+    const timer = setInterval(() => {
+      if (index >= steps.length - 1) {
+        isPlaying = false;
+      } else {
+        at = index + 1;
+      }
+    }, 1600);
+    return () => clearInterval(timer);
+  });
+
+  const located = createQuery(() => ({
+    ...orpc.elections.locate.queryOptions({ input: { path: settled ?? "" } }),
+    enabled: settled != null,
+    placeholderData: keepPreviousData,
+    staleTime: Infinity,
+  }));
+  const hub = createQuery(() => ({
+    ...orpc.elections.get.queryOptions({
+      input: { id: located.data?.id ?? "" },
+    }),
+    enabled: located.data != null,
+    placeholderData: keepPreviousData,
+  }));
+  const race = $derived(
+    hub.data?.races.find(
+      (entry) => entry.map != null && entry.places != null,
+    ) ?? null,
+  );
+  const isStale = $derived(
+    hub.isPlaceholderData ||
+      located.isPlaceholderData ||
+      settled !== (step?.path ?? null),
+  );
+  const leaders = $derived(
+    race == null
+      ? []
+      : race.electors != null && race.electors.rows.length > 0
+        ? race.electors.rows
+            .slice(0, 2)
+            .map((row) => ({
+              key: row.key,
+              label: row.label,
+              color: swatch(row.color, row.key),
+              value: count(row.votes),
+            }))
+        : race.results
+            .slice(0, 2)
+            .map((row) => ({
+              key: row.key,
+              label: row.person == null ? (row.short ?? row.label) : row.label,
+              color: swatch(row.color, row.key),
+              value:
+                (row.seats ?? 0) > 1
+                  ? count(row.seats ?? 0)
+                  : percent(row.share),
+            })),
+  );
+
+  const sitting = $derived.by(() => {
+    const point =
+      chamber?.points.findLast((entry) => entry.date <= (step?.date ?? "")) ??
+      null;
+    const rows = (point?.parties ?? [])
+      .filter((entry) => entry.seats > 0)
+      .toSorted((a, b) => lean(a.party) - lean(b.party) || b.seats - a.seats);
+    let total = 0;
+    for (const row of rows) {
+      total += row.seats;
+    }
+    return { point, rows, total };
+  });
+  const dots = $derived.by(() => {
+    const total = sitting.total;
+    if (total === 0) {
+      return [];
+    }
+    const rings = Math.max(1, Math.ceil(Math.sqrt(total / 2.2)));
+    const gap = 0.6 / rings;
+    const radii = Array.from(
+      { length: rings },
+      (_, ring) => 0.4 + gap * (ring + 0.5),
+    );
+    let sum = 0;
+    for (const radius of radii) {
+      sum += radius;
+    }
+    const counts = radii.map((radius) =>
+      Math.max(1, Math.round((total * radius) / sum)),
+    );
+    let placed = 0;
+    for (const value of counts) {
+      placed += value;
+    }
+    counts[rings - 1] = (counts[rings - 1] ?? 0) + total - placed;
+    const colors = sitting.rows.flatMap((row) =>
+      Array.from({ length: row.seats }, () => tint(row.party)),
+    );
+    return radii
+      .flatMap((radius, ring) => {
+        const n = counts[ring] ?? 0;
+        return Array.from({ length: n }, (_, spot) => {
+          const angle = Math.PI * (n === 1 ? 0.5 : spot / (n - 1));
+          return {
+            x: -Math.cos(angle) * radius,
+            y: -Math.sin(angle) * radius,
+            angle,
+            radius,
+          };
+        });
+      })
+      .toSorted((a, b) => a.angle - b.angle || b.radius - a.radius)
+      .map((spot, seat) => ({
+        ...spot,
+        size: gap * 0.38,
+        color: colors[seat] ?? "var(--muted)",
+      }));
+  });
+  const government = $derived.by(() => {
+    const from = step?.date ?? "";
+    const next = steps[index + 1]?.date ?? "9999";
+    const all = record.data?.governments ?? [];
+    return (
+      all.find((entry) => entry.from > from && entry.from < next) ??
+      all.findLast(
+        (entry) => entry.from <= from && (entry.to == null || entry.to > from),
+      ) ??
+      null
+    );
+  });
+
+  const pick = (event: PointerEvent) => {
+    const box = (event.currentTarget as HTMLElement).getBoundingClientRect();
+    const x = (event.clientX - box.left) / Math.max(box.width, 1);
+    let best = { index: 0, distance: Infinity };
+    for (const [spot, entry] of steps.entries()) {
+      const distance = Math.abs(along(entry.year) - x);
+      if (distance < best.distance) {
+        best = { index: spot, distance };
+      }
+    }
+    at = best.index;
+  };
+</script>
+
+{#if record.isPending || step != null}
+  <section
+    class="col-span-12 grid gap-4 bg-card px-3.5 pbs-4 pbe-4"
+    aria-labelledby="{uid}-title"
+  >
+    <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-2">
+      <div class="grid gap-0.5">
+        <h2
+          id="{uid}-title"
+          class="font-serif text-[clamp(1.375rem,2.2vw,1.75rem)]/tight font-[640] tracking-[-0.01em]"
+        >
+          {steps.length > 1 ? m.scrubber_title({ place }) : m.polity_latest()}
+        </h2>
+        {#if steps.length > 1}
+          <p
+            class="text-[0.875rem] text-pretty text-muted-foreground max-inline-[64ch]"
+          >
+            {m.scrubber_lede()}
+          </p>
+        {/if}
+      </div>
+      {#if steps.length > 1}
+        <button
+          type="button"
+          class="flex items-center gap-1.5 rounded-sm border border-input bg-card ps-2 pe-3 text-[0.8125rem] font-semibold block-8 hover:bg-secondary"
+          aria-pressed={isPlaying}
+          onclick={() => {
+            if (!isPlaying && index >= steps.length - 1) {
+              at = 0;
+            }
+            isPlaying = !isPlaying;
+          }}
+        >
+          {#if isPlaying}
+            <PauseIcon class="block-4 inline-4" />{m.scrubber_pause()}
+          {:else}
+            <PlayIcon class="block-4 inline-4" />{m.scrubber_play()}
+          {/if}
+        </button>
+      {/if}
+    </div>
+
+    {#if steps.length > 1}
+      <div class="grid gap-1 pbs-5">
+        <div
+          class="relative cursor-grab touch-none rounded-sm outline-offset-4 select-none block-9 active:cursor-grabbing"
+          role="slider"
+          tabindex="0"
+          aria-label={m.scrubber_slider()}
+          aria-valuemin={first}
+          aria-valuemax={last}
+          aria-valuenow={step?.year ?? last}
+          aria-valuetext={step == null ? undefined : date(step.date)}
+          onpointerdown={(event) => {
+            event.currentTarget.setPointerCapture(event.pointerId);
+            isDragging = true;
+            isPlaying = false;
+            pick(event);
+          }}
+          onpointermove={(event) => {
+            if (event.currentTarget.hasPointerCapture(event.pointerId)) {
+              pick(event);
+            }
+          }}
+          onpointerup={() => (isDragging = false)}
+          onpointercancel={() => (isDragging = false)}
+          onkeydown={(event) => {
+            const moves: Record<string, number> = {
+              ArrowLeft: -1,
+              ArrowDown: -1,
+              ArrowRight: 1,
+              ArrowUp: 1,
+              PageDown: -5,
+              PageUp: 5,
+              Home: -steps.length,
+              End: steps.length,
+            };
+            const move = moves[event.key];
+            if (move != null) {
+              event.preventDefault();
+              isPlaying = false;
+              at = Math.max(0, Math.min(steps.length - 1, index + move));
+            }
+          }}
+        >
+          <span
+            class="absolute inset-x-0 inset-bs-1/2 bg-border block-px"
+            aria-hidden="true"
+          ></span>
+          {#each steps as entry, spot (entry.path)}
+            <span
+              class={cn(
+                "absolute -translate-x-1/2 rounded-full transition-[block-size,opacity] duration-200 inline-1 motion-reduce:transition-none",
+                {
+                  "inset-bs-3 opacity-45 block-3": spot !== index,
+                  "inset-bs-0 block-9": spot === index,
+                },
+              )}
+              style:inset-inline-start="{along(entry.year) * 100}%"
+              style:background-color={entry.tone}
+              aria-hidden="true"
+            ></span>
+          {/each}
+          {#if step != null}
+            <span
+              class="pointer-events-none absolute inset-be-[calc(100%+0.375rem)] rounded-xs bg-foreground px-1.5 font-mono text-xs font-semibold text-background tabular-nums transition-[inset-inline-start] duration-200 motion-reduce:transition-none"
+              style:inset-inline-start="{along(step.year) * 100}%"
+              style:translate="{-along(step.year) * 100}% 0"
+              aria-hidden="true">{step.year}</span
+            >
+          {/if}
+        </div>
+        <div
+          class="flex justify-between font-mono text-[0.6875rem] text-muted-foreground tabular-nums"
+          aria-hidden="true"
+        >
+          <span>{first}</span><span>{last}</span>
+        </div>
+      </div>
+    {/if}
+
+    <div
+      class="grid gap-x-6 gap-y-4 lg:grid-cols-[minmax(0,1.9fr)_minmax(0,1fr)]"
+    >
+      <div
+        class={cn(
+          "transition-opacity duration-300 min-inline-0 motion-reduce:transition-none",
+          { "opacity-60": isStale },
+        )}
+      >
+        {#if step != null}
+          <p
+            class="mbe-2 flex items-baseline gap-2 lg:hidden"
+            aria-live="polite"
+          >
+            <span
+              class="font-serif text-4xl/none font-[640] tracking-[-0.03em] tabular-nums"
+              >{step.year}</span
+            >
+            {#if hub.data != null}
+              <a
+                class="truncate text-[0.8125rem] font-semibold underline decoration-border underline-offset-4"
+                href={resolve("/[...path]", { path: step.path })}
+                >{hub.data.name}</a
+              >
+            {/if}
+          </p>
+        {/if}
+        {#if race?.map != null && race.places != null}
+          {#key `${race.map.tiles}:${race.map.own?.tiles ?? ""}`}
+            <PlaceMap
+              places={race.places}
+              colors={race.places.legend.map((item) =>
+                swatch(item.color, item.key),
+              )}
+              tiles={race.map.tiles}
+              own={race.map.own}
+              frames={race.map.frames}
+              isApproximate={race.map.isApproximate}
+              noun={race.places.levels[0]?.noun ?? ""}
+              votes={m.col_votes()}
+              names={race.places.legend.map((item) =>
+                item.person == null ? (item.short ?? item.label) : item.label,
+              )}
+              levels={[]}
+              span={null}
+            />
+          {/key}
+        {:else}
+          <div
+            class="animate-pulse rounded-sm bg-muted block-[min(32rem,60svh)] motion-reduce:animate-none"
+          ></div>
+        {/if}
+      </div>
+
+      <div class="grid content-start gap-4">
+        <div class="grid gap-1 max-lg:hidden">
+          <p
+            class="font-serif text-[clamp(3rem,7vw,5.5rem)] leading-[0.85] font-[640] tracking-[-0.03em] tabular-nums"
+            aria-live="polite"
+          >
+            {step?.year ?? ""}
+          </p>
+          {#if hub.data != null && step != null}
+            <a
+              class="text-[0.9375rem] font-semibold text-pretty underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href={resolve("/[...path]", { path: step.path })}
+              >{hub.data.name}</a
+            >
+          {/if}
+        </div>
+
+        {#if race != null && leaders.length > 0}
+          <div class="grid gap-1.5">
+            <p class="text-[0.8125rem] font-bold">{race.name}</p>
+            <ul class="grid gap-1 text-sm">
+              {#each leaders as row (row.key)}
+                <li
+                  class="grid grid-cols-[auto_minmax(0,1fr)_auto] items-baseline gap-x-2"
+                >
+                  <span
+                    class="self-center rounded-xs block-2.5 inline-2.5"
+                    style:background-color={row.color}
+                  ></span>
+                  <span class="truncate font-semibold">{row.label}</span>
+                  <span class="font-mono text-[0.8125rem] tabular-nums"
+                    >{row.value}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+          </div>
+        {/if}
+
+        {#if chamber != null && dots.length > 0}
+          <figure class="grid gap-1.5">
+            <figcaption class="text-[0.8125rem] font-bold">
+              {m.scrubber_chamber({ chamber: chamber.name })}
+            </figcaption>
+            <svg
+              viewBox="-1.04 -1.04 2.08 1.1"
+              class="block inline-full"
+              role="img"
+              aria-label={sitting.rows
+                .map(
+                  (row) =>
+                    `${parties.get(row.party ?? "")?.short ?? parties.get(row.party ?? "")?.label ?? m.record_none()} ${row.seats}`,
+                )
+                .join(", ")}
+            >
+              {#each dots as dot, seat (seat)}
+                <circle
+                  class="transition-[transform,fill,r] duration-500 ease-out motion-reduce:transition-none"
+                  style:transform="translate({dot.x}px, {dot.y}px)"
+                  style:r="{dot.size}px"
+                  style:fill={dot.color}
+                />
+              {/each}
+              <line
+                x1="0"
+                x2="0"
+                y1="-1.02"
+                y2="-0.34"
+                class="stroke-foreground"
+                stroke-width="0.008"
+              />
+            </svg>
+            <ul class="flex flex-wrap gap-x-3 gap-y-1 text-[0.8125rem]">
+              {#each sitting.rows
+                .toSorted((a, b) => b.seats - a.seats)
+                .slice(0, 5) as row (row.party ?? "none")}
+                <li class="flex items-baseline gap-1.5">
+                  <span
+                    class="self-center rounded-xs block-2.5 inline-2.5"
+                    style:background-color={tint(row.party)}
+                  ></span>
+                  <span class="font-semibold"
+                    >{parties.get(row.party ?? "")?.short ??
+                      parties.get(row.party ?? "")?.label ??
+                      m.record_none()}</span
+                  >
+                  <span class="font-mono text-xs tabular-nums">{row.seats}</span
+                  >
+                </li>
+              {/each}
+            </ul>
+            <p class="text-xs text-muted-foreground">
+              {m.scrubber_majority({
+                seats: count(Math.floor(sitting.total / 2) + 1),
+              })}
+            </p>
+          </figure>
+        {/if}
+
+        {#if government != null}
+          <div class="grid gap-1">
+            <p class="text-[0.8125rem] font-bold">{m.scrubber_government()}</p>
+            <p class="flex items-baseline gap-1.5 text-sm">
+              <span
+                class="self-center rounded-xs block-2.5 inline-2.5"
+                style:background-color={tint(government.party)}
+              ></span>
+              <span class="font-semibold">{government.name}</span>
+            </p>
+            {#if government.head != null}
+              <p class="text-[0.8125rem] text-muted-foreground">
+                {government.head}
+              </p>
+            {/if}
+          </div>
+        {/if}
+      </div>
+    </div>
+  </section>
+{/if}

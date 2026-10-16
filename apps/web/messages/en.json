@@ -754,5 +754,14 @@
   "person_served_span": "{from}–{to}",
   "person_served_now": "{from}–present",
   "party_strength_title": "{party} support by {noun}",
-  "party_strength_lede": "Share of the vote by {noun} in the {race}. Darker colors indicate a larger share."
+  "party_strength_lede": "Share of the vote by {noun} in the {race}. Darker colors indicate a larger share.",
+  "scrubber_title": "{place}, election by election",
+  "scrubber_lede": "Drag the years or press play to see maps, the elected chamber, and the resulting government.",
+  "scrubber_play": "Play",
+  "scrubber_pause": "Pause",
+  "scrubber_slider": "Election year",
+  "scrubber_chamber": "{chamber} after the election",
+  "scrubber_majority": "{seats} for a majority",
+  "scrubber_government": "Government that followed",
+  "scrubber_open": "Open election"
 }
