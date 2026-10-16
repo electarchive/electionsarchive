@@ -4266,6 +4266,261 @@ export const polities = {
               },
       };
     }),
+  record: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/polities/{id}/record",
+        summary:
+          "List every general election of a polity's own chambers and offices, with the seats each party won and each office's winner and share",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        series: v.array(
+          v.object({
+            id: v.string(),
+            name: v.string(),
+            isOffice: v.boolean(),
+            points: v.array(
+              v.object({
+                name: v.string(),
+                path: v.nullable(v.string()),
+                date: v.string(),
+                year: v.number(),
+                races: v.number(),
+                filled: v.number(),
+                share: v.nullable(v.number()),
+                parties: v.array(
+                  v.object({
+                    party: v.nullable(v.string()),
+                    seats: v.number(),
+                  }),
+                ),
+              }),
+            ),
+          }),
+        ),
+        parties: v.array(
+          v.object({
+            id: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+            lean: v.nullable(v.number()),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        seat: string;
+        isOffice: boolean;
+        bucket: string;
+        link: string | null;
+        date: string;
+        year: number;
+        races: number;
+        party: string | null;
+        seats: number;
+        share: number | null;
+      }>(sql`
+        with recursive roots as materialized (
+          select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
+            e.date_from as date, ${CYCLE} as year, a.k as area,
+            case when e.polity_id = ${input.id}::uuid then e.id
+              when g.polity_id = ${input.id}::uuid then g.id
+              else (
+                select n.id from election n
+                where n.polity_id = ${input.id}::uuid and n.kind = e.kind
+                  and extract(year from n.date_from) = extract(year from e.date_from)
+                order by n.parent_id is null desc, abs(n.date_from - e.date_from) limit 1
+              ) end as link
+          from contest c
+          join election e on e.id = c.election_id
+          join election g on g.id = coalesce(e.parent_id, e.id)
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
+          where c.allocation_parent_id is null and c.party_scope_id is null
+            and e.kind in ('general', 'local') and c.kind in ('body_seats', 'list_allocation', 'office')
+            and not exists (
+              select from contest pc join election pe on pe.id = pc.election_id
+              where pc.id = c.previous_round_id and pe.kind in ('general', 'local')
+            )
+            and coalesce(
+              (select polity_id from body where id = c.body_id),
+              (select polity_id from office where id = c.office_id)
+            ) = ${input.id}::uuid
+        ),
+        rounds as (
+          select r.id as root, r.id from roots r
+          union all
+          select r.id, c.id from roots r join contest c on c.previous_round_id = r.id where r."isOffice"
+        ),
+        tree(root, id) as (
+          select root, id from rounds
+          union all
+          select tree.root, c.id from contest c join tree on c.allocation_parent_id = tree.id
+        ),
+        winners as materialized (
+          select t.root, t.id as contest, o.id, o.party_id, max(coalesce(x.seats, 1)) as seats
+          from tree t
+          join contest_option o on o.contest_id = t.id
+          join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          where not exists (select from contest k where k.allocation_parent_id = t.id)
+          group by t.root, t.id, o.id, o.party_id
+        ),
+        lines as materialized (
+          select ch.parent_option_id as parent, ch.party_id, ch.k, ch.contest_id
+          from winners w join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id
+          where w.party_id is null and ch.party_id is not null
+        ),
+        leads as (
+          select distinct on (l.parent) l.parent, l.party_id
+          from lines l
+          join result_set rs on rs.contest_id = l.contest_id and rs.is_default
+          join result_rollup y on y.result_set_k = rs.k and y.option_k = l.k
+          group by l.parent, l.party_id, l.k
+          order by l.parent, max(y.value) desc
+        ),
+        won as materialized (
+          select w.root, w.contest, w.id, w.seats, coalesce(pm.into_id, w.party_id, ld.party_id) as party
+          from winners w
+          left join leads ld on ld.parent = w.id
+          left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+        ),
+        fetched as (
+          select r.id as root, coalesce(o.parent_option_id, o.id) as top, x.measure, x.value::float8 as value,
+            x.count_round, max(x.count_round) over (partition by r.id, x.measure) as first
+          from (select id, area from roots where "isOffice") r
+          join (select distinct root, contest from won) w on w.root = r.id
+          join result_set rs on rs.contest_id = w.contest and rs.is_default
+          join result_rollup x on x.result_set_k = rs.k and x.area_k = r.area and x.measure = any(${COUNTED}) and x.option_k <> 0
+          join contest_option o on o.k = x.option_k
+        ),
+        mains as (
+          select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by root
+        ),
+        shares as (
+          select f.root,
+            sum(f.value) filter (where wn.id is not null) / nullif(sum(f.value), 0) as share
+          from fetched f join mains m on m.root = f.root and m.main = f.measure
+          left join won wn on wn.root = f.root and wn.id = f.top
+          where f.count_round = f.first
+          group by f.root
+        )
+        select r.seat, bool_or(r."isOffice") as "isOffice", coalesce(r.link::text, r.year::text) as bucket,
+          (array_agg(r.link))[1] as link,
+          min(r.date)::text as date, min(r.year) as year, count(distinct r.id)::int as races,
+          w.party, sum(w.seats)::int as seats, avg(sh.share)::float8 as share
+        from roots r
+        join won w on w.root = r.id
+        left join shares sh on sh.root = r.id
+        group by r.seat, coalesce(r.link::text, r.year::text), w.party
+        order by min(r.date)
+      `);
+      const seats = [...new Set(found.rows.map((row) => row.seat))];
+      const parties = [
+        ...new Set(found.rows.flatMap((row) => row.party ?? [])),
+      ];
+      const links = [...new Set(found.rows.flatMap((row) => row.link ?? []))];
+      const [labels, slugs, colors, positions] = await Promise.all([
+        names([...seats, ...links, ...parties]),
+        paths(links),
+        refs(parties),
+        db.execute<{ party_id: string; lean: number }>(sql`
+          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+          where party_id = any(${sql.param(parties)}::uuid[])
+          order by party_id, valid_from desc nulls last
+        `),
+      ]);
+      const lean = new Map(
+        positions.rows.map((row) => [row.party_id, row.lean]),
+      );
+      return {
+        series: seats
+          .map((seat) => {
+            const rows = found.rows.filter((row) => row.seat === seat);
+            return {
+              id: seat,
+              name: labels.full.get(seat) ?? "",
+              isOffice: rows.some((row) => row.isOffice),
+              points: Map.groupBy(rows, (row) => row.bucket)
+                .values()
+                .map((group) => {
+                  const first = group[0];
+                  let filled = 0;
+                  for (const row of group) {
+                    filled += row.seats;
+                  }
+                  return {
+                    name:
+                      (first?.link == null
+                        ? null
+                        : labels.full.get(first.link)) ??
+                      `${first?.year ?? ""} ${labels.full.get(seat) ?? ""}`.trim(),
+                    path:
+                      first?.link == null
+                        ? null
+                        : (slugs.get(first.link) ?? null),
+                    date: first?.date ?? "",
+                    year: first?.year ?? 0,
+                    races: Math.max(...group.map((row) => row.races)),
+                    filled,
+                    share:
+                      group.length === 1 && first?.isOffice === true
+                        ? first.share
+                        : null,
+                    parties: group
+                      .map((row) => ({ party: row.party, seats: row.seats }))
+                      .toSorted((a, b) => b.seats - a.seats),
+                  };
+                })
+                .toArray()
+                .toSorted((a, b) => a.date.localeCompare(b.date))
+                .flatMap((point, index, all) => {
+                  const next = all[index + 1];
+                  if (
+                    next != null &&
+                    next.year - point.year <= 1 &&
+                    point.filled * 2 < next.filled
+                  ) {
+                    next.races += point.races;
+                    next.filled += point.filled;
+                    next.share = null;
+                    const merged = new Map(
+                      next.parties.map((entry) => [entry.party, entry.seats]),
+                    );
+                    for (const entry of point.parties) {
+                      merged.set(
+                        entry.party,
+                        (merged.get(entry.party) ?? 0) + entry.seats,
+                      );
+                    }
+                    next.parties = [...merged]
+                      .map(([party, seats]) => ({ party, seats }))
+                      .toSorted((x, y) => y.seats - x.seats);
+                    return [];
+                  }
+                  return [point];
+                }),
+            };
+          })
+          .filter((entry) => entry.points.length > 1)
+          .toSorted(
+            (a, b) =>
+              Number(b.isOffice) - Number(a.isOffice) ||
+              Math.max(...b.points.map((point) => point.filled)) -
+                Math.max(...a.points.map((point) => point.filled)),
+          ),
+        parties: parties.map((id) => ({
+          ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
+          lean: lean.get(id) ?? null,
+        })),
+      };
+    }),
 };
 
 const PartyRef = v.object({

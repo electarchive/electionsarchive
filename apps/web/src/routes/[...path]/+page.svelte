@@ -169,7 +169,7 @@
     {:else if data.kind === "election"}
       <Election election={data.election} />
     {:else}
-      <Polity polity={data.polity} />
+      <Polity id={data.id} polity={data.polity} />
     {/if}
   </article>
 </main>

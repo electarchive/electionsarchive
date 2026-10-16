@@ -235,6 +235,7 @@ export async function archive(path: string, search: URLSearchParams) {
   if (slug.type === "polity") {
     return {
       kind: "polity" as const,
+      id: slug.entity_id,
       polity: await call(router.polities.get, { id: slug.entity_id }),
     };
   }

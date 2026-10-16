@@ -8,10 +8,13 @@
   import type { PageData } from "./$types";
   import PlaceMap from "./map.svelte";
   import Preview from "./preview.svelte";
+  import Timeline from "./record.svelte";
 
   const {
+    id,
     polity,
-  }: { polity: Extract<PageData, { kind: "polity" }>["polity"] } = $props();
+  }: { id: string; polity: Extract<PageData, { kind: "polity" }>["polity"] } =
+    $props();
 
   const STATUSES: Record<string, () => string> = {
     scheduled: m.election_scheduled,
@@ -171,6 +174,10 @@
           ),
         };
   });
+  const isMapped = $derived(
+    headline?.contest != null &&
+      (loaded?.id !== headline.contest || drawn != null),
+  );
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -192,26 +199,34 @@
   {/if}
 </header>
 
-{#if drawn != null}
+{#if isMapped}
   <div
     class="col-span-12 grid content-start gap-2 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-8"
   >
-    <h2 class="text-[0.8125rem] font-bold">
-      {m.polity_map_title({ race: headline?.name ?? "", noun: drawn.noun })}
-    </h2>
-    <PlaceMap
-      places={drawn.places}
-      colors={drawn.colors}
-      tiles={drawn.tiles}
-      own={drawn.own}
-      frames={drawn.frames}
-      isApproximate={drawn.isApproximate}
-      noun={drawn.noun}
-      votes={m.col_votes()}
-      names={drawn.names}
-      levels={[]}
-      span={null}
-    />
+    {#if drawn == null}
+      <p
+        class="grid place-items-center rounded-sm text-sm text-muted-foreground ring-1 ring-border block-[min(32rem,60svh)]"
+      >
+        {m.map_loading()}
+      </p>
+    {:else}
+      <h2 class="text-[0.8125rem] font-bold">
+        {m.polity_map_title({ race: headline?.name ?? "", noun: drawn.noun })}
+      </h2>
+      <PlaceMap
+        places={drawn.places}
+        colors={drawn.colors}
+        tiles={drawn.tiles}
+        own={drawn.own}
+        frames={drawn.frames}
+        isApproximate={drawn.isApproximate}
+        noun={drawn.noun}
+        votes={m.col_votes()}
+        names={drawn.names}
+        levels={[]}
+        span={null}
+      />
+    {/if}
   </div>
 {/if}
 
@@ -219,7 +234,7 @@
   <section
     class={cn(
       "col-span-12 grid content-start gap-3 bg-card px-3.5 pbs-3 pbe-3.5",
-      { "lg:col-span-4": drawn != null },
+      { "lg:col-span-4": isMapped },
     )}
     aria-labelledby="{uid}-latest"
   >
@@ -300,6 +315,8 @@
     </ul>
   </section>
 {/if}
+
+<Timeline {id} />
 
 {#if polity.elections.length > 0 || polity.results.length === 0}
   <section
