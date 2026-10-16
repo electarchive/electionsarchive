@@ -13,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "4"
+VERSION = "5"
 TITLE = "Political parties and their colors"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
@@ -132,22 +132,36 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("IT", "Azione – Italia Viva", None): "392CAA",
     ("IT", "Lega per Salvini Premier", None): "008000",
     ("TR", "Adalet Partisi", 1961): "D360BC",
+    ("TR", "Anavatan Partisi", 2023): "FBBA00",
+    ("TR", "Barış Partisi", None): "CD4A4C",
+    ("TR", "Büyük Birlik Partisi", None): "CC5252",
     ("TR", "Cumhuriyetçi Güven Partisi", None): "FF4500",
     ("TR", "Cumhuriyetçi Millet Partisi", None): "7A1F2B",
     ("TR", "Demokrat Parti", None): "CD42B2",
+    ("TR", "Demokrat Türkiye Partisi", None): "DA7766",
     ("TR", "Demokratik Parti", None): "FFA500",
+    ("TR", "Doğru Yol Partisi", 2011): "D360BC",
     ("TR", "Fazilet Partisi", None): "FF2E84",
     ("TR", "Güven Partisi", None): "FF4500",
     ("TR", "Halkçı Parti", None): "D40000",
-    ("TR", "Milli Selamet Partisi", None): "FF2E84",
+    ("TR", "Hürriyet Partisi", 1957): "C1F711",
+    ("TR", "Komünist Parti", None): "CC0000",
+    ("TR", "Memleket Partisi", None): "0D5DA6",
     ("TR", "Millet Partisi", 1950): "7A1F2B",
     ("TR", "Millet Partisi", 1965): "C65E1F",
+    ("TR", "Millet Partisi", 1987): "C83737",
+    ("TR", "Milli Selamet Partisi", None): "FF2E84",
+    ("TR", "Milli Yol Partisi", None): "F40F0F",
     ("TR", "Milliyetçi Hareket Partisi", None): "7A1F2B",
     ("TR", "Refah Partisi", None): "FF2E84",
     ("TR", "Türkiye Birlik Partisi", None): "B7006D",
     ("TR", "Türkiye İşçi Partisi", None): "CD0668",
+    ("TR", "Türkiye Komünist Hareketi", None): "990000",
+    ("TR", "Yeni Parti", None): "4B4AAF",
     ("TR", "Yeni Türkiye Partisi", 1961): "00B0F0",
     ("TR", "Yeniden Refah Partisi", None): "474647",
+    ("TR", "Yeşiller ve Sol Gelecek Partisi", None): "388537",
+    ("TR", "Zafer Partisi", None): "373736",
     ("US", "Natural Law Party", None): "D4A017",
     ("US", "Reform Party", None): "6A287E",
     ("US", "Socialist Workers Party", None): "AA0000",
