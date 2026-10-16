@@ -1,6 +1,8 @@
 <script lang="ts">
+  import Versus from "#routes/compare/places.svelte";
   import { resolve } from "$app/paths";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
+  import { createQuery } from "@tanstack/svelte-query";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -33,6 +35,36 @@
   };
 
   const uid = $props.id();
+  const isLocal = $derived(
+    polity.parent != null &&
+      polity.results.length > 0 &&
+      !["sovereign_state", "supranational", "federal_unit"].includes(
+        polity.kind,
+      ),
+  );
+  const above = $derived(polity.breadcrumbs.at(-1)?.name ?? "");
+  const versus = createQuery(() => ({
+    ...orpc.polities.compare.queryOptions({
+      input: { a: id, b: polity.parent ?? id },
+    }),
+    enabled: isLocal,
+  }));
+  const shared = $derived.by(() => {
+    const data = versus.data;
+    if (data == null) {
+      return null;
+    }
+    const series = data.series
+      .filter((entry) => !entry.isQuestion && entry.points.length > 1)
+      .toSorted(
+        (a, b) =>
+          (b.points.at(-1)?.date ?? "").localeCompare(
+            a.points.at(-1)?.date ?? "",
+          ) || b.points.length - a.points.length,
+      )
+      .slice(0, 2);
+    return series.length === 0 ? null : { ...data, series };
+  });
 
   let filter = $state("all");
   let query = $state("");
@@ -207,6 +239,34 @@
     </p>
   {/if}
 </header>
+
+{#if isLocal}
+  {#if shared != null}
+    <section
+      class="col-span-12 grid gap-1 bg-card px-3.5 pbs-4 pbe-1"
+      aria-labelledby="{uid}-versus"
+    >
+      <h2
+        id="{uid}-versus"
+        class="font-serif text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[640] tracking-[-0.005em]"
+      >
+        {m.polity_versus_title({ place: polity.name })}
+      </h2>
+      <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem]">
+        <span class="text-pretty text-muted-foreground"
+          >{m.polity_versus_lede({ place: polity.name, parent: above })}</span
+        >
+        <a
+          class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+          href={resolve(`/compare?a=${id}&b=${polity.parent ?? ""}`)}
+          >{m.polity_versus_all({ place: polity.name, parent: above })}</a
+        >
+      </p>
+    </section>
+    <Versus data={shared} />
+  {/if}
+  {@render inPlace()}
+{/if}
 
 {#if isMapped}
   <div
@@ -409,97 +469,8 @@
   </section>
 {/if}
 
-{#if polity.results.length > 0}
-  <section
-    class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3"
-    aria-labelledby="{uid}-results"
-  >
-    <div class="grid gap-0.5">
-      <h2 id="{uid}-results" class="text-[0.8125rem] font-bold">
-        {m.polity_results_title({ place: polity.name })}
-      </h2>
-      <p class="text-[0.8125rem] text-muted-foreground">
-        {m.polity_results_lede({ place: polity.name })}
-      </p>
-    </div>
-    <ol class="grid">
-      {#each results as group (group.date)}
-        <li
-          class="grid items-baseline gap-x-3 gap-y-1.5 border-be border-border/60 py-2 last:border-be-0 sm:grid-cols-[4.5rem_minmax(0,1fr)]"
-        >
-          <time
-            class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
-            datetime={group.date}>{group.year ?? ""}</time
-          >
-          <ul class="grid gap-2">
-            {#each group.races as race (race.id)}
-              {const leader = $derived(race.leaders[0])}
-              {const runner = $derived(race.leaders[1])}
-              <li
-                class="grid items-center gap-x-4 gap-y-1 text-sm sm:grid-cols-[minmax(0,1fr)_6rem_minmax(0,15rem)]"
-              >
-                <Preview
-                  class="text-pretty first-letter:uppercase hover:highlighter"
-                  path={race.path}
-                  >{group.year != null && race.name.startsWith(`${group.year} `)
-                    ? race.name.slice(String(group.year).length + 1)
-                    : race.name}</Preview
-                >
-                <div
-                  class="flex overflow-hidden rounded-xs bg-muted block-2 max-sm:hidden"
-                  aria-hidden="true"
-                >
-                  {#each race.leaders as row (row.key)}
-                    <span
-                      class="block-full"
-                      style:inline-size="{row.share * 100}%"
-                      style:background-color={swatch(row.color, row.key)}
-                    ></span>
-                  {/each}
-                </div>
-                <div class="grid gap-0.5 text-[0.8125rem]">
-                  {#each [leader, runner] as row, index (index)}
-                    {#if row != null}
-                      <span
-                        class={cn(
-                          "grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3",
-                          { "text-muted-foreground": index > 0 },
-                        )}
-                      >
-                        <Name
-                          class="truncate min-inline-0"
-                          label={row.label}
-                          color={swatch(row.color, row.key)}
-                          person={row.person}
-                          party={row.party}
-                        />
-                        <span class="font-mono text-xs tabular-nums"
-                          >{percent(row.share)}</span
-                        >
-                      </span>
-                    {/if}
-                  {/each}
-                </div>
-              </li>
-            {/each}
-          </ul>
-        </li>
-      {/each}
-    </ol>
-    {#if preview.length < polity.results.length}
-      <button
-        type="button"
-        class="keycap justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary"
-        aria-expanded={isAllYears}
-        onclick={() => (isAllYears = !isAllYears)}
-        >{isAllYears
-          ? m.polity_results_fewer()
-          : m.polity_results_more({
-              count: String(polity.results.length),
-            })}</button
-      >
-    {/if}
-  </section>
+{#if !isLocal}
+  {@render inPlace()}
 {/if}
 
 {#if polity.polities.length > 0}
@@ -575,3 +546,99 @@
     {/if}
   </section>
 {/if}
+
+{#snippet inPlace()}
+  {#if polity.results.length > 0}
+    <section
+      class="col-span-12 grid content-start gap-2.5 bg-card px-3.5 py-3"
+      aria-labelledby="{uid}-results"
+    >
+      <div class="grid gap-0.5">
+        <h2 id="{uid}-results" class="text-[0.8125rem] font-bold">
+          {m.polity_results_title({ place: polity.name })}
+        </h2>
+        <p class="text-[0.8125rem] text-muted-foreground">
+          {m.polity_results_lede({ place: polity.name })}
+        </p>
+      </div>
+      <ol class="grid">
+        {#each results as group (group.date)}
+          <li
+            class="grid items-baseline gap-x-3 gap-y-1.5 border-be border-border/60 py-2 last:border-be-0 sm:grid-cols-[4.5rem_minmax(0,1fr)]"
+          >
+            <time
+              class="font-mono text-[0.9375rem] tracking-[-0.02em] tabular-nums"
+              datetime={group.date}>{group.year ?? ""}</time
+            >
+            <ul class="grid gap-2">
+              {#each group.races as race (race.id)}
+                {const leader = $derived(race.leaders[0])}
+                {const runner = $derived(race.leaders[1])}
+                <li
+                  class="grid items-center gap-x-4 gap-y-1 text-sm sm:grid-cols-[minmax(0,1fr)_6rem_minmax(0,15rem)]"
+                >
+                  <Preview
+                    class="text-pretty first-letter:uppercase hover:highlighter"
+                    path={race.path}
+                    >{group.year != null &&
+                    race.name.startsWith(`${group.year} `)
+                      ? race.name.slice(String(group.year).length + 1)
+                      : race.name}</Preview
+                  >
+                  <div
+                    class="flex overflow-hidden rounded-xs bg-muted block-2 max-sm:hidden"
+                    aria-hidden="true"
+                  >
+                    {#each race.leaders as row (row.key)}
+                      <span
+                        class="block-full"
+                        style:inline-size="{row.share * 100}%"
+                        style:background-color={swatch(row.color, row.key)}
+                      ></span>
+                    {/each}
+                  </div>
+                  <div class="grid gap-0.5 text-[0.8125rem]">
+                    {#each [leader, runner] as row, index (index)}
+                      {#if row != null}
+                        <span
+                          class={cn(
+                            "grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3",
+                            { "text-muted-foreground": index > 0 },
+                          )}
+                        >
+                          <Name
+                            class="truncate min-inline-0"
+                            label={row.label}
+                            color={swatch(row.color, row.key)}
+                            person={row.person}
+                            party={row.party}
+                          />
+                          <span class="font-mono text-xs tabular-nums"
+                            >{percent(row.share)}</span
+                          >
+                        </span>
+                      {/if}
+                    {/each}
+                  </div>
+                </li>
+              {/each}
+            </ul>
+          </li>
+        {/each}
+      </ol>
+      {#if preview.length < polity.results.length}
+        <button
+          type="button"
+          class="keycap justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold block-7 hover:bg-secondary"
+          aria-expanded={isAllYears}
+          onclick={() => (isAllYears = !isAllYears)}
+          >{isAllYears
+            ? m.polity_results_fewer()
+            : m.polity_results_more({
+                count: String(polity.results.length),
+              })}</button
+        >
+      {/if}
+    </section>
+  {/if}
+{/snippet}

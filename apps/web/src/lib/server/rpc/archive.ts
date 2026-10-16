@@ -4792,6 +4792,7 @@ export const polities = {
       v.object({
         name: v.string(),
         kind: v.string(),
+        parent: v.nullable(v.string()),
         breadcrumbs: v.array(Link),
         polities: v.array(
           v.object({
@@ -4872,8 +4873,14 @@ export const polities = {
     .handler(async ({ input }) => {
       const [found, subdivisions, electionRows, crumbs, here] =
         await Promise.all([
-          db.execute<{ kind: string }>(
-            sql`select kind::text from polity where id = ${input.id}::uuid`,
+          db.execute<{ kind: string; parent: string | null }>(
+            sql`
+              select kind::text, (
+                select p.parent_id from polity_parent p where p.polity_id = polity.id
+                order by upper_inf(p.valid) desc, upper(p.valid) desc limit 1
+              ) as parent
+              from polity where id = ${input.id}::uuid
+            `,
           ),
           db.execute<{
             id: string;
@@ -5014,6 +5021,7 @@ export const polities = {
       return {
         name: labels.full.get(input.id) ?? "",
         kind: polity.kind,
+        parent: polity.parent,
         breadcrumbs: crumbs.slice(0, -1),
         polities: subdivisions.rows
           .map((row) => ({

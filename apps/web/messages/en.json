@@ -744,5 +744,8 @@
   "error_429_body": "You have made too many requests in a short time. Wait a minute and try again.",
   "error_search": "Search the archive",
   "error_home": "Go to home page",
-  "error_code": "Error {code}"
+  "error_code": "Error {code}",
+  "polity_versus_title": "{place} voting trends",
+  "polity_versus_lede": "Margins in {place} next to {parent} as a whole for the two most recent shared races.",
+  "polity_versus_all": "Compare {place} with {parent} in every race"
 }
