@@ -3,8 +3,10 @@
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import PlaceMap from "./map.svelte";
   import Preview from "./preview.svelte";
 
   const {
@@ -106,6 +108,68 @@
     return shown;
   });
   const results = $derived(isAllYears ? polity.results : preview);
+  const headline = $derived(
+    polity.latest?.races.find((race) => race.contest != null) ?? null,
+  );
+
+  let loaded = $state<{
+    id: string;
+    contest: Awaited<ReturnType<typeof orpc.contests.get.call>>;
+    bounds: Awaited<ReturnType<typeof orpc.contests.boundaries.call>>;
+  } | null>(null);
+
+  $effect(() => {
+    const id = headline?.contest;
+    if (id == null || loaded?.id === id) {
+      return;
+    }
+    const stop = new AbortController();
+    void (async () => {
+      try {
+        const contest = await orpc.contests.get.call({ id });
+        const bounds = await orpc.contests.boundaries.call({
+          id,
+          level: contest.places?.level,
+        });
+        if (!stop.signal.aborted) {
+          loaded = { id, contest, bounds };
+        }
+      } catch {
+        loaded = null;
+      }
+    })();
+    return () => {
+      stop.abort();
+    };
+  });
+
+  const drawn = $derived.by(() => {
+    const places = loaded?.contest.places;
+    if (loaded == null || places == null) {
+      return null;
+    }
+    const level = loaded.bounds.find((entry) => entry.scheme === places.level);
+    const own = loaded.bounds.find((entry) => entry.scheme !== places.level);
+    return level?.tiles == null || own == null || own.frames.length === 0
+      ? null
+      : {
+          places,
+          tiles: level.tiles,
+          own:
+            own.tiles == null || own.k == null
+              ? null
+              : { tiles: own.tiles, k: own.k },
+          frames: own.frames,
+          isApproximate: level.isApproximate,
+          noun:
+            places.levels.find((entry) => entry.code === places.level)?.noun ??
+            level.noun,
+          colors: places.legend.map((item) => swatch(item.color, item.key)),
+          names: places.legend.map((item) =>
+            item.person == null ? (item.short ?? item.label) : item.label,
+          ),
+        };
+  });
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -127,9 +191,35 @@
   {/if}
 </header>
 
+{#if drawn != null}
+  <div
+    class="col-span-12 grid content-start gap-2 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-8"
+  >
+    <h2 class="text-[0.8125rem] font-bold">
+      {m.polity_map_title({ race: headline?.name ?? "", noun: drawn.noun })}
+    </h2>
+    <PlaceMap
+      places={drawn.places}
+      colors={drawn.colors}
+      tiles={drawn.tiles}
+      own={drawn.own}
+      frames={drawn.frames}
+      isApproximate={drawn.isApproximate}
+      noun={drawn.noun}
+      votes={m.col_votes()}
+      names={drawn.names}
+      levels={[]}
+      span={null}
+    />
+  </div>
+{/if}
+
 {#if polity.latest != null && polity.latest.races.length > 0}
   <section
-    class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3 pbe-3.5"
+    class={cn(
+      "col-span-12 grid content-start gap-3 bg-card px-3.5 pbs-3 pbe-3.5",
+      { "lg:col-span-4": drawn != null },
+    )}
     aria-labelledby="{uid}-latest"
   >
     <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">

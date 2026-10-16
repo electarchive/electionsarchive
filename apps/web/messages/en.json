@@ -569,5 +569,6 @@
   "members_filter": "Search by name or place",
   "members_party": "Filter by party",
   "members_none": "No members match the filter.",
-  "members_all": "Show all {count}"
+  "members_all": "Show all {count}",
+  "polity_map_title": "{race} by {noun}"
 }

@@ -3581,6 +3581,7 @@ async function races(
         level == null || isBrief ? null : await sketch(place, level, day);
       return {
         map,
+        contest: single?.id ?? null,
         name:
           labels.full.get(
             (single == null ? head?.owner : single.id) ?? head?.id ?? "",
@@ -4015,6 +4016,7 @@ export const polities = {
             date: v.nullable(v.string()),
             races: v.array(
               v.object({
+                contest: v.nullable(v.string()),
                 name: v.string(),
                 path: v.nullable(v.string()),
                 count: v.number(),
@@ -4242,6 +4244,7 @@ export const polities = {
                     contested += row.seats ?? 0;
                   }
                   return {
+                    contest: race.contest,
                     name: race.name,
                     path: race.path,
                     count: race.count,
