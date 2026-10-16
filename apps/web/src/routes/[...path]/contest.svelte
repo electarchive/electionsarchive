@@ -611,7 +611,10 @@
   {/if}
   {#if drawn != null && contest.places != null}
     <div
-      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-8"
+      class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
+        "lg:col-span-8": contest.chamber != null,
+        "lg:col-span-7 xl:col-span-8": contest.chamber == null,
+      })}
     >
       {#key `${here}:${drawn.tiles}`}
         <PlaceMap
@@ -637,7 +640,7 @@
     </div>
     {#if contest.chamber == null}
       <div
-        class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-4"
+        class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
       >
         {@render stats(true)}
         <div

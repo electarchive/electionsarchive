@@ -427,7 +427,10 @@
   )}
   {#if isMapped && race.map != null && race.places != null}
     <div
-      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-8"
+      class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
+        "lg:col-span-8": isSeated,
+        "lg:col-span-7 xl:col-span-8": !isSeated,
+      })}
     >
       <PlaceMap
         places={race.places}
@@ -462,7 +465,7 @@
     class={cn(
       "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
       {
-        "lg:col-span-4": isMapped && !isSeated,
+        "lg:col-span-5 xl:col-span-4": isMapped && !isSeated,
         "lg:col-span-8": isSeated && !isMapped,
       },
     )}
