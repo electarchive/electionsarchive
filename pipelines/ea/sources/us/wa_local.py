@@ -15,7 +15,7 @@ from ea.sources.us.medsl_state import NATIONAL
 from ea.store import DATA, connect
 
 SOURCE = "us.wa_local"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Washington Secretary of State"
 TITLE = "Election results"
@@ -70,6 +70,27 @@ FILLER = {
     "city",
     "town",
 }
+MEASURES = re.compile(
+    r"PROPOSITION|WHETHER|PROP\.|AMENDMENT|CHARTER|FREEHOLDER|LEVY|BOND|PCO|PRECINCT|ADVISORY|RECALL|ANNEX|MEASURE"
+)
+SPECIAL = {
+    "fire": (r"\bFIRE\b|RESCUE", "Fire District"),
+    "port": (r"\bPORT\b", "Port District"),
+    "utility": (r"\bPUD\b|PUBLIC UTILITY", "Public Utility District"),
+    "hospital": (r"HOSPITAL", "Hospital District"),
+    "cemetery": (r"CEMETERY", "Cemetery District"),
+    "park": (r"\bPARKS?\b|\bREC(?:REATION)?\b", "Park and Recreation District"),
+    "water": (r"\bWATER\b", "Water District"),
+    "sewer": (r"SEWER|WASTEWATER", "Sewer District"),
+    "library": (r"LIBRARY", "Library District"),
+}
+MEMBER = re.compile(r"\b(?:COMMISSIONERS?|COMMRS?|COMM|DIRECTORS?|TRUSTEES?|SUPERVISORS?|POSITION|POS)\b")
+GENERIC = re.compile(
+    r"\b(?:COUNTY|CO|FIRE|PROTECTION|PORT|OF|DISTRICT|DIST|NO|PUBLIC|UTILITY|PUD|HOSPITAL|CEMETERY|PARKS?|REC|"
+    r"RECREATION|AND|WATER|SEWER|WASTEWATER|REGIONAL|AUTHORITY|RESCUE|LIBRARY|THE|AMP|METROPOLITAN|EMS|ALL|"
+    r"COUNTYWIDE|WIDE)\b|[^A-Z ]"
+)
+NUMBERS = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4, "FIVE": 5, "SIX": 6, "SEVEN": 7, "EIGHT": 8, "NINE": 9, "TEN": 10}
 SKIPPED = re.compile(
     r"PROPOSITION|WHETHER|PROP\.|AMENDMENT|CHARTER|FREEHOLDER|LEVY|BOND|PCO|PRECINCT|ADVISORY|RECALL|ANNEX|MEASURE|"
     r"\bFIRE\b|\bPORT\b|\bPARK\b|WATER|SEWER|CEMETERY|HOSPITAL|LIBRARY|AIRPORT|UTILITY|\bPUD\b|\bEMS\b|FLOOD|"
@@ -239,16 +260,119 @@ def parse() -> None:
             and (matched := _match(race, schools, fips, True)) is not None
         ):
             numbers[(county, int(number[1]))] = matched[0]
+    weights: dict[tuple[date, str], dict[str, int]] = {}
+    for day, race, county, votes in frame.group_by("day", "race", "county").agg(pl.col("votes").sum()).iter_rows():
+        weights.setdefault((day, race), {})[county] = votes
+    named = re.compile(rf"\b(?:{'|'.join(name.upper() for name in counties)})(?:-[A-Z]+)?\s+(?:CO|COUNTY)\b\.?")
+    specials: dict[str, tuple[date, str, str]] = {}
+    named_rows: list[tuple[int, str, date, str]] = []
     for county, race, jurisdiction, day in frame.select("county", "race", "jurisdiction", "day").unique().iter_rows():
         typed = day.year >= 2016
-        if typed and jurisdiction not in LOCAL:
-            continue
         upper = race.upper()
         fips = counties.get(county)
-        if fips is None or SKIPPED.search(upper) or re.search(r"JUDGE|COURT|JUSTICE", upper):
-            continue
         found = None
-        if SCHOOL.search(upper) and re.search(r"DIRECTOR|\bDIR\b|BOARD|POS|MEMBER", upper):
+        kind = next((kind for kind, (pattern, _) in SPECIAL.items() if re.search(pattern, upper)), None)
+        member = MEMBER.search(upper)
+        if (
+            fips is not None
+            and kind is not None
+            and member is not None
+            and member.start() > 0
+            and not (typed and jurisdiction in ("City/Town", "School", "County", "Commissioner", "PCO", "Judicial"))
+            and not MEASURES.search(upper)
+            and not SCHOOL.search(upper)
+            and not re.search(r"COUNCIL|MAYOR|JUDGE|COURT|CHARTER", upper)
+        ):
+            head, tail = upper[: member.start()], upper[member.start() :]
+            mentioned = [name for name in counties if re.search(rf"\b{name.upper()}\s+(?:CO|COUNTY|PUD)\b", head)]
+            home = (
+                mentioned[0] if len(mentioned) == 1 else max(weights[(day, race)].items(), key=lambda item: item[1])[0]
+            )
+            if (home_fips := counties.get(home)) is not None:
+                rest = " ".join(
+                    re.sub(
+                        r"\b(?:ALL|COUNTYWIDE|WIDE|OVERALL)\b|^\s*(?:COUNTY|CO)\b|[^A-Z0-9& ]",
+                        " ",
+                        re.sub(
+                            r"\bDIST\b\.?",
+                            "DISTRICT",
+                            re.sub(
+                                r"\bREC\b",
+                                "RECREATION",
+                                re.sub(
+                                    r"\bRFA\b", "REGIONAL FIRE AUTHORITY", named.sub(" ", head.replace("&AMP;", "&"))
+                                ),
+                            ),
+                        ),
+                    ).split()
+                )
+                rest = re.sub(
+                    r"^(PORT OF .+|.+ (?:DISTRICT|AUTHORITY|RESCUE)) (?:FIRE|PORT|WATER|SEWER|PARK|HOSPITAL|CEMETERY|PUD)$",
+                    r"\1",
+                    re.sub(r"\b(.+) \1$", r"\1", rest),
+                )
+                tokens = rest.split()
+                if len(tokens) > 3 and tokens[-1] == "".join(word[0] for word in tokens[-len(tokens[-1]) - 1 : -1]):
+                    rest = " ".join(tokens[:-1])
+                rest = re.sub(r"\bPK\b", "PARK", re.sub(r"\bSO\b", "SOUTH", re.sub(r"\bNO\b(?! \d)", "NORTH", rest)))
+                number = re.search(r"(?:DISTRICT|AUTHORITY|PUD|NO) (?:NO )?0*(\d+)\b", rest) or re.search(
+                    r"\b0*(\d+)\b", rest
+                )
+                spelled = re.search(rf"\bDISTRICT ({'|'.join(NUMBERS)})\b", rest)
+                count = int(number[1]) if number else NUMBERS[spelled[1]] if spelled else None
+                words = list(dict.fromkeys(GENERIC.sub(" ", rest).split()))
+                if slug(" ".join(words)) == slug(home):
+                    words = []
+                ident = str(count) if count is not None else slug(" ".join(words)) or "county"
+                code = f"{home_fips}:{kind}:{ident}"
+                if count is not None or not words and not re.search(r"REGIONAL|AUTHORITY|RESCUE", rest):
+                    display = f"{home} County {SPECIAL[kind][1]}" + (f" {count}" if count is not None else "")
+                else:
+                    display = re.sub(
+                        r"\b(Of|And|The)\b",
+                        lambda match: match[0].lower(),
+                        re.sub(r"\bPUD\b", "PUBLIC UTILITY DISTRICT", rest).title(),
+                    )
+                    if re.search(
+                        r"(?:Water|Sewer|Wastewater|Park|Fire|Hospital|Cemetery|Utility|Recreation)$", display
+                    ):
+                        display += " District"
+                    elif not re.search(r"District|Authority|Rescue|Department|^Port of ", display):
+                        display += f" {SPECIAL[kind][1]}"
+                    if GENERIC.fullmatch(display.split()[0].upper()) and not re.search(r"\bof\b", display):
+                        display = f"{home} County {display}"
+                if code not in specials or specials[code][0] < day:
+                    specials[code] = (day, home_fips, display)
+                if count is None and words and not mentioned:
+                    named_rows.append((len(labels), code, day, race))
+                district = re.search(r"\bDIST(?:RICT)?\.?\s*(?:NO\.?\s*|#\s*)?(\d+)", tail)
+                position = re.findall(
+                    r"(?:POSITION|\bPOS\b\.?|COMMISSIONER|\bCOMMR?\b|DIRECTOR|TRUSTEE|\bNO\.?|#|\()\s*[,(-]?\s*"
+                    r"(?:NO\.?\s*|#\s*)?0*(\d+)",
+                    tail if district is None else tail[: district.start()] + tail[district.end() :],
+                )
+                seat = " ".join(
+                    [
+                        *([f"District {int(district[1])}"] if district else []),
+                        *([f"Position {int(position[-1])}"] if position else []),
+                    ]
+                )
+                directors = re.search(r"DIRECTOR", tail) is not None
+                found = (
+                    code,
+                    "board-of-directors" if directors else "board-of-commissioners",
+                    "Board of Directors" if directors else "Board of Commissioners",
+                    True,
+                    seat or None,
+                    district is not None,
+                )
+        if found is None and (
+            typed and jurisdiction not in LOCAL or SKIPPED.search(upper) or re.search(r"JUDGE|COURT|JUSTICE", upper)
+        ):
+            continue
+        if fips is None:
+            continue
+        if found is None and SCHOOL.search(upper) and re.search(r"DIRECTOR|\bDIR\b|BOARD|POS|MEMBER", upper):
             number = NUMBER.search(upper)
             if (matched := _match(race, schools, fips, True)) is not None:
                 code, tail = matched
@@ -327,6 +451,33 @@ def parse() -> None:
                     and re.search(r"SHORT (?:AND|&) FULL|FULL (?:AND|&) SHORT", upper) is None,
                 }
             )
+    groups: dict[str, list[tuple[set[str], dict[str, int]]]] = {}
+    for _, code, day, race in named_rows:
+        own, _, rest = code.partition(":")
+        span = {counties[county]: votes or 0 for county, votes in weights[(day, race)].items() if county in counties}
+        span.setdefault(own, 0)
+        touching = [group for group in groups.get(rest, []) if group[0] & span.keys()]
+        merged = (set(span), dict(span))
+        for members, totals in touching:
+            merged[0].update(members)
+            for fips, votes in totals.items():
+                merged[1][fips] = merged[1].get(fips, 0) + votes
+        groups[rest] = [group for group in groups.get(rest, []) if group not in touching] + [merged]
+    homes = {
+        (fips, rest): max(totals.items(), key=lambda item: item[1])[0]
+        for rest, found in groups.items()
+        for members, totals in found
+        for fips in members
+    }
+    for index, code, _, _ in named_rows:
+        fips, _, rest = code.partition(":")
+        labels[index]["code"] = f"{homes[(fips, rest)]}:{rest}"
+    for code, (day, fips, text) in list(specials.items()):
+        _, _, rest = code.partition(":")
+        if (fips, rest) in homes and (home := homes[(fips, rest)]) != fips:
+            del specials[code]
+            if f"{home}:{rest}" not in specials or specials[f"{home}:{rest}"][0] < day:
+                specials[f"{home}:{rest}"] = (day, home, text)
     frame = frame.join(
         pl.DataFrame(labels, infer_schema_length=None), on=["county", "race", "jurisdiction", "day"], nulls_equal=True
     )
@@ -348,18 +499,24 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "candidates.parquet")
     places.filter(pl.col("code").is_in(frame["code"].implode())).write_parquet(PARSED / "places.parquet")
+    pl.DataFrame(
+        [(code, fips, text) for code, (_, fips, text) in specials.items() if code in set(frame["code"])],
+        schema=["code", "county", "name"],
+        orient="row",
+    ).write_parquet(PARSED / "specials.parquet")
     (PARSED / "missing.txt").write_text("\n".join(sorted(missing)))
 
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
     places = pl.read_parquet(PARSED / "places.parquet")
+    specials = pl.read_parquet(PARSED / "specials.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Washington's city, town, school board, and county elections, 2014–2025",
+            summary="Washington's city, town, school board, special district, and county elections, 2014–2025",
             polity="US-WA",
         )
 
@@ -387,16 +544,20 @@ def emit() -> Path:
             """select c.code, t.polity_id, n.text, s.path, p.kind from area a
                join area_code c on c.area_id = a.id
                join polity_territory t on t.area_id = a.id
-               join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality', 'school_district')
+               join polity p on p.id = t.polity_id
+                 and p.kind in ('county', 'municipality', 'school_district', 'special_district')
                join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                join slug s on s.entity_id = p.id
-               where a.scheme_code in ('us.county', 'us.place', 'us.school_district') and c.code like '53%%'"""
+               where a.scheme_code in ('us.county', 'us.place', 'us.school_district', 'us.special_district')
+                 and c.code like '53%%'"""
         ).fetchall():
             polities[f"sd{code}" if kind == "school_district" else code] = (
                 polity,
                 text,
                 path,
-                {"municipality": "city", "school_district": "school district"}.get(kind, "county"),
+                {"municipality": "city", "school_district": "school district", "special_district": "district"}.get(
+                    kind, "county"
+                ),
             )
         taken = {
             path
@@ -478,6 +639,45 @@ def emit() -> Path:
                     kind="standard",
                     valid_from=None,
                 )
+        cs.add(
+            "scheme",
+            code="us.special_district",
+            polity_id=cs.polity("US"),
+            kind="administrative",
+            rank=3,
+            noun="special district",
+        )
+        for code, county, text in specials.iter_rows():
+            if code in polities:
+                continue
+            polity = cs.key("us.polity", f"special:{code}")
+            path = f"{polities[county][2]}/{slug(text.removeprefix(polities[county][1]))}"
+            if path in taken:
+                raise ValueError(f"{text} would take {path}")
+            taken.add(path)
+            polities[code] = (polity, text, path, "district")
+            cs.add("polity", id=polity, kind="special_district", iso_code=None)
+            name(polity, text)
+            cs.add("polity_parent", polity_id=polity, parent_id=polities[county][0])
+            cs.add("slug", path=path, entity_id=polity)
+            area = cs.area("us.special_district", code)
+            cs.add("area", id=area, scheme_code="us.special_district")
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.county", county))
+            name(area, f"{text}, WA")
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            if (unit := cs.unit("us.special_district", code)) in cs.minted:
+                cs.add(
+                    "reporting_unit",
+                    id=unit,
+                    polity_id=polity,
+                    scheme_code="us.special_district",
+                    code=code,
+                    area_relation="equals",
+                    area_id=area,
+                    kind="standard",
+                    valid_from=None,
+                )
         fptp = cs.key("us.electoral_system", "fptp")
         if fptp in cs.minted:
             raise ValueError("the fptp system must already exist")
@@ -499,7 +699,11 @@ def emit() -> Path:
                 continue
             polity, place, path, word = polities[code]
             title = place
-            scheme = {5: "us.county", 7: "us.place"}.get(len(code), "us.school_district")
+            scheme = (
+                "us.special_district"
+                if ":" in code
+                else {5: "us.county", 7: "us.place"}.get(len(code), "us.school_district")
+            )
             geoid = code.removeprefix("sd")
             if key == "mayor":
                 office = f"Mayor of {title}"
@@ -595,13 +799,14 @@ def emit() -> Path:
                 default_result_kind="counted",
                 term="remainder" if first["remainder"] else "full",
             )
-            name(
-                contest,
-                (f"{day.year} {title} mayoral" if key == "mayor" else f"{day.year} {office}")
-                + (" primary" if stage == "primary" else " election")
-                + (f", {seat}" if seat else "")
-                + (" (short term)" if first["remainder"] else ""),
-            )
+            if contest in cs.minted:
+                name(
+                    contest,
+                    (f"{day.year} {title} mayoral" if key == "mayor" else f"{day.year} {office}")
+                    + (" primary" if stage == "primary" else " election")
+                    + (f", {seat}" if seat else "")
+                    + (" (short term)" if first["remainder"] else ""),
+                )
             contest_path = (
                 f"{path}/{day}-{stage}/{key}"
                 + (f"-{slug(seat)}" if seat else "")
