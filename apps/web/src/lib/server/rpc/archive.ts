@@ -3653,8 +3653,9 @@ async function races(
             group by 1
           `),
       ]);
+      const prior = previous?.rows ?? [];
       let earlier = 0;
-      for (const row of previous?.rows ?? []) {
+      for (const row of prior) {
         earlier += row.seats;
       }
       const before =
