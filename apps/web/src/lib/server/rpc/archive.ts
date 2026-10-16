@@ -2257,11 +2257,21 @@ export const contests = {
           relationLabels.full.get(row.to) ??
           "",
       }));
+      const owned = isRoot
+        ? null
+        : await db.execute<{ id: string }>(sql`
+            with recursive grp(id) as (
+              select ${contest.id}::uuid
+              union all
+              select c.id from contest c join grp on c.allocation_parent_id = grp.id
+            )
+            select c.id from contest c join grp on grp.id = c.id where c.district_area_id = ${area.id}::uuid
+          `);
       const loading = load(
         [contest.root],
         [area.k],
         contest.date ?? "infinity",
-        isRoot ? [contest.id] : [],
+        owned?.rows.map((row) => row.id) ?? [contest.id],
       );
       const [now, before, grid, cast, seats] = await Promise.all([
         loading,
@@ -2909,6 +2919,9 @@ async function races(election: string, polity: string, date: string | null) {
       isStage: boolean;
       size: number | null;
       isCounted: boolean;
+      isRunoff: boolean;
+      previous: string | null;
+      party: string | null;
       runoffs: Array<string>;
       area: string | null;
       k: number | null;
@@ -2922,11 +2935,12 @@ async function races(election: string, polity: string, date: string | null) {
       )
       select c.id, c.kind::text as kind,
         case when c.kind = 'ballot_question' then c.id::text
-          else concat_ws(':', c.office_id, c.body_id, c.kind, e.date_from, c.party_scope_id, tree.stage) end as series,
+          else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, c.party_scope_id, tree.stage) end as series,
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
         e.date_from::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", tree.stage as "isStage", z.seats as size,
         c.term is distinct from 'remainder' and coalesce(st.voting, true) as "isCounted",
+        e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
         array(select n.id from contest n join election ne on ne.id = n.election_id where n.previous_round_id = c.id and ne.kind = 'runoff') as runoffs,
         a.id as area, a.k, a.scheme_code as scheme, sc.noun
       from contest c
@@ -2985,6 +2999,20 @@ async function races(election: string, polity: string, date: string | null) {
       const counted = group.flatMap((row) =>
         row.isCounted ? [row.id, ...row.runoffs] : [],
       );
+      if (head != null && !head.isRunoff) {
+        for (const row of found.rows) {
+          if (
+            row.isRunoff &&
+            row.isCounted &&
+            row.owner === head.owner &&
+            row.kind === head.kind &&
+            row.party === head.party &&
+            !found.rows.some((other) => other.id === row.previous)
+          ) {
+            counted.push(row.id);
+          }
+        }
+      }
       const [totals, grid, table] = await Promise.all([
         load(roots, [place.k], day, counted.length > 0 ? counted : roots),
         single == null
