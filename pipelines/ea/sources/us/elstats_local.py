@@ -17,7 +17,7 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
@@ -190,6 +190,8 @@ STAGES = {
     "Special Election": "special",
     "Special": "special",
     "Municipal": "municipal",
+    "Primary Election": "primary",
+    "Primary": "primary",
 }
 ALIASES = {
     "silver": "silvercity",
@@ -279,6 +281,9 @@ def parse() -> None:
                     pl.col("candidate_id").alias("candidate"),
                     pl.col("candidate_name").str.replace_all(r"\s+", " ").str.strip_chars().alias("name"),
                     pl.col("candidate_party_name").alias("party"),
+                    pl.when(pl.col("election_type").str.contains("Primary"))
+                    .then(pl.col("primary_party"))
+                    .alias("scope"),
                     pl.col("division_type").replace_strict(RANKS, return_dtype=pl.Int8).alias("rank"),
                     pl.col("number_seats").cast(pl.Int16).alias("magnitude"),
                     pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64).alias("votes"),
@@ -299,7 +304,9 @@ def parse() -> None:
     )
     frame = (
         frame.filter(pl.col("rank") == pl.col("rank").min().over("state", "contest"))
-        .group_by("state", "contest", "day", "stage", "office", "type", "district", "candidate", "name", "magnitude")
+        .group_by(
+            "state", "contest", "day", "stage", "scope", "office", "type", "district", "candidate", "name", "magnitude"
+        )
         .agg(pl.col("party").drop_nulls().first(), pl.col("votes").sum(), pl.col("winner").mean() > 0.5)
     )
     with zipfile.ZipFile(raw.cached(ALGED, SCHOOLS[0]).path) as archive:
@@ -431,7 +438,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="County, city, town, and school board elections from the archives of Virginia, New Hampshire, Idaho, New Mexico, Connecticut, and Vermont",
+            summary="County, city, town, and school board elections and primaries from the archives of Virginia, New Hampshire, Idaho, New Mexico, Connecticut, and Vermont",
             polity="US",
         )
 
@@ -535,6 +542,7 @@ def emit() -> Path:
                 valid_from=None,
             )
         systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
+        labels = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         parties = {label: cs.key("us.party", key) for label, key in PARTIES.items()}
         if cs.minted & {*systems.values(), *parties.values()}:
             raise ValueError("the systems and parties must already exist")
@@ -604,24 +612,27 @@ def emit() -> Path:
                 name(owner, title)
             owners.add(owner)
 
-            general = day.month == 11 and stage != "municipal"
-            parent = cs.key("us.election", f"{day}:{state}")
+            primary = stage == "primary"
+            kind_of = "primary" if primary else "general" if day.month == 11 and stage != "municipal" else "local"
+            parent = cs.key("us.election", f"{day}:{state}" + (":primary" if primary else ""))
             if parent in cs.minted and parent not in elections:
                 elections.add(parent)
                 cs.add(
                     "election",
                     id=parent,
                     polity_id=states[state][0],
-                    kind="general" if general else "local",
+                    kind=kind_of,
                     date_from=day,
                     date_to=day,
                     date_precision="day",
                     status="held",
                 )
-                name(parent, f"{day.year} {states[state][1]} {'general' if general else 'local'} elections")
-                cs.add("slug", path=f"us/{state.lower()}/{day}-{'general' if general else 'local'}", entity_id=parent)
-            kind_of = "general" if general else "local"
-            election = cs.key("us.election", f"{day}:{state}:{code}")
+                name(
+                    parent,
+                    f"{day.year} {states[state][1]} " + ("primary" if primary else f"{kind_of} elections"),
+                )
+                cs.add("slug", path=f"us/{state.lower()}/{day}-{kind_of}", entity_id=parent)
+            election = cs.key("us.election", f"{day}:{state}:{code}" + (":primary" if primary else ""))
             if election in cs.minted and election not in elections:
                 elections.add(election)
                 cs.add(
@@ -665,6 +676,20 @@ def emit() -> Path:
             contest = cs.key("us.contest", contest_key)
             magnitude = first["magnitude"] or 1
             special = stage == "special"
+            scope = first["scope"]
+            label = (
+                PARTIES.get(scope or "")
+                or next(
+                    (
+                        key
+                        for key in (f"{state}:{slug(scope)}-party", f"{state}:{slug(scope)}", f"{slug(scope)}-party")
+                        if key in labels
+                    ),
+                    None,
+                )
+                if scope
+                else None
+            )
             cs.add(
                 "contest",
                 id=contest,
@@ -672,6 +697,7 @@ def emit() -> Path:
                 kind="office" if kind else "body_seats",
                 office_id=owner if kind else None,
                 body_id=None if kind else owner,
+                party_scope_id=None if label is None else cs.key("us.party", label),
                 district_area_id=area,
                 magnitude=magnitude,
                 round_number=1,
@@ -683,9 +709,14 @@ def emit() -> Path:
                 contest,
                 (f"{day.year} {place} mayoral election" if key == "mayor" else f"{day.year} {title} election")
                 + (f", {seat}" if seat else "")
+                + (f", {scope} primary" if primary else "")
                 + (" (special)" if special else ""),
             )
-            contest_path = f"{path}/{day}-{kind_of}/{key}" + (f"-{slug(seat)}" if seat else "")
+            contest_path = (
+                f"{path}/{day}-{kind_of}/{key}"
+                + (f"-{slug(seat)}" if seat else "")
+                + (f"-{slug(scope or 'open')}" if primary else "")
+            )
             contest_path += "-special" if special else ""
             suffix = 1
             candidate = held.get(contest)
@@ -758,7 +789,13 @@ def emit() -> Path:
                         is_independent=party == "Independent",
                     )
                     if winner if flagged else rank <= magnitude and votes > 0:
-                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind="won" if primary else "elected",
+                            seats=None,
+                        )
                 if result_set in cs.minted:
                     cs.add(
                         "result_value",
