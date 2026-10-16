@@ -26,6 +26,15 @@ const CYCLE = sql`
     )
   )::int
 `;
+const fused = (option: SQL, contest: SQL) => sql`
+  (
+    select ch.party_id from contest_option ch
+    join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
+    join result_rollup x on x.result_set_k = rs.k and x.option_k = ch.k
+    where ch.contest_id = ${contest} and ch.parent_option_id = ${option} and ch.party_id is not null
+    group by ch.id, ch.party_id order by max(x.value) desc, ch.id limit 1
+  )
+`;
 const paint = (party: SQL, elections: SQL, date: SQL) => sql`
   coalesce(
     (select pc.color from party_color pc where pc.party_id = ${party} and pc.valid @> ${date}),
@@ -981,7 +990,7 @@ async function holders(
     isElected: boolean;
   }>(sql`
     select c.id as contest, c.district_area_id as area, s.path, o.k, o.kind::text as kind,
-      coalesce(pm.into_id, o.party_id) as party, coalesce(x.seats, 1) as seats,
+      coalesce(pm.into_id, lp.party) as party, coalesce(x.seats, 1) as seats,
       coalesce(m.into_id, y.person_id) as person, y.list_position as position,
       coalesce(y.seated, false) as "isSeated", coalesce(y.elected, false) as "isElected"
     from contest c
@@ -989,7 +998,8 @@ async function holders(
     join result_set rs on rs.contest_id = c.id and rs.is_default
     join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and (x.seats > 0 or (x.seats is null and x.kind in ('elected', 'won')))
     join contest_option o on o.id = x.option_id
-    left join entity_merge pm on pm.entity_id = o.party_id
+    cross join lateral (select coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) as party) lp
+    left join entity_merge pm on pm.entity_id = lp.party
     left join lateral (
       select cy.person_id, cy.list_position,
         exists (
@@ -4488,9 +4498,12 @@ export const people = {
         ),
         mine as materialized (
           select o.id as option, o.contest_id, cd.id as candidacy, cd.role,
-            coalesce(pm.into_id, cd.member_of_party_id, o.party_id) as party
+            coalesce(pm.into_id, lp.party) as party
           from candidacy cd join contest_option o on o.id = cd.option_id
-          left join entity_merge pm on pm.entity_id = coalesce(cd.member_of_party_id, o.party_id)
+          cross join lateral (
+            select coalesce(cd.member_of_party_id, o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) as party
+          ) lp
+          left join entity_merge pm on pm.entity_id = lp.party
           where cd.person_id in (select id from ids) and cd.role in ('head', 'list_member')
         ),
         lines as materialized (
@@ -4815,7 +4828,8 @@ export const parties = {
         seated as (
           select w.root, coalesce(sum(w.seats) filter (where w.mine), 0) as seats, sum(w.seats) as filled
           from (
-            select r.id as root, o.id, bool_or(o.party_id in (select id from ids)) as mine,
+            select r.id as root, o.id,
+              bool_or(coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) in (select id from ids)) as mine,
               max(coalesce(x.seats, 1)) as seats
             from roots r
             join lateral (
