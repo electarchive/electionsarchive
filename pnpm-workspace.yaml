@@ -60,9 +60,11 @@ catalog:
   eslint-plugin-svelte: ^3.23.1
   formsnap: ^2.0.1
   knip: ^6.41.0
+  maplibre-gl: ^6.14.0
   mode-watcher: ^1.1.0
   oxfmt: ^0.72.0
   pg: ^8.23.1
+  pmtiles: ^4.5.0
   resend: ^6.32.1
   satori: 0.57.2
   shadcn-svelte: ^1.7.0

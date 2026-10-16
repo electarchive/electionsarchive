@@ -833,6 +833,7 @@
       places={contest.places}
       {span}
       {publishers}
+      {boundaries}
       votes={counted ?? m.col_votes()}
       bind:only={
         () => only,

@@ -518,5 +518,19 @@
   "polity_kind_county": "Counties",
   "polity_kind_municipality": "Municipalities",
   "polity_kind_label": "Place type",
-  "scope_home": "Everything in {place}"
+  "scope_home": "Everything in {place}",
+  "map_label": "Map of results by {noun}",
+  "map_hint": "Use arrow keys to move between places and Enter to open one.",
+  "map_zoom_in": "Zoom in",
+  "map_zoom_out": "Zoom out",
+  "map_reset": "Show the whole map",
+  "map_margin": "Winner's margin",
+  "map_margin_under": "Under {points}",
+  "map_margin_over": "{points} or more",
+  "map_open": "Open {place}",
+  "map_loading": "Loading map",
+  "map_gesture_windows": "Hold Ctrl and scroll to zoom",
+  "map_gesture_mac": "Hold ⌘ and scroll to zoom",
+  "map_gesture_mobile": "Use two fingers to move the map",
+  "map_pick": "Hover over or tap a place to see its result."
 }

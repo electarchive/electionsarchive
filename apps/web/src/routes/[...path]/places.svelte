@@ -12,12 +12,14 @@
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import PlaceMap from "./map.svelte";
 
   let {
     places,
     span,
     publishers,
     votes,
+    boundaries = [],
     limit = 100,
     only = $bindable(null),
   }: {
@@ -32,6 +34,7 @@
     } | null;
     publishers: Array<string>;
     votes: string;
+    boundaries?: Extract<PageData, { kind: "contest" }>["boundaries"];
     limit?: number;
     only?: number | string | null;
   } = $props();
@@ -42,6 +45,7 @@
   let column = $state<"name" | "leader" | "margin" | "valid" | "shift">("name");
   let descending = $state(false);
   let all = $state(false);
+  let focus = $state<number | null>(null);
 
   const noun = $derived(
     places.levels.find((level) => level.code === places.level)?.noun ?? "",
@@ -175,6 +179,21 @@
         ]
       : []),
   ]);
+  const drawn = $derived.by(() => {
+    const level = boundaries.find((entry) => entry.scheme === places.level);
+    const own = boundaries.find((entry) => entry.scheme !== places.level);
+    return level?.tiles == null || own == null || own.frames.length === 0
+      ? null
+      : {
+          tiles: level.tiles,
+          own:
+            own.tiles == null || own.k == null
+              ? null
+              : { tiles: own.tiles, k: own.k },
+          frames: own.frames,
+          isApproximate: level.isApproximate,
+        };
+  });
   const foreign = $derived(
     places.sources.filter((publisher) => !publishers.includes(publisher)),
   );
@@ -362,6 +381,21 @@
     {/if}
   </div>
 
+  {#if drawn != null}
+    <PlaceMap
+      {places}
+      {colors}
+      tiles={drawn.tiles}
+      own={drawn.own}
+      frames={drawn.frames}
+      isApproximate={drawn.isApproximate}
+      {noun}
+      {votes}
+      {only}
+      bind:focus
+    />
+  {/if}
+
   <div class="-mx-2 overflow-x-auto">
     <table class="border-collapse text-sm/tight inline-full">
       <thead>
@@ -466,7 +500,12 @@
       <tbody>
         {#each visible as row, index (row.path ?? row.name)}
           <tr
-            class="group relative border-be border-border/60 last:border-be-0 hover:bg-secondary/70"
+            class={cn(
+              "group relative border-be border-border/60 last:border-be-0 hover:bg-secondary/70",
+              { "bg-secondary/70": focus === row.k },
+            )}
+            onpointerenter={() => (focus = row.k)}
+            onpointerleave={() => (focus = null)}
           >
             <th class="px-2 py-1.5 text-start font-normal" scope="row">
               {#if row.path == null}

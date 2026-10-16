@@ -85,6 +85,7 @@ const Places = v.nullable(
     ),
     rows: v.array(
       v.object({
+        k: v.number(),
         name: v.string(),
         path: v.nullable(v.string()),
         contest: v.boolean(),
@@ -1354,6 +1355,7 @@ async function tabulate(
           entry.key !== leader?.key,
       );
       return {
+        k: row.k,
         name: row.name,
         path: row.path,
         contest: row.isContest,
@@ -2569,6 +2571,15 @@ export const contests = {
           ),
           count: v.number(),
           missing: v.array(v.string()),
+          k: v.nullable(v.number()),
+          frames: v.array(
+            v.object({
+              west: v.number(),
+              south: v.number(),
+              east: v.number(),
+              north: v.number(),
+            }),
+          ),
         }),
       ),
     )
@@ -2602,6 +2613,39 @@ export const contests = {
               },
             ]),
       ].filter((group) => group.ids.length > 0);
+      const parts = await db.execute<{
+        west: number;
+        south: number;
+        east: number;
+        north: number;
+        share: number;
+      }>(sql`
+        with parts as (
+          select (ST_Dump(ST_SimplifyPreserveTopology(g.geom, 0.02))).geom as geom
+          from area_geometry g
+          where g.area_id = ${area.id}::uuid and g.valid @> ${day}::date
+        ),
+        clustered as (
+          select geom, ST_ClusterDBSCAN(ST_Envelope(geom), eps := 2, minpoints := 1) over () as cluster
+          from parts
+        ),
+        grouped as (
+          select ST_Extent(geom) as box, sum(ST_Area(geom) * cos(radians(ST_Y(ST_Centroid(geom))))) as size
+          from clustered group by cluster
+        )
+        select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north,
+          size / nullif(sum(size) over (), 0) as share
+        from grouped order by size desc
+      `);
+      const frames = parts.rows
+        .filter((part) => part.share >= 0.0005)
+        .slice(0, 6)
+        .map((part) => ({
+          west: part.west,
+          south: part.south,
+          east: part.east,
+          north: part.north,
+        }));
       const drawn = await Promise.all(
         groups.map(async (group) => {
           const found = await db.execute<{
@@ -2659,6 +2703,8 @@ export const contests = {
               missing: absent
                 .map((id) => labels.full.get(id) ?? "")
                 .toSorted((a, b) => a.localeCompare(b)),
+              k: group.ids.includes(area.id) ? area.k : null,
+              frames: group.ids.includes(area.id) ? frames : [],
             },
           ];
         }),
