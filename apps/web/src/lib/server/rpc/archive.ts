@@ -2075,7 +2075,8 @@ export const contests = {
            join outcome x on x.result_set_id = rs.id and x.candidacy_id is null
            join contest_option o on o.id = x.option_id
            left join entity_merge pm on pm.entity_id = o.party_id
-           where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and rs.is_default and rs.kind <> 'counted'
+           where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and rs.is_default
+             and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k))
            order by o.k
         `),
       ]);

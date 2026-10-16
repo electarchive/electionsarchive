@@ -302,6 +302,11 @@
       const isPartial =
         whole != null && race.count > 1 && whole.total > total * 1.25;
       const top = whole?.parts.toSorted((a, b) => b.value - a.value) ?? [];
+      const isRound =
+        race.round != null &&
+        election.races.some(
+          (other) => other !== race && other.name === race.name,
+        );
       return {
         ...race,
         change,
@@ -374,13 +379,10 @@
                   isCount: false,
                   isWhole: false,
                 },
-        name:
-          race.round != null &&
-          election.races.some(
-            (other) => other !== race && other.name === race.name,
-          )
-            ? m.race_round({ name: race.name, round: race.round })
-            : race.name,
+        isLater: isRound && (race.round ?? 1) > 1,
+        name: isRound
+          ? m.race_round({ name: race.name, round: race.round ?? 1 })
+          : race.name,
         votes: MEASURES[race.measure]?.() ?? m.col_votes(),
         isSlate: race.kind === "elector_slate",
         seated: seated.map((row) => ({
@@ -447,7 +449,9 @@
                       count: count(race.count),
                     })
                   : seated.length > 0 && !race.isOffice
-                    ? m.race_lede_seats({
+                    ? (isRound && race.round === 1
+                        ? m.race_lede_seats_first
+                        : m.race_lede_seats)({
                         party: named(leader),
                         seats: count(leader.seats ?? 0),
                         total: count(
@@ -494,7 +498,7 @@
   {#if races.length > 1}
     <ul class="mbs-2 grid gap-2 max-inline-[72ch]">
       {#each races.slice(0, 3) as race, index (index)}
-        {#if race.lede != null}
+        {#if race.lede != null && !race.isLater}
           <li class="grid gap-0.5 border-s-2 border-border ps-3">
             <a
               class="text-[0.8125rem] font-semibold text-muted-foreground hover:text-foreground"
@@ -638,7 +642,8 @@
     race.seated.length > 0 &&
       race.electors == null &&
       !race.isOffice &&
-      !race.isSlate,
+      !race.isSlate &&
+      (race.kind !== "body_seats" || race.body != null),
   )}
   {const isMapped = $derived(
     race.map != null && race.places != null && index < 4,

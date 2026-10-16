@@ -70,6 +70,7 @@
     tacit: m.declared_tacit,
     show_of_hands: m.declared_show_of_hands,
     appointed: m.declared_appointed,
+    counted: m.declared_counted,
   };
   const STATUSES: Record<string, () => string> = {
     superseded: m.status_superseded,
