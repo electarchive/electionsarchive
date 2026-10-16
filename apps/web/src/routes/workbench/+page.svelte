@@ -1,5 +1,7 @@
 <script lang="ts">
   import type { ViewSpec } from "@ea/view-spec";
+  import PlaceMap from "#routes/[...path]/map.svelte";
+  import Seats from "#routes/[...path]/seats.svelte";
   import { enhance } from "$app/forms";
   import { goto, replaceState } from "$app/navigation";
   import { resolve } from "$app/paths";
@@ -24,6 +26,7 @@
   import * as Popover from "#lib/components/ui/popover/index.js";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { getConfirmationContext } from "#lib/stores/confirmation.svelte.js";
   import { cn } from "#lib/utils.js";
@@ -35,7 +38,9 @@
   const { data }: { data: PageData } = $props();
 
   const KINDS = [
+    { value: "map", label: m.workbench_panel_map },
     { value: "bar", label: m.workbench_panel_results },
+    { value: "hemicycle", label: m.workbench_panel_coalition },
     { value: "table", label: m.workbench_panel_places },
     { value: "scatter", label: m.workbench_panel_scatter },
   ] as const;
@@ -152,6 +157,71 @@
     legend.find((entry) => entry.key === focus) ?? legend[0] ?? null,
   );
 
+  const outlines = createQuery(() => ({
+    ...orpc.contests.boundaries.queryOptions({
+      input: {
+        id: spec == null ? "" : decodeId(spec.data.contests[0] ?? ""),
+        level: current?.places?.level,
+      },
+    }),
+    enabled: current?.places != null,
+  }));
+  const drawn = $derived.by(() => {
+    const places = current?.places;
+    const found = outlines.data ?? [];
+    const level = found.find((entry) => entry.scheme === places?.level);
+    const own = found.find((entry) => entry.scheme !== places?.level);
+    return places == null ||
+      level?.tiles == null ||
+      own == null ||
+      own.frames.length === 0
+      ? null
+      : {
+          places,
+          tiles: level.tiles,
+          own:
+            own.tiles == null || own.k == null
+              ? null
+              : { tiles: own.tiles, k: own.k },
+          frames: own.frames,
+          isApproximate: level.isApproximate,
+          noun:
+            places.levels.find((entry) => entry.code === places.level)?.noun ??
+            level.noun,
+        };
+  });
+  const span = $derived.by(() => {
+    const target = current?.target;
+    const own = current?.election;
+    if (
+      target?.date == null ||
+      target.year == null ||
+      own?.date == null ||
+      own.year == null
+    ) {
+      return null;
+    }
+    const forward = target.date > own.date;
+    return {
+      from: String(forward ? own.year : target.year),
+      to: String(forward ? target.year : own.year),
+      forward,
+    };
+  });
+  const change = $derived.by(() => {
+    if (span == null || current?.chamber == null) {
+      return null;
+    }
+    const moves = current.rows.flatMap((row) => {
+      const before = span.forward ? row.current : row.earlier;
+      const after = span.forward ? row.earlier : row.current;
+      return before?.seats == null
+        ? []
+        : [[row.key, (after?.seats ?? 0) - before.seats] as const];
+    });
+    return moves.length === 0 ? null : Object.fromEntries(moves);
+  });
+
   const panels = $derived.by(() => {
     const placed: Array<{ x: number; y: number; w: number; h: number }> = [];
     return (spec?.panels ?? []).map((panel) => {
@@ -163,8 +233,8 @@
             : panel.kind;
       let area = panel.area;
       if (area == null) {
-        const w = kind === "table" ? COLUMNS : 6;
-        const h = kind === "table" ? 14 : 12;
+        const w = kind === "table" || kind === "map" ? COLUMNS : 6;
+        const h = kind === "map" ? 18 : kind === "table" ? 14 : 12;
         let y = 0;
         let x = 0;
         for (; ; y += 1) {
@@ -547,6 +617,7 @@
                     },
                     filters: [],
                     panels: spec?.panels ?? [
+                      { kind: "map", color: "winner" },
                       { kind: "chart", chart: "bar" },
                       { kind: "chart", chart: "scatter" },
                       { kind: "table" },
@@ -643,7 +714,9 @@
                   spec?.panels.push(
                     kind.value === "table"
                       ? { kind: "table" }
-                      : { kind: "chart", chart: kind.value },
+                      : kind.value === "map"
+                        ? { kind: "map", color: "winner" }
+                        : { kind: "chart", chart: kind.value },
                   );
                 }}>{kind.label()}</DropdownMenu.Item
               >
@@ -1003,6 +1076,50 @@
               />
             {:else if panel.kind === "table"}
               <Places contest={current} focus={focused} {picked} bind:hovered />
+            {:else if panel.kind === "map"}
+              {#if drawn == null}
+                <p class="px-3 py-6 text-sm text-muted-foreground">
+                  {m.workbench_map_none()}
+                </p>
+              {:else}
+                {#key drawn.tiles}
+                  <PlaceMap
+                    places={drawn.places}
+                    colors={legend.map((item) => swatch(item.color, item.key))}
+                    tiles={drawn.tiles}
+                    own={drawn.own}
+                    frames={drawn.frames}
+                    isApproximate={drawn.isApproximate}
+                    noun={drawn.noun}
+                    votes={m.col_votes()}
+                    names={legend.map((item) =>
+                      item.person == null
+                        ? (item.short ?? item.label)
+                        : item.label,
+                    )}
+                    levels={[]}
+                    {span}
+                  />
+                {/key}
+              {/if}
+            {:else if panel.kind === "hemicycle"}
+              {#if current.chamber == null}
+                <p class="px-3 py-6 text-sm text-muted-foreground">
+                  {m.workbench_coalition_none()}
+                </p>
+              {:else}
+                <div class="grid grid-cols-[minmax(0,1fr)] *:col-span-full!">
+                  <Seats
+                    parties={current.chamber.parties}
+                    places={current.chamber.places}
+                    here={current.chamber.here}
+                    place={current.scope.name}
+                    link={current.chamber.link}
+                    size={current.chamber.size}
+                    {change}
+                  />
+                </div>
+              {/if}
             {:else if panel.kind === "scatter"}
               <Scatter
                 contest={current}

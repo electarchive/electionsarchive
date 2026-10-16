@@ -73,6 +73,7 @@
     "vite-plugin-devtools-json": "catalog:"
   },
   "imports": {
-    "#lib/*": "./src/lib/*"
+    "#lib/*": "./src/lib/*",
+    "#routes/*": "./src/routes/*"
   }
 }
