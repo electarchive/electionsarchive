@@ -593,6 +593,95 @@ INDEPENDENTS_1961 = """
 62 3520 Mehmet Soylu
 64 2290 Alâaddin Ergönenç
 """
+SENATE_1964 = """
+04 86470 74908 74538 25350 38901 3862 0 6425
+05 125362 82223 81746 41783 35027 4514 422 0
+07 203631 107235 106385 67917 36321 2141 0 0
+08 92398 61934 61536 30121 30085 1261 69 0
+10 351902 183621 182613 114990 67623 0 0 0
+13 49631 38214 37961 9865 0 0 0 28096
+15 90309 53067 52766 27863 24246 0 657 0
+17 173840 106465 105889 68664 33357 3869 0 0
+19 217905 143583 142779 74924 58846 9009 0 0
+24 97651 73372 73082 33523 37678 0 1881 0
+25 244372 167966 167199 83692 68074 11477 3956 0
+26 182594 111679 110913 68784 36054 4520 1555 0
+30 29084 21768 21692 4994 9724 0 6974 0
+31 184952 100115 99389 39476 34705 0 0 25208
+32 114830 63217 62811 38765 24046 0 0 0
+34 906069 370793 366461 199549 147038 18757 0 1117
+36 218446 164700 163931 51602 88927 0 23402 0
+43 191913 118195 117415 73952 34155 9308 0 0
+47 153896 106484 106212 31313 47661 2343 24895 0
+49 69816 53412 53005 27542 20596 1387 0 3480
+53 115550 70174 69802 37622 30554 1626 0 0
+55 297729 193453 192457 122910 69557 0 0 0
+56 98087 61833 61598 20654 28607 0 12337 0
+60 204494 140039 139077 59269 56266 0 23542 0
+65 86947 73944 73738 3496 61411 277 8554 0
+66 179619 128097 127197 61238 54433 11024 502 0
+"""
+WINNERS_1964 = """
+04 CHP Salih Türkmen
+05 AP Macit Zeren
+07 AP Akif Tekin
+07 CHP Mehmet Pırıltı
+08 AP Ahmet Özdemir
+10 AP Hasan Ali Türker
+10 AP Mehmet Güler
+10 CHP Nejat Sarlıcalı
+13 - Ziya Şerefhanoğlu
+15 AP Faruk Kınaytürk
+17 AP Ziya Termen
+17 AP Nahit Altan
+19 AP Ahmet Şefaattin Yalçuk
+24 CHP Fehmi Baysoy
+25 AP Osman Alihocagil
+25 AP Edip Somunoğlu
+25 CHP Sakıp Hatunoğlu
+26 AP Ömer Ucuzal
+30 CHP Necip Seyhan
+31 AP Mustafa Deliveli
+31 CHP Enver Bahadırlı
+32 AP Mustafa Gülcügil
+34 AP Tekin Arıburnu
+34 AP Erdoğan Adalılar
+34 AP Zeki Gümüşoğlu
+34 AP Rifat Öztürkçine
+34 AP Şevket Akyürek
+34 AP Sami Kırdar
+34 CHP Mebrure Aksoley
+34 CHP Cemal Yıldırım
+34 CHP Ekrem Özden
+34 CHP Fikret Gündoğan
+36 AP Yusuf Ziya Ayrım
+36 CHP Sırrı Atalay
+36 CHP Mehmet Hazer
+43 AP İbrahim Ethem Erdinç
+43 AP Ahmet Orhan Akça
+47 AP Abdürrahman Bayar
+47 CHP Abdülkerim Saraçoğlu
+49 AP İsa Bingöl
+53 AP Osman Mecdi Ağun
+55 AP Fethi Tevetoğlu
+55 AP Refet Rendeci
+55 AP Enver Işıklar
+55 CHP Rıza Isıtan
+56 CHP Abdurrahman Kavak
+60 AP Ali Altuntaş
+60 CHP Zihni Betil
+65 CHP Ferit Melen
+66 AP İsmail Yeşilyurt
+66 CHP Sadık Artukmaç
+"""
+INDEPENDENTS_1964 = """
+04 6425 Halit Acarbay
+13 15966 Ziya Şerefhanoğlu
+13 12130 Besim Müftigil
+31 25208 Alâeddin Çilli
+34 1117 Kaya Şahin
+49 3480 Ahmet Bingöl
+"""
 PARTIES_1961 = {
     "AP": "adalet-partisi-1961",
     "CHP": "cumhuriyet-halk-partisi",
@@ -622,7 +711,30 @@ SENATE = {
         4,
         "senate_1961",
     ),
+    date(1964, 6, 7): (
+        11735,
+        "Karar no. 1471: 7 Haziran 1964 Cumhuriyet Senatosu Üyeleri seçiminin sonuçları",
+        (
+            "YSK decision 1471 (June 16, 1964), published in Resmî Gazete 11735 on June 23, 1964, gives the results "
+            "of the June 7, 1964 Senate of the Republic election in 26 provinces, which renewed a third of the elected "
+            "senators: the senators elected in each province, each independent candidate's votes, and each province's "
+            "voters, valid ballots, and party votes. The decision says some provinces' party votes do not add up to "
+            "their valid ballots and publishes them as reported, and its total of registered voters is 30 below the "
+            "sum of the provinces. Every count was read from the scan's text layer, checked against the printed "
+            "totals, and carries a page and bounding-box locator."
+        ),
+        PARTIES_1961,
+        SENATE_1964,
+        {4: 26},
+        (4767467, 2870491, 2852192, 1419858, 1173892, 85375, 108746, 64326),
+        WINNERS_1964,
+        {3: "04", 4: "56"},
+        INDEPENDENTS_1964,
+        4,
+        "senate_1964",
+    ),
 }
+MISADDED = {date(1964, 6, 7): {0}}
 SENATE_SYSTEMS = {
     "senate_1961": (
         {"formula": "block"},
@@ -631,6 +743,14 @@ SENATE_SYSTEMS = {
             "Each province, and each of the three districts of Ankara, İstanbul, and İzmir, elected its senators at "
             "large by plurality from party lists, with independents standing on their own. Voters could strike names "
             "from a list and write in candidates from other lists, so a district's seats could split between lists."
+        ),
+    ),
+    "senate_1964": (
+        {"formula": "dhondt"},
+        "Senate of the Republic D'Hondt, 1964",
+        (
+            "Law 447 of April 17, 1964 applied the National Assembly's election law (Law 306) to the Senate, so each "
+            "province's seats went to party lists and independent candidates by D'Hondt."
         ),
     ),
 }
@@ -707,16 +827,24 @@ def parse() -> None:
         for unit, (registered, voters, valid, *_) in rows:
             if not valid <= voters <= registered:
                 raise ValueError(f"{day}: {unit} does not add up")
-        if [sum(column) for column in zip(*(counts for _, counts in rows), strict=True)] != list(totals):
+        if any(
+            sum(column) != total and index not in MISADDED.get(day, ())
+            for index, (column, total) in enumerate(zip(zip(*(counts for _, counts in rows)), totals, strict=True))
+        ):
             raise ValueError(f"{day}: the Senate districts do not sum to the printed totals")
-        tables.append((day, issue, layout, rows))
+        tables.append((day, issue, layout, [(unit, counts[:-1]) for unit, counts in rows]))
         pdf = raw.cached(SOURCE, f"{ARCHIVE}/{issue}.pdf")
         listed = [line.split(maxsplit=2) for line in winners.strip().splitlines()]
         stood = [line.split(maxsplit=2) for line in independents.strip().splitlines()]
         independent_votes = {unit: counts[-1] for unit, counts in rows}
         for unit, votes, _ in stood:
             independent_votes[unit] -= int(votes)
-        if any(independent_votes.values()) or {party.rstrip("*") for _, party, _ in listed} - set(parties):
+        alone = {(unit, name) for unit, party, name in listed if party == "-"}
+        if (
+            any(independent_votes.values())
+            or {party.rstrip("*") for _, party, _ in listed} - {*parties, "-"}
+            or alone - {(unit, name) for unit, _, name in stood}
+        ):
             raise ValueError(f"{day}: the Senate candidates do not match the vote table")
         on = {at: scan.layer(pdf.path, at) for at in {*starts, page}}
         sizes = {}
@@ -727,12 +855,13 @@ def parse() -> None:
         current = min(starts)
         for unit, party, name in listed:
             current = max((at for at in starts if starts[at] <= unit), default=current)
-            names.append((day, unit, party.rstrip("*"), party.endswith("*"), name, None, current, None))
-        for index, (day_, unit, party, independent, name, votes, at, _) in enumerate(names):
+            if party != "-":
+                names.append((day, unit, party.rstrip("*"), party.endswith("*"), True, name, None, current, None))
+        for index, (day_, unit, party, independent, elected, name, votes, at, _) in enumerate(names):
+            if day_ != day:
+                continue
             matched = [
-                box
-                for text, box in on[at]
-                if day_ == day and slug(text) and any(slug(text) == slug(token) for token in name.split())
+                box for text, box in on[at] if slug(text) and any(slug(text) == slug(token) for token in name.split())
             ]
             lines: dict[int, list[scan.Box]] = {}
             for box in matched:
@@ -745,6 +874,7 @@ def parse() -> None:
                     unit,
                     party,
                     independent,
+                    elected,
                     name,
                     votes,
                     at,
@@ -774,6 +904,7 @@ def parse() -> None:
                     unit,
                     None,
                     True,
+                    (unit, name) in alone,
                     name,
                     int(votes),
                     page,
@@ -896,6 +1027,7 @@ def parse() -> None:
             "unit": pl.String,
             "party": pl.String,
             "independent": pl.Boolean,
+            "elected": pl.Boolean,
             "name": pl.String,
             "votes": pl.Int64,
             "page": pl.Int16,
@@ -1120,7 +1252,8 @@ def emit() -> Path:
                     district = cs.unit("tr.secim_cevresi", plate)
                     if district in cs.minted:
                         raise ValueError("publish tr.thea before tr.gazette")
-                elected = named.filter(pl.col("unit") == unit, pl.col("votes").is_null())
+                elected = named.filter(pl.col("unit") == unit, pl.col("elected"))
+                listed = named.filter(pl.col("unit") == unit, pl.col("votes").is_null())
                 stood = named.filter(pl.col("unit") == unit, pl.col("votes").is_not_null())
                 contest_key = f"{day}:senate:{unit}"
                 contest = cs.key("tr.contest", contest_key)
@@ -1159,7 +1292,7 @@ def emit() -> Path:
                 row = counted.filter(pl.col("unit") == unit)
                 lists = {}
                 for column, short in enumerate(parties, len(SENATE_COLUMNS)):
-                    seats = elected.filter(pl.col("party") == short).height
+                    seats = listed.filter(pl.col("party") == short).height
                     if seats == 0 and row.filter(pl.col("column") == column).is_empty():
                         continue
                     lists[short] = cs.key("tr.option", f"{contest_key}:{slug(labels[short])}")
@@ -1187,8 +1320,8 @@ def emit() -> Path:
                     cells.append(
                         (declared, district, None, SENATE_COLUMNS[column], value, page_ids[(day, page)], box, fresh)
                     )
-                for index, (_, _, party, independent, person_name, votes, page, box) in enumerate(
-                    [*elected.iter_rows(), *stood.iter_rows()], 1
+                for index, (_, _, party, independent, won, person_name, votes, page, box) in enumerate(
+                    [*listed.iter_rows(), *stood.iter_rows()], 1
                 ):
                     member = f"{day}:senate:{unit}:{index}"
                     person = cs.key(f"{SOURCE}.person", member)
@@ -1223,9 +1356,13 @@ def emit() -> Path:
                         cs.add(
                             "candidacy_nomination", candidacy_id=candidacy, party_id=party_ids[party], kind="nominated"
                         )
-                    if party is not None:
+                    if won:
                         cs.add(
-                            "outcome", result_set_id=declared, option_id=option, candidacy_id=candidacy, kind="elected"
+                            "outcome",
+                            result_set_id=declared,
+                            option_id=option,
+                            candidacy_id=None if party is None else candidacy,
+                            kind="elected",
                         )
                     cs.add(
                         "citation",
