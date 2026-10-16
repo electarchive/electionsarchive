@@ -15,14 +15,18 @@ from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, 
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_local"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
+LISTING2022 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/UYQIEP"
+LISTING2020 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NT66Z3"
 ACCESS = "https://dataverse.harvard.edu/api/access/datafile"
 LOCAL2016 = f"{ACCESS}/3345356?format=original"
 LOCAL2018 = f"{ACCESS}/6692669"
 DATASETS = {
     date(2024, 11, 5): ("Precinct-Level Returns 2024 by Individual State", "https://doi.org/10.7910/DVN/NYTPDU"),
+    date(2022, 11, 8): ("Precinct-Level Returns 2022 by Individual State", "https://doi.org/10.7910/DVN/UYQIEP"),
+    date(2020, 11, 3): ("Precinct-Level Returns 2020 by Individual State", "https://doi.org/10.7910/DVN/NT66Z3"),
     date(2018, 11, 6): ("Local Precinct-Level Returns 2018", "https://doi.org/10.7910/DVN/CHYXUP"),
     date(2016, 11, 8): ("Local Precinct-Level Returns 2016", "https://doi.org/10.7910/DVN/Q8OHRS"),
 }
@@ -291,26 +295,26 @@ VACANCY = re.compile(r"UNEXPIRED|VACANCY|\bT?FV\b|SHORT TERM")
 
 
 def fetch() -> None:
-    listing = raw.fetch(SOURCE, LISTING, suffix=".json")
-    for file in json.loads(listing.path.read_text())["data"]["latestVersion"]["files"]:
-        data = file["dataFile"]
-        raw.fetch(
-            SOURCE,
-            f"{ACCESS}/{data['id']}" + ("?format=original" if data["filename"].endswith(".tab") else ""),
-            suffix=".csv",
-        )
+    raw.fetch(SOURCE, LISTING2020, suffix=".json")
+    for listing, local in ((LISTING, False), (LISTING2022, True)):
+        raw.fetch(SOURCE, listing, suffix=".json")
+        for state, url in _files(listing, local).items():
+            raw.fetch(SOURCE, url, suffix=".zip" if state.endswith(".zip") else ".csv")
     raw.fetch(SOURCE, LOCAL2016, suffix=".csv")
     for fips in TOWNS.values():
         raw.fetch(SOURCE, SUBDIVISIONS.format(fips), suffix=".zip")
         raw.fetch(SOURCE, INCORPORATED.format(fips), suffix=".zip")
 
 
-def _files() -> dict[str, str]:
+def _files(listing: str, local: bool) -> dict[str, str]:
     files = {}
-    for file in json.loads(raw.cached(SOURCE, LISTING).path.read_text())["data"]["latestVersion"]["files"]:
+    for file in json.loads(raw.cached(SOURCE, listing).path.read_text())["data"]["latestVersion"]["files"]:
         data = file["dataFile"]
-        state = data["filename"].split("-")[1].upper()
-        files[state] = f"{ACCESS}/{data['id']}" + ("?format=original" if data["filename"].endswith(".tab") else "")
+        name = data["filename"].replace("_", "-")
+        if not name.endswith((".csv", ".tab", ".zip")) or "sorted" in name or local != ("-local-" in name):
+            continue
+        state = name.split("-")[1].upper() + (".zip" if name.endswith(".zip") else "")
+        files[state] = f"{ACCESS}/{data['id']}" + ("?format=original" if name.endswith(".tab") else "")
     return files
 
 
@@ -609,12 +613,28 @@ def parse() -> None:
     inputs = [
         *(
             (
-                state,
-                pl.scan_csv(raw.cached(SOURCE, url).path, infer_schema=False)
-                .filter(pl.col("dataverse") == "LOCAL", pl.col("stage").is_in(["GEN", "GEN RECOUNT"]))
-                .select(pl.lit(date(2024, 11, 5)).alias("day"), *columns),
+                state.removesuffix(".zip"),
+                (
+                    pl.read_csv(
+                        zipfile.ZipFile(path).read(zipfile.ZipFile(path).namelist()[0]), infer_schema=False
+                    ).lazy()
+                    if path.suffix == ".zip"
+                    else pl.scan_csv(path, infer_schema=False)
+                )
+                .filter(
+                    pl.col("dataverse").is_null() if local else pl.col("dataverse") == "LOCAL",
+                    pl.col("stage").is_in(["GEN", "GEN RECOUNT"]),
+                )
+                .select(pl.lit(day).alias("day"), *columns),
             )
-            for state, url in sorted(_files().items())
+            for listing, local, day in (
+                (LISTING, False, date(2024, 11, 5)),
+                (LISTING2022, True, date(2022, 11, 8)),
+                (LISTING2020, False, date(2020, 11, 3)),
+            )
+            for state, url in sorted(_files(listing, local).items())
+            if listing != LISTING2020 or state == "OR"
+            if (path := raw.cached(SOURCE, url).path)
         ),
         *(
             (state, scan.filter(pl.col("state_po") == state))
@@ -632,6 +652,7 @@ def parse() -> None:
             )
             .filter(
                 pl.col("candidate").is_not_null(),
+                pl.col("office").is_not_null(),
                 pl.col("county_fips").is_not_null(),
                 ~pl.col("candidate").str.to_uppercase().is_in([*DROPPED, *VACANT]),
             )
@@ -860,10 +881,15 @@ def emit() -> Path:
                 license="CC0 1.0",
                 license_url="https://creativecommons.org/publicdomain/zero/1.0/",
             )
-        cs.artifact(raw.cached(SOURCE, LISTING), sources[date(2024, 11, 5)])
-        files = _files()
-        for state in sorted(set(contests.filter(pl.col("day") == date(2024, 11, 5))["state_po"])):
-            cs.artifact(raw.cached(SOURCE, files[state]), sources[date(2024, 11, 5)])
+        for listing, local, day in (
+            (LISTING, False, date(2024, 11, 5)),
+            (LISTING2022, True, date(2022, 11, 8)),
+            (LISTING2020, False, date(2020, 11, 3)),
+        ):
+            cs.artifact(raw.cached(SOURCE, listing), sources[day])
+            files = {state.removesuffix(".zip"): url for state, url in _files(listing, local).items()}
+            for state in sorted(set(contests.filter(pl.col("day") == day)["state_po"])):
+                cs.artifact(raw.cached(SOURCE, files[state]), sources[day])
         cs.artifact(raw.cached(SOURCE, LOCAL2016), sources[date(2016, 11, 8)])
         cs.artifact(raw.cached(SOURCE, LOCAL2018), sources[date(2018, 11, 6)])
         taken = set(
