@@ -619,21 +619,38 @@ async function load(
     where (o.k = any(${sql.param([...optionKs])}::int[]) or o.contest_id = any(${sql.param(outcomes)}::uuid[]))
       and (o.k = any(${sql.param([...optionKs])}::int[]) or oc.kind is not null)
   `);
-  const backing = await db.execute<{ party: string; person: string }>(sql`
-    with recursive grp(id) as (
-      select unnest(${sql.param(roots)}::uuid[])
-      union all
-      select c.id from contest c join grp on c.allocation_parent_id = grp.id
-    )
-    select distinct coalesce(pm.into_id, n.party_id) as party, coalesce(m.into_id, cy.person_id) as person
-    from candidacy_nomination n
-    join candidacy cy on cy.id = n.candidacy_id
-    join contest_option o on o.id = cy.option_id
-    join grp on grp.id = o.contest_id
-    left join entity_merge pm on pm.entity_id = n.party_id
-    left join entity_merge m on m.entity_id = cy.person_id
-    where n.kind in ('endorsed', 'supported')
-  `);
+  const [backing, coalitions] = await Promise.all([
+    db.execute<{ party: string; person: string }>(sql`
+      with recursive grp(id) as (
+        select unnest(${sql.param(roots)}::uuid[])
+        union all
+        select c.id from contest c join grp on c.allocation_parent_id = grp.id
+      )
+      select distinct coalesce(pm.into_id, n.party_id) as party, coalesce(m.into_id, cy.person_id) as person
+      from candidacy_nomination n
+      join candidacy cy on cy.id = n.candidacy_id
+      join contest_option o on o.id = cy.option_id
+      join grp on grp.id = o.contest_id
+      left join entity_merge pm on pm.entity_id = n.party_id
+      left join entity_merge m on m.entity_id = cy.person_id
+      where n.kind in ('endorsed', 'supported')
+    `),
+    db.execute<{ alliance: string; party: string }>(sql`
+      select distinct on (m.alliance_id) m.alliance_id as alliance, coalesce(pm.into_id, m.party_id) as party
+      from alliance_member m
+      left join entity_merge pm on pm.entity_id = m.party_id
+      left join contest_option o on o.party_id = m.party_id and o.alliance_id = m.alliance_id
+      left join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+      where m.alliance_id = any(${sql.param([...new Set(options.rows.flatMap((row) => (row.party == null ? (row.alliance ?? []) : [])))])}::uuid[])
+      group by m.alliance_id, coalesce(pm.into_id, m.party_id)
+      order by m.alliance_id, count(x.*) desc
+    `),
+  ]);
+  const anchor = new Map(
+    coalitions.rows.map((row) => [row.alliance, row.party]),
+  );
+  const stand = (row: { party: string | null; alliance: string | null }) =>
+    row.party ?? anchor.get(row.alliance ?? "") ?? null;
   const entities = [
     ...new Set([
       ...options.rows.flatMap((row) =>
@@ -643,7 +660,9 @@ async function load(
     ]),
   ];
   const parties = [
-    ...new Set(options.rows.map((row) => row.party).filter((id) => id != null)),
+    ...new Set(
+      options.rows.map((row) => stand(row)).filter((id) => id != null),
+    ),
   ];
   const [labels, colors, positions] = await Promise.all([
     names(entities, date),
@@ -662,7 +681,7 @@ async function load(
   const top = Math.max(0, ...tallies.values());
   const independents = options.rows.filter(
     (row) =>
-      row.party == null &&
+      stand(row) == null &&
       row.person != null &&
       (tallies.get(row.k) ?? 0) >= top * 0.05,
   );
@@ -677,7 +696,7 @@ async function load(
   separate(
     color,
     options.rows.map(
-      (row) => [row.party ?? row.person, tallies.get(row.k) ?? 0] as const,
+      (row) => [stand(row) ?? row.person, tallies.get(row.k) ?? 0] as const,
     ),
   );
   const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
@@ -762,9 +781,9 @@ async function load(
               null,
             color:
               tints.get(row.k) ??
-              color.get(row.party ?? row.person ?? "") ??
+              color.get(stand(row) ?? row.person ?? "") ??
               null,
-            lean: lean.get(row.party ?? "") ?? null,
+            lean: lean.get(stand(row) ?? "") ?? null,
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
             seats: row.seats,
@@ -3396,6 +3415,7 @@ async function races(
       k: number | null;
       scheme: string | null;
       noun: string | null;
+      grouping: "alliance" | "party";
     }>(sql`
       with recursive tree(id, stage) as (
         select ${election}::uuid, false
@@ -3428,7 +3448,10 @@ async function races(
         e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
         coalesce(runs.ids, '{}') as runoffs,
         c.term is not distinct from 'remainder' as "isRemainder",
-        a.id as area, a.k, a.scheme_code as scheme, sc.noun
+        a.id as area, a.k, a.scheme_code as scheme, sc.noun,
+        case when exists (
+          select from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null
+        ) then 'alliance' else 'party' end as grouping
       from contest c
       join election e on e.id = c.election_id
       left join seat st on st.id = c.seat_id
@@ -3493,6 +3516,8 @@ async function races(
       const place = single?.place ?? nation;
       const districts = group.filter((row) => row.k != null);
       const first = districts[0];
+      const grouping =
+        group.find((row) => row.grouping === "alliance")?.grouping ?? "party";
       const counted = [
         ...group.flatMap((row) =>
           row.isCounted ? [row.id, ...row.runoffs] : [],
@@ -3540,7 +3565,7 @@ async function races(
               null,
               lineage,
               "party",
-              "party",
+              grouping,
             ),
         db.execute<{ from: string; to: string }>(sql`
           with recursive tree(id) as (
@@ -3578,7 +3603,7 @@ async function races(
       ]);
       const here = totals.get(place.k);
       const rows = (
-        here == null ? [] : compare(here.side, null, lineage, "party")
+        here == null ? [] : compare(here.side, null, lineage, "party", grouping)
       ).flatMap((row) =>
         row.current == null ? [] : [{ ...row, cell: row.current }],
       );

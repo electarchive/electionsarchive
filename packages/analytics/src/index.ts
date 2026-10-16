@@ -280,7 +280,8 @@ export function compare(
     return {
       key,
       label: named?.label ?? lead.label,
-      short: named == null ? lead.short : named.roster,
+      short:
+        named == null ? lead.short : named.roster === "" ? null : named.roster,
       color: anchor?.color ?? lead.color,
       lean: anchor?.lean ?? lead.lean,
       current: flatten(present),
