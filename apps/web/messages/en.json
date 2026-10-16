@@ -420,6 +420,7 @@
   "boundaries_title": "Boundaries",
   "boundaries_set": "{noun} shapes from the {vintage} boundary set",
   "boundaries_scheme": "{noun} shapes",
+  "map_boundaries": "Boundaries from {publishers}",
   "boundaries_approximate": "Approximate",
   "term_boundaries_approximate": "These shapes are reconstructed from other geography, such as historic counties and town locations, instead of surveyed boundary maps. Borders are approximate.",
   "boundaries_missing": "No shape for {names}",

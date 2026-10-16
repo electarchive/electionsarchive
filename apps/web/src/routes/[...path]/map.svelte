@@ -15,6 +15,7 @@
   import { count, percent, points } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -75,6 +76,7 @@
   const uid = $props.id();
   let maps = $state<Array<Maplibre.Map>>([]);
   let isLoaded = $state(false);
+  let credits = $state<Array<string>>([]);
   let pinned = $state<number | null>(null);
   let grab = $state<number | null>(null);
   let drag = $state(0);
@@ -468,7 +470,7 @@
     const built: Array<Maplibre.Map> = [];
     const cleanup: Array<() => void> = [];
     void (async () => {
-      const [maplibre, { Protocol }, worker] = await Promise.all([
+      const [maplibre, { Protocol, PMTiles }, worker] = await Promise.all([
         import("maplibre-gl"),
         import("pmtiles"),
         import("maplibre-gl/dist/maplibre-gl-worker.mjs?worker&url"),
@@ -480,6 +482,34 @@
       maplibre.setWorkerUrl(worker.default);
       const protocol = new Protocol();
       maplibre.addProtocol("pmtiles", protocol.tile);
+      void Promise.all(
+        [tiles, own?.tiles].flatMap((name) => {
+          if (name == null) {
+            return [];
+          }
+          const archive = new PMTiles(
+            `${globalThis.location.origin}/tiles/${name}.pmtiles`,
+          );
+          protocol.add(archive);
+          return [
+            archive
+              .getMetadata()
+              .then((meta) =>
+                String((meta as { attribution?: unknown }).attribution ?? ""),
+              ),
+          ];
+        }),
+      ).then((found) => {
+        if (!stop.signal.aborted) {
+          credits = [
+            ...new Set(
+              found.flatMap((text) =>
+                text.split("; ").filter((part) => part.trim() !== ""),
+              ),
+            ),
+          ];
+        }
+      });
       const tones = paint(host);
       cleanup.push(tones.done);
       const colorsNow = style(tones.read);
@@ -1266,6 +1296,25 @@
       </span>
     {/if}
   </div>
+  {#if credits.length > 0}
+    {const publishers = $derived(
+      credits.filter((credit) => !credit.startsWith("©")),
+    )}
+    <p class="px-1 text-xs text-muted-foreground">
+      {[
+        ...(publishers.length === 0
+          ? []
+          : [
+              m.map_boundaries({
+                publishers: new Intl.ListFormat(getLocale(), {
+                  type: "conjunction",
+                }).format(publishers),
+              }),
+            ]),
+        ...credits.filter((credit) => credit.startsWith("©")),
+      ].join(". ")}
+    </p>
+  {/if}
 
   <p class="px-1 text-[0.8125rem] text-muted-foreground sm:hidden">
     {m.map_pick_touch()}

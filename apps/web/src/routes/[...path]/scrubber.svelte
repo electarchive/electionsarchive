@@ -272,7 +272,9 @@
   });
   const government = $derived.by(() => {
     const from = step?.date ?? "";
-    const next = steps[index + 1]?.date ?? "9999";
+    const next =
+      steps[index + 1]?.date ??
+      `${Number(from.slice(0, 4)) + 2}${from.slice(4)}`;
     const all = record.data?.governments ?? [];
     return (
       all.find((entry) => entry.from > from && entry.from < next) ??
@@ -524,7 +526,7 @@
       <div class="grid content-start gap-4">
         <div class="grid gap-1 max-lg:hidden">
           <p
-            class="font-figures text-[clamp(3rem,7vw,5.5rem)] leading-[0.85] font-[800] tracking-[-0.03em]"
+            class="font-figures text-[clamp(3rem,7vw,5.5rem)] leading-[0.85] font-extrabold tracking-[-0.03em]"
             aria-live="polite"
           >
             {step?.year ?? ""}
