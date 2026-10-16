@@ -3404,6 +3404,7 @@ async function races(
       series: string;
       owner: string | null;
       office: string | null;
+      body: string | null;
       election: string;
       day: string | null;
       round: number | null;
@@ -3448,6 +3449,7 @@ async function races(
         case when c.kind = 'ballot_question' then c.id::text
           else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, c.party_scope_id, tree.stage) end as series,
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
+        case when c.kind = 'office' then null else c.body_id end as body,
         e.date_from::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", tree.stage as "isStage", z.seats as size,
         (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
@@ -3779,6 +3781,7 @@ async function races(
         path: single == null ? null : (slugs.get(single.id) ?? null),
         kind: head?.kind ?? "",
         isOffice: head?.isOffice ?? false,
+        body: head?.body ?? null,
         isStage: head?.isStage ?? false,
         round: head?.round ?? null,
         office: head?.office ?? null,
@@ -3902,6 +3905,7 @@ export const elections = {
             path: v.nullable(v.string()),
             kind: v.string(),
             isOffice: v.boolean(),
+            body: v.nullable(v.string()),
             round: v.nullable(v.number()),
             count: v.number(),
             electors: v.nullable(
@@ -5090,7 +5094,12 @@ export const polities = {
           "List every general election of a polity's own chambers and offices, with the seats each party won and each office's winner and share",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        body: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
     .output(
       v.object({
         series: v.array(
@@ -5111,6 +5120,7 @@ export const polities = {
                   v.object({
                     party: v.nullable(v.string()),
                     seats: v.number(),
+                    listed: v.number(),
                   }),
                 ),
               }),
@@ -5150,9 +5160,11 @@ export const polities = {
         party: string | null;
         seats: number;
         share: number | null;
+        listed: number | null;
       }>(sql`
         with recursive roots as materialized (
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
+            c.kind = 'list_allocation' as "isList",
             e.date_from as date, ${CYCLE} as year, a.k as area,
             case when e.polity_id = ${input.id}::uuid then e.id
               when g.polity_id = ${input.id}::uuid then g.id
@@ -5239,7 +5251,8 @@ export const polities = {
         select r.seat, bool_or(r."isOffice") as "isOffice", coalesce(r.link::text, r.year::text) as bucket,
           (array_agg(r.link))[1] as link,
           min(r.date)::text as date, min(r.year) as year, count(distinct r.id)::int as races,
-          w.party, sum(w.seats)::int as seats, avg(sh.share)::float8 as share
+          w.party, sum(w.seats)::int as seats, avg(sh.share)::float8 as share,
+          (sum(w.seats) filter (where r."isList"))::int as listed
         from roots r
         join won w on w.root = r.id
         left join shares sh on sh.root = r.id
@@ -5266,7 +5279,13 @@ export const polities = {
         from government g where g.polity_id = ${input.id}::uuid
         order by g.from_date
       `);
-      const seats = [...new Set(found.rows.map((row) => row.seat))];
+      const seats = [
+        ...new Set(
+          found.rows
+            .filter((row) => input.body == null || row.seat === input.body)
+            .map((row) => row.seat),
+        ),
+      ];
       const parties = [
         ...new Set([
           ...found.rows.flatMap((row) => row.party ?? []),
@@ -5327,7 +5346,11 @@ export const polities = {
                         ? first.share
                         : null,
                     parties: group
-                      .map((row) => ({ party: row.party, seats: row.seats }))
+                      .map((row) => ({
+                        party: row.party,
+                        seats: row.seats,
+                        listed: row.listed ?? 0,
+                      }))
                       .toSorted((a, b) => b.seats - a.seats),
                   };
                 })
@@ -5344,16 +5367,21 @@ export const polities = {
                     next.filled += point.filled;
                     next.share = null;
                     const merged = new Map(
-                      next.parties.map((entry) => [entry.party, entry.seats]),
+                      next.parties.map((entry) => [entry.party, { ...entry }]),
                     );
                     for (const entry of point.parties) {
-                      merged.set(
-                        entry.party,
-                        (merged.get(entry.party) ?? 0) + entry.seats,
-                      );
+                      const held = merged.get(entry.party) ?? {
+                        party: entry.party,
+                        seats: 0,
+                        listed: 0,
+                      };
+                      held.seats += entry.seats;
+                      held.listed += entry.listed;
+                      merged.set(entry.party, held);
                     }
-                    next.parties = [...merged]
-                      .map(([party, seats]) => ({ party, seats }))
+                    next.parties = merged
+                      .values()
+                      .toArray()
                       .toSorted((x, y) => y.seats - x.seats);
                     return [];
                   }
@@ -5361,7 +5389,7 @@ export const polities = {
                 }),
             };
           })
-          .filter((entry) => entry.points.length > 1)
+          .filter((entry) => entry.points.length > (input.body == null ? 1 : 0))
           .toSorted(
             (a, b) =>
               Number(b.isOffice) - Number(a.isOffice) ||
@@ -5671,6 +5699,426 @@ async function locate(
   return peers[Number(suffix[2]) - 1] ?? null;
 }
 
+async function chambers(polity: string) {
+  const found = await db.execute<{ id: string; kind: string }>(sql`
+    select b.id, b.kind::text as kind from body b
+    where b.polity_id = ${polity}::uuid and b.kind <> 'electoral_college'
+    order by b.kind, b.id
+  `);
+  const labels = await names(found.rows.map((row) => row.id));
+  const taken = new Map<string, number>();
+  return found.rows.map((row) => {
+    const name = labels.full.get(row.id) ?? "";
+    const base = segment(name);
+    const seen = (taken.get(base) ?? 0) + 1;
+    taken.set(base, seen);
+    return {
+      id: row.id,
+      kind: row.kind,
+      name,
+      slug: seen > 1 ? `${base}-${seen}` : base,
+    };
+  });
+}
+
+export const bodies = {
+  locate: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/bodies/locate",
+        summary:
+          "Find the chamber a /chambers/{polity}/{slug} path names, the polity given by its path",
+      }),
+    )
+    .input(v.object({ polity: v.string(), slug: v.string() }))
+    .output(v.object({ id: v.string(), polity: v.string() }))
+    .handler(async ({ input }) => {
+      const owner = await db.execute<{ id: string }>(sql`
+        select s.entity_id as id from slug s join polity p on p.id = s.entity_id
+        where s.path = ${input.polity} and s.is_current
+      `);
+      const polity = owner.rows[0]?.id;
+      const peers = polity == null ? [] : await chambers(polity);
+      const found = peers.find((row) => row.slug === input.slug);
+      if (polity == null || found == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      return { id: found.id, polity };
+    }),
+  get: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/bodies/{id}",
+        summary:
+          "Get a chamber: its size over time, the seats each party held after every election, and the governments that sat",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        name: v.string(),
+        kind: v.string(),
+        polity: v.object({
+          id: v.string(),
+          name: v.string(),
+          path: v.nullable(v.string()),
+        }),
+        crumbs: v.array(
+          v.object({ name: v.string(), path: v.nullable(v.string()) }),
+        ),
+        siblings: v.array(
+          v.object({ id: v.string(), name: v.string(), path: v.string() }),
+        ),
+        sizes: v.array(
+          v.object({
+            seats: v.number(),
+            from: v.nullable(v.string()),
+            to: v.nullable(v.string()),
+          }),
+        ),
+        tenures: v.number(),
+        makeup: v.array(
+          v.object({
+            start: v.string(),
+            parties: v.array(
+              v.object({ party: v.nullable(v.string()), seats: v.number() }),
+            ),
+          }),
+        ),
+        parties: v.array(
+          v.object({
+            id: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+            lean: v.nullable(v.number()),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        kind: string;
+        polity: string;
+        tenures: number;
+      }>(sql`
+        select b.kind::text as kind, b.polity_id as polity,
+          (select count(*)::int from tenure t where t.body_id = b.id) as tenures
+        from body b where b.id = ${input.id}::uuid
+      `);
+      const body = found.rows[0];
+      if (body == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const [labels, slugs, crumbs, peers, sizes, makeup] = await Promise.all([
+        names([input.id, body.polity]),
+        paths([body.polity]),
+        breadcrumbs(body.polity),
+        chambers(body.polity),
+        db.execute<{ seats: number; from: string | null; to: string | null }>(
+          sql`
+            select seats, lower(valid)::text as from, upper(valid)::text as to
+            from body_size where body_id = ${input.id}::uuid
+            order by lower(valid) nulls first
+          `,
+        ),
+        db.execute<{ start: string; party: string | null; seats: number }>(sql`
+          with t as materialized (
+            select t.id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id
+            from tenure t left join seat st on st.id = t.seat_id
+            where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
+          ),
+          starts as (
+            select t.from_date as start from t
+            group by t.from_date
+            having count(*) >= 0.15 * coalesce(
+              (select z.seats from body_size z where z.body_id = ${input.id}::uuid and z.valid @> t.from_date limit 1),
+              (select max(n) from (select count(*) as n from t group by from_date) m)
+            )
+          ),
+          sat as (
+            select s.start, t.id from starts s join t on t.from_date <= s.start and t.to_date > s.start
+            where not exists (select from starts l where l.start > s.start and l.start < s.start + 90)
+          ),
+          fallback as materialized (
+            select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id) as party
+            from t
+            join contest_option o on o.contest_id = t.contest_id
+              or o.contest_id in (select k.id from contest k where k.allocation_parent_id = t.contest_id)
+            join candidacy cd on cd.option_id = o.id and cd.person_id = t.person_id
+            left join contest_option po on po.id = o.parent_option_id
+            left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
+            order by t.id
+          )
+          select s.start::text as start, coalesce(
+            (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
+              left join entity_merge pm on pm.entity_id = a.party_id
+              where a.tenure_id = s.id and a.kind = 'party' and a.party_id is not null
+              order by coalesce(a.valid @> s.start, false) desc, lower(a.valid) nulls first limit 1),
+            f.party
+          ) as party, count(*)::int as seats
+          from sat s left join fallback f on f.id = s.id
+          group by 1, 2 order by 1, 3 desc
+        `),
+      ]);
+      const home = slugs.get(body.polity) ?? null;
+      const held = [...new Set(makeup.rows.flatMap((row) => row.party ?? []))];
+      const [colors, positions] = await Promise.all([
+        refs(held),
+        db.execute<{ party_id: string; lean: number }>(sql`
+          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+          where party_id = any(${sql.param(held)}::uuid[])
+          order by party_id, valid_from desc nulls last
+        `),
+      ]);
+      const lean = new Map(
+        positions.rows.map((row) => [row.party_id, row.lean]),
+      );
+      return {
+        name: labels.full.get(input.id) ?? "",
+        kind: body.kind,
+        polity: {
+          id: body.polity,
+          name: labels.full.get(body.polity) ?? "",
+          path: home,
+        },
+        crumbs,
+        siblings:
+          home == null
+            ? []
+            : peers.map((peer) => ({
+                id: peer.id,
+                name: peer.name,
+                path: `chambers/${home}/${peer.slug}`,
+              })),
+        sizes: sizes.rows,
+        tenures: body.tenures,
+        makeup: Map.groupBy(makeup.rows, (row) => row.start)
+          .entries()
+          .map(([start, rows]) => ({
+            start,
+            parties: rows.map((row) => ({
+              party: row.party,
+              seats: row.seats,
+            })),
+          }))
+          .toArray(),
+        parties: held.map((id) => ({
+          ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
+          lean: lean.get(id) ?? null,
+        })),
+      };
+    }),
+  members: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/bodies/{id}/members",
+        summary:
+          "List who sat in a chamber during the term that began at an election, with each member's party, seat, and tenure; where the archive holds no tenures, the members the election returned",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        from: v.pipe(v.string(), v.isoDate()),
+        until: v.optional(v.pipe(v.string(), v.isoDate())),
+      }),
+    )
+    .output(
+      v.object({
+        start: v.nullable(v.string()),
+        end: v.nullable(v.string()),
+        isSeated: v.boolean(),
+        members: v.array(
+          v.object({
+            person: v.string(),
+            name: v.string(),
+            party: v.nullable(v.string()),
+            left: v.nullable(v.string()),
+            place: v.nullable(v.string()),
+            path: v.nullable(v.string()),
+            seat: v.nullable(v.string()),
+            from: v.nullable(v.string()),
+            to: v.nullable(v.string()),
+            acquired: v.nullable(v.string()),
+            ended: v.nullable(v.string()),
+            isVoting: v.boolean(),
+          }),
+        ),
+        parties: v.array(
+          v.object({
+            id: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+            lean: v.nullable(v.number()),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const until = input.until ?? null;
+      const window = await db.execute<{
+        start: string | null;
+        end: string | null;
+      }>(sql`
+        select
+          (select t.from_date::text from tenure t
+            where t.body_id = ${input.id}::uuid and t.from_date >= ${input.from}::date
+              and (${until}::date is null or t.from_date < ${until}::date)
+            group by t.from_date order by count(*) desc, t.from_date limit 1) as start,
+          (select t.from_date::text from tenure t
+            where t.body_id = ${input.id}::uuid and ${until}::date is not null
+              and t.from_date >= ${until}::date and t.from_date < ${until}::date + 400
+            group by t.from_date order by count(*) desc, t.from_date limit 1) as end
+      `);
+      const start = window.rows[0]?.start ?? null;
+      const end = window.rows[0]?.end ?? until;
+      const seated =
+        start == null
+          ? null
+          : await db.execute<{
+              person: string;
+              party: string | null;
+              left: string | null;
+              place: string | null;
+              contest: string | null;
+              seat: string | null;
+              from: string | null;
+              to: string | null;
+              acquired: string;
+              ended: string | null;
+              isVoting: boolean;
+            }>(sql`
+              select t.person_id as person, t.from_date::text as from, t.to_date::text as to,
+                coalesce(s.voting, true) as "isVoting",
+                t.acquired_via::text as acquired, t.ended_via::text as ended, t.contest_id as contest,
+                s.label as seat, coalesce(s.district_area_id, c.district_area_id, pc.district_area_id) as place,
+                coalesce(
+                  (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
+                    left join entity_merge pm on pm.entity_id = a.party_id
+                    where a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
+                    order by coalesce(a.valid @> greatest(t.from_date, ${start}::date), false) desc,
+                      lower(a.valid) nulls first limit 1),
+                  (select coalesce(pm.into_id, o.party_id, po.party_id) from contest_option o
+                    join candidacy cd on cd.option_id = o.id and cd.person_id = t.person_id
+                    left join contest_option po on po.id = o.parent_option_id
+                    left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
+                    where o.contest_id = t.contest_id or o.contest_id in (
+                      select k.id from contest k where k.allocation_parent_id = t.contest_id)
+                    limit 1)
+                ) as party,
+                (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
+                  left join entity_merge pm on pm.entity_id = a.party_id
+                  where a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
+                  order by lower(a.valid) desc nulls last limit 1) as left
+              from tenure t
+              left join seat s on s.id = t.seat_id
+              left join contest c on c.id = t.contest_id
+              left join contest pc on pc.id = c.allocation_parent_id
+              where t.body_id = ${input.id}::uuid
+                and coalesce(t.from_date, '-infinity'::date) < coalesce(${end}::date, 'infinity'::date)
+                and coalesce(t.to_date, 'infinity'::date) > ${start}::date
+              order by t.from_date, t.person_id
+            `);
+      const returned =
+        seated == null || seated.rows.length === 0
+          ? await db.execute<{
+              person: string;
+              party: string | null;
+              place: string | null;
+              contest: string;
+            }>(sql`
+              with picked as (
+                select c.id, c.district_area_id, c.allocation_parent_id from contest c
+                join election e on e.id = c.election_id
+                where c.body_id = ${input.id}::uuid and e.date_from >= ${input.from}::date
+                  and e.date_from < coalesce(${until}::date, 'infinity'::date)
+                  and e.kind in ('general', 'local')
+              )
+              select distinct on (cd.person_id) cd.person_id as person, c.id as contest,
+                coalesce(pm.into_id, o.party_id, po.party_id) as party,
+                coalesce(c.district_area_id, pc.district_area_id) as place
+              from picked c
+              left join contest pc on pc.id = c.allocation_parent_id
+              join contest_option o on o.contest_id = c.id
+              left join contest_option po on po.id = o.parent_option_id
+              join outcome x on x.option_id = o.id and x.kind = 'elected'
+              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              join candidacy cd on cd.option_id = o.id
+                and (cd.id = x.candidacy_id or (x.candidacy_id is null and cd.role = 'head'))
+              left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
+              order by cd.person_id, c.allocation_parent_id is null desc
+            `)
+          : null;
+      const rows =
+        returned == null
+          ? (seated?.rows ?? [])
+          : returned.rows.map((row) => ({
+              ...row,
+              left: null,
+              seat: null,
+              from: null,
+              to: null,
+              acquired: null,
+              ended: null,
+              isVoting: true,
+            }));
+      const parties = [
+        ...new Set(
+          rows
+            .flatMap((row) => [row.party, row.left])
+            .filter((id) => id != null),
+        ),
+      ];
+      const [labels, slugs, colors, positions] = await Promise.all([
+        names([
+          ...new Set([
+            ...rows.map((row) => row.person),
+            ...rows.flatMap((row) => row.place ?? []),
+          ]),
+        ]),
+        paths([...new Set(rows.flatMap((row) => row.contest ?? []))]),
+        refs(parties),
+        db.execute<{ party_id: string; lean: number }>(sql`
+          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+          where party_id = any(${sql.param(parties)}::uuid[])
+          order by party_id, valid_from desc nulls last
+        `),
+      ]);
+      const lean = new Map(
+        positions.rows.map((row) => [row.party_id, row.lean]),
+      );
+      return {
+        start,
+        end,
+        isSeated: returned == null,
+        members: rows.map((row) => ({
+          person: row.person,
+          name: labels.full.get(row.person) ?? "",
+          party: row.party,
+          left: row.left === row.party ? null : row.left,
+          place:
+            row.place == null ? null : (labels.full.get(row.place) ?? null),
+          path: row.contest == null ? null : (slugs.get(row.contest) ?? null),
+          seat: row.seat,
+          from: row.from,
+          to: row.to,
+          acquired: row.acquired,
+          ended: row.ended,
+          isVoting: row.isVoting,
+        })),
+        parties: parties.map((id) => ({
+          ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
+          lean: lean.get(id) ?? null,
+        })),
+      };
+    }),
+};
+
 export const entities = {
   path: os
     .meta(
@@ -5678,7 +6126,7 @@ export const entities = {
         method: "GET",
         path: "/entities/{id}/path",
         summary:
-          "Resolve any entity's ID to its canonical page path: a polity's, election's, or contest's slug, /people/{slug} for a person, and /parties/{polity}/{slug} for a party",
+          "Resolve any entity's ID to its canonical page path: a polity's, election's, or contest's slug, /people/{slug} for a person, /parties/{polity}/{slug} for a party, and /chambers/{polity}/{slug} for a chamber",
       }),
     )
     .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
@@ -5702,6 +6150,25 @@ export const entities = {
       }
       if (entity.slug != null) {
         return { path: entity.slug };
+      }
+      if (entity.type === "body") {
+        const owner = await db.execute<{
+          polity: string;
+          path: string | null;
+        }>(sql`
+          select b.polity_id as polity,
+            (select s.path from slug s where s.entity_id = b.polity_id and s.is_current) as path
+          from body b where b.id = ${entity.id}::uuid
+        `);
+        const home = owner.rows[0];
+        const peers = home?.path == null ? [] : await chambers(home.polity);
+        const found = peers.find((row) => row.id === entity.id);
+        return {
+          path:
+            found == null || home?.path == null
+              ? null
+              : `chambers/${home.path}/${found.slug}`,
+        };
       }
       if (entity.type !== "person" && entity.type !== "party") {
         return { path: null };

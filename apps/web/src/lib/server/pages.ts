@@ -167,6 +167,126 @@ export async function party(path: string) {
   return { kind: "party" as const, id, party, record, history };
 }
 
+function total(parties: Array<{ seats: number }>) {
+  let sum = 0;
+  for (const entry of parties) {
+    sum += entry.seats;
+  }
+  return sum;
+}
+
+export async function chamber(path: string) {
+  const segments = path.split("/");
+  const { id, polity } = await found(
+    call(router.bodies.locate, {
+      polity: segments.slice(0, -1).join("/"),
+      slug: segments.at(-1) ?? "",
+    }),
+  );
+  const [body, record] = await Promise.all([
+    call(router.bodies.get, { id }),
+    call(router.polities.record, { id: polity, body: id }),
+  ]);
+  const points = record.series[0]?.points ?? [];
+  const size = (on: string) =>
+    (
+      body.sizes.find(
+        (entry) =>
+          entry.from != null &&
+          entry.from >= on &&
+          Date.parse(entry.from) - Date.parse(on) < 3.5e10,
+      ) ??
+      body.sizes.find(
+        (entry) =>
+          (entry.from == null || entry.from <= on) &&
+          (entry.to == null || entry.to > on),
+      )
+    )?.seats ?? null;
+  const covered = body.makeup.filter((term) => {
+    const seats = size(term.start);
+    return seats == null || total(term.parties) >= 0.85 * seats;
+  });
+  const isSeated =
+    body.makeup.length > 0 && covered.length >= 0.8 * body.makeup.length;
+  const results = points.map((point) => {
+    const listed = point.parties
+      .filter((entry) => entry.listed > 0)
+      .map((entry) => ({ party: entry.party, seats: entry.listed }))
+      .toSorted((a, b) => b.seats - a.seats);
+    const seats = size(point.date) ?? point.filled;
+    return {
+      start: point.date,
+      parties:
+        total(point.parties) > seats && total(listed) >= 0.9 * seats
+          ? listed
+          : point.parties,
+      election: { name: point.name, path: point.path, date: point.date },
+    };
+  });
+  const first = Date.parse(body.makeup[0]?.start ?? "9999-12-31") - 2e10;
+  const earlier = results.filter((term) => Date.parse(term.start) < first);
+  const raw = isSeated
+    ? [
+        ...earlier,
+        ...body.makeup.map((term) => {
+          const point = points.findLast((entry) => entry.date <= term.start);
+          return {
+            start: term.start,
+            parties: term.parties,
+            election:
+              point == null ||
+              Date.parse(term.start) - Date.parse(point.date) > 8e10
+                ? null
+                : { name: point.name, path: point.path, date: point.date },
+          };
+        }),
+      ]
+    : results;
+  const terms = raw.map((term, index) => {
+    const next = raw[index + 1]?.start ?? null;
+    const lapse = body.sizes.find(
+      (entry) =>
+        entry.from != null &&
+        entry.from <= term.start &&
+        entry.to != null &&
+        entry.to > term.start &&
+        body.sizes.every((other) => other.from !== entry.to) &&
+        next != null &&
+        Date.parse(next) - Date.parse(entry.to) > 3.2e10,
+    )?.to;
+    return {
+      ...term,
+      end: lapse ?? next,
+      total: total(term.parties),
+      size: size(term.start),
+    };
+  });
+  const last = terms.at(-1);
+  const members =
+    last == null
+      ? null
+      : await call(router.bodies.members, { id, from: last.start });
+  return {
+    kind: "chamber" as const,
+    id,
+    body,
+    terms,
+    basis: isSeated
+      ? earlier.length > 0
+        ? ("mixed" as const)
+        : ("seated" as const)
+      : ("results" as const),
+    governments: record.governments,
+    parties: [
+      ...record.parties,
+      ...body.parties.filter((party) =>
+        record.parties.every((entry) => entry.id !== party.id),
+      ),
+    ],
+    members,
+  };
+}
+
 export async function archive(path: string, search: URLSearchParams) {
   const segments = path.split("/");
   const result = await db.execute<{

@@ -20,6 +20,7 @@
     change = null,
     partners = [],
     governing = [],
+    chamber = null,
   }: {
     parties: Array<{
       key: string;
@@ -44,6 +45,7 @@
     change?: Record<string, number> | null;
     partners?: Array<Array<string>>;
     governing?: Array<string>;
+    chamber?: string | null;
   } = $props();
 
   const uid = $props.id();
@@ -743,5 +745,11 @@
         >
       {/if}
     </div>
+  {/if}
+  {#if chamber != null}
+    <a
+      class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+      href={resolve("/id/[id]", { id: chamber })}>{m.chamber_open()}</a
+    >
   {/if}
 </section>

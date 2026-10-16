@@ -478,6 +478,7 @@
       isComplete={race.size != null || race.count === 1}
       partners={race.partners}
       governing={race.size === chamber?.size ? governing : []}
+      chamber={race.body}
     />
   {/if}
   <div

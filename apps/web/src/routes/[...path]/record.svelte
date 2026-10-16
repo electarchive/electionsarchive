@@ -221,6 +221,13 @@
         </h2>
         <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
           {current == null ? m.record_governments_lede() : m.record_lede()}
+          {#if current != null && !current.isOffice}
+            <a
+              class="font-semibold whitespace-nowrap text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href={resolve("/id/[id]", { id: current.id })}
+              >{m.chamber_open()}</a
+            >
+          {/if}
         </p>
       </div>
       {#if series.length > 1}

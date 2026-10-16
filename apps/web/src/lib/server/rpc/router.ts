@@ -1,4 +1,5 @@
 import {
+  bodies,
   contests,
   elections,
   entities,
@@ -9,6 +10,7 @@ import {
 } from "#lib/server/rpc/archive.js";
 
 export const router = {
+  bodies,
   contests,
   elections,
   entities,
