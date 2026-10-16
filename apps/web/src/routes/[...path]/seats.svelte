@@ -47,6 +47,7 @@
   let hovered = $state<string | null>(null);
   let picked = $state<Array<string>>([]);
   let active = $state<number | null>(null);
+  let isAllPaths = $state(false);
   let pointer = "mouse";
   let pressed: number | null = null;
 
@@ -249,6 +250,41 @@
     }
     return held;
   });
+
+  const paths = $derived.by(() => {
+    const holders = parties
+      .filter((party) => party.seats > 0)
+      .toSorted((a, b) => b.seats - a.seats)
+      .slice(0, 14);
+    const found: Array<{ keys: Array<string>; seats: number; span: number }> =
+      [];
+    for (let mask = 1; mask < 1 << holders.length; mask++) {
+      const members = holders.filter((_, index) => mask & (1 << index));
+      let held = 0;
+      for (const party of members) {
+        held += party.seats;
+      }
+      const smallest = Math.min(...members.map((party) => party.seats));
+      if (held < majority || held - smallest >= majority) {
+        continue;
+      }
+      const leans = members.map((party) => party.lean ?? Infinity);
+      found.push({
+        keys: ordered
+          .filter((party) => members.includes(party))
+          .map((party) => party.key),
+        seats: held,
+        span: leans.length === 1 ? 0 : Math.max(...leans) - Math.min(...leans),
+      });
+    }
+    return found.toSorted(
+      (a, b) =>
+        a.span - b.span || a.keys.length - b.keys.length || b.seats - a.seats,
+    );
+  });
+  const shorts = $derived(
+    new Map(parties.map((party) => [party.key, party.short ?? party.label])),
+  );
 
   const track = (
     event: PointerEvent & { currentTarget: EventTarget & SVGSVGElement },
@@ -605,4 +641,69 @@
       </li>
     {/each}
   </ul>
+  {#if whole && paths.length > 1}
+    <div class="grid gap-2 border-bs pbs-3">
+      <div class="grid gap-0.5">
+        <h3 class="text-[0.8125rem] font-bold">{m.seats_paths_title()}</h3>
+        <p class="text-xs text-muted-foreground">
+          {m.seats_paths_lede({ count: count(majority) })}
+        </p>
+      </div>
+      <ul class="grid gap-px">
+        {#each isAllPaths ? paths : paths.slice(0, 6) as path (path.keys.join())}
+          {const isPicked = $derived(
+            picked.length === path.keys.length &&
+              path.keys.every((key) => picked.includes(key)),
+          )}
+          <li>
+            <button
+              type="button"
+              class={cn(
+                "grid grid-cols-[minmax(0,1fr)_auto] items-center gap-x-3 gap-y-1 rounded-xs p-1.5 text-start  inline-full hover:bg-secondary",
+                { "ring-1 ring-foreground ring-inset": isPicked },
+              )}
+              aria-pressed={isPicked}
+              onclick={() => (picked = isPicked ? [] : [...path.keys])}
+            >
+              <span class="truncate text-[0.8125rem] font-semibold"
+                >{path.keys.map((key) => shorts.get(key)).join(" + ")}</span
+              >
+              <span class="font-mono text-[0.8125rem] tabular-nums"
+                >{count(path.seats)}</span
+              >
+              <span
+                class="relative col-span-2 flex overflow-hidden rounded-xs bg-muted block-1.5"
+                aria-hidden="true"
+              >
+                {#each path.keys as key (key)}
+                  <span
+                    style:inline-size="{((parties.find(
+                      (party) => party.key === key,
+                    )?.seats ?? 0) /
+                      totals.all) *
+                      100}%"
+                    style:background-color={colors.get(key)}
+                  ></span>
+                {/each}
+                <span
+                  class="absolute inset-y-0 bg-foreground inline-px"
+                  style:inset-inline-start="{(majority / totals.all) * 100}%"
+                ></span>
+              </span>
+            </button>
+          </li>
+        {/each}
+      </ul>
+      {#if paths.length > 6}
+        <button
+          type="button"
+          class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+          onclick={() => (isAllPaths = !isAllPaths)}
+          >{isAllPaths
+            ? m.seats_paths_fewer()
+            : m.seats_paths_more({ count: count(paths.length) })}</button
+        >
+      {/if}
+    </div>
+  {/if}
 </section>
