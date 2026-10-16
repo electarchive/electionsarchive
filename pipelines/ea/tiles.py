@@ -19,6 +19,8 @@ from area a join area_geometry g on g.area_id = a.id
 where a.scheme_code = %s and g.valid @> %s::date
 """
 
+DENSE = {"us.nyc_ed": 14}
+
 
 def build(prefix: str | None) -> str:
     started = time.monotonic()
@@ -58,12 +60,15 @@ def build(prefix: str | None) -> str:
                     "--quiet",
                     f"--attribution={attribution or ''}",
                     "--minimum-zoom=0",
-                    f"--maximum-zoom={12 if features >= 5_000 else 10}",
+                    f"--maximum-zoom={DENSE.get(scheme_code, 12 if features >= 5_000 else 10)}",
                     "--simplification=4",
                     "--detect-shared-borders",
                     "--exclude-all",
-                    "--no-tiny-polygon-reduction-at-maximum-zoom",
-                    "--drop-smallest-as-needed",
+                    *(
+                        ["--no-feature-limit", "--no-tile-size-limit", "--no-tiny-polygon-reduction", "--drop-rate=1"]
+                        if scheme_code in DENSE
+                        else ["--no-tiny-polygon-reduction-at-maximum-zoom", "--drop-smallest-as-needed"]
+                    ),
                     f"--named-layer=areas:{areas_path}",
                     f"--named-layer=labels:{labels_path}",
                 ],
