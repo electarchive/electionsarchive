@@ -18,6 +18,9 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://osf.io/download/tbwzd/"
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_place_500k.zip"
+SCHOOLS = [
+    f"https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_us_{kind}_500k.zip" for kind in ("unsd", "elsd", "scsd")
+]
 PUBLISHER = "de Benedictis-Kessner, Lee, Velez, and Warshaw"
 TITLE = "American Local Government Elections Database"
 STATES = {"Utah": "UT", "Maryland": "MD"}
@@ -63,7 +66,8 @@ YEAR = "The database gives only the year of this election."
 
 def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".csv")
-    raw.fetch(SOURCE, PLACES, suffix=".zip")
+    for url in [PLACES, *SCHOOLS]:
+        raw.fetch(SOURCE, url, suffix=".zip")
 
 
 def parse() -> None:
@@ -83,19 +87,31 @@ def parse() -> None:
         (pl.col("winner") == "win").alias("won"),
     )
     frame = frame.filter(
-        (pl.col("office") != "School Board")
-        & pl.col("fips").str.contains(r"^(\d{5}|\d{7})$")
-        & ~((pl.col("state") == "NC") & (pl.col("year") >= 2014))
+        pl.col("fips").str.contains(r"^(\d{5}|\d{7})$") & ~((pl.col("state") == "NC") & (pl.col("year") >= 2014))
+    ).with_columns(
+        fips=pl.when(pl.col("office") == "School Board").then(pl.lit("sd") + pl.col("fips")).otherwise("fips")
     )
-    with zipfile.ZipFile(raw.cached(SOURCE, PLACES).path) as archive:
-        parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
-    reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
-    wanted = set(frame.filter(pl.col("fips").str.len_chars() == 7)["fips"])
-    records = [
-        (record.as_dict(), json.dumps(shape.__geo_interface__))
-        for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True)
-        if record is not None and shape is not None and record["GEOID"] in wanted
-    ]
+    wanted = set(frame.filter(pl.col("fips").str.len_chars() > 5)["fips"])
+    records: list[tuple[dict[str, object], str]] = []
+    for url in [PLACES, *SCHOOLS]:
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+            parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
+        reader = shapefile.Reader(
+            shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
+        )
+        prefix = "" if url == PLACES else "sd"
+        records += [
+            (
+                {
+                    **record.as_dict(),
+                    "GEOID": prefix + str(record["GEOID"]),
+                    "LSAD": record["LSAD"] if url == PLACES else "SD",
+                },
+                json.dumps(shape.__geo_interface__),
+            )
+            for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True)
+            if record is not None and shape is not None and prefix + str(record["GEOID"]) in wanted
+        ]
     with connect() as conn:
         places = pl.DataFrame(
             conn.execute(
@@ -115,9 +131,9 @@ def parse() -> None:
             schema=["code", "name", "state", "lsad", "geom", "point"],
             orient="row",
         )
-    missing = frame.filter((pl.col("fips").str.len_chars() == 7) & ~pl.col("fips").is_in(places["code"]))
+    missing = frame.filter((pl.col("fips").str.len_chars() > 5) & ~pl.col("fips").is_in(places["code"].implode()))
     print(f"dropped {missing['contest'].n_unique()} contests in {missing['fips'].n_unique()} places missing from 2020")
-    frame = frame.filter((pl.col("fips").str.len_chars() == 5) | pl.col("fips").is_in(places["code"]))
+    frame = frame.filter((pl.col("fips").str.len_chars() == 5) | pl.col("fips").is_in(places["code"].implode()))
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "candidates.parquet")
     places.write_parquet(PARSED / "places.parquet")
@@ -131,7 +147,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Mayors, city councils, county boards and executives, sheriffs, and prosecutors, 1989–2021",
+            summary="Mayors, city councils, county boards and executives, sheriffs, prosecutors, and school boards, 1989–2021",
             polity="US",
         )
 
@@ -150,7 +166,16 @@ def emit() -> Path:
         )
         cs.artifact(raw.cached(SOURCE, URL), source)
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
-        cs.artifact(raw.cached(SOURCE, PLACES), census)
+        for url in [PLACES, *SCHOOLS]:
+            cs.artifact(raw.cached(SOURCE, url), census)
+        cs.add(
+            "scheme",
+            code="us.school_district",
+            polity_id=cs.polity("US"),
+            kind="administrative",
+            rank=3,
+            noun="school district",
+        )
         states = {
             iso[3:]: (polity, text)
             for iso, polity, text in conn.execute(
@@ -165,12 +190,18 @@ def emit() -> Path:
             """select c.code, t.polity_id, n.text, s.path, p.kind from area a
                join area_code c on c.area_id = a.id
                join polity_territory t on t.area_id = a.id
-               join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality')
+               join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality', 'school_district')
                join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                join slug s on s.entity_id = p.id
-               where a.scheme_code in ('us.county', 'us.place')"""
+               where a.scheme_code in ('us.county', 'us.place', 'us.school_district')"""
         ).fetchall():
-            polities[code] = (polity, text, path, "City" if kind == "municipality" else "County")
+            code = f"sd{code}" if kind == "school_district" else code
+            polities[code] = (
+                polity,
+                text,
+                path,
+                {"municipality": "City", "school_district": "School District"}.get(kind, "County"),
+            )
             if len(code) == 5 and text.startswith("City of "):
                 cities[(path.split("/")[1], text.removeprefix("City of "))] = code
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/%'").fetchall()}
@@ -182,22 +213,24 @@ def emit() -> Path:
                 continue
             if code in polities:
                 continue
-            polity = cs.key("us.polity", f"place:{code}")
+            school = code.startswith("sd")
+            geoid, scheme = code.removeprefix("sd"), "us.school_district" if school else "us.place"
+            polity = cs.key("us.polity", f"school:{geoid}" if school else f"place:{code}")
             path = f"us/{usps.lower()}/{slug(text)}"
             if path in taken:
                 path = f"us/{usps.lower()}/{slug(text)}-{slug(WORDS.get(lsad, 'City'))}"
             if path in taken:
                 raise ValueError(f"{text}, {usps} would take {path}")
             taken.add(path)
-            polities[code] = (polity, text, path, WORDS.get(lsad, "City"))
-            cs.add("polity", id=polity, kind="municipality", iso_code=None)
+            polities[code] = (polity, text, path, WORDS.get(lsad, "School District" if school else "City"))
+            cs.add("polity", id=polity, kind="school_district" if school else "municipality", iso_code=None)
             name(polity, text)
             cs.add("polity_parent", polity_id=polity, parent_id=states[usps][0])
             cs.add("slug", path=path, entity_id=polity)
-            area = cs.area("us.place", code)
-            cs.add("area", id=area, scheme_code="us.place")
-            cs.add("area_code", area_id=area, code=code, valid_from=None)
-            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", code[:2]))
+            area = cs.area(scheme, geoid)
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=geoid, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", geoid[:2]))
             name(area, f"{text}, {usps}")
             cs.add("polity_territory", polity_id=polity, area_id=area)
             cs.add(
@@ -209,14 +242,14 @@ def emit() -> Path:
                 quality="official",
                 source_id=census,
             )
-            if (unit := cs.unit("us.place", code)) not in cs.minted:
+            if (unit := cs.unit(scheme, geoid)) not in cs.minted:
                 continue
             cs.add(
                 "reporting_unit",
                 id=unit,
                 polity_id=polity,
-                scheme_code="us.place",
-                code=code,
+                scheme_code=scheme,
+                code=geoid,
                 area_relation="equals",
                 area_id=area,
                 kind="standard",
@@ -248,7 +281,8 @@ def emit() -> Path:
             polity, place, path, word = polities[code]
             city = len(code) == 5 and word == "City"
             place = place.removeprefix("City of ") if city else place
-            scheme = "us.place" if len(code) == 7 else "us.county"
+            geoid = code.removeprefix("sd")
+            scheme = {5: "us.county", 7: "us.place"}.get(len(code), "us.school_district")
             if office == "Mayor":
                 key, title, kind = "mayor", f"Mayor of {place}", "mayor"
             elif office == "City Council":
@@ -268,6 +302,8 @@ def emit() -> Path:
             elif office == "County Executive":
                 role = EXECUTIVES.get(usps, "County Executive")
                 key, title, kind = slug(role), f"{place} {role}", "other"
+            elif office == "School Board":
+                key, title, kind = "board-of-education", f"{place} Board of Education", None
             elif office == "Sheriff":
                 key, title, kind = "sheriff", f"{place} Sheriff", "other"
             else:
@@ -332,7 +368,10 @@ def emit() -> Path:
 
             text = first["district"] or ""
             seat = None
-            if office in ("City Council", "County Legislature") and text != first["geo_name"]:
+            if office in ("City Council", "County Legislature", "School Board") and text not in (
+                first["geo_name"],
+                "NA",
+            ):
                 label = re.sub(r"^synthetic ", "", text)
                 label = re.sub(r"^at-large [a-z]\b", "at-large", label)
                 if re.fullmatch(r"0*(\d+[a-z]?|[a-z])", label):
@@ -341,11 +380,11 @@ def emit() -> Path:
                     seat = re.sub(r"\b([a-z])", lambda found: found[1].upper(), label)
             remainder = "special" in text
             partial = seat is not None and not re.search(r"(?i)at[- ]?large", seat)
-            whole = cs.area(scheme, code)
-            unit = cs.unit(scheme, code)
+            whole = cs.area(scheme, geoid)
+            unit = cs.unit(scheme, geoid)
             area = whole
             if partial:
-                district = f"{code[:2]}:{code}:{key}:{slug(seat)}"
+                district = f"{geoid[:2]}:{code}:{key}:{slug(seat)}"
                 area = cs.area("us.local_district", district)
                 unit = cs.unit("us.local_district", district)
                 if area in cs.minted and district not in districts:
