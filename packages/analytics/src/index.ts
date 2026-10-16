@@ -15,6 +15,7 @@ export type Option = {
   outcome: string | null;
   seats: number | null;
   alliance: { id: string; label: string } | null;
+  line: string | null;
 };
 
 export type Side = {
@@ -38,6 +39,7 @@ export type Cell = {
   share: number;
   outcome: string | null;
   seats: number | null;
+  lines: Array<{ label: string; votes: number }>;
 };
 
 export type Row = {
@@ -62,7 +64,7 @@ const LINEAGE = new Set([
   "regional_branch",
 ]);
 
-type Group = { lead: Option; cell: Cell };
+type Group = { lead: Option; cell: Cell; members: Array<Option> };
 
 export function ancestry(relations: Array<Relation>, match: Match) {
   const parent = new Map<string, string>();
@@ -104,10 +106,13 @@ function tally(side: Side, identify: (option: Option) => string) {
           share: 0,
           outcome: option.outcome,
           seats: option.seats,
+          lines: [],
         },
+        members: [option],
       });
       continue;
     }
+    group.members.push(option);
     group.cell.votes += option.votes;
     group.cell.outcome ??= option.outcome;
     if (option.seats != null) {
@@ -122,6 +127,13 @@ function tally(side: Side, identify: (option: Option) => string) {
   }
   for (const group of groups.values()) {
     group.cell.share = side.valid > 0 ? group.cell.votes / side.valid : 0;
+    const lines = group.members.flatMap((member) =>
+      member.line == null || member.votes === 0
+        ? []
+        : [{ label: member.line, votes: member.votes }],
+    );
+    group.cell.lines =
+      lines.length < 2 ? [] : lines.toSorted((a, b) => b.votes - a.votes);
   }
   return groups;
 }

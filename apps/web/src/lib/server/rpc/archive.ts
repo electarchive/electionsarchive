@@ -114,6 +114,7 @@ const Cell = v.nullable(
     share: v.number(),
     outcome: v.nullable(v.string()),
     seats: v.nullable(v.number()),
+    lines: v.array(v.object({ label: v.string(), votes: v.number() })),
   }),
 );
 
@@ -679,9 +680,10 @@ async function load(
     outcome: string | null;
     seats: number | null;
     alliance: string | null;
+    is_line: boolean;
   }>(sql`
     select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
-      o.alliance_id as alliance,
+      o.alliance_id as alliance, o.parent_option_id is not null as is_line,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
@@ -880,6 +882,11 @@ async function load(
                     id: row.alliance,
                     label: labels.full.get(row.alliance) ?? "",
                   },
+            line: row.is_line
+              ? (labels.full.get(row.party ?? "") ??
+                /\(([^()]+)\)$/u.exec(row.label ?? "")?.[1] ??
+                row.label)
+              : null,
           })),
         backing: backers,
       },

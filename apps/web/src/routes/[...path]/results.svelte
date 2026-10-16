@@ -220,21 +220,35 @@
     ...(span == null ? [] : [`${there ?? ""} (%)`]),
   ]}
   rows={() =>
-    rows.map((row) => [
-      row.label,
-      row.current?.votes ?? null,
-      row.current == null ? null : Math.round(row.current.share * 1e6) / 1e4,
-      ...(seats == null ? [] : [row.current?.seats ?? null]),
-      row.current?.outcome == null
-        ? null
-        : (OUTCOMES[row.current.outcome]?.() ?? row.current.outcome),
-      ...(span == null
-        ? []
-        : [
-            row.earlier == null
-              ? null
-              : Math.round(row.earlier.share * 1e6) / 1e4,
-          ]),
+    rows.flatMap((row) => [
+      [
+        row.label,
+        row.current?.votes ?? null,
+        row.current == null ? null : Math.round(row.current.share * 1e6) / 1e4,
+        ...(seats == null ? [] : [row.current?.seats ?? null]),
+        row.current?.outcome == null
+          ? null
+          : (OUTCOMES[row.current.outcome]?.() ?? row.current.outcome),
+        ...(span == null
+          ? []
+          : [
+              row.earlier == null
+                ? null
+                : Math.round(row.earlier.share * 1e6) / 1e4,
+            ]),
+      ],
+      ...(row.current?.lines ?? []).map((line) => [
+        `${row.label}, ${m.fusion_line({ name: line.label })}`,
+        line.votes,
+        row.current == null || row.current.votes === 0
+          ? null
+          : Math.round(
+              (line.votes / row.current.votes) * row.current.share * 1e6,
+            ) / 1e4,
+        ...(seats == null ? [] : [null]),
+        null,
+        ...(span == null ? [] : [null]),
+      ]),
     ])}
 />
 <div class="overflow-x-auto">
@@ -324,7 +338,8 @@
         {const page = $derived(row.current)}
         {const other = $derived(row.earlier)}
         <tr
-          class={cn("border-be border-border/60", {
+          class={cn("border-border/60", {
+            "border-be": span != null || (page?.lines.length ?? 0) === 0,
             "text-muted-foreground": page == null,
             "animate-in fade-in motion-reduce:animate-none": folded.has(
               row.key,
@@ -346,7 +361,7 @@
                   person={(page ?? other)?.person}
                   party={(page ?? other)?.party}
                 />
-                {#if row.short != null && row.short !== row.label}
+                {#if row.short != null && row.short !== row.label && (span != null || (page?.lines.length ?? 0) === 0)}
                   <Name
                     class="text-[0.8125rem] text-muted-foreground"
                     label={row.short}
@@ -513,6 +528,34 @@
             </td>
           {/if}
         </tr>
+        {#if span == null && page != null}
+          {#each page.lines as fused, index (fused.label)}
+            <tr
+              class={cn("text-[0.8125rem] text-muted-foreground", {
+                "border-be border-border/60": index === page.lines.length - 1,
+              })}
+            >
+              <th class="ps-6.5 pe-2 pbe-1 text-start font-normal" scope="row">
+                {m.fusion_line({ name: fused.label })}
+              </th>
+              <td
+                class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
+              >
+                {count(fused.votes)}
+              </td>
+              <td
+                class="px-2 pbe-1 text-end font-figures whitespace-nowrap tabular-nums"
+              >
+                {page.votes === 0
+                  ? ""
+                  : percent((fused.votes / page.votes) * page.share)}
+              </td>
+              {#if seats != null}
+                <td></td>
+              {/if}
+            </tr>
+          {/each}
+        {/if}
       {/each}
       {#if folded.size > 0}
         <tr>

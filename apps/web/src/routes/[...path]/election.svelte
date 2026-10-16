@@ -475,6 +475,7 @@
             share: row.share,
             outcome: null,
             seats: row.seats,
+            lines: [],
           },
           earlier: null,
           delta: null,

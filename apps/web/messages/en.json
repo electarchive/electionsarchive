@@ -865,5 +865,6 @@
   "winners_lede": "Shows winners of all {count} races, grouped by {noun}, and the party with the most wins in each.",
   "winners_more": "Show all {count}",
   "winners_fewer": "Show fewer",
-  "winners_none": "Winner not recorded"
+  "winners_none": "Winner not recorded",
+  "fusion_line": "{name} line"
 }
