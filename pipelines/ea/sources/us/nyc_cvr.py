@@ -23,15 +23,31 @@ PRECINCT = re.compile(r"^AD: (\d\d) ED: (\d\d\d)$")
 WRITE_IN = "Write-in"
 WRITE_INS = "Write-ins"
 INACTIVE = "Inactive ballots"
+ALIASES = {"Selvena N. Brooks-Powers": "Selvena Brooks-Powers", "Nabaraj KC": "Nabaraj Kc"}
+RECERTIFIED = {
+    (date(2021, 6, 22), "024347"): (
+        date(2021, 8, 17),
+        19,
+        " The Board's report also counts 2,469 ballots as inactive from the first round, which the records do not.",
+    ),
+    (date(2021, 6, 22), "024367"): (
+        date(2021, 8, 24),
+        8,
+        " The Board's report also counts 233 ballots as inactive from the first round, which the records do not.",
+    ),
+    (date(2021, 6, 22), "024425"): (date(2021, 8, 24), 2, ""),
+    (date(2021, 6, 22), "024496"): (date(2021, 8, 24), 2, ""),
+}
 PUBLISHER = "Board of Elections in the City of New York"
 METHOD = (
     "Tabulated by electionsarchive.com from the Board of Elections' cast vote records, election district by election "
-    "district, following the official count's eliminations: skipped rankings are passed over, a ballot exhausts at its "
-    "first overvote, a repeated candidate counts once, undeclared write-ins go out after the first round, and every "
-    "later round eliminates the largest group of trailing candidates whose combined votes fall short of the next "
-    "candidate's. Citywide, every round reproduces the Board's official ranked-choice rounds exactly. Each candidate's "
-    "value at round n is their running total; an eliminated candidate has 0 at the round of their elimination."
+    "district. Skipped rankings are passed over, a ballot exhausts at its first overvote, and a repeated candidate "
+    "counts once. Each round drops the candidates the Board's official count dropped in that round, so the order of "
+    "eliminations is the Board's: undeclared write-ins first, then the largest group of trailing candidates whose "
+    "combined votes fall short of the next candidate's. Each candidate's value at round n is their running total; an "
+    "eliminated candidate has 0 at the round of their elimination."
 )
+EXACT = "Summed over the contest's election districts, every round reproduces the Board's official rounds exactly."
 
 
 def fetch() -> None:
@@ -44,14 +60,15 @@ def parse() -> None:
     for day, link in CVRS.items():
         archive = zipfile.ZipFile(raw.cached(SOURCE, link).path)
         names = archive.namelist()
-        labels = dict(
-            fastexcel.read_excel(
+        labels = {
+            candidacy: ALIASES.get(" ".join(label.split()), " ".join(label.split()))
+            for candidacy, label in fastexcel.read_excel(
                 archive.read(next(name for name in names if name.endswith("CandidacyID_To_Name.xlsx")))
             )
             .load_sheet(0, dtypes="string")
             .to_polars()
             .iter_rows()
-        )
+        }
         frames = []
         for name in names:
             if not re.search(r"_(ABS|AFF|EAR|ELE|EMG|OTH)[^/]*\.xlsx$", name):
@@ -94,7 +111,21 @@ def parse() -> None:
     for day in CVRS:
         ballots = pl.read_parquet(PARSED / f"ballots_{day}.parquet")
         for (page,) in official.filter(pl.col("date") == day).select("page").unique().iter_rows():
-            marks = ballots.filter(pl.col("page") == page).sort("ballot", "rank")
+            schedule = (
+                official.filter((pl.col("date") == day) & (pl.col("page") == page) & (pl.col("label") != INACTIVE))
+                .group_by("round")
+                .agg(pl.col("label"))
+                .sort("round")
+            )
+            rounds = [set(labels) for labels in schedule["label"]]
+            writein = next(
+                (label for label in rounds[0] if label.replace("-", "").lower() in ("writein", "writeins")), WRITE_INS
+            )
+            marks = (
+                ballots.filter(pl.col("page") == page)
+                .with_columns(choice=pl.col("choice").replace({WRITE_INS: writein}))
+                .sort("ballot", "rank")
+            )
             cuts = marks.filter(pl.col("choice") == "overvote").group_by("ballot").agg(cut=pl.col("rank").min())
             ranked = (
                 marks.join(cuts, on="ballot", how="left")
@@ -105,45 +136,28 @@ def parse() -> None:
                 .select("ballot", "ed", "rank", "choice")
             )
             counted = ranked.group_by("ballot").agg(pl.col("ed").first())
-            continuing = set(ranked["choice"].unique())
-            number = 1
-            while True:
+            previous = None
+            for number, continuing in enumerate(rounds, 1):
                 top = (
                     ranked.filter(pl.col("choice").is_in(list(continuing)))
                     .group_by("ballot", maintain_order=True)
                     .agg(pl.col("ed").first(), pl.col("choice").first())
                 )
                 inactive = counted.join(top, on="ballot", how="anti").with_columns(choice=pl.lit(INACTIVE))
-                tallies.append(
+                counts = (
                     pl.concat([top, inactive])
                     .group_by("ed", "choice")
                     .agg(votes=pl.len())
                     .with_columns(date=pl.lit(day), page=pl.lit(page), round=pl.lit(number))
                 )
-                if len(continuing) <= 2:
-                    break
-                totals = dict(top.group_by("choice").len().iter_rows())
-                order = sorted(continuing, key=lambda choice: totals.get(choice, 0))
-                votes = [totals.get(choice, 0) for choice in order]
-                if number == 1 and WRITE_INS in continuing:
-                    out = {WRITE_INS}
-                else:
-                    batch = max(
-                        (size for size in range(1, len(order) - 1) if sum(votes[:size]) < votes[size]), default=1
+                tallies.append(counts)
+                if previous is not None:
+                    tallies.append(
+                        previous.filter(pl.col("choice").is_in(list(rounds[number - 2] - continuing))).with_columns(
+                            votes=pl.lit(0, pl.UInt32), round=pl.lit(number)
+                        )
                     )
-                    if batch == 1 and votes[0] == votes[1]:
-                        raise ValueError(f"{day} {page}: tie for last in round {number}: {order[:2]}")
-                    out = set(order[:batch])
-                eliminated = (
-                    pl.concat([top, inactive])
-                    .filter(pl.col("choice").is_in(list(out)))
-                    .select("ed", "choice")
-                    .unique()
-                    .with_columns(votes=pl.lit(0, pl.UInt32), date=pl.lit(day), page=pl.lit(page))
-                )
-                continuing -= out
-                number += 1
-                tallies.append(eliminated.with_columns(round=pl.lit(number)))
+                previous = counts
     tally = pl.concat(tallies, how="vertical_relaxed")
     citywide = (
         tally.group_by("date", "page", "round", "choice")
@@ -157,7 +171,19 @@ def parse() -> None:
         how="full",
         coalesce=True,
         suffix="_official",
-    ).filter(pl.col("votes").fill_null(0) != pl.col("votes_official").fill_null(0))
+    ).filter(
+        (pl.col("votes").fill_null(0) != pl.col("votes_official").fill_null(0))
+        & ~pl.struct("date", "page", "label", "votes", "votes_official").map_elements(
+            lambda row: (
+                (key := (row["date"], row["page"])) in RECERTIFIED
+                and (
+                    row["label"] == INACTIVE
+                    or abs((row["votes_official"] or 0) - (row["votes"] or 0)) <= RECERTIFIED[key][1]
+                )
+            ),
+            return_dtype=pl.Boolean,
+        )
+    )
     if differences.height:
         raise ValueError(
             f"the CVR tabulation differs from the official rounds:\n{differences.sort('date', 'page', 'round')}"
@@ -248,8 +274,19 @@ def emit() -> Path:
                 )
                 if result_set not in cs.minted:
                     continue
-                cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
                 rows = frame.filter(pl.col("key") == contest_key)
+                recertified = RECERTIFIED.get((day, rows["page"][0]))
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=f"{METHOD} {EXACT}"
+                    if recertified is None
+                    else f"{METHOD} The Board certified this contest on {recertified[0]:%B %-d, %Y}, after it "
+                    f"published the cast vote records, and its count differs slightly from them: summed over the "
+                    f"contest's election districts, each candidate's total is within {recertified[1]} votes of the "
+                    f"certified one in every round.{recertified[2]}",
+                )
                 labels = [label for label in rows["choice"].unique().sort() if label != INACTIVE]
                 options = {label: cs.key("us.option", f"{contest_key}:{slug(label)}") for label in labels}
                 if cs.minted & set(options.values()):

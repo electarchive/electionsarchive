@@ -20,11 +20,132 @@ PRIMARIES = {
     date(2025, 6, 24): f"{RESULTS}/2025/20250624Primary%20Election/rcv",
 }
 PAGES = {
-    date(2021, 6, 22): ["024306"],
-    date(2025, 6, 24): ["026916"],
+    date(2021, 6, 22): [
+        "024306",
+        "024307",
+        "024309",
+        "024310",
+        "024311",
+        "024312",
+        "024314",
+        "024318",
+        "024319",
+        "024320",
+        "024321",
+        "024323",
+        "024324",
+        "024326",
+        "024327",
+        "024328",
+        "024329",
+        "024330",
+        "024332",
+        "024335",
+        "024336",
+        "024337",
+        "024338",
+        "024339",
+        "024340",
+        "024341",
+        "024346",
+        "024348",
+        "024349",
+        "024350",
+        "024351",
+        "024352",
+        "024353",
+        "024355",
+        "024357",
+        "024358",
+        "024361",
+        "024370",
+        "024375",
+        "024379",
+        "024389",
+        "024394",
+        "024399",
+        "024406",
+        "024408",
+        "024410",
+        "024414",
+        "024415",
+        "024424",
+        "024425",
+        "024458",
+        "024462",
+        "024463",
+        "024470",
+        "024481",
+        "024496",
+        "024500",
+        "024524",
+        "024546",
+        "024550",
+        "024554",
+        "24347",
+        "24367",
+    ],
+    date(2025, 6, 24): [
+        "026913",
+        "026914",
+        "026915",
+        "026916",
+        "026918",
+        "026919",
+        "026921",
+        "026922",
+        "026924",
+        "026925",
+        "026927",
+        "026928",
+        "026929",
+        "026932",
+        "026933",
+        "026935",
+        "026936",
+        "026937",
+        "026938",
+        "026939",
+        "026942",
+        "026943",
+        "026947",
+        "026952",
+        "026955",
+        "026956",
+        "026957",
+        "026988",
+        "026989",
+        "026999",
+        "027007",
+        "027025",
+        "027058",
+        "027075",
+        "027078",
+        "027101",
+        "027131",
+    ],
 }
 COUNTIES = ("36005", "36047", "36061", "36081", "36085")
-PARTIES = {"DEM": ("democratic-party", "Democratic"), "REP": ("republican-party", "Republican")}
+PARTIES = {
+    "DEM": ("democratic-party", "Democratic"),
+    "REP": ("republican-party", "Republican"),
+    "CON": ("NY:conservative-party", "Conservative"),
+}
+OFFICES = {
+    "Mayor": "mayor",
+    "Public Advocate": "public-advocate",
+    "City Comptroller": "comptroller",
+    "Comptroller": "comptroller",
+    "Borough President": "borough-president",
+    "Council Member": "council",
+}
+BOROUGHS = {
+    "New York": ("36061", "Manhattan"),
+    "Bronx": ("36005", "Bronx"),
+    "Kings": ("36047", "Brooklyn"),
+    "Queens": ("36081", "Queens"),
+    "Richmond": ("36085", "Staten Island"),
+}
 WRITE_INS = "Write-ins"
 INACTIVE = "Inactive ballots"
 PERSONS = {
@@ -88,16 +209,30 @@ def parse() -> None:
                 or final.row(0) != (winner[1].strip(), rounds, int(winner[2].replace(",", "")))
             ):
                 raise ValueError(f"{day} {page}: rounds do not conserve ballots ({totals}) or the winner differs")
-            party_code, office_text = title[1].split(" ", 1)
-            if office_text != "Mayor Citywide":
+            office_match = re.fullmatch(rf"(\w+) ({'|'.join(OFFICES)}) (.+)", title[1])
+            if office_match is None:
                 raise ValueError(f"unknown contest {title[1]}")
+            party_code, office, where = office_match[1], OFFICES[office_match[2]], office_match[3]
+            district = (
+                ""
+                if where == "Citywide"
+                else slug(BOROUGHS[where][1])
+                if office == "borough-president"
+                else str(int(re.fullmatch(r"(\d+)\w\w Council District", where)[1]))  # ty: ignore[not-subscriptable]
+            )
             frames.append(
                 frame.with_columns(
                     date=pl.lit(day),
-                    page=pl.lit(page),
+                    url=pl.lit(url(day, page)),
+                    page=pl.lit(page.zfill(6)),
                     contest=pl.lit(title[1]),
                     party=pl.lit(party_code),
-                    key=pl.lit(f"{day}:new-york-city:mayor:{PARTIES[party_code][1].lower()}"),
+                    office=pl.lit(office),
+                    district=pl.lit(district),
+                    key=pl.lit(
+                        f"{day}:new-york-city:{office}{f'-{district}' if district else ''}:"
+                        f"{PARTIES[party_code][1].lower()}"
+                    ),
                 )
             )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -173,6 +308,26 @@ def emit() -> Path:
             rules_version=1,
         )
         name(irv, "New York City ranked-choice voting")
+        council = cs.key("us.body", "NY:3651000:council")
+        offices = {"mayor": (mayor, "Mayor of New York City")}
+        for office, (key, title, county) in {
+            "public-advocate": ("new-york-city:public-advocate", "New York City Public Advocate", None),
+            "comptroller": ("new-york-city:comptroller", "New York City Comptroller", None),
+            **{
+                f"borough-president-{slug(borough)}": (
+                    f"new-york-city:borough-president:{slug(borough)}",
+                    f"{borough} Borough President",
+                    county,
+                )
+                for county, borough in BOROUGHS.values()
+            },
+        }.items():
+            offices[office] = (cs.key("us.office", key), title)
+            polity = city if county is None else cs.key("us.polity", f"county:{county}")
+            cs.add("office", id=offices[office][0], polity_id=polity, kind="other")
+            name(offices[office][0], title)
+        if cs.minted & {council, *(cs.key("us.polity", f"county:{county}") for county, _ in BOROUGHS.values())}:
+            raise ValueError("the City Council and the borough polities must already exist")
 
         known = {
             value for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{SOURCE}.person"])
@@ -192,7 +347,9 @@ def emit() -> Path:
             cs.add("slug", path=f"us/ny/new-york-city/{day}-primary", entity_id=election)
             for (page,) in frame.filter(pl.col("date") == day).select("page").unique().sort("page").iter_rows():
                 rounds_frame = frame.filter((pl.col("date") == day) & (pl.col("page") == page))
-                title, party_code, contest_key = rounds_frame.select("contest", "party", "key").row(0)
+                title, party_code, office, district, contest_key, link = rounds_frame.select(
+                    "contest", "party", "office", "district", "key", "url"
+                ).row(0)
                 party_key, adjective = PARTIES[party_code]
                 party = cs.key("us.party", party_key)
                 if party in cs.minted:
@@ -205,30 +362,45 @@ def emit() -> Path:
                     kind="official_body",
                     publisher=PUBLISHER,
                     title=source_title,
-                    url=url(day, page),
+                    url=link,
                     license="Public record",
                 )
-                cs.artifact(raw.cached(SOURCE, url(day, page)), source)
+                cs.artifact(raw.cached(SOURCE, link), source)
 
                 rounds = rounds_frame["round"].max()
                 contest = cs.key("us.contest", contest_key)
+                seat = f"{office}-{district}" if district else office
+                if office == "council":
+                    district_area = cs.area("us.local_district", f"36:3651000:council:district-{district}")
+                    if district_area in cs.minted:
+                        raise ValueError(f"council district {district} must already exist")
+                    owner, title = None, f"New York City Council, District {district}"
+                elif office == "borough-president":
+                    owner, title = offices[seat]
+                    district_area = cs.area(
+                        "us.county", next(county for county, borough in BOROUGHS.values() if slug(borough) == district)
+                    )
+                else:
+                    owner, title = offices[office]
+                    district_area = area
                 cs.add(
                     "contest",
                     id=contest,
                     election_id=election,
-                    kind="office",
-                    office_id=mayor,
+                    kind="body_seats" if office == "council" else "office",
+                    office_id=owner,
+                    body_id=council if office == "council" else None,
                     party_scope_id=party,
-                    district_area_id=area,
+                    district_area_id=district_area,
                     magnitude=1,
                     round_number=1,
                     electoral_system_id=irv,
                     default_result_kind="counted",
                 )
-                name(contest, f"{day.year} {adjective} primary for Mayor of New York City")
+                name(contest, f"{day.year} {adjective} primary for {title}")
                 cs.add(
                     "slug",
-                    path=f"us/ny/new-york-city/{day}-primary/mayor-{adjective.lower()}",
+                    path=f"us/ny/new-york-city/{day}-primary/{seat}-{adjective.lower()}",
                     entity_id=contest,
                 )
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
