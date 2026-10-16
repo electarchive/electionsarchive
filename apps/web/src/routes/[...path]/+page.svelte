@@ -135,7 +135,7 @@
 
 <main class="p-3.5 max-sm:p-0">
   <article
-    class="grid grid-cols-12 gap-px overflow-hidden rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
+    class="grid grid-cols-12 gap-px overflow-clip rounded-lg border bg-border max-sm:rounded-none max-sm:border-x-0"
   >
     {#if crumbs.length > 0}
       <nav

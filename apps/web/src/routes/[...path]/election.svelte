@@ -470,9 +470,11 @@
                         share: percent(leader.share),
                       })
                     : seated.length > 0 && !race.isOffice
-                      ? (isRound && race.round === 1
-                          ? m.race_lede_seats_first
-                          : m.race_lede_seats)({
+                      ? (race.kind === "body_seats" && race.body == null
+                          ? m.race_lede_tally
+                          : isRound && race.round === 1
+                            ? m.race_lede_seats_first
+                            : m.race_lede_seats)({
                           party: named(leader),
                           seats: count(leader.seats ?? 0),
                           total: count(
@@ -671,65 +673,67 @@
   )}
   {#if isMapped && race.map != null && race.places != null}
     <div
-      class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
-        "lg:col-span-8": isSeated,
-        "lg:col-span-7 xl:col-span-8": !isSeated,
-      })}
+      class={cn(
+        "col-span-12 self-stretch bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0",
+        { "lg:col-span-8": isSeated, "lg:col-span-7 xl:col-span-8": !isSeated },
+      )}
     >
       {const option = $derived(regionals[index]?.data ?? null)}
       {const region = $derived(regional[index] === true ? option : null)}
       {const swing = $derived(swings[index]?.data ?? null)}
       {const places = $derived(region?.places ?? swing?.places ?? race.places)}
       {const shape = $derived(region?.map ?? race.map)}
-      {#key places.level}
-        <PlaceMap
-          {places}
-          colors={swing == null && region == null
-            ? race.tones
-            : places.legend.map((item) => swatch(item.color, item.key))}
-          tiles={shape.tiles}
-          own={shape.own}
-          frames={shape.frames}
-          isApproximate={shape.isApproximate}
-          noun={places.levels[0]?.noun ?? ""}
-          votes={race.votes}
-          names={swing == null && region == null
-            ? race.titles
-            : places.legend.map((item) =>
-                item.person == null ? (item.short ?? item.label) : item.label,
-              )}
-          levels={option?.map == null
-            ? []
-            : [race.places, option.places].map((entry) => {
-                const noun = entry.levels[0]?.noun ?? "";
-                return {
-                  code: entry.level,
-                  label: noun.charAt(0).toUpperCase() + noun.slice(1),
-                  count: entry.rows.length,
-                  path: "",
-                  query: "",
-                  isCurrent: entry.level === places.level,
-                };
-              })}
-          pick={(code) => (regional[index] = code === option?.places.level)}
-          span={swing?.span ??
-            (region?.since != null
-              ? {
-                  from: region.since,
-                  to: election.date?.slice(0, 4) ?? "",
-                  forward: false,
-                }
-              : race.count > 1 &&
-                  race.since != null &&
-                  race.places.rows.some((row) => row.prior != null)
+      <div class="lg:sticky lg:inset-bs-3">
+        {#key places.level}
+          <PlaceMap
+            {places}
+            colors={swing == null && region == null
+              ? race.tones
+              : places.legend.map((item) => swatch(item.color, item.key))}
+            tiles={shape.tiles}
+            own={shape.own}
+            frames={shape.frames}
+            isApproximate={shape.isApproximate}
+            noun={places.levels[0]?.noun ?? ""}
+            votes={race.votes}
+            names={swing == null && region == null
+              ? race.titles
+              : places.legend.map((item) =>
+                  item.person == null ? (item.short ?? item.label) : item.label,
+                )}
+            levels={option?.map == null
+              ? []
+              : [race.places, option.places].map((entry) => {
+                  const noun = entry.levels[0]?.noun ?? "";
+                  return {
+                    code: entry.level,
+                    label: noun.charAt(0).toUpperCase() + noun.slice(1),
+                    count: entry.rows.length,
+                    path: "",
+                    query: "",
+                    isCurrent: entry.level === places.level,
+                  };
+                })}
+            pick={(code) => (regional[index] = code === option?.places.level)}
+            span={swing?.span ??
+              (region?.since != null
                 ? {
-                    from: race.since,
+                    from: region.since,
                     to: election.date?.slice(0, 4) ?? "",
                     forward: false,
                   }
-                : null)}
-        />
-      {/key}
+                : race.count > 1 &&
+                    race.since != null &&
+                    race.places.rows.some((row) => row.prior != null)
+                  ? {
+                      from: race.since,
+                      to: election.date?.slice(0, 4) ?? "",
+                      forward: false,
+                    }
+                  : null)}
+          />
+        {/key}
+      </div>
     </div>
   {/if}
   {#if isSeated}
