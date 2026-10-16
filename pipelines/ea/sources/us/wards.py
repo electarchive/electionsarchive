@@ -8,7 +8,7 @@ from pathlib import Path
 
 import polars as pl
 import shapefile
-from pyproj import CRS, Transformer
+from pyproj import CRS
 
 from ea import raw
 from ea.changeset import Changeset
@@ -133,14 +133,14 @@ def fetch() -> None:
                 )
 
 
-def features(url: str) -> Iterator[tuple[dict[str, object], str]]:
+def features(url: str) -> Iterator[tuple[dict[str, object], str, int]]:
     if not url.endswith(".zip"):
         for link in links(url):
             if link.endswith("?f=json"):
                 continue
             for feature in json.loads(raw.cached(SOURCE, link).path.read_text())["features"]:
                 if feature["geometry"] is not None:
-                    yield feature["properties"], json.dumps(feature["geometry"])
+                    yield feature["properties"], json.dumps(feature["geometry"]), 4326
         return
     with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
         names = {name.lower(): name for name in archive.namelist() if not name.startswith("__MACOSX")}
@@ -151,38 +151,35 @@ def features(url: str) -> Iterator[tuple[dict[str, object], str]]:
                 dbf=io.BytesIO(archive.read(names[f"{stem}.dbf"])),
                 encoding="latin-1",
             )
-            project = Transformer.from_crs(
-                CRS(archive.read(names[f"{stem}.prj"]).decode("latin-1")), 4326, always_xy=True
-            ).transform
+            srid = CRS(archive.read(names[f"{stem}.prj"]).decode("latin-1")).to_epsg(min_confidence=20)
+            assert srid is not None, f"{url}: {stem}"
+            fields = [field[0] for field in reader.fields[1:]]
             for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
-                if shape.shapeType == shapefile.NULL or not shape.points:
+                if record is None or shape is None or shape.shapeType == shapefile.NULL or not shape.points:
                     continue
-                geometry = shape.__geo_interface__
-                rings = (
-                    geometry["coordinates"]
-                    if geometry["type"] == "Polygon"
-                    else [ring for polygon in geometry["coordinates"] for ring in polygon]
-                )
-                for ring in rings:
-                    ring[:] = [project(*point[:2]) for point in ring]
-                yield record.as_dict(), json.dumps(geometry)
+                yield dict(zip(fields, list(record), strict=True)), json.dumps(shape.__geo_interface__), srid
 
 
 def parse() -> None:
     with connect() as conn:
-        conn.execute("create temp table feature (geoid text, plan int, label text, geojson text) on commit drop")
-        with conn.cursor() as cursor, cursor.copy("copy feature (geoid, plan, label, geojson) from stdin") as copy:
+        conn.execute(
+            "create temp table feature (geoid text, plan int, label text, geojson text, srid int) on commit drop"
+        )
+        with (
+            conn.cursor() as cursor,
+            cursor.copy("copy feature (geoid, plan, label, geojson, srid) from stdin") as copy,
+        ):
             for geoid, plans in PLANS.items():
                 for start, _, url, field, _, _ in plans:
-                    for properties, geometry in features(url):
+                    for properties, geometry, srid in features(url):
                         label = properties.get(field)
                         if label is not None and token(str(label)):
-                            copy.write_row((geoid, start, token(str(label)), geometry))
+                            copy.write_row((geoid, start, token(str(label)), geometry, srid))
         rows = conn.execute(
             """with shape as (
                  select geoid, plan, label,
                         st_multi(st_collectionextract(st_makevalid(st_union(st_makevalid(st_force2d(
-                          st_setsrid(st_geomfromgeojson(geojson), 4326))))), 3)) as geom
+                          st_transform(st_setsrid(st_geomfromgeojson(geojson), srid), 4326))))), 3)) as geom
                  from feature group by geoid, plan, label
                )
                select geoid, plan, label, encode(st_asewkb(geom), 'hex'),
