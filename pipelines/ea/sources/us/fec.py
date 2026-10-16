@@ -1106,6 +1106,14 @@ IOWA = {
     2016: date(2016, 2, 1),
     2020: date(2020, 2, 3),
 }
+DELEGATE_SEATS = {
+    "DC": "Delegate from the District of Columbia",
+    "PR": "Resident Commissioner of Puerto Rico",
+    "GU": "Delegate from Guam",
+    "VI": "Delegate from the Virgin Islands",
+    "AS": "Delegate from American Samoa",
+    "MP": "Delegate from the Northern Mariana Islands",
+}
 DELEGATES = {(2020, "democratic"): 3979}
 UNAFFILIATED = (
     "California lets voters who declined to state a party ask for this party's ballot. The totals here include their "
@@ -5093,8 +5101,21 @@ def emit() -> Path:
                     body_id=bodies["senate"],
                     district_area_id=states[state][1],
                     label=f"{states[state][2]} Class {'I' * number}",
+                    voting=True,
                     valid_from=None,
                 )
+        delegates: dict[str, UUID] = {}
+        for state, label in DELEGATE_SEATS.items():
+            delegates[state] = cs.key("us.seat", f"house:{state}")
+            cs.add(
+                "seat",
+                id=delegates[state],
+                body_id=bodies["house"],
+                district_area_id=states[state][1],
+                label=label,
+                voting=False,
+                valid_from=None,
+            )
 
         used: set[tuple[int, str]] = set()
         for year in sorted(frame["year"].unique()):
@@ -5457,7 +5478,7 @@ def emit() -> Path:
             day = held or opened
             on = day if special else date(year + 1, 1, 3)
             plan = next(id for id, start, end in plans if start <= on and (end is None or on < end))
-            seat = None
+            seat = None if chamber == "senate" else delegates.get(state)
             if chamber == "senate":
                 seat = senate_seats[(state, classes[(year, state, term)])]
                 place, part, office_name = state_name, "senate", "Senate"
@@ -5540,6 +5561,7 @@ def emit() -> Path:
                     body_id=bodies[chamber],
                     district_area_id=area,
                     seat_id=seat,
+                    term="remainder" if special else "full",
                     boundary_set_id=None if chamber == "senate" else plan,
                     party_scope_id=None if blanket else parties[(state, label)],
                     magnitude=1,
@@ -5935,7 +5957,7 @@ def emit() -> Path:
             held = POSTPONED.get((year, state, district), held)
             on = held if special else date(year + 1, 1, 3)
             plan = next(id for id, start, end in plans if start <= on and (end is None or on < end))
-            seat = None
+            seat = None if chamber == "senate" else delegates.get(state)
             if chamber == "senate":
                 seat = senate_seats[(state, classes[(year, state, term)])]
                 place, part, office_name = state_name, "senate", "Senate"
@@ -6030,6 +6052,7 @@ def emit() -> Path:
                     body_id=bodies[chamber],
                     district_area_id=area,
                     seat_id=seat,
+                    term="remainder" if special else "full",
                     boundary_set_id=None if chamber == "senate" else plan,
                     magnitude=1,
                     round_number=number

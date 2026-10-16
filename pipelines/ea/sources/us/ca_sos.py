@@ -10,7 +10,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.ca_sos"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SOV = "https://elections.cdn.sos.ca.gov/sov/"
 PUBLISHER = "California Secretary of State"
@@ -179,6 +179,7 @@ def emit() -> Path:
                     body_id=senate,
                     district_area_id=area,
                     seat_id=seat,
+                    term="remainder" if special else "full",
                     magnitude=1,
                     round_number=1 if day == PRIMARY else 2,
                     previous_round_id=previous,
