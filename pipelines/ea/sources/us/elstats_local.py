@@ -93,13 +93,71 @@ STATES = {
             "no county row."
         ),
     ),
+    "NM": (
+        2014,
+        {
+            "County Commissioner": COUNTY,
+            "County Clerk": ("clerk", "Clerk", "other"),
+            "County Treasurer": TREASURER,
+            "County Sheriff": SHERIFF,
+            "County Assessor": ("assessor", "Assessor", "other"),
+            "Probate Judge": ("probate-judge", "Probate Judge", "other"),
+            "Mayor": ("mayor", "Mayor", "mayor"),
+            "City Mayor": ("mayor", "Mayor", "mayor"),
+            "Town Mayor": ("mayor", "Mayor", "mayor"),
+            "Village Mayor": ("mayor", "Mayor", "mayor"),
+            "City Councilor": ("council", "City Council", None),
+            "City Commissioner": ("council", "City Commission", None),
+            "City Trustee": ("council", "Board of Trustees", None),
+            "Town Councilor": ("council", "Town Council", None),
+            "Town Commissioner": ("council", "Town Commission", None),
+            "Town Trustee": ("council", "Board of Trustees", None),
+            "Village Councilor": ("council", "Village Council", None),
+            "Village Trustee": ("council", "Board of Trustees", None),
+            "School Board Member": ("board-of-education", "Board of Education", None),
+        },
+        [
+            "County",
+            "County Commissioner District",
+            "City",
+            "Town",
+            "Village",
+            "Mayor District",
+            "City Council District",
+            "City Commissioner District",
+            "Town Council District",
+            "Town Commissioner District",
+            "Village Council District",
+            "School Board District",
+        ],
+        {"25", "43", "47"},
+        "Totals are the sums of the Secretary of State's precinct rows across every voting method.",
+    ),
 }
 STAGES = {
     "General Election": "general",
     "General": "general",
     "Local Election": "local",
+    "Regular Local Election": "local",
     "Special Election": "special",
     "Special": "special",
+}
+ALIASES = {
+    "silver": "silvercity",
+    "jemezmountains": "jemezmountain",
+    "hondo": "hondovalley",
+    "moriartyedgewood": "moriarty",
+}
+MUNICIPAL = {
+    "Town",
+    "City/Town",
+    "City",
+    "Village",
+    "City Council District",
+    "City Commissioner District",
+    "Town Council District",
+    "Town Commissioner District",
+    "Village Council District",
 }
 RANKS = {"Locality": 0, "County": 0, "City/Town": 1, "Ward": 1, "Precinct": 2}
 PARTIES = {
@@ -189,11 +247,11 @@ def parse() -> None:
     )
     with zipfile.ZipFile(raw.cached(ALGED, SCHOOLS[0]).path) as archive:
         parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
-    schools = {
-        elstats.plain(str(record["NAME"]).removesuffix(" Public Schools")): str(record["GEOID"])
-        for record in shapefile.Reader(dbf=io.BytesIO(parts["dbf"])).iterRecords()
-        if record is not None and record["STUSPS"] == "VA"
-    }
+    schools: dict[str, dict[str, str]] = {}
+    for record in shapefile.Reader(dbf=io.BytesIO(parts["dbf"])).iterRecords():
+        if record is not None and record["STUSPS"] in STATES:
+            text = re.sub(r" (Public|Municipal|Consolidated|Independent)? ?Schools$", "", str(record["NAME"]))
+            schools.setdefault(str(record["STUSPS"]), {})[elstats.plain(text)] = str(record["GEOID"])
     with zipfile.ZipFile(raw.cached(ALGED, PLACES).path) as archive:
         parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
     towns: dict[str, dict[str, str]] = {}
@@ -222,6 +280,8 @@ def parse() -> None:
         numbered = re.fullmatch(r"(.+?) (\d+)", locality)
         if not seat and numbered and kind != "City/Town":
             locality, seat = numbered[1], numbered[2]
+        if locality.endswith(" Ward"):
+            locality, seat = locality.removesuffix(" Ward"), f"Ward {seat}"
         plain = elstats.plain(re.sub(r"^Mt\.? ", "Mount ", locality))
         code = next(
             (
@@ -231,10 +291,28 @@ def parse() -> None:
             ),
             None,
         )
-        if kind in ("Town", "City/Town") and not locality.endswith("County"):
+        if kind in MUNICIPAL and not locality.endswith("County"):
             code = towns.get(state, {}).get(plain)
-        elif code is not None and office.endswith("School Board"):
-            school = next((schools[key] for key in (plain, f"{plain}city", f"{plain}county") if key in schools), None)
+        elif STATES[state][1][office][0] in ("board-of-education", "chair-of-the-school-board"):
+            cleaned = elstats.plain(
+                re.sub(
+                    r"( \d+)+$", "", re.sub(r" (Municipal|Muncipal|Public|Consolidated|Independent)\b", "", locality)
+                )
+            )
+            school = next(
+                (
+                    found
+                    for key in (
+                        plain,
+                        f"{plain}city",
+                        f"{plain}county",
+                        f"{cleaned}city",
+                        ALIASES.get(cleaned, cleaned),
+                    )
+                    if (found := schools.get(state, {}).get(key)) is not None
+                ),
+                None,
+            )
             code = None if school is None else f"sd{school}"
         labels.append({"state": state, "contest": contest, "code": code, "seat": seat or None})
     labels = pl.DataFrame(
@@ -285,7 +363,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="County, city, town, and school board elections from the archives of Virginia, New Hampshire, and Idaho",
+            summary="County, city, town, and school board elections from the archives of Virginia, New Hampshire, Idaho, and New Mexico",
             polity="US",
         )
 
