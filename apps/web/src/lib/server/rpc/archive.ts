@@ -1294,18 +1294,20 @@ async function places(
   if (level == null) {
     return null;
   }
-  const rows = kids
-    .filter((kid) => kid.scheme === level.code)
-    .map((kid) => {
-      const child = childPath.get(kid.id);
-      return {
-        k: kid.k,
-        name: kid.name,
-        path: child ?? (base == null ? null : `${base}/${kid.segment}`),
-        isContest: child != null,
-        owner: null,
-      };
-    });
+  const shown = kids.filter((kid) => kid.scheme === level.code);
+  const tail = /, [^,]+$/.exec(shown[0]?.name ?? "")?.[0];
+  const isShared =
+    tail != null && shown.every((kid) => kid.name.endsWith(tail));
+  const rows = shown.map((kid) => {
+    const child = childPath.get(kid.id);
+    return {
+      k: kid.k,
+      name: isShared ? kid.name.slice(0, -tail.length) : kid.name,
+      path: child ?? (base == null ? null : `${base}/${kid.segment}`),
+      isContest: child != null,
+      owner: null,
+    };
+  });
   const [tabulated, points] = await Promise.all([
     tabulate(
       [contest.root],
