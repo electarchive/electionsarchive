@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import {
+    LayoutDashboardIcon,
     LogOutIcon,
     MonitorIcon,
     MoonIcon,
@@ -89,6 +90,14 @@
               <span class="truncate font-normal">{page.data.user.email}</span>
             </DropdownMenu.Label>
             <DropdownMenu.Separator />
+            <DropdownMenu.Item>
+              {#snippet child({ props })}
+                <a {...props} href={resolve("/workbench")}>
+                  <LayoutDashboardIcon class="text-muted-foreground" />
+                  {m.workbench_nav()}
+                </a>
+              {/snippet}
+            </DropdownMenu.Item>
             <form method="POST" action={resolve("/sign-out")}>
               <DropdownMenu.Item class="inline-full">
                 {#snippet child({ props })}

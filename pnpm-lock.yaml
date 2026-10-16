@@ -424,6 +424,9 @@ importers:
       '@ea/db':
         specifier: workspace:*
         version: link:../../packages/db
+      '@ea/view-spec':
+        specifier: workspace:*
+        version: link:../../packages/view-spec
       '@fontsource-variable/martian-mono':
         specifier: 'catalog:'
         version: 5.3.0

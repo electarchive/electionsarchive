@@ -35,7 +35,10 @@ export const viewSpec = v.object({
       "all",
     ),
     compare: v.optional(
-      v.object({ contests: v.pipe(v.array(publicId("ct")), v.minLength(1)) }),
+      v.union([
+        v.object({ contests: v.pipe(v.array(publicId("ct")), v.minLength(1)) }),
+        v.object({ previous: v.literal(true) }),
+      ]),
     ),
   }),
   filters: v.optional(
@@ -98,3 +101,25 @@ export const viewSpec = v.object({
 export type ViewSpec = v.InferOutput<typeof viewSpec>;
 
 export const viewSpecJsonSchema = toJsonSchema(viewSpec);
+
+const ALPHABET = "0123456789abcdefghjkmnpqrstvwxyz";
+
+export function encodeId(prefix: string, uuid: string) {
+  let value = BigInt(`0x${uuid.replaceAll("-", "")}`);
+  let suffix = "";
+  for (let index = 0; index < 26; index += 1) {
+    suffix = `${ALPHABET[Number(value & 31n)] ?? ""}${suffix}`;
+    value >>= 5n;
+  }
+  return `${prefix}_${suffix}`;
+}
+
+export function decodeId(id: string) {
+  let value = 0n;
+  const digits = id.slice(id.indexOf("_") + 1);
+  for (const character of digits) {
+    value = (value << 5n) | BigInt(ALPHABET.indexOf(character));
+  }
+  const hex = value.toString(16).padStart(32, "0");
+  return `${hex.slice(0, 8)}-${hex.slice(8, 12)}-${hex.slice(12, 16)}-${hex.slice(16, 20)}-${hex.slice(20)}`;
+}
