@@ -11,6 +11,7 @@
   import Header from "#lib/components/header.svelte";
   import { Toaster } from "#lib/components/ui/sonner/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
+  import { palette } from "#lib/palette.svelte.js";
   import { makeQueryClient } from "#lib/query-client.js";
   import {
     ConfirmationStore,
@@ -22,6 +23,37 @@
   const queryClient = makeQueryClient();
 
   setConfirmationContext(new ConfirmationStore());
+
+  $effect(() => {
+    try {
+      const saved: unknown = JSON.parse(
+        localStorage.getItem("palette") ?? "null",
+      );
+      if (saved != null && typeof saved === "object") {
+        if ("isSafe" in saved && typeof saved.isSafe === "boolean") {
+          palette.isSafe = saved.isSafe;
+        }
+        if (
+          "overrides" in saved &&
+          saved.overrides != null &&
+          typeof saved.overrides === "object"
+        ) {
+          for (const [party, color] of Object.entries(saved.overrides)) {
+            if (typeof color === "string" && /^#[\da-f]{6}$/i.test(color)) {
+              palette.overrides[party] = color;
+            }
+          }
+        }
+      }
+    } catch {}
+  });
+
+  $effect(() => {
+    const value = JSON.stringify($state.snapshot(palette));
+    try {
+      localStorage.setItem("palette", value);
+    } catch {}
+  });
 
   onNavigate(async (navigation) => {
     if (

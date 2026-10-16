@@ -14,6 +14,7 @@
   import Search from "#lib/components/search.svelte";
   import { buttonVariants } from "#lib/components/ui/button/index.js";
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
+  import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
 
   const THEMES = [
@@ -46,7 +47,7 @@
           {/if}
           <span class="sr-only">{m.theme_menu()}</span>
         </DropdownMenu.Trigger>
-        <DropdownMenu.Content align="end" class="inline-40">
+        <DropdownMenu.Content align="end" class="inline-56">
           <DropdownMenu.RadioGroup
             value={userPrefersMode.current}
             onValueChange={(value) => {
@@ -66,6 +67,10 @@
               </DropdownMenu.RadioItem>
             {/each}
           </DropdownMenu.RadioGroup>
+          <DropdownMenu.Separator />
+          <DropdownMenu.CheckboxItem bind:checked={palette.isSafe}>
+            {m.palette_safe()}
+          </DropdownMenu.CheckboxItem>
         </DropdownMenu.Content>
       </DropdownMenu.Root>
       {#if page.data.user == null}
