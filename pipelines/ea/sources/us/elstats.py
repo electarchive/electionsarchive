@@ -3,6 +3,7 @@ import json
 import re
 import unicodedata
 import zipfile
+from datetime import date
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -16,7 +17,7 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
 SEARCH = "https://{tenant}.civera.com/api/download_search.csv?"
@@ -31,7 +32,14 @@ TENANTS = {
     "VT": ("vt2.elstats", "Vermont Secretary of State", "https://electionarchive.vermont.gov"),
     "VA": ("va2.elstats", "Virginia Department of Elections", "https://historical.elections.virginia.gov"),
 }
+MA_PUBLISHER = "Massachusetts Secretary of the Commonwealth"
 TITLE = "Election statistics archive"
+MASSACHUSETTS = "https://electionstats.state.ma.us/elections/"
+MA_OFFICES = {5: "house", 6: "senate"}
+MA_ROW = re.compile(
+    r'id="election-id-(\d+)".*?<td[^>]*>(\d{4})</td>\s*<td[^>]*>[^<]*</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>',
+    re.DOTALL,
+)
 OFFICES = ["U.S. House", "U.S. Senate", "United States", "Congress"]
 DIVISIONS = {"County": "county", "Locality": "county", "City/Town": "town"}
 FORMER = {
@@ -56,6 +64,10 @@ def url(tenant: str, year: int) -> str:
     return SEARCH.format(tenant=tenant) + urlencode({"search": json.dumps(search, separators=(",", ":"))})
 
 
+def ma_search(office: int) -> str:
+    return f"{MASSACHUSETTS}search/year_from:{FIRST}/year_to:{LAST}/office_id:{office}/stage:General"
+
+
 def plain(text: str) -> str:
     return re.sub(
         r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower().replace("saint ", "st ").replace("&", "and")
@@ -64,6 +76,10 @@ def plain(text: str) -> str:
 
 def fetch() -> None:
     raw.fetch(SOURCE, GAZETTEER, suffix=".zip")
+    for office in MA_OFFICES:
+        listing = raw.fetch(SOURCE, ma_search(office), suffix=".html").path.read_text()
+        for election, *_ in MA_ROW.findall(listing):
+            raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
     for tenant, _, _ in TENANTS.values():
         for year in range(FIRST, LAST + 1):
             raw.fetch(SOURCE, url(tenant, year), suffix=".csv")
@@ -86,7 +102,7 @@ def parse() -> None:
     with zipfile.ZipFile(raw.cached(SOURCE, GAZETTEER).path) as archive:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
-        ).filter(pl.col("USPS").is_in(list(TENANTS)))
+        ).filter(pl.col("USPS").is_in([*TENANTS, "MA"]))
     towns: dict[str, dict[str, str]] = {}
     for state, geoid, name in (
         gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
@@ -165,6 +181,42 @@ def parse() -> None:
                     votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
                 )
             )
+    for office, chamber in MA_OFFICES.items():
+        listing = raw.cached(SOURCE, ma_search(office)).path.read_text()
+        for election, year, district, stage in MA_ROW.findall(listing):
+            if "Special" in stage:
+                continue
+            table = pl.read_csv(
+                raw.cached(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/").path,
+                infer_schema=False,
+                skip_rows_after_header=1,
+            )
+            general = date(int(year), 11, 2 + (-date(int(year), 11, 1).weekday()) % 7)
+            frames.append(
+                table.filter(pl.col("City/Town").is_not_null() & (pl.col("City/Town") != "TOTALS"))
+                .with_columns(
+                    pl.col("City/Town")
+                    .str.replace(r"^N\. ", "North ")
+                    .str.replace(r"^S\. ", "South ")
+                    .str.replace(r"^E\. ", "East ")
+                    .str.replace(r"^W\. ", "West ")
+                )
+                .unpivot([column for column in table.columns[3:] if column], index="City/Town", variable_name="name")
+                .select(
+                    year=pl.lit(int(year), pl.Int32),
+                    chamber=pl.lit(chamber),
+                    day=pl.lit(general),
+                    special=pl.lit(False),
+                    state=pl.lit("MA"),
+                    district=pl.lit(int(district.split()[0][:-2]) if chamber == "house" else None, pl.Int16),
+                    code=pl.col("City/Town")
+                    .map_elements(plain, return_dtype=pl.String)
+                    .replace_strict(towns["MA"], default=None),
+                    county=pl.concat_str(pl.lit("MA:"), "City/Town"),
+                    candidate=pl.col("name").str.to_uppercase().str.strip_chars(),
+                    votes=pl.col("value").str.replace_all(",", "").cast(pl.Int64, strict=False),
+                )
+            )
     frame = pl.concat(frames).filter(pl.col("votes").is_not_null())
     lost = frame.filter(pl.col("code").is_null())
     if lost.height:
@@ -213,5 +265,22 @@ def emit() -> Path:
             )
             for year in frame.filter(pl.col("state") == state)["year"].unique().sort():
                 cs.artifact(raw.cached(SOURCE, url(tenant, year)), sources[state])
+        sources["MA"] = cs.source(MA_PUBLISHER, TITLE)
+        cs.add(
+            "source",
+            id=sources["MA"],
+            kind="official_body",
+            publisher=MA_PUBLISHER,
+            title=TITLE,
+            url="https://electionstats.state.ma.us",
+            license="Public record",
+        )
+        for office in MA_OFFICES:
+            listing = raw.cached(SOURCE, ma_search(office))
+            cs.artifact(listing, sources["MA"])
+            for election, *_ in MA_ROW.findall(listing.path.read_text()):
+                cs.artifact(
+                    raw.cached(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/"), sources["MA"]
+                )
         medsl.attach(cs, conn, frame, sources)
         return cs.write()
