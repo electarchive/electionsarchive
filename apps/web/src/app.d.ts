@@ -12,7 +12,9 @@ declare global {
       user: User | null;
       session: Session["session"] | null;
     }
-    // interface PageData {}
+    interface PageData {
+      user: { name: string; email: string } | null;
+    }
     // interface PageState {}
     // interface Platform {}
   }

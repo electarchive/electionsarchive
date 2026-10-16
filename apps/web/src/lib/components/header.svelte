@@ -1,6 +1,13 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
-  import { MonitorIcon, MoonIcon, SunIcon } from "@lucide/svelte";
+  import { page } from "$app/state";
+  import {
+    LogOutIcon,
+    MonitorIcon,
+    MoonIcon,
+    SunIcon,
+    UserIcon,
+  } from "@lucide/svelte";
   import { setMode, userPrefersMode } from "mode-watcher";
   import Monogram from "#lib/components/monogram.svelte";
   import Search from "#lib/components/search.svelte";
@@ -60,6 +67,41 @@
           </DropdownMenu.RadioGroup>
         </DropdownMenu.Content>
       </DropdownMenu.Root>
+      {#if page.data.user == null}
+        <a
+          href="{resolve('/sign-in')}?next={encodeURIComponent(
+            page.url.pathname,
+          )}"
+          class={buttonVariants({ variant: "ghost" })}>{m.sign_in_submit()}</a
+        >
+      {:else}
+        <DropdownMenu.Root>
+          <DropdownMenu.Trigger
+            class={buttonVariants({ variant: "ghost", size: "icon" })}
+          >
+            <UserIcon />
+            <span class="sr-only">{m.account_menu()}</span>
+          </DropdownMenu.Trigger>
+          <DropdownMenu.Content align="end" class="inline-56">
+            <DropdownMenu.Label class="grid gap-0.5">
+              <span class="truncate text-foreground">{page.data.user.name}</span
+              >
+              <span class="truncate font-normal">{page.data.user.email}</span>
+            </DropdownMenu.Label>
+            <DropdownMenu.Separator />
+            <form method="POST" action={resolve("/sign-out")}>
+              <DropdownMenu.Item class="inline-full">
+                {#snippet child({ props })}
+                  <button {...props} type="submit">
+                    <LogOutIcon class="text-muted-foreground" />
+                    {m.sign_out()}
+                  </button>
+                {/snippet}
+              </DropdownMenu.Item>
+            </form>
+          </DropdownMenu.Content>
+        </DropdownMenu.Root>
+      {/if}
     </div>
   </div>
 </header>
