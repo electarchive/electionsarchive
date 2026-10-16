@@ -1,4 +1,4 @@
-import type { Grouping, Match, Option, Relation, Side } from "@ea/analytics";
+import type { Match, Option, Relation, Side } from "@ea/analytics";
 import type { SQL } from "drizzle-orm";
 import { ancestry, compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
@@ -568,10 +568,8 @@ async function load(
     label: string | null;
     outcome: string | null;
     seats: number | null;
-    alliance: string | null;
   }>(sql`
     select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
-      o.alliance_id as alliance,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
@@ -607,7 +605,7 @@ async function load(
   const entities = [
     ...new Set([
       ...options.rows.flatMap((row) =>
-        [row.party, row.person, row.alliance].filter((id) => id != null),
+        [row.party, row.person].filter((id) => id != null),
       ),
       ...backing.rows.map((row) => row.person),
     ]),
@@ -718,13 +716,6 @@ async function load(
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
             seats: row.seats,
-            alliance:
-              row.alliance == null
-                ? null
-                : {
-                    id: row.alliance,
-                    label: labels.full.get(row.alliance) ?? "",
-                  },
           })),
         backing: backers,
       },
@@ -896,20 +887,22 @@ function assign(
   return {
     places: places.values().toArray(),
     seats: new Map(
-      seats.entries().map(([key, list]) => [
-        key,
-        list
-          .toSorted(
-            (a, b) =>
-              a.place.name.localeCompare(b.place.name) ||
-              (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
-          )
-          .map((slot) => ({
-            place: at.get(slot.place.id) ?? 0,
-            name: slot.name,
-            position: slot.position,
-          })),
-      ]),
+      seats
+        .entries()
+        .map(([key, list]) => [
+          key,
+          list
+            .toSorted(
+              (a, b) =>
+                a.place.name.localeCompare(b.place.name) ||
+                (at.get(a.place.id) ?? 0) - (at.get(b.place.id) ?? 0),
+            )
+            .map((slot) => ({
+              place: at.get(slot.place.id) ?? 0,
+              name: slot.name,
+              position: slot.position,
+            })),
+        ]),
     ),
   };
 }
@@ -1132,7 +1125,6 @@ async function places(
   chosen: { id: string; date: string | null } | null,
   lineage: Array<Relation>,
   match: Match,
-  grouping: Grouping = "option",
 ): Promise<v.InferOutput<typeof Places>> {
   const kids = await children(
     contest.id,
@@ -1213,7 +1205,6 @@ async function places(
       chosen,
       lineage,
       match,
-      grouping,
     )),
   };
 }
@@ -1231,7 +1222,6 @@ async function tabulate(
   chosen: { id: string; date: string | null } | null,
   lineage: Array<Relation>,
   match: Match,
-  grouping: Grouping = "option",
 ) {
   const ks = rows.map((row) => row.k);
   const [now, then] = await Promise.all([
@@ -1269,13 +1259,7 @@ async function tabulate(
     const result =
       current == null
         ? []
-        : compare(
-            current.side,
-            then?.get(row.k)?.side ?? null,
-            lineage,
-            match,
-            grouping,
-          );
+        : compare(current.side, then?.get(row.k)?.side ?? null, lineage, match);
     const running = result.find(
       (entry) => entry.current != null && !entry.key.startsWith("kind:"),
     );
@@ -1477,7 +1461,6 @@ const Input = v.object({
   by: v.optional(v.string()),
   vs: v.optional(v.string()),
   match: v.optional(v.picklist(["party", "person", "family"]), "party"),
-  group: v.optional(v.picklist(["option", "alliance"]), "option"),
 });
 
 export const contests = {
@@ -2269,7 +2252,6 @@ export const contests = {
           chosen,
           lineage,
           input.match,
-          input.group,
         ),
         counterpart?.indirect === true
           ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
@@ -2358,7 +2340,6 @@ export const contests = {
         earlier?.side ?? null,
         lineage,
         input.match,
-        input.group,
       );
       const ballots = [current, cast?.get(area.k)].find(
         (entry) => entry?.measure === "electoral_votes",
@@ -2472,7 +2453,6 @@ export const contests = {
         null,
         [],
         input.match,
-        input.group,
       );
     }),
   boundaries: os
