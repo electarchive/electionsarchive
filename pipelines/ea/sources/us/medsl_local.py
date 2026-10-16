@@ -17,8 +17,10 @@ PARSED = DATA / "parsed" / SOURCE
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
 ACCESS = "https://dataverse.harvard.edu/api/access/datafile"
 LOCAL2016 = f"{ACCESS}/3345356?format=original"
+LOCAL2018 = f"{ACCESS}/6692669"
 DATASETS = {
     date(2024, 11, 5): ("Precinct-Level Returns 2024 by Individual State", "https://doi.org/10.7910/DVN/NYTPDU"),
+    date(2018, 11, 6): ("Local Precinct-Level Returns 2018", "https://doi.org/10.7910/DVN/CHYXUP"),
     date(2016, 11, 8): ("Local Precinct-Level Returns 2016", "https://doi.org/10.7910/DVN/Q8OHRS"),
 }
 COUNTS = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4, "FIVE": 5, "SIX": 6, "SEVEN": 7}
@@ -194,7 +196,8 @@ EXCLUDED = re.compile(
     r"RECALL|PRESIDENT|CHAIR|VICE|JUDGE|CLERK|TREASURER|ATTORNEY|AUDITOR|BOARD|SCHOOL|QUESTION|PROPOSITION|AMENDMENT"
     r"|CHARTER|MEASURE|COUNTY|TOWNSHIP|ADVISORY|SHALL"
 )
-NONPARTISAN = {"NONPARTISAN", "NON-PARTISAN", "NP"}
+NONPARTISAN = {"NONPARTISAN", "NON-PARTISAN", "NP", "OTHER", '""'}
+UNAFFILIATED = {"NO", "INDEPENDENT-UNENROLLED", "NO PARTY PREFERENCE"}
 METHOD = (
     "Totals are the sums of the precinct rows in MEDSL's 2024 precinct file for the state. The file does not mark "
     "winners, so the winners shown are the candidates with the most votes, as many as the contest elects."
@@ -374,36 +377,40 @@ def parse() -> None:
         votes="votes",
         magnitude=pl.col("office").str.extract(count).str.to_uppercase().replace(COUNTS).cast(pl.Int32, strict=False),
     )
+    columns = [
+        "state_po",
+        "office",
+        "district",
+        pl.col("special").str.to_uppercase(),
+        "county_fips",
+        "county_name",
+        "precinct",
+        "jurisdiction_fips",
+        "stage",
+        "mode",
+        "candidate",
+        "party_detailed",
+        pl.col("writein").str.to_uppercase(),
+        "votes",
+        pl.col("magnitude").cast(pl.Float64, strict=False).cast(pl.Int32),
+    ]
+    local2018 = pl.scan_csv(raw.cached(SOURCE, LOCAL2018).path, infer_schema=False).select(
+        pl.lit(date(2018, 11, 6)).alias("day"), *columns
+    )
     inputs = [
         *(
             (
                 state,
                 pl.scan_csv(raw.cached(SOURCE, url).path, infer_schema=False)
                 .filter(pl.col("dataverse") == "LOCAL", pl.col("stage").is_in(["GEN", "GEN RECOUNT"]))
-                .select(
-                    pl.lit(date(2024, 11, 5)).alias("day"),
-                    "state_po",
-                    "office",
-                    "district",
-                    "special",
-                    "county_fips",
-                    "county_name",
-                    "precinct",
-                    "jurisdiction_fips",
-                    "stage",
-                    "mode",
-                    "candidate",
-                    "party_detailed",
-                    "writein",
-                    "votes",
-                    pl.col("magnitude").cast(pl.Float64, strict=False).cast(pl.Int32),
-                ),
+                .select(pl.lit(date(2024, 11, 5)).alias("day"), *columns),
             )
             for state, url in sorted(_files().items())
         ),
         *(
-            (state, local2016.filter(pl.col("state_po") == state))
-            for state in sorted(local2016.select("state_po").unique().collect()["state_po"])
+            (state, scan.filter(pl.col("state_po") == state))
+            for scan in (local2016, local2018)
+            for state in sorted(scan.select("state_po").unique().collect()["state_po"])
         ),
     ]
     for state, scan in inputs:
@@ -528,7 +535,7 @@ def parse() -> None:
         for row in doubled.iter_rows(named=True):
             problems.append(f"{year} {state}: {row['place']} {row['key']} {row['seat']} has several office labels")
         summary = summary.filter(pl.col("offices") == 1).with_columns(
-            magnitude=pl.when(pl.col("body") & pl.col("seat").is_null() & (year != 2024))
+            magnitude=pl.when(pl.col("body") & pl.col("seat").is_null() & (year == 2016))
             .then("magnitude")
             .otherwise(pl.col("magnitude").fill_null(1)),
             district=pl.col("seat").is_not_null()
@@ -577,7 +584,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="County offices elected in November 2016 and 2024, from MEDSL's precinct files",
+            summary="County offices elected in November 2016, 2018, and 2024, from MEDSL's precinct files",
             polity="US",
         )
 
@@ -593,7 +600,7 @@ def emit() -> Path:
             if not label or label in NONPARTISAN:
                 return None, False
             label = EXPANDED.get(label, label)
-            if label in INDEPENDENT or "PETITION" in label:
+            if label in INDEPENDENT or label in UNAFFILIATED or "PETITION" in label:
                 return None, True
             if label in NATIONAL:
                 return cs.key("us.party", NATIONAL[label]), False
@@ -625,6 +632,7 @@ def emit() -> Path:
         for state in sorted(set(contests.filter(pl.col("day") == date(2024, 11, 5))["state_po"])):
             cs.artifact(raw.cached(SOURCE, files[state]), sources[date(2024, 11, 5)])
         cs.artifact(raw.cached(SOURCE, LOCAL2016), sources[date(2016, 11, 8)])
+        cs.artifact(raw.cached(SOURCE, LOCAL2018), sources[date(2018, 11, 6)])
         taken = set(
             conn.execute(
                 """select e.date_from, x.value from contest c
