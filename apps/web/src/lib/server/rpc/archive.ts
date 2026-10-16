@@ -1236,13 +1236,24 @@ async function tabulate(
   grouping: Grouping = "option",
 ) {
   const ks = rows.map((row) => row.k);
+  const depth = new Map<number, number>();
+  const tier = rows.map((row) => {
+    const n = depth.get(row.k) ?? 0;
+    depth.set(row.k, n + 1);
+    return n;
+  });
   const [now, then] = await Promise.all([
-    load(
-      roots,
-      ks,
-      date ?? "infinity",
-      [],
-      rows.flatMap((row) => (row.owner == null ? [] : [row.owner])),
+    Promise.all(
+      Array.from({ length: Math.max(0, ...tier) + 1 }, (_, n) => {
+        const batch = rows.filter((_row, index) => tier[index] === n);
+        return load(
+          roots,
+          batch.map((row) => row.k),
+          date ?? "infinity",
+          [],
+          batch.flatMap((row) => (row.owner == null ? [] : [row.owner])),
+        );
+      }),
     ),
     chosen == null
       ? null
@@ -1262,8 +1273,8 @@ async function tabulate(
     }
   >();
   const sources = new Set<string>();
-  const compared = rows.map((row) => {
-    const current = now.get(row.k);
+  const compared = rows.map((row, index) => {
+    const current = now[tier[index] ?? 0]?.get(row.k);
     const sets = current?.sets ?? [];
     for (const set of sets) {
       sources.add(set.source.publisher);
