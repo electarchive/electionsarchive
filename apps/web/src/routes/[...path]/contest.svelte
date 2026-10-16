@@ -21,17 +21,20 @@
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
   import Results, { MEASURES, OUTCOMES } from "./results.svelte";
+  import Rounds from "./rounds.svelte";
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
 
   const {
     contest,
     lists,
+    rounds,
     boundaries,
     match,
   }: {
     contest: Extract<PageData, { kind: "contest" }>["contest"];
     lists: Extract<PageData, { kind: "contest" }>["lists"];
+    rounds: Extract<PageData, { kind: "contest" }>["rounds"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     match: string;
   } = $props();
@@ -257,13 +260,12 @@
         detail: m.group_alliance_detail(),
       },
     ].map((option) => {
-      const query = new URLSearchParams(
-        [...page.url.searchParams].filter(([key]) => key !== "group"),
-      );
-      if (option.value === "alliance") {
-        query.set("group", "alliance");
-      }
-      const text = query.toString().replaceAll("%2F", "/");
+      const text = new URLSearchParams([
+        ...[...page.url.searchParams].filter(([key]) => key !== "group"),
+        ...(option.value === "alliance" ? [["group", "alliance"]] : []),
+      ])
+        .toString()
+        .replaceAll("%2F", "/");
       return {
         ...option,
         suffix: text === "" ? ("" as const) : (`?${text}` as const),
@@ -445,6 +447,10 @@
     </nav>
   {/if}
 </header>
+
+{#if rounds.length > 1}
+  <Rounds {rounds} />
+{/if}
 
 {#if contest.current == null && contest.declared != null}
   <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">

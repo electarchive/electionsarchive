@@ -37,7 +37,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
     requested === "person" || requested === "family" ? requested : "party";
   if (slug.type === "contest") {
     try {
-      const [contest, lists] = await Promise.all([
+      const [contest, lists, rounds] = await Promise.all([
         call(router.contests.get, {
           id: slug.entity_id,
           unit,
@@ -47,13 +47,21 @@ export const load: PageServerLoad = async ({ params, url }) => {
           group: url.searchParams.get("group") ?? undefined,
         }),
         call(router.contests.lists, { id: slug.entity_id }),
+        call(router.contests.rounds, { id: slug.entity_id, unit }),
       ]);
       const boundaries = await call(router.contests.boundaries, {
         id: slug.entity_id,
         unit,
         level: contest.places?.level,
       });
-      return { kind: "contest" as const, contest, lists, boundaries, match };
+      return {
+        kind: "contest" as const,
+        contest,
+        lists,
+        rounds,
+        boundaries,
+        match,
+      };
     } catch (error_) {
       if (error_ instanceof ORPCError && error_.code === "NOT_FOUND") {
         error(404);

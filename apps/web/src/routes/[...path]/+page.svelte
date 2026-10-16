@@ -69,6 +69,7 @@
       <Contest
         contest={data.contest}
         lists={data.lists}
+        rounds={data.rounds}
         boundaries={data.boundaries}
         match={data.match}
       />

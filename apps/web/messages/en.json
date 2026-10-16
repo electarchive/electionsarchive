@@ -373,5 +373,14 @@
   "group_option": "Party",
   "group_option_detail": "Show each party or candidate on its own row.",
   "group_alliance": "Alliance",
-  "group_alliance_detail": "Fold parties that ran together in an alliance or coalition into one row. Alliances that recur in other elections match by their largest party."
+  "group_alliance_detail": "Fold parties that ran together in an alliance or coalition into one row. Alliances that recur in other elections match by their largest party.",
+  "rounds_title": "Rounds",
+  "round_primary": "Primary",
+  "round_first": "First round",
+  "round_general": "General election",
+  "round_runoff": "Runoff",
+  "round_indirect": "Contingent vote",
+  "round_number": "Round {round}",
+  "round_ballot": "Ballot {round}",
+  "round_electoral": "Electoral College vote"
 }

@@ -2730,7 +2730,8 @@ export const contests = {
                             party: entry.current.party,
                             votes: entry.current.votes,
                             share: entry.current.share,
-                            outcome: chain.length > 0 ? null : entry.current.outcome,
+                            outcome:
+                              chain.length > 0 ? null : entry.current.outcome,
                           },
                         ],
                   )
