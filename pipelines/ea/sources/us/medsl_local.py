@@ -1,10 +1,13 @@
+import io
 import json
 import re
+import zipfile
 from datetime import date
 from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -12,7 +15,7 @@ from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, 
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_local"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
 ACCESS = "https://dataverse.harvard.edu/api/access/datafile"
@@ -210,6 +213,81 @@ DISTRICT = (
     "Only part of the county votes in this contest. The archive has no boundary for the district yet, so the "
     "results are shown for the district as a whole."
 )
+TOWNS = {
+    "IA": "19",
+    "IL": "17",
+    "IN": "18",
+    "KS": "20",
+    "MA": "25",
+    "ME": "23",
+    "MI": "26",
+    "MN": "27",
+    "MO": "29",
+    "ND": "38",
+    "NE": "31",
+    "NJ": "34",
+    "NY": "36",
+    "OH": "39",
+    "PA": "42",
+    "RI": "44",
+    "SD": "46",
+    "WI": "55",
+}
+WHOLE = {"MA", "ME", "NJ", "RI"}
+SUBDIVISIONS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{}_cousub_500k.zip"
+INCORPORATED = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{}_place_500k.zip"
+KINDS = {"township", "charter township", "town", "borough", "village", "city", "plantation"}
+SUFFIXED = {"township", "charter township", "borough", "village", "plantation"}
+MUNICIPAL = [
+    ("mayor", "Mayor", False, r"MAYOR"),
+    ("school-committee", "School Committee", True, r"SCHOOL COMMITTEE(?: MEMBERS?)?"),
+    (
+        "board-of-education",
+        "Board of Education",
+        True,
+        (
+            r"(?:MEMBERS? (?:OF|TO) |MEMBERSHIP TO )?(?:THE )?(?:LOCAL )?(?:BOARD OF ED(?:UCATION)?|BOE|SCHOOL BOARD)"
+            r"(?: MEMBERS?)?"
+        ),
+    ),
+    (
+        "committee",
+        "Committee",
+        True,
+        r"(?:MEMBERS? (?:OF )?(?:THE )?)?COMMITTEE(?: ?(?:MEMBERS?|M[AE]N|WOMAN|PERSONS?))?",
+    ),
+    (
+        "council",
+        "Council",
+        True,
+        (
+            r"(?:MEMBERS? (?:OF )?(?:THE )?)?(?:COMMON )?COUNCIL(?: ?(?:MEMBERS?|M[AE]N|WOMAN|PERSONS?|ORS?))?"
+            r"|COUNCIL(?:MEMBER|MAN|PERSON|OR)S?"
+        ),
+    ),
+    ("board", "Board", True, r"(?:MEMBERS? (?:OF )?(?:THE )?)?BOARD(?: MEMBERS?)?"),
+    ("board-of-trustees", "Board of Trustees", True, r"(?:BOARD OF )?TRUSTEES?"),
+    ("supervisor", "Supervisor", False, r"SUPERVISOR"),
+    ("justice", "Justice", False, r"JUSTICE"),
+    ("clerk-treasurer", "Clerk-Treasurer", False, r"CLERK ?[-/] ?TREASURER|CLERK (?:AND|&) TREASURER"),
+    ("clerk", "Clerk", False, r"CLERK"),
+    ("treasurer", "Treasurer", False, r"TREASURER"),
+    (
+        "highway-superintendent",
+        "Superintendent of Highways",
+        False,
+        r"(?:SUPERINTENDENT|SUPT) OF HIGHWAYS|HIGHWAY SUPERINTENDENT",
+    ),
+    ("assessor", "Assessor", False, r"ASSESSORS?"),
+    ("tax-collector", "Tax Collector", False, r"TAX COLLECTOR|RECEIVER OF TAXES"),
+    ("moderator", "Moderator", False, r"MODERATOR"),
+    ("administrator", "Administrator", False, r"ADMINISTRATOR"),
+]
+UNLISTED = re.compile(
+    r"QUESTION|PROPOSITION|MEASURE|FIRE|LIBRARY|REGIONAL|CONSOLIDATED|SHALL|OPEN SPACE|\b\d{4} TERM|RECALL|DEPUTY"
+    r"|PRO TEM|JUDGE|COURT|COUNTY|CHAIR|PRESIDENT"
+)
+VACANCY = re.compile(r"UNEXPIRED|VACANCY|\bT?FV\b|SHORT TERM")
 
 
 def fetch() -> None:
@@ -222,6 +300,9 @@ def fetch() -> None:
             suffix=".csv",
         )
     raw.fetch(SOURCE, LOCAL2016, suffix=".csv")
+    for fips in TOWNS.values():
+        raw.fetch(SOURCE, SUBDIVISIONS.format(fips), suffix=".zip")
+        raw.fetch(SOURCE, INCORPORATED.format(fips), suffix=".zip")
 
 
 def _files() -> dict[str, str]:
@@ -312,6 +393,66 @@ def _city(office: str, places: dict[str, tuple[str, str]]) -> dict[str, object] 
     }
 
 
+def _town(
+    state: str, office: str, county: str, options: list[tuple[str, str, str, str, str, str]]
+) -> dict[str, object] | None:
+    text = re.sub(r"\s+", " ", office.upper()).strip()
+    if UNLISTED.search(text):
+        return None
+    text = re.sub(r"\bBORO\b", "BOROUGH", re.sub(r"\bTWP\b", "TOWNSHIP", re.sub(r"[.']", "", text)))
+    remainder = VACANCY.search(text) is not None
+    text = re.sub(
+        r"\(?(?:UNEXPIRED(?: TERM)?|TO FILL (?:A |THE )?VACANCY|VACANCY|\bT?FV\b|SHORT TERM)\)?"
+        r"|\b\d+[- ]?(?:YRS?|YEARS?)(?: TERM)?\b|\(\d\)",
+        " ",
+        text,
+    )
+    hits = []
+    for code, scheme, base, kind, display, proper in options:
+        word = kind.upper()
+        for form, explicit in ((f"{word} OF {base}", True), (f"{base} {word}", True), (base, False)):
+            for match in re.finditer(rf"(?<![A-Z]){re.escape(form)}(?![A-Z])", text):
+                outside = text[: match.start()] + " " + text[match.end() :]
+                if explicit or re.search(rf"\b{word}\b", outside):
+                    hits.append((explicit, len(form), code, scheme, proper, kind, display, match.start(), match.end()))
+    if not hits:
+        return None
+    hits.sort(key=lambda hit: (hit[0], hit[1]), reverse=True)
+    best = hits[0]
+    if any(hit[2] != best[2] and hit[:2] == best[:2] for hit in hits):
+        return None
+    _, _, code, scheme, proper, kind, display, _, _ = best
+    for start, end in sorted({(hit[7], hit[8]) for hit in hits if hit[2] == code}, key=lambda span: -span[1]):
+        text = text[:start] + " " * (end - start) + text[end:]
+    text = re.sub(rf"\b(?:{re.escape(county.upper())}|TOWNSHIP|TOWN|BOROUGH|VILLAGE|CITY)\b|[()]", " ", text)
+    text = re.sub(r"\s+", " ", text).strip(" ,-:")
+    for key, title, body, pattern in MUNICIPAL:
+        found = re.fullmatch(rf"(?:{pattern})(?:\s*[-,:]?\s*(.*))?", text)
+        if found is None:
+            continue
+        rest = (found[1] or "").strip(" ,-") or None
+        if rest is not None and (not SEAT.fullmatch(rest) or BANNED.search(rest)):
+            return None
+        if state == "NY" and kind == "town" and key == "council":
+            key, title = "board", "Board"
+        if state == "IN" and key == "board-of-trustees":
+            key, title, body = "trustee", "Trustee", False
+        stem = f"{proper} Town" if kind == "town" else f"{proper} City" if kind == "city" else display
+        return {
+            "office": office,
+            "code": code,
+            "scheme": scheme,
+            "place": display,
+            "key": key,
+            "title": title,
+            "body": body,
+            "rest": rest,
+            "remainder": remainder,
+            "stem": f"Mayor of {proper}" if key == "mayor" else f"{stem} {title}",
+        }
+    return None
+
+
 def _seat(text: str | None) -> str | None:
     if text is None:
         return None
@@ -347,6 +488,74 @@ def parse() -> None:
             places.setdefault(code[:2], {})[
                 re.sub(r"[^A-Z]", "", re.sub(r"^(?:CITY|TOWN|VILLAGE) OF ", "", text.upper())).removesuffix("CITY")
             ] = (code, text)
+        existing = {
+            code
+            for (code,) in conn.execute(
+                "select code from reporting_unit where scheme_code in ('us.place', 'us.town') and code ~ '^[0-9]+$'"
+            ).fetchall()
+        }
+        municipalities: dict[str, list[tuple[str, str, str, str, str, str]]] = {}
+        shapes: dict[str, tuple[str, str, str, str]] = {}
+        incorporated: list[tuple[str, str, str, str]] = []
+        for state, fips in TOWNS.items():
+            for url in (SUBDIVISIONS.format(fips), INCORPORATED.format(fips)):
+                with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+                    parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
+                reader = shapefile.Reader(
+                    shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"])
+                )
+                for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
+                    if record is None or shape is None:
+                        continue
+                    proper, whole = str(record["NAME"]), str(record["NAMELSAD"])
+                    kind = whole[len(proper) :].strip().lower() if whole.startswith(proper) else ""
+                    code = str(record["GEOID"])
+                    subdivision = url == SUBDIVISIONS.format(fips)
+                    if kind not in KINDS or subdivision != (
+                        state in WHOLE
+                        or kind in ("township", "charter township", "plantation")
+                        or kind == "town"
+                        and state in ("NY", "WI")
+                    ):
+                        continue
+                    scheme = "us.town" if subdivision else "us.place"
+                    if subdivision and kind == "city":
+                        found = places.get(fips, {}).get(re.sub(r"[^A-Z]", "", proper.upper()))
+                        if found is not None:
+                            code, scheme = found[0], "us.place"
+                    option = (
+                        code,
+                        scheme,
+                        re.sub(r"[.']", "", proper.upper()),
+                        kind,
+                        f"{proper} {kind.title()}" if kind in SUFFIXED else proper,
+                        proper,
+                    )
+                    if code not in existing:
+                        shapes[code] = (option[4], state, json.dumps(shape.__geo_interface__), code[:5])
+                    if subdivision:
+                        municipalities.setdefault(str(record["GEOID"])[:5], []).append(option)
+                    else:
+                        incorporated.append((code, json.dumps(shape.__geo_interface__), state, json.dumps(option)))
+        for code, within, option in conn.execute(
+            """select f.code, array(select c.code from area a join area_code c on c.area_id = a.id
+                     join area_geometry g on g.area_id = a.id
+                     where a.scheme_code = 'us.county' and left(c.code, 2) = left(f.code, 2) and g.geom && s.geom
+                       and st_area(st_intersection(g.geom, s.geom)) > 0.01 * st_area(s.geom)
+                     order by st_area(st_intersection(g.geom, s.geom)) desc), f.option
+               from unnest(%s::text[], %s::text[], %s::text[]) as f(code, geojson, option)
+               cross join lateral (select st_makevalid(st_transform(st_setsrid(st_geomfromgeojson(f.geojson), 4269), 4326))
+                 as geom) s""",
+            [
+                [code for code, _, _, _ in incorporated],
+                [geojson for _, geojson, _, _ in incorporated],
+                [option for _, _, _, option in incorporated],
+            ],
+        ).fetchall():
+            if code in shapes and within:
+                shapes[code] = (*shapes[code][:3], within[0])
+            for county in within:
+                municipalities.setdefault(county, []).append(tuple(json.loads(option)))
     contests: list[pl.DataFrame] = []
     lines: list[pl.DataFrame] = []
     problems: list[str] = []
@@ -463,12 +672,17 @@ def parse() -> None:
                         "body": body,
                         "rest": rest,
                         "remainder": remainder,
+                        "stem": None,
                     }
                 )
             elif office not in towns:
                 towns[office] = _city(office, places.get(fips[:2], {}))
             if found is None and (town := towns[office]) is not None:
-                labels.append({**town, "county_fips": fips, "scheme": "us.place"})
+                labels.append({**town, "county_fips": fips, "scheme": "us.place", "stem": None})
+            elif (
+                found is None and (town := _town(state, office, county or "", municipalities.get(fips, []))) is not None
+            ):
+                labels.append({**town, "county_fips": fips})
         if not labels:
             continue
         frame = frame.join(pl.DataFrame(labels, infer_schema_length=None), on=["office", "county_fips"])
@@ -525,6 +739,7 @@ def parse() -> None:
             pl.col("place").first(),
             pl.col("title").first(),
             pl.col("body").first(),
+            pl.col("stem").first(),
             pl.col("office").n_unique().alias("offices"),
             pl.col("office").first(),
             pl.col("magnitude").max(),
@@ -552,10 +767,28 @@ def parse() -> None:
             .agg(pl.col("party_detailed").drop_nulls().mode().first(), pl.col("votes").sum())
         )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat(contests).sort("state_po", "code", "key", "seat", nulls_last=False).write_parquet(
+    pl.concat(contests, how="diagonal_relaxed").sort("state_po", "code", "key", "seat", nulls_last=False).write_parquet(
         PARSED / "contests.parquet"
     )
     pl.concat(lines).write_parquet(PARSED / "lines.parquet")
+    used = set(pl.read_parquet(PARSED / "contests.parquet").filter(pl.col("scheme") != "us.county")["code"])
+    with connect() as conn:
+        pl.DataFrame(
+            conn.execute(
+                """select f.code, f.display, f.state, f.county, encode(st_asewkb(s.geom), 'hex'),
+                     encode(st_asewkb(st_pointonsurface(s.geom)), 'hex')
+                   from unnest(%s::text[], %s::text[], %s::text[], %s::text[], %s::text[])
+                     as f(code, display, state, county, geojson)
+                   cross join lateral (select st_multi(st_collectionextract(st_makevalid(st_transform(
+                     st_setsrid(st_geomfromgeojson(f.geojson), 4269), 4326)), 3)) as geom) s""",
+                [
+                    [code for code in shapes if code in used],
+                    *([shapes[code][part] for code in shapes if code in used] for part in (0, 1, 3, 2)),
+                ],
+            ).fetchall(),
+            schema=["code", "display", "state", "county", "geom", "point"],
+            orient="row",
+        ).write_parquet(PARSED / "municipalities.parquet")
     (PARSED / "problems.txt").write_text("\n".join(problems))
 
 
@@ -572,7 +805,7 @@ def emit() -> Path:
                    join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality')
                    join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                    join slug s on s.entity_id = p.id
-                   where a.scheme_code in ('us.county', 'us.place')"""
+                   where a.scheme_code in ('us.county', 'us.place', 'us.town')"""
             ).fetchall()
         }
         parties_known = {
@@ -644,6 +877,64 @@ def emit() -> Path:
                 [list(DATASETS), list(sources.values())],
             ).fetchall()
         )
+        census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
+        municipalities = pl.read_parquet(PARSED / "municipalities.parquet")
+        for state in sorted(set(municipalities["state"])):
+            for url in (SUBDIVISIONS.format(TOWNS[state]), INCORPORATED.format(TOWNS[state])):
+                cs.artifact(raw.cached(SOURCE, url), census)
+        for code, display, state, county, geom, point in municipalities.iter_rows():
+            town = len(code) == 10
+            scheme = "us.town" if town else "us.place"
+            if (scheme, code) in polities:
+                continue
+            polity = cs.key("us.polity", f"town:{code}" if town else f"place:{code}")
+            path = f"us/{state.lower()}/{slug(display)}"
+            for fallback in (
+                path
+                if re.search(r"-(?:township|town|village|borough|city|plantation)$", path)
+                else f"{path}-{'town' if town else 'city'}",
+                f"{path}-{slug(polities[('us.county', county)][1])}",
+            ):
+                if path in slugs:
+                    path = fallback
+            if path in slugs:
+                raise ValueError(f"{display} would take {path}")
+            slugs[path] = polity
+            polities[(scheme, code)] = (polity, display, path)
+            cs.add("polity", id=polity, kind="municipality", iso_code=None)
+            name(polity, display)
+            cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{state}"))
+            cs.add("slug", path=path, entity_id=polity)
+            area = cs.area(scheme, code)
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add(
+                "area_parent",
+                area_id=area,
+                parent_id=cs.area("us.county", county) if town else cs.area("us.state", code[:2]),
+            )
+            name(area, f"{display}, {state}")
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=None,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=census,
+            )
+            cs.add(
+                "reporting_unit",
+                id=cs.unit(scheme, code),
+                polity_id=polity,
+                scheme_code=scheme,
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
         systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp and block systems must already exist")
@@ -702,7 +993,7 @@ def emit() -> Path:
             election = elections[(day, code)]
             body = row["body"]
             city = place.removeprefix("City of ")
-            office_title = (
+            office_title = row["stem"] or (
                 f"Mayor of {city}"
                 if key == "mayor" and (city != place or scheme == "us.place")
                 else f"{city} City Council"
@@ -713,11 +1004,17 @@ def emit() -> Path:
             )
             if (code, key) not in owners:
                 owner = owners[(code, key)] = cs.key("us.body" if body else "us.office", f"{state}:{code}:{key}")
-                if body:
-                    cs.add("body", id=owner, polity_id=polity, kind="council")
-                else:
-                    cs.add("office", id=owner, polity_id=polity, kind="other")
-                name(owner, office_title)
+                if owner in cs.minted:
+                    if body:
+                        cs.add("body", id=owner, polity_id=polity, kind="council")
+                    else:
+                        cs.add(
+                            "office",
+                            id=owner,
+                            polity_id=polity,
+                            kind="mayor" if key == "mayor" and row["stem"] else "other",
+                        )
+                    name(owner, office_title)
             whole, unit = cs.area(scheme, code), cs.unit(scheme, code)
             area = whole
             if row["district"]:
@@ -805,7 +1102,8 @@ def emit() -> Path:
                     if person_key not in persons:
                         persons[person_key] = cs.key(f"{SOURCE}.person", f"{state}:{code}:{slug(candidate)}")
                         cs.add("person", id=persons[person_key])
-                        name(persons[person_key], ballot)
+                        if persons[person_key] in cs.minted:
+                            name(persons[person_key], ballot)
                     option = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
                     cs.add(
                         "contest_option",
