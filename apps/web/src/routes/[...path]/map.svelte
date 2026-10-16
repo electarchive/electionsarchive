@@ -6,9 +6,11 @@
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
+  import XIcon from "@lucide/svelte/icons/x";
   import { mode } from "mode-watcher";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
+  import { fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
   import { count, percent, points } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -72,6 +74,11 @@
   let maps = $state<Array<Maplibre.Map>>([]);
   let isLoaded = $state(false);
   let pinned = $state<number | null>(null);
+  let grab = $state<number | null>(null);
+  let drag = $state(0);
+  const calm =
+    typeof matchMedia !== "undefined" &&
+    matchMedia("(prefers-reduced-motion: reduce)").matches;
   let shading = $state<
     "winner" | "bubbles" | "swing" | "arrows" | "flips" | number
   >(
@@ -910,12 +917,30 @@
     >
       <span
         id="{uid}-shading"
-        class="shrink-0 self-start text-sm/7 font-semibold whitespace-nowrap max-sm:sr-only"
+        class="shrink-0 text-sm/7 font-semibold whitespace-nowrap sm:self-start"
         >{m.map_color_by()}</span
       >
-      <div
-        class="-my-1 flex gap-2 py-1 min-inline-0 sm:flex-wrap max-sm:overflow-x-auto"
+      <select
+        class="keycap rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold block-10 min-inline-0 sm:hidden"
+        aria-labelledby="{uid}-shading"
+        value={String(view)}
+        onchange={(event) => {
+          const value = event.currentTarget.value;
+          shading = MODES.find((choice) => choice === value) ?? Number(value);
+        }}
       >
+        <option value="winner">{m.map_mode_winner()}</option>
+        {#each options as option (option.index)}
+          <option value={String(option.index)}>{option.name}</option>
+        {/each}
+        <option value="bubbles">{m.map_mode_bubbles()}</option>
+        {#if isCompared}
+          <option value="swing">{m.map_mode_swing()}</option>
+          <option value="arrows">{m.map_mode_arrows()}</option>
+          <option value="flips">{m.map_mode_flips()}</option>
+        {/if}
+      </select>
+      <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
         {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
           {#if group.length > 0}
             <div class="flex shrink-0">
@@ -999,12 +1024,12 @@
       </div>
     {/if}
     <div
-      class="absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border"
+      class="absolute inset-e-2 inset-bs-2 flex flex-col overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border max-sm:inset-bs-auto max-sm:inset-be-2"
       data-export-skip
     >
       <button
         type="button"
-        class="grid place-items-center block-8 inline-8 hover:bg-secondary"
+        class="grid place-items-center block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_in()}
         title={m.map_zoom_in()}
         onclick={() => maps[0]?.zoomIn()}
@@ -1013,7 +1038,7 @@
       </button>
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary"
+        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_out()}
         title={m.map_zoom_out()}
         onclick={() => maps[0]?.zoomOut()}
@@ -1022,7 +1047,7 @@
       </button>
       <button
         type="button"
-        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary"
+        class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_reset()}
         title={m.map_reset()}
         onclick={() => {
@@ -1222,18 +1247,74 @@
     {/if}
   </div>
 
-  <div class="sm:hidden" aria-live="polite">
-    {#if current != null}
-      <div class="grid gap-1.5 rounded-sm p-1">
-        {@render readout()}
+  <p class="px-1 text-[0.8125rem] text-muted-foreground sm:hidden">
+    {m.map_pick_touch()}
+  </p>
+  {#if pinned != null && current != null}
+    <div
+      class="fixed inset-x-0 inset-be-0 z-40 grid touch-none gap-2 rounded-t-lg bg-card px-4 pbs-1.5 pbe-[max(1rem,env(safe-area-inset-bottom))] shadow-menu ring-1 ring-border sm:hidden"
+      style:translate="0 {Math.max(0, drag)}px"
+      style:transition={drag === 0 ? "translate 200ms ease-out" : "none"}
+      role="region"
+      aria-label={current.name}
+      aria-live="polite"
+      data-export-skip
+      transition:fly={{ y: 48, duration: calm ? 0 : 220 }}
+      onpointerdown={(event) => {
+        if (event.pointerType === "touch") {
+          grab = event.clientY;
+        }
+      }}
+      onpointermove={(event) => {
+        if (grab != null) {
+          drag = event.clientY - grab;
+        }
+      }}
+      onpointerup={() => {
+        if (drag > 56) {
+          pinned = null;
+          focus = null;
+        }
+        grab = null;
+        drag = 0;
+      }}
+      onpointercancel={() => {
+        grab = null;
+        drag = 0;
+      }}
+    >
+      <div class="flex items-center justify-between">
+        <span
+          class="mx-auto rounded-full bg-border block-1 inline-10"
+          aria-hidden="true"
+        ></span>
+        <button
+          type="button"
+          class="-me-2 grid place-items-center rounded-sm text-muted-foreground block-10 inline-10 hover:bg-secondary"
+          aria-label={m.map_sheet_close()}
+          onclick={() => {
+            pinned = null;
+            focus = null;
+          }}
+        >
+          <XIcon class="block-4 inline-4" />
+        </button>
       </div>
-    {:else}
-      <p class="px-1 text-[0.8125rem] text-muted-foreground">{m.map_pick()}</p>
-    {/if}
-  </div>
+      {@render readout(true)}
+      {#if current.path != null}
+        {const place = $derived(current)}
+        <button
+          type="button"
+          class="flex items-center justify-center rounded-sm bg-primary text-sm font-semibold text-primary-foreground block-11"
+          onclick={() => open(place.k)}
+          >{m.map_open({ place: place.name })}</button
+        >
+      {/if}
+    </div>
+  {/if}
 </div>
 
-{#snippet readout()}
+{#snippet readout(isSheet = false)}
   {#if current != null}
     <span class="flex items-baseline justify-between gap-3">
       <span class="font-semibold text-pretty">{current.name}</span>
@@ -1290,7 +1371,7 @@
         >{votes}
         <span class="font-mono tabular-nums">{count(current.valid)}</span></span
       >
-      {#if current.path != null}
+      {#if current.path != null && !isSheet}
         <a
           class="pointer-events-auto font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
           href={resolve("/[...path]", { path: current.path })}

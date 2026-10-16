@@ -1,6 +1,8 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
+  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import PauseIcon from "@lucide/svelte/icons/pause";
   import PlayIcon from "@lucide/svelte/icons/play";
   import {
@@ -39,6 +41,7 @@
   let isPlaying = $state(false);
   let isDragging = $state(false);
   let settled = $state<string | null>(null);
+  let swipe: { x: number; y: number } | null = null;
 
   const parties = $derived(
     new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
@@ -341,7 +344,7 @@
     {#if steps.length > 1}
       <div class="grid gap-1 pbs-5">
         <div
-          class="relative cursor-grab touch-none rounded-sm outline-offset-4 select-none block-9 active:cursor-grabbing"
+          class="relative cursor-grab touch-pan-y rounded-sm outline-offset-4 select-none block-9 before:absolute before:inset-x-0 before:-inset-y-2.5 active:cursor-grabbing"
           role="slider"
           tabindex="0"
           aria-label={m.scrubber_slider()}
@@ -427,22 +430,69 @@
         )}
       >
         {#if step != null}
-          <p
-            class="mbe-2 flex items-baseline gap-2 lg:hidden"
-            aria-live="polite"
+          <div
+            class="mbe-2 flex touch-pan-y items-center gap-2 lg:hidden"
+            role="group"
+            aria-label={m.scrubber_slider()}
+            onpointerdown={(event) => {
+              if (event.pointerType === "touch") {
+                swipe = { x: event.clientX, y: event.clientY };
+              }
+            }}
+            onpointerup={(event) => {
+              if (swipe != null) {
+                const dx = event.clientX - swipe.x;
+                if (
+                  Math.abs(dx) > 40 &&
+                  Math.abs(dx) > Math.abs(event.clientY - swipe.y) * 1.5
+                ) {
+                  isPlaying = false;
+                  at = Math.max(
+                    0,
+                    Math.min(steps.length - 1, index + (dx < 0 ? 1 : -1)),
+                  );
+                }
+              }
+              swipe = null;
+            }}
+            onpointercancel={() => (swipe = null)}
           >
-            <span
-              class="font-serif text-4xl/none font-[640] tracking-[-0.03em] tabular-nums"
-              >{step.year}</span
+            <p
+              class="flex items-baseline gap-2 min-inline-0"
+              aria-live="polite"
             >
-            {#if hub.data != null}
-              <a
-                class="truncate text-[0.8125rem] font-semibold underline decoration-border underline-offset-4"
-                href={resolve("/[...path]", { path: step.path })}
-                >{hub.data.name}</a
+              <span
+                class="font-serif text-4xl/none font-[640] tracking-[-0.03em] tabular-nums"
+                >{step.year}</span
               >
+              {#if hub.data != null}
+                <a
+                  class="truncate text-[0.8125rem] font-semibold underline decoration-border underline-offset-4"
+                  href={resolve("/[...path]", { path: step.path })}
+                  >{hub.data.name}</a
+                >
+              {/if}
+            </p>
+            {#if steps.length > 1}
+              <div class="ms-auto flex shrink-0 gap-1">
+                {#each [{ move: -1, label: m.scrubber_previous(), icon: ChevronLeftIcon }, { move: 1, label: m.scrubber_next(), icon: ChevronRightIcon }] as button (button.move)}
+                  <button
+                    type="button"
+                    class="grid place-items-center rounded-sm border border-input bg-card block-11 inline-11 hover:bg-secondary disabled:opacity-40"
+                    aria-label={button.label}
+                    disabled={index + button.move < 0 ||
+                      index + button.move > steps.length - 1}
+                    onclick={() => {
+                      isPlaying = false;
+                      at = index + button.move;
+                    }}
+                  >
+                    <button.icon class="block-5 inline-5" />
+                  </button>
+                {/each}
+              </div>
             {/if}
-          </p>
+          </div>
         {/if}
         {#if race?.map != null && race.places != null}
           {#key `${race.map.tiles}:${race.map.own?.tiles ?? ""}`}

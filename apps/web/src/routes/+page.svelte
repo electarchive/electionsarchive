@@ -289,7 +289,7 @@
           </button>
           <div class="grid gap-1">
             <div
-              class="relative cursor-grab touch-none rounded-sm outline-offset-4 select-none block-8 active:cursor-grabbing"
+              class="relative cursor-grab touch-pan-y rounded-sm outline-offset-4 select-none block-8 before:absolute before:inset-x-0 before:-inset-y-3 active:cursor-grabbing"
               role="slider"
               tabindex="0"
               aria-label={m.home_scrub_slider()}
