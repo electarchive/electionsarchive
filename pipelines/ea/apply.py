@@ -344,8 +344,14 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
     if table == "slug":
         conn.execute(
             sql.SQL(
-                """update public.slug p set is_current = p.path = s.path from {} s
-                   where p.entity_id = s.entity_id and p.is_current is distinct from (p.path = s.path)"""
+                """update public.slug p set is_current = false from {} s
+                   where p.entity_id = s.entity_id and p.is_current and p.path <> s.path"""
+            ).format(staged)
+        )
+        conn.execute(
+            sql.SQL(
+                """update public.slug p set is_current = true from {} s
+                   where p.entity_id = s.entity_id and not p.is_current and p.path = s.path"""
             ).format(staged)
         )
     if table in stage.temporal:
