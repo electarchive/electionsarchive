@@ -1,9 +1,11 @@
 <script lang="ts">
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Electors from "./electors.svelte";
+  import PlaceMap from "./map.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
   import Results, { MEASURES } from "./results.svelte";
@@ -70,8 +72,58 @@
           : race.results.find(
               (row) => row.person != null && row.person === elector?.person,
             );
+      const legend = race.places?.legend ?? [];
+      const ordered = seated.toSorted(
+        (a, b) =>
+          (a.lean ?? 1e9) - (b.lean ?? 1e9) || (b.seats ?? 0) - (a.seats ?? 0),
+      );
       return {
         ...race,
+        tones: legend.map((item) => swatch(item.color, item.key)),
+        titles: legend.map((item) =>
+          item.person == null ? (item.short ?? item.label) : item.label,
+        ),
+        balance:
+          race.electors != null && race.electors.rows.length > 0
+            ? {
+                total: appointed,
+                parts: race.electors.rows.map((row) => ({
+                  key: row.key,
+                  label: row.short ?? row.label,
+                  color: swatch(row.color, row.key),
+                  value: row.votes,
+                })),
+                isCount: true,
+                isWhole: true,
+              }
+            : seated.length > 1 || (seated.length > 0 && race.count > 1)
+              ? {
+                  total:
+                    race.size != null && race.size <= total + 2
+                      ? race.size
+                      : total,
+                  parts: ordered.map((row) => ({
+                    key: row.key,
+                    label: row.short ?? row.label,
+                    color: swatch(row.color, row.key),
+                    value: row.seats ?? 0,
+                  })),
+                  isCount: true,
+                  isWhole: race.size != null && race.size <= total + 2,
+                }
+              : {
+                  total: 1,
+                  parts: race.results
+                    .slice(0, 2)
+                    .map((row) => ({
+                      key: row.key,
+                      label: row.short ?? row.label,
+                      color: swatch(row.color, row.key),
+                      value: row.share,
+                    })),
+                  isCount: false,
+                  isWhole: false,
+                },
         name:
           race.round != null &&
           election.races.some(
@@ -187,87 +239,7 @@
   </p>
 </header>
 
-{#each races as race, index (index)}
-  <section class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-1">
-    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-      <h2
-        class="font-serif text-2xl/tight font-[640] tracking-[-0.005em] text-balance"
-      >
-        {race.name}
-      </h2>
-      <p
-        class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground"
-      >
-        {#if race.count > 1}
-          <span>{m.race_contests({ count: race.count })}</span>
-        {/if}
-        {#if race.path != null}
-          <Preview
-            class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-            path={race.path}>{m.race_open()}</Preview
-          >
-        {/if}
-      </p>
-    </div>
-    {#if race.lede != null}
-      <p class="text-[0.9375rem] text-pretty max-inline-[64ch]">
-        {race.lede}
-      </p>
-    {/if}
-  </section>
-  {#if race.electors != null && race.electors.rows.length > 0}
-    <Electors electors={race.electors} />
-  {/if}
-  <div
-    class={cn(
-      "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-      {
-        "lg:col-span-8":
-          race.seated.length > 0 &&
-          race.electors == null &&
-          !race.isOffice &&
-          !race.isSlate,
-      },
-    )}
-  >
-    <Results
-      rows={race.rows}
-      span={null}
-      votes={race.votes}
-      seats={race.seated.length === 0 ||
-      (race.isOffice && race.electors == null)
-        ? null
-        : race.electors == null && !race.isSlate
-          ? m.col_seats()
-          : m.col_electors()}
-    />
-  </div>
-  {#if race.seated.length > 0 && race.electors == null && !race.isOffice && !race.isSlate}
-    <Seats
-      parties={race.seated}
-      places={[]}
-      here={null}
-      place={race.name}
-      link={null}
-      size={race.size}
-      isComplete={race.size != null || race.count === 1}
-    />
-  {/if}
-  {#if race.places != null}
-    <Places
-      places={{
-        ...race.places,
-        levels: race.places.levels.filter(
-          (level) => level.code === race.places?.level,
-        ),
-      }}
-      span={null}
-      publishers={[]}
-      votes={race.votes}
-      limit={15}
-    />
-  {/if}
-{:else}
+{#if races.length === 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_contests()}</h2>
     <ul class="grid text-sm">
@@ -291,6 +263,162 @@
       {/each}
     </ul>
   </section>
+{/if}
+
+{#if races.length > 1}
+  <section
+    class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-4"
+    aria-labelledby="board-title"
+  >
+    <h2 id="board-title" class="text-[0.8125rem] font-bold">
+      {m.board_title({ count: races.length })}
+    </h2>
+    <ol
+      class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-px overflow-hidden rounded-sm bg-border ring-1 ring-border"
+    >
+      {#each races as race, index (index)}
+        <li class="grid">
+          <a
+            class="group grid content-start gap-2.5 bg-card p-3 hover:bg-secondary/60"
+            href="#race-{index}"
+          >
+            <span class="flex items-baseline justify-between gap-3">
+              <span
+                class="font-serif text-lg/tight font-[640] text-balance group-hover:underline group-hover:decoration-border group-hover:underline-offset-4"
+                >{race.name}</span
+              >
+              {#if race.count > 1}
+                <span
+                  class="shrink-0 font-mono text-xs text-muted-foreground tabular-nums"
+                  >{race.count}</span
+                >
+              {/if}
+            </span>
+            {@render balance(race.balance)}
+          </a>
+        </li>
+      {/each}
+    </ol>
+  </section>
+{/if}
+
+{#each races as race, index (index)}
+  <section
+    id="race-{index}"
+    class="col-span-12 grid scroll-mbs-4 gap-1.5 bg-card px-3.5 pbs-4 pbe-1"
+  >
+    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
+      <h2
+        class={cn("font-serif font-[640] tracking-[-0.005em] text-balance", {
+          "text-[clamp(1.5rem,2.4vw,2rem)]/tight": index === 0,
+          "text-2xl/tight": index > 0,
+        })}
+      >
+        {race.name}
+      </h2>
+      <p
+        class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground"
+      >
+        {#if race.count > 1}
+          <span>{m.race_contests({ count: race.count })}</span>
+        {/if}
+        {#if race.path != null}
+          <Preview
+            class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+            path={race.path}>{m.race_open()}</Preview
+          >
+        {/if}
+      </p>
+    </div>
+    {#if race.lede != null}
+      <p
+        class={cn("text-pretty max-inline-[64ch]", {
+          "text-[1.0625rem]": index === 0,
+          "text-[0.9375rem]": index > 0,
+        })}
+      >
+        {race.lede}
+      </p>
+    {/if}
+  </section>
+  {#if race.electors != null && race.electors.rows.length > 0}
+    <Electors electors={race.electors} />
+  {/if}
+  {const isSeated = $derived(
+    race.seated.length > 0 &&
+      race.electors == null &&
+      !race.isOffice &&
+      !race.isSlate,
+  )}
+  {const isMapped = $derived(
+    race.map != null && race.places != null && index < 4,
+  )}
+  {#if isMapped && race.map != null && race.places != null}
+    <div
+      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-8"
+    >
+      <PlaceMap
+        places={race.places}
+        colors={race.tones}
+        tiles={race.map.tiles}
+        own={race.map.own}
+        frames={race.map.frames}
+        isApproximate={race.map.isApproximate}
+        noun={race.places.levels[0]?.noun ?? ""}
+        votes={race.votes}
+        names={race.titles}
+        levels={[]}
+        span={null}
+      />
+    </div>
+  {/if}
+  {#if isSeated}
+    <Seats
+      parties={race.seated}
+      places={[]}
+      here={null}
+      place={race.name}
+      link={null}
+      size={race.size}
+      isComplete={race.size != null || race.count === 1}
+    />
+  {/if}
+  <div
+    class={cn(
+      "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
+      {
+        "lg:col-span-4": isMapped && !isSeated,
+        "lg:col-span-8": isSeated && !isMapped,
+      },
+    )}
+  >
+    <Results
+      rows={race.rows}
+      span={null}
+      votes={race.votes}
+      seats={race.seated.length === 0 ||
+      (race.isOffice && race.electors == null)
+        ? null
+        : race.electors == null && !race.isSlate
+          ? m.col_seats()
+          : m.col_electors()}
+    />
+  </div>
+  {#if race.places != null}
+    <Places
+      places={{
+        ...race.places,
+        levels: race.places.levels.filter(
+          (level) => level.code === race.places?.level,
+        ),
+      }}
+      span={null}
+      publishers={[]}
+      votes={race.votes}
+      {isMapped}
+      limit={15}
+    />
+  {/if}
 {/each}
 
 {#if stages.length > 0}
@@ -359,3 +487,57 @@
     </ul>
   </section>
 {/if}
+
+{#snippet balance(bar: {
+  total: number;
+  parts: Array<{ key: string; label: string; color: string; value: number }>;
+  isCount: boolean;
+  isWhole: boolean;
+})}
+  {const shown = $derived(
+    bar.parts
+      .filter((part) => part.value > 0)
+      .toSorted((a, b) => b.value - a.value)
+      .slice(0, 2)
+      .toSorted((a, b) => bar.parts.indexOf(a) - bar.parts.indexOf(b)),
+  )}
+  <span class="grid gap-1.5">
+    <span class="flex items-baseline justify-between gap-3 text-[0.8125rem]">
+      {#each shown as part, at (part.key)}
+        <span
+          class={cn("flex items-baseline gap-1.5 min-inline-0", {
+            "flex-row-reverse text-end": at === 1,
+          })}
+        >
+          <span class="truncate font-semibold">{part.label}</span>
+          <span class="shrink-0 font-mono text-xs tabular-nums"
+            >{bar.isCount ? count(part.value) : percent(part.value)}</span
+          >
+        </span>
+      {/each}
+    </span>
+    <span
+      class="relative flex overflow-hidden rounded-xs bg-muted block-2.5"
+      aria-hidden="true"
+    >
+      {#each bar.isCount ? bar.parts : shown as part, at (part.key)}
+        <span
+          class={cn("block block-full", {
+            "ms-auto": !bar.isCount && at === 1,
+          })}
+          style:inline-size="{(part.value / Math.max(bar.total, 0.0001)) *
+            100}%"
+          style:background-color={part.color}
+        ></span>
+      {/each}
+      {#if bar.isWhole && bar.total > 1}
+        <span
+          class="absolute inset-y-0 bg-foreground inline-0.5"
+          style:inset-inline-start="{((Math.floor(bar.total / 2) + 1) /
+            bar.total) *
+            100}%"
+        ></span>
+      {/if}
+    </span>
+  </span>
+{/snippet}

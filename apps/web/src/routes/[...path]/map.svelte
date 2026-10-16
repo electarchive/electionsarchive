@@ -1073,7 +1073,7 @@
       </div>
     {:else}
       <div class="flex flex-wrap gap-1.5">
-        {#each leads as [index, won] (index)}
+        {#each leads.slice(0, 6) as [index, won] (index)}
           <button
             type="button"
             class={cn(

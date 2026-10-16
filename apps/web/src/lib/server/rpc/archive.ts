@@ -2668,39 +2668,7 @@ export const contests = {
               },
             ]),
       ].filter((group) => group.ids.length > 0);
-      const parts = await db.execute<{
-        west: number;
-        south: number;
-        east: number;
-        north: number;
-        share: number;
-      }>(sql`
-        with parts as (
-          select (ST_Dump(ST_SimplifyPreserveTopology(g.geom, 0.02))).geom as geom
-          from area_geometry g
-          where g.area_id = ${area.id}::uuid and g.valid @> ${day}::date
-        ),
-        clustered as (
-          select geom, ST_ClusterDBSCAN(ST_Envelope(geom), eps := 2, minpoints := 1) over () as cluster
-          from parts
-        ),
-        grouped as (
-          select ST_Extent(geom) as box, sum(ST_Area(geom) * cos(radians(ST_Y(ST_Centroid(geom))))) as size
-          from clustered group by cluster
-        )
-        select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north,
-          size / nullif(sum(size) over (), 0) as share
-        from grouped order by size desc
-      `);
-      const frames = parts.rows
-        .filter((part) => part.share >= 0.0005)
-        .slice(0, 6)
-        .map((part) => ({
-          west: part.west,
-          south: part.south,
-          east: part.east,
-          north: part.north,
-        }));
+      const frames = await framing(area.id, day);
       const drawn = await Promise.all(
         groups.map(async (group) => {
           const found = await db.execute<{
@@ -3296,6 +3264,75 @@ export const contests = {
     }),
 };
 
+async function framing(area: string, day: string) {
+  const parts = await db.execute<{
+    west: number;
+    south: number;
+    east: number;
+    north: number;
+    share: number;
+  }>(sql`
+    with parts as (
+      select (ST_Dump(ST_SimplifyPreserveTopology(g.geom, 0.02))).geom as geom
+      from area_geometry g
+      where g.area_id = ${area}::uuid and g.valid @> ${day}::date
+    ),
+    clustered as (
+      select geom, ST_ClusterDBSCAN(ST_Envelope(geom), eps := 2, minpoints := 1) over () as cluster
+      from parts
+    ),
+    grouped as (
+      select ST_Extent(geom) as box, sum(ST_Area(geom) * cos(radians(ST_Y(ST_Centroid(geom))))) as size
+      from clustered group by cluster
+    )
+    select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north,
+      size / nullif(sum(size) over (), 0) as share
+    from grouped order by size desc
+  `);
+  return parts.rows
+    .filter((part) => part.share >= 0.0005)
+    .slice(0, 6)
+    .map((part) => ({
+      west: part.west,
+      south: part.south,
+      east: part.east,
+      north: part.north,
+    }));
+}
+
+async function sketch(
+  area: { id: string; k: number },
+  level: string,
+  day: string,
+) {
+  const [frames, found] = await Promise.all([
+    framing(area.id, day),
+    db.execute<{ scheme: string; tiles: string; synthetic: boolean }>(sql`
+      select distinct on (bs.scheme_code) bs.scheme_code as scheme,
+        coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
+        exists (
+          select from area_geometry g join area x on x.id = g.area_id
+          where x.scheme_code = bs.scheme_code and g.quality = 'synthetic' and g.valid @> coalesce(bs.as_of, ${day}::date)
+          limit 1
+        ) as synthetic
+      from boundary_set bs
+      where bs.scheme_code in (${level}, (select scheme_code from area where id = ${area.id}::uuid))
+        and bs.valid @> ${day}::date
+      order by bs.scheme_code, bs.valid_from desc nulls last
+    `),
+  ]);
+  const tiled = found.rows.find((row) => row.scheme === level);
+  const own = found.rows.find((row) => row.scheme !== level);
+  return tiled == null || frames.length === 0
+    ? null
+    : {
+        tiles: tiled.tiles,
+        own: own == null ? null : { tiles: own.tiles, k: area.k },
+        frames,
+        isApproximate: tiled.synthetic,
+      };
+}
+
 async function races(
   election: string,
   polity: string,
@@ -3534,7 +3571,11 @@ async function races(
         })
         .toArray()
         .toSorted((a, b) => b.votes - a.votes);
+      const level = grid?.level ?? (table == null ? null : first?.scheme);
+      const map =
+        level == null || isBrief ? null : await sketch(place, level, day);
       return {
+        map,
         name:
           labels.full.get(
             (single == null ? head?.owner : single.id) ?? head?.id ?? "",
@@ -3704,6 +3745,21 @@ export const elections = {
               }),
             ),
             places: Places,
+            map: v.nullable(
+              v.object({
+                tiles: v.string(),
+                own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
+                frames: v.array(
+                  v.object({
+                    west: v.number(),
+                    south: v.number(),
+                    east: v.number(),
+                    north: v.number(),
+                  }),
+                ),
+                isApproximate: v.boolean(),
+              }),
+            ),
           }),
         ),
         contests: v.array(

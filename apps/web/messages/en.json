@@ -558,5 +558,6 @@
   "scatter_movers": "Biggest shifts",
   "scatter_movers_note": "Change in the margin between the top two from {from} to {to}, in points.",
   "scatter_toward": "Toward {name}",
-  "scatter_change": "Margin shift"
+  "scatter_change": "Margin shift",
+  "board_title": "{count} races"
 }
