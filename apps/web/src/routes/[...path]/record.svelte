@@ -22,7 +22,13 @@
   let hovered = $state<number | null>(null);
   let seated = $state<string | null>(null);
 
-  const series = $derived(record.data?.series ?? []);
+  const series = $derived(
+    (record.data?.series ?? []).filter((entry) =>
+      entry.points.some((point) =>
+        point.parties.some((party) => party.party != null),
+      ),
+    ),
+  );
   const parties = $derived(
     new Map((record.data?.parties ?? []).map((party) => [party.id, party])),
   );
