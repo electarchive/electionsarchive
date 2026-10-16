@@ -1325,7 +1325,7 @@
         {const place = $derived(current)}
         <button
           type="button"
-          class="flex items-center justify-center rounded-sm bg-primary text-sm font-semibold text-primary-foreground block-11"
+          class="flex items-center justify-center rounded-sm border border-foreground bg-marker text-sm font-semibold text-[#15171a] block-11"
           onclick={() => open(place.k)}
           >{m.map_open({ place: place.name })}</button
         >

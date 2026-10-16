@@ -173,7 +173,7 @@
       >
     {/if}
   </Tooltip.Provider>
-  <ProgressBar class="text-primary" displayThresholdMs={300} />
+  <ProgressBar class="text-marker" displayThresholdMs={300} />
   <ConfirmationDialog />
   <Provenance />
 </QueryClientProvider>

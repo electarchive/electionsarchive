@@ -41,6 +41,7 @@
   --border: #dadde2;
   --input: #b9bec6;
   --ring: #15171a;
+  --marker: #ffe03a;
   --radius: 3px;
   --menu-shadow:
     0 1px 2px rgb(21 23 26 / 0.08), 0 12px 28px -12px rgb(21 23 26 / 0.3);
@@ -67,6 +68,7 @@
   --border: #2b2f34;
   --input: #474d55;
   --ring: #e8eaed;
+  --marker: #e8c547;
   --menu-shadow: 0 1px 2px rgb(0 0 0 / 0.5), 0 12px 28px -10px rgb(0 0 0 / 0.8);
   color-scheme: dark;
 }
@@ -81,6 +83,7 @@
     "Sofia Sans Semi Condensed Variable", "Noto Sans", system-ui, sans-serif;
   --font-figures--font-feature-settings: "tnum" 1, "lnum" 1;
   --color-ring: var(--ring);
+  --color-marker: var(--marker);
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
@@ -319,7 +322,8 @@
     -webkit-font-smoothing: antialiased;
   }
   ::selection {
-    background-color: var(--accent);
+    background-color: color-mix(in oklab, var(--marker) 70%, transparent);
+    color: var(--foreground);
   }
   :focus-visible {
     outline: 2px solid var(--ring);

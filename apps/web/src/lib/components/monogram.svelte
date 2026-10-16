@@ -10,9 +10,10 @@
   viewBox="0 0 32 32"
   aria-hidden="true"
 >
-  <rect class="fill-foreground" width="32" height="32" rx="3" />
+  <rect class="fill-marker" width="32" height="32" rx="3" />
   <path
-    class="fill-none stroke-background"
+    fill="none"
+    stroke="#15171a"
     d="M9.5 7 V25 M13.75 7 V25 M18 7 V25 M22.25 7 V25 M5.5 21 L26.5 11"
     stroke-width="2.4"
     stroke-linecap="square"

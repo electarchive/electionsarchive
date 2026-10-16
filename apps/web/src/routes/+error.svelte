@@ -43,7 +43,7 @@
     {#if page.status !== 429}
       <button
         type="button"
-        class="flex items-center gap-2 rounded-sm bg-primary px-3.5 text-sm font-semibold text-primary-foreground block-10 hover:bg-primary/90"
+        class="flex items-center gap-2 rounded-sm border border-foreground bg-marker px-3.5 text-sm font-semibold text-[#15171a] block-10 hover:bg-[color-mix(in_oklab,var(--marker),#15171a_10%)]"
         onclick={() => {
           finder.value = guess;
           finder.isOpen = true;

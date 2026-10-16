@@ -13,14 +13,14 @@
     variants: {
       variant: {
         default:
-          "keycap border-foreground bg-primary text-primary-foreground hover:bg-[color-mix(in_oklab,var(--primary),var(--foreground)_8%)]",
+          "border-foreground bg-marker text-[#15171a] keycap hover:bg-[color-mix(in_oklab,var(--marker),#15171a_10%)]",
         outline:
           "keycap hover:bg-secondary aria-expanded:bg-secondary data-open:bg-secondary",
-        secondary: "keycap bg-secondary hover:bg-card",
+        secondary: "bg-secondary keycap hover:bg-card",
         ghost:
           "border-transparent bg-transparent hover:highlighter aria-expanded:highlighter data-open:highlighter",
         destructive:
-          "keycap border-destructive/60 text-destructive hover:bg-destructive/10",
+          "border-destructive/60 text-destructive keycap hover:bg-destructive/10",
         link: "border-transparent bg-transparent underline decoration-border underline-offset-4 hover:decoration-foreground",
       },
       size: {

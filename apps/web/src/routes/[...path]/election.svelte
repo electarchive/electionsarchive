@@ -326,10 +326,6 @@
                   : [[row.key, (row.seats ?? 0) - earlier]];
               }),
             );
-      const ordered = seated.toSorted(
-        (a, b) =>
-          (a.lean ?? 1e9) - (b.lean ?? 1e9) || (b.seats ?? 0) - (a.seats ?? 0),
-      );
       const whole =
         race.body == null || race.electors != null
           ? null
@@ -395,16 +391,29 @@
                     race.size != null && race.size <= total + 2
                       ? race.size
                       : total,
-                  parts: ordered.map((row) => ({
-                    key: row.key,
-                    label: row.key.startsWith("alliance:")
-                      ? row.label
-                      : (row.short ?? row.label),
-                    color: swatch(row.color, row.key),
-                    value: row.seats ?? 0,
-                    delta:
-                      change == null ? undefined : (change[row.key] ?? null),
-                  })),
+                  parts: units
+                    .toSorted(
+                      (a, b) =>
+                        (a.lean ?? 1e9) - (b.lean ?? 1e9) ||
+                        (b.seats ?? 0) - (a.seats ?? 0),
+                    )
+                    .map((row) => {
+                      let delta: number | null = 0;
+                      for (const key of row.keys) {
+                        const step = change?.[key];
+                        delta =
+                          step == null || delta == null ? null : delta + step;
+                      }
+                      return {
+                        key: row.key,
+                        label: row.key.startsWith("alliance:")
+                          ? row.label
+                          : (row.short ?? row.label),
+                        color: swatch(row.color, row.key),
+                        value: row.seats ?? 0,
+                        delta: change == null ? undefined : delta,
+                      };
+                    }),
                   isCount: true,
                   isWhole: race.size != null && race.size <= total + 2,
                 }
@@ -550,24 +559,6 @@
       >
     {/if}
   </p>
-  {#if races.length > 1}
-    <ul class="mbs-2 grid gap-2 max-inline-[72ch]">
-      {#each races.slice(0, 3) as race, index (index)}
-        {#if race.lede != null && !race.isLater}
-          <li class="grid gap-0.5 border-s-2 border-border ps-3">
-            <a
-              class="text-[0.8125rem] font-semibold text-muted-foreground hover:text-foreground"
-              href="#race-{index}">{race.name}</a
-            >
-            <span
-              class="font-serif text-[clamp(1.0625rem,1.6vw,1.25rem)]/snug text-pretty"
-              >{race.sequel ?? race.lede}</span
-            >
-          </li>
-        {/if}
-      {/each}
-    </ul>
-  {/if}
 </header>
 
 {#if races.length === 0}
@@ -597,55 +588,52 @@
 {/if}
 
 {#if races.length > 1}
-  <section
-    class="col-span-12 grid gap-3 bg-card px-3.5 pbs-3.5 pbe-4"
-    aria-labelledby="board-title"
-  >
-    <h2 id="board-title" class="text-[0.8125rem] font-bold">
+  <section class="col-span-12 bg-card px-3.5" aria-labelledby="board-title">
+    <h2 id="board-title" class="sr-only">
       {m.board_title({ count: races.length })}
     </h2>
-    <ol
-      class={cn(
-        "grid gap-px overflow-hidden rounded-sm bg-border ring-1 ring-border",
-        {
-          "sm:grid-cols-2": races.length >= 2 && races.length <= 4,
-          "sm:*:last:col-span-2 lg:grid-cols-3 lg:*:last:col-span-1":
-            races.length === 3,
-          "lg:grid-cols-4": races.length === 4,
-          "grid-cols-[repeat(auto-fill,minmax(min(100%,17rem),1fr))]":
-            races.length > 4,
-        },
-      )}
-    >
+    <ol class="grid">
       {#each races as race, index (index)}
-        <li class="grid">
-          <a
-            class="group grid content-start gap-2.5 bg-card p-3 hover:bg-secondary/60"
-            href="#race-{index}"
+        {#if !race.isLater}
+          <li
+            class="grid gap-x-10 gap-y-3 border-bs border-border py-4 first:border-bs-0 first:pbs-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
           >
-            <span class="flex items-baseline justify-between gap-3">
-              <span
-                class="text-lg/tight font-[720] text-balance group-hover:underline group-hover:decoration-border group-hover:underline-offset-4"
-                >{race.name}</span
+            <div class="grid content-start gap-1">
+              <h3
+                class={cn("font-[740] tracking-[-0.012em] text-balance", {
+                  "text-xl/tight": index === 0,
+                  "text-lg/tight": index > 0,
+                })}
               >
-              {#if race.count > 1}
-                <span
-                  class="shrink-0 font-figures text-xs text-muted-foreground tabular-nums"
-                  >{race.count}</span
+                <a
+                  class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  href="#race-{index}">{race.name}</a
                 >
+              </h3>
+              {#if race.lede != null}
+                <p
+                  class={cn("font-serif text-pretty max-inline-[52ch]", {
+                    "text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug": index === 0,
+                    "text-[1.0625rem]/snug": index > 0,
+                  })}
+                >
+                  {race.sequel ?? race.lede}
+                </p>
               {/if}
-            </span>
-            {@render balance(race.balance)}
-            {#if race.whole != null}
-              <span class="grid gap-1.5 border-bs border-border/60 pbs-2">
-                <span class="text-xs text-muted-foreground"
-                  >{m.board_after()}</span
-                >
-                {@render balance({ ...race.whole, isCount: true })}
-              </span>
-            {/if}
-          </a>
-        </li>
+            </div>
+            <div class="grid content-end gap-3">
+              {@render balance(race.balance, index === 0)}
+              {#if race.whole != null}
+                <div class="grid gap-1">
+                  <p class="text-[0.8125rem] text-muted-foreground">
+                    {m.board_after()}
+                  </p>
+                  {@render balance({ ...race.whole, isCount: true }, false)}
+                </div>
+              {/if}
+            </div>
+          </li>
+        {/if}
       {/each}
     </ol>
   </section>
@@ -679,7 +667,7 @@
         {/if}
       </p>
     </div>
-    {#if race.lede != null && (races.length === 1 || index >= 3 || race.sequel != null)}
+    {#if race.lede != null && (races.length === 1 || race.isLater)}
       <p
         class={cn("text-pretty max-inline-[64ch]", {
           "text-[1.0625rem]": index === 0,
@@ -690,7 +678,7 @@
       </p>
     {/if}
   </section>
-  {#if race.electors != null && race.electors.rows.length > 0}
+  {#if race.electors != null && race.electors.rows.length > 0 && races.length === 1}
     <Electors electors={race.electors} />
   {/if}
   {const isSeated = $derived(
@@ -905,18 +893,21 @@
   </section>
 {/if}
 
-{#snippet balance(bar: {
-  total: number;
-  parts: Array<{
-    key: string;
-    label: string;
-    color: string;
-    value: number;
-    delta?: number | null;
-  }>;
-  isCount: boolean;
-  isWhole: boolean;
-})}
+{#snippet balance(
+  bar: {
+    total: number;
+    parts: Array<{
+      key: string;
+      label: string;
+      color: string;
+      value: number;
+      delta?: number | null;
+    }>;
+    isCount: boolean;
+    isWhole: boolean;
+  },
+  isLead: boolean,
+)}
   {const shown = $derived(
     bar.parts
       .filter((part) => part.value > 0)
@@ -924,35 +915,49 @@
       .slice(0, 2)
       .toSorted((a, b) => bar.parts.indexOf(a) - bar.parts.indexOf(b)),
   )}
-  <span class="grid gap-1.5">
-    <span class="flex items-baseline justify-between gap-3 text-[0.8125rem]">
+  <div class="grid gap-1.5">
+    <div class="flex items-end justify-between gap-4">
       {#each shown as part, at (part.key)}
-        <span
-          class={cn("flex items-baseline gap-1.5 min-inline-0", {
-            "flex-row-reverse text-end": at === 1,
+        <p
+          class={cn("grid min-inline-0", {
+            "justify-items-end text-end": at === 1,
           })}
         >
-          <span class="truncate font-semibold">{part.label}</span>
-          <span class="shrink-0 font-figures text-xs tabular-nums"
-            >{bar.isCount ? count(part.value) : percent(part.value)}</span
+          <span
+            class={cn(
+              "font-figures leading-none font-[780] tracking-[-0.02em]",
+              { "text-[2.5rem]": isLead, "text-[1.75rem]": !isLead },
+            )}>{bar.isCount ? count(part.value) : percent(part.value)}</span
           >
-          {#if part.delta !== undefined}
-            <span
-              class={cn("shrink-0 font-figures text-[0.6875rem] tabular-nums", {
-                "text-muted-foreground": part.delta == null || part.delta === 0,
-              })}
-              >{part.delta == null
-                ? m.seats_change_new()
-                : part.delta === 0
-                  ? "±0"
-                  : `${part.delta > 0 ? "+" : "−"}${count(Math.abs(part.delta))}`}</span
-            >
-          {/if}
-        </span>
+          <span
+            class="flex items-baseline gap-1.5 text-[0.9375rem] font-semibold min-inline-0"
+          >
+            <span class="truncate">{part.label}</span>
+            {#if part.delta !== undefined}
+              <span
+                class={cn(
+                  "shrink-0 font-figures text-[0.8125rem] font-normal",
+                  {
+                    "text-muted-foreground":
+                      part.delta == null || part.delta === 0,
+                  },
+                )}
+                >{part.delta == null
+                  ? m.seats_change_new()
+                  : part.delta === 0
+                    ? "±0"
+                    : `${part.delta > 0 ? "+" : "−"}${count(Math.abs(part.delta))}`}</span
+              >
+            {/if}
+          </span>
+        </p>
       {/each}
-    </span>
-    <span
-      class="relative flex animate-sweep overflow-hidden rounded-xs bg-muted block-2.5 motion-reduce:animate-none"
+    </div>
+    <div
+      class={cn(
+        "relative flex animate-sweep overflow-hidden bg-muted motion-reduce:animate-none",
+        { "block-4": isLead, "block-3": !isLead },
+      )}
       aria-hidden="true"
     >
       {#each bar.isCount ? bar.parts : shown as part, at (part.key)}
@@ -967,12 +972,12 @@
       {/each}
       {#if bar.isWhole && bar.total > 1}
         <span
-          class="absolute inset-y-0 bg-foreground inline-0.5"
+          class="absolute -inset-y-px bg-foreground inline-0.5"
           style:inset-inline-start="{((Math.floor(bar.total / 2) + 1) /
             bar.total) *
             100}%"
         ></span>
       {/if}
-    </span>
-  </span>
+    </div>
+  </div>
 {/snippet}
