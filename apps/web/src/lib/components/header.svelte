@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import {
+    ArrowLeftRightIcon,
     LayoutDashboardIcon,
     LogOutIcon,
     MonitorIcon,
@@ -16,6 +17,7 @@
   import * as DropdownMenu from "#lib/components/ui/dropdown-menu/index.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { cn } from "#lib/utils.js";
 
   const THEMES = [
     { value: "system", label: m.theme_system(), icon: MonitorIcon },
@@ -34,6 +36,14 @@
     </a>
     <div class="flex items-center gap-2">
       <Search />
+      <a
+        href={resolve("/compare")}
+        class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2")}
+        aria-current={page.url.pathname === "/compare" ? "page" : undefined}
+      >
+        <ArrowLeftRightIcon />
+        <span class="max-sm:sr-only">{m.versus_action()}</span>
+      </a>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger
           class={buttonVariants({ variant: "ghost", size: "icon" })}
