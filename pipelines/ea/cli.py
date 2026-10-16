@@ -2,7 +2,7 @@ import argparse
 import importlib
 from pathlib import Path
 
-from ea import cache, fixtures, search, tiles
+from ea import cache, coverage, fixtures, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import connect
 
@@ -24,6 +24,9 @@ def main() -> None:
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
+    commands.add_parser(
+        "coverage", help="measure a polity's coverage against its v1 goal and write .agents/spec/{polity}-coverage.md"
+    ).add_argument("polity", choices=("us",))
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -43,6 +46,8 @@ def main() -> None:
             print(tiles.build(args.scheme))
         case "search":
             print(search.build())
+        case "coverage":
+            print(getattr(coverage, args.polity)())
         case "raw":
             cache.main(args.action, args.source, quick=args.quick)
         case "publish":
