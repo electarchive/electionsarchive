@@ -117,7 +117,33 @@
       }),
     );
   });
-  const leader = $derived(term?.parties[0] ?? null);
+  const leaders = $derived(
+    data.terms.map(
+      (entry) =>
+        Map.groupBy(
+          entry.parties,
+          (row) =>
+            body.partners.find((pair) => pair.includes(row.party ?? ""))?.[0] ??
+            row.party,
+        )
+          .values()
+          .map((rows) => {
+            let seats = 0;
+            for (const row of rows) {
+              seats += row.seats;
+            }
+            return {
+              party: rows[0]?.party ?? null,
+              name: rows.map((row) => label(row.party)).join("/"),
+              seats,
+            };
+          })
+          .toArray()
+          .toSorted((a, b) => b.seats - a.seats)[0] ?? null,
+    ),
+  );
+  const leader = $derived(leaders[selected] ?? null);
+  const largest = $derived(leaders.at(-1) ?? null);
   const whole = $derived(term == null ? 0 : (term.size ?? term.total));
   const cabinets = $derived(
     term == null
@@ -223,16 +249,16 @@
             <span
               class="self-center rounded-xs block-3 inline-3"
               style:background={swatch(
-                info.get(latest.parties[0]?.party ?? "")?.color ?? null,
-                `party:${latest.parties[0]?.party ?? ""}`,
+                info.get(largest?.party ?? "")?.color ?? null,
+                `party:${largest?.party ?? ""}`,
               )}
             ></span>
             <span class="text-xl font-[760] tracking-[-0.015em]"
-              >{label(latest.parties[0]?.party ?? null)}</span
+              >{largest?.name ?? ""}</span
             >
             <span
               class="font-figures text-base text-muted-foreground tabular-nums"
-              >{count(latest.parties[0]?.seats ?? 0)}</span
+              >{count(largest?.seats ?? 0)}</span
             >
           </dd>
         </div>
@@ -335,13 +361,13 @@
           >
             {#if leader.seats >= Math.floor(whole / 2) + 1}
               {m.chamber_majority({
-                party: label(leader.party),
+                party: leader.name,
                 seats: count(leader.seats),
                 total: count(whole),
               })}
             {:else}
               {m.chamber_plurality({
-                party: label(leader.party),
+                party: leader.name,
                 seats: count(leader.seats),
                 total: count(whole),
               })}

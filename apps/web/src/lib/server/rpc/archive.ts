@@ -6632,6 +6632,7 @@ export const bodies = {
             ),
           }),
         ),
+        partners: v.array(v.array(v.string())),
         parties: v.array(
           v.object({
             id: v.string(),
@@ -6710,13 +6711,30 @@ export const bodies = {
       ]);
       const home = slugs.get(body.polity) ?? null;
       const held = [...new Set(makeup.rows.flatMap((row) => row.party ?? []))];
-      const [colors, positions] = await Promise.all([
+      const last = await db.execute<{ id: string; date: string }>(sql`
+        select c.id, e.date_from::text as date from contest c join election e on e.id = c.election_id
+        where c.body_id = ${input.id}::uuid and c.allocation_parent_id is null
+          and c.party_scope_id is null and e.kind = 'general'
+          and e.date_from = (
+            select max(e2.date_from) from contest c2 join election e2 on e2.id = c2.election_id
+            where c2.body_id = ${input.id}::uuid and e2.kind = 'general'
+          )
+      `);
+      const [colors, positions, pairs] = await Promise.all([
         refs(held),
         db.execute<{ party_id: string; lean: number }>(sql`
           select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
           where party_id = any(${sql.param(held)}::uuid[])
           order by party_id, valid_from desc nulls last
         `),
+        last.rows.length === 0
+          ? null
+          : db.execute<{ from: string; to: string }>(
+              sisters(
+                last.rows.map((row) => row.id),
+                last.rows[0]?.date ?? "infinity",
+              ),
+            ),
       ]);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
@@ -6754,6 +6772,8 @@ export const bodies = {
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,
         })),
+        partners:
+          pairs?.rows.map((row) => [row.from.slice(6), row.to.slice(6)]) ?? [],
       };
     }),
   members: os
