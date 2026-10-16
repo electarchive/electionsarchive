@@ -186,6 +186,10 @@ REMAINDER = re.compile(
     r",? ?-? ?\(?(?:UNEXPIRED(?: TERM(?: ENDING [\d/]+)?)?|TO FILL (?:A |THE )?VACANCY|SHORT TERM|SPECIAL)\)?$"
 )
 VACANT = {"NO CANDIDATE FILED", "NO CANDIDATE", "NO CANDIDATES", "NO NOMINATION", "VACANT", "NONE"}
+EXCLUDED = re.compile(
+    r"RECALL|PRESIDENT|CHAIR|VICE|JUDGE|CLERK|TREASURER|ATTORNEY|AUDITOR|BOARD|SCHOOL|QUESTION|PROPOSITION|AMENDMENT"
+    r"|CHARTER|MEASURE|COUNTY|TOWNSHIP|ADVISORY|SHALL"
+)
 NONPARTISAN = {"NONPARTISAN", "NON-PARTISAN", "NP"}
 METHOD = (
     "Totals are the sums of the precinct rows in MEDSL's 2024 precinct file for the state. The file does not mark "
@@ -265,6 +269,41 @@ def _classify(state: str, office: str, county: str) -> tuple[str, str, bool, str
     return None if found is None else (*found, remainder)
 
 
+def _city(office: str, places: dict[str, tuple[str, str]]) -> dict[str, object] | None:
+    text = re.sub(r"\s+", " ", office.upper()).strip()
+    if not re.search(r"MAYOR|COUNCIL|ALDERM", text) or EXCLUDED.search(text):
+        return None
+    key = "mayor" if "MAYOR" in text else "council"
+    remainder = REMAINDER.search(text) is not None
+    text = REMAINDER.sub("", text)
+    seats = re.findall(
+        r"\b(?:WARD|DISTRICT|DIST\.?|POSITION(?: NO\.?)?|POS\.?|SEAT|PLACE) ?#? ?[A-Z]?\d+[A-Z]?\b|\bAT[- ]LARGE\b",
+        text,
+    )
+    for seat in seats:
+        text = text.replace(seat, " ")
+    text = re.sub(r"\b(?:CITY|TOWN|VILLAGE) OF\b", " ", text)
+    text = re.sub(
+        r"\b(?:MAYOR|CITY COUNCIL|COUNCIL ?(?:MEMBERS?|M[AE]N|WOMAN|PERSONS?)|COUNCILMEMBERS?|COUNCILORS?|COUNCIL|ALDERM[AE]N"
+        r"|\d+ ?(?:YRS?|YEARS?)(?: TERM)?)\b",
+        " ",
+        text,
+    )
+    found = places.get(re.sub(r"[^A-Z]", "", text).removesuffix("CITY"))
+    if found is None or len(seats) > 1:
+        return None
+    return {
+        "office": office,
+        "code": found[0],
+        "place": found[1],
+        "key": key,
+        "title": "Mayor" if key == "mayor" else "City Council",
+        "body": key == "council",
+        "rest": seats[0] if seats else None,
+        "remainder": remainder,
+    }
+
+
 def _seat(text: str | None) -> str | None:
     if text is None:
         return None
@@ -273,6 +312,7 @@ def _seat(text: str | None) -> str | None:
     text = re.sub(r"\s*#\s*", " ", text).strip()
     text = re.sub(r"\bPOS\b\.?", "POSITION", text)
     text = re.sub(r"^(?:NO|NUMBER|#)\.? ?#? ?", "", text)
+    text = re.sub(r"\b(?:NO|NUMBER)\.? (?=\d)", "", text)
     text = re.sub(r"\b0+(\d)", r"\1", text)
     if text.isdigit():
         text = f"DISTRICT {text}"
@@ -289,6 +329,16 @@ def _seat(text: str | None) -> str | None:
 
 
 def parse() -> None:
+    with connect() as conn:
+        places: dict[str, dict[str, tuple[str, str]]] = {}
+        for code, text in conn.execute(
+            """select u.code, n.text from reporting_unit u
+               join name n on n.entity_id = u.polity_id and n.is_preferred and n.lang = 'en'
+               where u.scheme_code = 'us.place' and u.code ~ '^[0-9]{7}$'"""
+        ).fetchall():
+            places.setdefault(code[:2], {})[
+                re.sub(r"[^A-Z]", "", re.sub(r"^(?:CITY|TOWN|VILLAGE) OF ", "", text.upper())).removesuffix("CITY")
+            ] = (code, text)
     contests: list[pl.DataFrame] = []
     lines: list[pl.DataFrame] = []
     problems: list[str] = []
@@ -335,14 +385,18 @@ def parse() -> None:
             .with_columns(pooled=pl.col("candidate").is_in(list(POOLED)) | (pl.col("writein") == "TRUE"))
         )
         labels = []
-        for office, county in frame.select("office", "county_name").unique().iter_rows():
+        towns = {}
+        for office, county, fips in frame.select("office", "county_name", "county_fips").unique().iter_rows():
             found = _classify(state, office, county or "")
             if found is not None:
                 key, title, body, rest, remainder = found
                 labels.append(
                     {
                         "office": office,
-                        "county_name": county,
+                        "county_fips": fips,
+                        "code": fips,
+                        "scheme": "us.county",
+                        "place": county,
                         "key": key,
                         "title": title,
                         "body": body,
@@ -350,22 +404,24 @@ def parse() -> None:
                         "remainder": remainder,
                     }
                 )
+            elif office not in towns:
+                towns[office] = _city(office, places.get(fips[:2], {}))
+            if found is None and (town := towns[office]) is not None:
+                labels.append({**town, "county_fips": fips, "scheme": "us.place"})
         if not labels:
             continue
-        frame = frame.join(
-            pl.DataFrame(labels, infer_schema_length=None), on=["office", "county_name"], nulls_equal=True
-        )
+        frame = frame.join(pl.DataFrame(labels, infer_schema_length=None), on=["office", "county_fips"])
         chosen = (
-            frame.group_by("county_fips", "key", "rest", "remainder", "office")
+            frame.group_by("county_fips", "code", "key", "rest", "remainder", "office")
             .agg(pl.struct("jurisdiction_fips", "precinct").n_unique().alias("width"))
             .sort("width", "office", descending=[True, False])
-            .unique(["county_fips", "key", "rest", "remainder"], keep="first", maintain_order=True)
+            .unique(["county_fips", "code", "key", "rest", "remainder"], keep="first", maintain_order=True)
             .select("county_fips", "office")
         )
-        frame = frame.join(chosen, on=["county_fips", "office"], nulls_equal=True)
+        frame = frame.join(chosen, on=["county_fips", "office"])
         race = ["office", "district", "special"]
         spread = (
-            frame.filter(~pl.col("pooled"))
+            frame.filter(~pl.col("pooled"), pl.col("scheme") == "us.county")
             .group_by(*race, "candidate")
             .agg(pl.col("county_fips").n_unique().alias("counties"))
             .filter(pl.col("counties") > 1)
@@ -397,13 +453,11 @@ def parse() -> None:
             ),
             remainder=pl.col("remainder") | (pl.col("special") == "TRUE"),
         )
-        widths = dict(
-            frame.group_by("county_fips").agg(pl.struct("jurisdiction_fips", "precinct").n_unique()).iter_rows()
-        )
-        contest = ["county_fips", "key", "seat", "remainder"]
+        contest = ["code", "key", "seat", "remainder"]
         summary = frame.group_by(contest).agg(
             pl.col("state_po").first(),
-            pl.col("county_name").first(),
+            pl.col("scheme").first(),
+            pl.col("place").first(),
             pl.col("title").first(),
             pl.col("body").first(),
             pl.col("office").n_unique().alias("offices"),
@@ -414,10 +468,9 @@ def parse() -> None:
         )
         doubled = summary.filter(pl.col("offices") > 1)
         for row in doubled.iter_rows(named=True):
-            problems.append(f"{state}: {row['county_name']} {row['key']} {row['seat']} has several office labels")
+            problems.append(f"{state}: {row['place']} {row['key']} {row['seat']} has several office labels")
         summary = summary.filter(pl.col("offices") == 1).with_columns(
-            district=pl.col("seat").is_not_null()
-            & (pl.col("precincts") < 0.9 * pl.col("county_fips").replace_strict(widths, return_dtype=pl.UInt32))
+            district=pl.col("seat").is_not_null() & (pl.col("precincts") < 0.9 * pl.col("precincts").max().over("code"))
         )
         contests.append(summary.drop("offices", "precincts"))
         lines.append(
@@ -430,7 +483,7 @@ def parse() -> None:
             .agg(pl.col("party_detailed").drop_nulls().mode().first(), pl.col("votes").sum())
         )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat(contests).sort("state_po", "county_fips", "key", "seat", nulls_last=False).write_parquet(
+    pl.concat(contests).sort("state_po", "code", "key", "seat", nulls_last=False).write_parquet(
         PARSED / "contests.parquet"
     )
     pl.concat(lines).write_parquet(PARSED / "lines.parquet")
@@ -441,16 +494,16 @@ def emit() -> Path:
     contests = pl.read_parquet(PARSED / "contests.parquet")
     lines = pl.read_parquet(PARSED / "lines.parquet")
     with connect() as conn:
-        counties = {
-            code: (polity, text, path)
-            for code, polity, text, path in conn.execute(
-                """select c.code, t.polity_id, n.text, s.path from area a
+        polities = {
+            (scheme, code): (polity, text, path)
+            for scheme, code, polity, text, path in conn.execute(
+                """select a.scheme_code, c.code, t.polity_id, n.text, s.path from area a
                    join area_code c on c.area_id = a.id
                    join polity_territory t on t.area_id = a.id
                    join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality')
                    join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
                    join slug s on s.entity_id = p.id
-                   where a.scheme_code = 'us.county'"""
+                   where a.scheme_code in ('us.county', 'us.place')"""
             ).fetchall()
         }
         parties_known = {
@@ -515,14 +568,12 @@ def emit() -> Path:
         persons: dict[tuple[str, str], UUID] = {}
         districts: set[str] = set()
         values: list[tuple[str, str, str, int]] = []
-        grouped = {
-            keys: rows for keys, rows in lines.group_by("county_fips", "key", "seat", "remainder", maintain_order=True)
-        }
+        grouped = {keys: rows for keys, rows in lines.group_by("code", "key", "seat", "remainder", maintain_order=True)}
         for row in contests.iter_rows(named=True):
-            state, code, key, seat = row["state_po"], row["county_fips"], row["key"], row["seat"]
-            if code not in counties:
+            state, scheme, code, key, seat = row["state_po"], row["scheme"], row["code"], row["key"], row["seat"]
+            if (scheme, code) not in polities:
                 continue
-            polity, place, path = counties[code]
+            polity, place, path = polities[(scheme, code)]
             parent = cs.key("us.election", f"{DAY}:{state}")
             if parent in cs.minted:
                 raise ValueError(f"no election {DAY}:{state}")
@@ -545,9 +596,9 @@ def emit() -> Path:
             city = place.removeprefix("City of ")
             office_title = (
                 f"Mayor of {city}"
-                if key == "mayor" and city != place
+                if key == "mayor" and (city != place or scheme == "us.place")
                 else f"{city} City Council"
-                if key == "city-council" and city != place
+                if key in ("city-council", "council") and (city != place or scheme == "us.place")
                 else f"{place} Council"
                 if key == "city-council"
                 else f"{place} {row['title']}"
@@ -559,12 +610,12 @@ def emit() -> Path:
                 else:
                     cs.add("office", id=owner, polity_id=polity, kind="other")
                 name(owner, office_title)
-            whole, unit = cs.area("us.county", code), cs.unit("us.county", code)
+            whole, unit = cs.area(scheme, code), cs.unit(scheme, code)
             area = whole
             if row["district"]:
-                district = f"{code}:{key}:{slug(seat)}"
+                district = f"{code[:2]}:{code}:{key}:{slug(seat)}"
                 area, unit = cs.area("us.local_district", district), cs.unit("us.local_district", district)
-                if district not in districts:
+                if area in cs.minted and district not in districts:
                     districts.add(district)
                     cs.add("area", id=area, scheme_code="us.local_district")
                     cs.add("area_code", area_id=area, code=district, valid_from=None)
@@ -603,7 +654,7 @@ def emit() -> Path:
             )
             name(
                 contest,
-                f"2024 {office_title} election"
+                (f"2024 {city} mayoral election" if key == "mayor" else f"2024 {office_title} election")
                 + (f", {seat}" if seat else "")
                 + (" (unexpired term)" if row["remainder"] else ""),
             )
