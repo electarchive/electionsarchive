@@ -2,8 +2,10 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { untrack } from "svelte";
   import { on } from "svelte/events";
   import { count, percent } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -21,6 +23,7 @@
     partners = [],
     governing = [],
     chamber = null,
+    isLinked = false,
   }: {
     parties: Array<{
       key: string;
@@ -46,12 +49,28 @@
     partners?: Array<Array<string>>;
     governing?: Array<string>;
     chamber?: string | null;
+    isLinked?: boolean;
   } = $props();
 
   const uid = $props.id();
 
   let hovered = $state<string | null>(null);
-  let picked = $state<Array<string>>([]);
+  let picked = $state<Array<string>>(
+    untrack(() =>
+      isLinked
+        ? (page.url.searchParams
+            .get("coalition")
+            ?.split(",")
+            .filter((key) => parties.some((party) => party.key === key)) ?? [])
+        : [],
+    ),
+  );
+
+  $effect(() => {
+    if (isLinked) {
+      keep({ coalition: picked.length === 0 ? null : picked.join(",") });
+    }
+  });
   let active = $state<number | null>(null);
   let isAllPaths = $state(false);
   let pointer = "mouse";

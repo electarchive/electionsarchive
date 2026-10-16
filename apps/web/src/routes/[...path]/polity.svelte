@@ -1,10 +1,12 @@
 <script lang="ts">
   import Versus from "#routes/compare/places.svelte";
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import { createQuery } from "@tanstack/svelte-query";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -67,9 +69,17 @@
     return series.length === 0 ? null : { ...data, series };
   });
 
-  let filter = $state("all");
-  let query = $state("");
-  let picked = $state<string | null>(null);
+  let filter = $state(page.url.searchParams.get("show") ?? "all");
+  let query = $state(page.url.searchParams.get("q") ?? "");
+  let picked = $state<string | null>(page.url.searchParams.get("within"));
+
+  $effect(() => {
+    keep({
+      show: filter === "all" ? null : filter,
+      q: query.trim() === "" ? null : query,
+      within: picked,
+    });
+  });
   let isAllYears = $state(false);
 
   const sorts = $derived(

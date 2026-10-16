@@ -1,6 +1,8 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { count, percent } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -14,7 +16,11 @@
   const PAD = { top: 16, right: 18, bottom: 26, left: 36 };
 
   let width = $state(720);
-  let chosen = $state<string | null>(null);
+  let chosen = $state<string | null>(page.url.searchParams.get("series"));
+
+  $effect(() => {
+    keep({ series: chosen });
+  });
   let hovered = $state<number | null>(null);
 
   const series = $derived(

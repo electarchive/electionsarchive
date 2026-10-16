@@ -1,6 +1,8 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { count, date } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -62,8 +64,12 @@
     term_end: m.chamber_end_term_end,
   };
 
-  let party = $state<string | null>(null);
-  let query = $state("");
+  let party = $state<string | null>(page.url.searchParams.get("party"));
+  let query = $state(page.url.searchParams.get("member") ?? "");
+
+  $effect(() => {
+    keep({ party, member: query.trim() === "" ? null : query });
+  });
   let isOpen = $state(false);
 
   const today = new Date().toISOString().slice(0, 10);

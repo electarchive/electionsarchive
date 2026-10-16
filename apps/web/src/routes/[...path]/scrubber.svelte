@@ -1,5 +1,6 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import PauseIcon from "@lucide/svelte/icons/pause";
   import PlayIcon from "@lucide/svelte/icons/play";
   import {
@@ -7,7 +8,9 @@
     keepPreviousData,
     useQueryClient,
   } from "@tanstack/svelte-query";
+  import { untrack } from "svelte";
   import { count, date, percent } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -83,7 +86,24 @@
         return { ...point, tone: tint(top?.party ?? null) };
       }),
   );
-  const index = $derived(Math.min(at ?? steps.length - 1, steps.length - 1));
+  const wanted = untrack(
+    () => Number(page.url.searchParams.get("year")) || null,
+  );
+  const asked = $derived(
+    wanted == null ? -1 : steps.findIndex((entry) => entry.year >= wanted),
+  );
+  const index = $derived(
+    Math.min(at ?? (asked === -1 ? steps.length - 1 : asked), steps.length - 1),
+  );
+
+  $effect(() => {
+    if (at != null) {
+      keep({
+        year:
+          index === steps.length - 1 ? null : String(steps[index]?.year ?? ""),
+      });
+    }
+  });
   const step = $derived(
     steps[index] ??
       (latest?.path == null || latest.date == null || record.isPending

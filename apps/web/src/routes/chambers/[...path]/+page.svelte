@@ -320,6 +320,7 @@
 
       {#key term.start}
         <Seats
+          isLinked
           parties={hemicycle}
           {places}
           here={null}

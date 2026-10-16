@@ -629,6 +629,7 @@
           names={titles}
           {levels}
           {span}
+          isLinked
           bind:only={
             () => only,
             (value: number | string | null) =>
@@ -651,6 +652,7 @@
       </div>
     {:else}
       <Seats
+        isLinked
         parties={contest.chamber.parties}
         places={contest.chamber.places}
         here={contest.chamber.here}
@@ -966,6 +968,7 @@
 
   {#if contest.chamber != null && drawn == null}
     <Seats
+      isLinked
       parties={contest.chamber.parties}
       places={contest.chamber.places}
       here={contest.chamber.here}

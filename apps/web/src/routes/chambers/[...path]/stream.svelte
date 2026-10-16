@@ -1,6 +1,8 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import { count, date, percent } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -43,7 +45,11 @@
   const PAD = { top: 10, side: 1, axis: 22 };
 
   let width = $state(960);
-  let isShare = $state(false);
+  let isShare = $state(page.url.searchParams.get("scale") === "share");
+
+  $effect(() => {
+    keep({ scale: isShare ? "share" : null });
+  });
   let hovered = $state<number | null>(null);
   let seated = $state<string | null>(null);
 

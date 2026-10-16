@@ -1,7 +1,7 @@
 import { replaceState } from "$app/navigation";
 import { page } from "$app/state";
 
-export function link(params: Record<string, string | null>) {
+export function keep(params: Record<string, string | null>) {
   const url = new URL(page.url.href);
   for (const [key, value] of Object.entries(params)) {
     if (value == null) {

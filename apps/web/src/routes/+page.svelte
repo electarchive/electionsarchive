@@ -6,7 +6,7 @@
   import SearchIcon from "@lucide/svelte/icons/search";
   import XIcon from "@lucide/svelte/icons/x";
   import { count, date } from "#lib/format.js";
-  import { link } from "#lib/linked.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { finder } from "#lib/search.svelte.js";
@@ -89,7 +89,7 @@
       : (value - span.first) / (span.last - span.first);
 
   $effect(() => {
-    link({ year: year == null ? null : String(year) });
+    keep({ year: year == null ? null : String(year) });
   });
 
   $effect(() => {

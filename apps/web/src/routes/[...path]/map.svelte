@@ -2,6 +2,7 @@
   import type * as Maplibre from "maplibre-gl";
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
+  import { page } from "$app/state";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
@@ -9,6 +10,7 @@
   import { untrack } from "svelte";
   import { on } from "svelte/events";
   import { count, percent, points } from "#lib/format.js";
+  import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -32,6 +34,7 @@
     only = $bindable(null),
     focus = $bindable(null),
     shade = "winner",
+    isLinked = false,
   }: {
     places: Places;
     colors: Array<string>;
@@ -54,6 +57,7 @@
     only?: number | string | null;
     focus?: number | null;
     shade?: "winner" | number;
+    isLinked?: boolean;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -61,6 +65,7 @@
   const STEPS = [16, 36, 56, 78, 100];
   const SWINGS = [0.02, 0.05, 0.1];
   const COMPARED = new Set(["swing", "arrows", "flips"]);
+  const MODES = ["winner", "bubbles", "swing", "arrows", "flips"] as const;
 
   const uid = $props.id();
   let maps = $state<Array<Maplibre.Map>>([]);
@@ -68,7 +73,24 @@
   let pinned = $state<number | null>(null);
   let shading = $state<
     "winner" | "bubbles" | "swing" | "arrows" | "flips" | number
-  >(untrack(() => shade));
+  >(
+    untrack(() => {
+      const asked = isLinked ? page.url.searchParams.get("shade") : null;
+      if (asked == null) {
+        return shade;
+      }
+      return (
+        MODES.find((choice) => choice === asked) ??
+        (/^\d+$/.test(asked) ? Number(asked) : shade)
+      );
+    }),
+  );
+
+  $effect(() => {
+    if (isLinked) {
+      keep({ shade: shading === "winner" ? null : String(shading) });
+    }
+  });
   let fit: Maplibre.PaddingOptions = {
     top: 24,
     right: 24,
