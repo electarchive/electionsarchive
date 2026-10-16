@@ -282,17 +282,18 @@ def emit() -> Path:
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.format(required=REQUIRED[required]))
-            for answer, votes in (("Yes", yes), ("No", no)):
-                cs.add(
-                    "result_value",
-                    result_set_id=result_set,
-                    unit_id=unit,
-                    option_id=options[answer],
-                    channel=0,
-                    measure=1,
-                    count_round=0,
-                    flags=0,
-                    value=votes,
-                )
+            if result_set in cs.minted:
+                for answer, votes in (("Yes", yes), ("No", no)):
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=options[answer],
+                        channel=0,
+                        measure=1,
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
             cs.add("outcome", result_set_id=result_set, option_id=options["Yes" if passed else "No"], kind="won")
         return cs.write()

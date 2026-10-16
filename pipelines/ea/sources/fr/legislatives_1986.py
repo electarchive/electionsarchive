@@ -379,7 +379,7 @@ def emit() -> Path:
                 (cdsp.VALID, valid),
                 (cdsp.INVALID, None if voters is None or valid is None else voters - valid),
             ):
-                if value is not None:
+                if value is not None and result_set in cs.minted:
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
@@ -422,17 +422,18 @@ def emit() -> Path:
                     ballot_name=head,
                     is_independent=False,
                 )
-                cs.add(
-                    "result_value",
-                    result_set_id=result_set,
-                    unit_id=unit,
-                    option_id=option,
-                    channel=0,
-                    measure=cdsp.VOTES,
-                    count_round=0,
-                    flags=0,
-                    value=votes,
-                )
+                if result_set in cs.minted:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=cdsp.VOTES,
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
                 if seats:
                     cs.add(
                         "outcome",

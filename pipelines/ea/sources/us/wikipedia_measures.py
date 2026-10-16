@@ -15,7 +15,7 @@ SOURCE = "us.wikipedia_measures"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
-YEARS = (2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023, 2025)
+YEARS = (2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023, 2024, 2025)
 ARCHIVES = {"CO", "CT", "ID", "MA", "NH", "NM", "NY", "VT", "VA"}
 ALIASES = {"Washington D.C.": "District of Columbia", "U.S. Virgin Islands": "United States Virgin Islands"}
 MONTHS = {
@@ -89,6 +89,10 @@ def parse() -> None:
                         cells.append(cell.strip())
                     elif cells:
                         cells[-1] += " " + line.strip()
+                if cells and re.sub(r"\s+", " ", cells[0]) == label:
+                    cells = cells[1:]
+                if "% req." in body and len(cells) >= 8:
+                    del cells[5]
                 if len(cells) < 7:
                     continue
                 origin, status, measure, _, when, yes, no = cells[:7]
@@ -104,7 +108,7 @@ def parse() -> None:
                         "state": state,
                         "day": date(year, MONTHS[found[1]], int(found[2])),
                         "origin": re.sub(r"\s+", " ", origin).strip().lower(),
-                        "status": re.sub(r"[^A-Za-z]", "", status),
+                        "status": re.sub(r"[^A-Za-z]", "", re.split(r"<br", status)[0]).replace("Passed", "Approved"),
                         "measure": re.sub(r"\s+", " ", re.sub(r"'{2,}", "", measure)).strip(),
                         "yes": int(votes[0][0].replace(",", "")),
                         "no": int(votes[1][0].replace(",", "")),
@@ -178,8 +182,21 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        covered = set(
+            conn.execute(
+                """select substr(p.iso_code, 4), e.date_from from contest k
+                   join ballot_question q on q.contest_id = k.id
+                   join election e on e.id = k.election_id
+                   join polity p on p.id = e.polity_id
+                   join changeset c on c.id = k.changeset_id
+                   where c.pipeline <> %s and p.iso_code ~ '^US-[A-Z]{2}$'""",
+                [SOURCE],
+            ).fetchall()
+        )
         created: set[str] = set()
         for state, day, origin, status, measure, yes, no in frame.sort("state", "day").iter_rows():
+            if day.year == 2024 and (state, day) in covered:
+                continue
             if state not in states:
                 print(f"no state area for {state}, skipped {measure}")
                 continue
@@ -258,18 +275,19 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            for label, votes in (("Yes", yes), ("No", no)):
-                cs.add(
-                    "result_value",
-                    result_set_id=result_set,
-                    unit_id=cs.unit("us.state", states[state][1]),
-                    option_id=options[label],
-                    channel=0,
-                    measure=1,
-                    count_round=0,
-                    flags=0,
-                    value=votes,
-                )
+            if result_set in cs.minted:
+                for label, votes in (("Yes", yes), ("No", no)):
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=cs.unit("us.state", states[state][1]),
+                        option_id=options[label],
+                        channel=0,
+                        measure=1,
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.format(year=day.year))
             cs.add(
                 "outcome",

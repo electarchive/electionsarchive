@@ -602,18 +602,19 @@ def emit() -> Path:
                 note(result_set, "methodology", CREATED.format(source=label, fallback="" if result else FALLBACK))
                 passed = result == "Passed" if result else yes > no
                 cs.add("outcome", result_set_id=result_set, option_id=options["YES" if passed else "NO"], kind="won")
-            for code, answer, votes in rows.select("code", "answer", "votes").iter_rows():
-                cs.add(
-                    "result_value",
-                    result_set_id=result_set,
-                    unit_id=cs.unit("us.county", code),
-                    option_id=options.get(answer),
-                    channel=0,
-                    measure=MEASURES[answer],
-                    count_round=0,
-                    flags=0,
-                    value=votes,
-                )
+            if result_set in cs.minted:
+                for code, answer, votes in rows.select("code", "answer", "votes").iter_rows():
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=cs.unit("us.county", code),
+                        option_id=options.get(answer),
+                        channel=0,
+                        measure=MEASURES[answer],
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
         for key, found in attachments.items():
             if len(found) > 1:
                 skipped["duplicate"] = skipped.get("duplicate", 0) + len(found) - 1
@@ -637,17 +638,18 @@ def emit() -> Path:
             )
             note(result_set, "methodology", ATTACHED.format(source=label))
             answers = {"YES": yes_option, "NO": no_option}
-            for code, answer, votes in rows.select("code", "answer", "votes").iter_rows():
-                cs.add(
-                    "result_value",
-                    result_set_id=result_set,
-                    unit_id=cs.unit("us.county", code),
-                    option_id=answers.get(answer),
-                    channel=0,
-                    measure=MEASURES[answer],
-                    count_round=0,
-                    flags=0,
-                    value=votes,
-                )
+            if result_set in cs.minted:
+                for code, answer, votes in rows.select("code", "answer", "votes").iter_rows():
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=cs.unit("us.county", code),
+                        option_id=answers.get(answer),
+                        channel=0,
+                        measure=MEASURES[answer],
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
         print(skipped)
         return cs.write()
