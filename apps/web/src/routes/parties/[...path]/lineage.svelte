@@ -215,14 +215,6 @@
             rx="3"
             fill={tint}
           />
-          <a href={resolve("/id/[id]", { id: entry.party.id })}>
-            <text
-              x={Math.min(sx(entry.from), width - 120)}
-              y={sy(entry.row) - 7}
-              class="fill-foreground text-[0.75rem] font-semibold hover:underline"
-              >{entry.party.short ?? entry.party.label}</text
-            >
-          </a>
         {/each}
         {#if Number.isFinite(main.from)}
           <rect
@@ -236,10 +228,25 @@
           <text
             x={Math.min(sx(main.from), width - 140)}
             y={sy(0) - 10}
-            class="fill-foreground text-[0.8125rem] font-bold"
-            >{party.short ?? party.name}</text
+            class="fill-foreground stroke-card text-[0.8125rem] font-bold"
+            stroke-width="4"
+            stroke-linejoin="round"
+            paint-order="stroke">{party.short ?? party.name}</text
           >
         {/if}
+        {#each rows as entry (entry.party.id)}
+          <a href={resolve("/id/[id]", { id: entry.party.id })}>
+            <text
+              x={Math.min(sx(entry.from), width - 120)}
+              y={sy(entry.row) - 7}
+              class="fill-foreground stroke-card text-[0.75rem] font-semibold hover:underline"
+              stroke-width="4"
+              stroke-linejoin="round"
+              paint-order="stroke"
+              >{entry.party.short ?? entry.party.label}</text
+            >
+          </a>
+        {/each}
       </svg>
     </div>
   </section>
