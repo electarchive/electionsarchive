@@ -10,11 +10,15 @@
   import Preview from "./preview.svelte";
   import Results, { MEASURES } from "./results.svelte";
   import Seats from "./seats.svelte";
+  import Tiers from "./tiers.svelte";
 
   const {
+    id,
     election,
-  }: { election: Extract<PageData, { kind: "election" }>["election"] } =
-    $props();
+  }: {
+    id: string;
+    election: Extract<PageData, { kind: "election" }>["election"];
+  } = $props();
 
   const STATUSES: Record<string, () => string> = {
     scheduled: m.election_scheduled,
@@ -36,6 +40,10 @@
           numeric: true,
         }),
       ),
+  );
+  const isTiled = $derived(
+    parts.length > 1 &&
+      parts.every((child) => /^us\/[a-z]{2}\//.test(child.path ?? "")),
   );
   const partNoun = $derived(
     parts.every((child) => child.noun != null && child.noun === parts[0]?.noun)
@@ -464,7 +472,14 @@
   </section>
 {/if}
 
-{#if parts.length > 0}
+{#if isTiled}
+  <Tiers
+    {id}
+    {parts}
+    noun={partNoun ?? ""}
+    race={election.races.find((race) => race.electors != null)?.name ?? null}
+  />
+{:else if parts.length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-2 text-[0.8125rem] font-bold">
       {partNoun == null

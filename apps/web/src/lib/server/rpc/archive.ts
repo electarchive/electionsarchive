@@ -3976,6 +3976,210 @@ export const elections = {
           ),
       };
     }),
+  tiers: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/tiers",
+        summary:
+          "Summarize an election's parts down the ballot: the top race's winner, governors, legislative seats, and ballot measures in each part",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        parts: v.array(
+          v.object({
+            id: v.string(),
+            code: v.string(),
+            place: v.string(),
+            path: v.nullable(v.string()),
+            top: v.nullable(v.string()),
+          }),
+        ),
+        tiers: v.array(
+          v.object({
+            kind: v.picklist(["governor", "lower", "upper", "measure"]),
+            rows: v.array(
+              v.object({
+                part: v.string(),
+                races: v.number(),
+                passed: v.number(),
+                parties: v.array(
+                  v.object({
+                    party: v.nullable(v.string()),
+                    seats: v.number(),
+                  }),
+                ),
+              }),
+            ),
+          }),
+        ),
+        parties: v.array(
+          v.object({
+            id: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+            lean: v.nullable(v.number()),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        part: string;
+        polity: string;
+        tier: string | null;
+        party: string | null;
+        seats: number;
+        races: number;
+        passed: number;
+      }>(sql`
+        with parts as materialized (
+          select e.id, e.polity_id, e.date_from from election e
+          where e.parent_id = ${input.id}::uuid and e.kind not in ('runoff', 'indirect')
+            and e.polity_id <> (select polity_id from election where id = ${input.id}::uuid)
+        ),
+        roots as materialized (
+          select c.id, p.id as part,
+            case when c.kind = 'ballot_question' then 'measure'
+              when o.kind = 'head_of_state' or c.kind = 'elector_slate' then 'top'
+              when o.kind = 'governor' then 'governor'
+              when b.kind = 'lower_house' then 'lower'
+              else 'upper' end as tier
+          from parts p
+          join contest c on c.election_id = p.id
+          left join office o on o.id = c.office_id
+          left join body b on b.id = c.body_id
+          where c.party_scope_id is null and (
+            (c.allocation_parent_id is null and c.kind = 'ballot_question')
+            or (c.allocation_parent_id is null and o.kind = 'governor' and o.polity_id = p.polity_id)
+            or (c.allocation_parent_id is null and b.kind in ('lower_house', 'upper_house', 'unicameral') and b.polity_id = p.polity_id)
+            or ((o.kind = 'head_of_state' or c.kind = 'elector_slate') and not exists (select from contest k where k.allocation_parent_id = c.id))
+          )
+        ),
+        winners as materialized (
+          select r.id as contest, r.part, r.tier, o.id, o.party_id, max(coalesce(x.seats, 1)) as seats
+          from roots r
+          join result_set rs on rs.contest_id = r.id and rs.is_default
+          join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
+          join contest_option o on o.id = x.option_id
+          where r.tier <> 'measure'
+          group by r.id, r.part, r.tier, o.id, o.party_id
+        ),
+        lines as materialized (
+          select ch.parent_option_id as parent, ch.party_id, ch.k, ch.contest_id
+          from winners w join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id
+          where w.party_id is null and ch.party_id is not null
+        ),
+        leads as (
+          select distinct on (l.parent) l.parent, l.party_id
+          from lines l
+          join result_set rs on rs.contest_id = l.contest_id and rs.is_default
+          join result_rollup y on y.result_set_k = rs.k and y.option_k = l.k
+          group by l.parent, l.party_id, l.k
+          order by l.parent, max(y.value) desc
+        ),
+        measures as (
+          select r.part, count(*)::int as races,
+            count(*) filter (where exists (
+              select from result_set rs
+              join outcome x on x.result_set_id = rs.id and x.kind = 'won'
+              join contest_option o on o.id = x.option_id
+              where rs.contest_id = r.id and rs.is_default and o.ballot_label ~* '^(yes|for|approve)'
+            ))::int as passed
+          from roots r where r.tier = 'measure'
+          group by r.part
+        )
+        select w.part, p.polity_id as polity, w.tier, coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
+          sum(w.seats)::int as seats, count(distinct w.contest)::int as races, 0 as passed
+        from winners w
+        join parts p on p.id = w.part
+        left join leads ld on ld.parent = w.id
+        left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+        left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
+          and br.kind = 'regional_branch' and br.valid @> p.date_from
+        left join entity_merge bm on bm.entity_id = br.parent_party_id
+        group by w.part, p.polity_id, w.tier, coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id)
+        union all
+        select m.part, p.polity_id, 'measure', null, 0, m.races, m.passed
+        from measures m join parts p on p.id = m.part
+        union all
+        select p.id, p.polity_id, null, null, 0, 0, 0 from parts p
+      `);
+      const parts = [...new Set(found.rows.map((row) => row.part))];
+      const polities = [...new Set(found.rows.map((row) => row.polity))];
+      const parties = [
+        ...new Set(found.rows.flatMap((row) => row.party ?? [])),
+      ];
+      const [labels, slugs, colors, positions] = await Promise.all([
+        names(polities),
+        paths([...parts, ...polities]),
+        refs(parties),
+        db.execute<{ party_id: string; lean: number }>(sql`
+          select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
+          where party_id = any(${sql.param(parties)}::uuid[])
+          order by party_id, valid_from desc nulls last
+        `),
+      ]);
+      const lean = new Map(
+        positions.rows.map((row) => [row.party_id, row.lean]),
+      );
+      const owner = new Map(found.rows.map((row) => [row.part, row.polity]));
+      return {
+        parts: parts
+          .map((part) => {
+            const polity = owner.get(part) ?? "";
+            const top = found.rows
+              .filter((row) => row.part === part && row.tier === "top")
+              .toSorted((a, b) => b.seats - a.seats)[0];
+            return {
+              id: part,
+              code: slugs.get(polity)?.split("/").at(-1) ?? "",
+              place: labels.full.get(polity) ?? "",
+              path: slugs.get(part) ?? null,
+              top: top?.party ?? null,
+            };
+          })
+          .toSorted((a, b) => a.place.localeCompare(b.place)),
+        tiers: (["governor", "lower", "upper", "measure"] as const)
+          .map((kind) => ({
+            kind,
+            rows: Map.groupBy(
+              found.rows.filter((row) => row.tier === kind),
+              (row) => row.part,
+            )
+              .entries()
+              .map(([part, group]) => {
+                let races = 0;
+                let passed = 0;
+                for (const row of group) {
+                  races += row.races;
+                  passed += row.passed;
+                }
+                return {
+                  part,
+                  races,
+                  passed,
+                  parties: group
+                    .filter((row) => row.seats > 0)
+                    .map((row) => ({ party: row.party, seats: row.seats }))
+                    .toSorted((a, b) => b.seats - a.seats),
+                };
+              })
+              .toArray(),
+          }))
+          .filter((tier) => tier.rows.length > 0),
+        parties: parties.map((id) => ({
+          id,
+          label: colors.get(id)?.label ?? "",
+          short: colors.get(id)?.short ?? null,
+          color: colors.get(id)?.color ?? null,
+          lean: lean.get(id) ?? null,
+        })),
+      };
+    }),
 };
 
 export const polities = {

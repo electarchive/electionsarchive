@@ -229,6 +229,7 @@ export async function archive(path: string, search: URLSearchParams) {
   if (slug.type === "election") {
     return {
       kind: "election" as const,
+      id: slug.entity_id,
       election: await call(router.elections.get, { id: slug.entity_id }),
     };
   }

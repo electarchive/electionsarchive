@@ -167,7 +167,7 @@
         match={data.match}
       />
     {:else if data.kind === "election"}
-      <Election election={data.election} />
+      <Election id={data.id} election={data.election} />
     {:else}
       <Polity id={data.id} polity={data.polity} />
     {/if}

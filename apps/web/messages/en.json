@@ -612,5 +612,21 @@
   "members_party": "Filter by party",
   "members_none": "No members match the filter.",
   "members_all": "Show all {count}",
-  "polity_map_title": "{race} by {noun}"
+  "polity_map_title": "{race} by {noun}",
+  "tiers_title": "Down the ballot",
+  "tiers_lede": "Governors, legislatures, and ballot measures decided in each {noun} on the same day.",
+  "tiers_parts_key": "Colored by the winner of the {race} in each {noun}.",
+  "tiers_governor": "Governors",
+  "tiers_lower": "Lower chambers",
+  "tiers_upper": "Upper chambers",
+  "tiers_measure": "Ballot measures",
+  "tiers_races": "{count} races",
+  "tiers_seats": "{seats} seats in {count} chambers",
+  "tiers_chamber_key": "Colored by the party that won the most seats; darker shades indicate a larger share.",
+  "tiers_passed": "{passed} of {count} passed",
+  "tiers_measure_key": "Darker shades indicate more measures passed.",
+  "tiers_tile_party": "{place}: {party}",
+  "tiers_tile_seats": "{place}: {party} won {seats} of {total} seats",
+  "tiers_tile_measures": "{place}: {passed} of {count} passed",
+  "tiers_tile_none": "{place}: no race"
 }
