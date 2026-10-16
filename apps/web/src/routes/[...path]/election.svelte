@@ -20,6 +20,7 @@
   import Results, { MEASURES } from "./results.svelte";
   import Seats from "./seats.svelte";
   import Tiers from "./tiers.svelte";
+  import Winners from "./winners.svelte";
 
   const {
     id,
@@ -804,6 +805,8 @@
     noun={partNoun ?? ""}
     race={election.races.find((race) => race.electors != null)?.name ?? null}
   />
+{:else if parts.length >= 40}
+  <Winners {id} {parts} />
 {:else if parts.length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-2 text-[0.8125rem] font-bold">

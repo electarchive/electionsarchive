@@ -4474,6 +4474,119 @@ export const elections = {
           ),
       }));
     }),
+  winners: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/elections/{id}/winners",
+        summary:
+          "List who won the office in each of an election's child elections, grouped by region",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.object({
+        noun: v.nullable(v.string()),
+        groups: v.array(v.object({ id: v.string(), name: v.string() })),
+        rows: v.array(
+          v.object({
+            path: v.string(),
+            group: v.nullable(v.string()),
+            person: v.nullable(v.string()),
+            party: v.nullable(v.string()),
+            label: v.nullable(v.string()),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+          }),
+        ),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const found = await db.execute<{
+        path: string;
+        group: string | null;
+        date: string;
+        person: string | null;
+        party: string | null;
+        label: string | null;
+        color: string | null;
+      }>(sql`
+        with top as (
+          select pt.area_id as id from election e
+          join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          where e.id = ${input.id}::uuid limit 1
+        )
+        select s.path, k.date_from::text as date, w.person, w.party, w.label, w.color, g.id as group
+        from election k
+        join slug s on s.entity_id = k.id and s.is_current
+        left join lateral (
+          select coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label, c.district_area_id as area,
+            (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
+             where cy.option_id = o.id and cy.role = 'head' order by cy.id limit 1) as person,
+            ${paint(sql`coalesce(pm.into_id, o.party_id)`, sql`select ${input.id}::uuid`, sql`k.date_from`)} as color
+          from contest c
+          join result_set rs on rs.contest_id = c.id and rs.is_default
+          join outcome x on x.result_set_id = rs.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+          join contest_option o on o.id = x.option_id
+          left join entity_merge pm on pm.entity_id = o.party_id
+          where c.election_id = k.id and c.kind = 'office'
+          order by c.id limit 1
+        ) w on true
+        left join lateral (
+          with recursive up(id, depth) as (
+            select w.area, 0
+            union all
+            select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
+            where up.depth < 6 and up.id <> (select id from top)
+          )
+          select up.id from up
+          where exists (select from area_parent p where p.area_id = up.id and p.parent_id = (select id from top))
+          order by up.depth limit 1
+        ) g on true
+        where k.parent_id = ${input.id}::uuid
+      `);
+      if (found.rows.length < 40) {
+        return { noun: null, groups: [], rows: [] };
+      }
+      const groups = [...new Set(found.rows.flatMap((row) => row.group ?? []))];
+      const [labels, nouns] = await Promise.all([
+        names(
+          [
+            ...groups,
+            ...found.rows.flatMap((row) =>
+              [row.person, row.party].filter((id) => id != null),
+            ),
+          ],
+          found.rows[0]?.date ?? null,
+        ),
+        db.execute<{ noun: string }>(sql`
+          select sc.noun from area a join scheme sc on sc.code = a.scheme_code
+          where a.id = any(${sql.param(groups)}::uuid[])
+          group by sc.noun order by count(*) desc limit 1
+        `),
+      ]);
+      return {
+        noun: nouns.rows[0]?.noun ?? null,
+        groups: groups
+          .map((id) => ({ id, name: labels.full.get(id) ?? "" }))
+          .toSorted((a, b) => a.name.localeCompare(b.name, "tr")),
+        rows: found.rows.map((row) => ({
+          path: row.path,
+          group: row.group,
+          person: row.person,
+          party: row.party,
+          label:
+            labels.full.get(row.person ?? "") ??
+            labels.full.get(row.party ?? "") ??
+            row.label,
+          short:
+            labels.short.get(row.party ?? "") ??
+            labels.full.get(row.party ?? "") ??
+            null,
+          color: row.color,
+        })),
+      };
+    }),
   regional: os
     .meta(
       openapi({

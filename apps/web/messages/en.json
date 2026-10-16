@@ -825,5 +825,10 @@
   "method_seats": "Seats are recorded exactly as declared by the authority. The archive does not recalculate them.",
   "method_swing": "Swing is the change in the gap between the top two options from one election to the next, in percentage points.",
   "method_stage": "When multiple counts exist, the page shows the most final: certified, official, or preliminary.",
-  "provenance_loading": "Looking up source…"
+  "provenance_loading": "Looking up source…",
+  "winners_title": "Winners by {noun}",
+  "winners_lede": "Shows winners of all {count} races, grouped by {noun}, and the party with the most wins in each.",
+  "winners_more": "Show all {count}",
+  "winners_fewer": "Show fewer",
+  "winners_none": "Winner not recorded"
 }
