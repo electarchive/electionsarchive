@@ -814,7 +814,7 @@ def emit() -> Path:
         constituency_areas: dict[str, UUID] = {}
         constituency_units: dict[str, UUID] = {}
         for wk, land, label in constituencies.iter_rows():
-            constituency_areas[wk] = cs.area("de.wahlkreis", wk)
+            constituency_areas[wk] = cs.area("de.wahlkreis", wk, ELECTION)
             cs.add("area", id=constituency_areas[wk], scheme_code="de.wahlkreis")
             cs.add("area_code", area_id=constituency_areas[wk], code=wk, valid_from=ELECTION)
             cs.add("area_parent", area_id=constituency_areas[wk], parent_id=laender[land], valid_from=ELECTION)
@@ -828,7 +828,7 @@ def emit() -> Path:
                 quality="official",
                 source_id=results,
             )
-            constituency_units[wk] = cs.unit("de.wahlkreis", wk)
+            constituency_units[wk] = cs.unit("de.wahlkreis", wk, ELECTION)
             cs.add(
                 "reporting_unit",
                 id=constituency_units[wk],
