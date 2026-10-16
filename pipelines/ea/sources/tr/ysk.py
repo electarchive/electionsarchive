@@ -27,7 +27,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "tr.ysk"
-VERSION = "17"
+VERSION = "18"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 SCANS = PARSED / "scans"
@@ -1324,6 +1324,23 @@ EARLY = {
         "2002MilletvekiliSecimi/2002_gumruk_sonuclari",
     ),
 }
+SIIRT_2003 = date(2003, 3, 9)
+SIIRT_GAZETTE = f"{GAZETTE}/2003/03/20030311M1.htm"
+SIIRT_PAGE = f"{GAZETTE}/2003/03/20030311M1-2.gif"
+SIIRT_VALUES = (
+    (None, REGISTERED, 119198, (471, 47, 514, 57)),
+    (None, VOTERS, 73624, (477, 63, 514, 74)),
+    (None, VALID, 65079, (476, 96, 515, 106)),
+    ("turkiye-komunist-partisi", VOTES, 404, (401, 282, 421, 292)),
+    ("isci-partisi", VOTES, 500, (401, 298, 421, 308)),
+    ("cumhuriyet-halk-partisi", VOTES, 8972, (396, 314, 426, 323)),
+    ("adalet-ve-kalkinma-partisi", VOTES, 55203, (392, 329, 430, 339)),
+)
+SIIRT_MEMBERS = (
+    ("Recep Tayyip Erdoğan", (14, 696, 174, 708)),
+    ("Öner Gülyeşil", (13, 712, 116, 726)),
+    ("Öner Ergenç", (13, 728, 108, 741)),
+)
 MEMBER_LISTS = {
     day: f"{WIKIPEDIA}index.php?{urlencode({'action': 'raw', 'title': f'TBMM {term}. dönem milletvekilleri listesi'})}"
     for term, day in enumerate(EARLY, 17)
@@ -1413,6 +1430,12 @@ EARLY_PARTIES = {
         "yeni-turkiye-partisi": "Yeni Türkiye Partisi",
         INDEPENDENTS: INDEPENDENTS,
     },
+}
+EARLY_PARTIES[SIIRT_2003] = {
+    "turkiye-komunist-partisi": "Türkiye Komünist Partisi",
+    "isci-partisi": "İşçi Partisi",
+    "cumhuriyet-halk-partisi": "Cumhuriyet Halk Partisi",
+    "adalet-ve-kalkinma-partisi": "Adalet ve Kalkınma Partisi",
 }
 ABBREVIATIONS_1999 = {
     "DSP": "demokratik-sol-parti",
@@ -1591,10 +1614,21 @@ CAVEATS_EARLY = {
         "this member to Wikidata."
     ),
     (DAY_2002, "56"): (
-        "YSK annulled Siirt's election, and a new election was held there on March 9, 2003. These are the results and "
-        "members of November 3, 2002, as the gazette printed them; the 2003 rerun is not stored."
+        "YSK annulled Siirt's election, and a new election was held there on March 9, 2003, which the archive stores as "
+        "its own election. These are the results and members of November 3, 2002, as the gazette printed them."
     ),
 }
+REWRITTEN = "YSK annulled Siirt's election, and a new election was held there on March 9, 2003"
+SIIRT_SOURCE = (
+    "YSK decision 212 on the March 9, 2003 Siirt rerun, published in Resmî Gazete 25045 (Mükerrer) on March 11, "
+    "2003. The gazette pages are available only as scanned images. Data includes registered voters, voters, valid and "
+    "invalid votes, party votes, seats won, and the names of elected members. We transcribed the counts by eye and "
+    "verified that the party votes sum to the total valid votes."
+)
+SIIRT_NOTE = (
+    "YSK annulled the Siirt election of November 3, 2002, and this rerun replaced it. Recep Tayyip Erdoğan, who had "
+    "been barred from standing in 2002, won a seat here and became prime minister days later."
+)
 UNSEEN_CAVEAT = (
     "The gazette scan does not include this district's results. Its counts come from YSK's results table, and its "
     "members from Turkish Wikipedia's list of the term."
@@ -1711,6 +1745,8 @@ def fetch() -> None:
                 raw.fetch(SOURCE, f"{YSK_DOCS}/{name}.pdf", suffix=".pdf")
         raw.fetch(SOURCE, MEMBER_LISTS[day], suffix=".wiki")
     raw.fetch(SOURCE, DISTRICTS_1999, suffix=".htm")
+    raw.fetch(SOURCE, SIIRT_GAZETTE, suffix=".htm")
+    raw.fetch(SOURCE, SIIRT_PAGE, suffix=".gif")
     for code in CODES_1999:
         raw.fetch(SOURCE, f"{TBMM_1999}{code}", suffix=".htm")
     titles = sorted(
@@ -4342,6 +4378,52 @@ def parse() -> None:
             else:
                 pages.append(render(raw.cached(SOURCE, url), page))
 
+    gif = raw.cached(SOURCE, SIIRT_PAGE)
+    image = PAGES / f"{gif.sha256}-1.png"
+    if not image.exists():
+        PAGES.mkdir(parents=True, exist_ok=True)
+        Image.open(gif.path).convert("L").save(image)
+    width, height = Image.open(image).size
+    pages.append(
+        {"url": SIIRT_PAGE, "page": 1, "image": f"pages/{SOURCE}/{image.name}", "width": width, "height": height}
+    )
+    if (
+        sum(value for option, _, value, _ in SIIRT_VALUES if option is not None)
+        != {measure: value for option, measure, value, _ in SIIRT_VALUES if option is None}[VALID]
+    ):
+        raise ValueError("2003 Siirt: party votes do not add up to the valid votes")
+    parliaments[SIIRT_2003] = {
+        "districts": [{"code": "56", "plate": 56, "number": 0, "magnitude": len(SIIRT_MEMBERS)}],
+        "district_values": [
+            {
+                "derived": False,
+                "code": "56",
+                "option": option,
+                "measure": measure,
+                "value": value,
+                "url": SIIRT_PAGE,
+                "page": 1,
+                "box": [box[0] / width, box[1] / height, box[2] / width, box[3] / height],
+            }
+            for option, measure, value, box in SIIRT_VALUES
+        ],
+        "seats": [{"code": "56", "option": "adalet-ve-kalkinma-partisi", "seats": len(SIIRT_MEMBERS)}],
+        "elected": [
+            {
+                "code": "56",
+                "sequence": sequence,
+                "name": label,
+                "party": "adalet-ve-kalkinma-partisi",
+                "person": qids[label],
+                "label": label,
+                "url": SIIRT_PAGE,
+                "page": 1,
+                "box": [box[0] / width, box[1] / height, box[2] / width, box[3] / height],
+            }
+            for sequence, (label, box) in enumerate(SIIRT_MEMBERS, 1)
+        ],
+    }
+
     edge = 322.0
     printed: list[dict[str, object]] = []
     for day, standing, split in (
@@ -5860,6 +5942,16 @@ def emit() -> Path:
                     [f"{YSK_DOCS}/{name}.pdf" for name in (table_name, seats_name, customs_name) if name is not None],
                 ),
             ]
+        groups.append(
+            (
+                PUBLISHER,
+                "official_body",
+                "9 Mart 2003 Siirt İli Milletvekili Yenileme Seçimi kesin sonuçları",
+                SIIRT_SOURCE,
+                SIIRT_GAZETTE,
+                [SIIRT_GAZETTE, SIIRT_PAGE],
+            )
+        )
         for publisher, kind, heading, note, home, urls in groups:
             source = cs.source(publisher, heading)
             cs.add(
@@ -5893,10 +5985,35 @@ def emit() -> Path:
         ).fetchone() == (len(EARLY),)
         if not ready:
             print("tr.thea has not published the 1983–2002 parliaments, so their districts are skipped")
-        for day, (gazette, *_) in EARLY.items() if ready else ():
-            election = cs.key("tr.election", str(day))
+        rewritten: dict[UUID, UUID] = dict(
+            conn.execute(
+                "select entity_id, id from note where kind = 'caveat' and body_md like %s",
+                [f"{REWRITTEN}%"],
+            ).fetchall()
+        )
+        for day, gazette in (
+            [*((day, gazette) for day, (gazette, *_) in EARLY.items()), (SIIRT_2003, SIIRT_GAZETTE)] if ready else ()
+        ):
             national_key = f"{day}:parliament"
-            national = cs.key("tr.contest", national_key)
+            rerun = day == SIIRT_2003
+            election = cs.key("tr.election", f"{day}:siirt" if rerun else str(day))
+            national = None if rerun else cs.key("tr.contest", national_key)
+            path = f"tr/{day}-{'rerun' if rerun else 'general'}"
+            if rerun:
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=turkey,
+                    kind="by_election",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                    rerun_of_id=cs.key("tr.election", str(DAY_2002)),
+                )
+                name(election, "2003 Siirt parliamentary rerun", "en")
+                name(election, "9 Mart 2003 Siirt İli Milletvekili Yenileme Seçimi", kind="native")
+                cs.add("slug", path=path, entity_id=election)
+                cs.add("note", entity_id=election, kind="context", body_md=SIIRT_NOTE)
             system = cs.key(
                 "tr.electoral_system",
                 "parliament_1983" if day == DAY_1983 else "parliament_1987" if day < DAY_1995 else "parliament_1995",
@@ -5947,7 +6064,7 @@ def emit() -> Path:
                     default_result_kind="counted",
                 )
                 name(contest, f"Grand National Assembly, {label}", "en")
-                cs.add("slug", path=f"tr/{day}-general/parliament/{slug(label)}", entity_id=contest)
+                cs.add("slug", path=f"{path}/parliament/{slug(label)}", entity_id=contest)
                 rows = district_values.filter(pl.col("code") == code)
                 for caveat, applies in (
                     (CAVEATS_EARLY.get((day, code)), True),
@@ -5955,7 +6072,17 @@ def emit() -> Path:
                     (DERIVED_EARLY_CAVEAT, rows["derived"].any()),
                 ):
                     if caveat is not None and applies:
-                        cs.add("note", entity_id=contest, kind="caveat", body_md=caveat)
+                        cs.add(
+                            "note",
+                            **(
+                                {"id": rewritten[contest]}
+                                if contest in rewritten and caveat.startswith(REWRITTEN)
+                                else {}
+                            ),
+                            entity_id=contest,
+                            kind="caveat",
+                            body_md=caveat,
+                        )
                 declared = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
                     "result_set",
