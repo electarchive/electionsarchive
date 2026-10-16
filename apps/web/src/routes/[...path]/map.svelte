@@ -31,6 +31,7 @@
     span,
     only = $bindable(null),
     focus = $bindable(null),
+    shade = "winner",
   }: {
     places: Places;
     colors: Array<string>;
@@ -52,6 +53,7 @@
     span: { from: string; to: string; forward: boolean } | null;
     only?: number | string | null;
     focus?: number | null;
+    shade?: "winner" | number;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -66,7 +68,7 @@
   let pinned = $state<number | null>(null);
   let shading = $state<
     "winner" | "bubbles" | "swing" | "arrows" | "flips" | number
-  >("winner");
+  >(untrack(() => shade));
   let fit: Maplibre.PaddingOptions = {
     top: 24,
     right: 24,

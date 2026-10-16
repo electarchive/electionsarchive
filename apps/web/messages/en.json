@@ -752,5 +752,7 @@
   "person_lede_single": "Ran in one election in {year}.",
   "person_served": "Served in",
   "person_served_span": "{from}–{to}",
-  "person_served_now": "{from}–present"
+  "person_served_now": "{from}–present",
+  "party_strength_title": "{party} support by {noun}",
+  "party_strength_lede": "Share of the vote by {noun} in the {race}. Darker colors indicate a larger share."
 }

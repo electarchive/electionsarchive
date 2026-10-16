@@ -159,12 +159,34 @@ export async function party(path: string) {
       slug: segments.at(-1) ?? "",
     }),
   );
-  const [party, record, history] = await Promise.all([
+  const [party, record, history, latest] = await Promise.all([
     call(router.parties.get, { id }),
     call(router.parties.elections, { id }),
     call(router.parties.history, { id }),
+    db.execute<{ id: string }>(sql`
+      with ids as (
+        select ${id}::uuid as id
+        union
+        select entity_id from entity_merge where into_id = ${id}::uuid
+      )
+      select e.id from election e
+      where e.kind = 'general' and e.parent_id is null and e.date_from <= current_date
+        and e.polity_id = (select polity_id from party where id = ${id}::uuid)
+        and exists (
+          select from contest c join contest_option o on o.contest_id = c.id
+          where c.election_id = e.id and o.party_id in (select id from ids)
+        )
+      order by e.date_from desc limit 1
+    `),
   ]);
-  return { kind: "party" as const, id, party, record, history };
+  return {
+    kind: "party" as const,
+    id,
+    party,
+    record,
+    history,
+    election: latest.rows[0]?.id ?? null,
+  };
 }
 
 function total(parties: Array<{ seats: number }>) {

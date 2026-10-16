@@ -9,6 +9,7 @@
   import type { PageData } from "./$types";
   import History from "./history.svelte";
   import Lineage from "./lineage.svelte";
+  import Strength from "./strength.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -206,6 +207,10 @@
     {/if}
 
     <History history={data.history} name={party.name} {color} />
+
+    {#if data.election != null}
+      <Strength election={data.election} party={data.id} name={party.name} />
+    {/if}
 
     <Lineage {party} {color} />
 
