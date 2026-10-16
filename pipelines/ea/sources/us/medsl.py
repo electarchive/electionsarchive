@@ -30,14 +30,27 @@ PRECINCTS = {
     ("house", 2020): ("13582893", "VLGF2M"),
     ("senate", 2022): ("13996913", "IAD3XR"),
     ("house", 2022): ("13996912", "EOKNGW"),
+    ("senate", 2024): ("13731184", "ZCM3BN"),
+    ("house", 2024): ("13731101", "USBYR4"),
 }
 PSEUDO = {
     **dict.fromkeys(
-        ["UNDERVOTES", "UNDER VOTES", "BLANK", "BLANKS", "BLANK BALLOTS", "BLANK VOTES", "TIMES BLANK VOTED"], 6
+        [
+            "UNDERVOTES",
+            "UNDERVOTE",
+            "UNDER VOTES",
+            "BLANK",
+            "BLANKS",
+            "BLANK BALLOTS",
+            "BLANK VOTES",
+            "TIMES BLANK VOTED",
+        ],
+        6,
     ),
     **dict.fromkeys(
         [
             "OVERVOTES",
+            "OVERVOTE",
             "OVER VOTES",
             "OVER",
             "VOID",
@@ -63,6 +76,9 @@ PSEUDO = {
             "TOTAL VOTES",
             "TOTAL VOTES CAST",
             "CONTEST TOTALS",
+            "CONTEST TOTAL",
+            "TOTAL BALLOTS CAST",
+            "UNDERVOTES-VOIDS",
             "REGISTERED VOTERS",
             "SPECIAL VOTES",
             "FEDERAL BALLOTS",
@@ -183,7 +199,7 @@ def parse() -> None:
     frames = []
     for (chamber, year), (file, _) in PRECINCTS.items():
         path = raw.cached(SOURCE, DATAVERSE + file).path
-        frame = pl.read_csv(path, separator="," if path.suffix == ".csv" else "\t", infer_schema_length=0)
+        frame = pl.read_csv(path, separator="\t" if "\t" in path.open().readline() else ",", infer_schema_length=0)
         if year == 2016:
             frame = frame.rename({"state_postal": "state_po", "jurisdiction": "jurisdiction_name"}).with_columns(
                 date=pl.lit("2016-11-08")
@@ -355,7 +371,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Presidential results by county 2000–2024, and House and Senate results by county 2016–2022, from the MIT Election Data and Science Lab",
+            summary="Presidential results by county 2000–2024, and House and Senate results by county 2016–2024, from the MIT Election Data and Science Lab",
             polity="US",
         )
         source = cs.source("MIT Election Data and Science Lab", "County Presidential Election Returns 2000-2024")
@@ -594,8 +610,8 @@ def emit() -> Path:
                    where c.id = %s group by 1, 2, 3 order by 3 limit 1""",
                 [contest],
             ).fetchone() or (None, None, None, None)
-            if election is None or not official:
-                print(f"{key}: no official total, skipped")
+            if election is None or first is None or not official or first > 1:
+                print(f"{key}: no official total or first round, skipped")
                 continue
             known = []
             for option, kind, label, name, fec in conn.execute(

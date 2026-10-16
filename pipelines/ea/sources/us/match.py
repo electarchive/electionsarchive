@@ -10,7 +10,7 @@ from ea.sources.us import fec
 from ea.store import connect
 
 SOURCE = "us.match"
-VERSION = "3"
+VERSION = "4"
 TITLE = "Candidate Master Files, 1982–2000"
 NOMINEES = {
     "P20000642": "william-j-clinton",
@@ -47,6 +47,29 @@ MERGES = {
     ("fec.candidate", "H0CA21104"): ("fec.candidate", "H8FL24067"),
     ("fec.candidate", "H0TX27087"): ("fec.candidate", "H8FL24067"),
     ("fec.candidate", "H0CA13051"): ("fec.candidate", "S4CA00332"),
+    **{
+        ("fec.candidate", later): ("fec.candidate", earlier)
+        for later, earlier in [
+            ("H4MO03221", "H8MO09146"),
+            ("H4CA47085", "H8CA45148"),
+            ("H2VA07170", "H2VA01108"),
+            ("H4CA01140", "H2CA01268"),
+            ("S4MN00502", "H2MN05190"),
+            ("H4MT02098", "S8MT00218"),
+            ("H4UT03260", "S8UT00242"),
+            ("S4OH00218", "H0OH11122"),
+            ("H4KS01083", "S2KS00139"),
+            ("H4OK02196", "S2OK00285"),
+            ("S2IN00166", "P00010660"),
+            ("H2CA53038", "H8CA50163"),
+            ("S4VT00165", "P60021508"),
+            ("H4AK00164", "H8OR03078"),
+            ("H6HI02392", "H8OR03078"),
+        ]
+    },
+    ("us.fec.person", "robby-wells"): ("fec.candidate", "P20004065"),
+    ("us.fec.person", "CA:bill-quraishi"): ("fec.candidate", "H6CA11011"),
+    ("fec.candidate", "S4CA00290"): ("fec.candidate", "H6CA11011"),
 }
 
 

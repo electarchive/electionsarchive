@@ -1046,8 +1046,14 @@ PRIMARY_RUNOFFS = {
 SUMMARIZED: dict[object, str] = {"LIB": "LBT", "DFL": "D", (2012, "PA", "D"): "R", (2020, "LA", "D"): "R"}
 SURNAMES = {"Bloomberg": "P00014530", "Romney": "P80003353"}
 NAMESAKES = {"H8CA52052", "P00014613"}
+MOVED_IDS = {"H2IL06090": "IL:niki-conforti"}
 MISATTRIBUTED = {"2020:Democratic:P60016342": "P00014613"}
-REUSED_IDS = {"2002:H2CA46073:Richard B. Owens": None, "2022:H2NY22139:Carolyn B. Maloney": "H2NY14037"}
+REUSED_IDS = {
+    "2002:H2CA46073:Richard B. Owens": None,
+    "2022:H2NY22139:Carolyn B. Maloney": "H2NY14037",
+    "2022:H2IL06090:Kina Collins": "H0IL07167",
+    '2022:H0IL07167:Jacqueline "Jacqui" Collins': "H2IL01315",
+}
 TWINS = {
     "P00003343": "S2NC00174",
     "P00003608": "S4GA11046",
@@ -4762,7 +4768,7 @@ def emit() -> Path:
                  select o.id, o.k, o.contest_id, o.ballot_label, c.published_at, y.id as head, y.person,
                         (select count(*) from candidacy z where z.person_id = y.person) as count,
                         exists (select from external_id x where x.entity_id = y.person and x.scheme = 'fec.candidate'
-                                and x.value in ('H2NY22139', 'H2CA46073')) as split
+                                and x.value = any(%s)) as split
                  from contest_option o join changeset c on c.id = o.changeset_id
                  left join lateral (
                    select cy.id, coalesce(m.into_id, cy.person_id) as person from candidacy cy
@@ -4775,7 +4781,8 @@ def emit() -> Path:
                from line a join line b on b.contest_id = a.contest_id and b.ballot_label = a.ballot_label
                  and b.published_at > a.published_at
                where not exists (select from result_value v join result_set r on r.k = v.result_set_k
-                                 where r.contest_id = b.contest_id and v.option_k = b.k)"""
+                                 where r.contest_id = b.contest_id and v.option_k = b.k)""",
+            [[key.split(":")[1] for key in REUSED_IDS]],
         ).fetchall():
             cs.merge(new, old)
             if old_head is not None and new_head is not None:
@@ -4791,6 +4798,9 @@ def emit() -> Path:
         for duplicate, survivor in twins.values():
             cs.merge(duplicate, survivor)
         fec_persons = {key: cs.survivors.get(person, person) for key, person in fec_persons.items()}
+        for fec_id, handle in MOVED_IDS.items():
+            fec_persons[fec_id] = cs.key(f"{SOURCE}.person", handle)
+            cs.add("external_id", entity_id=fec_persons[fec_id], scheme="fec.candidate", value=fec_id)
         figures = {text: cs.survivors.get(person, person) for text, person in figures.items()}
 
         elections: dict[str, UUID] = {}
