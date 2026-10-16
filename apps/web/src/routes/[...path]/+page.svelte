@@ -66,7 +66,12 @@
       </nav>
     {/if}
     {#if data.kind === "contest"}
-      <Contest contest={data.contest} lists={data.lists} match={data.match} />
+      <Contest
+        contest={data.contest}
+        lists={data.lists}
+        boundaries={data.boundaries}
+        match={data.match}
+      />
     {:else if data.kind === "election"}
       <Election election={data.election} />
     {:else}

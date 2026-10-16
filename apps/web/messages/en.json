@@ -361,5 +361,12 @@
   "lists_rank": "Rank {position}",
   "term_cut": "The line after the last member elected from a list. Members above it took the list's seats in rank order.",
   "term_next": "The first member below the cut line who stayed in the race. They would take the next seat this list won.",
-  "term_withdrew_fallback": "Left the race after the lists were final. Their name stayed on the list and the seat went to the next member."
+  "term_withdrew_fallback": "Left the race after the lists were final. Their name stayed on the list and the seat went to the next member.",
+  "boundaries_title": "Boundaries",
+  "boundaries_set": "{noun} shapes from the {vintage} boundary set",
+  "boundaries_scheme": "{noun} shapes",
+  "boundaries_approximate": "Approximate",
+  "term_boundaries_approximate": "These shapes are reconstructed from other geography, such as historic counties and town locations, instead of surveyed boundary maps. Borders are approximate.",
+  "boundaries_missing": "No shape for {names}",
+  "boundaries_missing_more": "No shape for {names} and {count} others."
 }

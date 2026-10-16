@@ -27,10 +27,12 @@
   const {
     contest,
     lists,
+    boundaries,
     match,
   }: {
     contest: Extract<PageData, { kind: "contest" }>["contest"];
     lists: Extract<PageData, { kind: "contest" }>["lists"];
+    boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     match: string;
   } = $props();
 
@@ -779,7 +781,7 @@
   </section>
 {/if}
 
-{#if contest.sets.length > 0 || contest.citations.length > 0 || checks.length > 0}
+{#if contest.sets.length > 0 || contest.citations.length > 0 || checks.length > 0 || boundaries.length > 0}
   <section
     id="sources"
     class={cn("col-span-12 grid content-start gap-4 bg-card px-3.5 py-3", {
@@ -867,6 +869,61 @@
                   class="underline decoration-border underline-offset-4 hover:decoration-foreground"
                   href={citation.url}
                   rel="external noopener">{citation.title}</a
+                >
+              {/if}
+            </li>
+          {/each}
+        </ul>
+      </div>
+    {/if}
+    {#if boundaries.length > 0}
+      <div id="boundaries">
+        <h2 class="mbe-1.5 text-[0.8125rem] font-bold">
+          {m.boundaries_title()}
+        </h2>
+        <ul class="grid gap-2.5 text-sm/snug">
+          {#each boundaries as entry (entry.scheme)}
+            {const shown = $derived(entry.missing.slice(0, 3).join(", "))}
+            <li class="grid gap-0.5">
+              <span class="flex flex-wrap items-baseline gap-x-2">
+                <span class="font-semibold first-letter:uppercase"
+                  >{entry.vintage == null
+                    ? m.boundaries_scheme({ noun: entry.noun })
+                    : m.boundaries_set({
+                        noun: entry.noun,
+                        vintage: entry.vintage,
+                      })}</span
+                >
+                {#if entry.isApproximate}
+                  <Term
+                    class="highlighter px-1 text-xs font-semibold"
+                    label={m.boundaries_approximate()}
+                    definition={m.term_boundaries_approximate()}
+                  />
+                {/if}
+              </span>
+              {#each entry.sources as source, index (index)}
+                <span>
+                  {source.publisher}:
+                  {#if source.url == null}
+                    {source.title}
+                  {:else}
+                    <a
+                      class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                      href={source.url}
+                      rel="external noopener">{source.title}</a
+                    >
+                  {/if}
+                </span>
+              {/each}
+              {#if entry.missing.length > 0}
+                <span class="text-[0.8125rem] text-muted-foreground"
+                  >{entry.missing.length > 3
+                    ? m.boundaries_missing_more({
+                        names: shown,
+                        count: entry.missing.length - 3,
+                      })
+                    : m.boundaries_missing({ names: shown })}</span
                 >
               {/if}
             </li>

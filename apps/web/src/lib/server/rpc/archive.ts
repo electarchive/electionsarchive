@@ -2455,6 +2455,136 @@ export const contests = {
         input.match,
       );
     }),
+  boundaries: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/boundaries",
+        summary:
+          "Pick the boundary set a contest's place and the places within it are drawn from, with the shapes' quality, sources, and places without a shape",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        unit: v.optional(v.string()),
+        level: v.optional(v.string()),
+      }),
+    )
+    .output(
+      v.array(
+        v.object({
+          scheme: v.string(),
+          noun: v.string(),
+          vintage: v.nullable(v.string()),
+          asOf: v.nullable(v.string()),
+          tiles: v.nullable(v.string()),
+          isApproximate: v.boolean(),
+          sources: v.array(
+            v.object({
+              publisher: v.string(),
+              title: v.string(),
+              url: v.nullable(v.string()),
+            }),
+          ),
+          count: v.number(),
+          missing: v.array(v.string()),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const contest = await find(input.id);
+      const chain = await descend(contest, input.unit);
+      const area = chain.at(-1) ?? contest.place;
+      if (area == null) {
+        return [];
+      }
+      const day = contest.date ?? "infinity";
+      const [own, kids] = await Promise.all([
+        db.execute<{ scheme: string }>(sql`
+          select scheme_code as scheme from area where id = ${area.id}::uuid
+        `),
+        input.level == null
+          ? []
+          : children(contest.id, area, chain.length === 0, day),
+      ]);
+      const scheme = own.rows[0]?.scheme ?? "";
+      const groups = [
+        { scheme, ids: [area.id] },
+        ...(input.level == null || input.level === scheme
+          ? []
+          : [
+              {
+                scheme: input.level,
+                ids: kids
+                  .filter((kid) => kid.scheme === input.level)
+                  .map((kid) => kid.id),
+              },
+            ]),
+      ].filter((group) => group.ids.length > 0);
+      const drawn = await Promise.all(
+        groups.map(async (group) => {
+          const found = await db.execute<{
+            noun: string;
+            vintage: string | null;
+            asOf: string | null;
+            tiles: string | null;
+            shaped: Array<string>;
+            qualities: Array<string>;
+            sources: Array<{
+              publisher: string;
+              title: string;
+              url: string | null;
+            }> | null;
+          }>(sql`
+            with chosen as (
+              select bs.vintage, bs.as_of, coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles
+              from boundary_set bs
+              where bs.scheme_code = ${group.scheme}
+                and (bs.id = (select boundary_set_id from contest where id = ${contest.id}::uuid) or bs.valid @> ${day}::date)
+              order by bs.id = (select boundary_set_id from contest where id = ${contest.id}::uuid) desc, bs.valid_from desc nulls last
+              limit 1
+            ),
+            shapes as (
+              select g.area_id, g.quality::text as quality, g.source_id
+              from area_geometry g
+              left join chosen on true
+              where g.area_id = any(${sql.param(group.ids)}::uuid[]) and g.valid @> coalesce(chosen.as_of, ${day}::date)
+            )
+            select sc.noun, chosen.vintage, chosen.as_of::text as "asOf", chosen.tiles,
+              array(select distinct area_id::text from shapes) as shaped,
+              array(select distinct quality from shapes) as qualities,
+              (select json_agg(json_build_object('publisher', s.publisher, 'title', s.title, 'url', s.url) order by s.publisher)
+               from source s where s.id in (select source_id from shapes)) as sources
+            from scheme sc left join chosen on true
+            where sc.code = ${group.scheme}
+          `);
+          const row = found.rows[0];
+          if (row == null || (row.vintage == null && row.shaped.length === 0)) {
+            return [];
+          }
+          const shaped = new Set(row.shaped);
+          const absent = group.ids.filter((id) => !shaped.has(id));
+          const labels = await names(absent, contest.date);
+          return [
+            {
+              scheme: group.scheme,
+              noun: row.noun,
+              vintage: row.vintage,
+              asOf: row.asOf,
+              tiles: row.tiles,
+              isApproximate: row.qualities.includes("synthetic"),
+              sources: row.sources ?? [],
+              count: group.ids.length,
+              missing: absent
+                .map((id) => labels.full.get(id) ?? "")
+                .toSorted((a, b) => a.localeCompare(b)),
+            },
+          ];
+        }),
+      );
+      return drawn.flat();
+    }),
   lists: os
     .meta(
       openapi({
@@ -2821,9 +2951,9 @@ async function races(election: string, polity: string, date: string | null) {
       const place = single?.place ?? nation;
       const districts = group.filter((row) => row.k != null);
       const first = districts[0];
-      const counted = group
-        .filter((row) => row.isCounted)
-        .flatMap((row) => [row.id, ...row.runoffs]);
+      const counted = group.flatMap((row) =>
+        row.isCounted ? [row.id, ...row.runoffs] : [],
+      );
       const [totals, grid, table] = await Promise.all([
         load(roots, [place.k], day, counted.length > 0 ? counted : roots),
         single == null

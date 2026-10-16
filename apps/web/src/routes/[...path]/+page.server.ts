@@ -47,7 +47,12 @@ export const load: PageServerLoad = async ({ params, url }) => {
         }),
         call(router.contests.lists, { id: slug.entity_id }),
       ]);
-      return { kind: "contest" as const, contest, lists, match };
+      const boundaries = await call(router.contests.boundaries, {
+        id: slug.entity_id,
+        unit,
+        level: contest.places?.level,
+      });
+      return { kind: "contest" as const, contest, lists, boundaries, match };
     } catch (error_) {
       if (error_ instanceof ORPCError && error_.code === "NOT_FOUND") {
         error(404);
