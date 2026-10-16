@@ -2,7 +2,7 @@ import argparse
 import importlib
 from pathlib import Path
 
-from ea import fixtures, search, tiles
+from ea import cache, fixtures, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import connect
 
@@ -24,6 +24,15 @@ def main() -> None:
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
+    caching = commands.add_parser("raw", help="check and maintain the raw cache")
+    caching.add_argument(
+        "action",
+        choices=("verify", "license", "pin", "retire"),
+        help="verify files against the index, stamp licenses from the database, pin Wikipedia fetches to revisions, "
+        "or move unindexed files to data/retired",
+    )
+    caching.add_argument("source", nargs="?", help="limit verify or pin to one source, such as us.medsl")
+    caching.add_argument("--quick", action="store_true", help="verify sizes only, without hashing")
     args = parser.parse_args()
     match args.command:
         case "apply":
@@ -34,6 +43,8 @@ def main() -> None:
             print(tiles.build(args.scheme))
         case "search":
             print(search.build())
+        case "raw":
+            cache.main(args.action, args.source, quick=args.quick)
         case "publish":
             with connect() as conn:
                 publish(conn, args.changeset_id)

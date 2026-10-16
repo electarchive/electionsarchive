@@ -1,5 +1,8 @@
+import fcntl
 import hashlib
 import json
+from collections.abc import Generator
+from contextlib import contextmanager
 from dataclasses import dataclass
 from datetime import UTC, datetime
 from pathlib import Path
@@ -7,6 +10,7 @@ from uuid import uuid4
 
 import httpx
 
+from ea import wikipedia
 from ea.store import DATA
 
 USER_AGENT = "electionsarchive/0.1 (+https://electionsarchive.com)"
@@ -30,6 +34,21 @@ class Artifact:
 def _index(source: str) -> tuple[Path, dict[str, dict[str, str | int | None]]]:
     path = DATA / "raw" / source / "index.json"
     return path, json.loads(path.read_text()) if path.exists() else {}
+
+
+@contextmanager
+def locked(source: str) -> Generator[dict[str, dict[str, str | int | None]]]:
+    """Yield the source's index under an exclusive lock and write it back atomically, so concurrent fetches keep
+    each other's entries."""
+    path, _ = _index(source)
+    path.parent.mkdir(parents=True, exist_ok=True)
+    with (path.parent / ".index.lock").open("w") as lock:
+        fcntl.flock(lock, fcntl.LOCK_EX)
+        _, index = _index(source)
+        yield index
+        partial = path.parent / f".{uuid4()}.json.part"
+        partial.write_text(json.dumps(index, indent=2))
+        partial.replace(path)
 
 
 def _artifact(source: str, url: str, entry: dict[str, str | int | None]) -> Artifact:
@@ -59,27 +78,28 @@ def cached(source: str, url: str, body: dict[str, object] | None = None) -> Arti
 
 
 def store(source: str, url: str, content: bytes, *, suffix: str, retrieved_at: datetime, media_type: str) -> Artifact:
-    index_path, index = _index(source)
-    index_path.parent.mkdir(parents=True, exist_ok=True)
+    folder = DATA / "raw" / source
+    folder.mkdir(parents=True, exist_ok=True)
     digest = hashlib.sha256(content).hexdigest()
-    (index_path.parent / f"{digest}{suffix}").write_bytes(content)
-    index[url] = {
+    (folder / f"{digest}{suffix}").write_bytes(content)
+    entry: dict[str, str | int | None] = {
         "sha256": digest,
         "file": f"{digest}{suffix}",
         "retrieved_at": retrieved_at.isoformat(),
         "media_type": media_type,
         "bytes": len(content),
     }
-    index_path.write_text(json.dumps(index, indent=2))
-    return _artifact(source, url, index[url])
+    with locked(source) as index:
+        index[url] = entry
+    return _artifact(source, url, entry)
 
 
 def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None = None) -> Artifact:
-    index_path, index = _index(source)
+    _, index = _index(source)
     key = _key(url, body)
     if key in index:
         return _artifact(source, key, index[key])
-    folder = index_path.parent
+    folder = DATA / "raw" / source
     folder.mkdir(parents=True, exist_ok=True)
     partial = folder / f".{uuid4()}.part"
     digest = hashlib.sha256()
@@ -103,13 +123,16 @@ def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None 
             file.write(chunk)
     name = f"{digest.hexdigest()}{suffix}"
     partial.rename(folder / name)
-    index[key] = {
+    retrieved_at = datetime.now(UTC)
+    entry: dict[str, str | int | None] = {
         "sha256": digest.hexdigest(),
         "file": name,
-        "retrieved_at": datetime.now(UTC).isoformat(),
+        "retrieved_at": retrieved_at.isoformat(),
         "media_type": media_type,
         "bytes": size,
         **({} if body is None else {"body": json.dumps(body, sort_keys=True)}),
+        **wikipedia.pin(url, folder / name, retrieved_at),
     }
-    index_path.write_text(json.dumps(index, indent=2))
-    return _artifact(source, key, index[key])
+    with locked(source) as index:
+        index[key] = entry
+    return _artifact(source, key, entry)
