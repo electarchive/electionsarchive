@@ -121,6 +121,8 @@
     county: m.polity_kind_county,
     municipality: m.polity_kind_municipality,
     school_district: m.polity_kind_school_district,
+    special_district: m.polity_kind_special_district,
+    judicial_district: m.polity_kind_judicial_district,
   };
   const kinds = $derived(
     Object.keys(KINDS).filter(
@@ -494,7 +496,9 @@
   >
     <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
       <h2 id="{uid}-places" class="text-[0.8125rem] font-bold">
-        {m.polity_subdivisions()}
+        {kinds.length === 2
+          ? (KINDS[kinds[1] ?? ""]?.() ?? m.polity_subdivisions())
+          : m.polity_subdivisions()}
       </h2>
       {#if kinds.length > 2}
         <div class="flex" role="group" aria-label={m.polity_kind_label()}>

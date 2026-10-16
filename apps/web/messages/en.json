@@ -868,5 +868,7 @@
   "winners_none": "Winner not recorded",
   "fusion_line": "{name} line",
   "versus_opponents": "Compare with opponents",
-  "versus_neighbors": "Compare with neighbors"
+  "versus_neighbors": "Compare with neighbors",
+  "polity_kind_special_district": "Special districts",
+  "polity_kind_judicial_district": "Judicial districts"
 }

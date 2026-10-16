@@ -4331,6 +4331,9 @@ async function races(
         return then >= now * 0.9 && then <= now * 1.1;
       }),
   );
+  const chambers = built
+    .filter((race) => race.isNational && race.count === 1 && race.body != null)
+    .map((race) => race.chamber);
   return built
     .filter(
       (race) =>
@@ -4368,7 +4371,9 @@ async function races(
             null,
           name:
             isNational && race.count === 1 && race.body != null
-              ? (chamber ?? race.name)
+              ? chambers.indexOf(chamber) === chambers.lastIndexOf(chamber)
+                ? (chamber ?? race.name)
+                : [chamber ?? "", ...race.name.split(", ").slice(1)].join(", ")
               : race.name,
           partners: spread.map((row) => [row.from, row.to]),
           electors:
