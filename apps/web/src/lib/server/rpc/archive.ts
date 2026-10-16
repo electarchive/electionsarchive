@@ -525,6 +525,7 @@ async function load(
   date: string,
   outcomes: Array<string>,
   owners: Array<string> = [],
+  round: number | null = null,
 ) {
   const loaded = new Map<
     number,
@@ -595,23 +596,32 @@ async function load(
     main: number;
     value: number;
     exact: boolean;
+    rank: number;
   }>(sql`
     with fetched as materialized (
       select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
         r.value::float8 as value, r.exact,
-        min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as first
+        coalesce(${round}::int, min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)) as first,
+        min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as opening
       from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[]) as p(set, area)
       join result_rollup r on r.result_set_k = p.set and r.area_k = p.area
-      where (r.measure = any(${COUNTED}) or r.option_k = 0 and r.measure in (2, 4))
+      where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4 and ${round}::int is null))
     ),
     mains as materialized (
       select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
     ),
+    gone as materialized (
+      select r.result_set_k as set, r.option_k as option from result_rollup r
+      where ${round}::int is not null and r.result_set_k = any(${sql.param([...new Set(picked.rows.map((row) => row.k))])}::int[])
+        and r.measure = any(${COUNTED}) and r.count_round = ${round}::int
+      group by 1, 2 having max(r.value) = 0
+    ),
     flagged as (
-      select f.*, m.main, bool_or(f.measure = m.main) over (partition by f.set, f.area) as kept
+      select f.*, m.main, bool_or(f.measure = m.main) over (partition by f.set, f.area) as kept,
+        sum(f.value) filter (where f.count_round = f.opening and f.measure = m.main) over (partition by f.option) as rank
       from fetched f join mains m on m.area = f.area
     )
-    select r.set, r.area, r.option, x.role, r.main, r.value, r.exact
+    select r.set, r.area, r.option, x.role, r.main, r.value, r.exact, 0::float8 as rank
     from flagged r
     cross join lateral (
       select case
@@ -621,9 +631,18 @@ async function load(
       end as role
     ) x
     where r.kept and r.count_round = r.first and x.role is not null
+      and not exists (select from gone g where g.set = r.set and g.option = r.option)
+    union all
+    select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, r.rank::float8
+    from flagged r where r.rank is not null
   `);
-  const kept = new Set(rollup.rows.map((row) => `${row.set}:${row.area}`));
-  const tallies = new Map<number, number>();
+  const counts = rollup.rows.filter((row) => row.role !== "rank");
+  const kept = new Set(counts.map((row) => `${row.set}:${row.area}`));
+  const tallies = new Map(
+    rollup.rows
+      .filter((row) => row.role === "rank")
+      .map((row) => [row.option, row.rank]),
+  );
   const areas = new Map<
     number,
     {
@@ -633,7 +652,7 @@ async function load(
       exact: boolean;
     }
   >();
-  for (const row of rollup.rows) {
+  for (const row of counts) {
     const area = areas.get(row.area) ?? {
       votes: new Map<number, number>(),
       sums: new Map<string, number>(),
@@ -646,7 +665,6 @@ async function load(
     area.sums.set(sum, (area.sums.get(sum) ?? 0) + row.value);
     if (row.role === "votes") {
       area.votes.set(row.option, (area.votes.get(row.option) ?? 0) + row.value);
-      tallies.set(row.option, (tallies.get(row.option) ?? 0) + row.value);
     }
   }
   const optionKs = new Set(tallies.keys());
@@ -1264,6 +1282,81 @@ async function chamber(
   };
 }
 
+async function tally(
+  contest: Found,
+  areaK: number,
+  round: number | null,
+  last: number,
+  lineage: Array<Relation>,
+  match: Match,
+  grouping: Grouping,
+) {
+  if (round == null) {
+    return null;
+  }
+  const rounds = Array.from({ length: last }, (_, index) => index + 1);
+  const [sides, spent] = await Promise.all([
+    Promise.all(
+      rounds.map(async (step) =>
+        load([contest.root], [areaK], contest.date ?? "infinity", [], [], step),
+      ),
+    ),
+    db.execute<{ round: number; value: number }>(sql`
+      select r.count_round as round, sum(r.value)::float8 as value
+      from result_set rs join result_rollup r on r.result_set_k = rs.k
+      where rs.contest_id = ${contest.id}::uuid and rs.is_default and r.area_k = ${areaK}
+        and r.option_k = 0 and r.measure = 21
+      group by r.count_round
+    `),
+  ]);
+  const lines = new Map<
+    string,
+    {
+      key: string;
+      label: string;
+      short: string | null;
+      color: string | null;
+      person: string | null;
+      party: string | null;
+      votes: Array<number | null>;
+    }
+  >();
+  for (const [index, entry] of sides.entries()) {
+    const side = entry.get(areaK)?.side;
+    const compared =
+      side == null ? [] : compare(side, null, lineage, match, grouping);
+    for (const row of compared) {
+      const line = lines.get(row.key) ?? {
+        key: row.key,
+        label: row.label,
+        short: row.short,
+        color: row.color,
+        person: row.current?.person ?? null,
+        party: row.current?.party ?? null,
+        votes: rounds.map(() => null),
+      };
+      line.votes[index] = row.current?.votes ?? null;
+      lines.set(row.key, line);
+    }
+  }
+  const reach = (votes: Array<number | null>) =>
+    votes.findLastIndex((value) => value != null);
+  const exhausted = new Map(spent.rows.map((row) => [row.round, row.value]));
+  return {
+    round,
+    last,
+    rows: lines
+      .values()
+      .toArray()
+      .toSorted(
+        (a, b) =>
+          reach(b.votes) - reach(a.votes) ||
+          (b.votes[reach(b.votes)] ?? 0) - (a.votes[reach(a.votes)] ?? 0),
+      ),
+    exhausted: rounds.map((step) => exhausted.get(step) ?? null),
+  };
+}
+
 async function places(
   contest: Found,
   area: { id: string; k: number },
@@ -1274,6 +1367,7 @@ async function places(
   lineage: Array<Relation>,
   match: Match,
   grouping: Grouping = "option",
+  round: number | null = null,
 ): Promise<v.InferOutput<typeof Places>> {
   const kids = await children(
     contest.id,
@@ -1351,6 +1445,7 @@ async function places(
       lineage,
       match,
       grouping,
+      round,
     ),
     db.execute<{ k: number; x: number; y: number }>(sql`
       select distinct on (a.k) a.k,
@@ -1396,6 +1491,7 @@ async function tabulate(
   lineage: Array<Relation>,
   match: Match,
   grouping: Grouping = "option",
+  round: number | null = null,
 ) {
   const ks = rows.map((row) => row.k);
   const depth = new Map<number, number>();
@@ -1414,6 +1510,7 @@ async function tabulate(
           date ?? "infinity",
           [],
           batch.flatMap((row) => (row.owner == null ? [] : [row.owner])),
+          round,
         );
       }),
     ),
@@ -1442,22 +1539,37 @@ async function tabulate(
     }
   >();
   const sources = new Set<string>();
+  const results = rows.map((row, index) => {
+    const current = now[tier[index] ?? 0]?.get(row.k);
+    return current == null
+      ? []
+      : compare(
+          current.side,
+          then?.get(row.k)?.side ?? null,
+          lineage,
+          match,
+          grouping,
+        );
+  });
+  const personal = new Set(
+    results
+      .flat()
+      .filter((entry) => entry.key.startsWith("person:"))
+      .map((entry) => (entry.current ?? entry.earlier)?.party),
+  );
   const compared = rows.map((row, index) => {
     const current = now[tier[index] ?? 0]?.get(row.k);
     const sets = current?.sets ?? [];
     for (const set of sets) {
       sources.add(set.source.publisher);
     }
-    const result =
-      current == null
-        ? []
-        : compare(
-            current.side,
-            then?.get(row.k)?.side ?? null,
-            lineage,
-            match,
-            grouping,
-          );
+    const result = (results[index] ?? []).map((entry) =>
+      entry.key.startsWith("party:") &&
+      entry.current?.person != null &&
+      personal.has(entry.current.party)
+        ? { ...entry, key: `person:${entry.current.person}` }
+        : entry,
+    );
     const running = result.find(
       (entry) => entry.current != null && !entry.key.startsWith("kind:"),
     );
@@ -1669,6 +1781,7 @@ const Input = v.object({
   by: v.optional(v.string()),
   vs: v.optional(v.string()),
   match: v.optional(v.picklist(["party", "person", "family"]), "party"),
+  round: v.optional(v.pipe(v.number(), v.integer(), v.minValue(0)), 0),
   group: v.pipe(
     v.optional(v.string(), "option"),
     v.transform((value): Grouping =>
@@ -1916,6 +2029,25 @@ export const contests = {
         turnout: v.nullable(
           v.object({ registered: v.number(), voters: v.number() }),
         ),
+        count: v.nullable(
+          v.object({
+            round: v.number(),
+            last: v.number(),
+            rows: v.array(
+              v.object({
+                key: v.string(),
+                label: v.string(),
+                short: v.nullable(v.string()),
+                color: v.nullable(v.string()),
+                person: v.nullable(v.string()),
+                party: v.nullable(v.string()),
+                votes: v.array(v.nullable(v.number())),
+              }),
+            ),
+            exhausted: v.array(v.nullable(v.number())),
+          }),
+        ),
+        isDerived: v.boolean(),
         current: v.nullable(
           v.object({
             valid: v.number(),
@@ -2036,7 +2168,7 @@ export const contests = {
       const isRoot = scoped == null;
       const area = scoped ?? contest.place;
       const unit = chain.map((entry) => entry.segment);
-      const [parts, ancestors, cited, home, roll] = await Promise.all([
+      const [parts, ancestors, cited, home, roll, counted] = await Promise.all([
         db.execute<{ id: string }>(sql`
           select id from contest where allocation_parent_id = ${contest.id}::uuid
         `),
@@ -2087,7 +2219,27 @@ export const contests = {
               and r.option_k = 0 and r.measure in (2, 3, 14) and r.count_round = 0
           ) t where registered is not null and voters is not null
         `),
+        db.execute<{
+          last: number;
+          round: number | null;
+          derived: boolean;
+        }>(sql`
+          select coalesce(t.last, 1) as last,
+            case when t.last > 1 then least(greatest(coalesce(nullif(${input.round}::int, 0), t.last), 1), t.last) end as round,
+            exists (
+              select from result_set rs join note n on n.entity_id = rs.id and n.kind = 'methodology'
+              where rs.contest_id = ${contest.id}::uuid and not rs.is_default
+            ) as derived
+          from (
+            select max(r.count_round)::int as last from result_set rs join result_rollup r on r.result_set_k = rs.k
+            where rs.contest_id = ${contest.id}::uuid and rs.is_default and r.area_k = ${contest.place?.k ?? null}::int
+              and r.measure = any(${COUNTED})
+          ) t
+        `),
       ]);
+      const [
+        { last, round, derived } = { last: 1, round: null, derived: false },
+      ] = counted.rows;
       const childIds = parts.rows.map((row) => row.id);
       const ancestorIds = ancestors.rows.map((row) => row.id);
       const [labels, slugs, crumbs, notes, sets, declared] = await Promise.all([
@@ -2281,6 +2433,8 @@ export const contests = {
                 })),
               },
         turnout: roll.rows[0] ?? null,
+        count: null,
+        isDerived: derived,
         current: null,
         electors: null,
         chamber: null,
@@ -2628,8 +2782,10 @@ export const contests = {
         [area.k],
         contest.date ?? "infinity",
         owned?.rows.map((row) => row.id) ?? [contest.id],
+        [],
+        round,
       );
-      const [now, before, grid, cast, seats, pairs] = await Promise.all([
+      const [now, before, grid, cast, seats, pairs, steps] = await Promise.all([
         loading,
         chosen == null
           ? null
@@ -2649,6 +2805,7 @@ export const contests = {
           lineage,
           input.match,
           input.group,
+          round,
         ),
         counterpart?.indirect === true
           ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
@@ -2657,6 +2814,7 @@ export const contests = {
         db.execute<{ from: string; to: string }>(
           sisters([contest.root], contest.date ?? "infinity"),
         ),
+        tally(contest, area.k, round, last, lineage, input.match, input.group),
       ]);
       const current = now.get(area.k);
       if (current == null) {
@@ -2789,6 +2947,7 @@ export const contests = {
         series,
         places: grid,
         checks,
+        count: steps,
         current: {
           valid: current.side.valid,
           measure: current.measure,

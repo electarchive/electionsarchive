@@ -15,6 +15,7 @@
   import type { PageData } from "./$types";
   import Ballot from "./ballot.svelte";
   import Changes from "./changes.svelte";
+  import Count from "./count.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
   import Lists from "./lists.svelte";
@@ -28,6 +29,7 @@
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
   import Shift from "./shift.svelte";
+  import Tally from "./tally.svelte";
 
   const {
     contest,
@@ -335,6 +337,28 @@
             seats: count(top.seats),
             total: count(total),
             share: percent(top.share),
+          });
+    }
+    if (contest.count != null) {
+      const last = contest.count.last - 1;
+      const [first, second] = contest.count.rows;
+      const won = contest.rows.find((row) => row.key === first?.key)?.current;
+      const total = (first?.votes[last] ?? 0) + (second?.votes[last] ?? 0);
+      return first == null || second == null || total === 0
+        ? null
+        : (["won", "elected"].includes(won?.outcome ?? "")
+            ? m.race_lede_final
+            : m.race_lede_final_led)({
+            party: named(first),
+            share: percent((first.votes[last] ?? 0) / total),
+            margin: count(
+              Math.round(
+                (((first.votes[last] ?? 0) - (second.votes[last] ?? 0)) /
+                  total) *
+                  1000,
+              ) / 10,
+            ),
+            runner: named(second),
           });
     }
     const [top, next] = contest.rows
@@ -703,6 +727,9 @@
     {m.no_results()}
   </p>
 {:else}
+  {#if contest.count != null}
+    <Count count={contest.count} {here} isDerived={contest.isDerived} />
+  {/if}
   {#if contest.electors != null}
     <Electors electors={contest.electors} />
   {/if}
@@ -802,6 +829,9 @@
     {/if}
   {:else}
     {@render stats(false)}
+  {/if}
+  {#if contest.count != null}
+    <Tally count={contest.count} {here} />
   {/if}
 
   <div
@@ -1126,7 +1156,10 @@
 {/if}
 
 {#if notes.length > 0}
-  <section class="col-span-12 bg-card px-3.5 py-3 md:col-span-6">
+  <section
+    id="notes"
+    class="col-span-12 scroll-mbs-4 bg-card px-3.5 py-3 md:col-span-6"
+  >
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.notes_title()}</h2>
     <ul class="grid gap-1.5 text-sm/snug text-muted-foreground">
       {#each notes as note, index (index)}

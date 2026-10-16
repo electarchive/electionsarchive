@@ -354,6 +354,7 @@ export async function archive(path: string, search: URLSearchParams) {
           by: search.get("by") ?? undefined,
           vs: search.get("vs") ?? undefined,
           match,
+          round: Math.max(0, Math.trunc(Number(search.get("round"))) || 0),
           group: search.get("group") ?? undefined,
         }),
         call(router.contests.lists, { id: slug.entity_id }),
