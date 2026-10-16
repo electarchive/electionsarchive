@@ -230,4 +230,6 @@ def emit() -> Path:
                 notes="Moutier transferred from the canton of Bern to the canton of Jura",
             )
             cs.add("area_event_member", event_id=event, area_id=commune, role="from")
+        for scheme in ("ch.canton", "ch.commune"):
+            cs.add("boundary_set", scheme_code=scheme, vintage=EDITION, valid_from=None, valid_to=None, as_of=moved)
         return cs.write()

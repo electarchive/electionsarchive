@@ -534,6 +534,14 @@ def emit() -> Path:
                 quality="official",
                 source_id=boundaries["2023"],
             )
+        cs.add(
+            "boundary_set",
+            scheme_code="ca.province",
+            vintage="2023",
+            valid_from=None,
+            valid_to=None,
+            as_of=max(ELECTIONS),
+        )
 
         fed_areas: dict[tuple[str, str], UUID] = {}
         commons = cs.key(f"{SOURCE}.body", "house_of_commons")

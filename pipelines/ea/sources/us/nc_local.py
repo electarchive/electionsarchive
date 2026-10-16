@@ -321,6 +321,14 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=None,
             )
+        cs.add(
+            "boundary_set",
+            scheme_code="us.place",
+            vintage="2020",
+            valid_from=None,
+            valid_to=None,
+            as_of=date(2020, 1, 1),
+        )
         systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
         cs.add("electoral_system", id=systems["block"], polity_id=us, rules={"formula": "block"}, rules_version=1)
         name(systems["block"], "Block vote")

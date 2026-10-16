@@ -809,6 +809,7 @@ def emit() -> Path:
                     quality="official",
                     source_id=results,
                 )
+        cs.add("boundary_set", scheme_code="de.land", vintage="2025", valid_from=None, valid_to=None, as_of=ELECTION)
 
         constituency_areas: dict[str, UUID] = {}
         constituency_units: dict[str, UUID] = {}
