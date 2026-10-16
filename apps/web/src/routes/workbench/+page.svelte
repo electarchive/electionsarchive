@@ -383,7 +383,7 @@
   <header class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
     <div class="grid gap-1.5">
       <h1
-        class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em]"
+        class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
       >
         {spec?.title ?? m.workbench_title()}
       </h1>

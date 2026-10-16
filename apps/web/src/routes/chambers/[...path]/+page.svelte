@@ -164,7 +164,7 @@
       <div class="flex flex-wrap items-end justify-between gap-x-6 gap-y-3">
         <div class="grid gap-1">
           <h1
-            class="font-serif text-[clamp(1.75rem,3.4vw,2.75rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
+            class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
           >
             {body.name}
           </h1>

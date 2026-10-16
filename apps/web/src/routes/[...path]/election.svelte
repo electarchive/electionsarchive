@@ -206,6 +206,8 @@
     return { size: best.size, seats };
   });
 
+  const named = (row: { label: string; short: string | null }) =>
+    row.label.length > 28 ? (row.short ?? row.label) : row.label;
   const races = $derived(
     election.races.map((race) => {
       const winners = race.results.filter((row) => (row.seats ?? 0) > 0);
@@ -394,7 +396,7 @@
               ? null
               : race.kind === "elector_slate" && seated.length > 0
                 ? m.race_lede_electors({
-                    party: leader.label,
+                    party: named(leader),
                     seats: count(leader.seats ?? 0),
                     total: count(total),
                     share: percent(leader.share),
@@ -408,7 +410,7 @@
                     })
                   : seated.length > 0 && !race.isOffice
                     ? m.race_lede_seats({
-                        party: leader.label,
+                        party: named(leader),
                         seats: count(leader.seats ?? 0),
                         total: count(
                           race.size != null && race.size <= total + 2
@@ -422,13 +424,13 @@
                       : (seated.length > 0
                           ? m.race_lede_won
                           : m.race_lede_votes)({
-                          party: leader.label,
+                          party: named(leader),
                           share: percent(leader.share),
                           margin: count(
                             Math.round((leader.share - runner.share) * 1000) /
                               10,
                           ),
-                          runner: runner.label,
+                          runner: named(runner),
                         }),
       };
     }),
@@ -810,7 +812,7 @@
       {/each}
     </span>
     <span
-      class="relative flex overflow-hidden rounded-xs bg-muted block-2.5"
+      class="relative flex animate-sweep overflow-hidden rounded-xs bg-muted block-2.5 motion-reduce:animate-none"
       aria-hidden="true"
     >
       {#each bar.isCount ? bar.parts : shown as part, at (part.key)}

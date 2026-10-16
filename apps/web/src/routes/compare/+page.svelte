@@ -159,7 +159,7 @@
     <header class="col-span-12 grid gap-3 bg-card px-3.5 pbs-4 pbe-3.5">
       <div class="grid gap-1">
         <h1
-          class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em]"
+          class="font-serif text-[clamp(1.75rem,3vw,2.5rem)] leading-[1.02] font-[640] tracking-[-0.01em] text-balance"
         >
           {m.versus_title()}
         </h1>

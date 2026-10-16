@@ -122,7 +122,7 @@
   </div>
   <div class="relative pbs-1.5 pbe-5">
     <div
-      class="flex gap-px overflow-hidden rounded-xs bg-card block-6"
+      class="flex animate-sweep gap-px overflow-hidden rounded-xs bg-card block-6 motion-reduce:animate-none"
       role="img"
       aria-label={electors.rows
         .map((row) => `${row.label} ${count(row.votes)}`)

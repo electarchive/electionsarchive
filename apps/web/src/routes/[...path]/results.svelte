@@ -140,7 +140,7 @@
   >
     {#if after != null}
       <span
-        class="absolute inset-y-0.75 inset-s-0 rounded-e-xs bg-(--party)"
+        class="absolute inset-y-0.75 inset-s-0 animate-sweep rounded-e-xs bg-(--party) transition-[inline-size] duration-500 motion-reduce:animate-none motion-reduce:transition-none"
         style:inline-size="{(after.share / scale) * 100}%"
       ></span>
     {/if}

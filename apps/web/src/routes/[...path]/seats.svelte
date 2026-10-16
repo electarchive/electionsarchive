@@ -470,7 +470,10 @@
         )}
         <circle
           id="{uid}-seat-{seat.index}"
-          class="transition-[fill] duration-150 motion-reduce:transition-none"
+          class="animate-seat transition-[fill] duration-150 motion-reduce:animate-none motion-reduce:transition-none"
+          style:animation-delay="{Math.round(
+            (seat.index / seats.length) * 640,
+          )}ms"
           cx={seat.x}
           cy={seat.y}
           r={dot}
