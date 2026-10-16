@@ -4162,12 +4162,12 @@ export const elections = {
           where not exists (select from contest k where k.allocation_parent_id = g.id)
         ),
         winners as materialized (
-          select l.id as leaf, l.root, o.id, o.party_id, max(coalesce(x.seats, 1))::int as seats
+          select l.id as leaf, l.root, o.id, o.party_id, o.alliance_id, max(coalesce(x.seats, 1))::int as seats
           from leaves l
           join result_set rs on rs.contest_id = l.id and rs.is_default
           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
           join contest_option o on o.id = x.option_id
-          group by l.id, l.root, o.id, o.party_id
+          group by l.id, l.root, o.id, o.party_id, o.alliance_id
         ),
         leads as (
           select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
@@ -4191,7 +4191,7 @@ export const elections = {
             and (z.valid @> r.day or z.valid_from between r.day and r.day + 150)
             order by z.valid_from desc nulls last limit 1) as size,
           w.leaf, up.area as region, a.scheme_code as scheme,
-          coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party, w.seats
+          coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id, w.alliance_id) as party, w.seats
         from winners w
         join roots r on r.id = w.root
         join up on up.leaf = w.leaf
@@ -4202,50 +4202,49 @@ export const elections = {
           and br.kind = 'regional_branch' and br.valid @> r.day
         left join entity_merge bm on bm.entity_id = br.parent_party_id
       `);
-      const chambers = Map.groupBy(
-        found.rows,
-        (row) => `${row.body}:${row.kind}`,
-      )
+      const best = Map.groupBy(found.rows, (row) => row.body)
         .values()
-        .flatMap((rows) => {
-          const leaves = new Set(rows.map((row) => row.leaf));
-          const schemes = Map.groupBy(rows, (row) => row.scheme)
-            .entries()
-            .map(([scheme, group]) => ({
-              scheme,
-              rows: group,
-              leaves: new Set(group.map((row) => row.leaf)).size,
-              regions: new Set(group.map((row) => row.region)).size,
-            }))
-            .filter(
-              (entry) => entry.leaves === leaves.size && entry.regions >= 4,
-            )
-            .toArray()
-            .toSorted((a, b) => a.regions - b.regions);
-          const chosen = schemes[0];
-          const counted = chosen?.rows ?? [];
-          let seats = 0;
-          for (const row of counted) {
-            seats += row.seats;
-          }
-          const size = rows[0]?.size ?? null;
-          return chosen == null || size == null || seats < size * 0.9
-            ? []
-            : [
-                {
-                  body: rows[0]?.body ?? "",
-                  scheme: chosen.scheme,
-                  seats,
-                  rows: chosen.rows,
-                },
-              ];
+        .flatMap((all) => {
+          const kinds = Map.groupBy(all, (row) => row.kind);
+          const size = all[0]?.size ?? null;
+          return [...kinds.values(), ...(kinds.size > 1 ? [all] : [])]
+            .flatMap((rows) => {
+              const leaves = new Set(rows.map((row) => row.leaf)).size;
+              const chosen = Map.groupBy(rows, (row) => row.scheme)
+                .entries()
+                .map(([scheme, group]) => ({
+                  scheme,
+                  rows: group,
+                  leaves: new Set(group.map((row) => row.leaf)).size,
+                  regions: new Set(group.map((row) => row.region)).size,
+                }))
+                .filter(
+                  (entry) => entry.leaves === leaves && entry.regions >= 4,
+                )
+                .toArray()
+                .toSorted((a, b) => a.regions - b.regions)[0];
+              const counted = chosen?.rows ?? [];
+              let seats = 0;
+              for (const row of counted) {
+                seats += row.seats;
+              }
+              return chosen == null ||
+                size == null ||
+                seats < size * 0.9 ||
+                seats > size * 1.02
+                ? []
+                : [
+                    {
+                      body: rows[0]?.body ?? "",
+                      scheme: chosen.scheme,
+                      seats,
+                      rows: chosen.rows,
+                    },
+                  ];
+            })
+            .toSorted((a, b) => b.seats - a.seats)
+            .slice(0, 1);
         })
-        .toArray();
-      const best = Map.groupBy(chambers, (chamber) => chamber.body)
-        .values()
-        .flatMap((group) =>
-          group.toSorted((a, b) => b.seats - a.seats).slice(0, 1),
-        )
         .toArray();
       const parties = [
         ...new Set(
@@ -4254,6 +4253,26 @@ export const elections = {
           ),
         ),
       ];
+      const members = await db.execute<{ alliance: string; party: string }>(sql`
+        select alliance_id as alliance, party_id as party from alliance_member
+        where alliance_id = any(${sql.param(parties)}::uuid[])
+      `);
+      const held = Map.groupBy(
+        best.flatMap((chamber) => chamber.rows),
+        (row) => row.party,
+      );
+      const anchor = new Map(
+        Map.groupBy(members.rows, (row) => row.alliance)
+          .entries()
+          .map(([alliance, rows]) => [
+            alliance,
+            rows.toSorted(
+              (a, b) =>
+                (held.get(b.party)?.length ?? 0) -
+                (held.get(a.party)?.length ?? 0),
+            )[0]?.party ?? alliance,
+          ]),
+      );
       const [labels, colors, positions, nouns] = await Promise.all([
         names(
           [
@@ -4262,10 +4281,10 @@ export const elections = {
           ],
           null,
         ),
-        refs(parties),
+        refs([...parties, ...anchor.values()]),
         db.execute<{ party_id: string; lean: number }>(sql`
           select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
-          where party_id = any(${sql.param(parties)}::uuid[])
+          where party_id = any(${sql.param([...parties, ...anchor.values()])}::uuid[])
           order by party_id, valid_from desc nulls last
         `),
         db.execute<{ code: string; noun: string | null }>(sql`
@@ -4313,8 +4332,8 @@ export const elections = {
           id,
           label: colors.get(id)?.label ?? "",
           short: colors.get(id)?.short ?? null,
-          color: colors.get(id)?.color ?? null,
-          lean: lean.get(id) ?? null,
+          color: colors.get(anchor.get(id) ?? id)?.color ?? null,
+          lean: lean.get(anchor.get(id) ?? id) ?? null,
         })),
       }));
     }),
