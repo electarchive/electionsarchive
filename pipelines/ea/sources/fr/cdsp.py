@@ -23,8 +23,14 @@ LANDING = {
     "presi": "https://www.data.gouv.fr/datasets/elections-presidentielles-1965-2012-1",
 }
 TITLES = {"legi": "Élections législatives 1958-2012", "presi": "Élections présidentielles 1965-2012"}
+AGGREGATED = {
+    "general": "https://data-pipeline-open.s3.sbg.io.cloud.ovh.net/elections/general_results.parquet",
+    "candidates": "https://data-pipeline-open.s3.sbg.io.cloud.ovh.net/elections/candidats_results.parquet",
+}
+AGGREGATED_TITLE = "Données des élections agrégées"
+AGGREGATED_YEAR = 2017
 PUBLISHER = "Centre de données socio-politiques, Sciences Po"
-REGISTERED, VALID, INVALID, VOTERS, VOTES = 2, 4, 5, 14, 1
+REGISTERED, VALID, INVALID, BLANK, VOTERS, VOTES = 2, 4, 5, 6, 14, 1
 ACCOUNTING = {"Inscrits": REGISTERED, "Votants": VOTERS, "Exprimés": VALID, "Blancs et nuls": INVALID}
 SKIPPED = {"élu premier tour", "Taux de participation (%)"}
 PRESIDENTIAL = {
@@ -37,6 +43,8 @@ PRESIDENTIAL = {
     2002: (date(2002, 4, 21), date(2002, 5, 5)),
     2007: (date(2007, 4, 22), date(2007, 5, 6)),
     2012: (date(2012, 4, 22), date(2012, 5, 6)),
+    2017: (date(2017, 4, 23), date(2017, 5, 7)),
+    2022: (date(2022, 4, 10), date(2022, 4, 24)),
 }
 LEGISLATIVE = {
     1958: (date(1958, 11, 23), date(1958, 11, 30)),
@@ -52,6 +60,8 @@ LEGISLATIVE = {
     2002: (date(2002, 6, 9), date(2002, 6, 16)),
     2007: (date(2007, 6, 10), date(2007, 6, 17)),
     2012: (date(2012, 6, 10), date(2012, 6, 17)),
+    2017: (date(2017, 6, 11), date(2017, 6, 18)),
+    2022: (date(2022, 6, 12), date(2022, 6, 19)),
 }
 MAPS = [
     (date(1958, 11, 23), date(1967, 3, 5)),
@@ -146,6 +156,25 @@ CANDIDATES = {
     "Marine LE PEN": "Marine Le Pen",
     "Jacques CHEMINADE": "Jacques Cheminade",
 }
+LATER_PARTIES = {
+    "Emmanuel Macron": "LREM",
+    "Marine Le Pen": "FN",
+    "François Fillon": "LR",
+    "Jean-Luc Mélenchon": "LFI",
+    "Benoît Hamon": "PS",
+    "Nicolas Dupont-Aignan": "DLF",
+    "Jean Lassalle": "RES",
+    "Philippe Poutou": "NPA",
+    "François Asselineau": "UPR",
+    "Nathalie Arthaud": "LO",
+    "Jacques Cheminade": "SP",
+    "Éric Zemmour": "REC",
+    "Valérie Pécresse": "LR",
+    "Yannick Jadot": "EELV",
+    "Fabien Roussel": "PCF",
+    "Anne Hidalgo": "PS",
+}
+RENAMED = date(2018, 6, 1)
 PARTIES = {
     "MRP": ("wikidata", "Q1236315"),
     "UNR": ("parlgov", "1094"),
@@ -163,6 +192,8 @@ PARTIES = {
     "VERTS": ("wikidata", "Q743390"),
     "UMP": ("wikidata", "Q173152"),
     "MODEM": ("wikidata", "Q587370"),
+    "LREM": ("wikidata", "Q23731823"),
+    "LR": ("wikidata", "Q20012759"),
 }
 NEW_PARTIES = {
     "CIR": "Convention des institutions républicaines",
@@ -187,6 +218,11 @@ NEW_PARTIES = {
     "NPA": "Nouveau Parti anticapitaliste",
     "DLR": "Debout la République",
     "SP": "Solidarité et progrès",
+    "LFI": "La France insoumise",
+    "DLF": "Debout la France",
+    "RES": "Résistons !",
+    "UPR": "Union populaire républicaine",
+    "REC": "Reconquête",
 }
 TENDENCIES_1981 = {
     "COM": "Parti communiste",
@@ -231,6 +267,31 @@ NUANCES = {
     "MODEM-": "Centristes",
     "MPF": "Mouvement pour la France",
 }
+LATER_NUANCES = {
+    2017: {
+        "REM": "La République en marche",
+        "FI": "La France insoumise",
+        "FN": "Front national",
+        "LR": "Les Républicains",
+        "DLF": "Debout la France",
+        "MDM": "Mouvement démocrate",
+        "UDI": "Union des démocrates et indépendants",
+        "RDG": "Parti radical de gauche",
+    },
+    2022: {
+        "ENS": "Ensemble",
+        "NUP": "Nouvelle Union populaire écologique et sociale",
+        "RN": "Rassemblement national",
+        "REC": "Reconquête",
+        "LR": "Les Républicains",
+        "DSV": "Droite souverainiste",
+        "DXG": "Divers extrême gauche",
+        "DXD": "Divers extrême droite",
+        "DVC": "Divers centre",
+        "UDI": "Union des démocrates et indépendants",
+        "RDG": "Parti radical de gauche",
+    },
+}
 NUANCE_FIXES = {
     1988: {
         "SCO": "MAJ",
@@ -258,6 +319,11 @@ NOTES = {
         "Results by constituency, compiled by the Banque de données socio-politiques in Grenoble and Sciences Po's "
         "CDSP. Until 1995 the files cover metropolitan France only; 2002 adds the overseas départements and "
         "territories, and 2007 and 2012 add voters abroad. Here they are summed by département."
+    ),
+    "aggregated": (
+        "Results by polling station for every election since 1999, harmonized by data.gouv.fr from the Interior "
+        "Ministry's files. Here the 2017 and 2022 presidential and legislative elections are summed by département "
+        "and by constituency."
     ),
 }
 TENDENCY_CAVEAT = (
@@ -287,6 +353,8 @@ def fold(text: str) -> str:
 def fetch() -> None:
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".zip")
+    for url in AGGREGATED.values():
+        raw.fetch(SOURCE, url, suffix=".parquet")
 
 
 def parse() -> None:
@@ -397,6 +465,85 @@ def parse() -> None:
                         )
                     )
                 options.append(pl.concat(rows))
+    elections = {
+        f"{year}_{kind}_t{number}": (kind, year, number)
+        for kind in ("legi", "presi")
+        for year in (2017, 2022)
+        for number in (1, 2)
+    }
+    general = (
+        pl.scan_parquet(raw.cached(SOURCE, AGGREGATED["general"]).path)
+        .filter(pl.col("id_election").is_in(list(elections)))
+        .collect()
+    )
+    candidates = (
+        pl.scan_parquet(raw.cached(SOURCE, AGGREGATED["candidates"]).path)
+        .filter(pl.col("id_election").is_in(list(elections)))
+        .collect()
+    )
+    codes = {
+        "ZA": "971",
+        "ZB": "972",
+        "ZC": "973",
+        "ZD": "974",
+        "ZS": "975",
+        "ZM": "976",
+        "ZW": "986",
+        "ZP": "987",
+        "ZN": "988",
+    }
+    general = general.with_columns(pl.col("code_departement").replace(codes))
+    candidates = candidates.with_columns(pl.col("code_departement").replace(codes))
+    circs = general.select(
+        "id_election", "id_brut_miom", circ=pl.col("code_departement") + pl.col("code_circonscription")
+    )
+    for election, (kind, year, number) in elections.items():
+        keys = [
+            pl.lit(kind).alias("kind"),
+            pl.lit(year).alias("year"),
+            pl.lit(number).alias("round"),
+            pl.col("code_departement").alias("dept"),
+            (pl.lit(None, pl.String) if kind == "presi" else pl.col("circ")).alias("circ"),
+        ]
+        rows = general.filter(pl.col("id_election") == election).with_columns(
+            circ=pl.col("code_departement") + pl.col("code_circonscription")
+        )
+        accounting.append(
+            rows.unpivot(
+                on=["inscrits", "votants", "exprimes", "blancs", "nuls"],
+                index=["code_departement", "circ"],
+                variable_name="field",
+            ).select(
+                *keys,
+                measure=pl.col("field").replace_strict(
+                    {"inscrits": REGISTERED, "votants": VOTERS, "exprimes": VALID, "blancs": BLANK, "nuls": INVALID},
+                    return_dtype=pl.Int16,
+                ),
+                value=pl.col("value").cast(pl.Int64),
+            )
+        )
+        lines = (
+            candidates.filter(pl.col("id_election") == election)
+            .join(circs, on=["id_election", "id_brut_miom"], how="left")
+            .with_columns(display=pl.col("prenom") + " " + pl.col("nom").str.to_titlecase())
+        )
+        options.append(
+            lines.select(
+                *keys,
+                slot=pl.col("no_panneau").cast(pl.Int32),
+                label=pl.col("display") if kind == "presi" else pl.col("nom") + " " + pl.col("prenom"),
+                abbreviation=pl.col("display").replace_strict(LATER_PARTIES, default=None)
+                if kind == "presi"
+                else pl.lit(None, pl.String),
+                sex="sexe",
+                surname="nom",
+                forename="prenom",
+                etiquette=pl.lit(None, pl.String),
+                nuance=pl.col("nuance") if kind == "legi" else pl.lit(None, pl.String),
+                votes=pl.col("voix").cast(pl.Int64),
+                elected=pl.lit(None, pl.Boolean),
+            )
+        )
     values = pl.concat(accounting)
     standing = pl.concat(options, how="diagonal")
     values = values.group_by("kind", "year", "round", "dept", "circ", "measure").agg(pl.col("value").sum())
@@ -506,12 +653,28 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="French presidential elections 1965–2012 by département and legislative elections 1958–2012 by constituency",
+            summary="French presidential elections 1965–2022 by département and legislative elections 1958–2022 by constituency",
             polity="FR",
         )
 
-        def name(entity: UUID, text: str, lang: str = "fr", kind: str = "official") -> None:
-            cs.add("name", entity_id=entity, text=text, lang=lang, kind=kind, is_preferred=kind == "official")
+        def name(
+            entity: UUID,
+            text: str,
+            lang: str = "fr",
+            kind: str = "official",
+            start: date | None = None,
+            end: date | None = None,
+        ) -> None:
+            cs.add(
+                "name",
+                entity_id=entity,
+                text=text,
+                lang=lang,
+                kind=kind,
+                is_preferred=kind == "official",
+                valid_from=start,
+                valid_to=end,
+            )
 
         def existing(scheme: str, value: str) -> UUID:
             entity = cs.key(scheme, value)
@@ -535,6 +698,20 @@ def emit() -> Path:
                 notes=NOTES[kind],
             )
             cs.artifact(raw.cached(SOURCE, url), sources[kind])
+        sources["aggregated"] = cs.source("data.gouv.fr", AGGREGATED_TITLE)
+        cs.add(
+            "source",
+            id=sources["aggregated"],
+            kind="official_body",
+            publisher="data.gouv.fr",
+            title=AGGREGATED_TITLE,
+            url="https://www.data.gouv.fr/datasets/donnees-des-elections-agregees",
+            license="Licence Ouverte v2.0",
+            license_url="https://www.etalab.gouv.fr/licence-ouverte-open-licence",
+            notes=NOTES["aggregated"],
+        )
+        for url in AGGREGATED.values():
+            cs.artifact(raw.cached(SOURCE, url), sources["aggregated"])
 
         france = cs.polity("FR")
         nation = cs.area("fr.nation", "FR")
@@ -678,6 +855,36 @@ def emit() -> Path:
                 )
             return None
 
+        front = parties[f"fr.party:{slug(NEW_PARTIES['FN'])}"] = cs.key("fr.party", slug(NEW_PARTIES["FN"]))
+        if front in cs.minted:
+            cs.add("party", id=front, kind="party", polity_id=france)
+            name(front, "FN", "fr", "abbreviation", end=RENAMED)
+            name(front, "RN", "fr", "abbreviation", start=RENAMED)
+        named = conn.execute(
+            "select id from name where entity_id = %s and text = 'Front national' and kind = 'official'", [front]
+        ).fetchone()
+        cs.add(
+            "name",
+            id=named[0] if named else None,
+            entity_id=front,
+            text="Front national",
+            lang="fr",
+            kind="official",
+            is_preferred=True,
+            valid_from=None,
+            valid_to=RENAMED,
+        )
+        cs.add(
+            "name",
+            entity_id=front,
+            text="Rassemblement national",
+            lang="fr",
+            kind="official",
+            is_preferred=True,
+            valid_from=RENAMED,
+            valid_to=None,
+        )
+
         persons: dict[str, UUID] = {}
 
         def person_of(key: str, display: str, sex: str | None) -> UUID:
@@ -789,7 +996,7 @@ def emit() -> Path:
                             stage="official",
                             kind="counted",
                             status="active",
-                            source_id=sources[kind],
+                            source_id=sources["aggregated" if year >= AGGREGATED_YEAR else kind],
                             is_default=True,
                             completeness=None if partial else 1,
                         )
@@ -873,7 +1080,7 @@ def emit() -> Path:
                             stage="official",
                             kind="counted",
                             status="active",
-                            source_id=sources[kind],
+                            source_id=sources["aggregated" if year >= AGGREGATED_YEAR else kind],
                             is_default=True,
                             completeness=1,
                         )
@@ -907,7 +1114,16 @@ def emit() -> Path:
                                     ballot_label=line["label"],
                                 )
                             else:
-                                if line["nuance"] is not None and line["nuance"] not in NUANCES:
+                                nuances = LATER_NUANCES.get(year, {}) | (
+                                    NUANCES
+                                    if year < AGGREGATED_YEAR
+                                    else {
+                                        code: label
+                                        for code, label in NUANCES.items()
+                                        if code in ("COM", "SOC", "DVD", "DVG", "EXG", "EXD", "ECO", "REG", "DIV")
+                                    }
+                                )
+                                if line["nuance"] is not None and line["nuance"] not in nuances:
                                     raise ValueError(f"unknown nuance {line['nuance']} in {year}")
                                 party = (
                                     None
@@ -915,7 +1131,7 @@ def emit() -> Path:
                                     else party_of(
                                         "fr.interieur.nuance",
                                         f"{year}:{line['nuance']}",
-                                        NUANCES[line["nuance"]],
+                                        nuances[line["nuance"]],
                                         line["nuance"],
                                         "nuance",
                                     )
