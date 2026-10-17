@@ -34,13 +34,35 @@ VOLUMES = {
     1884: ("eveningjournalal1885slsn", 1885, date(1884, 11, 4), [84, 85, 86]),
     1886: ("eveningjournalal1887slsn", 1887, date(1886, 11, 2), [96, 97]),
     1890: ("eveningjournalal1891slsn", 1891, date(1890, 11, 4), [84, 85]),
+    1892: ("eveningjournalal1895slsn", 1895, date(1892, 11, 8), [95, 96, 97, 98]),
+    1894: ("eveningjournalal1895slsn", 1895, date(1894, 11, 6), [95, 96, 97, 98]),
 }
 JOINT = {"fultonandhamilton": ("Fulton and Hamilton", ["36035", "36041"])}
 CORRECTED: dict[tuple[int, int, str, int], int] = {}
-UNBALANCED = {(1870, 12, 0), (1870, 13, 1), (1872, 17, 0), (1886, 15, 2), (1886, 17, 1), (1886, 21, 1), (1890, 20, 1)}
-ANCHORS = {(1886, 96, 11, 0, 0): (551, 2610, 632, 2625), (1886, 96, 11, 0, 1): (753, 2606, 789, 2629)}
+UNBALANCED = {
+    (1870, 12, 0),
+    (1870, 13, 1),
+    (1872, 17, 0),
+    (1886, 15, 2),
+    (1886, 17, 1),
+    (1886, 21, 1),
+    (1890, 20, 1),
+    (1892, 17, 1),
+    (1892, 18, 2),
+    (1892, 21, 2),
+    (1892, 25, 1),
+}
+ANCHORS = {
+    (1886, 96, 11, 0, 0): (551, 2610, 632, 2625),
+    (1886, 96, 11, 0, 1): (753, 2606, 789, 2629),
+    (1892, 98, 33, 0, 0): (955, 508, 1030, 532),
+    (1892, 98, 33, 0, 2): (1293, 511, 1326, 529),
+    (1892, 98, 34, 0, 0): (963, 641, 1017, 661),
+    (1892, 98, 34, 0, 1): (1115, 643, 1170, 663),
+    (1894, 98, 34, 0, 2): (832, 635, 864, 654),
+}
 WITHHELD = {(1882, 3)}
-MISPRINTED = {(1870, 22, 1), (1870, 26, 0), (1872, 32, 0), (1874, 26, 1), (1882, 21, 1)}
+MISPRINTED = {(1870, 22, 1), (1870, 26, 0), (1872, 32, 0), (1874, 26, 1), (1882, 21, 1), (1892, 30, 0), (1892, 30, 1)}
 GAP = (
     "The county figures printed for {candidate} sum to {counted} votes, but the almanac gives a district total of "
     "{printed}. We show the county figures as they were printed."
@@ -199,12 +221,11 @@ def parse() -> None:
                         for (r, c), b in anchors.items()
                         if abs((b[1] + b[3]) / 2 - ys[r]) < 40 and abs(b[2] - xs[c]) < 120
                     }
-                if not anchors:
-                    anchors = {
-                        (r, c): box
-                        for (y, p, d, r, c), box in ANCHORS.items()
-                        if (y, p, d) == (year, page, table["district"])
-                    }
+                anchors |= {
+                    (r, c): box
+                    for (y, p, d, r, c), box in ANCHORS.items()
+                    if (y, p, d) == (year, page, table["district"])
+                }
                 if not anchors:
                     raise ValueError(f"{year} page {page} district {table['district']}: no cell found on the page")
                 ys = {
