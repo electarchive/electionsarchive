@@ -105,7 +105,9 @@
       const other = sides[1]?.marks.find(
         (entry) => entry.path != null && entry.path === mark.path,
       );
-      return other == null ? [] : [{ path: mark.path, pair: [mark, other] }];
+      return other == null || Math.max(mark.share ?? 1, other.share ?? 1) < 0.01
+        ? []
+        : [{ path: mark.path, pair: [mark, other] }];
     }),
   );
   const focus = $derived(marks.find((mark) => mark.id === hovered) ?? null);
