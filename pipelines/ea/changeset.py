@@ -75,6 +75,10 @@ class Changeset:
         self.merged: dict[str, list[str]] = {}
         for entity, into in conn.execute("select entity_id, into_id from entity_merge"):
             self.merged.setdefault(str(into), []).append(str(entity))
+            self.survivors[entity] = into
+        for entity in self.survivors:
+            while self.survivors[entity] in self.survivors:
+                self.survivors[entity] = self.survivors[self.survivors[entity]]
 
     def add(self, table: str, **row: object) -> None:
         self.rows.setdefault(table, []).append(row)
@@ -91,7 +95,7 @@ class Changeset:
         if key not in known:
             known[key] = uuid5(NAMESPACE, f"{cache}\x1f{key}")
             self.minted.add(known[key])
-        return known[key]
+        return self.survivors.get(known[key], known[key])
 
     def key(self, scheme: str, value: str) -> UUID:
         cache = f"external_id:{scheme}"

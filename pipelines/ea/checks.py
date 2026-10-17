@@ -412,3 +412,72 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
             for entity_id, result_set_id, details in conn.execute(query).fetchall()
         )
     return findings
+
+
+def merged(
+    conn: Connection, changeset_id: str | None = None, tables: set[str] | None = None
+) -> list[tuple[str, str, UUID, UUID, UUID, int]]:
+    types = [
+        kind
+        for (kind,) in conn.execute(
+            "select distinct e.type::text from entity_merge m join entity e on e.id = m.entity_id"
+        ).fetchall()
+    ]
+    found: list[tuple[str, str, UUID, UUID, UUID, int]] = []
+    for relation, column, stamped in conn.execute(
+        """select c.conrelid::regclass::text, a.attname, exists (
+                  select from pg_attribute s where s.attrelid = c.conrelid and s.attname = 'changeset_id'
+                    and not s.attisdropped)
+           from pg_constraint c join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+           where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+             and c.confrelid::regclass::text = any(%s)
+             and c.conrelid::regclass::text not in ('search_document', 'entity_merge')
+             and not exists (
+               select from pg_constraint k where k.conrelid = c.conrelid and k.contype = 'p'
+                 and a.attnum = any(k.conkey))""",
+        [["entity", *types]],
+    ).fetchall():
+        if changeset_id is not None and not stamped or tables is not None and relation not in tables:
+            continue
+        found.extend(
+            conn.execute(
+                sql.SQL(
+                    """select {relation}, {column}, m.entity_id, m.into_id, m.changeset_id, count(*)::int
+                       from public.{table} t join entity_merge m on m.entity_id = t.{key} {scope}
+                       group by 3, 4, 5"""
+                ).format(
+                    relation=sql.Literal(relation),
+                    column=sql.Literal(column),
+                    table=sql.Identifier(relation),
+                    key=sql.Identifier(column),
+                    scope=sql.SQL("where t.changeset_id = {}").format(sql.Literal(changeset_id))
+                    if changeset_id is not None
+                    else sql.SQL(""),
+                )
+            ).fetchall()
+        )
+    for relation, column, parent in REFERENCES:
+        if parent not in types or tables is not None and relation not in tables:
+            continue
+        found.extend(
+            conn.execute(
+                sql.SQL(
+                    """select {relation}, {column}, m.entity_id, m.into_id, m.changeset_id, count(*)::int
+                       from public.{table} t join public.{parent} p on p.k = t.{key}
+                       join entity_merge m on m.entity_id = p.id {scope}
+                       group by 3, 4, 5"""
+                ).format(
+                    relation=sql.Literal(relation),
+                    column=sql.Literal(column),
+                    table=sql.Identifier(relation),
+                    parent=sql.Identifier(parent),
+                    key=sql.Identifier(column),
+                    scope=sql.SQL(
+                        "where t.result_set_k in (select k from public.result_set where changeset_id = {})"
+                    ).format(sql.Literal(changeset_id))
+                    if changeset_id is not None
+                    else sql.SQL(""),
+                )
+            ).fetchall()
+        )
+    return found

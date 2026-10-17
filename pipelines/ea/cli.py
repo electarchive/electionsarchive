@@ -2,7 +2,7 @@ import argparse
 import importlib
 from pathlib import Path
 
-from ea import cache, coverage, fixtures, raw, search, tiles
+from ea import cache, checks, coverage, fixtures, raw, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import connect
 
@@ -24,6 +24,7 @@ def main() -> None:
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
+    commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
     commands.add_parser(
         "coverage", help="measure a polity's coverage against its v1 goal and write .agents/spec/{polity}-coverage.md"
     ).add_argument("polity", choices=("us",))
@@ -52,6 +53,10 @@ def main() -> None:
             print(getattr(raw, args.action)(args.source))
         case "raw":
             cache.main(args.action, args.source, quick=args.quick)
+        case "merged":
+            with connect() as conn:
+                for relation, column, entity, into, merge, rows in checks.merged(conn):
+                    print(f"{relation}.{column}: {rows} rows reference {entity}, merged into {into} by {merge}")
         case "publish":
             with connect() as conn:
                 publish(conn, args.changeset_id)

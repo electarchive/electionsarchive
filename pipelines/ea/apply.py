@@ -12,6 +12,8 @@ from ea import checks
 from ea.checks import FACTS, KEYS, Stage
 from ea.store import DATA, Connection, connect
 
+MERGE_LOCK = 1700949316
+
 
 def _stage(conn: Connection, changeset_id: str) -> Stage:
     row = conn.execute(
@@ -501,6 +503,47 @@ def publish(conn: Connection, changeset_id: str) -> None:
     stage = _stage(conn, changeset_id)
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
+        if "entity_merge" in stage.tables:
+            conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
+            conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
+        else:
+            conn.execute("select pg_advisory_xact_lock_shared(%s)", [MERGE_LOCK])
+        conn.execute(
+            """create temporary table survivor on commit drop as
+               with recursive chain (entity_id, into_id) as (
+                 select entity_id, into_id from entity_merge
+                 union select c.entity_id, m.into_id from chain c join entity_merge m on m.entity_id = c.into_id
+               )
+               select c.entity_id, c.into_id from chain c
+               where not exists (select from entity_merge m where m.entity_id = c.into_id)"""
+        )
+        types = [
+            kind
+            for (kind,) in conn.execute(
+                "select distinct e.type::text from survivor s join entity e on e.id = s.entity_id"
+            ).fetchall()
+        ]
+        referencing = {
+            (relation, column)
+            for relation, column in conn.execute(
+                """select c.conrelid::regclass::text, a.attname from pg_constraint c
+                   join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+                   where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+                     and c.confrelid::regclass::text = any(%s)
+                     and not exists (
+                       select from pg_constraint k where k.conrelid = c.conrelid and k.contype = 'p'
+                         and a.attnum = any(k.conkey))""",
+                [["entity", *types]],
+            ).fetchall()
+        } | {(fact, column) for fact in FACTS for column, parent in KEYS.items() if parent in types}
+        for table, columns in stage.tables.items():
+            for column in columns:
+                if (table, column) in referencing and (table, column) != ("entity_merge", "entity_id"):
+                    conn.execute(
+                        sql.SQL("update {} t set {} = s.into_id from survivor s where t.{} = s.entity_id").format(
+                            stage.staged(table), sql.Identifier(column), sql.Identifier(column)
+                        )
+                    )
         findings = checks.run(conn, stage)
         moved = (
             [
@@ -546,6 +589,15 @@ def publish(conn: Connection, changeset_id: str) -> None:
             ]
         for table in stage.tables:
             _publish_table(conn, stage, table)
+        stray = checks.merged(conn, changeset_id, set(stage.tables))
+        if stray:
+            raise ValueError(
+                f"{changeset_id} still references merged entities: "
+                + "; ".join(
+                    f"{relation}.{column} {entity} ({rows} rows), merged into {into} by {merge}"
+                    for relation, column, entity, into, merge, rows in stray[:10]
+                )
+            )
         _rollup(conn, stage, moved, repointed)
         with (
             conn.cursor() as cursor,
@@ -580,6 +632,8 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 [f"Rejected: {reason}", changeset_id],
             )
         return
+    conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
+    conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
     rekeyed = next(
         (
             folder / "rekey"
