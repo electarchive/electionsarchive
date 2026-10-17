@@ -2,7 +2,7 @@ import io
 import json
 import re
 import zipfile
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -16,7 +16,7 @@ from ea.sources.us.ncsbe import SOURCE as NCSBE
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_local"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = [date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in range(2014, 2026)]
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_37_place_500k.zip"
@@ -235,9 +235,26 @@ def parse() -> None:
                 }
             )
             results.append(
-                rows.group_by("choice", "party")
+                rows.group_by("choice", "party", "county", "precinct")
                 .agg(pl.col("votes").sum())
-                .with_columns(day=pl.lit(day), code=pl.lit(code), contest=pl.lit(contest))
+                .with_columns(
+                    day=pl.lit(day),
+                    code=pl.lit(code),
+                    contest=pl.lit(contest),
+                    unit=pl.when(pl.col("precinct").fill_null("").str.strip_chars() != "").then(
+                        pl.concat_str(
+                            pl.lit(f"{day.year}:NC"),
+                            pl.col("county").map_elements(
+                                lambda county: counties[re.sub(r"[^A-Z]", "", county.upper())][0],
+                                return_dtype=pl.String,
+                            ),
+                            pl.col("county").str.to_uppercase().str.strip_chars(),
+                            pl.col("precinct").str.strip_chars(),
+                            separator=":",
+                        )
+                    ),
+                )
+                .drop("county", "precinct")
             )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(contests, infer_schema_length=None)
@@ -341,6 +358,26 @@ def emit() -> Path:
         elections: dict[tuple[date, str], UUID] = {}
         persons: dict[tuple[str, str], UUID] = {}
         districts: set[str] = set()
+        grouped = {keys: rows for keys, rows in results.group_by("day", "code", "contest")}
+        precincts: dict[str, UUID] = dict(
+            conn.execute(
+                "select code, id from reporting_unit where scheme_code = 'us.precinct' and code like '20__:NC:%%'"
+            ).fetchall()
+        )
+        parents: dict[str, tuple[UUID, UUID]] = {
+            code: (unit, area)
+            for code, unit, area in conn.execute(
+                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code like '37%%'"
+            ).fetchall()
+        }
+        sets = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
+            ).fetchall()
+        }
+        minted: dict[str, date] = {}
+        memberships: set[tuple[UUID, UUID, date]] = set()
         for row in contests.sort("day", "code", "office", "seat", descending=[True, False, False, False]).iter_rows(
             named=True
         ):
@@ -459,7 +496,24 @@ def emit() -> Path:
                     kind="caveat",
                     body_md=DISTRICT.format(whole=kind.lower() if town else "county"),
                 )
+            previous = None
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            if not town:
+                if contest_key in sets:
+                    previous = result_set
+                    cs.add(
+                        "result_set",
+                        id=previous,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="certified",
+                        kind="counted",
+                        status="superseded",
+                        source_id=source,
+                        is_default=False,
+                        completeness=1,
+                    )
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
             cs.add(
                 "result_set",
                 id=result_set,
@@ -470,19 +524,22 @@ def emit() -> Path:
                 status="active",
                 source_id=source,
                 is_default=True,
+                supersedes_id=previous,
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
 
+            counted = grouped[(day, code, row["contest"])].with_columns(
+                writein=pl.col("choice").str.contains(r"(?i)write-?\s*in")
+            )
             lines = (
-                results.filter(
-                    (pl.col("day") == day) & (pl.col("code") == code) & (pl.col("contest") == row["contest"])
+                counted.group_by(
+                    pl.when("writein").then(pl.lit("Write-ins")).otherwise("choice").alias("choice"), "writein"
                 )
-                .with_columns(writein=pl.col("choice").str.contains(r"(?i)write-?\s*in"))
-                .group_by(pl.when("writein").then(pl.lit("Write-ins")).otherwise("choice").alias("choice"), "writein")
                 .agg(pl.col("party").first(), pl.col("votes").sum())
                 .sort("votes", "choice", descending=[True, False])
             )
+            options: dict[str, UUID] = {}
             rank = 0
             for choice, writein, party, votes in lines.iter_rows():
                 if writein:
@@ -515,7 +572,8 @@ def emit() -> Path:
                     )
                     if rank <= magnitude:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=None)
-                if result_set in cs.minted:
+                options[choice] = option
+                if result_set in cs.minted and town:
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
@@ -527,4 +585,50 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
+            if result_set in cs.minted and not town:
+                cells: dict[tuple[UUID, UUID], int] = {}
+                for choice, writein, place, votes in counted.select("choice", "writein", "unit", "votes").iter_rows():
+                    target = unit
+                    if place is not None:
+                        target = precincts.get(place) or cs.unit("us.precinct", place)
+                        if place not in precincts:
+                            minted.setdefault(place, day)
+                        if row["district"]:
+                            memberships.add((target, area, day))
+                    cell = (target, options["Write-ins" if writein else choice])
+                    cells[cell] = cells.get(cell, 0) + (votes or 0)
+                for (target, option), votes in cells.items():
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=target,
+                        option_id=option,
+                        channel=0,
+                        measure=1,
+                        count_round=0,
+                        flags=0,
+                        value=votes,
+                    )
+        for place, day in minted.items():
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.precinct", place),
+                polity_id=state,
+                scheme_code="us.precinct",
+                code=place,
+                parent_id=parents[place.split(":")[2]][0],
+                area_relation="within",
+                area_id=parents[place.split(":")[2]][1],
+                kind="standard",
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
+        for target, area, day in memberships:
+            cs.add(
+                "reporting_unit_area",
+                unit_id=target,
+                area_id=area,
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
         return cs.write()
