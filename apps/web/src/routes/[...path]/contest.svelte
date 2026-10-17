@@ -113,6 +113,15 @@
           frames: own.frames,
           isApproximate: level.isApproximate,
           noun: noun ?? level.noun,
+          sources: [
+            ...new Set(
+              [...level.sources, ...own.sources].flatMap((source) =>
+                source.attribution == null
+                  ? [source.publisher]
+                  : [source.publisher, source.attribution],
+              ),
+            ),
+          ],
         };
   });
   const unmapped = $derived.by(() => {
@@ -779,6 +788,7 @@
           frames={drawn.frames}
           isApproximate={drawn.isApproximate}
           noun={drawn.noun}
+          sources={drawn.sources}
           votes={counted ?? m.col_votes()}
           names={titles}
           {levels}

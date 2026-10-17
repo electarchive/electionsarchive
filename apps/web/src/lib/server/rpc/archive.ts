@@ -180,6 +180,7 @@ const Sketch = v.object({
   ),
   isApproximate: v.boolean(),
   shaped: v.optional(v.nullable(v.number())),
+  credits: v.optional(v.nullable(v.array(v.string()))),
 });
 
 type Found = {
@@ -3919,6 +3920,7 @@ async function sketch(
       tiles: string;
       synthetic: boolean;
       shaped: number;
+      credits: Array<string>;
     }>(sql`
       select distinct on (bs.scheme_code) bs.scheme_code as scheme,
         coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
@@ -3926,6 +3928,13 @@ async function sketch(
           select count(distinct x.k)::int from area x join area_geometry g on g.area_id = x.id
           where x.k = any(${sql.param(ks)}::int[]) and g.valid @> coalesce(bs.as_of, ${day}::date)
         ) as shaped,
+        array(
+          select distinct c.credit from area x
+          join area_geometry g on g.area_id = x.id and g.valid @> coalesce(bs.as_of, ${day}::date)
+          join source s on s.id = g.source_id
+          cross join lateral (values (s.publisher), (nullif(s.attribution, ''))) c(credit)
+          where x.scheme_code = bs.scheme_code and x.k = any(${sql.param([...ks, area.k])}::int[]) and c.credit is not null
+        ) as credits,
         exists (
           select from area_geometry g join area x on x.id = g.area_id
           where x.scheme_code = bs.scheme_code and g.quality = 'synthetic' and g.valid @> coalesce(bs.as_of, ${day}::date)
@@ -3947,6 +3956,10 @@ async function sketch(
         frames,
         isApproximate: tiled.synthetic,
         shaped: ks.length === 0 ? null : tiled.shaped,
+        credits:
+          ks.length === 0
+            ? null
+            : [...new Set([...tiled.credits, ...(own?.credits ?? [])])],
       };
 }
 

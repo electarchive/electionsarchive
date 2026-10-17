@@ -729,6 +729,7 @@
             own={shape.own}
             frames={shape.frames}
             isApproximate={shape.isApproximate}
+            sources={shape.credits}
             noun={places.levels[0]?.noun ?? ""}
             votes={race.votes}
             names={swing == null && region == null

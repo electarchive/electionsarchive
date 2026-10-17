@@ -40,6 +40,7 @@
     shade = "winner",
     isLinked = false,
     pick,
+    sources = null,
   }: {
     places: Places;
     colors: Array<string>;
@@ -64,6 +65,7 @@
     shade?: "winner" | number;
     isLinked?: boolean;
     pick?: (code: string) => void;
+    sources?: Array<string> | null;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -77,6 +79,7 @@
   let maps = $state<Array<Maplibre.Map>>([]);
   let isLoaded = $state(false);
   let credits = $state<Array<string>>([]);
+  const credited = $derived(sources ?? credits);
   let pinned = $state<number | null>(null);
   let grab = $state<number | null>(null);
   let drag = $state(0);
@@ -1315,12 +1318,12 @@
       </span>
     {/if}
   </div>
-  {#if credits.length > 0}
+  {#if credited.length > 0}
     {const notices = $derived(
-      credits.filter((credit) => /©|: |\.$|^Contains /u.test(credit)),
+      credited.filter((credit) => /©|: |\.$|^Contains /u.test(credit)),
     )}
     {const publishers = $derived(
-      credits.filter((credit) => !notices.includes(credit)),
+      credited.filter((credit) => !notices.includes(credit)),
     )}
     <div class="grid gap-0.5 px-1 text-xs text-muted-foreground">
       {#if publishers.length > 0}
