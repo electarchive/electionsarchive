@@ -4537,6 +4537,7 @@ async function races(
         path: single == null ? null : (slugs.get(single.id) ?? null),
         kind: head?.kind ?? "",
         isOffice: head?.isOffice ?? false,
+        isRemainder: head?.isRemainder ?? false,
         body: head?.body ?? null,
         isStage: head?.isStage ?? false,
         round: head?.round ?? null,
@@ -4654,7 +4655,13 @@ async function races(
         stages.every((stage) => stage.election !== race.election),
     )
     .toSorted(
-      (a, b) => (a.day ?? "").localeCompare(b.day ?? "") || b.valid - a.valid,
+      (a, b) =>
+        (a.day ?? "").localeCompare(b.day ?? "") ||
+        Number(a.kind === "ballot_question") -
+          Number(b.kind === "ballot_question") ||
+        (a.kind === "ballot_question"
+          ? a.name.localeCompare(b.name, undefined, { numeric: true })
+          : b.valid - a.valid),
     )
     .map(
       ({
@@ -4768,6 +4775,7 @@ export const elections = {
             path: v.nullable(v.string()),
             kind: v.string(),
             isOffice: v.boolean(),
+            isRemainder: v.boolean(),
             body: v.nullable(v.string()),
             round: v.nullable(v.number()),
             count: v.number(),

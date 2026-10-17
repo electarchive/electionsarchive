@@ -234,6 +234,7 @@
   "election_children": "Elections held within this one",
   "race_round": "{name} round {round}",
   "race_split": "{name}, by {noun}",
+  "race_special": "{name}, special election",
   "race_lede_seats": "{party} won {seats} of the {total} seats, with {share} of the vote.",
   "race_lede_seats_first": "{party} won {seats} of the {total} seats, with {share} of the first-round vote.",
   "race_lede_tally": "{party} won {seats} of {total}, with {share} of the vote.",

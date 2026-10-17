@@ -73,7 +73,7 @@
   );
   const isTiled = $derived(
     parts.length > 1 &&
-      parts.every((child) => /^us\/[a-z]{2}\//.test(child.path ?? "")),
+      parts.every((child) => /^us\/[a-z]{2}\/[^/]+$/.test(child.path ?? "")),
   );
   const partNoun = $derived(
     parts.every((child) => child.noun != null && child.noun === parts[0]?.noun)
@@ -481,7 +481,12 @@
           ? m.race_round({ name: race.name, round: race.round ?? 1 })
           : isSplit
             ? m.race_split({ name: race.name, noun })
-            : race.name,
+            : race.isRemainder &&
+                election.races.some(
+                  (other) => other !== race && other.name === race.name,
+                )
+              ? m.race_special({ name: race.name })
+              : race.name,
         votes: MEASURES[race.measure]?.() ?? m.col_votes(),
         isSlate: race.kind === "elector_slate",
         seated: seated.map((row) => ({
