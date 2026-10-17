@@ -8,6 +8,7 @@
   "party_history_seats_of": "{seats} of {filled}",
   "party_history_won": "{count} won",
   "party_history_title": "Vote share and seats",
+  "party_history_as": "Running as {name}",
   "party_history_votes": "Vote share",
   "party_lineage_lede": "Predecessor parties are above the line, and successor parties are below.",
   "party_lineage_title": "Lineage",

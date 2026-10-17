@@ -380,6 +380,11 @@
           style:inset-block-start="{PAD.top}px"
         >
           <span class="text-[0.8125rem] font-semibold">{lit.name}</span>
+          {#if lit.predecessor != null}
+            <span class="text-muted-foreground"
+              >{m.party_history_as({ name: lit.predecessor })}</span
+            >
+          {/if}
           {#if lit.share != null}
             <span class="flex justify-between gap-4">
               <span class="text-muted-foreground"

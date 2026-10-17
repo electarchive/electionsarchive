@@ -7158,11 +7158,23 @@ async function namesakes(
     where type = ${type}::entity_type
       and tsv @@ to_tsquery('simple', ${words.map((word) => `${word}:*`).join(" & ")})
       and (${polity}::uuid is null or polity_id = ${polity}::uuid)
-    order by entity_id
+    order by case when type = 'person' then rank_boost end desc nulls last, entity_id
   `);
   const ids = found.rows.map((row) => row.id);
-  const labels = await names(ids);
-  return ids.filter((id) => segment(labels.full.get(id) ?? "") === base);
+  if (type === "party") {
+    const labels = await names(ids);
+    return ids.filter((id) => segment(labels.full.get(id) ?? "") === base);
+  }
+  const known = await db.execute<{ entity_id: string; text: string }>(sql`
+    select entity_id, text from name
+    where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
+  `);
+  const matched = new Set(
+    known.rows
+      .filter((row) => segment(row.text) === base)
+      .map((row) => row.entity_id),
+  );
+  return ids.filter((id) => matched.has(id));
 }
 
 async function locate(
@@ -7686,7 +7698,16 @@ export const entities = {
         return { path: null };
       }
       const labels = await names([entity.id]);
-      const base = segment(labels.full.get(entity.id) ?? "");
+      const common =
+        entity.type === "person"
+          ? await db.execute<{ text: string }>(sql`
+            select text from name where entity_id = ${entity.id}::uuid and kind = 'english' and lang = 'en'
+            order by is_preferred desc, text limit 1
+          `)
+          : null;
+      const base = segment(
+        common?.rows[0]?.text ?? labels.full.get(entity.id) ?? "",
+      );
       const owner =
         entity.type === "party"
           ? await db.execute<{ polity: string | null }>(sql`
@@ -8111,6 +8132,7 @@ export const parties = {
               total: v.nullable(v.number()),
               seats: v.nullable(v.number()),
               filled: v.nullable(v.number()),
+              predecessor: v.nullable(v.string()),
             }),
           ),
         }),
@@ -8128,6 +8150,7 @@ export const parties = {
         total: number | null;
         seats: number | null;
         filled: number | null;
+        predecessor: string | null;
       }>(sql`
         with recursive ids(id) as (
           select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
@@ -8145,8 +8168,24 @@ export const parties = {
           select id from ids union select id from branches
           union select em.entity_id from entity_merge em where em.into_id in (select id from branches)
         ),
+        predecessors as (
+          select coalesce(fm.into_id, r.from_party_id) as id, r.date as until
+          from party_relation r
+          left join entity_merge fm on fm.entity_id = r.from_party_id
+          left join entity_merge tm on tm.entity_id = r.to_party_id
+          where r.kind = 'merged_into' and r.date is not null
+            and coalesce(tm.into_id, r.to_party_id) in (select id from ids)
+        ),
+        early as (
+          select id, until from predecessors
+          union select em.entity_id, p.until from entity_merge em join predecessors p on em.into_id = p.id
+        ),
         mine as materialized (
           select o.id as option, o.contest_id from contest_option o where o.party_id in (select id from family)
+          union
+          select o.id, o.contest_id from early p join contest_option o on o.party_id = p.id
+          join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+          where e.date_from < p.until
         ),
         up(id, parent) as (
           select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
@@ -8200,7 +8239,7 @@ export const parties = {
         tallied as (
           select f.root, sum(f.value) as total,
             coalesce(sum(f.value) filter (
-              where o.party_id in (select id from family) or o.parent_option_id in (select option from mine)
+              where o.id in (select option from mine) or o.parent_option_id in (select option from mine)
             ), 0) as votes
           from fetched f join mains m on m.root = f.root and m.main = f.measure
           join contest_option o on o.k = f.option_k
@@ -8211,7 +8250,10 @@ export const parties = {
           select w.root, coalesce(sum(w.seats) filter (where w.mine), 0) as seats, sum(w.seats) as filled
           from (
             select r.id as root, o.id,
-              bool_or(coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) in (select id from family)) as mine,
+              bool_or(
+                o.id in (select option from mine)
+                or o.party_id is null and ${fused(sql`o.id`, sql`o.contest_id`)} in (select id from family)
+              ) as mine,
               max(coalesce(x.seats, 1)) as seats
             from roots r
             join lateral (
@@ -8233,7 +8275,8 @@ export const parties = {
           (array_agg(r.id order by r.id))[1] as root, min(r.date)::text as date,
           min(r.year) as year, count(distinct r.id)::int as races,
           sum(t.votes)::float8 as votes, sum(t.total)::float8 as total,
-          sum(s.seats)::int as seats, sum(s.filled)::int as filled
+          sum(s.seats)::int as seats, sum(s.filled)::int as filled,
+          (select p.id from predecessors p where p.until > min(r.date) order by p.until limit 1) as predecessor
         from roots r left join tallied t on t.root = r.id left join seated s on s.root = r.id
         group by r.bucket, r.seat
         order by min(r.date)
@@ -8295,6 +8338,7 @@ export const parties = {
         names([
           ...seats,
           ...linked,
+          ...found.rows.flatMap((row) => row.predecessor ?? []),
           ...local.rows.flatMap((row) => [row.id, row.election]),
         ]),
         paths(linked),
@@ -8321,6 +8365,7 @@ export const parties = {
               total: row.total == null || row.total === 0 ? null : row.total,
               seats: row.filled == null ? null : (row.seats ?? 0),
               filled: row.filled,
+              predecessor: null,
             })),
         }))
         .toArray();
@@ -8355,6 +8400,10 @@ export const parties = {
                 total: row.total == null || row.total === 0 ? null : row.total,
                 seats: row.filled == null ? null : row.seats,
                 filled: row.filled,
+                predecessor:
+                  row.predecessor == null
+                    ? null
+                    : (labels.full.get(row.predecessor) ?? null),
               };
             }),
         })),
