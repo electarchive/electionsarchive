@@ -2534,7 +2534,7 @@ def emit() -> Path:
                 if len(same) == 1:
                     picked[candidate] = same[0]
                 elif write_in or any(
-                    slug(candidate) in names
+                    slug(candidate) in names or words[-1] in (name.split("-")[-1] for name in names)
                     for party, names in ballots[(state, day, office, district)].items()
                     if party != rows["party"][0]
                 ):
