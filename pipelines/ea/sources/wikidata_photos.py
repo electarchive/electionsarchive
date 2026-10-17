@@ -25,40 +25,43 @@ ITEMS = DATA / "parsed" / SOURCE / "items.json"
 IMAGES = (
     """SELECT ?item (MIN(?image) AS ?file) WHERE {{ VALUES ?item {{ {items} }} ?item wdt:P18 ?image }} GROUP BY ?item"""
 )
-SCOPE = """
-with scoped as (
-  select c.id from contest c
-  join election e on e.id = c.election_id
-  join polity p on p.id = e.polity_id
-  where p.kind in ('sovereign_state', 'supranational', 'historical_state')
-        and c.kind in ('office', 'body_seats', 'list_allocation')
-     or p.kind in ('federal_unit', 'region') and c.kind = 'office'
-), votes as (
-  select o.id as option_id, o.contest_id, max(r.value) as value
-  from scoped s
-  join result_set rs on rs.contest_id = s.id and rs.is_default
-  join result_rollup r on r.result_set_k = rs.k and r.measure = 1 and r.channel = 0
-  join contest_option o on o.k = r.option_k
-  group by o.id, o.contest_id
-), finishers as (
-  select option_id from (
-    select option_id, rank() over (partition by contest_id order by value desc) as place from votes
-  ) ranked where place <= 2
-  union
-  select oc.option_id from scoped s
-  join result_set rs on rs.contest_id = s.id and rs.is_default
-  join outcome oc on oc.result_set_id = rs.id and oc.kind in ('elected', 'won')
-)
-select distinct x.value from candidacy cd
-join external_id x on x.entity_id = cd.person_id and x.scheme = 'wikidata'
-where cd.option_id in (select option_id from finishers)
-"""
+SCOPE = "select x.value from external_id x join person p on p.id = x.entity_id where x.scheme = 'wikidata'"
 CHUNK = 400
 TITLES = 50
 WIDTH = 256
 FETCHED = 330
 FREE = re.compile(r"pd|cc0|cc-by(-sa)?-[0-9.]+(-[a-z]+)?")
 FREE_NAME = re.compile(r"Public domain|CC0( 1\.0)?|CC BY(-SA)? [0-9.]+( [A-Za-z]+)?")
+HOSTS = {
+    "bioguide.congress.gov": "Biographical Directory of the United States Congress",
+    "parl.gc.ca": "Library of Parliament",
+    "lop.parl.ca": "Library of Parliament",
+    "house.gov": "U.S. House of Representatives",
+    "senate.gov": "U.S. Senate",
+    "president.gov.ua": "Office of the President of Ukraine",
+    "kremlin.ru": "Presidential Press and Information Office of Russia",
+}
+CREDITS = {
+    "PRESIDENT OF UKRAINE VOLODYMYR ZELENSKYY Official website": "Office of the President of Ukraine",
+    "Пресс-служба Президента Российской Федерации": "Presidential Press and Information Office of Russia",
+    "Қазақстан Республикасы Парламентінің Мәжілісі": "Mazhilis of the Parliament of Kazakhstan",
+}
+BOILERPLATE = [
+    r"Transferred from \S+ to Commons[^.]*\.",
+    r"This image is available from .*",
+    r"This tag does not indicate .*",
+    r"The factual accuracy of this .*",
+    r"Reproduced on web sites .*",
+    r"^w:Public domain from ",
+    r"^(Source|Artist|Photographer|Author)\s*:\s*",
+    r"\b(Facebook|Twitter|Instagram|YouTube)\s*:\s*(?=https?://)",
+    r"\s*\bOfficial (web)?site$",
+]
+UNKNOWN = re.compile(
+    r"(unknown|anonymous|unidentified)( (unknown )?(author|photographer|artist))?( (unknown )?(author|photographer|artist))?"
+    r"|(author|photographer|artist) (unknown|unidentified|not credited)",
+    re.IGNORECASE,
+)
 
 
 def _items() -> list[str]:
@@ -98,12 +101,12 @@ def _commons(files: list[str]) -> list[str]:
     ]
 
 
-def _get(url: str, suffix: str, pause: float) -> Artifact:
+def _get(url: str, suffix: str, pause: float) -> Artifact | None:
     try:
         return raw.cached(SOURCE, url)
     except LookupError:
         pass
-    while True:
+    for _ in range(3):
         try:
             artifact = raw.fetch(SOURCE, url, suffix=suffix)
         except httpx.HTTPStatusError as error:
@@ -115,6 +118,8 @@ def _get(url: str, suffix: str, pause: float) -> Artifact:
             continue
         time.sleep(pause)
         return artifact
+    print(f"skipped {url}")
+    return None
 
 
 def _files(items: list[str]) -> dict[str, str]:
@@ -147,13 +152,48 @@ def _infos(files: dict[str, str]) -> dict[str, dict[str, str]]:
                 "page": info["descriptionurl"],
                 "code": meta.get("License", "").lower(),
                 "license": _text(meta.get("LicenseShortName", "")),
-                "artist": _text(meta.get("Artist", "")) or _text(meta.get("Credit", "")),
+                "artist": _credit(meta.get("Artist", "")) or _credit(meta.get("Credit", "")),
             }
     return infos
 
 
 def _text(markup: str) -> str:
     return re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", markup))).strip()
+
+
+def _credit(markup: str) -> str:
+    text = _text(re.sub(r"<(style|figure)\b.*?</\1>", " ", markup, flags=re.DOTALL)).lstrip(" .")
+    text = re.sub(r"(?:(?<=[a-z]{3})|(?<=[)\"”]))\s*\.$", "", text)
+    if text in CREDITS:
+        return CREDITS[text]
+    uploaded = re.fullmatch(
+        r"The original uploader was (.+?) at \S+ Wikipedia ?\.?(?: \( Original text: (.+) \))?", text
+    )
+    if uploaded:
+        text = uploaded.group(2) or uploaded.group(1)
+    for pattern in BOILERPLATE:
+        text = re.sub(pattern, "", text, flags=re.IGNORECASE).strip()
+    urls = re.findall(r"(?:https?://|www\.)\S+", text)
+    text = re.sub(r"(?:https?://|www\.)\S+", "", text).strip(" ,;:-–(")
+    if (not text or text.lower() == "from") and urls:
+        host = re.sub(r"^(?:https?://)?(?:www\d?\.)?", "", urls[0]).split("/")[0]
+        return next((name for domain, name in HOSTS.items() if host.endswith(domain)), host)
+    text = re.sub(r"^(.+?) \1\b", r"\1", text)
+    if len(text) > 120:
+        text = re.split(r"(?<=[a-z)])\. |; ", text)[0]
+    if UNKNOWN.fullmatch(text.strip(" .")):
+        return "Unknown author"
+    roles = r",\s*(photographer|publisher|author|editor|engraver|artist|compiler)s?\.?$"
+    while re.search(roles, text):
+        text = re.sub(roles, "", text)
+    letters = [c for c in text if c.isalpha()]
+    if letters and sum(c.isupper() for c in letters) / len(letters) > 0.8 and len(letters) > 8:
+        text = re.sub(r"\b[A-Z]{4,}\b", lambda match: match.group().capitalize(), text)
+        text = re.sub(r"\b(OF|AND|THE|FOR)\b", lambda match: match.group().lower(), text)
+    text = re.sub(r"\s+([,.;:])", r"\1", text).strip(" ,;:")
+    if len(text) > 160:
+        text = text[:160].rsplit(" ", 1)[0].rstrip(" ,;:") + "…"
+    return text
 
 
 def _free(info: dict[str, str]) -> bool:
@@ -178,7 +218,7 @@ def fetch() -> None:
     kept = sorted({title for title in files.values() if title in infos and _free(infos[title])})
     print(f"{len(kept)} freely licensed images to fetch")
     for count, title in enumerate(kept, 1):
-        _get(infos[title]["thumb"], Path(infos[title]["thumb"]).suffix.lower(), 0.5)
+        _get(infos[title]["thumb"], Path(infos[title]["thumb"]).suffix.lower(), 1)
         if count % 250 == 0:
             print(f"{count}/{len(kept)}")
 
@@ -201,7 +241,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Portraits from Wikimedia Commons for people with a Wikidata image, limited to public domain, CC0, "
+                "Portraits from Wikimedia Commons for every person with a Wikidata image, limited to public domain, CC0, "
                 "CC BY, and CC BY-SA files, as 256-pixel-wide thumbnails with their license and author"
             ),
             polity=None,
@@ -231,7 +271,10 @@ def emit() -> Path:
             if not _free(info):
                 rejected[info["license"] or info["code"] or "none"] += 1
                 continue
-            artifact = raw.cached(SOURCE, info["thumb"])
+            try:
+                artifact = raw.cached(SOURCE, info["thumb"])
+            except LookupError:
+                continue
             if info["thumb"] not in thumbs:
                 cs.artifact(artifact, source)
                 thumbs.add(info["thumb"])
