@@ -40,6 +40,12 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("REP", "Spencer"), ("DEM", "Long"), ("SOC", "Hodges"), ("SLP", "Trudell"), ("FL", "Mallett")],
     ),
     (
+        "1922-11-07",
+        "senate",
+        [(14505, 0.25, 1, 0, 1), (14506, 0.2, 0.69, 0, 1)],
+        [("REP", "Brewster"), ("DEM", "Reed"), ("SOC", "Brandt"), ("SLP", "Cox")],
+    ),
+    (
         "1926-11-02",
         "senate",
         [(13612, 0.2, 1, 0, 1), (13613, 0.17, 0.6, 0, 1)],
@@ -87,6 +93,17 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
             ("REP", "Davis"),
             ("SOC", "Rinck"),
             ("SLP", "Baeff"),
+        ],
+    ),
+    (
+        "1944-11-07",
+        "senate",
+        [(23210, 0.6, 1, 0, 1), (23211, 0, 1, 0, 1), (23212, 0, 0.36, 0, 1)],
+        [
+            ("DEM", "McKittrick"),
+            ("REP", "Donnell"),
+            ("SOC", "Priesler"),
+            ("SLP", "Cox"),
         ],
     ),
     (
@@ -167,12 +184,28 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
     ),
 ]
 CHECKED: set[tuple[str, str, int]] = {
+    ("1922-11-07", "senate", 1),
     ("1926-11-02", "senate", 0),
     ("1926-11-02", "senate", 1),
     ("1938-11-08", "senate", 3),
 }
-NOTES: list[tuple[str, str, str]] = []
+NOTES: list[tuple[str, str, str]] = [
+    (
+        "1944-11-07",
+        "senate",
+        (
+            "Sullivan's figure for McKittrick prints with a broken first digit that looks like an 8; it is read as "
+            "3,314, which the printed total needs."
+        ),
+    ),
+]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1944-11-07", "senate", "29211", 0): 3314,
+    ("1944-11-07", "senate", "29091", 2): 3,
+    ("1944-11-07", "senate", "29105", 2): 3,
+    ("1944-11-07", "senate", "29117", 2): 3,
+    ("1944-11-07", "senate", "29135", 2): 3,
+    ("1944-11-07", "senate", "TOTAL", 2): 1320,
     ("1934-11-06", "senate", "29123", 2): 5,
     ("1934-11-06", "senate", "29153", 2): 14,
     ("1934-11-06", "senate", "29063", 3): 1,
@@ -578,6 +611,8 @@ def segment(
                 value for x, y, value in tokens if abs(x - spot) <= 14 and abs(y - slope * x - middle) <= pitch * 0.4
             ]
             key = f"{round(spot)},{round(middle)}"
+            if not known[key]:
+                cell = []
             for found_text in known[key]:
                 text = re.sub(r"(?<=\d)\.(?=\d{3})", ",", found_text.strip(" .,"))
                 if re.fullmatch(r"\d{1,3}(,\d{3})*", text):
@@ -694,7 +729,10 @@ def parse() -> None:
             readings = {}
             for page, top, bottom, left, right in segments:
                 for county, (support, cells) in segment(page, (top, bottom, left, right), expected, order).items():
-                    if county not in readings or support > readings[county][0]:
+                    if county not in readings or (support, sum(map(bool, cells))) > (
+                        readings[county][0],
+                        sum(map(bool, readings[county][1])),
+                    ):
                         readings[county] = (support, cells)
             missing = sorted((set(base) - set(readings)) - ({jackson} if "KC" in readings else set()))
             if not missing and (jackson in readings and readings[jackson][0] or "KC" in readings):
@@ -748,6 +786,7 @@ def parse() -> None:
             ]
             if (day, office, column) in CHECKED or (
                 column in informed
+                and any(county in expected for county in order)
                 and all(
                     chosen[county][column] == expected[county][column]
                     for county in order
