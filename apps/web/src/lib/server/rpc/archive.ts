@@ -2311,6 +2311,7 @@ export const contests = {
                 color: v.nullable(v.string()),
                 person: v.nullable(v.string()),
                 party: v.nullable(v.string()),
+                lean: v.nullable(v.number()),
                 votes: v.number(),
               }),
             ),
@@ -3224,6 +3225,7 @@ export const contests = {
           color: row.color,
           person: row.current?.person ?? null,
           party: row.party,
+          lean: row.lean,
           votes: row.votes,
         }))
         .toSorted((a, b) => b.votes - a.votes);
@@ -4770,6 +4772,7 @@ async function races(
                         color: line?.color ?? row.color,
                         person: row.person,
                         party: line?.party ?? row.party,
+                        lean: line?.lean ?? row.lean,
                         votes: row.votes,
                       };
                     }),
@@ -4847,6 +4850,7 @@ export const elections = {
                     color: v.nullable(v.string()),
                     person: v.nullable(v.string()),
                     party: v.nullable(v.string()),
+                    lean: v.nullable(v.number()),
                     votes: v.number(),
                   }),
                 ),

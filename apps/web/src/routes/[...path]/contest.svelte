@@ -157,7 +157,9 @@
     const places = contest.places;
     const ranked = contest.electors?.rows ?? [];
     const rows = [...(places?.rows ?? []), ...(places?.districts ?? [])];
-    const sides = ranked.slice(0, 2).map((row) => row.person);
+    const sides = ranked
+      .slice(0, 2)
+      .toSorted((a, b) => (a.lean ?? 1e9) - (b.lean ?? 1e9));
     const rungs = rows.flatMap((row) => {
       const item = places?.legend[row.leader ?? -1];
       const margin = row.margin ?? 0;
@@ -170,7 +172,7 @@
               name: row.name,
               path: row.path,
               seats: row.seats,
-              side: sides.indexOf(item.person),
+              side: sides.findIndex((side) => side.person === item.person),
               leader: titles[row.leader ?? -1] ?? "",
               margin,
               color: `color-mix(in oklab, ${tones[row.leader ?? -1]} ${[34, 54, 76, 100][strength]}%, var(--card))`,
@@ -178,14 +180,14 @@
           ];
     });
     let isMatched = sides.length === 2 && rungs.length === rows.length;
-    for (const [index, person] of sides.entries()) {
+    for (const [index, side] of sides.entries()) {
       let won = 0;
       for (const rung of rungs) {
         if (rung.side === index) {
           won += rung.seats;
         }
       }
-      isMatched &&= person != null && won === ranked[index]?.votes;
+      isMatched &&= side.person != null && won === side.votes;
     }
     return !isMatched
       ? null

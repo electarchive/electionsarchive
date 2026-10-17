@@ -22,6 +22,7 @@
         color: string | null;
         person: string | null;
         party: string | null;
+        lean: number | null;
         votes: number;
       }>;
       appointed: number | null;
@@ -47,8 +48,13 @@
     return sum;
   });
   const majority = $derived(Math.floor((electors.appointed ?? total) / 2) + 1);
-  const first = $derived(electors.rows[0]);
-  const second = $derived(electors.rows[1]);
+  const pair = $derived(
+    electors.rows
+      .slice(0, 2)
+      .toSorted((a, b) => (a.lean ?? 1e9) - (b.lean ?? 1e9)),
+  );
+  const first = $derived(pair[0]);
+  const second = $derived(pair[1]);
   const others = $derived(electors.rows.slice(2));
   const order = $derived([
     ...(first == null ? [] : [first]),

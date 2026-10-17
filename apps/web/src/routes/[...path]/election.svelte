@@ -418,13 +418,18 @@
           race.electors != null && race.electors.rows.length > 0
             ? {
                 total: appointed,
-                parts: race.electors.rows.map((row) => ({
-                  key: row.key,
-                  label:
-                    row.person == null ? (row.short ?? row.label) : row.label,
-                  color: swatch(row.color, row.key),
-                  value: row.votes,
-                })),
+                parts: race.electors.rows
+                  .toSorted(
+                    (a, b) =>
+                      (a.lean ?? 1e9) - (b.lean ?? 1e9) || b.votes - a.votes,
+                  )
+                  .map((row) => ({
+                    key: row.key,
+                    label:
+                      row.person == null ? (row.short ?? row.label) : row.label,
+                    color: swatch(row.color, row.key),
+                    value: row.votes,
+                  })),
                 isCount: true,
                 isWhole: true,
               }
