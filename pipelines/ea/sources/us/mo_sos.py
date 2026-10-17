@@ -1,9 +1,14 @@
+import difflib
+import io
+import itertools
+import json
 import re
 import subprocess
 from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -17,7 +22,93 @@ COUNTY = SITE + "CountyGeneral1996.pdf"
 STATE = SITE + "AllRacesGeneralNovember1996.pdf"
 PUBLISHER = "Missouri Secretary of State"
 TITLE = "Official election returns"
+BOOK = "Official Manual of the State of Missouri"
+IMAGE = "https://mdh.contentdm.oclc.org/iiif/2/bluebook:{}/full/full/0/default.jpg"
+TEXT = "https://mdh.contentdm.oclc.org/digital/api/collections/bluebook/items/{}/false"
 DAY = "1996-11-05"
+MANUAL = [
+    ("1990-11-06", "auditor", (56834,), [("REP", "Kelly, Margaret"), ("DEM", "Hendren, Connie B.")]),
+    (
+        "1992-11-03",
+        "president",
+        (58227, 58228),
+        [
+            ("REP", "George Bush, Dan Quayle"),
+            ("DEM", "Bill Clinton, Al Gore"),
+            ("LIB", "Andre Marrou, Nancy Lord"),
+            ("IND", "Ross Perot, James Stockdale"),
+        ],
+    ),
+    (
+        "1992-11-03",
+        "senate",
+        (58229,),
+        [("REP", "Bond, Christopher (Kit)"), ("DEM", "Rothman-Serot, Geri"), ("LIB", "Bojarski, Jeanne F.")],
+    ),
+    ("1992-11-03", "governor", (58230,), [("REP", "Webster, William L."), ("DEM", "Carnahan, Mel")]),
+    (
+        "1992-11-03",
+        "lieutenant-governor",
+        (58231,),
+        [("REP", "Kelly, Margaret"), ("DEM", "Wilson, Roger B."), ("LIB", "Nugent, Franklin M.")],
+    ),
+    (
+        "1992-11-03",
+        "secretary-of-state",
+        (58232,),
+        [("REP", "Hancock, John"), ("DEM", "Moriarty, Judith K. (Judi)"), ("LIB", "Harris, Eric")],
+    ),
+    (
+        "1992-11-03",
+        "treasurer",
+        (58233,),
+        [("REP", "Melton, Gary"), ("DEM", "Holden, Bob"), ("LIB", "Lewis, Janet")],
+    ),
+    (
+        "1992-11-03",
+        "attorney-general",
+        (58234,),
+        [("REP", "Steelman, David L."), ("DEM", "Nixon, Jeremiah W. (Jay)"), ("LIB", "Moore, Mitchell J.")],
+    ),
+    (
+        "1994-11-08",
+        "auditor",
+        (59735,),
+        [("DEM", "Danner, Steve"), ("REP", "Kelly, Margaret"), ("LIB", "Stauffer, Grant")],
+    ),
+    (
+        "1994-11-08",
+        "senate",
+        (59736,),
+        [("DEM", "Wheat, Alan"), ("REP", "Ashcroft, John"), ("LIB", "Johnson, Bill")],
+    ),
+    (
+        "1998-11-03",
+        "senate",
+        (62622, 62623),
+        [
+            ("DEM", "Nixon, Jeremiah W. (Jay)"),
+            ("REP", "Bond, Christopher (Kit)"),
+            ("LIB", "Millay, Tamara A."),
+            ("UST", "Frazier, Curt"),
+            ("REF", "Newport, James F."),
+        ],
+    ),
+    (
+        "1998-11-03",
+        "auditor",
+        (62624, 62625),
+        [
+            ("DEM", "McCaskill, Claire C."),
+            ("REP", "Pierce, Charles A. (Chuck)"),
+            ("LIB", "Geier, Gerald R."),
+            ("REF", "Weber, George D."),
+        ],
+    ),
+]
+ALONE = {"Eric Harris", "George D. Weber"}
+CHECKED = {("1992-11-03", "treasurer")}
+FIXES: dict[tuple[str, str, str], list[int]] = {("1994-11-08", "auditor", "29141"): [1963, 3734, 222]}
 OFFICES = {
     "U.S. President And Vice President": "president",
     "Governor": "governor",
@@ -31,6 +122,7 @@ TITLES = {
     "secretary-of-state": "Secretary of State",
     "treasurer": "State Treasurer",
     "attorney-general": "Attorney General",
+    "auditor": "State Auditor",
 }
 PARTIES = {
     "DEM": "democratic-party",
@@ -39,6 +131,7 @@ PARTIES = {
     "UST": "MO:u-s-taxpayers-party",
     "REF": "reform-party",
     "NAT": "natural-law-party",
+    "IND": None,
 }
 WRITE_IN = "Write-ins"
 
@@ -46,6 +139,168 @@ WRITE_IN = "Write-ins"
 def fetch() -> None:
     for url in (COUNTY, STATE):
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for _, _, pages, _ in MANUAL:
+        for page in pages:
+            raw.fetch(SOURCE, IMAGE.format(page), suffix=".jpg")
+            raw.fetch(SOURCE, TEXT.format(page), suffix=".json")
+
+
+def readings(text: str, width: int, names: dict[str, str]) -> dict[str, list[int]]:
+    text = re.sub(r"(?<=\d)[)\]]|[|]", " ", re.sub(r"\bS[1l]\.", "St.", text))
+    found: dict[str, list[int]] = {}
+    pattern = r"((?:[A-Za-z.']+ ){0,2}[A-Za-z.']+)\s+((?:\d[\d,./]*\s+){" + str(width - 1) + r"}\d[\d,./]*)(?=\s|$)"
+    for line in text.splitlines():
+        for match in re.finditer(pattern, line):
+            if re.match(r"\s+\d", line[match.end() :]):
+                continue
+            words = match[1].split()
+            county = next(
+                (
+                    names[key]
+                    for start in range(len(words))
+                    if (key := re.sub(r"[^a-z]", "", " ".join(words[start:]).lower())) in names
+                ),
+                None,
+            )
+            if county is None:
+                close = difflib.get_close_matches(re.sub(r"[^a-z]", "", match[1].lower()), names, 1, 0.8)
+                county = names[close[0]] if close else None
+            if county is not None and county not in found:
+                found[county] = [int(re.sub(r"\D", "", value.replace("/", "7"))) for value in match[2].split()]
+    pair = (
+        r"\b((?:[A-Za-z.']+ ){0,2}?[A-Za-z.']+) ((?:[A-Za-z.']+ ){0,2}?[A-Za-z.']+) ((?:\d[\d,]* ){"
+        + str(2 * width - 1)
+        + r"}\d[\d,]*)(?= |$)"
+    )
+    for match in re.finditer(pair, " ".join(text.split())):
+        first, second = (re.sub(r"[^a-z]", "", match[group].lower()) for group in (1, 2))
+        values = [int(value.replace(",", "")) for value in match[3].split()]
+        if first in names and second in names and names[first] not in found and names[second] not in found:
+            found[names[first]] = values[:width]
+            found[names[second]] = values[width:]
+    return found
+
+
+def manual(names: dict[str, str]) -> list[dict[str, object]]:
+    (PARSED / "ocr").mkdir(parents=True, exist_ok=True)
+    rows: list[dict[str, object]] = []
+    caveats: list[dict[str, object]] = []
+    for day, office, pages, candidates in MANUAL:
+        width = len(candidates)
+        reads: list[dict[str, list[int]]] = [{}, {}, {}, {}]
+        for page in pages:
+            texts = []
+            for mode in ("gray", "150", "halves"):
+                cache = PARSED / "ocr" / f"{page}-{mode}.txt"
+                if not cache.exists():
+                    image = Image.open(raw.cached(SOURCE, IMAGE.format(page)).path).convert("L")
+                    image = image.resize((image.width * 2, image.height * 2), Image.Resampling.LANCZOS)
+                    if mode == "150":
+                        image = image.point(lambda value: 255 if value > 150 else 0)
+                    parts = [image]
+                    if mode == "halves":
+                        parts = [
+                            image.crop((0, 0, image.width // 2, image.height)),
+                            image.crop((image.width // 2, 0, image.width, image.height)),
+                        ]
+                    output = []
+                    for part in parts:
+                        buffer = io.BytesIO()
+                        part.save(buffer, "PNG")
+                        output.append(
+                            subprocess.run(
+                                ["tesseract", "stdin", "stdout", "--psm", "6"],
+                                input=buffer.getvalue(),
+                                capture_output=True,
+                                check=True,
+                            ).stdout.decode()
+                        )
+                    cache.write_text("\n".join(output))
+                texts.append(cache.read_text())
+            texts.append(
+                " ".join((json.loads(raw.cached(SOURCE, TEXT.format(page)).path.read_text())["text"] or "").split())
+            )
+            for read, text in zip(reads, texts, strict=True):
+                for county, values in readings(text, width, names).items():
+                    read.setdefault(county, values)
+        totals = next(read["TOTALS"] for read in reads if "TOTALS" in read)
+        for read in reads:
+            read.pop("TOTALS", None)
+        counties = {
+            county: [
+                max(
+                    (votes for votes in (read[county][column] for read in reversed(reads) if county in read)),
+                    key=lambda votes, county=county, column=column: sum(
+                        1 for read in reads if county in read and read[county][column] == votes
+                    ),
+                )
+                for column in range(width)
+            ]
+            for county in set().union(*reads)
+        }
+        if len(counties) != (116 if "KC" in counties else 115):
+            raise ValueError(
+                f"{day} {office}: missing {sorted(set(names.values()) - set(counties) - {'TOTALS', 'KC'})}"
+            )
+        for (when, what, county), values in FIXES.items():
+            if (when, what) == (day, office):
+                counties[county] = values
+        for column in range(width):
+            gap = totals[column] - sum(values[column] for values in counties.values())
+            if gap == 0:
+                continue
+            others = sorted(
+                {
+                    (county, read[county][column])
+                    for county in counties
+                    if (day, office, county) not in FIXES
+                    for read in reads
+                    if county in read and read[county][column] != counties[county][column]
+                }
+            )
+            swaps = [
+                chosen
+                for size in range(1, 4)
+                for chosen in itertools.combinations(others, size)
+                if len({county for county, _ in chosen}) == size
+                and sum(value - counties[county][column] for county, value in chosen) == gap
+            ]
+            agreed = all(
+                sum(1 for read in reads if county in read and read[county][column] == values[column]) >= 2
+                for county, values in counties.items()
+                if (day, office, county) not in FIXES
+            )
+            if not swaps and (agreed or (day, office) in CHECKED):
+                caveats.append(
+                    {
+                        "day": day,
+                        "office": office,
+                        "note": f"The Manual's printed total for {candidates[column][1]} is {totals[column]:,}; "
+                        f"its county figures sum to {totals[column] - gap:,}.",
+                    }
+                )
+                continue
+            if not swaps or len([chosen for chosen in swaps if len(chosen) == len(swaps[0])]) > 1:
+                raise ValueError(f"{day} {office}: column {column} is off by {gap}, other readings {others}")
+            for county, value in swaps[0]:
+                counties[county][column] = value
+        for county, values in counties.items():
+            for (party, label), votes in zip(candidates, values, strict=True):
+                rows.append(
+                    {
+                        "day": day,
+                        "book": BOOK,
+                        "office": office,
+                        "county": names["jackson"] if county == "KC" else county,
+                        "label": label,
+                        "party": party,
+                        "votes": votes,
+                    }
+                )
+    pl.DataFrame(caveats, schema={"day": pl.String, "office": pl.String, "note": pl.String}).write_parquet(
+        PARSED / "caveats.parquet"
+    )
+    return rows
 
 
 def read(url: str) -> dict[str, dict[str, list[tuple[str, str, int]]]]:
@@ -96,12 +351,36 @@ def parse() -> None:
             code = keys.get(key) or codes[key]
             for label, party, votes in lines:
                 sums[label] = sums.get(label, 0) + votes
-                rows.append({"office": office, "county": code, "label": label, "party": party, "votes": votes})
+                rows.append(
+                    {
+                        "day": DAY,
+                        "book": TITLE,
+                        "office": office,
+                        "county": code,
+                        "label": label,
+                        "party": party,
+                        "votes": votes,
+                    }
+                )
         if sums != {label: votes for label, _, votes in printed}:
             raise ValueError(f"{office}: counties sum to {sums}, printed {printed}")
+    names = {
+        **codes,
+        "stlouis": "29189",
+        "stlouiscity": "29510",
+        "city": "29510",
+        "kansascity": "KC",
+        "lron": codes["iron"],
+        "stlouiscounty": "29189",
+        "louiscounty": "29189",
+        "girardeau": codes["capegirardeau"],
+        "genevieve": codes["stegenevieve"],
+        "totals": "TOTALS",
+    }
+    rows.extend(manual(names))
     frame = (
         pl.DataFrame(rows)
-        .group_by("office", "county", "label", "party", maintain_order=True)
+        .group_by("day", "book", "office", "county", "label", "party", maintain_order=True)
         .agg(pl.col("votes").sum())
     )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -115,8 +394,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Missouri's president, governor, and statewide offices by county 1996 "
-            "from the Secretary of State's official returns",
+            summary="Missouri's president, governor, U.S. Senate, and statewide offices by county 1990–1998 "
+            "from the Secretary of State's official returns and the Official Manual",
             polity="US",
         )
 
@@ -142,18 +421,27 @@ def emit() -> Path:
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add(
-            "source",
-            id=source,
-            kind="official_body",
-            publisher=PUBLISHER,
-            title=TITLE,
-            url="https://www.sos.mo.gov/elections/resultsandstats",
-            license="Public record",
-        )
+        sources = {TITLE: cs.source(PUBLISHER, TITLE), BOOK: cs.source(PUBLISHER, BOOK)}
+        for title, url in (
+            (TITLE, "https://www.sos.mo.gov/elections/resultsandstats"),
+            (BOOK, "https://mdh.contentdm.oclc.org/digital/collection/bluebook"),
+        ):
+            cs.add(
+                "source",
+                id=sources[title],
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=url,
+                license="Public record",
+            )
         for url in (COUNTY, STATE):
-            cs.artifact(raw.cached(SOURCE, url), source)
+            cs.artifact(raw.cached(SOURCE, url), sources[TITLE])
+        for _, _, pages, _ in MANUAL:
+            for page in pages:
+                for url in (IMAGE, TEXT):
+                    cs.artifact(raw.cached(SOURCE, url.format(page)), sources[BOOK])
+        caveats = {(day, office): note for day, office, note in pl.read_parquet(PARSED / "caveats.parquet").iter_rows()}
         counties: dict[str, UUID] = dict(
             conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'us.county' and code like '29%%'"
@@ -182,8 +470,8 @@ def emit() -> Path:
             ranks[person] = (statewide, known, years)
             texts[person] = text
 
-        def fits(one: UUID, candidate: str) -> bool:
-            if min((abs(other - 1996) for other in ranks[one][2]), default=0) > 30:
+        def fits(one: UUID, candidate: str, year: int) -> bool:
+            if min((abs(other - year) for other in ranks[one][2]), default=0) > 30:
                 return False
             mine, mark = parts(candidate)
             theirs, their_mark = parts(texts[one])
@@ -192,15 +480,20 @@ def emit() -> Path:
             return len(mine) < 3 or len(theirs) < 3 or mine[1][:1] == theirs[1][:1]
 
         fptp = cs.key("us.electoral_system", "fptp")
-        parties = {code: cs.key("us.party", party) for code, party in PARTIES.items()}
-        if cs.minted & {fptp, *parties.values()}:
+        parties = {code: cs.key("us.party", party) if party else None for code, party in PARTIES.items()}
+        if cs.minted & {fptp, *parties.values()} - {None}:
             raise ValueError("the electoral system and parties must exist")
         contests: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':MO:'")
         )
-        ((election, area),) = conn.execute(
-            "select election_id, district_area_id from contest where id = %s", [contests[f"{DAY}:MO:governor"]]
+        ((area,),) = conn.execute(
+            "select district_area_id from contest where id = %s", [contests["1996-11-05:MO:governor"]]
         ).fetchall()
+        elections: dict[str, UUID] = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.election' and value ~ '^\\d{4}-\\d\\d-\\d\\d:MO$'"
+            )
+        )
         columns = (
             "id",
             "election_id",
@@ -213,8 +506,9 @@ def emit() -> Path:
             "completeness",
             "supersedes_id",
         )
-        for (office,), lines in frame.group_by("office", maintain_order=True):
-            key = f"{DAY}:MO:{office}"
+        for (day, book, office), lines in frame.group_by("day", "book", "office", maintain_order=True):
+            key = f"{day}:MO:{office}"
+            year = int(day[:4])
             result_set = cs.key(f"{SOURCE}.result_set", key)
             contest = contests.get(key)
             if contest is None:
@@ -225,7 +519,7 @@ def emit() -> Path:
                 cs.add(
                     "contest",
                     id=contest,
-                    election_id=election,
+                    election_id=elections[f"{day}:MO"],
                     kind="office",
                     office_id=office_id,
                     district_area_id=area,
@@ -235,9 +529,9 @@ def emit() -> Path:
                     electoral_system_id=fptp,
                     default_result_kind="counted",
                 )
-                name(contest, f"1996 Missouri {TITLES[office]} election")
-                cs.add("slug", path=f"us/mo/{DAY}-general/{office}", entity_id=contest)
-                election_id = election
+                name(contest, f"{year} Missouri {TITLES[office]} election")
+                cs.add("slug", path=f"us/mo/{day}-general/{office}", entity_id=contest)
+                election_id = elections[f"{day}:MO"]
             else:
                 ((election_id,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             options = conn.execute(
@@ -284,7 +578,7 @@ def emit() -> Path:
                     known = {
                         one
                         for one in people.get(plain(candidate)) or people.get(f"{first}|{surname(candidate)}", set())
-                        if fits(one, candidate)
+                        if fits(one, candidate, year) and candidate not in ALONE
                     }
                     person = (
                         max(
@@ -292,7 +586,7 @@ def emit() -> Path:
                             key=lambda one: (
                                 ranks[one][0],
                                 ranks[one][1],
-                                -min(abs(other - 1996) for other in ranks[one][2]),
+                                -min(abs(other - year) for other in ranks[one][2]),
                             ),
                         )
                         if known
@@ -332,10 +626,12 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=sources[book],
                 is_default=True,
                 completeness=1,
             )
+            if (day, office) in caveats:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=caveats[(day, office)])
             if conn.execute("select from result_set where id = %s", [result_set]).fetchone() is None:
                 cells: dict[tuple[str, UUID], int] = {}
                 for county, label, votes in lines.select("county", "label", "votes").iter_rows():
