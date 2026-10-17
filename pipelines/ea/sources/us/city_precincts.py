@@ -8,18 +8,17 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import medsl, medsl_local
+from ea.sources.us import medsl, medsl_local, nc_local, ncsbe
 from ea.store import DATA, connect
 
 SOURCE = "us.city_precincts"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 OFFICE = r"MAYOR|COUNCIL|ALDER|WARD|COMMISSION|SELECT|CITY|TOWN|VILLAGE|BOROUGH|TRUSTEE"
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
 METHOD = (
-    "Precinct returns for city races from the MIT Election Data and Science Lab's or OpenElections' precinct files, "
-    "matched to the "
-    "city's official contest by candidate and checked against its official totals. Absentee, early, and provisional "
+    "Precinct returns for city races from the North Carolina State Board of Elections', the MIT Election Data and "
+    "Science Lab's, or OpenElections' precinct files, matched to the city's official contest by candidate and checked against its official totals. Absentee, early, and provisional "
     "ballots that a county reported only countywide stay in their own countywide rows."
 )
 
@@ -137,6 +136,32 @@ def parse() -> None:
                 ),
             )
         )
+    for (day,), part in (
+        pl.read_parquet(nc_local.PARSED / "results.parquet")
+        .filter(pl.col("code").str.contains(r"^\d{7}$") & pl.col("unit").is_not_null())
+        .group_by("day")
+    ):
+        unit = pl.col("unit").str.splitn(":", 5)
+        origins.append(
+            (
+                day,
+                "ncsbe",
+                part.lazy().select(
+                    state=pl.lit("NC"),
+                    fips=unit.struct.field("field_2"),
+                    jurisdiction=unit.struct.field("field_3"),
+                    precinct=unit.struct.field("field_4"),
+                    office="contest",
+                    district=pl.lit(""),
+                    candidate="choice",
+                    writein=pl.when(pl.col("choice").str.contains(r"(?i)write-in"))
+                    .then(pl.lit("TRUE"))
+                    .otherwise(pl.lit("FALSE")),
+                    mode=pl.lit("TOTAL"),
+                    votes=pl.col("votes").cast(pl.String),
+                ),
+            )
+        )
     frames = []
     for day, origin, scan in origins:
         fips = pl.col("fips").str.replace(r"\.0$", "")
@@ -171,7 +196,9 @@ def parse() -> None:
     precinct = ["day", "origin", "state", "fips", "jurisdiction", "precinct", "office", "district"]
     frame = (
         pl.concat(frames)
-        .filter((pl.col("origin") == "medsl") | ~(pl.col("origin") == "medsl").any().over("day", "state"))
+        .with_columns(rank=pl.col("origin").replace_strict({"ncsbe": 0, "medsl": 1, "openelections": 2}))
+        .filter(pl.col("rank") == pl.col("rank").min().over("day", "state"))
+        .drop("rank")
         .with_columns(measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16))
         .filter(pl.col("measure") > 0)
         .filter((pl.col("mode") == "TOTAL").any().over([*precinct, "candidate"]).not_() | (pl.col("mode") == "TOTAL"))
@@ -195,7 +222,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="City council and mayoral results by precinct 2016–2024, from the MIT Election Data and Science Lab",
+            summary="City council and mayoral results by precinct 2014–2025, from the MIT Election Data and Science Lab, OpenElections, and the North Carolina State Board of Elections",
             polity="US",
         )
         states = {
@@ -305,6 +332,11 @@ def emit() -> Path:
                 ),
                 sources[(state, day)],
             )
+        for day in sorted(set(rows.filter(pl.col("origin") == "ncsbe")["day"])):
+            sources[("NC", day)] = cs.source(ncsbe.PUBLISHER, ncsbe.TITLE)
+            if sources[("NC", day)] in cs.minted:
+                raise ValueError(f"{ncsbe.TITLE} must already be a source")
+            cs.artifact(raw.cached(ncsbe.SOURCE, ncsbe.FILES.format(day=day)), sources[("NC", day)])
         groups = {key: frame for key, frame in rows.group_by("day", "state")}
         index: dict[tuple[date, str], dict[str, set[str]]] = {}
         for (day, state), frame in groups.items():
@@ -401,7 +433,7 @@ def emit() -> Path:
                 stage=stage,
                 kind=kind,
                 status="active",
-                source_id=sources[(state, day)] if lines["origin"][0] == "openelections" else sources[day],
+                source_id=sources[day] if lines["origin"][0] == "medsl" else sources[(state, day)],
                 is_default=False,
                 completeness=round(sum(counted.values()) / total, 4),
             )
