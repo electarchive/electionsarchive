@@ -5551,6 +5551,13 @@ def emit() -> Path:
         }
         noted: set[str] = set()
         openings: dict[tuple[int, str, str, int | None, str], UUID] = {}
+        jungle: dict[str, UUID] = dict(
+            conn.execute(
+                """select x.value, x.entity_id from external_id x join contest c on c.id = x.entity_id
+                   join changeset s on s.id = c.changeset_id
+                   where x.scheme = 'us.contest' and s.pipeline = 'us.la_congress'"""
+            ).fetchall()
+        )
         unmatched: list[tuple[str, set[str], set[str]]] = []
         for (year, state, chamber, district, term, held, label), lines in primaries.with_columns(
             scope=pl.when(
@@ -6094,7 +6101,11 @@ def emit() -> Path:
                 runoffs.add((year, state))
                 stages.append((RUNOFFS[(year, state)], "runoff", runoff))
 
-            previous = openings.get((year, state, chamber, district, term))
+            previous = openings.get((year, state, chamber, district, term)) or (
+                jungle.get(f"{JUNGLE[year]}:LA:{chamber}" + ("" if chamber == "senate" else f":{district}"))
+                if november
+                else None
+            )
             for number, (day, stage, rows) in enumerate(stages):
                 if stage == "general":
                     parent = election(
