@@ -33,6 +33,7 @@ DERIVED = 1
 VOLUMES = {
     1888: ("biennialreports06texagoog", date(1888, 11, 6), [192, 193, 194]),
     1900: ("biennialreports05texagoog", date(1900, 11, 6), [86, 87, 88, 89]),
+    1904: ("biennialreportof1903texa", date(1904, 11, 8), [210, 211, 212, 213]),
 }
 FORMER = {"greer": ("Greer", "40055", date(1896, 3, 16))}
 CORRECTED: dict[tuple[int, int, str, int], int] = {}
@@ -386,11 +387,11 @@ def emit() -> Path:
                 print(f"{key}: no contest")
                 continue
             row = conn.execute(
-                """select c.election_id, min(v.count_round),
+                """select c.election_id, coalesce(min(v.count_round), 0),
                           coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
                                    sum(v.value) filter (where v.measure = 1))::bigint
                    from contest c join result_set rs on rs.contest_id = c.id and rs.is_default
-                   join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
+                   left join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
                    where c.id = %s group by 1""",
                 [contest],
             ).fetchone()
