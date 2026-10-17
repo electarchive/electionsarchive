@@ -147,10 +147,23 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         joins: list[sql.Composable] = []
         selected: list[sql.Composable] = []
         inserted: list[sql.Composable] = []
+        resolving: list[sql.Composable] = []
+        unresolved: list[sql.Composable] = []
         for index, column in enumerate(columns):
             if column in KEYS:
                 alias = sql.Identifier(f"j{index}")
                 optional = KEYS[column] == "contest_option"
+                resolving.append(
+                    sql.SQL("left join public.{} {} on {}.id = s.{}").format(
+                        sql.Identifier(KEYS[column]), alias, alias, sql.Identifier(column)
+                    )
+                )
+                unresolved.append(
+                    sql.SQL("count(*) filter (where {}{}.id is null)").format(
+                        sql.SQL("s.{} is not null and ").format(sql.Identifier(column)) if optional else sql.SQL(""),
+                        alias,
+                    )
+                )
                 joins.append(
                     sql.SQL("{} join public.{} {} on {}.id = s.{}").format(
                         sql.SQL("left" if optional else ""),
@@ -165,6 +178,20 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             else:
                 selected.append(sql.SQL("s.{}").format(sql.Identifier(column)))
                 inserted.append(sql.Identifier(column))
+        resolved = [column for column in columns if column in KEYS]
+        if resolved:
+            counts = conn.execute(
+                sql.SQL("select {} from {} s {}").format(
+                    sql.SQL(", ").join(unresolved), staged, sql.SQL(" ").join(resolving)
+                )
+            ).fetchone()
+            assert counts is not None
+            missing = {column: count for column, count in zip(resolved, counts, strict=True) if count}
+            if missing:
+                raise ValueError(
+                    f"{table}: rows whose keys resolve to nothing would be dropped: "
+                    + ", ".join(f"{count} by {column}" for column, count in missing.items())
+                )
         conn.execute(
             sql.SQL("insert into public.{} ({}) select {} from {} s {}").format(
                 target,
