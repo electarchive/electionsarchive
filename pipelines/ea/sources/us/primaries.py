@@ -70,6 +70,7 @@ IL_WRITE_INS = ("33561", "33562", "33567")
 COLUMBIA = "https://electionresults.dcboe.org/{}"
 LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob=20240323/{}.htm"
 LA_RACES = {"65031": "Democratic", "65033": "Republican"}
+MS_RUNOFF = "https://www.sos.ms.gov/elections/electionResults/Republican%20Primary%20Runoff%20Certified%20Results24.pdf"
 KENTUCKY = "https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf"
 DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
@@ -268,6 +269,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, LOUISIANA.format(f"VotesRaceByParish/Votes_{race}"), suffix=".json")
         for parish in range(1, 65):
             raw.fetch(SOURCE, LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"), suffix=".json")
+    raw.fetch(SOURCE, MS_RUNOFF, suffix=".pdf")
     for url in (ILLINOIS, IL_TOTALS):
         raw.fetch(SOURCE, url, suffix=".txt")
     for office, district in PA_OFFICES:
@@ -475,6 +477,7 @@ def parse() -> None:
         ("AR", "county", ARKANSAS.format("GetContestResults", "&contestType=FED")),
         *(("PA", "county", PENNSYLVANIA.format(office, district)) for office, district in PA_OFFICES),
         ("IL", "county", ILLINOIS),
+        ("MS", "county", MS_RUNOFF),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
             for race in LA_RACES
@@ -844,6 +847,57 @@ def parse() -> None:
                                         }
                                     )
             frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
+        elif url == MS_RUNOFF:
+            pdf = raw.cached(SOURCE, url).path
+            cells = []
+            counted: dict[str, int] = defaultdict(int)
+            for page in range(3, 6):
+                text = subprocess.run(
+                    ["pdftotext", "-raw", "-f", str(page), "-l", str(page), str(pdf), "-"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout
+                recap = text.split("day of April 2024\n")[1].split("\nStatewide")[0].split("\n")
+                for found in re.finditer(r"^(Ron Eller|Andrew Scott Smith) Republican ", text, flags=re.MULTILINE):
+                    marker = next(box for word, box in scan.layer(pdf, page) if word == found[1].split()[0])
+                    numbers = sorted(
+                        (box[0], word, box)
+                        for word, box in scan.layer(pdf, page)
+                        if re.fullmatch(r"\d+", word) and abs(box[1] - marker[1]) < 12
+                    )
+                    if len(numbers) != len(recap):
+                        raise ValueError(f"MS runoff page {page}: {len(numbers)} numbers for {len(recap)} counties")
+                    for place, (_, word, box) in zip(recap, numbers, strict=True):
+                        if place == "TOTAL":
+                            if int(word) != counted[found[1]]:
+                                raise ValueError(
+                                    f"MS runoff: {found[1]}'s counties sum to {counted[found[1]]}, not {word}"
+                                )
+                            continue
+                        counted[found[1]] += int(word)
+                        cells.append(
+                            {
+                                "county": place,
+                                "office": "U.S. House",
+                                "district": "2",
+                                "party": "Republican",
+                                "candidate": found[1],
+                                "votes": word,
+                                "page": page,
+                                "x0": box[0],
+                                "y0": box[1],
+                                "x1": box[2],
+                                "y1": box[3],
+                            }
+                        )
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(COLUMNS, pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
         elif state == "LA":
             race, parish = re.findall(r"Votes_(\d+)_(\d+)", url)[0]
             labels = {
@@ -1852,6 +1906,8 @@ def parse() -> None:
             if state == "DC"
             else date(2024, 3, 23)
             if state == "LA"
+            else date(2024, 4, 2)
+            if url == MS_RUNOFF
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -2258,6 +2314,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "LA"
+                else (
+                    "Mississippi Secretary of State",
+                    "Official recapitulation, April 2, 2024 Republican primary runoff, certified results",
+                    "https://www.sos.ms.gov/elections/electionResults/2024RepublicanPrimaryRunoff.asp",
+                    "official_body",
+                    "Public record",
+                )
+                if used == MS_RUNOFF
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
