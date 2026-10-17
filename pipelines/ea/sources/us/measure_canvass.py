@@ -1,0 +1,331 @@
+import json
+from datetime import date
+from pathlib import Path
+from uuid import UUID
+
+import httpx
+import polars as pl
+
+from ea import raw
+from ea.changeset import Changeset
+from ea.sources.us import elstats, fl_sos, wa_local
+from ea.store import DATA, connect
+
+SOURCE = "us.measure_canvass"
+VERSION = "1"
+PARSED = DATA / "parsed" / SOURCE
+ANSWERS = {
+    "YES": ("YES", "YES"),
+    "NO": ("NO", "YES"),
+    "APPROVED": ("YES", "APPROVED"),
+    "REJECTED": ("NO", "APPROVED"),
+    "MAINTAINED": ("YES", "MAINTAINED"),
+    "REPEALED": ("NO", "MAINTAINED"),
+}
+TAG = r"(?i)(initiative|referendum|advisory vote|resolution|amendment)\D{0,25}?(\d+)"
+METHOD = (
+    "County totals from {document}, the state's certified results. They replace the totals transcribed from the "
+    "English Wikipedia as this question's default.{advisory}"
+)
+ADVISORY = " As in the question's existing options, the export's Maintained is recorded as Yes and Repealed as No."
+DOCUMENTS = {
+    "WA": (
+        wa_local.PUBLISHER,
+        wa_local.TITLE,
+        "https://results.vote.wa.gov/results/",
+        "the Washington Secretary of State's county results export",
+    ),
+    "FL": (
+        fl_sos.PUBLISHER,
+        fl_sos.TITLE,
+        "https://results.elections.myflorida.com/",
+        "the Florida Division of Elections' official results extract",
+    ),
+}
+
+
+def wikipedia(conn) -> list[tuple[str, date]]:
+    return conn.execute(
+        """select distinct substr(p.iso_code, 4), e.date_from from contest c
+           join election e on e.id = c.election_id join polity p on p.id = e.polity_id
+           join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+           join result_set rs on rs.contest_id = c.id and rs.is_default join source s on s.id = rs.source_id
+           where c.kind = 'ballot_question' and s.publisher = 'Wikipedia' and substr(p.iso_code, 4) = any(%s)
+             and e.date_from between '2000-01-01' and '2025-12-31'
+           order by 1, 2""",
+        [list(DOCUMENTS)],
+    ).fetchall()
+
+
+def link(state: str, day: date) -> tuple[str, str]:
+    owner, url = (
+        (wa_local.SOURCE, wa_local.PRECINCTS.format(day=day).replace("_allstateprecincts.csv", "_AllCounties.csv"))
+        if state == "WA"
+        else (fl_sos.SOURCE, fl_sos.EXTRACT.format(day=day))
+    )
+    index = json.loads((DATA / "raw" / owner / "index.json").read_text())
+    return (owner if url in index else SOURCE), url
+
+
+def fetch() -> None:
+    with connect() as conn:
+        dates = wikipedia(conn)
+    for state, day in dates:
+        source, url = link(state, day)
+        if source == SOURCE:
+            try:
+                raw.fetch(SOURCE, url, suffix=".csv" if state == "WA" else ".tsv")
+            except httpx.HTTPStatusError as error:
+                print(f"{state} {day}: {error}")
+
+
+def parse() -> None:
+    with connect() as conn:
+        dates = wikipedia(conn)
+        names: dict[str, dict[str, str]] = {}
+        for code, text, iso in conn.execute(
+            """select u.code, n.text, p.iso_code from reporting_unit u
+               join name n on n.entity_id = u.area_id and n.kind = 'short'
+               join reporting_unit s on s.scheme_code = 'us.state' and s.code = left(u.code, 2)
+               join polity p on p.id = s.polity_id
+               where u.scheme_code = 'us.county' and p.iso_code = any(%s)""",
+            [[f"US-{state}" for state in DOCUMENTS]],
+        ).fetchall():
+            names.setdefault(iso.removeprefix("US-"), {})[elstats.plain(text)] = code
+    frames = []
+    for state, day in dates:
+        source, url = link(state, day)
+        try:
+            path = raw.cached(source, url).path
+        except LookupError:
+            continue
+        if state == "WA":
+            table = (
+                pl.read_csv(path, infer_schema=False, encoding="utf8-lossy")
+                .filter(pl.col("JurisdictionName").is_in(["State Executive", "State Measures", "Advisory Votes"]))
+                .select(
+                    county=pl.col("County"),
+                    office=pl.col("Race").str.replace(
+                        r"^(Washington State |Advisory Votes |State Measures |Proposed Constitutional Amendments )", ""
+                    ),
+                    answer=pl.col("Candidate"),
+                    votes=pl.col("Votes"),
+                )
+            )
+        else:
+            table = pl.read_csv(
+                path, separator="\t", infer_schema=False, quote_char=None, encoding="utf8-lossy"
+            ).select(
+                county=pl.col("CountyName"),
+                office=pl.col("RaceCode") + " " + pl.col("OfficeDesc"),
+                answer=pl.col("CanNameLast"),
+                votes=pl.col("CanVotes"),
+            )
+        frames.append(
+            table.select(
+                state=pl.lit(state),
+                day=pl.lit(day),
+                url=pl.lit(url),
+                office=pl.col("office").str.replace_all(r"\s+", " ").str.strip_chars(),
+                fips=pl.col("county")
+                .map_elements(elstats.plain, return_dtype=pl.String)
+                .replace_strict(names[state], default=None),
+                label=pl.col("answer").str.strip_chars().str.extract(r"(?i)^(\w+)").str.to_uppercase(),
+                votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64, strict=False),
+            ).filter(pl.col("label").is_in(list(ANSWERS)))
+        )
+    frame = pl.concat(frames).with_columns(
+        answer=pl.col("label").replace_strict({label: answer for label, (answer, _) in ANSWERS.items()}),
+        pair=pl.col("label").replace_strict({label: pair for label, (_, pair) in ANSWERS.items()}),
+    )
+    counties = frame.group_by("state").agg(pl.col("fips").n_unique().alias("counties"))
+    PARSED.mkdir(parents=True, exist_ok=True)
+    (
+        frame.join(counties, on="state")
+        .filter(
+            pl.col("answer").n_unique().over("state", "day", "office") == 2,
+            pl.col("pair").n_unique().over("state", "day", "office") == 1,
+            pl.col("fips").n_unique().over("state", "day", "office") == pl.col("counties"),
+        )
+        .group_by("state", "day", "url", "office", "pair", "fips", "answer")
+        .agg(pl.col("votes").sum())
+        .sort("state", "day", "office", "fips", "answer")
+        .write_parquet(PARSED / "canvass.parquet")
+    )
+
+
+def emit() -> Path:
+    frame = pl.read_parquet(PARSED / "canvass.parquet")
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Statewide ballot questions' certified county totals from the states' canvasses, replacing "
+            "Wikipedia's totals as the default",
+            polity="US",
+        )
+        wiki = pl.DataFrame(
+            conn.execute(
+                """select x.value, substr(p.iso_code, 4), e.date_from, rs.id::text, rs.election_id::text,
+                          rs.contest_id::text, rs.stage, rs.kind, rs.source_id::text, rs.completeness::float8,
+                          max(o.id::text) filter (where upper(o.ballot_label) = 'YES'),
+                          max(o.id::text) filter (where upper(o.ballot_label) = 'NO'),
+                          sum(v.value) filter (where upper(o.ballot_label) = 'YES')::bigint,
+                          sum(v.value) filter (where upper(o.ballot_label) = 'NO')::bigint,
+                          (select min(n.text) from name n where n.entity_id = c.id)
+                   from contest c
+                   join election e on e.id = c.election_id join polity p on p.id = e.polity_id
+                   join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+                   join result_set rs on rs.contest_id = c.id and rs.is_default
+                   join source s on s.id = rs.source_id and s.publisher = 'Wikipedia'
+                   join result_value v on v.result_set_k = rs.k and v.measure = 1
+                   join contest_option o on o.k = v.option_k
+                   where c.kind = 'ballot_question' and substr(p.iso_code, 4) = any(%s)
+                   group by c.id, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10""",
+                [list(DOCUMENTS)],
+            ).fetchall(),
+            schema=[
+                "key",
+                "state",
+                "day",
+                "set",
+                "election",
+                "contest",
+                "stage",
+                "kind",
+                "source",
+                "completeness",
+                "yes_option",
+                "no_option",
+                "wyes",
+                "wno",
+                "name",
+            ],
+            orient="row",
+        )
+        questions = (
+            frame.group_by("state", "day", "url", "office", "pair")
+            .agg(
+                yes=pl.col("votes").filter(pl.col("answer") == "YES").sum(),
+                no=pl.col("votes").filter(pl.col("answer") == "NO").sum(),
+            )
+            .with_columns(
+                tag=pl.when(pl.col("state") == "FL")
+                .then(pl.concat_str(pl.lit("amendment "), pl.col("office").str.extract(r"^A0*(\d+) ")))
+                .otherwise(
+                    pl.concat_str(
+                        pl.col("office").str.extract(TAG, 1).str.to_lowercase(),
+                        pl.lit(" "),
+                        pl.col("office").str.extract(TAG, 2),
+                    )
+                ),
+                ballot=pl.len().over("state", "day"),
+            )
+        )
+        wiki = wiki.with_columns(
+            wtag=pl.concat_str(
+                pl.col("name").str.extract(TAG, 1).str.to_lowercase(), pl.lit(" "), pl.col("name").str.extract(TAG, 2)
+            ),
+            wballot=pl.len().over("state", "day"),
+        )
+        pairs = (
+            questions.join(wiki, on=["state", "day"])
+            .filter(
+                (pl.col("tag") == pl.col("wtag"))
+                | (pl.col("wtag").is_null() & (pl.col("ballot") == 1) & (pl.col("wballot") == 1))
+            )
+            .filter(pl.len().over("key") == 1, pl.len().over("state", "day", "office") == 1)
+        )
+        for row in pairs.filter((pl.col("yes") != pl.col("wyes")) | (pl.col("no") != pl.col("wno"))).iter_rows(
+            named=True
+        ):
+            print(row["key"], row["yes"] - row["wyes"], row["no"] - row["wno"])
+        print(wiki.join(pairs, on="key", how="anti").select("key").to_series().to_list())
+        sources = {}
+        for state, (publisher, title, url, _) in DOCUMENTS.items():
+            sources[state] = cs.source(publisher, title)
+            if sources[state] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources[state],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
+        artifacts = {}
+        for state, day, url in pairs.select("state", "day", "url").unique().iter_rows():
+            artifacts[url] = cs.artifact(raw.cached(link(state, day)[0], url), sources[state])
+        landed: dict[str, int] = {}
+        for row in pairs.iter_rows(named=True):
+            result_set = cs.key(f"{SOURCE}.result_set", f"{row['key']}:county")
+            if result_set not in cs.minted:
+                continue
+            old = UUID(row["set"])
+            cs.add(
+                "result_set",
+                id=old,
+                election_id=UUID(row["election"]),
+                contest_id=UUID(row["contest"]),
+                stage=row["stage"],
+                kind=row["kind"],
+                source_id=UUID(row["source"]),
+                status="superseded",
+                is_default=False,
+                completeness=row["completeness"],
+            )
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=UUID(row["election"]),
+                contest_id=UUID(row["contest"]),
+                stage="certified",
+                kind="counted",
+                source_id=sources[row["state"]],
+                status="active",
+                is_default=True,
+                supersedes_id=old,
+                completeness=1,
+            )
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=METHOD.format(
+                    document=DOCUMENTS[row["state"]][3], advisory=ADVISORY if row["pair"] == "MAINTAINED" else ""
+                ),
+            )
+            cs.add(
+                "citation",
+                entity_id=result_set,
+                source_id=sources[row["state"]],
+                locator={"url": row["url"], "artifact": str(artifacts[row["url"]]), "race": row["office"]},
+            )
+            for option, kind, seats in conn.execute(
+                "select option_id, kind, seats from outcome where result_set_id = %s", [old]
+            ).fetchall():
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
+            options = {"YES": UUID(row["yes_option"]), "NO": UUID(row["no_option"])}
+            for fips, answer, votes in (
+                frame.filter(
+                    pl.col("state") == row["state"], pl.col("day") == row["day"], pl.col("office") == row["office"]
+                )
+                .select("fips", "answer", "votes")
+                .iter_rows()
+            ):
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=cs.unit("us.county", fips),
+                    option_id=options[answer],
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=votes,
+                )
+            landed[row["state"]] = landed.get(row["state"], 0) + 1
+        print(f"{pairs.height} questions paired, {sorted(landed.items())} new defaults")
+        return cs.write()
