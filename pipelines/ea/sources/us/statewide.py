@@ -6,6 +6,7 @@ import threading
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import UTC, date, datetime, timedelta
+from itertools import pairwise
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
@@ -461,18 +462,37 @@ def emit() -> Path:
             [SOURCE],
         ).fetchall():
             existing.setdefault(key, []).append((option, set(slug(label or "").split("-"))))
-        slugs = {path for (path,) in conn.execute("select path from slug").fetchall()}
+        slugs: dict[str, UUID | None] = dict(conn.execute("select path, entity_id from slug").fetchall())
+        current = dict(conn.execute("select entity_id, path from slug where is_current").fetchall())
+        published: dict[UUID, UUID | None] = dict(
+            conn.execute(
+                """select o.id, coalesce(h.party_id, o.party_id) from contest_option o
+                   join changeset c on c.id = o.changeset_id
+                   left join lateral (select party_id from contest_option_history h where h.id = o.id
+                                      order by h.recorded_from limit 1) h on true
+                   where c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
+        mine = {
+            id
+            for (id,) in conn.execute(
+                "select c.id from contest c join changeset s on s.id = c.changeset_id where s.pipeline = %s", [SOURCE]
+            ).fetchall()
+        }
 
-        def unique(path: str) -> str:
+        def unique(path: str, entity: UUID | None = None) -> str:
+            if entity in current and re.fullmatch(re.escape(path) + r"(-\d+)?", current[entity]):
+                return current[entity]
             base, index = path, 2
-            while path in slugs:
+            while path in slugs and slugs[path] != entity:
                 path, index = f"{base}-{index}", index + 1
-            slugs.add(path)
+            slugs[path] = entity
             return path
 
-        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "block")}
         if cs.minted & set(systems.values()):
-            raise ValueError("the fptp and two-round systems must exist")
+            raise ValueError("the fptp, two-round, and block systems must exist")
 
         def party(state: str, year: int, label: str | None) -> tuple[UUID | None, bool]:
             label = (label or "").split("/")[0].strip()
@@ -519,6 +539,17 @@ def emit() -> Path:
                 remainder=pl.col("modifier").fill_null("").str.contains("(?i)vacancy|short term|unexpired|to fill"),
             )
         )
+        runoffs: dict[str, str] = {}
+        rounds: dict[tuple[str, str, str | None, bool], list[tuple[date, str]]] = {}
+        for row in contests.filter(pl.col("kind") == "primary", pl.col("day").is_not_null()).iter_rows(named=True):
+            key = (row["state"], row["office"], row["scope"], row["remainder"])
+            rounds.setdefault(key, []).append((row["day"], row["contest"]))
+        for held in rounds.values():
+            held.sort()
+            for (before, first), (after, second) in pairwise(held):
+                if 0 < (after - before).days <= 70:
+                    runoffs[second] = first
+        ours: dict[str, UUID] = {}
         days: dict[tuple[str, int, str], str] = {}
         for value in sorted(elections_known):
             parts = value.split(":")
@@ -539,8 +570,12 @@ def emit() -> Path:
                 )
             else:
                 datekey = str(day)
-            key = f"{datekey}:{state}" + ("" if kind == "general" else ":primary")
+            key = f"{datekey}:{state}" + ("" if kind == "general" else f":{kind}")
             if key not in elections:
+                if kind == "runoff" and f"{datekey}:{state}:primary" in elections_known:
+                    primary = cs.key("us.election", f"{datekey}:{state}:primary")
+                    if primary != cs.key("us.election", key):
+                        cs.merge(primary, cs.key("us.election", key))
                 elections[key] = cs.key("us.election", key)
                 if key not in elections_known:
                     elections_known.add(key)
@@ -600,7 +635,8 @@ def emit() -> Path:
         for row in contests.sort("year", "day", "state", "contest", nulls_last=True).iter_rows(named=True):
             state, year, office, modifier, kind = row["state"], row["year"], row["office"], row["modifier"], row["kind"]
             group = lines.filter(pl.col("contest") == row["contest"])
-            election_id, datekey, election_kind = election(state, year, row["day"], kind)
+            runoff = row["contest"] in runoffs
+            election_id, datekey, election_kind = election(state, year, row["day"], "runoff" if runoff else kind)
             office_slug = slug(office)
             office_key = f"{office_slug}:{state}"
             if office_key not in offices:
@@ -629,7 +665,9 @@ def emit() -> Path:
                 contest_key += f":{row['contest'].split(':')[1]}"
             taken.add(contest_key)
             contest = cs.key("us.contest", contest_key)
-            reused = contest not in cs.minted
+            ours[row["contest"]] = contest
+            advancing = row["contest"] in runoffs.values()
+            reused = contest not in cs.minted and contest not in mine
             seats = row["seats"] or 1
             if not reused:
                 cs.add(
@@ -641,17 +679,21 @@ def emit() -> Path:
                     district_area_id=areas[state],
                     term="remainder" if row["remainder"] else "full",
                     magnitude=seats,
-                    round_number=1,
+                    round_number=2 if runoff else 1,
+                    previous_round_id=ours.get(runoffs[row["contest"]]) if runoff else None,
                     electoral_system_id=systems["two_round"]
                     if kind == "nonpartisan"
+                    or runoff
+                    or advancing
+                    or (state == "VA" and 1953 <= year <= 1969 and scope)
                     else systems["fptp"]
                     if seats == 1
-                    else None,
+                    else systems["block"],
                     default_result_kind="counted",
                     party_scope_id=party(state, year, scope)[0] if scope else None,
                 )
                 label = (
-                    f"{scope} primary"
+                    f"{scope} primary" + (" runoff" if runoff else "")
                     if scope
                     else "special election"
                     if row["remainder"]
@@ -666,7 +708,8 @@ def emit() -> Path:
                         f"us/{state.lower()}/{datekey}-{election_kind}/{office_slug}"
                         + (f"-{slug(scope)}" if scope else "")
                         + ("-special" if row["remainder"] else "")
-                        + (f"-{slug(shown)}" if shown and not row["remainder"] else "")
+                        + (f"-{slug(shown)}" if shown and not row["remainder"] else ""),
+                        contest,
                     ),
                     entity_id=contest,
                 )
@@ -711,7 +754,7 @@ def emit() -> Path:
                         id=root,
                         contest_id=contest,
                         kind="write_in" if write_in else "ticket" if re.search(TICKET, ballot) else "candidate",
-                        party_id=resolved[0][0] if len(resolved) == 1 else None,
+                        party_id=published.get(root, resolved[0][0] if len(resolved) == 1 else None),
                         ballot_label=ballot,
                     )
                     members = re.split(TICKET, ballot, maxsplit=1) if person is not None else []
@@ -750,33 +793,39 @@ def emit() -> Path:
                         contest_id=contest,
                         parent_option_id=root,
                         kind="write_in" if label == "Write In" else "candidate",
-                        party_id=party_id,
+                        party_id=published.get(target, party_id),
                         ballot_label=f"{ballot} ({label or 'no party'})",
                     )
                     targets.append(target)
                 for (code, label), cells in rows.group_by("code", "party", maintain_order=True):
                     target = targets[list(lines_by_party["party"]).index(label)]
-                    values.append(
-                        (
-                            str(result_set),
-                            str(cs.unit("us.county", str(code))),
-                            str(target),
-                            1,
-                            int(cells["votes"].sum()),
+                    if result_set in cs.minted:
+                        values.append(
+                            (
+                                str(result_set),
+                                str(cs.unit("us.county", str(code))),
+                                str(target),
+                                1,
+                                int(cells["votes"].sum()),
+                            )
                         )
-                    )
                 totals.append((root, int(rows["votes"].sum()), bool(lines_by_party["winner"].any()), person is None))
             for code, measure, votes in (
                 group.filter(pl.col("measure") != 1).group_by("code", "measure").agg(pl.col("votes").sum()).iter_rows()
             ):
-                values.append((str(result_set), str(cs.unit("us.county", str(code))), "", measure, int(votes)))
+                if result_set in cs.minted:
+                    values.append((str(result_set), str(cs.unit("us.county", str(code))), "", measure, int(votes)))
             if reused:
                 continue
             ranked = sorted(
                 ((votes, root) for root, votes, _, pooled in totals if not pooled), key=lambda pair: -pair[0]
             )
             total = sum(votes for _, votes, _, _ in totals)
-            if state == "MA":
+            if advancing:
+                winners = []
+                for _, root in ranked[:2]:
+                    cs.add("outcome", result_set_id=result_set, option_id=root, kind="advanced", seats=None)
+            elif state == "MA":
                 winners = [root for root, _, declared, _ in totals if declared]
             elif kind == "nonpartisan":
                 winners = [root for votes, root in ranked[:1] if votes * 2 > total]
