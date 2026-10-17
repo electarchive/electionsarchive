@@ -5966,7 +5966,15 @@ def emit() -> Path:
                 allocation_parent_id=nationals.get((year, lines["nominee"][0])),
                 default_result_kind="tacit" if tacit else "counted",
             )
-            name(contest, f"{year} {state_name} {title} presidential primary")
+            display = titles[(state, label)] if title == state_name else title
+            text = f"{year} {display if display.startswith(state_name) else f'{state_name} {display}'} presidential primary"
+            held = conn.execute(
+                "select id, text from name where entity_id = %s and is_preferred and lang = 'en'", [contest]
+            ).fetchone()
+            if held is not None and held[1] != text:
+                cs.add("name", id=held[0], entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
+            else:
+                name(contest, text)
             cs.add("slug", path=f"us/{state.lower()}/{day}-primary/president-{slug(title)}", entity_id=contest)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
@@ -6483,4 +6491,15 @@ def emit() -> Path:
 
         if RUNOFFS.keys() - runoffs or NOTES.keys() - noted:
             raise ValueError(f"unused runoffs {RUNOFFS.keys() - runoffs} or notes {NOTES.keys() - noted}")
+        demoted = {
+            str(id)
+            for (id,) in conn.execute(
+                """select r.id from result_set r join changeset s on s.id = r.changeset_id
+                   where s.pipeline <> %s and not r.is_default""",
+                [SOURCE],
+            ).fetchall()
+        }
+        for row in cs.rows.get("result_set", []):
+            if str(row["id"]) in demoted:
+                row["is_default"] = False
         return cs.write()

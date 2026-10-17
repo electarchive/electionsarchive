@@ -134,6 +134,13 @@ def emit() -> Path:
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
+        named: dict[UUID, tuple[UUID, str]] = {
+            entity: (id, text)
+            for entity, id, text in conn.execute(
+                """select n.entity_id, n.id, n.text from name n join contest c on c.id = n.entity_id
+                   where n.is_preferred and n.lang = 'en' and c.kind = 'ballot_question'"""
+            ).fetchall()
+        }
         source = cs.source(ceda.PUBLISHER, ceda.TITLE)
         if source in cs.minted:
             raise ValueError("us.ceda must be published first")
@@ -244,7 +251,12 @@ def emit() -> Path:
                 default_result_kind="counted",
             )
             cs.add("ballot_question", contest_id=contest, type=TYPES.get(kind, "mandatory_referendum"))
-            name(contest, f"{day.year} {title} Measure {letter}" if letter else f"{day.year} {title} ballot measure")
+            letter = " ".join(dict.fromkeys(letter.split())) if letter else letter
+            text = f"{day.year} {title} Measure {letter}" if letter else f"{day.year} {title} ballot measure"
+            if (current := named.get(contest)) is not None and current[1] != text:
+                cs.add("name", id=current[0], entity_id=contest, text=text, lang="en", kind="official", is_preferred=True)
+            else:
+                name(contest, text)
             if contest in cs.minted:
                 contest_path = held.get(contest)
                 if contest_path is None:

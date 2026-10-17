@@ -129,7 +129,9 @@ def emit() -> Path:
                join contest_option o on o.contest_id = k.entity_id
                join candidacy cy on cy.option_id = o.id
                join name n on n.entity_id = cy.person_id and n.is_preferred
-               where k.scheme = 'us.contest' and k.value like '%:CA:%'"""
+               join contest c on c.id = k.entity_id
+               join external_id b on b.entity_id = c.body_id and b.scheme = 'us.body'
+               where k.scheme = 'us.contest' and k.value like '%:CA:%' and b.value in ('senate', 'house')"""
         ).fetchall():
             known.setdefault(slug(text), set()).add(person)
         senate, seat, top_two = (
@@ -194,10 +196,21 @@ def emit() -> Path:
                     electoral_system_id=top_two,
                     default_result_kind="counted",
                 )
-                name(
-                    contest,
-                    f"2024 U.S. Senate {'special election ' if special else ''}"
-                    f"{'primary' if day == PRIMARY else 'election'} in California",
+                text = (
+                    f"2024 U.S. Senate {'special ' if special else ''}"
+                    f"{'primary' if day == PRIMARY else 'election'} in California"
+                )
+                held = conn.execute(
+                    "select id from name where entity_id = %s and is_preferred and lang = 'en'", [contest]
+                ).fetchone()
+                cs.add(
+                    "name",
+                    **({"id": held[0]} if held else {}),
+                    entity_id=contest,
+                    text=text,
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
                 )
                 cs.add("slug", path=f"us/ca/{day}-{stage}/senate{'-special' if special else ''}", entity_id=contest)
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
