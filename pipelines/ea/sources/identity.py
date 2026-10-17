@@ -544,6 +544,10 @@ PEOPLE = {
         ("wikidata", "Q731599"),
         ("us.klarner.person", "30425"),
     ),
+    "Scotty Baesler, mayor of Lexington 1982-1993 and Kentucky representative": (
+        ("bioguide", "B000028"),
+        ("us.alged.person", "15539"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
