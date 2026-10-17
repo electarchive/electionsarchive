@@ -247,7 +247,7 @@
   title={m.search_title()}
   description={m.search_placeholder()}
   shouldFilter={false}
-  class="sm:max-inline-xl"
+  class="sm:max-inline-xl max-sm:inset-bs-2"
 >
   <Command.Input
     placeholder={m.search_placeholder()}
