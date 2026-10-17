@@ -43,6 +43,14 @@ MASSACHUSETTS = [
     for office, stage in (("1", ""), ("6", ""), ("5", "/stage:Democratic"), ("5", "/stage:Republican"))
 ]
 IOWA = "https://electionresults.iowa.gov/IA/121508/344769/reports/detailxml.zip"
+SOUTH_CAROLINA = {
+    f"https://www.enr-scvotes.org/SC/{election}/reports/detailxml.zip": day
+    for election, day in (
+        ("119283/327921", date(2024, 2, 3)),
+        ("119816/330796", date(2024, 2, 24)),
+        ("122026/344536", date(2024, 6, 25)),
+    )
+}
 KANSAS = "https://sos.ks.gov/elections/24elec/2024-Primary-Election-United-States-House-of-Representatives-Precinct%20Results.xlsx"
 KS_PRESIDENT = "https://sos.ks.gov/elections/24elec/2024-Presidential-Preference-Primary-Official-Vote-Totals{}.pdf"
 TED = "https://data.capitol.texas.gov/api/3/action/package_show?id=2024_{}"
@@ -226,6 +234,8 @@ def fetch() -> None:
     for path in ME_FILES:
         raw.fetch(SOURCE, MAINE.format(path), suffix=".xlsx")
     raw.fetch(SOURCE, IOWA, suffix=".zip")
+    for url in SOUTH_CAROLINA:
+        raw.fetch(SOURCE, url, suffix=".zip")
     for name in NJ_FILES:
         raw.fetch(SOURCE, NEW_JERSEY.format(name), suffix=".pdf")
     raw.fetch(SOURCE, NEBRASKA, suffix=".pdf")
@@ -426,6 +436,7 @@ def parse() -> None:
         *(("AL", "precinct", url) for url in ALABAMA),
         *(("ME", "precinct", MAINE.format(path)) for path in ME_FILES),
         ("IA", "county", IOWA),
+        *(("SC", "county", url) for url in SOUTH_CAROLINA),
         *(("NJ", "county", NEW_JERSEY.format(name)) for name in NJ_FILES),
         ("NE", "county", NEBRASKA),
         *(("TX", "precinct", url) for url in texas),
@@ -633,17 +644,22 @@ def parse() -> None:
                     )
                 )
             frame = pl.concat(sheets)
-        elif state == "IA":
+        elif url.endswith("detailxml.zip"):
             with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
                 root = ElementTree.fromstring(archive.read("detail.xml"))
+            for choice in root.iter("Choice"):
+                if sum(int(str(place.get("votes"))) for place in choice.iter("County")) != int(
+                    str(choice.get("totalVotes"))
+                ):
+                    raise ValueError(f"{url}: the counties do not add up to {choice.get('text')}'s total")
             frame = pl.DataFrame(
                 [
                     {
                         "county": place.get("name"),
-                        "office": contest.get("text"),
+                        "office": re.sub(r"^(DEM|REP) ", "", str(contest.get("text"))),
                         "district": contest.get("text"),
-                        "party": re.sub(r"^.* - (\w+)\.$", r"\1", str(contest.get("text"))),
-                        "candidate": choice.get("text"),
+                        "party": re.sub(r"^(DEM|REP) .*$|^.* - (\w+)\.?$", r"\1\2", str(contest.get("text"))),
+                        "candidate": str(choice.get("text")).removesuffix(" - WITHDREW"),
                         "votes": place.get("votes"),
                     }
                     for contest in root.iter("Contest")
@@ -1614,6 +1630,8 @@ def parse() -> None:
             if url == DELAWARE.format("html")
             else date(2024, 5, 21)
             if url == KENTUCKY
+            else SOUTH_CAROLINA[url]
+            if url in SOUTH_CAROLINA
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1971,6 +1989,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if used == KENTUCKY
+                else (
+                    "South Carolina Election Commission",
+                    "Election results",
+                    "https://scvotes.gov/election-results/",
+                    "official_body",
+                    "Public record",
+                )
+                if used in SOUTH_CAROLINA
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
