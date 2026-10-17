@@ -4476,10 +4476,14 @@ async function races(
               group by ch.parent_option_id, ch.party_id, ch.k
               order by ch.parent_option_id, max(y.value) desc
             )
-            select coalesce(pm.into_id, w.party_id, ld.party_id) as party, sum(w.seats)::int as seats
+            select coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
+              sum(w.seats)::int as seats
             from winners w
             left join leads ld on ld.parent = w.id
             left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+            left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
+              and br.kind = 'regional_branch' and br.valid @> (select day from last)
+            left join entity_merge bm on bm.entity_id = br.parent_party_id
             group by 1
           `),
         sequel(group, isBrief, place.k, lineage),
@@ -4585,7 +4589,7 @@ async function races(
     loose.length === 0
       ? null
       : await db.execute<{ path: string; party: string; seats: number }>(sql`
-        select s.path, coalesce(pm.into_id, o.party_id) as party, sum(x.seats)::int as seats
+        select s.path, coalesce(bm.into_id, br.parent_party_id, pm.into_id, o.party_id) as party, sum(x.seats)::int as seats
         from slug s
         join contest c on c.id = s.entity_id
         join election e on e.id = c.election_id
@@ -4603,6 +4607,9 @@ async function races(
         join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
         join result_set rs on rs.id = x.result_set_id and rs.is_default
         left join entity_merge pm on pm.entity_id = o.party_id
+        left join party_affiliation br on br.party_id = coalesce(pm.into_id, o.party_id)
+          and br.kind = 'regional_branch' and br.valid @> e.date_from
+        left join entity_merge bm on bm.entity_id = br.parent_party_id
         where s.is_current and s.path = any(${sql.param(loose)}::text[])
         group by 1, 2
       `);
@@ -6588,10 +6595,15 @@ export const polities = {
           order by l.parent, max(y.value) desc
         ),
         won as materialized (
-          select w.root, w.contest, w.id, w.seats, coalesce(pm.into_id, w.party_id, ld.party_id) as party
+          select w.root, w.contest, w.id, w.seats,
+            coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party
           from winners w
+          join roots r on r.id = w.root
           left join leads ld on ld.parent = w.id
           left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
+          left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
+            and br.kind = 'regional_branch' and br.valid @> r.date
+          left join entity_merge bm on bm.entity_id = br.parent_party_id
         ),
         fetched as (
           select r.id as root, coalesce(o.parent_option_id, o.id) as top, x.measure, x.value::float8 as value,
@@ -7228,14 +7240,20 @@ export const bodies = {
             left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
             order by t.id
           )
-          select s.start::text as start, coalesce(
-            (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
-              left join entity_merge pm on pm.entity_id = a.party_id
-              where a.tenure_id = s.id and a.kind = 'party' and a.party_id is not null
-              order by coalesce(a.valid @> s.start, false) desc, lower(a.valid) nulls first limit 1),
-            f.party
-          ) as party, count(*)::int as seats
-          from sat s left join fallback f on f.id = s.id
+          select x.start::text as start, coalesce(bm.into_id, br.parent_party_id, x.party) as party, count(*)::int as seats
+          from (
+            select s.start, coalesce(
+              (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
+                left join entity_merge pm on pm.entity_id = a.party_id
+                where a.tenure_id = s.id and a.kind = 'party' and a.party_id is not null
+                order by coalesce(a.valid @> s.start, false) desc, lower(a.valid) nulls first limit 1),
+              f.party
+            ) as party
+            from sat s left join fallback f on f.id = s.id
+          ) x
+          left join party_affiliation br on br.party_id = x.party
+            and br.kind = 'regional_branch' and br.valid @> x.start
+          left join entity_merge bm on bm.entity_id = br.parent_party_id
           group by 1, 2 order by 1, 3 desc
         `),
       ]);
