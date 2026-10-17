@@ -123,6 +123,12 @@ export const rules = v.variant("formula", [
   v.object({
     formula: v.literal("referendum"),
     quorum: v.optional(v.pipe(v.number(), v.minValue(0), v.maxValue(1))),
+    majority: v.optional(
+      v.object({
+        share: v.pipe(v.number(), v.minValue(0.5), v.maxValue(1)),
+        strict: v.optional(v.boolean(), false),
+      }),
+    ),
     doubleMajority: v.optional(
       v.object({
         scheme: v.string(),

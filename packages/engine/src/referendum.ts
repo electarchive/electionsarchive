@@ -22,7 +22,13 @@ export function decide(
     if (ballot.voters <= rules.quorum * ballot.registered)
       return { outcome: "quorum_failed" as const };
   }
-  const isPopular = ballot.yes > ballot.no;
+  const share = rules.majority;
+  const isPopular =
+    share == null
+      ? ballot.yes > ballot.no
+      : share.strict
+        ? ballot.yes > share.share * (ballot.yes + ballot.no)
+        : ballot.yes >= share.share * (ballot.yes + ballot.no);
   const double = rules.doubleMajority;
   if (
     double == null ||

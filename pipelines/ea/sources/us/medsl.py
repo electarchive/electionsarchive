@@ -253,13 +253,14 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                         "statewide": r"GOVERNOR|ATTORNEY GENERAL|SECRETARY OF|TREASURER|AUDITOR|COMPTROLLER|CONTROLLER|"
                         r"CHIEF FINANCIAL|SUPERINTENDENT|COMMISSIONER|SUPREME|APPEALS|BOARD OF EDUCATION|REGENT|"
                         r"PUBLIC SERVICE|PUBLIC UTILITIES|MINE INSPECTOR|TRUSTEE",
+                        "retention": r"JUDGE|JUSTICE|COURT|CRT|APPEAL|APPELLATE|RETAIN|RETENTION",
                     }.get(chamber, r"U\.?S\.? HOUSE|HOUSE OF REP")
                 )
                 & (
                     (pl.col("state_po") != "DC")
                     | pl.col("office").str.to_uppercase().str.contains("DELEGATE")
                     | (year < 2018)
-                    | (chamber in ("president", "statewide"))
+                    | (chamber in ("president", "statewide", "retention"))
                 )
             )
             .select(
@@ -285,12 +286,12 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                 mode=pl.col("mode").fill_null("").str.to_uppercase(),
                 votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
                 office=pl.col("office").str.to_uppercase()
-                if chamber in ("state", "statewide")
+                if chamber in ("state", "statewide", "retention")
                 else pl.lit(None, pl.String),
-                seat=pl.col("district") if chamber in ("state", "statewide") else pl.lit(None, pl.String),
-                party=pl.col("party_detailed") if chamber in ("state", "statewide") else pl.lit(None, pl.String),
+                seat=pl.col("district") if chamber in ("state", "statewide", "retention") else pl.lit(None, pl.String),
+                party=pl.col("party_detailed") if chamber in ("state", "statewide", "retention") else pl.lit(None, pl.String),
                 stage=pl.col("stage").str.to_uppercase()
-                if chamber in ("state", "statewide")
+                if chamber in ("state", "statewide", "retention")
                 else pl.lit(None, pl.String),
                 magnitude=pl.col("magnitude").cast(pl.String)
                 if chamber == "statewide" and year > 2016

@@ -298,6 +298,14 @@
       "properties": {
         "formula": { "const": "referendum" },
         "quorum": { "type": "number", "minimum": 0, "maximum": 1 },
+        "majority": {
+          "type": "object",
+          "properties": {
+            "share": { "type": "number", "minimum": 0.5, "maximum": 1 },
+            "strict": { "type": "boolean", "default": false }
+          },
+          "required": ["share"]
+        },
         "doubleMajority": {
           "type": "object",
           "properties": {
