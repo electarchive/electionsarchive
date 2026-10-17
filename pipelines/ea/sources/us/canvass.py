@@ -1,5 +1,8 @@
+import html
 import json
 import re
+import struct
+import subprocess
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -7,13 +10,15 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
+from ea import raw, scan
 from ea.changeset import Changeset, slug
+from ea.sources.us import openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.canvass"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
 RHODE_ISLAND = "https://s3.amazonaws.com/rigov/election/results/2010/general_election/{town}.json"
 RI_STATEWIDE = "https://s3.amazonaws.com/rigov/election/results/2010/general_election/statewide.json"
 RI_PUBLISHER = "Rhode Island Board of Elections"
@@ -24,6 +29,31 @@ KENTUCKY = (
 )
 KY_PUBLISHER = "OpenElections"
 KY_TITLE = "Kentucky 2023 general election results by precinct"
+INDIANA = "https://enr.indianavoters.in.gov/archive/2022General/data/OffCatC_{category}_A.json"
+IN_CATEGORIES = (1040, 1046, 1036)
+IN_PUBLISHER = "Indiana Election Division"
+IN_TITLE = "2022 General Election results"
+MICHIGAN = (
+    "https://raw.githubusercontent.com/openelections/openelections-data-mi/"
+    "2103114f669c2bb25f19792bf5ca290300381396/2022/20221108__mi__general__county.csv"
+)
+MI_TITLE = "Michigan 2022 general election results by county"
+ARIZONA = (
+    "https://web.archive.org/web/20221205195258id_/"
+    "https://azsos.gov/sites/default/files/2022Dec05_General_Election_Canvass_Web.pdf"
+)
+AZ_PUBLISHER = "Arizona Secretary of State"
+AZ_TITLE = "State of Arizona Official Canvass, 2022 General Election"
+AZ_COUNTIES = [f"040{code:02d}" for code in (1, 3, 5, 7, 9, 11, 12, 13, 15, 17, 19, 21, 23, 25, 27)]
+SEATS = {
+    "Corporation Commissioner": 2,
+    "Justice of Supreme Court": 2,
+    "State Board of Education": 2,
+    "Regent of the University of Michigan": 2,
+    "Trustee of Michigan State University": 2,
+    "Governor of Wayne State University": 2,
+}
+NONPARTISAN = {"Justice of Supreme Court"}
 TOWNS = {
     "44001": ["Barrington", "Bristol", "Warren"],
     "44003": ["Coventry", "East Greenwich", "Warwick", "West Greenwich", "West Warwick"],
@@ -70,12 +100,42 @@ OFFICES = {
     "Auditor of Public Accounts": ("Auditor of Public Accounts", "auditor"),
     "State Treasurer": ("Treasurer", "treasurer"),
     "Commissioner of Agriculture": ("Commissioner of Agriculture", "commissioner-of-agriculture"),
+    "Secretary Of State": ("Secretary of State", "secretary-of-state"),
+    "Auditor Of State": ("Auditor of State", "auditor"),
+    "Treasurer Of State": ("Treasurer of State", "treasurer"),
+    "Superintendent of Public Instruction": (
+        "Superintendent of Public Instruction",
+        "superintendent-of-public-instruction",
+    ),
+    "State Mine Inspector": ("State Mine Inspector", "mine-inspector"),
+    "Corporation Commissioner": ("Corporation Commissioner", "corporation-commissioner"),
+    "Justice of Supreme Court": ("Justice of the Supreme Court", "justice-of-the-supreme-court"),
+    "State Board of Education": ("Member of the State Board of Education", "member-of-the-state-board-of-education"),
+    "Regent of the University of Michigan": (
+        "Regent of the University of Michigan",
+        "regent-of-the-university-of-michigan",
+    ),
+    "Trustee of Michigan State University": (
+        "Trustee of Michigan State University",
+        "trustee-of-michigan-state-university",
+    ),
+    "Governor of Wayne State University": ("Governor of Wayne State University", "governor-of-wayne-state-university"),
 }
 PARTIES = {
     "DEM": "democratic-party",
     "REP": "republican-party",
     "MOD": "RI:moderate-party",
     "CM": "RI:cool-moose-party",
+    "R": "republican-party",
+    "D": "democratic-party",
+    "L": "libertarian-party",
+    "G": "green-party",
+    "LIB": "libertarian-party",
+    "LBT": "libertarian-party",
+    "GRN": "green-party",
+    "UST": "MI:u-s-taxpayers-party",
+    "NLP": "natural-law-party",
+    "WCP": "MI:working-class",
 }
 NAMED = {"RI:moderate-party": "Moderate Party of Rhode Island", "RI:cool-moose-party": "Cool Moose Party"}
 MISSPELLED = {'Kimberly "Kim" REEDER': 'Kimberley "Kim" REEDER'}
@@ -111,6 +171,16 @@ CAVEATS = {
         "Rhode Island's statewide totals run a few dozen votes above the sum of its town results because some ballots "
         "were reported only statewide. Those votes appear here as a statewide line with no county."
     ),
+    "2022-11-08:AZ:attorney-general": (
+        "These are the canvass totals certified on December 5, 2022. The automatic recount, whose results the "
+        "Maricopa County Superior Court announced on December 29, cut Kris Mayes's lead over Abraham Hamadeh from 511 "
+        "votes to 280 without changing the winner. The recount's county figures are not included here."
+    ),
+    "2022-11-08:AZ:superintendent-of-public-instruction": (
+        "These are the canvass totals certified on December 5, 2022. The automatic recount, whose results the "
+        "Maricopa County Superior Court announced on December 29, raised Tom Horne's lead over Kathy Hoffman from "
+        "8,967 votes to 9,188 without changing the winner. The recount's county figures are not included here."
+    ),
 }
 
 
@@ -136,6 +206,10 @@ def fetch() -> None:
         raw.fetch(SOURCE, RHODE_ISLAND.format(town=town), suffix=".json")
     for county in _counties():
         raw.fetch(SOURCE, KENTUCKY.format(county=county, joint="_" if county in JOINED else "__"), suffix=".csv")
+    for category in IN_CATEGORIES:
+        raw.fetch(SOURCE, INDIANA.format(category=category), suffix=".json")
+    raw.fetch(SOURCE, MICHIGAN, suffix=".csv")
+    raw.fetch(SOURCE, ARIZONA, suffix=".pdf")
 
 
 def parse() -> None:
@@ -223,13 +297,130 @@ def parse() -> None:
             candidate=pl.col("candidate").str.split(" / ").list.first(),
         )
     )
+    for category in IN_CATEGORIES:
+        data = json.loads(raw.cached(SOURCE, INDIANA.format(category=category)).path.read_text(encoding="utf-8-sig"))
+        summary = data["Root"]["StatewideSummary"]["Race"]
+        counted: dict[str, int] = defaultdict(int)
+        for region in data["Root"]["OfficeCategory"]["Regions"]["Region"]:
+            for candidate in region["Races"]["Race"]["Candidates"]["Candidate"]:
+                counted[candidate["NAME_ON_BALLOT"]] += int(candidate["TOTAL_VOTES"])
+                rows.append(
+                    {
+                        "state": "IN",
+                        "day": date(2022, 11, 8),
+                        "office": summary["OFFICE_TITLE"],
+                        "candidate": candidate["NAME_ON_BALLOT"].removesuffix(" (W/I)"),
+                        "mate": None,
+                        "party": candidate["PARTY_ABBREV"],
+                        "fips": region["MAP_FIPS"],
+                        "votes": int(candidate["TOTAL_VOTES"]),
+                        "write_in": candidate["NAME_ON_BALLOT"].endswith(" (W/I)"),
+                        "winner": candidate["isWinner"] == "T",
+                    }
+                )
+        if counted != {
+            candidate["NAME_ON_BALLOT"]: int(candidate["TOTAL"]) for candidate in summary["Candidates"]["Candidate"]
+        }:
+            raise ValueError(f"Indiana's counties do not add up to the statewide {summary['OFFICE_TITLE']} totals")
+    pdf = raw.cached(SOURCE, ARIZONA).path
+    office: str | None = None
+    line: dict[str, object] | None = None
+    for page in range(1, 16):
+        lines: list[list[tuple[str, scan.Box]]] = []
+        for word, box in sorted(scan.layer(pdf, page), key=lambda item: (item[1][1], item[1][0])):
+            if lines and abs(lines[-1][0][1][1] - box[1]) < 20:
+                lines[-1].append((word, box))
+            else:
+                lines.append([(word, box)])
+        for words in lines:
+            words.sort(key=lambda item: item[1][0])
+            figures = [(word, box) for word, box in words if re.fullmatch(r"[\d,]+|---", word)]
+            text = html.unescape(" ".join(word for word, _ in words[: len(words) - len(figures)])).replace('""', '"')
+            if line is not None and not figures and text.endswith("In)"):
+                label = str(line["label"])
+                line["label"] = label + ("" if label.endswith("-") or text.startswith("-") else " ") + text
+                continue
+            if line is not None:
+                rows.extend(arizona(line, office))
+                line = None
+            if not figures:
+                office = text if text in OFFICES else None
+                continue
+            if office is None or not text.startswith("("):
+                continue
+            if len(figures) != 16 or "---" in (word for word, _ in figures):
+                raise ValueError(f"Arizona {office}: {text} has {len(figures)} figures")
+            line = {"label": text, "figures": figures, "page": page}
+    if line is not None:
+        rows.extend(arizona(line, office))
+    with connect() as conn:
+        michigan_fips = openelections.counties(conn)["MI"]
+    michigan = (
+        pl.read_csv(raw.cached(SOURCE, MICHIGAN).path, infer_schema_length=0)
+        .filter(
+            pl.col("office").is_in(
+                [text for text in OFFICES if text in SEATS or text in ("Secretary of State", "Attorney General")]
+            )
+        )
+        .with_columns(
+            state=pl.lit("MI"),
+            day=pl.lit(date(2022, 11, 8)),
+            mate=pl.lit(None, pl.String),
+            fips=pl.col("county")
+            .str.to_lowercase()
+            .str.replace(r"^saint ", "st ")
+            .str.replace_all(r"[^a-z]", "")
+            .replace_strict(michigan_fips),
+            votes=pl.col("votes").cast(pl.Int64),
+            write_in=pl.col("party").is_null() & ~pl.col("office").is_in(list(NONPARTISAN)),
+        )
+    )
+    if michigan.group_by("office", "candidate").agg(pl.col("fips").n_unique())["fips"].ne(83).any():
+        raise ValueError("Michigan's county file is missing counties")
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat(
+    frame = pl.concat(
         [
-            pl.DataFrame(rows, schema_overrides={"mate": pl.String}),
+            pl.DataFrame(rows, schema_overrides={"mate": pl.String, "winner": pl.Boolean}, infer_schema_length=None),
             kentucky.select("state", "day", "office", "candidate", "mate", "party", "fips", "votes"),
-        ]
-    ).write_parquet(PARSED / "lines.parquet")
+            michigan.select("state", "day", "office", "candidate", "mate", "party", "fips", "votes", "write_in"),
+        ],
+        how="diagonal_relaxed",
+    ).with_columns(
+        pl.col("write_in").fill_null(False),
+        seats=pl.col("office").replace_strict(SEATS, default=1, return_dtype=pl.Int64),
+    )
+    frame.write_parquet(PARSED / "lines.parquet")
+
+
+def arizona(line: dict[str, object], office: str | None) -> list[dict[str, object]]:
+    found = re.fullmatch(r"\((\w+)\) (.+?)( \(Write-In\))?( \*)?", str(line["label"]))
+    if found is None or office is None:
+        raise ValueError(f"Arizona: cannot read {line['label']}")
+    figures = line["figures"]
+    assert isinstance(figures, list)
+    votes = [int(word.replace(",", "")) for word, _ in figures]
+    if sum(votes[:15]) != votes[15]:
+        raise ValueError(f"Arizona {office}: {found[2]}'s counties do not add up to {votes[15]}")
+    return [
+        {
+            "state": "AZ",
+            "day": date(2022, 11, 8),
+            "office": office,
+            "candidate": found[2],
+            "mate": None,
+            "party": found[1],
+            "fips": fips,
+            "votes": count,
+            "write_in": found[3] is not None,
+            "winner": found[4] is not None,
+            "page": line["page"],
+            "x0": box[0],
+            "y0": box[1],
+            "x1": box[2],
+            "y1": box[3],
+        }
+        for fips, count, (_, box) in zip(AZ_COUNTIES, votes, figures, strict=False)
+    ]
 
 
 def emit() -> Path:
@@ -239,7 +430,10 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Rhode Island's 2010 and Kentucky's 2023 statewide general elections by county",
+            summary=(
+                "Rhode Island's 2010, Indiana's, Michigan's, and Arizona's 2022, and Kentucky's 2023 statewide general "
+                "elections by county"
+            ),
             polity="US",
         )
 
@@ -271,31 +465,91 @@ def emit() -> Path:
             publisher=KY_PUBLISHER,
             title=KY_TITLE,
             url="https://github.com/openelections/openelections-data-ky",
-            license=None,
+            license="No license stated: facts published with attribution, raw files not redistributed",
         )
         for county in _counties():
             cs.artifact(
                 raw.cached(SOURCE, KENTUCKY.format(county=county, joint="_" if county in JOINED else "__")), community
             )
-        sources = {"RI": board, "KY": community}
+        division = cs.source(IN_PUBLISHER, IN_TITLE)
+        cs.add(
+            "source",
+            id=division,
+            kind="official_body",
+            publisher=IN_PUBLISHER,
+            title=IN_TITLE,
+            url="https://enr.indianavoters.in.gov/archive/2022General/",
+            license="Public record",
+        )
+        for category in IN_CATEGORIES:
+            cs.artifact(raw.cached(SOURCE, INDIANA.format(category=category)), division)
+        michigan = cs.source(KY_PUBLISHER, MI_TITLE)
+        cs.add(
+            "source",
+            id=michigan,
+            kind="community",
+            publisher=KY_PUBLISHER,
+            title=MI_TITLE,
+            url="https://github.com/openelections/openelections-data-mi",
+            license="No license stated: facts published with attribution, raw files not redistributed",
+        )
+        cs.artifact(raw.cached(SOURCE, MICHIGAN), michigan)
+        secretary = cs.source(AZ_PUBLISHER, AZ_TITLE)
+        cs.add(
+            "source",
+            id=secretary,
+            kind="official_body",
+            publisher=AZ_PUBLISHER,
+            title=AZ_TITLE,
+            url="https://azsos.gov/sites/default/files/2022Dec05_General_Election_Canvass_Web.pdf",
+            license="Public record",
+        )
+        canvass = cs.artifact(raw.cached(SOURCE, ARIZONA), secretary)
+        pages: dict[int, tuple[UUID, int, int]] = {}
+        for number in frame["page"].drop_nulls().unique().to_list():
+            pdf = raw.cached(SOURCE, ARIZONA)
+            image = PAGES / f"{pdf.sha256}-{number}.png"
+            if not image.exists():
+                PAGES.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                    + [str(pdf.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+            width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            pages[number] = (cs.page(canvass, number), width * 3, height * 3)
+            cs.add(
+                "source_page",
+                id=pages[number][0],
+                artifact_id=canvass,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+        sources = {"RI": board, "KY": community, "IN": division, "MI": michigan, "AZ": secretary}
+        isos = [f"US-{state}" for state in sources]
         states = dict(
             conn.execute(
                 """select substr(p.iso_code, 4), n.text from polity p
                    join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
-                   where p.iso_code in ('US-RI', 'US-KY')"""
+                   where p.iso_code = any(%s)""",
+                [isos],
             ).fetchall()
         )
         areas = dict(
             conn.execute(
                 """select substr(p.iso_code, 4), u.area_id from reporting_unit u
                    join polity_territory t on t.area_id = u.area_id
-                   join polity p on p.id = t.polity_id and p.iso_code in ('US-RI', 'US-KY')
-                   where u.scheme_code = 'us.state'"""
+                   join polity p on p.id = t.polity_id and p.iso_code = any(%s)
+                   where u.scheme_code = 'us.state'""",
+                [isos],
             ).fetchall()
         )
         counties: dict[str, UUID] = dict(
             conn.execute(
-                "select code, id from reporting_unit where scheme_code = 'us.county' and left(code, 2) in ('21', '44')"
+                """select code, id from reporting_unit
+                   where scheme_code = 'us.county' and left(code, 2) in ('21', '44', '18', '26', '04')"""
             ).fetchall()
         )
         cs.add(
@@ -318,7 +572,8 @@ def emit() -> Path:
         existing: dict[str, tuple[list[tuple[UUID, set[str]]], list[tuple[object, ...]]]] = {}
         for key, contest in conn.execute(
             """select e.value, e.entity_id from external_id e
-               where e.scheme = 'us.contest' and (e.value like '2010-11-02:RI:%%' or e.value like '2023-11-07:KY:%%')"""
+               where e.scheme = 'us.contest' and e.value like any(%s)""",
+            [[f"{day}:{state}:%" for state, day in frame.select("state", "day").unique().iter_rows()]],
         ).fetchall():
             options = [
                 (option, set(slug(label or "").split("-")))
@@ -333,23 +588,25 @@ def emit() -> Path:
                 [contest],
             ).fetchall()
             existing[key] = (options, defaults)
-        people: dict[tuple[str, str], set[UUID]] = defaultdict(set)
+        people: dict[tuple[str, str], dict[UUID, int]] = defaultdict(lambda: defaultdict(int))
         for state, person, ballot in conn.execute(
-            """select distinct substr(p.iso_code, 4), cd.person_id, cd.ballot_name from candidacy cd
+            """select substr(p.iso_code, 4), cd.person_id, cd.ballot_name from candidacy cd
                join contest_option o on o.id = cd.option_id join contest ct on ct.id = o.contest_id
                join election e on e.id = ct.election_id join polity p on p.id = e.polity_id
-               where p.iso_code in ('US-RI', 'US-KY') and cd.ballot_name is not null"""
+               where p.iso_code = any(%s) and cd.ballot_name is not null""",
+            [isos],
         ).fetchall():
             words = [
                 word
                 for word in slug(re.sub(r'"[^"]*"|\([^)]*\)', "", ballot)).split("-")
-                if word not in ("jr", "sr", "ii", "iii") and len(word) > 1
+                if word not in ("jr", "sr", "ii", "iii", "iv") and len(word) > 1
             ]
             if len(words) > 1:
-                people[(state, f"{words[0]} {words[-1]}")].add(person)
+                people[(state, f"{words[0]} {words[-1]}")][person] += 1
         fptp = cs.key("us.electoral_system", "fptp")
-        if fptp in cs.minted:
-            raise ValueError("the fptp system must exist")
+        block = cs.key("us.electoral_system", "block")
+        if fptp in cs.minted or block in cs.minted:
+            raise ValueError("the fptp and block systems must exist")
         persons: dict[tuple[str, str], UUID] = {}
 
         def person(state: str, text: str) -> UUID:
@@ -358,11 +615,11 @@ def emit() -> Path:
             words = [
                 word
                 for word in slug(re.sub(r'"[^"]*"|\([^)]*\)', "", text)).split("-")
-                if word not in ("jr", "sr", "ii", "iii") and len(word) > 1
+                if word not in ("jr", "sr", "ii", "iii", "iv") and len(word) > 1
             ]
-            found = people.get((state, f"{words[0]} {words[-1]}"), set())
-            if len(found) == 1:
-                persons[(state, text)] = next(iter(found))
+            found = people.get((state, f"{words[0]} {words[-1]}"), {})
+            if found:
+                persons[(state, text)] = max(found, key=lambda person: (found[person], str(person)))
             else:
                 persons[(state, text)] = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
                 if persons[(state, text)] in cs.minted:
@@ -381,8 +638,10 @@ def emit() -> Path:
                 name(found, NAMED[key])
             return found
 
-        for (state, day, office_text), lines in frame.group_by("state", "day", "office", maintain_order=True):
-            state, office_text = str(state), str(office_text)
+        for (state, day, office_text, seats), lines in frame.group_by(
+            "state", "day", "office", "seats", maintain_order=True
+        ):
+            state, office_text, seats = str(state), str(office_text), int(str(seats))
             assert isinstance(day, date)
             office, office_slug = OFFICES[office_text]
             election_key = f"{day}:{state}"
@@ -423,14 +682,17 @@ def emit() -> Path:
                     office_id=office_id,
                     district_area_id=areas[state],
                     term="full",
-                    magnitude=1,
+                    magnitude=seats,
                     round_number=1,
-                    electoral_system_id=fptp,
+                    electoral_system_id=fptp if seats == 1 else block,
                     default_result_kind="counted",
                 )
                 name(contest, f"{day.year} {states[state]} {office} election")
                 cs.add("slug", path=f"us/{state.lower()}/{day}-general/{office_slug}", entity_id=contest)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             for row in defaults:
+                if row[0] == result_set:
+                    continue
                 cs.add(
                     "result_set",
                     **dict(
@@ -453,7 +715,6 @@ def emit() -> Path:
                     ),
                     is_default=False,
                 )
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -464,12 +725,17 @@ def emit() -> Path:
                 status="active",
                 source_id=sources[state],
                 is_default=True,
-                completeness=1 if state == "RI" else None,
+                completeness=None if state == "KY" else 1,
             )
-            cs.add("note", entity_id=contest, kind="caveat", body_md=CAVEATS[state])
+            for key in (state, contest_key):
+                if key in CAVEATS:
+                    cs.add("note", entity_id=contest, kind="caveat", body_md=CAVEATS[key])
             totals: dict[UUID, int] = {}
-            for (candidate, mate, label), cells in lines.group_by("candidate", "mate", "party", maintain_order=True):
-                ballot = title(str(candidate))
+            declared: set[UUID] = set()
+            for (candidate, mate, label, write_in), cells in lines.group_by(
+                "candidate", "mate", "party", "write_in", maintain_order=True
+            ):
+                ballot = title(str(candidate)) if state in ("RI", "KY") else str(candidate)
                 party_id = party(label)
                 surname = [word for word in slug(ballot).split("-") if word not in ("jr", "sr", "ii", "iii")][-1]
                 option = next((option for option, words in options if surname in words), None)
@@ -480,7 +746,7 @@ def emit() -> Path:
                         "contest_option",
                         id=option,
                         contest_id=contest,
-                        kind="candidate",
+                        kind="write_in" if write_in else "candidate",
                         party_id=party_id,
                         ballot_label=ballot,
                     )
@@ -493,10 +759,22 @@ def emit() -> Path:
                                 option_id=option,
                                 role=role,
                                 ballot_name=text,
-                                is_independent=label == "IND" or label is None,
+                                is_independent=label in ("IND", "NON")
+                                or label is None
+                                and office_text not in NONPARTISAN,
                             )
                 totals[option] = totals.get(option, 0) + int(cells["votes"].sum())
-                for fips, votes in cells.group_by("fips", maintain_order=True).agg(pl.col("votes").sum()).iter_rows():
+                if cells["winner"].any():
+                    declared.add(option)
+                for fips, votes, page, x0, y0, x1, y1 in (
+                    cells.group_by("fips", maintain_order=True)
+                    .agg(
+                        pl.col("votes").sum(), *(pl.col(column).first() for column in ("page", "x0", "y0", "x1", "y1"))
+                    )
+                    .iter_rows()
+                ):
+                    if result_set not in cs.minted:
+                        continue
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
@@ -508,11 +786,26 @@ def emit() -> Path:
                         flags=32 if fips == "RI:statewide" else 0,
                         value=votes,
                     )
-            cs.add(
-                "outcome",
-                result_set_id=result_set,
-                option_id=max(totals, key=totals.__getitem__),
-                kind="elected",
-                seats=1,
-            )
+                    if page is not None:
+                        page_id, width, height = pages[page]
+                        cs.add(
+                            "value_locator",
+                            result_set_id=result_set,
+                            unit_id=counties[str(fips)],
+                            option_id=option,
+                            channel=0,
+                            measure=1,
+                            count_round=0,
+                            page_id=page_id,
+                            source_id=None,
+                            x0=x0 / width,
+                            y0=y0 / height,
+                            x1=x1 / width,
+                            y1=y1 / height,
+                        )
+            elected = sorted(totals, key=totals.__getitem__, reverse=True)[:seats]
+            if declared and declared != set(elected):
+                raise ValueError(f"{contest_key}: the declared winners are not the leaders")
+            for option in elected:
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
         return cs.write()
