@@ -41,6 +41,7 @@ PUBLISHERS = {
         "Center for Spatial Analysis, University of Oklahoma",
     ),
     "RI": ("Rhode Island Department of State", "Voting Precincts (2022)", "Public record", "RIGIS"),
+    "IA": ("Iowa Secretary of State", "Iowa Precincts", "Public record", "Iowa Legislative Services Agency"),
     "AZ": ("Maricopa County Recorder", "Maricopa County Voting Precincts (2022-)", "Public record", None),
     "NC": ("North Carolina State Board of Elections", "Precinct Shapefile, 2022-08-31", "Public record", None),
     "TX": ("Texas Legislative Council", "Precincts, 2022 General Election", "CC BY", None),
@@ -75,6 +76,7 @@ LAYERS = {
     "DC": "https://maps2.dcgis.dc.gov/DCGIS/rest/services/DCGIS_DATA/Administrative_Other_Boundaries/MapServer/0/",
     "OK": "https://services.arcgis.com/3xOwF6p0r7IHIjfn/arcgis/rest/services/State_Wide_2020_Precincts/FeatureServer/0/",
     "RI": "https://services2.arcgis.com/S8zZg9pg23JUEexQ/ArcGIS/rest/services/BND_Voting_Precincts_2022/FeatureServer/0/",
+    "IA": "https://services.arcgis.com/vPD5PVLI6sfkZ5E4/arcgis/rest/services/Iowa_Precincts/FeatureServer/0/",
     "AZ": "https://services.arcgis.com/ykpntM6e3tHvzKRJ/arcgis/rest/services/Maricopa_County_Voting_Precincts_(2022-)/FeatureServer/0/",
     "WI": "https://services1.arcgis.com/FDsAtKBk8Hy4cAH0/arcgis/rest/services/2022_Election_Data_wtih_2022_Wards/FeatureServer/0/",
     "DC:1990": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Administrative_Other_Boundaries_WebMercator/MapServer/30/",
@@ -102,8 +104,9 @@ LAYERS = {
     "IN:2024": "https://gisdata.in.gov/server/rest/services/Hosted/Voting_District_Boundaries_2024/FeatureServer/1/",
     "HI:2024": "https://geodata.hawaii.gov/arcgis/rest/services/AdminBnd/MapServer/13/",
 }
-LAYERS |= {f"{state}:2024": LAYERS[state] for state in ("DC", "OK", "RI", "AZ")} | {
+LAYERS |= {f"{state}:2024": LAYERS[state] for state in ("DC", "OK", "RI", "AZ", "IA")} | {
     "IN:2023": "https://gisdata.in.gov/server/rest/services/Hosted/Voting_District_Boundaries_2023/FeatureServer/1/",
+    "RI:2016": "https://services2.arcgis.com/S8zZg9pg23JUEexQ/arcgis/rest/services/Voting_Precincts/FeatureServer/0/",
     "IN:marion-1990": "https://gis.indy.gov/server/rest/services/Political/VotingPrecincts/MapServer/1/",
     "IN:marion-2011": "https://gis.indy.gov/server/rest/services/Political/VotingPrecincts/MapServer/2/",
     "IN:marion-2021": "https://gis.indy.gov/server/rest/services/Political/VotingPrecincts/MapServer/3/",
@@ -374,6 +377,11 @@ SHAPES: dict[str, Callable[[dict[str, Any]], tuple[str, str, str]]] = {
     "DC": lambda p: ("11001", bare(p["NAME"]), p["NAME"]),
     "OK": lambda p: (f"40{p['CO_FIPS']}", canon(p["PCT_CEB"]), f"Precinct {p['PCT_CEB']}"),
     "RI": lambda p: ("", canon(p["DISTRICT"]), f"{p['TOWN']} {p['DISTRICT']}"),
+    "IA": lambda p: (
+        f"19{p['CoFIPS']}",
+        canon(re.sub(r"^\d+\s+", "", p["PctNameOfficial"])),
+        re.sub(r"^\d+\s+", "", p["PctNameOfficial"]),
+    ),
     "AZ": lambda p: ("04013", canon(p["BdVal"]), f"{p['BdVal']} {cased(p['BdName'])}"),
     "NC": lambda p: (p["county_nam"], canon(p["prec_id"]), cased(p["enr_desc"])),
     "TX": lambda p: (f"48{int(p['CNTY']):03d}", canon(p["PREC"]), f"Precinct {p['PREC']}"),
@@ -400,6 +408,7 @@ FIPS = {
     "AK": "02",
     "AR": "05",
     "AZ": "04",
+    "IA": "19",
     "DC": "11",
     "GA": "13",
     "HI": "15",
@@ -706,7 +715,7 @@ SNAPSHOTS: dict[
 DATED |= {
     f"{state}:2024": (GENERAL, GENERAL + timedelta(days=1), *entry)
     for state, entry in {
-        **{state: (*PUBLISHERS[state], SHAPES[state]) for state in ("DC", "OK", "RI", "AZ", "MA", "NM", "NH")},
+        **{state: (*PUBLISHERS[state], SHAPES[state]) for state in ("DC", "OK", "RI", "AZ", "MA", "NM", "NH", "IA")},
         "NC": (
             "North Carolina State Board of Elections",
             "Precinct Shapefile, 2024-07-23",
@@ -826,6 +835,15 @@ DATED |= {
     },
 }
 DATED |= {
+    "RI:2016": (
+        date(2016, 1, 1),
+        date(2017, 1, 1),
+        "Rhode Island Geographic Information System",
+        "Voting Precincts (2016)",
+        "Public record",
+        "RIGIS",
+        lambda p: ("", canon(p["NAME"].lstrip("0")), p["NAME"].lstrip("0")),
+    ),
     "DE:2012": (
         *years(2012, 2015),
         "Delaware Department of Elections",
@@ -1224,14 +1242,88 @@ def parse() -> None:
                     return_dtype=pl.String,
                 )
             )
+            .when(pl.col("state") == "RI")
+            .then(
+                pl.struct("jurisdiction", "precinct").map_elements(
+                    lambda row: (
+                        f"{row['jurisdiction']} {int(match[1]) % 100}"
+                        if (match := re.search(r"(\d+)$", row["precinct"] or "")) is not None
+                        else ""
+                    ),
+                    return_dtype=pl.String,
+                )
+            )
             .when(pl.col("state") == "WI")
-            .then(pl.col("precinct").str.replace(r"^(T|C|V)(?:OWN|ITY|ILLAGE) OF (.+) WARD (\d+)$", "${2} - ${1} ${3}"))
+            .then(
+                pl.col("precinct")
+                .str.to_uppercase()
+                .str.replace(r"^(T|C|V)(?:OWN|ITY|ILLAGE) OF (.+) WARD (\d+)$", "${2} - ${1} ${3}")
+            )
             .otherwise(
                 pl.col("precinct").map_elements(
                     lambda text: re.sub(r"^(NAN_)?(\d+\s*-?\s*(?=[A-Za-z]))?", "", text), return_dtype=pl.String
                 )
             )
         )
+        wards: dict[tuple[str, str, str, str], list[str]] = {}
+        for county, name, geom in (
+            pl.read_parquet(DATA / "parsed" / "us.vest" / f"precincts_{year}.parquet")
+            .filter(pl.col("state") == "WI")
+            .select("county", "name", "geom")
+            .iter_rows()
+        ):
+            match = re.fullmatch(r"(.+) - ([CTV]) 0*(\d+[A-Z]?)", name)
+            if match is not None:
+                wards.setdefault((county, canon(match[1]), match[2], canon(match[3])), []).append(geom)
+        groups = {}
+        for code, county, precinct in (
+            mine.filter(pl.col("state") == "WI")
+            .select("code", "county", pl.col("precinct").str.to_uppercase())
+            .iter_rows()
+        ):
+            match = re.fullmatch(r"(TOWN|CITY|VILLAGE) OF (.+?) WARDS? ([0-9A-Z]+(?:\s*[-,&]\s*[0-9A-Z]+)*)", precinct)
+            if match is None:
+                continue
+            numbers = []
+            for item in re.split(r"\s*[,&]\s*", match[3]):
+                span = re.fullmatch(r"(\d+)\s*-\s*(\d+)", item)
+                if span is not None and int(span[1]) < int(span[2]):
+                    numbers += [str(number) for number in range(int(span[1]), int(span[2]) + 1)]
+                elif re.fullmatch(r"\d+[A-Z]?", item):
+                    numbers.append(canon(item))
+                else:
+                    numbers = []
+                    break
+            found = [wards.get((county, canon(match[2]), match[1][0], number), []) for number in numbers]
+            if len(numbers) > 1 and all(len(geoms) == 1 for geoms in found):
+                groups[code] = (county, precinct, [geoms[0] for geoms in found])
+        claims = Counter(geom for _, _, geoms in groups.values() for geom in geoms)
+        groups = {code: entry for code, entry in groups.items() if all(claims[geom] == 1 for geom in entry[2])}
+        with connect() as conn:
+            conn.execute("create temp table ward (code text, geom text)")
+            with conn.cursor().copy("copy ward (code, geom) from stdin") as copy:
+                for code, (_, _, geoms) in groups.items():
+                    for geom in geoms:
+                        copy.write_row((code, geom))
+            dissolved = pl.DataFrame(
+                conn.execute(
+                    """select code, encode(st_asewkb(geom), 'hex'), encode(st_asewkb(st_pointonsurface(geom)), 'hex')
+                       from (select code, st_multi(st_collectionextract(st_makevalid(st_union(st_makevalid(geom::geometry))), 3))
+                             as geom from ward group by code) dissolved
+                       where not st_isempty(geom)""",
+                ).fetchall(),
+                schema={"unit": pl.String, "geom": pl.String, "point": pl.String},
+                orient="row",
+            ).with_columns(
+                county=pl.col("unit").replace_strict({code: entry[0] for code, entry in groups.items()}),
+                key=pl.col("unit").replace_strict({code: canon(entry[1]) for code, entry in groups.items()}),
+                label=pl.col("unit").replace_strict({code: cased(entry[1]) for code, entry in groups.items()}),
+            )
+        dissolved.drop("unit").with_columns(within="county").write_parquet(PARSED / f"WI_vest{year}.parquet")
+        wisconsin = dissolved.select(
+            code="unit", area=pl.format("{}:WI:{}:{}", pl.lit(str(day(int(year))[0])), "county", "key")
+        )
+        print(f"{year} WI: {wisconsin.height} ward groups dissolved from VEST's wards", flush=True)
         vintage = {"2016": "NC_2016", "2018": "NC_2017", "2020": "NC_2020"}[year]
         sbe = pl.read_parquet(PARSED / f"{vintage}.parquet")
         start_date = str(DATED[vintage.replace("_", ":")][0])
@@ -1255,6 +1347,30 @@ def parse() -> None:
             ]
         )
         print(f"{year} NC: {found.height} units matched to the State Board's precincts", flush=True)
+        if year == "2016":
+            found = pl.concat(
+                [
+                    found,
+                    pair(
+                        mine.filter(pl.col("state") == "RI", ~pl.col("jurisdiction").str.ends_with(" LI")).select(
+                            "code",
+                            county=pl.lit("RI"),
+                            key=pl.col("precinct").str.extract(r"(\d+)$").str.strip_chars_start("0"),
+                        ),
+                        pl.read_parquet(PARSED / "RI_2016.parquet")
+                        .filter(pl.col("key") != "")
+                        .select(
+                            area=pl.format(
+                                "2016-01-01:RI:{}:{}",
+                                pl.when(pl.col("county") == "").then("within").otherwise("county"),
+                                "key",
+                            ),
+                            county=pl.lit("RI"),
+                            key="key",
+                        ),
+                    ),
+                ]
+            )
         rows = []
         for code, county, jurisdiction, precinct in (
             mine.filter(pl.col("state") == "MI")
@@ -1302,7 +1418,7 @@ def parse() -> None:
                 ),
             ]
         )
-        for unit, shape in (("precinct", "bare"), ("clean", "bare"), ("jurisdiction", "name")):
+        for unit, shape in (("precinct", "bare"), ("clean", "bare"), ("clean", "name"), ("jurisdiction", "name")):
             found = pl.concat(
                 [
                     found,
@@ -1312,6 +1428,7 @@ def parse() -> None:
                     ),
                 ]
             )
+        found = pl.concat([found, wisconsin.join(found, on="code", how="anti")])
         links.append(found)
         for state, total, matched in (
             mine.join(found, on="code", how="left")
@@ -1432,6 +1549,16 @@ def emit() -> Path:
                 )
                 for vintage, (start, end, publisher, title, license, attribution, _) in SNAPSHOTS.items()
             },
+            **{
+                f"WI:vest{year}": (
+                    *day(year),
+                    "Voting and Election Science Team",
+                    f"{year} Precinct-Level Election Results",
+                    "CC BY 4.0",
+                    None,
+                )
+                for year in (2016, 2018, 2020)
+            },
             "IA:caucus": (
                 CAUCUS,
                 CAUCUS + timedelta(days=1),
@@ -1445,7 +1572,7 @@ def emit() -> Path:
         for vintage, (start, end, publisher, title, license, attribution) in vintages.items():
             state = vintage.split(":")[0]
             source = cs.source(publisher, title)
-            if vintage != "IA:caucus" and source not in staged:
+            if vintage != "IA:caucus" and "vest" not in vintage and source not in staged:
                 staged.add(source)
                 url = (
                     LAYERS.get(vintage)
@@ -1465,7 +1592,7 @@ def emit() -> Path:
                 )
                 for cached in [url + "?f=json", *pages(vintage)] if vintage in LAYERS else FILES.get(vintage) or [url]:
                     cs.artifact(raw.cached(SOURCE, cached), source)
-            elif source in cs.minted:
+            elif source in cs.minted and source not in staged:
                 raise ValueError(f"{title} must already be a source")
             frame = (
                 pl.read_parquet(PARSED / f"{vintage.replace(':', '_')}{'' if ':' in vintage else '_2022'}.parquet")
@@ -1500,7 +1627,7 @@ def emit() -> Path:
                 pl.DataFrame({"area_id": ids, "geom": frame["geom"], "label_point": frame["point"]}).with_columns(
                     valid_from=pl.lit(start),
                     valid_to=pl.lit(end),
-                    quality=pl.lit("academic" if vintage == "IA:caucus" else "official"),
+                    quality=pl.lit("academic" if vintage == "IA:caucus" or "vest" in vintage else "official"),
                     source_id=pl.lit(str(source)),
                 ),
             )
