@@ -505,6 +505,7 @@
               )}
               tiles={race.map.tiles}
               own={race.map.own}
+              nested={race.map.nested}
               frames={race.map.frames}
               isApproximate={race.map.isApproximate}
               noun={race.places.levels[0]?.noun ?? ""}
