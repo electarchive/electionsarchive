@@ -52,6 +52,7 @@ OHIO = (
 )
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
+KENTUCKY = "https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf"
 DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
 SUMMIT = "https://vote.utah.gov/wp-content/uploads/2024/08/P24_Summit.pdf"
@@ -235,6 +236,7 @@ def fetch() -> None:
     for name in ("media", "summary"):
         raw.fetch(SOURCE, HAWAII.format(name), suffix=".txt")
     raw.fetch(SOURCE, UTAH, suffix=".json")
+    raw.fetch(SOURCE, KENTUCKY, suffix=".pdf")
     for suffix in ("html", "csv"):
         raw.fetch(SOURCE, DELAWARE.format(suffix), suffix=f".{suffix}")
     raw.fetch(SOURCE, SUMMIT, suffix=".pdf")
@@ -390,6 +392,7 @@ def parse() -> None:
         ("HI", "precinct", HAWAII.format("media")),
         ("UT", "county", UTAH),
         ("DE", "precinct", DELAWARE.format("html")),
+        ("KY", "county", KENTUCKY),
         ("UT", "county", SUMMIT),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
@@ -694,6 +697,97 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif url == KENTUCKY:
+            pdf = raw.cached(SOURCE, url).path
+            cells = []
+            seat = affiliation = None
+            people: list[list[str]] = []
+            tally: list[int] = []
+            for page in range(12, 18):
+                lines = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][3], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][-1][1][3] - box[3]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                pending: list[list[tuple[str, scan.Box]]] = []
+                slots: list[tuple[int, int]] = []
+                for words in lines:
+                    words.sort(key=lambda item: item[1][0])
+                    text = " ".join(word for word, _ in words)
+                    numbers = [(word, box) for word, box in words if re.fullmatch(r"\d{1,3}(,\d{3})*", word)]
+                    if found := re.search(r"(\d+)(st|nd|rd|th) Congressional District", text):
+                        seat = found[1]
+                    elif found := re.fullmatch(r"(Democratic|Republican) Party", text):
+                        affiliation = found[1]
+                        pending = []
+                    elif "Commonwealth" in text or "Secretary" in text or not numbers:
+                        if not re.search(r"Representative|Commonwealth|Secretary|Results|For the office", text):
+                            pending.append(words)
+                    elif text.startswith("Total Votes"):
+                        if [int(word.replace(",", "")) for word, _ in numbers] != tally:
+                            raise ValueError(
+                                f"KY page {page}: the {seat} {affiliation} counties sum to {tally}, not {text}"
+                            )
+                        slots = []
+                        tally = []
+                        people = []
+                    else:
+                        if not slots:
+                            slots = [(box[0], box[2]) for _, box in numbers]
+                            heard: list[list[str]] = [[] for _ in slots]
+                            for line in pending:
+                                clusters: list[list[tuple[str, scan.Box]]] = []
+                                for word, box in line:
+                                    if clusters and box[0] - clusters[-1][-1][1][2] < 45:
+                                        clusters[-1].append((word, box))
+                                    else:
+                                        clusters.append([(word, box)])
+                                for cluster in clusters:
+                                    middle = (cluster[0][1][0] + cluster[-1][1][2]) / 2
+                                    nearest = min(
+                                        range(len(slots)),
+                                        key=lambda index: abs((slots[index][0] + slots[index][1]) / 2 - middle),
+                                    )
+                                    heard[nearest].extend(word for word, _ in cluster)
+                            pending = []
+                            if people and heard != people:
+                                raise ValueError(
+                                    f"KY page {page}: the continued table's names {heard} differ from {people}"
+                                )
+                            people = heard
+                            tally = tally or [0] * len(slots)
+                        if len(numbers) != len(slots):
+                            raise ValueError(f"KY page {page}: {text} has {len(numbers)} numbers for {len(slots)}")
+                        for index, (word, box) in enumerate(numbers):
+                            tally[index] += int(word.replace(",", ""))
+                            cells.append(
+                                {
+                                    "county": " ".join(word for word, _ in words[: words.index(numbers[0])]),
+                                    "office": "U.S. House",
+                                    "district": seat,
+                                    "party": affiliation,
+                                    "candidate": " ".join(people[index]).title(),
+                                    "votes": word,
+                                    "page": page,
+                                    "x0": box[0],
+                                    "y0": box[1],
+                                    "x1": box[2],
+                                    "y1": box[3],
+                                }
+                            )
+            if tally:
+                raise ValueError(f"KY: the {seat} {affiliation} table has no total")
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(COLUMNS, pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
         elif url == DELAWARE.format("html"):
             page = raw.cached(SOURCE, url).path.read_text()
             page = page[page.index('id="byelectiondist"') : page.index('id="bycounty"')]
@@ -1474,6 +1568,8 @@ def parse() -> None:
             if url in (UTAH, SUMMIT)
             else date(2024, 9, 10)
             if url == DELAWARE.format("html")
+            else date(2024, 5, 21)
+            if url == KENTUCKY
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1824,6 +1920,14 @@ def emit() -> Path:
                 )
                 if used == DELAWARE.format("html")
                 else (
+                    "Kentucky State Board of Elections",
+                    "Official 2024 Primary Election Results",
+                    "https://elect.ky.gov/results/2020-2029/Pages/2024.aspx",
+                    "official_body",
+                    "Public record",
+                )
+                if used == KENTUCKY
+                else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
                     "https://sos.ks.gov/elections/election-results.html",
@@ -2083,7 +2187,7 @@ def emit() -> Path:
                     channel=pl.lit(0, pl.Int16),
                     measure=pl.lit(1, pl.Int16),
                     count_round=pl.lit(0, pl.Int16),
-                    flags=pl.lit(0, pl.Int16),
+                    flags=pl.when(pl.col("url") == KENTUCKY).then(8).otherwise(0).cast(pl.Int16),
                     value="votes",
                 )
                 .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
