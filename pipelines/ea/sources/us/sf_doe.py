@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import time
+import unicodedata
 import xml.etree.ElementTree as ET
 import zipfile
 from datetime import date, timedelta
@@ -25,14 +26,43 @@ ORIGIN = "https://www.sfelections.org/results/"
 WAYBACK = "https://web.archive.org/web/{}id_/" + ORIGIN + "{}"
 PUBLISHER = "San Francisco Department of Elections"
 PLANS = {
-    "2012": "https://data.sf.gov/api/geospatial/bsfq-aeyw?method=export&format=GeoJSON",
-    "2022": "https://data.sf.gov/api/geospatial/d6x4-hefw?method=export&format=GeoJSON",
+    "2002": (
+        "https://data.sf.gov/api/geospatial/2iky-e78c?method=export&format=GeoJSON",
+        "precname",
+        date(2008, 11, 4),
+        date(2011, 11, 9),
+    ),
+    "2012": (
+        "https://data.sf.gov/api/geospatial/bsfq-aeyw?method=export&format=GeoJSON",
+        "prec_2012",
+        date(2012, 11, 6),
+        date(2018, 11, 7),
+    ),
+    "2022": (
+        "https://data.sf.gov/api/geospatial/d6x4-hefw?method=export&format=GeoJSON",
+        "prec_2022",
+        date(2022, 11, 8),
+        date(2022, 11, 9),
+    ),
 }
 RECORDS = {
     "2020-11-03": ("20210628011559", "20201103/data/20201201/CVR_Export_20201201091840.zip"),
     "2022-11-08": ("20230419065651", "20221108/data/20221201/CVR_Export_20221201120428.zip"),
 }
 IMAGES = {
+    "2008-11-04:CA:san-francisco:supervisors:1": (("20260406113518", "20081104/D1_BallotImageFinal.zip"),),
+    "2008-11-04:CA:san-francisco:supervisors:3": (("20260406123016", "20081104/D3_BallotImageFinal.zip"),),
+    "2008-11-04:CA:san-francisco:supervisors:9": (("20260406113154", "20081104/D9_BallotImageFinal.zip"),),
+    "2008-11-04:CA:san-francisco:supervisors:11": (("20260406123609", "20081104/D11_BallotImageFinal.zip"),),
+    "2010-11-02:CA:san-francisco:supervisors:2": (("20110827022900", "20101102/data/D2.zip"),),
+    "2010-11-02:CA:san-francisco:supervisors:6": (("20110827023000", "20101102/data/D6.zip"),),
+    "2010-11-02:CA:san-francisco:supervisors:8": (("20110827023133", "20101102/data/D8.zip"),),
+    "2010-11-02:CA:san-francisco:supervisors:10": (("20110827022719", "20101102/data/D10.zip"),),
+    "2011-11-08:CA:san-francisco:mayor": (("20120315205349", "20111108/data/Mayor.zip"),),
+    "2011-11-08:CA:san-francisco:district-attorney": (("20120315205403", "20111108/data/DA.zip"),),
+    "2011-11-08:CA:san-francisco:sheriff": (("20120315205408", "20111108/data/Sheriff.zip"),),
+    "2012-11-06:CA:san-francisco:supervisors:5": (("20160404135654", "20121106/data/D5.zip"),),
+    "2014-11-04:CA:san-francisco:supervisors:10": (("20160312112952", "20141104/data/D10.zip"),),
     "2015-11-03": (
         ("20151205182055", "20151103/data/20151119/20151119_ballotimage.txt"),
         ("20151122163351", "20151103/data/20151119/20151119_masterlookup.txt"),
@@ -51,6 +81,62 @@ IMAGES = {
     ),
 }
 CONTESTS: dict[str, tuple[str, tuple[str, str]]] = {
+    "2008-11-04:CA:san-francisco:supervisors:1": (
+        "alged:667000_2008_11_san francisco_CA_City Council_1_1",
+        ("20221124012746", "20081104/D1_Pass%20Report%20Final.xls"),
+    ),
+    "2008-11-04:CA:san-francisco:supervisors:3": (
+        "alged:667000_2008_11_san francisco_CA_City Council_3_1",
+        ("20221124012851", "20081104/D3-Pass%20Report%20Final.xls"),
+    ),
+    "2008-11-04:CA:san-francisco:supervisors:9": (
+        "alged:667000_2008_11_san francisco_CA_City Council_9_1",
+        ("20221124013011", "20081104/D9-Pass%20Report%20Final.xls"),
+    ),
+    "2008-11-04:CA:san-francisco:supervisors:11": (
+        "alged:667000_2008_11_san francisco_CA_City Council_11_1",
+        ("20221124012906", "20081104/D11-Pass%20Report%20Final.xls"),
+    ),
+    "2010-11-02:CA:san-francisco:supervisors:2": (
+        "alged:667000_2010_11_san francisco_CA_City Council_2_1",
+        ("20110827022844", "20101102/data/RCV-D2.xls"),
+    ),
+    "2010-11-02:CA:san-francisco:supervisors:6": (
+        "alged:667000_2010_11_san francisco_CA_City Council_6_1",
+        ("20110827023028", "20101102/data/RCV-D6.xls"),
+    ),
+    "2010-11-02:CA:san-francisco:supervisors:8": (
+        "alged:667000_2010_11_san francisco_CA_City Council_8_1",
+        ("20110827023041", "20101102/data/RCV-D8.xls"),
+    ),
+    "2010-11-02:CA:san-francisco:supervisors:10": (
+        "alged:667000_2010_11_san francisco_CA_City Council_10_1",
+        ("20110827022706", "20101102/data/RCV-D10.xls"),
+    ),
+    "2011-11-08:CA:san-francisco:mayor": (
+        "alged:667000_2011_11_san francisco_CA_Mayor_mayor_1",
+        ("20120315205349", "20111108/data/RCV-Mayor.xls"),
+    ),
+    "2011-11-08:CA:san-francisco:district-attorney": (
+        "alged:6075_2011_11_san francisco_CA_Prosecutor_san francisco_1",
+        ("20120315205403", "20111108/data/RCV-DA.xls"),
+    ),
+    "2011-11-08:CA:san-francisco:sheriff": (
+        "ceda:201100178",
+        ("20120315205407", "20111108/data/RCV-Sheriff.xls"),
+    ),
+    "2012-11-06:CA:san-francisco:supervisors:5": (
+        "alged:667000_2012_11_san francisco_CA_City Council_5_1",
+        ("20131019212340", "20121106/data/D5-PassReport.pdf"),
+    ),
+    "2012-11-06:CA:san-francisco:supervisors:7": (
+        "alged:667000_2012_11_san francisco_CA_City Council_7_1",
+        ("20211130002206", "20121106/data/D7-PassReport.pdf"),
+    ),
+    "2014-11-04:CA:san-francisco:supervisors:10": (
+        "alged:667000_2014_11_san francisco_CA_City Council_10_1",
+        ("20160312113852", "20141104/data/RCV_D10.pdf"),
+    ),
     "2015-11-03:CA:san-francisco:mayor": (
         "alged:667000_2015_11_san francisco_CA_Mayor_mayor_1",
         ("20151122163411", "20151103/data/20151119/mayor/20151119_mayor.html"),
@@ -189,7 +275,7 @@ DERIVED = (
 
 
 def fetch() -> None:
-    downloads = [(plan, ".geojson") for plan in PLANS.values()]
+    downloads = [(plan[0], ".geojson") for plan in PLANS.values()]
     for stamp, path in [
         *(report for _, report in CONTESTS.values()),
         *RECORDS.values(),
@@ -213,20 +299,60 @@ def parse() -> None:
     for key, (_, (stamp, path)) in CONTESTS.items():
         file = raw.cached(SOURCE, WAYBACK.format(stamp, path)).path
         lines: list[tuple[str, list[int]]] = []
-        if path.endswith(".html"):
+        if path.endswith(".html") or key < "2015":
+            table: list[tuple[str, list[int]]] = []
+            if path.endswith(".html"):
+                for row in re.findall(
+                    r"<tr[^>]*>(.*?)</tr>", file.read_bytes().decode("utf-8"), re.DOTALL | re.IGNORECASE
+                ):
+                    cells = [
+                        html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                        for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL | re.IGNORECASE)
+                    ]
+                    if cells and cells[0]:
+                        table.append((cells[0], [int(value) for value in cells[1::3] if re.fullmatch(r"-?\d+", value)]))
+            else:
+                passes: list[dict[str, int]] = []
+                if path.endswith(".xls"):
+                    workbook = fastexcel.read_excel(file)
+                    for sheet in workbook.sheet_names[1:]:
+                        cells = [
+                            [cell.strip() for cell in row if cell not in (None, "")]
+                            for row in workbook.load_sheet(sheet, header_row=None, dtypes="string")
+                            .to_polars()
+                            .iter_rows()
+                        ]
+                        start = max(index for index, row in enumerate(cells) if row and row[0] == "Final State")
+                        found = {}
+                        for row in cells[start + 2 :]:
+                            if row and row[0] == "Total Ballots":
+                                break
+                            if row:
+                                found[row[0]] = next(int(cell) for cell in row[1:] if re.fullmatch(r"-?\d+", cell))
+                        passes.append(found)
+                else:
+                    text = subprocess.run(
+                        ["pdftotext", "-layout", str(file), "-"], capture_output=True, text=True, check=True
+                    ).stdout
+                    for block in text.split("Final State")[1:]:
+                        found = {}
+                        for line in block.split("Total Ballots")[0].splitlines():
+                            match = re.match(
+                                r"^\s*(\S.*?\S)\s{2,}(?:(?:\*\* WINNER \*\*|Eliminated in pass \d+\.)\s+)?(-?\d+)(?:\s|$)",
+                                line,
+                            )
+                            if match and match[1] != "Candidate":
+                                found[match[1]] = int(match[2])
+                        passes.append(found)
+                table = [(label, [found.get(label, 0) for found in passes]) for label in passes[0]]
             spare = {}
-            for row in re.findall(r"<tr[^>]*>(.*?)</tr>", file.read_bytes().decode("utf-8"), re.DOTALL | re.IGNORECASE):
-                cells = [
-                    html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
-                    for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL | re.IGNORECASE)
-                ]
-                values = [int(value) for value in cells[1::3] if re.fullmatch(r"-?\d+", value)]
-                if not cells or not cells[0] or not values or cells[0] in ("Continuing Ballots", "TOTAL"):
+            for label, values in table:
+                if not values or label in ("Continuing Ballots", "TOTAL"):
                     continue
-                if cells[0] in ("Exhausted by Over Votes", "Under Votes", "Exhausted Ballots"):
-                    spare[cells[0]] = values
-                elif not cells[0].startswith("WRITE-IN") or any(values):
-                    lines.append((re.sub(r"^WRITE-IN\s+-?\s*", "", cells[0]), values))
+                if label in ("Exhausted by Over Votes", "Under Votes", "Exhausted Ballots"):
+                    spare[label] = values
+                elif not label.startswith("WRITE-IN") or any(values):
+                    lines.append((re.sub(r"^WRITE-IN\s+-?\s*", "", label), values))
             lines.append(("Non Transferable Total", [sum(values) for values in zip(*spare.values(), strict=True)]))
         elif path.endswith(".xml"):
             root = ET.parse(file).getroot()
@@ -371,39 +497,47 @@ def parse() -> None:
                                     [ranks.get(rank, set()) for rank in range(1, max(ranks, default=0) + 1)],
                                 )
                             )
-    for scope, (image, lookup) in IMAGES.items():
+    for scope, (image, *lookup) in IMAGES.items():
+        if lookup:
+            text = raw.cached(SOURCE, WAYBACK.format(*lookup[0])).path.read_text(encoding="utf-8")
+            data = raw.cached(SOURCE, WAYBACK.format(*image)).path.read_bytes()
+        else:
+            with zipfile.ZipFile(raw.cached(SOURCE, WAYBACK.format(*image)).path) as archive:
+                members = [name for name in archive.namelist() if name.casefold().endswith(".txt")]
+                text = archive.read(next(name for name in members if "lookup" in name.casefold())).decode("utf-8")
+                data = archive.read(next(name for name in members if "image" in name.casefold()))
         labels, contests, precincts = {}, {}, {}
-        for line in raw.cached(SOURCE, WAYBACK.format(*lookup)).path.read_text(encoding="utf-8").splitlines():
+        for line in text.splitlines():
             kind, ident, description = line[:10].strip(), line[10:17], line[17:67].strip()
             if kind == "Candidate":
-                labels[ident] = re.sub(r"^WRITE-IN\s+-?\s*", "", description)
+                labels[ident] = (re.sub(r"^WRITE-IN\s+-?\s*", "", description), line[81:82] == "1")
             elif kind == "Contest":
                 contests[description] = ident
             elif kind == "Precinct":
                 precincts[ident] = "/".join(sorted(re.findall(r"\d{4}", description)))
         wanted = {}
         for key in CONTESTS:
-            if key.startswith(scope):
+            if scope in (key, key[:10]):
                 office = key.split(":", 3)[3]
                 wanted[
                     contests[
                         f"Board of Supervisors, District {office.split(':')[1]}"
                         if office.startswith("supervisors")
-                        else office.title()
+                        else office.replace("-", " ").title()
                     ]
                 ] = key
-        data = raw.cached(SOURCE, WAYBACK.format(*image)).path.read_bytes()
         records: dict[tuple[str, str], tuple[str, dict[int, set[str]]]] = {}
         for line in (gzip.decompress(data) if data[:2] == b"\x1f\x8b" else data).decode("ascii").splitlines():
             if line[:7] not in wanted:
                 continue
             _, ranks = records.setdefault((line[:7], line[7:16]), (precincts[line[26:33]], {}))
+            label, write_in = labels.get(line[36:43], ("", False))
             ranks[int(line[33:36])] = (
                 {"over", "votes"}
                 if line[43] == "1"
                 else set()
                 if line[44] == "1" or line[36:43] == "0000000"
-                else {labels[line[36:43]]}
+                else {label if label in official[wanted[line[:7]]][0] or not write_in else "WRITE-IN"}
             )
         for (contest, _), (precinct, ranks) in records.items():
             cast.setdefault(wanted[contest], []).append((precinct, [ranks[rank] for rank in sorted(ranks)]))
@@ -448,7 +582,7 @@ def parse() -> None:
 
     rows = []
     with connect() as conn:
-        for vintage, plan in PLANS.items():
+        for vintage, (plan, field, _, _) in PLANS.items():
             features = json.loads(raw.cached(SOURCE, plan).path.read_text())["features"]
             rows.extend(
                 (vintage, *row)
@@ -459,7 +593,7 @@ def parse() -> None:
                        cross join lateral (select st_multi(st_collectionextract(st_makevalid(
                          st_setsrid(st_geomfromgeojson(f.geojson), 4326)), 3)) as geom) s""",
                     [
-                        [str(feature["properties"][f"prec_{vintage}"]) for feature in features],
+                        [str(feature["properties"][field]) for feature in features],
                         [json.dumps(feature["geometry"]) for feature in features],
                     ],
                 ).fetchall()
@@ -481,7 +615,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="San Francisco's ranked-choice contests for mayor, district attorney, the Board of Supervisors, "
-            "and sheriff that went past round 1, 2015 to 2024, with each round by precinct from the cast vote records "
+            "and sheriff that went past round 1, 2008 to 2024, with each round by precinct from the cast vote records "
             "and ballot images",
             polity="US",
         )
@@ -491,7 +625,7 @@ def emit() -> Path:
 
         county = cs.area("us.county", "06075")
         plans = {}
-        for vintage, url in PLANS.items():
+        for vintage, (url, _, _, _) in PLANS.items():
             plans[vintage] = cs.source("City and County of San Francisco", f"Election Precincts, {vintage}")
             cs.add(
                 "source",
@@ -532,8 +666,8 @@ def emit() -> Path:
             cs.add(
                 "area_geometry",
                 area_id=area,
-                valid_from=date(2022, 11, 8),
-                valid_to=date(2022, 11, 9),
+                valid_from=PLANS["2022"][2],
+                valid_to=PLANS["2022"][3],
                 geom=shapes["2022", number][0],
                 label_point=shapes["2022", number][1],
                 quality="official",
@@ -567,37 +701,41 @@ def emit() -> Path:
         )
         if polity is None:
             raise ValueError("San Francisco County must already be a polity")
-        older = tallies.filter(pl.col("key").str.slice(0, 10).is_in(["2015-11-03", "2018-06-05", "2018-11-06"]))
-        for number in sorted(set(older["unit"])):
+        older = tallies.filter(~pl.col("key").str.slice(0, 10).is_in(["2016-11-08", *RECORDS])).with_columns(
+            plan=pl.when(pl.col("key") < "2012").then(pl.lit("2002")).otherwise(pl.lit("2012"))
+        )
+        for vintage, number in sorted(set(older.select("plan", "unit").iter_rows())):
             members = number.split("/")
-            area = cs.area("us.precinct", "2012:CA:06075:" + "-".join(members))
+            area = cs.area("us.precinct", f"{vintage}:CA:06075:" + "-".join(members))
             cs.add("area", id=area, scheme_code="us.precinct")
-            cs.add("area_code", area_id=area, code="2012:CA:06075:" + "-".join(members), valid_from=None)
+            cs.add("area_code", area_id=area, code=f"{vintage}:CA:06075:" + "-".join(members), valid_from=None)
             cs.add("area_parent", area_id=area, parent_id=county)
             name(area, f"Precinct {number}, San Francisco County")
-            if all(("2012", member) in shapes for member in members):
+            if all((vintage, member) in shapes for member in members):
                 geom, point = (
-                    shapes["2012", members[0]]
+                    shapes[vintage, members[0]]
                     if len(members) == 1
                     else conn.execute(
                         """select encode(st_asewkb(g), 'hex'), encode(st_asewkb(st_pointonsurface(g)), 'hex')
                            from (select st_multi(st_collectionextract(st_makevalid(st_union(
                              st_geomfromewkb(decode(h, 'hex')))), 3)) as g from unnest(%s::text[]) as h) u""",
-                        [[shapes["2012", member][0] for member in members]],
+                        [[shapes[vintage, member][0] for member in members]],
                     ).fetchone()
                     or (None, None)
                 )
                 cs.add(
                     "area_geometry",
                     area_id=area,
-                    valid_from=date(2015, 11, 3),
-                    valid_to=date(2018, 11, 7),
+                    valid_from=PLANS[vintage][2],
+                    valid_to=PLANS[vintage][3],
                     geom=geom,
                     label_point=point,
                     quality="official",
-                    source_id=plans["2012"],
+                    source_id=plans[vintage],
                 )
-            for day in sorted(set(older.filter(pl.col("unit") == number)["key"].str.slice(0, 10))):
+            for day in sorted(
+                set(older.filter((pl.col("plan") == vintage) & (pl.col("unit") == number))["key"].str.slice(0, 10))
+            ):
                 code = f"{day}:CA:06075:" + "-".join(members)
                 unit = cs.unit("us.precinct", code)
                 precincts.setdefault(day, {})[number] = [unit]
@@ -613,7 +751,7 @@ def emit() -> Path:
                     valid_from=date.fromisoformat(day),
                     valid_to=date.fromisoformat(day) + timedelta(days=1),
                 )
-        for day in ("2015-11-03", "2018-06-05"):
+        for day in ("2011-11-08", "2015-11-03", "2018-06-05"):
             cs.add(
                 "boundary_set",
                 scheme_code="us.precinct",
@@ -622,6 +760,11 @@ def emit() -> Path:
                 valid_to=date.fromisoformat(day) + timedelta(days=1),
                 as_of=date.fromisoformat(day),
             )
+
+        def spell(text: str) -> list[str]:
+            plain = unicodedata.normalize("NFKD", text).encode("ascii", "ignore").decode().casefold()
+            return [word for word in re.findall(r"[\w'-]+", plain) if word not in ("jr", "sr")]
+
         people: dict[tuple[str, str], set[tuple[UUID, date, bool]]] = {}
         for text, person, held, city in conn.execute(
             """select coalesce(c.ballot_name, o.ballot_label), c.person_id, e.date_from,
@@ -632,7 +775,7 @@ def emit() -> Path:
                where t.area_id in (%s, %s)""",
             [county, cs.area("us.place", "0667000")],
         ).fetchall():
-            words = [word for word in re.findall(r"[\w'-]+", text.casefold()) if word not in ("jr", "sr")]
+            words = spell(text)
             people.setdefault((words[0], words[-1]), set()).add((person, held, city))
 
         irv = cs.key("us.electoral_system", "irv")
@@ -699,7 +842,10 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, path)), source)
 
             current = conn.execute(
-                "select id, ballot_label from contest_option where contest_id = %s and kind = 'candidate'", [contest]
+                """select o.id, o.ballot_label, h.pipeline = %s from contest_option o
+                   join entity n on n.id = o.id join changeset h on h.id = n.changeset_id
+                   where o.contest_id = %s and o.kind = 'candidate'""",
+                [SOURCE, contest],
             ).fetchall()
             options: dict[str, UUID] = {}
             for label in (label for label in rounds[0] if label is not None):
@@ -707,7 +853,8 @@ def emit() -> Path:
                     found = [
                         option
                         for (option,) in conn.execute(
-                            "select id from contest_option where contest_id = %s and kind = 'write_in'", [contest]
+                            "select id from contest_option where contest_id = %s and kind = 'write_in'",
+                            [contest],
                         ).fetchall()
                     ]
                     if len(found) > 1:
@@ -722,8 +869,15 @@ def emit() -> Path:
                             ballot_label="Write-in",
                         )
                     continue
-                words = [word for word in re.findall(r"[\w'-]+", label.casefold()) if word not in ("jr", "sr")]
-                found = [option for option, text in current if text.casefold().split()[-1] == words[-1]]
+                words = spell(label)
+                spelled = {option: spell(text) for option, text, _ in current}
+                found = [option for option, other in spelled.items() if other[-1] == words[-1]]
+                if len(found) > 1 or [
+                    other for other in rounds[0] if other is not None and spell(other)[-1] == words[-1]
+                ] != [label]:
+                    found = [option for option in found if spelled[option][0] == words[0]]
+                if len(found) > 1:
+                    found = [option for option, _, mine in current if mine and option in found] or found
                 if len(found) == 1:
                     options[label] = found[0]
                     continue
