@@ -143,6 +143,7 @@ PRIMARIES = {
     "petitioningcand": ("petitioning candidates'", None),
     "una": ("unaffiliated", None),
 }
+MISDATED = {"1974-11-04": "1974-11-05"}
 SUFFIXES = {"jr": "Jr.", "sr": "Sr."}
 RANK = {"w": 0, "t": 1, "r": 2, "withdrew": 3}
 MONTHS = [
@@ -412,6 +413,13 @@ def emit() -> Path:
             slugs[path] = entity
             return path
 
+        cs.renamed.update({right: wrong for wrong, right in MISDATED.items()})
+        merged = {entity for entities in cs.merged.values() for entity in entities}
+        for wrong, right in MISDATED.items():
+            for value in sorted(value for value in elections_known if value.startswith(wrong)):
+                duplicate = cs.key("us.election", value)
+                if str(duplicate) not in merged and value.replace(wrong, right) in elections_known:
+                    cs.merge(duplicate, cs.key("us.election", value.replace(wrong, right)))
         for sab, year, month, day, kind in sorted(on_day, key=lambda row: (row[0], row[1], row[2], row[3] or 0)):
             original = kind
             suffix = {"general": "", "primary": ":primary", "runoff": ":runoff", "special": ":special"}[kind]
@@ -427,7 +435,9 @@ def emit() -> Path:
                 matches = sorted(
                     value
                     for value in elections_known
-                    if value.startswith(f"{year}-{month:02}-") and value.endswith(f":{sab}{suffix}")
+                    if value.startswith(f"{year}-{month:02}-")
+                    and value.endswith(f":{sab}{suffix}")
+                    and value.split(":")[0] not in MISDATED
                 )
                 if f"{year}-{month:02}:{sab}{suffix}" in elections_known:
                     datekey, precision = f"{year}-{month:02}", "month"
@@ -436,7 +446,7 @@ def emit() -> Path:
                 else:
                     datekey, precision = f"{year}-{month:02}", "month"
             else:
-                datekey = f"{year}-{month:02}-{day:02}"
+                datekey = MISDATED.get(f"{year}-{month:02}-{day:02}", f"{year}-{month:02}-{day:02}")
             on = date.fromisoformat(datekey if precision == "day" else f"{datekey}-01")
             key = f"{datekey}:{sab}{suffix}"
             election = cs.key("us.election", key)

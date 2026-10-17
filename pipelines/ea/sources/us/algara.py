@@ -202,10 +202,34 @@ def emit() -> Path:
             conn.execute("select code, id from reporting_unit where scheme_code = 'us.county'").fetchall()
         )
         generals: dict[tuple[str, int], list[str]] = {}
-        for (value,) in conn.execute("select value from external_id where scheme = 'us.election'"):
+        seated: set[str] = set()
+        for value, seats in conn.execute(
+            """select x.value, exists (select from contest c where c.election_id = x.entity_id and c.kind = 'body_seats')
+               from external_id x where x.scheme = 'us.election'
+                 and not exists (select from entity_merge m where m.entity_id = x.entity_id)"""
+        ):
             parts = value.split(":")
             if len(parts) == 2 and len(parts[0]) == 10 and parts[1] in states:
                 generals.setdefault((parts[1], int(parts[0][:4])), []).append(parts[0])
+                if seats:
+                    seated.add(value)
+        merged = {entity for entities in cs.merged.values() for entity in entities}
+        defaults: dict[UUID, bool] = dict(
+            conn.execute(
+                """select r.id, r.is_default from result_set r join external_id x on x.entity_id = r.id
+                   where x.scheme = %s""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        )
+        own: dict[tuple[str, int], str] = {}
+        for (value,) in conn.execute(
+            """select x.value from external_id x join contest c on c.id = x.entity_id
+               join changeset s on s.id = c.changeset_id
+               where x.scheme = 'us.contest' and s.pipeline = %s and x.value ~ '^[0-9-]+:[A-Z]{2}:governor$'""",
+            [SOURCE],
+        ):
+            datekey, state, _ = value.split(":")
+            own.setdefault((state, int(datekey[:4])), datekey)
         others: dict[tuple[str, int], list[tuple[str, UUID, list[tuple[UUID, set[str]]]]]] = {}
         for key, contest, option, label in conn.execute(
             """select e.value, c.id, o.id, o.ballot_label from external_id e
@@ -251,7 +275,22 @@ def emit() -> Path:
                 datekey = contest_key.split(":")[0]
             else:
                 november = [day for day in days if day[5:7] == "11"]
-                datekey = november[0] if len(november) == 1 else days[0] if len(days) == 1 else str(year)
+                house = sorted(day for day in days if f"{day}:{state}" in seated)
+                datekey = (
+                    house[0]
+                    if house
+                    else november[0]
+                    if len(november) == 1
+                    else days[0]
+                    if len(days) == 1
+                    else str(year)
+                )
+                previous = own.get((state, year), datekey)
+                if previous != datekey:
+                    cs.renamed[f"{datekey}:{state}"] = f"{previous}:{state}"
+                    placeholder = cs.key("us.election", f"{previous}:{state}")
+                    if previous == str(year) and str(placeholder) not in merged:
+                        cs.merge(placeholder, cs.key("us.election", f"{datekey}:{state}"))
                 contest_key = f"{datekey}:{state}:governor"
                 contest = cs.key("us.contest", contest_key)
                 existing = []
@@ -297,7 +336,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=not reused,
+                is_default=defaults.get(result_set, not reused),
                 completeness=None,
             )
             cs.add("note", entity_id=result_set, kind="caveat", body_md=TWO_PARTY)
@@ -353,7 +392,7 @@ def emit() -> Path:
                             is_independent=False,
                         )
                     totals[option] = int(pooled[votes].sum())
-                for code, value in pooled.select("code", votes).iter_rows():
+                for code, value in pooled.select("code", votes).iter_rows() if result_set in cs.minted else ():
                     cs.add(
                         "result_value",
                         result_set_id=result_set,

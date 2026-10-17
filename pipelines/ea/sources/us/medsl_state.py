@@ -57,6 +57,7 @@ DROPPED = {
 }
 NATIONAL = {
     "DEMOCRAT": "democratic-party",
+    "DEMOCRATIC": "democratic-party",
     "DEMOCRATIC-NPL": "democratic-party",
     "DEMOCRATIC-FARMER-LABOR": "democratic-party",
     "REPUBLICAN": "republican-party",
@@ -78,6 +79,7 @@ INDEPENDENT = {
     "NON PARTY CANDIDATE",
     "WRITEIN",
 }
+CROSS_FILED = {("VT", "DEMOCRAT/REPUBLICAN"): "REPUBLICAN/DEMOCRAT"}
 EXPANDED = {"PFP": "PEACE AND FREEDOM", "CSS": "COMMON SENSE", "LOC607": "LOCAL 607"}
 
 
@@ -362,6 +364,16 @@ def emit() -> Path:
                 continue
             past[(body, words[-1])][code].add(person)
             past[(body, f"{words[0]} {words[-1]}")][code].add(person)
+        last_party: dict[UUID, UUID] = dict(
+            conn.execute(
+                """select distinct on (cd.person_id) cd.person_id, o.party_id
+                   from candidacy cd join contest_option o on o.id = cd.option_id
+                   join contest ct on ct.id = o.contest_id join election e on e.id = ct.election_id
+                   where cd.role = 'head' and o.party_id is not null and ct.kind = 'body_seats'
+                     and e.date_from >= '2014-01-01' and e.date_from < '2024-11-05'
+                   order by cd.person_id, e.date_from desc"""
+            ).fetchall()
+        )
         parties_known = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'").fetchall()
         }
@@ -373,6 +385,7 @@ def emit() -> Path:
             summary="State legislative general elections of 2024 by district",
             polity="US",
         )
+        principals = {cs.key("us.party", "democratic-party"), cs.key("us.party", "republican-party")}
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -431,6 +444,9 @@ def emit() -> Path:
             if label is None:
                 return None, False
             label = EXPANDED.get(label, label)
+            if "/" in label:
+                found = [party(state, part.strip()) for part in CROSS_FILED.get((state, label), label).split("/")]
+                return next((id for id, _ in found if id is not None), None), all(alone for _, alone in found)
             if label in INDEPENDENT:
                 return None, True
             if label in NATIONAL:
@@ -564,14 +580,9 @@ def emit() -> Path:
                 labels = rows["party_detailed"].to_list()
                 resolved = [party(state, label) for label in labels]
                 ballot = "Write-ins" if pooled else title(str(candidate))
-                cs.add(
-                    "contest_option",
-                    id=root,
-                    contest_id=contest,
-                    kind="write_in" if pooled else "candidate",
-                    party_id=resolved[0][0] if len(rows) == 1 else None,
-                    ballot_label=ballot,
-                )
+                majors = {id for id, _ in resolved if id in principals}
+                named = [(votes or 0, id) for (id, _), votes in zip(resolved, rows["votes"], strict=True) if id]
+                principal = next(iter(majors)) if len(majors) == 1 else max(named)[1] if named else None
                 if not pooled:
                     surname = _surname(str(candidate))
                     first = str(candidate).split()[0]
@@ -596,15 +607,30 @@ def emit() -> Path:
                             if len(str(candidate).split()) == 1:
                                 problems.append(f"surname only: {state} {office} {district} {candidate}")
                     persons[person_key] = person
+                    head = cs.key("us.candidacy", f"{option_key}:head")
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{option_key}:head"),
+                        id=head,
                         person_id=person,
                         option_id=root,
                         role="head",
                         ballot_name=ballot,
                         is_independent=all(independent for _, independent in resolved),
                     )
+                    for label in labels:
+                        for part in (label or "").split("/") if "/" in (label or "") else ():
+                            if (nominee := party(state, part.strip())[0]) is not None:
+                                cs.add("candidacy_nomination", candidacy_id=head, party_id=nominee, kind="nominated")
+                    if principal is None and not all(independent for _, independent in resolved):
+                        principal = last_party.get(person)
+                cs.add(
+                    "contest_option",
+                    id=root,
+                    contest_id=contest,
+                    kind="write_in" if pooled else "candidate",
+                    party_id=principal,
+                    ballot_label=ballot,
+                )
                 for label, (party_id, _), votes in zip(labels, resolved, rows["votes"], strict=True):
                     target = root
                     if len(rows) > 1:
