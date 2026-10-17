@@ -25,13 +25,21 @@ TOWNS = {
     2004: ("20041102", "m.xlsx", ["w.xlsx"]),
     2008: ("20081104", "p.xlsx", ["z.xlsx", "ab.xlsx"]),
 }
+TABULATIONS = {
+    1984: (
+        "https://digitalmaine.com/tabulations_for_elections_1980s/41/",
+        "https://web.archive.org/web/2024id_/https://digitalmaine.com/cgi/viewcontent.cgi?article=1040&context=tabulations_for_elections_1980s",
+        ["Hall", "Mondale", "Reagan", "Serrette"],
+    )
+}
 CANVASS = {2008: "https://sos.nebraska.gov/sites/default/files/doc/elections/2008/2008%20General%20Canvass%20Book.pdf"}
 PAIRS = (
     [(year, state) for year in YEARS for state in STATES]
-    + [(year, "ME") for year in TOWNS]
+    + [(year, "ME") for year in (*TABULATIONS, *TOWNS)]
     + [(year, "NE") for year in CANVASS]
 )
 DAYS = {
+    1984: "1984-11-06",
     1988: "1988-11-08",
     1992: "1992-11-03",
     1996: "1996-11-05",
@@ -55,6 +63,12 @@ METHOD = {
         "district by the same year's returns for Representative to Congress; the districts sum to the statewide "
         "official vote for every candidate."
     ),
+    "tabulation": (
+        "Votes by congressional district for each ticket, from the total lines of the Secretary of State's official "
+        "tabulation by district, county, and town, a scan with OCR text that the Maine State Library keeps on "
+        "DigitalMaine. The district tables list only the tickets, so write-ins are not here; completeness is the "
+        "tickets' share of the statewide vote."
+    ),
     "canvass": (
         "Votes by congressional district for each ticket, from the Secretary of State's official canvass book, "
         "which reports the presidential vote by district. The district tables leave out write-ins, so completeness is "
@@ -77,6 +91,8 @@ def documents(year: int, state: str) -> list[str]:
         return [CERTIFICATE.format(year=year, prefix=YEARS[year], state=STATES[state])]
     if state == "NE":
         return [CANVASS[year]]
+    if year in TABULATIONS:
+        return [TABULATIONS[year][1]]
     day, president, house = TOWNS[year]
     return [LLDC.format(year=year, day=day, file=name) for name in (president, *house)]
 
@@ -137,6 +153,16 @@ def parse() -> None:
                 short += numbers[2] - numbers[0] - numbers[1]
             if short > uocava:
                 raise ValueError(f"{year} {state}: the districts fall short by more than the {uocava} overseas votes")
+        elif year in TABULATIONS:
+            names = TABULATIONS[year][2]
+            districts = [
+                [int(number.replace(",", "")) for number in found.group(1).split()][: len(names)]
+                for found in re.finditer(r"^\s*TOTAL +(\d[\d, ]*\d)", text(addresses[0]), re.MULTILINE)
+            ][:2]
+            if len(districts) != 2 or any(len(district) != len(names) for district in districts):
+                raise ValueError(f"{year} {state}: unreadable district totals {districts}")
+            for name, one, two in zip(names, *districts, strict=True):
+                rows.append((year, state, name, one + two, one, two, None))
         elif state == "NE":
             book = text(addresses[0])
             heading = re.search(r"^For President of the United States\s*$", book, re.MULTILINE)
@@ -284,7 +310,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's presidential votes by congressional district 1988–2024 and Nebraska's 2008–2024, from the states' certificates of ascertainment, Maine's official vote by town, and Nebraska's canvass book",
+            summary="Maine's presidential votes by congressional district 1984–2024 and Nebraska's 2008–2024, from the states' certificates of ascertainment, Maine's official vote by town, and Nebraska's canvass book",
             polity="US",
         )
         for (year, state), lines in frame.group_by("year", "state", maintain_order=True):
@@ -293,7 +319,15 @@ def emit() -> Path:
                 continue
             uocava = int(lines.filter(pl.col("candidate") == "")["statewide"][0])
             lines = lines.filter(pl.col("candidate") != "")
-            kind = "certificate" if year in YEARS else "towns" if state == "ME" else "canvass"
+            kind = (
+                "certificate"
+                if year in YEARS
+                else "tabulation"
+                if year in TABULATIONS
+                else "towns"
+                if state == "ME"
+                else "canvass"
+            )
             addresses = documents(int(year), str(state))
             publisher, title, license = {
                 "certificate": (
@@ -306,6 +340,11 @@ def emit() -> Path:
                     f"{year} general election, official vote for President by town",
                     "Public record",
                 ),
+                "tabulation": (
+                    "Maine Department of the Secretary of State",
+                    f"{year} general election, official tabulation for President",
+                    "Public domain",
+                ),
                 "canvass": ("Nebraska Secretary of State", f"{year} general canvass book", "Public record"),
             }[kind]
             source = cs.source(publisher, title)
@@ -315,7 +354,7 @@ def emit() -> Path:
                 kind="official_body",
                 publisher=publisher,
                 title=title,
-                url=addresses[0],
+                url=TABULATIONS[int(year)][0] if kind == "tabulation" else addresses[0],
                 license=license,
             )
             for address in addresses:
