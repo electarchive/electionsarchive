@@ -480,6 +480,12 @@
     if (top?.current == null || next?.current == null) {
       return null;
     }
+    if (contest.kind === "ballot_question" && top.current.outcome === "lost") {
+      return m.race_lede_lost({
+        answer: named(top),
+        share: percent(top.current.share),
+      });
+    }
     const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
     return (isWon ? m.race_lede_won : m.race_lede_votes)({
       party: named(top),

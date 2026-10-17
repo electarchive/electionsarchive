@@ -6,6 +6,7 @@
     won: m.outcome_won,
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
+    lost: m.outcome_lost,
   };
   export const MEASURES: Record<string, () => string> = {
     list_votes: m.measure_list_votes,
@@ -372,8 +373,10 @@
                 {/if}
                 {#if page?.outcome != null && seats == null}
                   <span
-                    class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
-                    >{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+                    class={cn("ms-1 px-1 text-xs font-semibold", {
+                      "highlighter text-foreground": page.outcome !== "lost",
+                      "text-muted-foreground": page.outcome === "lost",
+                    })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
                   >
                 {/if}
                 {#if span != null && there != null}

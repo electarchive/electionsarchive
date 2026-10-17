@@ -39,6 +39,7 @@ const OUTCOMES: Record<string, () => string> = {
   won: m.outcome_won,
   advanced: m.outcome_advanced,
   tied: m.outcome_tied,
+  lost: m.outcome_lost,
 };
 
 const outcome = (value: string | null) =>

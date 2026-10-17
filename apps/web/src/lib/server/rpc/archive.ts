@@ -723,7 +723,7 @@ async function load(
         coalesce(max(x.seats), nullif(count(*) filter (where x.kind = 'elected'), 0))::int as seats
       from outcome x join result_set rs on rs.id = x.result_set_id
       where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and rs.is_default
-        and x.kind in ('elected', 'won', 'advanced', 'tied') and x.candidacy_id is null
+        and (x.kind in ('elected', 'won', 'advanced', 'tied') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
     ) oc on true
     where (o.k = any(${sql.param([...optionKs])}::int[]) or o.contest_id = any(${sql.param(outcomes)}::uuid[]))
       and (o.k = any(${sql.param([...optionKs])}::int[]) or oc.kind is not null)
@@ -4474,6 +4474,7 @@ async function races(
             share,
             seats,
             isWon: ["elected", "won"].includes(String(lead?.cell.outcome)),
+            isLost: lead?.cell.outcome === "lost",
           };
         })
         .filter((row) => !row.key.startsWith("kind:") || row.votes > 0)
@@ -4880,6 +4881,7 @@ export const elections = {
                 share: v.number(),
                 seats: v.nullable(v.number()),
                 isWon: v.optional(v.boolean()),
+                isLost: v.optional(v.boolean()),
               }),
             ),
             places: Places,

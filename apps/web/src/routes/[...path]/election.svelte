@@ -592,19 +592,25 @@
                           ),
                           share: percent(leader.share),
                         })
-                      : runner == null
-                        ? null
-                        : (seated.length > 0 || race.results[0]?.isWon === true
-                            ? m.race_lede_won
-                            : m.race_lede_votes)({
-                            party: named(leader),
+                      : race.kind === "ballot_question" &&
+                          race.results[0]?.isLost === true
+                        ? m.race_lede_lost({
+                            answer: named(leader),
                             share: percent(leader.share),
-                            margin: points(leader.share - runner.share).replace(
-                              /^\+/u,
-                              "",
-                            ),
-                            runner: named(runner),
-                          }),
+                          })
+                        : runner == null
+                          ? null
+                          : (seated.length > 0 ||
+                              race.results[0]?.isWon === true
+                              ? m.race_lede_won
+                              : m.race_lede_votes)({
+                              party: named(leader),
+                              share: percent(leader.share),
+                              margin: points(
+                                leader.share - runner.share,
+                              ).replace(/^\+/u, ""),
+                              runner: named(runner),
+                            }),
         next:
           race.runoff?.runner == null
             ? null
