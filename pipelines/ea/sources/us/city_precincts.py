@@ -8,7 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import elstats, elstats_local, medsl, medsl_local, nc_local, ncsbe
+from ea.sources.us import elstats, elstats_local, medsl, medsl_local, nc_local, ncsbe, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.city_precincts"
@@ -23,8 +23,69 @@ METHOD = (
 )
 
 
+WA = "https://results.vote.wa.gov/results/{day:%Y%m%d}/export/{day:%Y%m%d}_allstateprecincts.csv"
+KING = {
+    date(
+        2019, 11, 5
+    ): "https://cdn.kingcounty.gov/-/media/king-county/depts/elections/results/2019/201911/final-precinct-results.csv",
+    date(2021, 11, 2): "https://data.kingcounty.gov/api/views/4qrf-rjar/rows.csv?accessType=DOWNLOAD",
+    date(2023, 11, 7): "https://data.kingcounty.gov/api/views/wbb4-8cse/rows.csv?accessType=DOWNLOAD",
+    date(
+        2025, 11, 4
+    ): "https://cdn.kingcounty.gov/-/media/king-county/depts/elections/results/2025/11/final-precinct-results.csv",
+}
+WA_COUNTIES = {
+    "AD": "ADAMS",
+    "AS": "ASOTIN",
+    "BE": "BENTON",
+    "CH": "CHELAN",
+    "CM": "CLALLAM",
+    "CR": "CLARK",
+    "CU": "COLUMBIA",
+    "CZ": "COWLITZ",
+    "DG": "DOUGLAS",
+    "FE": "FERRY",
+    "FR": "FRANKLIN",
+    "GA": "GARFIELD",
+    "GR": "GRANT",
+    "GY": "GRAYS HARBOR",
+    "IS": "ISLAND",
+    "JE": "JEFFERSON",
+    "KI": "KING",
+    "KP": "KITSAP",
+    "KS": "KITTITAS",
+    "KT": "KLICKITAT",
+    "LE": "LEWIS",
+    "LI": "LINCOLN",
+    "MA": "MASON",
+    "OK": "OKANOGAN",
+    "PA": "PACIFIC",
+    "PE": "PEND OREILLE",
+    "PI": "PIERCE",
+    "SJ": "SAN JUAN",
+    "SK": "SKAGIT",
+    "SM": "SKAMANIA",
+    "SN": "SNOHOMISH",
+    "SP": "SPOKANE",
+    "ST": "STEVENS",
+    "TH": "THURSTON",
+    "WK": "WAHKIAKUM",
+    "WL": "WALLA WALLA",
+    "WM": "WHATCOM",
+    "WT": "WHITMAN",
+    "YA": "YAKIMA",
+}
+KING_PUBLISHER = "King County Elections"
+KING_TITLE = "Final precinct results"
+
+
 def fetch() -> None:
     medsl_local.fetch()
+    for url in [*(WA.format(day=day) for day in wa_local.DAYS), *KING.values()]:
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            raw.fetch(SOURCE, url, suffix=".csv")
 
 
 def parse() -> None:
@@ -106,6 +167,69 @@ def parse() -> None:
             ).fetchall()
         )
     origins = [(day, "medsl", scan.select(list(columns)).rename(columns)) for day, scan in scans]
+    names = {name: code for (prefix, name), code in counties.items() if prefix == "53"}
+    for day in wa_local.DAYS:
+        origins.append(
+            (
+                day,
+                "washington",
+                pl.scan_csv(raw.cached(SOURCE, WA.format(day=day)).path, infer_schema=False, encoding="utf8-lossy")
+                .filter(
+                    (pl.col("PrecinctName") != "Total") & ((pl.col("CountyCode") != "KI") | pl.lit(day not in KING))
+                )
+                .select(
+                    state=pl.lit("WA"),
+                    fips=pl.col("CountyCode")
+                    .replace_strict(WA_COUNTIES)
+                    .str.replace_all(r"[^A-Z]", "")
+                    .replace_strict(names),
+                    jurisdiction=pl.col("CountyCode").replace_strict(WA_COUNTIES),
+                    precinct=pl.col("PrecinctName").str.to_uppercase(),
+                    office="Race",
+                    district=pl.lit(""),
+                    candidate="Candidate",
+                    writein=pl.when(pl.col("Candidate").str.contains(r"(?i)^write"))
+                    .then(pl.lit("TRUE"))
+                    .otherwise(pl.lit("FALSE")),
+                    mode=pl.lit("TOTAL"),
+                    votes="Votes",
+                ),
+            )
+        )
+    for day, url in KING.items():
+        origins.append(
+            (
+                day,
+                "king",
+                pl.scan_csv(raw.cached(SOURCE, url).path, infer_schema=False, encoding="utf8-lossy")
+                .filter(
+                    (pl.col("CounterGroup") == "Total")
+                    & ~pl.col("CounterType").is_in(
+                        [
+                            "Registered Voters",
+                            "Times Counted",
+                            "Times Under Voted",
+                            "Times Over Voted",
+                            "Times Blank Voted",
+                        ]
+                    )
+                )
+                .select(
+                    state=pl.lit("WA"),
+                    fips=pl.lit("53033"),
+                    jurisdiction=pl.lit("KING"),
+                    precinct=pl.col("Precinct").str.to_uppercase(),
+                    office="Race",
+                    district=pl.lit(""),
+                    candidate="CounterType",
+                    writein=pl.when(pl.col("CounterType").str.contains(r"(?i)^write"))
+                    .then(pl.lit("TRUE"))
+                    .otherwise(pl.lit("FALSE")),
+                    mode=pl.lit("TOTAL"),
+                    votes="SumOfCount",
+                ),
+            )
+        )
     stats = []
     for state in ("VA", "ID", "NM", "CT"):
         for year in range(elstats_local.STATES[state][0], 2026):
@@ -290,7 +414,11 @@ def parse() -> None:
     precinct = ["day", "origin", "state", "fips", "jurisdiction", "precinct", "office", "district"]
     frame = (
         pl.concat(frames)
-        .with_columns(rank=pl.col("origin").replace_strict({"ncsbe": 0, "elstats": 0, "medsl": 1, "openelections": 2}))
+        .with_columns(
+            rank=pl.col("origin").replace_strict(
+                {"ncsbe": 0, "elstats": 0, "washington": 0, "king": 0, "medsl": 1, "openelections": 2}
+            )
+        )
         .filter(pl.col("rank") == pl.col("rank").min().over("day", "state"))
         .drop("rank")
         .with_columns(measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16))
@@ -445,6 +573,25 @@ def emit() -> Path:
                 raw.cached(elstats_local.SOURCE, elstats_local.url(state, year)),
                 cs.source(elstats.TENANTS[state][1], elstats.TITLE),
             )
+        days = sorted(set(rows.filter(pl.col("origin") == "washington")["day"]))
+        for day in days:
+            sources[("WA", day)] = cs.source(wa_local.PUBLISHER, wa_local.TITLE)
+            if sources[("WA", day)] in cs.minted:
+                raise ValueError(f"{wa_local.TITLE} must already be a source")
+            cs.artifact(raw.cached(SOURCE, WA.format(day=day)), sources[("WA", day)])
+        king = cs.source(KING_PUBLISHER, KING_TITLE)
+        cs.add(
+            "source",
+            id=king,
+            kind="official_body",
+            publisher=KING_PUBLISHER,
+            title=KING_TITLE,
+            url="https://kingcounty.gov/en/dept/elections/results",
+            license="Public record",
+        )
+        for url in KING.values():
+            cs.artifact(raw.cached(SOURCE, url), king)
+        sources["king"] = king
         groups = {key: frame for key, frame in rows.group_by("day", "state")}
         index: dict[tuple[date, str], dict[str, set[str]]] = {}
         for (day, state), frame in groups.items():
@@ -506,6 +653,7 @@ def emit() -> Path:
             race = lines.filter((pl.col("office") == office) & (pl.col("district") == district))
             mine = set(race.filter(pl.col("candidate").is_in(list(picked)))["code"])
             race = race.filter(pl.col("code").is_in(list(mine)))
+            origin = race.group_by("origin").agg(pl.col("votes").sum()).sort("votes", descending=True)["origin"][0]
             others = race.filter(
                 (pl.col("measure") == 1) & ~pl.col("candidate").is_in(list(picked)) & ~pl.col("writein")
             )
@@ -520,7 +668,7 @@ def emit() -> Path:
                 .agg(pl.col("votes").sum())
             )
             counted = dict(sums.iter_rows())
-            if any(
+            if sum(counted.values()) == 0 or any(
                 abs(counted.get(option, 0) - official) > max(2, official * 0.005)
                 for option, _, _, official in candidates
             ):
@@ -541,7 +689,11 @@ def emit() -> Path:
                 stage=stage,
                 kind=kind,
                 status="active",
-                source_id=sources[day] if lines["origin"][0] == "medsl" else sources[(state, day)],
+                source_id=sources[day]
+                if origin == "medsl"
+                else sources["king"]
+                if origin == "king"
+                else sources[(state, day)],
                 is_default=False,
                 completeness=round(sum(counted.values()) / total, 4),
             )
