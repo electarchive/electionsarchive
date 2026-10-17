@@ -231,6 +231,22 @@ def emit() -> Path:
         elections_known = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'").fetchall()
         }
+        published: dict[UUID, UUID | None] = dict(
+            conn.execute(
+                """select o.id, o.party_id from contest_option o join changeset c on c.id = o.changeset_id
+                   where c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
+        demoted = {
+            result_set
+            for (result_set,) in conn.execute(
+                """select r.id from result_set r join changeset c on c.id = r.changeset_id
+                   join external_id e on e.entity_id = r.id and e.scheme = %s
+                   where c.pipeline <> %s and not r.is_default""",
+                [f"{SOURCE}.result_set", SOURCE],
+            ).fetchall()
+        }
         parties_known = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'").fetchall()
         }
@@ -388,12 +404,12 @@ def emit() -> Path:
             for sab, year, month, day, kind in dated.select("sab", "year", "month", "day", "kind").iter_rows()
         }
         elections: dict[tuple[str, int, int, int | None, str], UUID] = {}
-        slugs = {path for (path,) in conn.execute("select path from slug").fetchall()}
+        slugs: dict[str, UUID | None] = dict(conn.execute("select path, entity_id from slug").fetchall())
 
-        def unique(path: str) -> str:
-            if path in slugs:
+        def unique(path: str, entity: UUID | None = None) -> str:
+            if path in slugs and (entity is None or slugs[path] != entity):
                 raise ValueError(f"slug {path} is taken")
-            slugs.add(path)
+            slugs[path] = entity
             return path
 
         for sab, year, month, day, kind in sorted(on_day, key=lambda row: (row[0], row[1], row[2], row[3] or 0)):
@@ -413,7 +429,9 @@ def emit() -> Path:
                     for value in elections_known
                     if value.startswith(f"{year}-{month:02}-") and value.endswith(f":{sab}{suffix}")
                 )
-                if len(matches) == 1:
+                if f"{year}-{month:02}:{sab}{suffix}" in elections_known:
+                    datekey, precision = f"{year}-{month:02}", "month"
+                elif len(matches) == 1:
                     datekey = matches[0].split(":")[0]
                 else:
                     datekey, precision = f"{year}-{month:02}", "month"
@@ -471,9 +489,21 @@ def emit() -> Path:
                 elections[(sab, year, month, day, etype)] = election
                 days[(sab, year, month, day, etype)] = (datekey, on, kind)
 
-        fptp, top_two = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "top_two")
-        if cs.minted & {fptp, top_two}:
-            raise ValueError("the fptp and top-two systems must exist")
+        systems = {
+            key: cs.key("us.electoral_system", key)
+            for key in ("fptp", "top_two", "two_round", "two_round_40", "two_round_45", "block", "cumulative")
+        }
+        if cs.minted & (set(systems.values()) - {systems["cumulative"]}):
+            raise ValueError("the fptp, top-two, two-round, and block systems must exist")
+        if systems["cumulative"] in cs.minted:
+            cs.add(
+                "electoral_system",
+                id=systems["cumulative"],
+                polity_id=nation,
+                rules={"formula": "cumulative"},
+                rules_version=1,
+            )
+            name(systems["cumulative"], "Cumulative vote")
         persons: dict[str, UUID] = {}
         for candid, group in lines.filter(pl.col("cand") != "scattering").group_by("candid"):
             persons[str(candid[0])] = cs.key(f"{SOURCE}.person", str(candid[0]))
@@ -526,7 +556,45 @@ def emit() -> Path:
                     if match is not None and match[1] < on:
                         previous = match[0]
                         break
-            system = top_two if etype == "ttp" else fptp if magnitude == 1 and not first_round and not runoff else None
+            general = re.sub(r"(fsettled|funsettled|fpartunsettled|runoff)$", "", etype) in ("g", "gs", "ssg")
+            blanket = general and (sab == "NE" or (sab == "CA" and year >= 2012) or (sab == "WA" and year >= 2008))
+            if (
+                blanket
+                and (match := contests.get((sab, sen, code, mmdpost, "ttp", year))) is not None
+                and match[1] < on
+            ):
+                previous = match[0]
+            if etype == "ttp" or blanket:
+                system = "top_two"
+            elif sab in ("VT", "NH") and general and (first_round or runoff):
+                system = "fptp" if runoff or magnitude == 1 else "block"
+            elif (
+                first_round
+                or runoff
+                or (sab == "GA" and "primary" not in label)
+                or (
+                    "primary" in label
+                    and (
+                        sab in ("AL", "AR", "GA", "MS", "NC", "OK", "SC", "TX")
+                        or (sab == "FL" and year < 2002)
+                        or (sab == "LA" and year < 1975)
+                        or (sab == "VA" and year <= 1969)
+                    )
+                )
+            ):
+                system = (
+                    "two_round_40"
+                    if sab == "NC"
+                    else "two_round_45"
+                    if sab == "GA" and general and 1994 <= year <= 2004
+                    else "two_round"
+                )
+            elif group["dtype"][0] == 10:
+                system = "cumulative"
+            elif magnitude == 1 or (magnitude is None and group["dtype"][0] not in (3, 6, 9)):
+                system = "fptp"
+            else:
+                system = "block"
             cs.add(
                 "contest",
                 id=contest,
@@ -538,7 +606,7 @@ def emit() -> Path:
                 term="remainder" if etype == "gs" else "full",
                 round_number=2 if previous is not None else 1,
                 previous_round_id=previous,
-                electoral_system_id=system,
+                electoral_system_id=systems[system],
                 default_result_kind="counted",
                 party_scope_id=party(sab, None, scope)[0] if scope in ("d", "r") else party(sab, scope, "nm")[0],
             )
@@ -551,7 +619,7 @@ def emit() -> Path:
                 + ("" if label == "election" else f"-{slug(label)}")
                 + (f"-{etype[-1]}" if etype[-1].isdigit() else "")
             )
-            cs.add("slug", path=unique(path), entity_id=contest)
+            cs.add("slug", path=unique(path, contest), entity_id=contest)
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             cs.add(
                 "result_set",
@@ -562,7 +630,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=contest_key not in RANKED_ROUNDS,
+                is_default=contest_key not in RANKED_ROUNDS and result_set not in demoted,
                 completeness=None if group["votes"].is_null().any() else 1,
             )
             fresh = result_set in cs.minted
@@ -581,7 +649,7 @@ def emit() -> Path:
                     id=root,
                     contest_id=contest,
                     kind="write_in" if write_in else "candidate",
-                    party_id=resolved[0][0] if len(rows) == 1 else None,
+                    party_id=published.get(root, resolved[0][0] if len(rows) == 1 else None),
                     ballot_label=ballot,
                 )
                 if not scattered:
@@ -607,7 +675,7 @@ def emit() -> Path:
                             contest_id=contest,
                             parent_option_id=root,
                             kind="write_in" if partyz == "w" else "candidate",
-                            party_id=party_id,
+                            party_id=published.get(target, party_id),
                             ballot_label=f"{ballot} ({text})",
                         )
                     if fresh and votes is not None:
