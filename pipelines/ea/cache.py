@@ -22,6 +22,7 @@ RESTRICTED = {
 CLASSES = [
     ("restricted", re.compile(r"ICPSR|All rights reserved", re.IGNORECASE)),
     ("non-commercial", re.compile(r"non-?commercial", re.IGNORECASE)),
+    ("revocable", re.compile(r"revocable", re.IGNORECASE)),
     ("share-alike", re.compile(r"ShareAlike|BY-SA|ODbL|Open Database License", re.IGNORECASE)),
     (
         "open",
@@ -41,7 +42,16 @@ CLASSES = [
     ("public-record", re.compile(r"public record", re.IGNORECASE)),
     ("unknown", re.compile(r"^No license stated")),
 ]
-STRICTNESS = ["open", "attribution", "public-record", "share-alike", "unknown", "non-commercial", "restricted"]
+STRICTNESS = [
+    "open",
+    "attribution",
+    "public-record",
+    "share-alike",
+    "unknown",
+    "revocable",
+    "non-commercial",
+    "restricted",
+]
 SHAREABLE = {"open", "attribution", "public-record", "share-alike"}
 FRESH = timedelta(days=1)
 

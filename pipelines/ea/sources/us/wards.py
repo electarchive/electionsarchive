@@ -55,6 +55,38 @@ PUBLISHERS = {
         "https://maps.longbeach.gov/pages/termsofuse",
     ),
     "yonkers": ("City of Yonkers", FREE, None),
+    "phoenix": (
+        "City of Phoenix",
+        (
+            "City of Phoenix Open Data Terms of Use: non-exclusive, limited, and revocable rights to use, reproduce, and"
+            " redistribute City data; used by the owner's decision of 2026-10-17"
+        ),
+        "https://phoenixopendata.com/pages/terms-of-use",
+    ),
+    "durham": (
+        "City of Durham",
+        (
+            "Open Database License (ODbL) 1.0, with the City and County of Durham reserving their other rights in the data;"
+            " used by the owner's decision of 2026-10-17"
+        ),
+        "https://opendatacommons.org/licenses/odbl/1-0/",
+    ),
+    "charlotte": (
+        "City of Charlotte",
+        (
+            "Creative Commons Attribution-NonCommercial-ShareAlike 4.0 (CC BY-NC-SA 4.0); used by the owner's decision of"
+            " 2026-10-17"
+        ),
+        "https://creativecommons.org/licenses/by-nc-sa/4.0/",
+    ),
+    "census-vtd": (
+        "Elections Archive",
+        (
+            "Public domain: built by this archive as unions of U.S. Census Bureau TIGER/Line voting districts, a U.S."
+            " Government work"
+        ),
+        "https://www.census.gov/about/policies/open-gov/open-data.html",
+    ),
     "guilford": ("Guilford County, North Carolina", FREE, None),
     "high-point": ("City of High Point", FREE, None),
     "boston-archive": ("City of Boston", FREE, None),
@@ -152,7 +184,48 @@ PUBLISHERS = {
 NYC = "https://www.nyc.gov/assets/planning/download/zip/data-maps/open-data"
 NYC_NEW = "https://s-media.nyc.gov/agencies/dcp/assets/files/zip/data-tools/bytes/city-council"
 GRANIT = "https://ftp.granit.unh.edu/GRANIT_Data/Vector_Data/Administrative_and_Political_Boundaries/d-nhpolitdists"
+DERIVED = {"census-vtd"}
 PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
+    "0455000": [
+        (
+            2024,
+            None,
+            "arcgis:https://services.arcgis.com/cfKakmeHE95cgeEK/arcgis/rest/services/Council_Districts/FeatureServer/0",
+            "DISTRICT",
+            "phoenix",
+            "Council Districts",
+        ),
+    ],
+    "3719000": [
+        (
+            2025,
+            None,
+            "arcgis:https://services2.arcgis.com/G5vR3cOjh6g2Ed8E/ArcGIS/rest/services/Electoral/FeatureServer/3",
+            "Ward",
+            "durham",
+            "City Council Wards",
+        ),
+    ],
+    "3712000": [
+        (
+            2022,
+            None,
+            "arcgis:https://gis.charlottenc.gov/arcgis/rest/services/PLN/CouncilDistricts/MapServer/0",
+            "District",
+            "charlotte",
+            "Council Districts",
+        ),
+    ],
+    "0952000": [
+        (
+            2013,
+            2023,
+            "https://www2.census.gov/geo/tiger/TIGER2020PL/LAYER/VTD/2020/tl_2020_09_vtd20.zip",
+            r"NAME20~New Haven (?!0*(?:9|17|21)-)0*(\d+)-.*",
+            "census-vtd",
+            "New Haven wards, 2012 plan, rebuilt from Census 2020 voting districts",
+        ),
+    ],
     "3345140": [
         (
             2013,
@@ -1303,14 +1376,15 @@ def features(url: str) -> Iterator[tuple[dict[str, object], str, int]]:
 def parse() -> None:
     with connect() as conn:
         conn.execute(
-            "create temp table feature (geoid text, plan int, label text, geojson text, srid int) on commit drop"
+            "create temp table feature (geoid text, plan int, label text, geojson text, srid int, clip bool)"
+            " on commit drop"
         )
         with (
             conn.cursor() as cursor,
-            cursor.copy("copy feature (geoid, plan, label, geojson, srid) from stdin") as copy,
+            cursor.copy("copy feature (geoid, plan, label, geojson, srid, clip) from stdin") as copy,
         ):
             for geoid, plans in PLANS.items():
-                for start, _, url, field, _, _ in plans:
+                for start, _, url, field, publisher, _ in plans:
                     for properties, geometry, srid in features(url):
                         spec, _, condition = field.partition("@")
                         name, _, pattern = spec.partition("~")
@@ -1322,17 +1396,32 @@ def parse() -> None:
                             match = re.fullmatch(pattern, str(label).strip())
                             label = match[1] if match else None
                         if label is not None and token(str(label)):
-                            copy.write_row((geoid, start, token(str(label)), geometry, srid))
+                            copy.write_row((geoid, start, token(str(label)), geometry, srid, publisher in DERIVED))
         rows = conn.execute(
             """with shape as (
                  select geoid, plan, label,
                         st_multi(st_collectionextract(st_makevalid(st_union(st_makevalid(st_force2d(
                           st_transform(st_setsrid(st_geomfromgeojson(geojson), srid), 4326))))), 3)) as geom
                  from feature group by geoid, plan, label
+               ), clipped as (
+                 select s.geoid, s.plan, s.label, st_multi(st_union(d.geom)) as geom
+                 from shape s
+                 join area a on a.scheme_code = 'us.place'
+                 join area_code c on c.area_id = a.id and c.code = s.geoid
+                 join area_geometry g on g.area_id = a.id
+                 cross join lateral (
+                   select p.geom, st_area(p.geom) / sum(st_area(p.geom)) over () as share
+                   from st_dump(st_collectionextract(st_makevalid(st_intersection(s.geom, g.geom)), 3)) p
+                 ) d
+                 where (s.geoid, s.plan) in (select geoid, plan from feature where clip) and d.share >= 0.05
+                 group by s.geoid, s.plan, s.label
+                 union all
+                 select geoid, plan, label, geom from shape
+                 where (geoid, plan) not in (select geoid, plan from feature where clip)
                )
                select geoid, plan, label, encode(st_asewkb(geom), 'hex'),
                       encode(st_asewkb(st_pointonsurface(geom)), 'hex'), st_area(geom::geography) / 1e6
-               from shape where not st_isempty(geom)"""
+               from clipped where not st_isempty(geom)"""
         ).fetchall()
     frame = pl.DataFrame(
         rows,
@@ -1392,7 +1481,7 @@ def emit() -> Path:
                         cs.add(
                             "source",
                             id=source,
-                            kind="official_body",
+                            kind="compendium" if publisher in DERIVED else "official_body",
                             publisher=name,
                             title=title,
                             url=socrata(url) if url.startswith("socrata:") else layer(url),
@@ -1414,7 +1503,7 @@ def emit() -> Path:
             )
         shaped = 0
         for geoid, plan, label, geom, point in frame.select("geoid", "plan", "label", "geom", "point").iter_rows():
-            end = next(end for start, end, *_ in PLANS[geoid] if start == plan)
+            end, publisher = next((end, publisher) for start, end, _, _, publisher, _ in PLANS[geoid] if start == plan)
             for area in areas.get((geoid, label), []):
                 shaped += 1
                 cs.add(
@@ -1426,7 +1515,7 @@ def emit() -> Path:
                     valid_to_precision="year",
                     geom=geom,
                     label_point=point,
-                    quality="official",
+                    quality="synthetic" if publisher in DERIVED else "official",
                     source_id=sources[(geoid, plan)],
                 )
         print(f"{shaped} geometry versions on {len({id for ids in areas.values() for id in ids})} candidate areas")
