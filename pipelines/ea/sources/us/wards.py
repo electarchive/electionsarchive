@@ -37,6 +37,18 @@ PUBLISHERS = {
         None,
     ),
     "albuquerque": ("City of Albuquerque", FREE, None),
+    "aurora": ("City of Aurora, Illinois", FREE, None),
+    "boston-archive": ("City of Boston", FREE, None),
+    "milwaukee-city": (
+        "City of Milwaukee",
+        "Creative Commons Attribution",
+        "https://creativecommons.org/licenses/by/4.0/",
+    ),
+    "san-francisco-pddl": (
+        "City and County of San Francisco",
+        "Open Data Commons Public Domain Dedication and License (PDDL)",
+        "https://opendatacommons.org/licenses/pddl/1-0/",
+    ),
     "atlanta": ("City of Atlanta Department of City Planning", FREE, None),
     "augusta": ("Augusta-Richmond County", FREE, None),
     "berkeley": ("City of Berkeley", FREE, None),
@@ -323,6 +335,14 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
     ],
     "0667000": [
         (
+            2002,
+            2012,
+            "socrata:data.sfgov.org/qdm2-fi8r",
+            "supervisor",
+            "san-francisco-pddl",
+            "Supervisor Districts (2002)",
+        ),
+        (
             2022,
             None,
             "arcgis:https://services7.arcgis.com/7qUjhSdhXbHzGULA/arcgis/rest/services/Supervisor_Districts/FeatureServer/0",
@@ -455,6 +475,22 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
     ],
     "4260000": [
         (
+            1991,
+            2003,
+            "arcgis:https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/Council_Districts_1990/FeatureServer/0",
+            "district",
+            "philadelphia",
+            "Council Districts 1990",
+        ),
+        (
+            2003,
+            2012,
+            "https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/Council_Districts_2000/FeatureServer/0/query?where=1%3D1&outFields=*&outSR=4326&f=geojson",
+            "DIST_NUM",
+            "philadelphia",
+            "Council Districts 2000",
+        ),
+        (
             2012,
             2023,
             "arcgis:https://services.arcgis.com/fLeGjb7u4uXqeF9q/arcgis/rest/services/Council_Districts_2016/FeatureServer/0",
@@ -482,6 +518,22 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
         ),
     ],
     "2507000": [
+        (
+            1983,
+            1993,
+            "arcgis:https://services.arcgis.com/sFnw0xNflSi8J0uh/arcgis/rest/services/1983_City_Council_Districts/FeatureServer/0",
+            "DISTRICT",
+            "boston-archive",
+            "1983 City Council Districts",
+        ),
+        (
+            1993,
+            2003,
+            "arcgis:https://services.arcgis.com/sFnw0xNflSi8J0uh/arcgis/rest/services/1993_City_Council_Districts/FeatureServer/0",
+            "DISTRICT",
+            "boston-archive",
+            "1993 City Council Districts",
+        ),
         (
             2014,
             2023,
@@ -536,6 +588,30 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
         ),
     ],
     "5553000": [
+        (
+            1992,
+            2004,
+            "https://data.milwaukee.gov/dataset/1301738f-4b4a-4f73-bbaa-a4cac069e371/resource/bc82c16f-281a-4453-b063-8ff1cf318b84/download/ald1992.zip",
+            "DISTRICT",
+            "milwaukee-city",
+            "Aldermanic Districts 1992",
+        ),
+        (
+            2004,
+            2012,
+            "https://data.milwaukee.gov/dataset/1301738f-4b4a-4f73-bbaa-a4cac069e371/resource/dc576495-95be-44b0-b60e-6e520fddbef5/download/ald2004.zip",
+            "ALD2000",
+            "milwaukee-city",
+            "Aldermanic Districts 2004",
+        ),
+        (
+            2012,
+            2024,
+            "https://data.milwaukee.gov/dataset/1301738f-4b4a-4f73-bbaa-a4cac069e371/resource/e34a8c79-2fad-4c7b-bf46-0ceb210f74fb/download/alders052023.zip",
+            "ALD2012",
+            "milwaukee-city",
+            "Aldermanic Districts 2012",
+        ),
         (
             2024,
             None,
@@ -923,6 +999,24 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
             "BDNUM",
             "minneapolis",
             "Wards 2022",
+        ),
+    ],
+    "1703012": [
+        (
+            2013,
+            2023,
+            "arcgis:https://gis.aurora.il.us/arcgis/rest/services/Administrative_Boundaries/2013Wards/MapServer/0",
+            "WARD",
+            "aurora",
+            "2013 Wards",
+        ),
+        (
+            2023,
+            None,
+            "arcgis:https://gis.aurora.il.us/arcgis/rest/services/Administrative_Boundaries/2022Wards/FeatureServer/0",
+            "WARD",
+            "aurora",
+            "2022 Wards",
         ),
     ],
     "1304000": [
