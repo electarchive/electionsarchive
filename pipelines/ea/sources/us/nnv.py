@@ -19,7 +19,7 @@ from ea.sources.us.party_labels import NATIONAL, UNAFFILIATED
 from ea.store import DATA, connect
 
 SOURCE = "us.nnv"
-VERSION = "3"
+VERSION = "4"
 COMMIT = "13e2f82692c76e3695f6cd609a5e710d6cab5e26"
 ARCHIVE = f"https://codeload.github.com/mapping-elections/nnv-xml/tar.gz/{COMMIT}"
 PUBLISHER = "American Antiquarian Society and Tufts University"
@@ -998,9 +998,6 @@ def emit() -> Path:
                 )
                 if clash:
                     tally["NNV races THEA holds without reconciling, not added"] += 1
-                    continue
-                if district and any(other == year for other, *_ in thea_seats.get((postal, 0), [])):
-                    tally["NNV district races where THEA holds the state's seats at large, not added"] += 1
                     continue
                 seats = (
                     max(len(winner_words), 1)

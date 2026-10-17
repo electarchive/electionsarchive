@@ -521,6 +521,13 @@ def emit() -> Path:
                    join changeset c on c.id = k.changeset_id where c.pipeline = 'us.nnv_trials'"""
             ).fetchall()
         }
+        split: set[UUID] = {
+            id
+            for (id,) in conn.execute(
+                """select r.id from result_set r join changeset c on c.id = r.changeset_id
+                   where c.pipeline = 'us.nnv_split'"""
+            ).fetchall()
+        }
         labeled: dict[UUID, UUID] = dict(
             conn.execute(
                 """select o.id, o.party_id from contest_option o join changeset c on c.id = o.changeset_id
@@ -721,9 +728,9 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="official",
                 kind="tacit" if tacit else "counted",
-                status="active",
+                status="superseded" if result_set in split else "active",
                 source_id=sources[chamber],
-                is_default=True,
+                is_default=result_set not in split,
                 supersedes_id=previous,
                 completeness=None if tacit else 1 if len(counted) == len(rows) else 0,
             )
