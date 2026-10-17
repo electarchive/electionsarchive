@@ -5,7 +5,7 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
+from ea import names, raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import medsl, medsl_state
 from ea.sources.us.medsl_state_precincts import FILES, TITLES
@@ -15,7 +15,7 @@ SOURCE = "us.medsl_statewide"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 TAIL = (
-    r"(?:,? -? ?(?P<seat>(?:PLACE|POSITION|SEAT|DEPT\.|DEPARTMENT|COURT|- JUSTICE POSITION) #?\w+|#\d+|\d+|\([A-Z]+\)"
+    r"(?:,? -? ?(?P<seat>(?:PLACE|POSITION|SEAT|DEPT\.|DEPARTMENT|COURT|- JUSTICE POSITION) (?:NO\. )?#?\w+|#\d+|\d+|\([A-Z]+\)"
     r"|:? ?TERM COMMENCING [\d/]+|UNEXPIRED [\w\- /,]+|INCUMBENT - PARTIAL TERM ENDING [\d/]+))?"
     r"(?: FULL TERM| 8 YEAR TERMS? \(\d\) POSITIONS?)?"
 )
@@ -23,7 +23,7 @@ OFFICES = [
     (r"(?:STATE )?GOVERNOR(?: AND (?:LIEUTENANT|LT\.) GOVERNOR|/LIEUTENANT GOVERNOR)?", "Governor"),
     (r"(?:LIEUTENANT|LT\.) GOVERNOR", "Lieutenant Governor"),
     (r"(?:STATE )?ATTORNEY GENERAL", "Attorney General"),
-    (r"(?:WASHINGTON STATE - )?SECRETARY OF STATE(?:\|STATEWIDE)?", "Secretary of State"),
+    (r"(?:WASHINGTON STATE - |STATE OF WASHINGTON )?SECRETARY OF STATE(?:\|STATEWIDE)?", "Secretary of State"),
     (r"SECRETARY OF THE STATE", "Secretary of the State"),
     (r"SECRETARY OF THE COMMONWEALTH", "Secretary of the Commonwealth"),
     (r"(?:STATE |GENERAL )?TREASURER(?: OF STATE)?", "Treasurer"),
@@ -125,6 +125,7 @@ MAJORITY = {"GA"}
 RETENTION = r"^(YES|NO)\b|- (YES|NO|UNDERVOTES|OVERVOTES)$|RETAIN|REJECT|^FOR$|^AGAINST$"
 PSEUDO = r"^(OVER|UNDER) ?VOTES?$|^NONE$|^NOT QUALIFIED$|^BLANKS?$|^SPOILED$|^VOID$"
 NOTA = "NONE OF THESE CANDIDATES"
+MISSPELLED = {"OR:ELIZABETH STENIER": "ELIZABETH STEINER"}
 LABELS = {
     "DEMOCRATIC": "DEMOCRAT",
     "DEM": "DEMOCRAT",
@@ -213,7 +214,9 @@ def parse() -> None:
                     column = re.sub(r"^STATEWIDE, ", "", seat).split(", ")[-1]
                 post = tail or column
                 if post and (
-                    number := re.fullmatch(r"(?:PLACE|POSITION|SEAT|COURT|- JUSTICE POSITION)? ?#?0*(\d+)", post)
+                    number := re.fullmatch(
+                        r"(?:PLACE|POSITION|SEAT|COURT|- JUSTICE POSITION)? ?(?:NO\. )?#?0*(\d+)", post
+                    )
                 ):
                     post = number[1]
                 named.append((office, seat, title, post))
@@ -337,6 +340,18 @@ def emit() -> Path:
                    where p.iso_code like 'US-%'"""
             ).fetchall()
         )
+        own: dict[str, tuple[UUID, UUID, UUID, UUID, UUID | None, int]] = {
+            key: (result_set, election, contest, source, supersedes, int(total))
+            for key, result_set, election, contest, source, supersedes, total in conn.execute(
+                """select regexp_replace(x.value, ':([0-9]+|folded)$', ''), r.id, r.election_id, r.contest_id, r.source_id,
+                          r.supersedes_id,
+                          (select coalesce(sum(v.value), 0) from result_value v
+                           where v.result_set_k = r.k and v.measure = 1 and v.count_round = 0)
+                   from external_id x join result_set r on r.id = x.entity_id and r.is_default
+                   where x.scheme = %s""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -386,6 +401,8 @@ def emit() -> Path:
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round")}
         values: list[tuple[str, str, str, int]] = []
         persons: set[str] = set()
+        folds: dict[UUID, list[UUID]] = {}
+        outcomes: list[tuple[UUID, UUID, str, int | None]] = []
         mapping: list[tuple[int, str, str, str | None, bool, str]] = []
         contest_columns = ["year", "day", "state", "title", "post", "special"]
         for row in races.sort("state", "year", "title", "post", nulls_last=True).iter_rows(named=True):
@@ -436,20 +453,47 @@ def emit() -> Path:
                 matches = [key for key in matches if key.split(":")[2] == slug(office)] or matches
             if len(matches) > 1:
                 matches = [max(matches, key=lambda key: len(existing[(str(day), state)][key]))]
+            entries = sorted(
+                lines.group_by("candidate", "writein", "party", maintain_order=True)
+                .agg(pl.col("votes").sum())
+                .group_by("candidate", "writein", maintain_order=True),
+                key=lambda entry: -entry[1]["votes"].sum(),
+            )
+            named = [
+                index for index, ((candidate, pooled), _) in enumerate(entries) if not pooled and candidate != NOTA
+            ]
+            folded = {
+                named[index]: named[survivor]
+                for index, survivor in names.fold(
+                    [
+                        title(MISSPELLED.get(f"{state}:{entries[index][0][0]}", str(entries[index][0][0])))
+                        for index in named
+                    ]
+                ).items()
+            }
+            revised = None
             if matches:
                 mapping.append((year, state, office, post, special, matches[0]))
-                continue
-            if contest_key in keys:
+                published = own.get(matches[0])
+                changed = published is not None and published[5] != int(lines["votes"].sum())
+                if matches[0] != contest_key or published is None or not (changed or (folded and published[4] is None)):
+                    continue
+                contest_key, revised = matches[0], published
+                print(
+                    f"{contest_key}: {published[5]} votes on file, {int(lines['votes'].sum())} parsed, {len(folded)} folded"
+                )
+            elif contest_key in keys:
                 print(f"{contest_key}: taken by a contest with other candidates, skipped")
                 continue
-            keys.add(contest_key)
-            mapping.append((year, state, office, post, special, contest_key))
+            else:
+                keys.add(contest_key)
+                mapping.append((year, state, office, post, special, contest_key))
             election = cs.key("us.election", f"{day}:{state}")
             if election in cs.minted:
                 raise ValueError(f"no election {day}:{state}")
             office_key = f"{slug(office)}:{state}"
             office_id = cs.key("us.office", office_key)
-            if office_key not in offices_known:
+            if revised is None and office_key not in offices_known:
                 offices_known.add(office_key)
                 cs.add(
                     "office",
@@ -494,7 +538,15 @@ def emit() -> Path:
             if slugs.setdefault(path, contest) != contest:
                 raise ValueError(f"slug {path} is taken")
             cs.add("slug", path=path, entity_id=contest)
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            total = int(lines["votes"].sum())
+            result_set = cs.key(
+                f"{SOURCE}.result_set",
+                contest_key
+                if revised is None
+                else f"{contest_key}:{total}"
+                if total != revised[5]
+                else f"{contest_key}:folded",
+            )
             missing = int(row["counties"] or 0) - len(row["present"])
             cs.add(
                 "result_set",
@@ -506,8 +558,27 @@ def emit() -> Path:
                 status="active",
                 source_id=sources[year],
                 is_default=True,
+                supersedes_id=None if revised is None else revised[0],
                 completeness=None,
             )
+            if revised is not None:
+                cs.add(
+                    "result_set",
+                    id=revised[0],
+                    election_id=revised[1],
+                    contest_id=revised[2],
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=revised[3],
+                    is_default=False,
+                    supersedes_id=revised[4],
+                    completeness=None,
+                )
+                for option, kind, seats in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [revised[0]]
+                ).fetchall():
+                    outcomes.append((revised[0], option, kind, seats))
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
             if missing > 0:
                 cs.add(
@@ -517,12 +588,14 @@ def emit() -> Path:
                     body_md=MISSING.format(counties=f"{missing} of the state's {row['counties']} counties"),
                 )
             totals: list[tuple[int, UUID]] = []
-            total = int(lines["votes"].sum())
-            for (candidate, pooled), rows in (
-                lines.group_by("candidate", "writein", "party", maintain_order=True)
-                .agg(pl.col("votes").sum())
-                .group_by("candidate", "writein", maintain_order=True)
-            ):
+            members: dict[int, list[int]] = defaultdict(list)
+            for index in range(len(entries)):
+                members[folded.get(index, index)].append(index)
+            for index, indices in members.items():
+                (candidate, pooled), _ = entries[index]
+                rows = pl.concat(
+                    [entries[member][1].with_columns(printed=pl.lit(str(entries[member][0][0]))) for member in indices]
+                )
                 nota = candidate == NOTA
                 option_key = (
                     f"{contest_key}:write-ins"
@@ -533,6 +606,7 @@ def emit() -> Path:
                 )
                 root = cs.key("us.option", option_key)
                 labels = rows["party"].to_list()
+                printed = rows["printed"].to_list()
                 resolved = [party(state, label) for label in labels] if not (pooled or nota) else [(None, False)]
                 ballot = "Write-ins" if pooled else "None of These Candidates" if nota else title(str(candidate))
                 cs.add(
@@ -562,8 +636,13 @@ def emit() -> Path:
                 targets = [root]
                 if len(rows) > 1 and not (pooled or nota):
                     targets = []
-                    for label, (party_id, _) in zip(labels, resolved, strict=True):
-                        target = cs.key("us.option", f"{option_key}:{slug(label or 'no party')}")
+                    for text, label, (party_id, _) in zip(printed, labels, resolved, strict=True):
+                        target = cs.key(
+                            "us.option",
+                            f"{option_key}:"
+                            + ("" if text == candidate else f"{slug(text)}:")
+                            + slug(label or "no party"),
+                        )
                         cs.add(
                             "contest_option",
                             id=target,
@@ -571,15 +650,19 @@ def emit() -> Path:
                             parent_option_id=root,
                             kind="candidate",
                             party_id=party_id,
-                            ballot_label=f"{ballot} ({title(label or 'no party')})",
+                            ballot_label=f"{title(text)} ({title(label or 'no party')})",
                         )
                         targets.append(target)
-                for label, target in zip(labels, targets * len(labels) if len(targets) == 1 else targets, strict=True):
+                for text, label, target in zip(
+                    printed, labels, targets * len(labels) if len(targets) == 1 else targets, strict=True
+                ):
                     cells = lines.filter(
-                        pl.col("candidate") == candidate, pl.col("writein") == pooled, pl.col("party").eq_missing(label)
+                        pl.col("candidate") == text, pl.col("writein") == pooled, pl.col("party").eq_missing(label)
                     )
                     for county, votes in (
-                        cells.with_columns(
+                        ()
+                        if result_set not in cs.minted
+                        else cells.with_columns(
                             unit=pl.when(pl.col("county").is_in(list(counties))).then("county").otherwise(pl.lit(state))
                         )
                         .group_by("unit")
@@ -590,6 +673,25 @@ def emit() -> Path:
                         values.append((str(result_set), str(unit), str(target), int(votes)))
                 if not (pooled or nota):
                     totals.append((int(rows["votes"].sum()), root))
+                for member in indices if revised is not None else ():
+                    gone = str(entries[member][0][0])
+                    gone_key = f"{contest_key}:{slug(gone)}"
+                    old = cs.key("us.option", gone_key)
+                    if member == index or old in cs.minted:
+                        continue
+                    lost = [label for text, label in zip(printed, labels, strict=True) if text == gone]
+                    for label in lost:
+                        into = cs.key("us.option", f"{option_key}:{slug(gone)}:{slug(label or 'no party')}")
+                        cs.merge(
+                            old if len(lost) == 1 else cs.key("us.option", f"{gone_key}:{slug(label or 'no party')}"),
+                            into,
+                        )
+                    if len(lost) > 1:
+                        cs.merge(old, root)
+                    cs.merge(cs.key("us.candidacy", f"{gone_key}:head"), cs.key("us.candidacy", f"{option_key}:head"))
+                    folds.setdefault(cs.key(f"{SOURCE}.person", f"{state}:{slug(gone)}"), []).append(
+                        cs.key(f"{SOURCE}.person", f"{state}:{slug(str(candidate))}")
+                    )
             if missing > 0:
                 continue
             totals.sort(key=lambda pair: -pair[0])
@@ -603,6 +705,18 @@ def emit() -> Path:
                 continue
             for _, root in totals[:magnitude]:
                 cs.add("outcome", result_set_id=result_set, option_id=root, kind="elected", seats=1)
+        for result_set, option, kind, seats in outcomes:
+            cs.add(
+                "outcome", result_set_id=result_set, option_id=cs.survivors.get(option, option), kind=kind, seats=seats
+            )
+        candidacies: dict[UUID, int] = dict(
+            conn.execute(
+                "select person_id, count(*) from candidacy where person_id = any(%s) group by 1", [list(folds)]
+            ).fetchall()
+        )
+        for duplicate, into in folds.items():
+            if len(set(into)) == 1 and candidacies.get(duplicate, 0) == len(into) and duplicate not in cs.minted:
+                cs.merge(duplicate, into[0])
         cs.frame(
             "result_value",
             pl.DataFrame(
