@@ -8169,23 +8169,19 @@ export const parties = {
           union select em.entity_id from entity_merge em where em.into_id in (select id from branches)
         ),
         predecessors as (
-          select coalesce(fm.into_id, r.from_party_id) as id, r.date as until
+          select coalesce(fm.into_id, r.from_party_id) as id
           from party_relation r
           left join entity_merge fm on fm.entity_id = r.from_party_id
           left join entity_merge tm on tm.entity_id = r.to_party_id
-          where r.kind = 'merged_into' and r.date is not null
-            and coalesce(tm.into_id, r.to_party_id) in (select id from ids)
+          where r.kind = 'merged_into' and coalesce(tm.into_id, r.to_party_id) in (select id from ids)
         ),
-        early as (
-          select id, until from predecessors
-          union select em.entity_id, p.until from entity_merge em join predecessors p on em.into_id = p.id
+        early as materialized (
+          select id, id as via from predecessors
+          union select em.entity_id, p.id from entity_merge em join predecessors p on em.into_id = p.id
         ),
         mine as materialized (
-          select o.id as option, o.contest_id from contest_option o where o.party_id in (select id from family)
-          union
-          select o.id, o.contest_id from early p join contest_option o on o.party_id = p.id
-          join contest c on c.id = o.contest_id join election e on e.id = c.election_id
-          where e.date_from < p.until
+          select o.id as option, o.contest_id from contest_option o
+          where o.party_id in (select id from family) or o.party_id in (select id from early)
         ),
         up(id, parent) as (
           select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
@@ -8237,12 +8233,13 @@ export const parties = {
           select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by root
         ),
         tallied as (
-          select f.root, sum(f.value) as total,
+          select f.root, sum(f.value) as total, min(pe.via::text) as via,
             coalesce(sum(f.value) filter (
               where o.id in (select option from mine) or o.parent_option_id in (select option from mine)
             ), 0) as votes
           from fetched f join mains m on m.root = f.root and m.main = f.measure
           join contest_option o on o.k = f.option_k
+          left join early pe on pe.id = o.party_id
           where f.count_round = f.first
           group by f.root
         ),
@@ -8276,7 +8273,7 @@ export const parties = {
           min(r.year) as year, count(distinct r.id)::int as races,
           sum(t.votes)::float8 as votes, sum(t.total)::float8 as total,
           sum(s.seats)::int as seats, sum(s.filled)::int as filled,
-          (select p.id from predecessors p where p.until > min(r.date) order by p.until limit 1) as predecessor
+          min(t.via) as predecessor
         from roots r left join tallied t on t.root = r.id left join seated s on s.root = r.id
         group by r.bucket, r.seat
         order by min(r.date)
