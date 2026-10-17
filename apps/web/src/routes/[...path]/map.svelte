@@ -193,7 +193,10 @@
       Math.log(Math.tan(Math.PI / 4 + (latitude * Math.PI) / 360));
     const wide = ((frame.east - frame.west) * Math.PI) / 180;
     const tall = y(frame.north) - y(frame.south);
-    return Math.min(2, Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04));
+    return Math.min(
+      frames.length > 1 ? 1.5 : 2,
+      Math.max(0.8, (wide / Math.max(tall, 0.0001)) * 1.04),
+    );
   });
   const leads = $derived(
     Map.groupBy(
@@ -577,7 +580,7 @@
       ];
       const room = {
         top: 20,
-        right: 52,
+        right: matchMedia("(min-width: 40rem)").matches ? 52 : 20,
         bottom: (surfaces[1]?.clientHeight ?? 0) + 20,
         left: 20,
       };
