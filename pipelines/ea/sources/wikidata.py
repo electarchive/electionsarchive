@@ -137,6 +137,7 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("US", "Socialist Party of America", None): "CD3700",
     ("US", "Southern Democrats", None): "4F990C",
     ("US", "States' Rights Democratic Party", None): "FF9955",
+    ("US", "Union Party", None): "7F3300",
     ("DE", "Bavarian Peasants' League", None): "4C9A3C",
     ("DE", "Bavarian People's Party", None): "5EA4D8",
     ("DE", "Centre Party", None): "6E6E6E",

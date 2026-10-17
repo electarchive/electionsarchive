@@ -846,9 +846,21 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "contests.parquet")
+    frame = pl.read_parquet(PARSED / "contests.parquet").with_columns(
+        party=pl.when(pl.col("year").is_between(1936, 1940))
+        .then(pl.col("party").str.replace_all(r"(^|[,;/]\s*)Union(\s*(?:[,;/]|$))", "${1}Union Party of 1936${2}"))
+        .otherwise(pl.col("party"))
+    )
     days = {year: date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in YEARS}
     with connect() as conn:
+        claimed: set[UUID] = {
+            contest
+            for (contest,) in conn.execute(
+                """select rs.contest_id from result_set rs join changeset c on c.id = rs.changeset_id
+                   where rs.is_default and c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
         states: dict[str, tuple[UUID, UUID, str, str]] = {
             iso.removeprefix("US-"): (unit, area, text, code)
             for text, iso, unit, area, code in conn.execute(
@@ -999,13 +1011,13 @@ def emit() -> Path:
                 canonical = CANONICAL.get(label, PARTIES.get(label, label))
                 if re.search(r"Minnesota|North Dakota", canonical) and state not in ("MN", "ND"):
                     canonical = label
-                national = canonical in NATIONAL
+                national = canonical in NATIONAL or canonical == "Union Party of 1936"
                 party = cs.key("us.party", slug(canonical) if national else f"{state}:{slug(canonical)}")
                 parties[(state, label)] = party
                 if party in cs.minted and party not in created:
                     created.add(party)
                     cs.add("party", id=party, kind="party", polity_id=us if national else cs.polity(f"US-{state}"))
-                    name(party, canonical)
+                    name(party, "Union Party" if canonical == "Union Party of 1936" else canonical)
 
         persons: dict[str, UUID] = {}
         by_state: dict[tuple[str, str], UUID] = {}
@@ -1178,7 +1190,7 @@ def emit() -> Path:
                     f"Statistics of the {'Presidential and ' if year % 4 == 0 else ''}Congressional Election of "
                     f"{days[year]:%B %-d, %Y}",
                 ),
-                is_default=True,
+                is_default=contest not in claimed,
                 completeness=None if tacit else 0 if missing else 1,
             )
             for applies, kind, body in (
