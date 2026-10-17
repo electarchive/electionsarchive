@@ -114,12 +114,17 @@ def emit() -> Path:
                 "select code, id, area_id from reporting_unit where scheme_code in ('us.county', 'us.place')"
             ).fetchall()
         }
-        shaped: dict[str, str] = {
+        areas: dict[str, str] = {
             code: str(area)
             for code, area in conn.execute(
                 """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
-                   where a.scheme_code = 'us.precinct' and c.code ~ '^20(16|18|20|22|24):'"""
+                   where a.scheme_code = 'us.precinct'"""
             ).fetchall()
+        }
+        shaped = {code: areas[code] for code in units["code"] if code in areas} | {
+            unit: areas[area]
+            for unit, area in pl.read_parquet(DATA / "parsed" / "us.precinct_shapes" / "links.parquet").iter_rows()
+            if area in areas
         }
         missing = set(units["county"]) - set(counties)
         if missing:
@@ -127,7 +132,9 @@ def emit() -> Path:
         existing = {
             code
             for (code,) in conn.execute(
-                "select code from reporting_unit where scheme_code = 'us.precinct' and code ~ '^20(16|18|20|22|24):'"
+                """select u.code from reporting_unit u join changeset c on c.id = u.changeset_id
+                   where u.scheme_code = 'us.precinct' and u.code ~ '^20(16|18|20|22|24):' and c.pipeline <> %s""",
+                [SOURCE],
             ).fetchall()
         }
         units = units.filter(~pl.col("code").is_in(list(existing)))

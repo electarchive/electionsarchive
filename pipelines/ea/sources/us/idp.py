@@ -12,7 +12,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.idp"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = (
     "https://web.archive.org/web/20200418120020id_/"
@@ -43,7 +43,9 @@ METHODOLOGY = (
     "after supporters of nonviable groups realigned, and state delegate equivalents (SDEs). The party declared the "
     "winner by SDEs, not by raw votes. Precinct SDEs are published to four decimal places and statewide totals to "
     "three. National delegates are taken from the party's statewide table. Satellite caucuses held outside Iowa have "
-    "no location on the map. Satellites inside Iowa are placed within their congressional district."
+    "no location on the map. Satellites inside Iowa are placed within their congressional district. Precincts take "
+    "their shape from the Voting and Election Science Team's 2020 general election precincts where the county has "
+    "exactly one precinct of the same name; the others are placed within their county."
 )
 
 
@@ -250,6 +252,14 @@ def emit() -> Path:
                    where u.scheme_code = 'us.county' and u.code like '19%'"""
             ).fetchall()
         }
+        shaped: dict[str, UUID] = {
+            code.split(":", 2)[2]: area
+            for code, area in conn.execute(
+                """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
+                   where a.scheme_code = 'us.precinct' and c.code like %s""",
+                [f"{CAUCUS}:IA:%"],
+            ).fetchall()
+        }
         units: dict[tuple[str, str], UUID] = {}
         for county, precinct in frame.select("county", "precinct").unique().sort("county", "precinct").iter_rows():
             district = re.fullmatch(r"CD(\d) Satellite", county)
@@ -263,6 +273,7 @@ def emit() -> Path:
             else:
                 raise ValueError(f"{county} is neither an Iowa county nor a satellite group")
             units[(county, precinct)] = cs.unit("us-ia.caucus_precinct", f"{code}:{precinct}")
+            area = shaped.get(f"{code}:{precinct}", area)
             cs.add(
                 "reporting_unit",
                 id=units[(county, precinct)],
@@ -270,7 +281,7 @@ def emit() -> Path:
                 scheme_code="us-ia.caucus_precinct",
                 code=f"{code}:{precinct}",
                 parent_id=parent,
-                area_relation="unlocated" if area is None else "within",
+                area_relation="unlocated" if area is None else "equals" if f"{code}:{precinct}" in shaped else "within",
                 area_id=area,
                 kind="standard",
                 valid_from=CAUCUS,
@@ -290,7 +301,18 @@ def emit() -> Path:
             is_default=True,
             completeness=1,
         )
-        cs.add("note", entity_id=result_set, kind="methodology", body_md=METHODOLOGY)
+        note = conn.execute(
+            "select id from note where entity_id = %s and kind = 'methodology'", [result_set]
+        ).fetchone()
+        cs.add(
+            "note",
+            id=None if note is None else note[0],
+            entity_id=result_set,
+            kind="methodology",
+            body_md=METHODOLOGY,
+            valid_from_precision="day",
+            valid_to_precision="day",
+        )
         for label, delegates in statewide.select("label", "delegates").iter_rows():
             if delegates:
                 cs.add("outcome", result_set_id=result_set, option_id=options[label], kind="won", seats=delegates)

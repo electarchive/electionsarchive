@@ -1,3 +1,4 @@
+import html
 import io
 import json
 import re
@@ -6,6 +7,7 @@ from collections.abc import Callable, Iterator
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
+from uuid import UUID
 
 import polars as pl
 import shapefile
@@ -16,9 +18,11 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "us.precinct_shapes"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 DAY = date(2022, 11, 8)
+CAUCUS = date(2020, 2, 3)
+GENERAL = date(2024, 11, 5)
 PUBLISHERS = {
     "MN": ("Minnesota Secretary of State", "General Election Results By Precinct 2022", "Public record", None),
     "MI": ("Michigan Department of State, Bureau of Elections", "2022 Voting Precincts", "Public record", None),
@@ -85,6 +89,21 @@ LAYERS = {
     "VT:snapshot": "https://services1.arcgis.com/BkFxaEFNwHqX3tAw/ArcGIS/rest/services/FS_VCGI_VT_Municipal_Voting_Districts_SP_v1/FeatureServer/0/",
     "NJ:snapshot": "https://services2.arcgis.com/XVOqAjTOJ5P6ngMu/ArcGIS/rest/services/Election_Districts_for_New_Jersey/FeatureServer/0/",
     "ND:snapshot": "https://services1.arcgis.com/GOcSXpzwBHyk2nog/arcgis/rest/services/NDGISHUB_Voter_Precincts/FeatureServer/0/",
+    "MN:2024": "https://enterprise.gisdata.mn.gov/aghost/rest/services/us_mn_state_sos/bdry_electionresults_2022_2030/FeatureServer/0/",
+    "MI:2024": "https://gisagocss.state.mi.us/arcgis/rest/services/OpenData/boundaries/MapServer/9/",
+    "IN:2024": "https://gisdata.in.gov/server/rest/services/Hosted/Voting_District_Boundaries_2024/FeatureServer/1/",
+    "HI:2024": "https://geodata.hawaii.gov/arcgis/rest/services/AdminBnd/MapServer/13/",
+}
+LAYERS |= {f"{state}:2024": LAYERS[state] for state in ("DC", "OK", "RI", "AZ")} | {
+    "IN:2023": "https://gisdata.in.gov/server/rest/services/Hosted/Voting_District_Boundaries_2023/FeatureServer/1/",
+    "IN:marion-1990": "https://gis.indy.gov/server/rest/services/Political/VotingPrecincts/MapServer/1/",
+    "IN:marion-2011": "https://gis.indy.gov/server/rest/services/Political/VotingPrecincts/MapServer/2/",
+    "IN:marion-2021": "https://gis.indy.gov/server/rest/services/Political/VotingPrecincts/MapServer/3/",
+    "IL:snapshot": "https://services3.arcgis.com/HESxeTbDliKKvec2/arcgis/rest/services/LakeCounty_PoliticalBoundaries/FeatureServer/7/",
+    "FL:snapshot": "https://services.arcgis.com/8Pc9XBTAsYuxx9Ny/arcgis/rest/services/Precinct_gdb/FeatureServer/0/",
+    "DE:2012": "https://hosting.firstmap.delaware.gov/hosting/rest/services/Boundaries/SenRepElectDistSP_Archived/MapServer/0/",
+    "OK:2012": "https://services.arcgis.com/3xOwF6p0r7IHIjfn/arcgis/rest/services/Voter_Precints/FeatureServer/0/",
+    "MI:2014": "https://gisagocss.state.mi.us/arcgis/rest/services/OpenData/boundaries/MapServer/0/",
 }
 ZIPS = {
     "NC": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20220831.zip",
@@ -138,8 +157,111 @@ ZIPS = {
     "NC:2014": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20141016.zip",
     "WV:2002": "https://data.wvgis.wvu.edu/pub/Clearinghouse/Boundaries/votingDistrictsWV_legislativeServices_2002_utm83_shp.zip",
     "SC:snapshot": "https://rfa.sc.gov/media/10668",
+    "NC:2024": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20240723.zip",
+    "TX:2024": "https://data.capitol.texas.gov/dataset/d04c72b9-16c4-4ab2-8c6d-c666d41e04b7/resource/4572665a-8de5-461d-84b8-79f704b63530/download/precincts24g.zip",
+    "WA:2024": "https://www.sos.wa.gov/sites/default/files/2024-12/Statewide_Precincts_2024General_Consol.zip",
+    "LA:2024": "https://redist.legis.la.gov/2025%201RS/Shapefiles/2024%20Precinct%20Shapefiles%20(12-31-2024).zip",
+    "WV:2024": "https://data.wvgis.wvu.edu/pub/Clearinghouse/Boundaries/WV_Voting_Districts_Precincts/WV_Precinct_2024_20240213_UTM83.zip",
+    "GA:2024": "https://www.legis.ga.gov/api/document/docs/default-source/reapportionment-document-library/precincts/gaprec_2024-website-shapefile.zip?sfvrsn=7b38ca99_2",
+    "WI:2024": "https://web.s3.wisc.edu/rml-gisdata/WI_MunicipalWards_Fall_2024.zip",
 }
-UNPROJECTED = {"WA:2006": 4269, "MN:1996": 26915, "MN:2002": 26915}
+ZIPS |= {f"{state}:2024": ZIPS[state] for state in ("MA", "NM", "NH")} | {
+    "MS:1990": "https://maris.mississippi.edu/MARISdata/Political/MS_VotingPrecincts_1990.zip",
+    "MA:2012": "https://s3.us-east-1.amazonaws.com/download.massgis.digital.mass.gov/shapefiles/state/wardsprecincts_poly.zip",
+    "NH:2012": "https://ftp.granit.unh.edu/GRANIT_Data/Vector_Data/Administrative_and_Political_Boundaries/d-nhpolitdists/NHPolitDists.zip",
+    "WI:2011": "https://web.s3.wisc.edu/rml-gisdata/WI_MunicipalWards_2011.zip",
+}
+FILES = {
+    "OH:2025": [
+        "https://vote.franklincountyohio.gov/getmedia/65bd6003-91e0-497a-b1ba-f07c0ba5195e/Voting_Precinct_dbf",
+        "https://vote.franklincountyohio.gov/getmedia/33541603-81d5-4c69-8608-331117b8d62a/Voting_Precinct_prj",
+        "https://vote.franklincountyohio.gov/getmedia/59989478-b4b8-4562-bef0-ad34d50829bd/Voting_Precinct_shp",
+        "https://vote.franklincountyohio.gov/getmedia/59e6d59c-d860-4427-b796-ad1566cff87c/Voting_Precinct_shx",
+    ],
+    "OH:2023": [
+        "https://vote.franklincountyohio.gov/getmedia/f2d859aa-f107-4ac7-8f78-916c16355365/Voting_Precinct_dbf",
+        "https://vote.franklincountyohio.gov/getmedia/d728dea4-98b4-475a-9238-9a343239d64f/Voting_Precinct_prj",
+        "https://vote.franklincountyohio.gov/getmedia/11000da7-3309-4a6a-8b21-23c4d8cccbea/Voting_Precinct_shp",
+        "https://vote.franklincountyohio.gov/getmedia/2e0c38af-aa90-417e-aa21-8c2af73d531e/Voting_Precinct_shx",
+    ],
+    "OH:2022": [
+        "https://vote.franklincountyohio.gov/getmedia/eb50b952-a7a0-493a-be72-a582fa53ca8f/Voting-Precincts-G22-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/e4e36bd1-fec6-466a-ba2c-aee4084049fb/Voting-Precincts-G22-prj",
+        "https://vote.franklincountyohio.gov/getmedia/cb0ff76d-fd59-403b-8aa2-4547b6d9d10c/Voting-Precincts-G22-shp",
+        "https://vote.franklincountyohio.gov/getmedia/209f8e91-7300-4ebc-acbc-1cdc0b34fa94/Voting-Precincts-G22-shx",
+    ],
+    "OH:2019": [
+        "https://vote.franklincountyohio.gov/getmedia/88b16596-9bd7-43d2-a020-01a15f796fcf/Precincts-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/f75ff88c-e9f3-4ecc-b105-5233182abdcf/Precincts-prj",
+        "https://vote.franklincountyohio.gov/getmedia/36edc828-77cc-445c-9c03-569cb5739412/Precincts-shp",
+        "https://vote.franklincountyohio.gov/getmedia/e20a31eb-b778-402f-8095-74ffadcf2743/Precincts-shx",
+    ],
+    "OH:2017": [
+        "https://vote.franklincountyohio.gov/getmedia/a701414b-e15f-41bc-878b-2198e3632408/VotingPrecinct-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/a0d7edbd-cafa-4de2-9408-b493bfdd32b1/VotingPrecinct-prj",
+        "https://vote.franklincountyohio.gov/getmedia/443fcf31-2b62-4ef6-a934-82f1d94765ca/VotingPrecinct-shp",
+        "https://vote.franklincountyohio.gov/getmedia/7161857a-fae8-4040-b6ba-bd43fc50154f/VotingPrecinct-shx",
+    ],
+    "OH:2015": [
+        "https://vote.franklincountyohio.gov/getmedia/097917aa-2d1e-4329-93eb-f41c38d1ea29/Precincts_P15-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/a2185f75-d0c0-4480-b129-ac97695f5d46/Precincts_P15-prj",
+        "https://vote.franklincountyohio.gov/getmedia/89309b90-5ef2-4457-9ed6-d6200e932230/Precincts_P15-shp",
+        "https://vote.franklincountyohio.gov/getmedia/88c9027c-74e3-4db9-8610-8abd67e3e757/Precincts_P15-shx",
+    ],
+    "OH:2014": [
+        "https://vote.franklincountyohio.gov/getmedia/798b8ef3-76bf-44bf-b971-6aec43824c8d/Precincts_14-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/b0afa367-f25d-4e54-8f52-7f52ac990a9c/Precincts_14-prj",
+        "https://vote.franklincountyohio.gov/getmedia/184d61ff-e309-4753-a443-f4068b6a304f/Precincts_14-shp",
+        "https://vote.franklincountyohio.gov/getmedia/ea6689d1-fed7-489f-aa34-fe3dba1bc07f/Precincts_14-shx",
+    ],
+    "OH:2013": [
+        "https://vote.franklincountyohio.gov/getmedia/34e0af44-abcf-4c6e-9b90-d52726bbd195/Precincts_G13-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/5c63c29b-471b-49cd-ad5c-d7423dbf4db8/Precincts_G13-prj",
+        "https://vote.franklincountyohio.gov/getmedia/c0dc7186-d0e9-40e2-bbf7-d4b51b04ae1b/Precincts_G13-shp",
+        "https://vote.franklincountyohio.gov/getmedia/7a9fac46-eefb-4e14-81ca-bb608fda4d7e/Precincts_G13-shx",
+    ],
+    "OH:2012": [
+        "https://vote.franklincountyohio.gov/getmedia/7ad3fdb7-406c-4e7d-9ba8-a0d8875d6c2b/Precincts_G12-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/6cf3fde6-3ee8-4069-83ae-8016174851e9/Precincts_G12-prj",
+        "https://vote.franklincountyohio.gov/getmedia/40612805-f294-4235-9263-e1a2cc0084af/Precincts_G12-shp",
+        "https://vote.franklincountyohio.gov/getmedia/0a0453f2-3fb4-42ed-a396-2622577cccea/Precincts_G12-shx",
+    ],
+    "OH:2011": [
+        "https://vote.franklincountyohio.gov/getmedia/8bcec880-99a6-4c1f-ac5a-1d46278372ce/Precincts_G11-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/e6eeac19-2ec2-4b5e-b7db-5e224d5cc47e/Precincts_G11-prj",
+        "https://vote.franklincountyohio.gov/getmedia/74ea4e3d-e0aa-4114-b9dd-5c2e8945a869/Precincts_G11-shp",
+        "https://vote.franklincountyohio.gov/getmedia/e6e32d4c-f772-44da-b6b9-25e0ddd1e0ee/Precincts_G11-shx",
+    ],
+    "OH:2010": [
+        "https://vote.franklincountyohio.gov/getmedia/c46a1b16-5c22-48ee-9932-487e46a6319c/Precincts_10-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/5fc06924-a7c5-4446-87ad-7bb299594a4f/Precincts_10-prj",
+        "https://vote.franklincountyohio.gov/getmedia/37c759e6-9d73-429c-94f7-60a22a1b8d7b/Precincts_10-shp",
+        "https://vote.franklincountyohio.gov/getmedia/23657b97-199a-4ef5-8de9-ef5138e5a076/Precincts_10-shx",
+    ],
+    "OH:2009": [
+        "https://vote.franklincountyohio.gov/getmedia/22d95b14-8bce-4bf8-b575-7a9800ea872b/Precincts_P09-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/3985d815-1afd-4d1b-847a-cd36f7cce0a5/Precincts_P09-prj",
+        "https://vote.franklincountyohio.gov/getmedia/c4855443-c67d-4ead-8092-f04b6ea6184a/Precincts_P09-shp",
+        "https://vote.franklincountyohio.gov/getmedia/caaac57b-5aa1-4fd3-ae79-1c107a161c6d/Precincts_P09-shx",
+    ],
+    "OH:2008": [
+        "https://vote.franklincountyohio.gov/getmedia/fd71c636-ce38-4d51-9572-664a34611dca/Precincts_08-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/68580412-31b5-42d5-9bbc-8b62ce212dff/Precincts_08-shp",
+        "https://vote.franklincountyohio.gov/getmedia/dcd190e0-5271-49e9-bb81-9f1e67d2af09/Precincts_08-shx",
+    ],
+    "OH:2007": [
+        "https://vote.franklincountyohio.gov/getmedia/e233a707-89bd-4003-b731-30a03cdda142/Precincts_G07-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/6856100e-88a1-4245-882c-1ba2c366c77f/Precincts_G07-prj",
+        "https://vote.franklincountyohio.gov/getmedia/f066e549-964f-4cfc-97bd-769a4fdb6b44/Precincts_G07-shp",
+        "https://vote.franklincountyohio.gov/getmedia/365f713a-387e-48a8-8e8e-6bc8fb77337a/Precincts_G07-shx",
+    ],
+    "OH:2006": [
+        "https://vote.franklincountyohio.gov/getmedia/82289fcd-f7a0-465d-beac-c4997c9acb81/Precincts_G06-dbf",
+        "https://vote.franklincountyohio.gov/getmedia/2eca4be0-e2b2-49c9-9902-88a82fdc764b/Precincts_G06-shp",
+        "https://vote.franklincountyohio.gov/getmedia/df0621d0-925a-480d-ba6c-2546e2a46d66/Precincts_G06-shx",
+    ],
+}
+PROJECTIONS = {"WA:2006": 4269, "MN:1996": 26915, "MN:2002": 26915, "OH:2006": 32123, "OH:2008": 3735, "WI:2011": 3857}
 GEOJSONS = {
     "NM:2006": "https://gstore.unm.edu/apps/rgisarchive/datasets/edf218ed-22cc-4e1e-ad3e-255626bea630/nmprecincts_08.derived.geojson",
 }
@@ -174,6 +296,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".zip")
     for url in GEOJSONS.values():
         raw.fetch(SOURCE, url, suffix=".geojson")
+    for urls in FILES.values():
+        for url in urls:
+            raw.fetch(SOURCE, url, suffix=".zip")
 
 
 def features(state: str) -> Iterator[tuple[dict[str, object], str, int]]:
@@ -183,28 +308,33 @@ def features(state: str) -> Iterator[tuple[dict[str, object], str, int]]:
                 if feature["geometry"] is not None:
                     yield feature["properties"], json.dumps(feature["geometry"]), 4326
         return
-    path = raw.cached(SOURCE, GEOJSONS.get(state) or ZIPS[state]).path
-    with zipfile.ZipFile(path) as archive:
-        names = {name.lower(): name for name in archive.namelist() if not name.startswith("__MACOSX")}
-        for name in sorted(name for name in names if name.endswith(".geojson")):
-            for feature in json.loads(archive.read(names[name]))["features"]:
-                if feature["geometry"] is not None:
-                    yield feature["properties"], json.dumps(feature["geometry"]), 4326
-        for stem in sorted(name[:-4] for name in names if name.endswith(".shp")):
-            reader = shapefile.Reader(
-                shp=io.BytesIO(archive.read(names[f"{stem}.shp"])),
-                shx=io.BytesIO(archive.read(names[f"{stem}.shx"])),
-                dbf=io.BytesIO(archive.read(names[f"{stem}.dbf"])),
-                encoding="latin-1",
-            )
-            crs = CRS(archive.read(names[f"{stem}.prj"]).decode("latin-1")) if f"{stem}.prj" in names else None
-            srid = crs.to_epsg(min_confidence=20) if crs is not None else UNPROJECTED[state]
-            assert srid is not None, f"{state}: {stem}"
-            fields = [field[0] for field in reader.fields[1:]]
-            for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
-                if record is None or shape is None or shape.shapeType == shapefile.NULL or not shape.points:
-                    continue
-                yield dict(zip(fields, list(record), strict=True)), json.dumps(shape.__geo_interface__), srid
+    contents: dict[str, bytes] = {}
+    for url in FILES.get(state) or [GEOJSONS.get(state) or ZIPS[state]]:
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+            contents |= {
+                name.lower(): archive.read(name)
+                for name in archive.namelist()
+                if not name.startswith("__MACOSX") and not name.endswith("/")
+            }
+    for name in sorted(name for name in contents if name.endswith(".geojson")):
+        for feature in json.loads(contents[name])["features"]:
+            if feature["geometry"] is not None:
+                yield feature["properties"], json.dumps(feature["geometry"]), 4326
+    for stem in sorted(name[:-4] for name in contents if name.endswith(".shp")):
+        reader = shapefile.Reader(
+            shp=io.BytesIO(contents[f"{stem}.shp"]),
+            shx=io.BytesIO(contents[f"{stem}.shx"]),
+            dbf=io.BytesIO(contents[f"{stem}.dbf"]),
+            encoding="latin-1",
+        )
+        crs = CRS(contents[f"{stem}.prj"].decode("latin-1")) if f"{stem}.prj" in contents else None
+        srid = PROJECTIONS.get(state) or (crs.to_epsg(min_confidence=20) if crs is not None else None)
+        assert srid is not None, f"{state}: {stem}"
+        fields = [field[0] for field in reader.fields[1:]]
+        for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
+            if record is None or shape is None or shape.shapeType == shapefile.NULL or not shape.points:
+                continue
+            yield dict(zip(fields, list(record), strict=True)), json.dumps(shape.__geo_interface__), srid
 
 
 def canon(text: object) -> str:
@@ -256,6 +386,9 @@ FIPS = {
     "AR": "05",
     "AZ": "04",
     "DC": "11",
+    "GA": "13",
+    "HI": "15",
+    "IN": "18",
     "KY": "21",
     "LA": "22",
     "MA": "25",
@@ -275,6 +408,12 @@ FIPS = {
     "VT": "50",
     "WA": "53",
     "WV": "54",
+    "OH": "39",
+    "DE": "10",
+    "MS": "28",
+    "IL": "17",
+    "FL": "12",
+    "WI": "55",
 }
 GENERALS = [date(year, 11, 2 + (7 - date(year, 11, 1).weekday()) % 7) for year in range(1990, 2015, 2)]
 
@@ -311,7 +450,7 @@ def census(p: dict[str, Any]) -> tuple[str, str, str]:
 
 DC = ("District of Columbia Board of Elections", "CC BY 4.0", "DC GIS")
 LCC = ("Minnesota Legislative Coordinating Commission, GIS Office", "Public record", None)
-HISTORY: dict[str, tuple[date, date, str, str, str, str | None, Callable[[dict[str, Any]], tuple[str, str, str]]]] = {
+DATED: dict[str, tuple[date, date, str, str, str, str | None, Callable[[dict[str, Any]], tuple[str, str, str]]]] = {
     **{
         f"DC:{year}": (
             *years(int(year), end),
@@ -532,6 +671,208 @@ SNAPSHOTS: dict[
         lambda p: (f"45{int(p['FIPS']):03d}", canon(p["PCode"]), p["PName"]),
     ),
 }
+DATED |= {
+    f"{state}:2024": (GENERAL, GENERAL + timedelta(days=1), *entry)
+    for state, entry in {
+        **{state: (*PUBLISHERS[state], SHAPES[state]) for state in ("DC", "OK", "RI", "AZ", "MA", "NM", "NH")},
+        "NC": (
+            "North Carolina State Board of Elections",
+            "Precinct Shapefile, 2024-07-23",
+            "Public record",
+            None,
+            SHAPES["NC"],
+        ),
+        "TX": ("Texas Legislative Council", "Precincts, 2024 General Election", "CC BY", None, SHAPES["TX"]),
+        "WA": (
+            "Washington Secretary of State",
+            "Statewide Precincts, 2024 General, Consolidated",
+            "Public record",
+            None,
+            lambda p: (p["County"], canon(str(p["PrecinctNu"])), p["PrecinctNa"]),
+        ),
+        "LA": (
+            "Louisiana Legislature",
+            "2024 Precinct Shapefiles (12-31-2024)",
+            "Public record",
+            None,
+            lambda p: (f"22{p['COUNTYFP20']}", bare(p["NAME20"]), f"Precinct {p['NAME20']}"),
+        ),
+        "WV": (
+            "West Virginia GIS Technical Center",
+            "WV Precinct 2024 (2024-02-13)",
+            "Free to copy and distribute (MapWV terms of use)",
+            None,
+            SHAPES["WV"],
+        ),
+        "GA": (
+            "Georgia General Assembly, Legislative and Congressional Reapportionment Office",
+            "2024 Precincts",
+            "Public record",
+            None,
+            lambda p: (p["FIPS"], canon(p["PRECINCT_I"]), p["PRECINCT_N"]),
+        ),
+        "WI": (
+            "Wisconsin Legislative Technology Services Bureau",
+            "Municipal Wards, Fall 2024",
+            "Public record",
+            "LTSB, Wisconsin County Clerks and Land Information Offices",
+            lambda p: (p["CNTY_FIPS"], f"{p['MCD_FIPS']} {canon(p['WARDID'])}", p["LABEL"]),
+        ),
+        "MN": (
+            "Minnesota Secretary of State",
+            "General Election Results By Precinct 2024",
+            "Public record",
+            None,
+            lambda p: (f"27{p['countyfips']}", canon(p["pctcode"]), p["pctname"]),
+        ),
+        "MI": (
+            "Michigan Department of State, Bureau of Elections",
+            "2024 Voting Precincts",
+            "Public record",
+            None,
+            SHAPES["MI"],
+        ),
+        "IN": (
+            "Indiana Election Division",
+            "Voting District Boundaries 2024",
+            "Public record",
+            "IndianaMap",
+            lambda p: (f"18{p['county']}", canon(p["p24"]), f"Precinct {p['p24']}"),
+        ),
+        "HI": (
+            "Hawaii State Office of Elections",
+            "Election Precincts - 2024",
+            "Public record",
+            "Hawaii Statewide GIS Program",
+            lambda p: ("", p["dp"], f"Precinct {p['dp']}"),
+        ),
+    }.items()
+}
+DATED |= {
+    **{
+        f"OH:{year}": (
+            date(int(year), 1, 1),
+            date(int(year) + 1, 1, 1),
+            "Franklin County Board of Elections",
+            f"GIS Shape Files, {year}",
+            "Public record",
+            None,
+            lambda p: (
+                "39049",
+                str(p.get("PRECINCTID") or p.get("PRECCODE") or canon(p["NAME"])),
+                f"{p['SUBDIV']} {p['WARD']}-{p['PRECINCT']}"
+                if "SUBDIV" in p and "PRECINCT" in p
+                else p.get("NAME") or p["Name"],
+            ),
+        )
+        for year in (key.split(":")[1] for key in FILES)
+    },
+    "IN:2023": (
+        date(2023, 11, 7),
+        date(2023, 11, 8),
+        "Indiana Election Division",
+        "Voting District Boundaries 2023",
+        "Public record",
+        "IndianaMap",
+        lambda p: (f"18{p['county']}", canon(p["p23"]), p["p23"]),
+    ),
+    **{
+        f"IN:marion-{year}": (
+            start,
+            end,
+            "Marion County Election Board",
+            f"Voting Precincts {year}",
+            "Public record",
+            "Indianapolis and Marion County GIS",
+            rule,
+        )
+        for year, start, end, rule in (
+            ("1990", date(1990, 1, 1), date(2012, 1, 1), lambda p: ("18097", canon(p["PCT"]), p["PCT"])),
+            ("2011", date(2012, 1, 1), date(2022, 1, 1), lambda p: ("18097", p["MCEB_PRECINCT"], p["MCEB_PRECINCT"])),
+            ("2021", date(2022, 1, 1), date(2025, 1, 1), lambda p: ("18097", p["EBIRS_PRECINCT"], p["EBIRS_PRECINCT"])),
+        )
+    },
+}
+DATED |= {
+    "DE:2012": (
+        *years(2012, 2015),
+        "Delaware Department of Elections",
+        "Election Districts_2012",
+        "Public record",
+        "Delaware FirstMap",
+        lambda p: ("", p["EDRD_2012"], f"Election District {p['EDRD_2012']}"),
+    ),
+    "OK:2012": (
+        *years(2012, 2015),
+        "Oklahoma State Election Board",
+        "Voter Precincts 2010",
+        "Public record",
+        "Center for Spatial Analysis, University of Oklahoma",
+        lambda p: (f"40{p['GIS_COUNTY']}", canon(p["PCT_CEB"]), f"Precinct {p['PCT_CEB']}"),
+    ),
+    "MI:2014": (
+        *day(2014),
+        "Michigan Department of State, Bureau of Elections",
+        "2014 Voting Precincts",
+        "Public record",
+        None,
+        lambda p: (
+            f"26{p['CountyFips']}",
+            p["VP"],
+            p["PrecinctLa"].strip()
+            or " ".join([*([f"Ward {int(p['Ward'])}"] if p["Ward"] != "00" else []), f"Precinct {int(p['Precinct'])}"]),
+        ),
+    ),
+    "MS:1990": (
+        *years(1990, 1990),
+        "Mississippi Automated Resource Information System",
+        "Mississippi Voting Precincts 1990",
+        "Public record",
+        "MARIS",
+        lambda p: (f"28{p['COUNTY']}", canon(p["PRECINCT"]), p["PRECINCT"]),
+    ),
+    "MA:2012": (*years(2012, 2015), "MassGIS", "2012 Wards and Precincts", "Public record", None, SHAPES["MA"]),
+    "NH:2012": (
+        *years(2012, 2015),
+        "New Hampshire Office of Planning and Development",
+        "NH Political Districts 2012",
+        "Public record",
+        "NH GRANIT",
+        lambda p: (
+            "",
+            canon(re.sub(r"\s*-\s*entire$", "", p["WARD"], flags=re.IGNORECASE)),
+            re.sub(r"\s*-\s*entire$", "", p["WARD"], flags=re.IGNORECASE),
+        ),
+    ),
+    "WI:2011": (
+        *years(2012, 2015),
+        "Wisconsin Legislative Technology Services Bureau",
+        "Municipal Wards 2011",
+        "Public record",
+        "LTSB, Wisconsin County Clerks and Land Information Offices",
+        lambda p: (p["CNTY_FIPS"], p["WARD_FIPS"], p["NAME"]),
+    ),
+}
+SNAPSHOTS |= {
+    "IL:snapshot": (
+        None,
+        None,
+        "Lake County Clerk",
+        "Voting Precincts",
+        "Public record",
+        "Lake County, Illinois",
+        lambda p: ("17097", str(p["PRECINCT"]), p["TWP_PCT"]),
+    ),
+    "FL:snapshot": (
+        None,
+        None,
+        "Miami-Dade County Elections Department",
+        "Precinct",
+        "Public record",
+        "Miami-Dade County",
+        lambda p: ("12086", str(p["ID"]), f"Precinct {p['ID']}"),
+    ),
+}
 WORDS = {"SAINT": "ST", "TOWNSHIP": "TWP", "HEIGHTS": "HTS", "MOUNT": "MT", "FORT": "FT"}
 FILLER = {"CITY", "OF", "CHARTER", "PRECINCT", "PCT", "PREC", "P", "WARD", "W", "TOWN", "VILLAGE"}
 
@@ -581,6 +922,36 @@ def group(rows: list[tuple[str, str, str, str, int]], prefix: str) -> pl.DataFra
         )
 
 
+def michigan(precinct: str) -> str:
+    match = re.fullmatch(r"(.*) (\S+) Ward (\S+)", precinct)
+    if match is None:
+        return canon(precinct)
+    return canon(f"{match[1]} {match[2]}" if match[3] == "0" else f"{match[1]} {match[3]} {match[2]}")
+
+
+UNITS24: dict[str, Callable[[str, str, str], str]] = {
+    "TX": lambda county, _, precinct: canon(precinct.removeprefix(str((int(county[2:]) + 1) // 2))),
+    "MI": lambda _, __, precinct: michigan(precinct),
+}
+
+
+def pair(units: pl.DataFrame, shapes: pl.DataFrame) -> pl.DataFrame:
+    matched = pl.DataFrame(schema={"code": pl.String, "area": pl.String})
+    for rule in (canon, lambda key: loose(canon(key)), lambda key: unordered(canon(key))):
+        left = (
+            units.join(matched, on="code", how="anti")
+            .with_columns(match=pl.col("key").map_elements(rule, return_dtype=pl.String))
+            .filter(pl.len().over("county", "match") == 1)
+        )
+        right = (
+            shapes.join(matched, on="area", how="anti")
+            .with_columns(match=pl.col("key").map_elements(rule, return_dtype=pl.String))
+            .filter(pl.len().over("county", "match") == 1)
+        )
+        matched = pl.concat([matched, left.join(right, on=["county", "match"]).select("code", "area")])
+    return matched
+
+
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     with connect() as conn:
@@ -591,7 +962,7 @@ def parse() -> None:
                    join name n on n.entity_id = a.id and n.kind = 'short' where a.scheme_code = 'us.county'"""
             ).fetchall()
         }
-    for vintage, (_, _, _, _, _, _, rule) in {**HISTORY, **SNAPSHOTS}.items():
+    for vintage, (_, _, _, _, _, _, rule) in {**DATED, **SNAPSHOTS}.items():
         state = vintage.split(":")[0]
         rows = []
         for properties, geojson, srid in features(vintage):
@@ -602,6 +973,38 @@ def parse() -> None:
         )
         print(f"{vintage}: {len(rows)} features, {shapes.height} precincts", flush=True)
         shapes.write_parquet(PARSED / f"{vintage.replace(':', '_')}.parquet")
+
+    vest = pl.read_parquet(DATA / "parsed" / "us.vest" / "precincts_2020.parquet").filter(pl.col("state") == "IA")
+    caucuses = (
+        pl.read_parquet(DATA / "parsed" / "us.idp" / "precincts.parquet")
+        .select("county", "precinct")
+        .unique()
+        .with_columns(
+            county=pl.col("county").map_elements(
+                lambda name: named.get(("19", name.upper()), ""), return_dtype=pl.String
+            )
+        )
+        .filter(pl.col("county") != "")
+    )
+    caucus = (
+        pair(
+            caucuses.select(
+                code=pl.concat_str("county", pl.lit("\x1f"), "precinct"),
+                county="county",
+                key=pl.col("precinct").map_elements(html.unescape, return_dtype=pl.String),
+            ),
+            vest.select(area=pl.col("n").cast(pl.String), county="county", key="name"),
+        )
+        .select(
+            county=pl.col("code").str.split("\x1f").list.get(0),
+            key=pl.col("code").str.split("\x1f").list.get(1),
+            n=pl.col("area").cast(pl.Int64),
+        )
+        .join(vest.select("n", label="name", geom="geom", point="point"), on="n")
+        .with_columns(within="county")
+    )
+    print(f"IA:caucus: {caucus.height} of {caucuses.height} caucus precincts matched to {vest.height} VEST precincts")
+    caucus.write_parquet(PARSED / "IA_caucus.parquet")
 
     units = pl.read_parquet(DATA / "parsed" / "us.medsl_precincts" / "units.parquet").with_columns(
         jurisdiction=pl.col("code").str.split(":").list.get(3),
@@ -615,7 +1018,7 @@ def parse() -> None:
             rows.append((named.get((FIPS[state], county.upper()), county), key, str(label).strip(), geojson, srid))
         shapes = group(rows, FIPS[state])
         unit = UNITS.get(state, lambda _, precinct: canon(precinct))
-        mine = units.filter(pl.col("state") == state).with_columns(
+        mine = units.filter(pl.col("state") == state, pl.col("code").str.starts_with("2022:")).with_columns(
             county=pl.lit("") if state in STATEWIDE else pl.col("county"),
             key=pl.struct("jurisdiction", "precinct").map_elements(
                 lambda row, unit=unit: unit(row["jurisdiction"], row["precinct"]), return_dtype=pl.String
@@ -672,6 +1075,126 @@ def parse() -> None:
         PARSED / "report_2022.parquet"
     )
 
+    units = (
+        pl.concat(
+            [
+                pl.read_parquet(DATA / "parsed" / pipeline / "units.parquet").select("code", "state", "county")
+                for pipeline in ("us.medsl_precincts", "us.medsl_state_precincts")
+            ]
+        )
+        .unique("code")
+        .with_columns(
+            year=pl.col("code").str.slice(0, 4),
+            jurisdiction=pl.col("code").str.split(":").list.get(3),
+            precinct=pl.col("code").str.split(":").list.slice(4).list.join(":"),
+        )
+    )
+    known = set(named.values())
+    counties = {code: name for (_, name), code in named.items()}
+    links = []
+    for year in ("2016", "2018", "2020"):
+        vest = pl.read_parquet(DATA / "parsed" / "us.vest" / f"precincts_{year}.parquet").select(
+            area=pl.format("{}:{}:{}", pl.lit(year), "state", "n"),
+            county="county",
+            name="name",
+            bare=pl.struct("county", "name").map_elements(
+                lambda row: re.sub(
+                    rf"^({re.escape(counties.get(row['county'], '~'))}|Voting District)\s+",
+                    "",
+                    re.sub(r" - ([TCV]) 0*(\d+)$", r" - \1 \2", row["name"]),
+                    flags=re.IGNORECASE,
+                ),
+                return_dtype=pl.String,
+            ),
+        )
+        mine = units.filter(pl.col("year") == year).with_columns(
+            clean=pl.when(pl.col("state") == "TX")
+            .then(pl.col("precinct").str.slice(3, 4))
+            .when(pl.col("state") == "CO")
+            .then(pl.col("precinct").str.slice(-3))
+            .when(pl.col("state") == "WV")
+            .then(pl.col("precinct").str.replace(r"^PRECINCT\s+", ""))
+            .when(pl.col("state") == "WI")
+            .then(pl.col("precinct").str.replace(r"^(T|C|V)(?:OWN|ITY|ILLAGE) OF (.+) WARD (\d+)$", "${2} - ${1} ${3}"))
+            .otherwise(
+                pl.col("precinct").map_elements(
+                    lambda text: re.sub(r"^(NAN_)?(\d+\s*-?\s*(?=[A-Za-z]))?", "", text), return_dtype=pl.String
+                )
+            )
+        )
+        found = pl.DataFrame(schema={"code": pl.String, "area": pl.String})
+        for unit, shape in (("precinct", "bare"), ("clean", "bare"), ("jurisdiction", "name")):
+            found = pl.concat(
+                [
+                    found,
+                    pair(
+                        mine.join(found, on="code", how="anti").select("code", "county", key=unit),
+                        vest.join(found, on="area", how="anti").select("area", "county", key=shape),
+                    ),
+                ]
+            )
+        links.append(found)
+        for state, total, matched in (
+            mine.join(found, on="code", how="left")
+            .group_by("state")
+            .agg(pl.len(), pl.col("area").is_not_null().sum())
+            .sort("state")
+            .iter_rows()
+        ):
+            print(f"{year} {state}: {matched} of {total} units matched to VEST", flush=True)
+    shapes = pl.concat(
+        [
+            pl.read_parquet(PARSED / f"{vintage.replace(':', '_')}.parquet")
+            .filter(pl.col("key") != "")
+            .with_columns(
+                state=pl.lit(vintage[:2]),
+                county=pl.when(pl.col("county").is_in(list(known))).then("county").otherwise("within"),
+            )
+            .select(
+                area=pl.format("{}:{}:{}:{}", pl.lit(str(GENERAL)), "state", "county", "key"),
+                county=pl.when(pl.col("state").is_in(STATEWIDE)).then("state").otherwise("county"),
+                key="key",
+                alt=pl.col("label").str.replace(r"^\d+\s+", ""),
+            )
+            for vintage in DATED
+            if vintage.endswith(":2024")
+        ]
+    )
+    mine = units.filter(
+        pl.col("year") == "2024", pl.col("state").is_in([vintage[:2] for vintage in DATED if vintage.endswith(":2024")])
+    ).with_columns(
+        key=pl.struct("state", "county", "jurisdiction", "precinct").map_elements(
+            lambda row: (
+                UNITS24[row["state"]](row["county"], row["jurisdiction"], row["precinct"])
+                if row["state"] in UNITS24
+                else UNITS.get(row["state"], lambda _, precinct: canon(precinct))(row["jurisdiction"], row["precinct"])
+            ),
+            return_dtype=pl.String,
+        ),
+        alt=pl.col("precinct").str.replace(r"^\d+\s+", ""),
+        county=pl.when(pl.col("state").is_in(STATEWIDE)).then("state").otherwise("county"),
+    )
+    found = pair(mine.select("code", "county", "key"), shapes.select("area", "county", "key"))
+    found = pl.concat(
+        [
+            found,
+            pair(
+                mine.join(found, on="code", how="anti").select("code", "county", key="alt"),
+                shapes.join(found, on="area", how="anti").select("area", "county", key="alt"),
+            ),
+        ]
+    )
+    links.append(found)
+    for state, total, matched in (
+        mine.join(found, on="code", how="left")
+        .group_by("state")
+        .agg(pl.len(), pl.col("area").is_not_null().sum())
+        .sort("state")
+        .iter_rows()
+    ):
+        print(f"2024 {state}: {matched} of {total} units matched to official shapes", flush=True)
+    pl.concat(links).write_parquet(PARSED / "links.parquet")
+
 
 def emit() -> Path:
     with connect() as conn:
@@ -679,8 +1202,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Official precinct shapes from state and county election offices, 1990–2015 and 2022, "
-            "with 2022's joined to MEDSL's precincts",
+            summary="Official precinct shapes from state and county election offices, 1990–2015, 2022, and current "
+            "snapshots, with 2022's joined to MEDSL's precincts and VEST's 2020 shapes carried to Iowa's caucus precincts",
             polity="US",
         )
         counties = {
@@ -698,18 +1221,18 @@ def emit() -> Path:
             for vintage, entry in SNAPSHOTS.items()
             if entry[0] is None
         }
-        for general in [*GENERALS, DAY, *sorted(set(retrieved.values()))]:
+        for general in [*GENERALS, CAUCUS, DAY, GENERAL, *sorted(set(retrieved.values()))]:
             cs.add(
                 "boundary_set",
                 scheme_code="us.precinct",
-                vintage=str(general) if general in retrieved.values() else str(general.year),
+                vintage=str(general.year) if general in (*GENERALS, DAY, GENERAL) else str(general),
                 valid_from=general,
                 valid_to=general + timedelta(days=1),
                 as_of=general,
             )
         vintages = {
             **{state: (DAY, DAY + timedelta(days=1), *PUBLISHERS[state]) for state in SHAPES},
-            **{vintage: entry[:6] for vintage, entry in HISTORY.items()},
+            **{vintage: entry[:6] for vintage, entry in DATED.items()},
             **{
                 vintage: (
                     start or retrieved[vintage],
@@ -721,23 +1244,41 @@ def emit() -> Path:
                 )
                 for vintage, (start, end, publisher, title, license, attribution, _) in SNAPSHOTS.items()
             },
+            "IA:caucus": (
+                CAUCUS,
+                CAUCUS + timedelta(days=1),
+                "Voting and Election Science Team",
+                "2020 Precinct-Level Election Results",
+                "CC BY 4.0",
+                None,
+            ),
         }
+        staged: set[UUID] = set()
         for vintage, (start, end, publisher, title, license, attribution) in vintages.items():
             state = vintage.split(":")[0]
             source = cs.source(publisher, title)
-            url = LAYERS.get(vintage) or ZIPS.get(vintage) or GEOJSONS[vintage]
-            cs.add(
-                "source",
-                id=source,
-                kind="official_body",
-                publisher=publisher,
-                title=title,
-                url=url,
-                license=license,
-                attribution=attribution,
-            )
-            for cached in [url + "?f=json", *pages(vintage)] if vintage in LAYERS else [url]:
-                cs.artifact(raw.cached(SOURCE, cached), source)
+            if vintage != "IA:caucus" and source not in staged:
+                staged.add(source)
+                url = (
+                    LAYERS.get(vintage)
+                    or ZIPS.get(vintage)
+                    or GEOJSONS.get(vintage)
+                    or "https://vote.franklincountyohio.gov/maps-and-data/gis-shape-files"
+                )
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license=license,
+                    attribution=attribution,
+                )
+                for cached in [url + "?f=json", *pages(vintage)] if vintage in LAYERS else FILES.get(vintage) or [url]:
+                    cs.artifact(raw.cached(SOURCE, cached), source)
+            elif source in cs.minted:
+                raise ValueError(f"{title} must already be a source")
             frame = (
                 pl.read_parquet(PARSED / f"{vintage.replace(':', '_')}{'' if ':' in vintage else '_2022'}.parquet")
                 .filter(pl.col("key") != "", ~pl.col("county").str.contains(r"^\d{2}(000)?$"))
@@ -771,7 +1312,7 @@ def emit() -> Path:
                 pl.DataFrame({"area_id": ids, "geom": frame["geom"], "label_point": frame["point"]}).with_columns(
                     valid_from=pl.lit(start),
                     valid_to=pl.lit(end),
-                    quality=pl.lit("official"),
+                    quality=pl.lit("academic" if vintage == "IA:caucus" else "official"),
                     source_id=pl.lit(str(source)),
                 ),
             )
