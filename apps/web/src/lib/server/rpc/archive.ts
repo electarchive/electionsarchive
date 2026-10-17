@@ -6776,7 +6776,7 @@ export const polities = {
         ]),
       ];
       const links = [...new Set(found.rows.flatMap((row) => row.link ?? []))];
-      const [labels, slugs, colors, positions] = await Promise.all([
+      const [labels, slugs, colors, positions, homes] = await Promise.all([
         names([
           ...seats,
           ...links,
@@ -6790,10 +6790,22 @@ export const polities = {
           where party_id = any(${sql.param(parties)}::uuid[])
           order by party_id, valid_from desc nulls last
         `),
+        db.execute<{ id: string; region: string | null }>(sql`
+          select p.id, split_part(po.iso_code, '-', 2) as region from party p
+          join polity po on po.id = p.polity_id
+          where p.id = any(${sql.param(parties)}::uuid[]) and po.iso_code like '%-%'
+        `),
       ]);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
       );
+      const region = new Map(homes.rows.map((row) => [row.id, row.region]));
+      const shown = new Map<string, number>();
+      for (const id of parties) {
+        const ref = colors.get(id);
+        const text = ref?.short ?? ref?.label ?? "";
+        shown.set(text, (shown.get(text) ?? 0) + 1);
+      }
       return {
         series: seats
           .map((seat) => {
@@ -6878,10 +6890,24 @@ export const polities = {
           to: row.to,
           isCaretaker: row.isCaretaker,
         })),
-        parties: parties.map((id) => ({
-          ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
-          lean: lean.get(id) ?? null,
-        })),
+        parties: parties.map((id) => {
+          const ref = colors.get(id) ?? {
+            id,
+            label: "",
+            short: null,
+            color: null,
+          };
+          const text = ref.short ?? ref.label;
+          const place = region.get(id);
+          return {
+            ...ref,
+            short:
+              (shown.get(text) ?? 0) > 1 && place != null && place !== ""
+                ? `${text} (${place})`
+                : ref.short,
+            lean: lean.get(id) ?? null,
+          };
+        }),
       };
     }),
   compare: os

@@ -61,7 +61,7 @@ UNSEATED = 23
 EXEMPT = "SSW"
 COLORS = {
     "CDU": "#151518",
-    "CSU": "#1f7cfe",
+    "CSU": "#004b76",
     "SPD": "#e3000f",
     "AfD": "#009ee0",
     "GRÜNE": "#46962b",
