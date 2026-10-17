@@ -45,6 +45,7 @@ ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 2
 TURNED: set[tuple[int, int]] = set()
+THRESHOLDS: tuple[int, ...] = ()
 
 
 def fetch() -> None:

@@ -79,6 +79,7 @@ def parse(source: ModuleType) -> None:
     failed: list[str] = []
     columns_by: dict[tuple[int, object, int], list[int]] = {}
     printed: dict[tuple[int, object, int], int] = {}
+    labels: dict[tuple[int, object], list[str]] = {}
     for year, (_, _, _, pages) in source.VOLUMES.items():
         book = _artifact(source, year)
         firsts = _tables(parsed / "model" / f"{year}.txt")
@@ -90,13 +91,26 @@ def parse(source: ModuleType) -> None:
         for page in pages:
             tokens: list[tuple[str, tuple[int, int, int, int]]] = []
             words: list[tuple[str, tuple[int, int, int, int]]] = []
-            for dpi, psm in ((300, "6"), (300, "11"), (600, "6"), (600, "11")):
-                cache = parsed / "ocr" / f"{book.sha256}-{page}-{dpi}-{psm}.tsv"
+            for dpi, psm, threshold in (
+                (300, "6", None),
+                (300, "11", None),
+                (600, "6", None),
+                (600, "11", None),
+                *((300, psm, threshold) for threshold in source.THRESHOLDS for psm in ("6", "11")),
+            ):
+                cache = (
+                    parsed
+                    / "ocr"
+                    / f"{book.sha256}-{page}-{dpi}-{psm}{'' if threshold is None else f'-{threshold}'}.tsv"
+                )
                 if not cache.exists():
                     cache.parent.mkdir(parents=True, exist_ok=True)
                     with tempfile.TemporaryDirectory() as folder:
                         image = Path(folder) / "page.png"
                         _render(book, page, dpi, image, (year, page) in source.TURNED)
+                        if threshold is not None:
+                            with Image.open(image) as rendered:
+                                rendered.point(lambda v, cut=threshold: 255 if v > cut else 0).save(image)
                         cache.write_text(
                             subprocess.run(
                                 ["tesseract", str(image), "stdout", "--psm", psm, "tsv"],
@@ -134,10 +148,14 @@ def parse(source: ModuleType) -> None:
                         re.sub(r"\D", "", row["text"].translate(scan.CONFUSABLE)),
                     }:
                         tokens.append((digits, box))
+            reach: list[tuple[float, float, float]] = []
+            pitch: list[float] = []
             for table, second in zip(firsts, seconds, strict=True):
                 if table["page"] != page:
                     continue
                 columns = table["columns"]
+                known = labels.setdefault((year, table["district"]), [])
+                known.extend(label for label in columns if label not in known)
                 cells = [
                     (r, c, county, value, again[c])
                     for r, ((county, votes), (_, again)) in enumerate(zip(table["rows"], second["rows"], strict=True))
@@ -160,10 +178,10 @@ def parse(source: ModuleType) -> None:
                     ):
                         failed.append(f"{year} district {table['district']} row {r}: the plurality does not fit")
                 for c in range(int(columns[0] == "Plurality"), len(columns)):
-                    column = columns_by.setdefault((year, table["district"], c), [])
+                    column = columns_by.setdefault((year, table["district"], known.index(columns[c])), [])
                     column.extend(settled.get((k, c), -(10**9)) for k in lines)
                     if total is not None:
-                        printed[(year, table["district"], c)] = settled.get((total, c), -1)
+                        printed[(year, table["district"], known.index(columns[c]))] = settled.get((total, c), -1)
                 found = {
                     (r, c): list(
                         dict.fromkeys(
@@ -205,7 +223,8 @@ def parse(source: ModuleType) -> None:
                 heads = {
                     c: min(pairs)[1]
                     for c in range(len(columns))
-                    if (
+                    if len(columns) > 1
+                    and (
                         pairs := [
                             (k[1] - h[3], h)
                             for name, h in words
@@ -245,7 +264,56 @@ def parse(source: ModuleType) -> None:
                         if abs((b[1] + b[3]) / 2 - ys[r]) < 12 and abs(b[2] - xs[c]) < 40
                     }
                 if not anchors:
+                    for r, c, county, *_ in cells:
+                        near = {
+                            b
+                            for b in boxes.get((r, c), [])
+                            for name, k in words
+                            if name == _plain(county)
+                            and abs((k[1] + k[3]) / 2 - (b[1] + b[3]) / 2) < 12
+                            and 0 < b[0] - k[2] < 700
+                            and any(name_ == _plain(columns[c]) and h[3] < k[1] < h[3] + 1200 for name_, h in words)
+                        }
+                        if len(near) == 1:
+                            anchors[(r, c)] = near.pop()
+                guessed = set()
+                if not anchors and reach:
+                    offset = statistics.median(r_[0] for r_ in reach)
+                    for r, c, county, *_ in cells:
+                        if r == total or (r, c) not in settled:
+                            continue
+                        heads_ = [h for name, h in words if name == _plain(columns[c])]
+                        near = sorted(
+                            (k[1] - h[3], k)
+                            for name, k in words
+                            if name == _plain(county)
+                            for h in heads_
+                            if 0 < k[1] - h[3] < 1200 and abs(k[0] - h[0]) < 150
+                        )
+                        if near:
+                            k = near[0][1]
+                            width = statistics.median(r_[2] for r_ in reach) * len(str(settled[(r, c)]))
+                            middle, half = (k[1] + k[3]) / 2, statistics.median(r_[1] for r_ in reach) / 2
+                            anchors[(r, c)] = (
+                                round(k[0] + offset - width),
+                                round(middle - half),
+                                round(k[0] + offset),
+                                round(middle + half),
+                            )
+                            guessed.add((r, c))
+                if not anchors:
                     raise ValueError(f"{year} page {page} district {table['district']}: no cell found on the page")
+                for (r, c), b in anchors.items():
+                    lefts = [
+                        k
+                        for name, k in words
+                        if name == _plain(table["rows"][r][0])
+                        and k[2] < b[0]
+                        and abs((k[1] + k[3]) / 2 - (b[1] + b[3]) / 2) < 12
+                    ]
+                    if lefts and (r, c) not in guessed:
+                        k = max(lefts, key=lambda k: k[2])
+                        reach.append((b[2] - k[0], b[3] - b[1], (b[2] - b[0]) / len(str(settled[(r, c)]))))
                 ys = {
                     r: statistics.median((b[1] + b[3]) / 2 for (rr, _), b in anchors.items() if rr == r)
                     for r in {r for r, _ in anchors}
@@ -272,13 +340,18 @@ def parse(source: ModuleType) -> None:
                         xs[c] = statistics.median(b[2] for (_, k), b in anchors.items() if k == c)
                 height = statistics.median(b[3] - b[1] for b in anchors.values())
                 digit = statistics.median((b[2] - b[0]) / len(str(settled[key])) for key, b in anchors.items())
+                pitch.extend((ys[b] - ys[a]) / (b - a) for a, b in zip(sorted(ys), sorted(ys)[1:]))
                 for r in set(lines) - set(ys):
                     below, above = [k for k in ys if k < r], [k for k in ys if k > r]
                     if below and above:
                         lo, hi = max(below), min(above)
                         ys[r] = ys[lo] + (ys[hi] - ys[lo]) * (r - lo) / (hi - lo)
-                    elif len(ys) >= 2:
-                        step = statistics.median(ys[b] - ys[a] for a, b in zip(sorted(ys), sorted(ys)[1:]))
+                    elif len(ys) >= 2 or (ys and pitch):
+                        step = (
+                            statistics.median((ys[b] - ys[a]) / (b - a) for a, b in zip(sorted(ys), sorted(ys)[1:]))
+                            if len(ys) >= 2
+                            else statistics.median(pitch)
+                        )
                         ys[r] = (
                             ys[max(below)] + step * (r - max(below))
                             if below
@@ -290,7 +363,7 @@ def parse(source: ModuleType) -> None:
                         lo, hi = max(left), min(right)
                         xs[c] = xs[lo] + (xs[hi] - xs[lo]) * (c - lo) / (hi - lo)
                     elif len(xs) >= 2:
-                        step = statistics.median(xs[b] - xs[a] for a, b in zip(sorted(xs), sorted(xs)[1:]))
+                        step = statistics.median((xs[b] - xs[a]) / (b - a) for a, b in zip(sorted(xs), sorted(xs)[1:]))
                         xs[c] = (
                             xs[min(right)] - step * (min(right) - c)
                             if right
@@ -302,7 +375,7 @@ def parse(source: ModuleType) -> None:
                     votes = settled[(r, c)]
                     box, how = None, None
                     if (r, c) in anchors:
-                        box, how = anchors[(r, c)], "unique"
+                        box, how = anchors[(r, c)], "placed" if (r, c) in guessed else "unique"
                     elif pairs := sorted(
                         (k[1] - h[3], h, k)
                         for name, h in words
@@ -321,7 +394,7 @@ def parse(source: ModuleType) -> None:
                         _, h, k = pairs[0]
                         right = xs[c] if any(cc == c for _, cc in anchors) else (h[0] + h[2]) / 2 + 25
                         down = (k[1] + k[3]) / 2
-                        if r in ys and abs(ys[r] - down) < 15:
+                        if r in ys and (len(columns) == 1 or abs(ys[r] - down) < 15):
                             down = ys[r]
                         near = sorted(
                             (
@@ -369,7 +442,7 @@ def parse(source: ModuleType) -> None:
                             "page": page,
                             "district": table["district"],
                             "county": county,
-                            "column": c,
+                            "column": known.index(columns[c]),
                             "label": columns[c],
                             "votes": votes,
                             "box": None if box is None else list(box),
@@ -377,7 +450,11 @@ def parse(source: ModuleType) -> None:
                         }
                     )
     for (year, district, c), column in columns_by.items():
-        if (year, district) not in source.ERRATA and sum(column) != printed.get((year, district, c)):
+        if (
+            (year, district) not in source.ERRATA
+            and (year, district, c) in printed
+            and sum(column) != printed[(year, district, c)]
+        ):
             failed.append(f"{year} district {district} column {c}: the column does not add up")
     frame = pl.DataFrame(rows, infer_schema_length=None)
     print(frame.group_by("located").len().sort("located"))
