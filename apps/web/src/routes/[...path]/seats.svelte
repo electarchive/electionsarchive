@@ -211,14 +211,14 @@
   const top = $derived(whole ? reach + 12 : reach);
   const center = $derived(
     link == null
-      ? { value: totals.all, of: whole ? null : size }
+      ? { value: totals.all, of: whole || scale < 0.5 ? null : size }
       : { value: totals.local, of: totals.all },
   );
   const font = $derived.by(() => {
-    const hole = 38.4 - dot - 2;
+    const hole = Math.min(...layout.radii) * 96 - dot - 2;
     const width = 0.28 * count(center.value).length;
     return Math.min(
-      30,
+      30 / scale,
       center.of == null
         ? (hole - 2) / Math.hypot(width, 0.72)
         : hole / Math.hypot(width, 1.18),

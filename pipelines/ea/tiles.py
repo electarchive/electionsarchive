@@ -29,10 +29,10 @@ def build(prefix: str | None) -> str:
             """select bs.scheme_code, bs.vintage, bs.as_of,
                       (select count(*) from area a join area_geometry g on g.area_id = a.id
                        where a.scheme_code = bs.scheme_code and g.valid @> bs.as_of),
-                      (select string_agg(distinct case when s.publisher = 'Eurostat'
-                                then '© EuroGeographics for the administrative boundaries' else s.publisher end, '; ')
+                      (select string_agg(distinct c.credit, E'\n')
                        from area a join area_geometry g on g.area_id = a.id join source s on s.id = g.source_id
-                       where a.scheme_code = bs.scheme_code and g.valid @> bs.as_of)
+                       cross join lateral (values (s.publisher), (nullif(s.attribution, ''))) c(credit)
+                       where a.scheme_code = bs.scheme_code and g.valid @> bs.as_of and c.credit is not null)
                from boundary_set bs where starts_with(bs.scheme_code, %s)
                order by bs.scheme_code, bs.vintage""",
             [prefix or ""],

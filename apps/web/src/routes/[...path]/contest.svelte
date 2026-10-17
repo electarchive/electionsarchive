@@ -1316,6 +1316,11 @@
                     >
                   {/if}
                 </span>
+                {#if source.attribution != null && source.attribution !== source.publisher}
+                  <span class="text-[0.8125rem] text-muted-foreground"
+                    >{source.attribution}</span
+                  >
+                {/if}
               {/each}
               {#if entry.missing.length > 0}
                 <span class="text-[0.8125rem] text-muted-foreground"

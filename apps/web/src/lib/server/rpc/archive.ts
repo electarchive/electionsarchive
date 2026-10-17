@@ -3201,6 +3201,7 @@ export const contests = {
               publisher: v.string(),
               title: v.string(),
               url: v.nullable(v.string()),
+              attribution: v.nullable(v.string()),
             }),
           ),
           count: v.number(),
@@ -3261,6 +3262,7 @@ export const contests = {
               publisher: string;
               title: string;
               url: string | null;
+              attribution: string | null;
             }> | null;
           }>(sql`
             with chosen as (
@@ -3280,7 +3282,7 @@ export const contests = {
             select sc.noun, chosen.vintage, chosen.as_of::text as "asOf", chosen.tiles,
               array(select distinct area_id::text from shapes) as shaped,
               array(select distinct quality from shapes) as qualities,
-              (select json_agg(json_build_object('publisher', s.publisher, 'title', s.title, 'url', s.url) order by s.publisher)
+              (select json_agg(json_build_object('publisher', s.publisher, 'title', s.title, 'url', s.url, 'attribution', nullif(s.attribution, '')) order by s.publisher)
                from source s where s.id in (select source_id from shapes)) as sources
             from scheme sc left join chosen on true
             where sc.code = ${group.scheme}

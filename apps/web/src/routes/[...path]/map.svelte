@@ -504,7 +504,9 @@
           credits = [
             ...new Set(
               found.flatMap((text) =>
-                text.split("; ").filter((part) => part.trim() !== ""),
+                text
+                  .split(text.includes("\n") ? "\n" : "; ")
+                  .filter((part) => part.trim() !== ""),
               ),
             ),
           ];
@@ -1314,23 +1316,26 @@
     {/if}
   </div>
   {#if credits.length > 0}
-    {const publishers = $derived(
-      credits.filter((credit) => !credit.startsWith("©")),
+    {const notices = $derived(
+      credits.filter((credit) => /©|: |\.$|^Contains /u.test(credit)),
     )}
-    <p class="px-1 text-xs text-muted-foreground">
-      {[
-        ...(publishers.length === 0
-          ? []
-          : [
-              m.map_boundaries({
-                publishers: new Intl.ListFormat(getLocale(), {
-                  type: "conjunction",
-                }).format(publishers),
-              }),
-            ]),
-        ...credits.filter((credit) => credit.startsWith("©")),
-      ].join(". ")}
-    </p>
+    {const publishers = $derived(
+      credits.filter((credit) => !notices.includes(credit)),
+    )}
+    <div class="grid gap-0.5 px-1 text-xs text-muted-foreground">
+      {#if publishers.length > 0}
+        <p>
+          {m.map_boundaries({
+            publishers: new Intl.ListFormat(getLocale(), {
+              type: "conjunction",
+            }).format(publishers),
+          })}
+        </p>
+      {/if}
+      {#each notices as notice (notice)}
+        <p>{notice}</p>
+      {/each}
+    </div>
   {/if}
 
   <p class="px-1 text-[0.8125rem] text-muted-foreground sm:hidden">
