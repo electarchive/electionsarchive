@@ -87,7 +87,7 @@
   const lit = $derived(hovered == null ? null : (marks[hovered] ?? null));
 </script>
 
-{#if marks.length > 1}
+{#if marks.filter((mark) => mark.share != null).length > 1}
   <section
     class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="career-title"
@@ -165,41 +165,41 @@
           stroke-width="1.25"
         />
         {#each marks as mark, index (index)}
-          {const x = $derived(sx(mark.at))}
-          {const y = $derived(sy(mark.share ?? 0))}
-          {#if mark.kind === "primary"}
+          {#if mark.share != null}
+            {const x = $derived(sx(mark.at))}
+            {const y = $derived(sy(mark.share))}
+            {#if mark.kind === "primary"}
+              <rect
+                x={x - 4}
+                y={y - 4}
+                width="8"
+                height="8"
+                transform="rotate(45 {x} {y})"
+                fill={mark.isWon ? mark.tint : "var(--card)"}
+                stroke={mark.tint}
+                stroke-width="2"
+              />
+            {:else}
+              <circle
+                cx={x}
+                cy={y}
+                r={hovered === index ? 6.5 : 5}
+                fill={mark.isWon ? mark.tint : "var(--card)"}
+                stroke={mark.tint}
+                stroke-width="2"
+              />
+            {/if}
             <rect
-              x={x - 4}
-              y={y - 4}
-              width="8"
-              height="8"
-              transform="rotate(45 {x} {y})"
-              fill={mark.isWon ? mark.tint : "var(--card)"}
-              stroke={mark.tint}
-              stroke-width="2"
-              opacity={mark.share == null ? 0.5 : 1}
-            />
-          {:else}
-            <circle
-              cx={x}
-              cy={y}
-              r={hovered === index ? 6.5 : 5}
-              fill={mark.isWon ? mark.tint : "var(--card)"}
-              stroke={mark.tint}
-              stroke-width="2"
-              opacity={mark.share == null ? 0.5 : 1}
+              x={x - 9}
+              y={y - 9}
+              width="18"
+              height="18"
+              fill="transparent"
+              role="presentation"
+              onpointerenter={() => (hovered = index)}
+              onpointerleave={() => (hovered = null)}
             />
           {/if}
-          <rect
-            x={x - 9}
-            y={y - 9}
-            width="18"
-            height="18"
-            fill="transparent"
-            role="presentation"
-            onpointerenter={() => (hovered = index)}
-            onpointerleave={() => (hovered = null)}
-          />
         {/each}
       </svg>
       {#if lit != null}
