@@ -27,6 +27,10 @@ FILE = "https://archive.org/download/{item}/{item}.pdf"
 DIGITIZED = 8
 DERIVED = 1
 VOLUMES = {
+    1984: ("officialvote84illi", date(1984, 11, 6), range(34, 40)),
+    1986: ("officialvote1986illi", date(1986, 11, 4), range(34, 43)),
+    1988: ("officialvoteofst1988illi", date(1988, 11, 8), range(33, 44)),
+    1990: ("officialvote90illi", date(1990, 11, 6), range(37, 51)),
     1992: ("stateofillinois1992illi", date(1992, 11, 3), range(59, 72)),
     1994: ("stateofillinoiso1994illi", date(1994, 11, 8), range(39, 52)),
     1996: ("stateofillinois1996illi", date(1996, 11, 5), range(32, 45)),
@@ -36,6 +40,7 @@ VOLUMES = {
     2004: ("stateofillinoiso2004illi", date(2004, 11, 2), range(35, 48)),
     2006: ("officialvote2006illi", date(2006, 11, 7), range(37, 51)),
 }
+ERRATA = {(1984, 1), (1986, 3)}
 
 
 def _artifact(year: int) -> raw.Artifact:
@@ -164,7 +169,8 @@ def parse() -> None:
                 for r in range(len(table["rows"])):
                     top = sorted((settled[(r, k)] for k in range(1, len(columns)) if (r, k) in settled), reverse=True)
                     if (
-                        (r, 0) in settled
+                        (year, table["district"]) not in ERRATA
+                        and (r, 0) in settled
                         and len(top) == len(columns) - 1
                         and settled[(r, 0)] != top[0] - (top[1] if len(top) > 1 else 0)
                     ):
@@ -212,6 +218,24 @@ def parse() -> None:
                         if len(bottom) == len(repeated):
                             for c, box in zip(repeated, bottom, strict=True):
                                 anchors[(lines[0], c)] = box
+                heads = {
+                    c: min(pairs)[1]
+                    for c in range(len(columns))
+                    if (
+                        pairs := [
+                            (k[1] - h[3], h)
+                            for name, h in words
+                            if name == _plain(columns[c])
+                            for place, k in words
+                            if place == _plain(table["rows"][lines[0]][0]) and 0 < k[1] - h[3] < 400
+                        ]
+                    )
+                }
+                anchors = {
+                    (r, c): b
+                    for (r, c), b in anchors.items()
+                    if c not in heads or (b[2] > heads[c][0] - 60 and b[0] < heads[c][2] + 150)
+                }
                 for _ in range(2):
                     if not anchors:
                         break
@@ -336,7 +360,7 @@ def parse() -> None:
                         }
                     )
     for (year, district, c), column in columns_by.items():
-        if sum(column) != printed.get((year, district, c)):
+        if (year, district) not in ERRATA and sum(column) != printed.get((year, district, c)):
             failed.append(f"{year} district {district} column {c}: the column does not add up")
     frame = pl.DataFrame(rows, infer_schema_length=None)
     print(frame.group_by("located").len().sort("located"))
@@ -461,14 +485,23 @@ def emit() -> Path:
                     and len(same := [o for o, k, _, t in known if k in ("candidate", "write_in") and t == summed]) == 1
                 ):
                     picked[int(column)] = same[0]
+                elif summed == 0:
+                    lines = lines.filter(pl.col("column") != column)
                 else:
                     print(f"{key}: no option for {label} ({summed})")
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
             if result_set not in cs.minted:
                 continue
             if len(picked) < lines["column"].n_unique():
-                pool = cs.key("us.option", f"{key}:others:il_sbe")
-                cs.add("contest_option", id=pool, contest_id=contest, kind="others", ballot_label="Others")
+                rest = int(lines.filter(~pl.col("column").is_in(list(picked)))["votes"].sum())
+                lumped = [
+                    o for o, k, _, t in known if k in ("write_in", "others") and t == rest and o not in picked.values()
+                ]
+                if len(lumped) == 1:
+                    pool = lumped[0]
+                else:
+                    pool = cs.key("us.option", f"{key}:others:il_sbe")
+                    cs.add("contest_option", id=pool, contest_id=contest, kind="others", ballot_label="Others")
                 picked = {int(column): picked.get(int(column), pool) for column in lines["column"].unique()}
             lines = lines.with_columns(
                 option=pl.col("column").replace_strict({column: str(option) for column, option in picked.items()})
