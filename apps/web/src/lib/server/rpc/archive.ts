@@ -4434,7 +4434,7 @@ async function races(
               level,
               day,
               (table ?? grid)?.rows.map((row) => row.k) ?? [],
-              table == null ? grid?.districts?.map((row) => row.k) : [],
+              grid?.districts?.map((row) => row.k),
             ),
         isBrief ||
         date == null ||
