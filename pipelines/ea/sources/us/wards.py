@@ -1307,4 +1307,11 @@ def emit() -> Path:
                     source_id=sources[(geoid, plan)],
                 )
         print(f"{shaped} geometry versions on {len({id for ids in areas.values() for id in ids})} candidate areas")
+        for duplicate, survivor in conn.execute(
+            """select a.area_id, b.area_id from area_code a
+               join area_code b on b.code = replace(a.code, '06075:board-of-supervisors', '0667000:council')
+               where a.code ~ '^06:06075:board-of-supervisors:district-[0-9]+$'
+                 and not exists (select from entity_merge m where m.entity_id = a.area_id)"""
+        ).fetchall():
+            cs.merge(duplicate, survivor)
         return cs.write()
