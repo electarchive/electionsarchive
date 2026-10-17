@@ -115,6 +115,10 @@ INDEPENDENT = {
 NO_PARTY = {"Nonpartisan", "Write In", "Write-In", "Past labels not allowed in current law", "None"}
 TICKET = r" and | & "
 LEGISLATURE = {"Governor", "Lieutenant Governor", "Treasurer"}
+RETIRED_OFFICE = (
+    'This statewide "County Treasurer" office came from a county race that the Idaho archive filed as a statewide '
+    "contest. The race now belongs to its county's treasurer office."
+)
 VERMONT = (
     "No candidate won a majority of the popular vote. Under Vermont's constitution, the General Assembly then chose "
     "the winner from the top three candidates."
@@ -497,6 +501,9 @@ def emit() -> Path:
             slugs[path] = entity
             return path
 
+        for key in offices_known:
+            if key.startswith("county-"):
+                cs.add("entity_retirement", entity_id=cs.key("us.office", key), reason=RETIRED_OFFICE)
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "two_round", "block")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp, two-round, and block systems must exist")
@@ -633,7 +640,8 @@ def emit() -> Path:
             if person not in persons:
                 persons[person] = cs.key(f"{SOURCE}.person", person)
                 cs.add("person", id=persons[person])
-                name(persons[person], candidate)
+                if persons[person] in cs.minted:
+                    name(persons[person], candidate)
             named[(state, candidate)] = person
             surnames[(state, year, office, slug(candidate).split("-")[-1])] = person
 
@@ -647,6 +655,10 @@ def emit() -> Path:
             election_id, datekey, election_kind = election(state, year, row["day"], "runoff" if runoff else kind)
             office_slug = slug(office)
             office_key = f"{office_slug}:{state}"
+            county = str(group["code"][0]) if office.startswith("County ") else None
+            if county is not None:
+                election_id = cs.key("us.election", f"{datekey}:{state}:{county}")
+                offices[office_key] = cs.key("us.office", f"{state}:{county}:{slug(office.removeprefix('County '))}")
             if office_key not in offices:
                 offices[office_key] = cs.key("us.office", office_key)
                 if office_key not in offices_known:
@@ -684,7 +696,7 @@ def emit() -> Path:
                     election_id=election_id,
                     kind="office",
                     office_id=offices[office_key],
-                    district_area_id=areas[state],
+                    district_area_id=areas[state] if county is None else cs.area("us.county", county),
                     term="remainder" if row["remainder"] else "full",
                     magnitude=seats,
                     round_number=2 if runoff else 1,
@@ -709,18 +721,29 @@ def emit() -> Path:
                     if kind == "primary"
                     else "election"
                 )
-                name(contest, f"{year} {states[state]} {office} {label}" + (f" ({shown})" if shown else ""))
-                cs.add(
-                    "slug",
-                    path=unique(
-                        f"us/{state.lower()}/{datekey}-{election_kind}/{office_slug}"
-                        + (f"-{slug(scope)}" if scope else "")
-                        + ("-special" if row["remainder"] else "")
-                        + (f"-{slug(shown)}" if shown and not row["remainder"] else ""),
-                        contest,
-                    ),
-                    entity_id=contest,
-                )
+                if county is not None:
+                    (title,) = conn.execute(
+                        "select text from name where entity_id = %s and is_preferred", [offices[office_key]]
+                    ).fetchone() or (office,)
+                    name(contest, f"{year} {title} {label}")
+                    cs.add(
+                        "slug",
+                        path=unique(f"{current[election_id]}/{slug(office.removeprefix('County '))}", contest),
+                        entity_id=contest,
+                    )
+                else:
+                    name(contest, f"{year} {states[state]} {office} {label}" + (f" ({shown})" if shown else ""))
+                    cs.add(
+                        "slug",
+                        path=unique(
+                            f"us/{state.lower()}/{datekey}-{election_kind}/{office_slug}"
+                            + (f"-{slug(scope)}" if scope else "")
+                            + ("-special" if row["remainder"] else "")
+                            + (f"-{slug(shown)}" if shown and not row["remainder"] else ""),
+                            contest,
+                        ),
+                        entity_id=contest,
+                    )
             candidates = group.filter(pl.col("measure") == 1)
             entries = sorted(
                 candidates.group_by("person", "candidate", maintain_order=True),
@@ -824,7 +847,8 @@ def emit() -> Path:
                         if who not in persons:
                             persons[who] = cs.key(f"{SOURCE}.person", who)
                             cs.add("person", id=persons[who])
-                            name(persons[who], member)
+                            if persons[who] in cs.minted:
+                                name(persons[who], member)
                         cs.add(
                             "candidacy",
                             id=cs.key("us.candidacy", f"{option_key}:{role}"),

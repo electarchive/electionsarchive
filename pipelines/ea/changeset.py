@@ -117,6 +117,8 @@ class Changeset:
         return self.survivors.get(id, id)
 
     def merge(self, entity: UUID, into: UUID) -> None:
+        if entity == into:
+            return
         self.add("entity_merge", entity_id=entity, into_id=into)
         self.survivors[entity] = into
         self.merged.setdefault(str(into), []).append(str(entity))

@@ -432,9 +432,7 @@ def emit() -> Path:
             for value in sorted(value for value in elections_known if value.startswith(wrong)):
                 duplicate = cs.key("us.election", value)
                 if str(duplicate) not in merged and value.replace(wrong, right) in elections_known:
-                    survivor = cs.key("us.election", value.replace(wrong, right))
-                    if survivor != duplicate:
-                        cs.merge(duplicate, survivor)
+                    cs.merge(duplicate, cs.key("us.election", value.replace(wrong, right)))
         for sab, year, month, day, kind in sorted(on_day, key=lambda row: (row[0], row[1], row[2], row[3] or 0)):
             original = kind
             suffix = {"general": "", "primary": ":primary", "runoff": ":runoff", "special": ":special"}[kind]
