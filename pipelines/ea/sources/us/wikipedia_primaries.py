@@ -155,7 +155,7 @@ PARTIES = [
     (r"progressive", "progressive", "VT:progressive-party"),
     (r"legal marijuana now", "legal-marijuana-now", "legal-marijuana-now"),
 ]  # fmt: skip
-WRITE_IN = re.compile(r"^(write.?ins?|scattering|scattered|other write.?ins?|other candidates)$", re.IGNORECASE)
+WRITE_IN = re.compile(r"write.?ins?\b|^scatter|^other candidates$", re.IGNORECASE)
 BLANK = re.compile(r"^(blanks?|over ?votes?|under ?votes?|spoiled|void)$", re.IGNORECASE)
 NOTA = re.compile(r"^none of (these|the above)", re.IGNORECASE)
 TITLE = "2024 United States primary elections"
@@ -370,7 +370,7 @@ def parse() -> None:
                         int(digits) if digits else None,
                         "winning" in name,
                         "write_in"
-                        if "write" in name or WRITE_IN.match(candidate)
+                        if "write" in name or WRITE_IN.search(candidate)
                         else "none_of_the_above"
                         if NOTA.match(candidate)
                         else "candidate",
@@ -433,6 +433,7 @@ def parse() -> None:
                 continue
             caucus = "caucus" in f"{suffix} {label}".lower()
             total = None
+            spoiled = 0
             for chunk in re.split(r"^\|-.*$", text, flags=re.MULTILINE):
                 cells: list[str] = []
                 for line in chunk.split("\n"):
@@ -451,6 +452,11 @@ def parse() -> None:
                     continue
                 if not digits or re.fullmatch(r"candidate", cells[0], re.IGNORECASE):
                     continue
+                if re.match(
+                    r'"?(?:blank\b|void\b|over ?votes?\b|under ?votes?\b|over and under)', cells[0], re.IGNORECASE
+                ):
+                    spoiled += int(digits)
+                    continue
                 presidential.append(
                     {
                         "state": state,
@@ -463,7 +469,7 @@ def parse() -> None:
                         "kind": "uncommitted"
                         if re.match(r"uncommitted|no preference|uninstructed", cells[0], re.IGNORECASE)
                         else "write_in"
-                        if re.match(r"write.?in", cells[0], re.IGNORECASE)
+                        if re.search(r"write.?in", cells[0], re.IGNORECASE)
                         else "none_of_the_above"
                         if NOTA.match(cells[0])
                         else "others"
@@ -471,6 +477,8 @@ def parse() -> None:
                         else "candidate",
                     }
                 )
+            if total is not None:
+                total -= spoiled
             counted = 0
             for row in presidential:
                 if row["template"] == template:
