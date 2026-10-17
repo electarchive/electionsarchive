@@ -1,6 +1,9 @@
+import html
 import io
 import json
 import re
+import struct
+import subprocess
 import zipfile
 from collections import defaultdict
 from datetime import date, datetime, timedelta
@@ -12,7 +15,7 @@ from xml.etree import ElementTree
 import fastexcel
 import polars as pl
 
-from ea import raw
+from ea import raw, scan
 from ea.changeset import Changeset, slug
 from ea.sources.us import elstats, ncsbe, openelections, wa_local
 from ea.store import DATA, connect
@@ -20,6 +23,7 @@ from ea.store import DATA, connect
 SOURCE = "us.primaries"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
 CALIFORNIA = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/79-us-rep-congress.xlsx"
 NORTH_CAROLINA = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2024_03_05/results_pct_20240305.zip"
 MINNESOTA = "https://electionresultsfiles.sos.mn.gov/20240813/{}.txt"
@@ -38,6 +42,22 @@ MASSACHUSETTS = [
 IOWA = "https://electionresults.iowa.gov/IA/121508/344769/reports/detailxml.zip"
 KANSAS = "https://sos.ks.gov/elections/24elec/2024-Primary-Election-United-States-House-of-Representatives-Precinct%20Results.xlsx"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
+NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
+NJ_FILES = {"president": "President", "us-senate": "U.S. Senate", "us-house": "U.S. House"}
+ORDINALS = (
+    "First",
+    "Second",
+    "Third",
+    "Fourth",
+    "Fifth",
+    "Sixth",
+    "Seventh",
+    "Eighth",
+    "Ninth",
+    "Tenth",
+    "Eleventh",
+    "Twelfth",
+)
 ME_FILES = {
     "20240305/elec_20240305a": ("President", None, "Democratic"),
     "20240305/elec_20240305b": ("President", None, "Republican"),
@@ -75,6 +95,7 @@ CHECKED = {
     "2024-05-07:IN:governor:republican",
     "2024-03-05:AL:house:3:republican",
     "2024-03-05:AL:house:4:republican",
+    "2024-06-04:NJ:president:republican",
 }
 PARTIES = {
     "d": "democratic",
@@ -179,6 +200,8 @@ def fetch() -> None:
     for path in ME_FILES:
         raw.fetch(SOURCE, MAINE.format(path), suffix=".xlsx")
     raw.fetch(SOURCE, IOWA, suffix=".zip")
+    for name in NJ_FILES:
+        raw.fetch(SOURCE, NEW_JERSEY.format(name), suffix=".pdf")
     raw.fetch(SOURCE, KANSAS, suffix=".xlsx")
     for listing in MASSACHUSETTS:
         for election, *_ in elstats.MA_ROW.findall(raw.fetch(SOURCE, listing, suffix=".html").path.read_text()):
@@ -295,6 +318,7 @@ def parse() -> None:
         *(("AL", "precinct", url) for url in ALABAMA),
         *(("ME", "precinct", MAINE.format(path)) for path in ME_FILES),
         ("IA", "county", IOWA),
+        *(("NJ", "county", NEW_JERSEY.format(name)) for name in NJ_FILES),
         ("KS", "precinct", KANSAS),
         *(
             ("MA", "precinct", f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/")
@@ -445,6 +469,94 @@ def parse() -> None:
                 ],
                 schema=dict.fromkeys(("county", "office", "district", "party", "candidate", "votes"), pl.String),
             )
+        elif state == "NJ":
+            pdf = raw.cached(SOURCE, url).path
+            info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+            cells: list[dict[str, object]] = []
+            seat: int | None = None
+            candidate: str | None = None
+            opened = party = ""
+            naming = False
+            tallied = 0
+            for page in range(1, int(info.split("Pages:")[1].split()[0]) + 1):
+                lines: list[list[tuple[str, scan.Box]]] = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][1], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][0][1][1] - box[1]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                heading = next(
+                    (words for words in lines if {"Name", "Address", "Party", "Tally"} <= {word for word, _ in words}),
+                    None,
+                )
+                if heading is None:
+                    continue
+                columns = {word: box[0] for word, box in heading}
+                for words in lines[lines.index(heading) + 1 :]:
+                    words.sort(key=lambda item: item[1][0])
+                    text = " ".join(word for word, _ in words)
+                    named = next(
+                        (
+                            word
+                            for word, box in words
+                            if word in ("Democratic", "Republican") and abs(box[0] - columns["Party"]) < 40
+                        ),
+                        None,
+                    )
+                    first = re.sub(r"[^a-z]", "", " ".join(word for word, _ in words[:2]).lower())
+                    place = (
+                        fips["NJ"].get(first) or fips["NJ"].get(re.sub(r"[^a-z]", "", words[0][0].lower()))
+                        if abs(words[0][1][0] - columns["County"]) < 40
+                        else None
+                    )
+                    if found := re.match(r"(\w+) Congressional District:", text):
+                        seat = ORDINALS.index(found[1]) + 1
+                    elif named is not None:
+                        heading_name = " ".join(word for word, box in words if box[2] < columns["Address"])
+                        if candidate is not None and heading_name == opened:
+                            continue
+                        if candidate is not None:
+                            raise ValueError(f"NJ {url}: {candidate} has no total")
+                        candidate = opened = heading_name
+                        party = named
+                        naming = True
+                        tallied = 0
+                    elif candidate is not None and (found := re.fullmatch(r"Total ([\d,]+)", text)):
+                        if int(found[1].replace(",", "")) != tallied:
+                            raise ValueError(f"NJ {url}: {candidate}'s counties sum to {tallied}, not {found[1]}")
+                        candidate = None
+                    elif candidate is not None and place is not None and re.fullmatch(r"[\d,]+", words[-1][0]):
+                        naming = False
+                        tallied += int(words[-1][0].replace(",", ""))
+                        cells.append(
+                            {
+                                "county": place,
+                                "office": NJ_FILES[url.split("results-")[1].removesuffix(".pdf")],
+                                "district": None if seat is None else str(seat),
+                                "party": party,
+                                "candidate": candidate,
+                                "votes": words[-1][0],
+                                "page": page,
+                                "x0": words[-1][1][0],
+                                "y0": words[-1][1][1],
+                                "x1": words[-1][1][2],
+                                "y1": words[-1][1][3],
+                            }
+                        )
+                    elif candidate is not None and naming and words[0][1][2] < columns["Address"]:
+                        candidate += " " + " ".join(word for word, box in words if box[2] < columns["Address"])
+            if candidate is not None:
+                raise ValueError(f"NJ {url}: {candidate} has no total")
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(("county", "office", "district", "party", "candidate", "votes"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
         elif state == "ME":
             office_text, district, stage = ME_FILES[url.removeprefix(MAINE[:-7]).removesuffix(".xlsx")]
             table = (
@@ -650,7 +762,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME"):
+        if state in ("MN", "IN", "ME", "NJ"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -693,7 +805,7 @@ def parse() -> None:
             else date(2024, 8, 6)
             if state == "KS"
             else date(2024, 6, 4)
-            if state == "IA"
+            if state in ("IA", "NJ")
             else date(2024, 5, 7)
             if state == "IN"
             else (date(2024, 4, 16) if "Runoff" in url else date(2024, 3, 5))
@@ -727,6 +839,11 @@ def parse() -> None:
                 pl.col("candidate").fill_null("").str.strip_chars() != "",
             )
             .select(
+                *(
+                    pl.col(column).cast(pl.Int64)
+                    for column in ("page", "x0", "y0", "x1", "y1")
+                    if column in frame.columns
+                ),
                 state=pl.lit(state),
                 day=pl.lit(DAYS.get((state, day), day)),
                 office="kind",
@@ -820,7 +937,7 @@ def parse() -> None:
             )
             .filter(pl.col("votes").is_not_null())
         )
-    frame = pl.concat(frames)
+    frame = pl.concat(frames, how="diagonal")
     print(frame.filter(pl.col("county").is_null()).group_by("state", "url").agg(pl.col("votes").sum()))
     frame = frame.filter(pl.col("county").is_not_null())
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -882,6 +999,8 @@ def emit() -> Path:
             "supersedes_id",
         )
         sources: dict[str, UUID] = {}
+        artifacts: dict[str, UUID] = {}
+        pages: dict[tuple[str, int], tuple[UUID, int, int]] = {}
         for state, used in frame.select("state", "url").unique(maintain_order=True).iter_rows():
             publisher, title, url, kind, license = (
                 (
@@ -965,6 +1084,14 @@ def emit() -> Path:
                 )
                 if state == "KS"
                 else (
+                    "New Jersey Division of Elections",
+                    "2024 official primary election results",
+                    "https://www.nj.gov/state/elections/election-information-2024.shtml",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "NJ"
+                else (
                     elstats.MA_PUBLISHER,
                     elstats.TITLE,
                     "https://electionstats.state.ma.us",
@@ -993,7 +1120,7 @@ def emit() -> Path:
                 cs.add(
                     "source", id=sources[used], kind=kind, publisher=publisher, title=title, url=url, license=license
                 )
-            cs.artifact(raw.cached(SOURCE, used), sources[used])
+            artifacts[used] = cs.artifact(raw.cached(SOURCE, used), sources[used])
         spans: dict[tuple[str, int], set[str]] = defaultdict(set)
         for value, county in conn.execute(
             """select distinct e.value, case u.scheme_code when 'us.county' then u.code
@@ -1206,6 +1333,49 @@ def emit() -> Path:
                 .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
                 .agg(pl.col("value").sum())
             )
+            for url, number, county, candidate, x0, y0, x1, y1 in (
+                lines.filter(pl.col("page").is_not_null())
+                .select("url", "page", "county", "candidate", "x0", "y0", "x1", "y1")
+                .iter_rows()
+            ):
+                if (url, number) not in pages:
+                    pdf = raw.cached(SOURCE, url)
+                    image = PAGES / f"{pdf.sha256}-{number}.png"
+                    if not image.exists():
+                        PAGES.mkdir(parents=True, exist_ok=True)
+                        subprocess.run(
+                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                            + [str(pdf.path), str(image.with_suffix(""))],
+                            check=True,
+                        )
+                    width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                    page = cs.page(artifacts[url], number)
+                    cs.add(
+                        "source_page",
+                        id=page,
+                        artifact_id=artifacts[url],
+                        page_number=number,
+                        image_key=f"pages/{SOURCE}/{image.name}",
+                        width=width,
+                        height=height,
+                    )
+                    pages[(url, number)] = (page, width * 3, height * 3)
+                page, width, height = pages[(url, number)]
+                cs.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=UUID(members[county]),
+                    option_id=UUID(str(picked[candidate])),
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    page_id=page,
+                    source_id=None,
+                    x0=x0 / width,
+                    y0=y0 / height,
+                    x1=x1 / width,
+                    y1=y1 / height,
+                )
         for unit, (code, day, county) in precincts.items():
             if UUID(unit) in cs.minted:
                 cs.add(
