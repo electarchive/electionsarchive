@@ -73,7 +73,8 @@ NOTE = (
     "boxes YSK ballot-box data reports only as a whole are kept as one unit. For 2014, the places whose races YSK's March 30 totals "
     "leave out are left out here too: 12 mayoral races, and the provincial and municipal council races in central Ağrı "
     "and Yeşilyurt in Tokat. YSK ballot-box data shows no votes for Fatih Şahinler, an independent candidate for mayor of Kadıköy "
-    "in 2014, but its valid votes there include 91 votes that no candidate has, so we count them as his."
+    "in 2014, and its valid votes there include 91 votes that no candidate has; they are counted in valid votes but "
+    "given to no option."
 )
 ABOLISHED = date(2014, 3, 30)
 ABSORBED_NOTE = (
@@ -126,10 +127,11 @@ LABELS = (
     }
 )
 DISTRICTS = {("20", "MERKEZ"): "MERKEZEFENDİ"}
-GAPS = {
-    ("2011-milletvekilligi-genel-secimleri", "DİYARBAKIR"): "HATİP DİCLE",
-    ("2014-yerel-belediye-baskanlık-secimleri", "İSTANBUL"): "FATİH ŞAHİNLER",
-}
+UNATTRIBUTED = ("2014-yerel-belediye-baskanlık-secimleri", "İSTANBUL")
+UNATTRIBUTED_NOTE = (
+    "the YSK ballot-box files' valid votes for this race include 91 votes, all in Kadıköy, that it assigns to no candidate. They are "
+    "counted in valid votes here but not given to any option."
+)
 ANKARA_2015 = {
     1: [
         "Akyurt",
@@ -192,6 +194,7 @@ def fetch() -> None:
 def parse() -> None:
     plates = {upper(label): f"{plate:02}" for plate, label in enumerate(PROVINCES, 1)}
     rows = []
+    unattributed = []
     for slug, url in URLS.items():
         with gzip.open(raw.cached(SOURCE, url).path, "rt") as file:
             for line in file:
@@ -199,15 +202,21 @@ def parse() -> None:
                 location = data["location"]
                 results = data["results"]
                 if gap := data["stats"]["validVoteSum"] - sum(result["votes"] for result in results):
-                    if (missing := GAPS.get((slug, location["province"]))) is None:
+                    if (slug, location["province"]) == UNATTRIBUTED:
+                        if location["scope"] == "neighborhood":
+                            unattributed.append(
+                                (
+                                    slug,
+                                    plates[location["province"]],
+                                    location["district"],
+                                    location["neighborhood"],
+                                    gap,
+                                )
+                            )
+                    elif (slug, location["province"]) == ("2011-milletvekilligi-genel-secimleri", "DİYARBAKIR"):
+                        results = [*results, {"name": "HATİP DİCLE", "votes": gap}]
+                    else:
                         raise ValueError(f"{slug} {location['sourceId']}: votes do not sum to valid votes")
-                    results = [
-                        *(result for result in results if result["name"] != missing),
-                        {
-                            "name": missing,
-                            "votes": gap + sum(result["votes"] for result in results if result["name"] == missing),
-                        },
-                    ]
                 rows += [
                     (
                         slug,
@@ -276,6 +285,11 @@ def parse() -> None:
             frame.join(missing.filter(pl.col("slug").str.contains("yerel")), on=places, how="semi"),
         ]
     ).filter(pl.col("slug").is_in(LOCAL)).drop("scope").write_parquet(PARSED / "local.parquet")
+    pl.DataFrame(
+        unattributed, schema=["slug", "plate", "district", "neighborhood", "votes"], orient="row"
+    ).with_columns(pl.col("district", "neighborhood").str.replace_all(r"\s+", " ").str.strip_chars()).write_parquet(
+        PARSED / "unattributed.parquet"
+    )
     print(
         neighborhoods.group_by("slug").agg(
             pl.col("votes").sum(), places=pl.struct("plate", "district", "neighborhood").n_unique()
@@ -614,8 +628,15 @@ def emit() -> Path:
         for contest_key, option in local.select("contest", "option").unique().iter_rows():
             options[f"{contest_key}\x1f{option}"] = str(cs.key("tr.option", option))
         votes = pl.concat([votes, local.group_by("contest", "unit", "option").agg(pl.col("votes").sum())])
+        unattributed = pl.read_parquet(PARSED / "unattributed.parquet").join(
+            local.select("slug", "plate", "district", "neighborhood", "contest", "unit").unique(),
+            on=["slug", "plate", "district", "neighborhood"],
+        )
         valid = (
-            pl.concat([frame, local.select(frame.columns)], how="diagonal_relaxed")
+            pl.concat(
+                [frame, local.select(frame.columns), unattributed.select("contest", "unit", "votes")],
+                how="diagonal_relaxed",
+            )
             .group_by("contest", "unit")
             .agg(pl.col("votes").sum())
         )
@@ -648,6 +669,8 @@ def emit() -> Path:
             )
             if result_set in cs.minted:
                 result_sets[contest_key] = str(result_set)
+                if contest_key in unattributed["contest"]:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=UNATTRIBUTED_NOTE)
         values = pl.concat(
             [
                 votes.select(
