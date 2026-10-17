@@ -12,7 +12,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_elchist"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://elections.sos.state.tx.us/"
 STATEWIDE = re.compile(
@@ -23,6 +23,7 @@ STATEWIDE = re.compile(
 )
 PUBLISHER = "Texas Secretary of State"
 TITLE = "Texas election history: statewide returns by county, 1992–1998"
+LATER = "Texas election history: statewide returns by county, 2000–2014"
 SEPARATE = {"David Young"}
 DAYS = {12: date(1993, 6, 5)}
 OFFICES = {
@@ -43,6 +44,7 @@ PARTIES = {
     "DEM": "democratic-party",
     "REP": "republican-party",
     "LIB": "libertarian-party",
+    "GRN": "green-party",
     "NLP": "natural-law-party",
     "UST": "TX:u-s-taxpayers-party",
     "SWP": "socialist-workers-party",
@@ -52,6 +54,7 @@ RUNOFF_DATE = (
     "and we show it on that date."
 )
 ELECTIONS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 52, 53, 54, 55, 56, 57, 58, 62, 63, 69, 70, 72)
+GENERALS = (82, 95, 114, 127, 141, 154, 164, 175)
 
 
 def races(election: int) -> list[tuple[int, str]]:
@@ -64,7 +67,7 @@ def races(election: int) -> list[tuple[int, str]]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, f"{SITE}index.htm", suffix=".htm")
-    for election in ELECTIONS:
+    for election in (*ELECTIONS, *GENERALS):
         raw.fetch(SOURCE, f"{SITE}elchist{election}_raceselect.htm", suffix=".htm")
         time.sleep(1)
         for race, title in races(election):
@@ -86,7 +89,7 @@ def cells(row: str, tag: str) -> list[str]:
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
-    for election in ELECTIONS:
+    for election in (*ELECTIONS, *GENERALS):
         for race, title in races(election):
             if not STATEWIDE.match(title):
                 continue
@@ -151,7 +154,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas statewide elections of 1992 to 1998 by county from the Secretary of State's election history",
+            summary="Texas statewide elections of 1992 to 1998 and generals of 2000 to 2014 by county from the Secretary "
+            "of State's election history",
             polity="US",
         )
 
@@ -182,8 +186,18 @@ def emit() -> Path:
             url=SITE,
             license="Public record",
         )
+        later = cs.source(PUBLISHER, LATER)
+        cs.add(
+            "source",
+            id=later,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=LATER,
+            url=SITE,
+            license="Public record",
+        )
         pages: dict[tuple[int, str], str] = {}
-        for election in ELECTIONS:
+        for election in (*ELECTIONS, *GENERALS):
             for race, title in races(election):
                 if STATEWIDE.match(title):
                     pages[(election, title)] = f"{SITE}elchist{election}_race{race}.htm"
@@ -214,7 +228,7 @@ def emit() -> Path:
         known_offices = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         contests: dict[str, UUID] = dict(
             conn.execute(
-                "select value, entity_id from external_id where scheme = 'us.contest' and value ~ '^199[2-8].*:TX:'"
+                "select value, entity_id from external_id where scheme = 'us.contest' and value ~ '^(199[2-8]|20(0[0-9]|1[0-4])).*:TX:'"
             ).fetchall()
         )
         people: dict[str, set[UUID]] = {}
@@ -361,6 +375,7 @@ def emit() -> Path:
             options: list[tuple[UUID, str, str]] = []
             outcomes: list[tuple[UUID, str, int | None]] = []
             on_file: dict[UUID, int] = {}
+            promoted = not existing or election not in GENERALS
             if existing:
                 options = conn.execute(
                     "select id, kind, ballot_label from contest_option where contest_id = %s and kind <> 'others'",
@@ -368,8 +383,8 @@ def emit() -> Path:
                 ).fetchall()
                 for row in conn.execute(
                     """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
-                         supersedes_id from result_set where contest_id = %s and is_default""",
-                    [contest],
+                         supersedes_id from result_set where contest_id = %s and is_default and %s""",
+                    [contest, promoted],
                 ).fetchall():
                     cs.add(
                         "result_set",
@@ -470,13 +485,13 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
-                is_default=True,
+                source_id=later if election in GENERALS else source,
+                is_default=promoted,
                 completeness=1,
             )
             if election in DAYS:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=RUNOFF_DATE)
-            cs.artifact(raw.cached(SOURCE, pages[(election, race)]), source)
+            cs.artifact(raw.cached(SOURCE, pages[(election, race)]), later if election in GENERALS else source)
             for candidate, county, votes in lines.select("candidate", "county", "votes").iter_rows():
                 cs.add(
                     "result_value",
