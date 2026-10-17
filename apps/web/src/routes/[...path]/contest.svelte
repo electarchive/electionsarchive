@@ -364,7 +364,7 @@
         };
   });
   const verdict = $derived.by(() => {
-    if (contest.current == null || question) {
+    if (contest.current == null) {
       return null;
     }
     const named = (row: {
@@ -376,6 +376,19 @@
       row.label.length > 28 && (row.person ?? row.current?.person) == null
         ? (row.short ?? row.label)
         : row.label;
+    if (question) {
+      const top = contest.rows
+        .filter((row) => row.current != null)
+        .toSorted(
+          (a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0),
+        )[0];
+      return top?.current?.outcome === "lost"
+        ? m.race_lede_lost({
+            answer: named(top),
+            share: percent(top.current.share),
+          })
+        : null;
+    }
     const [elector, second] = contest.electors?.rows ?? [];
     if (elector != null) {
       let total = contest.electors?.appointed ?? 0;
@@ -479,12 +492,6 @@
     }
     if (top?.current == null || next?.current == null) {
       return null;
-    }
-    if (contest.kind === "ballot_question" && top.current.outcome === "lost") {
-      return m.race_lede_lost({
-        answer: named(top),
-        share: percent(top.current.share),
-      });
     }
     const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
     return (isWon ? m.race_lede_won : m.race_lede_votes)({
