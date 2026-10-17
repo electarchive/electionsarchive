@@ -153,6 +153,52 @@
   const tones = $derived(
     contest.places?.legend.map((item) => swatch(item.color, item.key)) ?? [],
   );
+  const ladder = $derived.by(() => {
+    const places = contest.places;
+    const ranked = contest.electors?.rows ?? [];
+    const rows = [...(places?.rows ?? []), ...(places?.districts ?? [])];
+    const sides = ranked.slice(0, 2).map((row) => row.person);
+    const rungs = rows.flatMap((row) => {
+      const item = places?.legend[row.leader ?? -1];
+      const margin = row.margin ?? 0;
+      const strength = [0.05, 0.1, 0.2].filter((edge) => margin >= edge).length;
+      return row.seats == null || item == null
+        ? []
+        : [
+            {
+              k: row.k,
+              name: row.name,
+              path: row.path,
+              seats: row.seats,
+              side: sides.indexOf(item.person),
+              leader: titles[row.leader ?? -1] ?? "",
+              margin,
+              color: `color-mix(in oklab, ${tones[row.leader ?? -1]} ${[34, 54, 76, 100][strength]}%, var(--card))`,
+            },
+          ];
+    });
+    let isMatched = sides.length === 2 && rungs.length === rows.length;
+    for (const [index, person] of sides.entries()) {
+      let won = 0;
+      for (const rung of rungs) {
+        if (rung.side === index) {
+          won += rung.seats;
+        }
+      }
+      isMatched &&= person != null && won === ranked[index]?.votes;
+    }
+    return !isMatched
+      ? null
+      : [
+          ...rungs
+            .filter((rung) => rung.side === 0)
+            .toSorted((a, b) => b.margin - a.margin),
+          ...rungs.filter((rung) => rung.side === -1),
+          ...rungs
+            .filter((rung) => rung.side === 1)
+            .toSorted((a, b) => a.margin - b.margin),
+        ];
+  });
   const levels = $derived(
     contest.places?.levels.map((level) => {
       const query = new URLSearchParams({
@@ -797,7 +843,7 @@
     <Count count={contest.count} {here} isDerived={contest.isDerived} />
   {/if}
   {#if contest.electors != null}
-    <Electors electors={contest.electors} />
+    <Electors electors={contest.electors} {ladder} bind:focus />
   {/if}
   {#if drawn != null && contest.places != null}
     <div

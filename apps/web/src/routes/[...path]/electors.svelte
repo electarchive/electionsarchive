@@ -1,14 +1,18 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, date, percent } from "#lib/format.js";
+  import { count, date, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { cn } from "#lib/utils.js";
   import Preview from "./preview.svelte";
 
-  const {
+  let {
     electors,
+    ladder = null,
+    focus = $bindable(null),
   }: {
     electors: {
       rows: Array<{
@@ -23,6 +27,16 @@
       appointed: number | null;
       link: { path: string | null; date: string | null; popular: boolean };
     };
+    ladder?: Array<{
+      k: number;
+      name: string;
+      path: string | null;
+      seats: number;
+      color: string;
+      leader: string;
+      margin: number;
+    }> | null;
+    focus?: number | null;
   } = $props();
 
   const total = $derived.by(() => {
@@ -42,6 +56,7 @@
     ...(second == null ? [] : [second]),
   ]);
   const tether = TooltipPrimitive.createTether<number>();
+  const rungs = TooltipPrimitive.createTether<number>();
   const uid = $props.id();
 </script>
 
@@ -128,22 +143,70 @@
         .map((row) => `${row.label} ${count(row.votes)}`)
         .join(", ")}
     >
-      {#each order as row, index (row.key)}
-        <Tooltip.Trigger {tether} payload={index} tabindex={-1}>
-          {#snippet child({ props })}
-            <span
-              {...props}
-              class="block shrink-0"
-              style:background-color={swatch(row.color, row.key)}
-              style:width="{(row.votes / total) * 100}%"
-            ></span>
-          {/snippet}
-        </Tooltip.Trigger>
-      {/each}
+      {#if ladder == null}
+        {#each order as row, index (row.key)}
+          <Tooltip.Trigger {tether} payload={index} tabindex={-1}>
+            {#snippet child({ props })}
+              <span
+                {...props}
+                class="block shrink-0"
+                style:background-color={swatch(row.color, row.key)}
+                style:width="{(row.votes / total) * 100}%"
+              ></span>
+            {/snippet}
+          </Tooltip.Trigger>
+        {/each}
+      {:else}
+        {#each ladder as rung, index (rung.k)}
+          <Tooltip.Trigger tether={rungs} payload={index} tabindex={-1}>
+            {#snippet child({ props })}
+              <svelte:element
+                this={rung.path == null ? "span" : "a"}
+                {...props}
+                type={undefined}
+                href={rung.path == null
+                  ? undefined
+                  : resolve("/[...path]", { path: rung.path })}
+                class={cn("block shrink-0 transition-opacity", {
+                  "opacity-45": focus != null && focus !== rung.k,
+                })}
+                style:background-color={rung.color}
+                style:width="calc({(rung.seats / total) * 100}% - 1px)"
+                onpointerenter={() => (focus = rung.k)}
+                onpointerleave={() => (focus = null)}
+              />
+            {/snippet}
+          </Tooltip.Trigger>
+        {/each}
+      {/if}
     </div>
     <Tooltip.Root {tether} delayDuration={150}>
       {#snippet children({ payload })}
         {@render about(payload == null ? undefined : order.at(Number(payload)))}
+      {/snippet}
+    </Tooltip.Root>
+    <Tooltip.Root tether={rungs} delayDuration={0}>
+      {#snippet children({ payload })}
+        {const rung = $derived(
+          payload == null ? undefined : ladder?.at(Number(payload)),
+        )}
+        {#if rung != null}
+          <Tooltip.Content
+            collisionPadding={8}
+            class="grid gap-0.5 leading-snug"
+          >
+            <span class="font-semibold">{rung.name}</span>
+            <span class="font-figures text-xs tabular-nums"
+              >{m.record_electors({ count: count(rung.seats) })}</span
+            >
+            <span class="text-xs opacity-80"
+              >{rung.leader}
+              <span class="font-figures tabular-nums"
+                >{points(rung.margin)}</span
+              ></span
+            >
+          </Tooltip.Content>
+        {/if}
       {/snippet}
     </Tooltip.Root>
     <span

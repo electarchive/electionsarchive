@@ -145,6 +145,7 @@ const PlaceRow = v.object({
   earlier: v.nullable(v.array(v.number())),
   prior: v.nullable(v.number()),
   within: v.optional(v.number()),
+  seats: v.optional(v.nullable(v.number())),
 });
 
 const Places = v.nullable(
@@ -1554,8 +1555,15 @@ async function places(
     k: number;
     parent: string | null;
     path: string | null;
+    seats: number | null;
   }>(sql`
-    select c.district_area_id as area, a.k, p.parent_id as parent, s.path
+    select c.district_area_id as area, a.k, p.parent_id as parent, s.path,
+      (
+        select sum(x.seats)::int from contest_option o
+        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+        join result_set rs on rs.id = x.result_set_id and rs.is_default
+        where o.contest_id = c.id
+      ) as seats
     from contest c
     join area a on a.id = c.district_area_id
     left join area_parent p on p.area_id = a.id and p.valid @> ${contest.date ?? "infinity"}::date
@@ -1637,6 +1645,7 @@ async function places(
   const at = new Map(
     points.rows.map((row) => [row.k, [row.x, row.y] as [number, number]]),
   );
+  const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
   return {
     levels: levels.map((entry) => ({
       code: entry.code,
@@ -1647,12 +1656,17 @@ async function places(
     ...tabulated,
     rows: tabulated.rows
       .slice(0, rows.length)
-      .map((row) => ({ ...row, at: at.get(row.k) ?? null })),
+      .map((row) => ({
+        ...row,
+        at: at.get(row.k) ?? null,
+        seats: seats.get(row.k) ?? null,
+      })),
     districts: tabulated.rows
       .slice(rows.length)
       .map((row, index) => ({
         ...row,
         at: at.get(row.k) ?? null,
+        seats: seats.get(row.k) ?? null,
         within: parents.get(nested[index]?.parent ?? ""),
       })),
   };
