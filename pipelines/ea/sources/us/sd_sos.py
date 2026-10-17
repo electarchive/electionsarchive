@@ -99,7 +99,7 @@ def fetch() -> None:
 def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)["SD"]
-    rows: list[tuple[str, bool, str, str, str | None, int]] = []
+    rows: list[tuple[str, bool, str, str, str | None, int, str]] = []
     unknown: set[str] = set()
 
     def county(name: str) -> str | None:
@@ -126,7 +126,7 @@ def parse() -> None:
             code = county(row[0])
             for (name, party), votes in zip(candidates, row[1:], strict=False):
                 if code is not None:
-                    rows.append((path[:4], special, office, name, party, int(votes or 0)) + (code,))  # type: ignore[arg-type]
+                    rows.append((path[:4], special, office, name, party, int(votes or 0), code))
     for path, totals in LONG.items():
         expected = {
             (race, candidate): int(votes) for race, _, candidate, votes, *_ in table(totals)[1:] if votes.isdigit()
@@ -136,9 +136,7 @@ def parse() -> None:
             sums[(race, candidate)] = sums.get((race, candidate), 0) + int(votes)
             code = county(name)
             if code is not None:
-                rows.append(
-                    (path[:4], False, race.upper(), candidate, PARTIES.get(party.upper()), int(votes)) + (code,)
-                )  # type: ignore[arg-type]
+                rows.append((path[:4], False, race.upper(), candidate, PARTIES.get(party.upper()), int(votes), code))
         if sums != expected:
             raise ValueError(f"{path}: {sorted(set(sums.items()) ^ set(expected.items()))}")
     if unknown:
