@@ -337,7 +337,11 @@
     )}
     aria-labelledby="{uid}-latest"
   >
-    <div class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5">
+    <div
+      class={cn("flex flex-wrap items-baseline gap-x-3 gap-y-0.5", {
+        "lg:flex-col lg:items-start": isMapped,
+      })}
+    >
       <h2 id="{uid}-latest" class="text-[0.8125rem] font-bold">
         {m.polity_latest()}
       </h2>
@@ -359,11 +363,20 @@
     >
       {#each polity.latest.races as race, index (index)}
         {const isSeated = $derived(race.contested > 1)}
+        {const plain = $derived(
+          race.name.replace(/^\d{4} /u, "").replace(/ election$/u, ""),
+        )}
+        {const short = $derived(
+          plain.replace(new RegExp(`^${RegExp.escape(polity.name)} `, "u"), ""),
+        )}
         {const stripped = $derived(
-          race.name
-            .replace(/^\d{4} /u, "")
-            .replace(new RegExp(`^${RegExp.escape(polity.name)} `, "u"), "")
-            .replace(/ election$/u, ""),
+          polity.latest.races.some(
+            (other) =>
+              other !== race &&
+              other.name.replace(/ election$/u, "").endsWith(` ${short}`),
+          )
+            ? plain
+            : short,
         )}
         {const label = $derived(
           stripped.charAt(0).toUpperCase() + stripped.slice(1),
