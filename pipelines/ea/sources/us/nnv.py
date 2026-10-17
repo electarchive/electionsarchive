@@ -19,7 +19,7 @@ from ea.sources.us.party_labels import NATIONAL, UNAFFILIATED
 from ea.store import DATA, connect
 
 SOURCE = "us.nnv"
-VERSION = "1"
+VERSION = "2"
 COMMIT = "13e2f82692c76e3695f6cd609a5e710d6cab5e26"
 ARCHIVE = f"https://codeload.github.com/mapping-elections/nnv-xml/tar.gz/{COMMIT}"
 PUBLISHER = "American Antiquarian Society and Tufts University"
@@ -64,6 +64,33 @@ TITLES = {
 }  # fmt: skip
 TRIALS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
 MAJORITY = {"MA", "NH", "VT", "RI", "ME"}
+BODIES = {
+    "House of Representatives": "house",
+    "State Senate": "senate",
+    "House of Delegates": "house-of-delegates",
+    "House of Commons": "house",
+    "Assembly": "assembly",
+}
+STATE_BODIES = {
+    ("NJ", "Assembly"): "general-assembly",
+    ("NJ", "Legislative Council"): "senate",
+    ("CT", "Council of Assistants"): "senate",
+    ("DE", "Council"): "senate",
+}
+CHOSEN = {"MD": 1838, "VA": 1851, "NC": 1836, "GA": 1825, "NJ": 1844, "SC": 1865}
+ADMITTED = {
+    "VT": 1791,
+    "KY": 1792,
+    "TN": 1796,
+    "OH": 1803,
+    "LA": 1812,
+    "IN": 1816,
+    "MS": 1817,
+    "IL": 1818,
+    "AL": 1819,
+    "ME": 1820,
+    "MO": 1821,
+}
 POOLED = {"scattering", "unknown", "scattering votes", "scatterings", "others", "all others"}
 BLANK = re.compile(r"(?i)^blanks?\b")
 KINDS = {"Populated Place": "place"}
@@ -324,7 +351,13 @@ def emit() -> Path:
         & pl.col("year").is_between(1787, 1823)
         & (pl.col("folder") != "USA")
     )
-    wanted = list(house["record"])
+    state = records.filter(
+        pl.col("type").is_in(["General", "Special"])
+        & pl.col("year").is_between(1787, 1825)
+        & (pl.col("folder") != "USA")
+        & pl.col("office").is_in(["Governor", *BODIES, *(office for _, office in STATE_BODIES)])
+    )
+    wanted = list(house["record"]) + list(state["record"])
     nodes: dict[tuple[str, int], tuple[int | None, str | None, str | None, int]] = {
         (record, node): (parent, kind, name, depth)
         for record, node, parent, kind, name, depth in pl.read_parquet(PARSED / "units.parquet")
@@ -391,6 +424,12 @@ def emit() -> Path:
             if name is not None and not (depth == 1 and kind in (None, "District"))
         )
 
+    homes: dict[tuple[str, str, str], set[str]] = {}
+    for (record, _), (parent, kind, name, depth) in nodes.items():
+        if parent is not None and name is not None and kind not in ("County", "Parish", "District"):
+            above = nodes[(record, parent)]
+            if above[1] in ("County", "Parish") and above[2] is not None:
+                homes.setdefault((record[:2].upper(), kind or "unit", plain(name)), set()).add(above[2])
     returns: dict[str, dict[tuple[tuple[str, str], ...], dict[str, float]]] = {}
     for record in wanted:
         for node in leaves.get(record, []):
@@ -398,14 +437,33 @@ def emit() -> Path:
             cell = returns.setdefault(record, {}).setdefault(where, {})
             for candidate, vote in cells[(record, node)].items():
                 cell[candidate] = cell.get(candidate, 0) + vote
+    spots: dict[str, tuple[tuple[str, str], ...]] = {}
+    for record, postal, scope, label in state.select("record", "postal", "role_scope", "label").iter_rows():
+        places = [where for where in returns.get(record, {}) if where]
+        common = places[0] if places else ()
+        for where in places[1:]:
+            common = common[: next((index for index, (a, b) in enumerate(zip(common, where)) if a != b), len(where))]
+        seat = ", ".join(part for part in (label or "").split(", ")[1:] if not part.startswith("Ballot "))
+        fallback = common or (((scope or "unit", seat),) if seat and scope != "State" else ())
+        moved: dict[tuple[tuple[str, str], ...], tuple[tuple[str, str], ...]] = {}
+        for where in [*returns.get(record, {}), fallback]:
+            top = where[0][0] if where else None
+            home = homes.get((postal, top or "", plain(where[0][1])), set()) if where else set()
+            if top in ("County", "Parish", None) or (top == "District" and postal == "SC") or len(home) != 1:
+                moved[where] = where
+            else:
+                moved[where] = (("County", next(iter(home))), *where)
+        returns[record] = {moved[where]: cell for where, cell in returns.get(record, {}).items()}
+        spots[record] = moved[fallback]
 
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House returns by county and town, 1788–1823, from A New Nation Votes: attached to THEA's contests "
-            "where they reconcile, and the contests THEA lacks",
+            summary="House returns by county and town, 1788–1823, from A New Nation Votes, attached to THEA's contests "
+            "where they reconcile, with the House contests THEA lacks, and governor and state legislative "
+            "elections 1787–1825",
             polity="US",
         )
         us = cs.polity("US")
@@ -550,8 +608,9 @@ def emit() -> Path:
                    from external_id x join contest c on c.id = x.entity_id
                    join result_set r on r.contest_id = c.id and r.is_default
                    left join contest_option o on o.contest_id = c.id and o.parent_option_id is null
+                   join changeset s on s.id = c.changeset_id
                    where x.scheme = 'us.contest' and x.value like '%%:house:%%' and x.value ~ '^1[78][0-9]{2}'
-                     and left(x.value, 4)::int < 1824"""
+                     and left(x.value, 4)::int < 1824 and s.pipeline = 'us.thea'"""
         ).fetchall():
             entry = held.setdefault(
                 key,
@@ -725,10 +784,17 @@ def emit() -> Path:
                         }
                     )
 
-        groups: dict[tuple[str, str, bool], list[str]] = {}
+        info |= {row["record"]: row for row in state.iter_rows(named=True)}
+        groups: dict[tuple[str, str, str, bool], list[str]] = {}
         for record, row in info.items():
+            if record not in lines:
+                tally["NNV records with no candidates, not added"] += 1
+                continue
+            if len({line["candidate"] for line in lines[record]}) < len(lines[record]):
+                tally["NNV records repeating candidate numbers across ballots, not added"] += 1
+                continue
             seat = ", ".join(part for part in (row["label"] or "").split(", ")[1:] if not part.startswith("Ballot "))
-            groups.setdefault((row["postal"], seat, row["type"] == "Special"), []).append(record)
+            groups.setdefault((row["postal"], row["office"], seat, row["type"] == "Special"), []).append(record)
         chains: list[list[str]] = []
         for members in groups.values():
             members.sort(
@@ -845,65 +911,162 @@ def emit() -> Path:
             for chain in chains
             if not any(record in taken for record in chain)
         }
+        governed = {
+            (key.split(":")[1], int(key[:4]))
+            for (key,) in conn.execute(
+                """select x.value from external_id x join contest k on k.id = x.entity_id
+                   join changeset c on c.id = k.changeset_id
+                   where x.scheme = 'us.contest' and x.value ~ '^1[78][0-9]{2}.*:governor' and c.pipeline <> %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+        offices: set[UUID] = set()
         for chain in chains:
-            postal = info[chain[0]]["postal"]
-            special = info[chain[0]]["type"] == "Special"
-            at_large = info[chain[0]]["role_scope"] == "State"
-            hit = next(((index, found) for index, record in enumerate(chain) if (found := seated(record))), None)
-            thea_index = next((index for index, record in enumerate(chain) if record in taken), None)
-            if thea_index is not None:
-                tally["NNV trials before a THEA contest's trial, not added"] += thea_index
-                tally["NNV trials after a THEA contest's trial, not added"] += len(chain) - thea_index - 1
-                continue
-            if hit is None:
-                tally["NNV races whose winner is not on the roster, not added"] += 1
-                continue
-            number, members = hit[1]
-            district = 0 if at_large else members[0]["district"]
-            tail = ", ".join(
-                part
-                for part in (info[chain[0]]["label"] or "").split(", ")[1:]
-                if not part.startswith(("District ", "Ballot ")) and part != "At-Large"
-            )
-            year = info[chain[0]]["year"]
+            first = info[chain[0]]
+            postal = first["postal"]
+            special = first["type"] == "Special"
+            year = first["year"]
+            unit_id, area, place, fips = states[postal]
             winner_words = [
                 _words(line["name"]) for record in chain for line in lines.get(record, []) if line["elected"]
             ]
-            clash = any(
-                abs(other - year) <= 1
-                and (flag == special or any(_alike(one, two) for one in winner_words for two in won))
-                for other, flag, won in thea_seats.get((postal, district), [])
-            )
-            if clash:
-                tally["NNV races THEA holds without reconciling, not added"] += 1
-                continue
-            seats = (
-                max(len(winner_words), 1)
-                if special or tail
-                else len(
-                    [
-                        member
-                        for member in roster.get((number, postal), [])
-                        if member["first"] and member["district"] == district
-                    ]
+            pool_members: list[dict] = []
+            umbrella: UUID | None = None
+            if first["office"] == "U.S. House of Representatives":
+                hit = next(((index, found) for index, record in enumerate(chain) if (found := seated(record))), None)
+                thea_index = next((index for index, record in enumerate(chain) if record in taken), None)
+                if thea_index is not None:
+                    tally["NNV trials before a THEA contest's trial, not added"] += thea_index
+                    tally["NNV trials after a THEA contest's trial, not added"] += len(chain) - thea_index - 1
+                    continue
+                if hit is None:
+                    tally["NNV races whose winner is not on the roster, not added"] += 1
+                    continue
+                number, members = hit[1]
+                district = 0 if first["role_scope"] == "State" else members[0]["district"]
+                tail = ", ".join(
+                    part
+                    for part in (first["label"] or "").split(", ")[1:]
+                    if not part.startswith(("District ", "Ballot ")) and part != "At-Large"
                 )
-                or 1
-            )
-            pool_members = roster.get((number, postal), [])
-            unit_id, area, place, fips = states[postal]
-            start = date(1789 + 2 * (number - 1), 3, 4)
-            umbrella = elections.get(f"congress-{number}")
-            if umbrella is None:
-                raise ValueError(f"no THEA umbrella election for the {number}th Congress")
+                clash = any(
+                    abs(other - year) <= 1
+                    and (flag == special or any(_alike(one, two) for one in winner_words for two in won))
+                    for other, flag, won in thea_seats.get((postal, district), [])
+                )
+                if clash:
+                    tally["NNV races THEA holds without reconciling, not added"] += 1
+                    continue
+                seats = (
+                    max(len(winner_words), 1)
+                    if special or tail
+                    else len(
+                        [
+                            member
+                            for member in roster.get((number, postal), [])
+                            if member["first"] and member["district"] == district
+                        ]
+                    )
+                    or 1
+                )
+                pool_members = roster.get((number, postal), [])
+                umbrella = elections.get(f"congress-{number}")
+                if umbrella is None:
+                    raise ValueError(f"no THEA umbrella election for the {number}th Congress")
+                on = day_of(chain[0])[0] if special else date(1789 + 2 * (number - 1), 3, 4)
+                matches = [entry for entry in districts.get(f"{fips}{district:02d}", []) if on in entry[3]]
+                district_area, district_unit, title_place = area, unit_id, f"{place} at large"
+                if len(matches) == 1:
+                    district_area, district_unit, title_place, _ = matches[0]
+                elif district:
+                    title_place = f"{place}'s district {district}"
+                base = (
+                    f"{postal}:house:{district}" + (":special" if special else "") + (f":{slug(tail)}" if tail else "")
+                )
+                title = f"U.S. House {'special election' if special else 'election'} in {title_place}" + (
+                    f" ({tail[0].lower()}{tail[1:]})" if tail else ""
+                )
+                part_path = (
+                    (f"house-{district}" if district else "house-at-large")
+                    + ("-special" if special else "")
+                    + (f"-{slug(tail)}" if tail else "")
+                )
+                fields = {
+                    "kind": "body_seats",
+                    "body_id": body,
+                    "office_id": None,
+                    "district_area_id": district_area,
+                    "boundary_set_id": next(
+                        (id for id, begin, end in plans if begin <= on and (end is None or on < end)), None
+                    ),
+                }
+                body_label = "the House"
+            elif year < ADMITTED.get(postal, 0):
+                tally[f"{first['office']} races before statehood, not added"] += 1
+                continue
+            elif first["office"] == "Governor":
+                if (postal, year) in governed:
+                    tally["governor races another pipeline holds, not added"] += 1
+                    continue
+                if year < CHOSEN.get(postal, 0):
+                    tally["governor races before the state's first popular election, not added"] += 1
+                    continue
+                office = cs.key("us.office", f"governor:{postal}")
+                if office in cs.minted and office not in offices:
+                    offices.add(office)
+                    cs.add("office", id=office, polity_id=cs.polity(f"US-{postal}"), kind="governor")
+                    named(office, f"Governor of {place}")
+                seats, district_unit = 1, unit_id
+                base = f"{postal}:governor" + (":special" if special else "")
+                title = f"{place} gubernatorial {'special election' if special else 'election'}"
+                part_path = "governor" + ("-special" if special else "")
+                fields = {
+                    "kind": "office",
+                    "body_id": None,
+                    "office_id": office,
+                    "district_area_id": area,
+                    "boundary_set_id": None,
+                }
+                body_label = "governor"
+            else:
+                code = STATE_BODIES.get((postal, first["office"]), BODIES.get(first["office"]))
+                chamber = None if code is None else cs.key("us.body", f"{postal}:{code}")
+                if code is None or chamber is None or chamber in cs.minted:
+                    tally[f"{first['office']} races with no matching chamber, not added"] += 1
+                    continue
+                seat = ", ".join(
+                    part for part in (first["label"] or "").split(", ")[1:] if not part.startswith("Ballot ")
+                )
+                where = spots[chain[0]]
+                district_unit = unit(postal, where) if where else unit_id
+                district_area = area if not where else None
+                if len(where) == 1 and where[0][0] in ("County", "Parish", "District", "City"):
+                    target = ALIASES.get((postal, _county(where[0][1])), _county(where[0][1]))
+                    if where[0][0] == "City":
+                        target = plain(where[0][1]) + "city"
+                    if (postal, target) in counties or f"{postal}:{target}" in made:
+                        district_area = made.get(f"{postal}:{target}", counties.get((postal, target), (None, None)))[1]
+                seats = max(len(winner_words), 1)
+                base = f"{postal}:{code}" + (f":{slug(seat)}" if seat else "") + (":special" if special else "")
+                title = f"{place} {first['office']} {'special election' if special else 'election'}" + (
+                    f" in {seat}" if seat else ""
+                )
+                part_path = code + (f"-{slug(seat)}" if seat else "") + ("-special" if special else "")
+                fields = {
+                    "kind": "body_seats",
+                    "body_id": chamber,
+                    "office_id": None,
+                    "district_area_id": district_area,
+                    "boundary_set_id": None,
+                }
+                body_label = first["office"]
             previous: UUID | None = None
             filled = 0
             first_election: UUID | None = None
             for round_number, record in enumerate(chain, start=1):
                 row = info[record]
                 day, precision, stamp = day_of(record)
-                key = f"{stamp}:{postal}:house:{district}" + (":special" if special else "")
-                key += f":{slug(tail)}" if tail else ""
-                key += f":ballot{round_number}" if round_number > 1 else ""
+                key = f"{stamp}:{base}" + (f":ballot{round_number}" if round_number > 1 else "")
                 if key in used:
                     tally["NNV races duplicating another NNV race, not added"] += 1
                     break
@@ -932,56 +1095,62 @@ def emit() -> Path:
                 first_election = first_election or election
                 contest = cs.key("us.contest", key)
                 if contest not in cs.minted:
-                    tally["NNV trials already on file"] += 1
+                    tally["NNV trials already on file, from THEA or an earlier emit"] += 1
                     previous = contest
                     continue
-                on = day if special else start
-                plan = next((id for id, begin, end in plans if begin <= on and (end is None or on < end)), None)
-                matches = [entry for entry in districts.get(f"{fips}{district:02d}", []) if on in entry[3]]
-                district_area, district_unit, title_place = area, unit_id, f"{place} at large"
-                if len(matches) == 1:
-                    district_area, district_unit, title_place, _ = matches[0]
-                elif district:
-                    title_place = f"{place}'s district {district}"
-                magnitude = max(seats - filled, 1)
-                elected = [line for line in lines.get(record, []) if line["elected"]]
-                filled += len(elected)
+                totals = {line["candidate"]: line["total"] for line in lines.get(record, [])}
+                local = {place_key: cell for place_key, cell in returns.get(record, {}).items() if place_key}
+                sums: dict[str, float] = {}
+                for cell in local.values():
+                    for candidate, vote in cell.items():
+                        sums[candidate] = sums.get(candidate, 0) + vote
+                tallied = {
+                    line["candidate"]: sums.get(line["candidate"], 0) if line["total"] is None else line["total"]
+                    for line in lines.get(record, [])
+                    if not BLANK.match(line["name"]) and line["name"].lower() not in POOLED
+                }
+                chosen = {line["candidate"] for line in lines.get(record, []) if line["elected"]} & set(tallied)
+                magnitude: int | None = max(seats - filled, 1)
+                if (
+                    body_label != "the House"
+                    and chosen
+                    and any(
+                        vote > min(tallied[winner] for winner in chosen)
+                        for candidate, vote in tallied.items()
+                        if candidate not in chosen
+                    )
+                ):
+                    magnitude = None
+                    tally["added, winners marked are not the top vote-getters (magnitude left open)"] += 1
+                filled += len([line for line in lines.get(record, []) if line["elected"]])
                 cs.add(
                     "contest",
                     id=contest,
                     election_id=election,
-                    kind="body_seats",
-                    body_id=body,
-                    district_area_id=district_area,
                     seat_id=None,
                     term="remainder" if special else "full",
-                    boundary_set_id=plan,
                     magnitude=magnitude,
                     round_number=round_number,
                     previous_round_id=previous,
-                    electoral_system_id=systems[
-                        "majority" if postal in MAJORITY else "block" if magnitude > 1 else "fptp"
-                    ],
+                    electoral_system_id=None
+                    if magnitude is None
+                    else systems["majority" if postal in MAJORITY else "block" if magnitude > 1 else "fptp"],
                     default_result_kind="counted",
+                    **fields,
                 )
-                trial = f", {TRIALS[round_number - 1]} trial" if round_number > 1 else ""
                 named(
                     contest,
-                    f"{day.year} U.S. House {'special election' if special else 'election'} in {title_place}"
-                    + (f" ({tail[0].lower()}{tail[1:]})" if tail else "")
-                    + trial,
+                    f"{day.year} {title}" + (f", {TRIALS[round_number - 1]} trial" if round_number > 1 else ""),
                 )
                 cs.add(
                     "slug",
-                    path=f"us/{postal.lower()}/{stamp}-{part}/{f'house-{district}' if district else 'house-at-large'}"
-                    + ("-special" if special else "")
-                    + (f"-{slug(tail)}" if tail else "")
+                    path=f"us/{postal.lower()}/{stamp}-{part}/{part_path}"
                     + (f"-trial-{round_number}" if round_number > 1 else ""),
                     entity_id=contest,
                 )
                 previous = contest
-                tally[f"added {postal}"] += 1
-                tally["added"] += 1
+                tally[f"added {body_label}"] += 1
+                tally[f"added {body_label}, {postal}"] += 1
                 options: dict[str, UUID | None] = {}
                 winners: list[UUID] = []
                 for line in lines.get(record, []):
@@ -990,7 +1159,8 @@ def emit() -> Path:
                         continue
                     if line["name"].lower() in POOLED or not _words(line["name"]):
                         option = cs.key("us.option", f"{key}:others")
-                        if option in cs.minted and option not in options.values():
+                        if option in cs.minted and option not in listed:
+                            listed.add(option)
                             cs.add(
                                 "contest_option", id=option, contest_id=contest, kind="others", ballot_label="Others"
                             )
@@ -999,7 +1169,10 @@ def emit() -> Path:
                     found = [member for member in pool_members if _alike(_words(line["name"]), member["words"])]
                     member = found[0] if line["elected"] and len({one["bioguide"] for one in found}) == 1 else None
                     person = person_of(line, postal, member)
-                    option = cs.key("us.option", f"{key}:{person}")
+                    held_key = f"{key}:{person}"
+                    if cs.key("us.option", held_key) in options.values():
+                        held_key += f":{line['candidate']}"
+                    option = cs.key("us.option", held_key)
                     options[line["candidate"]] = option
                     if option not in cs.minted or option in listed:
                         continue
@@ -1023,7 +1196,7 @@ def emit() -> Path:
                     )
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{key}:{person}:head"),
+                        id=cs.key("us.candidacy", f"{held_key}:head"),
                         person_id=person,
                         option_id=option,
                         role="head",
@@ -1033,16 +1206,11 @@ def emit() -> Path:
                     )
                     if line["elected"]:
                         winners.append(option)
-                totals = {line["candidate"]: line["total"] for line in lines.get(record, [])}
-                local = {place_key: cell for place_key, cell in returns.get(record, {}).items() if place_key}
-                sums: dict[str, float] = {}
-                for cell in local.values():
-                    for candidate, vote in cell.items():
-                        sums[candidate] = sums.get(candidate, 0) + vote
                 whole = (
                     bool(local)
                     and all(totals.get(candidate) == vote for candidate, vote in sums.items())
                     and all(total is None or total == sums.get(candidate, 0) for candidate, total in totals.items())
+                    and all(line["candidate"] in sums for line in lines.get(record, []) if line["elected"])
                 )
                 grains: list[tuple[UUID, dict[tuple[tuple[str, str], ...], dict[str, float]], bool]] = []
                 default = cs.key(f"{SOURCE}.result_set", key)
@@ -1051,14 +1219,19 @@ def emit() -> Path:
                 else:
                     printed = totals if None not in totals.values() else {}
                     grains.append((default, {(): printed} if printed else {}, True))
-                    if local and not any(
+                    if local:
+                        grains.append((cs.key(f"{SOURCE}.result_set", f"{key}:units"), local, False))
+                    if any(
                         totals.get(candidate) is not None and vote > totals[candidate]
                         for candidate, vote in sums.items()
                     ):
-                        grains.append((cs.key(f"{SOURCE}.result_set", f"{key}:units"), local, False))
-                    elif local:
-                        tally["added, units exceed NNV's printed totals (contest totals only)"] += 1
-                known = sum(total for total in totals.values() if total is not None)
+                        tally["added, units exceed NNV's printed totals"] += 1
+                known = (
+                    sum(total for total in totals.values() if total is not None)
+                    if None not in totals.values()
+                    and all(vote <= (totals.get(candidate) or 0) for candidate, vote in sums.items())
+                    else 0
+                )
                 for result_set, places, is_default in grains:
                     counted = sum(vote for cell in places.values() for vote in cell.values())
                     cs.add(
@@ -1095,7 +1268,8 @@ def emit() -> Path:
                         for candidate, vote in cell.items():
                             if candidate not in options:
                                 pool = cs.key("us.option", f"{key}:others")
-                                if pool in cs.minted and pool not in options.values():
+                                if pool in cs.minted and pool not in listed:
+                                    listed.add(pool)
                                     cs.add(
                                         "contest_option",
                                         id=pool,
