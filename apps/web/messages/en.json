@@ -47,6 +47,7 @@
   "home_search_cta": "Search places, elections, parties, and people",
   "home_search_try": "Try",
   "home_map_title": "Archive depth by country",
+  "home_map_key_since": "Earliest records",
   "home_map_lede": "Color intensity indicates how far back the records go. Gray countries only include European Parliament elections. Hover or tap a country to see its record.",
   "home_map_since": "Since {year}",
   "home_map_older": "Older",

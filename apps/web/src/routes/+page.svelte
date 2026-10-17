@@ -457,6 +457,7 @@
           <div
             class="absolute inset-e-0 inset-bs-0 grid gap-1 text-[0.6875rem] text-muted-foreground inline-36 max-sm:static max-sm:inline-full"
           >
+            <span>{m.home_map_key_since()}</span>
             <span
               class="block rounded-xs block-2"
               style:background={`linear-gradient(to right, var(--marker), color-mix(in oklab, var(--marker) 22%, var(--card)))`}
