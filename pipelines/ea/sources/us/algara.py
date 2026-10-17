@@ -47,8 +47,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, URL, suffix=".rdata")
 
 
-def parse() -> None:
-    data = gzip.decompress(raw.cached(SOURCE, URL).path.read_bytes())
+def objects(path: Path) -> dict[str, object]:
+    data = gzip.decompress(path.read_bytes())
     if data[:5] not in (b"RDX2\n", b"RDX3\n"):
         raise ValueError("not an R data file")
     position = 7
@@ -107,10 +107,14 @@ def parse() -> None:
     ints(2)
     if version == 3:
         position += 4 + ints(1)[0]
-    objects = item()
-    if not isinstance(objects, list):
+    found = item()
+    if not isinstance(found, list):
         raise TypeError("no objects")
-    frame = dict(objects)["gov_elections_release"]
+    return dict(found)
+
+
+def parse() -> None:
+    frame = objects(raw.cached(SOURCE, URL).path)["gov_elections_release"]
     if not isinstance(frame, dict):
         raise TypeError("no gubernatorial returns")
     columns = {
