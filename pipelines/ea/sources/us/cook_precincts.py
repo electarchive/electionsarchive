@@ -176,8 +176,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Chicago's ward precincts of 2011, 2013, and 2023 and suburban Cook County's precincts of 2009, "
-            "2011, and today, held out of releases until permission arrives, linked to MEDSL's and "
+            summary="Chicago's ward precincts of 2011, 2013, and 2023, held out of releases until permission arrives, "
+            "and suburban Cook County's public-domain precincts of 2009, 2011, and today, linked to MEDSL's and "
             "OpenElections' precincts",
             polity="US",
         )
@@ -200,6 +200,22 @@ def emit() -> Path:
         for layer, (portal, view, publisher, title, start, end) in LAYERS.items():
             meta, data = urls(layer)
             retrieved = raw.cached(SOURCE, data).retrieved_at.date()
+            public = layer.startswith("cook")
+            scheme = "us.precinct" if public else "us.restricted_precinct"
+            if (
+                layer == "cook:current"
+                and not conn.execute(
+                    "select from boundary_set where scheme_code = 'us.precinct' and vintage = %s", [str(retrieved)]
+                ).fetchone()
+            ):
+                cs.add(
+                    "boundary_set",
+                    scheme_code="us.precinct",
+                    vintage=str(retrieved),
+                    valid_from=retrieved,
+                    valid_to=retrieved + timedelta(days=1),
+                    as_of=retrieved,
+                )
             source = cs.source(publisher, title)
             cs.add(
                 "source",
@@ -208,18 +224,20 @@ def emit() -> Path:
                 publisher=publisher,
                 title=title,
                 url=f"{portal}d/{view}",
-                license=LICENSE,
+                license="Public Domain" if public else LICENSE,
                 attribution=publisher,
-                notes=NOTES,
+                notes=f"Cook County data catalog dataset {view}, license field: Public Domain" if public else NOTES,
             )
             cs.artifact(raw.cached(SOURCE, meta), source)
             cs.artifact(raw.cached(SOURCE, data), source)
             frame = pl.read_parquet(PARSED / f"{layer.replace(':', '_')}.parquet").with_columns(
-                code=pl.format("{}:{}", pl.lit(layer), "key")
+                code=pl.format("{}:IL:17031:{}", pl.lit(str(start)), "key")
+                if public
+                else pl.format("{}:{}", pl.lit(layer), "key")
             )
-            ids = [str(cs.area("us.restricted_precinct", code)) for code in frame["code"]]
+            ids = [str(cs.area(scheme, code)) for code in frame["code"]]
             keys[layer] = dict(zip(frame["key"], ids, strict=True))
-            cs.frame("area", pl.DataFrame({"id": ids, "scheme_code": "us.restricted_precinct"}))
+            cs.frame("area", pl.DataFrame({"id": ids, "scheme_code": scheme}))
             cs.frame(
                 "area_code",
                 pl.DataFrame({"area_id": ids, "code": frame["code"]}).with_columns(valid_from=pl.lit(None, pl.Date)),

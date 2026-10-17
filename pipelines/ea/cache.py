@@ -18,7 +18,6 @@ RESTRICTED = {
     "us.algara": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
     "us.algara_federal": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
     "us.swdb_precincts": "awaiting the Statewide Database's permission",
-    "us.cook_precincts": "awaiting the Chicago Board of Election Commissioners' and Cook County Clerk's permission",
 }
 # The first rule a license matches sets its class; a file cited under several licenses takes the strictest.
 CLASSES = [
