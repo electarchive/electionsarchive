@@ -14,7 +14,7 @@ VERSION = "1"
 NEAR = 12 * 366
 LONG_GAP = 24 * 365
 LONG_SPAN = 50 * 365
-MATCHED = ("tr.",)
+MATCHED = ("tr.", "br.")
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 IDENTITIES = (
     "bioguide",
@@ -212,6 +212,338 @@ PEOPLE = {
         ("us.klarner.person", "10465"),
         ("us.medsl_statewide.person", "AZ:sandra-kennedy"),
     ),
+    "Aaron Ogden, with the record of U.S. House election in New Jersey's at-large congressional district": (
+        ("wikidata", "Q302436"),
+        ("us.thea.person", "NJ:aaron-ogden"),
+    ),
+    "Alan Dupree Wheat, with the record of U.S. House election in Missouri's 5th congressional district": (
+        ("wikidata", "Q548596"),
+        ("fec.candidate", "H2MO05139"),
+    ),
+    "Ben Erdreich, with the record of U.S. House election in Alabama's 6th congressional district": (
+        ("wikidata", "Q816481"),
+        ("fec.candidate", "H2AL06019"),
+    ),
+    "Bernard Cazeneuve, with the record of e, constituency 5, first round": (
+        ("wikidata", "Q560890"),
+        ("fr.cdsp.person", "50:CAZENEUVE:BERNARD"),
+    ),
+    "L. William Paxon, with the record of U.S. House election in New York's 31st congressional district": (
+        ("wikidata", "Q3639996"),
+        ("fec.candidate", "H8NY31012"),
+    ),
+    "William Blaine Richardson, with the record of New Hampshire Republican presidential primary": (
+        ("wikidata", "Q311782"),
+        ("fec.candidate", "P80003411"),
+    ),
+    "Bob Barr, with the record of presidential election in Alabama": (
+        ("wikidata", "Q540544"),
+        ("fec.candidate", "P80005580"),
+    ),
+    "Carol Moseley Braun, with the record of District of Columbia Democratic presidential primary": (
+        ("wikidata", "Q289396"),
+        ("fec.candidate", "P40002552"),
+    ),
+    "Charles H. Pond, with the record of Connecticut Comptroller election": (
+        ("wikidata", "Q885605"),
+        ("us.statewide.person", "CT:38163"),
+    ),
+    "Chester Greenough Atkins, with the record of Massachusetts House of Representatives election, Thirty-Third Middlesex": (
+        ("wikidata", "Q1070716"),
+        ("us.klarner.person", "83339"),
+    ),
+    "Chris Chocola, with the record of U.S. House Republican primary in Indiana's 3rd congressional district": (
+        ("wikidata", "Q980183"),
+        ("fec.candidate", "H2IN03111"),
+    ),
+    "Chris Christie, with the record of New Hampshire Democratic presidential primary": (
+        ("wikidata", "Q63879"),
+        ("fec.candidate", "P60008521"),
+    ),
+    "Chuck Morse, with the record of New Hampshire House of Representatives election, Rockingham 28": (
+        ("wikidata", "Q16193758"),
+        ("us.klarner.person", "142718"),
+    ),
+    "Clyde Cecil Holloway, with the record of U.S. House election in Louisiana's 8th congressional district": (
+        ("wikidata", "Q735333"),
+        ("fec.candidate", "H0LA08017"),
+    ),
+    "Craig Anthony Washington, with the record of Texas House of Representatives Democratic primary, District 86": (
+        ("wikidata", "Q1138504"),
+        ("us.klarner.person", "219987"),
+    ),
+    "Dan Frisa, with the record of U.S. House Republican primary in New York's 4th congressional district": (
+        ("wikidata", "Q723209"),
+        ("fec.candidate", "H2NY04079"),
+    ),
+    "David Lloyd George, with the record of general election in Caernarvon Boroughs": (
+        ("wikidata", "Q134982"),
+        ("gb.umit.person", "wls-caernarvon-boroughs:george-david-lloyd"),
+    ),
+    "David Ray Nagle, with the record of U.S. House election in Iowa's 3rd congressional district": (
+        ("wikidata", "Q1176239"),
+        ("fec.candidate", "H2IA03028"),
+    ),
+    "Deval Patrick, with the record of New Hampshire Republican presidential primary": (
+        ("wikidata", "Q11100"),
+        ("fec.candidate", "P00014407"),
+    ),
+    "Donald DiFrancesco, with the record of New Jersey General Assembly election, District 22": (
+        ("wikidata", "Q889620"),
+        ("us.klarner.person", "155554"),
+    ),
+    "Earl Ray Tomblin, with the record of West Virginia House of Delegates Democratic primary, District 16": (
+        ("wikidata", "Q888517"),
+        ("us.klarner.person", "250290"),
+    ),
+    "Floyd Harold Flake, with the record of U.S. House election in New York's 6th congressional district": (
+        ("wikidata", "Q3510629"),
+        ("fec.candidate", "H6NY06067"),
+    ),
+    "Francis Gillette, with the record of Connecticut gubernatorial election": (
+        ("wikidata", "Q1441508"),
+        ("us.elstats_gov.person", "CT:francis-gillette"),
+    ),
+    "François Bayrou, with the record of ées-Atlantiques, constituency 2, first round": (
+        ("wikidata", "Q12963"),
+        ("fr.cdsp.person", "64:BAYROU:FRANCOIS"),
+    ),
+    "Francis Xavier McCloskey, with the record of U.S. House election in Indiana's 8th congressional district": (
+        ("wikidata", "Q1443758"),
+        ("fec.candidate", "H2IN08029"),
+    ),
+    "Frank Mariano Tejeda, with the record of Texas House of Representatives Democratic primary, District 57-2": (
+        ("wikidata", "Q737918"),
+        ("us.klarner.person", "220190"),
+    ),
+    "Gary E. Johnson, with the record of New Hampshire Republican presidential primary": (
+        ("wikidata", "Q352123"),
+        ("fec.candidate", "P20002671"),
+    ),
+    "George Joseph Hochbrueckner, with the record of U.S. House election in New York's 1st congressional district": (
+        ("wikidata", "Q82423"),
+        ("fec.candidate", "H4NY01030"),
+    ),
+    "Giorgia Meloni, with the record of er of Deputies, Lazio 2 - U07 (Latina)": (
+        ("wikidata", "Q451791"),
+        ("it.camera.persona", "302103"),
+    ),
+    "Glenn Poshard, with the record of U.S. House election in Illinois's 22nd congressional district": (
+        ("wikidata", "Q3108818"),
+        ("fec.candidate", "H8IL22094"),
+    ),
+    "Gordon Brown, with the record of general election in Edinburgh South": (
+        ("wikidata", "Q10648"),
+        ("mnis", "591"),
+    ),
+    "Gregory H. Laughlin, with the record of U.S. House election in Texas's 14th congressional district": (
+        ("wikidata", "Q1544943"),
+        ("fec.candidate", "H6TX14033"),
+    ),
+    "Harley Orrin Staggers Jr., with the record of U.S. House election in West Virginia's 2nd congressional district": (
+        ("wikidata", "Q1585518"),
+        ("fec.candidate", "H2WV02019"),
+    ),
+    "Harris W. Fawell, with the record of U.S. House election in Illinois's 13th congressional district": (
+        ("wikidata", "Q5665116"),
+        ("fec.candidate", "H4IL13043"),
+    ),
+    "Helen Delich Bentley, with the record of U.S. House election in Maryland's 2nd congressional district": (
+        ("wikidata", "Q868577"),
+        ("fec.candidate", "H0MD02057"),
+    ),
+    "Howard Dean, with the record of District of Columbia Democratic presidential primary": (
+        ("wikidata", "Q337470"),
+        ("fec.candidate", "P40002214"),
+    ),
+    "James Roy Rowland Jr., with the record of Georgia House of Representatives Democratic primary, District 119": (
+        ("wikidata", "Q1676390"),
+        ("us.klarner.person", "39904"),
+    ),
+    "Jack Dalrymple, with the record of North Dakota House of Representatives election, District 22": (
+        ("wikidata", "Q770393"),
+        ("us.klarner.person", "138727"),
+    ),
+    "Jacques Chirac, with the record of French presidential election, first round": (
+        ("wikidata", "Q2105"),
+        ("fr.cdsp.person", "president:jacques-chirac"),
+    ),
+    "James Hubert Bilbray, with the record of U.S. House election in Nevada's at-large congressional district": (
+        ("wikidata", "Q285366"),
+        ("fec.candidate", "H6NV01042"),
+    ),
+    "Jan Brewer, with the record of Arizona House of Representatives election, District 19": (
+        ("wikidata", "Q236941"),
+        ("us.klarner.person", "10296"),
+    ),
+    "Jan Meyers, with the record of U.S. House election in Kansas's 3rd congressional district": (
+        ("wikidata", "Q372424"),
+        ("fec.candidate", "H4KS03014"),
+    ),
+    "Jane Dee Hull, with the record of Arizona House of Representatives election, District 19": (
+        ("wikidata", "Q264297"),
+        ("us.klarner.person", "11508"),
+    ),
+    "Jean-Marc Ayrault, with the record of -Atlantique, constituency 3, first round": (
+        ("wikidata", "Q7711"),
+        ("fr.cdsp.person", "44:AYRAULT:JEAN MARC"),
+    ),
+    "Jeb E. Bradley, with the record of U.S. House Democratic primary in New Hampshire's 1st congressional district": (
+        ("wikidata", "Q1686078"),
+        ("fec.candidate", "H2NH01130"),
+    ),
+    "Jeb Bush, with the record of New Hampshire Republican presidential primary": (
+        ("wikidata", "Q221997"),
+        ("fec.candidate", "P60008059"),
+    ),
+    "Jill Lynette Long Thompson, with the record of U.S. Senate election in Indiana": (
+        ("wikidata", "Q514523"),
+        ("fec.candidate", "H6IN05026"),
+    ),
+    "Jim Chapman, with the record of U.S. House election in Texas's 1st congressional district": (
+        ("wikidata", "Q1385199"),
+        ("fec.candidate", "H6TX01055"),
+    ),
+    "James Ross Lightfoot, with the record of U.S. House election in Iowa's 5th congressional district": (
+        ("wikidata", "Q1271006"),
+        ("fec.candidate", "H4IA05078"),
+    ),
+    "James Charles Slattery, with the record of U.S. House election in Kansas's 2nd congressional district": (
+        ("wikidata", "Q1689219"),
+        ("fec.candidate", "H2KS02010"),
+    ),
+    "John Bidwell, with the record of presidential election in Alabama": (
+        ("wikidata", "Q1699334"),
+        ("us.wikipedia.person", "john-bidwell"),
+    ),
+    "John George Schmitz, with the record of presidential election in Alabama": (
+        ("wikidata", "Q1700152"),
+        ("us.wikipedia.person", "john-schmitz"),
+    ),
+    "John Major, with the record of ary 1974 general election in St Pancras North": (
+        ("wikidata", "Q9559"),
+        ("mnis", "119"),
+    ),
+    "John Parker Hale, with the record of presidential election in California": (
+        ("wikidata", "Q716927"),
+        ("us.wikipedia.person", "john-hale"),
+    ),
+    "Jon D. Fox, with the record of U.S. House election in Pennsylvania's 13th congressional district": (
+        ("wikidata", "Q6270560"),
+        ("fec.candidate", "H2PA13052"),
+    ),
+    "Joseph Patrick Kennedy II, with the record of U.S. House election in Massachusetts's 8th congressional district": (
+        ("wikidata", "Q1386420"),
+        ("fec.candidate", "H6MA08141"),
+    ),
+    "Joseph Paul Kolter, with the record of Pennsylvania House of Representatives election, District 14": (
+        ("wikidata", "Q6286018"),
+        ("us.klarner.person", "194886"),
+    ),
+    "Larry LaRocco, with the record of U.S. House election in Idaho's 1st congressional district": (
+        ("wikidata", "Q446691"),
+        ("fec.candidate", "H2ID01010"),
+    ),
+    "Larry Rhoden, with the record of South Dakota House of Representatives election, District 29": (
+        ("wikidata", "Q16193325"),
+        ("us.klarner.person", "211968"),
+    ),
+    "Laurent Fabius, with the record of -Maritime, constituency 4, first round": (
+        ("wikidata", "Q217070"),
+        ("fr.cdsp.person", "76:FABIUS:LAURENT"),
+    ),
+    "Manuel Valls, with the record of ne, constituency 1, first round": (
+        ("wikidata", "Q10287"),
+        ("fr.cdsp.person", "91:VALLS:MANUEL"),
+    ),
+    "Mark R. Kennedy, with the record of U.S. House Republican primary in Minnesota's 2nd congressional district": (
+        ("wikidata", "Q1900180"),
+        ("fec.candidate", "H0MN02035"),
+    ),
+    "Mark W. Neumann, with the record of U.S. House election in Wisconsin's 1st congressional district": (
+        ("wikidata", "Q1900315"),
+        ("fec.candidate", "H0WI03118"),
+    ),
+    "Melissa A. Hart, with the record of U.S. House Republican primary in Pennsylvania's 4th congressional district": (
+        ("wikidata", "Q3854236"),
+        ("fec.candidate", "H0PA04154"),
+    ),
+    "Albert Michael Espy, with the record of U.S. House election in Mississippi's 2nd congressional district": (
+        ("wikidata", "Q1400332"),
+        ("fec.candidate", "H6MS02014"),
+    ),
+    "Mike Huckabee, with the record of New Hampshire Republican presidential primary": (
+        ("wikidata", "Q158813"),
+        ("fec.candidate", "P80003478"),
+    ),
+    "Michael E. Sodrel, with the record of U.S. House Republican primary in Indiana's 9th congressional district": (
+        ("wikidata", "Q1933523"),
+        ("fec.candidate", "H2IN09084"),
+    ),
+    "Newton Leroy Gingrich, with the record of New Hampshire Republican presidential primary": (
+        ("wikidata", "Q182788"),
+        ("fec.candidate", "P60003654"),
+    ),
+    "Nikki R. Haley, with the record of Iowa Republican caucuses": (
+        ("wikidata", "Q11668"),
+        ("fec.candidate", "P40010977"),
+    ),
+    "Peter Gerard Torkildsen, with the record of U.S. House election in Massachusetts's 6th congressional district": (
+        ("wikidata", "Q1605716"),
+        ("fec.candidate", "H2MA06045"),
+    ),
+    "Peter William Barca, with the record of Wisconsin State Assembly election, District 64": (
+        ("wikidata", "Q2078827"),
+        ("us.klarner.person", "247879"),
+    ),
+    "Richard Henry Lehman, with the record of U.S. House election in California's 18th congressional district": (
+        ("wikidata", "Q1424689"),
+        ("fec.candidate", "H2CA18015"),
+    ),
+    "Richard Howard Stallings, with the record of U.S. House election in Idaho's 2nd congressional district": (
+        ("wikidata", "Q2149678"),
+        ("fec.candidate", "H2ID02018"),
+    ),
+    "Rick Perry, with the record of New Hampshire Republican presidential primary": (
+        ("wikidata", "Q215057"),
+        ("fec.candidate", "P20003281"),
+    ),
+    "Henry Scott Baesler, with the record of U.S. House election in Kentucky's 6th congressional district": (
+        ("wikidata", "Q2261433"),
+        ("fec.candidate", "H2KY06076"),
+    ),
+    "Stanley Baldwin, with the record of ry 1910 general election in Bewdley": (
+        ("wikidata", "Q166635"),
+        ("gb.umit.person", "eng-bewdley:baldwin-stanley"),
+    ),
+    "Steven Harvey Schiff, with the record of U.S. House election in New Mexico's 1st congressional district": (
+        ("wikidata", "Q71766"),
+        ("fec.candidate", "H8NM01075"),
+    ),
+    "Susan Molinari, with the record of U.S. House election in New York's 14th congressional district": (
+        ("wikidata", "Q3978229"),
+        ("fec.candidate", "H0NY14098"),
+    ),
+    "Sylvester Turner, with the record of Texas House of Representatives Democratic primary, District 139": (
+        ("wikidata", "Q16751186"),
+        ("us.klarner.person", "222192"),
+    ),
+    "Theresa May, with the record of general election in North West Durham": (
+        ("wikidata", "Q264766"),
+        ("mnis", "8"),
+    ),
+    "Thomas J. Manton, with the record of U.S. House election in New York's 9th congressional district": (
+        ("wikidata", "Q7791100"),
+        ("fec.candidate", "H8NY09059"),
+    ),
+    "Victor O. Frazer, with the record of U.S. House election in United States Virgin Islands's at-large congressional district": (
+        ("wikidata", "Q2522517"),
+        ("fec.candidate", "H2VI00033"),
+    ),
+    "Wayne Mixson, with the record of Florida House of Representatives election, District 10, Post 2": (
+        ("wikidata", "Q731599"),
+        ("us.klarner.person", "30425"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
@@ -262,6 +594,9 @@ def emit() -> Path:
             held[person].setdefault(scheme, set()).add(value)
         created: dict[UUID, datetime] = dict(
             conn.execute("select id, created_at from entity where type = 'person'").fetchall()
+        )
+        born: dict[UUID, date] = dict(
+            conn.execute("select id, birth_date from person where birth_date is not null").fetchall()
         )
         cs = Changeset(
             conn,
@@ -321,7 +656,8 @@ def emit() -> Path:
             for index, person in enumerate(members):
                 for other in members[index + 1 :]:
                     signed = initials[line, person] | initials[line, other]
-                    if set(dates[person]) & set(dates[other]) or len(signed) > 1:
+                    births = {born[one] for one in (person, other) if one in born}
+                    if set(dates[person]) & set(dates[other]) or len(signed) > 1 or len(births) > 1:
                         blocked.append((person, other))
                         continue
                     if min(abs((a - b).days) for a in people[person] for b in people[other]) <= NEAR:
