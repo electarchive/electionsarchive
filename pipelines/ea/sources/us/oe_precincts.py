@@ -552,6 +552,23 @@ def emit() -> Path:
             ).fetchall()
         }
         existing = set(medsl_units)
+        shaped = {
+            unit: str(area)
+            for unit, area in pl.read_parquet(DATA / "parsed" / "us.cook_precincts" / "links.parquet")
+            .join(
+                pl.DataFrame(
+                    conn.execute(
+                        """select c.code, c.area_id::text from area_code c join area a on a.id = c.area_id
+                           where a.scheme_code = 'us.precinct' and c.code like '%%:IL:17031:%%'"""
+                    ).fetchall(),
+                    schema=["area", "id"],
+                    orient="row",
+                ),
+                on="area",
+            )
+            .select("code", "id")
+            .iter_rows()
+        }
         minted = (
             returns.filter(~pl.col("code").is_in(list(existing)))
             .group_by("code")
@@ -559,7 +576,7 @@ def emit() -> Path:
             .with_columns(
                 id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String)
             )
-            .filter(pl.col("id").is_in(list(used)))
+            .filter(pl.col("id").is_in(list(used)) | pl.col("code").is_in(list(shaped)))
         )
         cs.frame(
             "reporting_unit",
@@ -571,8 +588,13 @@ def emit() -> Path:
                 scheme_code=pl.lit("us.precinct"),
                 code="code",
                 parent_id=pl.col("fips").replace_strict({code: str(unit) for code, (unit, _) in counties.items()}),
-                area_relation=pl.lit("within"),
-                area_id=pl.col("fips").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
+                area_relation=pl.when(pl.col("code").is_in(list(shaped)))
+                .then(pl.lit("equals"))
+                .otherwise(pl.lit("within")),
+                area_id=pl.col("code").replace_strict(
+                    shaped,
+                    default=pl.col("fips").replace_strict({code: str(area) for code, (_, area) in counties.items()}),
+                ),
                 kind=pl.lit("standard"),
                 valid_from="day",
                 valid_to=pl.col("day") + timedelta(days=1),

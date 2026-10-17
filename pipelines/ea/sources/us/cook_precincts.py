@@ -168,6 +168,31 @@ def parse() -> None:
             conn.execute("truncate prec")
             frame.sort("key").write_parquet(PARSED / f"{layer.replace(':', '_')}.parquet")
             print(f"{layer}: {len(rows)} features, {frame.height} precincts", flush=True)
+        units = pl.DataFrame(
+            conn.execute(
+                """select u.code from reporting_unit u join changeset c on c.id = u.changeset_id
+                   where c.pipeline in ('us.medsl_precincts', 'us.oe_precincts')
+                     and u.code ~ '^20[0-9]{2}:IL:17031:[^:]*:[0-9]{7}(\\.0)?$'"""
+            ).fetchall(),
+            schema=["code"],
+            orient="row",
+        ).with_columns(
+            year=pl.col("code").str.slice(0, 4).cast(pl.Int32),
+            key=pl.col("code").str.extract(r"(\d{7})(?:\.0)?$").cast(pl.Int64).cast(pl.String),
+        )
+        links = pl.concat(
+            [
+                units.filter(when)
+                .join(pl.read_parquet(PARSED / f"{layer.replace(':', '_')}.parquet").select("key"), on="key")
+                .select("code", area=pl.format("{}:IL:17031:{}", pl.lit(str(LAYERS[layer][4])), "key"))
+                for layer, when in (("cook:2011", pl.col("year") < 2016), ("cook:current", pl.col("year") >= 2022))
+            ]
+        )
+        links.write_parquet(PARSED / "links.parquet")
+        for year, total in units.group_by("year").len().sort("year").iter_rows():
+            print(
+                f"{year} suburban Cook: {links.filter(pl.col('code').str.starts_with(str(year))).height} of {total} units"
+            )
 
 
 def emit() -> Path:
@@ -176,9 +201,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Chicago's ward precincts of 2011, 2013, and 2023, held out of releases until permission arrives, "
-            "and suburban Cook County's public-domain precincts of 2009, 2011, and today, linked to MEDSL's and "
-            "OpenElections' precincts",
+            summary="Chicago's ward precincts of 2011, 2013, and 2023, held out of releases until permission arrives "
+            "and linked to MEDSL's and OpenElections' precincts, and suburban Cook County's public-domain precincts "
+            "of 2009, 2011, and today",
             polity="US",
         )
         if conn.execute("select from scheme where code = 'us.restricted_precinct'").fetchone() is None:
@@ -284,7 +309,7 @@ def emit() -> Path:
         units = conn.execute(
             """select u.id::text, u.code from reporting_unit u join changeset c on c.id = u.changeset_id
                where c.pipeline in ('us.medsl_precincts', 'us.oe_precincts')
-                 and u.code ~ '^(2014|2016|2018|2020|2022|2024):IL:17031:'"""
+                 and u.code ~* '^(2014|2016|2018|2020|2022|2024):IL:17031:.*ward'"""
         ).fetchall()
         links = []
         tally: dict[tuple[int, str], list[int]] = {}
@@ -295,9 +320,6 @@ def emit() -> Path:
             if ward is not None:
                 part, key = "Chicago", f"{int(ward[1])}-{int(ward[2])}"
                 layer = "chicago:2013" if day < date(2022, 6, 29) else "chicago:2023"
-            elif re.fullmatch(r"\d{7}(\.0)?", name):
-                part, key = "suburban Cook", str(int(float(name)))
-                layer = "cook:2011" if year < 2016 else "cook:current" if year >= 2022 else None
             else:
                 part, key, layer = "other", "", None
             area = keys.get(layer or "", {}).get(key)
