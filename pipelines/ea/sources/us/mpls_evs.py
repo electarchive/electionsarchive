@@ -1,5 +1,6 @@
 import csv
 import difflib
+import html
 import io
 import json
 import re
@@ -23,6 +24,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "City of Minneapolis Elections & Voter Services"
 BASE = "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/"
+PAGES = "https://vote.minneapolismn.gov/results-data/election-results/"
 PLANS = {
     "2009": "2008-11-04",
     "2013": "2012-11-06",
@@ -202,6 +204,47 @@ CONTESTS: dict[str, tuple[str | None, str, str | None]] = {
         "2025-Board-of-Estimate-and-Taxation-RCV-Tabulation-Summary.pdf",
         "2025-BET-Cast-Vote-Record.csv",
     ),
+    **{
+        f"2013-11-05:MN:minneapolis:park-board:{district}": (
+            None,
+            f"{PAGES}2013/park-board-{district}/",
+            f"2013-Park-District-{district}-CVR.xlsx",
+        )
+        for district in range(1, 7)
+    },
+    "2013-11-05:MN:minneapolis:board-of-estimate-and-taxation": (
+        None,
+        f"{PAGES}2013/bet/",
+        "2013-Board-of-Estimate-CVR.xlsx",
+    ),
+    "2017-11-07:MN:minneapolis:park-board:2": (None, f"{PAGES}2017/park-board-2/", "2017-Park-District-2-CVR.csv"),
+    "2017-11-07:MN:minneapolis:park-board:4": (
+        None,
+        f"{PAGES}2017/park-board-4/",
+        "2017-Park-Board-District-4-Cast-Vote-Record.csv",
+    ),
+    "2017-11-07:MN:minneapolis:park-board:5": (None, f"{PAGES}2017/park-board-5/", "2017-Park-District-5-CVR.csv"),
+    "2021-11-02:MN:minneapolis:park-board:1": (None, f"{PAGES}2021/park-board-1/", "2021-Park-1-Cast-Vote-Record.csv"),
+    **{
+        f"{year}:MN:minneapolis:city-council:{ward}": (
+            None,
+            f"{PAGES}{year[:4]}/council-ward-{ward}/",
+            f"{year[:4]}-Ward-{ward}-Cast-Vote-Record.csv",
+        )
+        for year, wards in (
+            ("2023-11-07", (1, 2, 3, 4, 5, 9, 10, 11, 12, 13)),
+            ("2025-11-04", (1, 2, 3, 4, 6, 7, 8, 9, 10, 11, 12, 13)),
+        )
+        for ward in wards
+    },
+    **{
+        f"2025-11-04:MN:minneapolis:park-board:{district}": (
+            None,
+            f"{PAGES}2025/park-board-{district}/",
+            f"2025-Park-District-{district}-CVR.csv",
+        )
+        for district in (2, 3, 6)
+    },
 }
 SKIPPED = {"undervote", "xxx", ""}
 
@@ -224,6 +267,23 @@ DERIVED = (
     "over, and ballots with no countable ranking are excluded. Each round drops the candidates the official count "
     "dropped and moves the surpluses using the same truncated fractions. When summed over the precincts, every round "
     "reproduces the tabulation summary statement exactly."
+)
+PAGE = (
+    "Data from the City of Minneapolis official results page. Each candidate's first-choice votes are listed and "
+    "winners are declared. No later rounds were tabulated because the winners received enough first-choice votes to "
+    "be elected."
+)
+FIRSTS = (
+    "Tabulated by electionsarchive.com from Elections & Voter Services' cast vote record, which includes each ballot's "
+    "three rankings and its precinct. Each ballot is counted by its first valid ranking. Following Minneapolis rules, "
+    "skipped, repeated, or overvoted rankings are ignored, and ballots with no countable ranking are excluded. The sum "
+    "of first choices across all precincts equals the official results page exactly."
+)
+COLUMN = (
+    "Tabulated by electionsarchive.com from Elections & Voter Services' cast vote record, which includes each ballot's "
+    "three rankings and its precinct. Following the city's results page, each ballot counts only for its first "
+    "ranking; ballots with a blank or overvoted first ranking are excluded. The sum across all precincts equals the "
+    "official results page exactly."
 )
 BOUNDARY = "The archive has no boundary for this district in 2009; the results are shown for the district as a whole."
 BALLOT = {
@@ -282,22 +342,56 @@ def fetch() -> None:
     for name in [file for _, *files in CONTESTS.values() for file in files if file is not None]:
         for attempt in range(5):
             try:
-                raw.fetch(SOURCE, BASE + name, suffix="." + name.rsplit(".", 1)[1])
+                if name.startswith(PAGES):
+                    raw.fetch(SOURCE, name, suffix=".html")
+                else:
+                    raw.fetch(SOURCE, BASE + name, suffix="." + name.rsplit(".", 1)[1])
                 break
             except httpx.HTTPError:
                 time.sleep(10 * 2**attempt)
         else:
-            raw.fetch(SOURCE, BASE + name, suffix="." + name.rsplit(".", 1)[1])
+            raw.fetch(SOURCE, name if name.startswith(PAGES) else BASE + name, suffix="." + name.rsplit(".", 1)[1])
 
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     official: dict[str, tuple[int, list[dict[str | None, float]]]] = {}
     frames = []
+    columns: list[str] = []
     for key, (existing, summary, record) in CONTESTS.items():
-        path = raw.cached(SOURCE, BASE + summary).path
+        path = raw.cached(SOURCE, summary if summary.startswith(PAGES) else BASE + summary).path
         table: list[tuple[str, list[str]]] = []
-        if summary.endswith(".pdf"):
+        declared: list[str] = []
+        if summary.startswith(PAGES):
+            main = re.search(r"(?is)<main.*?</main>", path.read_text())
+            page = re.sub(
+                r"\s+",
+                " ",
+                html.unescape(
+                    re.sub(r"(?is)<script.*?</script>|<style.*?</style>|<[^>]+>", " ", main[0] if main else "")
+                ),
+            )
+            winners = re.search(r"Official [Ww]inners?:?\s*(.*?)\.?\s+(?:November|See)", page)
+            header = re.search(
+                r"Candidate (?:First-choice votes|First ranked votes?|Final round votes)(?: Percent(?:age)?)?", page
+            )
+            if winners is None or header is None:
+                raise ValueError(f"{key}: no winner or results table on the page")
+            declared = re.split(r", | and ", winners[1])
+            end = min(
+                index
+                for marker in (
+                    "Ranked-choice voting tabulation",
+                    "Ballots cast summary",
+                    "The top two",
+                    "Total ballots",
+                )
+                if (index := page.find(marker, header.end())) >= 0
+            )
+            for label, votes in re.findall(r"\s*(.+?) ([\d,]+)(?: [\d.]+%)?(?= |$)", page[header.end() : end]):
+                table.append((label.strip(), [votes]))
+            text = f"Number to be elected: {len(declared)}"
+        elif summary.endswith(".pdf"):
             lines = subprocess.run(
                 ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
             ).stdout.splitlines()
@@ -365,6 +459,13 @@ def parse() -> None:
         stated = re.search(r"Threshold:?\s*([\d,]+)", text)
         if stated is not None and int(stated[1].replace(",", "")) != threshold:
             raise ValueError(f"{key}: the threshold is {stated[1]}, not {threshold}")
+        if declared:
+            final = rounds[-1]
+            leaders = sorted((label for label in final if label is not None), key=lambda label: -final[label])[:seats]
+            if sorted(re.sub(r"\W", "", name.split()[-1]).casefold() for name in declared) != sorted(
+                re.sub(r"\W", "", label.split()[-1]).casefold() for label in leaders
+            ):
+                raise ValueError(f"{key}: the page declares {declared}, the first choices lead with {leaders}")
         official[key] = (seats, rounds)
         if record is None:
             continue
@@ -463,59 +564,77 @@ def parse() -> None:
                     {label for label, votes in after.items() if label is not None and votes and label not in elected},
                 )
             )
-        counts: dict[tuple[str, int, str | None], int] = {}
-        for (unit, ranking), count in ballots.items():
-            first = next(
-                (pos for pos, choice in enumerate(ranking) if choice is not None and choice in rounds[0]), None
-            )
-            if first is None:
-                continue
-            pieces: dict[int | None, int] = {first: 10**4}
-            for number in range(len(rounds)):
-                if number:
-                    factors, continuing = steps[number - 1]
-                    moved: dict[int | None, int] = {}
-                    for pos, weight in pieces.items():
-                        factor = 0 if pos is None else factors.get(ranking[pos] or "", 0)
-                        share = weight if factor == 10**4 else weight * factor // 10**4
-                        if share < weight:
-                            moved[pos] = moved.get(pos, 0) + weight - share
-                        if share:
-                            target = (
-                                next(
-                                    (later for later in range(pos + 1, len(ranking)) if ranking[later] in continuing),
-                                    None,
-                                )
-                                if pos is not None
-                                else None
-                            )
-                            moved[target] = moved.get(target, 0) + share
-                    pieces = moved
-                for pos, weight in pieces.items():
-                    label = None if pos is None else ranking[pos]
-                    counts[unit, number + 1, label] = counts.get((unit, number + 1, label), 0) + count * weight
-        tally = pl.DataFrame(
-            [
-                (unit, number, label, counts.get((unit, number, label), 0) / 10**4)
-                for unit in sorted({unit for unit, _ in ballots})
-                for number, standing in enumerate(rounds, 1)
-                for label in {*standing, *(rounds[number - 2] if number > 1 else ())}
-            ],
-            schema={"unit": pl.String, "round": pl.Int16, "label": pl.String, "votes": pl.Float64},
-            orient="row",
-        )
-        sums = tally.group_by("round", "label").agg(pl.col("votes").sum())
-        for number, expected in enumerate(rounds, 1):
-            found = {
-                label: round(votes, 4)
-                for _, label, votes in sums.filter(pl.col("round") == number).iter_rows()
-                if votes
-            }
-            if found != {label: round(votes, 4) for label, votes in expected.items() if votes}:
-                raise ValueError(
-                    f"{key} round {number}: cast vote record and summary differ on "
-                    f"{ {label: (found.get(label), expected.get(label)) for label in {*found, *expected} if found.get(label, 0) != expected.get(label, 0)} }"
+        for literal in (True, False) if declared else (False,):
+            counts: dict[tuple[str, int, str | None], int] = {}
+            for (unit, ranking), count in ballots.items():
+                first = next(
+                    (
+                        pos
+                        for pos, choice in enumerate(ranking[:1] if literal else ranking)
+                        if choice is not None and choice in rounds[0]
+                    ),
+                    None,
                 )
+                if first is None:
+                    continue
+                pieces: dict[int | None, int] = {first: 10**4}
+                for number in range(len(rounds)):
+                    if number:
+                        factors, continuing = steps[number - 1]
+                        moved: dict[int | None, int] = {}
+                        for pos, weight in pieces.items():
+                            factor = 0 if pos is None else factors.get(ranking[pos] or "", 0)
+                            share = weight if factor == 10**4 else weight * factor // 10**4
+                            if share < weight:
+                                moved[pos] = moved.get(pos, 0) + weight - share
+                            if share:
+                                target = (
+                                    next(
+                                        (
+                                            later
+                                            for later in range(pos + 1, len(ranking))
+                                            if ranking[later] in continuing
+                                        ),
+                                        None,
+                                    )
+                                    if pos is not None
+                                    else None
+                                )
+                                moved[target] = moved.get(target, 0) + share
+                        pieces = moved
+                    for pos, weight in pieces.items():
+                        label = None if pos is None else ranking[pos]
+                        counts[unit, number + 1, label] = counts.get((unit, number + 1, label), 0) + count * weight
+            tally = pl.DataFrame(
+                [
+                    (unit, number, label, counts.get((unit, number, label), 0) / 10**4)
+                    for unit in sorted({unit for unit, _ in ballots})
+                    for number, standing in enumerate(rounds, 1)
+                    for label in {*standing, *(rounds[number - 2] if number > 1 else ())}
+                ],
+                schema={"unit": pl.String, "round": pl.Int16, "label": pl.String, "votes": pl.Float64},
+                orient="row",
+            )
+            sums = tally.group_by("round", "label").agg(pl.col("votes").sum())
+            mismatch = {
+                label: (found.get(label), expected.get(label))
+                for number, expected in enumerate(rounds, 1)
+                for found in [
+                    {
+                        label: round(votes, 4)
+                        for _, label, votes in sums.filter(pl.col("round") == number).iter_rows()
+                        if votes
+                    }
+                ]
+                for label in {*found, *expected}
+                if found.get(label, 0) != round(expected.get(label, 0), 4)
+            }
+            if not mismatch:
+                if literal:
+                    columns.append(key)
+                break
+        else:
+            raise ValueError(f"{key}: cast vote record and summary differ on {mismatch}")
         frames.append(tally.with_columns(key=pl.lit(key)))
     (PARSED / "official.json").write_text(
         json.dumps(
@@ -529,6 +648,7 @@ def parse() -> None:
         )
     )
     pl.concat(frames).write_parquet(PARSED / "tallies.parquet")
+    (PARSED / "columns.json").write_text(json.dumps(columns))
 
     rows = []
     with connect() as conn:
@@ -556,6 +676,7 @@ def emit() -> Path:
         for key, contest in json.loads((PARSED / "official.json").read_text()).items()
     }
     tallies = pl.read_parquet(PARSED / "tallies.parquet")
+    literal = set(json.loads((PARSED / "columns.json").read_text()))
     shapes = {
         (plan, unit): (geom, point)
         for plan, unit, _, geom, point in pl.read_parquet(PARSED / "precincts.parquet").iter_rows()
@@ -849,7 +970,10 @@ def emit() -> Path:
                     raise ValueError(f"{key}: {existing} must already be published")
 
             sources = []
-            for file, label in ((summary, "tabulation summary statement"), (record, "cast vote record")):
+            for file, label in (
+                (summary, "official results page" if summary.startswith(PAGES) else "tabulation summary statement"),
+                (record, "cast vote record"),
+            ):
                 if file is None:
                     continue
                 title = f"{day:%B} {day.day}, {day.year} Minneapolis municipal election: {seat}, {label}"
@@ -860,10 +984,10 @@ def emit() -> Path:
                     kind="official_body",
                     publisher=PUBLISHER,
                     title=title,
-                    url=BASE + file,
+                    url=file if file.startswith(PAGES) else BASE + file,
                     license="Public record",
                 )
-                cs.artifact(raw.cached(SOURCE, BASE + file), source)
+                cs.artifact(raw.cached(SOURCE, file if file.startswith(PAGES) else BASE + file), source)
                 sources.append(source)
 
             ballot = BALLOT.get(office, {}) if day.year == 2009 else {}
@@ -994,7 +1118,7 @@ def emit() -> Path:
                 (
                     result,
                     True,
-                    OFFICIAL + (SURPLUS if seats > 1 else ""),
+                    PAGE if summary.startswith(PAGES) else OFFICIAL + (SURPLUS if seats > 1 else ""),
                     sources[0],
                     0,
                     pl.DataFrame(
@@ -1014,7 +1138,7 @@ def emit() -> Path:
                     (
                         cs.key(f"{SOURCE}.result_set", f"{key}:precincts:2" if key in REDONE else f"{key}:precincts"),
                         False,
-                        DERIVED,
+                        (COLUMN if key in literal else FIRSTS) if summary.startswith(PAGES) else DERIVED,
                         sources[1],
                         1,
                         rows.select("unit", "round", "label", "votes"),
