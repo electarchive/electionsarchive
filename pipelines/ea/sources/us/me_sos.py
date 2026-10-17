@@ -14,10 +14,11 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.fec import NOTES
 from ea.store import DATA, connect
 
 SOURCE = "us.me_sos"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ORIGIN = "https://www.maine.gov/sos/cec/elec/results/"
 WAYBACK = "https://web.archive.org/web/{}id_/" + ORIGIN + "{}"
@@ -447,10 +448,19 @@ def emit() -> Path:
 
             sets = []
             if key not in KEPT:
+                federal = cs.key("us.fec.result_set", key)
+                if federal in cs.minted:
+                    raise ValueError(f"{key}: us.fec's result set must already exist")
+                if key in NOTES:
+                    kind, body = NOTES[key]
+                    for (note,) in conn.execute(
+                        "select id from note where entity_id = %s and kind = %s", [federal, kind]
+                    ).fetchall():
+                        cs.add("note", id=note, entity_id=federal, kind=kind, body_md=body)
                 for previous in conn.execute(
                     """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
-                         supersedes_id from result_set where contest_id = %s and is_default and source_id <> %s""",
-                    [contest, source],
+                         supersedes_id from result_set where id = %s""",
+                    [federal],
                 ).fetchall():
                     cs.add(
                         "result_set",

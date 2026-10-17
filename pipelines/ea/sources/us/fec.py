@@ -1283,9 +1283,9 @@ NOTES = {
     "2018-11-06:ME:house:2": (
         "caveat",
         (
-            "Maine counted this race by ranked-choice voting, and no candidate won a majority of first choices. The FEC's "
-            "table reports first-choice votes only, so the later rounds, in which Jared Golden overtook Bruce Poliquin, "
-            "are not shown here."
+            "These are the FEC's figures, which report first-choice votes only. Maine counted this race by ranked-choice "
+            "voting, and no candidate won a majority of first choices; the Secretary of State's official rounds, in "
+            "which Jared Golden overtook Bruce Poliquin, are the results shown by default."
         ),
     ),
     "2022-11-08:AK:senate": ("methodology", RANKED),
@@ -1300,11 +1300,17 @@ NOTES = {
     "2024-11-05:ME:house:2": (
         "methodology",
         (
-            "Maine used ranked-choice voting for this race. The Clerk's statistics report only the second and final "
-            "round of the count, after write-in votes were set aside; first-choice votes are not shown here. The "
-            "Clerk lists 391,596 continuing ballots and 11,340 exhausted ballots in that round."
+            "These are the Clerk's figures, which report only the second and final round of Maine's ranked-choice "
+            "count, after write-in votes were set aside: 391,596 continuing ballots and 11,340 exhausted ballots. The "
+            "Secretary of State's official rounds, with first choices, are the results shown by default."
         ),
     ),
+}
+RANKED_ELSEWHERE = {
+    "2018-06-12:ME:house:2:democratic",
+    "2018-11-06:ME:house:2",
+    "2020-07-14:ME:house:2:republican",
+    "2024-11-05:ME:house:2",
 }
 PRINTED_TOTAL = (
     "The FEC's book prints a total of {printed} votes, but the candidates' counts add up to {sum}. This page uses the "
@@ -5668,7 +5674,7 @@ def emit() -> Path:
                     kind="tacit" if tacit else "counted",
                     status="annulled" if annulled else "active",
                     source_id=sources[year],
-                    is_default=True,
+                    is_default=contest_key not in RANKED_ELSEWHERE,
                     completeness=None if tacit else 1,
                 )
                 if contest_key in NOTES:
@@ -6166,7 +6172,7 @@ def emit() -> Path:
                     kind="tacit" if tacit else "counted",
                     status="annulled" if annulled else "superseded" if contest_key in canvasses else "active",
                     source_id=statistics if year == 2024 else sources[year],
-                    is_default=contest_key not in canvasses,
+                    is_default=contest_key not in canvasses and contest_key not in RANKED_ELSEWHERE,
                     completeness=None if tacit else 1,
                 )
                 if contest_key in NOTES:
