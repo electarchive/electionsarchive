@@ -394,9 +394,24 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
         sql.SQL(
             """with recursive
             rs as (
-              select r.k, e.date_from as on_date
-              from result_set r join election e on e.id = r.election_id
+              select r.k, e.date_from as on_date, c.id as contest_id, c.district_area_id, c.allocation_parent_id
+              from result_set r join election e on e.id = r.election_id join contest c on c.id = r.contest_id
               where r.id in ({facts}) or r.k = any({stale})
+            ),
+            above as (
+              select rs.k as result_set_k, p.parent_id as area_id, rs.on_date
+              from rs join area_parent p on p.area_id = rs.district_area_id and p.valid @> rs.on_date
+              where rs.allocation_parent_id is not null
+              union
+              select b.result_set_k, p.parent_id, b.on_date
+              from above b join area_parent p on p.area_id = b.area_id and p.valid @> b.on_date
+            ),
+            ceiling as (
+              select b.result_set_k, b.area_id from above b join rs on rs.k = b.result_set_k
+              where exists (
+                select from contest s join above t on t.result_set_k = b.result_set_k and t.area_id = s.district_area_id
+                where s.allocation_parent_id = rs.allocation_parent_id and s.id <> rs.contest_id
+              )
             ),
             units as (
               select rs.k as result_set_k, ru.k as unit_k, ru.id as unit_id,
@@ -422,6 +437,7 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
             join ancestors a on a.result_set_k = v.result_set_k and a.unit_k = v.unit_k
             join area on area.id = a.area_id
             where v.result_set_k in (select k from rs)
+              and not exists (select from ceiling x where x.result_set_k = v.result_set_k and x.area_id = a.area_id)
             group by v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round"""
         ).format(facts=facts, stale=sql.Literal(stale))
     )
