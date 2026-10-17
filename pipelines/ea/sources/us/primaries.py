@@ -52,6 +52,7 @@ OHIO = (
 )
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
+DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
 SUMMIT = "https://vote.utah.gov/wp-content/uploads/2024/08/P24_Summit.pdf"
 HAWAII = "https://files.hawaii.gov/elections/files/results/2024/Primary/{}.txt"
@@ -234,6 +235,8 @@ def fetch() -> None:
     for name in ("media", "summary"):
         raw.fetch(SOURCE, HAWAII.format(name), suffix=".txt")
     raw.fetch(SOURCE, UTAH, suffix=".json")
+    for suffix in ("html", "csv"):
+        raw.fetch(SOURCE, DELAWARE.format(suffix), suffix=f".{suffix}")
     raw.fetch(SOURCE, SUMMIT, suffix=".pdf")
     for package in TEXAS:
         for resource in json.loads(raw.fetch(SOURCE, TED.format(package), suffix=".json").path.read_text())["result"][
@@ -275,6 +278,12 @@ def parse() -> None:
             conn.execute(
                 """select distinct split_part(split_part(code, ':', 5), '-', 1), split_part(code, ':', 3)
                    from reporting_unit where scheme_code = 'us.precinct' and code like '2024:HI:%'"""
+            ).fetchall()
+        )
+        delaware = dict(
+            conn.execute(
+                """select split_part(code, ':', 5), split_part(code, ':', 3)
+                   from reporting_unit where scheme_code = 'us.precinct' and code like '2024:DE:%'"""
             ).fetchall()
         )
     rows: list[tuple[str, date, str, int | None, str | None, str, str, str | None, str, bool, int, str]] = []
@@ -380,6 +389,7 @@ def parse() -> None:
         ("MO", "county", MISSOURI),
         ("HI", "precinct", HAWAII.format("media")),
         ("UT", "county", UTAH),
+        ("DE", "precinct", DELAWARE.format("html")),
         ("UT", "county", SUMMIT),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
@@ -684,6 +694,50 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif url == DELAWARE.format("html"):
+            page = raw.cached(SOURCE, url).path.read_text()
+            page = page[page.index('id="byelectiondist"') : page.index('id="bycounty"')]
+            cells = []
+            heading = district = affiliation = None
+            for match in re.finditer(
+                r'<h3 class="contest-title[^"]*">([^<]+)</h3>|<h4 class="electiondistrict-title[^"]*">Election District'
+                r' ([^<]+)</h4>|<h4 class="party-Name[^"]*">([^<]+)</h4>|<tr>\s*<td[^>]*>([^<]+)</td>'
+                r"(?:\s*<td[^>]*>[^<]*</td>){3}\s*<td[^>]*>([^<]+)</td>",
+                page,
+                flags=re.DOTALL,
+            ):
+                if match[1]:
+                    heading = match[1].strip()
+                elif match[2]:
+                    district = match[2].strip()
+                elif match[3]:
+                    affiliation = match[3].strip()
+                elif heading in ("U.S. Representative in Congress", "Governor") and district and affiliation:
+                    cells.append(
+                        {
+                            "county": delaware[district],
+                            "precinct": district,
+                            "office": heading,
+                            "district": None,
+                            "party": affiliation.removesuffix(" Party"),
+                            "candidate": html.unescape(match[4]).strip().title(),
+                            "votes": match[5].replace(",", ""),
+                        }
+                    )
+            frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
+            printed = pl.read_csv(raw.cached(SOURCE, DELAWARE.format("csv")).path, infer_schema=False).select(
+                office="office",
+                party=pl.col("partyname").str.replace(" Party$", ""),
+                candidate=pl.col("candidatename").str.to_titlecase(),
+                printed=pl.col("totalvotessum").cast(pl.Int64),
+            )
+            summed = (
+                frame.group_by("office", "party", "candidate")
+                .agg(pl.col("votes").cast(pl.Int64).sum())
+                .join(printed, on=["office", "party", "candidate"], how="left")
+            )
+            if summed.filter(pl.col("votes") != pl.col("printed").fill_null(-1)).height:
+                raise ValueError(f"DE: the election districts do not add up to the statewide report: {summed}")
         elif url == UTAH:
             export = json.loads(raw.cached(SOURCE, url).path.read_text())
             statewide = {
@@ -1368,7 +1422,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI"):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -1418,6 +1472,8 @@ def parse() -> None:
             if state == "HI"
             else date(2024, 6, 25)
             if url in (UTAH, SUMMIT)
+            else date(2024, 9, 10)
+            if url == DELAWARE.format("html")
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1759,6 +1815,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if used in (UTAH, SUMMIT)
+                else (
+                    "Delaware Department of Elections",
+                    "2024 Primary Election Report, official results",
+                    "https://elections.delaware.gov/reports/PR2024.html",
+                    "official_body",
+                    "Public record",
+                )
+                if used == DELAWARE.format("html")
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
