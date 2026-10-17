@@ -11,7 +11,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import elstats, fl_sos, mo_sos, wa_local
+from ea.sources.us import al_sos, elstats, fl_sos, mo_sos, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_canvass"
@@ -70,6 +70,13 @@ MISSOURI = {
     date(2020, 11, 3): "ActualResults-November32020.pdf",
     date(2024, 8, 6): "ActualResults-August62024.pdf",
 }
+ALABAMA = {
+    date(2012, 9, 18): "voter-pdfs/2012/scae-results-certified-2012-10-09.pdf",
+    date(2014, 11, 4): "voter-pdfs/2014/2014GeneralResults-WithoutWriteIn.pdf",
+    date(2016, 11, 8): "voter-pdfs/2016/2016-Official-General-Election-Results-Certified-2016-11-29.pdf",
+    date(2018, 11, 6): "voter-pdfs/2018/2018-Official-General-Election-Results-Certified-2018-11-27.pdf",
+    date(2020, 11, 3): "election-2020/Final%20Canvass%20of%20Results-Merged.pdf",
+}
 METHOD = (
     "{level} totals from {document}, the state's certified results. They replace the totals transcribed from the "
     "English Wikipedia as this question's default.{advisory}"
@@ -80,6 +87,12 @@ KANSAS_CITY = (
 )
 ADVISORY = " As in the question's existing options, the export's Maintained is recorded as Yes and Repealed as No."
 DOCUMENTS = {
+    "AL": (
+        al_sos.PUBLISHER,
+        "Certified results of the State Canvassing Board",
+        "https://www.sos.alabama.gov/alabama-votes/voter/election-information",
+        "the Alabama State Canvassing Board's certified results",
+    ),
     "WA": (
         wa_local.PUBLISHER,
         wa_local.TITLE,
@@ -129,6 +142,8 @@ def wikipedia(conn) -> list[tuple[str, date]]:
 def link(state: str, day: date) -> tuple[str, str]:
     if state == "UT":
         return SOURCE, WAYBACK.format(*UTAH[day]) if day in UTAH else ""
+    if state == "AL":
+        return SOURCE, "https://www.sos.alabama.gov/sites/default/files/" + ALABAMA[day] if day in ALABAMA else ""
     if state == "MO":
         return SOURCE, mo_sos.SITE + MISSOURI[day] if day in MISSOURI else ""
     if state == "OR":
@@ -153,9 +168,7 @@ def fetch() -> None:
         source, url = link(state, day)
         if source == SOURCE and url:
             try:
-                raw.fetch(
-                    SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "OR": ".pdf", "MO": ".pdf"}[state]
-                )
+                raw.fetch(SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx"}.get(state, ".pdf"))
             except httpx.HTTPStatusError as error:
                 print(f"{state} {day}: {error}")
 
@@ -184,7 +197,52 @@ def parse() -> None:
             path = raw.cached(source, url).path
         except LookupError:
             continue
-        if state == "MO":
+        if state == "AL":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            columns: list[tuple[str, str]] = []
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    if re.search(r"(?i)amendment|#", line):
+                        columns = re.findall(
+                            r"(?i)(\w+)\s+(?:#|amendment\s+number\s+\w+\s+\(|amendment\s+no\.\s*)(\d+)", line
+                        )
+                    elif (
+                        columns
+                        and (matched := re.fullmatch(r"\W*([A-Za-z][\w .']*?)\s{2,}(\d.*)", line))
+                        and (elstats.plain(matched[1]) in names["AL"] or matched[1].upper() in ("TOTAL", "TOTALS"))
+                    ):
+                        numbers = re.findall(r"\d[\d,]*", matched[2])
+                        for index, (kind, measure) in enumerate(columns):
+                            if "statewide" in kind.lower() and len(numbers) >= 2 * index + 2:
+                                records.append((matched[1], f"Amendment {measure}", "YES", numbers[2 * index], number))
+                                records.append(
+                                    (matched[1], f"Amendment {measure}", "NO", numbers[2 * index + 1], number)
+                                )
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64, strict=False))
+            total = pl.col("county").str.to_uppercase().is_in(["TOTAL", "TOTALS"])
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & total.any().over("office", "answer")
+                    & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "MO":
             records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             for number, page in enumerate(text.stdout.split("\f"), start=1):
