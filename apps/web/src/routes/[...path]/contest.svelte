@@ -183,7 +183,7 @@
     const median =
       rows.toSorted((a, b) => a.valid - b.valid)[Math.floor(rows.length / 2)]
         ?.valid ?? 0;
-    const sizable = rows.filter((row) => row.valid >= median / 2);
+    const sizable = rows.filter((row) => row.valid >= median / 10);
     return [
       {
         label: m.key_closest(),
