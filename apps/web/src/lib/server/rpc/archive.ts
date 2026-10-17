@@ -172,6 +172,9 @@ const Places = v.nullable(
 const Sketch = v.object({
   tiles: v.string(),
   own: v.nullable(v.object({ tiles: v.string(), k: v.number() })),
+  nested: v.optional(
+    v.nullable(v.object({ tiles: v.string(), ks: v.array(v.number()) })),
+  ),
   frames: v.array(
     v.object({
       west: v.number(),
@@ -3994,8 +3997,9 @@ async function sketch(
   level: string,
   day: string,
   ks: Array<number> = [],
+  inner: Array<number> = [],
 ) {
-  const [frames, found] = await Promise.all([
+  const [frames, found, nested] = await Promise.all([
     framing(area.id, day, ks),
     db.execute<{
       scheme: string;
@@ -4027,7 +4031,16 @@ async function sketch(
         and bs.valid @> ${day}::date
       order by bs.scheme_code, bs.valid_from desc nulls last
     `),
+    db.execute<{ tiles: string }>(sql`
+      select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles
+      from boundary_set bs
+      where bs.scheme_code = (select scheme_code from area where k = ${inner[0] ?? -1})
+        and bs.valid @> ${day}::date
+      order by bs.valid_from desc nulls last
+      limit 1
+    `),
   ]);
+  const inside = nested.rows[0]?.tiles;
   const tiled = found.rows.find((row) => row.scheme === level);
   const own = found.rows.find((row) => row.scheme !== level);
   return tiled == null || frames.length === 0
@@ -4035,6 +4048,7 @@ async function sketch(
     : {
         tiles: tiled.tiles,
         own: own == null ? null : { tiles: own.tiles, k: area.k },
+        nested: inside == null ? null : { tiles: inside, ks: inner },
         frames,
         isApproximate: tiled.synthetic,
         shaped: ks.length === 0 ? null : tiled.shaped,
@@ -4420,6 +4434,7 @@ async function races(
               level,
               day,
               (table ?? grid)?.rows.map((row) => row.k) ?? [],
+              table == null ? grid?.districts?.map((row) => row.k) : [],
             ),
         isBrief ||
         date == null ||

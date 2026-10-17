@@ -791,6 +791,7 @@
               : places.legend.map((item) => swatch(item.color, item.key))}
             tiles={shape.tiles}
             own={shape.own}
+            nested={shape.nested}
             frames={shape.frames}
             isApproximate={shape.isApproximate}
             sources={shape.credits}
