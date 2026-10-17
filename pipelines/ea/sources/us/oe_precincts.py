@@ -18,7 +18,7 @@ from ea.store import DATA, connect
 SOURCE = "us.oe_precincts"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-YEARS = range(2000, 2015, 2)
+YEARS = range(2000, 2015)
 TOTALS = r"(?i)^\s*(county\s+|grand\s+|election\s+)?totals?:?\s*$"
 TALLIES = r"(?i)^(number of precincts|registered voters|times (blank|over|under) voted|total ?votes|under ?votes?|over ?votes?)\b"
 COLUMNS = {
@@ -275,7 +275,15 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "lines.parquet")
+    frame = pl.read_parquet(PARSED / "lines.parquet").with_columns(
+        day=pl.when(pl.col("year") % 2 == 1)
+        .then(pl.col("path").str.extract(r"(\d{8})__").str.to_date("%Y%m%d"))
+        .otherwise(
+            pl.col("year").map_elements(
+                lambda year: date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7), return_dtype=pl.Date
+            )
+        )
+    )
     office = pl.col("office").str.to_lowercase()
     with connect() as conn:
         cs = Changeset(
@@ -356,9 +364,9 @@ def emit() -> Path:
                 "select value from external_id where scheme = 'us.contest' and value ~ '^20(0[0-9]|1[0-4])-11-'"
             ).fetchall()
         }
-        seats: list[tuple[str, int, str, str | None, str]] = []
-        for state, year, name, district in (
-            frame.filter(pl.col("year") < 2016).select("state", "year", "office", "district").unique().iter_rows()
+        seats: list[tuple[str, date, str, str | None, str]] = []
+        for state, day, name, district in (
+            frame.filter(pl.col("year") < 2016).select("state", "day", "office", "district").unique().iter_rows()
         ):
             text = re.sub(r"\s+", " ", name.lower()).strip()
             if re.search(
@@ -367,7 +375,6 @@ def emit() -> Path:
                 text,
             ):
                 continue
-            day = date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7)
             special = bool(re.search(r"special|unexpired|vacancy", f"{text} {district or ''}".lower()))
             plain_office = re.sub(r"\s*\((unexpired|special)[^)]*\)|\s+state ?wide$|\s+(special|unexpired)$", "", text)
             names = next((names for pattern, names in STATEWIDE.items() if re.fullmatch(pattern, plain_office)), None)
@@ -428,15 +435,17 @@ def emit() -> Path:
                 continue
             key = next((key for key in tried if key in keys), None)
             if key is not None:
-                seats.append((state, year, name, district, key.split(":", 2)[2]))
-        seated = pl.DataFrame(seats, schema=["state", "year", "office", "district", "seat"], orient="row").with_columns(
-            pl.col("year").cast(pl.Int32)
+                seats.append((state, day, name, district, key.split(":", 2)[2]))
+        seated = pl.DataFrame(
+            seats,
+            schema={"state": pl.String, "day": pl.Date, "office": pl.String, "district": pl.String, "seat": pl.String},
+            orient="row",
         )
         print(f"{len(seats)} state office and legislative lines map to {seated['seat'].n_unique()} contest keys")
         lines = pl.concat(
             [
                 frame.filter(pl.col("year") < 2016)
-                .join(seated, on=["state", "year", "office", "district"], how="left", nulls_equal=True)
+                .join(seated, on=["state", "day", "office", "district"], how="left", nulls_equal=True)
                 .with_columns(
                     chamber=pl.when(office.str.contains(r"^(u\.?s\.? )?president|^presidential electors"))
                     .then(pl.lit("president"))
@@ -448,6 +457,7 @@ def emit() -> Path:
                 )
                 .select(
                     "year",
+                    "day",
                     "chamber",
                     "state",
                     "fips",
@@ -463,6 +473,7 @@ def emit() -> Path:
                 ),
                 michigan.select(
                     "year",
+                    "day",
                     chamber=pl.when(pl.col("office").is_in(["State Senate", "State House"]))
                     .then(
                         pl.concat_str(
@@ -487,12 +498,7 @@ def emit() -> Path:
         )
         returns = (
             lines.filter(pl.col("chamber").is_not_null())
-            .with_columns(
-                day=pl.col("year").map_elements(
-                    lambda year: date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7), return_dtype=pl.Date
-                ),
-                candidate=pl.col("candidate").str.to_uppercase(),
-            )
+            .with_columns(candidate=pl.col("candidate").str.to_uppercase())
             .filter(~pl.col("candidate").str.contains(openelections.NOT_COUNTED), pl.col("candidate") != "")
             .with_columns(
                 measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
