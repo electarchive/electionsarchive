@@ -26,6 +26,15 @@ FILES = [
     "1992/results_1992/pregaa.html",
     "1992/results_1992/prepaa.html",
     "1996/results_1996/pregaa.html",
+    "2002/results/g_comptroller.html",
+    "2002/results/g_attorney_general.html",
+    "2006/results/general/office_Comptroller.html",
+    "2006/results/general/office_Attorney_General.html",
+    *(
+        f"{year}/results/general/gen_detail_results_{year}_2_BOT00{page}-.html"
+        for year in (2010, 2014)
+        for page in (5, 6)
+    ),
 ]
 DAYS = {
     (1990, "general"): date(1990, 11, 6),
@@ -37,6 +46,10 @@ DAYS = {
     (1996, "general"): date(1996, 11, 5),
     (1998, "general"): date(1998, 11, 3),
     (1998, "primary"): date(1998, 9, 15),
+    (2002, "general"): date(2002, 11, 5),
+    (2006, "general"): date(2006, 11, 7),
+    (2010, "general"): date(2010, 11, 2),
+    (2014, "general"): date(2014, 11, 4),
 }
 OFFICES = {
     "President and Vice President of the United States": "president",
@@ -54,6 +67,9 @@ CODES = {
     "Alliance": "ALL",
     "Taxpayers": "TAX",
     "Independent": "IND",
+    "Green": "GRN",
+    "Constitution": "CON",
+    "Populist": "POP",
     "Other": "OTH",
 }
 
@@ -79,6 +95,64 @@ def parse() -> None:
         year = int(path[:4])
         stage = "primary" if "/pa" in path or "/prep" in path else "general"
         text = raw.cached(SOURCE, SITE + path).path.read_text(errors="replace")
+        if year >= 2002:
+            office = "comptroller" if re.search("omptroller|005-", path) else "attorney-general"
+            header: list[tuple[str, str]] = []
+            body: list[list[str]] = []
+            for row in re.split(r"<(?:tr|table)[^>]*>", text):
+                cells = [
+                    re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", re.sub(r"<br\s*/?>", "|", cell)))).strip()
+                    for cell in re.findall(r"<t[dh][^>]*>(.*?)(?=<t[dh][\s>]|</?tr[\s>]|</table>|$)", row, re.DOTALL)
+                ]
+                if len(cells) < 2:
+                    continue
+                if not cells[0] and not any(re.fullmatch(r"[\d,]+", cell) for cell in cells[1:]):
+                    parts = [
+                        [
+                            part.strip()
+                            for part in cell.split("|")
+                            if part.strip() and not re.fullmatch(r"\(?\s*Won\s*\)?|N/A", part.strip())
+                        ]
+                        for cell in cells[1:]
+                    ]
+                    if not header or body:
+                        header, body = [], []
+                        for part in parts:
+                            name = re.sub(r"\s*\(Won\)$", "", part[0] if part else "").strip()
+                            header.append((name, part[1] if len(part) > 1 else ""))
+                    else:
+                        header = [(name, " ".join(part)) for (name, _), part in zip(header, parts, strict=True)]
+                    continue
+                if not header:
+                    continue
+                values = [re.sub(r"\s*\([^)]*\)", "", cell).replace(",", "") for cell in cells[1 : len(header) + 1]]
+                if cells[0] != "Totals":
+                    body.append([cells[0], *values])
+                    continue
+                keys = [re.sub(r"[^a-z]", "", line[0].lower()) for line in body]
+                if sorted(keys) != sorted(codes):
+                    raise ValueError(f"{path}: counties {sorted(set(keys) ^ set(codes))}")
+                for column, (name, affiliation) in enumerate(header, 1):
+                    counted = [int(line[column]) if line[column].isdigit() else 0 for line in body]
+                    if sum(counted) != int(values[column - 1]):
+                        raise ValueError(f"{path} {name}: {sum(counted)}, printed {values[column - 1]}")
+                    pooled = "Write" in affiliation or "Write-In" in name
+                    rows.extend(
+                        {
+                            "day": DAYS[(year, "general")],
+                            "stage": "general",
+                            "office": office,
+                            "party": None,
+                            "code": "OTH" if pooled else CODES.get(affiliation, "OTH"),
+                            "candidate": name,
+                            "label": f"{name} ({affiliation})" if affiliation else name,
+                            "county": codes[key],
+                            "votes": value,
+                        }
+                        for key, value in zip(keys, counted, strict=True)
+                    )
+                header, body = [], []
+            continue
         tables: dict[tuple[str, str | None], list[list[list[str]]]] = {}
         for table in re.findall(r"<table.*?</table>", text, re.DOTALL):
             found = re.search(r"<h2>(.*?)</h2>", table, re.DOTALL)
@@ -148,7 +222,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Maryland's president, U.S. Senate, governor, comptroller, and attorney general by county 1990–1998, "
-            "with their primaries, from the State Board of Elections' archive",
+            "with their primaries, and its comptroller and attorney general by county 2002–2014, from the State Board "
+            "of Elections' archive",
             polity="US",
         )
 
@@ -266,6 +341,8 @@ def emit() -> Path:
                     name(found, f"{year} Maryland primary election")
                     cs.add("slug", path=f"us/md/{day}-primary", entity_id=found)
                 election = found
+            if cs.key(f"{SOURCE}.result_set", key) not in cs.minted:
+                continue
             contest = contests.get(key) or (general if stage == "general" else None)
             if contest is None:
                 contest = cs.key("us.contest", key)
