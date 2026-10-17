@@ -11,7 +11,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import swdb, wa_local
+from ea.sources.us import wa_local
 from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
@@ -106,7 +106,6 @@ STATES = {
         TITLE,
         "https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
     ),
-    "CA": ("06", "California", swdb.PUBLISHER, swdb.TITLE, "https://statewidedatabase.org/election.html"),
     "WA": ("53", "Washington", wa_local.PUBLISHER, wa_local.TITLE, "https://results.vote.wa.gov"),
     "MN": (
         "27",
@@ -188,9 +187,6 @@ def fetch() -> None:
     for day in MN_DAYS:
         for name in ("allracesbyprecinct", "PrctTbl"):
             raw.fetch(SOURCE, MN_FILES.format(day=day, name=name), suffix=".txt")
-    for code in CA_DAYS.values():
-        for county in swdb.COUNTIES:
-            raw.fetch(SOURCE, CA_FILES.format(code=code, county=county), suffix=".txt")
 
 
 def parse() -> None:
@@ -493,48 +489,6 @@ def parse() -> None:
                 votes="votes",
             )
         )
-    for day, code in CA_DAYS.items():
-        rows = []
-        for county in swdb.COUNTIES:
-            text = raw.cached(SOURCE, CA_FILES.format(code=code, county=county)).path.read_text(encoding="cp1252")
-            for line in text.splitlines():
-                if found := CA_LINE.fullmatch(line):
-                    office, district, party, choice, votes = found.groups()
-                    rows.append(
-                        (
-                            CA_OFFICES[office],
-                            None if district is None else str(int(district)),
-                            "" if day.year >= 2012 else party,
-                            party,
-                            f"06{county:03d}",
-                            choice.rstrip("*").strip(),
-                            int(votes),
-                        )
-                    )
-        frame = pl.DataFrame(rows, schema=["office", "code", "party", "label", "fips", "choice", "votes"], orient="row")
-        unknown = frame.filter(~pl.col("party").is_in(list(PARTIES)))
-        if unknown.height:
-            print(
-                day,
-                "rows of other parties:",
-                unknown.group_by("office", "code", "party").agg(pl.col("votes").sum()).rows()[:10],
-            )
-        frames.append(
-            frame.filter(pl.col("party").is_in(list(PARTIES))).select(
-                state=pl.lit("CA"),
-                day=pl.lit(day),
-                office="office",
-                code="code",
-                party="party",
-                label=pl.when(pl.col("label").is_in(list(PARTIES))).then("label"),
-                fips="fips",
-                scheme=pl.lit("us.county"),
-                unit="fips",
-                choice="choice",
-                writein=pl.lit(False),
-                votes="votes",
-            )
-        )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.concat(frames)
@@ -578,9 +532,6 @@ def emit() -> Path:
         for day in MN_DAYS:
             for file in ("allracesbyprecinct", "PrctTbl"):
                 cs.artifact(raw.cached(SOURCE, MN_FILES.format(day=day, name=file)), sources["MN"])
-        for code in CA_DAYS.values():
-            for county in swdb.COUNTIES:
-                cs.artifact(raw.cached(SOURCE, CA_FILES.format(code=code, county=county)), sources["CA"])
         for day in WA_DAYS:
             for url in (wa_local.FILES[day], wa_local.PRECINCTS.format(day=day)):
                 cs.artifact(raw.cached(wa_local.SOURCE, url), sources["WA"])
@@ -663,7 +614,6 @@ def emit() -> Path:
             *(("NC", day, first) for day, first in NC_DAYS.items()),
             *(("MN", day, None) for day in MN_DAYS),
             *(("WA", day, None) for day in WA_DAYS),
-            *(("CA", day, None) for day in CA_DAYS),
         ]:
             kind = "runoff" if first else "primary"
             election = elections[(state, day)] = cs.key("us.election", f"{day}:{state}:{kind}")
