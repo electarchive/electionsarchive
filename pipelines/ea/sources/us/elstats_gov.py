@@ -77,8 +77,8 @@ ALIASES = {
 }
 MAJORITY = {"VT": 9999, "CT": 1901}
 OVERCOUNTED = (
-    "Candidate votes exceed the total votes cast by more than 0.5% in this archive. "
-    "Results from another source are shown by default."
+    "The state archive's candidate votes exceed its own total vote count by over 0.5%. "
+    "These figures are shown exactly as provided by the archive."
 )
 LEGISLATURE = (
     "No candidate won a majority of the popular vote. Under {state}'s constitution at the time, the legislature chose "
@@ -460,18 +460,6 @@ def emit() -> Path:
                 ).fetchall():
                     cs.add("outcome", result_set_id=previous, option_id=option, kind=kind_, seats=seats)
                 result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:folded")
-            instead = (
-                conn.execute(
-                    """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.status, r.source_id, r.as_of,
-                              r.completeness, r.supersedes_id
-                       from result_set r join changeset c on c.id = r.changeset_id
-                       where r.contest_id = %s and c.pipeline <> %s and r.stage = 'certified' and r.status = 'active'
-                       order by c.pipeline = 'us.algara' desc, r.k limit 1""",
-                    [contest, SOURCE],
-                ).fetchone()
-                if not reused and (state, day, primary) in overcounted
-                else None
-            )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -481,34 +469,12 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[state],
-                is_default=not reused and instead is None and (previous or result_set) not in demoted,
+                is_default=not reused and (previous or result_set) not in demoted,
                 supersedes_id=previous,
                 completeness=1,
             )
-            if instead is not None:
+            if not reused and (state, day, primary) in overcounted:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=OVERCOUNTED)
-                cs.add(
-                    "result_set",
-                    **dict(
-                        zip(
-                            (
-                                "id",
-                                "election_id",
-                                "contest_id",
-                                "stage",
-                                "kind",
-                                "status",
-                                "source_id",
-                                "as_of",
-                                "completeness",
-                                "supersedes_id",
-                            ),
-                            instead,
-                            strict=True,
-                        )
-                    ),
-                    is_default=True,
-                )
 
             options: dict[str, UUID] = {}
             for candidate, pooled, party in (
@@ -589,7 +555,7 @@ def emit() -> Path:
                         f"{state}:{slug(printed.partition(' and ')[0] if primary is None else printed)}",
                     )
                     old = cs.key("us.option", f"{contest_key}:{gone}")
-                    if previous is None or old in cs.minted or old == targets[printed]:
+                    if previous is None or old in cs.minted or old == targets[printed] or gone == kept:
                         continue
                     cs.merge(old, targets[printed])
                     cs.merge(
