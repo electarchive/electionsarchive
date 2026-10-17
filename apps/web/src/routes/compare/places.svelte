@@ -14,6 +14,7 @@
 
   let width = $state(720);
   let hovered = $state<{ series: number; point: number } | null>(null);
+  let opened = $state<Array<string>>([]);
 
   const parties = $derived(
     new Map(data.parties.map((party) => [party.id, party])),
@@ -380,7 +381,9 @@
           </tr>
         </thead>
         <tbody>
-          {#each race.rows.toReversed() as row (row.date)}
+          {#each opened.includes(race.name) ? race.rows.toReversed() : race.rows
+                .toReversed()
+                .slice(0, 12) as row (row.date)}
             {const a = $derived(row.margins[1] ?? null)}
             {const b = $derived(row.margins[2] ?? null)}
             <tr
@@ -428,6 +431,21 @@
         </tbody>
       </table>
     </div>
+    {#if race.rows.length > 12}
+      {const isOpen = $derived(opened.includes(race.name))}
+      <button
+        type="button"
+        class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+        aria-expanded={isOpen}
+        onclick={() =>
+          (opened = isOpen
+            ? opened.filter((name) => name !== race.name)
+            : [...opened, race.name])}
+        >{isOpen
+          ? m.polity_results_fewer()
+          : m.polity_results_more({ count: String(race.rows.length) })}</button
+      >
+    {/if}
   </section>
 {/each}
 

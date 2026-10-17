@@ -7014,7 +7014,7 @@ export const polities = {
         ) home on true
         order by e.date_from
       `);
-      const [labels, slugs, loaded] = await Promise.all([
+      const [labels, slugs, loaded, branches] = await Promise.all([
         names(
           [
             input.a,
@@ -7036,6 +7036,20 @@ export const polities = {
             ),
           ),
         ),
+        db.execute<{
+          from: string;
+          to: string;
+          kind: string;
+          start: string | null;
+          end: string | null;
+        }>(sql`
+          select coalesce(fm.into_id, a.party_id) as from, coalesce(tm.into_id, a.parent_party_id) as to, a.kind::text,
+            lower(a.valid)::text as start, upper(a.valid)::text as end
+          from party_affiliation a
+          left join entity_merge fm on fm.entity_id = a.party_id
+          left join entity_merge tm on tm.entity_id = a.parent_party_id
+          where a.kind = 'regional_branch'
+        `),
       ]);
       const points = found.rows.map((row, index) => ({
         ...row,
@@ -7043,7 +7057,18 @@ export const polities = {
           const here = k == null ? null : loaded[index]?.get(k);
           return here == null
             ? []
-            : compare(here.side, null, [], "party")
+            : compare(
+                here.side,
+                null,
+                branches.rows
+                  .filter(
+                    (branch) =>
+                      (branch.start == null || branch.start <= row.date) &&
+                      (branch.end == null || row.date < branch.end),
+                  )
+                  .map((branch) => ({ ...branch, toLabel: "" })),
+                "party",
+              )
                 .flatMap((entry) =>
                   entry.current == null
                     ? []
