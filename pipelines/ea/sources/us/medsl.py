@@ -742,14 +742,18 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
             .group_by("option")
             .agg(pl.col("votes").sum())
         )
-        overcounted = False
+        overcounted = undercounted = False
         for option, kind, label, _, fec in known:
             medsl = int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
             if kind in ("candidate", "ticket") and fec and abs(medsl - fec) > max(100, fec * 0.02):
                 drifted.append((key, label, medsl, fec))
                 overcounted |= medsl > fec
+                undercounted |= medsl < fec
         if overcounted:
             print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
+            continue
+        if undercounted and ":" in chamber:
+            print(f"{key}: a primary candidate's county sum falls short of the FEC total, skipped")
             continue
         if any(votes > official * 0.01 for _, _, votes, official in missing):
             print(

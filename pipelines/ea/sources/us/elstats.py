@@ -17,7 +17,7 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
 EARLY = {"CT": 1789, "VT": 1789}
@@ -157,7 +157,24 @@ def parse() -> None:
                 .filter(
                     pl.col("chamber").is_not_null()
                     & pl.col("division_type").is_in(list(DIVISIONS))
-                    & pl.col("election_type").str.contains("(?i)general")
+                    & (
+                        pl.col("election_type").str.contains("(?i)general")
+                        | (
+                            pl.col("election_type").str.contains("(?i)primary")
+                            & (pl.col("chamber") == "senate")
+                            & pl.col("primary_party").is_not_null()
+                        )
+                    )
+                )
+                .with_columns(
+                    chamber=pl.when(pl.col("election_type").str.contains("(?i)primary"))
+                    .then(
+                        pl.concat_str(
+                            pl.lit("senate:"),
+                            pl.col("primary_party").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", "-"),
+                        )
+                    )
+                    .otherwise("chamber")
                 )
                 .select(
                     year=pl.col("election_date").str.slice(0, 4).cast(pl.Int32),
