@@ -313,6 +313,7 @@ RADIUS = 3000
 TOLERANCE = 25
 ELECTION = date(1868, 11, 17)
 UNION = date(1922, 12, 6)
+REDISTRIBUTION = date(1885, 11, 24)
 
 
 def fetch() -> None:
@@ -544,14 +545,25 @@ def emit() -> Path:
             cs.add(
                 "area_geometry",
                 area_id=cs.area("gb.nation", code) if layer == "nation" else areas[code],
-                valid_from=None,
+                valid_from=None if layer == "nation" else ELECTION,
                 valid_from_precision="day",
-                valid_to=UNION if layer == "nation" else None,
+                valid_to=UNION if layer == "nation" else REDISTRIBUTION,
                 valid_to_precision="day",
                 geom=geom,
                 label_point=point,
                 quality="synthetic",
                 source_id=sources[source],
             )
-        cs.add("boundary_set", scheme_code="gb.pcon", vintage="1868", valid_from=None, valid_to=None, as_of=ELECTION)
+        existing = conn.execute(
+            "select id from boundary_set where scheme_code = 'gb.pcon' and vintage = '1868'"
+        ).fetchone()
+        cs.add(
+            "boundary_set",
+            **({"id": existing[0]} if existing else {}),
+            scheme_code="gb.pcon",
+            vintage="1868",
+            valid_from=ELECTION,
+            valid_to=REDISTRIBUTION,
+            as_of=ELECTION,
+        )
         return cs.write()

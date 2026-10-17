@@ -1,3 +1,4 @@
+import itertools
 import re
 import unicodedata
 from datetime import date
@@ -37,6 +38,8 @@ COUNTRIES = {
 }
 NOT_PARTIES = ("Independent", "Speaker")
 SHAPED = date(2010, 5, 6)
+REDISTRIBUTIONS = (1832, 1868, 1885, 1918, 1950, 1955, 1974, 1983, 1997)
+MISSPELLED = {"RoxBoroughshire": "Roxburghshire", "East Suex": "East Sussex"}
 RENAMED = {
     "Central Newcastle upon Tyne": "Newcastle upon Tyne Central",
     "Central Stoke-on-Trent": "Stoke-on-Trent Central",
@@ -438,6 +441,76 @@ def emit() -> Path:
                 )
                 name(units[unit_code], label)
 
+        era = (
+            pl.col("date_start")
+            .dt.year()
+            .replace_strict(
+                {year: max(since for since in REDISTRIBUTIONS if since <= year) for year in range(1832, 2025)}
+            )
+        )
+        starts = sorted(rows["date_start"].unique())
+        following = dict(itertools.pairwise(starts))
+        reformed = {
+            (fold(text), country): area
+            for text, country, area in conn.execute(
+                """select distinct on (n.text, p.code) n.text, p.code, a.id from area a
+                   join area_code c on c.area_id = a.id
+                   join name n on n.entity_id = a.id and n.is_preferred
+                   join area_parent ap on ap.area_id = a.id
+                   join area_code p on p.area_id = ap.parent_id
+                   where a.scheme_code = 'gb.pcon' and lower(c.valid) is null
+                   order by n.text, p.code, a.id"""
+            ).fetchall()
+        }
+        plans = dict(conn.execute("select vintage, id from boundary_set where scheme_code = 'gb.pcon'").fetchall())
+        historic: dict[tuple[int, str], UUID] = {}
+        for since, unit_code, country, label, first, last in (
+            rows.with_columns(era=era)
+            .filter(
+                ~pl.col("era").is_in([1868, 1997]),
+                ~pl.col("constituency").str.contains("Universit"),
+            )
+            .sort("date_start")
+            .group_by("era", "unit", maintain_order=True)
+            .agg(
+                pl.col("country").last(),
+                pl.col("constituency").last(),
+                pl.col("date_start").first().alias("first"),
+                pl.col("date_start").last().alias("last"),
+            )
+            .iter_rows()
+        ):
+            label = MISSPELLED.get(label, label)
+            if country == "SCT":
+                label = label.replace(" Boroughs", " Burghs")
+            code = f"{since}:{unit_code}"
+            area = historic[(since, unit_code)] = cs.area("gb.pcon", code, on=first)
+            if area in cs.minted:
+                cs.add("area", id=area, scheme_code="gb.pcon")
+                cs.add("area_code", area_id=area, code=code, valid_from=first, valid_to=following[last])
+                cs.add(
+                    "area_parent",
+                    area_id=area,
+                    parent_id=countries[country],
+                    valid_from=first,
+                    valid_to=following[last],
+                )
+                name(area, label)
+        for index, since in enumerate(REDISTRIBUTIONS[:-1]):
+            if since == 1868:
+                continue
+            opening = min(day for day in starts if day.year >= since)
+            closing = min(day for day in starts if day.year >= REDISTRIBUTIONS[index + 1])
+            cs.add(
+                "boundary_set",
+                **({"id": plans[str(since)]} if str(since) in plans else {}),
+                scheme_code="gb.pcon",
+                vintage=str(since),
+                valid_from=opening,
+                valid_to=closing,
+                as_of=opening,
+            )
+
         persons: dict[str, UUID] = {}
         for (start, end, label, year), held in rows.group_by(
             "date_start", "date_end", "election", "year", maintain_order=True
@@ -475,12 +548,25 @@ def emit() -> Path:
                 since = max((day for day in shaped if day <= start), default=None)
                 constituency = first["constituency"]
                 district = (
-                    None
+                    reformed.get(
+                        (
+                            fold(
+                                MISSPELLED.get(constituency, constituency).replace(
+                                    " Boroughs", " Burghs" if first["country"] == "SCT" else " Boroughs"
+                                )
+                            ),
+                            first["country"],
+                        )
+                    )
+                    if 1868 <= year < 1885
+                    else historic.get((max(since for since in REDISTRIBUTIONS if since <= year), unit_code))
                     if since is None
                     else districts.get((fold(RENAMED.get(constituency, constituency)), first["country"], since))
                 )
                 if since is not None and district is None and not (first["country"] == "NIR" and start < SHAPED):
                     raise ValueError(f"{start}: no boundary for {constituency}")
+                if district is None and "Universit" not in constituency and start < SHAPED:
+                    print(f"{start}: no area for {constituency}")
                 cs.add(
                     "contest",
                     id=contest,
