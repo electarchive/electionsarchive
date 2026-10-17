@@ -37,6 +37,10 @@ QUERY = """query Contest($contestId: Int!) {
   }
 }"""
 TOLERANCE = 0.005
+WINNERS = (
+    "Winners are those declared in Klarner's state legislative election returns for this race. The state's election "
+    "archive marks only who led in each town, not who won the seat."
+)
 
 
 def search(state: str, year: int) -> str:
@@ -187,6 +191,18 @@ def emit() -> Path:
                 "and (code like '33%%' or code like '50%%')"
             ).fetchall()
         }
+        published = {
+            value
+            for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{SOURCE}.result_set"])
+        }
+        noted = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join external_id x on x.entity_id = n.entity_id
+                   where x.scheme = %s and n.body_md = %s""",
+                [f"{SOURCE}.result_set", WINNERS],
+            ).fetchall()
+        )
+        memberships: set[tuple[str, str, date]] = set()
         minted: dict[str, tuple[str, str, date]] = {}
         skipped: dict[str, list[str]] = {}
         values = []
@@ -202,14 +218,15 @@ def emit() -> Path:
             if key in filled:
                 skipped.setdefault("already has a precinct set", []).append(key)
                 continue
-            contest, election, first, official = conn.execute(
-                """select c.id, c.election_id, min(v.count_round), sum(v.value) filter (where v.measure = 1)::bigint
+            contest, election, district, default, first, official = conn.execute(
+                """select c.id, c.election_id, c.district_area_id, rs.id, min(v.count_round),
+                          sum(v.value) filter (where v.measure = 1)::bigint
                    from external_id x join contest c on c.id = x.entity_id
                    join result_set rs on rs.contest_id = c.id and rs.is_default
                    join result_value v on v.result_set_k = rs.k and v.measure = 1
-                   where x.scheme = 'us.contest' and x.value = %s group by 1, 2""",
+                   where x.scheme = 'us.contest' and x.value = %s group by 1, 2, 3, 4""",
                 [key],
-            ).fetchone() or (None, None, None, None)
+            ).fetchone() or (None, None, None, None, None, None)
             if contest is None or not official or first not in (0, 1):
                 skipped.setdefault("no contest on file", []).append(key)
                 continue
@@ -289,6 +306,23 @@ def emit() -> Path:
                 )
                 for unit, fips in picked.select("code", "fips").unique().iter_rows():
                     minted.setdefault(unit, (state, fips, day))
+                    if district is not None:
+                        memberships.add((unit, str(district), day))
+                declared = conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [default]
+                ).fetchall()
+                for option, kind, seats in declared:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
+                if declared:
+                    cs.add(
+                        "note",
+                        **({"id": noted[result_set]} if result_set in noted else {}),
+                        entity_id=result_set,
+                        kind="methodology",
+                        body_md=WINNERS,
+                    )
+                if f"{key}:precinct" in published:
+                    continue
                 values.append(
                     picked.select(
                         result_set_id=pl.lit(str(result_set)),
@@ -328,6 +362,18 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=day,
                 valid_to=day + timedelta(days=1),
+            )
+        if memberships:
+            cs.frame(
+                "reporting_unit_area",
+                pl.DataFrame(
+                    [
+                        (str(cs.unit("us.precinct", unit)), area, day, day + timedelta(days=1))
+                        for unit, area, day in sorted(memberships)
+                    ],
+                    schema={"unit_id": pl.String, "area_id": pl.String, "valid_from": pl.Date, "valid_to": pl.Date},
+                    orient="row",
+                ),
             )
         for state in GRAPHQL:
             for year in YEARS:
