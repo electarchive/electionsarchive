@@ -5,11 +5,13 @@ from ea.sources.tr.ysk import LICENSE as TURKISH_OFFICIAL_ACTS
 from ea.store import connect
 
 SOURCE = "licenses"
-VERSION = "4"
+VERSION = "5"
 PUBLIC_RECORD = "Public record"
+UNLICENSED = "No license stated: facts published with attribution, raw files not redistributed"
 NEWS = "All rights reserved: a news article cited for one fact, not redistributed"
 # Publishers whose source rows were recorded with no license: government results are public records, Turkish court
-# decisions are free to reproduce once published, and news articles are cited for single facts, never redistributed.
+# decisions are free to reproduce once published, news articles are cited for single facts, and sources stating no
+# license keep their raw files private.
 PUBLISHERS = {
     "Cork Returning Officer": PUBLIC_RECORD,
     "Dublin County Returning Officer": PUBLIC_RECORD,
@@ -25,6 +27,12 @@ PUBLISHERS = {
     "Memurlar.net": NEWS,
     "Yeni Şafak": NEWS,
     "Son Dakika": NEWS,
+    "OpenElections": UNLICENSED,
+    "California State University, Sacramento, Institute for Social Research": UNLICENSED,
+    "Statewide Database, University of California, Berkeley": UNLICENSED,
+    "Iowa Democratic Party": UNLICENSED,
+    "IBGE": UNLICENSED,
+    "Tapu ve Kadastro Genel Müdürlüğü": UNLICENSED,
 }
 ATTRIBUTIONS = {
     "City of Chicago": "This site provides applications using data that has been modified for use from its original source, "
