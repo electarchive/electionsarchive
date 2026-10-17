@@ -188,6 +188,7 @@ ELSTATS = {
     "NY": {14: "assembly", 5: "senate"},
     "VT": {8: "house", 9: "senate"},
     "VA": {8: "house-of-delegates", 9: "senate"},
+    "MA": {8: "house", 9: "senate"},
 }
 ELSTATS = {state: offices for state, offices in ELSTATS.items() if state not in elstats.HELD}
 ELSTATS_YEARS = range(2000, 2023)
@@ -196,6 +197,22 @@ ELSTATS_DATES = {
     ("NH", date(2022, 9, 11)): date(2022, 9, 13),
     ("NY", date(2014, 9, 14)): date(2014, 9, 9),
 }
+MA_DAYS = {
+    2000: date(2000, 9, 19),
+    2002: date(2002, 9, 17),
+    2004: date(2004, 9, 14),
+    2006: date(2006, 9, 19),
+    2008: date(2008, 9, 16),
+    2010: date(2010, 9, 14),
+    2012: date(2012, 9, 6),
+    2014: date(2014, 9, 9),
+    2016: date(2016, 9, 8),
+    2018: date(2018, 9, 4),
+    2020: date(2020, 9, 1),
+    2022: date(2022, 9, 6),
+}
+MA_DOWNLOAD = elstats.MASSACHUSETTS + "download/{}/precincts_include:0/"
+MA_EMPTY = re.compile(r'id="election-id-(\d+)"(?:(?!id="election-id-).)*?class="no_candidates"', re.DOTALL)
 ELSTATS_PARTIES = {"Democratic": "DEM", "Republican": "REP", "Libertarian": "LIB", "Green": "GRE"}
 ELSTATS_LOCAL = [
     "Conservative",
@@ -205,6 +222,7 @@ ELSTATS_LOCAL = [
     "Reform",
     "Progressive",
     "Liberty Union",
+    "Green-Rainbow",
 ]
 WA_OFFICES = {
     "GOVERNOR": "governor",
@@ -246,6 +264,7 @@ STATES = {
     "NY": ("36", "New York", elstats.TENANTS["NY"][1], elstats.TITLE, elstats.TENANTS["NY"][2]),
     "VT": ("50", "Vermont", elstats.TENANTS["VT"][1], elstats.TITLE, elstats.TENANTS["VT"][2]),
     "VA": ("51", "Virginia", elstats.TENANTS["VA"][1], elstats.TITLE, elstats.TENANTS["VA"][2]),
+    "MA": ("25", "Massachusetts", elstats.MA_PUBLISHER, elstats.TITLE, "https://electionstats.state.ma.us"),
     "CA": (
         "06",
         "California",
@@ -308,6 +327,7 @@ PARTIES = {
     "NY:Reform": ("NY:reform-party", "reform", "reformp", "Reform"),
     "VT:Progressive": ("VT:progressive-party", "progressive", "progp", "Progressive"),
     "VT:Liberty Union": ("VT:liberty-union-party", "liberty-union", "libertyunionp", "Liberty Union"),
+    "MA:Green-Rainbow": ("MA:green-rainbow-party", "green-rainbow", "greenp", "Green-Rainbow"),
     "GLC": (
         "MN:grassroots-legalize-cannabis-party",
         "grassroots-legalize-cannabis",
@@ -338,6 +358,8 @@ METHOD = (
 
 
 def search(state: str, office: int, year: int) -> str:
+    if state == "MA":
+        return f"{elstats.MASSACHUSETTS}search/year_from:{year}/year_to:{year}/office_id:{office}/stage:Primaries"
     query = {
         "global": {"years": {"from": year, "to": year}},
         "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
@@ -363,7 +385,16 @@ def fetch() -> None:
     for state, offices in ELSTATS.items():
         for office in offices:
             for year in ELSTATS_YEARS:
-                raw.fetch(SOURCE, search(state, office, year), suffix=".csv")
+                if state != "MA":
+                    raw.fetch(SOURCE, search(state, office, year), suffix=".csv")
+                    continue
+                if year not in MA_DAYS:
+                    continue
+                listing = raw.fetch(SOURCE, search(state, office, year), suffix=".html").path.read_text()
+                empty = set(MA_EMPTY.findall(listing))
+                for election, _, _, stage in elstats.MA_ROW.findall(listing):
+                    if election not in empty and "Special" not in stage:
+                        raw.fetch(SOURCE, MA_DOWNLOAD.format(election), suffix=".csv")
 
 
 def parse() -> None:
@@ -412,7 +443,68 @@ def parse() -> None:
         fips = STATES[state][0]
         for office, body in offices.items():
             for year in ELSTATS_YEARS:
-                frame = pl.read_csv(raw.cached(SOURCE, search(state, office, year)).path, infer_schema=False)
+                if state == "MA":
+                    if year not in MA_DAYS:
+                        continue
+                    listing = raw.cached(SOURCE, search(state, office, year)).path.read_text()
+                    empty = set(MA_EMPTY.findall(listing))
+                    tables = []
+                    for election, _, district, stage in elstats.MA_ROW.findall(listing):
+                        if election in empty or "Special" in stage:
+                            continue
+                        table = pl.read_csv(
+                            raw.cached(SOURCE, MA_DOWNLOAD.format(election)).path,
+                            infer_schema=False,
+                            skip_rows_after_header=1,
+                        )
+                        long = (
+                            table.filter(pl.col("City/Town").is_not_null())
+                            .unpivot(
+                                [column for column in table.columns[3:] if column],
+                                index="City/Town",
+                                variable_name="candidate_name",
+                            )
+                            .select(
+                                division_name=pl.col("City/Town")
+                                .str.replace(r"^N\. ", "North ")
+                                .str.replace(r"^S\. ", "South ")
+                                .str.replace(r"^E\. ", "East ")
+                                .str.replace(r"^W\. ", "West "),
+                                candidate_name="candidate_name",
+                                votes=pl.col("value").str.replace_all(",", "").cast(pl.Int64),
+                            )
+                        )
+                        summed = (
+                            long.filter(pl.col("division_name") != "TOTALS")
+                            .group_by("candidate_name")
+                            .agg(pl.col("votes").sum())
+                        )
+                        if (
+                            not long.filter(pl.col("division_name") == "TOTALS")
+                            .drop("division_name")
+                            .join(summed, on="candidate_name", how="full")
+                            .filter(pl.col("votes") != pl.col("votes_right"))
+                            .is_empty()
+                        ):
+                            print(f"{year} MA {body} {district} {stage}: towns do not add up to the totals, skipped")
+                            continue
+                        tables.append(
+                            long.filter(pl.col("division_name") != "TOTALS").with_columns(
+                                election_date=pl.lit(MA_DAYS[year].isoformat()),
+                                election_type=pl.lit("State Primary"),
+                                primary_party=pl.lit(
+                                    stage.removesuffix(" Primary").replace("Green-rainbow", "Green-Rainbow")
+                                ),
+                                office_id=pl.lit(str(office)),
+                                office_modifier=pl.lit(None, pl.String),
+                                district_name=pl.lit(district),
+                                division_type=pl.lit("City/Town"),
+                                number_seats=pl.lit("1"),
+                            )
+                        )
+                    frame = pl.concat(tables) if tables else pl.DataFrame()
+                else:
+                    frame = pl.read_csv(raw.cached(SOURCE, search(state, office, year)).path, infer_schema=False)
                 if "office_id" not in frame.columns:
                     continue
                 frame = frame.filter(
@@ -435,7 +527,31 @@ def parse() -> None:
                     code = next(
                         (
                             known[key]
-                            for key in (plain, re.sub(r"[^a-z0-9]", "", lettered), plain.removesuffix("1"))
+                            for key in (
+                                plain,
+                                re.sub(r"[^a-z0-9]", "", lettered),
+                                plain.removesuffix("1"),
+                                re.sub(
+                                    r"^(\d+)(?:st|nd|rd|th)(.+)$",
+                                    r"\2\1",
+                                    re.sub(
+                                        r"[^a-z0-9]",
+                                        "",
+                                        re.sub(
+                                            r"^(first|second|third|fourth|fifth|sixth)\b",
+                                            lambda found: {
+                                                "first": "1st",
+                                                "second": "2nd",
+                                                "third": "3rd",
+                                                "fourth": "4th",
+                                                "fifth": "5th",
+                                                "sixth": "6th",
+                                            }[found[1]],
+                                            re.sub(r"\band\b", "", district.lower().replace("&", "and")),
+                                        ),
+                                    ),
+                                ),
+                            )
                             if key in known
                         ),
                         None,
@@ -932,8 +1048,8 @@ def emit() -> Path:
             version=VERSION,
             summary="State legislative and statewide primaries and runoffs from state canvasses: "
             "North Carolina 2002–2022, Minnesota 2016–2022, and Washington 2015–2022 by precinct, "
-            "California 2002–2022 by county, and Colorado, Connecticut, Idaho, New York, Vermont, "
-            "and Virginia 2000–2022 by county from their ElectionStats archives",
+            "California 2002–2022 by county, and Colorado, Connecticut, Idaho, Massachusetts, New York, "
+            "Vermont, and Virginia 2000–2022 by county from their ElectionStats archives",
             polity="US",
         )
 
@@ -965,10 +1081,22 @@ def emit() -> Path:
         for state, offices in ELSTATS.items():
             for office in offices:
                 for year in ELSTATS_YEARS:
+                    if state == "MA" and year not in MA_DAYS:
+                        continue
                     artifact = raw.cached(SOURCE, search(state, office, year))
                     if artifact.storage_key not in held:
                         held.add(artifact.storage_key)
                         cs.artifact(artifact, sources[state])
+                    if state == "MA":
+                        listing = artifact.path.read_text()
+                        empty = set(MA_EMPTY.findall(listing))
+                        for election, _, _, stage in elstats.MA_ROW.findall(listing):
+                            if election in empty or "Special" in stage:
+                                continue
+                            download = raw.cached(SOURCE, MA_DOWNLOAD.format(election))
+                            if download.storage_key not in held:
+                                held.add(download.storage_key)
+                                cs.artifact(download, sources[state])
         for path, names in CA_DAYS.values():
             for file in names:
                 cs.artifact(raw.cached(SOURCE, CA_SOV.format(path=path.format(file))), sources["CA"])
