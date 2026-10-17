@@ -1,0 +1,732 @@
+import io
+import json
+import re
+import zipfile
+from collections import defaultdict
+from datetime import date, datetime, timedelta
+from pathlib import Path
+from urllib.parse import urlencode
+from uuid import UUID
+
+import fastexcel
+import polars as pl
+
+from ea import raw
+from ea.changeset import Changeset, slug
+from ea.sources.us import elstats, ncsbe, openelections
+from ea.store import DATA, connect
+
+SOURCE = "us.primaries"
+VERSION = "2"
+PARSED = DATA / "parsed" / SOURCE
+CALIFORNIA = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/79-us-rep-congress.xlsx"
+NORTH_CAROLINA = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2024_03_05/results_pct_20240305.zip"
+OPENELECTIONS = {
+    "CT": "f948d0a1ce36871de4a1d696612ab2a268fd0758",
+    "GA": "36b7453793848c02d8f41601d9304a66ad828dd0",
+    "KY": "025799258505414d62830ea75fd34b58cb2ee59b",
+    "MI": "2103114f669c2bb25f19792bf5ca290300381396",
+    "MS": "84d07603a7eacefa07cb58e90fcb12ce76fcdcce",
+    "ND": "c25145fbab08f849e6eeec319f516d7916533ea1",
+    "RI": "977565f9d7cf7a32d3a2a454282b5fd291cef291",
+    "SC": "5e05b67e15f3614a20d31144df83248235cba6f2",
+    "SD": "9e01b9aea628e9ae17ada6656b649daf319fd212",
+    "TN": "4cb8cc5d0bb74b45dc05ad03c80c41b246301c1c",
+    "UT": "a023ab4d87c4a93f0913f505c6fcbad1a585db57",
+    "WV": "49d32c279d0e02d740c8af4fcb5b5eee380fbed4",
+    "WY": "d4d430672e8823beeb7dbc9274362992739155c3",
+}
+ELECTIONSTATS = ("CO", "CT", "ID", "NH", "NM", "NY", "VA", "VT")
+TYPOS = {"MS": {"jeffdavis": "28065"}, "TN": {"williamsonx": "47187"}, "VT": {"essexjunction": "50007"}}
+DAYS = {("RI", date(2024, 8, 13)): date(2024, 9, 10)}
+PARTIES = {
+    "dem": "democratic",
+    "democrat": "democratic",
+    "democratic": "democratic",
+    "democratic party": "democratic",
+    "rep": "republican",
+    "republican": "republican",
+    "republican party": "republican",
+    "lib": "libertarian",
+    "lbn": "libertarian",
+    "libertarian": "libertarian",
+    "grn": "green",
+    "green": "green",
+}
+SKIPPED = r"(?i)^(registered voters|ballots cast|total ballots|times (blank|over|under) voted|total ?votes|under ?votes?|over ?votes?|no candidate qualified|blank|void)\b"
+COLUMNS = ("county", "precinct", "office", "district", "party", "candidate", "votes")
+
+
+def search(state: str) -> str:
+    return elstats.SEARCH.format(tenant=elstats.TENANTS[state][0]) + urlencode(
+        {
+            "search": json.dumps(
+                {
+                    "global": {"years": {"from": 2024, "to": 2024}},
+                    "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
+                    "contests": {
+                        "candidates": [],
+                        "divisions": [],
+                        "offices": [
+                            {"free": office}
+                            for office in (
+                                "U.S. House",
+                                "U.S. Senate",
+                                "United States",
+                                "Congress",
+                                "President",
+                                "Governor",
+                            )
+                        ],
+                    },
+                    "specialElectionsOnly": False,
+                    "voterStats": False,
+                    "stages": [],
+                },
+                separators=(",", ":"),
+            )
+        }
+    )
+
+
+def picks(fips: dict[str, dict[str, str]]) -> list[tuple[str, str, str]]:
+    chosen: list[tuple[str, str, str]] = []
+    for state, commit in OPENELECTIONS.items():
+        tree = json.loads(
+            raw.cached(SOURCE, openelections.TREE.format(state=state.lower(), commit=commit)).path.read_text()
+        )
+        found: dict[str, dict[str, list[str]]] = defaultdict(lambda: defaultdict(list))
+        for entry in tree["tree"]:
+            name = entry["path"].rsplit("/", 1)[-1]
+            if not (
+                entry["type"] == "blob"
+                and entry["path"].startswith("2024/")
+                and re.fullmatch(rf"2024\d{{4}}__{state.lower()}__[\w-]*primary[\w-]*\.csv", name)
+            ):
+                continue
+            middle = re.search(r"primary__([a-z_]+)__precinct\.csv$", name)
+            grain = (
+                "county"
+                if re.search(r"__(county|county-level|town)\.csv$", name)
+                else "part"
+                if "/counties/" in entry["path"] or (middle and re.sub(r"[^a-z]", "", middle[1]) in fips[state])
+                else "precinct"
+            )
+            found[name[:8]][grain].append(entry["path"])
+        for _, files in sorted(found.items()):
+            precincts = files["precinct"] or (files["part"] if len(files["part"]) == len(fips[state]) else [])
+            chosen.extend((state, "county", path) for path in files["county"])
+            chosen.extend((state, "precinct", path) for path in precincts)
+    return chosen
+
+
+def fetch() -> None:
+    raw.fetch(SOURCE, CALIFORNIA, suffix=".xlsx")
+    raw.fetch(SOURCE, NORTH_CAROLINA, suffix=".zip")
+    for state in ELECTIONSTATS:
+        raw.fetch(SOURCE, search(state), suffix=".csv")
+    for state, commit in OPENELECTIONS.items():
+        raw.fetch(SOURCE, openelections.TREE.format(state=state.lower(), commit=commit), suffix=".json")
+    with connect() as conn:
+        fips = openelections.counties(conn)
+    for state, _, path in picks(fips):
+        raw.fetch(
+            SOURCE,
+            openelections.REPOSITORY.format(state=state.lower(), commit=OPENELECTIONS[state], path=path),
+            suffix=".csv",
+        )
+
+
+def parse() -> None:
+    with connect() as conn:
+        fips = openelections.counties(conn)
+        towns = {
+            (state, re.sub(r"[^a-z]", "", town.lower())): county
+            for state, county, town in conn.execute(
+                """select distinct split_part(code, ':', 2), split_part(code, ':', 3), split_part(code, ':', 4)
+                   from reporting_unit where scheme_code = 'us.precinct' and code ~ '^2024:(CT|RI):[0-9]{5}:'"""
+            ).fetchall()
+        }
+    rows: list[tuple[str, date, str, int | None, str | None, str, str, str | None, str, bool, int, str]] = []
+    sheet = (
+        fastexcel.read_excel(raw.cached(SOURCE, CALIFORNIA).path)
+        .load_sheet(0, header_row=None, dtypes="string")
+        .to_polars()
+    )
+    lines = list(sheet.iter_rows())
+    district = 0
+    names: list[tuple[str, str, bool]] = []
+    counted: list[int] = []
+    for index, (label, *cells) in enumerate(lines):
+        if label is not None and (found := re.fullmatch(r"(\d+)\w\w Congressional District", label.strip())):
+            district = int(found[1])
+        elif label is None and any(cells) and index + 1 < len(lines) and lines[index + 1][0] is None:
+            names = [
+                (" ".join(name.split()), party.removesuffix(" (W/I)"), party.endswith("(W/I)"))
+                for name, party in zip(cells, lines[index + 1][1:], strict=True)
+                if name is not None and party is not None
+            ]
+            counted = [0] * len(names)
+        elif label == "District Totals":
+            printed = [int(cell) for cell in cells[: len(names)]]
+            if printed != counted:
+                raise ValueError(f"CA {district}: counties sum to {counted}, the sheet prints {printed}")
+        elif label is not None and label.strip() != "Percent" and names:
+            county = fips["CA"][re.sub(r"[^a-z]", "", label.lower())]
+            for position, ((name, _, write_in), cell) in enumerate(zip(names, cells, strict=False)):
+                counted[position] += int(cell or 0)
+                rows.append(
+                    (
+                        "CA",
+                        date(2024, 3, 5),
+                        "house",
+                        district,
+                        None,
+                        "county",
+                        county,
+                        None,
+                        name,
+                        write_in,
+                        int(cell or 0),
+                        CALIFORNIA,
+                    )
+                )
+    frames = [
+        pl.DataFrame(
+            rows,
+            schema={
+                "state": pl.String,
+                "day": pl.Date,
+                "office": pl.String,
+                "district": pl.Int64,
+                "party": pl.String,
+                "grain": pl.String,
+                "county": pl.String,
+                "precinct": pl.String,
+                "candidate": pl.String,
+                "write_in": pl.Boolean,
+                "votes": pl.Int64,
+                "url": pl.String,
+            },
+            orient="row",
+        )
+    ]
+    for state, grain, url in [
+        ("NC", "precinct", NORTH_CAROLINA),
+        *(
+            (state, grain, openelections.REPOSITORY.format(state=state.lower(), commit=OPENELECTIONS[state], path=path))
+            for state, grain, path in picks(fips)
+        ),
+    ]:
+        if state == "NC":
+            with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+                text = archive.read(archive.namelist()[0])
+            contest = pl.col("Contest Name").str.strip_chars()
+            frame = pl.read_csv(
+                io.BytesIO(text), separator="\t", infer_schema=False, truncate_ragged_lines=True
+            ).select(
+                county="County",
+                precinct="Precinct",
+                office=contest.str.replace(r"^NC ", "").str.replace(r"\s*\(\w+\)$", ""),
+                district=contest.str.extract(r"DISTRICT (\d+)"),
+                party=contest.str.extract(r"\((\w+)\)$"),
+                candidate="Choice",
+                votes="Total Votes",
+            )
+        else:
+            text = raw.cached(SOURCE, url).path.read_bytes()
+            frame = pl.read_csv(
+                io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
+                infer_schema_length=0,
+                truncate_ragged_lines=True,
+            ).rename(str.lower)
+        if "votes" not in frame.columns:
+            frame = frame.with_columns(
+                votes=pl.sum_horizontal(
+                    pl.col(column).str.replace_all(r"[,\s]", "").cast(pl.Int64, strict=False)
+                    for column in frame.columns
+                    if column.endswith("_votes")
+                ).cast(pl.String)
+            )
+        if "county" not in frame.columns or state in ("CT", "RI"):
+            frame = frame.with_columns(
+                county=pl.col("town" if "town" in frame.columns else "county")
+                .str.to_lowercase()
+                .str.replace_all(r"[^a-z]", "")
+                .str.replace(r"limited$", "")
+                .replace_strict(
+                    {
+                        **{town: county for (known, town), county in towns.items() if known == state},
+                        **dict.fromkeys(("federalprecinct", "federalprecincts", "congressionaldistrict"), "44"),
+                    },
+                    default=None,
+                )
+            )
+        else:
+            frame = frame.with_columns(
+                county=pl.col("county")
+                .str.to_lowercase()
+                .str.replace_all(r"saint ", "st ")
+                .str.replace_all(r"\b(county|parish)\b", "")
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict({**fips[state], **TYPOS.get(state, {})}, default=None)
+            )
+        office = pl.col("office").str.to_lowercase().str.strip_chars()
+        day = datetime.strptime(re.findall(r"2024\d{4}", url)[-1], "%Y%m%d").date()
+        frames.append(
+            frame.with_columns(
+                [pl.lit(None, pl.String).alias(column) for column in COLUMNS if column not in frame.columns]
+            )
+            .with_columns(
+                kind=pl.when(office.str.contains(r"^(u\.?s\.? )?president|^presidential"))
+                .then(pl.lit("president"))
+                .when(office.str.contains(openelections.SENATE.pattern))
+                .then(pl.lit("senate"))
+                .when(office.str.contains(openelections.HOUSE.pattern) & ~office.str.contains("measure|initiat"))
+                .then(pl.lit("house"))
+                .when(office.str.contains(r"^governor\b"))
+                .then(pl.lit("governor"))
+            )
+            .filter(
+                pl.col("kind").is_not_null(),
+                ~pl.col("candidate").fill_null("").str.contains(SKIPPED),
+                pl.col("candidate").fill_null("").str.strip_chars() != "",
+            )
+            .select(
+                state=pl.lit(state),
+                day=pl.lit(DAYS.get((state, day), day)),
+                office="kind",
+                district=pl.when(pl.col("kind") == "house").then(
+                    pl.lit(0, pl.Int64)
+                    if state in ("AK", "DE", "ND", "SD", "VT", "WY")
+                    else pl.col("district").fill_null("").str.extract(r"(\d+)").cast(pl.Int64).fill_null(0)
+                ),
+                party=pl.col("party")
+                .str.to_lowercase()
+                .str.strip_chars()
+                .replace_strict(
+                    {**PARTIES, "dem": "north-dakota-democratic-nonpartisan-league"} if state == "ND" else PARTIES,
+                    default=None,
+                ),
+                grain=pl.lit(grain),
+                county="county",
+                precinct=pl.when(pl.lit(grain) == "precinct").then(
+                    pl.col("precinct").str.strip_chars().str.replace_all(r"\s+", " ")
+                ),
+                candidate=pl.col("candidate").str.strip_chars().str.replace_all(r"\s+", " "),
+                write_in=pl.col("candidate").str.contains(r"(?i)write[- ]?ins?\b"),
+                votes=pl.col("votes").str.replace_all(r"[,\s]", "").cast(pl.Float64, strict=False).cast(pl.Int64),
+                url=pl.lit(url),
+            )
+            .filter(pl.col("votes").is_not_null())
+        )
+    with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS").is_in(ELECTIONSTATS))
+    places: dict[str, dict[str, str]] = defaultdict(dict)
+    for state, geoid, name in (
+        gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
+        .select("USPS", "GEOID", "NAME")
+        .iter_rows()
+    ):
+        places[state].setdefault(elstats.plain(name), geoid[:5])
+        places[state].setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+    for (state, name), code in elstats.FORMER.items():
+        places[state].setdefault(name, code)
+    for state in ELECTIONSTATS:
+        places[state].update(TYPOS.get(state, {}))
+        url = search(state)
+        frame = pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False, truncate_ragged_lines=True)
+        office = pl.col("office_name").str.to_lowercase().str.strip_chars()
+        division = pl.col("division_name").str.replace(r"\s*\(.*\)$", "").str.strip_chars()
+        frames.append(
+            frame.filter(
+                pl.col("election_type").str.contains("(?i)primary"),
+                pl.col("division_type").is_in(["County", "Locality", "City/Town"]),
+                ~pl.col("candidate_name").fill_null("").str.contains(SKIPPED),
+            )
+            .with_columns(
+                kind=pl.when(
+                    office.str.contains(r"^(u\.?s\.? )?president|^presidential") & ~office.str.contains("delegate")
+                )
+                .then(pl.lit("president"))
+                .when(office.str.contains(openelections.SENATE.pattern))
+                .then(pl.lit("senate"))
+                .when(office.str.contains(openelections.HOUSE.pattern))
+                .then(pl.lit("house"))
+                .when(office.str.contains(r"^governor\b"))
+                .then(pl.lit("governor"))
+            )
+            .filter(pl.col("kind").is_not_null())
+            .select(
+                state=pl.lit(state),
+                day=pl.col("election_date").str.slice(0, 10).str.to_date(),
+                office="kind",
+                district=pl.when(pl.col("kind") == "house").then(
+                    pl.col("district_name").str.extract(r"(\d+)").cast(pl.Int64).fill_null(0)
+                ),
+                party=pl.col("primary_party")
+                .str.to_lowercase()
+                .str.strip_chars()
+                .replace_strict(PARTIES, default=None),
+                grain=pl.lit("county"),
+                county=pl.when(pl.col("division_type") == "City/Town")
+                .then(
+                    pl.coalesce(
+                        division.map_elements(elstats.plain, return_dtype=pl.String).replace_strict(
+                            places[state], default=None
+                        ),
+                        division.str.to_lowercase()
+                        .str.replace_all(elstats.SUFFIXES, "")
+                        .map_elements(elstats.plain, return_dtype=pl.String)
+                        .replace_strict(places[state], default=None),
+                    )
+                )
+                .otherwise(
+                    division.str.to_lowercase()
+                    .str.replace_all(r"saint ", "st ")
+                    .str.replace_all(r"\b(county|parish)\b", "")
+                    .str.replace_all(r"[^a-z]", "")
+                    .replace_strict({**fips[state], **TYPOS.get(state, {})}, default=None)
+                ),
+                precinct=pl.lit(None, pl.String),
+                candidate=pl.col("candidate_name").str.strip_chars().str.replace_all(r"\s+", " "),
+                write_in=pl.col("candidate_name").str.contains(r"(?i)write[- ]?ins?\b|scatter|^all other"),
+                votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+                url=pl.lit(url),
+            )
+            .filter(pl.col("votes").is_not_null())
+        )
+    frame = pl.concat(frames)
+    print(frame.filter(pl.col("county").is_null()).group_by("state", "url").agg(pl.col("votes").sum()))
+    frame = frame.filter(pl.col("county").is_not_null())
+    PARSED.mkdir(parents=True, exist_ok=True)
+    frame.write_parquet(PARSED / "returns.parquet")
+    print(frame.group_by("state", "grain").agg(pl.col("day").n_unique(), pl.col("votes").sum()).sort("state", "grain"))
+
+
+def emit() -> Path:
+    frame = pl.read_parquet(PARSED / "returns.parquet").with_columns(
+        key=pl.concat_str(
+            pl.col("day").cast(pl.String),
+            "state",
+            "office",
+            pl.col("district").cast(pl.String),
+            "party",
+            separator=":",
+            ignore_nulls=True,
+        )
+    )
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Official and OpenElections 2024 primary returns by county or precinct, taking the default from "
+            "Wikipedia's election boxes",
+            polity="US",
+        )
+        contests = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.contest' and value = any(%s)",
+                [frame["key"].unique().to_list()],
+            ).fetchall()
+        )
+        done = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
+            ).fetchall()
+        }
+        counties = {
+            code: (unit, area, name)
+            for code, unit, area, name in conn.execute(
+                """select u.code, u.id, u.area_id, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'short' where u.scheme_code = 'us.county'
+                   union all select code, id, area_id, 'statewide' from reporting_unit where scheme_code = 'us.state'"""
+            ).fetchall()
+        }
+        columns = (
+            "id",
+            "election_id",
+            "contest_id",
+            "stage",
+            "kind",
+            "status",
+            "source_id",
+            "as_of",
+            "completeness",
+            "supersedes_id",
+        )
+        sources: dict[str, UUID] = {}
+        for state, used in frame.select("state", "url").unique(maintain_order=True).iter_rows():
+            publisher, title, url, kind, license = (
+                (
+                    "California Secretary of State",
+                    "Statement of Vote, March 5, 2024, Presidential Primary Election",
+                    CALIFORNIA,
+                    "official_body",
+                    "Public record",
+                )
+                if state == "CA"
+                else (
+                    ncsbe.PUBLISHER,
+                    ncsbe.TITLE,
+                    "https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "NC"
+                else (
+                    elstats.TENANTS[state][1],
+                    elstats.TITLE,
+                    elstats.TENANTS[state][2],
+                    "official_body",
+                    "Public record",
+                )
+                if "civera.com" in used
+                else (
+                    "OpenElections",
+                    f"{state} 2024 primary results",
+                    f"https://github.com/openelections/openelections-data-{state.lower()}",
+                    "community",
+                    "No license stated: facts published with attribution, raw files not redistributed",
+                )
+            )
+            sources[used] = cs.source(publisher, title)
+            if sources[used] in cs.minted:
+                cs.add(
+                    "source", id=sources[used], kind=kind, publisher=publisher, title=title, url=url, license=license
+                )
+            cs.artifact(raw.cached(SOURCE, used), sources[used])
+        values: list[pl.DataFrame] = []
+        precincts: dict[str, tuple[str, date, str]] = {}
+        parts: dict[str, tuple[str, str, date, str, UUID | None]] = {}
+        ballots: dict[tuple[str, date, str, int | None], dict[str | None, set[str]]] = defaultdict(
+            lambda: defaultdict(set)
+        )
+        for state, day, office, district, party, candidate in (
+            frame.select("state", "day", "office", "district", "party", "candidate").unique().iter_rows()
+        ):
+            ballots[(state, day, office, district)][party].add(slug(candidate))
+        for (key, state, day, office, district), rows in frame.group_by(
+            "key", "state", "day", "office", "district", maintain_order=True
+        ):
+            contest = contests.get(key)
+            if contest is None:
+                if rows["votes"].sum() > 0:
+                    print(f"{key}: no contest, {rows['votes'].sum()} votes skipped")
+                continue
+            if key in done:
+                continue
+            fine = rows.filter(pl.col("grain") == "precinct")
+            coarse = rows.filter(pl.col("grain") == "county")
+            if fine.height and coarse.height:
+                sums = [
+                    part.group_by("candidate").agg(pl.col("votes").sum()).sort("candidate") for part in (fine, coarse)
+                ]
+                if not sums[0].equals(sums[1]):
+                    print(f"{key}: precinct and county files disagree, the county file used")
+                    fine = fine.clear()
+            lines = fine if fine.height else coarse
+            election, district_area = conn.execute(
+                "select election_id, district_area_id from contest where id = %s", [contest]
+            ).fetchone() or (None, None)
+            options = conn.execute(
+                """select o.id, o.kind, o.ballot_label,
+                          (select n.text from candidacy cy join name n on n.entity_id = cy.person_id and n.is_preferred
+                           where cy.option_id = o.id and cy.role = 'head' limit 1),
+                          (select sum(v.value)::bigint from result_value v
+                           where v.result_set_k = any(%s) and v.option_k = o.k and v.measure = 1)
+                   from contest_option o where o.contest_id = %s and o.parent_option_id is null""",
+                [
+                    [
+                        k
+                        for (k,) in conn.execute(
+                            "select k from result_set where contest_id = %s and is_default", [contest]
+                        ).fetchall()
+                    ],
+                    contest,
+                ],
+            ).fetchall()
+            outcomes = conn.execute(
+                """select o.option_id, o.kind, o.seats from outcome o
+                   join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
+                [contest],
+            ).fetchall()
+            picked: dict[str, UUID | str] = {}
+            dropped: list[str] = []
+            for candidate, write_in, votes in (
+                lines.group_by("candidate", "write_in", maintain_order=True).agg(pl.col("votes").sum()).iter_rows()
+            ):
+                words = [
+                    word
+                    for word in slug(re.sub(r"\(.*?\)|\".*?\"", "", candidate)).split("-")
+                    if word not in {"jr", "sr", "ii", "iii", "iv"}
+                ] or ["-"]
+                same = [
+                    option
+                    for option, kind, label, person, _ in options
+                    if kind != "write_in"
+                    and any(words[-1] in slug(text).split("-") for text in (label, person) if text)
+                ]
+                for pattern, kind in (
+                    (r"(?i)uncommitted|uninstructed|no preference|noncommitted", "uncommitted"),
+                    (r"(?i)^none of", "none_of_the_above"),
+                ):
+                    if re.search(pattern, candidate):
+                        same = [option for option, known, _, _, _ in options if known == kind]
+                if len(same) > 1:
+                    same = [
+                        option
+                        for option, _, label, person, _ in options
+                        if option in same
+                        and any(slug(text).split("-")[0] == words[0] for text in (label, person) if text)
+                    ]
+                if not same and votes:
+                    same = [
+                        option
+                        for option, kind, _, _, total in options
+                        if kind != "write_in" and total == votes and option not in picked.values()
+                    ]
+                if len(same) == 1:
+                    picked[candidate] = same[0]
+                elif write_in or any(
+                    slug(candidate) in names
+                    for party, names in ballots[(state, day, office, district)].items()
+                    if party != rows["party"][0]
+                ):
+                    pooled = [option for option, kind, _, _, _ in options if kind == "write_in"]
+                    picked[candidate] = pooled[0] if len(pooled) == 1 else f"{key}:write-in:{slug(candidate)}"
+                elif not votes:
+                    dropped.append(candidate)
+                else:
+                    break
+            else:
+                candidate = None
+            if candidate is not None:
+                print(f"{key}: {candidate} matches no single option, skipped")
+                continue
+            lines = lines.filter(~pl.col("candidate").is_in(dropped))
+            totals = (
+                lines.with_columns(option=pl.col("candidate").replace_strict({k: str(v) for k, v in picked.items()}))
+                .group_by("option")
+                .agg(pl.col("votes").sum())
+                .sort("votes", descending=True)
+            )
+            kept = {str(option) for option, kind, _ in outcomes if kind in ("won", "advanced", "elected")}
+            leaders = set(totals["option"].head(len(kept)))
+            if leaders != kept:
+                print(f"{key}: the returns lead with {leaders}, the outcomes name {kept}, skipped")
+                continue
+            known = {str(option): total for option, _, _, _, total in options}
+            drift = [
+                (option, votes, known.get(option))
+                for option, votes in totals.iter_rows()
+                if known.get(option) is not None
+                and abs(votes - (known[option] or 0)) > 10 + (known[option] or 0) // 100
+            ]
+            if drift:
+                print(f"{key}: drift from the earlier default {drift}, skipped")
+                continue
+            for candidate, option in list(picked.items()):
+                if isinstance(option, str):
+                    picked[candidate] = cs.key("us.option", option)
+                    if picked[candidate] in cs.minted:
+                        cs.add(
+                            "contest_option",
+                            id=picked[candidate],
+                            contest_id=contest,
+                            kind="write_in",
+                            ballot_label=candidate,
+                        )
+            result_set = cs.key(f"{SOURCE}.result_set", key)
+            for row in conn.execute(
+                f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
+            ).fetchall():
+                cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=sources[lines["url"][0]],
+                is_default=True,
+            )
+            for option, kind, seats in outcomes:
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
+            members: dict[str, str] = {}
+            if fine.height:
+                for county, precinct in lines.select("county", "precinct").unique().iter_rows():
+                    code = f"2024:{state}:{county}:{counties[county][2].upper()}:{precinct}"
+                    members[f"{county}\x1f{precinct}"] = str(cs.unit("us.precinct", code, on=day))
+                    precincts[members[f"{county}\x1f{precinct}"]] = (code, day, county)
+            for county in lines["county"].unique().to_list():
+                if fine.height:
+                    continue
+                if office != "house" or not district:
+                    members[county] = str(counties[county][0])
+                    continue
+                part = f"{day.year}:{county}:{district}"
+                members[county] = str(cs.unit("us.county_part", part, on=day))
+                parts[members[county]] = (state, part, day, county, district_area)
+            values.append(
+                lines.select(
+                    result_set_id=pl.lit(str(result_set)),
+                    unit_id=(
+                        pl.concat_str("county", "precinct", separator="\x1f") if fine.height else pl.col("county")
+                    ).replace_strict(members),
+                    option_id=pl.col("candidate").replace_strict({k: str(v) for k, v in picked.items()}),
+                    channel=pl.lit(0, pl.Int16),
+                    measure=pl.lit(1, pl.Int16),
+                    count_round=pl.lit(0, pl.Int16),
+                    flags=pl.lit(0, pl.Int16),
+                    value="votes",
+                )
+                .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
+                .agg(pl.col("value").sum())
+            )
+        for unit, (code, day, county) in precincts.items():
+            if UUID(unit) in cs.minted:
+                cs.add(
+                    "reporting_unit",
+                    id=UUID(unit),
+                    polity_id=cs.polity(f"US-{code.split(':')[1]}"),
+                    scheme_code="us.precinct",
+                    code=code,
+                    parent_id=counties[county][0],
+                    area_relation="within",
+                    area_id=counties[county][1],
+                    kind="standard",
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+        for unit, (state, part, day, county, district_area) in parts.items():
+            if UUID(unit) in cs.minted:
+                cs.add(
+                    "reporting_unit",
+                    id=UUID(unit),
+                    polity_id=cs.polity(f"US-{state}"),
+                    scheme_code="us.county_part",
+                    code=part,
+                    parent_id=counties[county][0],
+                    area_relation="within",
+                    area_id=counties[county][1],
+                    kind="standard",
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=UUID(unit),
+                    area_id=district_area,
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
+        if values:
+            cs.frame("result_value", pl.concat(values))
+        return cs.write()
