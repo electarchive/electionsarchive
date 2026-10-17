@@ -198,7 +198,12 @@
               color: swatch(row.color, row.key),
               value: count(row.votes),
             }))
-        : race.results
+        : (race.results.some((row) => (row.seats ?? 0) > 1)
+            ? race.results.toSorted(
+                (a, b) => (b.seats ?? 0) - (a.seats ?? 0) || b.votes - a.votes,
+              )
+            : race.results
+          )
             .slice(0, 2)
             .map((row) => ({
               key: row.key,
