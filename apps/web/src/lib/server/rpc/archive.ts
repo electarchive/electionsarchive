@@ -8374,16 +8374,26 @@ export const search = {
       if (input.q === "") {
         return [];
       }
-      const chambers = db.execute<{ id: string; polity: string }>(sql`
-        with q as (select lower(unaccent(${input.q})) as t)
-        select b.id, b.polity_id as polity
-        from body b join name n on n.entity_id = b.id, q
+      const chambers = db.execute<{
+        id: string;
+        polity: string;
+        isClose: boolean;
+      }>(sql`
+        with q as (select lower(unaccent(${input.q})) as t),
+        seated as (select body_id, count(*) as members from tenure group by body_id)
+        select b.id, b.polity_id as polity,
+          bool_or(
+            lower(unaccent(n.text)) like '%' || q.t || '%'
+            and similarity(q.t, lower(unaccent(n.text))) >= 0.3
+          ) as "isClose"
+        from body b join name n on n.entity_id = b.id cross join q
+        left join seated on seated.body_id = b.id
         where b.kind <> 'electoral_college' and (
           lower(unaccent(n.text)) like '%' || q.t || '%' or q.t <% lower(unaccent(n.text))
         )
-        group by b.id, b.polity_id
+        group by b.id, b.polity_id, seated.members
         order by max(word_similarity(q.t, lower(unaccent(n.text)))) desc,
-          (select count(*) from tenure t where t.body_id = b.id) desc
+          coalesce(seated.members, 0) desc
         limit 4
       `);
       const found = await db.execute<{
@@ -8437,7 +8447,7 @@ export const search = {
               when 'election' then (select date_from from election where id = top.entity_id)
             end as date
         ) x
-        order by top.score desc
+        order by top.score desc, x.date desc nulls last
       `);
       const matched = await chambers;
       const bodies = matched.rows.map((row) => ({
@@ -8446,10 +8456,12 @@ export const search = {
         target: row.id,
         context: row.polity,
         date: null,
+        isClose: row.isClose,
       }));
       const rows = [
-        ...bodies,
+        ...bodies.filter((row) => row.isClose),
         ...found.rows.filter((row) => row.target != null),
+        ...bodies.filter((row) => !row.isClose),
       ];
       const ids = rows.flatMap((row) =>
         [row.id, row.target, row.context].filter((id) => id != null),
@@ -8470,6 +8482,11 @@ export const search = {
           date: row.date,
         }))
         .filter((row) => row.path != null && row.name !== "")
+        .toSorted(
+          (a, b) =>
+            Number(segment(b.name) === segment(input.q)) -
+            Number(segment(a.name) === segment(input.q)),
+        )
         .slice(0, input.limit);
     }),
 };
