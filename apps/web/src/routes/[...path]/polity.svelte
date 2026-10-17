@@ -454,15 +454,29 @@
             >
             <ul class="grid gap-1 text-sm">
               {#each entries as election, index (index)}
+                {const dated = $derived(
+                  election.name.replace(
+                    new RegExp(`^(?:\\p{L}+ (?:\\d{1,2}, )?)?${year} `, "u"),
+                    "",
+                  ),
+                )}
+                {const short = $derived(
+                  dated.startsWith(`${polity.name} `)
+                    ? dated.slice(polity.name.length + 1)
+                    : dated,
+                )}
+                {const label = $derived(
+                  short.charAt(0).toUpperCase() + short.slice(1),
+                )}
                 <li
                   class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
                 >
                   <span class="flex flex-wrap items-baseline gap-x-2">
                     {#if election.path == null}
-                      <span>{election.name}</span>
+                      <span>{label}</span>
                     {:else}
                       <Preview class="hover:highlighter" path={election.path}
-                        >{election.name}</Preview
+                        >{label}</Preview
                       >
                     {/if}
                     {#if STATUSES[election.status] != null}
@@ -472,7 +486,7 @@
                     {/if}
                   </span>
                   <time
-                    class="text-xs text-muted-foreground tabular-nums max-sm:hidden"
+                    class="text-xs text-muted-foreground tabular-nums"
                     datetime={election.date}>{date(election.date)}</time
                   >
                 </li>
