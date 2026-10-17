@@ -665,6 +665,25 @@
                   ],
                 },
               },
+              ...(own == null
+                ? []
+                : [
+                    {
+                      id: "veil",
+                      type: "fill" as const,
+                      source: "own",
+                      "source-layer": "areas",
+                      filter: [
+                        "!=",
+                        ["id"],
+                        own.k,
+                      ] as Maplibre.FilterSpecification,
+                      paint: {
+                        "fill-color": colorsNow.paper,
+                        "fill-opacity": 0.6,
+                      },
+                    },
+                  ]),
               ...(nested == null
                 ? []
                 : [
@@ -965,6 +984,7 @@
         map.setPaintProperty("focus", "line-color", colorsNow.ink);
         if (map.getLayer("outline") != null) {
           map.setPaintProperty("outline", "line-color", colorsNow.ink);
+          map.setPaintProperty("veil", "fill-color", colorsNow.paper);
         }
         map.setPaintProperty("bubble", "circle-stroke-color", colorsNow.seam);
         map.setPaintProperty("arrow", "icon-halo-color", colorsNow.seam);
