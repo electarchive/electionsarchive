@@ -768,6 +768,17 @@
                   : null)}
           />
         {/key}
+        {const districts = $derived(
+          new Set(places.rows.map((row) => row.k)).size,
+        )}
+        {#if shape.shaped != null && shape.shaped < districts}
+          <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+            {m.map_shaped({
+              shaped: count(shape.shaped),
+              count: count(districts),
+            })}
+          </p>
+        {/if}
       </div>
     </div>
   {/if}

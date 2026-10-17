@@ -179,6 +179,7 @@ const Sketch = v.object({
     }),
   ),
   isApproximate: v.boolean(),
+  shaped: v.optional(v.nullable(v.number())),
 });
 
 type Found = {
@@ -3909,12 +3910,22 @@ async function sketch(
   area: { id: string; k: number },
   level: string,
   day: string,
+  ks: Array<number> = [],
 ) {
   const [frames, found] = await Promise.all([
     framing(area.id, day),
-    db.execute<{ scheme: string; tiles: string; synthetic: boolean }>(sql`
+    db.execute<{
+      scheme: string;
+      tiles: string;
+      synthetic: boolean;
+      shaped: number;
+    }>(sql`
       select distinct on (bs.scheme_code) bs.scheme_code as scheme,
         coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) as tiles,
+        (
+          select count(distinct x.k)::int from area x join area_geometry g on g.area_id = x.id
+          where x.k = any(${sql.param(ks)}::int[]) and g.valid @> coalesce(bs.as_of, ${day}::date)
+        ) as shaped,
         exists (
           select from area_geometry g join area x on x.id = g.area_id
           where x.scheme_code = bs.scheme_code and g.quality = 'synthetic' and g.valid @> coalesce(bs.as_of, ${day}::date)
@@ -3935,6 +3946,7 @@ async function sketch(
         own: own == null ? null : { tiles: own.tiles, k: area.k },
         frames,
         isApproximate: tiled.synthetic,
+        shaped: ks.length === 0 ? null : tiled.shaped,
       };
 }
 
@@ -4259,7 +4271,14 @@ async function races(
         filled += row.seats ?? 0;
       }
       const [map, previous] = await Promise.all([
-        level == null || isBrief ? null : sketch(place, level, day),
+        level == null || isBrief
+          ? null
+          : sketch(
+              place,
+              level,
+              day,
+              (table ?? grid)?.rows.map((row) => row.k) ?? [],
+            ),
         isBrief ||
         date == null ||
         head?.owner == null ||
