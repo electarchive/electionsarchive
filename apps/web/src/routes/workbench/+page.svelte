@@ -170,7 +170,9 @@
     const places = current?.places;
     const found = outlines.data ?? [];
     const level = found.find((entry) => entry.scheme === places?.level);
-    const own = found.find((entry) => entry.scheme !== places?.level);
+    const own = found.find(
+      (entry) => entry.k != null && entry.scheme !== places?.level,
+    );
     return places == null ||
       level?.tiles == null ||
       own == null ||

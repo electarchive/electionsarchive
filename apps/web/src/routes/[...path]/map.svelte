@@ -28,6 +28,7 @@
     colors,
     tiles,
     own,
+    nested = null,
     frames,
     isApproximate,
     noun,
@@ -46,6 +47,7 @@
     colors: Array<string>;
     tiles: string;
     own: { tiles: string; k: number } | null;
+    nested?: { tiles: string; ks: Array<number> } | null;
     frames: Array<{ west: number; south: number; east: number; north: number }>;
     isApproximate: boolean;
     noun: string;
@@ -113,7 +115,13 @@
     left: 24,
   };
 
-  const rows = $derived(new Map(places.rows.map((row) => [row.k, row])));
+  const rows = $derived(
+    new Map(
+      [...places.rows, ...(places.districts ?? [])].map((row) => [row.k, row]),
+    ),
+  );
+  const inner = $derived(new Set(nested?.ks ?? []));
+  const hit = $derived(nested == null ? ["fill"] : ["nested-fill", "fill"]);
   const isCompared = $derived(
     span != null && places.rows.some((row) => row.earlier != null),
   );
@@ -359,7 +367,7 @@
 
   function fills(read: (css: string) => string) {
     const result: Array<[number, string]> = [];
-    for (const row of places.rows) {
+    for (const row of [...places.rows, ...(places.districts ?? [])]) {
       if (row.leader == null) {
         continue;
       }
@@ -497,7 +505,7 @@
       const protocol = new Protocol();
       maplibre.addProtocol("pmtiles", protocol.tile);
       void Promise.all(
-        [tiles, own?.tiles].flatMap((name) => {
+        [tiles, own?.tiles, nested?.tiles].flatMap((name) => {
           if (name == null) {
             return [];
           }
@@ -595,6 +603,14 @@
                       url: `pmtiles://${origin}/tiles/${own.tiles}.pmtiles`,
                     },
                   }),
+              ...(nested == null
+                ? {}
+                : {
+                    nested: {
+                      type: "vector" as const,
+                      url: `pmtiles://${origin}/tiles/${nested.tiles}.pmtiles`,
+                    },
+                  }),
             },
             layers: [
               {
@@ -646,6 +662,64 @@
                   ],
                 },
               },
+              ...(nested == null
+                ? []
+                : [
+                    {
+                      id: "nested-fill",
+                      type: "fill" as const,
+                      source: "nested",
+                      "source-layer": "areas",
+                      filter: [
+                        "in",
+                        ["id"],
+                        ["literal", nested.ks],
+                      ] as Maplibre.FilterSpecification,
+                      paint: {
+                        "fill-color": [
+                          "coalesce",
+                          ["feature-state", "color"],
+                          "rgba(0, 0, 0, 0)",
+                        ] as Maplibre.ExpressionSpecification,
+                      },
+                    },
+                    {
+                      id: "nested-seam",
+                      type: "line" as const,
+                      source: "nested",
+                      "source-layer": "areas",
+                      filter: [
+                        "in",
+                        ["id"],
+                        ["literal", nested.ks],
+                      ] as Maplibre.FilterSpecification,
+                      paint: {
+                        "line-color": colorsNow.seam,
+                        "line-width": 0.75,
+                      },
+                    },
+                    {
+                      id: "nested-focus",
+                      type: "line" as const,
+                      source: "nested",
+                      "source-layer": "areas",
+                      filter: [
+                        "in",
+                        ["id"],
+                        ["literal", nested.ks],
+                      ] as Maplibre.FilterSpecification,
+                      paint: {
+                        "line-color": colorsNow.ink,
+                        "line-width": 2.25,
+                        "line-opacity": [
+                          "case",
+                          ["boolean", ["feature-state", "focus"], false],
+                          1,
+                          0,
+                        ] as Maplibre.ExpressionSpecification,
+                      },
+                    },
+                  ]),
               ...(own == null
                 ? []
                 : [
@@ -768,7 +842,8 @@
           ),
         });
         map.on("mousemove", "fill", (event) => {
-          const id = event.features?.[0]?.id;
+          const id = map.queryRenderedFeatures(event.point, { layers: hit })[0]
+            ?.id;
           const k = typeof id === "number" && rows.has(id) ? id : null;
           map.getCanvas().style.cursor =
             k != null && rows.get(k)?.path != null ? "pointer" : "";
@@ -784,7 +859,7 @@
         });
         map.on("click", (event) => {
           const [feature] = map.queryRenderedFeatures(event.point, {
-            layers: ["fill"],
+            layers: hit,
           });
           const k =
             typeof feature?.id === "number" && rows.has(feature.id)
@@ -890,6 +965,11 @@
         }
         map.setPaintProperty("bubble", "circle-stroke-color", colorsNow.seam);
         map.setPaintProperty("arrow", "icon-halo-color", colorsNow.seam);
+        if (map.getLayer("nested-seam") != null) {
+          map.setPaintProperty("nested-seam", "line-color", colorsNow.seam);
+          map.setPaintProperty("nested-focus", "line-color", colorsNow.ink);
+          map.removeFeatureState({ source: "nested", sourceLayer: "areas" });
+        }
         const source = map.getSource("dots");
         if (source?.type === "geojson") {
           void (source as Maplibre.GeoJSONSource).setData(dots);
@@ -904,7 +984,14 @@
         map.removeFeatureState({ source: "places", sourceLayer: "areas" });
         map.removeFeatureState({ source: "dots" });
         for (const [k, color] of painted) {
-          if (view === "bubbles") {
+          if (inner.has(k)) {
+            if (view !== "bubbles") {
+              map.setFeatureState(
+                { source: "nested", sourceLayer: "areas", id: k },
+                { color },
+              );
+            }
+          } else if (view === "bubbles") {
             map.setFeatureState(
               { source: "dots", id: k },
               {
@@ -924,7 +1011,11 @@
         const k = untrack(() => focus);
         if (k != null) {
           map.setFeatureState(
-            { source: "places", sourceLayer: "areas", id: k },
+            {
+              source: inner.has(k) ? "nested" : "places",
+              sourceLayer: "areas",
+              id: k,
+            },
             { focus: true },
           );
         }
@@ -944,13 +1035,21 @@
       const apply = () => {
         if (shown != null) {
           map.setFeatureState(
-            { source: "places", sourceLayer: "areas", id: shown },
+            {
+              source: inner.has(shown) ? "nested" : "places",
+              sourceLayer: "areas",
+              id: shown,
+            },
             { focus: false },
           );
         }
         if (k != null) {
           map.setFeatureState(
-            { source: "places", sourceLayer: "areas", id: k },
+            {
+              source: inner.has(k) ? "nested" : "places",
+              sourceLayer: "areas",
+              id: k,
+            },
             { focus: true },
           );
         }

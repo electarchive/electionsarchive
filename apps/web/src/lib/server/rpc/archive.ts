@@ -131,6 +131,22 @@ const Cell = v.nullable(
   }),
 );
 
+const PlaceRow = v.object({
+  k: v.number(),
+  at: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+  name: v.string(),
+  path: v.nullable(v.string()),
+  contest: v.boolean(),
+  isRemainder: v.boolean(),
+  valid: v.number(),
+  shares: v.array(v.number()),
+  leader: v.nullable(v.number()),
+  margin: v.nullable(v.number()),
+  earlier: v.nullable(v.array(v.number())),
+  prior: v.nullable(v.number()),
+  within: v.optional(v.number()),
+});
+
 const Places = v.nullable(
   v.object({
     levels: v.array(
@@ -147,22 +163,8 @@ const Places = v.nullable(
         party: v.nullable(v.string()),
       }),
     ),
-    rows: v.array(
-      v.object({
-        k: v.number(),
-        at: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
-        name: v.string(),
-        path: v.nullable(v.string()),
-        contest: v.boolean(),
-        isRemainder: v.boolean(),
-        valid: v.number(),
-        shares: v.array(v.number()),
-        leader: v.nullable(v.number()),
-        margin: v.nullable(v.number()),
-        earlier: v.nullable(v.array(v.number())),
-        prior: v.nullable(v.number()),
-      }),
-    ),
+    rows: v.array(PlaceRow),
+    districts: v.optional(v.array(PlaceRow)),
     sources: v.array(v.string()),
   }),
 );
@@ -1554,10 +1556,18 @@ async function places(
       rows: tabulated.rows.map((row) => ({ ...row, at: null })),
     };
   }
-  const allocated = await db.execute<{ area: string; path: string | null }>(sql`
-    select c.district_area_id as area, s.path
-    from contest c left join slug s on s.entity_id = c.id and s.is_current
-    where c.allocation_parent_id = ${contest.id}::uuid and c.district_area_id is not null
+  const allocated = await db.execute<{
+    area: string;
+    k: number;
+    parent: string | null;
+    path: string | null;
+  }>(sql`
+    select c.district_area_id as area, a.k, p.parent_id as parent, s.path
+    from contest c
+    join area a on a.id = c.district_area_id
+    left join area_parent p on p.area_id = a.id and p.valid @> ${contest.date ?? "infinity"}::date
+    left join slug s on s.entity_id = c.id and s.is_current
+    where c.allocation_parent_id = ${contest.id}::uuid
   `);
   const childPath = new Map(allocated.rows.map((row) => [row.area, row.path]));
   const levels = eligible.toSorted(
@@ -1591,10 +1601,29 @@ async function places(
       owner: null,
     };
   });
+  const parents = new Map(shown.map((kid) => [kid.id, kid.k]));
+  const nested = allocated.rows.filter(
+    (row) =>
+      !parents.has(row.area) && row.parent != null && parents.has(row.parent),
+  );
+  const nestedNames = await names(
+    nested.map((row) => row.area),
+    contest.date,
+  );
+  const listed = [
+    ...rows,
+    ...nested.map((row) => ({
+      k: row.k,
+      name: nestedNames.full.get(row.area) ?? "",
+      path: row.path,
+      isContest: true,
+      owner: null,
+    })),
+  ];
   const [tabulated, points] = await Promise.all([
     tabulate(
       [contest.root],
-      rows,
+      listed,
       contest.date,
       chosen == null ? null : { ids: [chosen.id], date: chosen.date },
       lineage,
@@ -1607,7 +1636,7 @@ async function places(
         ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
         ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
       from area a join area_geometry g on g.area_id = a.id
-      where a.k = any(${sql.param(rows.map((row) => row.k))}::int[])
+      where a.k = any(${sql.param(listed.map((row) => row.k))}::int[])
         and g.valid @> ${contest.date ?? "infinity"}::date
       order by a.k
     `),
@@ -1623,7 +1652,16 @@ async function places(
     })),
     level: level.code,
     ...tabulated,
-    rows: tabulated.rows.map((row) => ({ ...row, at: at.get(row.k) ?? null })),
+    rows: tabulated.rows
+      .slice(0, rows.length)
+      .map((row) => ({ ...row, at: at.get(row.k) ?? null })),
+    districts: tabulated.rows
+      .slice(rows.length)
+      .map((row, index) => ({
+        ...row,
+        at: at.get(row.k) ?? null,
+        within: parents.get(nested[index]?.parent ?? ""),
+      })),
   };
 }
 
@@ -3283,18 +3321,29 @@ export const contests = {
           : children(contest.id, area, chain.length === 0, day),
       ]);
       const scheme = own.rows[0]?.scheme ?? "";
+      const listed = kids
+        .filter((kid) => kid.scheme === input.level)
+        .map((kid) => kid.id);
+      const nested = await db.execute<{ scheme: string; id: string }>(sql`
+        select a.scheme_code as scheme, a.id
+        from contest c
+        join area a on a.id = c.district_area_id
+        join area_parent p on p.area_id = a.id and p.valid @> ${day}::date
+        where c.allocation_parent_id = ${contest.id}::uuid
+          and p.parent_id = any(${sql.param(listed)}::uuid[])
+          and a.scheme_code <> ${input.level ?? ""}
+      `);
       const groups = [
         { scheme, ids: [area.id] },
         ...(input.level == null || input.level === scheme
           ? []
-          : [
-              {
-                scheme: input.level,
-                ids: kids
-                  .filter((kid) => kid.scheme === input.level)
-                  .map((kid) => kid.id),
-              },
-            ]),
+          : [{ scheme: input.level, ids: listed }]),
+        ...Map.groupBy(nested.rows, (row) => row.scheme)
+          .entries()
+          .map(([code, rows]) => ({
+            scheme: code,
+            ids: rows.map((row) => row.id),
+          })),
       ].filter((group) => group.ids.length > 0);
       const frames = await framing(
         area.id,

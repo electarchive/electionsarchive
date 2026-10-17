@@ -98,7 +98,16 @@
   const drawn = $derived.by(() => {
     const places = contest.places;
     const level = boundaries.find((entry) => entry.scheme === places?.level);
-    const own = boundaries.find((entry) => entry.scheme !== places?.level);
+    const own = boundaries.find(
+      (entry) => entry.k != null && entry.scheme !== places?.level,
+    );
+    const inner = boundaries.find(
+      (entry) =>
+        entry.k == null &&
+        entry.scheme !== places?.level &&
+        entry.tiles != null,
+    );
+    const districts = places?.districts ?? [];
     const noun = places?.levels.find(
       (entry) => entry.code === places.level,
     )?.noun;
@@ -110,6 +119,10 @@
             own.tiles == null || own.k == null
               ? null
               : { tiles: own.tiles, k: own.k },
+          nested:
+            inner?.tiles == null || districts.length === 0
+              ? null
+              : { tiles: inner.tiles, ks: districts.map((row) => row.k) },
           frames: own.frames,
           isApproximate: level.isApproximate,
           noun: noun ?? level.noun,
@@ -799,6 +812,7 @@
           colors={tones}
           tiles={drawn.tiles}
           own={drawn.own}
+          nested={drawn.nested}
           frames={drawn.frames}
           isApproximate={drawn.isApproximate}
           noun={drawn.noun}

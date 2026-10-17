@@ -76,10 +76,11 @@
   const comparing = $derived(
     span != null && places.rows.some((row) => row.earlier != null),
   );
+  const listed = $derived([...places.rows, ...(places.districts ?? [])]);
   const first = $derived(places.legend[0]);
   const second = $derived(places.legend[1]);
   const moves = $derived(
-    places.rows.map((row) => {
+    listed.map((row) => {
       const before = span?.forward === true ? row.shares : row.earlier;
       const after = span?.forward === true ? row.earlier : row.shares;
       const from = span?.forward === true ? row.leader : row.prior;
@@ -110,7 +111,7 @@
   const filtered = $derived.by(() => {
     const [needle = "", ...names] = [
       query.trim(),
-      ...places.rows.map((row) => row.name),
+      ...listed.map((row) => row.name),
     ].map((text) =>
       text
         .replaceAll("ı", "i")
@@ -118,7 +119,8 @@
         .normalize("NFKD")
         .replaceAll(/\p{M}/gu, ""),
     );
-    return places.rows
+    const isNested = column === "name" && !descending;
+    return listed
       .map((row, index) => ({
         row,
         move: moves[index],
@@ -147,7 +149,21 @@
             : a.value - b.value;
         return descending ? -order : order;
       })
-      .map((entry) => ({ ...entry.row, move: entry.move }));
+      .map((entry) => {
+        const parent = places.rows.find((row) => row.k === entry.row.within);
+        const short = entry.row.name
+          .replace(`${parent?.name ?? ""}'s `, "")
+          .replace(" congressional district", " district");
+        return {
+          ...entry.row,
+          move: entry.move,
+          isNested: isNested && parent != null,
+          label:
+            isNested && parent != null
+              ? short.charAt(0).toUpperCase() + short.slice(1)
+              : entry.row.name,
+        };
+      });
   });
   const visible = $derived(all ? filtered : filtered.slice(0, limit));
   const levels = $derived(
@@ -333,7 +349,7 @@
         "URL",
       ]}
       rows={() =>
-        places.rows.map((row, index) => [
+        listed.map((row, index) => [
           row.name,
           row.valid,
           row.leader == null ? null : (titles[row.leader] ?? null),
@@ -526,12 +542,20 @@
             onpointerenter={() => (focus = row.k)}
             onpointerleave={() => (focus = null)}
           >
-            <th class="px-2 py-1.5 text-start font-normal" scope="row">
+            <th
+              class={cn("px-2 py-1.5 text-start font-normal", {
+                "ps-6": row.isNested,
+              })}
+              scope="row"
+            >
               {#if row.path == null}
-                <span class="font-semibold">{row.name}</span>
+                <span class="font-semibold">{row.label}</span>
               {:else}
                 <a
-                  class="font-semibold group-hover:underline group-hover:decoration-border group-hover:underline-offset-4 before:absolute before:inset-0"
+                  class={cn(
+                    "font-semibold group-hover:underline group-hover:decoration-border group-hover:underline-offset-4 before:absolute before:inset-0",
+                    { "font-medium": row.isNested },
+                  )}
                   href={resolve("/[...path]", { path: row.path })}
                   onclick={(event) => {
                     if (
@@ -542,7 +566,7 @@
                     ) {
                       event.currentTarget.dataset.scopeSource = "";
                     }
-                  }}>{row.name}</a
+                  }}>{row.label}</a
                 >
               {/if}
               {#if row.isRemainder}<span

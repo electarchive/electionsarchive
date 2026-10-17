@@ -205,7 +205,14 @@
       return null;
     }
     const level = loaded.bounds.find((entry) => entry.scheme === places.level);
-    const own = loaded.bounds.find((entry) => entry.scheme !== places.level);
+    const own = loaded.bounds.find(
+      (entry) => entry.k != null && entry.scheme !== places.level,
+    );
+    const inner = loaded.bounds.find(
+      (entry) =>
+        entry.k == null && entry.scheme !== places.level && entry.tiles != null,
+    );
+    const districts = places.districts ?? [];
     return level?.tiles == null || own == null || own.frames.length === 0
       ? null
       : {
@@ -215,6 +222,10 @@
             own.tiles == null || own.k == null
               ? null
               : { tiles: own.tiles, k: own.k },
+          nested:
+            inner?.tiles == null || districts.length === 0
+              ? null
+              : { tiles: inner.tiles, ks: districts.map((row) => row.k) },
           frames: own.frames,
           isApproximate: level.isApproximate,
           noun:
@@ -303,6 +314,7 @@
         colors={drawn.colors}
         tiles={drawn.tiles}
         own={drawn.own}
+        nested={drawn.nested}
         frames={drawn.frames}
         isApproximate={drawn.isApproximate}
         noun={drawn.noun}
