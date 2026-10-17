@@ -17,10 +17,12 @@ RESTRICTED = {
     "thea": "awaiting THEA's permission",
     "us.algara": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
     "us.algara_federal": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
+    "us.swdb_precincts": "awaiting the Statewide Database's permission",
+    "us.cook_precincts": "awaiting the Chicago Board of Election Commissioners' and Cook County Clerk's permission",
 }
 # The first rule a license matches sets its class; a file cited under several licenses takes the strictest.
 CLASSES = [
-    ("restricted", re.compile(r"ICPSR|All rights reserved", re.IGNORECASE)),
+    ("restricted", re.compile(r"ICPSR|All rights reserved|permission .*pending", re.IGNORECASE)),
     ("non-commercial", re.compile(r"non-?commercial", re.IGNORECASE)),
     ("revocable", re.compile(r"revocable", re.IGNORECASE)),
     ("share-alike", re.compile(r"ShareAlike|BY-SA|ODbL|Open Database License", re.IGNORECASE)),
