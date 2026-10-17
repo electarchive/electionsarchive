@@ -67,6 +67,77 @@ OFFICIAL = (
     " excluded from the valid total."
 )
 
+RESULTS = "https://www.cambridgema.gov/-/media/Files/electioncommission/electionresults/"
+DECLARED = {
+    "1999-11-02": (
+        "alged:2511000_1999_11_cambridge_MA_City Council_synthetic at-large d_9",
+        "https://web.archive.org/web/20000925121520id_/http://www.ci.cambridge.ma.us:80/~Election/99council.pdf",
+        [
+            "Anthony Galluccio",
+            "Kathleen Born",
+            "Marjorie Decker",
+            "Michael Sullivan",
+            "Timothy Toomey",
+            "James Braude",
+            "Henrietta Davis",
+            "Kenneth Reeves",
+            "David Maher",
+        ],
+    ),
+    "2001-11-06": (
+        "alged:2511000_2001_11_cambridge_MA_City Council_synthetic at-large b_9",
+        RESULTS + "2001officialcitycouncilresults.pdf",
+        [
+            "Anthony Galluccio",
+            "Brian Murphy",
+            "Henrietta Davis",
+            "Michael Sullivan",
+            "Marjorie Decker",
+            "Denise Simmons",
+            "Timothy Toomey",
+            "David Maher",
+            "Kenneth Reeves",
+        ],
+    ),
+    "2003-11-04": (
+        "alged:2511000_2003_11_cambridge_MA_City Council_synthetic at-large d_9",
+        RESULTS + "2003citycouncil.pdf",
+        [
+            "Anthony Galluccio",
+            "Henrietta Davis",
+            "Michael Sullivan",
+            "Marjorie Decker",
+            "Brian Murphy",
+            "Timothy Toomey",
+            "Kenneth Reeves",
+            "David Maher",
+            "Denise Simmons",
+        ],
+    ),
+    "2009-11-03": (
+        "alged:2511000_2009_11_cambridge_MA_City Council_synthetic at-large b_9",
+        RESULTS + "2009citycouncilresults.pdf",
+        [
+            "Henrietta Davis",
+            "Denise Simmons",
+            "Timothy Toomey",
+            "Craig Kelley",
+            "David Maher",
+            "Kenneth Reeves",
+            "Sam Seidel",
+            "Marjorie Decker",
+            "Leland Cheung",
+        ],
+    ),
+}
+DECLARED_NOTE = (
+    "Nine candidates elected, listed in order of election from the Cambridge Election Commission's certified "
+    "proportional representation count sheet, signed by the Director of the Count and the Auditor. This set records "
+    "only the elected candidates; vote counts are not included. The American Local Government Elections Database's "
+    "first-choice totals are available as a separate set, but that database marked the nine candidates with the most "
+    "first choices as elected, which does not match the certified count."
+)
+
 
 def pages(base: str) -> list[str]:
     start = BASE + base + "%20Round.htm"
@@ -80,6 +151,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, BASE + base + "%20Round.htm", suffix=".htm")
         for page in pages(base)[1:]:
             raw.fetch(SOURCE, page, suffix=".htm")
+    for _, file, _ in DECLARED.values():
+        raw.fetch(SOURCE, file, suffix=".pdf")
 
 
 def parse() -> None:
@@ -484,5 +557,93 @@ def emit() -> Path:
                 for outcome in (
                     ("won", "elected") if "elected" in fate else ("lost",) if "lost" in fate else ("eliminated",)
                 ):
+                    cs.add("outcome", result_set_id=result, option_id=option, kind=outcome)
+        for day, (existing, file, winners) in DECLARED.items():
+            contest = cs.key("us.contest", existing)
+            election = cs.key("us.election", f"{day}:MA:2511000")
+            previous = cs.key("us.alged.result_set", existing)
+            if {contest, election, previous} & cs.minted:
+                raise ValueError(f"{day}: {existing} must already exist")
+            for values in conn.execute(
+                """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
+                     supersedes_id from result_set where id = %s""",
+                [previous],
+            ).fetchall():
+                cs.add(
+                    "result_set",
+                    **dict(
+                        zip(
+                            (
+                                "id",
+                                "election_id",
+                                "contest_id",
+                                "stage",
+                                "kind",
+                                "status",
+                                "source_id",
+                                "as_of",
+                                "completeness",
+                                "supersedes_id",
+                            ),
+                            values,
+                            strict=True,
+                        )
+                    ),
+                    is_default=False,
+                )
+            stamp = date.fromisoformat(day)
+            title = (
+                f"{stamp:%B} {stamp.day}, {stamp.year} Cambridge municipal election: City Council, certified "
+                "proportional representation count"
+            )
+            source = cs.source(PUBLISHER, title)
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=file,
+                license="Public record",
+            )
+            cs.artifact(raw.cached(SOURCE, file), source)
+            current = {
+                tuple(spell(text)[:1] + spell(text)[-1:]): option
+                for option, text in conn.execute(
+                    "select id, ballot_label from contest_option where contest_id = %s and kind = 'candidate'",
+                    [contest],
+                ).fetchall()
+            }
+            chosen = []
+            for winner in winners:
+                words = spell(winner)
+                found = [option for (first, last), option in current.items() if last == words[-1]]
+                if len(found) > 1:
+                    found = [
+                        option for (first, last), option in current.items() if (first, last) == (words[0], words[-1])
+                    ]
+                if len(found) != 1:
+                    raise ValueError(f"{day}: no single option for {winner}")
+                chosen.append(found[0])
+            if len(set(chosen)) != 9:
+                raise ValueError(f"{day}: {winners}")
+            result = cs.key(f"{SOURCE}.result_set", f"{day}:declared")
+            if result not in cs.minted:
+                continue
+            cs.add(
+                "result_set",
+                id=result,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                completeness=0,
+            )
+            cs.add("note", entity_id=result, kind="methodology", body_md=DECLARED_NOTE)
+            for option in chosen:
+                for outcome in ("won", "elected"):
                     cs.add("outcome", result_set_id=result, option_id=option, kind=outcome)
         return cs.write()
