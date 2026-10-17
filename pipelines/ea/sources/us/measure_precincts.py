@@ -180,7 +180,7 @@ MASSACHUSETTS = (
 )
 COMMITS = openelections.COMMITS | county_measures.COMMITS
 FILE = re.compile(
-    r"(?:.*/)?(\d{8})__([a-z]{2})__((?:general|primary|special|runoff)(?:__(?:general|primary|runoff))?)(__[a-z_]+)?__precinct\.csv"
+    r"(?:.*/)?(\d{8})__([a-z]{2})__((?:general|primary|special|runoff)(?:__(?:general|primary|runoff))?)(__[a-z_]+)?__(precinct|town)\.csv"
 )
 
 
@@ -234,7 +234,7 @@ def fetch() -> None:
             list(pool.map(lambda link: raw.fetch(SOURCE, link, suffix=".json"), links))
     trees: dict[str, list[str]] = {}
     for state, day in dates:
-        if state not in COMMITS or day.year < 2015:
+        if state not in COMMITS or day.year < (2012 if state == "RI" else 2015):
             continue
         if state not in trees:
             tree = raw.fetch(
@@ -246,7 +246,10 @@ def fetch() -> None:
         found = [
             (path, matched)
             for path in trees[state]
-            if (matched := FILE.fullmatch(path)) and matched[1] == f"{day:%Y%m%d}" and "diff/" not in path
+            if (matched := FILE.fullmatch(path))
+            and matched[1] == f"{day:%Y%m%d}"
+            and "diff/" not in path
+            and matched[5] == ("town" if state == "RI" and day.year < 2018 else "precinct")
         ]
         whole = [path for path, matched in found if matched[4] is None]
         for path in whole or [path for path, _ in found]:
@@ -323,7 +326,7 @@ def parse() -> None:
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
-        ).filter(pl.col("USPS").is_in(list(TOWNS)))
+        ).filter(pl.col("USPS").is_in([*TOWNS, "RI"]))
     places: dict[str, dict[str, str]] = {}
     for state, geoid, name in gazetteer.select("USPS", "GEOID", "NAME").iter_rows():
         places.setdefault(state, {}).setdefault(elstats.plain(name), geoid[:5])
@@ -490,6 +493,8 @@ def parse() -> None:
         if not url.startswith("https://raw.githubusercontent.com/openelections/") or matched is None:
             continue
         state, day = matched[2].upper(), date(int(matched[1][:4]), int(matched[1][4:6]), int(matched[1][6:]))
+        if matched[5] == "town" and state != "RI":
+            continue
         text = raw.cached(SOURCE, url).path.read_bytes()
         frame = pl.read_csv(
             io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
@@ -515,6 +520,9 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
+        if matched[5] == "town":
+            frame = frame.rename({"town": "county"}, strict=False)
+            frame = frame.with_columns(precinct=pl.col("county"))
         if "county" not in frame.columns and matched[4]:
             frame = frame.with_columns(county=pl.lit(matched[4].strip("_").replace("_", " ")))
         if not {"county", "precinct", "office", "candidate", "votes"} <= set(frame.columns):
@@ -533,7 +541,7 @@ def parse() -> None:
                     r"\b(city and county of|county of|county|parish|borough|census area|municipality)\b", ""
                 )
                 .str.replace_all(r"[^a-z]", "")
-                .replace_strict(fips.get(state, {}), default=None),
+                .replace_strict(places["RI"] if state == "RI" else fips.get(state, {}), default=None),
                 precinct=pl.col("precinct").fill_null("").str.strip_chars().str.replace_all(r"\s+", " "),
                 office=pl.col("office")
                 .fill_null("")
@@ -543,7 +551,7 @@ def parse() -> None:
                 district=(pl.col("district") if "district" in frame.columns else pl.lit(None, pl.String))
                 .fill_null("")
                 .str.to_uppercase(),
-                candidate=pl.col("candidate").fill_null(""),
+                candidate=pl.col("candidate").fill_null("").str.replace(r"(?i)^question \d+\s+", ""),
                 votes=pl.col("votes").str.replace_all(r"[,\s]", "").cast(pl.Float64, strict=False).cast(pl.Int64),
             )
         )
