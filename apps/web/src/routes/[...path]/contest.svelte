@@ -284,8 +284,15 @@
     if (contest.current == null || question) {
       return null;
     }
-    const named = (row: { label: string; short: string | null }) =>
-      row.label.length > 28 ? (row.short ?? row.label) : row.label;
+    const named = (row: {
+      label: string;
+      short: string | null;
+      person?: string | null;
+      current?: { person: string | null } | null;
+    }) =>
+      row.label.length > 28 && (row.person ?? row.current?.person) == null
+        ? (row.short ?? row.label)
+        : row.label;
     const [elector, second] = contest.electors?.rows ?? [];
     if (elector != null) {
       let total = contest.electors?.appointed ?? 0;
@@ -354,7 +361,11 @@
     if (contest.count != null) {
       const last = contest.count.last - 1;
       const [first, second] = contest.count.rows;
-      const won = contest.rows.find((row) => row.key === first?.key)?.current;
+      const won = contest.rows.find(
+        (row) =>
+          row.key === first?.key ||
+          (first?.person != null && row.current?.person === first.person),
+      )?.current;
       const total = (first?.votes[last] ?? 0) + (second?.votes[last] ?? 0);
       return first == null || second == null || total === 0
         ? null

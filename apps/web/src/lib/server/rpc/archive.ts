@@ -1343,11 +1343,24 @@ async function tally(
       votes: Array<number | null>;
     }
   >();
-  for (const [index, entry] of sides.entries()) {
+  const steps = sides.map((entry) => {
     const side = entry.get(areaK)?.side;
-    const compared =
-      side == null ? [] : compare(side, null, lineage, match, grouping);
-    for (const row of compared) {
+    return side == null ? [] : compare(side, null, lineage, match, grouping);
+  });
+  const personal = new Set(
+    steps
+      .flat()
+      .filter((row) => row.key.startsWith("person:"))
+      .map((row) => row.current?.party),
+  );
+  for (const [index, compared] of steps.entries()) {
+    for (const found of compared) {
+      const row =
+        found.key.startsWith("party:") &&
+        found.current?.person != null &&
+        personal.has(found.current.party)
+          ? { ...found, key: `person:${found.current.person}` }
+          : found;
       const line = lines.get(row.key) ?? {
         key: row.key,
         label: row.label,
