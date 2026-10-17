@@ -224,6 +224,21 @@ def emit() -> Path:
                     source_id=sources[url],
                 )
             cs.add("boundary_set", scheme_code="gb.pcon", vintage=vintage, valid_from=start, valid_to=end, as_of=start)
+        plans = dict(
+            conn.execute(
+                "select scheme_code, id from boundary_set where scheme_code in ('gb.nation', 'gb.country')"
+            ).fetchall()
+        )
+        for scheme in ("gb.nation", "gb.country"):
+            cs.add(
+                "boundary_set",
+                **({"id": plans[scheme]} if scheme in plans else {}),
+                scheme_code=scheme,
+                vintage="1922",
+                valid_from=PARTITION,
+                valid_to=None,
+                as_of=PARTITION,
+            )
         for code, geom, point in pl.read_parquet(PARSED / "wholes.parquet").sort("code").iter_rows():
             area = (
                 cs.area("gb.nation", code, on=PARTITION)

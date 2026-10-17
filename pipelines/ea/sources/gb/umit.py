@@ -385,7 +385,7 @@ def emit() -> Path:
                    join name n on n.entity_id = a.id and n.is_preferred
                    join area_parent ap on ap.area_id = a.id and ap.valid && c.valid
                    join area_code p on p.area_id = ap.parent_id
-                   where a.scheme_code = 'gb.pcon' and lower(c.valid) is not null"""
+                   where a.scheme_code = 'gb.pcon' and lower(c.valid) is not null and c.code !~ '^[0-9]{4}:'"""
             ).fetchall()
         }
         shaped = sorted({start for _, _, start in districts})
@@ -511,6 +511,7 @@ def emit() -> Path:
                 as_of=opening,
             )
 
+        spans: dict[tuple[str, UUID], list[date]] = {}
         persons: dict[str, UUID] = {}
         for (start, end, label, year), held in rows.group_by(
             "date_start", "date_end", "election", "year", maintain_order=True
@@ -567,6 +568,8 @@ def emit() -> Path:
                     raise ValueError(f"{start}: no boundary for {constituency}")
                 if district is None and "Universit" not in constituency and start < SHAPED:
                     print(f"{start}: no area for {constituency}")
+                if district is not None:
+                    spans.setdefault((unit_code, district), []).append(start)
                 cs.add(
                     "contest",
                     id=contest,
@@ -673,4 +676,12 @@ def emit() -> Path:
                         )
                     if line["elected"]:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected")
+        for (unit_code, district), held_on in spans.items():
+            cs.add(
+                "reporting_unit_area",
+                unit_id=units[unit_code],
+                area_id=district,
+                valid_from=min(held_on),
+                valid_to=following.get(max(held_on)),
+            )
         return cs.write()
