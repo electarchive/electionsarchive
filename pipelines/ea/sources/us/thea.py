@@ -514,6 +514,12 @@ def emit() -> Path:
         ):
             handle = slug(str(text))
             runs.setdefault((state, handle), {}).setdefault(None if "-" in handle else district, []).append(day)
+        labeled: dict[UUID, UUID] = dict(
+            conn.execute(
+                """select o.id, o.party_id from contest_option o join changeset c on c.id = o.changeset_id
+                   where c.pipeline = 'us.party_labels'"""
+            ).fetchall()
+        )
         held: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
         )
@@ -729,7 +735,7 @@ def emit() -> Path:
                     id=root,
                     contest_id=contest,
                     kind="candidate",
-                    party_id=(nominated[0] if nominated else None) if len(lines) == 1 else None,
+                    party_id=labeled.get(root, nominated[0] if nominated else None) if len(lines) == 1 else None,
                     ballot_label=label,
                 )
                 head = cs.key("us.candidacy", f"{option_key}:head")
