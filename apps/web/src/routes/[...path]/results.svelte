@@ -123,6 +123,17 @@
     ),
   );
   const isPictured = $derived(credits.length > 0);
+  const isOneParty = $derived.by(() => {
+    const parties = rows.flatMap((row) => {
+      const option = row.current ?? row.earlier;
+      return option?.person == null ? [] : [option.party ?? null];
+    });
+    return (
+      parties.length > 1 &&
+      parties[0] != null &&
+      parties.every((party) => party === parties[0])
+    );
+  });
   const tail = $derived.by(() => {
     let total = 0;
     let current = 0;
@@ -368,9 +379,21 @@
                   height="28"
                 />
               {:else if isPictured}
-                <span class="flex shrink-0 justify-center self-center inline-7"
-                  ><span class="rounded-xs bg-(--party) block-2.5 inline-2.5"
-                  ></span></span
+                <span
+                  class="grid shrink-0 place-items-center self-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none block-7 inline-7"
+                  aria-hidden="true"
+                  >{(page ?? other)?.person == null
+                    ? ""
+                    : row.label
+                        .split(/\s+/u)
+                        .filter(
+                          (word) => !/^(?:jr|sr|ii|iii|iv)\.?,?$/iu.test(word),
+                        )
+                        .filter((word, index, words) =>
+                          [0, words.length - 1].includes(index),
+                        )
+                        .map((word) => word.slice(0, 1))
+                        .join("")}</span
                 >
               {:else}
                 <span
@@ -386,7 +409,7 @@
                   person={(page ?? other)?.person}
                   party={(page ?? other)?.party}
                 />
-                {#if row.short != null && row.short !== row.label && (span != null || (page?.lines.length ?? 0) === 0)}
+                {#if row.short != null && row.short !== row.label && !isOneParty && (span != null || (page?.lines.length ?? 0) === 0)}
                   <Name
                     class="text-[0.8125rem] text-muted-foreground"
                     label={row.short}
