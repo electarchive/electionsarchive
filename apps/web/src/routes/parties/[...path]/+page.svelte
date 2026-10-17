@@ -276,7 +276,7 @@
                     <span
                       class="text-xs whitespace-nowrap text-muted-foreground tabular-nums"
                       >{m.race_contests({
-                        count: election.races,
+                        count: count(election.races),
                       })}{#if election.won > 0}, <span
                           class="font-semibold text-foreground"
                           >{m.party_won({ count: count(election.won) })}</span

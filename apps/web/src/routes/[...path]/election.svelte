@@ -762,7 +762,7 @@
         class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground"
       >
         {#if race.count > 1}
-          <span>{m.race_contests({ count: race.count })}</span>
+          <span>{m.race_contests({ count: count(race.count) })}</span>
         {/if}
         {#if race.path != null}
           <Preview
