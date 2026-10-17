@@ -335,6 +335,11 @@
       const runner = race.results.find(
         (row) => row.key !== leader?.key && !joined.includes(row.key),
       );
+      const legend = race.places?.legend ?? [];
+      const districts = race.places?.rows ?? [];
+      const wins = districts.filter((row) =>
+        joined.includes(legend[row.leader ?? -1]?.key ?? ""),
+      ).length;
       const elector = race.electors?.rows[0];
       const second = race.electors?.rows[1];
       let appointed = race.electors?.appointed ?? 0;
@@ -349,7 +354,6 @@
           : race.results.find(
               (row) => row.person != null && row.person === elector?.person,
             );
-      const legend = race.places?.legend ?? [];
       const before = new Map(
         (race.before ?? []).map((entry) => [entry.key, entry.seats]),
       );
@@ -547,7 +551,11 @@
                   : seated.length > 0 && !race.isOffice && isSplit
                     ? m.race_lede_split({
                         party: named(leader),
-                        seats: count(leader.seats ?? 0),
+                        seats: count(
+                          districts.length === race.count
+                            ? wins
+                            : (leader.seats ?? 0),
+                        ),
                         total: count(race.count),
                         noun,
                         share: percent(leader.share),
