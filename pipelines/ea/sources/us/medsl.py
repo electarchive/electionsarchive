@@ -665,7 +665,13 @@ def emit() -> Path:
         return cs.write()
 
 
-def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dict[str, UUID]) -> None:
+def attach(
+    cs: Changeset,
+    conn: Connection,
+    congress: pl.DataFrame,
+    sources: dict[str, UUID],
+    redone: frozenset[str] = frozenset(),
+) -> None:
     tag = str(cs.manifest["pipeline"])
     states: dict[str, UUID] = {
         iso.removeprefix("US-"): polity
@@ -832,6 +838,9 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
             continue
         unmatched.extend(missing)
         result_set = cs.key(f"{tag}.result_set", f"{key}:county")
+        previous = None
+        if key in redone:
+            previous, result_set = result_set, cs.key(f"{tag}.result_set", f"{key}:county:2")
         if result_set not in cs.minted:
             continue
         if "pool" in picked.values():
@@ -840,6 +849,12 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
             if pool in cs.minted:
                 cs.add("contest_option", id=pool, contest_id=contest, kind="write_in", ballot_label="Write-ins")
             picked = {candidate: str(pool) if option == "pool" else option for candidate, option in picked.items()}
+        if previous is not None:
+            columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
+            row = conn.execute(f"select {', '.join(columns)} from result_set where id = %s", [previous]).fetchone()
+            if row is None:
+                raise ValueError(f"{key}: no result set to supersede")
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="superseded")
         cs.add(
             "result_set",
             id=result_set,
@@ -853,6 +868,7 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
             completeness=round(
                 float(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum()) / float(official), 4
             ),
+            supersedes_id=previous,
         )
         members: dict[str, str] = {}
         for code, kind in lines.select("code", "kind").unique().iter_rows():

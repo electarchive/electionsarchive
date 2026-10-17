@@ -19,13 +19,23 @@ SOURCE = "us.oe_precincts"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 YEARS = range(2000, 2015, 2)
-TOTALS = r"(?i)^\s*(county\s+|grand\s+)?totals?:?\s*$"
+TOTALS = r"(?i)^\s*(county\s+|grand\s+|election\s+)?totals?:?\s*$"
+TALLIES = r"(?i)^(number of precincts|registered voters|times (blank|over|under) voted|total ?votes|under ?votes?|over ?votes?)\b"
 COLUMNS = {
     "vote": "votes",
     "total_votes": "votes",
     "precint": "precinct",
     "precinct name": "precinct",
     "election_district": "precinct",
+    "precinct_name": "precinct",
+    "precinctname": "precinct",
+    "race": "office",
+    "contest_name": "office",
+    "contesttitle": "office",
+    "choice_name": "candidate",
+    "candidate_name": "candidate",
+    "count": "votes",
+    "vote_total": "votes",
 }
 COUNTIES = {
     ("TX", "galvestone"): "galveston",
@@ -63,6 +73,27 @@ STATEWIDE = {
     r"(state )?auditor|auditor of state": ("auditor",),
     r"(state )?comptroller|comptroller of public accounts": ("comptroller",),
     r"(state )?controller": ("controller",),
+}
+REDONE = frozenset(
+    {
+        "2012-11-06:TX:house:4",
+        "2012-11-06:UT:president",
+        "2012-11-06:UT:senate",
+        "2012-11-06:UT:governor",
+        "2012-11-06:UT:house:2",
+        "2012-11-06:UT:house:4",
+    }
+)
+PENNSYLVANIA = {
+    "USP": "President",
+    "USS": "U.S. Senate",
+    "USC": "U.S. House",
+    "GOV": "Governor",
+    "ATT": "Attorney General",
+    "AUD": "Auditor General",
+    "TRE": "State Treasurer",
+    "STS": "State Senate",
+    "STH": "State House",
 }
 VERMONT = {
     "add": "addison",
@@ -123,7 +154,26 @@ def parse() -> None:
             io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
             infer_schema_length=0,
             truncate_ragged_lines=True,
+            has_header=state != "PA",
         )
+        if state == "PA":
+            frame = frame.select(
+                county=(
+                    pl.lit("42") + (pl.col("column_2").cast(pl.Int32) * 2 - 1).cast(pl.String).str.zfill(3)
+                ).replace_strict({code: name for name, code in fips["PA"].items()}),
+                precinct=pl.concat_str(
+                    "column_3", "column_20", "column_22", "column_24", separator=" ", ignore_nulls=True
+                ),
+                office=pl.col("column_8").replace_strict(PENNSYLVANIA, default=""),
+                district=pl.col("column_5"),
+                party=pl.col("column_9"),
+                candidate=pl.when(pl.col("column_11").is_null() & (pl.col("column_9") == "OTH"))
+                .then(pl.lit("Write-ins"))
+                .otherwise(
+                    pl.concat_str("column_12", "column_13", "column_11", "column_14", separator=" ", ignore_nulls=True)
+                ),
+                votes="column_15",
+            )
         renamed: dict[str, str] = {}
         for column in frame.columns:
             name = COLUMNS.get(column.strip().lower(), column.strip().lower())
@@ -132,6 +182,9 @@ def parse() -> None:
         frame = frame.rename(renamed)
         if "votes" not in frame.columns and "total" in frame.columns:
             frame = frame.rename({"total": "votes"})
+        for column in ("vote_type", "votetype"):
+            if column in frame.columns:
+                frame = frame.filter(pl.col(column).str.to_lowercase() != "total")
         if "candidate" not in frame.columns and {"first_name", "last_name"} <= set(frame.columns):
             frame = frame.with_columns(
                 candidate=pl.concat_str("first_name", "last_name", separator=" ", ignore_nulls=True)
@@ -169,7 +222,10 @@ def parse() -> None:
             )
         )
     frame = pl.concat(frames).filter(
-        pl.col("votes").is_not_null(), pl.col("precinct").is_not_null(), pl.col("precinct") != ""
+        pl.col("votes").is_not_null(),
+        pl.col("precinct").is_not_null(),
+        pl.col("precinct") != "",
+        ~pl.col("candidate").str.contains(TALLIES),
     )
     lost = frame.filter(pl.col("fips").is_null())
     if lost.height:
@@ -445,7 +501,7 @@ def emit() -> Path:
                         license="No license stated: facts published with attribution, raw files not redistributed",
                     )
             cs.artifact(raw.cached(SOURCE, url(state, path)), sources[state])
-        medsl.attach(cs, conn, returns, sources)
+        medsl.attach(cs, conn, returns, sources, REDONE)
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         counties = {
             code: (unit, area)
