@@ -97,6 +97,8 @@ def parse() -> None:
             if column.strip().lower() not in renamed.values():
                 renamed[column] = column.strip().lower()
         frame = frame.rename(renamed)
+        if "votes" not in frame.columns and "total_votes" in frame.columns:
+            frame = frame.rename({"total_votes": "votes"})
         if "county" not in frame.columns and {"jurisdiction", "reporting_level"} <= set(frame.columns):
             frame = frame.filter(pl.col("reporting_level") == "county").rename({"jurisdiction": "county"})
         if not {"county", "office", "candidate", "votes"} <= set(frame.columns):

@@ -686,9 +686,15 @@ def emit(
                 for member in indices if revised is not None else ():
                     gone = str(entries[member][0][0])
                     gone_key = f"{contest_key}:{slug(gone)}"
-                    old = cs.key("us.option", gone_key)
-                    if member == index or old in cs.minted:
+                    if (
+                        member == index
+                        or conn.execute(
+                            "select from external_id where scheme = 'us.option' and value = %s", [gone_key]
+                        ).fetchone()
+                        is None
+                    ):
                         continue
+                    old = cs.key("us.option", gone_key)
                     lost = [label for text, label in zip(printed, labels, strict=True) if text == gone]
                     for label in lost:
                         into = cs.key("us.option", f"{option_key}:{slug(gone)}:{slug(label or 'no party')}")
