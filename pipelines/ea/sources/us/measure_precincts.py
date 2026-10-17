@@ -6,7 +6,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import elstats, measures, medsl, medsl_measures, medsl_state, medsl_state_precincts
+from ea.sources.us import elstats, measures, medsl, medsl_measures, medsl_state, medsl_state_precincts, oe_precincts
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_precincts"
@@ -19,6 +19,11 @@ ARCHIVE = "Precinct rows of the state's election statistics archive, which add u
 MEDSL = (
     "Precinct rows of MEDSL's precinct returns, which compile each state's certified canvass. Each answer's precinct "
     "rows add up to the totals of this question's default results{counties}."
+)
+
+OPENELECTIONS = (
+    "Precinct rows of OpenElections' volunteer-transcribed precinct files. Each answer's precinct rows add up to the "
+    "totals of this question's default results{counties}."
 )
 
 
@@ -179,19 +184,56 @@ def parse() -> None:
         .write_parquet(PARSED / "medsl.parquet")
     )
 
+    candidate = pl.col("candidate").str.to_uppercase().str.strip_chars()
+    affirmative = candidate.str.contains(medsl_measures.AFFIRMATIVE.pattern + r"|^IN FAVOR\b")
+    negative = candidate.str.contains(medsl_measures.NEGATIVE.pattern)
+    (
+        pl.scan_parquet(oe_precincts.PARSED / "lines.parquet")
+        .with_columns(
+            office=pl.col("office").str.to_uppercase().str.replace_all(r"[^A-Z0-9]+", " ").str.strip_chars(),
+            district=pl.col("district").fill_null("").str.to_uppercase(),
+        )
+        .filter(
+            ~pl.col("office").str.contains("RETAIN|RETENTION|JUDGE|JUSTICE|COURT"),
+            affirmative.any().over("state", "year", "office", "district")
+            & negative.any().over("state", "year", "office", "district"),
+            affirmative | negative,
+        )
+        .group_by(
+            "year",
+            "state",
+            "office",
+            "district",
+            "fips",
+            pl.lit("").alias("jurisdiction"),
+            "precinct",
+            answer=pl.when(affirmative).then(pl.lit("YES")).otherwise(pl.lit("NO")),
+        )
+        .agg(pl.col("votes").sum())
+        .sort("year", "state", "office", "district", "fips", "precinct", "answer")
+        .collect()
+        .write_parquet(PARSED / "openelections.parquet")
+    )
+
 
 def emit() -> Path:
     archives = pl.read_parquet(PARSED / "archives.parquet").with_columns(
         key=pl.concat_str(pl.col("day").cast(pl.String), "state", pl.lit("question"), "question", separator=":")
     )
-    returns = pl.read_parquet(PARSED / "medsl.parquet")
+    returns = pl.concat(
+        [
+            pl.read_parquet(PARSED / "medsl.parquet").drop("day").with_columns(origin=pl.lit("medsl")),
+            pl.read_parquet(PARSED / "openelections.parquet").with_columns(origin=pl.lit("openelections")),
+        ],
+        how="diagonal_relaxed",
+    )
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
             summary="Statewide ballot questions by precinct 2000–2025 from the states' election statistics archives "
-            "and MEDSL's precinct returns",
+            "and MEDSL's and OpenElections' precinct returns",
             polity="US",
         )
         filled = {
@@ -254,34 +296,35 @@ def emit() -> Path:
             )
             .filter((pl.col("yes") > 0) & (pl.col("no") > 0))
         )
-        sources = {
-            year: cs.source(medsl_state.PUBLISHER, title) for year, (title, _) in medsl_state_precincts.TITLES.items()
+        sources: dict[tuple[str, str | int], tuple[UUID, str]] = {
+            ("medsl", year): (cs.source(medsl_state.PUBLISHER, title), MEDSL)
+            for year, (title, _) in medsl_state_precincts.TITLES.items()
+        } | {
+            ("openelections", state): (cs.source("OpenElections", f"{state} precinct-level results"), OPENELECTIONS)
+            for state in returns.filter(pl.col("origin") == "openelections")["state"].unique().to_list()
         }
 
         candidates: list[tuple[str, str, UUID | None, str, pl.DataFrame]] = [
             (key, state, None, ARCHIVE, rows)
             for (key, state), rows in archives.group_by("key", "state", maintain_order=True)
         ]
-        questions = returns.group_by("year", "day", "state", "office", "district").agg(
+        question = ["origin", "year", "state", "office", "district"]
+        questions = returns.group_by(question).agg(
             yes=pl.col("votes").filter(pl.col("answer") == "YES").sum(),
             no=pl.col("votes").filter(pl.col("answer") == "NO").sum(),
         )
-        matched = questions.join(totals, on=["state", "day", "yes", "no"])
-        doubled = matched.filter(pl.len().over("key") > 1)
-        for key in doubled["key"].unique().to_list():
-            print(f"{key}: several MEDSL questions share its totals, skipped")
-        matched = matched.filter(pl.len().over("key") == 1, pl.len().over("year", "state", "office", "district") == 1)
-        print(f"{matched.height} MEDSL questions match a statewide question's totals exactly")
-        for year, state, office, district, key in matched.select(
-            "year", "state", "office", "district", "key"
-        ).iter_rows():
-            rows = returns.filter(
-                pl.col("year") == year,
-                pl.col("state") == state,
-                pl.col("office") == office,
-                pl.col("district") == district,
-            )
-            candidates.append((key, state, sources[year], MEDSL, rows))
+        matched = questions.join(
+            totals.with_columns(year=pl.col("day").dt.year()), on=["state", "year", "yes", "no"]
+        ).filter(pl.len().over(question) == 1)
+        for origin, key in matched.filter(pl.len().over("origin", "key") > 1).select("origin", "key").unique().rows():
+            print(f"{key}: several {origin} questions share its totals, skipped")
+        matched = matched.filter(pl.len().over("origin", "key") == 1).sort("origin")
+        print(f"{matched.group_by('origin').len().rows()} questions match a statewide question's totals exactly")
+        picked = returns.join(matched.select(*question, "key"), on=question)
+        del returns
+        for (origin, year, state, key), rows in picked.group_by("origin", "year", "state", "key", maintain_order=True):
+            source, method = sources[(str(origin), year if origin == "medsl" else state)]
+            candidates.append((str(key), str(state), source, method, rows))
 
         landed: dict[str, int] = {}
         skipped = 0
