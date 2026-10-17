@@ -11,7 +11,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import medsl
-from ea.store import DATA, connect
+from ea.store import DATA, Connection, connect
 
 SOURCE = "us.openelections"
 VERSION = "3"
@@ -90,6 +90,7 @@ MISSPELLED = {
     ("SD", "melletet"): "mellette",
     ("SD", "bufaflo"): "buffalo",
     ("WA", "wahkiukum"): "wahkiakum",
+    ("MS", "launderdale"): "lauderdale",
 }
 LEVELS = {"__county": 0, "": 1, "__precinct": 2, "__ward": 3}
 SENATE = re.compile(r"\b(u\.?\s?s\.?|united states)\s*senat")
@@ -97,6 +98,29 @@ HOUSE = re.compile(r"\b(u\.?\s?s\.?|united states)\s*(house|rep)|congress")
 NOT_COUNTED = (
     r"^(TOTAL|TIMES (CAST|COUNTED)|BALLOTS CAST|REGISTERED|BVS|BLANKS?\W.*(VOID|SCATTER))|UNDER ?VOTES|OVER ?VOTES"
 )
+
+
+def counties(conn: Connection) -> dict[str, dict[str, str]]:
+    fips: dict[str, dict[str, str]] = {}
+    for code, text, iso in conn.execute(
+        """select u.code, n.text, p.iso_code from reporting_unit u
+           join name n on n.entity_id = u.area_id and n.kind = 'short'
+           join reporting_unit s on s.scheme_code = 'us.state' and s.code = left(u.code, 2)
+           join polity p on p.id = s.polity_id
+           where u.scheme_code = 'us.county' and u.code <> '51515'"""
+    ).fetchall():
+        names = fips.setdefault(iso.removeprefix("US-"), {})
+        plain = re.sub(
+            r"[^a-z]",
+            "",
+            unicodedata.normalize("NFKD", text).lower().replace("saint ", "st ").replace("&", "and"),
+        )
+        if int(code[2:]) >= 500:
+            names[f"{plain}city"] = code
+        names.setdefault(plain, code)
+    for (state, typo), plain in MISSPELLED.items():
+        fips[state][typo] = fips[state][plain]
+    return fips
 
 
 def picks() -> list[tuple[str, int, str]]:
@@ -151,25 +175,7 @@ def parse() -> None:
     ).write_parquet(PARSED / "georgia.parquet")
 
     with connect() as conn:
-        fips: dict[str, dict[str, str]] = {}
-        for code, text, iso in conn.execute(
-            """select u.code, n.text, p.iso_code from reporting_unit u
-               join name n on n.entity_id = u.area_id and n.kind = 'short'
-               join reporting_unit s on s.scheme_code = 'us.state' and s.code = left(u.code, 2)
-               join polity p on p.id = s.polity_id
-               where u.scheme_code = 'us.county' and u.code <> '51515'"""
-        ).fetchall():
-            names = fips.setdefault(iso.removeprefix("US-"), {})
-            plain = re.sub(
-                r"[^a-z]",
-                "",
-                unicodedata.normalize("NFKD", text).lower().replace("saint ", "st ").replace("&", "and"),
-            )
-            if int(code[2:]) >= 500:
-                names[f"{plain}city"] = code
-            names.setdefault(plain, code)
-        for (state, typo), plain in MISSPELLED.items():
-            fips[state][typo] = fips[state][plain]
+        fips = counties(conn)
     frames = []
     for state, year, path in picks():
         text = raw.cached(

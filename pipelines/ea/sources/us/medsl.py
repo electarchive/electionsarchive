@@ -814,6 +814,9 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
         if counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1:
             print(f"{key}: the county sum exceeds the official total by over 10 percent, skipped")
             continue
+        if counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() < official * 0.5:
+            print(f"{key}: the county sum covers under half the official total, skipped")
+            continue
         unmatched.extend(missing)
         result_set = cs.key(f"{tag}.result_set", f"{key}:county")
         if result_set not in cs.minted:
