@@ -8,7 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import medsl, medsl_local, nc_local, ncsbe
+from ea.sources.us import elstats, elstats_local, medsl, medsl_local, nc_local, ncsbe
 from ea.store import DATA, connect
 
 SOURCE = "us.city_precincts"
@@ -91,7 +91,101 @@ def parse() -> None:
                    where a.scheme_code = 'us.county'"""
             ).fetchall()
         }
+        jurisdictions = {
+            code: text.upper() + (" CITY" if code[:2] == "51" and int(code[2:]) >= 500 else "")
+            for code, text in conn.execute(
+                """select u.code, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code <> '51515'"""
+            ).fetchall()
+        }
+        towns = dict(
+            conn.execute(
+                """select distinct split_part(code, ':', 4), split_part(code, ':', 3) from reporting_unit
+                   where scheme_code = 'us.precinct' and code like '20__:CT:%'"""
+            ).fetchall()
+        )
     origins = [(day, "medsl", scan.select(list(columns)).rename(columns)) for day, scan in scans]
+    stats = []
+    for state in ("VA", "ID", "NM", "CT"):
+        for year in range(elstats_local.STATES[state][0], 2026):
+            frame = pl.read_csv(
+                raw.cached(elstats_local.SOURCE, elstats_local.url(state, year)).path,
+                infer_schema=False,
+                truncate_ragged_lines=True,
+            )
+            if frame.height:
+                stats.append(
+                    frame.filter(
+                        pl.col("division_type").is_in(["Precinct", "Polling Place"])
+                        & ~pl.col("candidate_name").str.contains(
+                            r"(?i)^total |^unknown candidate$|^(?:under|over) ?votes?$|^blank"
+                        )
+                    ).select(
+                        state=pl.lit(state),
+                        contest="contest_id",
+                        day=pl.col("election_date").str.slice(0, 10).str.to_date(),
+                        office="office_name",
+                        kind="district_type",
+                        town=pl.col("district_name").str.replace(r" - .*$", "").str.to_uppercase(),
+                        candidate="candidate_name",
+                        division="division_id",
+                        precinct=pl.col("division_name")
+                        .str.replace_all(r"\s+", " ")
+                        .str.strip_chars()
+                        .str.to_uppercase(),
+                        votes="votes",
+                    )
+                )
+    stats = pl.concat(stats)
+    homes = (
+        stats.join(
+            pl.read_parquet(elstats_local.PARSED / "candidates.parquet")
+            .select("state", "contest", "code")
+            .unique()
+            .filter(pl.col("code").str.len_chars() == 5),
+            on=["state", "contest"],
+        )
+        .group_by("state", "division")
+        .agg(pl.col("code").unique())
+        .filter(pl.col("code").list.len() == 1)
+        .select("state", "division", home=pl.col("code").list.first())
+    )
+    stats = (
+        stats.filter(pl.col("kind").is_in(list(elstats_local.MUNICIPAL)))
+        .join(homes, on=["state", "division"], how="left")
+        .with_columns(
+            fips=pl.when(pl.col("state") == "CT")
+            .then(pl.col("town").replace_strict(towns, default=None))
+            .otherwise("home")
+        )
+        .with_columns(
+            jurisdiction=pl.when(pl.col("state") == "CT")
+            .then("town")
+            .otherwise(pl.col("fips").replace_strict(jurisdictions, default=None))
+        )
+    )
+    for (day,), part in stats.group_by("day"):
+        origins.append(
+            (
+                day,
+                "elstats",
+                part.lazy().select(
+                    "state",
+                    "fips",
+                    "jurisdiction",
+                    "precinct",
+                    "office",
+                    district="contest",
+                    candidate="candidate",
+                    writein=pl.when(pl.col("candidate").str.contains(r"(?i)^write"))
+                    .then(pl.lit("TRUE"))
+                    .otherwise(pl.lit("FALSE")),
+                    mode=pl.lit("TOTAL"),
+                    votes="votes",
+                ),
+            )
+        )
     for (state, day), commit in medsl_local.OPENELECTIONS_FILES.items():
         names = {
             name: code
@@ -196,7 +290,7 @@ def parse() -> None:
     precinct = ["day", "origin", "state", "fips", "jurisdiction", "precinct", "office", "district"]
     frame = (
         pl.concat(frames)
-        .with_columns(rank=pl.col("origin").replace_strict({"ncsbe": 0, "medsl": 1, "openelections": 2}))
+        .with_columns(rank=pl.col("origin").replace_strict({"ncsbe": 0, "elstats": 0, "medsl": 1, "openelections": 2}))
         .filter(pl.col("rank") == pl.col("rank").min().over("day", "state"))
         .drop("rank")
         .with_columns(measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16))
@@ -337,6 +431,20 @@ def emit() -> Path:
             if sources[("NC", day)] in cs.minted:
                 raise ValueError(f"{ncsbe.TITLE} must already be a source")
             cs.artifact(raw.cached(ncsbe.SOURCE, ncsbe.FILES.format(day=day)), sources[("NC", day)])
+        for state, day in sorted(set(rows.filter(pl.col("origin") == "elstats").select("state", "day").iter_rows())):
+            sources[(state, day)] = cs.source(elstats.TENANTS[state][1], elstats.TITLE)
+            if sources[(state, day)] in cs.minted:
+                raise ValueError(f"{elstats.TENANTS[state][1]}'s {elstats.TITLE} must already be a source")
+        for state, year in sorted(
+            {
+                (state, day.year)
+                for state, day in rows.filter(pl.col("origin") == "elstats").select("state", "day").iter_rows()
+            }
+        ):
+            cs.artifact(
+                raw.cached(elstats_local.SOURCE, elstats_local.url(state, year)),
+                cs.source(elstats.TENANTS[state][1], elstats.TITLE),
+            )
         groups = {key: frame for key, frame in rows.group_by("day", "state")}
         index: dict[tuple[date, str], dict[str, set[str]]] = {}
         for (day, state), frame in groups.items():
