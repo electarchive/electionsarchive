@@ -3540,17 +3540,17 @@ export const contests = {
       const unit = chain.map((entry) => entry.segment).join("/");
       return Promise.all(
         found.rows.map(async (row) => {
-          const all =
+          const [all, lineage] = await Promise.all([
             area == null
               ? null
-              : await load([row.id], [area.k], row.date ?? "infinity", [
-                  row.id,
-                ]);
+              : load([row.id], [area.k], row.date ?? "infinity", [row.id]),
+            branches(row.date ?? "infinity"),
+          ]);
           const loaded = area == null ? undefined : all?.get(area.k);
           const leaders =
             loaded == null
               ? []
-              : compare(loaded.side, null, [], "party")
+              : compare(loaded.side, null, lineage, "party")
                   .flatMap((entry) =>
                     entry.current == null
                       ? []
@@ -3698,7 +3698,10 @@ export const contests = {
           if (unit == null) {
             return null;
           }
-          const totals = await load([row.id], [area.k], day, [row.id]);
+          const [totals, lineage] = await Promise.all([
+            load([row.id], [area.k], day, [row.id]),
+            branches(day),
+          ]);
           const loaded = totals.get(area.k);
           return {
             id: row.id,
@@ -3707,7 +3710,7 @@ export const contests = {
             leaders:
               loaded == null
                 ? []
-                : compare(loaded.side, null, [], "party")
+                : compare(loaded.side, null, lineage, "party")
                     .flatMap((entry) =>
                       entry.current == null
                         ? []
@@ -4276,7 +4279,7 @@ async function races(
   if (nation == null || groups.length === 0) {
     return [];
   }
-  const [labels, slugs, branches] = await Promise.all([
+  const [labels, slugs, lineage] = await Promise.all([
     names(
       found.rows.flatMap((row) => [
         row.id,
@@ -4285,16 +4288,9 @@ async function races(
       date,
     ),
     paths(found.rows.map((row) => row.id)),
-    db.execute<{ from: string; to: string; kind: string }>(sql`
-      select coalesce(fm.into_id, a.party_id) as from, coalesce(tm.into_id, a.parent_party_id) as to, a.kind::text
-      from party_affiliation a
-      left join entity_merge fm on fm.entity_id = a.party_id
-      left join entity_merge tm on tm.entity_id = a.parent_party_id
-      where a.kind = 'regional_branch' and a.valid @> ${day}::date
-    `),
+    branches(day),
   ]);
-  const lineage = branches.rows.map((row) => ({ ...row, toLabel: "" }));
-  const parentOf = new Map(branches.rows.map((row) => [row.from, row.to]));
+  const parentOf = new Map(lineage.map((row) => [row.from, row.to]));
   const built = await Promise.all(
     groups.map(async (group) => {
       const roots = group.map((row) => row.id);
@@ -5522,7 +5518,7 @@ export const elections = {
       if (date == null || roots.length < 2) {
         return null;
       }
-      const [levels, territory, previous, branches] = await Promise.all([
+      const [levels, territory, previous, lineage] = await Promise.all([
         db.execute<{ scheme: string; noun: string; ks: Array<number> }>(sql`
           with hits as (
             select distinct r.area_k
@@ -5576,13 +5572,7 @@ export const elections = {
           select id, date_from::text as date from pool
           where date_from between (select max(date_from) from pool) - 200 and (select max(date_from) from pool)
         `),
-        db.execute<{ from: string; to: string; kind: string }>(sql`
-          select coalesce(fm.into_id, a.party_id) as from, coalesce(tm.into_id, a.parent_party_id) as to, a.kind::text
-          from party_affiliation a
-          left join entity_merge fm on fm.entity_id = a.party_id
-          left join entity_merge tm on tm.entity_id = a.parent_party_id
-          where a.kind = 'regional_branch' and a.valid @> ${date}::date
-        `),
+        branches(date),
       ]);
       const level = levels.rows[0];
       const nation = territory.rows[0];
@@ -5624,7 +5614,6 @@ export const elections = {
         .map((row) => row.date)
         .toSorted((a, b) => a.localeCompare(b))
         .at(-1);
-      const lineage = branches.rows.map((row) => ({ ...row, toLabel: "" }));
       const [table, map] = await Promise.all([
         tabulate(
           roots,
@@ -6437,9 +6426,10 @@ export const polities = {
             if (unit == null) {
               return null;
             }
-            const [totals, label] = await Promise.all([
+            const [totals, label, lineage] = await Promise.all([
               load([row.id], [row.k], row.date, [row.id]),
               names([row.id], row.date),
+              branches(row.date),
             ]);
             const loaded = totals.get(row.k);
             return {
@@ -6449,7 +6439,7 @@ export const polities = {
               leaders:
                 loaded == null
                   ? []
-                  : compare(loaded.side, null, [], "party")
+                  : compare(loaded.side, null, lineage, "party")
                       .flatMap((entry) =>
                         entry.current == null
                           ? []
@@ -7014,7 +7004,7 @@ export const polities = {
         ) home on true
         order by e.date_from
       `);
-      const [labels, slugs, loaded, branches] = await Promise.all([
+      const [labels, slugs, loaded] = await Promise.all([
         names(
           [
             input.a,
@@ -7028,47 +7018,25 @@ export const polities = {
         paths([input.a, input.b, ...found.rows.map((row) => row.id)]),
         Promise.all(
           found.rows.map(async (row) =>
-            load(
-              [row.id],
-              [row.own, row.a, row.b].filter((k) => k != null),
-              row.date,
-              [row.id],
-            ),
+            Promise.all([
+              load(
+                [row.id],
+                [row.own, row.a, row.b].filter((k) => k != null),
+                row.date,
+                [row.id],
+              ),
+              branches(row.date),
+            ]),
           ),
         ),
-        db.execute<{
-          from: string;
-          to: string;
-          kind: string;
-          start: string | null;
-          end: string | null;
-        }>(sql`
-          select coalesce(fm.into_id, a.party_id) as from, coalesce(tm.into_id, a.parent_party_id) as to, a.kind::text,
-            lower(a.valid)::text as start, upper(a.valid)::text as end
-          from party_affiliation a
-          left join entity_merge fm on fm.entity_id = a.party_id
-          left join entity_merge tm on tm.entity_id = a.parent_party_id
-          where a.kind = 'regional_branch'
-        `),
       ]);
       const points = found.rows.map((row, index) => ({
         ...row,
         sides: [row.own, row.a, row.b].map((k) => {
-          const here = k == null ? null : loaded[index]?.get(k);
+          const here = k == null ? null : loaded[index]?.[0].get(k);
           return here == null
             ? []
-            : compare(
-                here.side,
-                null,
-                branches.rows
-                  .filter(
-                    (branch) =>
-                      (branch.start == null || branch.start <= row.date) &&
-                      (branch.end == null || row.date < branch.end),
-                  )
-                  .map((branch) => ({ ...branch, toLabel: "" })),
-                "party",
-              )
+            : compare(here.side, null, loaded[index]?.[1] ?? [], "party")
                 .flatMap((entry) =>
                   entry.current == null
                     ? []
@@ -7122,6 +7090,21 @@ export const polities = {
       };
     }),
 };
+
+async function branches(day: string): Promise<Array<Relation>> {
+  const found = await db.execute<{
+    from: string;
+    to: string;
+    kind: string;
+  }>(sql`
+    select coalesce(fm.into_id, a.party_id) as from, coalesce(tm.into_id, a.parent_party_id) as to, a.kind::text
+    from party_affiliation a
+    left join entity_merge fm on fm.entity_id = a.party_id
+    left join entity_merge tm on tm.entity_id = a.parent_party_id
+    where a.kind = 'regional_branch' and a.valid @> ${day}::date
+  `);
+  return found.rows.map((row) => ({ ...row, toLabel: "" }));
+}
 
 async function refs(ids: Array<string>) {
   const unique = [...new Set(ids)];
@@ -8190,19 +8173,22 @@ export const parties = {
           union all
           select tree.root, c.id, tree.area from contest c join tree on c.allocation_parent_id = tree.id
         ),
-        picked as (
+        picked as materialized (
           select distinct on (rs.contest_id) t.root, rs.k, t.area
           from tree t join result_set rs on rs.contest_id = t.id
-          where exists (
-            select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = t.area and x.measure = any(${COUNTED}) limit 1
-          )
+          cross join lateral (
+            select from result_rollup x where x.result_set_k = rs.k and x.area_k = t.area and x.measure = any(${COUNTED}) limit 1
+          ) hit
           order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
         ),
         fetched as (
           select p.root, x.option_k, x.measure, x.value::float8 as value, x.count_round,
             min(x.count_round) over (partition by p.root, x.measure) as first
-          from picked p join result_rollup x on x.result_set_k = p.k and x.area_k = p.area
-            and x.measure = any(${COUNTED}) and x.option_k <> 0
+          from picked p cross join lateral (
+            select x.option_k, x.measure, x.value, x.count_round from result_rollup x
+            where x.result_set_k = p.k and x.area_k = p.area and x.measure = any(${COUNTED}) and x.option_k <> 0
+            offset 0
+          ) x
         ),
         mains as (
           select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by root
