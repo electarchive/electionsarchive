@@ -89,6 +89,7 @@ ARIZONA = tuple(
         ("20240817161358", "2024_Primary_Election_Official_Canvass_0815b"),
     )
 )
+CLARK = "https://clark.legistar1.com/clark/attachments/f2a5b366-4205-4df9-9335-68731b056c1f.pdf"
 OKLAHOMA = "https://web.archive.org/web/20240314213731id_/https://oklahoma.gov/content/dam/ok/en/elections/candidate-filing-archives/2024-candidate-filing-archives/2024-ppp-cd-results.pdf"
 MONTANA = "https://web.archive.org/web/20240905130237id_/https://sosmt.gov/wp-content/uploads/wpfd/preview_files/2024-Primary-State-Canvass.pdf"
 WISCONSIN = tuple(
@@ -150,7 +151,7 @@ OPENELECTIONS = {
     "WV": "49d32c279d0e02d740c8af4fcb5b5eee380fbed4",
     "WY": "d4d430672e8823beeb7dbc9274362992739155c3",
 }
-PARTIAL = ("AZ", "PA")
+PARTIAL = ("AZ", "PA", "NV")
 ELECTIONSTATS = ("CO", "CT", "ID", "NH", "NM", "NY", "VA", "VT")
 TYPOS = {
     "MO": {"kansascity": "2938000"},
@@ -309,6 +310,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".xlsx")
     raw.fetch(SOURCE, MONTANA, suffix=".pdf")
     raw.fetch(SOURCE, OKLAHOMA, suffix=".pdf")
+    raw.fetch(SOURCE, CLARK, suffix=".pdf")
     for url in ARIZONA:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
@@ -530,6 +532,7 @@ def parse() -> None:
         *(("NY", "county", url) for url in NEW_YORK),
         ("MT", "county", MONTANA),
         ("OK", "county", OKLAHOMA),
+        ("NV", "county", CLARK),
         *(("AZ", "county", url) for url in ARIZONA),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
@@ -1179,6 +1182,59 @@ def parse() -> None:
                 cells,
                 schema={
                     **dict.fromkeys((*COLUMNS, "write_in"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
+        elif url == CLARK:
+            artifact = raw.cached(SOURCE, url)
+            cells = []
+            for page in (3, 4):
+                cache = PARSED / "ocr" / f"{artifact.sha256}-{page}.tsv"
+                cache.parent.mkdir(parents=True, exist_ok=True)
+                grouped: dict[tuple[int, int, int], list[tuple[str, scan.Box]]] = {}
+                for word, box, line, _ in scan.words(artifact.path, page, cache):
+                    grouped.setdefault(line, []).append((word, box))
+                seat: str | None = None
+                party = ""
+                entries: list[tuple[str, int, scan.Box]] = []
+                for words in sorted(grouped.values(), key=lambda words: min(box[1] for _, box in words)):
+                    text = re.sub(r"^[^A-Za-z]+", "", " ".join(word for word, _ in words))
+                    if found := re.match(r"(.+?) - (REP|DEM) \(Vote for", text):
+                        titled = re.fullmatch(r"Representative in Congress District (\d)", found[1])
+                        seat = titled[1] if titled else None
+                        party = {"REP": "Republican", "DEM": "Democratic"}[found[2]]
+                        entries = []
+                    elif seat is None:
+                        continue
+                    elif found := re.fullmatch(r"Total Votes ([\d,]+)\W*", text):
+                        if sum(votes for _, votes, _ in entries) != int(found[1].replace(",", "")):
+                            raise ValueError(
+                                f"NV Clark page {page}: district {seat} {party} does not sum to {found[1]}"
+                            )
+                        cells += [
+                            {
+                                "county": "32003",
+                                "office": "U.S. House",
+                                "district": seat,
+                                "party": party,
+                                "candidate": re.sub(r"^(.+?), (?:(Jr\.|Sr\.), )?(.+)$", r"\3 \1 \2", name).strip(),
+                                "votes": str(votes),
+                                "page": page,
+                                "x0": box[0],
+                                "y0": box[1],
+                                "x1": box[2],
+                                "y1": box[3],
+                            }
+                            for name, votes, box in entries
+                        ]
+                        seat = None
+                    elif found := re.fullmatch(r"(.+?) \W*(?:REP|DEM) \W*([\d,]+) \W*[\d.]+%\W*", text):
+                        box = next(box for word, box in words if re.fullmatch(r"\d{1,3}(,\d{3})*", word))
+                        entries.append((re.sub(r"[|‘']+$", "", found[1]).strip(), int(found[2].replace(",", "")), box))
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(COLUMNS, pl.String),
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             )
@@ -2442,7 +2498,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC", "LA") or url == OKLAHOMA:
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC", "LA") or url in (OKLAHOMA, CLARK):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -2508,6 +2564,8 @@ def parse() -> None:
             if url in SOUTH_CAROLINA
             else date(2024, 3, 5)
             if state == "AR" or url == OKLAHOMA
+            else date(2024, 6, 11)
+            if url == CLARK
             else date(2024, 4, 23)
             if url.startswith(PENNSYLVANIA.split("?")[0])
             else date(2024, 3, 19)
@@ -3009,6 +3067,14 @@ def emit() -> Path:
                 )
                 if used == OKLAHOMA
                 else (
+                    "Clark County Election Department",
+                    "Results of Canvass, 2024 Primary Election, June 11, 2024",
+                    "https://clark.legistar.com/Calendar.aspx",
+                    "official_body",
+                    "Public record",
+                )
+                if used == CLARK
+                else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
                     "https://sos.ks.gov/elections/election-results.html",
@@ -3297,7 +3363,7 @@ def emit() -> Path:
                     channel=pl.lit(0, pl.Int16),
                     measure=pl.lit(1, pl.Int16),
                     count_round=pl.lit(0, pl.Int16),
-                    flags=pl.when(pl.col("url").is_in([KENTUCKY, *ARIZONA])).then(8).otherwise(0).cast(pl.Int16),
+                    flags=pl.when(pl.col("url").is_in([KENTUCKY, *ARIZONA, CLARK])).then(8).otherwise(0).cast(pl.Int16),
                     value="votes",
                 )
                 .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
