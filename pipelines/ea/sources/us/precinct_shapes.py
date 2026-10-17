@@ -42,6 +42,7 @@ PUBLISHERS = {
     ),
     "RI": ("Rhode Island Department of State", "Voting Precincts (2022)", "Public record", "RIGIS"),
     "IA": ("Iowa Secretary of State", "Iowa Precincts", "Public record", "Iowa Legislative Services Agency"),
+    "MT": ("Montana State Library", "Montana Voting Precincts 2021", "Public record", None),
     "AZ": ("Maricopa County Recorder", "Maricopa County Voting Precincts (2022-)", "Public record", None),
     "NC": ("North Carolina State Board of Elections", "Precinct Shapefile, 2022-08-31", "Public record", None),
     "TX": ("Texas Legislative Council", "Precincts, 2022 General Election", "CC BY", None),
@@ -117,6 +118,8 @@ LAYERS |= {f"{state}:2024": LAYERS[state] for state in ("DC", "OK", "RI", "AZ", 
     "MI:2014": "https://gisagocss.state.mi.us/arcgis/rest/services/OpenData/boundaries/MapServer/0/",
 }
 ZIPS = {
+    "MT": "https://ftpgeoinfo.msl.mt.gov/Data/Spatial/MSDI/AdministrativeBoundaries/Historic/MontanaVotingPrecinctsSHP2021.zip",
+    "MT:2024": "https://ftpgeoinfo.msl.mt.gov/Data/Spatial/MSDI/AdministrativeBoundaries/Historic/MontanaPrecinctSplitsSHP20240215.zip",
     "NC": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20220831.zip",
     "TX": "https://data.capitol.texas.gov/dataset/d04c72b9-16c4-4ab2-8c6d-c666d41e04b7/resource/8d1035a6-0aaf-495e-aef1-ede0b70deae4/download/precincts22g.zip",
     "WA": "https://www.sos.wa.gov/sites/default/files/2023-05/statewide_precincts_2022general_ok_consol.zip",
@@ -347,7 +350,14 @@ def features(state: str) -> Iterator[tuple[dict[str, object], str, int]]:
         for record, shape in zip(reader.iterRecords(), reader.iterShapes(), strict=True):
             if record is None or shape is None or shape.shapeType == shapefile.NULL or not shape.points:
                 continue
-            yield dict(zip(fields, list(record), strict=True)), json.dumps(shape.__geo_interface__), srid
+            try:
+                geometry = shape.__geo_interface__
+            except shapefile.RingSamplingError:
+                rings = [
+                    shape.points[start:end] for start, end in zip(shape.parts, [*shape.parts[1:], len(shape.points)])
+                ]
+                geometry = {"type": "Polygon", "coordinates": rings}
+            yield dict(zip(fields, list(record), strict=True)), json.dumps(geometry), srid
 
 
 def cased(text: str) -> str:
@@ -370,6 +380,10 @@ def town(text: str) -> str:
     return f"{canon(match[1])} W{canon(match[2])} P{canon(match[3])}" if match else canon(text)
 
 
+def montana(text: str) -> str:
+    return canon(re.sub(r"^(?:PRECINCT|PREC|PCT)[\s_#.]*0*", "", text.upper().strip()))
+
+
 SHAPES: dict[str, Callable[[dict[str, Any]], tuple[str, str, str]]] = {
     "MN": lambda p: (f"27{p['countyfips']}", canon(p["pctname"]), p["pctname"]),
     "MI": lambda p: (f"26{p['COUNTYFIPS']}", canon(p["Precinct_Long_Name"]), p["Precinct_Long_Name"]),
@@ -377,6 +391,7 @@ SHAPES: dict[str, Callable[[dict[str, Any]], tuple[str, str, str]]] = {
     "DC": lambda p: ("11001", bare(p["NAME"]), p["NAME"]),
     "OK": lambda p: (f"40{p['CO_FIPS']}", canon(p["PCT_CEB"]), f"Precinct {p['PCT_CEB']}"),
     "RI": lambda p: ("", canon(p["DISTRICT"]), f"{p['TOWN']} {p['DISTRICT']}"),
+    "MT": lambda p: (p["COUNTY"], montana(p["NAME"]), p["NAME"]),
     "IA": lambda p: (
         f"19{p['CoFIPS']}",
         canon(re.sub(r"^\d+\s+", "", p["PctNameOfficial"])),
@@ -398,6 +413,7 @@ UNITS: dict[str, Callable[[str, str], str]] = {
     "RI": lambda _, precinct: canon(precinct.split()[-1]),
     "AZ": lambda _, precinct: canon(precinct.split()[0]),
     "TX": lambda _, precinct: canon(precinct[3:7]),
+    "MT": lambda _, precinct: montana(precinct),
     "LA": lambda _, precinct: re.sub(r"^0 ", "", canon(precinct)),
     "MA": lambda _, precinct: town(precinct),
     "NM": lambda _, precinct: bare(precinct),
@@ -409,6 +425,7 @@ FIPS = {
     "AR": "05",
     "AZ": "04",
     "IA": "19",
+    "MT": "30",
     "DC": "11",
     "GA": "13",
     "HI": "15",
@@ -835,6 +852,15 @@ DATED |= {
     },
 }
 DATED |= {
+    "MT:2024": (
+        GENERAL,
+        GENERAL + timedelta(days=1),
+        "Montana State Library",
+        "Montana Precinct Splits, 2024-02-15",
+        "Public record",
+        None,
+        lambda p: (p["County"], montana(p["Prec_Name"]), p["Prec_Name"]),
+    ),
     "RI:2016": (
         date(2016, 1, 1),
         date(2017, 1, 1),
