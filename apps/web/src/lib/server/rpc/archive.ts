@@ -2631,29 +2631,31 @@ export const contests = {
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           where c.allocation_parent_id is null and coalesce(c.district_area_id, pt.area_id) in (select id from anc)
         ),
-        grp(root, id) as (
+        grp(root, id) as materialized (
           select id, id from roots
           union all
           select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
-        )
-        select * from (
-          select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-            r."isRemainder", exists (
-              select 1 from grp join result_set rs on rs.contest_id = grp.id
-              where grp.root = r.id and exists (
-                select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED})
-              )
-            ) as counted, r.date_from
-          from roots r
-          where r.id <> ${contest.root}::uuid
-        ) r
-        where r.counted or exists (
-          select 1 from grp
+        ),
+        tallied as materialized (
+          select distinct grp.root from grp
+          join result_set rs on rs.contest_id = grp.id
+          where exists (
+            select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED})
+          )
+        ),
+        decided as materialized (
+          select distinct grp.root from grp
           join contest_option o on o.contest_id = grp.id
           join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
           join result_set rs on rs.id = x.result_set_id and rs.is_default
-          where grp.root = r.id
         )
+        select * from (
+          select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
+            r."isRemainder", r.id in (select root from tallied) as counted, r.date_from
+          from roots r
+          where r.id <> ${contest.root}::uuid
+        ) r
+        where r.counted or r.id in (select root from decided)
         order by r.date_from desc nulls last, r.id
       `);
       const rootIds = covering.rows.map((row) => row.id);
