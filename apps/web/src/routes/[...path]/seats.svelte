@@ -628,7 +628,7 @@
     </div>
   {/if}
   <ul class="grid gap-px text-sm/tight">
-    {#each ordered as party (party.key)}
+    {#each ordered.toSorted((a, b) => b.seats - a.seats) as party (party.key)}
       <li
         class={cn(
           "relative flex items-center gap-2 rounded-xs px-1.5 py-1",

@@ -5,11 +5,14 @@ export function count(value: number) {
 }
 
 export function percent(value: number) {
-  return new Intl.NumberFormat(getLocale(), {
+  const format = new Intl.NumberFormat(getLocale(), {
     style: "percent",
     minimumFractionDigits: 1,
     maximumFractionDigits: 1,
-  }).format(value);
+  });
+  return value > 0 && value < 0.0005
+    ? `<${format.format(0.001)}`
+    : format.format(value);
 }
 
 export function points(value: number) {
