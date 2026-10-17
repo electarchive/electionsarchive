@@ -304,10 +304,29 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Stevenson"), ("REP", "Eisenhower")],
     ),
     (
+        "1920-11-02",
+        "governor",
+        [(11843, 0.8, 0.95, 0, 1), (11844, 0.105, 0.96, 0, 1), (11845, 0.105, 0.43, 0, 1)],
+        [
+            ("REP", "Hyde"),
+            ("DEM", "Atkinson"),
+            ("SOC", "Aldrich"),
+            ("SLP", "Middlecoff"),
+            ("PRO", "Faris"),
+            ("FW", "Hickman"),
+        ],
+    ),
+    (
         "1924-11-04",
         "governor",
         [(12677, 0.155, 0.91, 0, 1), (12678, 0.12, 0.62, 0, 1)],
         [("REP", "Baker"), ("DEM", "Nelson"), ("SOC", "Brandt"), ("SLP", "Cox")],
+    ),
+    (
+        "1932-11-08",
+        "governor",
+        [(17056, 0.125, 0.96, 0, 1), (17057, 0.115, 0.505, 0, 1)],
+        [("DEM", "Park"), ("REP", "Winter"), ("SOC", "Wolf"), ("SLP", "Cox"), ("COM", "Penney")],
     ),
     (
         "1940-11-05",
@@ -316,10 +335,29 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "McDaniel"), ("REP", "Donnell"), ("SOC", "High"), ("SLP", "Cox")],
     ),
     (
+        "1944-11-07",
+        "governor",
+        [(23210, 0.6, 0.96, 0, 1), (23211, 0.12, 0.955, 0, 1), (23212, 0.12, 0.36, 0, 1)],
+        [("DEM", "Donnelly"), ("REP", "Bradshaw"), ("SOC", "Rinck"), ("SLP", "Tendler")],
+    ),
+    (
         "1948-11-02",
         "governor",
         [(26106, 0.09, 0.935, 0, 1), (26107, 0.085, 0.535, 0, 1)],
         [("DEM", "Smith"), ("REP", "Thompson"), ("SOC", "Gipe"), ("SLP", "Genck"), ("WPRG", "Logsdon")],
+    ),
+    (
+        "1952-11-04",
+        "governor",
+        [(28867, 0.615, 0.945, 0, 1), (28868, 0.09, 0.95, 0, 1), (28869, 0.09, 0.365, 0, 1)],
+        [
+            ("DEM", "Donnelly"),
+            ("REP", "Elliott"),
+            ("WPRG", "Edsell"),
+            ("SOC", "Wheeler"),
+            ("SLP", "Hayes"),
+            ("CN", "Lohbeck"),
+        ],
     ),
     (
         "1956-11-06",
@@ -332,6 +370,12 @@ MISORDERED: dict[tuple[str, str], list[tuple[str, str]]] = {
     ("1924-11-04", "president"): [("perry", "pettis")],
 }
 CHECKED: set[tuple[str, str, int]] = {
+    ("1944-11-07", "governor", 2),
+    ("1932-11-08", "governor", 2),
+    ("1920-11-02", "governor", 5),
+    ("1920-11-02", "governor", 4),
+    ("1920-11-02", "governor", 3),
+    ("1952-11-04", "governor", 5),
     ("1922-11-07", "senate", 1),
     ("1926-11-02", "senate", 0),
     ("1926-11-02", "senate", 1),
@@ -365,6 +409,38 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1944-11-07", "governor", "29045", 2): 2,
+    ("1944-11-07", "governor", "29133", 2): 9,
+    ("1944-11-07", "governor", "29135", 2): 3,
+    ("1944-11-07", "governor", "29143", 2): 3,
+    ("1944-11-07", "governor", "29185", 2): 2,
+    ("1932-11-08", "governor", "29185", 3): 6,
+    ("1932-11-08", "governor", "29207", 3): 3,
+    ("1932-11-08", "governor", "29225", 3): 3,
+    ("1920-11-02", "governor", "29001", 5): 8,
+    ("1920-11-02", "governor", "29003", 5): 5,
+    ("1920-11-02", "governor", "29005", 5): 3,
+    ("1920-11-02", "governor", "29007", 5): 6,
+    ("1920-11-02", "governor", "29013", 5): 16,
+    ("1920-11-02", "governor", "29183", 5): 13,
+    ("1920-11-02", "governor", "29187", 5): 3,
+    ("1920-11-02", "governor", "29189", 5): 237,
+    ("1920-11-02", "governor", "29203", 5): 3,
+    ("1920-11-02", "governor", "29213", 5): 3,
+    ("1920-11-02", "governor", "29001", 4): 54,
+    ("1920-11-02", "governor", "29005", 4): 18,
+    ("1920-11-02", "governor", "29007", 4): 21,
+    ("1920-11-02", "governor", "29183", 4): 19,
+    ("1920-11-02", "governor", "29185", 4): 37,
+    ("1920-11-02", "governor", "29197", 4): 16,
+    ("1920-11-02", "governor", "29201", 4): 30,
+    ("1920-11-02", "governor", "29217", 4): 32,
+    ("1920-11-02", "governor", "29219", 4): 16,
+    ("1920-11-02", "governor", "29510", 4): 670,
+    ("1920-11-02", "governor", "29001", 3): 32,
+    ("1920-11-02", "governor", "29007", 3): 2,
+    ("1920-11-02", "governor", "29013", 3): 14,
+    ("1920-11-02", "governor", "29211", 3): 3,
     ("1928-11-06", "senate", "29510", 0): 170645,
     ("1944-11-07", "senate", "29211", 0): 3314,
     ("1944-11-07", "senate", "29091", 2): 3,
@@ -523,6 +599,10 @@ NAMES: dict[tuple[str, str, str], str] = {
     ("1944-11-07", "Rinck", "SOC"): "William F. Rinck",
     ("1944-11-07", "Tendler", "SLP"): "Stephen Tendler",
     ("1948-11-02", "Gipe", "SOC"): "Gipe",
+    ("1952-11-04", "Edsell", "WPRG"): "Edsell",
+    ("1952-11-04", "Wheeler", "SOC"): "Wheeler",
+    ("1952-11-04", "Hayes", "SLP"): "Hayes",
+    ("1952-11-04", "Lohbeck", "CN"): "Lohbeck",
     ("1948-11-02", "Genck", "SLP"): "Henry W. Genck",
     ("1948-11-02", "Logsdon", "WPRG"): "Robert B. Logsdon",
 }
@@ -1290,7 +1370,7 @@ def emit() -> Path:
                                where x.value ~ %s and case when x.value ~ '^[0-9]{4}' then left(x.value, 4)::int end between %s and %s""",
                             [":president$" if office == "president" else ":MO:", int(day[:4]) - 12, int(day[:4]) + 12],
                         ).fetchall()
-                        if surname(text) == wanted and text[:1].lower() == full[:1].lower()
+                        if " " in full and surname(text) == wanted and text[:1].lower() == full[:1].lower()
                     ]
                     known = [
                         person
@@ -1301,12 +1381,13 @@ def emit() -> Path:
                     ]
                     if len(set(known)) > 1:
                         raise ValueError(f"{key}: {len(set(known))} people for {full}")
-                    known = known or [
-                        person
-                        for (person,) in conn.execute(
-                            "select distinct entity_id from name where text = %s and is_preferred", [full]
-                        ).fetchall()
-                    ]
+                    if not known and " " in full:
+                        known = [
+                            person
+                            for (person,) in conn.execute(
+                                "select distinct entity_id from name where text = %s and is_preferred", [full]
+                            ).fetchall()
+                        ]
                     if len(set(known)) > 1:
                         raise ValueError(f"{key}: {len(set(known))} people named {full}")
                     person = (
