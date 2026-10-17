@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, integer, text, smallint, date, numeric, boolean, timestamp, jsonb, customType, real, char, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, smallint, integer, text, date, numeric, boolean, timestamp, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -316,12 +316,12 @@ export const contest = pgTable("contest", {
 		name: "contest_previous_round_id_fkey"
 	}),
 	index("contest_allocation_parent_idx").using("btree", table.allocationParentId.asc().nullsLast()),
-	index("contest_previous_round_idx").using("btree", table.previousRoundId.asc().nullsLast()),
 	index("contest_body_idx").using("btree", table.bodyId.asc().nullsLast()),
 	index("contest_district_area_idx").using("btree", table.districtAreaId.asc().nullsLast()),
-	index("contest_seat_idx").using("btree", table.seatId.asc().nullsLast()),
 	index("contest_election_idx").using("btree", table.electionId.asc().nullsLast()),
 	index("contest_office_idx").using("btree", table.officeId.asc().nullsLast()),
+	index("contest_previous_round_idx").using("btree", table.previousRoundId.asc().nullsLast()),
+	index("contest_seat_idx").using("btree", table.seatId.asc().nullsLast()),
 ]);
 
 export const contestOption = pgTable("contest_option", {
@@ -438,6 +438,17 @@ export const externalId = pgTable("external_id", {
 	index("external_id_entity_idx").using("btree", table.entityId.asc().nullsLast()),
 ]);
 
+export const factRekey = pgTable("fact_rekey", {
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	relation: text().notNull(),
+	keyColumn: text("key_column").notNull(),
+	fromK: integer("from_k").notNull(),
+	toK: integer("to_k").notNull(),
+	rowKey: jsonb("row_key").notNull(),
+}, (table) => [
+	index("fact_rekey_changeset_idx").using("btree", table.changesetId.asc().nullsLast()),
+]);
+
 export const financeSummary = pgTable("finance_summary", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
 	subjectEntityId: uuid("subject_entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),
@@ -462,9 +473,9 @@ export const flag = pgTable("flag", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-check("flag_check", sql`(num_nonnulls(entity_id, result_set_id) >= 1)`),
 	index("flag_entity_idx").using("btree", table.entityId.asc().nullsLast()),
-	index("flag_result_set_idx").using("btree", table.resultSetId.asc().nullsLast()),]);
+	index("flag_result_set_idx").using("btree", table.resultSetId.asc().nullsLast()),
+check("flag_check", sql`(num_nonnulls(entity_id, result_set_id) >= 1)`),]);
 
 export const government = pgTable("government", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
@@ -818,8 +829,8 @@ export const reportingUnit = pgTable("reporting_unit", {
 		name: "reporting_unit_parent_id_fkey"
 	}),
 	index("reporting_unit_area_idx").using("btree", table.areaId.asc().nullsLast()),
-	index("reporting_unit_parent_idx").using("btree", table.parentId.asc().nullsLast()),
 	index("reporting_unit_counted_with_idx").using("btree", table.countedWithId.asc().nullsLast()),
+	index("reporting_unit_parent_idx").using("btree", table.parentId.asc().nullsLast()),
 	index("reporting_unit_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 	unique("reporting_unit_k_key").on(table.k),	unique("reporting_unit_scheme_code_code_valid_key").on(table.schemeCode, table.code, table.valid),check("reporting_unit_check", sql`((area_relation = 'unlocated'::area_relation) = (area_id IS NULL))`),]);
 
@@ -887,8 +898,8 @@ export const resultSet = pgTable("result_set", {
 		name: "result_set_supersedes_id_fkey"
 	}),
 	index("result_set_contest_idx").using("btree", table.contestId.asc().nullsLast()),
-	index("result_set_supersedes_idx").using("btree", table.supersedesId.asc().nullsLast()),
 	uniqueIndex("result_set_default_idx").using("btree", table.electionId.asc().nullsLast(), table.contestId.asc().nullsLast(), table.stage.asc().nullsLast()).where(sql`is_default`),
+	index("result_set_supersedes_idx").using("btree", table.supersedesId.asc().nullsLast()),
 	unique("result_set_k_key").on(table.k),]);
 
 export const resultValue = pgTable("result_value", {
@@ -923,9 +934,9 @@ export const searchDocument = pgTable("search_document", {
 	tsv: customType({ dataType: () => 'tsvector' })().notNull(),
 	rankBoost: real("rank_boost").default(0).notNull(),
 }, (table) => [
+	index("search_document_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 	index("search_document_trgm_idx").using("gin", table.text.asc().nullsLast().op("gin_trgm_ops")),
 	index("search_document_tsv_idx").using("gin", table.tsv.asc().nullsLast()),
-	index("search_document_polity_idx").using("btree", table.polityId.asc().nullsLast()),
 ]);
 
 export const seat = pgTable("seat", {
@@ -950,8 +961,8 @@ export const slug = pgTable("slug", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-	index("slug_entity_idx").using("btree", table.entityId.asc().nullsLast()),
 	uniqueIndex("slug_current_idx").using("btree", table.entityId.asc().nullsLast()).where(sql`is_current`),
+	index("slug_entity_idx").using("btree", table.entityId.asc().nullsLast()),
 ]);
 
 export const source = pgTable("source", {

@@ -300,7 +300,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     else sql.SQL(""),
                 )
             )
-        for relation, column, parent in checks.REFERENCES:
+        for relation, column, parent in checks.references(conn):
             if parent not in types:
                 continue
             others = [
@@ -325,14 +325,6 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 )
             ).fetchone() != (True,):
                 continue
-            changeset_id = conn.execute("select current_setting('ea.changeset_id')").fetchone()
-            assert changeset_id is not None
-            folder = DATA / "changesets" / changeset_id[0]
-            if not (folder / "manifest.json").exists():
-                raise ValueError(
-                    f"merging these {parent} rows moves {relation}.{column} keys, and their undo log needs the "
-                    f"changeset artifact at {folder}"
-                )
             if conn.execute(
                 sql.SQL(
                     """select exists (select {moving} join public.{target} t on t.{moved} = duplicate.k
@@ -348,20 +340,27 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     f"merging these {parent} rows would give {relation} two rows for one key; settle the duplicate "
                     "values first"
                 )
-            rows = conn.execute(
+            conn.execute(
                 sql.SQL(
-                    """update public.{target} t set {moved} = survivor.k {moving} where t.{moved} = duplicate.k
-                       returning {others}, duplicate.k, survivor.k"""
+                    """with moved as (
+                         update public.{target} t set {moved} = survivor.k {moving} where t.{moved} = duplicate.k
+                         returning {others}, duplicate.k as from_k, survivor.k as to_k
+                       )
+                       insert into fact_rekey (changeset_id, relation, key_column, from_k, to_k, row_key)
+                       select current_setting('ea.changeset_id')::uuid, {relation}, {column}, from_k, to_k,
+                              jsonb_build_object({row_key})
+                       from moved"""
                 ).format(
                     target=rekeyed,
                     moved=moved,
                     moving=moving,
                     others=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(key)) for key in others),
+                    relation=sql.Literal(relation),
+                    column=sql.Literal(column),
+                    row_key=sql.SQL(", ").join(
+                        sql.SQL("{}, {}").format(sql.Literal(key), sql.Identifier(key)) for key in others
+                    ),
                 )
-            ).fetchall()
-            (folder / "rekey").mkdir(exist_ok=True)
-            pl.DataFrame(rows, schema=[*others, "from_k", "to_k"], orient="row").write_parquet(
-                folder / "rekey" / f"{relation}.{column}.parquet"
             )
         for kind in types:
             filled = [
@@ -634,6 +633,43 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
         return
     conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
     conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
+    logged = conn.execute(
+        "select distinct relation, key_column from fact_rekey where changeset_id = %s order by 1, 2", [changeset_id]
+    ).fetchall()
+    for relation, column in logged:
+        kinds = dict(
+            conn.execute(
+                """select attname, format_type(atttypid, atttypmod) from pg_attribute
+                   where attrelid = %s::regclass and attnum > 0 and not attisdropped""",
+                [f"public.{relation}"],
+            ).fetchall()
+        )
+        others = [
+            key
+            for (key,) in conn.execute(
+                """select a.attname from pg_constraint c cross join lateral unnest(c.conkey) k(attnum)
+                   join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum
+                   where c.conrelid = %s::regclass and c.contype = 'p'""",
+                [f"public.{relation}"],
+            ).fetchall()
+            if key != column
+        ]
+        conn.execute(
+            sql.SQL(
+                """update public.{target} t set {moved} = r.from_k from fact_rekey r
+                   where r.changeset_id = %s and r.relation = %s and r.key_column = %s and t.{moved} = r.to_k and {same}"""
+            ).format(
+                target=sql.Identifier(relation),
+                moved=sql.Identifier(column),
+                same=sql.SQL(" and ").join(
+                    sql.SQL("t.{0} = (r.row_key ->> {1})::{2}").format(
+                        sql.Identifier(key), sql.Literal(key), sql.SQL(cast(LiteralString, kinds[key]))
+                    )
+                    for key in others
+                ),
+            ),
+            [changeset_id, relation, column],
+        )
     rekeyed = next(
         (
             folder / "rekey"
@@ -642,7 +678,7 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
         ),
         None,
     )
-    for path in sorted(rekeyed.glob("*.parquet")) if rekeyed is not None else []:
+    for path in sorted(rekeyed.glob("*.parquet")) if rekeyed is not None and not logged else []:
         relation, column = path.stem.split(".")
         frame = pl.read_parquet(path)
         kinds = dict(
@@ -723,7 +759,9 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 {"id": changeset_id},
             ).fetchall()
         )
-    for table, column, parent in checks.REFERENCES:
+    for table, column, parent in checks.references(conn):
+        if parent == "result_set":
+            continue
         inserted = sql.SQL(
             """select p.k from {} p where p.changeset_id = %(id)s
                and not exists (select from {} h where h.id = p.id and h.superseded_by = %(id)s)"""

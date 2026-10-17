@@ -16,13 +16,19 @@ KEYS = {
     "option_id": "contest_option",
     "from_option_id": "contest_option",
 }
-REFERENCES = (
-    *((fact, key, KEYS[f"{key.removesuffix('_k')}_id"]) for fact in FACTS for key in ("unit_k", "option_k")),
-    ("result_flow", "from_option_k", "contest_option"),
-    ("result_rollup", "option_k", "contest_option"),
-    ("result_rollup", "area_k", "area"),
-)
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
+
+
+def references(conn: Connection) -> list[tuple[str, str, str]]:
+    return conn.execute(
+        """select c.relname, a.attname, substring(d.description from '^references (\\w+) \\(k\\)$')
+           from pg_description d
+           join pg_class c on c.oid = d.objoid and d.classoid = 'pg_class'::regclass
+           join pg_attribute a on a.attrelid = c.oid and a.attnum = d.objsubid
+           where c.relnamespace = 'public'::regnamespace and not c.relispartition
+             and d.description ~ '^references \\w+ \\(k\\)$'
+           order by 1, 2"""
+    ).fetchall()
 
 
 @dataclass(frozen=True)
@@ -226,7 +232,7 @@ def _outcomes(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
-def _references(stage: Stage) -> list[tuple[str, sql.Composed]]:
+def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]]:
     queries: list[tuple[str, sql.Composed]] = []
     for table in FACTS:
         for column in stage.tables.get(table, []):
@@ -260,8 +266,8 @@ def _references(stage: Stage) -> list[tuple[str, sql.Composed]]:
                 )
             )
     if "result_set" in stage.tables:
-        for table, column, parent in REFERENCES:
-            if table in FACTS:
+        for table, column, parent in references(conn):
+            if table in FACTS and parent != "result_set":
                 queries.append(
                     (
                         "reference.stranded",
@@ -406,7 +412,13 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
                         {"path": list(error.absolute_path), "message": error.message},
                     )
                 )
-    for code, query in [*_references(stage), *_accounting(stage), *_outcomes(stage), *_geometry(stage), *_scope(stage)]:
+    for code, query in [
+        *_references(conn, stage),
+        *_accounting(stage),
+        *_outcomes(stage),
+        *_geometry(stage),
+        *_scope(stage),
+    ]:
         findings.extend(
             Finding(code, "error", entity_id, result_set_id, details)
             for entity_id, result_set_id, details in conn.execute(query).fetchall()
@@ -456,7 +468,7 @@ def merged(
                 )
             ).fetchall()
         )
-    for relation, column, parent in REFERENCES:
+    for relation, column, parent in references(conn):
         if parent not in types or tables is not None and relation not in tables:
             continue
         found.extend(

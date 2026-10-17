@@ -78,6 +78,7 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.entity.id.through(r.externalId.entityId),
 			alias: "changeset_id_entity_id_via_externalId"
 		}),
+		factRekeys: r.many.factRekey(),
 		financeSummaries: r.many.financeSummary(),
 		flags: r.many.flag(),
 		governments: r.many.government(),
@@ -735,6 +736,12 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.entityMerge.intoId,
 			to: r.entity.id,
 			alias: "entityMerge_intoId_entity_id"
+		}),
+	},
+	factRekey: {
+		changeset: r.one.changeset({
+			from: r.factRekey.changesetId,
+			to: r.changeset.id
 		}),
 	},
 	financeSummary: {
