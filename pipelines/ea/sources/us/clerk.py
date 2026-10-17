@@ -1148,7 +1148,9 @@ def emit() -> Path:
                 boundary_set_id=None if chamber == "senate" else plan,
                 magnitude=magnitude,
                 round_number=2 if runoff else 1,
-                electoral_system_id=systems["two_round" if jungle else "block" if magnitude > 1 else "fptp"],
+                electoral_system_id=systems[
+                    "two_round" if jungle or (state == "GA" and year >= 1964) else "block" if magnitude > 1 else "fptp"
+                ],
                 default_result_kind="tacit" if tacit else "counted",
             )
             name(
