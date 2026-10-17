@@ -10,7 +10,7 @@ from psycopg.types.json import Jsonb
 
 from ea import checks
 from ea.checks import FACTS, KEYS, Stage
-from ea.store import Connection, connect
+from ea.store import DATA, Connection, connect
 
 
 def _stage(conn: Connection, changeset_id: str) -> Stage:
@@ -298,14 +298,68 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     else sql.SQL(""),
                 )
             )
-        if "area" in types:
-            conn.execute(
+        for relation, column, parent in checks.REFERENCES:
+            if parent not in types:
+                continue
+            others = [
+                key
+                for (key,) in conn.execute(
+                    """select a.attname from pg_constraint c cross join lateral unnest(c.conkey) k(attnum)
+                       join pg_attribute a on a.attrelid = c.conrelid and a.attnum = k.attnum
+                       where c.conrelid = %s::regclass and c.contype = 'p'""",
+                    [f"public.{relation}"],
+                ).fetchall()
+                if key != column
+            ]
+            moving = sql.SQL(
+                """from {staged} s join public.{parent} duplicate on duplicate.id = s.entity_id
+                   join public.{parent} survivor on survivor.id = s.into_id"""
+            ).format(staged=staged, parent=sql.Identifier(parent))
+            target = sql.Identifier(relation)
+            moved = sql.Identifier(column)
+            if conn.execute(
+                sql.SQL("select exists (select {} join public.{} t on t.{} = duplicate.k)").format(
+                    moving, target, moved
+                )
+            ).fetchone() != (True,):
+                continue
+            changeset_id = conn.execute("select current_setting('ea.changeset_id')").fetchone()
+            assert changeset_id is not None
+            folder = DATA / "changesets" / changeset_id[0]
+            if not (folder / "manifest.json").exists():
+                raise ValueError(
+                    f"merging these {parent} rows moves {relation}.{column} keys, and their undo log needs the "
+                    f"changeset artifact at {folder}"
+                )
+            if conn.execute(
                 sql.SQL(
-                    """update public.result_rollup r set area_k = survivor.k
-                       from {} s join area duplicate on duplicate.id = s.entity_id
-                       join area survivor on survivor.id = s.into_id
-                       where r.area_k = duplicate.k"""
-                ).format(staged)
+                    """select exists (select {moving} join public.{target} t on t.{moved} = duplicate.k
+                       join public.{target} x on x.{moved} = survivor.k and {same})"""
+                ).format(
+                    moving=moving,
+                    target=target,
+                    moved=moved,
+                    same=sql.SQL(" and ").join(sql.SQL("x.{0} = t.{0}").format(sql.Identifier(key)) for key in others),
+                )
+            ).fetchone() != (False,):
+                raise ValueError(
+                    f"merging these {parent} rows would give {relation} two rows for one key; settle the duplicate "
+                    "values first"
+                )
+            rows = conn.execute(
+                sql.SQL(
+                    """update public.{target} t set {moved} = survivor.k {moving} where t.{moved} = duplicate.k
+                       returning {others}, duplicate.k, survivor.k"""
+                ).format(
+                    target=target,
+                    moved=moved,
+                    moving=moving,
+                    others=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(key)) for key in others),
+                )
+            ).fetchall()
+            (folder / "rekey").mkdir(exist_ok=True)
+            pl.DataFrame(rows, schema=[*others, "from_k", "to_k"], orient="row").write_parquet(
+                folder / "rekey" / f"{relation}.{column}.parquet"
             )
         for kind in types:
             filled = [
@@ -526,6 +580,41 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 [f"Rejected: {reason}", changeset_id],
             )
         return
+    rekeyed = next(
+        (
+            folder / "rekey"
+            for folder in (DATA / "changesets" / changeset_id, DATA / "retired" / "changesets" / changeset_id)
+            if (folder / "rekey").exists()
+        ),
+        None,
+    )
+    for path in sorted(rekeyed.glob("*.parquet")) if rekeyed is not None else []:
+        relation, column = path.stem.split(".")
+        frame = pl.read_parquet(path)
+        kinds = dict(
+            conn.execute(
+                """select attname, format_type(atttypid, atttypmod) from pg_attribute
+                   where attrelid = %s::regclass and attnum > 0 and not attisdropped""",
+                [f"public.{relation}"],
+            ).fetchall()
+        )
+        others = [key for key in frame.columns if key not in ("from_k", "to_k")]
+        conn.execute(
+            sql.SQL(
+                "update public.{target} t set {moved} = r.from_k from unnest({arrays}) r({names})"
+                " where t.{moved} = r.to_k and {same}"
+            ).format(
+                target=sql.Identifier(relation),
+                moved=sql.Identifier(column),
+                arrays=sql.SQL(", ").join(
+                    sql.SQL("%s::{}[]").format(sql.SQL(cast(LiteralString, kinds.get(key, kinds[column]))))
+                    for key in [*others, "from_k", "to_k"]
+                ),
+                names=sql.SQL(", ").join(map(sql.Identifier, [*others, "from_k", "to_k"])),
+                same=sql.SQL(" and ").join(sql.SQL("t.{0} = r.{0}").format(sql.Identifier(key)) for key in others),
+            ),
+            [frame[key].to_list() for key in [*others, "from_k", "to_k"]],
+        )
     stamped = [
         table
         for (table,) in conn.execute(
@@ -580,12 +669,7 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 {"id": changeset_id},
             ).fetchall()
         )
-    for table, column, parent in (
-        *((fact, key, KEYS[f"{key.removesuffix('_k')}_id"]) for fact in FACTS for key in ("unit_k", "option_k")),
-        ("result_flow", "from_option_k", "contest_option"),
-        ("result_rollup", "option_k", "contest_option"),
-        ("result_rollup", "area_k", "area"),
-    ):
+    for table, column, parent in checks.REFERENCES:
         inserted = sql.SQL(
             """select p.k from {} p where p.changeset_id = %(id)s
                and not exists (select from {} h where h.id = p.id and h.superseded_by = %(id)s)"""
@@ -651,6 +735,22 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                         sql.SQL(", ").join(map(sql.Identifier, settable)),
                         sql.SQL(", ").join(sql.SQL("h.{}").format(sql.Identifier(column)) for column in settable),
                         history,
+                    ),
+                    [changeset_id],
+                )
+                conn.execute(
+                    sql.SQL(
+                        """insert into {target} ({listed}) overriding system value
+                           select distinct on (h.id) {kept} from {history} h
+                           where h.superseded_by = %s and not exists (select from {target} t where t.id = h.id)
+                           order by h.id, lower(h.recorded)"""
+                    ).format(
+                        target=target,
+                        listed=sql.SQL(", ").join(sql.Identifier(column) for column, _ in columns),
+                        kept=sql.SQL(", ").join(
+                            sql.SQL("h.{}").format(sql.Identifier(column)) for column, _ in columns
+                        ),
+                        history=history,
                     ),
                     [changeset_id],
                 )

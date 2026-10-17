@@ -16,6 +16,12 @@ KEYS = {
     "option_id": "contest_option",
     "from_option_id": "contest_option",
 }
+REFERENCES = (
+    *((fact, key, KEYS[f"{key.removesuffix('_k')}_id"]) for fact in FACTS for key in ("unit_k", "option_k")),
+    ("result_flow", "from_option_k", "contest_option"),
+    ("result_rollup", "option_k", "contest_option"),
+    ("result_rollup", "area_k", "area"),
+)
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
@@ -253,6 +259,31 @@ def _references(stage: Stage) -> list[tuple[str, sql.Composed]]:
                     ).format(table=sql.Literal(table), facts=stage.staged(table)),
                 )
             )
+    if "result_set" in stage.tables:
+        for table, column, parent in REFERENCES:
+            if table in FACTS:
+                queries.append(
+                    (
+                        "reference.stranded",
+                        sql.SQL(
+                            """select null::uuid, r.id, jsonb_build_object('table', {table}, 'column', {column}, 'rows', count(*))
+                               from {sets} s join public.result_set r on r.id = s.id
+                               join public.{facts} t on t.result_set_k = r.k
+                               where t.{key} <> 0 and not exists (select from public.{parent} p where p.k = t.{key})
+                                 and not exists (
+                                   select from public.flag f where f.result_set_id = r.id and f.check_code = 'reference.stranded'
+                                     and f.details ->> 'table' = {table} and f.details ->> 'column' = {column})
+                               group by r.id"""
+                        ).format(
+                            table=sql.Literal(table),
+                            column=sql.Literal(column),
+                            sets=stage.staged("result_set"),
+                            facts=sql.Identifier(table),
+                            key=sql.Identifier(column),
+                            parent=sql.Identifier(parent),
+                        ),
+                    )
+                )
     return queries
 
 
