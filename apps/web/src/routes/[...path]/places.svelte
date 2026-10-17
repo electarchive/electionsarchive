@@ -77,6 +77,14 @@
     span != null && places.rows.some((row) => row.earlier != null),
   );
   const listed = $derived([...places.rows, ...(places.districts ?? [])]);
+  const owner = $derived.by(() => {
+    const head = /^.+?'s /u.exec(places.rows[0]?.name ?? "")?.[0];
+    return head != null &&
+      places.rows.length > 1 &&
+      places.rows.every((row) => row.name.startsWith(head))
+      ? head
+      : null;
+  });
   const first = $derived(places.legend[0]);
   const second = $derived(places.legend[1]);
   const moves = $derived(
@@ -151,17 +159,19 @@
       })
       .map((entry) => {
         const parent = places.rows.find((row) => row.k === entry.row.within);
-        const short = entry.row.name
-          .replace(`${parent?.name ?? ""}'s `, "")
-          .replace(" congressional district", " district");
+        const isUnder = isNested && parent != null;
+        const prefix = isUnder ? `${parent.name}'s ` : owner;
+        const short =
+          prefix != null && entry.row.name.startsWith(prefix)
+            ? entry.row.name
+                .slice(prefix.length)
+                .replace(" congressional district", " district")
+            : entry.row.name;
         return {
           ...entry.row,
           move: entry.move,
-          isNested: isNested && parent != null,
-          label:
-            isNested && parent != null
-              ? short.charAt(0).toUpperCase() + short.slice(1)
-              : entry.row.name,
+          isNested: isUnder,
+          label: short.charAt(0).toUpperCase() + short.slice(1),
         };
       });
   });
