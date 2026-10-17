@@ -711,7 +711,11 @@ async function load(
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
        order by cy.option_id = o.id desc, cy.id limit 1) as person,
-      oc.kind::text as outcome, oc.seats
+      oc.kind::text as outcome,
+      case when o.parent_option_id is null or not exists (
+        select from outcome y join result_set ry on ry.id = y.result_set_id and ry.is_default
+        where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
+      ) then oc.seats end as seats
     from contest_option o
     left join entity_merge pm on pm.entity_id = o.party_id
     left join lateral (

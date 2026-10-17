@@ -479,6 +479,7 @@
                   total: 1,
                   parts: race.results
                     .slice(0, 2)
+                    .toSorted((a, b) => (a.lean ?? 1e9) - (b.lean ?? 1e9))
                     .map((row) => ({
                       key: row.key,
                       label:
