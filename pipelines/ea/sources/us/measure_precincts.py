@@ -1,10 +1,14 @@
 import io
 import json
 import re
+import zipfile
+from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
 
+import fastexcel
+import httpx
 import polars as pl
 
 from ea import raw
@@ -12,6 +16,8 @@ from ea.changeset import Changeset
 from ea.sources.us import (
     county_measures,
     elstats,
+    la_sos,
+    me_canvass,
     measures,
     medsl,
     medsl_measures,
@@ -19,6 +25,7 @@ from ea.sources.us import (
     medsl_state_precincts,
     oe_precincts,
     openelections,
+    wa_local,
 )
 from ea.store import DATA, connect
 
@@ -38,6 +45,120 @@ OPENELECTIONS = (
     "Precinct rows of OpenElections' volunteer-transcribed precinct files. Each answer's precinct rows add up to the "
     "totals of this question's default results{counties}."
 )
+LOUISIANA = (
+    "Precinct rows of the Louisiana Secretary of State's official results for this question, one file per parish. "
+    "Each answer's precinct rows add up to the totals of this question's default results{counties}."
+)
+WASHINGTON = (
+    "Precinct rows of the Washington Secretary of State's statewide precinct results export. Each answer's precinct "
+    "rows add up to the totals of this question's default results{counties}."
+)
+WA_COUNTIES = {
+    "AD": 1,
+    "AS": 3,
+    "BE": 5,
+    "CH": 7,
+    "CM": 9,
+    "CR": 11,
+    "CU": 13,
+    "CZ": 15,
+    "DG": 17,
+    "FE": 19,
+    "FR": 21,
+    "GA": 23,
+    "GR": 25,
+    "GY": 27,
+    "IS": 29,
+    "JE": 31,
+    "KI": 33,
+    "KP": 35,
+    "KS": 37,
+    "KT": 39,
+    "LE": 41,
+    "LI": 43,
+    "MA": 45,
+    "OK": 47,
+    "PA": 49,
+    "PE": 51,
+    "PI": 53,
+    "SJ": 55,
+    "SK": 57,
+    "SM": 59,
+    "SN": 61,
+    "SP": 63,
+    "ST": 65,
+    "TH": 67,
+    "WK": 69,
+    "WL": 71,
+    "WM": 73,
+    "WT": 75,
+    "YA": 77,
+}
+MAINE = (
+    "Town and ward rows of the Maine Secretary of State's referendum tabulation, from the Wayback Machine's copy. "
+    "Maine reports by municipality, so most units here are whole towns rather than precincts. Each answer's rows add "
+    "up to the totals of this question's default results{counties}."
+)
+ME_FILES = {
+    "2012-11-06": ("20250324173053", "2012-13/refstate1112.xls"),
+    "2013-11-05": ("20250320045244", "2012-13/bondresults.xlsx"),
+    "2014-11-04": ("20250324114911", "2014-15/bondsgen.xlsx"),
+    "2015-11-03": ("20250320022437", "2014-15/referendum.xlsx"),
+    "2016-11-08": ("20250306110844", "2016/referendum16.xlsx"),
+    "2017-06-13": ("20250320045124", "2017/results61317.xlsx"),
+    "2017-11-07": ("20250320232336", "2017/results1117.xlsx"),
+    "2018-06-12": ("20250404024137", "2018/referendum618.xlsx"),
+    "2018-11-06": ("20250404054610", "2018/referendum11-6-18.xlsx"),
+    "2019-11-05": ("20250324070340", "2019/refer1119.xlsx"),
+    "2020-03-03": ("20250405141335", "2020/ref320.xlsx"),
+    "2020-07-14": ("20250405141224", "2020/reftab720.xlsx"),
+    "2021-11-02": ("20240405170851", "2021/ref1121.xlsx"),
+    "2023-11-07": ("20250318204154", "2023/referendum%20election%20nov%202023.xlsx"),
+}
+ME_NAMES = {
+    name: name[:3]
+    for name in [
+        "ANDROSCOGGIN",
+        "AROOSTOOK",
+        "CUMBERLAND",
+        "FRANKLIN",
+        "HANCOCK",
+        "KENNEBEC",
+        "KNOX",
+        "LINCOLN",
+        "OXFORD",
+        "PENOBSCOT",
+        "PISCATAQUIS",
+        "SAGADAHOC",
+        "SOMERSET",
+        "WALDO",
+        "WASHINGTON",
+        "YORK",
+    ]
+}
+ME_WAYBACK = "https://web.archive.org/web/{}id_/https://www.maine.gov/sos/cec/elec/results/{}"
+ME_COUNTIES = [
+    "AND",
+    "ARO",
+    "CUM",
+    "FRA",
+    "HAN",
+    "KEN",
+    "KNO",
+    "LIN",
+    "OXF",
+    "PEN",
+    "PIS",
+    "SAG",
+    "SOM",
+    "WAL",
+    "WAS",
+    "YOR",
+]
+MASSACHUSETTS = (
+    "Precinct rows of the Secretary of the Commonwealth's election statistics archive for this question. Each "
+    "answer's precinct rows add up to the totals of this question's default results{counties}."
+)
 COMMITS = openelections.COMMITS | county_measures.COMMITS
 FILE = re.compile(
     r"(?:.*/)?(\d{8})__([a-z]{2})__((?:general|primary|special|runoff)(?:__(?:general|primary|runoff))?)(__[a-z_]+)?__precinct\.csv"
@@ -51,16 +172,48 @@ def fetch() -> None:
             """select distinct substr(p.iso_code, 4), e.date_from from contest c
                join election e on e.id = c.election_id
                join polity p on p.id = e.polity_id and p.iso_code ~ '^US-..$'
-               where c.kind = 'ballot_question' and e.date_from between '2015-01-01' and %s
+               where c.kind = 'ballot_question' and e.date_from between %s and %s
                  and not exists (select 1 from result_set rs join result_value v on v.result_set_k = rs.k
                                  join reporting_unit u on u.k = v.unit_k
                                  where rs.contest_id = c.id and u.scheme_code = 'us.precinct')
                order by 1, 2""",
-            [date(LAST, 12, 31)],
+            [date(FIRST, 1, 1), date(LAST, 12, 31)],
         ).fetchall()
+    for state, day in dates:
+        if state == "WA" and wa_local.PRECINCTS.format(day=day) not in json.loads(
+            (DATA / "raw" / wa_local.SOURCE / "index.json").read_text()
+        ):
+            try:
+                raw.fetch(SOURCE, wa_local.PRECINCTS.format(day=day), suffix=".csv")
+            except httpx.HTTPStatusError:
+                print(f"{day}: no Washington precinct export")
+        if state == "ME" and f"{day}" in ME_FILES:
+            stamp, path = ME_FILES[f"{day}"]
+            raw.fetch(SOURCE, ME_WAYBACK.format(stamp, path), suffix="." + path.rsplit(".", 1)[1])
+        if state == "MA":
+            for id, year, *_ in measures.MA_ROW.findall(raw.cached(measures.SOURCE, measures.MA_LIST).path.read_text()):
+                if int(year) == day.year:
+                    raw.fetch(
+                        SOURCE,
+                        measures.MA_DOWNLOAD.format(id=id).replace("precincts_include:0", "precincts_include:1"),
+                        suffix=".csv",
+                    )
+        if state != "LA":
+            continue
+        races = json.loads(
+            raw.fetch(SOURCE, la_sos.blob(day, "RacesCandidates_Multiparish.htm"), suffix=".json").path.read_text()
+        )
+        links = [
+            la_sos.blob(day, f"VotesRaceByPrecinct/Votes_{race['ID']}_{parish}.htm")
+            for race in la_sos.many((races.get("Races") or {}).get("Race"))
+            if race["GeneralTitle"] == "Constitutional Amendment" and race.get("IsMultiParish") == "1"
+            for parish in la_sos.PARISHES
+        ]
+        with ThreadPoolExecutor(3) as pool:
+            list(pool.map(lambda link: raw.fetch(SOURCE, link, suffix=".json"), links))
     trees: dict[str, list[str]] = {}
     for state, day in dates:
-        if state not in COMMITS:
+        if state not in COMMITS or day.year < 2015:
             continue
         if state not in trees:
             tree = raw.fetch(
@@ -363,6 +516,199 @@ def parse() -> None:
         .write_parquet(PARSED / "openelections_recent.parquet")
     )
 
+    rows = []
+    for url in index:
+        found = re.fullmatch(re.escape(la_sos.DATA_URL) + r"(\d{8})/VotesRaceByPrecinct/Votes_(\d+)_(\d{2})\.htm", url)
+        if found is None:
+            continue
+        day = date(int(found[1][:4]), int(found[1][4:6]), int(found[1][6:]))
+        races = json.loads(raw.cached(SOURCE, la_sos.blob(day, "RacesCandidates_Multiparish.htm")).path.read_text())
+        race = next(race for race in la_sos.many(races["Races"]["Race"]) if race["ID"] == found[2])
+        answers = {choice["ID"]: ANSWERS.get(choice["Desc"].strip().upper()) for choice in la_sos.many(race["Choice"])}
+        listed = json.loads(raw.cached(SOURCE, url).path.read_text())
+        for precinct in la_sos.many((listed.get("Precincts") or {}).get("Precinct")):
+            for choice in la_sos.many(precinct.get("Choice")):
+                rows.append(
+                    {
+                        "year": day.year,
+                        "day": day,
+                        "state": "LA",
+                        "office": race["SpecificTitle"],
+                        "district": None,
+                        "fips": f"22{2 * int(found[3]) - 1:03}",
+                        "jurisdiction": "",
+                        "precinct": precinct["Precinct"].strip(),
+                        "answer": answers[choice["ID"]],
+                        "votes": int(choice["VoteTotal"]),
+                    }
+                )
+    washington = json.loads((DATA / "raw" / wa_local.SOURCE / "index.json").read_text())
+    frames = []
+    for url in [*index, *washington]:
+        found = re.fullmatch(r"https://results\.vote\.wa\.gov/results/(\d{8})/export/\d{8}_allstateprecincts\.csv", url)
+        if found is None:
+            continue
+        day = date(int(found[1][:4]), int(found[1][4:6]), int(found[1][6:]))
+        frames.append(
+            pl.read_csv(
+                raw.cached(SOURCE if url in index else wa_local.SOURCE, url).path,
+                infer_schema=False,
+                encoding="utf8-lossy",
+            ).select(
+                pl.lit(day.year, pl.Int32).alias("year"),
+                pl.lit(day).alias("day"),
+                pl.lit("WA").alias("state"),
+                pl.col("Race").str.replace_all(r"\s+", " ").str.strip_chars().alias("office"),
+                pl.lit(None, pl.String).alias("district"),
+                pl.col("CountyCode")
+                .replace_strict({code: f"53{number:03}" for code, number in WA_COUNTIES.items()}, default=None)
+                .alias("fips"),
+                pl.lit("").alias("jurisdiction"),
+                pl.col("PrecinctName").str.strip_chars().alias("precinct"),
+                pl.col("Candidate")
+                .str.strip_chars()
+                .str.to_uppercase()
+                .replace_strict(
+                    {
+                        "YES": "YES",
+                        "APPROVED": "YES",
+                        "REPEALED": "YES",
+                        "NO": "NO",
+                        "REJECTED": "NO",
+                        "MAINTAINED": "NO",
+                    },
+                    default=None,
+                )
+                .alias("answer"),
+                pl.col("Votes").cast(pl.Int64, strict=False).alias("votes"),
+            )
+        )
+    pl.concat(frames).filter(
+        pl.col("precinct").str.to_uppercase() != "TOTAL",
+        pl.col("answer").is_not_null(),
+        pl.col("answer").n_unique().over("day", "office") == 2,
+        pl.col("fips").n_unique().over("day", "office") == len(WA_COUNTIES),
+    ).group_by("year", "day", "state", "office", "district", "fips", "jurisdiction", "precinct", "answer").agg(
+        pl.col("votes").sum()
+    ).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "washington.parquet")
+
+    with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS") == "MA")
+    places: dict[str, str] = {}
+    for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
+        places.setdefault(elstats.plain(name), geoid[:5])
+        places.setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+    frames = []
+    for id, year, *_ in measures.MA_ROW.findall(raw.cached(measures.SOURCE, measures.MA_LIST).path.read_text()):
+        url = measures.MA_DOWNLOAD.format(id=id).replace("precincts_include:0", "precincts_include:1")
+        if url not in index:
+            continue
+        table = pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False)
+        town = (
+            pl.col("Locality")
+            .str.replace(r"^N\. ", "North ")
+            .str.replace(r"^S\. ", "South ")
+            .str.replace(r"^E\. ", "East ")
+            .str.replace(r"^W\. ", "West ")
+        )
+        frames.append(
+            table.filter(pl.col("Locality").is_not_null(), pl.col("Locality") != "TOTALS")
+            .unpivot(["Yes", "No"], index=["Locality", "Ward", "Pct"])
+            .select(
+                year=pl.lit(int(year), pl.Int32),
+                day=pl.lit(None, pl.Date),
+                state=pl.lit("MA"),
+                office=pl.lit(f"ma:{id}"),
+                district=pl.lit(None, pl.String),
+                fips=town.map_elements(elstats.plain, return_dtype=pl.String).replace_strict(places, default=None),
+                jurisdiction=pl.lit(""),
+                precinct=pl.concat_str(
+                    pl.col("Locality"),
+                    pl.when(pl.col("Ward") != "-").then(pl.lit(" Ward ") + pl.col("Ward")).otherwise(pl.lit("")),
+                    pl.lit(" Precinct "),
+                    pl.col("Pct"),
+                ),
+                answer=pl.col("variable").str.to_uppercase(),
+                votes=pl.col("value").str.replace_all(",", "").cast(pl.Int64),
+            )
+        )
+    pl.concat(frames).write_parquet(PARSED / "massachusetts.parquet")
+
+    tallies = []
+    towns: dict[str, str] = {}
+    for held, (stamp, path) in sorted(ME_FILES.items(), key=lambda item: item[1][1].startswith(("2012-13", "2014-15"))):
+        day = date.fromisoformat(held)
+        reader = fastexcel.read_excel(raw.cached(SOURCE, ME_WAYBACK.format(stamp, path)).path.read_bytes())
+        sheet = next(
+            frame
+            for name in reader.sheet_names
+            if (frame := reader.load_sheet(name, header_row=None).to_polars()).height >= 100
+        )
+        cells = [[str(cell).strip().upper() if cell is not None else "" for cell in row] for row in sheet.iter_rows()]
+        header = next(number for number, row in enumerate(cells) if "YES" in row)
+        labels = [cells[header][column] or cells[header - 1][column] for column in range(len(cells[header]))]
+        town = next(column for column, label in enumerate(labels) if label in ("MUNICIPALITY", "TOWN"))
+        county = next((column for column, label in enumerate(labels) if label in ("CTY", "COUNTY")), None)
+        ward = next((column for column, label in enumerate(labels) if label == "W-P"), None)
+        pairs = [
+            (column, next(other for other in range(column + 1, len(labels)) if labels[other] == "NO"))
+            for column, label in enumerate(labels)
+            if label == "YES"
+        ]
+        sections: list[str | None] = []
+        pending = None
+        for row in reversed(cells):
+            for cell in row[: town + 2]:
+                words = cell.replace(":", "").split()
+                named = [word for word in words if word in ME_NAMES]
+                if "TOTAL" in cell and named and ("COUNTY" in words or words[0] in ME_NAMES):
+                    pending = ME_NAMES[named[0]]
+            sections.append(pending)
+        sections.reverse()
+        current = None
+        for row, section in zip(cells[header + 1 :], sections[header + 1 :], strict=True):
+            if county is not None and row[county]:
+                current = row[county][:3]
+            overseas = any("UOCAVA" in cell for cell in row[: town + 2])
+            if not overseas and (not row[town] or any("TOTAL" in cell for cell in row[: town + 2])):
+                continue
+            if county is not None:
+                towns.setdefault(row[town], current or "")
+            code = current if county is not None else towns.get(row[town], section)
+            for number, (yes, no) in enumerate(pairs, 1):
+                for answer, column in (("YES", yes), ("NO", no)):
+                    tallies.append(
+                        {
+                            "year": day.year,
+                            "day": day,
+                            "state": "ME",
+                            "office": f"QUESTION {number}",
+                            "district": None,
+                            "fips": "ME:uocava"
+                            if overseas
+                            else f"23{2 * ME_COUNTIES.index(code) + 1:03}"
+                            if code in ME_COUNTIES
+                            else None,
+                            "jurisdiction": "",
+                            "precinct": "UOCAVA"
+                            if overseas
+                            else " ".join(part for part in (row[town], row[ward] if ward is not None else "") if part),
+                            "answer": answer,
+                            "votes": int(float(row[column] or 0)),
+                        }
+                    )
+    pl.DataFrame(
+        tallies, schema_overrides={"year": pl.Int32, "district": pl.String}, infer_schema_length=None
+    ).group_by("year", "day", "state", "office", "district", "fips", "jurisdiction", "precinct", "answer").agg(
+        pl.col("votes").sum()
+    ).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "maine.parquet")
+
+    pl.DataFrame(rows, schema_overrides={"year": pl.Int32, "district": pl.String}).sort(
+        "day", "office", "fips", "precinct", "answer"
+    ).write_parquet(PARSED / "louisiana.parquet")
+
 
 def emit() -> Path:
     archives = pl.read_parquet(PARSED / "archives.parquet").with_columns(
@@ -373,6 +719,10 @@ def emit() -> Path:
             pl.read_parquet(PARSED / "medsl.parquet").with_columns(origin=pl.lit("medsl")),
             pl.read_parquet(PARSED / "openelections.parquet").with_columns(origin=pl.lit("openelections")),
             pl.read_parquet(PARSED / "openelections_recent.parquet").with_columns(origin=pl.lit("openelections")),
+            pl.read_parquet(PARSED / "louisiana.parquet").with_columns(origin=pl.lit("louisiana")),
+            pl.read_parquet(PARSED / "washington.parquet").with_columns(origin=pl.lit("washington")),
+            pl.read_parquet(PARSED / "maine.parquet").with_columns(origin=pl.lit("maine")),
+            pl.read_parquet(PARSED / "massachusetts.parquet").with_columns(origin=pl.lit("massachusetts")),
         ],
         how="diagonal_relaxed",
     )
@@ -406,6 +756,9 @@ def emit() -> Path:
                 "select code, id, area_id from reporting_unit where scheme_code in ('us.county', 'us.place')"
             ).fetchall()
         }
+        aggregates: dict[str, UUID] = dict(
+            conn.execute("select code, id from reporting_unit where scheme_code = 'us.aggregate'").fetchall()
+        )
         defaults = pl.DataFrame(
             conn.execute(
                 """select cx.value, substr(p.iso_code, 4), e.date_from, rs.election_id::text, rs.contest_id::text,
@@ -445,13 +798,22 @@ def emit() -> Path:
             )
             .filter((pl.col("yes") > 0) & (pl.col("no") > 0))
         )
-        sources: dict[tuple[str, str | int], tuple[UUID, str]] = {
-            ("medsl", year): (cs.source(medsl_state.PUBLISHER, title), MEDSL)
-            for year, (title, _) in medsl_state_precincts.TITLES.items()
-        } | {
-            ("openelections", state): (cs.source("OpenElections", f"{state} precinct-level results"), OPENELECTIONS)
-            for state in returns.filter(pl.col("origin") == "openelections")["state"].unique().to_list()
-        }
+        sources: dict[tuple[str, str | int], tuple[UUID, str]] = (
+            {
+                ("medsl", year): (cs.source(medsl_state.PUBLISHER, title), MEDSL)
+                for year, (title, _) in medsl_state_precincts.TITLES.items()
+            }
+            | {
+                ("openelections", state): (cs.source("OpenElections", f"{state} precinct-level results"), OPENELECTIONS)
+                for state in returns.filter(pl.col("origin") == "openelections")["state"].unique().to_list()
+            }
+            | {
+                ("louisiana", "LA"): (cs.source(la_sos.PUBLISHER, la_sos.TITLE), LOUISIANA),
+                ("washington", "WA"): (cs.source(wa_local.PUBLISHER, wa_local.TITLE), WASHINGTON),
+                ("maine", "ME"): (cs.source(me_canvass.PUBLISHER, me_canvass.TITLE), MAINE),
+                ("massachusetts", "MA"): (cs.source(elstats.MA_PUBLISHER, elstats.TITLE), MASSACHUSETTS),
+            }
+        )
 
         candidates: list[tuple[str, str, UUID | None, str, pl.DataFrame]] = [
             (key, state, None, ARCHIVE, rows)
@@ -482,7 +844,7 @@ def emit() -> Path:
 
         landed: dict[str, int] = {}
         skipped = 0
-        minted: dict[str, tuple[str, str, date]] = {}
+        minted: dict[tuple[str, date], tuple[str, str]] = {}
         values = []
         for key, state, source, method, rows in candidates:
             official = defaults.filter(pl.col("key") == key)
@@ -531,40 +893,32 @@ def emit() -> Path:
             first = official.row(0, named=True)
             options = dict(official.select("answer", "option").unique().iter_rows())
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
-            if result_set not in cs.minted:
-                continue
+            present = pl.DataFrame(
+                conn.execute(
+                    """select u.id::text, o.id::text from result_value v join result_set rs on rs.k = v.result_set_k
+                       join reporting_unit u on u.k = v.unit_k join contest_option o on o.k = v.option_k
+                       where rs.id = %s""",
+                    [result_set],
+                ).fetchall(),
+                schema={"unit_id": pl.String, "option_id": pl.String},
+                orient="row",
+            )
             day = first["day"]
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=UUID(first["election"]),
-                contest_id=UUID(first["contest"]),
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=source or UUID(first["source"]),
-                is_default=False,
-                completeness=1,
-            )
-            cs.add(
-                "note",
-                entity_id=result_set,
-                kind="methodology",
-                body_md=method.format(counties=" and to each county's" if by_county else ""),
-            )
             rows = rows.with_columns(
                 code=pl.concat_str(pl.lit(f"{day.year}:{state}"), "fips", "jurisdiction", "precinct", separator=":")
             )
             codes = {}
             for code, fips in rows.select("code", "fips").unique().iter_rows():
+                if fips in aggregates:
+                    codes[code] = str(aggregates[fips])
+                    continue
                 codes[code] = str(cs.unit("us.precinct", code, on=day))
                 if UUID(codes[code]) in cs.minted:
-                    minted.setdefault(code, (state, fips, day))
-            values.append(
+                    minted.setdefault((code, day), (state, fips))
+            complete = (
                 rows.group_by("code", "answer")
                 .agg(pl.col("votes").sum())
                 .select(
-                    result_set_id=pl.lit(str(result_set)),
                     unit_id=pl.col("code").replace_strict(codes),
                     option_id=pl.col("answer").replace_strict(options),
                     channel=pl.lit(0, pl.Int16),
@@ -574,8 +928,38 @@ def emit() -> Path:
                     value=pl.col("votes"),
                 )
             )
+            staged, supersedes = result_set, None
+            if result_set not in cs.minted:
+                gap = complete.join(present, on=["unit_id", "option_id"], how="anti")
+                if gap.height == 0 or not present["unit_id"].is_in(list(codes.values())).all():
+                    continue
+                staged, supersedes = cs.key(f"{SOURCE}.result_set", f"{key}:precinct:complete"), result_set
+                if staged not in cs.minted:
+                    continue
+                print(f"{key}: {present.height} of its values on file, superseded by a complete set")
+            for id, status in [(supersedes, "superseded"), (staged, "active")] if supersedes else [(staged, "active")]:
+                cs.add(
+                    "result_set",
+                    id=id,
+                    election_id=UUID(first["election"]),
+                    contest_id=UUID(first["contest"]),
+                    stage="certified",
+                    kind="counted",
+                    status=status,
+                    source_id=source or UUID(first["source"]),
+                    is_default=False,
+                    supersedes_id=supersedes if id == staged else None,
+                    completeness=1,
+                )
+            cs.add(
+                "note",
+                entity_id=staged,
+                kind="methodology",
+                body_md=method.format(counties=" and to each county's" if by_county else ""),
+            )
+            values.append(complete.select(pl.lit(str(staged)).alias("result_set_id"), pl.all()))
             landed[state] = landed.get(state, 0) + 1
-        for code, (state, fips, day) in minted.items():
+        for (code, day), (state, fips) in minted.items():
             cs.add(
                 "reporting_unit",
                 id=cs.unit("us.precinct", code, on=day),
