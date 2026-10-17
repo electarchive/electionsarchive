@@ -11,7 +11,8 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import medsl, openelections
+from ea.sources.us import medsl, medsl_state, openelections
+from ea.sources.us.klarner import LOWER
 from ea.store import DATA, connect
 
 SOURCE = "us.oe_precincts"
@@ -52,6 +53,31 @@ MI_OFFICES = {
     "Secretary of State": "secretary-of-state",
     "Attorney General": "attorney-general",
     "Proposal 22-3": "question:county:proposal-22-3",
+}
+STATEWIDE = {
+    r"governor(\s*(and|&|/)\s*(lieutenant|lt\.?) governor)?": ("governor",),
+    r"(lieutenant|lt\.?) governor": ("lieutenant-governor",),
+    r"attorney general": ("attorney-general",),
+    r"secretary of (the )?state": ("secretary-of-state", "secretary-of-the-state"),
+    r"(state )?treasurer|treasurer of state": ("treasurer",),
+    r"(state )?auditor|auditor of state": ("auditor",),
+    r"(state )?comptroller|comptroller of public accounts": ("comptroller",),
+    r"(state )?controller": ("controller",),
+}
+VERMONT = {
+    "add": "addison",
+    "ben": "bennington",
+    "cal": "caledonia",
+    "cht": "chittenden",
+    "ess-orl": "essexorleans",
+    "frk": "franklin",
+    "gri": "grandisle",
+    "lam": "lamoille",
+    "ora": "orange",
+    "rut": "rutland",
+    "was": "washington",
+    "whm": "windham",
+    "wnd": "windsor",
 }
 
 
@@ -164,16 +190,16 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="President, U.S. Senate, and U.S. House general elections by precinct 2000–2014, and Michigan's "
-            "2022 statewide offices, legislature, and Proposal 22-3 by precinct, from OpenElections",
+            summary="President, U.S. Senate, U.S. House, governor, statewide office, and state legislative general "
+            "elections by precinct 2000–2014, and Michigan's 2022 statewide offices, legislature, and Proposal 22-3 by "
+            "precinct, from OpenElections",
             polity="US",
         )
         filled = {
             key
             for (key,) in conn.execute(
                 """select cx.value from external_id cx join result_set rs on rs.contest_id = cx.entity_id
-                   where cx.scheme = 'us.contest' and cx.value ~ '^20(0[0-9]|1[0-4])-11-'
-                     and cx.value ~ ':(president|senate|house)(:|$)' and rs.changeset_id not in
+                   where cx.scheme = 'us.contest' and cx.value ~ '^20(0[0-9]|1[0-4])-11-' and rs.changeset_id not in
                        (select id from changeset where pipeline = %s)
                      and exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')""",
@@ -232,9 +258,93 @@ def emit() -> Path:
         )
         if shared.height:
             raise ValueError(f"precinct names give one candidate twice in a unit: {shared.head(5)}")
+        keys = {
+            key
+            for (key,) in conn.execute(
+                "select value from external_id where scheme = 'us.contest' and value ~ '^20(0[0-9]|1[0-4])-11-'"
+            ).fetchall()
+        }
+        seats: list[tuple[str, int, str, str | None, str]] = []
+        for state, year, name, district in (
+            frame.filter(pl.col("year") < 2016).select("state", "year", "office", "district").unique().iter_rows()
+        ):
+            text = re.sub(r"\s+", " ", name.lower()).strip()
+            if re.search(
+                r"\b(u\.?\s?s\.?|united states|congress\w*|county|city|party|levy|referendum|measure|amendment|board"
+                r"|commission\w*|court|judge|regents?|school|recorder|clerk)\b",
+                text,
+            ):
+                continue
+            day = date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7)
+            special = bool(re.search(r"special|unexpired|vacancy", f"{text} {district or ''}".lower()))
+            plain_office = re.sub(r"\s*\((unexpired|special)[^)]*\)|\s+state ?wide$|\s+(special|unexpired)$", "", text)
+            names = next((names for pattern, names in STATEWIDE.items() if re.fullmatch(pattern, plain_office)), None)
+            upper = re.search(r"\bsenat", text)
+            statehood = re.search(r"\bstate\b|assembly|delegate|legislat", text) or re.fullmatch(
+                r"rep \d+-\d|repres \d+ dist", text
+            )
+            if names:
+                tried = [
+                    f"{day}:{state}:{office_name}{suffix}"
+                    for office_name in names
+                    for suffix in ((":special", "") if special else ("", ":special"))
+                ]
+            elif upper and not statehood and not district and not re.search(r"\d", text):
+                tried = [f"{day}:{state}:senate"]
+            elif (upper and (statehood or district)) or (
+                statehood and re.search(r"\b(house|rep\w*|assembly|delegates?|legislature)\b", text)
+            ):
+                body = (
+                    "legislature"
+                    if state == "NE"
+                    else "senate"
+                    if upper
+                    else re.sub(
+                        r"[^a-z]+",
+                        "-",
+                        LOWER.get(state, "House of Representatives")
+                        .removeprefix("State ")
+                        .removesuffix(" of Representatives")
+                        .lower(),
+                    )
+                )
+                seat = (district or "").lower().strip()
+                if not seat:
+                    found = re.search(r"(\d+(?:\s*-+\s*\d|[a-z]\b)?)", text)
+                    seat = found[1] if found else ""
+                seat = re.sub(r"\.0$|\s*(unexpired term|vacancy)$", "", seat)
+                seat = re.sub(r"^(\d+)(st|nd|rd|th) (representative|senatorial) district$", r"\1", seat)
+                seat = re.sub(r"^(ad|sd|hd|d)0*(?=\d)", "", seat)
+                post = None
+                if found_post := re.fullmatch(r"0*(\d+)\s*-+\s*(\d)", seat):
+                    seat, post = found_post[1], found_post[2]
+                elif found_post := re.search(r"\bpos(?:ition|\.)?\s*(\d)", text):
+                    post = found_post[1]
+                if not seat:
+                    continue
+                code = VERMONT[seat] if state == "VT" and seat in VERMONT else medsl_state._district(state, seat)[0]
+                base = f"{day}:{state}:{body}:{code}" + (f":{post}" if post else "")
+                wanted, other = ("gs", "g") if special else ("g", "gs")
+                tried = [f"{base}:{wanted}", f"{base}:{other}"]
+                if not post:
+                    for suffix in (wanted, other):
+                        posted = [
+                            f"{base}:{number}:{suffix}" for number in range(1, 5) if f"{base}:{number}:{suffix}" in keys
+                        ]
+                        tried.extend(posted if len(posted) == 1 else [])
+            else:
+                continue
+            key = next((key for key in tried if key in keys), None)
+            if key is not None:
+                seats.append((state, year, name, district, key.split(":", 2)[2]))
+        seated = pl.DataFrame(seats, schema=["state", "year", "office", "district", "seat"], orient="row").with_columns(
+            pl.col("year").cast(pl.Int32)
+        )
+        print(f"{len(seats)} state office and legislative lines map to {seated['seat'].n_unique()} contest keys")
         lines = pl.concat(
             [
                 frame.filter(pl.col("year") < 2016)
+                .join(seated, on=["state", "year", "office", "district"], how="left", nulls_equal=True)
                 .with_columns(
                     chamber=pl.when(office.str.contains(r"^(u\.?s\.? )?president|^presidential electors"))
                     .then(pl.lit("president"))
@@ -242,6 +352,7 @@ def emit() -> Path:
                     .then(pl.lit("senate"))
                     .when(office.str.contains(openelections.HOUSE.pattern) & ~office.str.contains(r"\bstate\b"))
                     .then(pl.lit("house"))
+                    .otherwise("seat")
                 )
                 .select(
                     "year",
@@ -250,7 +361,7 @@ def emit() -> Path:
                     "fips",
                     "candidate",
                     "votes",
-                    special=office.str.contains("special|unexpired"),
+                    special=office.str.contains("special|unexpired") & pl.col("seat").is_null(),
                     district=pl.when(pl.col("chamber") == "house").then(
                         pl.coalesce(
                             pl.col("district").fill_null("").str.extract(r"(\d+)"), office.str.extract(r"(\d+)")

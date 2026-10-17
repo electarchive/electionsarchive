@@ -289,7 +289,9 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                 if chamber in ("state", "statewide", "retention")
                 else pl.lit(None, pl.String),
                 seat=pl.col("district") if chamber in ("state", "statewide", "retention") else pl.lit(None, pl.String),
-                party=pl.col("party_detailed") if chamber in ("state", "statewide", "retention") else pl.lit(None, pl.String),
+                party=pl.col("party_detailed")
+                if chamber in ("state", "statewide", "retention")
+                else pl.lit(None, pl.String),
                 stage=pl.col("stage").str.to_uppercase()
                 if chamber in ("state", "statewide", "retention")
                 else pl.lit(None, pl.String),
@@ -717,14 +719,18 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
         known = []
         for option, kind, label, name, fec in conn.execute(
             """select o.id, o.kind, o.ballot_label, n.text,
-                          (select sum(v.value)::bigint from result_value v
-                           where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1 and v.count_round = %s)
+                          coalesce(
+                            (select sum(v.value)::bigint from result_value v
+                             where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1 and v.count_round = %s),
+                            (select sum(v.value)::bigint from result_value v
+                             join contest_option p on p.k = v.option_k and p.parent_option_id = o.id
+                             where v.result_set_k = rs.k and v.measure = 1 and v.count_round = %s))
                    from contest_option o
                    join result_set rs on rs.contest_id = o.contest_id and rs.is_default
                    left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
                    left join name n on n.entity_id = cy.person_id and n.is_preferred
                    where o.contest_id = %s and o.parent_option_id is null""",
-            [first, contest],
+            [first, first, contest],
         ).fetchall():
             tokens = [slug(text).split("-") for text in (label, name) if text]
             texts = {word for words in tokens for word in words} | {
@@ -806,6 +812,12 @@ def attach(cs: Changeset, conn: Connection, congress: pl.DataFrame, sources: dic
             continue
         if undercounted and ":" in chamber:
             print(f"{key}: a primary candidate's county sum falls short of the FEC total, skipped")
+            continue
+        if (
+            max(known, key=lambda option: option[4] or 0)[0]
+            != max(known, key=lambda option: int(tallies.filter(pl.col("option") == str(option[0]))["votes"].sum()))[0]
+        ):
+            print(f"{key}: the county sum puts another option first, skipped")
             continue
         if any(votes > official * 0.01 for _, _, votes, official in missing):
             print(
