@@ -6646,7 +6646,7 @@ export const polities = {
         rounds as (
           select r.id as root, r.id from roots r
           union all
-          select r.id, c.id from roots r join contest c on c.previous_round_id = r.id where r."isOffice"
+          select r.id, c.id from roots r join contest c on c.previous_round_id = r.id
         ),
         tree(root, id) as (
           select root, id from rounds
