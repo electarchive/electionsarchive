@@ -17,9 +17,11 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
+EARLY = {"CT": 1789, "VT": 1789}
+ORDINALS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
 SEARCH = "https://{tenant}.civera.com/api/download_search.csv?"
 GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_cousubs_national.zip"
 TENANTS = {
@@ -48,6 +50,14 @@ FORMER = {
     ("VA", "cliftonforgecity"): "51005",
     ("VT", "sherburne"): "50021",
     ("NH", "wentworthslocation"): "33007",
+    ("CT", "saybrook"): "09007",
+    ("CT", "chatham"): "09007",
+    ("CT", "huntington"): "09001",
+    ("CT", "southlyme"): "09011",
+    ("VT", "salem"): "50019",
+    ("VT", "mansfield"): "50015",
+    ("VT", "sterling"): "50015",
+    ("VT", "acton"): "50025",
 }
 SUFFIXES = r"\b(town|city|gore|grant|location|purchase|plantation|township|village)\b"
 
@@ -56,7 +66,11 @@ def url(tenant: str, year: int) -> str:
     search = {
         "global": {"years": {"from": year, "to": year}},
         "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
-        "contests": {"candidates": [], "divisions": [], "offices": [{"free": office} for office in OFFICES]},
+        "contests": {
+            "candidates": [],
+            "divisions": [],
+            "offices": [{"free": office} for office in [*OFFICES, *(["President"] if year < FIRST else [])]],
+        },
         "specialElectionsOnly": False,
         "voterStats": False,
         "stages": [],
@@ -80,8 +94,8 @@ def fetch() -> None:
         listing = raw.fetch(SOURCE, ma_search(office), suffix=".html").path.read_text()
         for election, *_ in MA_ROW.findall(listing):
             raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
-    for tenant, _, _ in TENANTS.values():
-        for year in range(FIRST, LAST + 1):
+    for state, (tenant, _, _) in TENANTS.items():
+        for year in range(EARLY.get(state, FIRST), LAST + 1):
             raw.fetch(SOURCE, url(tenant, year), suffix=".csv")
 
 
@@ -99,6 +113,14 @@ def parse() -> None:
             if int(code[2:]) >= 500:
                 names[f"{plain(text)}city"] = code
             names.setdefault(plain(text), code)
+        days: dict[tuple[str, str, int, int | None], list[date]] = {}
+        for (value,) in conn.execute(
+            "select value from external_id where scheme = 'us.contest' and value ~ '^\\d{4}-\\d\\d-\\d\\d:(CT|VT):'"
+        ).fetchall():
+            held, state, chamber, *rest = value.split(":")
+            if chamber in ("house", "senate", "president") and (not rest or (len(rest) == 1 and rest[0].isdigit())):
+                day = date.fromisoformat(held)
+                days.setdefault((state, chamber, day.year, int(rest[0]) if rest else None), []).append(day)
     with zipfile.ZipFile(raw.cached(SOURCE, GAZETTEER).path) as archive:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
@@ -117,7 +139,7 @@ def parse() -> None:
         towns.setdefault(state, {})[name] = code
     frames = []
     for state, (tenant, _, _) in TENANTS.items():
-        for year in range(FIRST, LAST + 1):
+        for year in range(EARLY.get(state, FIRST), LAST + 1):
             frame = pl.read_csv(raw.cached(SOURCE, url(tenant, year)).path, infer_schema=False)
             if "office_name" not in frame.columns or frame.height == 0:
                 continue
@@ -125,7 +147,9 @@ def parse() -> None:
             division = pl.col("division_name").fill_null("").str.replace(r"\s*\(.*\)$", "")
             frames.append(
                 frame.with_columns(
-                    chamber=pl.when(office.str.contains(SENATE.pattern) & ~office.str.contains("state"))
+                    chamber=pl.when(office.is_in(["president", "presidential electors"]))
+                    .then(pl.lit("president"))
+                    .when(office.str.contains(SENATE.pattern) & ~office.str.contains(r"^state\b"))
                     .then(pl.lit("senate"))
                     .when(office.str.contains(HOUSE.pattern) & ~office.str.contains(r"\bstate\b"))
                     .then(pl.lit("house"))
@@ -154,7 +178,14 @@ def parse() -> None:
                     ).str.contains("(?i)special|unexpired"),
                     state=pl.lit(state),
                     district=pl.when(pl.col("chamber") == "house").then(
-                        pl.col("district_name").str.extract(r"(\d+)").cast(pl.Int16, strict=False)
+                        pl.coalesce(
+                            pl.col("district_name").str.extract(r"(\d+)").cast(pl.Int16, strict=False),
+                            pl.col("district_name")
+                            .str.to_lowercase()
+                            .replace_strict(
+                                {word: n for n, word in enumerate(ORDINALS, 1)}, default=None, return_dtype=pl.Int16
+                            ),
+                        )
                     ),
                     code=pl.when(pl.col("division_type").replace_strict(DIVISIONS) == "county")
                     .then(
@@ -217,7 +248,27 @@ def parse() -> None:
                     votes=pl.col("value").str.replace_all(",", "").cast(pl.Int64, strict=False),
                 )
             )
-    frame = pl.concat(frames).filter(pl.col("votes").is_not_null())
+    frame = pl.concat(frames, how="diagonal_relaxed").filter(pl.col("votes").is_not_null())
+    snapped = {
+        (state, chamber, year, district): held[0]
+        for (state, chamber, year, district), held in days.items()
+        if year < FIRST and len(held) == 1
+    }
+    frame = frame.with_columns(
+        day=pl.when(pl.col("year") < FIRST)
+        .then(
+            pl.struct("state", "chamber", "year", "district").map_elements(
+                lambda row: (
+                    snapped.get((row["state"], row["chamber"], row["year"], row["district"]))
+                    or (
+                        snapped.get((row["state"], row["chamber"], row["year"], 0)) if row["district"] is None else None
+                    )
+                ),
+                return_dtype=pl.Date,
+            )
+        )
+        .otherwise("day")
+    ).filter(pl.col("day").is_not_null())
     lost = frame.filter(pl.col("code").is_null())
     if lost.height:
         print(lost.group_by("county").agg(pl.col("votes").sum()).sort("votes", descending=True).head(40))
@@ -246,7 +297,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House and Senate general elections by county from state election archives, 1982–2015",
+            summary="House, Senate, and presidential general elections by county from state election archives",
             polity="US",
         )
         sources: dict[str, UUID] = {}
