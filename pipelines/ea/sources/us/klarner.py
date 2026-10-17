@@ -8,6 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.ak_dor import CONTESTS as RANKED_ROUNDS
 from ea.store import DATA, connect
 
 SOURCE = "us.klarner"
@@ -561,7 +562,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=True,
+                is_default=contest_key not in RANKED_ROUNDS,
                 completeness=None if group["votes"].is_null().any() else 1,
             )
             fresh = result_set in cs.minted

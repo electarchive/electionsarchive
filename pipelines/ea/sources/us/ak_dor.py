@@ -28,7 +28,19 @@ SHAPES = (
 )
 SHAPES_TITLE = "Alaska Election Precincts, 2022 interim plan"
 SPECIAL = "2022-08-16:AK:house:0:special"
-CONTESTS: dict[str, tuple[str, tuple[str, str], tuple[str, str] | None, str, list[dict[str | None, int]], int]] = {
+Rounds = list[dict[str | None, int]]
+CONTESTS: dict[
+    str,
+    tuple[
+        str,
+        tuple[str, str],
+        tuple[str, str] | None,
+        str,
+        Rounds,
+        int,
+        tuple[tuple[str, str], Rounds, int] | None,
+    ],
+] = {
     SPECIAL: (
         "RCV Detailed Report: U.S. Representative (Special General), August 16, 2022",
         ("20220909051113", "22SSPG/RcvDetailedReport.txt"),
@@ -39,6 +51,7 @@ CONTESTS: dict[str, tuple[str, tuple[str, str], tuple[str, str] | None, str, lis
             {"Palin, Sarah": 86026, "Peltola, Mary S.": 91266, None: 14997},
         ],
         192289,
+        None,
     ),
     "2022-11-08:AK:senate": (
         "RCV Detailed Report: U.S. Senator, November 8, 2022 General Election",
@@ -57,6 +70,7 @@ CONTESTS: dict[str, tuple[str, tuple[str, str], tuple[str, str] | None, str, lis
             {"Murkowski, Lisa": 136330, "Tshibaka, Kelly C.": 117534, None: 12933},
         ],
         266797,
+        None,
     ),
     "2022-11-08:AK:house:0": (
         "RCV Detailed Report: U.S. Representative, November 8, 2022 General Election",
@@ -69,6 +83,136 @@ CONTESTS: dict[str, tuple[str, tuple[str, str], tuple[str, str] | None, str, lis
             {"Palin, Sarah": 112471, "Peltola, Mary S.": 137263, None: 17063},
         ],
         266797,
+        None,
+    ),
+    "2022-11-08:AK:house:11:g": (
+        "RCV Detailed Report: House District 11, November 8, 2022 General Election",
+        ("20221207225222", "22GENR/11.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "House District 11",
+        [
+            {"Bieling, Ross P.": 1186, "Coulombe, Julie": 3001, "Featherly, Walter T.": 3484, None: 519},
+            {"Coulombe, Julie": 3677, "Featherly, Walter T.": 3565, None: 948},
+        ],
+        8190,
+        None,
+    ),
+    "2022-11-08:AK:house:15:g": (
+        "RCV Detailed Report: House District 15, November 8, 2022 General Election, after the recount",
+        ("20230111191928", "22GENR/15_recount_rcv.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "House District 15",
+        [
+            {"Eibeck, David": 1040, 'McKay, Thomas W. "Tom"': 2840, "Wells, Denny": 3385, None: 274},
+            {'McKay, Thomas W. "Tom"': 3485, "Wells, Denny": 3476, None: 578},
+        ],
+        7539,
+        (
+            ("20221207225223", "22GENR/15.txt"),
+            [
+                {"Eibeck, David": 1039, 'McKay, Thomas W. "Tom"': 2839, "Wells, Denny": 3384, None: 447},
+                {'McKay, Thomas W. "Tom"': 3483, "Wells, Denny": 3476, None: 750},
+            ],
+            7709,
+        ),
+    ),
+    "2022-11-08:AK:house:18:g": (
+        "RCV Detailed Report: House District 18, November 8, 2022 General Election",
+        ("20221207225224", "22GENR/18.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "House District 18",
+        [
+            {"Franks, Lyn D.": 444, "Groh, Cliff": 746, "Nelson, David": 927, None: 180},
+            {"Groh, Cliff": 1045, "Nelson, David": 968, None: 284},
+        ],
+        2297,
+        None,
+    ),
+    "2022-11-08:AK:house:28:g": (
+        "RCV Detailed Report: House District 28, November 8, 2022 General Election",
+        ("20221201083955", "22GENR/28.pdf"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "House District 28",
+        [
+            {
+                "Allen, Rachel M.": 1287,
+                "Menard, Steve": 1575,
+                "Sumner, Jesse M.": 2217,
+                "Wright, Jessica": 863,
+                None: 1156,
+            },
+            {"Allen, Rachel M.": 1491, "Menard, Steve": 1721, "Sumner, Jesse M.": 2418, None: 1468},
+            {"Menard, Steve": 1936, "Sumner, Jesse M.": 3120, None: 2042},
+        ],
+        7098,
+        None,
+    ),
+    "2022-11-08:AK:house:30:g": (
+        "RCV Detailed Report: House District 30, November 8, 2022 General Election",
+        ("20221207225226", "22GENR/30.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "House District 30",
+        [
+            {"Holmes, Doyle E.": 2608, "McCabe, Kevin J.": 3394, "Mindiola, L. Joy": 1517, None: 616},
+            {"Holmes, Doyle E.": 2884, "McCabe, Kevin J.": 3662, None: 1589},
+        ],
+        8135,
+        None,
+    ),
+    "2022-11-08:AK:house:31:g": (
+        "RCV Detailed Report: House District 31, November 8, 2022 General Election",
+        ("20221207225227", "22GENR/31.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "House District 31",
+        [
+            {"Dibert, Maxine L.": 2478, "LeBon, Barton S.": 1492, "Nash, Kelly": 1092, None: 268},
+            {"Dibert, Maxine L.": 2589, "LeBon, Barton S.": 2074, None: 667},
+        ],
+        5330,
+        None,
+    ),
+    "2022-11-08:AK:house:34:g": (
+        "RCV Detailed Report: House District 34, November 8, 2022 General Election",
+        ("20221207225228", "22GENR/34.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "House District 34",
+        [
+            {"DeMars, Nate": 586, "Hopkins, Grier H.": 3175, "Tomaszewski, Frank J.": 3615, None: 317},
+            {"Hopkins, Grier H.": 3200, "Tomaszewski, Frank J.": 4013, None: 480},
+        ],
+        7693,
+        None,
+    ),
+    "2022-11-08:AK:senate:d:g": (
+        "RCV Detailed Report: Senate District D, November 8, 2022 General Election",
+        ("20221207225229", "22GENR/D.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "Senate District D",
+        [
+            {"Babcock, Tuckerman": 6331, "Bjorkman, Jesse J.": 7072, "Cizek, Andy": 1787, None: 1046},
+            {"Babcock, Tuckerman": 6594, "Bjorkman, Jesse J.": 7604, None: 2038},
+        ],
+        16236,
+        None,
+    ),
+    "2022-11-08:AK:senate:e:g": (
+        "RCV Detailed Report: Senate District E, November 8, 2022 General Election, after the recount",
+        ("20230111191922", "22GENR/E_recount_rcv.txt"),
+        ("20221223104437", "22GENR/rcv/CVR_Export.zip"),
+        "Senate District E",
+        [
+            {"Cacy, Roselynn": 5520, "Giessel, Cathy": 5651, "Holland, Roger": 5534, None: 480},
+            {"Giessel, Cathy": 7880, "Holland, Roger": 5951, None: 3354},
+        ],
+        17185,
+        (
+            ("20221207225231", "22GENR/E.txt"),
+            [
+                {"Cacy, Roselynn": 5518, "Giessel, Cathy": 5652, "Holland, Roger": 5532, None: 735},
+                {"Giessel, Cathy": 7881, "Holland, Roger": 5949, None: 3607},
+            ],
+            17437,
+        ),
     ),
     "2024-11-05:AK:house:0": (
         "RCV Detailed Report: U.S. Representative, November 5, 2024 General Election",
@@ -87,6 +231,117 @@ CONTESTS: dict[str, tuple[str, tuple[str, str], tuple[str, str] | None, str, lis
             {"Begich, Nick": 164861, "Peltola, Mary S.": 156985, None: 14007},
         ],
         335853,
+        None,
+    ),
+    "2024-11-05:AK:house:6:g": (
+        "RCV Detailed Report: House District 6, November 5, 2024 General Election",
+        ("20250206032953", "24GENR/RCV-HD6.pdf"),
+        None,
+        "House District 6",
+        [
+            {"Johnson, Brent": 4965, "Slaughter, Dawson R.": 1078, "Vance, Sarah L.": 5363, None: 392},
+            {"Johnson, Brent": 5150, "Vance, Sarah L.": 5638, None: 1010},
+        ],
+        11798,
+        None,
+    ),
+    "2024-11-05:AK:house:28:g": (
+        "RCV Detailed Report: House District 28, November 5, 2024 General Election, after the recount",
+        ("20250106215327", "24GENR/RcvDetailedReport-HD28-Recount.pdf"),
+        None,
+        "House District 28",
+        [
+            {"Menard, Steve": 2790, "Moore, Elexie": 2929, "Wright, Jessica": 2014, None: 1184},
+            {"Menard, Steve": 3234, "Moore, Elexie": 3243, None: 2440},
+        ],
+        8917,
+        None,
+    ),
+    "2024-11-05:AK:house:36:g": (
+        "RCV Detailed Report: House District 36, November 5, 2024 General Election",
+        ("20250206032958", "24GENR/RCV-HD36.pdf"),
+        None,
+        "House District 36",
+        [
+            {
+                "Fields, James": 498,
+                "Goode, Pamela": 2291,
+                "Kowalski, Brandon P.": 2953,
+                "Schwanke, Rebecca A.": 3189,
+                None: 451,
+            },
+            {"Goode, Pamela": 2362, "Kowalski, Brandon P.": 3022, "Schwanke, Rebecca A.": 3282, None: 716},
+            {"Kowalski, Brandon P.": 3155, "Schwanke, Rebecca A.": 4070, None: 2157},
+        ],
+        9382,
+        None,
+    ),
+    "2024-11-05:AK:house:38:g": (
+        "RCV Detailed Report: House District 38, November 5, 2024 General Election",
+        ("20250206033002", "24GENR/RCV-HD38.pdf"),
+        None,
+        "House District 38",
+        [
+            {
+                'Jimmie, Nellie D. "Unangik"': 1295,
+                "Keppel, Willy": 932,
+                "McCormick, C.J.": 1166,
+                "Sosa, Victoria B.": 184,
+                None: 130,
+            },
+            {'Jimmie, Nellie D. "Unangik"': 1351, "Keppel, Willy": 959, "McCormick, C.J.": 1200, None: 197},
+            {'Jimmie, Nellie D. "Unangik"': 1548, "McCormick, C.J.": 1411, None: 748},
+        ],
+        3707,
+        None,
+    ),
+    "2024-11-05:AK:house:40:g": (
+        "RCV Detailed Report: House District 40, November 5, 2024 General Election",
+        ("20241204024735", "24GENR/RCV-HD40.pdf"),
+        None,
+        "House District 40",
+        [
+            {'Baker, Thomas C. "Ikaaq"': 743, 'Burke, Robyn "Niayuq"': 1425, 'Chase, Saima "Ikrik"': 874, None: 128},
+            {'Burke, Robyn "Niayuq"': 1541, 'Chase, Saima "Ikrik"': 1008, None: 621},
+        ],
+        3170,
+        None,
+    ),
+    "2024-11-05:AK:senate:d:g": (
+        "RCV Detailed Report: Senate District D, November 5, 2024 General Election",
+        ("20241213112547", "24GENR/RCV-SenD.pdf"),
+        None,
+        "Senate District D",
+        [
+            {"Bjorkman, Jesse J.": 9257, "Carpenter, Ben": 7865, "Wegener, Tina": 2196, None: 820},
+            {"Bjorkman, Jesse J.": 9802, "Carpenter, Ben": 8114, None: 2222},
+        ],
+        20138,
+        None,
+    ),
+    "2024-11-05:AK:senate:f:g": (
+        "RCV Detailed Report: Senate District F, November 5, 2024 General Election",
+        ("20250206033010", "24GENR/RCV-SenF.pdf"),
+        None,
+        "Senate District F",
+        [
+            {"Borbridge, Harold": 1184, "Kaufman, James D.": 8180, "Park, Janice L.": 7657, None: 946},
+            {"Kaufman, James D.": 8678, "Park, Janice L.": 7744, None: 1545},
+        ],
+        17967,
+        None,
+    ),
+    "2024-11-05:AK:senate:l:g": (
+        "RCV Detailed Report: Senate District L, November 5, 2024 General Election",
+        ("20250206033015", "24GENR/RCV-SenL.pdf"),
+        None,
+        "Senate District L",
+        [
+            {"Goecker, Jared D.": 7698, "Hammermeister, Lee E.": 2770, "Merrick, Kelly R.": 9092, None: 780},
+            {"Goecker, Jared D.": 7939, "Merrick, Kelly R.": 9892, None: 2509},
+        ],
+        20340,
+        None,
     ),
 }
 OFFICIAL = (
@@ -100,6 +355,16 @@ UNMATCHED = (
     "than the tabulation counted, most of them absentee and questioned ballots, so they are not used for a breakdown "
     "by precinct."
 )
+UNMATCHED_DISTRICT = (
+    " The cast vote records the Division published for this election hold more ballots for this race than the "
+    "tabulation counted, so they are not used for a breakdown by precinct."
+)
+RECOUNT = " These are the rounds after the recount."
+BLANKS = " The recount's report counts fewer blank ballots than the first count did, so its ballot total is lower."
+MEDSL = (
+    "Alaska counted this race by ranked-choice voting. MEDSL's figures are first-choice votes only; the Division of "
+    "Elections' official rounds are the results shown by default."
+)
 DERIVED = (
     "Tabulated by electionsarchive.com from the Division of Elections' cast vote records, precinct by precinct. A "
     "ballot exhausts at an overvote or after two skipped rankings in a row, a repeated candidate counts as a skipped "
@@ -112,8 +377,9 @@ DERIVED = (
 
 def fetch() -> None:
     downloads = [(SHAPES, ".zip")]
-    for _, report, records, _, _, _ in CONTESTS.values():
-        downloads.append((WAYBACK.format(*report), "." + report[1].rsplit(".", 1)[1]))
+    for _, report, records, _, _, _, before in CONTESTS.values():
+        for stamp, path in [report, *([] if before is None else [before[0]])]:
+            downloads.append((WAYBACK.format(stamp, path), "." + path.rsplit(".", 1)[1]))
         if records is not None:
             downloads.append((WAYBACK.format(*records), ".zip"))
     for url, suffix in dict.fromkeys(downloads):
@@ -130,7 +396,7 @@ def fetch() -> None:
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frames = []
-    for records in dict.fromkeys(records for _, _, records, _, _, _ in CONTESTS.values() if records is not None):
+    for records in dict.fromkeys(records for _, _, records, _, _, _, _ in CONTESTS.values() if records is not None):
         with zipfile.ZipFile(raw.cached(SOURCE, WAYBACK.format(*records)).path) as archive:
             manifest = {
                 name: json.loads(archive.read(f"{name}Manifest.json"))["List"]
@@ -152,7 +418,7 @@ def parse() -> None:
             portions = {portion["Id"]: precincts[portion["PrecinctId"]] for portion in manifest["PrecinctPortion"]}
             wanted = {
                 key: next(contest["Id"] for contest in manifest["Contest"] if contest["Description"] == description)
-                for key, (_, _, source, description, _, _) in CONTESTS.items()
+                for key, (_, _, source, description, _, _, _) in CONTESTS.items()
                 if source == records
             }
             names = {candidate["Id"]: candidate["Description"] for candidate in manifest["Candidate"]}
@@ -177,7 +443,8 @@ def parse() -> None:
                                 )
                             )
         for key, contest in wanted.items():
-            rounds, total = CONTESTS[key][4], CONTESTS[key][5]
+            before = CONTESTS[key][6]
+            rounds, total = (CONTESTS[key][4], CONTESTS[key][5]) if before is None else (before[1], before[2])
             if len(ballots[contest]) != total:
                 raise ValueError(f"{key}: {len(ballots[contest])} records, the official count has {total} ballots")
             continuing = [{label for label in tally if label is not None} for tally in rounds]
@@ -345,9 +612,10 @@ def emit() -> Path:
             for unit in set(tallies["unit"])
         }
 
-        for key, (title, report, records, _, rounds, total) in CONTESTS.items():
+        for key, (title, report, records, _, rounds, total, before) in CONTESTS.items():
             day = date.fromisoformat(key[:10])
-            senate = ":senate" in key
+            district = re.fullmatch(r".*:(house|senate):(\w+):g", key)
+            owner = "us.fec" if district is None else "us.klarner" if day.year == 2022 else "us.medsl_state"
             source = cs.source(PUBLISHER, title)
             cs.add(
                 "source",
@@ -358,7 +626,8 @@ def emit() -> Path:
                 url=ORIGIN + report[1],
                 license="Public record",
             )
-            cs.artifact(raw.cached(SOURCE, WAYBACK.format(*report)), source)
+            for stamp, path in [report, *([] if before is None else [before[0]])]:
+                cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, path)), source)
             if records is not None:
                 cs.artifact(raw.cached(SOURCE, WAYBACK.format(*records)), source)
 
@@ -445,18 +714,25 @@ def emit() -> Path:
                     [contest],
                 ).fetchall()
                 for text in (text for text in rounds[0] if text is not None):
-                    found = [option for option, label in existing if text.split(",")[0] in label]
+                    found = [option for option, label in existing if text.split(",")[0].lower() in label.lower()]
                     if len(found) != 1:
                         raise ValueError(f"{key}: {len(found)} options for {text}")
                     options[text] = found[0]
-                federal = cs.key("us.fec.result_set", key)
+                federal = cs.key(f"{owner}.result_set", key)
                 if federal in cs.minted:
-                    raise ValueError(f"{key}: us.fec's result set must already exist")
-                kind, body = NOTES[key]
-                for (note,) in conn.execute(
-                    "select id from note where entity_id = %s and kind = %s", [federal, kind]
-                ).fetchall():
-                    cs.add("note", id=note, entity_id=federal, kind=kind, body_md=body)
+                    raise ValueError(f"{key}: {owner}'s result set must already exist")
+                notes = (
+                    [(federal, *NOTES[key])]
+                    if owner == "us.fec"
+                    else [(contest, "caveat", MEDSL)]
+                    if owner == "us.medsl_state"
+                    else []
+                )
+                for entity, kind, body in notes:
+                    for (note,) in conn.execute(
+                        "select id from note where entity_id = %s and kind = %s", [entity, kind]
+                    ).fetchall():
+                        cs.add("note", id=note, entity_id=entity, kind=kind, body_md=body)
                 for previous in conn.execute(
                     """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
                          supersedes_id from result_set where id = %s""",
@@ -485,7 +761,16 @@ def emit() -> Path:
                         is_default=False,
                     )
 
-            top = cs.unit("us.state", "02") if senate else cs.unit("us.cd", "0200", day)
+            top, area = (
+                (cs.unit("us.state", "02"), None)
+                if key.endswith(":senate")
+                else (cs.unit("us.cd", "0200", day), cs.area("us.cd", "0200", day))
+                if district is None
+                else (
+                    cs.unit(f"us.{'sldl' if district[1] == 'house' else 'sldu'}", f"AK:{district[2]}"),
+                    cs.area(f"us.{'sldl' if district[1] == 'house' else 'sldu'}", f"AK:{district[2]}"),
+                )
+            )
             official = cs.key(f"{SOURCE}.result_set", key)
             final = rounds[-1]
             winner = max((label for label in final if label is not None), key=lambda label: final[label])
@@ -500,7 +785,10 @@ def emit() -> Path:
                 (
                     official,
                     True,
-                    OFFICIAL + ("" if records is not None else UNMATCHED),
+                    OFFICIAL
+                    + (RECOUNT if "recount" in report[1].lower() else "")
+                    + ("" if before is None else BLANKS)
+                    + ("" if records is not None else UNMATCHED if district is None else UNMATCHED_DISTRICT),
                     pl.DataFrame(
                         [
                             (str(top), number, label, tally.get(label, 0))
@@ -522,13 +810,13 @@ def emit() -> Path:
                     .agg(pl.col("votes").sum())
                     .with_columns(unit_id=pl.col("unit").replace_strict({unit: str(id) for unit, id in units.items()}))
                 )
-                if not senate:
+                if area is not None:
                     cs.frame(
                         "reporting_unit_area",
                         pl.DataFrame(
                             {
                                 "unit_id": sorted(set(rows["unit_id"])),
-                                "area_id": str(cs.area("us.cd", "0200", day)),
+                                "area_id": str(area),
                                 "valid_from": day,
                                 "valid_to": day + timedelta(days=1),
                             }
@@ -539,7 +827,15 @@ def emit() -> Path:
                     (
                         cs.key(f"{SOURCE}.result_set", f"{key}:precincts"),
                         False,
-                        DERIVED,
+                        DERIVED
+                        if district is None
+                        else DERIVED.replace("over the state", "over the district")
+                        if before is None
+                        else DERIVED.replace(
+                            "Summed over the state, every round reproduces the official count exactly.",
+                            "Summed over the district, every round reproduces the Division's count before the "
+                            "recount exactly; the recount moved the candidates' totals by one or two votes.",
+                        ),
                         pl.concat(
                             [
                                 rows,

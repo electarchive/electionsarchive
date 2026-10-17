@@ -8,6 +8,8 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.ak_dor import CONTESTS as RANKED_ROUNDS
+from ea.sources.us.ak_dor import MEDSL
 from ea.sources.us.klarner import LOWER, UPPER
 from ea.store import DATA, connect
 
@@ -546,13 +548,15 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[group["origin"][0]],
-                is_default=True,
+                is_default=contest_key not in RANKED_ROUNDS,
                 completeness=None if group["masked"].any() else 1,
             )
             if group["masked"].any():
                 cs.add("note", entity_id=contest, kind="caveat", body_md=MASKED)
             if state == "AK":
-                cs.add("note", entity_id=contest, kind="caveat", body_md=RANKED)
+                cs.add(
+                    "note", entity_id=contest, kind="caveat", body_md=MEDSL if contest_key in RANKED_ROUNDS else RANKED
+                )
             totals: list[tuple[int, UUID]] = []
             for (candidate, pooled), rows in group.group_by("candidate", "pooled", maintain_order=True):
                 option_key = f"{contest_key}:write-ins" if pooled else f"{contest_key}:{slug(str(candidate))}"
