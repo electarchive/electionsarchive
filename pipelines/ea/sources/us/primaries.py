@@ -49,12 +49,14 @@ ME_FILES = {
     "20240611/elec_20240611m": ("U.S. House", "2", "Republican"),
 }
 OPENELECTIONS = {
+    "AZ": "bf14331521f62f74cb17848ab11ca3dfd27f4f82",
     "CT": "f948d0a1ce36871de4a1d696612ab2a268fd0758",
     "GA": "36b7453793848c02d8f41601d9304a66ad828dd0",
     "KY": "025799258505414d62830ea75fd34b58cb2ee59b",
     "MI": "2103114f669c2bb25f19792bf5ca290300381396",
     "MS": "84d07603a7eacefa07cb58e90fcb12ce76fcdcce",
     "ND": "c25145fbab08f849e6eeec319f516d7916533ea1",
+    "PA": "e79aeb525b4bb4e834c21bab0699fdbf9b6b2e9a",
     "RI": "977565f9d7cf7a32d3a2a454282b5fd291cef291",
     "SC": "5e05b67e15f3614a20d31144df83248235cba6f2",
     "SD": "9e01b9aea628e9ae17ada6656b649daf319fd212",
@@ -63,6 +65,7 @@ OPENELECTIONS = {
     "WV": "49d32c279d0e02d740c8af4fcb5b5eee380fbed4",
     "WY": "d4d430672e8823beeb7dbc9274362992739155c3",
 }
+PARTIAL = ("AZ", "PA")
 ELECTIONSTATS = ("CO", "CT", "ID", "NH", "NM", "NY", "VA", "VT")
 TYPOS = {"MS": {"jeffdavis": "28065"}, "TN": {"williamsonx": "47187"}, "VT": {"essexjunction": "50007"}}
 DAYS = {("RI", date(2024, 8, 13)): date(2024, 9, 10)}
@@ -151,7 +154,9 @@ def picks(fips: dict[str, dict[str, str]]) -> list[tuple[str, str, str]]:
             )
             found[name[:8]][grain].append(entry["path"])
         for _, files in sorted(found.items()):
-            precincts = files["precinct"] or (files["part"] if len(files["part"]) == len(fips[state]) else [])
+            precincts = files["precinct"] or (
+                files["part"] if len(files["part"]) == len(fips[state]) or state in PARTIAL else []
+            )
             chosen.extend((state, "county", path) for path in files["county"])
             chosen.extend((state, "precinct", path) for path in precincts)
     return chosen
@@ -989,6 +994,17 @@ def emit() -> Path:
                     "source", id=sources[used], kind=kind, publisher=publisher, title=title, url=url, license=license
                 )
             cs.artifact(raw.cached(SOURCE, used), sources[used])
+        spans: dict[tuple[str, int], set[str]] = defaultdict(set)
+        for value, county in conn.execute(
+            """select distinct e.value, case u.scheme_code when 'us.county' then u.code
+                      when 'us.county_part' then split_part(u.code, ':', 2) else split_part(u.code, ':', 3) end
+               from external_id e join result_set rs on rs.contest_id = e.entity_id
+               join result_value v on v.result_set_k = rs.k join reporting_unit u on u.k = v.unit_k
+               where e.scheme = 'us.contest' and e.value ~ %s
+               and u.scheme_code in ('us.county', 'us.county_part', 'us.precinct')""",
+            [rf"^2024-11-05:({'|'.join(PARTIAL)}):house:[0-9]+$"],
+        ).fetchall():
+            spans[(value.split(":")[1], int(value.split(":")[3]))].add(county)
         values: list[pl.DataFrame] = []
         precincts: dict[str, tuple[str, date, str]] = {}
         parts: dict[str, tuple[str, str, date, str, UUID | None]] = {}
@@ -1019,6 +1035,17 @@ def emit() -> Path:
                     print(f"{key}: precinct and county files disagree, the county file used")
                     fine = fine.clear()
             lines = fine if fine.height else coarse
+            if state in PARTIAL:
+                prefix = lines["county"][0][:2]
+                needed: set[str] = (
+                    spans[(state, district)]
+                    if office == "house"
+                    else {str(code) for code in counties if len(code) == 5 and code.startswith(prefix)}
+                )
+                missing = needed - {str(code) for code in lines["county"]}
+                if not needed or missing:
+                    print(f"{key}: files for {sorted(missing)} missing, skipped")
+                    continue
             election, district_area = conn.execute(
                 "select election_id, district_area_id from contest where id = %s", [contest]
             ).fetchone() or (None, None)
