@@ -23,8 +23,15 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "City of Minneapolis Elections & Voter Services"
 BASE = "https://vote.minneapolismn.gov/media/-www-content-assets/documents/archive/elections/"
-PLANS = {"2009": "2008-11-04", "2013": "2012-11-06", "2017": "2016", "2021": "2020"}
-CONTESTS: dict[str, tuple[str, str, str]] = {
+PLANS = {
+    "2009": "2008-11-04",
+    "2013": "2012-11-06",
+    "2017": "2016",
+    "2021": "2020",
+    "2023": "2022",
+    "2025": "2024-11-05",
+}
+CONTESTS: dict[str, tuple[str | None, str, str | None]] = {
     **{
         f"2009-11-03:MN:minneapolis:city-council:{ward}": (
             f"alged:2743000_2009_11_minneapolis_MN_City Council_{ward}_1",
@@ -94,6 +101,107 @@ CONTESTS: dict[str, tuple[str, str, str]] = {
         )
         for ward in (1, 2, 3, 5, 10)
     },
+    "2009-11-03:MN:minneapolis:park-board:1": (None, "2009-MPRB-District-01-Final-RCV.xls", None),
+    **{
+        f"2009-11-03:MN:minneapolis:park-board:{district}": (
+            None,
+            f"2009-MPRB-District-{district:02}-Final-RCV.xls",
+            f"2009-MPRB-District-{district}-CVR.xls",
+        )
+        for district in range(2, 7)
+    },
+    "2009-11-03:MN:minneapolis:park-board:at-large": (
+        None,
+        "2009-MPRB-At-Large-Final-RCV.xls",
+        "2009-MPRB-At-Large-CVR.xls",
+    ),
+    "2009-11-03:MN:minneapolis:board-of-estimate-and-taxation": (
+        None,
+        "2009-BET-Final-RCV.xls",
+        "2009-BET-At-Large-CVR.xls",
+    ),
+    "2013-11-05:MN:minneapolis:park-board:at-large": (
+        None,
+        "2013-Park-Board-At-Large-Final-RCV.xlsx",
+        "2013-Park-At-Large-CVR.xlsx",
+    ),
+    "2017-11-07:MN:minneapolis:board-of-estimate-and-taxation": (
+        None,
+        "2017-Board-of-Estimate-and-Taxation-Results-Summary.pdf",
+        "2017-Board-of-Estimate-and-Taxation-Ballot-Records.csv",
+    ),
+    "2017-11-07:MN:minneapolis:park-board:1": (
+        None,
+        "2017-Park-Board-District-1-Results-Summary.pdf",
+        "2017-Park-Board-District-1-Ballot-Records.csv",
+    ),
+    **{
+        f"2017-11-07:MN:minneapolis:park-board:{district}": (
+            None,
+            f"2017-Park-District-{district}-RCV-Tabulation-Summary.pdf",
+            f"2017-Park-District-{district}-CVR.csv",
+        )
+        for district in (3, 6)
+    },
+    "2017-11-07:MN:minneapolis:park-board:at-large": (
+        None,
+        "2017-Park-Board-At-Large-Race-Results-Summary.pdf",
+        "2017-Park-Board-At-Large-Ballot-Records.csv",
+    ),
+    "2021-11-02:MN:minneapolis:board-of-estimate-and-taxation": (
+        None,
+        "2021-BET-Round-Results-Summary.pdf",
+        "2021-BET-Cast-Vote-Record.csv",
+    ),
+    **{
+        f"2021-11-02:MN:minneapolis:park-board:{district}": (
+            None,
+            f"2021-Park-Board-District-{district}-Round-Results-Summary.pdf",
+            f"2021-Park-{district}-Cast-Vote-Record.csv",
+        )
+        for district in range(2, 7)
+    },
+    "2021-11-02:MN:minneapolis:park-board:at-large": (
+        None,
+        "2021-Park-Board-At-Large-Round-Results-Summary.pdf",
+        "2021-Park-AL-Cast-Vote-Record.csv",
+    ),
+    **{
+        f"2023-11-07:MN:minneapolis:city-council:{ward}": (
+            None,
+            f"2023-Ward-{ward}-Summary-Sheet.pdf",
+            f"2023-Ward-{ward}-Cast-Vote-Record.csv",
+        )
+        for ward in (6, 7, 8)
+    },
+    "2025-11-04:MN:minneapolis:mayor": (
+        None,
+        "2025-Mayor-Round-Results-Summary.pdf",
+        "2025-Mayor-Cast-Vote-Record.csv",
+    ),
+    "2025-11-04:MN:minneapolis:city-council:5": (
+        None,
+        "2025-Ward-5-RCV-Tabulation-Summary.pdf",
+        "2025-Ward-5-Cast-Vote-Record.csv",
+    ),
+    **{
+        f"2025-11-04:MN:minneapolis:park-board:{district}": (
+            None,
+            f"2025-Park-District-{district}-RCV-Tabulation-Summary.pdf",
+            f"2025-Park-District-{district}-CVR.csv",
+        )
+        for district in (1, 4, 5)
+    },
+    "2025-11-04:MN:minneapolis:park-board:at-large": (
+        None,
+        "2025-Park-At-Large-RCV-Tabulation-Summary.pdf",
+        "2025-Park-At-Large-CVR.csv",
+    ),
+    "2025-11-04:MN:minneapolis:board-of-estimate-and-taxation": (
+        None,
+        "2025-Board-of-Estimate-and-Taxation-RCV-Tabulation-Summary.pdf",
+        "2025-BET-Cast-Vote-Record.csv",
+    ),
 }
 SKIPPED = {"undervote", "xxx", ""}
 
@@ -104,17 +212,74 @@ OFFICIAL = (
     "exhausted in a round are the statement's exhausted ballots; the statement leaves out undervotes, defective "
     "ballots, and spoiled ballots."
 )
-DERIVED = (
-    "Tabulated by electionsarchive.com from Elections & Voter Services' cast vote record, which gives each "
-    "ballot's three rankings and its precinct. A skipped or repeated ranking is passed over, a ballot exhausts at an "
-    "overvote, and ballots with no ranking are left out, as Minneapolis's rules have them. Each round drops the "
-    "candidates the official count dropped. Summed over the precincts, every round reproduces the tabulation "
-    "summary statement exactly."
+SURPLUS = (
+    " In contests for more than one seat, a candidate who reaches the threshold is elected. In later rounds, their "
+    "surplus is moved: every ballot counting for them passes to its next continuing choice at the surplus's share of "
+    "its current value, truncated to four decimal places. The rest of the value stays with the elected candidate. All "
+    "values carry four decimal places."
 )
+DERIVED = (
+    "Tabulated by electionsarchive.com from Elections & Voter Services' cast vote record, which includes each ballot's "
+    "three rankings and its precinct. Following Minneapolis rules, skipped, repeated, or overvoted rankings are passed "
+    "over, and ballots with no countable ranking are excluded. Each round drops the candidates the official count "
+    "dropped and moves the surpluses using the same truncated fractions. When summed over the precincts, every round "
+    "reproduces the tabulation summary statement exactly."
+)
+BOUNDARY = "The archive has no boundary for this district in 2009; the results are shown for the district as a whole."
+BALLOT = {
+    "city-council:4": {
+        "Cermak": "Grant Cermak",
+        "Harcus": "Marcus Harcus",
+        "Johnson": "Barbara 'Barb' Johnson",
+        "Parker": "Troy Parker",
+    },
+    "city-council:5": {
+        "Chism": "Lennie Chism",
+        "Johnson Lee": "Natalie Johnson Lee",
+        "McKnight": "Kenya McKnight",
+        "Samuels": "Don Samuels",
+        "Smithrud": "Roger Smithrud",
+    },
+    "park-board:1": {"Kunza": "Bernie Kunza", "Malone": "John Malone", "Wielinski": "Liz Wielinski"},
+    "park-board:2": {"Guest": "Michael Guest", "Olson": "Jon Olson"},
+    "park-board:3": {"Vreeland": "Scott Vreeland", "Wendorf": "Mike Wendorf"},
+    "park-board:4": {"Tabb": "Anita Tabb"},
+    "park-board:5": {
+        "Barland": "Steve Barland",
+        "Kummer": "Carol Kummer",
+        "Looney": "McLain Looney",
+        "Peterson": "Dan Peterson",
+        "Stone": "Jason Stone",
+    },
+    "park-board:6": {"Bourn": "Brad Bourn", "Forney": "Meg Forney", "Hanvik": "Geneva Hanvik", "Jecha": "Steven Jecha"},
+    "park-board:at-large": {
+        "Bernard": "Nancy Bernard",
+        "Butler": "John Butler",
+        "Erwin": "John Erwin",
+        "Fine": "Bob Fine",
+        "Merrill Anderson": "Mary Merrill Anderson",
+        "Nordyke": "Tom Nordyke",
+        "Wahlstedt": "David Wahlstedt",
+        "Young": "Annie Young",
+    },
+    "board-of-estimate-and-taxation": {
+        "Becker": "Carol J. Becker",
+        "Martens": "Michael Martens",
+        "Swartwood": "James Elliot Swartwood",
+        "Townsend": "DeWayne Townsend",
+        "Wheeler": "David B. Wheeler",
+        "Willkie": "Phil Willkie",
+    },
+}
+REDONE = ("2009-11-03:MN:minneapolis:city-council:4", "2009-11-03:MN:minneapolis:city-council:5")
+BODIES = {
+    "park-board": "Minneapolis Park and Recreation Board",
+    "board-of-estimate-and-taxation": "Minneapolis Board of Estimate and Taxation",
+}
 
 
 def fetch() -> None:
-    for name in [file for _, *files in CONTESTS.values() for file in files]:
+    for name in [file for _, *files in CONTESTS.values() for file in files if file is not None]:
         for attempt in range(5):
             try:
                 raw.fetch(SOURCE, BASE + name, suffix="." + name.rsplit(".", 1)[1])
@@ -127,26 +292,30 @@ def fetch() -> None:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    official = {}
+    official: dict[str, tuple[int, list[dict[str | None, float]]]] = {}
     frames = []
-    for key, (_, summary, record) in CONTESTS.items():
+    for key, (existing, summary, record) in CONTESTS.items():
         path = raw.cached(SOURCE, BASE + summary).path
         table: list[tuple[str, list[str]]] = []
         if summary.endswith(".pdf"):
             lines = subprocess.run(
                 ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
             ).stdout.splitlines()
+            text = " ".join(lines)
             start = next(index for index, line in enumerate(lines) if re.match(r"^\s*Candidate\s{2,}", line))
             head: list[str] = []
             for line in lines[start + 1 :]:
                 if line.strip().startswith("TOTAL"):
                     break
                 match = re.match(r"^(.*?)\s*((?:\s+(?:-?[\d,]+(?:\.\d+)?%?|-))+)\s*$", line)
+                if re.fullmatch(r"\s*Exhausted\s+-\s*", line):
+                    table.append(("Exhausted", ["-"]))
+                    continue
                 if match is None or not re.search(r"\d", match[2]):
                     if line.strip() and not line.strip().startswith("BALANCED"):
                         head.append(line.strip())
                     continue
-                label = " ".join([*head, match[1].strip()]).strip()
+                label = re.sub(r"(?<=\w)- (?=\w)", "-", " ".join([*head, match[1].strip()]).strip())
                 head = []
                 table.append((label, [token for token in match[2].split() if not token.endswith("%")]))
             if head:
@@ -160,6 +329,7 @@ def parse() -> None:
                 ["" if cell is None else str(cell).strip() for cell in row]
                 for row in workbook.load_sheet(sheet, header_row=None, dtypes="string").to_polars().iter_rows()
             ]
+            text = " ".join(" ".join(row) for row in rows)
             start, column = next(
                 (index, row.index("Candidate")) for index, row in enumerate(rows) if "Candidate" in row
             )
@@ -188,9 +358,16 @@ def parse() -> None:
         ]
         if len({round(sum(tally.values()), 2) for tally in rounds}) != 1:
             raise ValueError(f"{key}: the rounds do not add up to one total, {[sum(t.values()) for t in rounds]}")
-        if len(rounds) == 1:
+        if len(rounds) == 1 and existing is not None:
             raise ValueError(f"{key}: decided in round 1")
-        official[key] = rounds
+        seats = int(elect[1]) if (elect := re.search(r"Number to be elected:?\s*(\d+)", text)) else 1
+        threshold = int(sum(rounds[0].values()) // (seats + 1)) + 1
+        stated = re.search(r"Threshold:?\s*([\d,]+)", text)
+        if stated is not None and int(stated[1].replace(",", "")) != threshold:
+            raise ValueError(f"{key}: the threshold is {stated[1]}, not {threshold}")
+        official[key] = (seats, rounds)
+        if record is None:
+            continue
 
         path = raw.cached(SOURCE, BASE + record).path
         if record.endswith(".csv"):
@@ -207,7 +384,7 @@ def parse() -> None:
             index for index, row in enumerate(data) if row and re.match(r"(precinct|w-p)", row[0], re.IGNORECASE)
         )
         labels = [label for label in rounds[0] if label is not None]
-        names: dict[str, str | None] = {}
+        names: dict[str, str | None] = {"CAROL BECKER": "Becker"} if "Becker" in labels else {}
         for row in data[start + 1 :]:
             for choice in row[1:4]:
                 choice = choice.strip()
@@ -223,6 +400,9 @@ def parse() -> None:
                     and choice.isupper()
                     and re.sub(r"[^A-Z]", "", label.split()[-1].upper())[:3] == choice
                 ]
+                if len(found) > 1:
+                    found = [label for label in found if re.sub(r"[^A-Z]", "", label.upper())[:3] == choice]
+                    found = found if len(found) == 1 else [None]
                 if not found:
                     found = [
                         label
@@ -256,37 +436,82 @@ def parse() -> None:
             )
             count = int(float(row[4])) if len(row) > 4 and row[4].strip() else 1
             ballots[unit, ranking] = ballots.get((unit, ranking), 0) + count
+        steps: list[tuple[dict[str, int], set[str]]] = []
+        elected: set[str] = set()
+        for number in range(1, len(rounds)):
+            before, after = rounds[number - 1], rounds[number]
+            surplus = {
+                label
+                for label, votes in before.items()
+                if seats > 1
+                and label is not None
+                and votes >= threshold
+                and after.get(label)
+                and after[label] < votes - 0.00005
+            }
+            elected |= surplus
+            factors = {
+                label: (round(votes * 10**4) - threshold * 10**4) * 10**4 // round(votes * 10**4)
+                if label in surplus
+                else 10**4
+                for label, votes in before.items()
+                if label is not None and votes and (label in surplus or not after.get(label))
+            }
+            steps.append(
+                (
+                    factors,
+                    {label for label, votes in after.items() if label is not None and votes and label not in elected},
+                )
+            )
         counts: dict[tuple[str, int, str | None], int] = {}
         for (unit, ranking), count in ballots.items():
-            tops = [
-                next(
-                    (
-                        choice
-                        for choice in ranking
-                        if choice is not None and choice in standing and (number == 1 or standing[choice])
-                    ),
-                    None,
-                )
-                for number, standing in enumerate(rounds, 1)
-            ]
-            if tops[0] is None:
+            first = next(
+                (pos for pos, choice in enumerate(ranking) if choice is not None and choice in rounds[0]), None
+            )
+            if first is None:
                 continue
-            for number, top in enumerate(tops, 1):
-                counts[unit, number, top] = counts.get((unit, number, top), 0) + count
+            pieces: dict[int | None, int] = {first: 10**4}
+            for number in range(len(rounds)):
+                if number:
+                    factors, continuing = steps[number - 1]
+                    moved: dict[int | None, int] = {}
+                    for pos, weight in pieces.items():
+                        factor = 0 if pos is None else factors.get(ranking[pos] or "", 0)
+                        share = weight if factor == 10**4 else weight * factor // 10**4
+                        if share < weight:
+                            moved[pos] = moved.get(pos, 0) + weight - share
+                        if share:
+                            target = (
+                                next(
+                                    (later for later in range(pos + 1, len(ranking)) if ranking[later] in continuing),
+                                    None,
+                                )
+                                if pos is not None
+                                else None
+                            )
+                            moved[target] = moved.get(target, 0) + share
+                    pieces = moved
+                for pos, weight in pieces.items():
+                    label = None if pos is None else ranking[pos]
+                    counts[unit, number + 1, label] = counts.get((unit, number + 1, label), 0) + count * weight
         tally = pl.DataFrame(
             [
-                (unit, number, label, counts.get((unit, number, label), 0))
+                (unit, number, label, counts.get((unit, number, label), 0) / 10**4)
                 for unit in sorted({unit for unit, _ in ballots})
                 for number, standing in enumerate(rounds, 1)
                 for label in {*standing, *(rounds[number - 2] if number > 1 else ())}
             ],
-            schema={"unit": pl.String, "round": pl.Int16, "label": pl.String, "votes": pl.Int64},
+            schema={"unit": pl.String, "round": pl.Int16, "label": pl.String, "votes": pl.Float64},
             orient="row",
         )
         sums = tally.group_by("round", "label").agg(pl.col("votes").sum())
         for number, expected in enumerate(rounds, 1):
-            found = {label: votes for _, label, votes in sums.filter(pl.col("round") == number).iter_rows() if votes}
-            if found != {label: votes for label, votes in expected.items() if votes}:
+            found = {
+                label: round(votes, 4)
+                for _, label, votes in sums.filter(pl.col("round") == number).iter_rows()
+                if votes
+            }
+            if found != {label: round(votes, 4) for label, votes in expected.items() if votes}:
                 raise ValueError(
                     f"{key} round {number}: cast vote record and summary differ on "
                     f"{ {label: (found.get(label), expected.get(label)) for label in {*found, *expected} if found.get(label, 0) != expected.get(label, 0)} }"
@@ -295,8 +520,11 @@ def parse() -> None:
     (PARSED / "official.json").write_text(
         json.dumps(
             {
-                key: [[[label, votes] for label, votes in tally.items()] for tally in rounds]
-                for key, rounds in official.items()
+                key: {
+                    "seats": seats,
+                    "rounds": [[[label, votes] for label, votes in tally.items()] for tally in rounds],
+                }
+                for key, (seats, rounds) in official.items()
             }
         )
     )
@@ -323,9 +551,9 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    official = {
-        key: [{label: int(votes) for label, votes in tally} for tally in rounds]
-        for key, rounds in json.loads((PARSED / "official.json").read_text()).items()
+    official: dict[str, tuple[int, list[dict[str | None, float]]]] = {
+        key: (contest["seats"], [{label: votes for label, votes in tally} for tally in contest["rounds"]])
+        for key, contest in json.loads((PARSED / "official.json").read_text()).items()
     }
     tallies = pl.read_parquet(PARSED / "tallies.parquet")
     shapes = {
@@ -337,8 +565,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Minneapolis's ranked-choice contests for mayor and city council that went past round 1, 2009 to "
-            "2021, with every round by precinct tabulated from the cast vote records",
+            summary="Minneapolis's ranked-choice contests for park board, the Board of Estimate and Taxation, and the "
+            "2023 and 2025 mayor and city council, 2009 to 2025, with every round by precinct tabulated from the cast "
+            "vote records",
             polity="US",
         )
 
@@ -351,55 +580,57 @@ def emit() -> Path:
 
         county = cs.area("us.county", "27053")
         city = cs.area("us.place", "2743000")
+        whole = cs.unit("us.place", "2743000")
         (polity,) = conn.execute("select polity_id from polity_territory where area_id = %s", [city]).fetchone() or (
             None,
         )
-        if polity is None:
-            raise ValueError("Minneapolis must already be a polity")
-        (special,) = conn.execute(
-            """select e.id from election e join external_id x on true join contest k on k.id = x.entity_id
-               where x.scheme = 'us.contest' and x.value = 'alged:2743000_2020_8_minneapolis_MN_City Council_6_1'
-               and e.id = k.election_id"""
+        (state,) = conn.execute(
+            "select polity_id from polity_territory where area_id = %s", [cs.area("us.state", "27")]
         ).fetchone() or (None,)
-        if special is None:
-            raise ValueError("the 2020 Ward 6 special must already exist")
-        cs.add(
-            "election",
-            **dict(
-                zip(
-                    ("id", "polity_id", "parent_id", "kind", "status", "rerun_of_id"),
-                    conn.execute(
-                        "select id, polity_id, parent_id, kind, status, rerun_of_id from election where id = %s",
-                        [special],
-                    ).fetchone()
-                    or (),
-                    strict=True,
-                )
-            ),
-            date_from=date(2020, 8, 11),
-            date_to=date(2020, 8, 11),
-            date_precision="day",
-            original_calendar=None,
-            original_text=None,
-        )
+        if polity is None or state is None or city in cs.minted or whole in cs.minted:
+            raise ValueError("Minneapolis and Minnesota must already exist")
+        for result_set, note in conn.execute(
+            """select n.entity_id, n.id from note n join result_set r on r.id = n.entity_id
+               join changeset h on h.id = r.changeset_id
+               where h.pipeline = %s and n.kind = 'methodology' and n.body_md like '%%exhausts at an overvote%%'""",
+            [SOURCE],
+        ).fetchall():
+            cs.add("note", id=note, entity_id=result_set, kind="methodology", body_md=DERIVED)
         irv = cs.key("us.electoral_system", "minneapolis:irv")
+        stv = cs.key("us.electoral_system", "minneapolis:stv")
+        if irv in cs.minted:
+            raise ValueError("minneapolis:irv must already exist")
         cs.add(
             "electoral_system",
-            id=irv,
+            id=stv,
             polity_id=polity,
-            rules={"formula": "irv", "maxRankings": 3, "batchElimination": True},
+            rules={
+                "formula": "stv",
+                "quota": "droop",
+                "surplus": "weighted_inclusive_gregory",
+                "maxRankings": 3,
+                "batchElimination": True,
+            },
             rules_version=1,
         )
-        name(irv, "Minneapolis ranked-choice voting")
+        name(stv, "Minneapolis single transferable vote")
 
+        pending = [key for key in CONTESTS if key in REDONE or cs.key(f"{SOURCE}.result_set", key) in cs.minted]
+        known = {
+            vintage for (vintage,) in conn.execute("select vintage from boundary_set where scheme_code = 'us.precinct'")
+        }
         precincts: dict[str, dict[str, UUID]] = {}
-        for key, unit in sorted(set(tallies.select("key", "unit").iter_rows())):
+        for key, unit in sorted(set(tallies.filter(pl.col("key").is_in(pending)).select("key", "unit").iter_rows())):
             day, plan = key[:10], key[:4]
+            code = f"{day}:MN:27053:{unit}"
             if unit in precincts.get(day, {}):
                 continue
-            area = cs.area("us.precinct", f"{day}:MN:27053:{unit}")
+            precincts.setdefault(day, {})[unit] = cs.unit("us.precinct", code)
+            area = cs.area("us.precinct", code)
+            if area not in cs.minted:
+                continue
             cs.add("area", id=area, scheme_code="us.precinct")
-            cs.add("area_code", area_id=area, code=f"{day}:MN:27053:{unit}", valid_from=None)
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
             cs.add("area_parent", area_id=area, parent_id=county)
             name(area, f"Minneapolis {unit}, Hennepin County")
             cs.add(
@@ -412,8 +643,6 @@ def emit() -> Path:
                 quality="official",
                 source_id=None,
             )
-            code = f"{day}:MN:27053:{unit}"
-            precincts.setdefault(day, {})[unit] = cs.unit("us.precinct", code)
             cs.add(
                 "reporting_unit",
                 id=precincts[day][unit],
@@ -426,7 +655,7 @@ def emit() -> Path:
                 valid_from=date.fromisoformat(day),
                 valid_to=date.fromisoformat(day) + timedelta(days=1),
             )
-        for day in sorted(precincts):
+        for day in sorted(set(precincts) - known):
             cs.add(
                 "boundary_set",
                 scheme_code="us.precinct",
@@ -447,48 +676,150 @@ def emit() -> Path:
             words = spell(text)
             people.setdefault((words[0], words[-1]), set()).add((person, held, area == city))
 
-        for key, (existing, summary, record) in CONTESTS.items():
+        done: set[UUID] = set()
+        for key in pending:
+            existing, summary, record = CONTESTS[key]
             day = date.fromisoformat(key[:10])
-            rounds = official[key]
-            contest = cs.key("us.contest", existing)
-            columns = (
-                "election_id",
-                "kind",
-                "office_id",
-                "body_id",
-                "district_area_id",
-                "seat_id",
-                "boundary_set_id",
-                "magnitude",
-                "party_scope_id",
-                "round_number",
-                "previous_round_id",
-                "allocation_parent_id",
-                "rules_override",
-                "default_result_kind",
-                "term",
-            )
-            row = conn.execute(f"select {', '.join(columns)} from contest where id = %s", [contest]).fetchone()
-            if contest in cs.minted or row is None:
-                raise ValueError(f"{key}: {existing} must already exist")
-            contest_row = dict(zip(columns, row, strict=True))
-            cs.add("contest", id=contest, **contest_row, electoral_system_id=irv)
-            election, district = contest_row["election_id"], contest_row["district_area_id"]
-            previous = cs.key("us.alged.result_set", existing)
-            if previous in cs.minted:
-                raise ValueError(f"{key}: {existing}'s result set must already exist")
-            tops = conn.execute(
-                """select distinct u.id from result_value v join result_set r on r.k = v.result_set_k
-                   join reporting_unit u on u.k = v.unit_k where r.id = %s""",
-                [previous],
-            ).fetchall()
-            if len(tops) != 1:
-                raise ValueError(f"{key}: {existing}'s result set has {len(tops)} reporting units")
+            seats, rounds = official[key]
             office = key.split(":", 3)[3]
-            seat = "Mayor" if office == "mayor" else f"City Council, Ward {office.split(':')[1]}"
+            kind, _, district_number = office.partition(":")
+            election = cs.key("us.election", f"{day}:MN:2743000")
+            if election in cs.minted and election not in done:
+                done.add(election)
+                parent = cs.key("us.election", f"{day}:MN")
+                if parent in cs.minted:
+                    cs.add(
+                        "election",
+                        id=parent,
+                        polity_id=state,
+                        kind="local",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    name(parent, f"{day.year} Minnesota local elections")
+                    cs.add("slug", path=f"us/mn/{day}-local", entity_id=parent)
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    parent_id=parent,
+                    kind="local",
+                    date_from=day,
+                    date_to=day,
+                    date_precision="day",
+                    status="held",
+                )
+                name(election, f"{day.year} Minneapolis local election")
+                cs.add("slug", path=f"us/mn/minneapolis/{day}-local", entity_id=election)
+            if kind in BODIES:
+                owner = cs.key("us.body", f"MN:2743000:{kind}")
+                if owner in cs.minted and owner not in done:
+                    done.add(owner)
+                    cs.add("body", id=owner, polity_id=polity, kind="council")
+                    name(owner, BODIES[kind])
+            else:
+                owner = cs.key(
+                    "us.office" if kind == "mayor" else "us.body",
+                    f"MN:2743000:{'mayor' if kind == 'mayor' else 'council'}",
+                )
+                if owner in cs.minted:
+                    raise ValueError(f"{key}: the {kind} must already exist")
+            district = city
+            top = whole
+            if district_number not in ("", "at-large"):
+                code = f"27:2743000:{'council' if kind == 'city-council' else kind}:district-{district_number}"
+                district = cs.area("us.local_district", code)
+                top = cs.unit("us.local_district", code)
+                if kind == "city-council" and district in cs.minted:
+                    raise ValueError(f"{key}: {code} must already exist")
+                if district in cs.minted and district not in done:
+                    done.add(district)
+                    cs.add("area", id=district, scheme_code="us.local_district")
+                    cs.add("area_code", area_id=district, code=code, valid_from=None)
+                    cs.add("area_parent", area_id=district, parent_id=city, valid_from=None)
+                    name(district, f"{BODIES[kind]}, District {district_number}")
+                    cs.add(
+                        "reporting_unit",
+                        id=top,
+                        polity_id=polity,
+                        scheme_code="us.local_district",
+                        code=code,
+                        area_relation="equals",
+                        area_id=district,
+                        kind="standard",
+                    )
+            seat = {
+                "mayor": "Mayor",
+                "city-council": f"City Council, Ward {district_number}",
+                "park-board": "Park and Recreation Commissioner "
+                + ("At Large" if district_number == "at-large" else f"District {district_number}"),
+                "board-of-estimate-and-taxation": "Board of Estimate and Taxation",
+            }[kind]
+            system = irv if seats == 1 else stv
+            rows = tallies.filter(pl.col("key") == key)
+            if existing is None:
+                contest = cs.key("us.contest", key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office" if kind == "mayor" else "body_seats",
+                    office_id=owner if kind == "mayor" else None,
+                    body_id=None if kind == "mayor" else owner,
+                    district_area_id=district,
+                    magnitude=seats,
+                    round_number=1,
+                    electoral_system_id=system,
+                    default_result_kind="counted",
+                    term="full",
+                )
+                tail = {
+                    "mayor": "mayor",
+                    "city-council": f"council-district-{district_number}",
+                    "park-board": f"park-board-{'at-large' if district_number == 'at-large' else f'district-{district_number}'}",
+                    "board-of-estimate-and-taxation": "board-of-estimate-and-taxation",
+                }[kind]
+                cs.add("slug", path=f"us/mn/minneapolis/{day}-local/{tail}", entity_id=contest)
+                name(
+                    contest,
+                    f"{day.year} Minneapolis mayoral election"
+                    if kind == "mayor"
+                    else f"{day.year} {'Minneapolis City Council' if kind == 'city-council' else BODIES[kind]} election"
+                    + (f", District {district_number}" if district_number not in ("", "at-large") else "")
+                    + (", At Large" if district_number == "at-large" else ""),
+                )
+                if kind == "park-board" and district_number != "at-large":
+                    if rows.is_empty():
+                        cs.add("note", entity_id=contest, kind="caveat", body_md=BOUNDARY)
+                    else:
+                        geom, point = conn.execute(
+                            """select encode(st_asewkb(st_multi(st_union(g))), 'hex'),
+                                 encode(st_asewkb(st_pointonsurface(st_union(g))), 'hex')
+                               from (select st_geomfromewkb(decode(h, 'hex')) g from unnest(%s::text[]) h) x""",
+                            [[shapes[key[:4], unit][0] for unit in rows["unit"].unique()]],
+                        ).fetchone() or (None, None)
+                        cs.add(
+                            "area_geometry",
+                            area_id=district,
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                            geom=geom,
+                            label_point=point,
+                            quality="synthetic",
+                            source_id=None,
+                        )
+            else:
+                contest = cs.key("us.contest", existing)
+                if contest in cs.minted or key not in REDONE:
+                    raise ValueError(f"{key}: {existing} must already be published")
+
             sources = []
-            for file, kind in ((summary, "tabulation summary statement"), (record, "cast vote record")):
-                title = f"{day:%B} {day.day}, {day.year} Minneapolis municipal election: {seat}, {kind}"
+            for file, label in ((summary, "tabulation summary statement"), (record, "cast vote record")):
+                if file is None:
+                    continue
+                title = f"{day:%B} {day.day}, {day.year} Minneapolis municipal election: {seat}, {label}"
                 source = cs.source(PUBLISHER, title)
                 cs.add(
                     "source",
@@ -502,16 +833,18 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, BASE + file), source)
                 sources.append(source)
 
-            current = conn.execute(
-                """select o.id, o.ballot_label, h.pipeline = %s from contest_option o
-                   join entity n on n.id = o.id join changeset h on h.id = n.changeset_id
-                   where o.contest_id = %s and o.kind = 'candidate'""",
-                [SOURCE, contest],
-            ).fetchall()
+            ballot = BALLOT.get(office, {}) if day.year == 2009 else {}
+            current = {
+                " ".join(spell(text)): option
+                for option, text in conn.execute(
+                    "select id, ballot_label from contest_option where contest_id = %s and kind = 'candidate'",
+                    [contest],
+                ).fetchall()
+            }
             options: dict[str, UUID] = {}
             scattered = None
             for label in (label for label in rounds[0] if label is not None):
-                if "write" in label.casefold() or len(spell(label)) == 1:
+                if label not in ballot and ("write" in label.casefold() or len(spell(label)) == 1 or ballot):
                     if scattered is None:
                         found = [
                             option
@@ -532,38 +865,31 @@ def emit() -> Path:
                             )
                     options[label] = scattered
                     continue
-                display = " ".join(reversed(label.split(", "))) if re.fullmatch(r"[^,]+, [^,]+", label) else label
+                display = ballot.get(label) or (
+                    " ".join(reversed(label.split(", "))) if re.fullmatch(r"[^,]+, [^,]+", label) else label
+                )
                 words = spell(display)
-                spelled = {option: spell(text) for option, text, _ in current}
-                found = [option for option, other in spelled.items() if other[-1] == words[-1]]
-                if len(found) > 1 or [
-                    other for other in rounds[0] if other is not None and spell(other)[-1] == words[-1]
-                ] != [label]:
-                    found = [option for option in found if spelled[option][0] == words[0]]
-                if len(found) > 1:
-                    found = [option for option, _, mine in current if mine and option in found] or found
-                if len(found) == 1:
-                    options[label] = found[0]
+                if existing is not None:
+                    if " ".join(words) not in current:
+                        raise ValueError(f"{key}: no option for {display}")
+                    options[label] = current[" ".join(words)]
                     continue
-                if found:
-                    raise ValueError(f"{key}: {len(found)} options for {label}")
-                known = people.get((words[0], words[-1]), set())
-                matches = {person for person, _, _ in known}
+                known_people = people.get((words[0], words[-1]), set())
+                matches = {person for person, _, _ in known_people}
                 for preferred in (
-                    {person for person, held, _ in known if held == day},
-                    {person for person, _, local in known if local},
+                    {person for person, held, _ in known_people if held == day},
+                    {person for person, _, local in known_people if local},
                 ):
                     if len(preferred) == 1:
                         matches = preferred
                         break
-                if len(matches) > 1:
-                    raise ValueError(f"{key}: {len(matches)} people for {label}")
-                if matches:
+                if len(matches) == 1:
                     (person,) = matches
                 else:
                     person = cs.key(f"{SOURCE}.person", slug(display))
-                    cs.add("person", id=person)
-                    name(person, display)
+                    if person in cs.minted and person not in {p for found in people.values() for p, _, _ in found}:
+                        cs.add("person", id=person)
+                        name(person, display)
                     people.setdefault((words[0], words[-1]), set()).add((person, day, True))
                 options[label] = cs.key("us.option", f"{key}:{person}")
                 cs.add("contest_option", id=options[label], contest_id=contest, kind="candidate", ballot_label=label)
@@ -583,47 +909,43 @@ def emit() -> Path:
             ):
                 raise ValueError(f"{key}: two candidates share an option")
 
-            for values in conn.execute(
-                """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
-                     supersedes_id from result_set where id = %s""",
-                [previous],
-            ).fetchall():
+            result = cs.key(f"{SOURCE}.result_set", f"{key}:2" if key in REDONE else key)
+            previous = {
+                default: cs.key(f"{SOURCE}.result_set", key if default else f"{key}:precincts")
+                for default in (True, False)
+                if key in REDONE
+            }
+            for old in previous.values():
                 cs.add(
                     "result_set",
                     **dict(
                         zip(
-                            (
-                                "id",
-                                "election_id",
-                                "contest_id",
-                                "stage",
-                                "kind",
-                                "status",
-                                "source_id",
-                                "as_of",
-                                "completeness",
-                                "supersedes_id",
-                            ),
-                            values,
+                            ("id", "election_id", "contest_id", "stage", "kind", "source_id", "as_of", "completeness"),
+                            conn.execute(
+                                """select id, election_id, contest_id, stage, kind, source_id, as_of, completeness
+                                   from result_set where id = %s""",
+                                [old],
+                            ).fetchone()
+                            or (),
                             strict=True,
                         )
                     ),
+                    status="superseded",
                     is_default=False,
+                    supersedes_id=None,
                 )
-            result = cs.key(f"{SOURCE}.result_set", key)
             final = rounds[-1]
-            winner = max((label for label in final if label is not None), key=lambda label: final[label])
+            winners = sorted((label for label in final if label is not None), key=lambda label: -final[label])[:seats]
             for option in set(options.values()):
                 held = [label for label, other in options.items() if other == option]
-                for kind in (
+                for outcome in (
                     ("won", "elected")
-                    if winner in held
+                    if set(held) & set(winners)
                     else ("lost" if any(final.get(label) for label in held) else "eliminated",)
                 ):
-                    cs.add("outcome", result_set_id=result, option_id=option, kind=kind)
-            rows = tallies.filter(pl.col("key") == key)
-            units = {"top": str(tops[0][0]), **{unit: str(precincts[key[:10]][unit]) for unit in rows["unit"].unique()}}
-            if office != "mayor":
+                    cs.add("outcome", result_set_id=result, option_id=option, kind=outcome)
+            units = {"top": str(top), **{unit: str(precincts[key[:10]][unit]) for unit in rows["unit"].unique()}}
+            if district != city and not rows.is_empty() and key not in REDONE:
                 cs.frame(
                     "reporting_unit_area",
                     pl.DataFrame(
@@ -639,29 +961,32 @@ def emit() -> Path:
                 (
                     result,
                     True,
-                    OFFICIAL,
+                    OFFICIAL + (SURPLUS if seats > 1 else ""),
                     sources[0],
                     0,
                     pl.DataFrame(
                         [
-                            ("top", number, label, tally.get(label, 0))
+                            ("top", number, label, float(tally.get(label, 0)))
                             for number, tally in enumerate(rounds, 1)
                             for label in rounds[0]
                             if label in tally
                         ],
-                        schema={"unit": pl.String, "round": pl.Int16, "label": pl.String, "votes": pl.Int64},
+                        schema={"unit": pl.String, "round": pl.Int16, "label": pl.String, "votes": pl.Float64},
                         orient="row",
                     ),
-                ),
-                (
-                    cs.key(f"{SOURCE}.result_set", f"{key}:precincts"),
-                    False,
-                    DERIVED,
-                    sources[1],
-                    1,
-                    rows.select("unit", "round", "label", "votes"),
-                ),
+                )
             ]
+            if record is not None:
+                sets.append(
+                    (
+                        cs.key(f"{SOURCE}.result_set", f"{key}:precincts:2" if key in REDONE else f"{key}:precincts"),
+                        False,
+                        DERIVED,
+                        sources[1],
+                        1,
+                        rows.select("unit", "round", "label", "votes"),
+                    )
+                )
             for result_set, default, note, source, flags, values in sets:
                 cs.add(
                     "result_set",
@@ -674,9 +999,8 @@ def emit() -> Path:
                     source_id=source,
                     is_default=default,
                     completeness=1,
+                    supersedes_id=previous.get(default),
                 )
-                if result_set not in cs.minted:
-                    continue
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
                 unknown = set(values["label"].drop_nulls()) - set(options)
                 if unknown:
@@ -712,7 +1036,7 @@ def emit() -> Path:
                         .cast(pl.Int16),
                         count_round=pl.col("round").cast(pl.Int16),
                     )
-                    .agg(value=pl.col("votes").sum())
+                    .agg(value=pl.col("votes").sum().round(4))
                     .select(
                         result_set_id=pl.lit(str(result_set)),
                         unit_id="unit_id",
