@@ -8719,12 +8719,27 @@ export const search = {
       if (input.q === "") {
         return [];
       }
+      const ALIASES: Record<string, string> = {
+        uk: "united kingdom",
+        gb: "united kingdom",
+        britain: "united kingdom",
+        "great britain": "united kingdom",
+        us: "united states",
+        usa: "united states",
+        "u.s.": "united states",
+        "u.k.": "united kingdom",
+        eu: "european union",
+      };
+      const q = input.q.replace(
+        /^(great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu)(?=\s|$)/iu,
+        (word) => ALIASES[word.toLowerCase()] ?? word,
+      );
       const chambers = db.execute<{
         id: string;
         polity: string;
         isClose: boolean;
       }>(sql`
-        with q as (select lower(unaccent(${input.q})) as t),
+        with q as (select lower(unaccent(${q})) as t),
         seated as (select body_id, count(*) as members from tenure group by body_id)
         select b.id, b.polity_id as polity,
           bool_or(
@@ -8748,7 +8763,7 @@ export const search = {
         context: string | null;
         date: string | null;
       }>(sql`
-        with q as (select lower(unaccent(${input.q})) as t),
+        with q as (select lower(unaccent(${q})) as t),
         terms as (
           select to_tsquery('simple', string_agg(quote_literal(w) || ':*', ' & ')) as tq
           from q, regexp_split_to_table(q.t, '\\s+') w where w <> ''
@@ -8829,10 +8844,8 @@ export const search = {
         .filter((row) => row.path != null && row.name !== "")
         .toSorted(
           (a, b) =>
-            Number(
-              b.type !== "person" && segment(b.name) === segment(input.q),
-            ) -
-            Number(a.type !== "person" && segment(a.name) === segment(input.q)),
+            Number(b.type !== "person" && segment(b.name) === segment(q)) -
+            Number(a.type !== "person" && segment(a.name) === segment(q)),
         )
         .slice(0, input.limit);
     }),
