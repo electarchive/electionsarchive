@@ -601,6 +601,11 @@
           class="grid grid-cols-[repeat(auto-fill,minmax(min(100%,20rem),1fr))] gap-x-6"
         >
           {#each data.today as election (election.path)}
+            {const name = $derived(
+              election.name
+                .replace(/^\d{4} /, "")
+                .replace(/ \(\p{L}+ \d{1,2}\)$/u, ""),
+            )}
             <li
               class="grid grid-cols-[4rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-2"
             >
@@ -611,10 +616,19 @@
                 <a
                   class="justify-self-start text-[0.9375rem] font-semibold hover:highlighter"
                   href={resolve("/[...path]", { path: election.path })}
-                  >{election.name.replace(/^\d{4} /, "")}</a
+                  >{name}</a
                 >
                 <span class="text-xs text-muted-foreground"
-                  >{[election.polity, date(election.date)]
+                  >{[
+                    election.polity != null && !name.includes(election.polity)
+                      ? election.polity
+                      : null,
+                    new Intl.DateTimeFormat(getLocale(), {
+                      month: "long",
+                      day: "numeric",
+                      timeZone: "UTC",
+                    }).format(new Date(`${election.date}T00:00:00Z`)),
+                  ]
                     .filter((part) => part != null)
                     .join(", ")}</span
                 >
