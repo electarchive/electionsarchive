@@ -374,6 +374,21 @@ def emit() -> Path:
                 )
             for origin, url in FILES[year]:
                 cs.artifact(raw.cached(origin, url), sources[year])
+        own: dict[str, tuple[UUID, UUID | None, int, set[str]]] = {
+            key: (result_set, supersedes, int(total), set(present))
+            for key, result_set, supersedes, total, present in conn.execute(
+                """select regexp_replace(x.value, ':r[0-9]+$', ''), r.id, r.supersedes_id,
+                          (select coalesce(sum(v.value), 0) from result_value v
+                           where v.result_set_k = r.k and v.measure = 1 and v.count_round = 0),
+                          (select coalesce(array_agg(distinct case u.scheme_code when 'us.precinct'
+                                  then split_part(u.code, ':', 3) else u.code end), '{}')
+                           from result_value v join reporting_unit u on u.k = v.unit_k
+                           where v.result_set_k = r.k and v.measure = 1 and v.value > 0)
+                   from external_id x join result_set r on r.id = x.entity_id and r.status = 'active'
+                   where x.scheme = %s""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        }
         values: list[pl.DataFrame] = []
         result_sets: list[UUID] = []
         taken: set[str] = set()
@@ -574,7 +589,27 @@ def emit() -> Path:
             if set(lines["code"]) - set(members):
                 print(f"{key}: no unit for {sorted(set(lines['code']) - set(members))}, skipped")
                 continue
-            result_set = cs.key(f"{SOURCE}.result_set", key)
+            counted = sum(
+                votes
+                for candidate, party, votes in lines.filter(pl.col("measure") == 1)
+                .select("candidate", "party", "votes")
+                .iter_rows()
+                if (candidate, party) in picked
+            )
+            published = own.get(key)
+            if published is not None and (
+                published[2] == counted
+                or not {
+                    code.split(":")[2] if kind == "precinct" else code
+                    for code, kind, votes in lines.filter(pl.col("measure") == 1)
+                    .select("code", "kind", "votes")
+                    .iter_rows()
+                    if votes > 0
+                }
+                - published[3]
+            ):
+                continue
+            result_set = cs.key(f"{SOURCE}.result_set", key if published is None else f"{key}:r{counted}")
             if result_set not in cs.minted:
                 continue
             result_sets.append(result_set)
@@ -582,6 +617,20 @@ def emit() -> Path:
                 pool = cs.key("us.option", f"{key}:write-ins")
                 cs.add("contest_option", id=pool, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 picked = {line: pool if option is None else option for line, option in picked.items()}
+            if published is not None:
+                print(f"{key}: {published[2]} votes on file, {counted} parsed")
+                cs.add(
+                    "result_set",
+                    id=published[0],
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=sources[year],
+                    is_default=False,
+                    supersedes_id=published[1],
+                )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -592,6 +641,7 @@ def emit() -> Path:
                 status="active",
                 source_id=sources[year],
                 is_default=False,
+                supersedes_id=None if published is None else published[0],
                 completeness=round(sum(tallies.values()) / official, 4) if official else None,
             )
             values.append(
