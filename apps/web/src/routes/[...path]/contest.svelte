@@ -197,6 +197,19 @@
     ];
   });
   const only = $derived(filter.at === page.url.href ? filter.value : null);
+  const sets = $derived(
+    contest.sets.filter(
+      (set, index) =>
+        contest.sets.findIndex(
+          (other) =>
+            other.stage === set.stage &&
+            other.status === set.status &&
+            other.isDefault === set.isDefault &&
+            other.source.publisher === set.source.publisher &&
+            other.source.title === set.source.title,
+        ) === index,
+    ),
+  );
   const drilled = $derived(contest.scope.noun != null);
   const counted = $derived(MEASURES[contest.current?.measure ?? ""]?.());
   const question = $derived(
@@ -1226,7 +1239,7 @@
       <div>
         <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.sources_title()}</h2>
         <ul class="grid gap-2.5 text-sm/snug">
-          {#each contest.sets as set, index (index)}
+          {#each sets as set, index (index)}
             <li class="grid gap-0.5">
               <span class="flex flex-wrap items-baseline gap-x-2">
                 {#if DEFINITIONS[set.stage] == null}
