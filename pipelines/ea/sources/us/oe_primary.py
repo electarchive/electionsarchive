@@ -1,6 +1,7 @@
 import io
 import json
 import re
+from collections import defaultdict
 from datetime import date
 from pathlib import Path
 
@@ -164,6 +165,17 @@ def parse() -> None:
                 continue
             day, state, chamber, party = found.groups()
             parties.setdefault((day, state, chamber), {})[party or ""] = str(contest)
+        surnames: dict[str, set[str]] = defaultdict(set)
+        for contest, label, person in conn.execute(
+            """select o.contest_id, o.ballot_label, n.text from contest_option o
+               left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+               left join name n on n.entity_id = cy.person_id and n.is_preferred
+               where o.contest_id = any(%s) and o.kind <> 'write_in'""",
+            [[contest for known in parties.values() for contest in known.values()]],
+        ).fetchall():
+            for text in (label, person):
+                if text:
+                    surnames[str(contest)].update(slug(text).split("-"))
     frames = []
     for (state, stamp), paths in picks().items():
         day = date(int(stamp[:4]), int(stamp[4:6]), int(stamp[6:]))
@@ -237,7 +249,7 @@ def parse() -> None:
                     .then(pl.lit("senate:special"))
                     .when(
                         (office.str.contains(openelections.HOUSE.pattern) | (office == "house") & (state == "WI"))
-                        & ~office.str.contains(r"\bstate\b")
+                        & ~office.str.contains(r"\bstate\b|proposition|amendment|question|referend|resolution")
                     )
                     .then(pl.lit("house")),
                     district=pl.coalesce(district.str.extract(r"(\d+)"), office.str.extract(r"(\d+)")).cast(
@@ -248,6 +260,7 @@ def parse() -> None:
                     .fill_null("")
                     .str.to_lowercase()
                     .str.replace_all(r"saint ", "st ")
+                    .str.replace_all(r"\(part\)", "")
                     .str.replace_all("&", "and")
                     .str.replace_all(
                         r"\b(city and county of|county of|county|parish|borough|census area|municipality)\b", ""
@@ -261,9 +274,51 @@ def parse() -> None:
                 ).filter(pl.col("office").is_not_null())
             )
     frame = pl.concat(frames).filter(
-        pl.col("votes").is_not_null() & ~pl.col("candidate").str.contains(openelections.NOT_COUNTED)
+        pl.col("votes").is_not_null()
+        & ~pl.col("candidate").str.contains(openelections.NOT_COUNTED)
+        & ~pl.col("candidate").str.contains("PRECINCTS REPORTING")
     )
     frame = frame.with_columns(district=pl.when(pl.col("office") == "house").then("district"))
+    guessed = []
+    for state, day, office, district, candidate in (
+        frame.filter((pl.col("party") == "") & pl.col("office").is_in(["house", "senate"]))
+        .select("state", "day", "office", "district", "candidate")
+        .unique()
+        .iter_rows()
+    ):
+        words = [word for word in slug(candidate).split("-") if word not in {"jr", "sr", "ii", "iii", "iv"}]
+        if not words:
+            continue
+        surname = words[0] if "," in candidate else words[-1]
+        for chamber in (
+            (office, f"{office}:special")
+            if office == "senate"
+            else (*([f"house:{district}"] if district is not None else []), "house:0")
+        ):
+            known = parties.get((day.isoformat(), state, chamber), {})
+            named = {name for name, contest in known.items() if name and surname in surnames[contest]}
+            if len(named) == 1:
+                guessed.append((state, day, office, district, candidate, named.pop()))
+                break
+            if known:
+                break
+    frame = frame.join(
+        pl.DataFrame(
+            guessed,
+            schema={
+                "state": pl.String,
+                "day": pl.Date,
+                "office": pl.String,
+                "district": pl.Int16,
+                "candidate": pl.String,
+                "guess": pl.String,
+            },
+            orient="row",
+        ),
+        on=["state", "day", "office", "district", "candidate"],
+        how="left",
+        nulls_equal=True,
+    ).with_columns(party=pl.when(pl.col("party") == "").then(pl.coalesce("guess", "party")).otherwise("party"))
     resolved = []
     for state, day, office, district, party in (
         frame.select("state", "day", "office", "district", "party").unique().iter_rows()
@@ -342,7 +397,8 @@ def parse() -> None:
         frame.filter(pl.col("chamber").is_not_null() & pl.col("code").is_not_null())
         .with_columns(
             measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
-            writein=pl.col("candidate").is_in(list(medsl.POOLED)) | pl.col("candidate").str.contains("WRITE"),
+            writein=pl.col("candidate").is_in(list(medsl.POOLED))
+            | pl.col("candidate").str.contains(r"WRITE|WNTE|^(MISC\.?|OTHER|SCATTERED)$"),
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
         .filter(pl.col("measure") > 0)
