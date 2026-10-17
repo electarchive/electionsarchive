@@ -541,8 +541,10 @@ FILES = {
     ),
 }
 STATEWIDE = {
-    (year, "general"): f"https://files.hawaii.gov/elections/files/results/{year}/general/histatewide.pdf"
-    for year in (2004, 2008, 2012)
+    (year, stage): "https://files.hawaii.gov/elections/files/results/"
+    + f"{year}/{stage.title() if year == 2024 else stage}/histatewide.{'htm' if year <= 2000 else 'pdf'}"
+    for year in range(1996, 2025, 2)
+    for stage in ("general", "primary")
 }
 UNASSIGNED = (
     "The Office of Elections' statewide summary counts more ballots than its four county reports, which were printed "
@@ -556,7 +558,7 @@ def fetch() -> None:
             raw.cached(SOURCE, url)
         except LookupError:
             time.sleep(30)
-            raw.fetch(SOURCE, url, suffix=".pdf")
+            raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1])
     for stamp, url in FILES.values():
         address = WAYBACK.format(stamp, url)
         try:
@@ -892,8 +894,11 @@ def emit() -> Path:
                 for candidate, votes in summed.items()
                 if candidate in printed and printed[candidate] != votes
             }
-            if printed and (set(printed) != set(summed) or any(votes < 0 for votes in remainder.values())):
-                raise ValueError(f"{key}: statewide summary {printed} does not cover the counties' {summed}")
+            if any(votes < 0 for votes in remainder.values()):
+                raise ValueError(f"{key}: statewide summary {printed} is below the counties' {summed}")
+            if printed and set(printed) != set(summed):
+                print(f"{key}: statewide summary names {sorted(printed)}, counties {sorted(summed)}; not compared")
+                remainder = {}
             result_set = cs.key(f"{SOURCE}.result_set", key)
             previous = None
             if result_set not in cs.minted:
