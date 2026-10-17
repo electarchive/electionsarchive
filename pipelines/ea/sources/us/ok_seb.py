@@ -20,6 +20,18 @@ FILES = {
     "1994-11-08": "content/dam/ok/en/elections/election-results/1994-election-results/1994-general-results.pdf",
     "1996-11-05:president": "elections/elections-results/election-results/1996-election-results/96gpres.html",
     "1996-11-05:senate": "elections/elections-results/election-results/1996-election-results/96gsen.html",
+    **{
+        f"{day}:{name}": f"content/dam/ok/en/elections/election-results/{day[:4]}-election-results/"
+        f"{day[:4]}-general-election-results/{day[2:4]}{name}.pdf"
+        for day, names in (
+            ("2000-11-07", ["corp"]),
+            ("2002-11-05", ["gov", "ltgov", "sai", "ag", "supt", "labor", "ins", "corp"]),
+            ("2004-11-02", ["corp"]),
+            ("2006-11-07", ["gov", "ltgov", "sai", "ag", "treas", "supt", "labor", "ins", "corp"]),
+            ("2008-11-04", ["corp"]),
+        )
+        for name in names
+    },
 }
 OFFICES = {
     "GOVERNOR": ("governor", None),
@@ -65,7 +77,7 @@ def parse() -> None:
         candidates: list[tuple[str, str | None]] = []
         sums: list[int] = []
         for line in text.splitlines():
-            title = line.strip()
+            title = re.sub(r" \(FULL TERM\)$", "", line.strip())
             if (title in OFFICES or title == "PRESIDENT") and office is None:
                 office = "president" if title == "PRESIDENT" else OFFICES[title][0]
                 if day == "1996-11-05" and office == "senate:special":
@@ -136,8 +148,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oklahoma's governor, U.S. Senate, and statewide offices by county 1994 "
-            "and president and U.S. Senate by county 1996, from the State Election Board",
+            summary="Oklahoma's governor, U.S. Senate, and statewide offices by county 1994, 2002, and 2006, "
+            "corporation commissioners in 2000, 2004, and 2008, and president and U.S. Senate by county 1996, "
+            "from the State Election Board",
             polity="US",
         )
 
@@ -199,6 +212,8 @@ def emit() -> Path:
         for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
             key = f"{day}:OK:{office}"
             result_set = cs.key(f"{SOURCE}.result_set", key)
+            if result_set not in cs.minted:
+                continue
             if key in contests:
                 contest = contests[key]
                 ((election, area),) = conn.execute(
@@ -207,7 +222,7 @@ def emit() -> Path:
             else:
                 ((election, area),) = conn.execute(
                     "select election_id, district_area_id from contest where id = %s",
-                    [contests[f"{day}:OK:governor"]],
+                    [contests.get(f"{day}:OK:governor") or contests[f"{day}:OK:president"]],
                 ).fetchall()
                 office_id = cs.key("us.office", f"{office}:OK")
                 if office_id in cs.minted:
