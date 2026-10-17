@@ -14,7 +14,7 @@ from uuid import UUID
 import httpx
 import polars as pl
 
-from ea import raw
+from ea import names, raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.elstats import (
     FORMER,
@@ -474,6 +474,13 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        kept: dict[UUID, bool] = dict(
+            conn.execute(
+                """select r.id, r.is_default from result_set r join changeset c on c.id = r.changeset_id
+                   join external_id e on e.entity_id = r.id and e.scheme = %s where c.pipeline <> %s""",
+                [f"{SOURCE}.result_set", SOURCE],
+            ).fetchall()
+        )
         mine = {
             id
             for (id,) in conn.execute(
@@ -632,6 +639,7 @@ def emit() -> Path:
 
         taken: set[str] = set()
         values: list[tuple[str, str, str, int, int]] = []
+        folds: dict[UUID, list[UUID]] = {}
         for row in contests.sort("year", "day", "state", "contest", nulls_last=True).iter_rows(named=True):
             state, year, office, modifier, kind = row["state"], row["year"], row["office"], row["modifier"], row["kind"]
             group = lines.filter(pl.col("contest") == row["contest"])
@@ -713,7 +721,45 @@ def emit() -> Path:
                     ),
                     entity_id=contest,
                 )
+            candidates = group.filter(pl.col("measure") == 1)
+            entries = sorted(
+                candidates.group_by("person", "candidate", maintain_order=True),
+                key=lambda entry: -entry[1]["votes"].sum(),
+            )
+            single = [
+                index
+                for index, ((person, candidate), _) in enumerate(entries)
+                if person is not None and not re.search(TICKET, str(candidate))
+            ]
+            folded = (
+                {}
+                if reused
+                else {
+                    single[index]: single[survivor]
+                    for index, survivor in names.fold([str(entries[index][0][1]) for index in single]).items()
+                }
+            )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            previous = None
+            if folded and result_set not in cs.minted:
+                previous = result_set
+                cs.add(
+                    "result_set",
+                    id=previous,
+                    election_id=election_id,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=sources[state],
+                    is_default=False,
+                    completeness=None,
+                )
+                for option, outcome, count in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [previous]
+                ).fetchall():
+                    cs.add("outcome", result_set_id=previous, option_id=option, kind=outcome, seats=count)
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:folded")
             cs.add(
                 "result_set",
                 id=result_set,
@@ -723,13 +769,20 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[state],
-                is_default=not reused,
+                is_default=kept.get(previous or result_set, not reused),
+                supersedes_id=previous,
                 completeness=None,
             )
             totals: list[tuple[UUID, int, bool, bool]] = []
-            candidates = group.filter(pl.col("measure") == 1)
-            for (person, candidate), rows in candidates.group_by("person", "candidate", maintain_order=True):
-                lines_by_party = rows.group_by("party", maintain_order=True).agg(
+            groups: dict[int, list[int]] = {}
+            for index in range(len(entries)):
+                groups.setdefault(folded.get(index, index), []).append(index)
+            for index, indices in groups.items():
+                (person, candidate), _ = entries[index]
+                rows = pl.concat(
+                    [entries[member][1].with_columns(printed=pl.lit(str(entries[member][0][1]))) for member in indices]
+                )
+                lines_by_party = rows.group_by("printed", "party", maintain_order=True).agg(
                     pl.col("votes").sum(), pl.col("winner").any()
                 )
                 resolved = [party(state, year, label) for label in lines_by_party["party"]]
@@ -782,11 +835,18 @@ def emit() -> Path:
                             is_independent=all(independent for _, independent in resolved),
                         )
                 targets: list[UUID] = []
-                for label, (party_id, _) in zip(lines_by_party["party"], resolved, strict=True):
+                for printed, label, (party_id, _) in zip(
+                    lines_by_party["printed"], lines_by_party["party"], resolved, strict=True
+                ):
                     if len(resolved) == 1 or reused:
                         targets.append(root)
                         continue
-                    target = cs.key("us.option", f"{option_key}:{slug(label or 'no-party')}")
+                    target = cs.key(
+                        "us.option",
+                        f"{option_key}:"
+                        + ("" if printed == ballot else f"{slug(printed)}:")
+                        + slug(label or "no-party"),
+                    )
                     cs.add(
                         "contest_option",
                         id=target,
@@ -794,11 +854,30 @@ def emit() -> Path:
                         parent_option_id=root,
                         kind="write_in" if label == "Write In" else "candidate",
                         party_id=published.get(target, party_id),
-                        ballot_label=f"{ballot} ({label or 'no party'})",
+                        ballot_label=f"{printed} ({label or 'no party'})",
                     )
                     targets.append(target)
-                for (code, label), cells in rows.group_by("code", "party", maintain_order=True):
-                    target = targets[list(lines_by_party["party"]).index(label)]
+                lines_keys = list(zip(lines_by_party["printed"], lines_by_party["party"], strict=True))
+                for member in indices if previous is not None else ():
+                    gone_person, gone = entries[member][0]
+                    gone_key = f"{contest_key}:{gone_person}"
+                    old = cs.key("us.option", gone_key)
+                    if member == index or old in cs.minted:
+                        continue
+                    lost = [(printed, label) for printed, label in lines_keys if printed == gone]
+                    for printed, label in lost:
+                        cs.merge(
+                            old if len(lost) == 1 else cs.key("us.option", f"{gone_key}:{slug(label or 'no-party')}"),
+                            targets[lines_keys.index((printed, label))],
+                        )
+                    if len(lost) > 1:
+                        cs.merge(old, root)
+                    cs.merge(cs.key("us.candidacy", f"{gone_key}:head"), cs.key("us.candidacy", f"{option_key}:head"))
+                    folds.setdefault(cs.key(f"{SOURCE}.person", str(gone_person)), []).append(
+                        cs.key(f"{SOURCE}.person", str(person))
+                    )
+                for (code, printed, label), cells in rows.group_by("code", "printed", "party", maintain_order=True):
+                    target = targets[lines_keys.index((printed, label))]
                     if result_set in cs.minted:
                         values.append(
                             (
@@ -826,7 +905,11 @@ def emit() -> Path:
                 for _, root in ranked[:2]:
                     cs.add("outcome", result_set_id=result_set, option_id=root, kind="advanced", seats=None)
             elif state == "MA":
-                winners = [root for root, _, declared, _ in totals if declared]
+                winners = [root for root, _, declared, _ in totals if declared] or [
+                    root
+                    for votes, root in ranked[:seats]
+                    if votes > 0 and (len(ranked) <= seats or ranked[seats - 1][0] > ranked[seats][0])
+                ]
             elif kind == "nonpartisan":
                 winners = [root for votes, root in ranked[:1] if votes * 2 > total]
                 advanced = [] if winners else [root for _, root in ranked[:2]]
@@ -869,4 +952,12 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        candidacies: dict[UUID, int] = dict(
+            conn.execute(
+                "select person_id, count(*) from candidacy where person_id = any(%s) group by 1", [list(folds)]
+            ).fetchall()
+        )
+        for duplicate, into in folds.items():
+            if len(set(into)) == 1 and candidacies.get(duplicate, 0) == len(into) and duplicate not in cs.minted:
+                cs.merge(duplicate, into[0])
         return cs.write()
