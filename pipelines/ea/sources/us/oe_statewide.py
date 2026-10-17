@@ -72,6 +72,48 @@ CLOSE = (
     "The race was within 0.5% in these sums, closer than transcription differences from the official canvass can be "
     "trusted to settle, so no winner is recorded."
 )
+MISSOURI = "https://web.archive.org/web/{stamp}id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/AllRacesGeneralNovember{year}.pdf"
+NEW_MEXICO = "https://nm.elstats2.civera.com/eng/files/serve/18"
+OREGON = (
+    "https://web.archive.org/web/2025id_/https://records.sos.state.or.us/ORSOSWebDrawer/Record/6873690/File/document"
+)
+ARKANSAS = "https://web.archive.org/web/20180216174010id_/http://results.enr.clarityelections.com/AR/53237/149792/json/sum.json"
+CANVASSES = {
+    "MO": (
+        "Missouri Secretary of State",
+        "Official election returns",
+        "https://www.sos.mo.gov/elections/resultsandstats",
+    ),
+    "NM": ("New Mexico Secretary of State", "Election statistics archive", "https://electionresults.sos.nm.gov"),
+    "OR": (
+        "Oregon Secretary of State",
+        "Official results, abstract of votes",
+        "https://sos.oregon.gov/elections/Pages/electionhistory.aspx",
+    ),
+    "AR": (
+        "Arkansas Secretary of State",
+        "2014 General Election, official results",
+        "https://results.enr.clarityelections.com/AR/53237/149792/Web01/en/summary.html",
+    ),
+}
+DECLARATIONS = {
+    "2000-11-07:MO:lieutenant-governor": (MISSOURI.format(stamp=2024, year=2000), {"page": 1}),
+    "2000-11-07:MO:secretary-of-state": (MISSOURI.format(stamp=2024, year=2000), {"page": 2}),
+    "2000-11-07:MO:treasurer": (MISSOURI.format(stamp=2024, year=2000), {"page": 2}),
+    "2000-11-07:MO:attorney-general": (MISSOURI.format(stamp=2024, year=2000), {"page": 2}),
+    "2004-11-02:MO:treasurer": (MISSOURI.format(stamp=2025, year=2004), {"page": 2}),
+    "2006-11-07:MO:auditor": (MISSOURI.format(stamp=2025, year=2006), {"page": 1}),
+    "2008-11-04:MO:lieutenant-governor": (MISSOURI.format(stamp=2025, year=2008), {"page": 1}),
+    "2002-11-05:NM:secretary-of-state": (NEW_MEXICO, {"document": 18, "page": 1}),
+    "2002-11-05:NM:commissioner-of-public-lands": (NEW_MEXICO, {"document": 18, "page": 2}),
+    "2012-11-06:OR:attorney-general": (OREGON, {"page": 6}),
+    "2014-11-04:AR:attorney-general": (ARKANSAS, {"contest": "Attorney General"}),
+    "2014-11-04:AR:auditor": (ARKANSAS, {"contest": "Auditor of State"}),
+    "2014-11-04:AR:treasurer": (ARKANSAS, {"contest": "State Treasurer"}),
+    "2014-11-04:AR:lieutenant-governor": (ARKANSAS, {"contest": "Lieutenant Governor"}),
+    "2014-11-04:AR:secretary-of-state": (ARKANSAS, {"contest": "Secretary of State"}),
+    "2014-11-04:AR:commissioner-of-state-lands": (ARKANSAS, {"contest": "Commissioner of State Lands"}),
+}
 CLOSE_WINNER = (
     "The race was within 0.5% in these sums. {winner} was declared the winner in the state's official canvass and "
     "took office."
@@ -183,6 +225,8 @@ ABSENT_WINNERS = {
 
 def fetch() -> None:
     openelections.fetch()
+    for url in {url for url, _ in DECLARATIONS.values()}:
+        raw.fetch(SOURCE, url, suffix=".json" if url.endswith(".json") else ".pdf")
 
 
 def parse() -> None:
@@ -356,6 +400,36 @@ def emit() -> Path:
                     ),
                     sources[state],
                 )
+        canvasses = {}
+        for state, (publisher, title, url) in CANVASSES.items():
+            canvasses[state] = cs.source(publisher, title)
+            if canvasses[state] in cs.minted:
+                cs.add(
+                    "source",
+                    id=canvasses[state],
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
+        cited = {
+            (str(entity), str(source))
+            for entity, source in cs.conn.execute("select entity_id, source_id from citation").fetchall()
+        }
+        for url in {url for url, _ in DECLARATIONS.values()}:
+            cs.artifact(
+                raw.cached(SOURCE, url), canvasses[next(k for k, (u, _) in DECLARATIONS.items() if u == url)[11:13]]
+            )
+        for key, (url, locator) in DECLARATIONS.items():
+            source = canvasses[key[11:13]]
+            ((result_set,),) = cs.conn.execute(
+                """select rs.id from external_id x join result_set rs on rs.contest_id = x.entity_id and rs.is_default
+                   where x.scheme = 'us.contest' and x.value = %s""",
+                [key],
+            ).fetchall()
+            if (str(result_set), str(source)) not in cited:
+                cs.add("citation", entity_id=result_set, source_id=source, locator=locator)
         return sources
 
     return medsl_statewide.emit(
