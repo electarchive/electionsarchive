@@ -18,6 +18,19 @@ const MEASURES = new Map([
   [12, "state_delegate_equivalents"],
 ]);
 const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
+const FACTS = {
+  area: (set: SQL, area: SQL) =>
+    sql`
+      select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.exact
+            from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area}
+    `,
+  unit: (set: SQL, unit: SQL) =>
+    sql`
+      select v.result_set_k, v.unit_k as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as exact
+            from result_value v where v.result_set_k = ${set} and v.unit_k = ${unit}
+            group by 1, 2, 3, 4, 5
+    `,
+};
 const CYCLE = sql`
   extract(year from e.date_from)::int - (
     e.kind = 'indirect' and extract(month from e.date_from) = 1 and exists (
@@ -527,6 +540,7 @@ async function load(
   outcomes: Array<string>,
   owners: Array<string> = [],
   round: number | null = null,
+  facts: keyof typeof FACTS = "area",
 ) {
   const loaded = new Map<
     number,
@@ -577,7 +591,7 @@ async function load(
           : sql`join unnest(${sql.param(areaKs)}::int[], ${sql.param(owners)}::uuid[]) as a(k, owner) on a.owner = rs.root`
       }
       join lateral (
-        select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED}) limit 1
+        select 1 from (${FACTS[facts](sql`rs.k`, sql`a.k`)}) f where f.measure = any(${COUNTED}) limit 1
       ) hit on true
       order by rs.contest_id, a.k, rs.is_default desc, array_position(${STAGES}, rs.stage),
         rs.completeness desc nulls last
@@ -605,7 +619,7 @@ async function load(
         coalesce(${round}::int, min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)) as first,
         min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as opening
       from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[]) as p(set, area)
-      join result_rollup r on r.result_set_k = p.set and r.area_k = p.area
+      join lateral (${FACTS[facts](sql`p.set`, sql`p.area`)}) r on true
       where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4 and ${round}::int is null))
     ),
     mains as materialized (
@@ -1403,7 +1417,96 @@ async function places(
     .filter((level) => level.count > 1)
     .toArray();
   if (eligible.length === 0) {
-    return null;
+    const sets = await db.execute<{ k: number }>(sql`
+      with recursive grp(id) as (
+        select ${contest.id}::uuid
+        union all
+        select c.id from contest c join grp on c.allocation_parent_id = grp.id
+      )
+      select rs.k from result_set rs join grp on grp.id = rs.contest_id where rs.is_default
+    `);
+    const units = await db.execute<{
+      k: number;
+      id: string;
+      code: string;
+      scheme: string;
+      noun: string;
+    }>(sql`
+      select u.k, u.id, u.code, u.scheme_code as scheme, s.noun
+      from reporting_unit u join scheme s on s.code = u.scheme_code
+      where u.area_relation = 'within'
+        and (u.area_id = ${area.id}::uuid or u.id in (select m.unit_id from reporting_unit_area m where m.area_id = ${area.id}::uuid))
+        and exists (
+          select from result_value v
+          where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.unit_k = u.k
+            and v.measure = any(${COUNTED})
+        )
+    `);
+    const schemes = Map.groupBy(units.rows, (row) => row.scheme)
+      .values()
+      .filter((group) => group.length > 1)
+      .toArray()
+      .toSorted((a, b) => b.length - a.length);
+    const group =
+      schemes.find((entry) => `unit:${entry[0]?.scheme ?? ""}` === by) ??
+      schemes[0];
+    if (group == null) {
+      return null;
+    }
+    const labels = await names(
+      group.map((row) => row.id),
+      contest.date,
+    );
+    const rows = group
+      .map((row) => {
+        const code =
+          row.scheme === "us.precinct"
+            ? row.code.split(":").slice(4).join(":")
+            : (row.code.split(":").at(-1) ?? row.code);
+        const cased = /\p{Ll}/u.test(code)
+          ? code
+          : code.replaceAll(/\p{Lu}+/gu, (word) =>
+              word.length > 2
+                ? word.charAt(0) + word.slice(1).toLowerCase()
+                : ["OF", "AT", "IN", "ON", "BY", "TO"].includes(word)
+                  ? word.toLowerCase()
+                  : word,
+            );
+        const noun = row.noun.charAt(0).toUpperCase() + row.noun.slice(1);
+        return {
+          k: row.k,
+          name:
+            labels.full.get(row.id) ??
+            (/^\d/u.test(cased) ? `${noun} ${cased}` : cased),
+          path: null,
+          isContest: false,
+          owner: null,
+        };
+      })
+      .toSorted((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true }),
+      );
+    const tabulated = await tabulate(
+      [contest.root],
+      rows,
+      contest.date,
+      null,
+      lineage,
+      match,
+      grouping,
+      round,
+      "unit",
+    );
+    return {
+      levels: schemes.map((entry) => ({
+        code: `unit:${entry[0]?.scheme ?? ""}`,
+        noun: entry[0]?.noun ?? "",
+        count: entry.length,
+      })),
+      level: `unit:${group[0]?.scheme ?? ""}`,
+      ...tabulated,
+      rows: tabulated.rows.map((row) => ({ ...row, at: null })),
+    };
   }
   const allocated = await db.execute<{ area: string; path: string | null }>(sql`
     select c.district_area_id as area, s.path
@@ -1411,21 +1514,19 @@ async function places(
     where c.allocation_parent_id = ${contest.id}::uuid and c.district_area_id is not null
   `);
   const childPath = new Map(allocated.rows.map((row) => [row.area, row.path]));
-  const rank = Math.min(...eligible.map((level) => level.rank));
-  const levels = eligible
-    .filter((level) => level.rank === rank)
-    .toSorted(
-      (a, b) =>
+  const levels = eligible.toSorted(
+    (a, b) =>
+      a.rank - b.rank ||
+      Number(
+        kids.some((kid) => kid.scheme === b.code && childPath.has(kid.id)),
+      ) -
         Number(
-          kids.some((kid) => kid.scheme === b.code && childPath.has(kid.id)),
-        ) -
-          Number(
-            kids.some((kid) => kid.scheme === a.code && childPath.has(kid.id)),
-          ) ||
-        Number(b.kind === "administrative") -
-          Number(a.kind === "administrative") ||
-        b.count - a.count,
-    );
+          kids.some((kid) => kid.scheme === a.code && childPath.has(kid.id)),
+        ) ||
+      Number(b.kind === "administrative") -
+        Number(a.kind === "administrative") ||
+      b.count - a.count,
+  );
   const level = levels.find((entry) => entry.code === by) ?? levels[0];
   if (level == null) {
     return null;
@@ -1500,6 +1601,7 @@ async function tabulate(
   match: Match,
   grouping: Grouping = "option",
   round: number | null = null,
+  facts: keyof typeof FACTS = "area",
 ) {
   const ks = rows.map((row) => row.k);
   const depth = new Map<number, number>();
@@ -1519,6 +1621,7 @@ async function tabulate(
           [],
           batch.flatMap((row) => (row.owner == null ? [] : [row.owner])),
           round,
+          facts,
         );
       }),
     ),
@@ -1581,7 +1684,8 @@ async function tabulate(
     const running = result.find(
       (entry) => entry.current != null && !entry.key.startsWith("kind:"),
     );
-    const leader = running ?? null;
+    const leader =
+      (running?.current?.votes ?? 0) > 0 ? (running ?? null) : null;
     let before: (typeof result)[number] | null = null;
     for (const entry of result) {
       if (
@@ -2265,7 +2369,16 @@ export const contests = {
         db.execute<{ kind: string; body: string }>(sql`
           select kind::text, body_md as body from note
           where entity_id in (${contest.id}::uuid, ${contest.election}::uuid)
-            or entity_id in (select id from result_set where contest_id = ${contest.id}::uuid)
+            or entity_id in (
+              select rs.id from result_set rs
+              where rs.contest_id = ${contest.id}::uuid and (rs.is_default or exists (
+                select from result_rollup r
+                where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
+                  select from result_set d join result_rollup q on q.result_set_k = d.k
+                  where d.contest_id = ${contest.id}::uuid and d.is_default and q.area_k = r.area_k
+                )
+              ))
+            )
             or entity_id in (
               select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
               where o.contest_id = ${contest.id}::uuid
