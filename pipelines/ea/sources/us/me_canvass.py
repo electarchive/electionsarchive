@@ -26,9 +26,12 @@ FILES = {
     ("1992-11-03", "president"): ("20080206211414", "1992g/pr-92g.txt"),
     ("1994-11-08", "governor"): ("20030912063023", "1994g/gen94g.txt"),
     ("1994-11-08", "senate"): ("20030912064918", "1994g/gen94s.txt"),
+    ("1996-11-05", "president"): ("20030728221301", "gen96p.txt"),
+    ("1996-11-05", "senate"): ("20030728222429", "gen96s.txt"),
+    ("1998-11-03", "governor"): ("20030912055919", "gen98gv.txt"),
     ("2010-11-02", "governor"): ("20150809042630", "results/2010-11/governor.txt"),
 }
-NAMES = {"ADAM": "Andrew Adam"}
+NAMES = {"ADAM": "Andrew Adam", "KING": "Angus King", "CLARKE": "William P. Clarke", "LAMARCHE": "Pat LaMarche"}
 STATEWIDE = "{} were reported statewide, not by town, and are not in the county breakdown."
 
 
@@ -58,6 +61,16 @@ def parse() -> None:
                         for header, party, votes in zip(lines[0][5:], lines[2][5:], line[5:], strict=False)
                         if header.strip() and header.strip() != "BLANK"
                     )
+        elif day.startswith(("1996", "1998")):
+            width = 4 if day.startswith("1998") else 2
+            start = 4 if day.startswith("1998") else 3
+            for fields in csv.reader(line for line in text.splitlines() if line.startswith('"')):
+                fields = [field.strip() for field in fields]
+                for at in range(start, len(fields) - width + 1, width):
+                    if fields[at]:
+                        party = fields[at + 1] if width == 4 and fields[at + 1] != "-0-" else None
+                        header = "OTHERS" if fields[at] == "OTHER" else fields[at]
+                        found.append((fields[0], header, party, fields[at + width - 1]))
         elif day.startswith("1994"):
             for record in csv.DictReader(io.StringIO(text)):
                 count = 1
@@ -100,7 +113,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's governor, U.S. Senate, and president by county 1990–1994 and governor 2010, "
+            summary="Maine's governor, U.S. Senate, and president by county 1990–1998 and governor 2010, "
             "from the Secretary of State's town tabulations",
             polity="US",
         )
@@ -158,7 +171,7 @@ def emit() -> Path:
         for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
             key = f"{day}:ME:{office}"
             contest = contests[key]
-            election = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()[0]
+            ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             result_set = cs.key(f"{SOURCE}.result_set", key)
             options = conn.execute(
                 """select id, kind, ballot_label from contest_option
@@ -180,7 +193,8 @@ def emit() -> Path:
             for row in conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchall():
-                cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+                if row[0] != result_set:
+                    cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
             outcomes = conn.execute(
                 """select o.option_id, o.kind, o.seats from outcome o
                    join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
@@ -216,7 +230,7 @@ def emit() -> Path:
                     raise ValueError(f"{key}: {len(matches)} options for {header}")
                 if matches:
                     option = matches[0]
-                elif writein or votes < 0.005 * lines["votes"].sum():
+                elif writein or votes < 0.005 * float(lines["votes"].sum()):
                     if not votes:
                         continue
                     if pool is None:
@@ -289,6 +303,7 @@ def emit() -> Path:
                         + ")"
                     ),
                 )
+            published = conn.execute("select from result_set where id = %s", [result_set]).fetchone() is not None
             for (county, option), cells in (
                 lines.filter(pl.col("header").is_in(list(picked)))
                 .with_columns(option=pl.col("header").replace_strict({k: str(v) for k, v in picked.items()}))
@@ -297,6 +312,8 @@ def emit() -> Path:
                 .rows_by_key(["county", "option"])
                 .items()
             ):
+                if published:
+                    continue
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
