@@ -18,6 +18,7 @@ with docs as (
             when 'contest' then 1 + (select (allocation_parent_id is null)::int from contest where id = e.id)
             when 'party' then 1 + ln(1 + (select count(*) from contest_option o where o.party_id = e.id)) / 3
             when 'person' then ln(1 + (select count(*) from candidacy cy where cy.person_id = e.id)) / 2
+                + (select count(*) from external_id x where x.entity_id = e.id and x.scheme = 'wikidata')
         end as rank_boost
     from entity e
     join name n on n.entity_id = e.id
