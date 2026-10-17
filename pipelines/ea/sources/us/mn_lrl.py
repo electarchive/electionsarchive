@@ -643,7 +643,7 @@ def parse() -> None:
                 for candidate in orders:
                     chains: list[list[tuple[float, str]]] = []
                     for y, name in named:
-                        if name in candidate:
+                        if name is not None and name in candidate:
                             prior = [chain for chain in chains if candidate.index(chain[-1][1]) < candidate.index(name)]
                             chains.append([*max(prior, key=len, default=[]), (y, name)])
                     if not chains:
