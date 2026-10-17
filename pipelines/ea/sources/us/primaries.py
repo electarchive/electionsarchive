@@ -71,6 +71,7 @@ COLUMBIA = "https://electionresults.dcboe.org/{}"
 LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob=20240323/{}.htm"
 LA_RACES = {"65031": "Democratic", "65033": "Republican"}
 MS_RUNOFF = "https://www.sos.ms.gov/elections/electionResults/Republican%20Primary%20Runoff%20Certified%20Results24.pdf"
+NC_RUNOFF = "https://er.ncsbe.gov/enr/20240514/data/{}.txt"
 KENTUCKY = "https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf"
 DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
@@ -270,6 +271,8 @@ def fetch() -> None:
         for parish in range(1, 65):
             raw.fetch(SOURCE, LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"), suffix=".json")
     raw.fetch(SOURCE, MS_RUNOFF, suffix=".pdf")
+    for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
+        raw.fetch(SOURCE, NC_RUNOFF.format(f"results_{place['cid']}"), suffix=".json")
     for url in (ILLINOIS, IL_TOTALS):
         raw.fetch(SOURCE, url, suffix=".txt")
     for office, district in PA_OFFICES:
@@ -477,6 +480,11 @@ def parse() -> None:
         ("AR", "county", ARKANSAS.format("GetContestResults", "&contestType=FED")),
         *(("PA", "county", PENNSYLVANIA.format(office, district)) for office, district in PA_OFFICES),
         ("IL", "county", ILLINOIS),
+        *(
+            ("NC", "county", NC_RUNOFF.format(f"results_{place['cid']}"))
+            for place in json.loads(raw.cached(SOURCE, NC_RUNOFF.format("county")).path.read_text())
+            if place["cid"] != "0"
+        ),
         ("MS", "county", MS_RUNOFF),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
@@ -505,7 +513,7 @@ def parse() -> None:
             for state, grain, path in picks(fips)
         ),
     ]:
-        if state == "NC":
+        if url == NORTH_CAROLINA:
             with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
                 text = archive.read(archive.namelist()[0])
             contest = pl.col("Contest Name").str.strip_chars()
@@ -847,6 +855,33 @@ def parse() -> None:
                                         }
                                     )
             frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
+        elif url.startswith(NC_RUNOFF.removesuffix("{}.txt")):
+            number = re.findall(r"results_(\d+)\.txt", url)[0]
+            name = next(
+                place["cnm"]
+                for place in json.loads(raw.cached(SOURCE, NC_RUNOFF.format("county")).path.read_text())
+                if place["cid"] == number
+            )
+            listed = [entry for entry in json.loads(raw.cached(SOURCE, url).path.read_text()) if entry["ogl"] == "FED"]
+            for entry in listed:
+                if entry["prt"] != entry["ptl"] or int(entry["vct"]) != sum(
+                    int(entry[kind]) for kind in ("evc", "ovc", "avc", "pvc")
+                ):
+                    raise ValueError(f"NC runoff {name}: {entry['bnm']}'s returns are incomplete or do not add up")
+            frame = pl.DataFrame(
+                [
+                    {
+                        "county": name,
+                        "office": entry["cnm"],
+                        "district": entry["cnm"],
+                        "party": entry["pty"],
+                        "candidate": entry["bnm"],
+                        "votes": entry["vct"],
+                    }
+                    for entry in listed
+                ],
+                schema=dict.fromkeys(COLUMNS, pl.String),
+            )
         elif url == MS_RUNOFF:
             pdf = raw.cached(SOURCE, url).path
             cells = []
@@ -2122,6 +2157,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "CA"
+                else (
+                    ncsbe.PUBLISHER,
+                    "Election results, May 14, 2024 second primary, official",
+                    "https://er.ncsbe.gov/?election_dt=05/14/2024&county_id=0&office=FED&contest=0",
+                    "official_body",
+                    "Public record",
+                )
+                if used.startswith(NC_RUNOFF.removesuffix("{}.txt"))
                 else (
                     ncsbe.PUBLISHER,
                     ncsbe.TITLE,
