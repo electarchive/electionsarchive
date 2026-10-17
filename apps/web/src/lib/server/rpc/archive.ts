@@ -8731,7 +8731,7 @@ export const search = {
         eu: "european union",
       };
       const q = input.q.replace(
-        /^(great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu)(?=\s|$)/iu,
+        /^(?:great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu)(?=\s|$)/iu,
         (word) => ALIASES[word.toLowerCase()] ?? word,
       );
       const chambers = db.execute<{
