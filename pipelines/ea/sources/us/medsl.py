@@ -671,6 +671,7 @@ def attach(
     congress: pl.DataFrame,
     sources: dict[str, UUID],
     redone: frozenset[str] = frozenset(),
+    grain: str = "county",
 ) -> None:
     tag = str(cs.manifest["pipeline"])
     states: dict[str, UUID] = {
@@ -841,10 +842,10 @@ def attach(
             print(f"{key}: the county sum covers under half the official total, skipped")
             continue
         unmatched.extend(missing)
-        result_set = cs.key(f"{tag}.result_set", f"{key}:county")
+        result_set = cs.key(f"{tag}.result_set", f"{key}:{grain}")
         previous = None
         if key in redone:
-            previous, result_set = result_set, cs.key(f"{tag}.result_set", f"{key}:county:2")
+            previous, result_set = result_set, cs.key(f"{tag}.result_set", f"{key}:{grain}:2")
         if result_set not in cs.minted:
             continue
         if "pool" in picked.values():

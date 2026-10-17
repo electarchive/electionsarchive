@@ -2,14 +2,16 @@ import io
 import json
 import re
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
+from uuid import UUID
 
 import polars as pl
+from psycopg import Connection
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import medsl, openelections
+from ea.sources.us import medsl, oe_precincts, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.oe_primary"
@@ -86,31 +88,48 @@ ALIASES = {
     "party_name": "party",
     "total_votes": "votes",
     "vote_total": "votes",
+    "precint": "precinct",
+    "precinct name": "precinct",
+    "precinct_name": "precinct",
+    "precinctname": "precinct",
+    "election_district": "precinct",
 }
 TARGET = r"^\d{4}-\d\d-\d\d:[A-Z]{2}:(senate|president|house:\d+)(:special)?:[a-z][a-z-]*$|^\d{4}-\d\d-\d\d:[A-Z]{2}:house:\d+$"
 KEY = re.compile(r"(\d{4}-\d\d-\d\d):([A-Z]{2}):((?:senate|president|house:\d+)(?::special)?)(?::([a-z][a-z-]*))?")
 
 
-def picks() -> dict[tuple[str, str], list[str]]:
+def held(conn: Connection, precinct: bool) -> set[str]:
+    return {
+        value
+        for (value,) in conn.execute(
+            """select e.value from external_id e where e.scheme = 'us.contest' and e.value ~ %s
+               and exists (select 1 from result_set rs join source s on s.id = rs.source_id
+                           where rs.contest_id = e.entity_id and s.publisher <> 'Federal Election Commission'
+                             and (not %s or exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
+                                                    where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')))""",
+            [TARGET, precinct],
+        ).fetchall()
+    }
+
+
+def picks() -> dict[tuple[str, str], dict[str, list[str]]]:
     with connect() as conn:
-        open_keys = {
-            value
+        filled = held(conn, True)
+        days = {
+            (value[11:13], value[:10].replace("-", ""))
             for (value,) in conn.execute(
-                """select e.value from external_id e where e.scheme = 'us.contest' and e.value ~ %s
-                   and not exists (select 1 from result_set rs join source s on s.id = rs.source_id
-                                   where rs.contest_id = e.entity_id and s.publisher <> 'Federal Election Commission')""",
-                [TARGET],
+                "select value from external_id where scheme = 'us.contest' and value ~ %s", [TARGET]
             ).fetchall()
+            if value not in filled
         }
-    days = {(key[11:13], key[:10].replace("-", "")) for key in open_keys}
-    chosen: dict[tuple[str, str], list[str]] = {}
+    chosen: dict[tuple[str, str], dict[str, list[str]]] = {}
     for state, commit in openelections.COMMITS.items():
         tree = json.loads(
             raw.cached(
                 openelections.SOURCE, openelections.TREE.format(state=state.lower(), commit=commit)
             ).path.read_text()
         )
-        best: dict[str, tuple[int, dict[str, str]]] = {}
+        best: dict[str, dict[str, tuple[int, dict[str, str]]]] = {}
         for entry in tree["tree"]:
             found = NAME.fullmatch(entry["path"])
             if entry["type"] != "blob" or found is None or (state, found[1]) not in days:
@@ -130,20 +149,24 @@ def picks() -> dict[tuple[str, str], list[str]]:
                 if tokens[-1].endswith("precinct")
                 else "state"
             )
-            rank = LEVELS[level]
             name = entry["path"].rsplit("/", 1)[-1]
-            if found[1] not in best or rank < best[found[1]][0]:
-                best[found[1]] = (rank, {name: entry["path"]})
-            elif rank == best[found[1]][0]:
-                best[found[1]][1].setdefault(name, entry["path"])
-        for day, (_, paths) in best.items():
-            chosen[(state, day)] = sorted(paths.values())
+            grains = [("county", LEVELS[level])]
+            if tokens[-1].endswith("precinct"):
+                grains.append(("precinct", int(level == "split")))
+            for grain, rank in grains:
+                known = best.setdefault(found[1], {})
+                if grain not in known or rank < known[grain][0]:
+                    known[grain] = (rank, {name: entry["path"]})
+                elif rank == known[grain][0]:
+                    known[grain][1].setdefault(name, entry["path"])
+        for day, known in best.items():
+            chosen[(state, day)] = {grain: sorted(paths.values()) for grain, (_, paths) in known.items()}
     return chosen
 
 
 def fetch() -> None:
-    for (state, _), paths in picks().items():
-        for path in paths:
+    for (state, _), grains in picks().items():
+        for path in sorted({path for paths in grains.values() for path in paths}):
             raw.fetch(
                 SOURCE,
                 openelections.REPOSITORY.format(state=state.lower(), commit=openelections.COMMITS[state], path=path),
@@ -177,9 +200,9 @@ def parse() -> None:
                 if text:
                     surnames[str(contest)].update(slug(text).split("-"))
     frames = []
-    for (state, stamp), paths in picks().items():
+    for (state, stamp), grains in picks().items():
         day = date(int(stamp[:4]), int(stamp[4:6]), int(stamp[6:]))
-        for path in paths:
+        for grain, path in ((grain, path) for grain, paths in grains.items() for path in paths):
             text = raw.cached(
                 SOURCE,
                 openelections.REPOSITORY.format(state=state.lower(), commit=openelections.COMMITS[state], path=path),
@@ -268,6 +291,10 @@ def parse() -> None:
                     .str.replace_all(r"[^a-z]", "")
                     .replace_strict(fips.get(state, {}), default=None),
                     county="county",
+                    precinct=(pl.col("precinct") if "precinct" in frame.columns else pl.lit(None, pl.String))
+                    .str.strip_chars()
+                    .str.replace_all(r"\s+", " "),
+                    grain=pl.lit(grain),
                     candidate=pl.col("candidate").fill_null("").str.to_uppercase().str.strip_chars(),
                     votes=pl.col("votes").str.replace_all(r"[,\s]", "").cast(pl.Float64, strict=False).cast(pl.Int64),
                     path=pl.lit(path),
@@ -373,12 +400,12 @@ def parse() -> None:
         how="left",
         nulls_equal=True,
     )
-    totals = frame.group_by("state", "day", "chamber", "seat", "code", "path").agg(pl.col("votes").sum())
+    totals = frame.group_by("grain", "state", "day", "chamber", "seat", "code", "path").agg(pl.col("votes").sum())
     frame = frame.join(
         totals.sort("votes", "path", descending=True)
-        .unique(["state", "day", "chamber", "seat", "code"], keep="first", maintain_order=True)
-        .select("state", "day", "chamber", "seat", "code", "path"),
-        on=["state", "day", "chamber", "seat", "code", "path"],
+        .unique(["grain", "state", "day", "chamber", "seat", "code"], keep="first", maintain_order=True)
+        .select("grain", "state", "day", "chamber", "seat", "code", "path"),
+        on=["grain", "state", "day", "chamber", "seat", "code", "path"],
         how="semi",
         nulls_equal=True,
     )
@@ -395,6 +422,30 @@ def parse() -> None:
         print(lost.group_by("state", "county").agg(pl.col("votes").sum()).sort("votes", descending=True).head(40))
     (
         frame.filter(pl.col("chamber").is_not_null() & pl.col("code").is_not_null())
+        .filter(
+            (pl.col("grain") == "county")
+            | pl.col("precinct").is_not_null()
+            & (pl.col("precinct") != "")
+            & ~pl.col("precinct").str.contains(oe_precincts.TOTALS)
+        )
+        .with_columns(
+            fips="code",
+            code=pl.when(pl.col("grain") == "precinct")
+            .then(pl.concat_str(pl.col("day").cast(pl.String), "state", "code", pl.lit(""), "precinct", separator=":"))
+            .otherwise("code"),
+            key=pl.concat_str(
+                pl.col("day").cast(pl.String),
+                "state",
+                pl.when(pl.col("chamber").str.starts_with("house"))
+                .then(
+                    pl.concat_str(
+                        pl.lit("house:"), pl.col("seat").cast(pl.String), pl.col("chamber").str.strip_prefix("house")
+                    )
+                )
+                .otherwise("chamber"),
+                separator=":",
+            ),
+        )
         .with_columns(
             measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
             writein=pl.col("candidate").is_in(list(medsl.POOLED))
@@ -402,53 +453,94 @@ def parse() -> None:
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
         .filter(pl.col("measure") > 0)
-        .group_by("chamber", "day", "state", "seat", "code", "candidate", "measure")
+        .group_by("grain", "key", "chamber", "day", "state", "seat", "fips", "code", "candidate", "measure")
         .agg(pl.col("writein").any(), pl.col("votes").sum())
-        .rename({"seat": "district"})
+        .rename({"seat": "district", "grain": "kind"})
         .with_columns(
             year=pl.col("day").dt.year(),
             special=pl.lit(False),
-            kind=pl.lit("county"),
-            source="state",
+            source=pl.concat_str("state", pl.lit(":"), "kind"),
         )
-        .write_parquet(PARSED / "counties.parquet")
+        .write_parquet(PARSED / "lines.parquet")
     )
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "counties.parquet")
+    frame = pl.read_parquet(PARSED / "lines.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House, Senate, and presidential primaries and runoffs by county from OpenElections",
+            summary="House, Senate, and presidential primaries and runoffs by county and precinct from OpenElections",
             polity="US",
         )
+        counties = frame.filter(pl.col("kind") == "county", ~pl.col("key").is_in(list(held(conn, False))))
+        precincts = frame.filter(pl.col("kind") == "precinct", ~pl.col("key").is_in(list(held(conn, True))))
         sources = {}
-        for state in frame["state"].unique().sort():
-            title = f"{state} primary results by county"
-            sources[state] = cs.source("OpenElections", title)
+        for source in pl.concat([counties, precincts])["source"].unique().sort():
+            state, grain = source.split(":")
+            title = f"{state} primary results by {grain}"
+            sources[source] = cs.source("OpenElections", title)
             cs.add(
                 "source",
-                id=sources[state],
+                id=sources[source],
                 kind="community",
                 publisher="OpenElections",
                 title=title,
                 url=f"https://github.com/openelections/openelections-data-{state.lower()}",
                 license=None,
             )
-        for (state, _), paths in picks().items():
-            if state in sources:
-                for path in paths:
-                    cs.artifact(
-                        raw.cached(
+        stored: set[tuple[str, str]] = set()
+        for (state, _), grains in picks().items():
+            for grain, paths in grains.items():
+                if f"{state}:{grain}" in sources:
+                    for path in paths:
+                        artifact = raw.cached(
                             SOURCE,
                             openelections.REPOSITORY.format(
                                 state=state.lower(), commit=openelections.COMMITS[state], path=path
                             ),
-                        ),
-                        sources[state],
-                    )
-        medsl.attach(cs, conn, frame, sources)
+                        )
+                        if (f"{state}:{grain}", artifact.storage_key) not in stored:
+                            stored.add((f"{state}:{grain}", artifact.storage_key))
+                            cs.artifact(artifact, sources[f"{state}:{grain}"])
+        medsl.attach(cs, conn, counties, sources)
+        medsl.attach(cs, conn, precincts, sources, grain="precinct")
+        used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
+        units = {
+            code: (unit, area)
+            for code, unit, area in conn.execute(
+                "select code, id, area_id from reporting_unit where scheme_code = 'us.county'"
+            ).fetchall()
+        }
+        minted = (
+            precincts.group_by("code")
+            .agg(pl.col("state", "fips", "day").first())
+            .with_columns(
+                id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String)
+            )
+            .filter(
+                pl.col("id").is_in(list(used)),
+                pl.col("id").map_elements(lambda id: UUID(id) in cs.minted, return_dtype=pl.Boolean),
+            )
+        )
+        cs.frame(
+            "reporting_unit",
+            minted.select(
+                "id",
+                polity_id=pl.col("state").map_elements(
+                    lambda state: str(cs.polity(f"US-{state}")), return_dtype=pl.String
+                ),
+                scheme_code=pl.lit("us.precinct"),
+                code="code",
+                parent_id=pl.col("fips").replace_strict({code: str(unit) for code, (unit, _) in units.items()}),
+                area_relation=pl.lit("within"),
+                area_id=pl.col("fips").replace_strict({code: str(area) for code, (_, area) in units.items()}),
+                kind=pl.lit("standard"),
+                valid_from="day",
+                valid_to=pl.col("day") + timedelta(days=1),
+            ),
+        )
+        print(f"{minted.height} new precincts")
         return cs.write()
