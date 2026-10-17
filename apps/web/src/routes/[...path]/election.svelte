@@ -531,6 +531,7 @@
           delta: null,
           backed: null,
           origin: null,
+          photo: row.photo,
         })),
         lede:
           elector != null

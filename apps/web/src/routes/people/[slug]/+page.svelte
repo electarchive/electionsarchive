@@ -78,7 +78,20 @@
       : swatch(person.party.color, `party:${person.party.id}`)}
     class="grid grid-cols-12 gap-px overflow-clip border-be bg-border"
   >
-    <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
+    <header
+      class={cn("col-span-12 grid gap-x-4 bg-card px-3.5 pbs-4 pbe-3.5", {
+        "grid-cols-[auto_minmax(0,1fr)] sm:gap-x-5": person.photo != null,
+      })}
+    >
+      {#if person.photo != null}
+        <img
+          class="row-span-3 aspect-4/5 rounded-sm bg-muted object-cover object-top ring-1 ring-border inline-18 sm:inline-28"
+          src={person.photo.src}
+          alt={m.photo_alt({ name: person.name })}
+          width="256"
+          height="320"
+        />
+      {/if}
       <div class="flex items-start justify-between gap-3">
         <h1 class="title">
           {person.name}
@@ -118,6 +131,19 @@
           >
         {/if}
       </p>
+      {#if person.photo != null}
+        <a
+          class="self-end justify-self-start text-xs text-muted-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+          href={person.photo.source}
+          rel="external noopener"
+          >{person.photo.artist == null
+            ? m.photo_credit_anonymous({ license: person.photo.license })
+            : m.photo_credit({
+                artist: person.photo.artist,
+                license: person.photo.license,
+              })}</a
+        >
+      {/if}
     </header>
 
     {#if entries.length > 0 || person.served.length > 0}

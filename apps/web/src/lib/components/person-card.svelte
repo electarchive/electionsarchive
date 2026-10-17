@@ -16,6 +16,7 @@
     won: m.outcome_won,
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
+    lost: m.person_lost_mark,
   };
 
   const query = createQuery(() => ({
@@ -51,7 +52,20 @@
   </p>
 {:else}
   {const person = $derived(query.data)}
-  <div class="grid gap-0.5 px-3 pbs-2.5 pbe-2">
+  <div
+    class={cn("grid gap-0.5 px-3 pbs-2.5 pbe-2", {
+      "grid-cols-[auto_minmax(0,1fr)] gap-x-3": person.photo != null,
+    })}
+  >
+    {#if person.photo != null}
+      <img
+        class="row-span-3 aspect-4/5 rounded-sm bg-muted object-cover object-top ring-1 ring-border inline-12"
+        src={person.photo.src}
+        alt={m.photo_alt({ name: person.name })}
+        width="48"
+        height="60"
+      />
+    {/if}
     <p class="text-[1.0625rem]/tight font-[720]">{person.name}</p>
     <p
       class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.8125rem] text-muted-foreground"
@@ -76,6 +90,19 @@
         >
       {/if}
     </p>
+    {#if person.photo != null}
+      <a
+        class="self-end justify-self-start text-[0.6875rem] text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+        href={person.photo.source}
+        rel="external noopener"
+        >{person.photo.artist == null
+          ? m.photo_credit_anonymous({ license: person.photo.license })
+          : m.photo_credit({
+              artist: person.photo.artist,
+              license: person.photo.license,
+            })}</a
+      >
+    {/if}
   </div>
   <div class="border-bs px-1.5 pbs-2 pbe-1.5">
     <p class="px-1.5 pbe-1 text-xs text-muted-foreground">{m.card_record()}</p>
@@ -108,8 +135,14 @@
                 {entry.name.replace(/^\d{4}\s+/u, "")}
                 {#if entry.outcome != null}
                   <span
-                    class="ms-0.5 highlighter px-1 text-[0.6875rem] font-semibold whitespace-nowrap"
-                    >{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
+                    class={cn(
+                      "ms-0.5 px-1 text-[0.6875rem] font-semibold whitespace-nowrap",
+                      {
+                        highlighter: entry.outcome !== "lost",
+                        "rounded-xs bg-secondary text-muted-foreground":
+                          entry.outcome === "lost",
+                      },
+                    )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
                   >
                 {/if}
               </span>

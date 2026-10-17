@@ -115,6 +115,14 @@
   const shown = $derived(
     expanded ? lines : lines.filter((line) => !folded.has(line.row.key)),
   );
+  const credits = $derived(
+    shown.flatMap(({ row }) =>
+      row.photo == null
+        ? []
+        : [{ key: row.key, label: row.label, photo: row.photo }],
+    ),
+  );
+  const isPictured = $derived(credits.length > 0);
   const tail = $derived.by(() => {
     let total = 0;
     let current = 0;
@@ -350,9 +358,25 @@
         >
           <th class="px-2 py-1.5 text-start font-normal" scope="row">
             <span class="flex items-baseline gap-2">
-              <span
-                class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
-              ></span>
+              {#if row.photo != null}
+                <img
+                  class="shrink-0 self-center rounded-full bg-muted object-cover object-top ring-2 ring-(--party) ring-offset-1 ring-offset-card block-7 inline-7"
+                  src={row.photo.src}
+                  alt=""
+                  loading="lazy"
+                  width="28"
+                  height="28"
+                />
+              {:else if isPictured}
+                <span class="flex shrink-0 justify-center self-center inline-7"
+                  ><span class="rounded-xs bg-(--party) block-2.5 inline-2.5"
+                  ></span></span
+                >
+              {:else}
+                <span
+                  class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
+                ></span>
+              {/if}
               <span class="flex-1 min-inline-0">
                 <Name
                   class="font-semibold text-foreground"
@@ -599,3 +623,26 @@
     </tbody>
   </table>
 </div>
+{#if credits.length > 0}
+  <div class="px-2 pbs-3 text-xs/relaxed text-muted-foreground">
+    <p class="font-medium">{m.results_photos()}</p>
+    <ul class="flex flex-wrap gap-x-3">
+      {#each credits as row (row.key)}
+        <li>
+          {row.label}:
+          <a
+            class="underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+            href={row.photo.source}
+            rel="external noopener"
+            >{row.photo.artist == null
+              ? m.photo_credit_anonymous({ license: row.photo.license })
+              : m.photo_credit({
+                  artist: row.photo.artist,
+                  license: row.photo.license,
+                })}</a
+          >
+        </li>
+      {/each}
+    </ul>
+  </div>
+{/if}

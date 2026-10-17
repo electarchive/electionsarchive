@@ -118,6 +118,15 @@ const ResultSet = v.object({
   }),
 });
 
+const Photo = v.nullable(
+  v.object({
+    src: v.string(),
+    license: v.string(),
+    artist: v.nullable(v.string()),
+    source: v.string(),
+  }),
+);
+
 const Cell = v.nullable(
   v.object({
     label: v.string(),
@@ -2395,6 +2404,7 @@ export const contests = {
             delta: v.nullable(v.number()),
             backed: v.nullable(v.string()),
             origin: v.nullable(v.string()),
+            photo: Photo,
           }),
         ),
         targets: v.array(
@@ -3233,6 +3243,9 @@ export const contests = {
           votes: row.votes,
         }))
         .toSorted((a, b) => b.votes - a.votes);
+      const faces = await portraits(
+        rows.flatMap((row) => row.current?.person ?? row.earlier?.person ?? []),
+      );
       return {
         ...page,
         series,
@@ -3272,7 +3285,11 @@ export const contests = {
                 : "estimated",
           notes: notesOut,
         },
-        rows,
+        rows: rows.map((row) => ({
+          ...row,
+          photo:
+            faces.get(row.current?.person ?? row.earlier?.person ?? "") ?? null,
+        })),
         targets,
       };
     }),
@@ -4882,6 +4899,7 @@ export const elections = {
                 seats: v.nullable(v.number()),
                 isWon: v.optional(v.boolean()),
                 isLost: v.optional(v.boolean()),
+                photo: Photo,
               }),
             ),
             places: Places,
@@ -4971,7 +4989,15 @@ export const elections = {
         ),
         ...(election.parent == null ? [] : [election.parent]),
       ];
-      const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
+      const [labels, slugs, faces] = await Promise.all([
+        names(ids),
+        paths(ids),
+        portraits(
+          raced.flatMap((race) =>
+            race.results.flatMap((row) => row.person ?? []),
+          ),
+        ),
+      ]);
       return {
         name: labels.full.get(input.id) ?? "",
         date: election.date,
@@ -4985,7 +5011,13 @@ export const elections = {
                 path: slugs.get(election.parent) ?? null,
               },
         notes: notes.rows,
-        races: raced,
+        races: raced.map((race) => ({
+          ...race,
+          results: race.results.map((row) => ({
+            ...row,
+            photo: faces.get(row.person ?? "") ?? null,
+          })),
+        })),
         contests: contestRows.rows
           .map((row) => ({
             name: labels.full.get(row.id) ?? "",
@@ -6902,7 +6934,7 @@ export const polities = {
           return {
             ...ref,
             short:
-              (shown.get(text) ?? 0) > 1 && place != null && place !== ""
+              place != null && place !== "" && (shown.get(text) ?? 0) > 1
                 ? `${text} (${place})`
                 : ref.short,
             lean: lean.get(id) ?? null,
@@ -7129,6 +7161,31 @@ export const polities = {
       };
     }),
 };
+
+async function portraits(ids: Array<string>) {
+  const found = await db.execute<{
+    person: string;
+    path: string;
+    license: string;
+    artist: string | null;
+    source: string;
+  }>(sql`
+    select distinct on (person_id) person_id as person, path, license, artist, source_url as source
+    from person_image where person_id = any(${sql.param([...new Set(ids)])}::uuid[])
+    order by person_id, recorded_from desc
+  `);
+  return new Map(
+    found.rows.map((row) => [
+      row.person,
+      {
+        src: `/${row.path}`,
+        license: row.license,
+        artist: row.artist,
+        source: row.source,
+      },
+    ]),
+  );
+}
 
 async function branches(day: string): Promise<Array<Relation>> {
   const found = await db.execute<{
@@ -7805,6 +7862,7 @@ export const people = {
         born: v.nullable(v.string()),
         precision: v.nullable(v.string()),
         wikidata: v.nullable(v.string()),
+        photo: Photo,
         party: v.nullable(PartyRef),
         served: v.array(
           v.object({
@@ -8043,11 +8101,13 @@ export const people = {
                   },
           };
         });
+      const faces = await portraits([person.id]);
       return {
         name: labels.full.get(person.id) ?? "",
         born: person.born,
         precision: person.precision,
         wikidata: person.wikidata,
+        photo: faces.get(person.id) ?? null,
         party: record.find((entry) => entry.party != null)?.party ?? null,
         served: spells
           .map((spell) => ({
