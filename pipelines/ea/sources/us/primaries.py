@@ -80,6 +80,7 @@ NEW_YORK = tuple(
         ("20240917001213", "08/2024-june-primary-results-for-certification_0"),
     )
 )
+MONTANA = "https://web.archive.org/web/20240905130237id_/https://sosmt.gov/wp-content/uploads/wpfd/preview_files/2024-Primary-State-Canvass.pdf"
 WISCONSIN = tuple(
     f"https://web.archive.org/web/{stamp}id_/https://elections.wi.gov/sites/default/files/documents/County%20by%20County%20{name}.pdf"
     for stamp, name in (
@@ -158,6 +159,7 @@ CHECKED = {
     "2024-06-25:NY:house:1:democratic",
     "2024-06-25:NY:house:10:democratic",
     "2024-06-25:NY:house:14:democratic",
+    "2024-06-04:MT:governor:democratic",
 }
 PARTIES = {
     "d": "democratic",
@@ -295,6 +297,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for url in NEW_YORK:
         raw.fetch(SOURCE, url, suffix=".xlsx")
+    raw.fetch(SOURCE, MONTANA, suffix=".pdf")
     for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
         raw.fetch(SOURCE, NC_RUNOFF.format(f"results_{place['cid']}"), suffix=".json")
     for url in (ILLINOIS, IL_TOTALS):
@@ -512,6 +515,7 @@ def parse() -> None:
         ("MS", "county", MS_RUNOFF),
         *(("WI", "county", url) for url in WISCONSIN),
         *(("NY", "county", url) for url in NEW_YORK),
+        ("MT", "county", MONTANA),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
             for race in LA_RACES
@@ -974,6 +978,112 @@ def parse() -> None:
                         for head, count in zip(grid[top][1:-1], counts, strict=True)
                     ]
             frame = pl.DataFrame(cells, schema=dict.fromkeys((*COLUMNS, "write_in"), pl.String))
+        elif state == "MT":
+            pdf = raw.cached(SOURCE, url).path
+            info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+            rows: list[tuple[int, list[tuple[str, scan.Box]]]] = []
+            for page in range(2, int(info.split("Pages:")[1].split()[0]) + 1):
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page) if 200 < box[1] < 3195),
+                    key=lambda item: (item[1][1], item[1][0]),
+                ):
+                    if rows and rows[-1][0] == page and abs(rows[-1][1][0][1][1] - box[1]) < 12:
+                        rows[-1][1].append((word, box))
+                    else:
+                        rows.append((page, [(word, box)]))
+            cells = []
+            header: list[tuple[str, scan.Box]] = []
+            titled: re.Match[str] | None = None
+            starts: list[int] = []
+            candidates: list[str] = []
+            entries: list[tuple[list[str], list[tuple[str, scan.Box]], int]] = []
+            for index, (page, words) in enumerate(rows):
+                numbers = [(word, box) for word, box in words if re.fullmatch(r"[\d,]+", word) and box[0] > 280]
+                named = [word for word, box in words if box[0] < 280]
+                if not (numbers and named):
+                    if entries and not numbers and named:
+                        entries[-1][0].extend(named)
+                    else:
+                        header += words
+                    continue
+                if header:
+                    header.sort(key=lambda item: (item[1][1], item[1][0]))
+                    cut = next(
+                        position
+                        for position, (word, _) in enumerate(header)
+                        if word in ("Democratic", "Republican", "Green", "Libertarian", "Partisan")
+                    )
+                    closing = next(
+                        later
+                        for later in range(index, len(rows))
+                        if [word for word, box in rows[later][1] if box[0] < 280] == ["Total"]
+                    )
+                    starts = sorted(
+                        {
+                            box[0]
+                            for _, later in rows[index : closing + 1]
+                            for word, box in later
+                            if re.fullmatch(r"[\d,]+", word) and box[0] > 280
+                        }
+                    )
+                    titled = re.fullmatch(
+                        r"(PRESIDENT|UNITEDSTATESSENATOR|USREPRESENTATIVEDIST(\d)|GOVERNOR&LT\.GOVERNOR)"
+                        r"(Democratic|Republican|Green|Libertarian)",
+                        "".join(word for word, _ in header[: cut + 1]),
+                    )
+                    candidates = [
+                        re.sub(
+                            r"- ",
+                            "-",
+                            " ".join(
+                                word
+                                for word, box in header[cut + 1 :]
+                                if max(start for start in starts if start <= box[0] + 10) == column
+                            ),
+                        ).title()
+                        for column in starts
+                    ]
+                    header = []
+                if [box[0] for _, box in numbers] != starts:
+                    raise ValueError(
+                        f"MT page {page}: {' '.join(named)} has numbers at {[box[0] for _, box in numbers]}"
+                    )
+                if named != ["Total"]:
+                    entries.append((named, numbers, page))
+                    continue
+                for column, (word, _) in enumerate(numbers):
+                    if sum(int(entry[1][column][0].replace(",", "")) for entry in entries) != int(
+                        word.replace(",", "")
+                    ):
+                        raise ValueError(f"MT page {page}: {candidates[column]}'s counties do not sum to {word}")
+                if titled is not None:
+                    cells += [
+                        {
+                            "county": " ".join(county),
+                            "office": {"PRESIDENT": "President", "UNITEDSTATESSENATOR": "U.S. Senate"}.get(
+                                titled[1], "Governor" if titled[1].startswith("GOVERNOR") else "U.S. House"
+                            ),
+                            "district": titled[2],
+                            "party": titled[3],
+                            "candidate": candidate,
+                            "votes": value,
+                            "page": located,
+                            "x0": box[0],
+                            "y0": box[1],
+                            "x1": box[2],
+                            "y1": box[3],
+                        }
+                        for county, counted, located in entries
+                        for candidate, (value, box) in zip(candidates, counted, strict=True)
+                    ]
+                entries = []
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(COLUMNS, pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
         elif state == "WI":
             pdf = raw.cached(SOURCE, url).path
             info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
@@ -2145,7 +2255,7 @@ def parse() -> None:
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
             if state == "KS"
             else date(2024, 6, 4)
-            if state in ("IA", "NJ")
+            if state in ("IA", "NJ", "MT")
             else date(2024, 5, 7)
             if state == "IN"
             else (date(2024, 4, 16) if "Runoff" in url else date(2024, 3, 5))
@@ -2601,6 +2711,14 @@ def emit() -> Path:
                 )
                 if state == "NY"
                 else (
+                    "Montana Secretary of State",
+                    "2024 Statewide Primary Election Canvass",
+                    "https://sosmt.gov/elections/results/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "MT"
+                else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
                     "https://sos.ks.gov/elections/election-results.html",
@@ -2766,6 +2884,12 @@ def emit() -> Path:
                         for option, _, label, person, _ in options
                         if option in same
                         and any(slug(text).split("-")[0] == words[0] for text in (label, person) if text)
+                    ]
+                if not same:
+                    same = [
+                        option
+                        for option, kind, label, _, _ in options
+                        if kind != "write_in" and label and slug(label).startswith(slug(candidate))
                     ]
                 if not same and votes:
                     same = [
