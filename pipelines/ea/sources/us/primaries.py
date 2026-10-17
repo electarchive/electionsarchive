@@ -2455,7 +2455,9 @@ def emit() -> Path:
                 if rows["votes"].sum() > 0:
                     print(f"{key}: no contest, {rows['votes'].sum()} votes skipped")
                 continue
-            fine = rows.filter(pl.col("grain") == "precinct")
+            fine = rows.filter(pl.col("grain") == "precinct").with_columns(
+                pl.col("precinct").fill_null("County total (no precinct breakdown)")
+            )
             coarse = rows.filter(pl.col("grain") == "county")
             if fine.height and coarse.height:
                 sums = [
@@ -2739,6 +2741,38 @@ def emit() -> Path:
                     valid_from=day,
                     valid_to=day + timedelta(days=1),
                 )
+        for unit, district_area, day in conn.execute(
+            """with house as (
+                 select r.k, c.district_area_id, e.date_from
+                 from result_set r join contest c on c.id = r.contest_id join election e on e.id = r.election_id
+                 join changeset h on h.id = r.changeset_id and h.pipeline = %s
+                 join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' and x.value ~ '^[0-9-]+:[A-Z]{2}:house:'
+                 where r.is_default and c.district_area_id is not null
+               ),
+               cast_votes as (
+                 select distinct house.district_area_id, house.date_from, u.id
+                 from house join result_value v on v.result_set_k = house.k and v.value > 0
+                 join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct'
+               ),
+               split as (select id from cast_votes group by id having count(distinct district_area_id) > 1)
+               select c.id, c.district_area_id, c.date_from from cast_votes c
+               where not exists (
+                 select from cast_votes s where s.district_area_id = c.district_area_id
+                   and s.date_from = c.date_from and s.id in (select id from split)
+               )
+               and not exists (
+                 select from reporting_unit_area a where a.unit_id = c.id and a.area_id = c.district_area_id
+               )
+               order by 3, 2, 1""",
+            [SOURCE],
+        ).fetchall():
+            cs.add(
+                "reporting_unit_area",
+                unit_id=unit,
+                area_id=district_area,
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
         if values:
             cs.frame("result_value", pl.concat(values))
         return cs.write()
