@@ -36,6 +36,11 @@ FIRST = 2000
 LAST = 2025
 ANSWERS = {"YES": "YES", "NO": "NO", "FOR": "YES", "AGAINST": "NO", "APPROVE": "YES", "REJECT": "NO"}
 ARCHIVE = "Precinct rows of the state's election statistics archive, which add up to its county totals for each answer."
+TOWNS = ("VT", "CT")
+TOWN_ARCHIVE = (
+    "City and town rows of the state's election statistics archive, which add up to its county totals for each "
+    "answer. The state reports by municipality, so the units are whole towns rather than precincts."
+)
 MEDSL = (
     "Precinct rows of MEDSL's precinct returns, which compile each state's certified canvass. Each answer's precinct "
     "rows add up to the totals of this question's default results{counties}."
@@ -293,6 +298,43 @@ def parse() -> None:
                 printed=pl.col("election_date").str.slice(0, 10).str.to_date(),
                 fips=plain.replace_strict({k: v[0] for k, v in counties[state].items()}, default=None),
                 jurisdiction=plain.replace_strict({k: v[1] for k, v in counties[state].items()}, default=None),
+                division=pl.col("division_id"),
+                precinct=pl.col("division_name").str.replace_all(r"\s+", " ").str.strip_chars().str.to_uppercase(),
+                answer=pl.col("candidate_name").str.to_uppercase().str.strip_chars(),
+                votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+            )
+        )
+    with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS").is_in(list(TOWNS)))
+    places: dict[str, dict[str, str]] = {}
+    for state, geoid, name in gazetteer.select("USPS", "GEOID", "NAME").iter_rows():
+        places.setdefault(state, {}).setdefault(elstats.plain(name), geoid[:5])
+        places[state].setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+    places["VT"]["essexjunction"] = "50007"
+    for state in TOWNS:
+        frames = [table for table in frames if table["state"][0] != state]
+        frames.append(
+            pl.read_csv(
+                raw.cached(measures.SOURCE, measures.url(elstats.TENANTS[state][0], measures.STATEWIDE[state])).path,
+                infer_schema=False,
+            )
+            .filter(
+                pl.col("retention_candidate_id").is_null(),
+                pl.col("district_type") == "State",
+                pl.col("election_date").str.slice(0, 4).cast(pl.Int32).is_between(FIRST, LAST),
+                pl.col("division_type") == "City/Town",
+                pl.col("candidate_name").str.to_uppercase().str.strip_chars().is_in(["YES", "NO"]),
+            )
+            .select(
+                state=pl.lit(state),
+                question=pl.col("contest_id"),
+                printed=pl.col("election_date").str.slice(0, 10).str.to_date(),
+                fips=pl.col("division_name")
+                .map_elements(elstats.plain, return_dtype=pl.String)
+                .replace_strict(places[state], default=None),
+                jurisdiction=pl.lit(""),
                 division=pl.col("division_id"),
                 precinct=pl.col("division_name").str.replace_all(r"\s+", " ").str.strip_chars().str.to_uppercase(),
                 answer=pl.col("candidate_name").str.to_uppercase().str.strip_chars(),
@@ -816,7 +858,7 @@ def emit() -> Path:
         )
 
         candidates: list[tuple[str, str, UUID | None, str, pl.DataFrame]] = [
-            (key, state, None, ARCHIVE, rows)
+            (key, state, None, TOWN_ARCHIVE if state in TOWNS else ARCHIVE, rows)
             for (key, state), rows in archives.group_by("key", "state", maintain_order=True)
         ]
         question = ["origin", "year", "day", "state", "office", "district"]
