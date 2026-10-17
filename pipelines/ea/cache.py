@@ -34,11 +34,12 @@ CLASSES = [
         re.compile(
             r"CC BY|Creative Commons Attribution|Licence Ouverte|Open Government|Open Parliament|Datenlizenz"
             r"|reuse is authorized|2011/833/EU|Open use|free use|free to distribute|free to copy|freely reproducible"
-            r"|City of Chicago Data Portal Terms of Use",
+            r"|City of Chicago Data Portal Terms of Use|Scottish Boundary Commissions Historical Electoral Data terms of use",
             re.IGNORECASE,
         ),
     ),
     ("public-record", re.compile(r"public record", re.IGNORECASE)),
+    ("unknown", re.compile(r"^No license stated")),
 ]
 STRICTNESS = ["open", "attribution", "public-record", "share-alike", "unknown", "non-commercial", "restricted"]
 SHAREABLE = {"open", "attribution", "public-record", "share-alike"}
@@ -135,7 +136,7 @@ def license() -> str:
                 entry["license_class"] = kind
                 entry["shareable"] = kind in SHAREABLE
                 counts[kind] = counts.get(kind, 0) + 1
-                unknown |= {text for text in licenses if text and _class(text) == "unknown"}
+                unknown |= {text for text in licenses if text and not any(rule.search(text) for _, rule in CLASSES)}
     for text in sorted(unknown):
         print(f"no class for license: {text}")
     return ", ".join(f"{count} {kind}" for kind, count in sorted(counts.items(), key=lambda item: -item[1]))
