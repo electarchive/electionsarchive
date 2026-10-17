@@ -6688,7 +6688,11 @@ export const polities = {
           from (select id, area from roots where "isOffice") r
           join (select distinct root, contest from won) w on w.root = r.id
           join result_set rs on rs.contest_id = w.contest and rs.is_default
-          join result_rollup x on x.result_set_k = rs.k and x.area_k = r.area and x.measure = any(${COUNTED}) and x.option_k <> 0
+          cross join lateral (
+            select x.option_k, x.measure, x.value, x.count_round from result_rollup x
+            where x.result_set_k = rs.k and x.area_k = r.area and x.measure = any(${COUNTED}) and x.option_k <> 0
+            offset 0
+          ) x
           join contest_option o on o.k = x.option_k
         ),
         mains as (
