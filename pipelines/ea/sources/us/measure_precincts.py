@@ -1,3 +1,6 @@
+import io
+import json
+import re
 from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
@@ -6,7 +9,17 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import elstats, measures, medsl, medsl_measures, medsl_state, medsl_state_precincts, oe_precincts
+from ea.sources.us import (
+    county_measures,
+    elstats,
+    measures,
+    medsl,
+    medsl_measures,
+    medsl_state,
+    medsl_state_precincts,
+    oe_precincts,
+    openelections,
+)
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_precincts"
@@ -25,10 +38,49 @@ OPENELECTIONS = (
     "Precinct rows of OpenElections' volunteer-transcribed precinct files. Each answer's precinct rows add up to the "
     "totals of this question's default results{counties}."
 )
+COMMITS = openelections.COMMITS | county_measures.COMMITS
+FILE = re.compile(
+    r"(?:.*/)?(\d{8})__([a-z]{2})__((?:general|primary|special|runoff)(?:__(?:general|primary|runoff))?)(__[a-z_]+)?__precinct\.csv"
+)
 
 
 def fetch() -> None:
     measures.fetch()
+    with connect() as conn:
+        dates = conn.execute(
+            """select distinct substr(p.iso_code, 4), e.date_from from contest c
+               join election e on e.id = c.election_id
+               join polity p on p.id = e.polity_id and p.iso_code ~ '^US-..$'
+               where c.kind = 'ballot_question' and e.date_from between '2015-01-01' and %s
+                 and not exists (select 1 from result_set rs join result_value v on v.result_set_k = rs.k
+                                 join reporting_unit u on u.k = v.unit_k
+                                 where rs.contest_id = c.id and u.scheme_code = 'us.precinct')
+               order by 1, 2""",
+            [date(LAST, 12, 31)],
+        ).fetchall()
+    trees: dict[str, list[str]] = {}
+    for state, day in dates:
+        if state not in COMMITS:
+            continue
+        if state not in trees:
+            tree = raw.fetch(
+                SOURCE, openelections.TREE.format(state=state.lower(), commit=COMMITS[state]), suffix=".json"
+            )
+            trees[state] = [
+                entry["path"] for entry in json.loads(tree.path.read_text())["tree"] if entry["type"] == "blob"
+            ]
+        found = [
+            (path, matched)
+            for path in trees[state]
+            if (matched := FILE.fullmatch(path)) and matched[1] == f"{day:%Y%m%d}" and "diff/" not in path
+        ]
+        whole = [path for path, matched in found if matched[4] is None]
+        for path in whole or [path for path, _ in found]:
+            raw.fetch(
+                SOURCE,
+                openelections.REPOSITORY.format(state=state.lower(), commit=COMMITS[state], path=path),
+                suffix=".csv",
+            )
 
 
 def parse() -> None:
@@ -215,6 +267,102 @@ def parse() -> None:
         .write_parquet(PARSED / "openelections.parquet")
     )
 
+    with connect() as conn:
+        fips = openelections.counties(conn)
+    for (state, typo), plain in oe_precincts.COUNTIES.items():
+        if plain in fips.get(state, {}):
+            fips[state][typo] = fips[state][plain]
+    index = json.loads((DATA / "raw" / SOURCE / "index.json").read_text())
+    frames = []
+    for url in index:
+        matched = FILE.fullmatch(url.rsplit("/", 1)[1])
+        if not url.startswith("https://raw.githubusercontent.com/openelections/") or matched is None:
+            continue
+        state, day = matched[2].upper(), date(int(matched[1][:4]), int(matched[1][4:6]), int(matched[1][6:]))
+        text = raw.cached(SOURCE, url).path.read_bytes()
+        frame = pl.read_csv(
+            io.BytesIO(text.replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
+            infer_schema_length=0,
+            truncate_ragged_lines=True,
+        )
+        renamed: dict[str, str] = {}
+        for column in frame.columns:
+            name = oe_precincts.COLUMNS.get(column.strip().lower(), column.strip().lower())
+            if name not in renamed.values():
+                renamed[column] = name
+        frame = frame.rename(renamed)
+        if "votes" not in frame.columns and "total" in frame.columns:
+            frame = frame.rename({"total": "votes"})
+        for column in ("vote_type", "votetype"):
+            if column in frame.columns:
+                frame = frame.filter(pl.col(column).fill_null("").str.to_lowercase() != "total")
+        if "votes" not in frame.columns and any(column.endswith("_votes") for column in frame.columns):
+            frame = frame.with_columns(
+                votes=pl.sum_horizontal(
+                    pl.col(column).str.replace_all(r"[,\s]", "").cast(pl.Int64, strict=False)
+                    for column in frame.columns
+                    if column.endswith("_votes")
+                ).cast(pl.String)
+            )
+        if "county" not in frame.columns and matched[4]:
+            frame = frame.with_columns(county=pl.lit(matched[4].strip("_").replace("_", " ")))
+        if not {"county", "precinct", "office", "candidate", "votes"} <= set(frame.columns):
+            print(f"{url}: columns {frame.columns}, skipped")
+            continue
+        frames.append(
+            frame.select(
+                state=pl.lit(state),
+                day=pl.lit(day),
+                fips=pl.col("county")
+                .fill_null("")
+                .str.to_lowercase()
+                .str.replace_all(r"saint ", "st ")
+                .str.replace_all("&", "and")
+                .str.replace_all(
+                    r"\b(city and county of|county of|county|parish|borough|census area|municipality)\b", ""
+                )
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict(fips.get(state, {}), default=None),
+                precinct=pl.col("precinct").fill_null("").str.strip_chars().str.replace_all(r"\s+", " "),
+                office=pl.col("office")
+                .fill_null("")
+                .str.to_uppercase()
+                .str.replace_all(r"[^A-Z0-9]+", " ")
+                .str.strip_chars(),
+                district=(pl.col("district") if "district" in frame.columns else pl.lit(None, pl.String))
+                .fill_null("")
+                .str.to_uppercase(),
+                candidate=pl.col("candidate").fill_null(""),
+                votes=pl.col("votes").str.replace_all(r"[,\s]", "").cast(pl.Float64, strict=False).cast(pl.Int64),
+            )
+        )
+    (
+        pl.concat(frames)
+        .filter(
+            pl.col("votes").is_not_null(),
+            pl.col("precinct") != "",
+            ~pl.col("precinct").str.contains(oe_precincts.TOTALS),
+            ~pl.col("office").str.contains("RETAIN|RETENTION|JUDGE|JUSTICE|COURT"),
+            affirmative.any().over("state", "day", "office", "district")
+            & negative.any().over("state", "day", "office", "district"),
+            affirmative | negative,
+        )
+        .group_by(
+            pl.col("day").dt.year().alias("year"),
+            "day",
+            "state",
+            "office",
+            "district",
+            "fips",
+            pl.lit("").alias("jurisdiction"),
+            "precinct",
+            answer=pl.when(affirmative).then(pl.lit("YES")).otherwise(pl.lit("NO")),
+        )
+        .agg(pl.col("votes").sum())
+        .sort("day", "state", "office", "district", "fips", "precinct", "answer")
+        .write_parquet(PARSED / "openelections_recent.parquet")
+    )
+
 
 def emit() -> Path:
     archives = pl.read_parquet(PARSED / "archives.parquet").with_columns(
@@ -222,8 +370,9 @@ def emit() -> Path:
     )
     returns = pl.concat(
         [
-            pl.read_parquet(PARSED / "medsl.parquet").drop("day").with_columns(origin=pl.lit("medsl")),
+            pl.read_parquet(PARSED / "medsl.parquet").with_columns(origin=pl.lit("medsl")),
             pl.read_parquet(PARSED / "openelections.parquet").with_columns(origin=pl.lit("openelections")),
+            pl.read_parquet(PARSED / "openelections_recent.parquet").with_columns(origin=pl.lit("openelections")),
         ],
         how="diagonal_relaxed",
     )
@@ -308,19 +457,24 @@ def emit() -> Path:
             (key, state, None, ARCHIVE, rows)
             for (key, state), rows in archives.group_by("key", "state", maintain_order=True)
         ]
-        question = ["origin", "year", "state", "office", "district"]
+        question = ["origin", "year", "day", "state", "office", "district"]
         questions = returns.group_by(question).agg(
             yes=pl.col("votes").filter(pl.col("answer") == "YES").sum(),
             no=pl.col("votes").filter(pl.col("answer") == "NO").sum(),
         )
-        matched = questions.join(
-            totals.with_columns(year=pl.col("day").dt.year()), on=["state", "year", "yes", "no"]
-        ).filter(pl.len().over(question) == 1)
+        matched = (
+            questions.join(
+                totals.rename({"day": "held"}).with_columns(year=pl.col("held").dt.year()),
+                on=["state", "year", "yes", "no"],
+            )
+            .filter(pl.col("day").is_null() | (pl.col("day") == pl.col("held")))
+            .filter(pl.len().over(question) == 1)
+        )
         for origin, key in matched.filter(pl.len().over("origin", "key") > 1).select("origin", "key").unique().rows():
             print(f"{key}: several {origin} questions share its totals, skipped")
         matched = matched.filter(pl.len().over("origin", "key") == 1).sort("origin")
         print(f"{matched.group_by('origin').len().rows()} questions match a statewide question's totals exactly")
-        picked = returns.join(matched.select(*question, "key"), on=question)
+        picked = returns.join(matched.select(*question, "key"), on=question, nulls_equal=True)
         del returns
         for (origin, year, state, key), rows in picked.group_by("origin", "year", "state", "key", maintain_order=True):
             source, method = sources[(str(origin), year if origin == "medsl" else state)]
