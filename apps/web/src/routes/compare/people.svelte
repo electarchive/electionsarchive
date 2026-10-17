@@ -147,7 +147,20 @@
 
 <dl class="col-span-12 grid grid-cols-2 gap-px">
   {#each sides as side, index (side.id)}
-    <div class="grid content-start gap-2 bg-card px-3.5 py-3">
+    <div
+      class={cn("grid content-start gap-2 bg-card px-3.5 py-3", {
+        "sm:grid-cols-[auto_minmax(0,1fr)] sm:gap-x-4": side.photo != null,
+      })}
+    >
+      {#if side.photo != null}
+        <img
+          class="aspect-4/5 rounded-sm bg-muted object-cover object-top ring-1 ring-border inline-14 sm:row-span-2 sm:inline-20"
+          src={side.photo.src}
+          alt={m.photo_alt({ name: side.name })}
+          width="80"
+          height="100"
+        />
+      {/if}
       <dt class="flex items-center gap-2">
         {@render glyph(index, true, "var(--foreground)", 12)}
         <a
@@ -175,6 +188,19 @@
             </span>
           {/each}
         </span>
+        {#if side.photo != null}
+          <a
+            class="justify-self-start text-[0.6875rem] text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+            href={side.photo.source}
+            rel="external noopener"
+            >{side.photo.artist == null
+              ? m.photo_credit_anonymous({ license: side.photo.license })
+              : m.photo_credit({
+                  artist: side.photo.artist,
+                  license: side.photo.license,
+                })}</a
+          >
+        {/if}
       </dd>
     </div>
   {/each}
