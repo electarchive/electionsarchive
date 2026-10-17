@@ -588,6 +588,7 @@
           container: surface,
           style: {
             version: 8,
+            projection: { type: "globe" },
             sources: {
               places: {
                 type: "vector",
@@ -820,11 +821,6 @@
               },
             ],
           },
-          bounds:
-            frame == null
-              ? undefined
-              : [frame.west, frame.south, frame.east, frame.north],
-          fitBoundsOptions: { padding: index === 0 ? room : 6 },
           renderWorldCopies: false,
           attributionControl: false,
           canvasContextAttributes: { preserveDrawingBuffer: true },
@@ -839,6 +835,14 @@
             "CooperativeGesturesHandler.MacHelpText": m.map_gesture_mac(),
             "CooperativeGesturesHandler.MobileHelpText": m.map_gesture_mobile(),
           },
+        });
+        map.once("style.load", () => {
+          if (frame != null) {
+            map.fitBounds([frame.west, frame.south, frame.east, frame.north], {
+              padding: index === 0 ? room : 6,
+              animate: false,
+            });
+          }
         });
         map.touchZoomRotate.disableRotation();
         map.keyboard.disable();
