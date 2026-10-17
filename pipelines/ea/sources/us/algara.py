@@ -41,6 +41,7 @@ UNDECIDED = (
     "No winner is recorded: with only the two major parties' votes, the pooled other votes could hold the winner, "
     "or no candidate reached the majority the state required."
 )
+BLANK = "Counties where the source provides a total but no votes for either major nominee are excluded from this table."
 
 
 def fetch() -> None:
@@ -235,6 +236,7 @@ def emit() -> Path:
         for key, contest, option, label in conn.execute(
             """select e.value, c.id, o.id, o.ballot_label from external_id e
                join contest c on c.id = e.entity_id join changeset s on s.id = c.changeset_id
+               join election l on l.id = c.election_id and l.kind = 'general'
                left join contest_option o on o.contest_id = c.id and o.parent_option_id is null
                where e.scheme = 'us.contest' and e.value ~ '^\\d{4}-\\d{2}-\\d{2}:[A-Z]{2}:governor$'
                  and s.pipeline <> %s""",
@@ -329,7 +331,31 @@ def emit() -> Path:
                 )
                 name(contest, f"{year} {state_name} gubernatorial election")
                 cs.add("slug", path=f"us/{state.lower()}/{datekey}-general/governor", entity_id=contest)
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            blank = (pl.col("d").fill_null(0) == 0) & (pl.col("r").fill_null(0) == 0) & (pl.col("total") > 0)
+            first = cs.key(f"{SOURCE}.result_set", contest_key)
+            result_set = (
+                cs.key(f"{SOURCE}.result_set", f"{contest_key}:2")
+                if first not in cs.minted and lines.select(blank.any()).item()
+                else first
+            )
+            if result_set != first:
+                cs.add(
+                    "result_set",
+                    id=first,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=source,
+                    is_default=False,
+                    supersedes_id=None,
+                    completeness=None,
+                )
+                for option, outcome, count in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [first]
+                ).fetchall():
+                    cs.add("outcome", result_set_id=first, option_id=option, kind=outcome, seats=count)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -339,14 +365,22 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=defaults.get(result_set, not reused),
+                is_default=defaults.get(result_set, defaults.get(first, not reused)),
+                supersedes_id=None if result_set == first else first,
                 completeness=None,
             )
             cs.add("note", entity_id=result_set, kind="caveat", body_md=TWO_PARTY)
             if lines["short"].any():
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=SHORT)
+            if lines.select(blank.any()).item():
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=BLANK)
             totals: dict[UUID, int] = {}
-            pooled = lines.with_columns(other=pl.col("total") - pl.col("d").fill_null(0) - pl.col("r").fill_null(0))
+            pooled = lines.with_columns(
+                other=pl.when(blank)
+                .then(None)
+                .otherwise(pl.col("total") - pl.col("d").fill_null(0) - pl.col("r").fill_null(0)),
+                blank=blank,
+            )
             for column, votes in (("democratic", "d"), ("republican", "r"), (None, "other")):
                 if column is None:
                     if pooled["other"].sum() == 0:
@@ -395,7 +429,9 @@ def emit() -> Path:
                             is_independent=False,
                         )
                     totals[option] = int(pooled[votes].sum())
-                for code, value in pooled.select("code", votes).iter_rows() if result_set in cs.minted else ():
+                for code, value in (
+                    pooled.filter(~pl.col("blank")).select("code", votes).iter_rows() if result_set in cs.minted else ()
+                ):
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
