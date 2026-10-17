@@ -580,7 +580,7 @@
       ];
       const room = {
         top: 20,
-        right: matchMedia("(min-width: 40rem)").matches ? 52 : 20,
+        right: 52,
         bottom: (surfaces[1]?.clientHeight ?? 0) + 20,
         left: 20,
       };
