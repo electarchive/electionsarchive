@@ -460,10 +460,12 @@ def emit() -> Path:
                 polity_id=polity,
                 scheme_code=scheme,
                 code=code,
-                parent_id=parent,
+                parent_id=cs.unit("us.county", "29095") if code == "2938000" else parent,
                 area_relation="equals" if kind == "district" else "within",
                 area_id=cs.area("us.county", "51019")
                 if code == "51515"
+                else cs.area("us.county", "29095")
+                if code == "2938000"
                 else cs.area("us.sldl", f"AK:{int(code[-2:])}")
                 if kind == "district"
                 else area,
@@ -471,6 +473,14 @@ def emit() -> Path:
                 valid_from=days[year] if kind == "district" else None,
                 valid_to=days[year] + timedelta(days=1) if kind == "district" else BEDFORD if code == "51515" else None,
             )
+            if code == "2938000":
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=units[code],
+                    area_id=cs.area("us.place", code),
+                    valid_from=None,
+                    valid_to=None,
+                )
 
         result_sets: dict[tuple[int, str], UUID] = {}
         options: dict[tuple[int, str, str], UUID] = {}
