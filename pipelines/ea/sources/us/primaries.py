@@ -1,3 +1,4 @@
+import csv
 import html
 import io
 import itertools
@@ -51,6 +52,7 @@ OHIO = (
 )
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
+HAWAII = "https://files.hawaii.gov/elections/files/results/2024/Primary/{}.txt"
 MISSOURI = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/ActualResults-August62024.pdf"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
 NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
@@ -227,6 +229,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, FLORIDA.format(day), suffix=".txt")
     raw.fetch(SOURCE, OREGON, suffix=".pdf")
     raw.fetch(SOURCE, MISSOURI, suffix=".pdf")
+    for name in ("media", "summary"):
+        raw.fetch(SOURCE, HAWAII.format(name), suffix=".txt")
     for package in TEXAS:
         for resource in json.loads(raw.fetch(SOURCE, TED.format(package), suffix=".json").path.read_text())["result"][
             "resources"
@@ -263,6 +267,12 @@ def parse() -> None:
                    from reporting_unit where scheme_code = 'us.precinct' and code ~ '^2024:(CT|RI):[0-9]{5}:'"""
             ).fetchall()
         }
+        hawaii = dict(
+            conn.execute(
+                """select distinct split_part(split_part(code, ':', 5), '-', 1), split_part(code, ':', 3)
+                   from reporting_unit where scheme_code = 'us.precinct' and code like '2024:HI:%'"""
+            ).fetchall()
+        )
     rows: list[tuple[str, date, str, int | None, str | None, str, str, str | None, str, bool, int, str]] = []
     sheet = (
         fastexcel.read_excel(raw.cached(SOURCE, CALIFORNIA).path)
@@ -364,6 +374,7 @@ def parse() -> None:
         *(("FL", "county", FLORIDA.format(day)) for day in ("20240319", "20240820")),
         ("OR", "county", OREGON),
         ("MO", "county", MISSOURI),
+        ("HI", "precinct", HAWAII.format("media")),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
         *(
@@ -667,6 +678,39 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif state == "HI":
+            records = [
+                record
+                for record in csv.reader(raw.cached(SOURCE, url).path.read_text(encoding="utf-16").splitlines()[2:])
+                if record[7].startswith("U.S.") and re.fullmatch(r"\d{2}-\d{2}", record[0])
+            ]
+            tallies: dict[tuple[str, str, str], int] = defaultdict(int)
+            for record in records:
+                tallies[(record[7], record[8], record[10])] += int(record[13]) + int(record[14])
+            for record in csv.reader(
+                raw.cached(SOURCE, HAWAII.format("summary")).path.read_text(encoding="utf-16").splitlines()[2:]
+            ):
+                if record[1].startswith("U.S.") and tallies.pop((record[1], record[4], record[15])) != int(record[20]):
+                    raise ValueError(f"HI: the precincts do not add up to the summary for {record[15]}")
+            if tallies:
+                raise ValueError(f"HI: {sorted(tallies)} are not in the summary")
+            frame = pl.DataFrame(
+                [
+                    {
+                        "county": hawaii[record[0].split("-")[0]],
+                        "precinct": f"{record[0]} {record[1]}".strip(),
+                        "office": record[7],
+                        "district": {"Dist I": "1", "Dist II": "2"}.get(record[7].split(", ")[-1]),
+                        "party": {"D": "democratic", "R": "republican", "G": "green", "L": "libertarian"}.get(
+                            record[8]
+                        ),
+                        "candidate": " ".join(reversed(record[10].split(", ", 1))),
+                        "votes": str(int(record[13]) + int(record[14])),
+                    }
+                    for record in records
+                ],
+                schema=dict.fromkeys(COLUMNS, pl.String),
+            )
         elif state == "MO":
             pdf = raw.cached(SOURCE, url).path
             info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
@@ -1241,7 +1285,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX"):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -1287,6 +1331,8 @@ def parse() -> None:
             if state == "OR"
             else date(2024, 8, 6)
             if state == "MO"
+            else date(2024, 8, 10)
+            if state == "HI"
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1612,6 +1658,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "MO"
+                else (
+                    "Hawaii Office of Elections",
+                    "2024 Primary Election, results by precinct",
+                    "https://elections.hawaii.gov/election-results/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "HI"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
