@@ -6473,6 +6473,7 @@ export const polities = {
             const loaded = totals.get(row.k);
             return {
               ...row,
+              valid: loaded?.side.valid ?? 0,
               name: label.full.get(row.id) ?? "",
               path: [row.path, unit].filter((part) => part !== "").join("/"),
               leaders:
@@ -6525,6 +6526,7 @@ export const polities = {
             .toSorted(
               (a, b) =>
                 b.date.localeCompare(a.date) ||
+                b.valid - a.valid ||
                 a.name.localeCompare(b.name, undefined, { numeric: true }),
             ),
           (race) => race.date,
