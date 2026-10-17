@@ -2740,9 +2740,9 @@ export const contests = {
         tallied as materialized (
           select distinct grp.root from grp
           join result_set rs on rs.contest_id = grp.id
-          where exists (
-            select 1 from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED})
-          )
+          cross join lateral (
+            select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
+          ) hit
         ),
         decided as materialized (
           select distinct grp.root from grp
