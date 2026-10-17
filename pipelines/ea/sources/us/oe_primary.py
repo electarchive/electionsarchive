@@ -11,7 +11,7 @@ from psycopg import Connection
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import medsl, oe_precincts, openelections
+from ea.sources.us import klarner, medsl, medsl_state, oe_precincts, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.oe_primary"
@@ -94,7 +94,30 @@ ALIASES = {
     "precinctname": "precinct",
     "election_district": "precinct",
 }
-TARGET = r"^\d{4}-\d\d-\d\d:[A-Z]{2}:(senate|president|house:\d+)(:special)?:[a-z][a-z-]*$|^\d{4}-\d\d-\d\d:[A-Z]{2}:house:\d+$"
+TARGET = (
+    r"^\d{4}-\d\d-\d\d:[A-Z]{2}:(senate|president|house:\d+)(:special)?:[a-z][a-z-]*$|^\d{4}-\d\d-\d\d:[A-Z]{2}:house:\d+$"
+    r"|^201[4-6]-\d\d-\d\d:[A-Z]{2}:(house|senate|assembly|general-assembly|house-of-delegates|legislature):[^:]+(:\d)?"
+    r":[a-z0-9]*p(fsettled|funsettled|fpartunsettled|f|runoff)?$"
+)
+BODIES = r"house|senate|assembly|general-assembly|house-of-delegates|legislature"
+SEATED = re.compile(
+    rf"(\d{{4}}-\d\d-\d\d):([A-Z]{{2}}):({BODIES}):([^:]+)(?::(\d))?:([a-z0-9]*p(?:fsettled|funsettled|fpartunsettled|f|runoff)?)"
+)
+ETYPES = {
+    "democratic": "dp",
+    "republican": "rp",
+    "libertarian": "liberp",
+    "green": "greenp",
+    "independence": "indepp",
+    "conservative": "conservativep",
+    "working-families": "workp",
+    "constitution": "constp",
+    "progressive": "progp",
+}
+LEGISLATIVE = (
+    r"^(state\s+(house|senat\w*|rep\w*|assembly\w*|delegate\w*|legislat\w*)|(state\s+)?(general\s+)?assembly(man|member)?\b"
+    r"|house of delegates|(member of )?(the )?house of representatives|state legislat\w*)"
+)
 KEY = re.compile(r"(\d{4}-\d\d-\d\d):([A-Z]{2}):((?:senate|president|house:\d+)(?::special)?)(?::([a-z][a-z-]*))?")
 
 
@@ -179,10 +202,15 @@ def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)
         parties: dict[tuple[str, str, str], dict[str, str]] = {}
+        legislative: dict[tuple[str, str, str, str, str | None], dict[str, str]] = {}
         for value, contest in conn.execute(
             "select value, entity_id from external_id where scheme = 'us.contest' and value ~ %s order by value",
             [TARGET],
         ).fetchall():
+            if (seated := SEATED.fullmatch(value)) is not None:
+                day, state, body, code, post, etype = seated.groups()
+                legislative.setdefault((day, state, body, code, post), {})[etype] = value
+                continue
             found = KEY.fullmatch(value)
             if found is None:
                 continue
@@ -274,7 +302,14 @@ def parse() -> None:
                         (office.str.contains(openelections.HOUSE.pattern) | (office == "house") & (state == "WI"))
                         & ~office.str.contains(r"\bstate\b|proposition|amendment|question|referend|resolution")
                     )
-                    .then(pl.lit("house")),
+                    .then(pl.lit("house"))
+                    .when(
+                        office.str.contains(LEGISLATIVE)
+                        & ~office.str.contains(r"\bu\.?\s?s\.?\b|united states|congress")
+                    )
+                    .then(pl.lit("state")),
+                    label=office,
+                    line=district,
                     district=pl.coalesce(district.str.extract(r"(\d+)"), office.str.extract(r"(\d+)")).cast(
                         pl.Int16, strict=False
                     ),
@@ -400,6 +435,80 @@ def parse() -> None:
         how="left",
         nulls_equal=True,
     )
+    seats = []
+    for state, day, label, line, party in (
+        frame.filter(pl.col("office") == "state", pl.col("grain") == "precinct")
+        .select("state", "day", "label", "line", "party")
+        .unique()
+        .iter_rows()
+    ):
+        body = (
+            "legislature"
+            if state == "NE"
+            else "senate"
+            if re.search(r"senat", label)
+            else slug(
+                klarner.LOWER.get(state, "House of Representatives")
+                .removeprefix("State ")
+                .removesuffix(" of Representatives")
+            )
+        )
+        text = re.sub(r"\.0$|^(district|dist\.?)\s*", "", line.strip().lower())
+        if not text:
+            found = re.search(r"(\d+)", label)
+            text = found[1] if found else ""
+        text = re.sub(r"^(ad|sd|hd|d)0*(?=\d)", "", text)
+        post = None
+        if found := re.search(r"\bpos(?:ition|\.)?\s*(\d)", label):
+            post = found[1]
+        if not text:
+            continue
+        code = medsl_state._district(state, text)[0]
+        known = legislative.get((day.isoformat(), state, body, code, post), {})
+        if not known and post is None:
+            posted = [
+                (number, held)
+                for number in "1234"
+                if (held := legislative.get((day.isoformat(), state, body, code, number)))
+            ]
+            if len(posted) == 1:
+                post, known = posted[0]
+        open_types = {etype for etype in known if re.match(r"(ttp|up)", etype)}
+        prefix = ETYPES.get(PARTIES.get(party, slug(party) if party else ""))
+        matches = (
+            open_types
+            if open_types and len(open_types) == len(known)
+            else {
+                etype
+                for etype in known
+                if prefix and re.fullmatch(rf"{prefix}(fsettled|funsettled|fpartunsettled|f)?", etype)
+            }
+        )
+        if len(matches) == 1:
+            seats.append(
+                (state, day, label, line, party, f"{body}:{code}" + (f":{post}" if post else "") + f":{matches.pop()}")
+            )
+    frame = frame.join(
+        pl.DataFrame(
+            seats,
+            schema={
+                "state": pl.String,
+                "day": pl.Date,
+                "label": pl.String,
+                "line": pl.String,
+                "party": pl.String,
+                "legislative": pl.String,
+            },
+            orient="row",
+        ),
+        on=["state", "day", "label", "line", "party"],
+        how="left",
+        nulls_equal=True,
+    ).with_columns(
+        chamber=pl.when(pl.col("office") == "state")
+        .then(pl.when(pl.col("grain") == "precinct").then("legislative"))
+        .otherwise("chamber")
+    )
     totals = frame.group_by("grain", "state", "day", "chamber", "seat", "code", "path").agg(pl.col("votes").sum())
     frame = frame.join(
         totals.sort("votes", "path", descending=True)
@@ -436,7 +545,7 @@ def parse() -> None:
             key=pl.concat_str(
                 pl.col("day").cast(pl.String),
                 "state",
-                pl.when(pl.col("chamber").str.starts_with("house"))
+                pl.when(pl.col("seat").is_not_null())
                 .then(
                     pl.concat_str(
                         pl.lit("house:"), pl.col("seat").cast(pl.String), pl.col("chamber").str.strip_prefix("house")
