@@ -615,7 +615,40 @@ def emit() -> Path:
         )
         name(stv, "Minneapolis single transferable vote")
 
-        pending = [key for key in CONTESTS if key in REDONE or cs.key(f"{SOURCE}.result_set", key) in cs.minted]
+        pending = [
+            key for key in CONTESTS if cs.key(f"{SOURCE}.result_set", f"{key}:2" if key in REDONE else key) in cs.minted
+        ]
+        columns = (
+            "election_id",
+            "kind",
+            "office_id",
+            "body_id",
+            "district_area_id",
+            "seat_id",
+            "boundary_set_id",
+            "magnitude",
+            "party_scope_id",
+            "round_number",
+            "previous_round_id",
+            "allocation_parent_id",
+            "rules_override",
+            "default_result_kind",
+            "term",
+        )
+        for contest, magnitude in conn.execute(
+            """select k.id, k.magnitude from contest k join election e on e.id = k.election_id
+               join polity_territory t on t.polity_id = e.polity_id
+               where t.area_id = %s and e.date_from >= '2009-11-03' and k.kind in ('office', 'body_seats')
+               and (k.electoral_system_id is null or k.electoral_system_id <> all(%s))""",
+            [city, [irv, stv]],
+        ).fetchall():
+            row = conn.execute(f"select {', '.join(columns)} from contest where id = %s", [contest]).fetchone()
+            cs.add(
+                "contest",
+                id=contest,
+                **dict(zip(columns, row or (), strict=True)),
+                electoral_system_id=irv if magnitude == 1 else stv,
+            )
         known = {
             vintage for (vintage,) in conn.execute("select vintage from boundary_set where scheme_code = 'us.precinct'")
         }

@@ -2,7 +2,7 @@ import json
 import re
 import subprocess
 import unicodedata
-from datetime import UTC, date, datetime
+from datetime import UTC, date, datetime, timedelta
 from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
@@ -69,6 +69,17 @@ CONTESTS = {
         ASSETS + "2025-11/St.%20Paul%20Mayoral%20Reallocation%2011-4-25.pdf",
     ),
 }
+PRECINCTS = {
+    "2023-11-07:council:1": (
+        "20260817235545",
+        ASSETS + "migrated-files/Reallocation_1st_Choice_Hand_Count_2023_-_Ward_1.pdf",
+    ),
+    "2023-11-07:council:3": (
+        "20260817235545",
+        ASSETS + "migrated-files/Reallocation_2023_1st_Choice_Hand_Count_Ward_3.pdf",
+    ),
+    "2023-11-07:council:7": ("20260817235546", ASSETS + "migrated-files/Reallocation_2023_-_Ward_7.pdf"),
+}
 STALE = {"2023-11-07:council:3"}
 HAND = (
     "Ramsey County Elections' reallocation summary statement for the contest, from its hand count of the ranked "
@@ -84,6 +95,11 @@ RCTAB = (
     "candidate's value is a running total; a candidate eliminated in a round shows 0 in the next. Exhausted "
     "counts every ballot not counting for a candidate in that round, including undervotes."
 )
+FIRST = (
+    "Reallocation began from the Ramsey County Elections hand count of first choices by precinct on November 10, "
+    "2023. Exhausted counts are ballots with no first choice for a candidate: undervotes, overvotes, and ballots "
+    "set aside for review."
+)
 STALE_NOTE = (
     "The county statement repeats the round 1 count of 168 inactive ballots in round 2. Here, the round 2 "
     "exhausted value is 2,470: 13,396 ballots counted minus 10,926 votes for the two remaining candidates "
@@ -92,7 +108,7 @@ STALE_NOTE = (
 
 
 def fetch() -> None:
-    for _, stamp, url in CONTESTS.values():
+    for stamp, url in [(stamp, url) for _, stamp, url in CONTESTS.values()] + list(PRECINCTS.values()):
         response = httpx.get(WAYBACK.format(stamp, url), timeout=120, follow_redirects=True)
         response.raise_for_status()
         if not response.content.startswith(b"%PDF"):
@@ -109,7 +125,7 @@ def fetch() -> None:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    contests = {}
+    contests: dict[str, dict[str, object]] = {}
     for key, (_, stamp, url) in CONTESTS.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, WAYBACK.format(stamp, url)).path), "-"],
@@ -195,6 +211,47 @@ def parse() -> None:
             "ballots": total,
             "rounds": [list(tally.items()) for tally in rounds],
         }
+        if key in PRECINCTS:
+            file = WAYBACK.format(*PRECINCTS[key])
+            sheet = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, file).path), "-"],
+                check=True,
+                capture_output=True,
+                text=True,
+            ).stdout
+            (header,) = [line.split() for line in sheet.splitlines() if line.strip().startswith("Precinct ")]
+            surnames = header[1 : header.index("Write-In") + 1]
+            order = []
+            for surname in surnames:
+                (label,) = [
+                    label
+                    for label in rounds[0]
+                    if label.split()[-1].casefold() == surname.casefold()
+                    or ("write" in label.casefold() and surname == "Write-In")
+                ]
+                order.append(label)
+            width = len(order)
+            units: dict[str, tuple[int, dict[str, int]]] = {}
+            for line in sheet.splitlines():
+                match = re.match(r"\s*(St\. Paul W-\d+ P-\d+|TOTAL)\s+([\d,\s]+)$", line)
+                if match is None:
+                    continue
+                values = [int(token.replace(",", "")) for token in match.group(2).split()]
+                if (
+                    len(values) != width + 5
+                    or sum(values[:width]) != values[width]
+                    or values[width] + values[width + 1] != values[width + 2]
+                    or values[width + 2] + values[width + 3] != values[width + 4]
+                ):
+                    raise ValueError(f"{key}: {line}")
+                units[match.group(1).upper()] = (values[-1], dict(zip(order, values[:width], strict=True)))
+            ballots, counts = units.pop("TOTAL")
+            if counts != rounds[0] or ballots != total:
+                raise ValueError(f"{key}: the precinct totals differ from the statement")
+            for label in order:
+                if sum(cell[label] for _, cell in units.values()) != rounds[0][label]:
+                    raise ValueError(f"{key}: precincts do not sum for {label}")
+            contests[key]["precincts"] = {"file": file, "units": units}
     (PARSED / "official.json").write_text(json.dumps(contests))
 
 
@@ -236,6 +293,7 @@ def emit() -> Path:
             rules_version=1,
         )
         name(irv, "St. Paul ranked-choice voting")
+        restated = {existing for existing, _, _ in CONTESTS.values() if existing is not None}
 
         people: dict[tuple[str, str], set[tuple[UUID, bool]]] = {}
         for text, person, area in conn.execute(
@@ -266,6 +324,15 @@ def emit() -> Path:
             "default_result_kind",
             "term",
         )
+        for contest, value in conn.execute(
+            """select k.id, x.value from contest k join external_id x on x.entity_id = k.id and x.scheme = 'us.contest'
+               join election e on e.id = k.election_id
+               where x.value like 'alged:2758000_%%' and e.date_from >= '2011-11-01'"""
+        ).fetchall():
+            if value in restated:
+                continue
+            row = conn.execute(f"select {', '.join(columns)} from contest where id = %s", [contest]).fetchone()
+            cs.add("contest", id=contest, **dict(zip(columns, row or (), strict=True)), electoral_system_id=irv)
         done: set[UUID] = set()
         for key, (existing, _, _) in CONTESTS.items():
             day = date.fromisoformat(key[:10])
@@ -453,41 +520,130 @@ def emit() -> Path:
                 raise ValueError(f"{key}: two candidates share an option")
 
             result = cs.key(f"{SOURCE}.result_set", key)
-            final = rounds[-1]
-            winner = max(final, key=lambda label: final[label])
-            for label, option in options.items():
-                for outcome in ("won", "elected") if label == winner else ("lost" if final[label] else "eliminated",):
-                    cs.add("outcome", result_set_id=result, option_id=option, kind=outcome)
-            cs.add(
-                "result_set",
-                id=result,
-                election_id=election,
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=True,
-                completeness=1,
-            )
-            cs.add("note", entity_id=result, kind="methodology", body_md=RCTAB if kind == "mayor" else HAND)
-            if key in STALE:
-                cs.add("note", entity_id=result, kind="caveat", body_md=STALE_NOTE)
             ballots = contests[key]["ballots"]
-            rows = [(None, 3, 0, ballots), (None, 4, 1, sum(rounds[0].values()))]
+            values = [(top, None, 3, 0, ballots), (top, None, 4, 1, sum(rounds[0].values()))]
             for number, tally in enumerate(rounds, 1):
-                rows.append((None, 21, number, ballots - sum(tally.values())))
-                rows.extend((options[label], 1, number, votes) for label, votes in tally.items())
-            for option, measure, number, votes in rows:
+                values.append((top, None, 21, number, ballots - sum(tally.values())))
+                values.extend((top, options[label], 1, number, votes) for label, votes in tally.items())
+            notes = [("methodology", RCTAB if kind == "mayor" else HAND)]
+            if key in STALE:
+                notes.append(("caveat", STALE_NOTE))
+            sets = [(result, True, source, notes, values)]
+            if result in cs.minted:
+                final = rounds[-1]
+                winner = max(final, key=lambda label: final[label])
+                for label, option in options.items():
+                    for outcome in (
+                        ("won", "elected") if label == winner else ("lost" if final[label] else "eliminated",)
+                    ):
+                        cs.add("outcome", result_set_id=result, option_id=option, kind=outcome)
+            if "precincts" in contests[key]:
+                sheet = contests[key]["precincts"]
+                title = f"{day:%B} {day.day}, {day.year} St. Paul municipal election: {seat}, first-choice hand count by precinct"
+                counted = cs.source(PUBLISHER, title)
                 cs.add(
-                    "result_value",
-                    result_set_id=result,
-                    unit_id=top,
-                    option_id=option,
-                    channel=0,
-                    measure=measure,
-                    count_round=number,
-                    flags=0,
-                    value=votes,
+                    "source",
+                    id=counted,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=sheet["file"],
+                    license="Public record",
                 )
+                cs.artifact(raw.cached(SOURCE, sheet["file"]), counted)
+                values = []
+                for unit, (cast, counts) in sheet["units"].items():
+                    code = f"{day}:MN:27123:{unit}"
+                    precinct = cs.unit("us.precinct", code)
+                    area = cs.area("us.precinct", code)
+                    if area in cs.minted and area not in done:
+                        done.add(area)
+                        ((ward_number, number),) = re.findall(r"W-(\d+) P-(\d+)", unit)
+                        geom, point = conn.execute(
+                            """select encode(st_asewkb(g.geom), 'hex'), encode(st_asewkb(g.label_point), 'hex')
+                               from area_code c join area_geometry g on g.area_id = c.area_id
+                               where c.code = %s""",
+                            [f"2022:MN:27123:RAMSEY:{unit}"],
+                        ).fetchone() or (None, None)
+                        if geom is None:
+                            raise ValueError(f"{key}: no 2022 shape for {unit}")
+                        cs.add("area", id=area, scheme_code="us.precinct")
+                        cs.add("area_code", area_id=area, code=code, valid_from=None)
+                        cs.add("area_parent", area_id=area, parent_id=county)
+                        name(area, f"St. Paul W-{ward_number} P-{int(number)}, Ramsey County")
+                        cs.add(
+                            "area_geometry",
+                            area_id=area,
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                            geom=geom,
+                            label_point=point,
+                            quality="official",
+                            source_id=None,
+                        )
+                        cs.add(
+                            "reporting_unit",
+                            id=precinct,
+                            polity_id=polity,
+                            scheme_code="us.precinct",
+                            code=code,
+                            area_relation="equals",
+                            area_id=area,
+                            kind="standard",
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                        cs.add(
+                            "reporting_unit_area",
+                            unit_id=precinct,
+                            area_id=district,
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                    values.extend(
+                        [
+                            (precinct, None, 3, 0, cast),
+                            (precinct, None, 4, 1, sum(counts.values())),
+                            (precinct, None, 21, 1, cast - sum(counts.values())),
+                            *((precinct, options[label], 1, 1, votes) for label, votes in counts.items()),
+                        ]
+                    )
+                sets.append(
+                    (
+                        cs.key(f"{SOURCE}.result_set", f"{key}:precincts"),
+                        False,
+                        counted,
+                        [("methodology", FIRST)],
+                        values,
+                    )
+                )
+            for result_set, default, origin, remarks, rows in sets:
+                if result_set not in cs.minted:
+                    continue
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=origin,
+                    is_default=default,
+                    completeness=1,
+                )
+                for remark, body in remarks:
+                    cs.add("note", entity_id=result_set, kind=remark, body_md=body)
+                for unit, option, measure, number, votes in rows:
+                    cs.add(
+                        "result_value",
+                        result_set_id=result_set,
+                        unit_id=unit,
+                        option_id=option,
+                        channel=0,
+                        measure=measure,
+                        count_round=number,
+                        flags=0,
+                        value=votes,
+                    )
         return cs.write()
