@@ -42,6 +42,7 @@ MASSACHUSETTS = [
 ]
 IOWA = "https://electionresults.iowa.gov/IA/121508/344769/reports/detailxml.zip"
 KANSAS = "https://sos.ks.gov/elections/24elec/2024-Primary-Election-United-States-House-of-Representatives-Precinct%20Results.xlsx"
+KS_PRESIDENT = "https://sos.ks.gov/elections/24elec/2024-Presidential-Preference-Primary-Official-Vote-Totals{}.pdf"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
 NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
 NEBRASKA = "https://sos.nebraska.gov/sites/default/files/doc/elections/2024/2024%20Primary%20Canvass%20Book.pdf"
@@ -207,6 +208,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, NEW_JERSEY.format(name), suffix=".pdf")
     raw.fetch(SOURCE, NEBRASKA, suffix=".pdf")
     raw.fetch(SOURCE, KANSAS, suffix=".xlsx")
+    for suffix in ("", "-by-County"):
+        raw.fetch(SOURCE, KS_PRESIDENT.format(suffix), suffix=".pdf")
     for listing in MASSACHUSETTS:
         for election, *_ in elstats.MA_ROW.findall(raw.fetch(SOURCE, listing, suffix=".html").path.read_text()):
             raw.fetch(SOURCE, f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/", suffix=".csv")
@@ -325,6 +328,7 @@ def parse() -> None:
         *(("NJ", "county", NEW_JERSEY.format(name)) for name in NJ_FILES),
         ("NE", "county", NEBRASKA),
         ("KS", "precinct", KANSAS),
+        ("KS", "county", KS_PRESIDENT.format("-by-County")),
         *(
             ("MA", "precinct", f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/")
             for election in dict.fromkeys(
@@ -397,6 +401,70 @@ def parse() -> None:
                         )
                     )
             frame = pl.concat(sheets)
+        elif url == KS_PRESIDENT.format("-by-County"):
+            pdf = raw.cached(SOURCE, url).path
+            info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+            cells = []
+            place = ""
+            for page in range(1, int(info.split("Pages:")[1].split()[0]) + 1):
+                lines = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][3], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][0][1][3] - box[3]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                for words in lines:
+                    words.sort(key=lambda item: item[1][0])
+                    text = " ".join(word for word, _ in words)
+                    if re.sub(r"[^a-z]", "", text.lower()) in fips["KS"]:
+                        place = text
+                    elif found := re.fullmatch(r"([DR])-(.+?)(?: ([\d,]+))? [\d.]+%", text):
+                        box = (
+                            words[-2][1]
+                            if found[3]
+                            else (words[0][1][0], words[0][1][1], words[-1][1][2], words[-1][1][3])
+                        )
+                        cells.append(
+                            {
+                                "county": place,
+                                "office": "President",
+                                "party": found[1],
+                                "candidate": found[2],
+                                "votes": found[3] or "0",
+                                "page": page,
+                                "x0": box[0],
+                                "y0": box[1],
+                                "x1": box[2],
+                                "y1": box[3],
+                            }
+                        )
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(("county", "office", "party", "candidate", "votes"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
+            summed = frame.group_by("party", "candidate").agg(
+                pl.col("votes").str.replace_all(",", "").cast(pl.Int64).sum()
+            )
+            printed = {
+                (party, name): int(votes.replace(",", ""))
+                for party, name, votes in re.findall(
+                    r"(?m)^\s*([DR])-(.+?)\s+([\d,]+)\s+[\d.]+%$",
+                    subprocess.run(
+                        ["pdftotext", "-layout", str(raw.cached(SOURCE, KS_PRESIDENT.format("")).path), "-"],
+                        capture_output=True,
+                        text=True,
+                        check=True,
+                    ).stdout,
+                )
+            }
+            if {(party, name): votes for party, name, votes in summed.iter_rows()} != printed:
+                raise ValueError(f"KS president: the counties sum to {summed.rows()}, the state totals are {printed}")
         elif state == "KS":
             workbook = fastexcel.read_excel(raw.cached(SOURCE, url).path)
             sheets = [
@@ -925,7 +993,7 @@ def parse() -> None:
         day = (
             date(2024, 5, 14)
             if state in ("MD", "NE")
-            else date(2024, 8, 6)
+            else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
             if state == "KS"
             else date(2024, 6, 4)
             if state in ("IA", "NJ")
@@ -1198,6 +1266,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "IA"
+                else (
+                    "Kansas Secretary of State",
+                    "Official vote totals by county, 2024 Presidential Preference Primary Election",
+                    "https://sos.ks.gov/elections/election-results.html",
+                    "official_body",
+                    "Public record",
+                )
+                if used.endswith("by-County.pdf")
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
