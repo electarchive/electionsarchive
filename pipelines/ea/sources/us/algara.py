@@ -246,12 +246,13 @@ def emit() -> Path:
             if option is not None:
                 found[-1][2].append((option, set(slug(label or "").split("-"))))
         fptp = cs.key("us.electoral_system", "fptp")
+        two_round = cs.key("us.electoral_system", "two_round")
         parties = {
             "democratic": cs.key("us.party", "democratic-party"),
             "republican": cs.key("us.party", "republican-party"),
         }
-        if cs.minted & {fptp, *parties.values()}:
-            raise ValueError("the fptp system and the major parties must exist")
+        if cs.minted & {fptp, two_round, *parties.values()}:
+            raise ValueError("the fptp and two-round systems and the major parties must exist")
         persons: dict[str, UUID] = {}
         offices: set[UUID] = set()
 
@@ -289,8 +290,9 @@ def emit() -> Path:
                 if previous != datekey:
                     cs.renamed[f"{datekey}:{state}"] = f"{previous}:{state}"
                     placeholder = cs.key("us.election", f"{previous}:{state}")
-                    if previous == str(year) and str(placeholder) not in merged:
-                        cs.merge(placeholder, cs.key("us.election", f"{datekey}:{state}"))
+                    survivor = cs.key("us.election", f"{datekey}:{state}")
+                    if previous == str(year) and placeholder != survivor and str(placeholder) not in merged:
+                        cs.merge(placeholder, survivor)
                 contest_key = f"{datekey}:{state}:governor"
                 contest = cs.key("us.contest", contest_key)
                 existing = []
@@ -321,7 +323,7 @@ def emit() -> Path:
                     term="full",
                     magnitude=1,
                     round_number=1,
-                    electoral_system_id=fptp,
+                    electoral_system_id=two_round if state == "GA" and year >= 1968 else fptp,
                     default_result_kind="counted",
                 )
                 name(contest, f"{year} {state_name} gubernatorial election")
