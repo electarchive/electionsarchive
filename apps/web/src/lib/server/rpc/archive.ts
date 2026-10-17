@@ -8653,8 +8653,10 @@ export const search = {
         .filter((row) => row.path != null && row.name !== "")
         .toSorted(
           (a, b) =>
-            Number(segment(b.name) === segment(input.q)) -
-            Number(segment(a.name) === segment(input.q)),
+            Number(
+              b.type !== "person" && segment(b.name) === segment(input.q),
+            ) -
+            Number(a.type !== "person" && segment(a.name) === segment(input.q)),
         )
         .slice(0, input.limit);
     }),
