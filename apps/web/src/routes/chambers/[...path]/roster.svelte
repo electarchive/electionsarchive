@@ -120,6 +120,7 @@
       .toSorted(
         (a, b) =>
           ordered.indexOf(a.party) - ordered.indexOf(b.party) ||
+          Number(a.place == null) - Number(b.place == null) ||
           (a.place ?? "").localeCompare(b.place ?? "", undefined, {
             numeric: true,
           }) ||
@@ -192,11 +193,8 @@
               class={cn("text-xs font-semibold whitespace-nowrap", {
                 "text-muted-foreground": !event.isJoin,
               })}
-              >{event.isJoin
-                ? m.chamber_joined()
-                : m.chamber_left()}{#if event.why != null}<span
-                  class="font-normal">: {event.why}</span
-                >{/if}</span
+              >{event.why ??
+                (event.isJoin ? m.chamber_joined() : m.chamber_left())}</span
             >
           </li>
         {/each}
