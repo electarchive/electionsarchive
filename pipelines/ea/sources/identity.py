@@ -374,6 +374,25 @@ def emit() -> Path:
             for party in members:
                 if party != survivor:
                     cs.merge(party, survivor)
+        nuances: dict[str, list[tuple[UUID, str | None, int]]] = defaultdict(list)
+        for party, text, item, options in conn.execute(
+            """select p.id, n.text,
+                      (select x.value from external_id x where x.entity_id = p.id and x.scheme = 'wikidata' limit 1),
+                      (select count(*) from contest_option o where o.party_id = p.id)
+               from party p join changeset c on c.id = p.changeset_id
+               join name n on n.entity_id = p.id and n.is_preferred
+               where c.pipeline in ('fr.cdsp', 'fr.interieur')
+                 and not exists (select from entity_merge m where m.entity_id = p.id)"""
+        ).fetchall():
+            folded = "".join(ch for ch in unicodedata.normalize("NFKD", text) if not unicodedata.combining(ch))
+            nuances[folded.lower().rstrip("s")].append((party, item, options))
+        for members in nuances.values():
+            if len(members) < 2 or len({item for _, item, _ in members if item}) > 1:
+                continue
+            survivor = max(members, key=lambda member: (member[1] is not None, member[2]))[0]
+            for party, _, _ in members:
+                if party != survivor:
+                    cs.merge(party, survivor)
         for label, keys in PEOPLE.items():
             found = [
                 person
