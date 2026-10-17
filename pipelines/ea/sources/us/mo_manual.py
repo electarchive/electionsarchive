@@ -155,6 +155,25 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Symington"), ("REP", "Palmer")],
     ),
     (
+        "1892-11-08",
+        "president",
+        [(2209, 0.16, 0.82, 0, 0.49), (2209, 0.16, 0.82, 0.49, 1)],
+        [("DEM", "Cleveland"), ("REP", "Harrison"), ("PPL", "Weaver"), ("PRO", "Bidwell")],
+    ),
+    (
+        "1896-11-03",
+        "president",
+        [(3120, 0.18, 0.95, 0, 1), (3121, 0.13, 0.78, 0, 1)],
+        [
+            ("DEM", "Bryan"),
+            ("REP", "McKinley"),
+            ("PRO", "Levering"),
+            ("SLP", "Matchett"),
+            ("NDEM", "Palmer"),
+            ("NPRO", "Bentley"),
+        ],
+    ),
+    (
         "1900-11-06",
         "president",
         [(4237, 0.18, 0.96, 0, 1), (4238, 0.14, 0.8, 0, 1)],
@@ -165,6 +184,19 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
             ("PRO", "Woolley"),
             ("SOC", "Debs"),
             ("SLP", "Malloney"),
+        ],
+    ),
+    (
+        "1904-11-08",
+        "president",
+        [(5770, 0.15, 0.92, 0, 1), (5771, 0.12, 0.69, 0, 1)],
+        [
+            ("DEM", "Parker"),
+            ("REP", "Roosevelt"),
+            ("PRO", "Swallow"),
+            ("SOC", "Debs"),
+            ("SLP", "Corrigan"),
+            ("PPL", "Watson"),
         ],
     ),
     (
@@ -187,10 +219,36 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Wilson"), ("REP", "Hughes"), ("PRO", "Hanly"), ("SOC", "Benson"), ("SLP", "Reimer")],
     ),
     (
+        "1920-11-02",
+        "president",
+        [(11815, 0.14, 0.965, 0, 1), (11816, 0.11, 0.52, 0, 1)],
+        [
+            ("REP", "Harding"),
+            ("DEM", "Cox"),
+            ("SOC", "Debs"),
+            ("SLP", "Cox"),
+            ("FL", "Christensen"),
+            ("PRO", "Watkins"),
+        ],
+    ),
+    (
         "1928-11-06",
         "president",
         [(15353, 0.12, 0.94, 0, 1), (15354, 0.1, 0.5, 0, 1)],
         [("REP", "Hoover"), ("DEM", "Smith"), ("SOC", "Thomas"), ("SLP", "Reynolds")],
+    ),
+    (
+        "1932-11-08",
+        "president",
+        [(17053, 0.12, 0.95, 0, 1), (17054, 0.11, 0.52, 0, 1)],
+        [
+            ("DEM", "Roosevelt"),
+            ("REP", "Hoover"),
+            ("SOC", "Thomas"),
+            ("SLP", "Reynolds"),
+            ("PRO", "Upshaw"),
+            ("COM", "Foster"),
+        ],
     ),
     (
         "1936-11-03",
@@ -246,16 +304,28 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Stevenson"), ("REP", "Eisenhower")],
     ),
 ]
+MISORDERED: dict[tuple[str, str], list[tuple[str, str]]] = {
+    ("1924-11-04", "president"): [("perry", "pettis")],
+}
 CHECKED: set[tuple[str, str, int]] = {
     ("1922-11-07", "senate", 1),
     ("1926-11-02", "senate", 0),
     ("1926-11-02", "senate", 1),
     ("1938-11-08", "senate", 3),
     ("1916-11-07", "president", 4),
+    ("1920-11-02", "president", 1),
+    ("1920-11-02", "president", 3),
+    ("1920-11-02", "president", 4),
     ("1928-11-06", "president", 1),
+    ("1932-11-08", "president", 1),
     ("1944-11-07", "president", 4),
 }
 NOTES: list[tuple[str, str, str]] = [
+    (
+        "1932-11-08",
+        "president",
+        "Monroe's figure for Hoover prints as 71 with its last place empty; it is read as 714, the figure ICPSR has.",
+    ),
     (
         "1928-11-06",
         "president",
@@ -271,13 +341,52 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1928-11-06", "senate", "29510", 0): 170645,
     ("1944-11-07", "senate", "29211", 0): 3314,
     ("1944-11-07", "senate", "29091", 2): 3,
     ("1944-11-07", "senate", "29105", 2): 3,
     ("1944-11-07", "senate", "29117", 2): 3,
     ("1944-11-07", "senate", "29135", 2): 3,
     ("1944-11-07", "senate", "TOTAL", 2): 1320,
+    ("1892-11-08", "president", "29041", 0): 3463,
+    ("1892-11-08", "president", "29047", 0): 3085,
+    ("1892-11-08", "president", "29063", 0): 1372,
+    ("1892-11-08", "president", "29127", 0): 3634,
+    ("1892-11-08", "president", "29035", 1): 377,
+    ("1892-11-08", "president", "29065", 1): 896,
+    ("1892-11-08", "president", "29083", 1): 2563,
+    ("1892-11-08", "president", "29109", 1): 2623,
+    ("1892-11-08", "president", "29159", 1): 3610,
+    ("1892-11-08", "president", "29510", 1): 35528,
+    ("1892-11-08", "president", "29189", 2): 30,
+    ("1892-11-08", "president", "29207", 2): 131,
+    ("1892-11-08", "president", "29009", 3): 37,
+    ("1892-11-08", "president", "29017", 3): 3,
+    ("1892-11-08", "president", "29061", 3): 34,
+    ("1892-11-08", "president", "29083", 3): 103,
+    ("1892-11-08", "president", "29111", 3): 37,
+    ("1892-11-08", "president", "TOTAL", 3): 4333,
+    ("1896-11-03", "president", "29510", 0): 50091,
+    ("1896-11-03", "president", "29037", 0): 3975,
+    ("1896-11-03", "president", "TOTAL", 1): 304940,
+    ("1896-11-03", "president", "TOTAL", 4): 2365,
+    ("1896-11-03", "president", "29149", 2): 3,
+    ("1896-11-03", "president", "29157", 2): 3,
+    ("1904-11-08", "president", "29165", 1): 953,
+    ("1904-11-08", "president", "29183", 1): 3203,
+    ("1904-11-08", "president", "29510", 1): 57547,
+    ("1904-11-08", "president", "29175", 2): 66,
+    ("1904-11-08", "president", "29510", 2): 296,
+    ("1904-11-08", "president", "29139", 5): 24,
+    ("1904-11-08", "president", "29225", 5): 123,
+    ("1904-11-08", "president", "29227", 5): 29,
     ("1916-11-07", "president", "29147", 4): 9,
+    ("1920-11-02", "president", "TOTAL", 4): 3291,
+    ("1920-11-02", "president", "TOTAL", 5): 5142,
+    ("1924-11-04", "president", "29129", 4): 0,
+    ("1924-11-04", "president", "29141", 4): 0,
+    ("1924-11-04", "president", "29187", 4): 3,
+    ("1924-11-04", "president", "TOTAL", 4): 883,
     ("1928-11-06", "president", "29137", 1): 4957,
     ("1940-11-05", "president", "29023", 4): 23,
     ("1940-11-05", "president", "29039", 4): 16,
@@ -285,6 +394,8 @@ FIXES: dict[tuple[str, str, str, int], int] = {
     ("1940-11-05", "president", "29065", 4): 3,
     ("1940-11-05", "president", "29109", 4): 39,
     ("1940-11-05", "president", "29127", 4): 33,
+    ("1932-11-08", "president", "29059", 1): 1958,
+    ("1932-11-08", "president", "29137", 1): 714,
     ("1944-11-07", "president", "29007", 3): 0,
     ("1952-11-04", "president", "29173", 3): 1,
     ("1934-11-06", "senate", "29123", 2): 5,
@@ -341,7 +452,7 @@ NAMES: dict[tuple[str, str, str], str] = {
     ("1904-11-08", "Watson", "PPL"): "Thomas E. Watson",
     ("1924-11-04", "Wallace", "CWL"): "William J. Wallace",
     ("1932-11-08", "Reynolds", "SLP"): "Verne L. Reynolds",
-    ("1932-11-08", "Upshaw", "PRO"): "William D. Upshaw",
+    ("1932-11-08", "Upshaw", "PRO"): "William David Upshaw",
     ("1932-11-08", "Foster", "COM"): "William Z. Foster",
     ("1936-11-03", "Aiken", "SLP"): "John W. Aiken",
     ("1936-11-03", "Colvin", "PRO"): "D. Leigh Colvin",
@@ -508,6 +619,29 @@ def segment(
     ]
     slope = statistics.median(slopes) if slopes else 0.0
     anchored = anchor(slope, 8)
+    ranked = sorted(
+        (order.index(county), middle, county) for county, (middle, _) in anchored.items() if county in order
+    )
+    chains: list[list[str]] = []
+    for position, (_, middle, county) in enumerate(ranked):
+        chains.append(
+            max(
+                (chains[earlier] for earlier in range(position) if ranked[earlier][1] < middle),
+                key=len,
+                default=[],
+            )
+            + [county]
+        )
+    chain = max(chains, key=len, default=[])
+    keep = set(chain)
+    kept = [(order.index(county), anchored[county][0]) for county in chain]
+    if len(kept) >= 2:
+        step = statistics.median((b[1] - a[1]) / (b[0] - a[0]) for a, b in itertools.pairwise(kept))
+        for index, middle, county in ranked:
+            near = min(kept, key=lambda one: abs(one[0] - index))
+            if county not in keep and abs(near[1] + (index - near[0]) * step - middle) <= step * 4.5:
+                keep.add(county)
+    anchored = {county: value for county, value in anchored.items() if county in keep or county not in order}
     if len(anchored) < 3:
         return {}
     matched: dict[int, list[float]] = {}
@@ -551,7 +685,8 @@ def segment(
                 and (
                     distance == 1
                     or any(
-                        abs(x - spots.get(0, -99)) <= 14 and abs(y - slope * x - middle) <= pitch * 0.4
+                        any(abs(x - spot) <= 14 for spot in spots.values())
+                        and abs(y - slope * x - middle) <= pitch * 0.4
                         for x, y, _ in tokens
                     )
                 )
@@ -632,10 +767,14 @@ def segment(
         raise ValueError(f"{page}: no column found for {missing}")
     cache = PARSED / "ocr" / f"{page}-{box[0]}-{box[1]}-{box[2]}-{box[3]}-cells.json"
     known: dict[str, list[str]] = json.loads(cache.read_text()) if cache.exists() else {}
-    reach = min(150, int(spacing) - 12)
+    reaches = {
+        column: min(150, int(spot - spots[column - 1]) - 12) if column - 1 in spots else 150
+        for column, spot in spots.items()
+    }
     jobs: dict[str, list[tuple[bytes, str, str]]] = {}
     for middle in lines.values():
-        for spot in spots.values():
+        for column, spot in spots.items():
+            reach = reaches[column]
             key = f"{round(spot)},{round(middle)}" + ("" if reach == 150 else f",{reach}")
             if key in known or key in jobs:
                 continue
@@ -714,12 +853,14 @@ def segment(
             cell = [
                 value for x, y, value in tokens if abs(x - spot) <= 14 and abs(y - slope * x - middle) <= pitch * 0.4
             ]
-            key = f"{round(spot)},{round(middle)}" + ("" if reach == 150 else f",{reach}")
+            key = f"{round(spot)},{round(middle)}" + ("" if reaches[column] == 150 else f",{reaches[column]}")
             if not known[key]:
                 cell = []
             for found_text in known[key]:
                 text = re.sub(r"(?<=\d)\.(?=\d{3})", ",", found_text.strip(" .,"))
-                if re.fullmatch(r"\d{1,3}(,\d{3})*", text):
+                if re.fullmatch(r"\d{1,3}(,\d{3})*", text) or (
+                    re.fullmatch(r"\d{4,6}", text) and not any(re.search(r"\d[.,]\d", one) for one in known[key])
+                ):
                     cell.append(int(text.replace(",", "")))
             if DEBUG and county in DEBUG:
                 print(page, county, column, cell, known[key])
@@ -778,7 +919,13 @@ def parse() -> None:
                             column
                             for column, candidate in enumerate(candidates)
                             if offices[column] == each
-                            and shared[(each, candidate[1])] == 1
+                            and (
+                                shared[(each, candidate[1])] == 1
+                                or {"DEM": "democrat", "SLP": "socialist labor", "SOC": "socialist party"}.get(
+                                    candidate[0], "-"
+                                )
+                                in re.sub(r"ic\b", "", (text or "").lower().replace("(socialist)", "(socialist party)"))
+                            )
                             and difflib.SequenceMatcher(
                                 None, surname, re.sub(r"[^a-z]", "", candidate[1].lower())
                             ).ratio()
@@ -820,7 +967,11 @@ def parse() -> None:
         ]
         if "29510" not in expected:
             expected.pop("29189", None)
-        swapped = list(base)
+        listed = list(base)
+        for first, second in MISORDERED.get((day, office), []):
+            one, other = listed.index(codes[first]), listed.index(codes[second])
+            listed[one], listed[other] = listed[other], listed[one]
+        swapped = list(listed)
         francois, genevieve = swapped.index(codes["stfrancois"]), swapped.index(codes["stegenevieve"])
         swapped[francois], swapped[genevieve] = swapped[genevieve], swapped[francois]
         readings: dict[str, tuple[int, list[list[int]]]] = {}
@@ -828,7 +979,7 @@ def parse() -> None:
         fallback: dict[str, tuple[int, list[list[int]]]] = {}
         for order in (
             arrangement
-            for each in (base, swapped)
+            for each in (listed, swapped)
             for arrangement in (each, each[: each.index(jackson) + 1] + ["KC"] + each[each.index(jackson) + 1 :])
         ):
             readings = {}
@@ -870,9 +1021,8 @@ def parse() -> None:
             if (when, what) == (day, office):
                 chosen[county][column] = votes
         for column, (_, label, *_) in enumerate(candidates):
-            printed = {chosen["TOTAL"][column], *readings["TOTAL"][1][column]}
             total = sum(chosen[county][column] for county in order)
-            if total in printed:
+            if total == chosen["TOTAL"][column]:
                 continue
             gap = chosen["TOTAL"][column] - total
             others = sorted(
@@ -896,6 +1046,7 @@ def parse() -> None:
             ]
             if (day, office, column) in CHECKED or (
                 column in informed
+                and abs(gap) <= max(10, total // 100)
                 and any(county in expected for county in order)
                 and all(
                     chosen[county][column] == expected[county][column]
