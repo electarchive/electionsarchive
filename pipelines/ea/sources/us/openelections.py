@@ -107,7 +107,8 @@ def counties(conn: Connection) -> dict[str, dict[str, str]]:
            join name n on n.entity_id = u.area_id and n.kind = 'short'
            join reporting_unit s on s.scheme_code = 'us.state' and s.code = left(u.code, 2)
            join polity p on p.id = s.polity_id
-           where u.scheme_code = 'us.county' and u.code <> '51515'"""
+           where u.scheme_code = 'us.county' and u.code <> '51515'
+           order by u.code"""
     ).fetchall():
         names = fips.setdefault(iso.removeprefix("US-"), {})
         plain = re.sub(
