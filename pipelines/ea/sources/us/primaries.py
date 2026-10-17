@@ -951,9 +951,10 @@ def parse() -> None:
             pdf = raw.cached(SOURCE, url).path
             cells = []
             seat = affiliation = None
+            title = "President"
             people: list[list[str]] = []
             tally: list[int] = []
-            for page in range(12, 18):
+            for page in (*range(2, 6), *range(12, 18)):
                 lines = []
                 for word, box in sorted(
                     ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
@@ -971,6 +972,10 @@ def parse() -> None:
                     numbers = [(word, box) for word, box in words if re.fullmatch(r"\d{1,3}(,\d{3})*", word)]
                     if found := re.search(r"(\d+)(st|nd|rd|th) Congressional District", text):
                         seat = found[1]
+                        title = "U.S. House"
+                    elif text == "President of the United States":
+                        seat = None
+                        title = "President"
                     elif found := re.fullmatch(r"(Democratic|Republican) Party", text):
                         affiliation = found[1]
                         pending = []
@@ -997,12 +1002,25 @@ def parse() -> None:
                                     else:
                                         clusters.append([(word, box)])
                                 for cluster in clusters:
-                                    middle = (cluster[0][1][0] + cluster[-1][1][2]) / 2
-                                    nearest = min(
-                                        range(len(slots)),
-                                        key=lambda index: abs((slots[index][0] + slots[index][1]) / 2 - middle),
-                                    )
-                                    heard[nearest].extend(word for word, _ in cluster)
+                                    sides = [
+                                        min(
+                                            range(len(slots)),
+                                            key=lambda index, middle=(box[0] + box[2]) / 2: abs(
+                                                (slots[index][0] + slots[index][1]) / 2 - middle
+                                            ),
+                                        )
+                                        for _, box in cluster
+                                    ]
+                                    if len(set(sides)) == 1:
+                                        middle = (cluster[0][1][0] + cluster[-1][1][2]) / 2
+                                        sides = [
+                                            min(
+                                                range(len(slots)),
+                                                key=lambda index: abs((slots[index][0] + slots[index][1]) / 2 - middle),
+                                            )
+                                        ] * len(cluster)
+                                    for (word, _), side in zip(cluster, sides, strict=True):
+                                        heard[side].append(word)
                             pending = []
                             if people and heard != people:
                                 raise ValueError(
@@ -1017,10 +1035,12 @@ def parse() -> None:
                             cells.append(
                                 {
                                     "county": " ".join(word for word, _ in words[: words.index(numbers[0])]),
-                                    "office": "U.S. House",
+                                    "office": title,
                                     "district": seat,
                                     "party": affiliation,
-                                    "candidate": " ".join(people[index]).title(),
+                                    "candidate": " ".join(people[index])
+                                    .replace('UNCOMMITTE D"', 'UNCOMMITTED"')
+                                    .title(),
                                     "votes": word,
                                     "page": page,
                                     "x0": box[0],
