@@ -19,6 +19,7 @@ from ea.sources.tr.ysk import (
     INDEPENDENTS,
     INVALID,
     LICENSE,
+    MONTHS_TR,
     PROVINCES,
     PUBLISHER,
     REGISTERED,
@@ -951,7 +952,7 @@ SENATE_1975 = """
 61 14 325362 198347 193635 85389 76778 7726 19114 4709 0 0
 62 15 67951 45753 45324 5194 38220 335 353 0 1216 1
 63 15 236923 136248 132639 40604 47831 6449 36483 1269 0 0
-64 15 118141 73469 0 0 0 0 0 0 0 0
+64 15 118141 73469 70597 28307 34272 2344 4192 1482 0 0
 """
 WINNERS_1975 = """
 01 AP Mehmet Ünaldı
@@ -1007,26 +1008,27 @@ WINNERS_1975 = """
 62 CHP Naim Taşan
 63 AP Hasan Oral
 63 CHP Abdulgani Demirkol
+64 CHP Ahmet Tahtakılıç
 """
 SENATE_1977 = """
 02 4 160938 121075 117222 39436 47028 857 2170 3197 24534 0
 09 9 336157 266530 254160 133590 97639 3104 6185 6578 6835 306
-11 10 76444 61831 59859 29583 23457 1251 0 1674 3694 0
+11 10 76444 61831 59659 29583 23457 1251 0 1674 3694 0
 14 12 234488 179803 172166 96309 48212 6001 0 5601 16043 0
 18 15 122935 91548 86313 40543 19797 2131 1314 13281 9247 0
-19 15 278754 217399 205968 76783 76118 3771 4093 26470 18235 0
+19 15 278754 217399 205968 76783 76116 3771 4093 26470 18235 0
 22 17 186570 143663 138898 54963 74869 1915 2631 1689 2852 0
 27 20 367858 253422 242912 83222 109437 3358 2985 23888 20022 0
 33 23 408732 269122 259885 104050 118135 3155 5988 21901 6647 0
 35 26 957630 751390 729605 291697 386681 8483 10212 21076 11456 0
 37 27 241385 178742 168485 84525 53087 7760 3380 11806 7493 0
 39 29 143157 116556 112422 52290 54590 1289 1672 989 1497 95
-40 29 112796 74360 70650 15561 32428 1018 4372 9479 7698 0
+40 29 112796 74360 70650 15561 32420 1018 4372 9479 7698 0
 42 31 706590 488701 468176 132995 147880 19189 26817 48725 92570 0
 44 32 286630 194709 188440 32249 101501 0 1772 12904 39934 0
 45 33 465400 377993 363732 177347 141521 4936 7908 13218 18802 0
 46 34 300701 218580 210409 63358 75115 1783 4979 31648 33526 0
-50 37 124307 88133 83658 35263 28986 1339 1299 8766 7971 0
+50 37 124307 88133 83658 35283 28986 1333 1299 8766 7971 0
 52 38 329292 228014 216436 63153 103461 4017 6569 22719 16517 0
 57 41 140470 100571 94044 35603 41941 3030 2954 3446 7070 0
 58 41 346706 257512 244327 60053 106601 3641 3534 30969 34306 0
@@ -1085,7 +1087,7 @@ WINNERS_1977 = """
 67 CHP Mehmet Ali Pestilci
 """
 SENATE_1979 = """
-04 9 110829 83794 81267 39438 19707 770 18901 657 862 0 488 444 0
+04 9 110829 83794 81267 39938 19707 775 18901 657 362 0 483 444 0
 05 10 142148 117404 114166 57467 37839 1988 6447 6202 778 1765 883 797 0
 07 10 308845 239895 233407 154259 53817 2981 6136 7731 1445 1433 1190 1313 3102
 08 11 95459 61874 60229 31496 24202 0 2268 713 477 435 314 324 0
@@ -1093,22 +1095,22 @@ SENATE_1979 = """
 13 12 63730 48818 47481 17482 8830 11449 8287 559 171 0 152 551 0
 15 13 108653 81253 78528 40345 22599 1395 3234 8994 505 497 392 567 0
 17 13 205032 159892 157030 93187 47119 2644 6815 3535 1154 738 843 995 0
-24 14 100996 84118 82440 34324 28629 781 3069 13794 633 464 399 347 0
+24 14 100995 84112 82440 34324 28629 781 3069 13794 633 464 399 347 0
 25 15 277284 223864 217922 109421 30116 2857 38175 34499 999 0 948 907 0
-30 15 41520 33201 32276 13307 10823 222 6784 0 148 0 236 1756 0
-31 16 299806 221457 216648 83822 89914 1564 11638 22097 916 801 1194 3310 1392
-32 16 143894 103088 99332 72086 11968 1383 3687 8147 696 481 388 498 0
+30 15 41520 33201 32276 13307 10823 222 5784 0 148 0 236 1756 0
+31 16 299805 221457 216648 83822 89914 1564 11638 22097 916 801 1194 3310 1392
+32 16 142394 102028 99222 72085 11963 1383 3587 8147 695 481 388 493 0
 34 17 2173962 1300209 1274392 509463 483365 39590 110474 46682 13101 25869 12616 5523 27709
-36 17 227832 135719 131680 45750 52721 2166 7383 15064 1832 1333 1843 3588 0
-43 18 220575 174629 169223 103689 33098 3695 14954 10888 0 1123 1025 851 0
-45 19 435317 325176 315028 179099 89666 5353 17907 14823 2258 1473 2669 1780 0
+36 17 227332 135719 131660 45750 52721 2166 7383 15064 1832 1333 1843 3568 0
+43 18 220575 174529 169223 103589 33098 3695 14954 10888 0 1123 1025 851 0
+45 19 435317 325175 315028 179099 89666 5353 17907 14823 2258 1473 2669 1780 0
 47 20 185255 123992 122486 33708 25485 301 21015 132 329 0 409 16679 24428
-49 21 75815 56916 55677 17858 13582 0 19535 1879 0 247 159 585 1962
-53 21 150941 107138 104753 55891 27066 1561 13058 5391 745 0 768 874 0
-55 22 386287 294472 288109 159422 73523 5185 25966 16317 1873 0 1821 1592 3410
+49 21 75813 56916 55677 17858 13522 0 19525 1872 0 247 156 535 1962
+53 21 150941 107138 104753 55891 27065 1561 13058 5291 745 0 768 374 0
+55 22 386287 294472 288109 159422 73523 5185 25966 15317 1873 0 1821 1592 3410
 56 22 124757 89649 87462 22821 13198 603 36571 601 494 234 459 12481 0
-60 23 255196 207518 202483 80773 43828 2432 20588 33839 1045 16415 1184 1289 1090
-65 23 119165 94200 90853 28725 19634 20382 19530 1193 391 0 490 2508 0
+60 23 255196 207518 202483 80773 43826 2432 20586 33843 1045 16415 1184 1289 1090
+65 23 119165 94200 90853 26725 19634 20382 19530 1193 391 0 490 2508 0
 66 24 186996 153023 148617 44741 32675 1752 19336 46363 798 889 915 1148 0
 """
 WINNERS_1979 = """
@@ -1259,8 +1261,9 @@ SENATE = {
         (
             "YSK's notice in Resmî Gazete 12922 on June 12, 1968 gives the results of the June 2, 1968 Senate of the "
             "Republic election, which renewed a third of the elected senators in 24 provinces: each province's voters, "
-            "valid ballots, party votes, and combined independent votes, and the senators it elected. The same notice's "
-            "National Assembly by-elections are not loaded. In nine provinces the party votes do not add up to the "
+            "valid ballots, party votes, and combined independent votes, and the senators it elected. It also gives the same "
+            "day's National Assembly by-elections in five provinces, where İstanbul's party votes add up to 24 more than "
+            "its printed valid ballots. In nine provinces the party votes do not add up to the "
             "printed valid ballots, most of all in Nevşehir, where they fall 980 short, and the national totals of "
             "valid ballots and Workers' Party votes differ from the sums of the provinces by 984 and 5; the archive "
             "keeps every figure as printed. Every count was read from the page, checked against the printed totals, "
@@ -1305,10 +1308,10 @@ SENATE = {
             "YSK decision 473 (October 22, 1975), published in Resmî Gazete 15394 on October 25, 1975, gives the "
             "results of the October 12, 1975 Senate of the Republic election, which renewed a third of the elected "
             "senators in 25 provinces: each province's voters, valid ballots, party votes, and combined independent "
-            "votes, and the senators it elected. The same decision's National Assembly by-elections are not loaded. "
-            "Uşak's block stops after its registered voters, voters, and turnout, so its valid ballots, party votes, "
-            "and senator are not in the Gazette, though the national totals include them. In seven provinces the "
-            "party votes do not add up to the printed valid ballots; the archive keeps every figure as printed. Every "
+            "votes, and the senators it elected, and the same day's National Assembly by-elections in six provinces. "
+            "Uşak's block runs over into the next column. In seven provinces the Senate party votes do not add up to "
+            "the printed valid ballots, nor in Bursa's and Eskişehir's by-elections, by 2 and 1; the archive keeps "
+            "every figure as printed. Every "
             "count was read from the page, checked against the printed totals, and carries a page and bounding-box "
             "locator."
         ),
@@ -1329,11 +1332,13 @@ SENATE = {
             "YSK decision 1507 (June 17, 1977), published in Resmî Gazete 15971 on June 19, 1977, gives the results "
             "of the June 5, 1977 Senate of the Republic election, held with the National Assembly election, which "
             "renewed a third of the elected senators in 22 provinces: each province's voters, valid ballots, party "
-            "votes, and combined independent votes, and the senators it elected. In ten provinces the party votes "
+            "votes, and combined independent votes, and the senators it elected. In nine provinces the party votes "
             "do not add up to the printed valid ballots. Sivas prints no independent votes, though its party votes "
             "fall 5,223 short of its valid ballots and the national total of independent votes is 5,223 above the "
-            "other provinces' sum. The scan is blotted in places, so a few digits in Aydın, Edirne, Gaziantep, "
-            "Kırşehir, Malatya, and Nevşehir are uncertain; the archive keeps every figure as read. Every count was "
+            "other provinces' sum. The scan is blotted in places; digits in Bilecik, Denizli, Kırşehir, and "
+            "Nevşehir were settled against the State Institute of Statistics' (DİE) 1979 results book, which closes "
+            "the national totals of the Justice, Republican People's, and Republican Reliance parties, and a few in "
+            "Aydın, Edirne, Gaziantep, and Malatya remain uncertain; the archive keeps every other figure as read. Every count was "
             "read from the page, checked against the printed totals, and carries a page and bounding-box locator."
         ),
         ("AP", "CHP", "CGP", "DP", "MHP", "MSP"),
@@ -1353,12 +1358,12 @@ SENATE = {
             "YSK's notice in Resmî Gazete 16803 on November 8, 1979 gives the results of the October 14, 1979 Senate "
             "of the Republic election, which renewed a third of the elected senators in 25 provinces: each "
             "province's voters, valid ballots, party votes, and combined independent votes, and the senators it "
-            "elected. The same notice's National Assembly by-elections are not loaded. The scan is blurred, so some "
-            "digits were settled by the province's printed valid ballots and turnout. In seven provinces the party "
-            "votes still do not add up to the printed valid ballots, by 1,000 in Hakkari and Samsun and 2,000 in "
-            "Van, and the provinces' registered voters, voters, and party votes sum to more than the printed "
-            "national totals; the archive keeps every figure as read. Every count carries a page and bounding-box "
-            "locator."
+            "elected, and the same day's National Assembly by-elections in five provinces. The scan is blurred, so "
+            "uncertain digits were settled against the State Institute of Statistics' (DİE) 1979 results book, whose "
+            "provincial figures add up exactly to the notice's national totals. The provinces' Republican People's "
+            "Party votes still sum to 24 more than the printed national total, as they do in DİE's book. In the "
+            "by-elections, Aydın's party votes add up to 53 more than its valid ballots, and the provinces' Socialist "
+            "Revolution Party votes to 270 more than the printed total. Every count carries a page and bounding-box locator."
         ),
         ("AP", "CHP", "CGP", "MSP", "MHP", "SDP", "TBP", "TİP-1975", "TSİP"),
         SENATE_1979,
@@ -1376,9 +1381,74 @@ MISADDED = {
     date(1966, 6, 5): {0},
     date(1968, 6, 2): {2, 8},
     date(1973, 10, 14): {1, 3, 7, 10},
-    date(1975, 10, 12): {2, 3, 4, 5, 6, 7, 8},
-    date(1977, 6, 5): {2, 3, 4, 5, 6, 7, 9},
-    date(1979, 10, 14): {0, 1, 2, 3, 4, 5, 6, 7, 8, 10, 11},
+    date(1975, 10, 12): {2, 4, 5, 6, 7},
+    date(1977, 6, 5): {2, 7, 9},
+    date(1979, 10, 14): {4},
+}
+BY_ELECTIONS = {
+    date(1968, 6, 2): (
+        """
+01 15 377314 249003 232204 107441 76114 7135 25685 5245 10584 0
+19 15 232143 141292 125364 57266 33172 3651 13009 10107 7011 1148
+21 15 205275 133333 126421 59892 12139 3028 0 45786 5576 0
+34 15 1138151 503803 458648 226871 140434 9634 20407 19750 39146 2430
+63 15 178986 112514 105921 55771 33210 0 6978 4777 5185 0
+""",
+        (2131869, 1139945, 1048582, 507241, 295069, 23448, 66079, 85665, 67502, 3578),
+        """
+01 AP M. Kemâl Çetinsoy
+19 AP İhsan Tombuş
+21 AP Abdüllâtif Ensarioğlu
+34 AP Mehmet Mustafa Gürpınar
+63 AP Hüsamettin Koran
+""",
+        {2},
+    ),
+    date(1975, 10, 12): (
+        """
+05 12 149702 105253 101615 41218 47890 2299 5936 2574 1698 0
+16 12 502658 330068 320757 182305 109485 7724 17878 3367 0 0
+26 13 251250 152317 147440 72458 61235 3538 6679 2937 566 26
+51 14 199685 115623 109855 45138 38904 6120 6937 12006 750 0
+63 15 236923 136394 133299 44293 43506 4446 39847 1207 0 0
+67 15 402934 280760 264854 138589 108367 6527 7429 2757 0 1185
+""",
+        (1743152, 1120415, 1077821, 524001, 409387, 30654, 84706, 24848, 3014, 1211),
+        """
+05 CHP Orhan Kayıhan
+16 AP Ali Elverdi
+26 AP M. İsmet Angı
+51 AP Hüseyin Avni Kavurmacıoğlu
+63 AP Halil Millî
+67 AP Sabati Ataman
+""",
+        {2},
+    ),
+    date(1979, 10, 14): (
+        """
+09 11 315110 239176 232778 137425 72654 3859 5868 8113 1743 0 1282 1887 0
+22 14 172596 134360 0 66758 54436 2041 1742 1412 777 421 402 518 297
+42 18 594369 426537 414430 199003 94703 7805 64699 39999 2440 1741 2122 1918 0
+45 19 435600 325021 316534 181158 89999 4936 17889 14727 2066 1436 2598 1725 0
+48 20 209394 164047 159881 92556 55525 2952 2734 2903 921 692 911 687 0
+""",
+        (1727069, 1289141, 1252427, 676900, 367317, 21593, 92932, 67154, 7677, 4290, 7315, 6735, 297),
+        """
+09 AP Selâhittin Acar
+22 AP Ahmet İnceoğlu
+42 AP Şaban Karataş
+45 AP Süleyman Çağlar
+48 AP Ünat Demir
+""",
+        {2, 8},
+    ),
+}
+BY_CAVEATS = {
+    (date(1979, 10, 14), "by22"): (
+        "The Gazette prints Edirne's valid ballots as 82,440, the figure printed for Erzincan's Senate race on the "
+        "same page, so the archive leaves it out. Its party votes add up to 128,804, which is the figure DİE's 1979 "
+        "results book gives and the one the notice's own total of valid ballots implies."
+    ),
 }
 SENATE_SYSTEMS = {
     "senate_1961": (
@@ -1422,12 +1492,6 @@ SENATE_CAVEATS = {
         "YSK gives each party list the votes of its best-placed candidate, since voters could strike names and add "
         "candidates from other lists. The list figures can add up to more than the valid ballots, and in Hatay and "
         "Tokat the seats split between two lists."
-    ),
-}
-SENATE_CAVEATS_BY_UNIT = {
-    (date(1975, 10, 12), "64"): (
-        "The Gazette's block for Uşak stops after its registered voters, voters, and turnout, so its valid ballots, "
-        "party votes, and elected senator are not recorded here."
     ),
 }
 SWAPPED = {(date(1961, 10, 15), "25"), (date(1961, 10, 15), "26")}
@@ -1489,24 +1553,37 @@ def parse() -> None:
         tables.append((day, issue, layout, rows))
     names = []
     values = []
-    for day, (issue, _, _, parties, table, layout, totals, winners, starts, independents, page, _) in SENATE.items():
+    for day, chamber, issue, parties, table, layout, totals, winners, starts, independents, page, misadded in [
+        *(
+            (day, "", issue, parties, table, layout, totals, winners, starts, independents, page, MISADDED.get(day, ()))
+            for day, (issue, _, _, parties, table, layout, totals, winners, starts, independents, page, _) in (
+                SENATE.items()
+            )
+        ),
+        *(
+            (day, "by", SENATE[day][0], SENATE[day][3], table, None, totals, winners, {}, "", 0, misadded)
+            for day, (table, totals, winners, misadded) in BY_ELECTIONS.items()
+        ),
+    ]:
         block = layout is None
         fields = [line.split() for line in table.strip().splitlines()]
-        rows = [(unit, [int(value) for value in counts[block:]]) for unit, *counts in fields]
-        homes = {unit: int(counts[0]) for unit, *counts in fields} if block else {}
+        rows = [(chamber + unit, [int(value) for value in counts[block:]]) for unit, *counts in fields]
+        homes = {chamber + unit: int(counts[0]) for unit, *counts in fields} if block else {}
         for unit, (registered, voters, valid, *_) in rows:
             if not valid <= voters <= registered:
                 raise ValueError(f"{day}: {unit} does not add up")
         if off := [
             index
             for index, (column, total) in enumerate(zip(zip(*(counts for _, counts in rows)), totals, strict=True))
-            if sum(column) != total and index not in MISADDED.get(day, ())
+            if sum(column) != total and index not in misadded
         ]:
             raise ValueError(f"{day}: the Senate districts do not sum to the printed totals in columns {off}")
         if not block:
             tables.append((day, issue, layout, [(unit, counts[:-1]) for unit, counts in rows]))
         pdf = raw.cached(SOURCE, f"{ARCHIVE}/{issue}.pdf")
-        listed = [line.split(maxsplit=2) for line in winners.strip().splitlines()]
+        listed = [
+            [chamber + unit, *rest] for unit, *rest in (line.split(maxsplit=2) for line in winners.strip().splitlines())
+        ]
         stood = [line.split(maxsplit=2) for line in independents.strip().splitlines()]
         independent_votes = {unit: counts[-1] for unit, counts in rows}
         for unit, votes, _ in stood:
@@ -1541,7 +1618,7 @@ def parse() -> None:
             if party != "-":
                 names.append((day, unit, party.rstrip("*"), party.endswith("*"), True, name, None, current, None))
         for index, (day_, unit, party, independent, elected, name, votes, at, _) in enumerate(names):
-            if day_ != day:
+            if day_ != day or unit.startswith("by") != bool(chamber):
                 continue
             lines: dict[tuple[int, bool, int], list[scan.Box]] = {}
             for near in (at, at + 1) if block else (at,):
@@ -1991,6 +2068,10 @@ def emit() -> Path:
                 cs.add("electoral_system", id=systems[code], polity_id=turkey, rules=rules, rules_version=1)
                 name(systems[code], label, "en")
                 cs.add("note", entity_id=systems[code], kind="methodology", body_md=methodology)
+        assembly = cs.key("tr.body", "millet-meclisi")
+        assembly_system = cs.key("tr.electoral_system", "parliament_1969")
+        if {assembly, assembly_system} & cs.minted:
+            raise ValueError("publish tr.thea before tr.gazette")
         cells = []
         for day, (issue, heading, notes, parties, *_, system) in SENATE.items():
             url = f"{ARCHIVE}/{issue}.pdf"
@@ -2024,6 +2105,25 @@ def emit() -> Path:
                 cs.add("election", id=vote, polity_id=turkey, kind="general", date_from=day, date_to=day, status="held")
                 name(vote, f"{day.year} Turkish Senate election", "en")
                 cs.add("slug", path=path, entity_id=vote)
+            by_election = vote
+            if day in BY_ELECTIONS:
+                by_election = cs.key("tr.election", f"{day}:by-election")
+                cs.add(
+                    "election",
+                    id=by_election,
+                    polity_id=turkey,
+                    kind="by_election",
+                    date_from=day,
+                    date_to=day,
+                    status="held",
+                )
+                name(by_election, f"{day.year} Turkish National Assembly by-elections", "en")
+                name(
+                    by_election,
+                    f"{day.day} {MONTHS_TR[day.month - 1]} {day.year} Milletvekili Ara Seçimi",
+                    kind="native",
+                )
+                cs.add("slug", path=f"tr/{day}-by-election", entity_id=by_election)
             party_ids = {}
             for short in parties:
                 party_ids[short] = cs.key("tr.party", SENATE_PARTIES[short])
@@ -2042,7 +2142,8 @@ def emit() -> Path:
             counted = values.filter(pl.col("day") == day)
             named = people.filter(pl.col("day") == day)
             for unit in counted["unit"].unique(maintain_order=True):
-                plate, _, part = unit.partition("-")
+                by = unit.startswith("by")
+                plate, _, part = unit.removeprefix("by").partition("-")
                 place = (
                     "Maraş"
                     if plate == "46" and day < MARAS_RENAMED
@@ -2071,27 +2172,33 @@ def emit() -> Path:
                 elected = named.filter(pl.col("unit") == unit, pl.col("elected"))
                 listed = named.filter(pl.col("unit") == unit, pl.col("votes").is_null())
                 stood = named.filter(pl.col("unit") == unit, pl.col("votes").is_not_null())
-                contest_key = f"{day}:senate:{unit}"
+                contest_key = f"{day}:by-election:{plate}" if by else f"{day}:senate:{unit}"
                 contest = cs.key("tr.contest", contest_key)
                 cs.add(
                     "contest",
                     id=contest,
-                    election_id=vote,
-                    kind="body_seats" if SENATE_SYSTEMS[system][0]["formula"] == "block" else "list_allocation",
-                    body_id=senate,
+                    election_id=by_election if by else vote,
+                    kind="body_seats"
+                    if not by and SENATE_SYSTEMS[system][0]["formula"] == "block"
+                    else "list_allocation",
+                    body_id=assembly if by else senate,
                     district_area_id=cs.area("tr.il", plate),
                     magnitude=elected.height or None,
                     round_number=1,
-                    electoral_system_id=systems[system],
+                    electoral_system_id=assembly_system if by else systems[system],
                     default_result_kind="counted",
                 )
-                name(contest, f"Senate of the Republic, {label}", "en")
-                cs.add("slug", path=f"{path}/{slug(label)}", entity_id=contest)
+                name(contest, f"{'National Assembly' if by else 'Senate of the Republic'}, {label}", "en")
+                cs.add(
+                    "slug",
+                    path=f"tr/{day}-by-election/{slug(label)}" if by else f"{path}/{slug(label)}",
+                    entity_id=contest,
+                )
                 declared = cs.key(f"{SOURCE}.result_set", contest_key)
                 cs.add(
                     "result_set",
                     id=declared,
-                    election_id=vote,
+                    election_id=by_election if by else vote,
                     contest_id=contest,
                     stage="certified",
                     kind="counted",
@@ -2100,10 +2207,10 @@ def emit() -> Path:
                     is_default=True,
                     completeness=1,
                 )
-                if day in SENATE_CAVEATS:
+                if day in SENATE_CAVEATS and not by:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=SENATE_CAVEATS[day])
-                if (day, unit) in SENATE_CAVEATS_BY_UNIT:
-                    cs.add("note", entity_id=declared, kind="caveat", body_md=SENATE_CAVEATS_BY_UNIT[(day, unit)])
+                if (day, unit) in BY_CAVEATS:
+                    cs.add("note", entity_id=declared, kind="caveat", body_md=BY_CAVEATS[(day, unit)])
                 if (day, unit) in SWAPPED:
                     cs.add("note", entity_id=declared, kind="caveat", body_md=SWAPPED_CAVEAT)
                 fresh = declared in cs.minted
@@ -2156,7 +2263,7 @@ def emit() -> Path:
                 for index, (_, _, party, independent, won, person_name, votes, page, box) in enumerate(
                     [*listed.iter_rows(), *stood.iter_rows()], 1
                 ):
-                    member = f"{day}:senate:{unit}:{index}"
+                    member = f"{contest_key}:{index}"
                     person = cs.key(f"{SOURCE}.person", member)
                     if person in cs.minted:
                         cs.add("person", id=person)
