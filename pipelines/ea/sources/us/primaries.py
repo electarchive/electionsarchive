@@ -43,6 +43,8 @@ MASSACHUSETTS = [
 IOWA = "https://electionresults.iowa.gov/IA/121508/344769/reports/detailxml.zip"
 KANSAS = "https://sos.ks.gov/elections/24elec/2024-Primary-Election-United-States-House-of-Representatives-Precinct%20Results.xlsx"
 KS_PRESIDENT = "https://sos.ks.gov/elections/24elec/2024-Presidential-Preference-Primary-Official-Vote-Totals{}.pdf"
+TED = "https://data.capitol.texas.gov/api/3/action/package_show?id=2024_{}"
+TEXAS = ("democratic_primary", "republican_primary", "democratic_runoff", "republican_runoff")
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
 NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
 NEBRASKA = "https://sos.nebraska.gov/sites/default/files/doc/elections/2024/2024%20Primary%20Canvass%20Book.pdf"
@@ -207,6 +209,12 @@ def fetch() -> None:
     for name in NJ_FILES:
         raw.fetch(SOURCE, NEW_JERSEY.format(name), suffix=".pdf")
     raw.fetch(SOURCE, NEBRASKA, suffix=".pdf")
+    for package in TEXAS:
+        for resource in json.loads(raw.fetch(SOURCE, TED.format(package), suffix=".json").path.read_text())["result"][
+            "resources"
+        ]:
+            if resource["name"].startswith(("U.S.", "President")):
+                raw.fetch(SOURCE, resource["url"], suffix=".csv")
     raw.fetch(SOURCE, KANSAS, suffix=".xlsx")
     for suffix in ("", "-by-County"):
         raw.fetch(SOURCE, KS_PRESIDENT.format(suffix), suffix=".pdf")
@@ -295,6 +303,12 @@ def parse() -> None:
         places[state].setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
     for (state, name), code in elstats.FORMER.items():
         places[state].setdefault(name, code)
+    texas = {
+        resource["url"]: resource["name"]
+        for package in TEXAS
+        for resource in json.loads(raw.cached(SOURCE, TED.format(package)).path.read_text())["result"]["resources"]
+        if resource["name"].startswith(("U.S.", "President"))
+    }
     frames = [
         pl.DataFrame(
             rows,
@@ -327,6 +341,7 @@ def parse() -> None:
         ("IA", "county", IOWA),
         *(("NJ", "county", NEW_JERSEY.format(name)) for name in NJ_FILES),
         ("NE", "county", NEBRASKA),
+        *(("TX", "precinct", url) for url in texas),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
         *(
@@ -630,6 +645,23 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif state == "TX":
+            frame = (
+                pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False)
+                .unpivot(index=["CNTYVTD", "VTDKEY"], variable_name="candidate", value_name="votes")
+                .select(
+                    county=pl.lit("48") + pl.col("CNTYVTD").str.slice(0, 3),
+                    precinct=(
+                        ((pl.col("CNTYVTD").str.slice(0, 3).cast(pl.Int64) + 1) // 2).cast(pl.String).str.zfill(3)
+                        + pl.col("CNTYVTD").str.slice(3)
+                    ).str.strip_chars_start("0"),
+                    office=pl.lit(texas[url]),
+                    district=pl.lit(texas[url]),
+                    party=pl.col("candidate").str.extract(r"([DR])_24[PR]_"),
+                    candidate=pl.col("candidate").str.replace(r"[DR]_24[PR]_.*$", ""),
+                    votes="votes",
+                )
+            )
         elif state == "NE":
             pdf = raw.cached(SOURCE, url).path
             cells = []
@@ -953,7 +985,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE"):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -993,6 +1025,8 @@ def parse() -> None:
         day = (
             date(2024, 5, 14)
             if state in ("MD", "NE")
+            else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
+            if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
             if state == "KS"
             else date(2024, 6, 4)
@@ -1274,6 +1308,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if used.endswith("by-County.pdf")
+                else (
+                    "Texas Legislative Council",
+                    "Texas Election Data, 2024 primary and runoff elections by VTD",
+                    "https://data.capitol.texas.gov/",
+                    "official_body",
+                    "Creative Commons Attribution",
+                )
+                if state == "TX"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
