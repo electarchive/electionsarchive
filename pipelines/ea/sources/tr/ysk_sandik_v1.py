@@ -68,9 +68,12 @@ NOTE = (
     "include them. We count the difference as votes for independents, which brings the province to the gazette's "
     "total. For 2011, YSK ballot-box data has no neighborhood results for 19 districts, most of them central districts that were "
     "later split or renamed, so those votes are missing here. Neighborhoods are matched to Oy ve Ötesi's neighborhood "
-    "list by province and district. In the 2019 local elections YSK ballot-box data lists independent candidates by name; in "
-    "2024 it reports every party it does not list together with the independents as one total. Towns whose ballot "
-    "boxes YSK ballot-box data reports only as a whole are kept as one unit."
+    "list by province and district. In the 2014 and 2019 local elections YSK ballot-box data lists independent candidates by name; "
+    "in 2024 it reports every party it does not list together with the independents as one total. Towns whose ballot "
+    "boxes YSK ballot-box data reports only as a whole are kept as one unit. For 2014, the places whose races YSK's March 30 totals "
+    "leave out are left out here too: 12 mayoral races, and the provincial and municipal council races in central Ağrı "
+    "and Yeşilyurt in Tokat. YSK ballot-box data shows no votes for Fatih Şahinler, an independent candidate for mayor of Kadıköy "
+    "in 2014, but its valid votes there include 91 votes that no candidate has, so we count them as his."
 )
 ABOLISHED = date(2014, 3, 30)
 ABSORBED_NOTE = (
@@ -93,7 +96,7 @@ CONTESTS = {
 }
 LOCAL = [
     f"{year}-yerel-{office}-secimleri"
-    for year in (2019, 2024)
+    for year in (2014, 2019, 2024)
     for office in ("buyuksehir-baskanlık", "belediye-baskanlık", "belediye-meclis", "il-genel-meclis-uyeligi")
 ]
 URLS = {slug: f"{SITE}/elections/{quote(slug)}" for slug in [*CONTESTS, *LOCAL]}
@@ -123,6 +126,10 @@ LABELS = (
     }
 )
 DISTRICTS = {("20", "MERKEZ"): "MERKEZEFENDİ"}
+GAPS = {
+    ("2011-milletvekilligi-genel-secimleri", "DİYARBAKIR"): "HATİP DİCLE",
+    ("2014-yerel-belediye-baskanlık-secimleri", "İSTANBUL"): "FATİH ŞAHİNLER",
+}
 ANKARA_2015 = {
     1: [
         "Akyurt",
@@ -192,9 +199,15 @@ def parse() -> None:
                 location = data["location"]
                 results = data["results"]
                 if gap := data["stats"]["validVoteSum"] - sum(result["votes"] for result in results):
-                    if (slug, location["province"]) != ("2011-milletvekilligi-genel-secimleri", "DİYARBAKIR"):
+                    if (missing := GAPS.get((slug, location["province"]))) is None:
                         raise ValueError(f"{slug} {location['sourceId']}: votes do not sum to valid votes")
-                    results = [*results, {"name": "HATİP DİCLE", "votes": gap}]
+                    results = [
+                        *(result for result in results if result["name"] != missing),
+                        {
+                            "name": missing,
+                            "votes": gap + sum(result["votes"] for result in results if result["name"] == missing),
+                        },
+                    ]
                 rows += [
                     (
                         slug,
@@ -331,7 +344,7 @@ def emit() -> Path:
             f"{ysk_local.DAYS[year]}:{ysk_local.OFFICES[office][0]}": value
             for year, office, value in pl.read_parquet(ysk_local.PARSED / "values.parquet")
             .filter(
-                pl.col("year").is_in([2019, 2024]),
+                pl.col("year").is_in([2014, 2019, 2024]),
                 pl.col("office").is_in(["il_genel", "belediye_meclisi"]),
                 pl.col("unit") == "domestic",
                 pl.col("column") == "valid",
@@ -348,7 +361,7 @@ def emit() -> Path:
             summary=(
                 "Neighborhood results of Turkey's 2014 presidential election, its 2011, June 2015, and "
                 "November 2015 parliamentary elections, its 2017 constitutional referendum, its 2018 and 2023 general elections, "
-                "İstanbul's 2019 mayoral elections, and the 2019 and 2024 local elections, from YSK ballot-box data"
+                "İstanbul's 2019 mayoral elections, and the 2014, 2019, and 2024 local elections, from YSK ballot-box data"
             ),
             polity="TR",
         )

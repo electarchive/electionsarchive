@@ -234,8 +234,29 @@ PLATES = {upper(name): f"{plate:02}" for plate, name in enumerate(PROVINCES, 1)}
     "TOPLAM": "domestic",
 }
 HEADERS = {"İL": "province", "İLÇE": "district", "BELDE": "town", "SOYADI": "family", "MESLEĞİ": "rest"}
-CANONICAL = {"BAHŞİLİ": "BAHŞILI", "19.May": "19 MAYIS"}
-TOWNS = {(2019, "80", "TÜRKMEN"): "TÜYSÜZ", (2019, "32", "SAV"): "SAVKÖY"}
+CANONICAL = {"BAHŞİLİ": "BAHŞILI", "19.May": "19 MAYIS", "KAZAN": "KAHRAMANKAZAN", "EYÜP": "EYÜPSULTAN"}
+TOWNS = {
+    (2019, "80", "TÜRKMEN"): "TÜYSÜZ",
+    (2019, "32", "SAV"): "SAVKÖY",
+    (2014, "32", "SAV"): "SAVKÖY",
+    (2014, "53", "SALARHA"): "ÇAYKENT",
+    (2014, "03", "KOCATEPE"): "BÜYÜKKALECİK",
+}
+COUNCIL_RERUN_2014 = {("04", "MERKEZ"), ("60", "YEŞİLYURT")}
+RERUN_2014 = {
+    ("04", "MERKEZ"),
+    ("09", "BUHARKENT"),
+    ("13", "GÜROYMAK"),
+    ("18", "ŞABANÖZÜ"),
+    ("19", "ORTAKÖY - AŞTAVUL"),
+    ("24", "TERCAN - ÇADIRKAYA"),
+    ("26", "MAHMUDİYE"),
+    ("37", "ÇATALZEYTİN"),
+    ("60", "YEŞİLYURT"),
+    ("66", "SORGUN - EYMİR"),
+    ("69", "AYDINTEPE"),
+    ("77", "MERKEZ"),
+}
 WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>')
 GLUED = re.compile(r"^(\D+?)(\d{1,3}(?:\.\d{3})+|\d+)$")
 NUMBER = re.compile(r"^(?:\d{1,3}(?:\.\d{3})+|\d+)(?:,0)?$|^-$")
@@ -680,12 +701,15 @@ def parse() -> None:
         .drop("parts")
     )
     lists: dict[tuple[object, ...], tuple[str, list[tuple[str | None, str, str]]]] = {}
-    for row in named.filter(pl.col("year") >= 2019).iter_rows(named=True):
+    for row in named.filter(pl.col("year") >= 2014).iter_rows(named=True):
         owner = party(str(row["party"]), int(row["year"]))
         contest = f"{DAYS[row['year']]}:{row['key']}-mayor"
+        district = None if row["district"] is None else str(row["district"]).split("/")[0]
         entry = lists.setdefault(
-            (row["year"], row["office"], row["plate"], row["district"], row["town"]), (contest, [])
+            (row["year"], row["office"], row["plate"], CANONICAL.get(district, district), row["town"]), (contest, [])
         )
+        if row["year"] == 2014:
+            continue
         if any(option.endswith(f":{owner or slug(str(row['name']))}") for _, _, option in entry[1]):
             raise ValueError(f"{contest}: two candidates share an option")
         entry[1].append((owner, str(row["name"]), f"{contest}:{owner or slug(str(row['name']))}"))
@@ -695,7 +719,7 @@ def parse() -> None:
         office=pl.col("slug").replace_strict(
             {
                 f"{year}-yerel-{name}-secimleri": office
-                for year in (2019, 2024)
+                for year in (2014, 2019, 2024)
                 for name, office in (
                     ("buyuksehir-baskanlık", "buyuksehir"),
                     ("belediye-baskanlık", "belediye_baskani"),
@@ -705,7 +729,22 @@ def parse() -> None:
             }
         ),
     )
-    local = local.filter(~((pl.col("year") == 2019) & (pl.col("office") == "buyuksehir") & (pl.col("plate") == "34")))
+    local = local.filter(
+        ~((pl.col("year") == 2019) & (pl.col("office") == "buyuksehir") & (pl.col("plate") == "34")),
+        ~(
+            (pl.col("year") == 2014)
+            & (pl.col("office") == "belediye_baskani")
+            & pl.struct("plate", "district").is_in([{"plate": plate, "district": place} for plate, place in RERUN_2014])
+            & ~pl.col("neighborhood").str.contains("-").fill_null(False)
+        ),
+        ~(
+            (pl.col("year") == 2014)
+            & pl.col("office").is_in(["il_genel", "belediye_meclisi"])
+            & pl.struct("plate", "district").is_in(
+                [{"plate": plate, "district": place} for plate, place in COUNCIL_RERUN_2014]
+            )
+        ),
+    )
     places: dict[tuple[object, ...], str] = {}
     for year, office, plate, place, neighborhood in (
         local.filter(pl.col("office").is_in(["buyuksehir", "belediye_baskani"]))
@@ -739,7 +778,7 @@ def parse() -> None:
             pl.String,
         )
     )
-    candidates = {contest: entry for contest, entry in lists.values()}
+    candidates = {contest: entry for contest, entry in lists.values() if entry}
     listed = {
         party(label, 2024) for label in local.filter(pl.col("year") == 2024)["label"].unique() if label in LABELS
     } - {None}
@@ -750,7 +789,10 @@ def parse() -> None:
         lumped = year == 2024 and label == "BAĞIMSIZ"
         if contest not in candidates:
             option = "others" if lumped else (party(label, year) if label in LABELS else None) or "independents"
-            options[(contest, label)] = (f"{contest}:{option}", "others" if lumped else "list")
+            options[(contest, label)] = (
+                f"{contest}:{option}",
+                "others" if lumped else "candidate" if contest.endswith("-mayor") else "list",
+            )
             continue
         running = candidates[contest]
         found = (
@@ -775,6 +817,14 @@ def parse() -> None:
             orient="row",
         ),
         on=["contest", "label"],
+    ).with_columns(
+        kind=pl.when(
+            pl.col("option").str.ends_with(":independents"),
+            pl.col("label").n_unique().over("option") > 1,
+            pl.col("kind") == "candidate",
+        )
+        .then(pl.lit("others"))
+        .otherwise("kind")
     )
     frame = pl.DataFrame(rows)
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -848,6 +898,7 @@ LABELS = {
     "HAK-PAR": "hak-ve-ozgurlukler-partisi",
     "HDP": "halklarin-demokratik-partisi",
     "HEPAR": "hak-ve-esitlik-partisi",
+    "HKP": "halkin-kurtulus-partisi",
     "HP": "halkci-parti",
     "HYP": "halkin-yukselisi-partisi",
     "HÜDA PAR": "hur-dava-partisi",
@@ -1625,6 +1676,29 @@ def emit() -> Path:
                         ballot_label=label(winning, day),
                     )
                     cs.add("outcome", result_set_id=declared, option_id=option, kind="elected")
+                if year == 2014:
+                    for option_key, kind in (
+                        municipal.filter(pl.col("contest") == contest_key)
+                        .select("option", "kind")
+                        .unique()
+                        .sort("option")
+                        .iter_rows()
+                    ):
+                        owner = option_key.rsplit(":", 1)[1]
+                        if (
+                            owner != (winning or "independents")
+                            and str(cs.key("tr.option", option_key)) not in options.values()
+                        ):
+                            cs.add(
+                                "contest_option",
+                                id=cs.key("tr.option", option_key),
+                                contest_id=contest,
+                                kind=kind,
+                                party_id=parties.get(owner),
+                                ballot_label=OTHERS
+                                if kind == "others"
+                                else label(owner if owner in parties else None, day),
+                            )
 
         day = DAYS[2014]
         towns = mayors.filter(pl.col("year") == 2014, pl.col("office") == "belediye_baskani")
@@ -1711,6 +1785,20 @@ def emit() -> Path:
             if year == 2014:
                 cs.add("note", entity_id=declared, kind="caveat", body_md=WINNER_CAVEAT)
                 elect(contest, contest_key, declared, candidates.row(0, named=True), day)
+                elected = f"{contest_key}:{party(str(candidates['party'][0]), year) or 'independents'}"
+                for option_key, kind, _ in tallies.get(contest_key, []):
+                    if option_key != elected:
+                        owner = option_key.rsplit(":", 1)[1]
+                        cs.add(
+                            "contest_option",
+                            id=cs.key("tr.option", option_key),
+                            contest_id=contest,
+                            kind=kind,
+                            party_id=parties.get(owner),
+                            ballot_label=OTHERS
+                            if kind == "others"
+                            else label(owner if owner in parties else None, day),
+                        )
                 continue
             options: dict[str, UUID] = {}
             for row in candidates.to_dicts():
