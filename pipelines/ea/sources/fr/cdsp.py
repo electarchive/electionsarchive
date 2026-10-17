@@ -1,3 +1,4 @@
+import html
 import re
 import unicodedata
 import zipfile
@@ -28,6 +29,18 @@ AGGREGATED = {
     "candidates": "https://data-pipeline-open.s3.sbg.io.cloud.ovh.net/elections/candidats_results.parquet",
 }
 AGGREGATED_TITLE = "Données des élections agrégées"
+COUNCIL = {
+    1965: ("1965/656pdr", "1965/6510pdr"),
+    1969: ("1969/6920PDR", "1969/6922pdr"),
+    1974: ("1974/7430pdr", "1974/7432PDR"),
+    1981: ("1981/8145pdr", "1981/8147pdr"),
+    1988: ("1988/8856pdr", "1988/8860PDR"),
+    1995: ("1995/9579pdr", "1995/9581PDR"),
+    2002: ("2002/2002109pdr", "2002/2002111PDR"),
+}
+COUNCIL_URL = "https://www.conseil-constitutionnel.fr/decision/{}.htm"
+COUNCIL_PUBLISHER = "Conseil constitutionnel"
+COUNCIL_TITLE = "Décisions PDR : résultats de l'élection présidentielle"
 AGGREGATED_YEAR = 2017
 PUBLISHER = "Centre de données socio-politiques, Sciences Po"
 REGISTERED, VALID, INVALID, BLANK, VOTERS, VOTES = 2, 4, 5, 6, 14, 1
@@ -333,6 +346,13 @@ TENDENCY_CAVEAT = (
 METROPOLITAN_CAVEAT = "Metropolitan France only: the overseas départements and territories are not in the source."
 UNSETTLED_CAVEAT = "No candidate won a majority, and the source has no second round for this constituency."
 NO_ABROAD_CAVEAT = "French voters abroad are not in the source."
+COUNCIL_METHOD = (
+    "National totals as the Constitutional Council declared them, covering metropolitan France, the overseas "
+    "départements and territories, and from 1981 French voters abroad: the first round from its declaration of the "
+    "first-round results, the second from its proclamation of the result. Invalid ballots are voters minus valid "
+    "votes. The département breakdown is CDSP's, which leaves out the votes outside metropolitan France before 2002 "
+    "and voters abroad in 2002."
+)
 PRESIDENT = (
     "The president is elected by direct universal suffrage. A candidate who wins more than half of the valid votes in "
     "the first round is elected; otherwise the two leading candidates go to a second round two weeks later, and the "
@@ -355,6 +375,9 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".zip")
     for url in AGGREGATED.values():
         raw.fetch(SOURCE, url, suffix=".parquet")
+    for decisions in COUNCIL.values():
+        for decision in decisions:
+            raw.fetch(SOURCE, COUNCIL_URL.format(decision), suffix=".html")
 
 
 def parse() -> None:
@@ -635,10 +658,72 @@ def parse() -> None:
         PARSED / "options.parquet"
     )
 
+    council: list[dict[str, object]] = []
+    for year, decisions in COUNCIL.items():
+        for number, decision in enumerate(decisions, start=1):
+            page = raw.cached(SOURCE, COUNCIL_URL.format(decision)).path.read_text(errors="replace")
+            text = html.unescape(re.sub(r"<[^>]+>", " ", re.sub(r"<script.*?</script>", "", page, flags=re.DOTALL)))
+            text = re.sub(r"\s+", " ", text)
+            start = re.search(r"[EÉ]lecteurs inscrits", text)
+            if start is None:
+                raise ValueError(f"no results in {decision}")
+            block = text[start.start() :]
+            block = re.split(r"Article 2|Qu.ainsi", block)[0]
+            labels = sorted(
+                set(
+                    standing.filter(
+                        (pl.col("kind") == "presi") & (pl.col("year") == year) & (pl.col("round") == number)
+                    )["label"]
+                )
+            )
+            matched: dict[str, int] = {}
+            measures: dict[int, int] = {}
+            for head, figure in re.findall(r"(\D+?)(\d[\d .]*\d|\d)", block):
+                value = int(re.sub(r"\D", "", figure))
+                if re.search(r":\s*l\s*$", head):
+                    value = int(f"1{value}")
+                folded = fold(head)
+                if "INSCRITS" in folded:
+                    measures[REGISTERED] = value
+                elif "VOTANTS" in folded:
+                    measures[VOTERS] = value
+                elif "EXPRIMES" in folded:
+                    measures[VALID] = value
+                elif "MAJORITE" in folded:
+                    continue
+                else:
+                    found = [
+                        label
+                        for label in labels
+                        if any(
+                            word == fold(label).split()[-1]
+                            or (len(word) > 5 and fold(label).split()[-1].startswith(word))
+                            for word in folded.split()
+                        )
+                    ]
+                    if len(found) != 1:
+                        raise ValueError(f"{year} round {number}: {head!r} matches {found}")
+                    matched[found[0]] = value
+            if set(matched) != set(labels) or len(measures) != 3:
+                raise ValueError(f"{year} round {number}: {sorted(set(labels) - set(matched))} unmatched, {measures}")
+            if sum(matched.values()) != measures[VALID]:
+                raise ValueError(f"{year} round {number}: candidates {sum(matched.values())} != {measures[VALID]}")
+            measures[INVALID] = measures[VOTERS] - measures[VALID]
+            council += [
+                {"year": year, "round": number, "label": None, "measure": measure, "value": value}
+                for measure, value in measures.items()
+            ]
+            council += [
+                {"year": year, "round": number, "label": label, "measure": VOTES, "value": value}
+                for label, value in matched.items()
+            ]
+    pl.DataFrame(council).write_parquet(PARSED / "council.parquet")
+
 
 def emit() -> Path:
     values = pl.read_parquet(PARSED / "values.parquet")
     options = pl.read_parquet(PARSED / "options.parquet")
+    council = pl.read_parquet(PARSED / "council.parquet")
     unsettled = set(pl.read_parquet(PARSED / "unsettled.parquet").iter_rows())
     with connect() as conn:
         labels: dict[str, str] = dict(
@@ -712,12 +797,37 @@ def emit() -> Path:
         )
         for url in AGGREGATED.values():
             cs.artifact(raw.cached(SOURCE, url), sources["aggregated"])
+        sources["council"] = cs.source(COUNCIL_PUBLISHER, COUNCIL_TITLE)
+        cs.add(
+            "source",
+            id=sources["council"],
+            kind="official_body",
+            publisher=COUNCIL_PUBLISHER,
+            title=COUNCIL_TITLE,
+            url="https://www.conseil-constitutionnel.fr/decisions/pdr",
+        )
+        for decisions in COUNCIL.values():
+            for decision in decisions:
+                cs.artifact(raw.cached(SOURCE, COUNCIL_URL.format(decision)), sources["council"])
 
         france = cs.polity("FR")
         nation = cs.area("fr.nation", "FR")
         departements = {code: cs.area("fr.departement", code) for code in labels if code != "ZZ"}
         if nation in cs.minted or any(area in cs.minted for area in departements.values()):
             raise ValueError("publish fr.interieur before fr.cdsp")
+        whole = cs.unit("fr.nation", "FR")
+        if whole in cs.minted:
+            cs.add(
+                "reporting_unit",
+                id=whole,
+                polity_id=france,
+                scheme_code="fr.nation",
+                code="FR",
+                area_relation="equals",
+                area_id=nation,
+                kind="aggregate",
+            )
+            name(whole, "France", "en")
         assembly = existing("fr.body", "national-assembly")
         legislative = existing("fr.electoral_system", "legislative-two-round")
         office = cs.key("fr.office", "president")
@@ -997,10 +1107,31 @@ def emit() -> Path:
                             kind="counted",
                             status="active",
                             source_id=sources["aggregated" if year >= AGGREGATED_YEAR else kind],
-                            is_default=True,
+                            is_default=year not in COUNCIL,
                             completeness=None if partial else 1,
                         )
                         fresh = result_set in cs.minted
+                        declared = council.filter((pl.col("year") == year) & (pl.col("round") == number))
+                        official = cs.key(f"{SOURCE}.result_set", f"{contest_key}:council") if year in COUNCIL else None
+                        if official is not None:
+                            cs.add(
+                                "result_set",
+                                id=official,
+                                election_id=election,
+                                contest_id=contest,
+                                stage="official",
+                                kind="counted",
+                                status="active",
+                                source_id=sources["council"],
+                                is_default=True,
+                                completeness=1,
+                            )
+                            cs.add("note", entity_id=official, kind="methodology", body_md=COUNCIL_METHOD)
+                            if official in cs.minted:
+                                for measure, value in (
+                                    declared.filter(pl.col("label").is_null()).select("measure", "value").iter_rows()
+                                ):
+                                    value_row(official, whole, None, measure, value)
                         if fresh and partial:
                             cs.add(
                                 "note",
@@ -1039,6 +1170,16 @@ def emit() -> Path:
                             )
                             if outcome is not None:
                                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome)
+                                if official is not None:
+                                    cs.add("outcome", result_set_id=official, option_id=option, kind=outcome)
+                            if official is not None and official in cs.minted:
+                                value_row(
+                                    official,
+                                    whole,
+                                    option,
+                                    VOTES,
+                                    declared.filter(pl.col("label") == label)["value"].item(),
+                                )
                             if fresh:
                                 for dept, votes in (
                                     held.filter(pl.col("label") == label).select("dept", "votes").iter_rows()
