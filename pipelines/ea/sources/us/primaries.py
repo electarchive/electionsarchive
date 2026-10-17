@@ -7,6 +7,7 @@ from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
 from uuid import UUID
+from xml.etree import ElementTree
 
 import fastexcel
 import polars as pl
@@ -24,10 +25,29 @@ NORTH_CAROLINA = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2024_03_05/results_
 MINNESOTA = "https://electionresultsfiles.sos.mn.gov/20240813/{}.txt"
 MARYLAND = "https://elections.maryland.gov/elections/archive/2024/election_data/PP24_{:02d}Precincts{}.csv"
 WASHINGTON = "https://results.vote.wa.gov/results/{0}/export/{0}_allcounties.csv"
+INDIANA = "https://enr.indianavoters.in.gov/archive/2024Primary/data/OffCatC_{}_B.json"
+IN_CATEGORIES = (1012, 1006, 1005, 1009)
+ALABAMA = (
+    "https://www.sos.alabama.gov/sites/default/files/election-data/2024-04/2024%20Primary%20Precinct%20Results.ZIP",
+    "https://www.sos.alabama.gov/sites/default/files/election-data/2024-07/2024%20Primary%20Runoff%20Precinct%20Results.zip",
+)
 MASSACHUSETTS = [
     f"{elstats.MASSACHUSETTS}search/year_from:2024/year_to:2024/office_id:{office}{stage}"
     for office, stage in (("1", ""), ("6", ""), ("5", "/stage:Democratic"), ("5", "/stage:Republican"))
 ]
+IOWA = "https://electionresults.iowa.gov/IA/121508/344769/reports/detailxml.zip"
+KANSAS = "https://sos.ks.gov/elections/24elec/2024-Primary-Election-United-States-House-of-Representatives-Precinct%20Results.xlsx"
+MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
+ME_FILES = {
+    "20240305/elec_20240305a": ("President", None, "Democratic"),
+    "20240305/elec_20240305b": ("President", None, "Republican"),
+    "20240611/elec_20240611a": ("U.S. Senate", None, "Democratic"),
+    "20240611/elec_20240611c": ("U.S. Senate", None, "Republican"),
+    "20240611/elec_20240611e": ("U.S. House", "1", "Democratic"),
+    "20240611/elec_20240611i": ("U.S. House", "1", "Republican"),
+    "20240611/elec_20240611k": ("U.S. House", "2", "Democratic"),
+    "20240611/elec_20240611m": ("U.S. House", "2", "Republican"),
+}
 OPENELECTIONS = {
     "CT": "f948d0a1ce36871de4a1d696612ab2a268fd0758",
     "GA": "36b7453793848c02d8f41601d9304a66ad828dd0",
@@ -46,7 +66,13 @@ OPENELECTIONS = {
 ELECTIONSTATS = ("CO", "CT", "ID", "NH", "NM", "NY", "VA", "VT")
 TYPOS = {"MS": {"jeffdavis": "28065"}, "TN": {"williamsonx": "47187"}, "VT": {"essexjunction": "50007"}}
 DAYS = {("RI", date(2024, 8, 13)): date(2024, 9, 10)}
-CHECKED = {"2024-05-14:MD:president:republican", "2024-05-14:MD:house:3:democratic"}
+CHECKED = {
+    "2024-05-14:MD:president:republican",
+    "2024-05-14:MD:house:3:democratic",
+    "2024-05-07:IN:governor:republican",
+    "2024-03-05:AL:house:3:republican",
+    "2024-03-05:AL:house:4:republican",
+}
 PARTIES = {
     "d": "democratic",
     "dem": "democratic",
@@ -141,6 +167,14 @@ def fetch() -> None:
         raw.fetch(SOURCE, MINNESOTA.format(name), suffix=".txt")
     for day in ("20240312", "20240806"):
         raw.fetch(SOURCE, WASHINGTON.format(day), suffix=".csv")
+    for category in IN_CATEGORIES:
+        raw.fetch(SOURCE, INDIANA.format(category), suffix=".json")
+    for url in ALABAMA:
+        raw.fetch(SOURCE, url, suffix=".zip")
+    for path in ME_FILES:
+        raw.fetch(SOURCE, MAINE.format(path), suffix=".xlsx")
+    raw.fetch(SOURCE, IOWA, suffix=".zip")
+    raw.fetch(SOURCE, KANSAS, suffix=".xlsx")
     for listing in MASSACHUSETTS:
         for election, *_ in elstats.MA_ROW.findall(raw.fetch(SOURCE, listing, suffix=".html").path.read_text()):
             raw.fetch(SOURCE, f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/", suffix=".csv")
@@ -252,6 +286,11 @@ def parse() -> None:
         ("MN", "precinct", MINNESOTA.format("ussenatepct")),
         ("WA", "county", WASHINGTON.format("20240312")),
         ("WA", "county", WASHINGTON.format("20240806")),
+        *(("IN", "county", INDIANA.format(category)) for category in IN_CATEGORIES),
+        *(("AL", "precinct", url) for url in ALABAMA),
+        *(("ME", "precinct", MAINE.format(path)) for path in ME_FILES),
+        ("IA", "county", IOWA),
+        ("KS", "precinct", KANSAS),
         *(
             ("MA", "precinct", f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/")
             for election in dict.fromkeys(
@@ -299,6 +338,196 @@ def parse() -> None:
                 candidate="Candidate",
                 votes="Votes",
             )
+        elif state == "AL":
+            sheets: list[pl.DataFrame] = []
+            with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+                for name in archive.namelist():
+                    sheet = fastexcel.read_excel(archive.read(name)).load_sheet(0, header_row=None).to_polars()
+                    header = [str(cell).strip() for cell in sheet.row(0)]
+                    columns = [
+                        f"{cell} ({header[:index].count(cell) + 1})" if cell in header[:index] else cell
+                        for index, cell in enumerate(header)
+                    ]
+                    sheets.append(
+                        sheet.slice(1)
+                        .rename(dict(zip(sheet.columns, columns, strict=True)))
+                        .unpivot(columns[3:], index=columns[:3], variable_name="precinct", value_name="votes")
+                        .select(
+                            county=pl.lit(re.sub(r"^2024-Primary-(Runoff-)?|\.xls$", "", name)),
+                            precinct="precinct",
+                            office=pl.col("Contest Title").str.strip_chars(),
+                            district=pl.col("Contest Title").str.strip_chars(),
+                            party="Party",
+                            candidate="Candidate",
+                            votes="votes",
+                        )
+                    )
+            frame = pl.concat(sheets)
+        elif state == "KS":
+            workbook = fastexcel.read_excel(raw.cached(SOURCE, url).path)
+            sheets = [
+                workbook.load_sheet(workbook.sheet_names[0], dtypes="string")
+                .to_polars()
+                .select(
+                    county="County",
+                    precinct="Precinct",
+                    office="Race",
+                    district="Race",
+                    party="Party",
+                    candidate=pl.col("Candidate").str.replace(r"^([^,]+), (.+)$", "$2 $1"),
+                    votes="Votes",
+                )
+            ]
+            for name in workbook.sheet_names[1:]:
+                table = workbook.load_sheet(name, header_row=None, dtypes="string").to_polars()
+                columns = table.columns[2:]
+                label = pl.col(table.columns[1])
+                total = table.filter(label == "COUNTY TOTALS")
+                table = (
+                    table.slice(3)
+                    .filter(label.is_not_null(), ~label.str.contains("TOTAL"))
+                    .with_columns(pl.col(columns).str.replace(r"(?i)^redacted.*", "").replace("", None))
+                )
+                if table.select(pl.any_horizontal(pl.col(columns).is_null())).to_series().any():
+                    table = pl.concat(
+                        [
+                            table,
+                            pl.DataFrame(
+                                {
+                                    table.columns[1]: ["Redacted precincts (county total less the reported ones)"],
+                                    **{
+                                        column: [str(int(total[column][0]) - table[column].cast(pl.Int64).sum())]
+                                        for column in columns
+                                    },
+                                }
+                            ),
+                        ],
+                        how="diagonal",
+                    )
+                for column in columns:
+                    if table[column].cast(pl.Int64).sum() != int(total[column][0]):
+                        raise ValueError(f"Kansas' {name} precincts do not add up to the county total")
+                heading = workbook.load_sheet(name, header_row=None, dtypes="string", n_rows=3).to_polars()
+                sheets.append(
+                    table.unpivot(columns, index=table.columns[1], variable_name="column", value_name="votes").select(
+                        county=pl.lit(name.title()),
+                        precinct=label,
+                        office=pl.col("column").replace_strict({column: heading[column][0] for column in columns}),
+                        district=pl.col("column").replace_strict({column: heading[column][0] for column in columns}),
+                        party=pl.col("column").replace_strict({column: heading[column][1] for column in columns}),
+                        candidate=pl.col("column").replace_strict({column: heading[column][2] for column in columns}),
+                        votes="votes",
+                    )
+                )
+            frame = pl.concat(sheets)
+        elif state == "IA":
+            with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+                root = ElementTree.fromstring(archive.read("detail.xml"))
+            frame = pl.DataFrame(
+                [
+                    {
+                        "county": place.get("name"),
+                        "office": contest.get("text"),
+                        "district": contest.get("text"),
+                        "party": re.sub(r"^.* - (\w+)\.$", r"\1", str(contest.get("text"))),
+                        "candidate": choice.get("text"),
+                        "votes": place.get("votes"),
+                    }
+                    for contest in root.iter("Contest")
+                    for choice in contest.iter("Choice")
+                    for kind in choice.iter("VoteType")
+                    for place in kind.iter("County")
+                ],
+                schema=dict.fromkeys(("county", "office", "district", "party", "candidate", "votes"), pl.String),
+            )
+        elif state == "ME":
+            office_text, district, stage = ME_FILES[url.removeprefix(MAINE[:-7]).removesuffix(".xlsx")]
+            table = (
+                fastexcel.read_excel(raw.cached(SOURCE, url).path)
+                .load_sheet(0, header_row=None, dtypes="string")
+                .to_polars()
+            )
+            header = [str(cell or "").strip() for cell in table.row(0)]
+            where = header.index("TOWN") if "TOWN" in header else header.index("MUNICIPALITY")
+            region = header.index("CTY") if "CTY" in header else header.index("COUNTY")
+            candidates = [
+                column
+                for index, (column, cell) in enumerate(zip(table.columns, header, strict=True))
+                if index > where and cell not in ("BLANK", "TBC", "TOTAL BALLOTS CAST")
+            ]
+            town = pl.col(table.columns[where]).str.strip_chars()
+            region_code = pl.col(table.columns[region]).str.strip_chars()
+            grand = table.filter(town.str.contains("TOTAL") | region_code.str.contains("TOTAL")).tail(1)
+            table = table.slice(1).filter(
+                (region_code.str.contains(r"^[A-Z]{3}$") & ~town.str.contains("TOTAL")) | town.str.contains("UOCAVA")
+            )
+            for column in candidates:
+                if table[column].cast(pl.Int64).sum() != int(grand[column][0]):
+                    raise ValueError(f"Maine's towns do not add up to the state total in {url}")
+            abbreviations = {name[:3].upper(): code for name, code in fips["ME"].items()}
+            frame = table.unpivot(
+                candidates,
+                index=[table.columns[region], table.columns[where]],
+                variable_name="column",
+                value_name="votes",
+            ).select(
+                county=pl.when(region_code.str.contains(r"^[A-Z]{3}$"))
+                .then(region_code.replace_strict(abbreviations, default=None))
+                .otherwise(pl.lit("23")),
+                precinct=town,
+                office=pl.lit(office_text),
+                district=pl.lit(district, pl.String),
+                party=pl.lit(stage),
+                candidate=pl.col("column")
+                .replace_strict(
+                    {
+                        column: "Write-ins" if cell == "OTHERS" else cell
+                        for column, cell in zip(table.columns, header, strict=True)
+                    }
+                )
+                .str.replace(r"^([^,]+), ([^,]+), (.+)$", "$2 $1 $3")
+                .str.replace(r"^([^,]+), ([^,]+)$", "$2 $1"),
+                votes="votes",
+            )
+        elif state == "IN":
+            data = json.loads(raw.cached(SOURCE, url).path.read_text(encoding="utf-8-sig"))["Root"]
+            lines = [
+                {
+                    "county": race["Jurisdiction"].get("FIPS", region.get("MAP_FIPS")),
+                    "office": race["SubSortOrder"],
+                    "district": race["SubSortOrder"],
+                    "party": candidate["PARTY_ABBREV"],
+                    "candidate": re.sub(r" \(W/I\)$", " (write-in)", candidate["NAME_ON_BALLOT"]),
+                    "votes": str(candidate["TOTAL_VOTES"]),
+                    "race": race["OFFICEID"],
+                }
+                for region in data["OfficeCategory"]["Regions"]["Region"]
+                for race in (
+                    region["Races"]["Race"] if isinstance(region["Races"]["Race"], list) else [region["Races"]["Race"]]
+                )
+                for candidate in (
+                    race["Candidates"]["Candidate"]
+                    if isinstance(race["Candidates"]["Candidate"], list)
+                    else [race["Candidates"]["Candidate"]]
+                )
+            ]
+            counted: dict[tuple[str, str], int] = defaultdict(int)
+            for line in lines:
+                counted[line["race"], line["candidate"]] += int(line["votes"])
+            summary = data["StatewideSummary"]["Race"]
+            if counted != {
+                (race["OFFICEID"], re.sub(r" \(W/I\)$", " (write-in)", candidate["NAME_ON_BALLOT"])): int(
+                    candidate["TOTAL"]
+                )
+                for race in (summary if isinstance(summary, list) else [summary])
+                for candidate in (
+                    race["Candidates"]["Candidate"]
+                    if isinstance(race["Candidates"]["Candidate"], list)
+                    else [race["Candidates"]["Candidate"]]
+                )
+            }:
+                raise ValueError(f"Indiana's counties do not add up to the statewide totals in {url}")
+            frame = pl.DataFrame(lines, schema=dict.fromkeys(lines[0], pl.String)).drop("race")
         elif state == "MA":
             listed: dict[str, tuple[str, str, str]] = {
                 election: (office, district, stage)
@@ -416,7 +645,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state == "MN":
+        if state in ("MN", "IN", "ME"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -456,6 +685,14 @@ def parse() -> None:
         day = (
             date(2024, 5, 14)
             if state == "MD"
+            else date(2024, 8, 6)
+            if state == "KS"
+            else date(2024, 6, 4)
+            if state == "IA"
+            else date(2024, 5, 7)
+            if state == "IN"
+            else (date(2024, 4, 16) if "Runoff" in url else date(2024, 3, 5))
+            if state == "AL"
             else (date(2024, 3, 5) if frame["office"][0] == "President" else date(2024, 9, 3))
             if state == "MA"
             else datetime.strptime(re.findall(r"2024\d{4}", url)[-1], "%Y%m%d").date()
@@ -472,7 +709,9 @@ def parse() -> None:
                 .then(pl.lit("president"))
                 .when(office.str.contains(openelections.SENATE.pattern))
                 .then(pl.lit("senate"))
-                .when(office.str.contains(openelections.HOUSE.pattern) & ~office.str.contains("measure|initiat"))
+                .when(
+                    office.str.contains(openelections.HOUSE.pattern) & ~office.str.contains("measure|initiat|delegate")
+                )
                 .then(pl.lit("house"))
                 .when(office.str.contains(r"^governor\b"))
                 .then(pl.lit("governor"))
@@ -680,6 +919,46 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "WA"
+                else (
+                    "Indiana Election Division",
+                    "2024 Primary Election results",
+                    "https://enr.indianavoters.in.gov/archive/2024Primary/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "IN"
+                else (
+                    "Alabama Secretary of State",
+                    "Election data downloads",
+                    "https://www.sos.alabama.gov/alabama-votes/voter/election-data",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "AL"
+                else (
+                    "Maine Department of the Secretary of State",
+                    "2024 primary election tabulations",
+                    "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "ME"
+                else (
+                    "Iowa Secretary of State",
+                    "Election night results, 2024 Primary Election",
+                    "https://electionresults.iowa.gov/IA/121508/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "IA"
+                else (
+                    "Kansas Secretary of State",
+                    "Election results, 2024 primary election",
+                    "https://sos.ks.gov/elections/election-results.html",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "KS"
                 else (
                     elstats.MA_PUBLISHER,
                     elstats.TITLE,
