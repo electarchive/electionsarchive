@@ -252,4 +252,13 @@ def emit() -> Path:
         method=METHOD,
         absent=MISSING,
         close=CLOSE,
+        declared={
+            "2002-11-05:AL:secretary-of-state": (
+                "Nancy L. Worley",
+                (
+                    "Nancy Worley leads by 1,989 votes in these totals. She was certified the winner and took office in "
+                    "January 2003."
+                ),
+            )
+        },
     )

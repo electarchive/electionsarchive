@@ -72,6 +72,113 @@ CLOSE = (
     "The race was within 0.5% in these sums, closer than transcription differences from the official canvass can be "
     "trusted to settle, so no winner is recorded."
 )
+CLOSE_WINNER = (
+    "The race was within 0.5% in these sums. {winner} was declared the winner in the state's official canvass and "
+    "took office."
+)
+ABSENT_WINNER = (
+    "{county} is missing from these sums, but it cast {ballots:,} votes for {office} in the same election. Since this "
+    "is fewer than {winner}'s {lead:,}-vote lead, the missing votes could not change the result. {winner} was "
+    "declared the winner."
+)
+CLOSE_WINNERS = {
+    "2006-11-07:SC:lieutenant-governor": ("Andre Bauer", "André Bauer"),
+    "2006-11-07:SC:superintendent-of-education": ("Jim Rex", "Jim Rex"),
+    "2014-11-04:NM:commissioner-of-public-lands": ("Aubrey Dunn", "Aubrey Dunn"),
+    "2000-11-07:ND:public-service-commissioner": ("Tony Clark", "Tony Clark"),
+    "2014-11-04:IL:treasurer": ("Michael W. Frerichs", "Michael Frerichs"),
+    "2006-11-07:WI:treasurer": ("Dawn Marie Sass", "Dawn Marie Sass"),
+    "2006-11-07:WI:attorney-general": ("J.B. Van Hollen", "J.B. Van Hollen"),
+    "2002-11-05:MI:attorney-general": ("Mike Cox", "Mike Cox"),
+    "2012-11-06:MT:superintendent-of-public-instruction": ("Denise Juneau", "Denise Juneau"),
+}
+ABSENT_WINNERS = {
+    "2000-11-07:MO:secretary-of-state": ("Matt Blunt", "Matt Blunt", "Shannon County", 3726, "governor", 142506),
+    "2000-11-07:MO:attorney-general": (
+        "Jeremiah W. (Jay) Nixon",
+        "Jay Nixon",
+        "Shannon County",
+        3726,
+        "governor",
+        521677,
+    ),
+    "2000-11-07:MO:treasurer": ("Nancy Farmer", "Nancy Farmer", "Shannon County", 3726, "governor", 129217),
+    "2000-11-07:MO:lieutenant-governor": ("Joe Maxwell", "Joe Maxwell", "Shannon County", 3726, "governor", 187932),
+    "2004-11-02:MO:treasurer": ("Sarah Steelman", "Sarah Steelman", "Washington County", 9177, "governor", 128791),
+    "2008-11-04:MO:lieutenant-governor": (
+        "Peter Kinder",
+        "Peter Kinder",
+        "Christian County",
+        37697,
+        "president",
+        57214,
+    ),
+    "2002-11-05:NM:secretary-of-state": (
+        "Rebecca D. Vigil-Giron",
+        "Rebecca Vigil-Giron",
+        "Cibola County",
+        5525,
+        "governor",
+        69808,
+    ),
+    "2002-11-05:NM:commissioner-of-public-lands": (
+        "Patrick H. Lyons",
+        "Patrick Lyons",
+        "Cibola County",
+        5525,
+        "governor",
+        13414,
+    ),
+    "2012-11-06:OR:attorney-general": (
+        "Ellen Rosenblum",
+        "Ellen Rosenblum",
+        "Yamhill County",
+        42907,
+        "president",
+        278465,
+    ),
+    "2014-11-04:AR:attorney-general": (
+        "Leslie Rutledge",
+        "Leslie Rutledge",
+        "Arkansas County",
+        5096,
+        "governor",
+        70152,
+    ),
+    "2014-11-04:AR:auditor": ("Representative Andrea Lea", "Andrea Lea", "Arkansas County", 5096, "governor", 163873),
+    "2014-11-04:AR:treasurer": (
+        "Circuit Clerk Dennis Milligan",
+        "Dennis Milligan",
+        "Arkansas County",
+        5096,
+        "governor",
+        157884,
+    ),
+    "2014-11-04:AR:lieutenant-governor": (
+        "Congressman Tim Griffin",
+        "Tim Griffin",
+        "Arkansas County",
+        5096,
+        "governor",
+        154990,
+    ),
+    "2014-11-04:AR:secretary-of-state": (
+        "Secretary Of State Mark Martin",
+        "Mark Martin",
+        "Arkansas County",
+        5096,
+        "governor",
+        210409,
+    ),
+    "2014-11-04:AR:commissioner-of-state-lands": (
+        "Commissioner John Thurston",
+        "John Thurston",
+        "Arkansas County",
+        5096,
+        "governor",
+        169068,
+    ),
+}
 
 
 def fetch() -> None:
@@ -120,7 +227,9 @@ def parse() -> None:
                     r"\b(city and county of|county of|county|parish|borough|census area|municipality)\b", ""
                 )
                 .str.replace_all(r"[^a-z]", "")
-                .replace_strict(fips.get(state, {}), default=None),
+                .replace_strict(
+                    {**fips.get(state, {}), **({"kansascity": "2938000"} if state == "MO" else {})}, default=None
+                ),
                 candidate=pl.col("candidate")
                 .fill_null("")
                 .str.to_uppercase()
@@ -183,7 +292,10 @@ def parse() -> None:
     )
     races = (
         frame.group_by(*contest, "candidate", "writein")
-        .agg(pl.col("votes").sum(), reach=pl.col("county").filter(pl.col("votes") > 0).n_unique())
+        .agg(
+            pl.col("votes").sum(),
+            reach=pl.col("county").filter(pl.col("votes") > 0, pl.col("county") != "2938000").n_unique(),
+        )
         .group_by(contest)
         .agg(
             pl.col("reach").max(),
@@ -191,7 +303,11 @@ def parse() -> None:
         )
         .join(
             frame.group_by(contest).agg(
-                pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
+                pl.col("county")
+                .filter(pl.col("votes") > 0, pl.col("county") != "2938000")
+                .unique()
+                .sort()
+                .alias("present"),
                 pl.col("magnitude").max(),
             ),
             on=contest,
@@ -251,4 +367,22 @@ def emit() -> Path:
         method=METHOD,
         absent=MISSING,
         close=CLOSE,
+        declared={
+            **{key: (label, CLOSE_WINNER.format(winner=winner)) for key, (label, winner) in CLOSE_WINNERS.items()},
+            **{
+                key: (
+                    label,
+                    ABSENT_WINNER.format(winner=winner, county=county, ballots=ballots, office=office, lead=lead),
+                )
+                for key, (label, winner, county, ballots, office, lead) in ABSENT_WINNERS.items()
+            },
+            "2006-11-07:MO:auditor": (
+                "Susan Montee",
+                (
+                    "Camden and Dade counties are missing from these sums, but together they cast 19,399 votes for U.S. "
+                    "Senator in the same election. Since this is fewer than Susan Montee's 201,959-vote lead, the missing "
+                    "votes could not change the result. Susan Montee was declared the winner."
+                ),
+            ),
+        },
     )

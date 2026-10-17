@@ -312,6 +312,7 @@ def emit(
     method: str = METHOD,
     absent: str = MISSING,
     close: str = CLOSE,
+    declared: dict[str, tuple[str, str]] | None = None,
 ) -> Path:
     returns = pl.read_parquet(parsed / "returns.parquet").filter(pl.col("measure") == 1)
     races = pl.read_parquet(parsed / "races.parquet")
@@ -333,7 +334,12 @@ def emit(
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         slugs = dict(conn.execute("select path, entity_id from slug").fetchall())
-        counties = dict(conn.execute("select code, id from reporting_unit where scheme_code = 'us.county'").fetchall())
+        counties = dict(
+            conn.execute(
+                """select code, id from reporting_unit
+                   where scheme_code = 'us.county' or scheme_code = 'us.place' and code = '2938000'"""
+            ).fetchall()
+        )
         state_units = {
             abbreviation: (unit, area)
             for abbreviation, unit, area in conn.execute(
@@ -487,6 +493,24 @@ def emit(
                 published = own.get(matches[0])
                 changed = published is not None and published[5] != int(lines["votes"].sum())
                 if matches[0] != contest_key or published is None or not (changed or (folded and published[4] is None)):
+                    if published is not None and declared and matches[0] in declared:
+                        label, caveat = declared[matches[0]]
+                        ((option,),) = conn.execute(
+                            """select id from contest_option
+                               where contest_id = %s and parent_option_id is null and ballot_label = %s""",
+                            [published[2], label],
+                        ).fetchall()
+                        cs.add("outcome", result_set_id=published[0], option_id=option, kind="elected", seats=1)
+                        stale = conn.execute(
+                            "select id from note where entity_id = %s and body_md = %s", [published[0], close]
+                        ).fetchall()
+                        cs.add(
+                            "note",
+                            **({"id": stale[0][0]} if stale else {}),
+                            entity_id=published[0],
+                            kind="caveat",
+                            body_md=caveat,
+                        )
                     continue
                 contest_key, revised = matches[0], published
                 print(
@@ -598,6 +622,7 @@ def emit(
                     body_md=absent.format(counties=f"{missing} of the state's {row['counties']} counties"),
                 )
             totals: list[tuple[int, UUID]] = []
+            ballots: dict[UUID, str] = {}
             members: dict[int, list[int]] = defaultdict(list)
             for index in range(len(entries)):
                 members[folded.get(index, index)].append(index)
@@ -619,6 +644,7 @@ def emit(
                 printed = rows["printed"].to_list()
                 resolved = [party(state, label) for label in labels] if not (pooled or nota) else [(None, False)]
                 ballot = "Write-ins" if pooled else "None of These Candidates" if nota else title(str(candidate))
+                ballots[root] = ballot
                 cs.add(
                     "contest_option",
                     id=root,
@@ -708,6 +734,12 @@ def emit(
                     folds.setdefault(cs.key(f"{pipeline}.person", f"{state}:{slug(gone)}"), []).append(
                         cs.key(f"{pipeline}.person", f"{state}:{slug(str(candidate))}")
                     )
+            if declared and contest_key in declared:
+                label, caveat = declared[contest_key]
+                (option,) = [root for root, ballot in ballots.items() if ballot == label]
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
+                continue
             if missing > 0:
                 continue
             totals.sort(key=lambda pair: -pair[0])

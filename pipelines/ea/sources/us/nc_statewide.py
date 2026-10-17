@@ -159,4 +159,30 @@ def emit() -> Path:
         method=METHOD,
         absent=MISSING,
         close=CLOSE,
+        declared={
+            "2004-11-02:NC:commissioner-of-agriculture": (
+                "Steve Troxler",
+                (
+                    "Steve Troxler leads by 2,287 votes in these totals. More than 4,000 votes were lost in Carteret "
+                    "County, and the race remained unresolved through three months of legal challenges until Britt Cobb "
+                    "conceded on February 4, 2005. Troxler was sworn in on February 8, 2005."
+                ),
+            ),
+            "2004-11-02:NC:superintendent-of-public-instruction": (
+                "June Atkinson",
+                (
+                    "The State Board of Elections certified June Atkinson the winner on November 30, 2004. Bill Fletcher "
+                    "contested the provisional ballots counted in the race; as the state constitution provides, the "
+                    "General Assembly decided the contested election in a joint session in August 2005, declaring "
+                    "Atkinson elected."
+                ),
+            ),
+            "2012-11-06:NC:lieutenant-governor": (
+                "Dan Forest",
+                (
+                    "The race was within 0.5% in these totals. The State Board of Elections certified Dan Forest the "
+                    "winner, and he took office in January 2013."
+                ),
+            ),
+        },
     )
