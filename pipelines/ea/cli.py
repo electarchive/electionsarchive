@@ -2,7 +2,7 @@ import argparse
 import importlib
 from pathlib import Path
 
-from ea import cache, coverage, fixtures, search, tiles
+from ea import cache, coverage, fixtures, raw, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import connect
 
@@ -30,11 +30,11 @@ def main() -> None:
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
-        choices=("verify", "license", "pin", "retire"),
+        choices=("verify", "license", "pin", "retire", "push", "pull"),
         help="verify files against the index, stamp licenses from the database, pin Wikipedia fetches to revisions, "
-        "or move unindexed files to data/retired",
+        "move unindexed files to data/retired, or sync the cache with the EA_REMOTE store",
     )
-    caching.add_argument("source", nargs="?", help="limit verify or pin to one source, such as us.medsl")
+    caching.add_argument("source", nargs="?", help="limit verify, pin, push, or pull to one source, such as us.medsl")
     caching.add_argument("--quick", action="store_true", help="verify sizes only, without hashing")
     args = parser.parse_args()
     match args.command:
@@ -48,6 +48,8 @@ def main() -> None:
             print(search.build())
         case "coverage":
             print(getattr(coverage, args.polity)())
+        case "raw" if args.action in ("push", "pull"):
+            print(getattr(raw, args.action)(args.source))
         case "raw":
             cache.main(args.action, args.source, quick=args.quick)
         case "publish":
