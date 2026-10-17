@@ -4,6 +4,7 @@ import io
 import itertools
 import json
 import re
+import statistics
 import subprocess
 from collections import Counter
 from pathlib import Path
@@ -55,6 +56,25 @@ WIDTHS = {
     ("1993-1994", 938): 7,
     ("1993-1994", 939): 7,
     ("1993-1994", 940): 7,
+    ("1981-1982", 907): 7,
+    ("1983-1984", 895): 7,
+    ("1983-1984", 897): 7,
+    ("1983-1984", 898): 5,
+    ("1983-1984", 899): 5,
+    ("1983-1984", 900): 6,
+    ("1987-1988", 897): 4,
+    ("1987-1988", 898): 4,
+    ("1987-1988", 901): 4,
+    ("1987-1988", 902): 3,
+    ("1987-1988", 903): 4,
+    ("1987-1988", 904): 5,
+    ("1989-1990", 927): 8,
+    ("1991-1992", 896): 4,
+    ("1991-1992", 897): 3,
+    ("1991-1992", 899): 3,
+    ("1991-1992", 900): 4,
+    ("1991-1992", 901): 4,
+    ("1993-1994", 921): 8,
 }
 TABLES = [
     (
@@ -323,6 +343,219 @@ TABLES = [
             ("IND", "Howard Phillips"),
         ],
     ),
+    (
+        "1980-09-09",
+        "senate",
+        [("1981-1982", 907, 0)],
+        [
+            ("CONS", "James P. Wickstrom"),
+            ("DEM", "Gaylord A. Nelson"),
+            ("LIB", "Bervin J. Larson"),
+            ("REP", "Douglass Cofrin"),
+            ("REP", "Robert W. Kasten Jr."),
+            ("REP", "Terry J. Kohler"),
+            ("REP", "Russell A. Olson"),
+        ],
+    ),
+    (
+        "1982-09-14",
+        "governor",
+        [("1983-1984", 895, 0)],
+        [
+            ("CONS", "James P. Wickstrom"),
+            ("DEM", "Anthony S. Earl"),
+            ("DEM", "Martin J. Schreiber"),
+            ("DEM", "James B. Wood"),
+            ("LIB", "Larry Smiley"),
+            ("REP", "Lowell B. Jackson"),
+            ("REP", "Terry J. Kohler"),
+        ],
+    ),
+    (
+        "1982-09-14",
+        "secretary-of-state",
+        [("1983-1984", 897, 0)],
+        [
+            ("CONS", "David E. Mrotek"),
+            ("DEM", "Ada Deer"),
+            ("DEM", "Douglas La Follette"),
+            ("DEM", "Lewis T. Mittness"),
+            ("DEM", "Vel Phillips"),
+            ("LIB", "Leslie G. Key"),
+            ("REP", "Frederick H. Rice"),
+        ],
+    ),
+    (
+        "1982-09-14",
+        "treasurer",
+        [("1983-1984", 898, 0)],
+        [
+            ("CONS", "Alfred E. Feustel"),
+            ("DEM", "Charles P. Smith"),
+            ("LIB", "Thomas P. Westgaard"),
+            ("REP", "Harold W. Clemens"),
+            ("REP", "Marlene A. Cummings"),
+        ],
+    ),
+    (
+        "1982-09-14",
+        "attorney-general",
+        [("1983-1984", 899, 0)],
+        [
+            ("CONS", "Gene D. Linehan"),
+            ("DEM", "Bronson C. La Follette"),
+            ("LIB", "James S. Hoffert"),
+            ("REP", "William Belter"),
+            ("REP", "Marcus Gumz"),
+        ],
+    ),
+    (
+        "1982-09-14",
+        "senate",
+        [("1983-1984", 900, 0)],
+        [
+            ("CONS", "Sanford G. Knapp"),
+            ("DEM", "Marcel Dandeneau"),
+            ("DEM", "William Proxmire"),
+            ("LIB", "George Liljenfeldt"),
+            ("REP", "Paul Thomas Brewer"),
+            ("REP", "Scott McCallum"),
+        ],
+    ),
+    (
+        "1986-09-09",
+        "governor",
+        [("1987-1988", 897, 0), ("1987-1988", 898, 0)],
+        [
+            ("DEM", "Anthony S. Earl"),
+            ("DEM", "Edmond Hou-Seye"),
+            ("LF", "Kathryn A. Christensen"),
+            ("REP", "Jonathan B. Barry"),
+            ("REP", "Joseph A. Ortiz"),
+            ("REP", "Tommy G. Thompson"),
+            ("REP", "George Watts"),
+            ("REP", "Albert Lee Wiley Jr."),
+        ],
+    ),
+    (
+        "1986-09-09",
+        "secretary-of-state",
+        [("1987-1988", 901, 0)],
+        [
+            ("DEM", "Douglas La Follette"),
+            ("LF", "Richard L. Ackley"),
+            ("REP", "Thomas Coaty"),
+            ("REP", "Clifford W. Krueger"),
+        ],
+    ),
+    (
+        "1986-09-09",
+        "treasurer",
+        [("1987-1988", 902, 0)],
+        [
+            ("DEM", "Charles P. Smith"),
+            ("LF", "Joan Hollingsworth"),
+            ("REP", "William D. Lorge"),
+        ],
+    ),
+    (
+        "1986-09-09",
+        "attorney-general",
+        [("1987-1988", 903, 0)],
+        [
+            ("DEM", "Bronson C. La Follette"),
+            ("LF", "Dennis L. Boyer"),
+            ("REP", "Donald J. Hanaway"),
+            ("REP", "Bartley G. Mauch"),
+        ],
+    ),
+    (
+        "1986-09-09",
+        "senate",
+        [("1987-1988", 904, 0)],
+        [
+            ("DEM", "Roman R. Blenski"),
+            ("DEM", "Matthew J. Flynn"),
+            ("DEM", "Edward R. Garvey"),
+            ("DEM", "Gary R. George"),
+            ("REP", "Robert W. Kasten Jr."),
+        ],
+    ),
+    (
+        "1988-09-13",
+        "senate",
+        [("1989-1990", 927, 0)],
+        [
+            ("DEM", "Anthony S. Earl"),
+            ("DEM", "Edward R. Garvey"),
+            ("DEM", "Edmond Hou-Seye"),
+            ("DEM", "Herbert H. Kohl"),
+            ("DEM", "Douglas La Follette"),
+            ("REP", "Susan Engeleiter"),
+            ("REP", "Stephen B. King"),
+            ("REP", "Peter Y. Taylor Sr."),
+        ],
+    ),
+    (
+        "1990-09-11",
+        "governor",
+        [("1991-1992", 896, 0), ("1991-1992", 897, 0)],
+        [
+            ("DEM", "Thomas Loftus"),
+            ("LF", "Rickey D. Keilholtz"),
+            ("REP", "Michele Ann Gess"),
+            ("REP", "Edmond Hou-Seye"),
+            ("REP", "Willie G. Lovelace"),
+            ("REP", "Bennett A. Masel"),
+            ("REP", "Tommy G. Thompson"),
+        ],
+    ),
+    (
+        "1990-09-11",
+        "secretary-of-state",
+        [("1991-1992", 899, 0)],
+        [
+            ("DEM", "Douglas La Follette"),
+            ("DEM", "Stuart Levitan"),
+            ("REP", "Robert M. Thompson"),
+        ],
+    ),
+    (
+        "1990-09-11",
+        "treasurer",
+        [("1991-1992", 900, 0)],
+        [
+            ("DEM", "Charles P. Smith"),
+            ("LF", "Lucille Berrien"),
+            ("REP", "Cathy S. Zeuske"),
+        ],
+    ),
+    (
+        "1990-09-11",
+        "attorney-general",
+        [("1991-1992", 901, 0)],
+        [
+            ("DEM", "James E. Doyle"),
+            ("DEM", "William P. Te Winkle"),
+            ("LF", "Patricia K. Hammel"),
+            ("REP", "Donald J. Hanaway"),
+        ],
+    ),
+    (
+        "1992-09-08",
+        "senate",
+        [("1993-1994", 921, 0)],
+        [
+            ("DEM", "Joseph Checota"),
+            ("DEM", "Russell D. Feingold"),
+            ("DEM", "Edmond E. Hou-Seye"),
+            ("DEM", "Thomas Keller"),
+            ("DEM", "Jim Moody"),
+            ("LIB", "William Bittner"),
+            ("REP", "Roger W. Faulkner"),
+            ("REP", "Robert W. Kasten Jr."),
+        ],
+    ),
 ]
 PARTIES = {
     "DEM": "democratic-party",
@@ -344,11 +577,33 @@ TITLES = {
     "attorney-general": "Wisconsin Attorney General election",
 }
 CHECKED: set[tuple[str, str, int]] = {
+    ("1986-09-09", "governor", 3),
+    ("1982-09-14", "senate", 0),
+    ("1982-09-14", "treasurer", 4),
+    ("1982-09-14", "secretary-of-state", 6),
+    ("1980-09-09", "senate", 4),
+    ("1980-09-09", "senate", 1),
     ("1984-11-06", "president", 7),
     ("1984-11-06", "president", 3),
     ("1984-11-06", "president", 1),
 }
 NOTES = [
+    (
+        "1992-09-08",
+        "senate",
+        (
+            "A scratch on the Blue Book scan crosses William Bittner's Brown, Buffalo, Clark, and Columbia figures; "
+            "they are read as 36, 0, 10, and 1, which fits the visible strokes and his printed total."
+        ),
+    ),
+    (
+        "1980-09-09",
+        "senate",
+        (
+            "Gaylord A. Nelson's Barron figure is damaged in the Blue Book and read as 956; it would need to be 866 "
+            "for his county figures to match the printed total."
+        ),
+    ),
     (
         "1984-11-06",
         "president",
@@ -375,6 +630,122 @@ NOTES = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1992-09-08", "senate", "Columbia", 5): 1,
+    ("1992-09-08", "senate", "Clark", 5): 10,
+    ("1992-09-08", "senate", "Buffalo", 5): 0,
+    ("1992-09-08", "senate", "Brown", 5): 36,
+    ("1992-09-08", "senate", "Waupaca", 3): 27,
+    ("1992-09-08", "senate", "Dunn", 3): 111,
+    ("1990-09-11", "governor", "Ozaukee", 4): 0,
+    ("1990-09-11", "governor", "Monroe", 4): 0,
+    ("1988-09-13", "senate", "Ashland", 7): 72,
+    ("1988-09-13", "senate", "Crawford", 4): 73,
+    ("1988-09-13", "senate", "Crawford", 1): 172,
+    ("1986-09-09", "senate", "Vilas", 3): 75,
+    ("1986-09-09", "senate", "Wood", 1): 717,
+    ("1986-09-09", "senate", "Pierce", 1): 532,
+    ("1986-09-09", "senate", "Pierce", 0): 83,
+    ("1986-09-09", "senate", "Dunn", 0): 76,
+    ("1986-09-09", "senate", "Grant", 0): 26,
+    ("1986-09-09", "attorney-general", "Vilas", 2): 717,
+    ("1986-09-09", "governor", "Rock", 7): 285,
+    ("1986-09-09", "governor", "Oneida", 7): 75,
+    ("1986-09-09", "governor", "Waushara", 4): 22,
+    ("1986-09-09", "governor", "Sauk", 4): 75,
+    ("1986-09-09", "governor", "Pierce", 4): 36,
+    ("1986-09-09", "governor", "Jefferson", 4): 22,
+    ("1986-09-09", "governor", "Fond du Lac", 4): 122,
+    ("1986-09-09", "governor", "Door", 4): 18,
+    ("1986-09-09", "governor", "Crawford", 4): 11,
+    ("1986-09-09", "governor", "Clark", 4): 23,
+    ("1986-09-09", "governor", "Calumet", 4): 29,
+    ("1986-09-09", "governor", "Burnett", 4): 9,
+    ("1986-09-09", "governor", "Buffalo", 4): 14,
+    ("1986-09-09", "governor", "Brown", 4): 58,
+    ("1986-09-09", "governor", "Ashland", 4): 14,
+    ("1986-09-09", "governor", "Sauk", 3): 2135,
+    ("1982-09-14", "senate", "Jackson", 5): 772,
+    ("1982-09-14", "senate", "Ashland", 5): 488,
+    ("1982-09-14", "senate", "Vilas", 4): 502,
+    ("1982-09-14", "senate", "Ashland", 3): 7,
+    ("1982-09-14", "senate", "Waukesha", 1): 2990,
+    ("1982-09-14", "senate", "Washburn", 0): 4,
+    ("1982-09-14", "senate", "Vilas", 0): 1,
+    ("1982-09-14", "senate", "Ashland", 0): 1,
+    ("1982-09-14", "attorney-general", "Marathon", 4): 0,
+    ("1982-09-14", "attorney-general", "Burnett", 4): 0,
+    ("1982-09-14", "attorney-general", "Waushara", 3): 0,
+    ("1982-09-14", "attorney-general", "Sheboygan", 2): 61,
+    ("1982-09-14", "attorney-general", "Marquette", 1): 752,
+    ("1982-09-14", "attorney-general", "Sheboygan", 0): 22,
+    ("1982-09-14", "attorney-general", "Shawano", 0): 46,
+    ("1982-09-14", "attorney-general", "Marathon", 0): 71,
+    ("1982-09-14", "attorney-general", "Kenosha", 0): 29,
+    ("1982-09-14", "attorney-general", "Fond du Lac", 0): 33,
+    ("1982-09-14", "attorney-general", "Eau Claire", 0): 7,
+    ("1982-09-14", "attorney-general", "Dodge", 0): 35,
+    ("1982-09-14", "attorney-general", "Dane", 0): 22,
+    ("1982-09-14", "attorney-general", "Adams", 0): 3,
+    ("1982-09-14", "treasurer", "Winnebago", 4): 5362,
+    ("1982-09-14", "treasurer", "St. Croix", 4): 989,
+    ("1982-09-14", "treasurer", "Pierce", 4): 512,
+    ("1982-09-14", "treasurer", "Oconto", 4): 1633,
+    ("1982-09-14", "treasurer", "Menominee", 4): 11,
+    ("1982-09-14", "treasurer", "Jackson", 4): 597,
+    ("1982-09-14", "treasurer", "Buffalo", 4): 909,
+    ("1982-09-14", "treasurer", "Burnett", 3): 266,
+    ("1982-09-14", "treasurer", "Wood", 3): 2803,
+    ("1982-09-14", "treasurer", "Jackson", 3): 759,
+    ("1982-09-14", "treasurer", "Rusk", 3): 513,
+    ("1982-09-14", "treasurer", "Langlade", 3): 516,
+    ("1982-09-14", "treasurer", "Buffalo", 3): 1231,
+    ("1982-09-14", "treasurer", "Ashland", 3): 503,
+    ("1982-09-14", "treasurer", "La Crosse", 1): 5026,
+    ("1982-09-14", "treasurer", "Winnebago", 1): 7054,
+    ("1982-09-14", "treasurer", "Polk", 1): 1830,
+    ("1982-09-14", "treasurer", "Juneau", 1): 727,
+    ("1982-09-14", "treasurer", "Marathon", 2): 24,
+    ("1982-09-14", "treasurer", "La Crosse", 2): 22,
+    ("1982-09-14", "treasurer", "Winnebago", 0): 38,
+    ("1982-09-14", "treasurer", "Taylor", 0): 4,
+    ("1982-09-14", "treasurer", "Sawyer", 0): 4,
+    ("1982-09-14", "treasurer", "Oneida", 0): 5,
+    ("1982-09-14", "treasurer", "Marquette", 0): 32,
+    ("1982-09-14", "treasurer", "Langlade", 0): 5,
+    ("1982-09-14", "treasurer", "Iowa", 0): 1,
+    ("1982-09-14", "treasurer", "Florence", 0): 4,
+    ("1982-09-14", "treasurer", "Adams", 0): 2,
+    ("1982-09-14", "secretary-of-state", "Taylor", 6): 756,
+    ("1982-09-14", "secretary-of-state", "La Crosse", 6): 5179,
+    ("1982-09-14", "secretary-of-state", "Jefferson", 6): 4931,
+    ("1982-09-14", "secretary-of-state", "Columbia", 6): 2951,
+    ("1982-09-14", "secretary-of-state", "Washburn", 5): 5,
+    ("1982-09-14", "secretary-of-state", "Trempealeau", 5): 5,
+    ("1982-09-14", "secretary-of-state", "Rusk", 5): 5,
+    ("1982-09-14", "secretary-of-state", "Green Lake", 5): 6,
+    ("1982-09-14", "secretary-of-state", "Grant", 4): 194,
+    ("1982-09-14", "secretary-of-state", "TOTAL", 4): 66576,
+    ("1982-09-14", "secretary-of-state", "Sawyer", 4): 44,
+    ("1982-09-14", "secretary-of-state", "Waushara", 4): 105,
+    ("1982-09-14", "secretary-of-state", "Richland", 4): 74,
+    ("1982-09-14", "secretary-of-state", "Portage", 4): 757,
+    ("1982-09-14", "secretary-of-state", "Eau Claire", 4): 704,
+    ("1982-09-14", "secretary-of-state", "Douglas", 4): 573,
+    ("1982-09-14", "secretary-of-state", "Dodge", 4): 566,
+    ("1982-09-14", "secretary-of-state", "Waushara", 3): 36,
+    ("1982-09-14", "secretary-of-state", "Sheboygan", 3): 367,
+    ("1982-09-14", "secretary-of-state", "Rock", 2): 4684,
+    ("1982-09-14", "governor", "Marathon", 5): 1761,
+    ("1982-09-14", "governor", "Monroe", 5): 1360,
+    ("1982-09-14", "governor", "Langlade", 1): 724,
+    ("1982-09-14", "governor", "Milwaukee", 1): 76374,
+    ("1980-09-09", "senate", "Columbia", 4): 2065,
+    ("1980-09-09", "senate", "Barron", 1): 956,
+    ("1980-09-09", "senate", "Grant", 0): 0,
+    ("1980-09-09", "senate", "Jefferson", 0): 15,
+    ("1980-09-09", "senate", "Forest", 0): 0,
+    ("1980-09-09", "senate", "Dunn", 0): 8,
+    ("1980-09-09", "senate", "Chippewa", 0): 10,
     ("1982-11-02", "senate", "Trempealeau", 2): 10,
     ("1982-11-02", "senate", "Sauk", 2): 27,
     ("1992-11-03", "president", "Milwaukee", 13): 281,
@@ -533,6 +904,12 @@ def grid(edition: str, leaf: int, order: list[str]) -> list[list[list[int]]]:
     ]
     while len(rows) > 1 and rows[1][0] - rows[0][1] > 150:
         rows.pop(0)
+    pitch = statistics.median(b[0] - a[0] for a, b in itertools.pairwise(rows))
+    if len(rows) == len(order):
+        for index, (a, b) in enumerate(itertools.pairwise(rows[:-1])):
+            if b[0] - a[0] > pitch * 1.7:
+                rows.insert(index + 1, (a[0] + pitch, a[1] + pitch))
+                break
     if len(rows) != len(order) + 1:
         raise ValueError(f"{edition} leaf {leaf}: {len(rows)} rows, expected {len(order) + 1}")
     labels = [
@@ -559,7 +936,7 @@ def grid(edition: str, leaf: int, order: list[str]) -> list[list[list[int]]]:
         and (close := difflib.get_close_matches(label, names, 1, 0.85))
         and close[0] != name
     ]
-    if agree < 20 or clash:
+    if agree < 8 or clash:
         raise ValueError(f"{edition} leaf {leaf}: county order does not line up ({agree} agree, {clash})")
     cells: list[list[list[int]]] = [[[] for _ in columns] for _ in rows]
     for found in numeric.values():
@@ -674,8 +1051,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Wisconsin's president, governor, U.S. Senate, and statewide offices by county 1978–1992 "
-            "from the Wisconsin Blue Book",
+            summary="Wisconsin's president, governor, U.S. Senate, and statewide offices by county 1978–1992, "
+            "with the 1980–1992 primaries, from the Wisconsin Blue Book",
             polity="US",
         )
 
@@ -708,9 +1085,9 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, PAGES.format(item)), sources[edition])
         for edition, leaf in sorted({(edition, leaf) for _, _, pages, _ in TABLES for edition, leaf, _ in pages}):
             cs.artifact(raw.cached(SOURCE, image(edition, leaf)), sources[edition])
-        caveats: dict[tuple[str, str], str] = {}
+        caveats: dict[tuple[str, str], list[str]] = {}
         for day, office, note in pl.read_parquet(PARSED / "caveats.parquet").iter_rows():
-            caveats[(day, office)] = f"{caveats[(day, office)]} {note}" if (day, office) in caveats else note
+            caveats.setdefault((day, office), []).append(note)
         counties: dict[str, UUID] = dict(
             conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'us.county' and code like '55%%'"
@@ -764,6 +1141,20 @@ def emit() -> Path:
             )
         )
         born: set[UUID] = set()
+        primaries = {"1980-09-09", "1982-09-14", "1986-09-09", "1988-09-13", "1990-09-11", "1992-09-08"}
+        kinds = {
+            "governor": "gubernatorial",
+            "secretary-of-state": "Secretary of State",
+            "treasurer": "State Treasurer",
+            "attorney-general": "Attorney General",
+        }
+        scopes = {code: re.sub(r"^WI:|-party$", "", party) for code, party in PARTIES.items() if party}
+        frame = frame.with_columns(
+            pl.when(pl.col("day").is_in(sorted(primaries)))
+            .then(pl.col("party").replace_strict(scopes, default=""))
+            .otherwise(pl.lit(""))
+            .alias("scope")
+        )
         columns = (
             "id",
             "election_id",
@@ -776,12 +1167,59 @@ def emit() -> Path:
             "completeness",
             "supersedes_id",
         )
-        for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
-            key = f"{day}:WI:{office}"
+        for (day, office, scope), lines in frame.group_by("day", "office", "scope", maintain_order=True):
+            key = f"{day}:WI:{office}:{scope}" if scope else f"{day}:WI:{office}"
             year = int(day[:4])
             result_set = cs.key(f"{SOURCE}.result_set", key)
             contest = contests.get(key)
-            if contest is None:
+            if scope:
+                election_id = cs.key("us.election", f"{day}:WI:primary")
+                if election_id in cs.minted and election_id not in born:
+                    born.add(election_id)
+                    cs.add(
+                        "election",
+                        id=election_id,
+                        polity_id=cs.polity("US-WI"),
+                        kind="primary",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    name(election_id, f"{year} Wisconsin primary election")
+                    cs.add("slug", path=f"us/wi/{day}-primary", entity_id=election_id)
+                contest = cs.key("us.contest", key)
+                party = scope.replace("-", " ").title().replace("Labor Farm", "Labor-Farm")
+                if office == "senate":
+                    ((body, seat, district, term),) = conn.execute(
+                        "select body_id, seat_id, district_area_id, term from contest where id = %s",
+                        [next(v for k, v in contests.items() if re.fullmatch(rf"{year}-11-\d\d:WI:senate", k))],
+                    ).fetchall()
+                    shape = {"kind": "body_seats", "body_id": body, "seat_id": seat}
+                    title = f"{year} U.S. Senate {party} primary in Wisconsin"
+                else:
+                    office_id = cs.key("us.office", f"{office}:WI")
+                    if office_id in cs.minted:
+                        raise ValueError(f"no office {office}")
+                    district, term = area, "full"
+                    shape = {"kind": "office", "office_id": office_id}
+                    title = f"{year} Wisconsin {kinds[office]} {party} primary"
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election_id,
+                    **shape,
+                    district_area_id=district,
+                    term=term,
+                    magnitude=1,
+                    party_scope_id=parties[lines["party"][0]],
+                    round_number=1,
+                    electoral_system_id=fptp,
+                    default_result_kind="counted",
+                )
+                name(contest, title)
+                cs.add("slug", path=f"us/wi/{day}-primary/{office}-{scope}", entity_id=contest)
+            elif contest is None:
                 office_id = cs.key("us.office", f"{office}:WI")
                 if office_id in cs.minted:
                     raise ValueError(f"no office {office}")
@@ -899,8 +1337,20 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            if (day, office) in caveats:
-                cs.add("note", entity_id=result_set, kind="caveat", body_md=caveats[(day, office)])
+            notes = [
+                note for note in caveats.get((day, office), []) if not scope or any(label in note for label in picked)
+            ]
+            if notes:
+                prior = conn.execute(
+                    "select id from note where entity_id = %s and kind = 'caveat'", [result_set]
+                ).fetchall()
+                cs.add(
+                    "note",
+                    **({"id": prior[0][0]} if len(prior) == 1 else {}),
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=" ".join(notes),
+                )
             if conn.execute("select from result_set where id = %s", [result_set]).fetchone() is None:
                 for county, label, votes in lines.select("county", "label", "votes").iter_rows():
                     cs.add(
@@ -919,5 +1369,11 @@ def emit() -> Path:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             if not kept:
                 winner = max(totals, key=totals.__getitem__)
-                cs.add("outcome", result_set_id=result_set, option_id=winner, kind="elected", seats=1)
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=winner,
+                    kind="won" if scope else "elected",
+                    seats=None if scope else 1,
+                )
         return cs.write()
