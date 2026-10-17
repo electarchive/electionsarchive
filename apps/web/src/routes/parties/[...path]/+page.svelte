@@ -261,16 +261,21 @@
               >
               <ul class="grid gap-1 text-sm">
                 {#each entries as election, index (index)}
+                  {const name = $derived(
+                    year != null && election.name.startsWith(`${year} `)
+                      ? election.name.slice(5)
+                      : election.name,
+                  )}
                   <li
                     class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
                   >
                     {#if election.path == null}
-                      <span>{election.name}</span>
+                      <span>{name}</span>
                     {:else}
                       <a
                         class="hover:highlighter"
                         href={resolve("/[...path]", { path: election.path })}
-                        title={date(election.date)}>{election.name}</a
+                        title={date(election.date)}>{name}</a
                       >
                     {/if}
                     <span

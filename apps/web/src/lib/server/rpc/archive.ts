@@ -8056,7 +8056,7 @@ export const parties = {
         left join won w on w.contest_id = up.id
         where up.parent is null
         group by coalesce(e.parent_id, e.id)
-        order by min(e.date_from) desc nulls last
+        order by min(e.date_from) desc nulls last, count(distinct up.id) desc
         limit 200
       `);
       const ids = found.rows.map((row) => row.election);
