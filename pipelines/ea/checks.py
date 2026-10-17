@@ -228,7 +228,8 @@ def _references(stage: Stage) -> list[tuple[str, sql.Composed]]:
                         sql.SQL(
                             """select null::uuid, null::uuid,
                                       jsonb_build_object('table', {table}, 'column', {column}, 'rows', count(*))
-                               from {facts} s where s.{key} is not null and s.{key} not in (select id from {targets})
+                               from {facts} s where s.{key} is not null
+                                 and not exists (select from {targets} t where t.id = s.{key})
                                having count(*) > 0"""
                         ).format(
                             table=sql.Literal(table),

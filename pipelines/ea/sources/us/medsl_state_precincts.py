@@ -9,19 +9,81 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import medsl, medsl_state
+from ea.sources.us import county_measures, medsl, medsl_state
 from ea.sources.us.klarner import LOWER
 from ea.sources.us.medsl_precincts import METHOD
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_state_precincts"
-VERSION = "2"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
+STATEWIDE = DATA / "parsed" / "us.medsl_statewide"
+STATES_2022 = {
+    "AK": "10855159",
+    "AL": "10855153",
+    "AZ": "14249794",
+    "CA": "10855141",
+    "CO": "10855131",
+    "CT": "10855136",
+    "DE": "10855156",
+    "FL": "10855171",
+    "GA": "10855164",
+    "HI": "10855177",
+    "IA": "10855151",
+    "ID": "13996909",
+    "IL": "10855148",
+    "IN": "10855180",
+    "KS": "10855161",
+    "KY": "10855135",
+    "LA": "10855157",
+    "MA": "10855170",
+    "MD": "14249804",
+    "ME": "10855138",
+    "MN": "10855150",
+    "MO": "10855176",
+    "MT": "10855149",
+    "NC": "10855142",
+    "ND": "13996910",
+    "NE": "10855155",
+    "NH": "10855179",
+    "NM": "10855137",
+    "NV": "10855182",
+    "NY": "10855145",
+    "OH": "10855174",
+    "OK": "10855147",
+    "OR": "10855146",
+    "PA": "10855169",
+    "RI": "10855163",
+    "SC": "10855139",
+    "SD": "10855168",
+    "TN": "10855152",
+    "TX": "10855154",
+    "UT": "10855134",
+    "VT": "10855166",
+    "WA": "10855160",
+    "WI": "10855181",
+    "WV": "10855172",
+    "WY": "10855165",
+}
 FILES = {
-    2016: ("us.medsl_measures", f"{medsl.DATAVERSE}3345337?format=original", "GSZG1O"),
-    2018: (SOURCE, f"{medsl.DATAVERSE}6692663", "ZFXEJU"),
-    2020: (SOURCE, f"{medsl.DATAVERSE}13582896", "OKL2K1"),
-    2024: (medsl_state.SOURCE, medsl_state.RETURNS, "DODOBJ"),
+    2016: [("us.medsl_measures", f"{medsl.DATAVERSE}3345337?format=original")],
+    2018: [(SOURCE, f"{medsl.DATAVERSE}6692663")],
+    2020: [(SOURCE, f"{medsl.DATAVERSE}13582896")],
+    2022: [
+        (
+            "us.medsl_measures" if state in county_measures.MEDSL_2022 else SOURCE,
+            f"{medsl.DATAVERSE}{file}?format=original",
+        )
+        for state, file in STATES_2022.items()
+    ],
+    2024: [(medsl_state.SOURCE, medsl_state.RETURNS)],
+}
+TITLES = {
+    2016: ("State Precinct-Level Returns 2016", "GSZG1O"),
+    2018: ("State Precinct-Level Returns 2018", "ZFXEJU"),
+    2020: ("State Precinct-Level Returns 2020", "OKL2K1"),
+    2022: ("Precinct-Level Returns 2022 by Individual State", "UYQIEP"),
+    2024: (medsl_state.TITLE, "DODOBJ"),
 }
 GUESTBOOK = {
     "name": "",
@@ -62,13 +124,53 @@ HAMPSHIRE = {
     "33017": "STRAFFORD",
     "33019": "SULLIVAN",
 }
+ALIASES = {
+    "womensequality": ("wep",),
+    "workingfamilies": ("wor",),
+    "conservative": ("constitution",),
+    "constitution": ("conservative",),
+}
+ORDINALS = {
+    word: number
+    for number, word in enumerate(
+        [
+            "FIRST",
+            "SECOND",
+            "THIRD",
+            "FOURTH",
+            "FIFTH",
+            "SIXTH",
+            "SEVENTH",
+            "EIGHTH",
+            "NINTH",
+            "TENTH",
+            "ELEVENTH",
+            "TWELFTH",
+            "THIRTEENTH",
+            "FOURTEENTH",
+            "FIFTEENTH",
+            "SIXTEENTH",
+            "SEVENTEENTH",
+            "EIGHTEENTH",
+            "NINETEENTH",
+            "TWENTIETH",
+        ],
+        1,
+    )
+} | {"THIRTIETH": 30}
+ORDINALS |= {
+    f"{tens}{separator}{word}": base + number
+    for tens, base in (("TWENTY", 20), ("THIRTY", 30))
+    for separator in ("-", " ")
+    for word, number in list(ORDINALS.items())[:9]
+}
 POOLS = {"write-ins", "all-others", "scattering", "scatter", "others", "misc", "write-in", "other"}
 BODIES = r"(house|senate|assembly|house-of-delegates|general-assembly|legislature)"
 
 
 def fetch() -> None:
     medsl_state.fetch()
-    for year, (source, url, _) in FILES.items():
+    for year, (source, url) in ((year, file) for year, files in FILES.items() for file in files):
         try:
             raw.cached(source, url)
         except LookupError:
@@ -84,7 +186,11 @@ def fetch() -> None:
 
 def parse() -> None:
     frame = pl.concat(
-        [medsl.precincts({("state", year): raw.cached(source, url).path}) for year, (source, url, _) in FILES.items()],
+        [
+            medsl.precincts({("state", year): raw.cached(source, url).path})
+            for year, files in FILES.items()
+            for source, url in files
+        ],
         how="diagonal_relaxed",
     ).with_columns(
         pl.col("precinct", "jurisdiction").str.strip_chars(),
@@ -93,7 +199,19 @@ def parse() -> None:
         .str.to_uppercase()
         .str.replace(r"\.0$", "")
         .str.replace(r"^(?:DISTRICT )?0*(\d+),? POSITION (\d)$", "DISTRICT $1 POSITION $2")
-        .str.replace(r"^DISTRICT 0*(\d+)$", "$1"),
+        .str.replace(r"^DISTRICT 0*(\d+)$", "$1")
+        .str.replace(r" DISTRICT$", "")
+        .map_elements(
+            lambda seat: next(
+                (
+                    f"{number}TH {seat.removeprefix(word).strip()}"
+                    for word, number in sorted(ORDINALS.items(), key=lambda item: -len(item[0]))
+                    if seat.startswith(f"{word} ")
+                ),
+                seat,
+            ),
+            return_dtype=pl.String,
+        ),
         candidate=pl.when(pl.col("year") == 2024)
         .then(
             pl.struct("code", "candidate").map_elements(
@@ -173,14 +291,39 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    returns = pl.read_parquet(PARSED / "returns.parquet")
+    mapped = pl.read_parquet(STATEWIDE / "contests.parquet")
+    returns = pl.concat(
+        [
+            pl.read_parquet(PARSED / "returns.parquet").with_columns(mapped=pl.lit(None, pl.String)),
+            pl.read_parquet(STATEWIDE / "returns.parquet")
+            .join(mapped, on=["year", "state", "title", "post", "special"], nulls_equal=True)
+            .select(
+                "year",
+                "day",
+                "state",
+                office="title",
+                seat="post",
+                special="special",
+                kind="kind",
+                code="code",
+                candidate="candidate",
+                party="party",
+                writein="writein",
+                measure="measure",
+                votes="votes",
+                mapped="key",
+            ),
+        ],
+        how="vertical_relaxed",
+    )
     days = sorted({str(day) for day in returns["day"].unique()})
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="State house and senate results by precinct 2016–2024, from the MIT Election Data and Science Lab",
+            summary="State legislative and statewide office results by precinct 2016–2024, from the MIT Election Data and "
+            "Science Lab",
             polity="US",
         )
         codes: dict[str, set[str]] = defaultdict(set)
@@ -202,9 +345,9 @@ def emit() -> Path:
                 join result_set rs on rs.contest_id = c.id and rs.is_default
                 left join result_value v on v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
                 where cx.scheme = 'us.contest' and left(cx.value, 10) = any(%s)
-                  and cx.value ~ '^[0-9-]{{10}}:[A-Z]{{2}}:{BODIES}:'
+                  and (cx.value ~ '^[0-9-]{{10}}:[A-Z]{{2}}:{BODIES}:' or cx.value = any(%s))
                 group by 1, 2, 3, 4, 5, 6, 7, 8""",
-            [days],
+            [days, mapped["key"].to_list()],
         ).fetchall():
             contests[key] = (contest, election)
             names = [slug(text) for text in (label, person) if text]
@@ -216,8 +359,7 @@ def emit() -> Path:
             ).fetchall()
         }
         sources: dict[int, UUID] = {}
-        for year, (origin, url, doi) in FILES.items():
-            title = medsl_state.TITLE if year == 2024 else f"State Precinct-Level Returns {year}"
+        for year, (title, doi) in TITLES.items():
             sources[year] = cs.source(medsl_state.PUBLISHER, title)
             if sources[year] in cs.minted:
                 cs.add(
@@ -230,57 +372,61 @@ def emit() -> Path:
                     license="CC0 1.0",
                     license_url="https://creativecommons.org/publicdomain/zero/1.0/",
                 )
+            for origin, url in FILES[year]:
                 cs.artifact(raw.cached(origin, url), sources[year])
         values: list[pl.DataFrame] = []
         result_sets: list[UUID] = []
         taken: set[str] = set()
-        for (year, day, state, office, seat, special), lines in returns.group_by(
-            "year", "day", "state", "office", "seat", "special", maintain_order=True
+        for (year, day, state, office, seat, special, statewide), lines in returns.group_by(
+            "year", "day", "state", "office", "seat", "special", "mapped", maintain_order=True
         ):
-            if state == "NE":
-                body_key, scheme = "NE:legislature", "us.sldu"
-            elif office == "STATE SENATE":
-                body_key, scheme = f"{state}:senate", "us.sldu"
-            else:
-                chamber = LOWER.get(state, "House of Representatives")
-                body_key = f"{state}:{slug(chamber.removeprefix('State ').removesuffix(' of Representatives'))}"
-                scheme = "us.sldl"
-            code, post = medsl_state._district(state, str(seat))
-            if state == "VT" and re.fullmatch(r"[A-Z]+(-[A-Z]+)*(-\d+){0,2}", str(seat)):
-                parts = str(seat).split("-")
-                numbers = [part for part in parts if part.isdigit()]
-                code = "".join(VERMONT.get(part, part) for part in parts if not part.isdigit()).lower() + "".join(
-                    f"-{number}" if index == 0 else f"-{chr(96 + int(number))}" for index, number in enumerate(numbers)
-                )
-                post = None
-            if f"{state}:{code}" not in codes[scheme]:
-                letters = sorted(code.split("-")[0])
-                number = code.split("-")[1] if "-" in code else None
-                near = [
-                    known
-                    for known in codes[scheme]
-                    if known.startswith(f"{state}:")
-                    and sorted(known.split(":")[1].split("-")[0]) == letters
-                    and (known.split("-")[1] if "-" in known else None) == number
-                ]
-                if len(near) == 1:
-                    code = near[0].split(":")[1]
-            key = (
-                f"{day}:{state}:{body_key.split(':')[1]}:{code}"
-                + (f":{post}" if post else "")
-                + (":gs" if special else ":g")
-            )
             total = int(lines.filter(pl.col("measure") == 1)["votes"].sum())
-            base = key.rsplit(":", 1)[0]
-            posted = [f"{base}:{number}:g" for number in range(1, 5) if f"{base}:{number}:g" in contests]
-            key = next(
-                (
-                    option
-                    for option in (key, f"{base}:{'g' if special else 'gs'}", *(posted if len(posted) == 1 else []))
-                    if option in contests and option not in taken
-                ),
-                key,
-            )
+            key = statewide
+            if statewide is None:
+                if state == "NE":
+                    body_key, scheme = "NE:legislature", "us.sldu"
+                elif office == "STATE SENATE":
+                    body_key, scheme = f"{state}:senate", "us.sldu"
+                else:
+                    chamber = LOWER.get(state, "House of Representatives")
+                    body_key = f"{state}:{slug(chamber.removeprefix('State ').removesuffix(' of Representatives'))}"
+                    scheme = "us.sldl"
+                code, post = medsl_state._district(state, str(seat))
+                if state == "VT" and re.fullmatch(r"[A-Z]+([- ][A-Z]+)*([- ]\d+){0,2}", str(seat)):
+                    parts = re.split(r"[- ]", str(seat))
+                    numbers = [part for part in parts if part.isdigit()]
+                    code = "".join(VERMONT.get(part, part) for part in parts if not part.isdigit()).lower() + "".join(
+                        f"-{number}" if index == 0 else f"-{chr(96 + int(number))}"
+                        for index, number in enumerate(numbers)
+                    )
+                    post = None
+                if f"{state}:{code}" not in codes[scheme]:
+                    letters = sorted(code.split("-")[0])
+                    number = code.split("-")[1] if "-" in code else None
+                    near = [
+                        known
+                        for known in codes[scheme]
+                        if known.startswith(f"{state}:")
+                        and sorted(known.split(":")[1].split("-")[0]) == letters
+                        and (known.split("-")[1] if "-" in known else None) == number
+                    ]
+                    if len(near) == 1:
+                        code = near[0].split(":")[1]
+                key = (
+                    f"{day}:{state}:{body_key.split(':')[1]}:{code}"
+                    + (f":{post}" if post else "")
+                    + (":gs" if special else ":g")
+                )
+                base = key.rsplit(":", 1)[0]
+                posted = [f"{base}:{number}:g" for number in range(1, 5) if f"{base}:{number}:g" in contests]
+                key = next(
+                    (
+                        option
+                        for option in (key, f"{base}:{'g' if special else 'gs'}", *(posted if len(posted) == 1 else []))
+                        if option in contests and option not in taken
+                    ),
+                    key,
+                )
             if key not in contests or key in taken:
                 print(f"{key}: no contest ({office} {seat}), {total} skipped")
                 continue
@@ -297,6 +443,9 @@ def emit() -> Path:
                 option
                 for option, (_, kind, parent, names, _) in known.items()
                 if parent is None and (kind == "write_in" or set(names) & POOLS)
+            ]
+            others = [
+                option for option, (_, kind, parent, _, _) in known.items() if parent is None and kind == "others"
             ]
             picked: dict[tuple[str, str | None], UUID | None] = {}
             unmatched = 0
@@ -322,7 +471,7 @@ def emit() -> Path:
                     if len(pools) > 1:
                         unmatched += votes
                         continue
-                    picked[(candidate, party)] = pools[0] if pools else None
+                    picked[(candidate, party)] = pools[0] if pools else others[0] if len(others) == 1 else None
                     continue
                 labeled = [option for option, names in roots.items() if names[:1] == [slug(candidate)]]
                 exact = [option for option, names in roots.items() if slug(candidate) in names]
@@ -330,7 +479,7 @@ def emit() -> Path:
                 if not same:
                     words = [
                         word
-                        for word in re.sub(r'"[^"]*"', " ", candidate).split()
+                        for word in re.sub(r'"[^"]*"', " ", re.split(r" AND | & |/", candidate)[0]).split()
                         if word not in {"JR", "SR", "II", "III", "IV"}
                     ]
                     if len(words) > 1 and len(words[-1]) == 1:
@@ -368,19 +517,23 @@ def emit() -> Path:
                 root = same[0] if len(same) == 1 else None
                 if root is not None and root in children:
                     wanted = re.sub(r"[^a-z]", "", slug(party or "no party"))
-                    wanted = {"womensequality": "wep"}.get(wanted, wanted)
+
                     stem = roots[root][0] if roots[root] else ""
                     tags = {
                         option: re.sub(r"[^a-z]", "", names[0].removeprefix(stem)) if names else ""
                         for option, (_, _, parent, names, _) in known.items()
                         if parent == root
                     }
+                    variants = {wanted, *ALIASES.get(wanted, ())}
                     lines_of = (
                         [option for option, tag in tags.items() if tag == wanted]
                         or [option for option, tag in tags.items() if tag and wanted[:5] in tag]
+                        or [option for option, tag in tags.items() if tag in variants]
                         or [option for option, tag in tags.items() if tag in ("nm", "unspecifiednonmaj", "other")]
                     )
                     root = lines_of[0] if len(lines_of) == 1 else None
+                if root is None and len(others) == 1:
+                    root = others[0]
                 if root is None:
                     unmatched += votes
                     continue
@@ -473,18 +626,23 @@ def emit() -> Path:
             code: str(area)
             for code, area in conn.execute(
                 """select c.code, c.area_id from area_code c join area a on a.id = c.area_id
-                   where a.scheme_code = 'us.precinct' and c.code ~ '^20(16|18|20|24):'"""
+                   where a.scheme_code = 'us.precinct' and c.code ~ '^20(16|18|20|22|24):'"""
             ).fetchall()
         }
         existing = {
             code
             for (code,) in conn.execute(
-                "select code from reporting_unit where scheme_code = 'us.precinct' and code ~ '^20(16|18|20|24):'"
+                "select code from reporting_unit where scheme_code = 'us.precinct' and code ~ '^20(16|18|20|22|24):'"
             ).fetchall()
         }
         used = set(frame["unit_id"].unique())
         units = (
-            pl.read_parquet(PARSED / "units.parquet")
+            pl.concat(
+                [pl.read_parquet(PARSED / "units.parquet"), pl.read_parquet(STATEWIDE / "units.parquet")],
+                how="vertical_relaxed",
+            )
+            .group_by("code")
+            .agg(pl.col("state").first(), pl.col("county").first(), pl.col("day").min())
             .filter(~pl.col("code").is_in(list(existing)))
             .with_columns(
                 id=pl.col("code").map_elements(lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String)

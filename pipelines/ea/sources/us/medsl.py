@@ -242,7 +242,14 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                 pl.col("office")
                 .str.to_uppercase()
                 .str.contains(
-                    {"senate": "SENATE", "president": "^US PRESIDENT$", "state": "^STATE (HOUSE|SENATE)$"}.get(
+                    {
+                        "senate": "SENATE",
+                        "president": "^US PRESIDENT$",
+                        "state": "^STATE (HOUSE|SENATE)$",
+                        "statewide": r"GOVERNOR|ATTORNEY GENERAL|SECRETARY OF|TREASURER|AUDITOR|COMPTROLLER|CONTROLLER|"
+                        r"CHIEF FINANCIAL|SUPERINTENDENT|COMMISSIONER|SUPREME|APPEALS|BOARD OF EDUCATION|REGENT|"
+                        r"PUBLIC SERVICE|PUBLIC UTILITIES|MINE INSPECTOR|TRUSTEE",
+                    }.get(
                         chamber, r"U\.?S\.? HOUSE|HOUSE OF REP"
                     )
                 )
@@ -250,7 +257,7 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                     (pl.col("state_po") != "DC")
                     | pl.col("office").str.to_uppercase().str.contains("DELEGATE")
                     | (year < 2018)
-                    | (chamber == "president")
+                    | (chamber in ("president", "statewide"))
                 )
             )
             .select(
@@ -275,10 +282,13 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                 writein=pl.col("writein").str.to_uppercase() == "TRUE",
                 mode=pl.col("mode").fill_null("").str.to_uppercase(),
                 votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-                office=pl.col("office").str.to_uppercase() if chamber == "state" else pl.lit(None, pl.String),
-                seat=pl.col("district") if chamber == "state" else pl.lit(None, pl.String),
-                party=pl.col("party_detailed") if chamber == "state" else pl.lit(None, pl.String),
-                stage=pl.col("stage").str.to_uppercase() if chamber == "state" else pl.lit(None, pl.String),
+                office=pl.col("office").str.to_uppercase() if chamber in ("state", "statewide") else pl.lit(None, pl.String),
+                seat=pl.col("district") if chamber in ("state", "statewide") else pl.lit(None, pl.String),
+                party=pl.col("party_detailed") if chamber in ("state", "statewide") else pl.lit(None, pl.String),
+                stage=pl.col("stage").str.to_uppercase() if chamber in ("state", "statewide") else pl.lit(None, pl.String),
+                magnitude=pl.col("magnitude").cast(pl.String)
+                if chamber == "statewide" and year > 2016
+                else pl.lit(None, pl.String),
             )
         )
     frame = (
