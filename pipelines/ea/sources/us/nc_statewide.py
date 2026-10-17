@@ -15,7 +15,7 @@ from ea.store import DATA, connect
 SOURCE = "us.nc_statewide"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-DAYS = [day for day in ncsbe.DAYS if day.year % 4 == 0]
+DAYS = [day for day in ncsbe.DAYS if day.year % 4 == 0 and day.year > 2000]
 OFFICES = {
     "LIEUTENANT GOVERNOR": "Lieutenant Governor",
     "SECRETARY OF STATE": "Secretary of State",
@@ -153,7 +153,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="North Carolina's Council of State elections 2000–2012 by county from the State Board of Elections' "
+        summary="North Carolina's Council of State elections 2004–2012 by county from the State Board of Elections' "
         "precinct results",
         cite=cite,
         method=METHOD,
