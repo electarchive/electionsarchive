@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, smallint, integer, text, date, numeric, boolean, timestamp, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, text, smallint, integer, date, boolean, numeric, timestamp, jsonb, customType, real, char, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -45,7 +45,7 @@ export const endedVia = pgEnum("ended_via", ["term_end", "resigned", "died", "re
 export const tenureEventKind = pgEnum("tenure_event_kind", ["elected", "certified", "certificate_denied", "certificate_reversed", "sworn_in", "suspended", "removed", "trustee_appointed", "reinstated", "resigned", "died", "immunity_lifted", "arrested", "switched_party", "became_independent", "expelled", "term_ended"])
 export const tenureAffiliationKind = pgEnum("tenure_affiliation_kind", ["party", "parliamentary_group"])
 export const nameKind = pgEnum("name_kind", ["official", "native", "english", "historical", "transliteration", "abbreviation", "ballot", "short"])
-export const noteKind = pgEnum("note_kind", ["context", "caveat", "methodology", "editorial"])
+export const noteKind = pgEnum("note_kind", ["context", "caveat", "methodology", "editorial", "retired"])
 export const labelKind = pgEnum("label_kind", ["recognition", "integrity", "data_quality"])
 export const flagSeverity = pgEnum("flag_severity", ["info", "warning", "error"])
 export const flagStatus = pgEnum("flag_status", ["open", "accepted", "resolved"])
@@ -416,7 +416,10 @@ export const entity = pgTable("entity", {
 	type: entityType().notNull(),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	createdAt: timestamp("created_at", { withTimezone: true }).default(sql`now()`).notNull(),
-});
+	retiredBy: uuid("retired_by").references(() => changeset.id),
+}, (table) => [
+	index("entity_retired_by_idx").using("btree", table.retiredBy.asc().nullsLast()).where(sql`(retired_by IS NOT NULL)`),
+]);
 
 export const entityMerge = pgTable("entity_merge", {
 	entityId: uuid("entity_id").primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
@@ -426,6 +429,14 @@ export const entityMerge = pgTable("entity_merge", {
 }, (table) => [
 	index("entity_merge_into_idx").using("btree", table.intoId.asc().nullsLast()),
 check("entity_merge_check", sql`(entity_id <> into_id)`),]);
+
+export const entityRetirement = pgTable("entity_retirement", {
+	entityId: uuid("entity_id").primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
+	reason: text().notNull(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+check("entity_retirement_reason_check", sql`(reason <> ''::text)`),]);
 
 export const externalId = pgTable("external_id", {
 	entityId: uuid("entity_id").notNull().references(() => entity.id, { onDelete: "cascade" } ),

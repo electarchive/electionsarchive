@@ -24,6 +24,7 @@ with docs as (
     join name n on n.entity_id = e.id
     where e.type in ('polity', 'election', 'contest', 'party', 'person')
         and not exists (select from entity_merge m where m.entity_id = e.id)
+        and e.retired_by is null
         and (e.type in ('party', 'person') or exists (select from slug s where s.entity_id = e.id and s.is_current))
     group by e.id, e.type
 )

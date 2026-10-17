@@ -789,6 +789,8 @@
   "workbench_examples": "Examples",
   "error_404_title": "Page not found",
   "error_404_body": "The link may be out of date, or the place or election may go by a different name. Search the archive or start from a country on the home page.",
+  "error_410_title": "Record removed",
+  "error_410_body": "This record was removed from the archive because it was not a real entry. {reason} Search the archive for what you were looking for.",
   "error_500_title": "Server error",
   "error_500_body": "The page failed to load. Try again in a moment; if it keeps failing, search for what you were looking for.",
   "error_429_title": "Too many requests",

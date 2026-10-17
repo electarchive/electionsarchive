@@ -11,6 +11,9 @@ export const load: PageServerLoad = async ({ params }) => {
     if (!(error_ instanceof ORPCError)) {
       throw error_;
     }
+    if (error_.code === "GONE") {
+      error(410, error_.message);
+    }
   }
   if (path == null) {
     error(404);

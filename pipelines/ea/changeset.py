@@ -14,7 +14,7 @@ from ea.raw import Artifact
 from ea.store import DATA, Connection
 
 NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
-LATE = ("name", "slug", "external_id", "note", "citation", "entity_merge")
+LATE = ("name", "slug", "external_id", "note", "citation", "entity_merge", "entity_retirement")
 UUID_TEXT = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 TRANSLITERATION = str.maketrans(
     {
@@ -79,6 +79,9 @@ class Changeset:
         for entity in self.survivors:
             while self.survivors[entity] in self.survivors:
                 self.survivors[entity] = self.survivors[self.survivors[entity]]
+        self.retired: dict[UUID, UUID] = dict(
+            conn.execute("select id, retired_by from entity where retired_by is not null").fetchall()
+        )
 
     def add(self, table: str, **row: object) -> None:
         self.rows.setdefault(table, []).append(row)
@@ -94,6 +97,8 @@ class Changeset:
         known = self._known[cache]
         if key not in known:
             known[key] = uuid5(NAMESPACE, f"{cache}\x1f{key}")
+            if known[key] in self.retired:
+                raise ValueError(f"{cache} {key} is {known[key]}, retired by changeset {self.retired[known[key]]}")
             self.minted.add(known[key])
         return self.survivors.get(known[key], known[key])
 

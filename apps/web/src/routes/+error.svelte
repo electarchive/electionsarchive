@@ -7,6 +7,15 @@
 
   const COPY: Record<number, [() => string, () => string]> = {
     404: [m.error_404_title, m.error_404_body],
+    410: [
+      m.error_410_title,
+      () => {
+        const reason = page.error?.message ?? "";
+        return m.error_410_body({
+          reason: `${reason.charAt(0).toUpperCase()}${reason.slice(1)}${/[.!?]$/u.test(reason) ? "" : "."}`,
+        });
+      },
+    ],
     429: [m.error_429_title, m.error_429_body],
   };
   const copy = $derived(

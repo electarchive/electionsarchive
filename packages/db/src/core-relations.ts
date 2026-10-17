@@ -69,10 +69,12 @@ export const relations = defineRelations(schema, (r) => ({
 		crosswalks: r.many.crosswalk(),
 		elections: r.many.election(),
 		electoralSystems: r.many.electoralSystem(),
-		entitiesChangesetId: r.many.entity({
-			alias: "entity_changesetId_changeset_id"
-		}),
 		entityMerges: r.many.entityMerge(),
+		entitiesViaEntityRetirement: r.many.entity({
+			from: r.changeset.id.through(r.entityRetirement.changesetId),
+			to: r.entity.id.through(r.entityRetirement.entityId),
+			alias: "changeset_id_entity_id_via_entityRetirement"
+		}),
 		entitiesViaExternalId: r.many.entity({
 			from: r.changeset.id.through(r.externalId.changesetId),
 			to: r.entity.id.through(r.externalId.entityId),
@@ -198,16 +200,14 @@ export const relations = defineRelations(schema, (r) => ({
 		contestOptions: r.many.contestOption(),
 		elections: r.many.election(),
 		electoralSystems: r.many.electoralSystem(),
-		changeset: r.one.changeset({
-			from: r.entity.changesetId,
-			to: r.changeset.id,
-			alias: "entity_changesetId_changeset_id"
-		}),
 		entityMergesEntityId: r.many.entityMerge({
 			alias: "entityMerge_entityId_entity_id"
 		}),
 		entityMergesIntoId: r.many.entityMerge({
 			alias: "entityMerge_intoId_entity_id"
+		}),
+		changesetsViaEntityRetirement: r.many.changeset({
+			alias: "changeset_id_entity_id_via_entityRetirement"
 		}),
 		changesetsViaExternalId: r.many.changeset({
 			alias: "changeset_id_entity_id_via_externalId"

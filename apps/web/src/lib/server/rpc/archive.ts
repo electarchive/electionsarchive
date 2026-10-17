@@ -7696,16 +7696,21 @@ export const entities = {
         type: string;
         slug: string | null;
         polity: string | null;
+        retired: string | null;
       }>(sql`
         select e.id, e.type::text as type,
           (select s.path from slug s where s.entity_id = e.id and s.is_current) as slug,
-          (select s.path from party p join slug s on s.entity_id = p.polity_id and s.is_current where p.id = e.id) as polity
+          (select s.path from party p join slug s on s.entity_id = p.polity_id and s.is_current where p.id = e.id) as polity,
+          (select r.reason from entity_retirement r where r.entity_id = e.id) as retired
         from entity e
         where e.id = coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
       `);
       const entity = found.rows[0];
       if (entity == null) {
         throw new ORPCError("NOT_FOUND");
+      }
+      if (entity.retired != null) {
+        throw new ORPCError("GONE", { message: entity.retired });
       }
       if (entity.slug != null) {
         return { path: entity.slug };

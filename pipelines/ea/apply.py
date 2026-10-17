@@ -62,7 +62,9 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
                                  where i.attrelid = c.conrelid and i.attname = 'id' and not i.attisdropped)
                order by c.conrelid, c.contype"""
         ).fetchall()
-        if table in tables and table not in temporal and table not in (*FACTS, "external_id", "slug", "entity_merge")
+        if table in tables
+        and table not in temporal
+        and table not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement")
     }
     return Stage(schema, tables, entities, pipeline, polity, temporal, parents)
 
@@ -396,6 +398,77 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         conn.execute(
             sql.SQL("delete from search_document where entity_id in (select entity_id from {})").format(staged)
         )
+    if table == "entity_retirement":
+        retiring: dict[str, list[str]] = {}
+        for entity, kind, retired in conn.execute(
+            sql.SQL(
+                "select s.entity_id::text, e.type::text, e.retired_by from {} s join entity e on e.id = s.entity_id"
+            ).format(staged)
+        ).fetchall():
+            if retired is not None:
+                raise ValueError(f"{entity} is already retired by {retired}")
+            retiring.setdefault(kind, []).append(entity)
+        held: list[str] = []
+        for kind, ids in retiring.items():
+            for relation, column in conn.execute(
+                """select distinct c.conrelid::regclass::text, a.attname from pg_constraint c
+                   join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+                   where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+                     and c.confrelid::regclass::text = any(%s)
+                     and c.conrelid::regclass::text not in
+                       ('name', 'note', 'external_id', 'slug', 'label', 'flag', 'search_document', 'entity_retirement')
+                     and (c.conrelid::regclass::text, a.attname) <> (%s, 'id')""",
+                [["entity", kind], kind],
+            ).fetchall():
+                held += [
+                    f"{relation}.{column} {entity} ({rows} rows)"
+                    for entity, rows in conn.execute(
+                        sql.SQL(
+                            "select {0}::text, count(*) from public.{1} where {0} = any(%s::uuid[]) group by 1"
+                        ).format(sql.Identifier(column), sql.Identifier(relation)),
+                        [ids],
+                    ).fetchall()
+                ]
+            for relation, column, parent in checks.references(conn):
+                if parent == kind:
+                    held += [
+                        f"{relation}.{column} {entity} ({rows} rows)"
+                        for entity, rows in conn.execute(
+                            sql.SQL(
+                                """select p.id::text, count(*) from public.{} p join public.{} t on t.{} = p.k
+                                   where p.id = any(%s::uuid[]) group by 1"""
+                            ).format(sql.Identifier(parent), sql.Identifier(relation), sql.Identifier(column)),
+                            [ids],
+                        ).fetchall()
+                    ]
+            if held:
+                raise ValueError("retiring entities still referenced: " + "; ".join(held[:10]))
+            conn.execute(
+                sql.SQL("delete from public.{} where id = any(%s::uuid[])").format(sql.Identifier(kind)), [ids]
+            )
+        for owned in ("name", "slug", "external_id", "label", "search_document"):
+            conn.execute(
+                sql.SQL("delete from public.{} where entity_id in (select entity_id from {})").format(
+                    sql.Identifier(owned), staged
+                )
+            )
+        conn.execute(
+            sql.SQL(
+                """update entity set retired_by = current_setting('ea.changeset_id')::uuid
+                   where id in (select entity_id from {})"""
+            ).format(staged)
+        )
+        conn.execute(
+            sql.SQL("insert into note (entity_id, kind, body_md) select entity_id, 'retired', reason from {}").format(
+                staged
+            )
+        )
+        conn.execute(
+            sql.SQL(
+                """update changeset set rationale = (select string_agg(distinct reason, '; ') from {})
+                   where id = current_setting('ea.changeset_id')::uuid"""
+            ).format(staged)
+        )
     if table == "slug":
         conn.execute(
             sql.SQL(
@@ -502,7 +575,7 @@ def publish(conn: Connection, changeset_id: str) -> None:
     stage = _stage(conn, changeset_id)
     with conn.transaction():
         conn.execute("select set_config('ea.changeset_id', %s, true)", [changeset_id])
-        if "entity_merge" in stage.tables:
+        if "entity_merge" in stage.tables or "entity_retirement" in stage.tables:
             conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
             conn.execute("select pg_advisory_xact_lock(%s)", [MERGE_LOCK])
         else:
@@ -798,6 +871,7 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 ).format(sql.Identifier(table)),
                 [changeset_id, changeset_id],
             )
+        conn.execute("update entity set retired_by = null where retired_by = %s", [changeset_id])
         conn.execute("set local session_replication_role = replica")
         for table in histories:
             history = sql.Identifier(f"{table}_history")
