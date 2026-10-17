@@ -32,6 +32,10 @@ LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data
 MASSACHUSETTS = "https://electionstats.state.ma.us/elections/download/{}/precincts_include:0/"
 VIRGINIA = "https://va2.elstats.civera.com/api/download_contest/{}_table.csv?split_party=false"
 PUBLISHERS = {
+    "AR": "Arkansas Secretary of State",
+    "TN:2023-03-14": "Shelby County Election Commission",
+    "2026-02-03:NY:senate:61": "Erie County Board of Elections",
+    "TN:2023-09-14": "Davidson County Election Commission",
     "MA": "Massachusetts Secretary of the Commonwealth",
     "NH": "New Hampshire Secretary of State",
     "VA": "Virginia Department of Elections",
@@ -214,6 +218,247 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2025-01-07:VA:house:26": ("elstats", VIRGINIA.format(161237), None),
     "2025-01-07:VA:senate:10": ("elstats", VIRGINIA.format(161235), None),
     "2025-01-07:VA:senate:32": ("elstats", VIRGINIA.format(161236), None),
+    "2023-01-03:GA:house:7": ("enhanced", GEORGIA.format("2023JanHD7Spec"), "State House Dist 7"),
+    "2023-01-31:GA:senate:11": ("enhanced", GEORGIA.format("2023JanSpec"), "State Senate 11 (Special)"),
+    "2023-01-31:GA:house:119": ("enhanced", GEORGIA.format("2023JanSpec"), "Representatives - District 119"),
+    "2023-02-28:GA:house:119:runoff": ("enhanced", GEORGIA.format("2023FebHD119Run"), "Representatives - District 119"),
+    "2023-03-21:GA:house:75": ("enhanced", GEORGIA.format("2023MarHD75Spec"), "State House District 75"),
+    "2023-05-16:GA:house:68": ("enhanced", GEORGIA.format("2023MayHD68Spec"), "State House Dist 68"),
+    "2023-06-13:GA:house:68:runoff": ("enhanced", GEORGIA.format("2023JunHD68Run"), "State House Dist 68"),
+    "2024-02-13:GA:senate:30": ("enhanced", GEORGIA.format("2024FebSpec"), "State Senate 30"),
+    "2024-02-13:GA:house:125": ("enhanced", GEORGIA.format("2024FebSpec"), "Representatives - District 125"),
+    "2024-03-12:GA:house:125:runoff": ("enhanced", GEORGIA.format("2024MarHD125Run"), "Representatives - District 125"),
+    "2024-04-09:GA:house:139": ("enhanced", GEORGIA.format("2024AprHD139Spec"), "Representatives - District 139"),
+    "2024-05-07:GA:house:139:runoff": (
+        "enhanced",
+        GEORGIA.format("2024MayHD139SpecRun"),
+        "Representatives - District 139",
+    ),
+    "2026-01-20:GA:senate:18": ("enhanced", GEORGIA.format("January20SpecialElection"), "Senate - District 18"),
+    "2026-02-17:GA:senate:18:runoff": (
+        "enhanced",
+        GEORGIA.format("Feb1726StateSenateDistrict18"),
+        "Senate - District 18",
+    ),
+    "2026-03-10:GA:senate:53": ("enhanced", GEORGIA.format("March102026SpecialElection"), "Senate - District 53"),
+    "2026-03-10:GA:house:94": (
+        "enhanced",
+        GEORGIA.format("March102026SpecialElection"),
+        "Representatives - District 94",
+    ),
+    "2026-03-10:GA:house:130": (
+        "enhanced",
+        GEORGIA.format("March102026SpecialElection"),
+        "Representatives - District 130",
+    ),
+    "2026-04-07:GA:senate:53:runoff": ("enhanced", GEORGIA.format("40726SpecialElection"), "Senate - District 53"),
+    "2026-04-07:GA:house:94:runoff": (
+        "enhanced",
+        GEORGIA.format("40726SpecialElection"),
+        "Representatives - District 94",
+    ),
+    "2026-04-07:GA:house:130:runoff": (
+        "enhanced",
+        GEORGIA.format("40726SpecialElection"),
+        "Representatives - District 130",
+    ),
+    "2026-05-12:GA:house:177": ("enhanced", GEORGIA.format("51226SpecialElection"), "Representatives - District 177"),
+    "2026-05-19:GA:senate:7": ("enhanced", GEORGIA.format("GeneralPrimary51926"), "Special State Senate - District 7"),
+    "2026-06-09:GA:house:177:runoff": (
+        "enhanced",
+        GEORGIA.format("06092026SpecialElectionRunoff"),
+        "Representatives - District 177",
+    ),
+    "2026-06-16:GA:senate:7:runoff": (
+        "enhanced",
+        GEORGIA.format("06162026GeneralPrimaryRunoff"),
+        "Special State Senate - District 7",
+    ),
+    "2023-01-31:PA:senate:27": ("pennsylvania", PENNSYLVANIA.format(96), None),
+    "2023-02-07:PA:house:32": ("pennsylvania", PENNSYLVANIA.format(97), None),
+    "2023-02-07:PA:house:34": ("pennsylvania", PENNSYLVANIA.format(98), None),
+    "2023-02-07:PA:house:35": ("pennsylvania", PENNSYLVANIA.format(99), None),
+    "2023-05-16:PA:house:108": ("pennsylvania", PENNSYLVANIA.format(101), None),
+    "2023-05-16:PA:house:163": ("pennsylvania", PENNSYLVANIA.format(102), None),
+    "2023-09-19:PA:house:21": ("pennsylvania", PENNSYLVANIA.format(103), None),
+    "2024-02-13:PA:house:140": ("pennsylvania", PENNSYLVANIA.format(104), None),
+    "2024-04-23:PA:house:139": ("pennsylvania", PENNSYLVANIA.format(106), None),
+    "2024-09-17:PA:house:195": ("pennsylvania", PENNSYLVANIA.format(107), None),
+    "2024-09-17:PA:house:201": ("pennsylvania", PENNSYLVANIA.format(108), None),
+    "2026-02-24:PA:house:42": ("pennsylvania", PENNSYLVANIA.format(113), None),
+    "2026-02-24:PA:house:22": ("pennsylvania", PENNSYLVANIA.format(114), None),
+    "2026-03-17:PA:house:79": ("pennsylvania", PENNSYLVANIA.format(115), None),
+    "2026-03-17:PA:house:193": ("pennsylvania", PENNSYLVANIA.format(116), None),
+    "2026-05-19:PA:house:196": ("pennsylvania", PENNSYLVANIA.format(118), None),
+    "2026-08-18:PA:house:12": ("pennsylvania", PENNSYLVANIA.format(119), None),
+    "2023-05-16:FL:house:24": ("florida", FLORIDA.format(date(2023, 5, 16)), None),
+    "2023-12-05:FL:house:118": ("florida", FLORIDA.format(date(2023, 12, 5)), None),
+    "2024-01-16:FL:house:35": ("florida", FLORIDA.format(date(2024, 1, 16)), None),
+    "2026-03-24:FL:house:51": ("florida", FLORIDA.format(date(2026, 3, 24)), None),
+    "2026-03-24:FL:house:87": ("florida", FLORIDA.format(date(2026, 3, 24)), None),
+    "2026-03-24:FL:senate:14": ("florida", FLORIDA.format(date(2026, 3, 24)), None),
+    "2023-01-10:VA:senate:7": ("elstats", VIRGINIA.format(160291), None),
+    "2023-01-10:VA:house:24": ("elstats", VIRGINIA.format(160292), None),
+    "2023-01-10:VA:house:35": ("elstats", VIRGINIA.format(160283), None),
+    "2023-03-28:VA:senate:9": ("elstats", VIRGINIA.format(160942), None),
+    "2024-01-09:VA:senate:9": ("elstats", VIRGINIA.format(160922), None),
+    "2024-01-09:VA:house:48": ("elstats", VIRGINIA.format(160923), None),
+    "2026-01-06:VA:senate:15": ("elstats", VIRGINIA.format(164992), None),
+    "2026-01-06:VA:house:77": ("elstats", VIRGINIA.format(164993), None),
+    "2026-01-13:VA:house:11": ("elstats", VIRGINIA.format(164994), None),
+    "2026-01-13:VA:house:23": ("elstats", VIRGINIA.format(164995), None),
+    "2026-01-20:VA:house:17": ("elstats", VIRGINIA.format(165667), None),
+    "2026-02-10:VA:senate:39": ("elstats", VIRGINIA.format(165669), None),
+    "2026-02-10:VA:house:5": ("elstats", VIRGINIA.format(165670), None),
+    "2026-03-17:VA:house:98": ("elstats", VIRGINIA.format(165673), None),
+    "2023-02-28:CT:house:6": ("elstats", CONNECTICUT.format(35494), None),
+    "2023-02-28:CT:house:100": ("elstats", CONNECTICUT.format(35495), None),
+    "2023-02-28:CT:house:148": ("elstats", CONNECTICUT.format(35496), None),
+    "2024-01-23:CT:house:115": ("elstats", CONNECTICUT.format(38452), None),
+    "2026-01-06:CT:house:25": ("elstats", CONNECTICUT.format(44017), None),
+    "2026-01-13:CT:house:139": ("elstats", CONNECTICUT.format(44015), None),
+    "2023-05-30:MA:house:suffolk-9": ("elstats", MASSACHUSETTS.format(160299), None),
+    "2023-05-30:MA:house:suffolk-10": ("elstats", MASSACHUSETTS.format(160300), None),
+    "2023-11-07:MA:senate:worcesterhampshire": ("elstats", MASSACHUSETTS.format(160410), None),
+    "2024-03-05:MA:house:worcester-6": ("elstats", MASSACHUSETTS.format(160911), None),
+    "2026-03-03:MA:senate:middlesex-1": ("elstats", MASSACHUSETTS.format(171923), None),
+    "2026-03-31:MA:house:essex-5": ("elstats", MASSACHUSETTS.format(171924), None),
+    "2026-02-07:LA:senate:3": ("louisiana", LOUISIANA.format(date(2026, 2, 7)), "3rd Senatorial District"),
+    "2026-02-07:LA:house:37": ("louisiana", LOUISIANA.format(date(2026, 2, 7)), "37th Representative District"),
+    "2026-02-07:LA:house:60": ("louisiana", LOUISIANA.format(date(2026, 2, 7)), "60th Representative District"),
+    "2026-02-07:LA:house:97": ("louisiana", LOUISIANA.format(date(2026, 2, 7)), "97th Representative District"),
+    "2026-02-07:LA:house:100": ("louisiana", LOUISIANA.format(date(2026, 2, 7)), "100th Representative District"),
+    "2026-03-14:LA:senate:3:runoff": ("louisiana", LOUISIANA.format(date(2026, 3, 14)), "3rd Senatorial District"),
+    "2026-03-14:LA:house:69": ("louisiana", LOUISIANA.format(date(2026, 3, 14)), "69th Representative District"),
+    "2026-03-14:LA:house:100:runoff": (
+        "louisiana",
+        LOUISIANA.format(date(2026, 3, 14)),
+        "100th Representative District",
+    ),
+    "2023-05-16:NH:house:hillsborough-3": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-special-elections/hillsborough-county-district-3-nashua-ward-4-may-16-2023",
+        None,
+    ),
+    "2023-08-22:NH:house:grafton-16": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-2024-special-elections/grafton-county-district-16-enfield-august-22-2023",
+        None,
+    ),
+    "2023-09-19:NH:house:rockingham-1": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-special-elections/rockingham-county-dist-1-northwood-nottingham-sept-19-2023",
+        None,
+    ),
+    "2023-11-07:NH:house:hillsborough-3": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-2024-special-elections/hillsborough-county-district-3-nashua-ward-4-november-7-2023",
+        None,
+    ),
+    "2024-01-23:NH:house:coos-1": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-2024-special-elections/coos-county-district-1-january-23-2024",
+        None,
+    ),
+    "2024-01-23:NH:house:coos-6": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-2024-special-elections/coos-county-district-6-january-23-2024",
+        None,
+    ),
+    "2024-03-12:NH:house:rockingham-21": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-2024-special-elections/rockingham-county-district-21-march-12-2024",
+        None,
+    ),
+    "2024-03-12:NH:house:strafford-11": (
+        "transcribed",
+        "https://www.sos.nh.gov/elections/2023-2024-special-elections/strafford-county-district-11-march-12-2024",
+        None,
+    ),
+    "2026-03-10:NH:house:carroll-7": (
+        "transcribed",
+        "https://www.sos.nh.gov/carroll-county-district-7-march-10-2026",
+        None,
+    ),
+    "2023-03-14:TN:house:86": (
+        "transcribed",
+        "https://www.electionsshelbytn.gov/wp-content/uploads/2025/09/3.14.23-Election-Summary-OFFICIAL-RESULTS.pdf",
+        None,
+    ),
+    "2023-09-14:TN:house:51": (
+        "transcribed",
+        "https://www.nashville.gov/sites/default/files/2024-03/OFFICIAL_Election_Results_by_Precinct_September_14_2023_Metropolitan_Runoff_and_District_51_Special_General.pdf?ct=1711729654",
+        None,
+    ),
+    "2026-03-03:AR:house:70": (
+        "transcribed",
+        "https://enr-results-api.totalresults.com/Contest/GetContestResults?cId=arkansas&electionID=55355810-8dde-40ff-a1d2-5b8675226873&contestType=County",
+        None,
+    ),
+    "2026-03-03:AR:senate:26": (
+        "transcribed",
+        "https://enr-results-api.totalresults.com/Contest/GetSingleContestResults?cId=arkansas&electionID=7f77a178-af02-40ec-92db-c5cc50882c68&contestType=State%20Senate&contestID=3252a2e9-592e-423f-8ff6-50fe267ba655",
+        None,
+    ),
+    "2023-11-07:ME:house:50": (
+        "transcribed",
+        "https://lldc.mainelegislature.org/Open/Elections/Returns/2023/20231107/elec_20231107e.pdf",
+        None,
+    ),
+    "2024-03-05:ME:house:122": (
+        "transcribed",
+        "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/20240305/elec_20240305f.pdf",
+        None,
+    ),
+    "2026-02-24:ME:house:94": (
+        "transcribed",
+        "https://lldc.mainelegislature.org/Open/Elections/Returns/2026/20260224/elec_20260224a.pdf",
+        None,
+    ),
+    "2023-09-12:NY:assembly:27": (
+        "transcribed",
+        "https://vote.nyc/sites/default/files/pdf/election_results/2023/20230912Special%20Election/00402100027Queens%20Member%20of%20the%20Assembly%2027th%20Assembly%20District%20Recap.csv",
+        None,
+    ),
+    "2024-02-13:NY:assembly:77": (
+        "transcribed",
+        "https://vote.nyc/sites/default/files/pdf/election_results/2024/20240213Special%20Election/00202100077Bronx%20Member%20of%20the%20Assembly%2077th%20Assembly%20District%20Recap.csv",
+        None,
+    ),
+    "2026-02-03:NY:assembly:36": (
+        "transcribed",
+        "https://vote.nyc/sites/default/files/pdf/election_results/2026/20260203Special%20Election/00402200036Queens%20Member%20of%20the%20Assembly%2036th%20Assembly%20District%20Recap.csv",
+        None,
+    ),
+    "2026-02-03:NY:assembly:74": (
+        "transcribed",
+        "https://vote.nyc/sites/default/files/pdf/election_results/2026/20260203Special%20Election/00102200074New%20York%20Member%20of%20the%20Assembly%2074th%20Assembly%20District%20Recap.csv",
+        None,
+    ),
+    "2026-02-03:NY:senate:47": (
+        "transcribed",
+        "https://vote.nyc/sites/default/files/pdf/election_results/2026/20260203Special%20Election/00102100047New%20York%20State%20Senator%2047th%20Senatorial%20District%20Recap.csv",
+        None,
+    ),
+    "2026-02-03:NY:senate:61": (
+        "transcribed",
+        "https://elections.erie.gov/Files/Election%20Results/2026/2026%20Special%20Canvass%20Book.pdf",
+        None,
+    ),
+    "2023-11-07:RI:senate:1": (
+        "transcribed",
+        "https://rigov.s3.amazonaws.com/election/results/2023/general_election/ga_senator.json",
+        None,
+    ),
+    "2024-01-09:AL:house:16": (
+        "transcribed",
+        "https://www.sos.alabama.gov/sites/default/files/election-2024/State%20Certification%20of%20General%20Election-HD16.pdf",
+        None,
+    ),
+    "2023-11-07:SC:senate:42": ("clarity", SOUTH_CAROLINA.format("118372/324411"), "State Senate District 42"),
+    "2024-01-02:SC:senate:19": ("clarity", SOUTH_CAROLINA.format("119333/325468"), "Senate, District  19"),
+    "2024-04-02:SC:house:109": ("clarity", SOUTH_CAROLINA.format("120699/334766"), "Representatives District 109"),
+    "2026-01-06:SC:house:98": ("clarity", SOUTH_CAROLINA.format("125869/367712"), "Representatives, District 98"),
 }
 TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
     "2025-06-24:AL:senate:5": [
@@ -257,6 +502,83 @@ TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
     "2025-02-25:ME:house:24": [("Sean Faircloth", "Democratic", 1431), ("Carolyn A. Fish", "Republican", 567)],
     "2025-06-24:NH:house:strafford-12": [("Billie Butler", "Democratic", 964), ("Ken Hilton", "Republican", 774)],
     "2025-11-04:NH:house:coos-5": [("Corinne Cascadden", "Democratic", 873), ("Marc D. Tremblay", "Republican", 878)],
+    "2023-05-16:NH:house:hillsborough-3": [
+        ("David M. Narkunas", "Republican", 60),
+        ("Marc W. Plamondon", "Democratic", 151),
+    ],
+    "2023-08-22:NH:house:grafton-16": [("David Fracht", "Democratic", 495), ("John P. Keane", "Republican", 194)],
+    "2023-09-19:NH:house:rockingham-1": [("Hal Rafter", "Democratic", 1571), ("James Guzofski", "Republican", 1240)],
+    "2023-11-07:NH:house:hillsborough-3": [
+        ("Paige Beauchemin", "Democratic", 409),
+        ("David M. Narkunas", "Republican", 265),
+    ],
+    "2024-01-23:NH:house:coos-1": [("Cathleen A. Fountain", "Democratic", 851), ("Sean C. Durkin", "Republican", 1289)],
+    "2024-01-23:NH:house:coos-6": [("Edith Tucker", "Democratic", 643), ("Michael P. Murphy", "Republican", 750)],
+    "2024-03-12:NH:house:rockingham-21": [
+        ("Jennifer Mandelbaum", "Democratic", 417),
+        ("Carol A. Bush", "Republican", 245),
+    ],
+    "2024-03-12:NH:house:strafford-11": [("Erik Johnson", "Democratic", 1028), ("Joseph E. Bazo", "Republican", 525)],
+    "2026-03-10:NH:house:carroll-7": [("Bobbi Boudman", "Democratic", 2207), ("Dale Fincher", "Republican", 2042)],
+    "2023-03-14:TN:house:86": [("Justin J. Pearson", "Democratic", 443), (None, None, 10)],
+    "2023-09-14:TN:house:51": [
+        ("Aftyn Behn", "Democratic", 10654),
+        ("David C. Hooven", "Republican", 3030),
+        ("Annabelle Lee", "Independent", 408),
+        (None, None, 159),
+    ],
+    "2026-03-03:AR:house:70": [("Alex Holladay", "Democratic", 4035), ("Bo Renshaw", "Republican", 2995)],
+    "2026-03-03:AR:senate:26": [("Brad C. Simon", None, 8930), ("Adam Watson", None, 4011)],
+    "2023-11-07:ME:house:50": [("David A. Sinclair", "Democratic", 2188)],
+    "2024-03-05:ME:house:122": [
+        ("Matthew D. Beck", "Democratic", 1218),
+        ("Tristram J. Howard", "Not Enrolled", 176),
+        ("Brendan K. Williams", "Unenrolled", 239),
+    ],
+    "2026-02-24:ME:house:94": [("Scott A. Harriman", "Democratic", 572), ("Janet I. Beaudoin", "Republican", 503)],
+    "2023-09-12:NY:assembly:27": [
+        ("Sam Berger", "Democratic", 2555),
+        ("David P. Hirsch", "Republican", 1796),
+        ("David P. Hirsch", "Conservative", 261),
+        (None, None, 12),
+    ],
+    "2024-02-13:NY:assembly:77": [
+        ("Landon C. Dais", "Democratic", 1143),
+        ("Norman Sobe McGill", "Republican", 244),
+        ("Norman Sobe McGill", "Conservative", 64),
+        (None, None, 74),
+    ],
+    "2026-02-03:NY:assembly:36": [
+        ("Diana C. Moreno", "Democratic", 3389),
+        ("Diana C. Moreno", "Working Families", 3083),
+        ("Rana Abdelhamid", "Queens For All", 1491),
+        ("Mary Jobaida", "People First", 665),
+        (None, None, 106),
+    ],
+    "2026-02-03:NY:assembly:74": [
+        ("Keith Powers", "Democratic", 4203),
+        ("Joseph W. Foley", "Republican", 719),
+        ("Joseph W. Foley", "Conservative", 120),
+        (None, None, 51),
+    ],
+    "2026-02-03:NY:senate:47": [
+        ("Erik Bottcher", "Democratic", 11076),
+        ("Erik Bottcher", "Working Families", 2249),
+        ("Charlotte Friedman", "Republican", 1117),
+        (None, None, 96),
+    ],
+    "2026-02-03:NY:senate:61": [
+        ("Jeremy J. Zellner", "Democratic", 19341),
+        ("Dan R. Gagliardo", "Republican", 9853),
+        ("Dan R. Gagliardo", "Conservative", 3033),
+        (None, None, 175),
+    ],
+    "2023-11-07:RI:senate:1": [("Jacob Bissaillon", "DEM", 904), ("Niyoka Powell", "REP", 179), (None, None, 9)],
+    "2024-01-09:AL:house:16": [
+        ("John H. Underwood", "Democratic", 469),
+        ("Bryan Brinyark", "Republican", 2372),
+        (None, None, 4),
+    ],
     "2025-04-29:IA:house:78": [("Angel Ramirez", "DEM", 2747), ("Bernie Hayes", "REP", 721), (None, None, 6)],
     "2025-11-04:NJ:senate:35": [
         ("Benjie E. Wimberly", "Democratic", 31676),
@@ -286,8 +608,29 @@ PARTIES = {
     "gre": "green-party",
     "NY:conservative": "NY:conservative-party",
     "NY:working families": "NY:working-families-party",
+    "NY:people first": "NY:people-first-party",
+    "SC:unc": "SC:united-citizens",
+    "SC:united citizens": "SC:united-citizens",
 }
-INDEPENDENT = {"", "npa", "non", "ind", "np", "nop", "una", "independent", "nonpartisan", "no party preference"}
+INDEPENDENT = {
+    "",
+    "npa",
+    "non",
+    "ind",
+    "np",
+    "nop",
+    "una",
+    "independent",
+    "nonpartisan",
+    "no party preference",
+    "petitioning candidate",
+    "noparty",
+    "nopty",
+    "unaffiliated",
+    "unenrolled",
+    "not enrolled",
+    "queens for all",
+}
 SUFFIXES = {
     "clarity": ".json",
     "florida": ".txt",
@@ -336,7 +679,7 @@ def parse() -> None:
             if len(contests) != 1:
                 raise ValueError(f"{key}: {len(contests)} contests match {select!r}")
             for label, party, votes in zip(contests[0]["CH"], contests[0]["P"], contests[0]["V"], strict=True):
-                label = re.sub(r"^(DEM|REP|LIB|GRN|CON|IND|NON|PET) ", "", label)
+                label = re.sub(r"^(DEM|REP|LIB|GRN|CON|IND|NON|PET|UNC) ", "", label)
                 found.append((None, None, int(votes)) if WRITE_INS.match(label) else (_title(label), party, int(votes)))
         elif system == "florida":
             code = "STS" if ":senate:" in key else "STR"
@@ -345,8 +688,16 @@ def parse() -> None:
                 if row["RaceCode"] == code and int(row["Juris1num"]) == int(key.split(":")[3]):
                     label = " ".join(f"{row['CanNameFirst']} {row['CanNameMiddle']} {row['CanNameLast']}".split())
                     totals[(label, row["PartyCode"])] += int(row["CanVotes"])
-            found = [(label, party, votes) for (label, party), votes in totals.items() if party != "WRI"]
-            if writes := sum(votes for (_, party), votes in totals.items() if party == "WRI"):
+            found = [
+                (label, None if party == "WRI" else party, votes)
+                for (label, party), votes in totals.items()
+                if party != "WRI" or (label and not WRITE_INS.match(label))
+            ]
+            if writes := sum(
+                votes
+                for (label, party), votes in totals.items()
+                if party == "WRI" and (not label or WRITE_INS.match(label))
+            ):
                 found.append((None, None, writes))
         elif system == "pennsylvania":
             for offices in json.loads(json.loads(path.read_text()))["Election"].values():
@@ -356,7 +707,13 @@ def parse() -> None:
                             for candidate in district["Candidates"]:
                                 found.append(
                                     (
-                                        _title(candidate["CandidateName"]),
+                                        _title(
+                                            re.sub(
+                                                r"(?i)^(.+?), (.+?)(?: (Jr|Sr|II|III|IV))?$",
+                                                lambda m: " ".join(filter(None, (m[2], m[1], m[3]))),
+                                                candidate["CandidateName"],
+                                            )
+                                        ),
                                         candidate["PartyName"],
                                         int(candidate["Votes"]),
                                     )
@@ -379,8 +736,8 @@ def parse() -> None:
             for label, party, votes in zip(table[0][1:], parties[1:], totals_row[1:], strict=False):
                 if label in ("Same Day Registration (SDR)", "Total Votes Cast", "Total Ballots Cast", "Blanks", ""):
                     continue
-                if party:
-                    found.append((label, party, int(votes.replace(",", ""))))
+                if not (WRITE_INS.match(label) or label == "All Others" or party.lower() in ("write in", "write-in")):
+                    found.append((" ".join(label.split()), party, int(votes.replace(",", ""))))
                 else:
                     writes += int(votes.replace(",", ""))
             if writes:
@@ -395,10 +752,11 @@ def parse() -> None:
             if len(items) != 1:
                 raise ValueError(f"{key}: {len(items)} contests match {select!r}")
             for option in items[0]["summaryResults"]["ballotOptions"]:
-                label = re.sub(
-                    r"^(DEM|REP|LIB|GRN|IND|NON) | \((Dem|Rep|Lib|Grn|Ind|Non)\)$", "", option["name"][0]["text"]
-                )
-                party = (option.get("party") or {}).get("abbreviation")
+                text = re.sub(r'"\s*([^"]*?)\s*"', r'"\1"', option["name"][0]["text"].replace('""', '"')).strip()
+                match = re.fullmatch(r"(?:(DEM|REP|LIB|GRN|IND|NON) )?(.+?)(?: \((\w+)\)| - (\w+))?", text)
+                assert match is not None
+                label = match[2]
+                party = (option.get("party") or {}).get("abbreviation") or match[1] or match[3] or match[4]
                 found.append(
                     (None, None, option["voteCount"])
                     if option["isWriteIn"] or WRITE_INS.match(label)
@@ -440,6 +798,10 @@ def emit() -> Path:
             value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")
         }
         slugs = dict(conn.execute("select path, entity_id from slug").fetchall())
+        published = {
+            value
+            for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{SOURCE}.result_set"])
+        }
         known: dict[tuple[str, str], set[UUID]] = defaultdict(set)
         for body, person, ballot in conn.execute(
             """select distinct b.value, cd.person_id, cd.ballot_name
@@ -469,7 +831,7 @@ def emit() -> Path:
         systems = {code: cs.key("us.electoral_system", code) for code in ("fptp", "two_round", "top_two")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp, two-round, and top-two systems must already exist")
-        sources: dict[str, UUID] = {}
+        sources: dict[tuple[str, date], UUID] = {}
         cited: set[str] = set()
         persons: dict[tuple[str, str], UUID] = {}
         contests: dict[str, UUID] = {}
@@ -480,20 +842,20 @@ def emit() -> Path:
             day, state, chamber, code = date.fromisoformat(parts[0]), parts[1], parts[2], parts[3]
             post = parts[4] if len(parts) > 4 and parts[4] != "runoff" else None
             runoff = key.endswith(":runoff")
-            if f"{state}:{day}" not in sources:
-                publisher = PUBLISHERS[state]
+            publisher = PUBLISHERS.get(key) or PUBLISHERS.get(f"{state}:{day}") or PUBLISHERS[state]
+            if (publisher, day) not in sources:
                 title = f"Official results, {day:%B} {day.day}, {day.year} special election"
-                sources[f"{state}:{day}"] = cs.source(publisher, title)
+                sources[(publisher, day)] = cs.source(publisher, title)
                 cs.add(
                     "source",
-                    id=sources[f"{state}:{day}"],
+                    id=sources[(publisher, day)],
                     kind="official_body",
                     publisher=publisher,
                     title=title,
                     url=url,
                     license="Public record",
                 )
-            source = sources[f"{state}:{day}"]
+            source = sources[(publisher, day)]
             if url not in cited:
                 cited.add(url)
                 cs.artifact(raw.cached(SOURCE, url), source)
@@ -540,11 +902,17 @@ def emit() -> Path:
             etype = ("gs" if on_general else "s") + ("runoff" if runoff else "")
             contest_key = f"{day}:{state}:{body_slug}:{code}" + (f":{post}" if post else "") + f":{etype}"
             contest = contests[key] = cs.key("us.contest", contest_key)
+            if contest_key in published:
+                continue
             previous = None
             if runoff:
-                first = next(
-                    (other for other in contests if other.split(":")[1:] == key.removesuffix(":runoff").split(":")[1:]),
-                    None,
+                first = max(
+                    (
+                        other
+                        for other in contests
+                        if other < key and other.split(":")[1:] == key.removesuffix(":runoff").split(":")[1:]
+                    ),
+                    default=None,
                 )
                 previous = contests[first] if first else None
             electoral_system = SYSTEMS.get(state, "fptp")
