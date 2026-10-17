@@ -52,6 +52,8 @@ OHIO = (
 )
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
+UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
+SUMMIT = "https://vote.utah.gov/wp-content/uploads/2024/08/P24_Summit.pdf"
 HAWAII = "https://files.hawaii.gov/elections/files/results/2024/Primary/{}.txt"
 MISSOURI = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/ActualResults-August62024.pdf"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
@@ -231,6 +233,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, MISSOURI, suffix=".pdf")
     for name in ("media", "summary"):
         raw.fetch(SOURCE, HAWAII.format(name), suffix=".txt")
+    raw.fetch(SOURCE, UTAH, suffix=".json")
+    raw.fetch(SOURCE, SUMMIT, suffix=".pdf")
     for package in TEXAS:
         for resource in json.loads(raw.fetch(SOURCE, TED.format(package), suffix=".json").path.read_text())["result"][
             "resources"
@@ -375,6 +379,8 @@ def parse() -> None:
         ("OR", "county", OREGON),
         ("MO", "county", MISSOURI),
         ("HI", "precinct", HAWAII.format("media")),
+        ("UT", "county", UTAH),
+        ("UT", "county", SUMMIT),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
         *(
@@ -678,6 +684,83 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif url == UTAH:
+            export = json.loads(raw.cached(SOURCE, url).path.read_text())
+            statewide = {
+                (item["name"].strip(), option["name"]): option["voteCount"]
+                for item in export["results"]["ballotItems"]
+                for option in item["ballotOptions"]
+            }
+            cells = []
+            for locality in export["localResults"]:
+                for item in locality["ballotItems"]:
+                    if not re.search(r" For (US |Governor)", item["name"]):
+                        continue
+                    for option in item["ballotOptions"]:
+                        statewide[(item["name"].strip(), option["name"])] -= option["voteCount"]
+                        cells.append(
+                            {
+                                "county": locality["name"],
+                                "office": item["name"].split(" For ", 1)[1].strip(),
+                                "district": item["name"],
+                                "party": item["name"].split(" For ", 1)[0],
+                                "candidate": option["name"].split("/")[0],
+                                "votes": str(option["voteCount"]),
+                            }
+                        )
+            if any(votes for (name, _), votes in statewide.items() if re.search(r" For (US |Governor)", name)):
+                raise ValueError("UT: the counties do not add up to the statewide results")
+            frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
+        elif url == SUMMIT:
+            pdf = raw.cached(SOURCE, url).path
+            cells = []
+            race: tuple[str, str] | None = None
+            seen = 0
+            for page in range(1, 6):
+                lines = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][3], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][-1][1][3] - box[3]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                for words in lines:
+                    words.sort(key=lambda item: item[1][0])
+                    text = " ".join(word for word, _ in words)
+                    heading = re.fullmatch(r"(Republican|Democratic) Candidate for (.+)", text)
+                    if heading:
+                        race = heading[1], heading[2]
+                        seen = 0
+                    elif race and text.startswith("Total Votes Cast"):
+                        if seen != int(words[3][0].replace(",", "")):
+                            raise ValueError(f"UT: Summit's {race} lines sum to {seen}, the total is {words[3][0]}")
+                        race = None
+                    elif race and re.fullmatch(r"[\d,]+", words[-2][0]) and words[-1][0].endswith("%"):
+                        seen += int(words[-2][0].replace(",", ""))
+                        cells.append(
+                            {
+                                "county": "Summit",
+                                "office": race[1].removesuffix(" and Lieutenant Governor").replace("U.S.", "US"),
+                                "district": race[1],
+                                "party": race[0],
+                                "candidate": " ".join(word for word, _ in words[:-2]).split("/")[0].title(),
+                                "votes": words[-2][0],
+                                "page": page,
+                                "x0": words[-2][1][0],
+                                "y0": words[-2][1][1],
+                                "x1": words[-2][1][2],
+                                "y1": words[-2][1][3],
+                            }
+                        )
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(COLUMNS, pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
         elif state == "HI":
             records = [
                 record
@@ -1333,6 +1416,8 @@ def parse() -> None:
             if state == "MO"
             else date(2024, 8, 10)
             if state == "HI"
+            else date(2024, 6, 25)
+            if url in (UTAH, SUMMIT)
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1666,6 +1751,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "HI"
+                else (
+                    "Utah Office of the Lieutenant Governor",
+                    "2024 Primary Election, official results by county",
+                    "https://vote.utah.gov/county-canvass-certifications-and-results-june-2024-primary-election/",
+                    "official_body",
+                    "Public record",
+                )
+                if used in (UTAH, SUMMIT)
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
