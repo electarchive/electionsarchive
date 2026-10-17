@@ -157,7 +157,7 @@ PARTIES = [
 ]  # fmt: skip
 WRITE_IN = re.compile(r"write.?ins?\b|^scatter|^other candidates$", re.IGNORECASE)
 BLANK = re.compile(r"^(blanks?|over ?votes?|under ?votes?|spoiled|void)$", re.IGNORECASE)
-NOTA = re.compile(r"^none of (these|the above)", re.IGNORECASE)
+NOTA = re.compile(r"^none of (these|the above|the names)", re.IGNORECASE)
 TITLE = "2024 United States primary elections"
 NOTE = (
     "Statewide and district primary totals as transcribed in the English Wikipedia's 2024 election articles, which "
@@ -457,6 +457,18 @@ def parse() -> None:
                 ):
                     spoiled += int(digits)
                     continue
+                candidate = re.sub(r"\s*\((?:Republican|Democrat|Democratic|Ind\.|Independent)\)$", "", cells[0])
+                kind = (
+                    "uncommitted"
+                    if re.match(r"uncommitted|noncommitted|no preference|uninstructed", candidate, re.IGNORECASE)
+                    else "write_in"
+                    if re.search(r"write.?in", candidate, re.IGNORECASE) or re.fullmatch(r'".*"', candidate)
+                    else "none_of_the_above"
+                    if NOTA.match(candidate)
+                    else "others"
+                    if re.fullmatch(r"others?|other candidates", candidate, re.IGNORECASE)
+                    else "candidate"
+                )
                 presidential.append(
                     {
                         "state": state,
@@ -464,17 +476,10 @@ def parse() -> None:
                         "day": day,
                         "caucus": caucus,
                         "template": template,
-                        "candidate": cells[0],
+                        "candidate": candidate.strip('"'),
                         "votes": int(digits),
-                        "kind": "uncommitted"
-                        if re.match(r"uncommitted|no preference|uninstructed", cells[0], re.IGNORECASE)
-                        else "write_in"
-                        if re.search(r"write.?in", cells[0], re.IGNORECASE)
-                        else "none_of_the_above"
-                        if NOTA.match(cells[0])
-                        else "others"
-                        if re.fullmatch(r"others?|other candidates", cells[0], re.IGNORECASE)
-                        else "candidate",
+                        "kind": "write_in" if candidate != cells[0] else kind,
+                        "named": kind == "candidate",
                     }
                 )
             if total is not None:
@@ -829,7 +834,83 @@ def emit() -> Path:
                     kind="advanced" if blanket or has_runoff else "won",
                 )
         print(f"{len(contests)} primaries and {skipped} skipped")
+
+        def split(text: str) -> tuple[str, str]:
+            parts = [
+                word
+                for word in slug(re.sub(r'"[^"]*"|\([^)]*\)', " ", text)).split("-")
+                if word not in {"jr", "sr", "ii", "iii", "iv", ""}
+            ] or ["", ""]
+            return parts[0], parts[-1]
+
+        def alike(a: str, b: str, initial: bool) -> bool:
+            return a == b or a.startswith(b) or b.startswith(a) or initial and a[:2] == b[:2]
+
         presidential = pl.read_parquet(PARSED / "presidential.parquet")
+        pool = [
+            (*split(text), person, president)
+            for person, text, president in conn.execute(
+                """select cy.person_id, n.text, bool_or(x.value ~ ':president(:|$)')
+                   from candidacy cy join contest_option o on o.id = cy.option_id
+                   join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+                   join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+                   join name n on n.entity_id = cy.person_id and n.is_preferred
+                   where e.date_from >= '2016-01-01' group by 1, 2"""
+            ).fetchall()
+        ]
+        people: dict[str, UUID] = {}
+        for candidate in presidential.filter(pl.col("named"))["candidate"].unique().sort():
+            first, surname = split(candidate)
+            words = {word for word in slug(candidate).split("-") if word not in {"jr", "sr", "ii", "iii", "iv"}}
+            hits = sorted(
+                {
+                    fec_id
+                    for fec_id, filed in roster[("US", "P", 0)]
+                    if surname in filed and (words - {surname}) & filed
+                },
+                key=lambda fec_id: fec_id not in fec_known,
+            )
+            hit = hits[0] if hits and (len(hits) == 1 or hits[0] in fec_known and hits[1] not in fec_known) else None
+            if hit is not None and hit in fec_known:
+                people[candidate] = cs.key("fec.candidate", hit)
+                continue
+            found = next(
+                (
+                    group
+                    for group in (
+                        {
+                            person
+                            for given, family, person, held in pool
+                            if family == surname and held == president and alike(first, given, president)
+                        }
+                        for president in (True, False)
+                    )
+                    if len(group) == 1
+                ),
+                None,
+            )
+            if found is not None:
+                people[candidate] = found.pop()
+            elif hit is not None:
+                fec_known.add(hit)
+                people[candidate] = cs.key("fec.candidate", hit)
+                cs.add("person", id=people[candidate])
+                name(people[candidate], candidate)
+        for candidate in presidential.filter(pl.col("named"))["candidate"].unique().sort():
+            if candidate in people:
+                continue
+            first, surname = split(candidate)
+            found = {
+                person
+                for other, person in people.items()
+                if split(other)[1] == surname and alike(first, split(other)[0], True)
+            }
+            if len(found) == 1:
+                people[candidate] = found.pop()
+                continue
+            people[candidate] = cs.key(f"{SOURCE}.person", f"US:{slug(candidate)}")
+            cs.add("person", id=people[candidate])
+            name(people[candidate], candidate)
         totals = {template: total for template, total in presidential.select("template", "total").unique().iter_rows()}
         nations: dict[str, UUID] = {}
         parents: dict[str, UUID] = {}
@@ -951,8 +1032,8 @@ def emit() -> Path:
                         "most likely scattered write-ins that it does not itemize."
                     ),
                 )
-            for candidate, kind_of, votes in (
-                lines.group_by("candidate", "kind", maintain_order=True).agg(pl.col("votes").sum()).iter_rows()
+            for candidate, kind_of, personal, votes in (
+                lines.group_by("candidate", "kind", "named", maintain_order=True).agg(pl.col("votes").sum()).iter_rows()
             ):
                 option_key = f"{contest_key}:{slug(candidate)}"
                 option = cs.key("us.option", option_key)
@@ -965,37 +1046,12 @@ def emit() -> Path:
                     ballot_label=candidate,
                 )
                 values.append((str(result_set), str(states[state]), str(option), int(votes)))
-                if kind_of != "candidate":
+                if not personal:
                     continue
-                words = {word for word in slug(candidate).split("-") if word not in {"jr", "sr", "ii", "iii", "iv"}}
-                surname = [word for word in slug(candidate).split("-") if word not in {"jr", "sr", "ii", "iii", "iv"}][
-                    -1
-                ]
-                hits = sorted(
-                    {
-                        fec_id
-                        for fec_id, filed in roster[("US", "P", 0)]
-                        if surname in filed and (words - {surname}) & filed
-                    },
-                    key=lambda fec_id: fec_id not in fec_known,
-                )
-                if hits and (len(hits) == 1 or hits[0] in fec_known and hits[1] not in fec_known):
-                    person = cs.key("fec.candidate", hits[0])
-                    if hits[0] not in fec_known:
-                        fec_known.add(hits[0])
-                        cs.add("person", id=person)
-                        name(person, candidate)
-                else:
-                    person_key = f"US:{slug(candidate)}"
-                    person = cs.key(f"{SOURCE}.person", person_key)
-                    if person in cs.minted and person_key not in persons:
-                        persons.add(person_key)
-                        cs.add("person", id=person)
-                        name(person, candidate)
                 cs.add(
                     "candidacy",
                     id=cs.key("us.candidacy", f"{option_key}:head"),
-                    person_id=person,
+                    person_id=people[candidate],
                     option_id=option,
                     role="head",
                     ballot_name=candidate,
