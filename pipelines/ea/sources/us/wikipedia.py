@@ -49,6 +49,17 @@ NOTE = (
     "sum is the total. The winners shown are the slates that carried the "
     "state; where the table splits a state's electors among candidates on its ballot, the split is kept."
 )
+SPLIT = (
+    "From 1972 Maine has given two electors to the statewide winner and one to the winner of each congressional "
+    "district. This set gives the statewide winner the two at-large electors and supersedes one that gave that "
+    "ticket all four."
+)
+DISTRICT_NOTE = (
+    "Maine gives one elector to the winner of each congressional district. The results-by-state table of the "
+    "English Wikipedia's article on the election reports Maine's vote statewide only, so this set records only "
+    "which ticket won the district's elector. From 1972 through 1980, both districts voted for the ticket that "
+    "carried the state."
+)
 
 
 def page(year: int) -> str:
@@ -510,6 +521,7 @@ def emit() -> Path:
                 contest_key = f"{stem}:{state}:president"
                 contest = cs.key("us.contest", contest_key)
                 electors = seats_by_state[state]
+                split = state == "ME" and year >= 1972
                 cs.add(
                     "contest",
                     id=contest,
@@ -519,13 +531,30 @@ def emit() -> Path:
                     default_result_kind="counted",
                     body_id=college_body,
                     district_area_id=cs.area("us.state", code),
-                    magnitude=electors,
+                    magnitude=2 if split else electors,
                     allocation_parent_id=national,
                     electoral_system_id=system,
                 )
                 name(contest, f"{year} presidential election in {state_name}")
                 cs.add("slug", path=f"us/{state.lower()}/{tag}/president", entity_id=contest)
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+                superseded = None
+                if split:
+                    superseded = result_set
+                    cs.add(
+                        "result_set",
+                        id=superseded,
+                        election_id=parent,
+                        contest_id=contest,
+                        stage="certified",
+                        kind="counted",
+                        status="superseded",
+                        source_id=source,
+                        is_default=False,
+                        completeness=1,
+                    )
+                    cs.add("note", entity_id=superseded, kind="methodology", body_md=NOTE)
+                    result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:districts")
                 cs.add(
                     "result_set",
                     id=result_set,
@@ -537,12 +566,16 @@ def emit() -> Path:
                     source_id=source,
                     is_default=True,
                     completeness=1,
+                    supersedes_id=superseded,
                 )
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+                if split:
+                    cs.add("note", entity_id=result_set, kind="context", body_md=SPLIT)
                 unit = cs.unit("us.state", code)
                 cells: dict[UUID, int] = {}
                 pledged: dict[UUID, int] = {}
                 owners: dict[UUID, UUID] = {}
+                tickets: dict[UUID, tuple[UUID | None, str, str, UUID | None, str]] = {}
                 others: UUID | None = None
                 for row in rows.sort("column").iter_rows(named=True):
                     parts = [part.strip() for part in row["label"].split("\n") if part.strip()]
@@ -597,8 +630,10 @@ def emit() -> Path:
                         )
                         heads[head] = (party, text)
                         owners[option] = head
+                        tickets[option] = (party, f"{text} ({shown})" if shown else text, text, None, mate)
                         if mate:
                             running, _ = person(year, "vice_president", mate)
+                            tickets[option] = (*tickets[option][:3], running, mate)
                             cs.add(
                                 "candidacy",
                                 id=cs.key("us.candidacy", f"{contest_key}:{head}:running_mate"),
@@ -636,9 +671,85 @@ def emit() -> Path:
                     leader = max(pledged, key=lambda option: cells[option], default=None)
                     voted = {} if leader is None or not cells[leader] else {leader: electors}
                 for option, seats in voted.items():
-                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="won", seats=seats)
+                    if superseded is not None:
+                        cs.add("outcome", result_set_id=superseded, option_id=option, kind="won", seats=seats)
+                    cs.add(
+                        "outcome", result_set_id=result_set, option_id=option, kind="won", seats=2 if split else seats
+                    )
                     if option in owners:
                         won[owners[option]] = won.get(owners[option], 0) + seats
+                if split:
+                    (leader,) = voted
+                    party, label, text, running, mate = tickets[leader]
+                    for number in (1, 2):
+                        district_key = f"{stem}:ME-{number:02d}:president"
+                        district = cs.key("us.contest", district_key)
+                        area = cs.area("us.cd", f"23{number:02d}")
+                        cs.add(
+                            "contest",
+                            id=district,
+                            election_id=parent,
+                            kind="elector_slate",
+                            round_number=1,
+                            default_result_kind="counted",
+                            body_id=college_body,
+                            district_area_id=area,
+                            magnitude=1,
+                            allocation_parent_id=national,
+                            electoral_system_id=system,
+                        )
+                        (district_name,) = conn.execute(
+                            "select text from name where entity_id = %s and kind = 'official'", [area]
+                        ).fetchone() or (None,)
+                        name(district, f"{year} presidential election in {district_name}")
+                        cs.add("slug", path=f"us/me/{tag}/president-district-{number}", entity_id=district)
+                        district_set = cs.key(f"{SOURCE}.result_set", district_key)
+                        (default,) = conn.execute(
+                            "select id from result_set where contest_id = %s and is_default", [district]
+                        ).fetchone() or (None,)
+                        cs.add(
+                            "result_set",
+                            id=district_set,
+                            election_id=parent,
+                            contest_id=district,
+                            stage="certified",
+                            kind="counted",
+                            status="active",
+                            source_id=source,
+                            is_default=default in (None, district_set),
+                            completeness=0,
+                        )
+                        cs.add("note", entity_id=district_set, kind="methodology", body_md=DISTRICT_NOTE)
+                        option_key = f"{district_key}:{owners[leader]}"
+                        option = cs.key("us.option", option_key)
+                        cs.add(
+                            "contest_option",
+                            id=option,
+                            contest_id=district,
+                            kind="ticket",
+                            party_id=party,
+                            ballot_label=label,
+                        )
+                        cs.add(
+                            "candidacy",
+                            id=cs.key("us.candidacy", f"{option_key}:head"),
+                            person_id=owners[leader],
+                            option_id=option,
+                            role="head",
+                            ballot_name=text,
+                            is_independent=party is None,
+                        )
+                        if running is not None:
+                            cs.add(
+                                "candidacy",
+                                id=cs.key("us.candidacy", f"{option_key}:running_mate"),
+                                person_id=running,
+                                option_id=option,
+                                role="running_mate",
+                                ballot_name=mate,
+                                is_independent=party is None,
+                            )
+                        cs.add("outcome", result_set_id=district_set, option_id=option, kind="won", seats=1)
             for head, seats in won.items():
                 option = cs.key("us.option", f"{national_key}:{head}")
                 cs.add(

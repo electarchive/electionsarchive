@@ -26,12 +26,46 @@ TOWNS = {
     2008: ("20081104", "p.xlsx", ["z.xlsx", "ab.xlsx"]),
 }
 TABULATIONS = {
+    1972: (
+        "https://digitalmaine.com/tabulations_for_elections_1970s/29/",
+        "https://web.archive.org/web/2024id_/https://digitalmaine.com/cgi/viewcontent.cgi?article=1028&context=tabulations_for_elections_1970s",
+        ["McGovern", "Nixon"],
+    ),
+    1976: (
+        "https://digitalmaine.com/tabulations_for_elections_1970s/62/",
+        "https://web.archive.org/web/2024id_/https://digitalmaine.com/cgi/viewcontent.cgi?article=1061&context=tabulations_for_elections_1970s",
+        ["Bubar", "Carter", "Ford", "McCarthy"],
+    ),
+    1980: (
+        "https://digitalmaine.com/tabulations_for_elections_1980s/10/",
+        "https://web.archive.org/web/2024id_/https://digitalmaine.com/cgi/viewcontent.cgi?article=1009&context=tabulations_for_elections_1980s",
+        ["Anderson", "Carter", "Clark", "Commoner", "Hall", "Reagan", "Others"],
+    ),
     1984: (
         "https://digitalmaine.com/tabulations_for_elections_1980s/41/",
         "https://web.archive.org/web/2024id_/https://digitalmaine.com/cgi/viewcontent.cgi?article=1040&context=tabulations_for_elections_1980s",
         ["Hall", "Mondale", "Reagan", "Serrette"],
-    )
+    ),
 }
+COUNTIES = {
+    "Androscoggin": (19509, 19406),
+    "Aroostook": (11474, 19051),
+    "Cumberland": (33326, 51268),
+    "Franklin": (2988, 5958),
+    "Hancock": (4191, 11889),
+    "Kennebec": (16379, 24617),
+    "Knox": (3601, 8478),
+    "Lincoln": (2903, 7580),
+    "Oxford": (6661, 12114),
+    "Penobscot": (18552, 30186),
+    "Piscataquis": (2518, 4617),
+    "Sagadahoc": (3414, 6463),
+    "Somerset": (5921, 10079),
+    "Waldo": (2941, 6480),
+    "Washington": (3742, 7820),
+    "York": (22464, 30452),
+}
+FIRST = {"Cumberland", "Kennebec", "Knox", "Lincoln", "Sagadahoc", "Waldo", "York"}
 CANVASS = {2008: "https://sos.nebraska.gov/sites/default/files/doc/elections/2008/2008%20General%20Canvass%20Book.pdf"}
 PAIRS = (
     [(year, state) for year in YEARS for state in STATES]
@@ -39,6 +73,9 @@ PAIRS = (
     + [(year, "NE") for year in CANVASS]
 )
 DAYS = {
+    1972: "1972-11-07",
+    1976: "1976-11-02",
+    1980: "1980-11-04",
     1984: "1984-11-06",
     1988: "1988-11-08",
     1992: "1992-11-03",
@@ -66,8 +103,15 @@ METHOD = {
     "tabulation": (
         "Votes by congressional district for each ticket, from the total lines of the Secretary of State's official "
         "tabulation by district, county, and town, a scan with OCR text that the Maine State Library keeps on "
-        "DigitalMaine. The district tables list only the tickets, so write-ins are not here; completeness is the "
-        "tickets' share of the statewide vote."
+        "DigitalMaine. The district tables list the tickets, and in 1980 also the other write-ins; in other years "
+        "write-ins are not here, and completeness is the tickets' share of the statewide vote."
+    ),
+    "counties": (
+        "Votes by congressional district for each ticket, summed from the county totals in the Secretary of State's "
+        "official tabulation, a scan that the Maine State Library keeps on DigitalMaine. The county figures were "
+        "transcribed from the scan and add up to its printed state totals; every county lay wholly in one district from "
+        "1972 through 1980. The tabulation lists only the two major tickets, so write-ins are not here; completeness is "
+        "the tickets' share of the statewide vote."
     ),
     "canvass": (
         "Votes by congressional district for each ticket, from the Secretary of State's official canvass book, "
@@ -78,6 +122,10 @@ METHOD = {
 MAINE = (
     "Maine counted {uocava} votes from uniformed-service and overseas voters only toward its at-large electors, not "
     "toward either district, so the two districts sum to slightly less than the statewide vote."
+)
+POOLED = (
+    "The district tables name {names}, whom the statewide results on file count under Others, so their district votes "
+    "are counted under Others here too."
 )
 WALDO = (
     "Waldo County was split between the districts in 1988. Its towns' votes come from the vote book's town table, "
@@ -155,10 +203,31 @@ def parse() -> None:
                 raise ValueError(f"{year} {state}: the districts fall short by more than the {uocava} overseas votes")
         elif year in TABULATIONS:
             names = TABULATIONS[year][2]
-            districts = [
-                [int(number.replace(",", "")) for number in found.group(1).split()][: len(names)]
-                for found in re.finditer(r"^\s*TOTAL +(\d[\d, ]*\d)", text(addresses[0]), re.MULTILINE)
-            ][:2]
+            document = text(addresses[0])
+            if year == 1972:
+                districts = [
+                    [
+                        sum(votes[index] for county, votes in COUNTIES.items() if (county in FIRST) is first)
+                        for index in (0, 1)
+                    ]
+                    for first in (True, False)
+                ]
+            elif year == 1976:
+                halves = [
+                    [int(number.replace(",", "")) for number in found.groups()]
+                    for found in re.finditer(
+                        r"^\s+(\d[\d,]*)\s+(\d[\d,]*)\s*$", document[: document.index("November 2, 1976")], re.MULTILINE
+                    )
+                ]
+                halves = halves[-6:]
+                districts = [halves[2] + halves[3], halves[4] + halves[5]] if len(halves) == 6 else []
+                if not districts or [one + two for one, two in zip(*districts, strict=True)] != halves[0] + halves[1]:
+                    raise ValueError(f"{year} {state}: the district tables do not sum to the state table {halves}")
+            else:
+                districts = [
+                    [int(number.replace(",", "")) for number in found.group(1).split()][: len(names)]
+                    for found in re.finditer(r"^\s*TOTA\S* +(\d[\d, ]*\d)", document, re.MULTILINE)
+                ][:2]
             if len(districts) != 2 or any(len(district) != len(names) for district in districts):
                 raise ValueError(f"{year} {state}: unreadable district totals {districts}")
             for name, one, two in zip(names, *districts, strict=True):
@@ -310,7 +379,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's presidential votes by congressional district 1984–2024 and Nebraska's 2008–2024, from the states' certificates of ascertainment, Maine's official vote by town, and Nebraska's canvass book",
+            summary="Maine's presidential votes by congressional district 1972–2024 and Nebraska's 2008–2024, from the states' certificates of ascertainment, Maine's official vote by town, and Nebraska's canvass book",
             polity="US",
         )
         for (year, state), lines in frame.group_by("year", "state", maintain_order=True):
@@ -322,6 +391,8 @@ def emit() -> Path:
             kind = (
                 "certificate"
                 if year in YEARS
+                else "counties"
+                if year == 1972
                 else "tabulation"
                 if year in TABULATIONS
                 else "towns"
@@ -345,6 +416,11 @@ def emit() -> Path:
                     f"{year} general election, official tabulation for President",
                     "Public domain",
                 ),
+                "counties": (
+                    "Maine Department of the Secretary of State",
+                    f"{year} general election, official tabulation for President",
+                    "Public domain",
+                ),
                 "canvass": ("Nebraska Secretary of State", f"{year} general canvass book", "Public record"),
             }[kind]
             source = cs.source(publisher, title)
@@ -354,7 +430,7 @@ def emit() -> Path:
                 kind="official_body",
                 publisher=publisher,
                 title=title,
-                url=TABULATIONS[int(year)][0] if kind == "tabulation" else addresses[0],
+                url=TABULATIONS[int(year)][0] if int(year) in TABULATIONS else addresses[0],
                 license=license,
             )
             for address in addresses:
@@ -364,7 +440,7 @@ def emit() -> Path:
                           (select array_agg(array[cy.role::text, cy.person_id::text, n.text] order by cy.role)
                            from candidacy cy join name n on n.entity_id = cy.person_id and n.is_preferred
                            where cy.option_id = o.id), o.ballot_label
-                   from external_id x join contest_option o on o.contest_id = x.entity_id and o.kind in ('ticket', 'write_in')
+                   from external_id x join contest_option o on o.contest_id = x.entity_id and o.kind in ('ticket', 'write_in', 'others')
                    join result_set rs on rs.contest_id = x.entity_id and rs.is_default
                    join result_value v on v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
                    where x.scheme = 'us.contest' and x.value = %s""",
@@ -380,6 +456,7 @@ def emit() -> Path:
             if total is None or total[0] is None:
                 raise ValueError(f"{day}:{state}:president has no default votes")
             tickets = []
+            pooled: list[tuple[str, int, list[int]]] = []
             for candidate, statewide, *districts in lines.select(
                 "candidate", "statewide", "d1", "d2", "d3"
             ).iter_rows():
@@ -394,6 +471,9 @@ def emit() -> Path:
                 if not found and len(scattered) == 1:
                     tickets.append(("write_in", None, [], values, scattered[0][5]))
                     continue
+                if not found and any(row[1] == "others" for row in options):
+                    pooled.append((candidate, statewide, values))
+                    continue
                 if not found and candidate == "Others":
                     if statewide != sum(row[3] for row in options if row[1] == "write_in"):
                         raise ValueError(f"{day}:{state}: others ({statewide}) are not the write-ins on file")
@@ -405,6 +485,19 @@ def emit() -> Path:
                 if abs(held - statewide) > max(5, held * 0.001):
                     raise ValueError(f"{day}:{state}: {candidate} {statewide} against {held} on file")
                 tickets.append((option_kind, party, candidacies, values, None))
+            if pooled:
+                residual = next(row[3] for row in options if row[1] == "others")
+                if sum(statewide for _, statewide, _ in pooled) > residual:
+                    raise ValueError(f"{day}:{state}: {pooled} exceed the {residual} others on file")
+                tickets.append(
+                    (
+                        "others",
+                        None,
+                        [],
+                        [sum(column) for column in zip(*(values for *_, values in pooled), strict=True)],
+                        "Others",
+                    )
+                )
             counted = int(lines["statewide"].sum())
             for number in range(1, 3 if state == "ME" else 4):
                 district_key = f"{day}:{state}-{number:02d}:president"
@@ -465,6 +558,14 @@ def emit() -> Path:
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD[kind])
                 if uocava:
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=MAINE.format(uocava=f"{uocava:,}"))
+                named = [candidate for candidate, *_ in pooled if candidate != "Others"]
+                if named:
+                    cs.add(
+                        "note",
+                        entity_id=result_set,
+                        kind="caveat",
+                        body_md=POOLED.format(names=" and ".join(named)),
+                    )
                 if year == 1988 and state == "ME":
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=WALDO)
                 ranked = []
