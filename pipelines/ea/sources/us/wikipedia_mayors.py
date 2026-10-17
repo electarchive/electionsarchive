@@ -188,6 +188,34 @@ ARTICLES: dict[tuple[int, str], tuple[str, ...]] = {
     (2025, "St. Louis"): ("2025-03-04 primary", "2025-04-08 won"),
     (2025, "Toledo, Ohio"): ("2025-05-06 primary", "2025-11-04 won"),
 }
+TOP_TWO = {
+    "Boston",
+    "Cincinnati",
+    "Cleveland",
+    "Columbus, Ohio",
+    "Detroit",
+    "Lexington, Kentucky",
+    "Lincoln, Nebraska",
+    "Milwaukee",
+    "Omaha",
+    "Seattle",
+    "St. Louis",
+    "Toledo, Ohio",
+}
+PLURALITY = {
+    "Baltimore",
+    "Charlotte",
+    "Indianapolis",
+    "Louisville",
+    "Memphis",
+    "Philadelphia",
+    "Pittsburgh",
+    "Raleigh",
+    "Richmond, Virginia",
+    "Tucson",
+    "Washington, D.C.",
+}
+THRESHOLDS = {"Anchorage": "two_round_45"}
 UNSTATED = {(2022, "North Las Vegas"), (2022, "Washington, D.C."), (2024, "Baltimore"), (2024, "Milwaukee")}
 TITLES = {
     (2022, "Washington, D.C."): "2022 Washington, D.C., mayoral election",
@@ -332,7 +360,13 @@ def emit() -> Path:
         )
         for batch in pages():
             cs.artifact(raw.cached(SOURCE, page(batch)), source)
-        fptp = cs.key("us.electoral_system", "fptp")
+        systems = {
+            key: cs.key("us.electoral_system", key)
+            for key in ("fptp", "top_two", "two_round", "two_round_30", "two_round_45")
+        }
+        if cs.minted & set(systems.values()):
+            raise ValueError("the fptp, top-two, and two-round systems must exist")
+        firsts: dict[tuple[int, str], UUID] = {}
         polities = {
             code: (polity, path)
             for code, polity, path in conn.execute(
@@ -345,6 +379,17 @@ def emit() -> Path:
         }
         known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
         taken = {path for (path,) in conn.execute("select path from slug where path like 'us/%'").fetchall()}
+        rounds: dict[tuple[str, date], UUID] = {}
+        for value, day, contest in conn.execute(
+            """select x.value, e.date_from, c.id from contest c
+               join election e on e.id = c.election_id
+               join result_set r on r.contest_id = c.id
+               join source s on s.id = r.source_id
+               join external_id x on x.entity_id = c.office_id and x.scheme = 'us.office'
+               where s.title <> %s and x.value like any(%s) and c.party_scope_id is null""",
+            [TITLE, [f"{state}:{code}:%" for state, code, _ in CITIES.values()]],
+        ).fetchall():
+            rounds[(value, day)] = contest
         held = set(
             conn.execute(
                 """select x.value, e.date_from from contest c
@@ -444,6 +489,27 @@ def emit() -> Path:
                 elections[election_key] = place(election, f"{polity_path}/{day}-{kind}")
             contest_key = f"wikipedia:{day}:{state}:{code}:mayor" + (f":{slug(party)}" if party else "")
             contest = cs.key("us.contest", contest_key)
+            if party:
+                system = "two_round_30" if city == "Charlotte" else "fptp"
+            elif city in PLURALITY:
+                system = "fptp"
+            else:
+                system = "top_two" if city in TOP_TWO else THRESHOLDS.get(city, "two_round")
+            previous = None
+            if system != "fptp" and not party:
+                if stage in ("runoff", "won"):
+                    previous = firsts.get((year, city)) or next(
+                        (
+                            rounds[(owner_key, on)]
+                            for on in sorted(
+                                (date.fromisoformat(spec[:10]) for spec in ARTICLES[(year, city)]), reverse=True
+                            )
+                            if on < day and (owner_key, on) in rounds
+                        ),
+                        None,
+                    )
+                else:
+                    firsts[(year, city)] = contest
             cs.add(
                 "contest",
                 id=contest,
@@ -453,8 +519,9 @@ def emit() -> Path:
                 party_scope_id=cs.key("us.party", PARTIES[party]) if party else None,
                 district_area_id=cs.area("us.county" if len(code) == 5 else "us.place", code),
                 magnitude=1,
-                round_number=2 if stage == "runoff" else 1,
-                electoral_system_id=fptp,
+                round_number=2 if stage == "runoff" or previous is not None else 1,
+                previous_round_id=previous,
+                electoral_system_id=systems[system],
                 default_result_kind="counted",
                 term="full",
             )

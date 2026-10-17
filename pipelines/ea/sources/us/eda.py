@@ -215,9 +215,9 @@ def emit() -> Path:
             [f"{DAY}:%", SOURCE],
         ).fetchall():
             others.setdefault(key, []).append((option, set(slug(label or "").split("-"))))
-        fptp = cs.key("us.electoral_system", "fptp")
-        if fptp in cs.minted:
-            raise ValueError("the fptp system must exist")
+        fptp, block = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "block")
+        if {fptp, block} & cs.minted:
+            raise ValueError("the fptp and block systems must exist")
         persons: dict[tuple[str, str], UUID] = {}
 
         def party(state: str, label: str) -> UUID | None:
@@ -261,7 +261,7 @@ def emit() -> Path:
                     term="full",
                     magnitude=seats,
                     round_number=1,
-                    electoral_system_id=fptp if seats == 1 else None,
+                    electoral_system_id=fptp if seats == 1 else block,
                     default_result_kind="counted",
                 )
                 name(contest, f"2020 {state_name} {office} election")
@@ -318,6 +318,8 @@ def emit() -> Path:
                         )
                     totals[option] = int(cells["votes"].sum())
                 for code, votes in cells.group_by("code").agg(pl.col("votes").sum()).iter_rows():
+                    if result_set not in cs.minted:
+                        break
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
