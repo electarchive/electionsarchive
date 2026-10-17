@@ -233,21 +233,32 @@ def emit() -> Path:
             datekey, state, _ = value.split(":")
             own.setdefault((state, int(datekey[:4])), datekey)
         others: dict[tuple[str, int], list[tuple[str, UUID, list[tuple[UUID, set[str]]]]]] = {}
-        for key, contest, option, label in conn.execute(
-            """select e.value, c.id, o.id, o.ballot_label from external_id e
+        runoffs: dict[tuple[str, int], tuple[str, str]] = {}
+        decided: dict[tuple[str, int], tuple[str, UUID]] = {}
+        for key, contest, option, label, first_round in conn.execute(
+            """select e.value, c.id, o.id, o.ballot_label, p.value from external_id e
                join contest c on c.id = e.entity_id join changeset s on s.id = c.changeset_id
-               join election l on l.id = c.election_id and l.kind = 'general'
+               join election l on l.id = c.election_id and l.kind in ('general', 'runoff')
+               left join external_id p on p.entity_id = c.previous_round_id and p.scheme = 'us.contest'
                left join contest_option o on o.contest_id = c.id and o.parent_option_id is null
                where e.scheme = 'us.contest' and e.value ~ '^\\d{4}-\\d{2}-\\d{2}:[A-Z]{2}:governor$'
-                 and s.pipeline <> %s""",
+                 and s.pipeline <> %s and (l.kind = 'general' or p.value is not null)
+               order by e.value""",
             [SOURCE],
         ).fetchall():
             day, state, _ = key.split(":")
             found = others.setdefault((state, int(day[:4])), [])
             if not found or found[-1][0] != key:
                 found.append((key, contest, []))
+            if first_round is not None:
+                runoffs[(state, int(day[:4]))] = (key, first_round)
             if option is not None:
                 found[-1][2].append((option, set(slug(label or "").split("-"))))
+        for (state, year), (key, first_round) in runoffs.items():
+            entries = {entry[0]: entry for entry in others[(state, year)]}
+            if first_round in entries:
+                decided[(state, year)] = entries[first_round][:2]
+                others[(state, year)] = [entries[key]]
         fptp = cs.key("us.electoral_system", "fptp")
         two_round = cs.key("us.electoral_system", "two_round")
         parties = {
@@ -299,7 +310,7 @@ def emit() -> Path:
                 contest_key = f"{datekey}:{state}:governor"
                 contest = cs.key("us.contest", contest_key)
                 existing = []
-            election_key = f"{datekey}:{state}"
+            election_key = f"{datekey}:{state}" + (":runoff" if (state, year) in decided else "")
             election = cs.key("us.election", election_key)
             if election in cs.minted:
                 generals.setdefault((state, year), []).append(datekey)
@@ -356,6 +367,31 @@ def emit() -> Path:
                     "select option_id, kind, seats from outcome where result_set_id = %s", [first]
                 ).fetchall():
                     cs.add("outcome", result_set_id=first, option_id=option, kind=outcome, seats=count)
+            replaced = None if result_set == first else first
+            if (state, year) in decided and result_set in cs.minted:
+                for replaced, stale_election, stale_contest, stale_supersedes in conn.execute(
+                    """select r.id, r.election_id, r.contest_id, r.supersedes_id from result_set r
+                       join external_id x on x.entity_id = r.id and x.scheme = %s
+                       where r.contest_id = %s and r.status = 'active'""",
+                    [f"{SOURCE}.result_set", decided[(state, year)][1]],
+                ).fetchall():
+                    cs.add(
+                        "result_set",
+                        id=replaced,
+                        election_id=stale_election,
+                        contest_id=stale_contest,
+                        stage="certified",
+                        kind="counted",
+                        status="superseded",
+                        source_id=source,
+                        is_default=False,
+                        supersedes_id=stale_supersedes,
+                        completeness=None,
+                    )
+                    for option, outcome, count in conn.execute(
+                        "select option_id, kind, seats from outcome where result_set_id = %s", [replaced]
+                    ).fetchall():
+                        cs.add("outcome", result_set_id=replaced, option_id=option, kind=outcome, seats=count)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -366,7 +402,7 @@ def emit() -> Path:
                 status="active",
                 source_id=source,
                 is_default=defaults.get(result_set, defaults.get(first, not reused)),
-                supersedes_id=None if result_set == first else first,
+                supersedes_id=replaced,
                 completeness=None,
             )
             cs.add("note", entity_id=result_set, kind="caveat", body_md=TWO_PARTY)
