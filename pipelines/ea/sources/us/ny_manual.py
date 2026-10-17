@@ -27,9 +27,9 @@ FILE = "https://archive.org/download/{item}/{item}.pdf"
 DIGITIZED = 8
 DERIVED = 1
 VOLUMES = {
-    1912: ("manualforuseofle1913newy", 1913, date(1912, 11, 5), range(722, 744)),
+    1912: ("manualforuseofle1913newy", 1913, date(1912, 11, 5), range(722, 744), True),
+    1926: ("manualforuseofle0000robe", 1927, date(1926, 11, 2), range(897, 909), False),
 }
-ACCOUNTING = ("Blank", "Whole")
 
 
 def _artifact(year: int) -> raw.Artifact:
@@ -49,14 +49,14 @@ def _plain(text: str) -> str:
     return re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
 
 
-def _upright(book: raw.Artifact, page: int, dpi: int, image: Path) -> None:
+def _upright(book: raw.Artifact, page: int, dpi: int, image: Path, turned: bool) -> None:
     subprocess.run(
         ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
         + [str(book.path), str(image.with_suffix(""))],
         check=True,
     )
     with Image.open(image) as rendered:
-        rendered.transpose(Image.Transpose.ROTATE_270).save(image)
+        (rendered.transpose(Image.Transpose.ROTATE_270) if turned else rendered).save(image)
 
 
 def _tables(path: Path) -> list[dict[str, object]]:
@@ -85,7 +85,7 @@ def _tables(path: Path) -> list[dict[str, object]]:
 def parse() -> None:
     rows: list[dict[str, object]] = []
     failed: list[str] = []
-    for year, (_, _, _, pages) in VOLUMES.items():
+    for year, (_, _, _, pages, turned) in VOLUMES.items():
         book = _artifact(year)
         firsts = _tables(PARSED / "model" / f"{year}.txt")
         seconds = _tables(PARSED / "model" / f"{year}.v2.txt")
@@ -101,7 +101,7 @@ def parse() -> None:
                     cache.parent.mkdir(parents=True, exist_ok=True)
                     with tempfile.TemporaryDirectory() as folder:
                         image = Path(folder) / "page.png"
-                        _upright(book, page, dpi, image)
+                        _upright(book, page, dpi, image, turned)
                         cache.write_text(
                             subprocess.run(
                                 ["tesseract", str(image), "stdout", "--psm", psm, "tsv"],
@@ -235,7 +235,7 @@ def parse() -> None:
                         xs[c] = xs[lo] + (xs[hi] - xs[lo]) * (c - lo) / (hi - lo)
                 for r, c, county, value, again in cells:
                     votes = settled.get((r, c))
-                    if votes is None or columns[c] in ACCOUNTING:
+                    if votes is None or columns[c] == "Whole":
                         continue
                     box, how = None, None
                     if (r, c) in anchors:
@@ -315,7 +315,7 @@ def emit() -> Path:
         PAGES.mkdir(parents=True, exist_ok=True)
         sources: dict[int, UUID] = {}
         pages: dict[tuple[int, int], tuple[UUID, int, int]] = {}
-        for year, (item, volume, _, numbers) in VOLUMES.items():
+        for year, (item, volume, _, numbers, turned) in VOLUMES.items():
             title = f"Manual for the Use of the Legislature of the State of New York, {volume}"
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
@@ -332,7 +332,7 @@ def emit() -> Path:
             for number in numbers:
                 image = PAGES / f"{book.sha256}-{number}.png"
                 if not image.exists():
-                    _upright(book, number, 100, image)
+                    _upright(book, number, 100, image, turned)
                 with Image.open(image) as rendered:
                     width, height = rendered.size
                 page = cs.page(artifact, number)
@@ -373,8 +373,16 @@ def emit() -> Path:
                 [contest],
             ).fetchall()
             picked: dict[int, UUID] = {}
+            dropped: list[int] = []
             for (column, label), cells in lines.group_by("column", "label", maintain_order=True):
                 summed = int(cells["votes"].sum())
+                if label == "Blank":
+                    blank = [option for option, kind, _, total in known if kind == "others" and total == summed]
+                    if len(blank) == 1:
+                        picked[int(column)] = blank[0]
+                    else:
+                        dropped.append(int(column))
+                    continue
                 surname = _plain(str(label))
                 named = [
                     (option, total)
@@ -394,6 +402,7 @@ def emit() -> Path:
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
             if result_set not in cs.minted:
                 continue
+            lines = lines.filter(~pl.col("column").is_in(dropped))
             if len(picked) < lines["column"].n_unique():
                 pool = cs.key("us.option", f"{key}:others:ny_manual")
                 cs.add("contest_option", id=pool, contest_id=contest, kind="others", ballot_label="Others")
