@@ -195,6 +195,13 @@ def emit() -> Path:
                    where u.scheme_code = 'us.state'"""
             ).fetchall()
         }
+        districts: dict[tuple[str, str], UUID] = {
+            (path.split("/")[1].upper(), path.rsplit("-", 1)[1]): area
+            for path, area in conn.execute(
+                """select s.path, c.district_area_id from contest c join slug s on s.entity_id = c.id
+                   where s.path like 'us/%%/2024-11-05-general/house-%%' and c.district_area_id is not null"""
+            ).fetchall()
+        }
         for member in members:
             ids = member["id"]
             person = next(
@@ -265,6 +272,20 @@ def emit() -> Path:
                     ((day, found) for day, found in won.get((person, chamber), []) if window[0] <= day <= window[1]),
                     default=(None, None),
                 )[1]
+                if chamber == "house" and seat is None and contest is None and start.year >= 2025:
+                    seat = cs.key("us.seat", f"house:{term['state']}:{term['district']}")
+                    if seat not in seated:
+                        seated.add(seat)
+                        cs.add(
+                            "seat",
+                            id=seat,
+                            body_id=bodies["house"],
+                            district_area_id=districts[(term["state"], str(term["district"]))],
+                            label=f"{term['state']}-{term['district']}",
+                            voting=True,
+                            valid_from=None,
+                            valid_to=None,
+                        )
                 scheduled = end.year % 2 == 1 and (end.month, end.day) in ((3, 3), (3, 4), (1, 3))
                 tenure = cs.key(f"{SOURCE}.tenure", f"{ids['bioguide']}:{chamber}:{term['start']}")
                 cs.add(
