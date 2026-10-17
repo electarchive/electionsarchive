@@ -115,6 +115,14 @@
           noun: noun ?? level.noun,
         };
   });
+  const unmapped = $derived.by(() => {
+    const total = contest.current?.valid ?? 0;
+    let mapped = 0;
+    for (const row of contest.places?.rows ?? []) {
+      mapped += row.valid;
+    }
+    return total > 0 ? (total - mapped) / total : 0;
+  });
   const titles = $derived(
     contest.places?.legend.map((item) =>
       item.person == null ? (item.short ?? item.label) : item.label,
@@ -773,6 +781,11 @@
           bind:focus
         />
       {/key}
+      {#if unmapped >= 0.01}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.map_unmapped({ percent: percent(unmapped) })}
+        </p>
+      {/if}
     </div>
     {#if contest.chamber == null}
       <div
