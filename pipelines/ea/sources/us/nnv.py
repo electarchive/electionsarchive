@@ -19,7 +19,7 @@ from ea.sources.us.party_labels import NATIONAL, UNAFFILIATED
 from ea.store import DATA, connect
 
 SOURCE = "us.nnv"
-VERSION = "2"
+VERSION = "3"
 COMMIT = "13e2f82692c76e3695f6cd609a5e710d6cab5e26"
 ARCHIVE = f"https://codeload.github.com/mapping-elections/nnv-xml/tar.gz/{COMMIT}"
 PUBLISHER = "American Antiquarian Society and Tufts University"
@@ -348,7 +348,7 @@ def emit() -> Path:
         (pl.col("office") == "U.S. House of Representatives")
         & pl.col("type").is_in(["General", "Special"])
         & pl.col("role_scope").is_in(["District", "State"])
-        & pl.col("year").is_between(1787, 1823)
+        & pl.col("year").is_between(1787, 1826)
         & (pl.col("folder") != "USA")
     )
     state = records.filter(
@@ -461,7 +461,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House returns by county and town, 1788–1823, from A New Nation Votes, attached to THEA's contests "
+            summary="House returns by county and town, 1788–1826, from A New Nation Votes, attached to THEA's contests "
             "where they reconcile, with the House contests THEA lacks, and governor and state legislative "
             "elections 1787–1825",
             polity="US",
@@ -610,7 +610,7 @@ def emit() -> Path:
                    left join contest_option o on o.contest_id = c.id and o.parent_option_id is null
                    join entity n on n.id = c.id join changeset s on s.id = n.changeset_id
                    where x.scheme = 'us.contest' and x.value like '%%:house:%%' and x.value ~ '^1[78][0-9]{2}'
-                     and left(x.value, 4)::int < 1824 and s.pipeline = 'us.thea'"""
+                     and left(x.value, 4)::int < 1827 and s.pipeline = 'us.thea'"""
         ).fetchall():
             entry = held.setdefault(
                 key,
@@ -632,7 +632,7 @@ def emit() -> Path:
         for contest, pipeline in conn.execute(
             """select distinct r.contest_id, c.pipeline from result_set r join changeset c on c.id = r.changeset_id
                join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
-               where x.value like '%%:house:%%' and x.value ~ '^1[78][0-9]{2}' and left(x.value, 4)::int < 1824
+               where x.value like '%%:house:%%' and x.value ~ '^1[78][0-9]{2}' and left(x.value, 4)::int < 1827
                  and c.pipeline not in ('us.thea', %s)""",
             [SOURCE],
         ).fetchall():
@@ -998,6 +998,9 @@ def emit() -> Path:
                 )
                 if clash:
                     tally["NNV races THEA holds without reconciling, not added"] += 1
+                    continue
+                if district and any(other == year for other, *_ in thea_seats.get((postal, 0), [])):
+                    tally["NNV district races where THEA holds the state's seats at large, not added"] += 1
                     continue
                 seats = (
                     max(len(winner_words), 1)

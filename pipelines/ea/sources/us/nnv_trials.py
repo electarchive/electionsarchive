@@ -5,7 +5,7 @@ from ea.sources.us.nnv import MAJORITY
 from ea.store import connect
 
 SOURCE = "us.nnv_trials"
-VERSION = "1"
+VERSION = "2"
 COLUMNS = [
     "id",
     "election_id",
@@ -41,7 +41,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="THEA's House contests before 1824 in the majority states take the repeated-trials majority rule, "
+            summary="THEA's House contests before 1827 in the majority states take the repeated-trials majority rule, "
             "and THEA contests with trials in A New Nation Votes sit in their chain",
             polity="US",
             kind="correction",
@@ -64,7 +64,7 @@ def emit() -> Path:
                from external_id x join contest c on c.id = x.entity_id
                join entity n on n.id = c.id join changeset s on s.id = n.changeset_id
                where x.scheme = 'us.contest' and s.pipeline = 'us.thea' and x.value like '%%:house:%%'
-                 and x.value ~ '^1[78][0-9]{2}' and left(x.value, 4)::int < 1824"""
+                 and x.value ~ '^1[78][0-9]{2}' and left(x.value, 4)::int < 1827"""
         ).fetchall()
         systems = chained = 0
         for key, *values in rows:
