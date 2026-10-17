@@ -362,7 +362,10 @@
       class="grid grid-cols-[repeat(auto-fit,minmax(min(100%,17rem),1fr))] gap-x-6 gap-y-4"
     >
       {#each polity.latest.races as race, index (index)}
-        {const isSeated = $derived(race.contested > 1)}
+        {const isSeated = $derived(
+          race.contested > 1 &&
+            race.results.filter((row) => (row.seats ?? 0) > 0).length > 1,
+        )}
         {const plain = $derived(
           race.name.replace(/^\d{4} /u, "").replace(/ election$/u, ""),
         )}
