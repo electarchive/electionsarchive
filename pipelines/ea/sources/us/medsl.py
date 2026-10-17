@@ -220,11 +220,17 @@ def parse() -> None:
 def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
     frames = []
     for (chamber, year), path in files.items():
-        frame = pl.scan_csv(path, separator="\t" if "\t" in path.open().readline() else ",", infer_schema_length=0)
+        frame = pl.scan_csv(
+            path,
+            separator="\t" if "\t" in path.open(errors="replace").readline() else ",",
+            infer_schema_length=0,
+            encoding="utf8-lossy",
+        )
         if year == 2016:
-            frame = frame.rename({"state_postal": "state_po", "jurisdiction": "jurisdiction_name"}).with_columns(
-                date=pl.lit("2016-11-08")
-            )
+            frame = frame.rename(
+                {"state_postal": "state_po", "jurisdiction": "jurisdiction_name", "party": "party_detailed"},
+                strict=False,
+            ).with_columns(date=pl.lit("2016-11-08"))
         fips = pl.col("county_fips").str.replace(r"\.0$", "")
         frames.append(
             frame.with_columns(pl.col("precinct", "mode").fill_null(""))
@@ -269,10 +275,10 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                 writein=pl.col("writein").str.to_uppercase() == "TRUE",
                 mode=pl.col("mode").fill_null("").str.to_uppercase(),
                 votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-                office=pl.col("office") if chamber == "state" else pl.lit(None, pl.String),
+                office=pl.col("office").str.to_uppercase() if chamber == "state" else pl.lit(None, pl.String),
                 seat=pl.col("district") if chamber == "state" else pl.lit(None, pl.String),
                 party=pl.col("party_detailed") if chamber == "state" else pl.lit(None, pl.String),
-                stage=pl.col("stage") if chamber == "state" else pl.lit(None, pl.String),
+                stage=pl.col("stage").str.to_uppercase() if chamber == "state" else pl.lit(None, pl.String),
             )
         )
     frame = (
