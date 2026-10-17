@@ -32,10 +32,25 @@ DIGITIZED = 8
 DERIVED = 1
 VOLUMES = {
     1888: ("biennialreports06texagoog", date(1888, 11, 6), [192, 193, 194]),
+    1900: ("biennialreports05texagoog", date(1900, 11, 6), [86, 87, 88, 89]),
 }
 FORMER = {"greer": ("Greer", "40055", date(1896, 3, 16))}
 CORRECTED: dict[tuple[int, int, str, int], int] = {}
-UNBALANCED = {(1888, 5, 0), (1888, 5, 2), (1888, 7, 1), (1888, 11, 0)}
+UNBALANCED = {
+    (1888, 5, 0),
+    (1888, 5, 2),
+    (1888, 7, 1),
+    (1888, 11, 0),
+    (1900, 2, 0),
+    (1900, 6, 4),
+    (1900, 8, 1),
+    (1900, 10, 2),
+    (1900, 11, 0),
+    (1900, 11, 1),
+    (1900, 12, 0),
+    (1900, 12, 1),
+    (1900, 13, 1),
+}
 GAP = (
     "The county figures printed for {candidate} sum to {counted} votes, but the report gives a district total of "
     "{printed}. We show the county figures as they were printed."
@@ -223,6 +238,11 @@ def parse() -> None:
                 status=pl.when(match & (pl.col("status") == "doubtful")).then(pl.lit("balanced")).otherwise("status")
             )
             continue
+        if (year, district, column) in UNBALANCED:
+            gaps.append(
+                {"year": year, "district": district, "label": lines["label"][0], "counted": counted, "printed": printed}
+            )
+            continue
         fixes = [
             (county, alternative)
             for county, votes, readings in counties.select("county", "votes", "readings").iter_rows()
@@ -240,11 +260,6 @@ def parse() -> None:
             frame = frame.with_columns(
                 votes=pl.when(match).then(alternative).otherwise("votes"),
                 status=pl.when(match).then(pl.lit("balanced")).otherwise("status"),
-            )
-            continue
-        if (year, district, column) in UNBALANCED:
-            gaps.append(
-                {"year": year, "district": district, "label": lines["label"][0], "counted": counted, "printed": printed}
             )
             continue
         failed.append((year, district, column, f"counties {counted}, printed {printed}, fixes {fixes}"))
