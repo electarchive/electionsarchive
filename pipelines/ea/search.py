@@ -13,7 +13,7 @@ with docs as (
         end as polity_id,
         string_agg(distinct n.text, ' ') as text,
         case e.type
-            when 'polity' then 4
+            when 'polity' then 4 + ln(1 + (select count(*) from election el where el.polity_id = e.id)) / 10
             when 'election' then 2 + (select (kind = 'general')::int from election where id = e.id)
             when 'contest' then 1 + (select (allocation_parent_id is null)::int from contest where id = e.id)
             when 'party' then 1 + ln(1 + (select count(*) from contest_option o where o.party_id = e.id)) / 3
