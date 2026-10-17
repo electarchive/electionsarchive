@@ -685,6 +685,20 @@ export const person = pgTable("person", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 });
 
+export const personImage = pgTable("person_image", {
+	id: uuid().default(sql`uuidv7()`).primaryKey(),
+	personId: uuid("person_id").notNull().references(() => person.id),
+	path: text().notNull(),
+	license: text().notNull(),
+	artist: text(),
+	sourceUrl: text("source_url").notNull(),
+	sourceId: uuid("source_id").references(() => source.id),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	index("person_image_person_idx").using("btree", table.personId.asc().nullsLast()),
+]);
+
 export const personPartyMembership = pgTable("person_party_membership", {
 	personId: uuid("person_id").notNull().references(() => person.id, { onDelete: "cascade" } ),
 	partyId: uuid("party_id").notNull().references(() => party.id),

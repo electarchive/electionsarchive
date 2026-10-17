@@ -106,6 +106,7 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.entity.id.through(r.person.id),
 			alias: "changeset_id_entity_id_via_person"
 		}),
+		personImages: r.many.personImage(),
 		personPartyMemberships: r.many.personPartyMembership(),
 		entitiesViaPolity: r.many.entity({
 			from: r.changeset.id.through(r.polity.changesetId),
@@ -347,6 +348,7 @@ export const relations = defineRelations(schema, (r) => ({
 		partyColors: r.many.partyColor(),
 		partyPositions: r.many.partyPosition(),
 		partyRelations: r.many.partyRelation(),
+		personImages: r.many.personImage(),
 		personPartyMemberships: r.many.personPartyMembership(),
 		polityRelations: r.many.polityRelation(),
 		resultSets: r.many.resultSet(),
@@ -595,6 +597,7 @@ export const relations = defineRelations(schema, (r) => ({
 	person: {
 		candidacies: r.many.candidacy(),
 		governments: r.many.government(),
+		personImages: r.many.personImage(),
 		personPartyMemberships: r.many.personPartyMembership(),
 		tenures: r.many.tenure(),
 	},
@@ -972,6 +975,20 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.partyRelation.toPartyId,
 			to: r.party.id,
 			alias: "partyRelation_toPartyId_party_id"
+		}),
+	},
+	personImage: {
+		changeset: r.one.changeset({
+			from: r.personImage.changesetId,
+			to: r.changeset.id
+		}),
+		person: r.one.person({
+			from: r.personImage.personId,
+			to: r.person.id
+		}),
+		source: r.one.source({
+			from: r.personImage.sourceId,
+			to: r.source.id
 		}),
 	},
 	personPartyMembership: {
