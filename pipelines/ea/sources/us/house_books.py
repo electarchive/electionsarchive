@@ -603,9 +603,11 @@ def emit(source: ModuleType) -> Path:
                     channel=0,
                     measure=1,
                     count_round=first,
-                    flags=DIGITIZED | (DERIVED if cells.height > 1 else 0),
+                    flags=(DIGITIZED if "box" in frame.columns else 0) | (DERIVED if cells.height > 1 else 0),
                     value=int(cells["votes"].sum()),
                 )
+                if "box" not in frame.columns:
+                    continue
                 boxes = [list(box) for box in cells["box"]]
                 page, width, height = pages[(int(year), int(cells["page"][0]))]
                 cs.add(
