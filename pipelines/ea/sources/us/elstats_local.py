@@ -18,7 +18,7 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
@@ -306,7 +306,7 @@ def parse() -> None:
         .otherwise("name"),
     )
     precincts = (
-        frame.filter((pl.col("rank") == 2) & pl.col("state").is_in(["VA", "ID", "NM"]))
+        frame.filter((pl.col("rank") == 2) & pl.col("state").is_in(["VA", "ID", "NM", "CT"]))
         .group_by("state", "contest", "candidate", "division", "precinct")
         .agg(pl.col("votes").sum())
     )
@@ -334,9 +334,11 @@ def parse() -> None:
                 towns.setdefault(usps, {})[elstats.plain(text)] = str(record["GEOID"])
     with zipfile.ZipFile(raw.cached(SOURCE, TOWNS).path) as archive:
         parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
+    connecticut: dict[str, str] = {}
     for record in shapefile.Reader(dbf=io.BytesIO(parts["dbf"])).iterRecords():
         if record is not None and record["COUSUBFP"] != "00000":
             towns.setdefault("CT", {})[elstats.plain(str(record["NAME"]))] = str(record["GEOID"])
+            connecticut[elstats.plain(str(record["NAME"]))] = str(record["GEOID"])[:5]
     with connect() as conn:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
@@ -418,9 +420,15 @@ def parse() -> None:
                     if key in ("mayor", "council")
                 ]
             )
-            & ((pl.col("code").str.len_chars() == 5) | pl.col("code").str.starts_with("sd"))
+            & ((pl.col("code").str.len_chars() == 5) | pl.col("code").str.starts_with("sd") | (pl.col("state") == "CT"))
         )
-        .select("state", "contest", "code", "day")
+        .select(
+            "state",
+            "contest",
+            "code",
+            "day",
+            pl.col("district").str.replace(r"\s*\([^)]*\)", "").str.replace(r" - .*$", "").alias("town"),
+        )
         .unique()
     )
     precincts = precincts.join(contests, on=["state", "contest"])
@@ -433,13 +441,24 @@ def parse() -> None:
     )
     precincts = (
         precincts.join(homes, on=["state", "division"], how="left")
+        .with_columns(
+            county=pl.when(pl.col("state") == "CT")
+            .then(
+                pl.col("town")
+                .map_elements(elstats.plain, return_dtype=pl.String)
+                .replace_strict(connecticut, default=None)
+            )
+            .otherwise("county")
+        )
         .filter(pl.col("county").is_not_null().all().over("state", "contest"))
         .with_columns(
             unit=pl.concat_str(
                 pl.col("day").dt.year().cast(pl.String),
                 "state",
                 "county",
-                pl.col("county").replace_strict(jurisdictions),
+                pl.when(pl.col("state") == "CT")
+                .then(pl.col("town").str.to_uppercase())
+                .otherwise(pl.col("county").replace_strict(jurisdictions, default=None)),
                 pl.col("precinct").str.to_uppercase(),
                 separator=":",
             )
@@ -632,20 +651,27 @@ def emit() -> Path:
         precincts: dict[str, UUID] = dict(
             conn.execute(
                 """select code, id from reporting_unit where scheme_code = 'us.precinct'
-                   and split_part(code, ':', 2) in ('VA', 'ID', 'NM')"""
+                   and split_part(code, ':', 2) in ('VA', 'ID', 'NM', 'CT')"""
             ).fetchall()
         )
         counties: dict[str, tuple[UUID, UUID]] = {
             code: (unit, area)
             for code, unit, area in conn.execute(
                 """select code, id, area_id from reporting_unit where scheme_code = 'us.county'
-                   and left(code, 2) in ('51', '16', '35')"""
+                   and left(code, 2) in ('51', '16', '35', '09')"""
             ).fetchall()
         }
         sets = {
             value
             for (value,) in conn.execute(
                 "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
+            ).fetchall()
+        }
+        wards = {
+            entity
+            for (entity,) in conn.execute(
+                """select distinct r.contest_id from result_set r join changeset x on x.id = r.changeset_id
+                   where x.pipeline = 'us.city_precincts'"""
             ).fetchall()
         }
         minted: dict[str, date] = {}
@@ -815,7 +841,7 @@ def emit() -> Path:
             cs.add("slug", path=candidate, entity_id=contest)
             if partial:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT.format(whole=whole))
-            counted = grouped.get((state, contest_id))
+            counted = None if contest in wards else grouped.get((state, contest_id))
             previous = None
             result_set = cs.key(f"{SOURCE}.result_set", contest_key) if counted is None or contest_key in sets else None
             if counted is not None:
