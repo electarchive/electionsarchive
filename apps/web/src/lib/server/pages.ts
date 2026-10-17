@@ -252,6 +252,8 @@ export async function chamber(path: string) {
   }));
   const first = Date.parse(body.makeup[0]?.start ?? "9999-12-31") - 2e10;
   const earlier = results.filter((term) => Date.parse(term.start) < first);
+  const final = Date.parse(body.makeup.at(-1)?.start ?? "0000-01-01") + 2e10;
+  const later = results.filter((term) => Date.parse(term.start) > final);
   const raw = isSeated
     ? [
         ...earlier,
@@ -267,6 +269,7 @@ export async function chamber(path: string) {
                 : { name: point.name, path: point.path, date: point.date },
           };
         }),
+        ...later,
       ]
     : results;
   const terms = raw.map((term, index) => {
@@ -299,7 +302,7 @@ export async function chamber(path: string) {
     body,
     terms,
     basis: isSeated
-      ? earlier.length > 0
+      ? earlier.length > 0 || later.length > 0
         ? ("mixed" as const)
         : ("seated" as const)
       : ("results" as const),
