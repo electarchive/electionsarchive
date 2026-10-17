@@ -1,3 +1,4 @@
+import re
 import zipfile
 from datetime import date, timedelta
 from itertools import pairwise
@@ -16,7 +17,8 @@ PARSED = DATA / "parsed" / SOURCE
 OFFICE = r"MAYOR|COUNCIL|ALDER|WARD|COMMISSION|SELECT|CITY|TOWN|VILLAGE|BOROUGH|TRUSTEE"
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "junior", "senior"}
 METHOD = (
-    "Precinct returns for city races from the MIT Election Data and Science Lab's precinct files, matched to the "
+    "Precinct returns for city races from the MIT Election Data and Science Lab's or OpenElections' precinct files, "
+    "matched to the "
     "city's official contest by candidate and checked against its official totals. Absentee, early, and provisional "
     "ballots that a county reported only countywide stay in their own countywide rows."
 )
@@ -77,13 +79,69 @@ def parse() -> None:
                     ),
                 )
             )
+    with connect() as conn:
+        counties = {
+            (
+                code[:2],
+                re.sub(r"[^A-Z]", "", re.sub(r" (?:COUNTY|PARISH)$", "", text.upper()).replace("SAINT", "ST")),
+            ): code
+            for code, text in conn.execute(
+                """select c.code, n.text from area a join area_code c on c.area_id = a.id
+                   join polity_territory t on t.area_id = a.id
+                   join name n on n.entity_id = t.polity_id and n.is_preferred and n.lang = 'en'
+                   where a.scheme_code = 'us.county'"""
+            ).fetchall()
+        }
+    origins = [(day, "medsl", scan.select(list(columns)).rename(columns)) for day, scan in scans]
+    for (state, day), commit in medsl_local.OPENELECTIONS_FILES.items():
+        names = {
+            name: code
+            for (prefix, name), code in counties.items()
+            if prefix
+            == {"FL": "12", "MN": "27", "NV": "32", "SD": "46", "TX": "48", "UT": "49", "WV": "54", "IN": "18"}[state]
+        }
+        county = pl.col("county").str.to_uppercase().str.replace(r" (?:COUNTY|PARISH)$", "")
+        origins.append(
+            (
+                day,
+                "openelections",
+                pl.scan_csv(
+                    raw.cached(
+                        medsl_local.SOURCE,
+                        medsl_local.OPENELECTIONS.format(state=state.lower(), commit=commit, day=day),
+                    ).path,
+                    infer_schema=False,
+                    encoding="utf8-lossy",
+                )
+                .rename(lambda column: column.lstrip("\ufeff"))
+                .filter(
+                    ~pl.col("candidate").str.contains(
+                        r"(?i)^(?:over|under) ?votes?$|^(?:rejected|unassigned) write|^total"
+                    )
+                )
+                .select(
+                    state=pl.lit(state),
+                    fips=county.str.replace("SAINT", "ST")
+                    .str.replace_all(r"[^A-Z]", "")
+                    .replace_strict(names, default=None),
+                    jurisdiction=county,
+                    precinct="precinct",
+                    office="office",
+                    district=pl.when(~pl.col("district").is_in(["NA", ""])).then("district"),
+                    candidate="candidate",
+                    writein=pl.when(pl.col("candidate").str.contains(r"(?i)write[- ]?in"))
+                    .then(pl.lit("TRUE"))
+                    .otherwise(pl.lit("FALSE")),
+                    mode=pl.lit("TOTAL"),
+                    votes="votes",
+                ),
+            )
+        )
     frames = []
-    for day, scan in scans:
+    for day, origin, scan in origins:
         fips = pl.col("fips").str.replace(r"\.0$", "")
         frames.append(
-            scan.select(list(columns))
-            .rename(columns)
-            .filter(pl.col("office").str.to_uppercase().str.contains(OFFICE))
+            scan.filter(pl.col("office").str.to_uppercase().str.contains(OFFICE))
             .with_columns(pl.col("precinct", "mode", "jurisdiction", "district").fill_null(""))
             .filter(
                 ~pl.col("precinct").str.to_uppercase().str.contains(r"TOTALS$|^COUNTY TOTAL$|- TOTAL$")
@@ -91,6 +149,7 @@ def parse() -> None:
             )
             .select(
                 day=pl.lit(day),
+                origin=pl.lit(origin),
                 state="state",
                 fips=pl.when(fips.str.contains(r"^\d{4,5}$")).then(fips.str.zfill(5).replace(medsl.RECODED)),
                 jurisdiction=pl.col("jurisdiction").str.to_uppercase().str.strip_chars(),
@@ -109,9 +168,10 @@ def parse() -> None:
             .filter(pl.col("votes").is_not_null() & pl.col("fips").is_not_null() & (pl.col("precinct") != ""))
             .collect()
         )
-    precinct = ["day", "state", "fips", "jurisdiction", "precinct", "office", "district"]
+    precinct = ["day", "origin", "state", "fips", "jurisdiction", "precinct", "office", "district"]
     frame = (
         pl.concat(frames)
+        .filter((pl.col("origin") == "medsl") | ~(pl.col("origin") == "medsl").any().over("day", "state"))
         .with_columns(measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16))
         .filter(pl.col("measure") > 0)
         .filter((pl.col("mode") == "TOTAL").any().over([*precinct, "candidate"]).not_() | (pl.col("mode") == "TOTAL"))
@@ -125,7 +185,7 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "rows.parquet")
-    print(frame.group_by("day").agg(pl.len(), pl.col("code").n_unique()).sort("day"))
+    print(frame.group_by("day", "origin").agg(pl.len(), pl.col("code").n_unique()).sort("day"))
 
 
 def emit() -> Path:
@@ -169,15 +229,19 @@ def emit() -> Path:
         )
         days = sorted(set(rows["day"]))
         contests = conn.execute(
-            """select distinct on (k.id) k.id, k.election_id, e.date_from, split_part(c.code, ':', 1), rs.stage, rs.kind,
+            """select distinct on (k.id) k.id, k.election_id, e.date_from, left(m.place, 2), rs.stage, rs.kind,
                       (select min(v.count_round) from result_value v where v.result_set_k = rs.k and v.measure = 1)
                from contest k join election e on e.id = k.election_id
                join area a on a.id = k.district_area_id join area_code c on c.area_id = a.id
+               cross join lateral (select case a.scheme_code when 'us.place' then c.code
+                                   else split_part(c.code, ':', 2) end as place) m
                left join office o on o.id = k.office_id left join body b on b.id = k.body_id
                join result_set rs on rs.contest_id = k.id and rs.is_default
-               where a.scheme_code in ('us.place', 'us.local_district') and e.date_from = any(%s)
-                 and (o.kind = 'mayor' or b.kind = 'council') and c.code not like '%%3651000%%'
-                 and c.code ~ '^[0-9]{2}'""",
+               where e.date_from = any(%s) and (o.kind = 'mayor' or b.kind = 'council') and m.place <> '3651000'
+                 and (a.scheme_code = 'us.place' and c.code ~ '^[0-9]{7}$'
+                      or a.scheme_code = 'us.local_district' and split_part(c.code, ':', 3) <> 'board-of-education'
+                         and (m.place ~ '^[0-9]{7}$|^(?!18)[0-9]{10}$' or m.place in ('24510', '29510', '32510')
+                              or m.place ~ '^51[5-8][0-9]{2}$'))""",
             [days],
         ).fetchall()
         ids = [contest for contest, *_ in contests]
@@ -231,6 +295,16 @@ def emit() -> Path:
             for state, url in medsl_local._files(listing, local).items():
                 if listing != medsl_local.LISTING2020 or state == "OR":
                     cs.artifact(raw.cached(medsl_local.SOURCE, url), sources[day])
+        for (state, day), commit in medsl_local.OPENELECTIONS_FILES.items():
+            sources[(state, day)] = cs.source("OpenElections", f"{state} precinct-level results")
+            if sources[(state, day)] in cs.minted:
+                raise ValueError(f"OpenElections' {state} source must already exist")
+            cs.artifact(
+                raw.cached(
+                    medsl_local.SOURCE, medsl_local.OPENELECTIONS.format(state=state.lower(), commit=commit, day=day)
+                ),
+                sources[(state, day)],
+            )
         groups = {key: frame for key, frame in rows.group_by("day", "state")}
         index: dict[tuple[date, str], dict[str, set[str]]] = {}
         for (day, state), frame in groups.items():
@@ -327,7 +401,7 @@ def emit() -> Path:
                 stage=stage,
                 kind=kind,
                 status="active",
-                source_id=sources[day],
+                source_id=sources[(state, day)] if lines["origin"][0] == "openelections" else sources[day],
                 is_default=False,
                 completeness=round(sum(counted.values()) / total, 4),
             )
