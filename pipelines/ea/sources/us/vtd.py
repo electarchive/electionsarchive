@@ -167,7 +167,7 @@ def emit() -> Path:
                 for county in frame["county"]
             ]
             labels = [
-                f"{(name.title() if name.isupper() else name) or f'Voting District {vtdst}'}"
+                f"{(re.sub(r'\w+', lambda word: word[0] if re.search(r'\d', word[0]) else word[0].title(), name) if name.isupper() else name) or f'Voting District {vtdst}'}"
                 + (f", {counties[county][1]}" if county in counties else "")
                 for name, vtdst, county in frame.select("name", "vtdst", "county").iter_rows()
             ]

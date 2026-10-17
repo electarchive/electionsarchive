@@ -3,6 +3,7 @@ import io
 import json
 import re
 import zipfile
+from collections import Counter
 from collections.abc import Callable, Iterator
 from datetime import date, timedelta
 from pathlib import Path
@@ -59,6 +60,12 @@ PUBLISHERS = {
         "Public record",
         "NH GRANIT",
     ),
+    "WI": (
+        "Wisconsin Legislative Technology Services Bureau",
+        "2022 Election Data with 2022 Wards",
+        "Open and publicly available data",
+        "LTSB, Wisconsin Elections Commission",
+    ),
 }
 ARCGIS = "query?where=1%3D1&outFields=*&outSR=4326&f=geojson&resultOffset={offset}&resultRecordCount={count}"
 LAYERS = {
@@ -69,6 +76,7 @@ LAYERS = {
     "OK": "https://services.arcgis.com/3xOwF6p0r7IHIjfn/arcgis/rest/services/State_Wide_2020_Precincts/FeatureServer/0/",
     "RI": "https://services2.arcgis.com/S8zZg9pg23JUEexQ/ArcGIS/rest/services/BND_Voting_Precincts_2022/FeatureServer/0/",
     "AZ": "https://services.arcgis.com/ykpntM6e3tHvzKRJ/arcgis/rest/services/Maricopa_County_Voting_Precincts_(2022-)/FeatureServer/0/",
+    "WI": "https://services1.arcgis.com/FDsAtKBk8Hy4cAH0/arcgis/rest/services/2022_Election_Data_wtih_2022_Wards/FeatureServer/0/",
     "DC:1990": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Administrative_Other_Boundaries_WebMercator/MapServer/30/",
     "DC:2002": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Administrative_Other_Boundaries_WebMercator/MapServer/29/",
     "DC:2008": "https://maps2.dcgis.dc.gov/dcgis/rest/services/DCGIS_DATA/Administrative_Other_Boundaries_WebMercator/MapServer/28/",
@@ -109,7 +117,6 @@ ZIPS = {
     "NC": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20220831.zip",
     "TX": "https://data.capitol.texas.gov/dataset/d04c72b9-16c4-4ab2-8c6d-c666d41e04b7/resource/8d1035a6-0aaf-495e-aef1-ede0b70deae4/download/precincts22g.zip",
     "WA": "https://www.sos.wa.gov/sites/default/files/2023-05/statewide_precincts_2022general_ok_consol.zip",
-    "WI": "https://web.s3.wisc.edu/rml-gisdata/WI_MunicipalWards_Spring_2022.zip",
     "LA": "https://redist.legis.la.gov/2022_GeoUpdates/2022_Louisiana_Precincts_(12-25-2022).zip",
     "MA": "https://s3.us-east-1.amazonaws.com/download.massgis.digital.mass.gov/shapefiles/state/wardsprecincts2022_poly.zip",
     "NM": "https://gstore.unm.edu/apps/rgis/datasets/3b1de40a-b37e-4d35-abdd-fd40bbbbe39e/New_Mexico_Voting_Precinct_20240703.original.zip",
@@ -155,6 +162,9 @@ ZIPS = {
     "NC:2006": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/Precincts2006Gen.zip",
     "NC:2012": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20120901.zip",
     "NC:2014": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20141016.zip",
+    "NC:2016": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20161004.zip",
+    "NC:2017": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20170519.zip",
+    "NC:2020": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20201018.zip",
     "WV:2002": "https://data.wvgis.wvu.edu/pub/Clearinghouse/Boundaries/votingDistrictsWV_legislativeServices_2002_utm83_shp.zip",
     "SC:snapshot": "https://rfa.sc.gov/media/10668",
     "NC:2024": "https://s3.amazonaws.com/dl.ncsbe.gov/ShapeFiles/Precinct/SBE_PRECINCTS_20240723.zip",
@@ -337,6 +347,10 @@ def features(state: str) -> Iterator[tuple[dict[str, object], str, int]]:
             yield dict(zip(fields, list(record), strict=True)), json.dumps(shape.__geo_interface__), srid
 
 
+def cased(text: str) -> str:
+    return re.sub(r"\w+", lambda word: word[0] if re.search(r"\d", word[0]) else word[0].title(), text)
+
+
 def canon(text: object) -> str:
     spaced = re.sub(r"(?<=[A-Z])(?=\d)|(?<=\d)(?=[A-Z])", " ", str(text).upper())
     return " ".join(
@@ -360,8 +374,8 @@ SHAPES: dict[str, Callable[[dict[str, Any]], tuple[str, str, str]]] = {
     "DC": lambda p: ("11001", bare(p["NAME"]), p["NAME"]),
     "OK": lambda p: (f"40{p['CO_FIPS']}", canon(p["PCT_CEB"]), f"Precinct {p['PCT_CEB']}"),
     "RI": lambda p: ("", canon(p["DISTRICT"]), f"{p['TOWN']} {p['DISTRICT']}"),
-    "AZ": lambda p: ("04013", canon(p["BdVal"]), f"{p['BdVal']} {p['BdName'].title()}"),
-    "NC": lambda p: (p["county_nam"], canon(p["prec_id"]), p["enr_desc"].title()),
+    "AZ": lambda p: ("04013", canon(p["BdVal"]), f"{p['BdVal']} {cased(p['BdName'])}"),
+    "NC": lambda p: (p["county_nam"], canon(p["prec_id"]), cased(p["enr_desc"])),
     "TX": lambda p: (f"48{int(p['CNTY']):03d}", canon(p["PREC"]), f"Precinct {p['PREC']}"),
     "WA": lambda p: (p["County"], canon(p["PrecName"]), p["PrecName"]),
     "LA": lambda p: (f"22{p['COUNTY']}", bare(p["NAME20"]), f"Precinct {p['NAME20']}"),
@@ -369,6 +383,7 @@ SHAPES: dict[str, Callable[[dict[str, Any]], tuple[str, str, str]]] = {
     "NM": lambda p: (f"35{p['COUNTY_FIP']}", canon(p["VTD_NUM"]), f"Precinct {p['VTD_NUM']}"),
     "WV": lambda p: (p["StCoFIPS"], canon(p["SHORTNAME"]), f"Precinct {p['SHORTNAME']}"),
     "NH": lambda p: ("", canon(re.sub(r"-\s*entire$", "", p["DISTRICT"])), re.sub(r"-\s*entire$", "", p["DISTRICT"])),
+    "WI": lambda p: (p["CNTY_FIPS"], canon(p["RU"]), cased(p["RU"])),
 }
 UNITS: dict[str, Callable[[str, str], str]] = {
     "DC": lambda _, precinct: bare(precinct),
@@ -419,7 +434,7 @@ GENERALS = [date(year, 11, 2 + (7 - date(year, 11, 1).weekday()) % 7) for year i
 
 
 def day(year: int) -> tuple[date, date]:
-    general = next(general for general in GENERALS if general.year == year)
+    general = date(year, 11, 2 + (7 - date(year, 11, 1).weekday()) % 7)
     return general, general + timedelta(days=1)
 
 
@@ -429,7 +444,7 @@ def years(first: int, last: int) -> tuple[date, date]:
 
 def maricopa(p: dict[str, Any]) -> tuple[str, str, str]:
     number = int(p.get("BdVal") or p.get("BDVAL") or p.get("PctNum") or p.get("PCT_NUM") or 0)
-    name = str(p.get("BdName") or p.get("PctName") or p.get("PCT_NAME") or "").title()
+    name = cased(str(p.get("BdName") or p.get("PctName") or p.get("PCT_NAME") or ""))
     return "04013", str(number), f"{number:04d} {name}".strip()
 
 
@@ -561,8 +576,25 @@ DATED: dict[str, tuple[date, date, str, str, str, str | None, Callable[[dict[str
             None,
             lambda p: (p["COUNTY_NAM"], canon(p["PREC_ID"]), p["ENR_DESC"].split("_", 1)[-1]),
         )
-        for year, stamp in ((2012, "2012-09-01"), (2014, "2014-10-16"))
+        for year, stamp in ((2012, "2012-09-01"), (2014, "2014-10-16"), (2016, "2016-10-04"))
     },
+    "NC:2017": (
+        date(2017, 5, 19),
+        date(2019, 5, 7),
+        "North Carolina State Board of Elections",
+        "Precinct Shapefile, 2017-05-19",
+        "Public record",
+        None,
+        lambda p: (p["COUNTY_NAM"], canon(p["PREC_ID"]), p["ENR_DESC"].split("_", 1)[-1]),
+    ),
+    "NC:2020": (
+        *day(2020),
+        "North Carolina State Board of Elections",
+        "Precinct Shapefile, 2020-10-18",
+        "Public record",
+        None,
+        lambda p: (p["county_nam"], canon(p["prec_id"]), p["enr_desc"]),
+    ),
     "WV:2002": (
         *years(2002, 2002),
         "West Virginia GIS Technical Center",
@@ -968,6 +1000,49 @@ def parse() -> None:
         for properties, geojson, srid in features(vintage):
             county, key, label = rule(properties)
             rows.append((named.get((FIPS[state], county.upper()), county), key, str(label).strip(), geojson, srid))
+        if vintage == "WI:2024":
+            wards = {}
+            for county, key, label, _, _ in rows:
+                match = re.fullmatch(r"(.+) - ([CTV]) \S+", label)
+                if match is not None:
+                    wards.setdefault((county, canon(match[1]), match[2], key.split(" ", 1)[1]), set()).add(key)
+            groups: dict[str, list[str]] = {}
+            for county, precinct in (
+                pl.read_parquet(DATA / "parsed" / "us.medsl_precincts" / "units.parquet")
+                .filter(pl.col("code").str.starts_with("2024:WI:"))
+                .select("county", precinct=pl.col("code").str.split(":").list.get(4))
+                .iter_rows()
+            ):
+                match = re.fullmatch(
+                    r"(TOWN|CITY|VILLAGE) OF (.+?) WARDS? ([0-9A-Z]+(?:\s*[-,&]\s*[0-9A-Z]+)*)", precinct
+                )
+                if match is None:
+                    continue
+                numbers = []
+                for item in re.split(r"\s*[,&]\s*", match[3]):
+                    span = re.fullmatch(r"(\d+)\s*-\s*(\d+)", item)
+                    if span is not None and int(span[1]) < int(span[2]):
+                        numbers += [str(number) for number in range(int(span[1]), int(span[2]) + 1)]
+                    elif re.fullmatch(r"\d+[A-Z]?", item):
+                        numbers.append(canon(item))
+                    else:
+                        numbers = []
+                        break
+                found = [wards.get((county, canon(match[2]), match[1][0], number), set()) for number in numbers]
+                if numbers and all(len(keys) == 1 for keys in found):
+                    groups[precinct] = [key for keys in found for key in keys]
+            claims = Counter(key for keys in groups.values() for key in keys)
+            claimed = {
+                key: precinct
+                for precinct, keys in groups.items()
+                if all(claims[key] == 1 for key in keys)
+                for key in keys
+            }
+            rows += [
+                (county, canon(claimed[key]), cased(claimed[key]), geojson, srid)
+                for county, key, _, geojson, srid in rows
+                if key in claimed
+            ]
         shapes = group(rows, FIPS[state]).with_columns(
             county=pl.when(pl.col("county") == "").then("within").otherwise("county")
         )
@@ -1091,17 +1166,39 @@ def parse() -> None:
     )
     known = set(named.values())
     counties = {code: name for (_, name), code in named.items()}
+    jurisdictions: dict[tuple[str, str], set[str]] = {}
+    for properties, _, _ in features("MI"):
+        jurisdictions.setdefault(
+            (
+                f"26{properties['COUNTYFIPS']}",
+                canon(
+                    re.sub(
+                        r"^(CITY|TOWNSHIP) OF (.+)$",
+                        r"\2 \1",
+                        str(properties["Precinct_Long_Name"]).split(",")[0].upper().replace("CHARTER ", ""),
+                    )
+                ),
+            ),
+            set(),
+        ).add(str(properties["MCDFIPS"]))
+    mcds = {key: next(iter(codes)) for key, codes in jurisdictions.items() if len(codes) == 1}
     links = []
     for year in ("2016", "2018", "2020"):
         vest = pl.read_parquet(DATA / "parsed" / "us.vest" / f"precincts_{year}.parquet").select(
             area=pl.format("{}:{}:{}", pl.lit(year), "state", "n"),
             county="county",
-            name="name",
+            name=pl.col("name").str.replace(r"\s+\d{3}-\d{2}$", ""),
             bare=pl.struct("county", "name").map_elements(
                 lambda row: re.sub(
                     rf"^({re.escape(counties.get(row['county'], '~'))}|Voting District)\s+",
                     "",
-                    re.sub(r" - ([TCV]) 0*(\d+)$", r" - \1 \2", row["name"]),
+                    re.sub(
+                        r" - ([TCV]) 0*(\d+)$|\s+(?:Borough|Township|City|Town|Village)$"
+                        if row["county"][:2] == "34"
+                        else r" - ([TCV]) 0*(\d+)$",
+                        lambda hit: f" - {hit[1]} {hit[2]}" if hit[1] else "",
+                        row["name"],
+                    ),
                     flags=re.IGNORECASE,
                 ),
                 return_dtype=pl.String,
@@ -1114,6 +1211,19 @@ def parse() -> None:
             .then(pl.col("precinct").str.slice(-3))
             .when(pl.col("state") == "WV")
             .then(pl.col("precinct").str.replace(r"^PRECINCT\s+", ""))
+            .when(pl.col("state") == "NJ")
+            .then(pl.col("precinct").str.replace(r"\s+(?:TWP|TOWNSHIP|BORO|BOROUGH|CITY|TOWN|VILLAGE)$", ""))
+            .when(pl.col("state") == "CT")
+            .then(
+                pl.struct("jurisdiction", "precinct").map_elements(
+                    lambda row: (
+                        ""
+                        if (match := re.match(r"DISTRICT (\d+)-(?:(\d+)-)?", row["precinct"] or "")) is None
+                        else f"{row['jurisdiction']} {int(match[1]):03d}-{int(match[2] or 0):02d}"
+                    ),
+                    return_dtype=pl.String,
+                )
+            )
             .when(pl.col("state") == "WI")
             .then(pl.col("precinct").str.replace(r"^(T|C|V)(?:OWN|ITY|ILLAGE) OF (.+) WARD (\d+)$", "${2} - ${1} ${3}"))
             .otherwise(
@@ -1122,7 +1232,76 @@ def parse() -> None:
                 )
             )
         )
-        found = pl.DataFrame(schema={"code": pl.String, "area": pl.String})
+        vintage = {"2016": "NC_2016", "2018": "NC_2017", "2020": "NC_2020"}[year]
+        sbe = pl.read_parquet(PARSED / f"{vintage}.parquet")
+        start_date = str(DATED[vintage.replace("_", ":")][0])
+        found = pair(
+            mine.filter(pl.col("state") == "NC").select("code", "county", key="precinct"),
+            sbe.select(area=pl.format("{}:NC:{}:{}", pl.lit(start_date), "county", "key"), county="county", key="key"),
+        )
+        found = pl.concat(
+            [
+                found,
+                pair(
+                    mine.filter(pl.col("state") == "NC")
+                    .join(found, on="code", how="anti")
+                    .select("code", "county", key="precinct"),
+                    sbe.filter(
+                        ~pl.format("{}:NC:{}:{}", pl.lit(start_date), "county", "key").is_in(found["area"].to_list())
+                    ).select(
+                        area=pl.format("{}:NC:{}:{}", pl.lit(start_date), "county", "key"), county="county", key="label"
+                    ),
+                ),
+            ]
+        )
+        print(f"{year} NC: {found.height} units matched to the State Board's precincts", flush=True)
+        rows = []
+        for code, county, jurisdiction, precinct in (
+            mine.filter(pl.col("state") == "MI")
+            .join(found, on="code", how="anti")
+            .select("code", "county", "jurisdiction", "precinct")
+            .iter_rows()
+        ):
+            name, text = precinct.split("; ", 1) if "; " in precinct else (jurisdiction, precinct)
+            match = re.fullmatch(r"Ward (\d+); Precinct (\d+)|(\d+)(?:, WARD (\d+))?", text)
+            mcd = mcds.get((county, canon(name.upper().replace("CHARTER ", ""))))
+            if match is not None and mcd is not None:
+                rows.append((code, county, f"{county[2:]}{mcd}", match[1] or match[4] or "", match[2] or match[3]))
+        michigan_units = pl.DataFrame(rows, schema=["code", "county", "place", "ward", "number"], orient="row")
+        michigan_vest = vest.filter(pl.col("county").str.starts_with("26"), pl.col("name").str.contains(r"^\d{13}$"))
+        found = pl.concat(
+            [
+                found,
+                pair(
+                    michigan_units.select(
+                        "code",
+                        "county",
+                        key=pl.format(
+                            "{}{}{}",
+                            "place",
+                            pl.col("ward").str.zfill(2),
+                            pl.col("number").str.zfill(3),
+                        ),
+                    ),
+                    michigan_vest.select("area", "county", key="name"),
+                ),
+            ]
+        )
+        found = pl.concat(
+            [
+                found,
+                pair(
+                    michigan_units.filter(pl.col("ward") == "")
+                    .join(found, on="code", how="anti")
+                    .select("code", "county", key=pl.format("{}~{}", "place", pl.col("number").str.zfill(3))),
+                    michigan_vest.join(found, on="area", how="anti").select(
+                        "area",
+                        "county",
+                        key=pl.format("{}~{}", pl.col("name").str.slice(0, 8), pl.col("name").str.slice(10, 3)),
+                    ),
+                ),
+            ]
+        )
         for unit, shape in (("precinct", "bare"), ("clean", "bare"), ("jurisdiction", "name")):
             found = pl.concat(
                 [
@@ -1141,7 +1320,7 @@ def parse() -> None:
             .sort("state")
             .iter_rows()
         ):
-            print(f"{year} {state}: {matched} of {total} units matched to VEST", flush=True)
+            print(f"{year} {state}: {matched} of {total} units matched to official or VEST shapes", flush=True)
     shapes = pl.concat(
         [
             pl.read_parquet(PARSED / f"{vintage.replace(':', '_')}.parquet")
@@ -1322,7 +1501,7 @@ def emit() -> Path:
                     {
                         "entity_id": ids,
                         "text": [
-                            f"{f'Precinct {label}' if label.isdigit() else label.title() if label.isupper() else label}, "
+                            f"{f'Precinct {label}' if label.isdigit() else cased(label) if label.isupper() else label}, "
                             f"{counties[county][1]}"
                             for label, county in frame.select("label", "county").iter_rows()
                         ],
