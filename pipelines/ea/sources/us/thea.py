@@ -514,6 +514,13 @@ def emit() -> Path:
         ):
             handle = slug(str(text))
             runs.setdefault((state, handle), {}).setdefault(None if "-" in handle else district, []).append(day)
+        trials: dict[UUID, tuple[int, UUID | None, UUID]] = {
+            id: (round_number, previous, system)
+            for id, round_number, previous, system in conn.execute(
+                """select k.id, k.round_number, k.previous_round_id, k.electoral_system_id from contest k
+                   join changeset c on c.id = k.changeset_id where c.pipeline = 'us.nnv_trials'"""
+            ).fetchall()
+        }
         labeled: dict[UUID, UUID] = dict(
             conn.execute(
                 """select o.id, o.party_id from contest_option o join changeset c on c.id = o.changeset_id
@@ -648,8 +655,11 @@ def emit() -> Path:
                 term="remainder" if special else "full",
                 boundary_set_id=None if chamber == "senate" else plan,
                 magnitude=magnitude,
-                round_number=1,
-                electoral_system_id=systems["block" if magnitude > 1 else "fptp"],
+                round_number=trials[contest][0] if contest in trials else 1,
+                previous_round_id=trials[contest][1] if contest in trials else None,
+                electoral_system_id=trials[contest][2]
+                if contest in trials
+                else systems["block" if magnitude > 1 else "fptp"],
                 default_result_kind="tacit" if tacit else "counted",
             )
             named(

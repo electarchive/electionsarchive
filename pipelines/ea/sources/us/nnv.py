@@ -608,7 +608,7 @@ def emit() -> Path:
                    from external_id x join contest c on c.id = x.entity_id
                    join result_set r on r.contest_id = c.id and r.is_default
                    left join contest_option o on o.contest_id = c.id and o.parent_option_id is null
-                   join changeset s on s.id = c.changeset_id
+                   join entity n on n.id = c.id join changeset s on s.id = n.changeset_id
                    where x.scheme = 'us.contest' and x.value like '%%:house:%%' and x.value ~ '^1[78][0-9]{2}'
                      and left(x.value, 4)::int < 1824 and s.pipeline = 'us.thea'"""
         ).fetchall():
@@ -672,10 +672,12 @@ def emit() -> Path:
                     score = (exact, -(sum(drift) / len(drift) if drift else 1), -abs(info[record]["year"] - year))
                     pairs.append((score, key, record))
         matched: dict[str, str] = {}
+        owner_of: dict[str, str] = {}
         taken: set[str] = set()
         for _, key, record in sorted(pairs, reverse=True):
             if key not in matched and record not in taken:
                 matched[key] = record
+                owner_of[record] = key
                 taken.add(record)
         tally["THEA contests matched to an NNV record"] = len(matched)
         tally["THEA contests without a matching NNV record"] = (
@@ -718,7 +720,7 @@ def emit() -> Path:
                 tally["matched, units exceed NNV's printed totals"] += 1
                 continue
             official = sum(option["votes"] or 0 for option in entry["options"])
-            drifted = False
+            drifted: list[str] = []
             for line in printed:
                 option = next(
                     (option for option in entry["options"] if option["id"] == picked.get(line["candidate"])), None
@@ -730,10 +732,12 @@ def emit() -> Path:
                 if option["votes"] >= official * 0.05 and abs(theirs - option["votes"]) > max(
                     2, option["votes"] * 0.02
                 ):
-                    drifted = True
+                    drifted.append(
+                        f"{line['name']} has {theirs:,.0f} here and {option['votes']:,} in THEA "
+                        f"({(theirs - option['votes']) / option['votes']:+.1%})"
+                    )
             if drifted:
-                tally["matched, NNV's totals differ from THEA's by more than 2 percent"] += 1
-                continue
+                tally["attached as an alternative, NNV's totals differ from THEA's by more than 2 percent"] += 1
             known = sum(total for total in totals.values() if total is not None)
             counted = sum(sums.values())
             result_set = cs.key(f"{SOURCE}.result_set", key)
@@ -763,6 +767,15 @@ def emit() -> Path:
                 source_id=source,
                 locator={"file": info[record]["file"], "election_id": record, "handle": info[record]["handle"]},
             )
+            if drifted:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="A New Nation Votes' totals differ from THEA's by more than 2 percent: "
+                    + "; ".join(drifted)
+                    + ". THEA's figures stay the default.",
+                )
             for place, cell in local.items():
                 spot = unit(postal, place)
                 merged: dict[tuple[UUID | None, int], float] = {}
@@ -817,11 +830,11 @@ def emit() -> Path:
                 else:
                     started.append([record])
             chains += started
-        thea_seats: dict[tuple[str, int], list[tuple[int, bool, list[list[str]]]]] = {}
+        thea_seats: dict[tuple[str, int], list[tuple[int, bool, list[list[str]], str]]] = {}
         for key, entry in held.items():
             stamp, postal, _, district, *rest = key.split(":")
             thea_seats.setdefault((postal, int(district)), []).append(
-                (int(stamp[:4]), bool(rest), [option["words"] for option in entry["options"] if option["won"]])
+                (int(stamp[:4]), bool(rest), [option["words"] for option in entry["options"] if option["won"]], key)
             )
         bioguides: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'bioguide'").fetchall()
@@ -932,13 +945,42 @@ def emit() -> Path:
             ]
             pool_members: list[dict] = []
             umbrella: UUID | None = None
-            if first["office"] == "U.S. House of Representatives":
-                hit = next(((index, found) for index, record in enumerate(chain) if (found := seated(record))), None)
-                thea_index = next((index for index, record in enumerate(chain) if record in taken), None)
-                if thea_index is not None:
-                    tally["NNV trials before a THEA contest's trial, not added"] += thea_index
-                    tally["NNV trials after a THEA contest's trial, not added"] += len(chain) - thea_index - 1
+            thea_index = next((index for index, record in enumerate(chain) if record in taken), None)
+            anchor: dict | None = None
+            if thea_index is not None:
+                if len(chain) == 1:
                     continue
+                anchor = held[owner_of[chain[thea_index]]]
+                area_id, plan_id, thea_seats_count, parent, umbrella_key, thea_name, thea_path = conn.execute(
+                    """select c.district_area_id, c.boundary_set_id, c.magnitude, e.parent_id,
+                              (select value from external_id where entity_id = e.parent_id and scheme = 'us.election'),
+                              (select text from name where entity_id = c.id and kind = 'official' and is_preferred
+                               limit 1),
+                              (select path from slug where entity_id = c.id and is_current limit 1)
+                       from contest c join election e on e.id = c.election_id where c.id = %s""",
+                    [anchor["contest"]],
+                ).fetchall()[0]
+                umbrella = parent
+                number = int(umbrella_key.removeprefix("congress-")) if umbrella_key.startswith("congress-") else 0
+                pool_members = roster.get((number, postal), [])
+                seats = (thea_seats_count or 1) + sum(
+                    1 for record in chain[:thea_index] for line in lines.get(record, []) if line["elected"]
+                )
+                title = thea_name.split(" ", 1)[1]
+                part_path = thea_path.rsplit("/", 1)[1]
+                district_unit = next(
+                    (entry[1] for entries in districts.values() for entry in entries if entry[0] == area_id), unit_id
+                )
+                fields = {
+                    "kind": "body_seats",
+                    "body_id": body,
+                    "office_id": None,
+                    "district_area_id": area_id,
+                    "boundary_set_id": plan_id,
+                }
+                body_label = "the House, trials of THEA contests"
+            elif first["office"] == "U.S. House of Representatives":
+                hit = next(((index, found) for index, record in enumerate(chain) if (found := seated(record))), None)
                 if hit is None:
                     tally["NNV races whose winner is not on the roster, not added"] += 1
                     continue
@@ -952,7 +994,7 @@ def emit() -> Path:
                 clash = any(
                     abs(other - year) <= 1
                     and (flag == special or any(_alike(one, two) for one in winner_words for two in won))
-                    for other, flag, won in thea_seats.get((postal, district), [])
+                    for other, flag, won, _ in thea_seats.get((postal, district), [])
                 )
                 if clash:
                     tally["NNV races THEA holds without reconciling, not added"] += 1
@@ -1065,8 +1107,28 @@ def emit() -> Path:
             first_election: UUID | None = None
             for round_number, record in enumerate(chain, start=1):
                 row = info[record]
+                if anchor is not None and round_number == (thea_index or 0) + 1:
+                    previous = anchor["contest"]
+                    first_election = first_election or anchor["election"]
+                    filled += sum(1 for option in anchor["options"] if option["won"])
+                    continue
+                if anchor is not None:
+                    anchor_key = owner_of[chain[thea_index or 0]]
+                    elected_words = [_words(line["name"]) for line in lines.get(record, []) if line["elected"]]
+                    if any(
+                        other_key != anchor_key
+                        and abs(other - row["year"]) <= 1
+                        and any(_alike(one, two) for one in elected_words for two in won)
+                        for other, _, won, other_key in thea_seats.get((postal, int(anchor_key.split(":")[3])), [])
+                    ):
+                        tally["NNV trials THEA holds as contests of their own, chain stopped"] += 1
+                        break
                 day, precision, stamp = day_of(record)
-                key = f"{stamp}:{base}" + (f":ballot{round_number}" if round_number > 1 else "")
+                key = (
+                    f"{owner_of[chain[thea_index or 0]]}:ballot{round_number}"
+                    if anchor is not None
+                    else f"{stamp}:{base}" + (f":ballot{round_number}" if round_number > 1 else "")
+                )
                 if key in used:
                     tally["NNV races duplicating another NNV race, not added"] += 1
                     break
@@ -1140,12 +1202,13 @@ def emit() -> Path:
                 )
                 named(
                     contest,
-                    f"{day.year} {title}" + (f", {TRIALS[round_number - 1]} trial" if round_number > 1 else ""),
+                    f"{day.year} {title}"
+                    + (f", {TRIALS[round_number - 1]} trial" if round_number > 1 or anchor is not None else ""),
                 )
                 cs.add(
                     "slug",
                     path=f"us/{postal.lower()}/{stamp}-{part}/{part_path}"
-                    + (f"-trial-{round_number}" if round_number > 1 else ""),
+                    + (f"-trial-{round_number}" if round_number > 1 or anchor is not None else ""),
                     entity_id=contest,
                 )
                 previous = contest
