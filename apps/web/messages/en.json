@@ -507,6 +507,8 @@
   "person_won": "Won",
   "person_years": "Years",
   "person_record": "Election record",
+  "person_record_more": "Show all {count} races",
+  "person_record_fewer": "Show fewer races",
   "person_empty": "No results published for this person yet.",
   "col_year": "Year",
   "col_contest": "Contest",

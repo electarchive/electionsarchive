@@ -21,6 +21,7 @@
     lost: m.person_lost_mark,
   };
 
+  let isOpen = $state(false);
   const person = $derived(data.person);
   const entries = $derived(
     person.record.map((entry) => ({
@@ -192,13 +193,15 @@
         <p class="text-sm text-muted-foreground">{m.person_empty()}</p>
       {:else}
         <ol class="grid text-sm">
-          {#each entries as entry, index (index)}
+          {#each isOpen ? entries : entries.slice(0, 12) as entry, index (index)}
             <li
               class="grid grid-cols-[3rem_minmax(0,1fr)_7.5rem] items-baseline gap-x-3 border-be border-border/60 py-2 last:border-be-0 max-sm:grid-cols-[2.75rem_minmax(0,1fr)_4rem]"
             >
               <span
                 class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                >{entry.year}</span
+                >{index === 0 || entries[index - 1]?.year !== entry.year
+                  ? entry.year
+                  : ""}</span
               >
               <span class="grid gap-0.5 min-inline-0">
                 <span>
@@ -265,6 +268,17 @@
             </li>
           {/each}
         </ol>
+        {#if entries.length > 12}
+          <button
+            type="button"
+            class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+            aria-expanded={isOpen}
+            onclick={() => (isOpen = !isOpen)}
+            >{isOpen
+              ? m.person_record_fewer()
+              : m.person_record_more({ count: String(entries.length) })}</button
+          >
+        {/if}
       {/if}
     </section>
   </article>
