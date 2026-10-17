@@ -15,6 +15,8 @@ RETIRED = DATA / "retired" / "raw"
 RESTRICTED = {
     "us.icpsr": "ICPSR terms of use bar redistribution",
     "thea": "awaiting THEA's permission",
+    "us.algara": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
+    "us.algara_federal": "compiled from CQ Press and ICPSR's United States Historical Election Returns",
 }
 # The first rule a license matches sets its class; a file cited under several licenses takes the strictest.
 CLASSES = [

@@ -53,6 +53,15 @@ FORMER = {
     ("ID", "LOGAN"): ("logan", "Logan", "16013", date(1895, 3, 5)),
     ("ID", "ALTURAS"): ("alturas", "Alturas", "16013", date(1895, 3, 5)),
 }
+LICENSE = (
+    "CC0 1.0 as deposited, but compiled from CQ Press and ICPSR's United States Historical Election Returns, "
+    "so held under the ICPSR terms of use"
+)
+PROVENANCE = (
+    "Algara and Amlani's returns are reported as compiled from CQ Press and ICPSR's United States Historical "
+    "Election Returns, so these county figures are kept beside the official total, never as the default, "
+    "and are not redistributed."
+)
 COUNTY = ("us.county", "us.town", "us.county_part", "us.former_county", "us.ak_house_district", "us.place")
 
 
@@ -150,7 +159,7 @@ def emit() -> Path:
         sources: dict[str, UUID] = {}
         for office, (url, _, title) in FILES.items():
             sources[office] = cs.source(PUBLISHER, title)
-            if sources[office] not in cs.minted:
+            if office == "governor":
                 continue
             cs.add(
                 "source",
@@ -159,7 +168,7 @@ def emit() -> Path:
                 publisher=PUBLISHER,
                 title=title,
                 url="https://doi.org/10.7910/DVN/DGUMFI",
-                license="CC0 1.0",
+                license=LICENSE,
             )
             cs.artifact(raw.cached(SOURCE, url), sources[office])
         counties: dict[str, tuple[UUID, UUID]] = {
@@ -207,6 +216,11 @@ def emit() -> Path:
                 [candidates, list(COUNTY)],
             ).fetchall()
         }
+        published: dict[str, UUID] = dict(
+            conn.execute(
+                "select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.result_set"]
+            ).fetchall()
+        )
         races: dict[tuple[str, int, str, bool], list[pl.DataFrame]] = {}
         for (office, year, state, _, special), lines in frame.group_by(
             "office", "year", "state", "seat_class", "special", maintain_order=True
@@ -229,6 +243,8 @@ def emit() -> Path:
             key, contest = found[0]
             lines = groups[0]
             if contest in counted_already:
+                if key in published:
+                    cs.add("note", entity_id=published[key], kind="caveat", body_md=PROVENANCE)
                 skip("already by county", key)
                 continue
             if lines["coarse"].any():
@@ -306,6 +322,7 @@ def emit() -> Path:
                 completeness=round(counted / official, 4),
             )
             cs.add("note", entity_id=result_set, kind="caveat", body_md=TWO_PARTY)
+            cs.add("note", entity_id=result_set, kind="caveat", body_md=PROVENANCE)
             pooled = lines.with_columns(other=pl.col("total") - pl.col("d") - pl.col("r"))
             if pooled["other"].sum() > 0:
                 others = cs.key("us.option", f"{key}:{SOURCE}:other")
@@ -325,5 +342,6 @@ def emit() -> Path:
                     )
                 )
         print(skipped, len({frame["result_set_id"][0] for frame in values}), "contests filled")
-        cs.frame("result_value", pl.concat(values))
+        if values:
+            cs.frame("result_value", pl.concat(values))
         return cs.write()
