@@ -7080,7 +7080,7 @@ export const bodies = {
         ),
         db.execute<{ start: string; party: string | null; seats: number }>(sql`
           with t as materialized (
-            select t.id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id
+            select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id
             from tenure t left join seat st on st.id = t.seat_id
             where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
           ),
@@ -7093,8 +7093,11 @@ export const bodies = {
             )
           ),
           sat as (
-            select s.start, t.id from starts s join t on t.from_date <= s.start and t.to_date > s.start
+            select distinct on (s.start, coalesce(t.seat_id, t.id)) s.start, t.id
+            from starts s join t on t.to_date > s.start
+              and (t.from_date <= s.start or t.seat_id is not null and t.from_date < s.start + 30)
             where not exists (select from starts l where l.start > s.start and l.start < s.start + 90)
+            order by s.start, coalesce(t.seat_id, t.id), t.from_date > s.start, t.from_date
           ),
           fallback as materialized (
             select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id) as party

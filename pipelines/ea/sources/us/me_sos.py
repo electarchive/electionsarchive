@@ -758,7 +758,11 @@ def emit() -> Path:
                             "outcome",
                             result_set_id=official,
                             option_id=option,
-                            kind="won" if label == winner else "lost" if label in final else "eliminated",
+                            kind=("won" if key in PRIMARIES else "elected")
+                            if label == winner
+                            else "lost"
+                            if label in final
+                            else "eliminated",
                         )
                 values = pl.DataFrame(
                     [

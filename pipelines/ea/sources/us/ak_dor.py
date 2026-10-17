@@ -779,7 +779,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=official,
                     option_id=option,
-                    kind="won" if label == winner else "lost" if label in final else "eliminated",
+                    kind="elected" if label == winner else "lost" if label in final else "eliminated",
                 )
             sets = [
                 (
