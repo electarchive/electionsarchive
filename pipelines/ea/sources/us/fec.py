@@ -1233,9 +1233,10 @@ SYSTEMS = {
     "top_four": ({"formula": "top_two", "advance": 4}, "Top-four primary"),
 }
 RANKED = (
-    "This page shows each round of Alaska's ranked-choice count. The FEC's table also lists first-choice totals from "
-    "the election summary. Those totals include write-in votes, and they differ slightly from the first round of the "
-    "count. We left them out."
+    "These are the FEC's figures: each round of Alaska's ranked-choice count, without exhausted ballots. The FEC's "
+    "table also lists first-choice totals from the election summary, which include write-in votes and differ slightly "
+    "from the first round of the count, so they are left out. The Division of Elections' official rounds are the "
+    "results shown by default."
 )
 NOTES = {
     "1982-11-30:GA:house:4": (
@@ -1293,8 +1294,9 @@ NOTES = {
     "2024-11-05:AK:house:0": (
         "methodology",
         (
-            "Alaska used ranked-choice voting for this race. The Clerk's statistics report first-choice votes only, "
-            "so later rounds are not shown here. Nick Begich led the first round and won the race."
+            "These are the Clerk's figures, which report first-choice votes only. Alaska counted this race by "
+            "ranked-choice voting, and Nick Begich won in the third round; the Division of Elections' official rounds "
+            "are the results shown by default."
         ),
     ),
     "2024-11-05:ME:house:2": (
@@ -1307,6 +1309,9 @@ NOTES = {
     ),
 }
 RANKED_ELSEWHERE = {
+    "2022-11-08:AK:senate",
+    "2022-11-08:AK:house:0",
+    "2024-11-05:AK:house:0",
     "2018-06-12:ME:house:2:democratic",
     "2018-11-06:ME:house:2",
     "2020-07-14:ME:house:2:republican",
