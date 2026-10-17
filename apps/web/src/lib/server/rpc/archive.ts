@@ -7852,11 +7852,16 @@ export const people = {
         )
         select p.root, p.date::text as date, p.year, p.kind, t.main::int as measure, t.votes,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
-          (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
-            from mine m join outcome x on x.option_id = m.option
-              and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
-            join result_set rs on rs.id = x.result_set_id and rs.is_default
-            where m.contest_id = p.root) as outcome,
+          coalesce(
+            (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
+              from mine m join outcome x on x.option_id = m.option
+                and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
+              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              where m.contest_id = p.root),
+            (select 'lost' from contest_option o join outcome x on x.option_id = o.id and x.kind in ('elected', 'won', 'advanced')
+              join result_set rs on rs.id = x.result_set_id and rs.is_default
+              where o.contest_id = p.root limit 1)
+          ) as outcome,
           lead.party,
           (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
             order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc,

@@ -7,6 +7,7 @@
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Career from "./career.svelte";
 
@@ -17,6 +18,7 @@
     won: m.outcome_won,
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
+    lost: m.person_lost_mark,
   };
 
   const person = $derived(data.person);
@@ -211,8 +213,14 @@
                   {/if}
                   {#if entry.outcome != null}
                     <span
-                      class="ms-1 highlighter px-1 text-xs font-semibold whitespace-nowrap"
-                      >{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
+                      class={cn(
+                        "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
+                        {
+                          highlighter: entry.outcome !== "lost",
+                          "rounded-xs bg-secondary text-muted-foreground":
+                            entry.outcome === "lost",
+                        },
+                      )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
                     >
                   {/if}
                 </span>

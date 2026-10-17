@@ -13,6 +13,7 @@
     won: m.outcome_won,
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
+    lost: m.person_lost_mark,
   };
 
   let width = $state(720);
