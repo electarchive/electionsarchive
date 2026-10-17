@@ -61,6 +61,14 @@ DATASETS = {
 COUNTS = {"ONE": 1, "TWO": 2, "THREE": 3, "FOUR": 4, "FIVE": 5, "SIX": 6, "SEVEN": 7}
 COVERED = {"AK", "CA", "CT", "DC", "ID", "NC", "NH", "NM", "VA", "VT"}
 COUNTY = r"(?:COUNTY|PARISH)"
+PROSECUTORS = {
+    "district-attorney",
+    "prosecuting-attorney",
+    "prosecutor",
+    "states-attorney",
+    "solicitor",
+    "public-defender",
+}
 OFFICES = [
     ("sheriff", "Sheriff", False, r"(?:HIGH )?SHERIFF"),
     ("coroner", "Coroner", False, r"CORONER"),
@@ -849,9 +857,81 @@ def parse() -> None:
             .filter("shared")
             .select(*race, "county_fips")
         )
-        for office, district in spread.select("office", "district").unique().iter_rows():
+        shared = frame.join(spread, on=[*race, "county_fips"], nulls_equal=True)
+        judicial = shared.filter(pl.col("key").is_in(list(PROSECUTORS)))
+        for office, district in (
+            shared.filter(~pl.col("key").is_in(list(PROSECUTORS))).select("office", "district").unique().iter_rows()
+        ):
             problems.append(f"{year} {state}: {office} {district or ''} spans counties")
         frame = frame.join(spread, on=[*race, "county_fips"], how="anti", nulls_equal=True)
+        if judicial.height:
+            groups = (
+                judicial.filter(~pl.col("pooled"))
+                .group_by(*race, "county_fips")
+                .agg(pl.col("candidate").unique().sort().str.join("|").alias("slate"), pl.col("county_name").first())
+                .group_by(*race, "slate")
+                .agg(pl.col("county_fips").sort(), pl.col("county_name").sort_by("county_fips"))
+            )
+            relabeled = []
+            for office, district, special, _, fips, names in groups.iter_rows():
+                number = re.search(r"\d+", district or "")
+                ident = str(int(number[0])) if number else fips[0]
+                ordinal = number and (
+                    f"{int(number[0])}"
+                    + (
+                        "th"
+                        if int(number[0]) % 100 in (11, 12, 13)
+                        else {1: "st", 2: "nd", 3: "rd"}.get(int(number[0]) % 10, "th")
+                    )
+                )
+                counties = [name.title() for name in names]
+                place = (
+                    f"{ordinal} Judicial District"
+                    if number and "JUDICIAL" in (district or "").upper() or number and state == "AR"
+                    else f"{ordinal} Judicial Circuit"
+                    if number and state == "FL"
+                    else f"Prosecutorial District {ident}"
+                    if number and state == "ME"
+                    else f"District Attorney District {ident}"
+                    if number
+                    else "Judicial District of "
+                    + (
+                        f"{counties[0]} and {counties[1]}"
+                        if len(counties) == 2
+                        else ", ".join(counties[:-1]) + f", and {counties[-1]}"
+                    )
+                    + " Counties"
+                )
+                relabeled += [
+                    {
+                        "office": office,
+                        "district": district,
+                        "special": special,
+                        "county_fips": county,
+                        "judicial": f"{state}:{ident}",
+                        "district_name": place,
+                    }
+                    for county in fips
+                ]
+            judicial = judicial.join(
+                pl.DataFrame(
+                    relabeled,
+                    schema={
+                        name: pl.String
+                        for name in ("office", "district", "special", "county_fips", "judicial", "district_name")
+                    },
+                ),
+                on=[*race, "county_fips"],
+                nulls_equal=True,
+            ).with_columns(
+                code=pl.col("judicial"),
+                scheme=pl.lit("us.judicial_district"),
+                place=pl.col("district_name"),
+                stem=pl.when(pl.col("district_name").str.starts_with(pl.col("title")))
+                .then("district_name")
+                .otherwise(pl.concat_str(pl.col("title"), pl.lit(", "), pl.col("district_name"))),
+            )
+            frame = pl.concat([frame, judicial.drop("judicial", "district_name")], how="diagonal_relaxed")
         frame = frame.with_columns(
             seat=pl.struct("rest", "district", "county_name").map_elements(
                 lambda row: (
@@ -873,7 +953,7 @@ def parse() -> None:
                 return_dtype=pl.String,
             ),
             remainder=pl.col("remainder") | (pl.col("special") == "TRUE"),
-        )
+        ).with_columns(seat=pl.when(pl.col("scheme") != "us.judicial_district").then("seat"))
         contest = ["day", "code", "key", "seat", "remainder"]
         summary = frame.group_by(contest).agg(
             pl.col("state_po").first(),
@@ -1122,6 +1202,54 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=None,
             )
+        judicial = contests.filter(pl.col("scheme") == "us.judicial_district").select("state_po", "code", "place")
+        if judicial.height:
+            cs.add(
+                "scheme",
+                code="us.judicial_district",
+                polity_id=cs.polity("US"),
+                kind="electoral_district",
+                rank=2,
+                noun="judicial district",
+            )
+            states = {
+                iso[3:]: (code, text)
+                for iso, code, text in conn.execute(
+                    """select p.iso_code, u.code, n.text from reporting_unit u join polity p on p.id = u.polity_id
+                       join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
+                       where u.scheme_code = 'us.state'"""
+                ).fetchall()
+            }
+        for state, code, display in judicial.unique().sort("code").iter_rows():
+            polity = cs.key("us.polity", f"judicial:{code}")
+            path = f"us/{state.lower()}/{slug(display)}"
+            if slugs.get(path, polity) != polity:
+                raise ValueError(f"{display} would take {path}")
+            slugs[path] = polity
+            polities[("us.judicial_district", code)] = (polity, display, path)
+            if polity not in cs.minted:
+                continue
+            cs.add("polity", id=polity, kind="judicial_district", iso_code=None)
+            name(polity, f"{states[state][1]} {display}")
+            cs.add("polity_parent", polity_id=polity, parent_id=cs.polity(f"US-{state}"))
+            cs.add("slug", path=path, entity_id=polity)
+            area = cs.area("us.judicial_district", code)
+            cs.add("area", id=area, scheme_code="us.judicial_district")
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.state", states[state][0]))
+            name(area, f"{display}, {state}")
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.judicial_district", code),
+                polity_id=polity,
+                scheme_code="us.judicial_district",
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
         systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
         if cs.minted & set(systems.values()):
             raise ValueError("the fptp and block systems must already exist")
@@ -1312,7 +1440,10 @@ def emit() -> Path:
                 counted.group_by("token", "pooled")
                 .agg(
                     pl.col("candidate").sort_by("votes", descending=True, nulls_last=True).first(),
-                    pl.col("party_detailed").drop_nulls().first(),
+                    pl.col("party_detailed")
+                    .sort_by("votes", "party_detailed", descending=True, nulls_last=True)
+                    .drop_nulls()
+                    .first(),
                     pl.when(pl.col("votes").is_null().all()).then(None).otherwise(pl.col("votes").sum()).alias("votes"),
                 )
                 .sort("votes", "candidate", descending=[True, False], nulls_last=True)
