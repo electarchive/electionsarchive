@@ -6,7 +6,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import elstats, measures
+from ea.sources.us import elstats, measures, medsl, medsl_measures, medsl_state, medsl_state_precincts
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_precincts"
@@ -14,7 +14,12 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 FIRST = 2000
 LAST = 2025
+ANSWERS = {"YES": "YES", "NO": "NO", "FOR": "YES", "AGAINST": "NO", "APPROVE": "YES", "REJECT": "NO"}
 ARCHIVE = "Precinct rows of the state's election statistics archive, which add up to its county totals for each answer."
+MEDSL = (
+    "Precinct rows of MEDSL's precinct returns, which compile each state's certified canvass. Each answer's precinct "
+    "rows add up to the totals of this question's default results{counties}."
+)
 
 
 def fetch() -> None:
@@ -105,17 +110,88 @@ def parse() -> None:
         .write_parquet(PARSED / "archives.parquet")
     )
 
+    affirmative = pl.col("candidate").str.contains(medsl_measures.AFFIRMATIVE.pattern)
+    negative = pl.col("candidate").str.contains(medsl_measures.NEGATIVE.pattern)
+    frames = []
+    for year, files in medsl_state_precincts.FILES.items():
+        for source, url in files:
+            path = raw.cached(source, url).path
+            scan = pl.scan_csv(
+                path,
+                separator="\t" if "\t" in path.open(errors="replace").readline() else ",",
+                infer_schema_length=0,
+                encoding="utf8-lossy",
+            )
+            if year == 2016:
+                scan = scan.rename(
+                    {"state_postal": "state_po", "jurisdiction": "jurisdiction_name"}, strict=False
+                ).with_columns(date=pl.lit("2016-11-08"))
+            columns = scan.collect_schema().names()
+            fips = pl.col("county_fips").str.replace(r"\.0$", "")
+            frames.append(
+                scan.with_columns(
+                    pl.col("precinct", "mode").fill_null(""),
+                    candidate=pl.col("candidate").fill_null("").str.to_uppercase().str.strip_chars(),
+                    office=pl.col("office").fill_null("").str.to_uppercase().str.strip_chars(),
+                    district=(pl.col("district") if "district" in columns else pl.lit(None, pl.String))
+                    .fill_null("")
+                    .str.to_uppercase(),
+                    stage=(pl.col("stage") if "stage" in columns else pl.lit("GEN"))
+                    .fill_null("GEN")
+                    .str.to_uppercase(),
+                )
+                .filter(
+                    pl.col("stage") == "GEN",
+                    ~pl.col("office").str.contains("RETAIN|RETENTION|JUDGE|JUSTICE|COURT"),
+                    ~pl.col("precinct").str.to_uppercase().str.contains(r"TOTALS$|^COUNTY TOTAL$|- TOTAL$"),
+                    ~(
+                        (pl.col("precinct").str.to_uppercase() == "TOTAL")
+                        & (pl.col("mode").str.to_uppercase() == "TOTAL")
+                    ),
+                )
+                .filter(
+                    affirmative.any().over("state_po", "office", "district")
+                    & negative.any().over("state_po", "office", "district"),
+                    affirmative | negative,
+                )
+                .select(
+                    year=pl.lit(year),
+                    day=pl.col("date").replace({"11/8/22": "2022-11-08"}).str.to_date(),
+                    state="state_po",
+                    office="office",
+                    district="district",
+                    fips=pl.when(fips.str.contains(r"^\d{4,7}$")).then(fips.str.zfill(5).replace(medsl.RECODED)),
+                    jurisdiction=pl.col("jurisdiction_name").fill_null("").str.to_uppercase().str.strip_chars(),
+                    precinct=pl.col("precinct").str.strip_chars(),
+                    mode=pl.col("mode").str.to_uppercase(),
+                    answer=pl.when(affirmative).then(pl.lit("YES")).otherwise(pl.lit("NO")),
+                    votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+                )
+                .collect()
+            )
+    precinct = ["year", "state", "office", "district", "fips", "jurisdiction", "precinct", "answer"]
+    frame = pl.concat(frames)
+    (
+        frame.filter((pl.col("mode") == "TOTAL").any().over(precinct).not_() | (pl.col("mode") == "TOTAL"))
+        .group_by("year", "day", *precinct[1:])
+        .agg(pl.col("votes").sum())
+        .sort(precinct)
+        .write_parquet(PARSED / "medsl.parquet")
+    )
+
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "archives.parquet").with_columns(
+    archives = pl.read_parquet(PARSED / "archives.parquet").with_columns(
         key=pl.concat_str(pl.col("day").cast(pl.String), "state", pl.lit("question"), "question", separator=":")
     )
+    returns = pl.read_parquet(PARSED / "medsl.parquet")
     with connect() as conn:
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Statewide ballot questions by precinct 2000–2025 from the states' election statistics archives",
+            summary="Statewide ballot questions by precinct 2000–2025 from the states' election statistics archives "
+            "and MEDSL's precinct returns",
             polity="US",
         )
         filled = {
@@ -136,49 +212,106 @@ def emit() -> Path:
         counties: dict[str, tuple[UUID, UUID]] = {
             code: (unit, area)
             for code, unit, area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code = 'us.county'"
+                "select code, id, area_id from reporting_unit where scheme_code in ('us.county', 'us.place')"
             ).fetchall()
         }
         defaults = pl.DataFrame(
             conn.execute(
-                """select cx.value, rs.election_id::text, rs.contest_id::text, rs.source_id::text,
-                          upper(o.ballot_label), o.id::text, u.scheme_code, u.code, v.value::bigint
-                   from external_id cx
-                   join result_set rs on rs.contest_id = cx.entity_id and rs.is_default
+                """select cx.value, substr(p.iso_code, 4), e.date_from, rs.election_id::text, rs.contest_id::text,
+                          rs.source_id::text, upper(o.ballot_label), o.id::text, u.scheme_code, u.code,
+                          v.value::bigint
+                   from contest c
+                   join election e on e.id = c.election_id
+                   join polity p on p.id = e.polity_id and p.iso_code ~ '^US-..$'
+                   join external_id cx on cx.entity_id = c.id and cx.scheme = 'us.contest'
+                   join result_set rs on rs.contest_id = c.id and rs.is_default
                    join result_value v on v.result_set_k = rs.k and v.measure = 1
                    join contest_option o on o.k = v.option_k
                    join reporting_unit u on u.k = v.unit_k
-                   where cx.scheme = 'us.contest' and cx.value = any(%s)""",
-                [frame["key"].unique().to_list()],
+                   where c.kind = 'ballot_question' and e.date_from between %s and %s""",
+                [date(FIRST, 1, 1), date(LAST, 12, 31)],
             ).fetchall(),
-            schema=["key", "election", "contest", "source", "answer", "option", "scheme", "code", "total"],
+            schema=[
+                "key",
+                "state",
+                "day",
+                "election",
+                "contest",
+                "source",
+                "answer",
+                "option",
+                "scheme",
+                "code",
+                "total",
+            ],
             orient="row",
+        ).with_columns(answer=pl.col("answer").replace_strict(ANSWERS, default=None))
+        totals = (
+            defaults.group_by("key", "state", "day")
+            .agg(
+                yes=pl.col("total").filter(pl.col("answer") == "YES").sum(),
+                no=pl.col("total").filter(pl.col("answer") == "NO").sum(),
+            )
+            .filter((pl.col("yes") > 0) & (pl.col("no") > 0))
         )
-        landed = skipped = 0
+        sources = {
+            year: cs.source(medsl_state.PUBLISHER, title) for year, (title, _) in medsl_state_precincts.TITLES.items()
+        }
+
+        candidates: list[tuple[str, str, UUID | None, str, pl.DataFrame]] = [
+            (key, state, None, ARCHIVE, rows)
+            for (key, state), rows in archives.group_by("key", "state", maintain_order=True)
+        ]
+        questions = returns.group_by("year", "day", "state", "office", "district").agg(
+            yes=pl.col("votes").filter(pl.col("answer") == "YES").sum(),
+            no=pl.col("votes").filter(pl.col("answer") == "NO").sum(),
+        )
+        matched = questions.join(totals, on=["state", "day", "yes", "no"])
+        doubled = matched.filter(pl.len().over("key") > 1)
+        for key in doubled["key"].unique().to_list():
+            print(f"{key}: several MEDSL questions share its totals, skipped")
+        matched = matched.filter(pl.len().over("key") == 1, pl.len().over("year", "state", "office", "district") == 1)
+        print(f"{matched.height} MEDSL questions match a statewide question's totals exactly")
+        for year, state, office, district, key in matched.select(
+            "year", "state", "office", "district", "key"
+        ).iter_rows():
+            rows = returns.filter(
+                pl.col("year") == year,
+                pl.col("state") == state,
+                pl.col("office") == office,
+                pl.col("district") == district,
+            )
+            candidates.append((key, state, sources[year], MEDSL, rows))
+
+        landed: dict[str, int] = {}
+        skipped = 0
         minted: dict[str, tuple[str, str, date]] = {}
         values = []
-        for (key, state), rows in frame.group_by("key", "state", maintain_order=True):
+        for key, state, source, method, rows in candidates:
             official = defaults.filter(pl.col("key") == key)
             if official.height == 0:
                 continue
             if key in filled:
                 print(f"{key}: already has a precinct set")
                 continue
-            if rows["fips"].null_count():
+            if rows.filter(pl.col("fips").is_null() | (pl.col("precinct") == ""))["votes"].sum():
                 print(
-                    f"{key}: {rows.filter(pl.col('fips').is_null())['votes'].sum()} votes in precincts with no county, skipped"
+                    f"{key}: {rows.filter(pl.col('fips').is_null() | (pl.col('precinct') == ''))['votes'].sum()} "
+                    "votes outside any county's precincts, skipped"
                 )
                 skipped += 1
                 continue
+            rows = rows.filter(pl.col("fips").is_not_null(), pl.col("precinct") != "")
             sums = rows.group_by("answer").agg(pl.col("votes").sum())
-            totals = official.group_by("answer").agg(pl.col("total").sum())
-            joined = totals.join(sums, on="answer", how="full", coalesce=True).fill_null(0)
+            expected = official.group_by("answer").agg(pl.col("total").sum())
+            joined = expected.join(sums, on="answer", how="full", coalesce=True).fill_null(0)
             if (joined["votes"] != joined["total"]).any():
-                print(f"{key}: precincts {sorted(sums.rows())} against totals {sorted(totals.rows())}, skipped")
+                print(f"{key}: precincts {sorted(sums.rows())} against totals {sorted(expected.rows())}, skipped")
                 skipped += 1
                 continue
-            if official["scheme"].unique().to_list() == ["us.county"]:
-                by_county = (
+            by_county = official["scheme"].unique().to_list() == ["us.county"]
+            if by_county:
+                differ = (
                     official.group_by("code", "answer")
                     .agg(pl.col("total").sum())
                     .join(
@@ -190,16 +323,20 @@ def emit() -> Path:
                     .fill_null(0)
                     .filter(pl.col("votes") != pl.col("total"))
                 )
-                if by_county.height:
-                    print(f"{key}: county sums differ in {by_county['code'].n_unique()} counties, skipped")
+                if differ.height:
+                    print(f"{key}: county sums differ in {differ['code'].n_unique()} counties, skipped")
                     skipped += 1
                     continue
+            if rows["fips"].is_in(list(counties)).not_().any():
+                print(f"{key}: precincts in counties not on file, skipped")
+                skipped += 1
+                continue
             first = official.row(0, named=True)
             options = dict(official.select("answer", "option").unique().iter_rows())
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
             if result_set not in cs.minted:
                 continue
-            day = rows["day"][0]
+            day = first["day"]
             cs.add(
                 "result_set",
                 id=result_set,
@@ -208,23 +345,30 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=UUID(first["source"]),
+                source_id=source or UUID(first["source"]),
                 is_default=False,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=ARCHIVE)
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=method.format(counties=" and to each county's" if by_county else ""),
+            )
+            rows = rows.with_columns(
+                code=pl.concat_str(pl.lit(f"{day.year}:{state}"), "fips", "jurisdiction", "precinct", separator=":")
+            )
             codes = {}
-            for fips, jurisdiction, precinct in rows.select("fips", "jurisdiction", "precinct").unique().iter_rows():
-                code = f"{day.year}:{state}:{fips}:{jurisdiction}:{precinct}"
+            for code, fips in rows.select("code", "fips").unique().iter_rows():
                 codes[code] = str(cs.unit("us.precinct", code, on=day))
                 if UUID(codes[code]) in cs.minted:
                     minted.setdefault(code, (state, fips, day))
             values.append(
-                rows.select(
+                rows.group_by("code", "answer")
+                .agg(pl.col("votes").sum())
+                .select(
                     result_set_id=pl.lit(str(result_set)),
-                    unit_id=pl.concat_str(
-                        pl.lit(f"{day.year}:{state}"), "fips", "jurisdiction", "precinct", separator=":"
-                    ).replace_strict(codes),
+                    unit_id=pl.col("code").replace_strict(codes),
                     option_id=pl.col("answer").replace_strict(options),
                     channel=pl.lit(0, pl.Int16),
                     measure=pl.lit(1, pl.Int16),
@@ -233,7 +377,7 @@ def emit() -> Path:
                     value=pl.col("votes"),
                 )
             )
-            landed += 1
+            landed[state] = landed.get(state, 0) + 1
         for code, (state, fips, day) in minted.items():
             cs.add(
                 "reporting_unit",
@@ -250,5 +394,7 @@ def emit() -> Path:
             )
         if values:
             cs.frame("result_value", pl.concat(values))
-        print(f"{landed} precinct sets, {skipped} skipped, {len(minted)} new precinct units")
+        print(
+            f"{sum(landed.values())} precinct sets {sorted(landed.items())}, {skipped} skipped, {len(minted)} new units"
+        )
         return cs.write()
