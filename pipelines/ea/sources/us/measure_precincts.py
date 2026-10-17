@@ -142,6 +142,20 @@ ME_NAMES = {
     ]
 }
 ME_WAYBACK = "https://web.archive.org/web/{}id_/https://www.maine.gov/sos/cec/elec/results/{}"
+ALABAMA = (
+    "Precinct rows of the Alabama Secretary of State's precinct-level results, one file per county, with each "
+    "county's absentee and provisional ballots as reported. Each answer's rows add up to the totals of this "
+    "question's default results{counties}."
+)
+AL_FILES = {
+    "2016-03-01": "2017-06/2016-Primary-PrecinctLevel.zip",
+    "2016-11-08": "2017-06/2016-General-PrecinctLevel.zip",
+    "2018-11-06": "2018-11/2018-Official-General-Precinct-Results.zip",
+    "2020-03-03": "2020-06/2020%20Primary%20Precinct%20Results.zip",
+    "2020-11-03": "2020-12/2020%20General%20Precinct%20Results.zip",
+    "2024-03-05": "2024-04/2024%20Primary%20Precinct%20Results.ZIP",
+}
+AL_DATA = "https://www.sos.alabama.gov/sites/default/files/election-data/"
 ME_COUNTIES = [
     "AND",
     "ARO",
@@ -192,6 +206,8 @@ def fetch() -> None:
                 raw.fetch(SOURCE, wa_local.PRECINCTS.format(day=day), suffix=".csv")
             except httpx.HTTPStatusError:
                 print(f"{day}: no Washington precinct export")
+        if state == "AL" and f"{day}" in AL_FILES:
+            raw.fetch(SOURCE, AL_DATA + AL_FILES[f"{day}"], suffix=".zip")
         if state == "ME" and f"{day}" in ME_FILES:
             stamp, path = ME_FILES[f"{day}"]
             raw.fetch(SOURCE, ME_WAYBACK.format(stamp, path), suffix="." + path.rsplit(".", 1)[1])
@@ -747,6 +763,50 @@ def parse() -> None:
         pl.col("votes").sum()
     ).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "maine.parquet")
 
+    tallies = []
+    for held, path in AL_FILES.items():
+        day = date.fromisoformat(held)
+        with zipfile.ZipFile(raw.cached(SOURCE, AL_DATA + path).path) as archive:
+            for name in archive.namelist():
+                if name.endswith("/"):
+                    continue
+                county = counties["AL"].get(
+                    elstats.plain(re.sub(r"^\d{4}-\w+-", "", name.rsplit("/", 1)[-1].rsplit(".", 1)[0]))
+                )
+                fips = county[0] if county else None
+                try:
+                    reader = fastexcel.read_excel(archive.read(name))
+                except fastexcel.CalamineError:
+                    print(f"{held} {name}: not a spreadsheet the reader opens, skipped")
+                    continue
+                sheet = reader.load_sheet(0).to_polars()
+                if "Contest Title" not in sheet.columns:
+                    print(f"{held} {name}: no Contest Title column, skipped")
+                    continue
+                polls = [column for column in sheet.columns[3:] if column]
+                for title, candidate, *counts in sheet.select("Contest Title", "Candidate", *polls).iter_rows():
+                    answer = re.match(r"\s*(yes|no)\b", candidate or "", re.IGNORECASE)
+                    if answer is None:
+                        continue
+                    for place, count in zip(polls, counts, strict=True):
+                        tallies.append((day, title.strip(), fips, place.strip(), answer[1].upper(), count))
+    pl.DataFrame(
+        tallies, schema=["day", "office", "fips", "precinct", "answer", "votes"], orient="row", infer_schema_length=None
+    ).select(
+        pl.col("day").dt.year().cast(pl.Int32).alias("year"),
+        "day",
+        pl.lit("AL").alias("state"),
+        "office",
+        pl.lit(None, pl.String).alias("district"),
+        "fips",
+        pl.lit("").alias("jurisdiction"),
+        "precinct",
+        "answer",
+        pl.col("votes").cast(pl.String).str.replace(r"\.0$", "").cast(pl.Int64, strict=False),
+    ).group_by("year", "day", "state", "office", "district", "fips", "jurisdiction", "precinct", "answer").agg(
+        pl.col("votes").sum()
+    ).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "alabama.parquet")
+
     pl.DataFrame(rows, schema_overrides={"year": pl.Int32, "district": pl.String}).sort(
         "day", "office", "fips", "precinct", "answer"
     ).write_parquet(PARSED / "louisiana.parquet")
@@ -765,6 +825,7 @@ def emit() -> Path:
             pl.read_parquet(PARSED / "washington.parquet").with_columns(origin=pl.lit("washington")),
             pl.read_parquet(PARSED / "maine.parquet").with_columns(origin=pl.lit("maine")),
             pl.read_parquet(PARSED / "massachusetts.parquet").with_columns(origin=pl.lit("massachusetts")),
+            pl.read_parquet(PARSED / "alabama.parquet").with_columns(origin=pl.lit("alabama")),
         ],
         how="diagonal_relaxed",
     )
@@ -854,6 +915,10 @@ def emit() -> Path:
                 ("washington", "WA"): (cs.source(wa_local.PUBLISHER, wa_local.TITLE), WASHINGTON),
                 ("maine", "ME"): (cs.source(me_canvass.PUBLISHER, me_canvass.TITLE), MAINE),
                 ("massachusetts", "MA"): (cs.source(elstats.MA_PUBLISHER, elstats.TITLE), MASSACHUSETTS),
+                ("alabama", "AL"): (
+                    cs.source("Alabama Secretary of State", "Election data downloads"),
+                    ALABAMA,
+                ),
             }
         )
 
