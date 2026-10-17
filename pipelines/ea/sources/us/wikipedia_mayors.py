@@ -393,12 +393,13 @@ def emit() -> Path:
         held = set(
             conn.execute(
                 """select x.value, e.date_from from contest c
+                   join changeset ch on ch.id = c.changeset_id
                    join election e on e.id = c.election_id
                    join result_set r on r.contest_id = c.id
                    join source s on s.id = r.source_id
                    join external_id x on x.entity_id = c.office_id and x.scheme = 'us.office'
-                   where s.title <> %s and x.value like any(%s)""",
-                [TITLE, [f"{state}:{code}:%" for state, code, _ in CITIES.values()]],
+                   where s.title <> %s and ch.pipeline <> %s and x.value like any(%s)""",
+                [TITLE, SOURCE, [f"{state}:{code}:%" for state, code, _ in CITIES.values()]],
             ).fetchall()
         )
         mine = dict(
