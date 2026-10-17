@@ -144,6 +144,7 @@ PRIMARIES = {
     "una": ("unaffiliated", None),
 }
 MISDATED = {"1974-11-04": "1974-11-05"}
+CORRECTED = {398272: (2393, "l"), 398273: (3586, "w"), 398299: (4288, "w"), 398409: (3256, "w"), 398410: (2819, "l")}
 SUFFIXES = {"jr": "Jr.", "sr": "Sr."}
 RANK = {"w": 0, "t": 1, "r": 2, "withdrew": 3}
 MONTHS = [
@@ -174,6 +175,18 @@ def parse() -> None:
         .with_columns(pl.all().str.strip_chars('"').str.replace_all(r'\\"', '"').replace("", None))
         .cast(pl.Schema(COLUMNS))
         .filter(~pl.col("etype").is_in(["appointed", "filer"]), pl.col("month").is_not_null())
+        .with_columns(
+            vote=pl.col("caseid").replace_strict(
+                {caseid: votes for caseid, (votes, _) in CORRECTED.items()},
+                default=pl.col("vote"),
+                return_dtype=pl.Int64,
+            ),
+            outcome=pl.col("caseid").replace_strict(
+                {caseid: outcome for caseid, (_, outcome) in CORRECTED.items()},
+                default=pl.col("outcome"),
+                return_dtype=pl.String,
+            ),
+        )
     )
     lines = (
         frame.group_by(*CONTEST, "candid", "party", "partyz", maintain_order=True)
@@ -630,7 +643,12 @@ def emit() -> Path:
                 + (f"-{etype[-1]}" if etype[-1].isdigit() else "")
             )
             cs.add("slug", path=unique(path, contest), entity_id=contest)
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            first = cs.key(f"{SOURCE}.result_set", contest_key)
+            result_set = (
+                cs.key(f"{SOURCE}.result_set", f"{contest_key}:2")
+                if first not in cs.minted and group["caseid"].is_in(list(CORRECTED)).any()
+                else first
+            )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -640,9 +658,28 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=contest_key not in RANKED_ROUNDS and result_set not in demoted,
+                is_default=contest_key not in RANKED_ROUNDS and first not in demoted,
+                supersedes_id=None if result_set == first else first,
                 completeness=None if group["votes"].is_null().any() else 1,
             )
+            if result_set != first:
+                cs.add(
+                    "result_set",
+                    id=first,
+                    election_id=elections[(sab, year, month, day, etype)],
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=source,
+                    is_default=False,
+                    supersedes_id=None,
+                    completeness=None if group["votes"].is_null().any() else 1,
+                )
+                for option, outcome, count in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [first]
+                ).fetchall():
+                    cs.add("outcome", result_set_id=first, option_id=option, kind=outcome, seats=count)
             fresh = result_set in cs.minted
             nomination = "primary" in label
             for index, (candid, rows) in enumerate(group.group_by("candid", maintain_order=True)):
