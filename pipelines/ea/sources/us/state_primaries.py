@@ -1,3 +1,4 @@
+import html
 import io
 import re
 import unicodedata
@@ -10,6 +11,8 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import swdb, wa_local
+from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
 
@@ -35,8 +38,87 @@ NC_DAYS = {
     date(2020, 6, 23): date(2020, 3, 3),
     date(2022, 5, 17): None,
 }
+MN_DAYS = [date(2016, 8, 9), date(2018, 8, 14), date(2020, 8, 11), date(2022, 8, 9)]
+MN_FILES = "https://electionresultsfiles.sos.mn.gov/{day:%Y%m%d}/{name}.txt"
+WA_DAYS = [
+    date(2015, 8, 4),
+    date(2016, 8, 2),
+    date(2017, 8, 1),
+    date(2018, 8, 7),
+    date(2019, 8, 6),
+    date(2020, 8, 4),
+    date(2022, 8, 2),
+]
+CA_DAYS = {
+    date(2004, 3, 2): "P04",
+    date(2006, 6, 6): "P06",
+    date(2008, 6, 3): "P08",
+    date(2010, 6, 8): "P10",
+    date(2012, 6, 5): "P12",
+    date(2014, 6, 3): "P14",
+    date(2016, 6, 7): "P16",
+    date(2018, 6, 5): "P18",
+    date(2020, 3, 3): "P20",
+    date(2022, 6, 7): "P22",
+}
+CA_FILES = "https://statewidedatabase.org/pub/data/{code}/c{county:03d}/{county:03d}.codes"
+CA_OFFICES = {
+    "ASS": "assembly",
+    "SEN": "senate",
+    "GOV": "governor",
+    "LTG": "lieutenant-governor",
+    "ATG": "attorney-general",
+    "SOS": "secretary-of-state",
+    "CON": "controller",
+    "TRS": "treasurer",
+    "INS": "insurance-commissioner",
+}
+CA_LINE = re.compile(rf"({'|'.join(CA_OFFICES)})(\d\d)?([A-Z]{{3}})\d\d\t(.+?)\t(\d+)\s*")
+WA_OFFICES = {
+    "GOVERNOR": "governor",
+    "LT. GOVERNOR": "lieutenant-governor",
+    "SECRETARY OF STATE": "secretary-of-state",
+    "STATE TREASURER": "treasurer",
+    "STATE AUDITOR": "auditor",
+    "ATTORNEY GENERAL": "attorney-general",
+    "COMMISSIONER OF PUBLIC LANDS": "commissioner-of-public-lands",
+    "SUPERINTENDENT OF PUBLIC INSTRUCTION": "superintendent-of-public-instruction",
+    "INSURANCE COMMISSIONER": "insurance-commissioner",
+}
+WA_LEGISLATIVE = re.compile(
+    r"LEGISLATIVE DISTRICT 0*(\d+) (?:STATE )?(SENATOR|REPRESENTATIVE)(?:,? (?:POS\.?|POSITION) ?(\d))?"
+)
+WA_STATEWIDE = re.compile(rf"(?:WASHINGTON STATE )?({'|'.join(re.escape(office) for office in WA_OFFICES)})")
+PREFERENCES = {
+    "democratic": "DEM",
+    "democrat": "DEM",
+    "republican": "REP",
+    "gop": "REP",
+    "libertarian": "LIB",
+    "green": "GRE",
+    "constitution": "CST",
+}
+STATES = {
+    "NC": (
+        "37",
+        "North Carolina",
+        PUBLISHER,
+        TITLE,
+        "https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
+    ),
+    "CA": ("06", "California", swdb.PUBLISHER, swdb.TITLE, "https://statewidedatabase.org/election.html"),
+    "WA": ("53", "Washington", wa_local.PUBLISHER, wa_local.TITLE, "https://results.vote.wa.gov"),
+    "MN": (
+        "27",
+        "Minnesota",
+        "Minnesota Secretary of State",
+        "Election results media files",
+        "https://electionresults.sos.mn.gov",
+    ),
+}
 OFFICES = {
     "GOVERNOR": ("governor", "gubernatorial"),
+    "GOVERNOR & LT GOVERNOR": ("governor", "gubernatorial"),
     "LIEUTENANT GOVERNOR": ("lieutenant-governor", "Lieutenant Governor"),
     "ATTORNEY GENERAL": ("attorney-general", "Attorney General"),
     "SECRETARY OF STATE": ("secretary-of-state", "Secretary of State"),
@@ -49,8 +131,12 @@ OFFICES = {
     "COMMISSIONER OF AGRICULTURE": ("commissioner-of-agriculture", "Commissioner of Agriculture"),
     "COMMISSIONER OF INSURANCE": ("commissioner-of-insurance", "Commissioner of Insurance"),
     "COMMISSIONER OF LABOR": ("commissioner-of-labor", "Commissioner of Labor"),
+    "COMMISSIONER OF PUBLIC LANDS": ("commissioner-of-public-lands", "Commissioner of Public Lands"),
+    "INSURANCE COMMISSIONER": ("insurance-commissioner", "Insurance Commissioner"),
+    "CONTROLLER": ("controller", "Controller"),
 }
 LEGISLATIVE = re.compile(r"NC (?:STATE )?(HOUSE|SENATE)(?: OF REPRESENTATIVES)?(?: DISTRICT 0*(\d+)| \(0*(\d+)\))")
+MN_LEGISLATIVE = re.compile(r"STATE (REPRESENTATIVE|SENATOR) DISTRICT 0*(\d+)([AB]?)")
 STATEWIDE = re.compile(rf"(?:NC )?(?:STATE )?({'|'.join(OFFICES)})")
 SUFFIX = re.compile(r"\s*(?:- |\()(DEM|REP|LIB|GRE|CST)\)?$")
 PSEUDO = re.compile(r"ABSENTEE.*|PROV.*|TRANSFERS?|CURBSIDE|ONE ?STOP.*|ONESTOP.*|OS|OS[ _-].*")
@@ -60,8 +146,34 @@ PARTIES = {
     "LIB": ("libertarian-party", "libertarian", "liberp", "Libertarian"),
     "GRE": ("green-party", "green", "greenp", "Green"),
     "CST": ("constitution-party", "constitution", "constp", "Constitution"),
+    "DFL": ("democratic-party", "democratic-farmer-labor", "dp", "Democratic-Farmer-Labor"),
+    "R": ("republican-party", "republican", "rp", "Republican"),
+    "IP": ("MN:independence-party", "independence", "indepp", "Independence"),
+    "LMN": ("MN:legalize-marijuana-now-party", "legal-marijuana-now", "lmnp", "Legal Marijuana Now"),
+    "": (None, None, "ttp", "top-two"),
+    "GRN": ("green-party", "green", "greenp", "Green"),
+    "AIP": ("CA:american-independent-party", "american-independent", "amerindepp", "American Independent"),
+    "PAF": ("CA:peace-and-freedom-party", "peace-and-freedom", "peacefreedomp", "Peace and Freedom"),
+    "GLC": (
+        "MN:grassroots-legalize-cannabis-party",
+        "grassroots-legalize-cannabis",
+        "glcp",
+        "Grassroots–Legalize Cannabis",
+    ),
 }
 UNALLOCATED = 32
+CA_METHOD = (
+    "Totals are the county totals of the Secretary of State's Statement of Vote, as the Statewide Database "
+    "republishes them. {rule}"
+)
+WA_METHOD = (
+    "Totals are the precinct rows of the Secretary of State's statewide precinct export where they add up to its "
+    "county results, and the county results elsewhere. The top two candidates advance to the general election."
+)
+MN_METHOD = (
+    "Totals are the sums of the precinct rows in the Secretary of State's all-races file. The file does not mark "
+    "winners, so the winner shown is the candidate with the most votes."
+)
 METHOD = (
     "Totals are the sums of the precinct, early voting, absentee, and provisional rows in the State Board's "
     "precinct file; votes the file reports only county-wide are kept at the county level. The file does not mark "
@@ -73,16 +185,22 @@ METHOD = (
 def fetch() -> None:
     for day in NC_DAYS:
         raw.fetch(SOURCE, FILES.format(day=day), suffix=".zip")
+    for day in MN_DAYS:
+        for name in ("allracesbyprecinct", "PrctTbl"):
+            raw.fetch(SOURCE, MN_FILES.format(day=day, name=name), suffix=".txt")
+    for code in CA_DAYS.values():
+        for county in swdb.COUNTIES:
+            raw.fetch(SOURCE, CA_FILES.format(code=code, county=county), suffix=".txt")
 
 
 def parse() -> None:
     with connect() as conn:
         counties = {
-            re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower()): code
+            (code[:2], re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())): code
             for code, text in conn.execute(
                 """select u.code, n.text from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'short'
-                   where u.scheme_code = 'us.county' and u.code like '37%'"""
+                   where u.scheme_code = 'us.county' and u.code ~ '^(37|53)'"""
             ).fetchall()
         }
     frames = []
@@ -167,30 +285,262 @@ def parse() -> None:
             print(
                 day, "rows without a party:", lost.group_by("contest", "choice").agg(pl.col("votes").sum()).rows()[:10]
             )
+        pseudo = pl.col("precinct").str.to_uppercase().str.contains(f"^(?:{PSEUDO.pattern})$")
         frames.append(
-            frame.filter(pl.col("party").is_not_null()).select(
+            frame.filter(pl.col("party").is_not_null())
+            .with_columns(
+                fips=pl.col("county").map_elements(
+                    lambda county: counties[("37", re.sub(r"[^a-z]", "", county.lower()))], return_dtype=pl.String
+                )
+            )
+            .select(
+                state=pl.lit("NC"),
                 day=pl.lit(day),
                 office="office",
                 code="code",
                 party="party",
-                fips=pl.col("county").map_elements(
-                    lambda county: counties[re.sub(r"[^a-z]", "", county.lower())], return_dtype=pl.String
+                label="party",
+                fips="fips",
+                scheme=pl.when(pseudo).then(pl.lit("us.aggregate")).otherwise(pl.lit("us.precinct")),
+                unit=pl.when(pseudo)
+                .then(pl.concat_str(pl.lit("NC"), "fips", pl.lit("county-wide"), separator=":"))
+                .otherwise(
+                    pl.concat_str(
+                        pl.lit(f"{day}:NC"), "fips", pl.col("county").str.to_uppercase(), "precinct", separator=":"
+                    )
                 ),
-                county=pl.col("county").str.to_uppercase(),
-                precinct=pl.when(pl.col("precinct").str.to_uppercase().str.contains(f"^(?:{PSEUDO.pattern})$"))
-                .then(None)
-                .otherwise("precinct"),
                 choice=pl.when("writein").then(pl.lit("Write-ins")).otherwise("choice"),
                 writein="writein",
+                votes="votes",
+            )
+        )
+    for day in MN_DAYS:
+        names = pl.read_csv(
+            io.BytesIO(
+                raw.cached(SOURCE, MN_FILES.format(day=day, name="PrctTbl")).path.read_bytes().decode("cp1252").encode()
+            ),
+            separator=";",
+            has_header=False,
+            infer_schema=False,
+        ).select(county="column_0", precinct="column_1", name=pl.col("column_2").str.strip_chars())
+        frame = (
+            pl.read_csv(
+                io.BytesIO(
+                    raw.cached(SOURCE, MN_FILES.format(day=day, name="allracesbyprecinct"))
+                    .path.read_bytes()
+                    .decode("cp1252")
+                    .encode()
+                ),
+                separator=";",
+                has_header=False,
+                infer_schema=False,
+                quote_char=None,
+            )
+            .select(
+                county="column_1",
+                precinct="column_2",
+                contest=pl.col("column_4").str.to_uppercase().str.strip_chars(),
+                choice=pl.col("column_7").str.strip_chars(),
+                party=pl.col("column_10").str.strip_chars(),
+                votes=pl.col("column_13").cast(pl.Int64),
+            )
+            .join(names, on=["county", "precinct"], how="left", validate="m:1")
+        )
+        labels = []
+        for contest in frame["contest"].unique():
+            if found := MN_LEGISLATIVE.fullmatch(contest):
+                office = "house" if found[1] == "REPRESENTATIVE" else "senate"
+                code = str(int(found[2])) + (f"-{found[3].lower()}" if found[3] else "")
+            elif found := STATEWIDE.fullmatch(contest):
+                office, code = OFFICES[found[1]][0], None
+            else:
+                continue
+            labels.append({"contest": contest, "office": office, "code": code})
+        frame = frame.join(pl.DataFrame(labels, schema_overrides={"code": pl.String}), on="contest")
+        unknown = frame.filter(~pl.col("party").is_in(list(PARTIES)))
+        if unknown.height:
+            print(
+                day,
+                "rows of other parties:",
+                unknown.group_by("contest", "party").agg(pl.col("votes").sum()).rows()[:10],
+            )
+        lost = frame.filter(pl.col("name").is_null())
+        if lost.height:
+            raise ValueError(f"{day}: precincts missing from the precinct table: {lost.head(5).rows()}")
+        fips = pl.lit("27") + (pl.col("county").cast(pl.Int64) * 2 - 1).cast(pl.String).str.zfill(3)
+        frames.append(
+            frame.filter(pl.col("party").is_in(list(PARTIES))).select(
+                state=pl.lit("MN"),
+                day=pl.lit(day),
+                office="office",
+                code="code",
+                party="party",
+                label="party",
+                fips=fips,
+                scheme=pl.lit("us.precinct"),
+                unit=pl.concat_str(
+                    pl.lit(f"{day}:MN"), fips, pl.lit(""), pl.col("name").str.to_uppercase(), separator=":"
+                ),
+                choice="choice",
+                writein=pl.lit(False),
+                votes="votes",
+            )
+        )
+    washington = {name: code for (prefix, name), code in counties.items() if prefix == "53"}
+    for day in WA_DAYS:
+        race = pl.col("Race").str.to_uppercase().str.replace_all(r"\s+-\s+|\s+", " ").str.strip_chars().alias("race")
+        choice = (
+            pl.col("Candidate")
+            .map_elements(html.unescape, return_dtype=pl.String)
+            .str.replace_all(r"\s+", " ")
+            .str.strip_chars()
+            .alias("choice")
+        )
+        totals = pl.read_csv(raw.cached(wa_local.SOURCE, wa_local.FILES[day]).path, infer_schema_length=0).select(
+            race,
+            choice,
+            fips=pl.col("County")
+            .str.to_lowercase()
+            .str.replace_all(r"[^a-z]", "")
+            .replace_strict(washington, default=None),
+            preference=pl.col("Party")
+            .str.extract(r"\(Prefers (.+?) ?Party\)")
+            .str.to_lowercase()
+            .str.replace_all(r"\s+", " ")
+            .str.strip_chars(),
+            votes=pl.col("Votes").cast(pl.Int64),
+        )
+        rows = (
+            pl.read_csv(
+                raw.cached(wa_local.SOURCE, wa_local.PRECINCTS.format(day=day)).path,
+                infer_schema=False,
+                encoding="utf8-lossy",
+            )
+            .select(
+                race,
+                choice,
+                fips=pl.col("CountyCode")
+                .replace_strict(WA_COUNTIES, default=None)
+                .str.to_lowercase()
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict(washington, default=None),
+                precinct=pl.col("PrecinctName").str.strip_chars(),
+                votes=pl.col("Votes").cast(pl.Int64),
+            )
+            .filter(pl.col("precinct") != "Total")
+        )
+        labels = []
+        for contest in pl.concat([totals["race"], rows["race"]]).unique():
+            if found := WA_LEGISLATIVE.fullmatch(contest):
+                office = "senate" if found[2] == "SENATOR" else "house"
+                code = found[1] + (f":{found[3]}" if office == "house" else "")
+            elif found := WA_STATEWIDE.fullmatch(contest):
+                office, code = WA_OFFICES[found[1]], None
+            else:
+                continue
+            labels.append({"race": contest, "office": office, "code": code})
+        if not labels:
+            continue
+        named = pl.DataFrame(labels, schema_overrides={"code": pl.String})
+        totals = totals.join(named, on="race").filter(~pl.col("choice").str.contains(r"(?i)rejected"))
+        rows = rows.join(named, on="race").filter(~pl.col("choice").str.contains(r"(?i)rejected"))
+        if totals["fips"].is_null().any() or rows["fips"].is_null().any():
+            raise ValueError(f"{day}: unmatched Washington counties")
+        sums = rows.group_by("office", "code", "fips", "choice").agg(pl.col("votes").sum())
+        exact = (
+            totals.join(sums, on=["office", "code", "fips", "choice"], how="left", nulls_equal=True)
+            .group_by("office", "code", "fips")
+            .agg(exact=(pl.col("votes") == pl.col("votes_right")).fill_null(False).all())
+            .filter("exact")
+            .drop("exact")
+        )
+        preferences = totals.group_by("office", "code", "choice").agg(pl.col("preference").drop_nulls().first())
+        lines = pl.concat(
+            [
+                rows.join(exact, on=["office", "code", "fips"], nulls_equal=True).with_columns(
+                    scheme=pl.lit("us.precinct"),
+                    unit=pl.concat_str(pl.lit(f"{day}:WA"), "fips", pl.lit(""), "precinct", separator=":"),
+                ),
+                totals.join(exact, on=["office", "code", "fips"], how="anti", nulls_equal=True)
+                .drop("preference")
+                .with_columns(scheme=pl.lit("us.county"), unit=pl.col("fips")),
+            ],
+            how="diagonal",
+        ).join(preferences, on=["office", "code", "choice"], how="left", nulls_equal=True)
+        print(
+            day,
+            "Washington counties by precinct:",
+            exact.height,
+            "of",
+            totals.select("office", "code", "fips").unique().height,
+        )
+        writein = pl.col("choice").str.contains(r"(?i)write-?\s*in")
+        frames.append(
+            lines.select(
+                state=pl.lit("WA"),
+                day=pl.lit(day),
+                office="office",
+                code="code",
+                party=pl.lit(""),
+                label=pl.when(writein)
+                .then(None)
+                .otherwise(pl.col("preference").replace_strict(PREFERENCES, default=None)),
+                fips="fips",
+                scheme="scheme",
+                unit="unit",
+                choice=pl.when(writein).then(pl.lit("Write-ins")).otherwise("choice"),
+                writein=writein,
+                votes="votes",
+            )
+        )
+    for day, code in CA_DAYS.items():
+        rows = []
+        for county in swdb.COUNTIES:
+            text = raw.cached(SOURCE, CA_FILES.format(code=code, county=county)).path.read_text(encoding="cp1252")
+            for line in text.splitlines():
+                if found := CA_LINE.fullmatch(line):
+                    office, district, party, choice, votes = found.groups()
+                    rows.append(
+                        (
+                            CA_OFFICES[office],
+                            None if district is None else str(int(district)),
+                            "" if day.year >= 2012 else party,
+                            party,
+                            f"06{county:03d}",
+                            choice.rstrip("*").strip(),
+                            int(votes),
+                        )
+                    )
+        frame = pl.DataFrame(rows, schema=["office", "code", "party", "label", "fips", "choice", "votes"], orient="row")
+        unknown = frame.filter(~pl.col("party").is_in(list(PARTIES)))
+        if unknown.height:
+            print(
+                day,
+                "rows of other parties:",
+                unknown.group_by("office", "code", "party").agg(pl.col("votes").sum()).rows()[:10],
+            )
+        frames.append(
+            frame.filter(pl.col("party").is_in(list(PARTIES))).select(
+                state=pl.lit("CA"),
+                day=pl.lit(day),
+                office="office",
+                code="code",
+                party="party",
+                label=pl.when(pl.col("label").is_in(list(PARTIES))).then("label"),
+                fips="fips",
+                scheme=pl.lit("us.county"),
+                unit="fips",
+                choice="choice",
+                writein=pl.lit(False),
                 votes="votes",
             )
         )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.concat(frames)
-        .group_by("day", "office", "code", "party", "fips", "county", "precinct", "choice", "writein")
-        .agg(pl.col("votes").sum())
-        .sort("day", "office", "code", "party", "fips", "precinct", "choice")
+        .group_by("state", "day", "office", "code", "party", "fips", "scheme", "unit", "choice", "writein")
+        .agg(pl.col("label").drop_nulls().first(), pl.col("votes").sum())
+        .sort("state", "day", "office", "code", "party", "fips", "unit", "choice")
         .write_parquet(PARSED / "lines.parquet")
     )
 
@@ -202,38 +552,66 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Carolina's state legislative and Council of State primaries and runoffs by precinct, 2002–2022",
-            polity="US-NC",
+            summary="State legislative and statewide primaries and runoffs by precinct from state canvasses: "
+            "North Carolina 2002–2022, California 2004–2022, Minnesota 2016–2022, and Washington 2015–2022",
+            polity="US",
         )
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
-        source = cs.source(PUBLISHER, TITLE)
+        sources: dict[str, UUID] = {}
+        for state, (_, _, publisher, title, url) in STATES.items():
+            source = sources[state] = cs.source(publisher, title)
+            if source in cs.minted:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=url,
+                    license="Public record",
+                )
         for day in NC_DAYS:
-            cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), source)
-        state = cs.polity("US-NC")
+            cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), sources["NC"])
+        for day in MN_DAYS:
+            for file in ("allracesbyprecinct", "PrctTbl"):
+                cs.artifact(raw.cached(SOURCE, MN_FILES.format(day=day, name=file)), sources["MN"])
+        for code in CA_DAYS.values():
+            for county in swdb.COUNTIES:
+                cs.artifact(raw.cached(SOURCE, CA_FILES.format(code=code, county=county)), sources["CA"])
+        for day in WA_DAYS:
+            for url in (wa_local.FILES[day], wa_local.PRECINCTS.format(day=day)):
+                cs.artifact(raw.cached(wa_local.SOURCE, url), sources["WA"])
+        polities = {state: cs.polity(f"US-{state}") for state in STATES}
         keys = {
             value
             for (value,) in conn.execute(
-                "select value from external_id where scheme = 'us.contest' and value like '20%%:NC:%%'"
+                """select e.value from external_id e join contest c on c.id = e.entity_id
+                   join changeset h on h.id = c.changeset_id
+                   where e.scheme = 'us.contest' and e.value ~ '^20[0-9-]+:(NC|MN|WA|CA):' and h.pipeline <> %s""",
+                [SOURCE],
             ).fetchall()
         }
-        slugs = {path for (path,) in conn.execute("select path from slug where path like 'us/nc/%%'").fetchall()}
+        slugs: dict[str, UUID] = dict(
+            conn.execute("select path, entity_id from slug where path ~ '^us/(nc|mn|wa|ca)/'").fetchall()
+        )
         counties: dict[str, tuple[UUID, UUID]] = {
             code: (unit, area)
             for code, unit, area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code like '37%%'"
+                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code ~ '^(37|27|53|06)'"
             ).fetchall()
         }
-        nominees: dict[tuple[int, str, str | None, UUID, str, str], set[UUID]] = {}
+        nominees: dict[tuple[str, int, str, str | None, UUID, str, str], set[UUID]] = {}
         for value, ballot, person, party in conn.execute(
             """select e.value, coalesce(d.ballot_name, n.text, o.ballot_label), d.person_id, o.party_id
                from external_id e
                join contest_option o on o.contest_id = e.entity_id
-               join candidacy d on d.option_id = o.id
+               join candidacy d on d.option_id = o.id and d.role = 'head'
                left join name n on n.entity_id = d.person_id and n.is_preferred and n.lang = 'en'
-               where e.scheme = 'us.contest' and e.value ~ '^20[0-2][0-9]-11-[0-9]{2}:NC:[a-z-]+(:[0-9]+:g)?$'
+               where e.scheme = 'us.contest'
+                 and e.value ~ '^20[0-2][0-9]-11-[0-9]{2}:(NC|MN|WA|CA):[a-z-]+(:[0-9]+(-[a-z])?(:[0-9])?:g)?$'
                  and o.party_id is not null"""
         ).fetchall():
             parts = value.split(":")
@@ -244,31 +622,57 @@ def emit() -> Path:
             ]
             if words:
                 signature = (
+                    parts[1],
                     int(parts[0][:4]),
                     parts[2],
-                    parts[3] if len(parts) > 3 else None,
+                    (parts[3] + (f":{parts[4]}" if len(parts) == 6 else "")) if len(parts) > 3 else None,
                     party,
                     words[0][0],
                     slug(words[-1]),
                 )
                 nominees.setdefault(signature, set()).add(person)
-        parties = {code: cs.key("us.party", key) for code, (key, *_) in PARTIES.items()}
-        systems = {key: cs.key("us.electoral_system", key) for key in ("two_round_40", "two_round_30")}
-        offices = {office: cs.key("us.office", f"{office}:NC") for office, _ in OFFICES.values()}
-        bodies = {office: cs.key("us.body", f"NC:{office}") for office in ("house", "senate")}
+        parties = {code: cs.key("us.party", key) for code, (key, *_) in PARTIES.items() if key}
+        systems = {
+            key: cs.key("us.electoral_system", key) for key in ("fptp", "top_two", "two_round_40", "two_round_30")
+        }
+        offices = {
+            (state, office): cs.key("us.office", f"{office}:{state}")
+            for state in STATES
+            for office in {office for office, _ in OFFICES.values()}
+            if not lines.filter(pl.col("state") == state, pl.col("office") == office).is_empty()
+        }
+        chambers: dict[str, str] = dict(
+            conn.execute(
+                """select e.value, n.text from external_id e
+                   join name n on n.entity_id = e.entity_id and n.is_preferred and n.lang = 'en'
+                   where e.scheme = 'us.body' and e.value ~ '^(NC|MN|WA|CA):(house|senate|assembly)$'"""
+            ).fetchall()
+        )
+        bodies = {
+            (state, office): cs.key("us.body", f"{state}:{office}")
+            for state, office in lines.filter(pl.col("code").is_not_null())
+            .select("state", "office")
+            .unique()
+            .iter_rows()
+        }
         if cs.minted & {*parties.values(), *systems.values(), *offices.values(), *bodies.values()}:
             raise ValueError("the parties, systems, offices, and bodies must already exist")
         titles = dict(OFFICES.values())
-        elections: dict[date, UUID] = {}
-        for day, first in NC_DAYS.items():
-            key = f"{day}:NC:{'runoff' if first else 'primary'}"
-            election = elections[day] = cs.key("us.election", key)
+        elections: dict[tuple[str, date], UUID] = {}
+        for state, day, first in [
+            *(("NC", day, first) for day, first in NC_DAYS.items()),
+            *(("MN", day, None) for day in MN_DAYS),
+            *(("WA", day, None) for day in WA_DAYS),
+            *(("CA", day, None) for day in CA_DAYS),
+        ]:
+            kind = "runoff" if first else "primary"
+            election = elections[(state, day)] = cs.key("us.election", f"{day}:{state}:{kind}")
             if election in cs.minted:
                 cs.add(
                     "election",
                     id=election,
-                    polity_id=state,
-                    kind="runoff" if first else "primary",
+                    polity_id=polities[state],
+                    kind=kind,
                     date_from=day,
                     date_to=day,
                     date_precision="day",
@@ -276,40 +680,43 @@ def emit() -> Path:
                 )
                 name(
                     election,
-                    f"{day:%B} {day.day}, {day.year} North Carolina primary {'runoff ' if first else ''}election",
+                    f"{day:%B} {day.day}, {day.year} {STATES[state][1]} primary {'runoff ' if first else ''}election",
                 )
-                cs.add("slug", path=f"us/nc/{day}-{'runoff' if first else 'primary'}", entity_id=election)
+                cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=election)
         later = {(first, day) for day, first in NC_DAYS.items() if first}
         contests = {
-            keys_: rows.sort("votes", descending=True)
-            for keys_, rows in lines.group_by("day", "office", "code", "party", "choice", "writein")
-            .agg(pl.col("votes").sum())
-            .group_by("day", "office", "code", "party")
+            group: rows.sort("votes", descending=True)
+            for group, rows in lines.group_by("state", "day", "office", "code", "party", "choice", "writein")
+            .agg(pl.col("label").drop_nulls().first(), pl.col("votes").sum())
+            .group_by("state", "day", "office", "code", "party")
         }
-        held = {(day, office, code, party) for day, office, code, party in contests}
+        held = {(day, office, code, party) for state, day, office, code, party in contests if state == "NC"}
         persons: dict[str, UUID] = {}
-        options: dict[tuple[date, str, str | None, str, str], UUID] = {}
-        sets: dict[tuple[date, str, str | None, str], UUID] = {}
-        made: dict[tuple[date, str, str | None, str], UUID] = {}
+        options: dict[tuple[str, date, str, str | None, str, str], UUID] = {}
+        sets: dict[tuple[str, date, str, str | None, str], UUID] = {}
+        made: dict[tuple[str, date, str, str | None, str], UUID] = {}
         skipped = 0
-        for (day, office, code, party), rows in sorted(contests.items(), key=lambda item: item[0][0]):
-            assert isinstance(day, date) and isinstance(office, str) and isinstance(party, str)
-            assert code is None or isinstance(code, str)
-            first = NC_DAYS[day]
+        for (state, day, office, code, party), rows in sorted(
+            contests.items(), key=lambda item: (item[0][0], item[0][1])
+        ):
+            assert isinstance(state, str) and isinstance(day, date) and isinstance(office, str)
+            assert isinstance(party, str) and (code is None or isinstance(code, str))
+            first = NC_DAYS.get(day) if state == "NC" else None
+            fips, place = STATES[state][0], STATES[state][1]
             _, word, etype, label = PARTIES[party]
             if code is not None:
-                base = f"{day}:NC:{office}:{code}:{etype}" + ("runoff" if first else "")
+                base = f"{day}:{state}:{office}:{code}:{etype}" + ("runoff" if first else "")
                 taken = re.compile(rf"{re.escape(base)}(f\w*)?")
             else:
-                base = f"{day}:NC:{office}:{word}"
+                base = f"{day}:{state}:{office}" + (f":{word}" if word else "")
                 taken = re.compile(re.escape(base))
             if any(taken.fullmatch(value) for value in keys):
                 skipped += 1
                 continue
-            contest = made[(day, office, code, party)] = cs.key("us.contest", base)
+            contest = made[(state, day, office, code, party)] = cs.key("us.contest", base)
             previous = None
             if first is not None:
-                previous = made.get((first, office, code, party))
+                previous = made.get((state, first, office, code, party))
                 if previous is None:
                     prior = f"{first}:NC:{office}:{code}:{etype}" if code is not None else f"{first}:NC:{office}:{word}"
                     previous = next(
@@ -322,127 +729,190 @@ def emit() -> Path:
                     )
             kind = "runoff" if first else "primary"
             stage = f"{label} primary" + (" runoff" if first else "")
+            district, _, post = (code or "").partition(":")
+            remainder = state == "WA" and day.year % 2 == 1
             cs.add(
                 "contest",
                 id=contest,
-                election_id=elections[day],
+                election_id=elections[(state, day)],
                 kind="office" if code is None else "body_seats",
-                office_id=offices[office] if code is None else None,
-                body_id=bodies[office] if code is not None else None,
-                district_area_id=cs.area("us.state", "37")
+                office_id=offices[(state, office)] if code is None else None,
+                body_id=bodies[(state, office)] if code is not None else None,
+                district_area_id=cs.area("us.state", fips)
                 if code is None
-                else cs.area("us.sldl" if office == "house" else "us.sldu", f"NC:{code}"),
+                else cs.area("us.sldl" if office in ("house", "assembly") else "us.sldu", f"{state}:{district}"),
                 magnitude=1,
-                term="full",
+                term="remainder" if remainder else "full",
                 round_number=2 if first else 1,
                 previous_round_id=previous,
-                electoral_system_id=systems["two_round_40" if day.year < 2018 else "two_round_30"],
+                electoral_system_id=systems[
+                    "top_two"
+                    if party == ""
+                    else "fptp"
+                    if state in ("MN", "CA")
+                    else "two_round_40"
+                    if day.year < 2018
+                    else "two_round_30"
+                ],
                 default_result_kind="counted",
-                party_scope_id=parties[party],
+                party_scope_id=parties.get(party),
             )
             if code is None:
-                name(contest, f"{day.year} North Carolina {titles[office]} {stage}")
-                path = f"us/nc/{day}-{kind}/{office}-{word}"
+                name(contest, f"{day.year} {place} {titles[office]} {stage}")
+                path = f"us/{state.lower()}/{day}-{kind}/{office}" + (f"-{word}" if word else "")
             else:
-                chamber = "House of Representatives" if office == "house" else "Senate"
-                name(contest, f"{day.year} North Carolina {chamber} {stage}, District {code}")
-                path = f"us/nc/{day}-{kind}/state-{office}-{code}-{slug(stage)}"
-            if path in slugs:
+                name(
+                    contest,
+                    f"{day.year} {chambers[f'{state}:{office}']} {stage}, District {district.replace('-', '').upper()}"
+                    + (f", Position {post}" if post else "")
+                    + (" (unexpired term)" if remainder else ""),
+                )
+                path = (
+                    f"us/{state.lower()}/{day}-{kind}/{'state-' if office in ('house', 'senate') else ''}{office}-{district}"
+                    + (f"-post-{post}" if post else "")
+                    + f"-{slug(stage)}"
+                )
+            if slugs.setdefault(path, contest) != contest:
                 raise ValueError(f"slug {path} is taken")
-            slugs.add(path)
             cs.add("slug", path=path, entity_id=contest)
-            result_set = sets[(day, office, code, party)] = cs.key(f"{SOURCE}.result_set", f"{base}:precinct")
+            result_set = sets[(state, day, office, code, party)] = cs.key(f"{SOURCE}.result_set", f"{base}:precinct")
             threshold = 40 if day.year < 2018 else 30
             cs.add(
                 "result_set",
                 id=result_set,
-                election_id=elections[day],
+                election_id=elections[(state, day)],
                 contest_id=contest,
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=sources[state],
                 is_default=True,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.format(threshold=threshold))
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=WA_METHOD
+                if state == "WA"
+                else CA_METHOD.format(
+                    rule="The top two candidates advance to the general election."
+                    if party == ""
+                    else "The file does not mark winners, so the winner shown is the candidate with the most votes."
+                )
+                if state == "CA"
+                else MN_METHOD
+                if state == "MN"
+                else METHOD.format(threshold=threshold),
+            )
             total = rows["votes"].sum()
             ranked = rows.filter(~pl.col("writein"))
             matched: list[bool] = []
-            for choice, writein, votes in rows.select("choice", "writein", "votes").iter_rows():
+            for choice, writein, preference in rows.select("choice", "writein", "label").iter_rows():
                 if writein:
                     option = cs.key("us.option", f"{base}:write-ins")
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
-                    options[(day, office, code, party, choice)] = option
+                    options[(state, day, office, code, party, choice)] = option
                     continue
-                words = [
-                    word
-                    for word in re.sub(r"\(.*?\)|\".*?\"|,", " ", choice).lower().split()
-                    if word.strip(".") not in ("jr", "sr", "ii", "iii", "iv")
-                ]
-                found = nominees.get((day.year, office, code, parties[party], words[0][0], slug(words[-1])), set())
-                local = f"NC:{office}:{code or ''}:{party}:{slug(choice)}"
-                if len(found) == 1:
-                    person = next(iter(found))
-                else:
-                    person = persons.get(local) or cs.key(f"{SOURCE}.person", local)
-                    if person in cs.minted and local not in persons:
-                        cs.add("person", id=person)
-                        name(person, choice)
-                persons[local] = person
-                matched.append(len(found) == 1)
-                option = cs.key("us.option", f"{base}:{person}")
+                ticket = re.fullmatch(r"(.+?) and (.+)", choice) if state == "MN" and office == "governor" else None
+                names = [ticket[1], ticket[2]] if ticket else [choice]
+                people = []
+                for role, text in zip(("head", "running_mate"), names, strict=False):
+                    words = [
+                        word
+                        for word in re.sub(r"\(.*?\)|\".*?\"|,", " ", text).lower().split()
+                        if word.strip(".") not in ("jr", "sr", "ii", "iii", "iv")
+                    ]
+                    found = (
+                        nominees.get(
+                            (state, day.year, office, code, parties.get(preference), words[0][0], slug(words[-1])),
+                            set(),
+                        )
+                        if role == "head" and preference in parties
+                        else set()
+                    )
+                    local = f"{state}:{office if role == 'head' else 'lieutenant-governor'}:{code or ''}:{party}:{slug(text)}"
+                    if len(found) == 1:
+                        person = next(iter(found))
+                    else:
+                        person = persons.get(local) or cs.key(f"{SOURCE}.person", local)
+                        if person in cs.minted and local not in persons:
+                            cs.add("person", id=person)
+                            name(person, text)
+                    persons[local] = person
+                    if role == "head":
+                        matched.append(len(found) == 1)
+                    people.append((role, text, person))
+                option = cs.key("us.option", f"{base}:{people[0][2]}")
                 cs.add(
                     "contest_option",
                     id=option,
                     contest_id=contest,
-                    kind="candidate",
-                    party_id=parties[party],
+                    kind="ticket" if ticket else "candidate",
+                    party_id=parties.get(preference),
                     ballot_label=choice,
                 )
-                cs.add(
-                    "candidacy",
-                    id=cs.key("us.candidacy", f"{base}:{person}:head"),
-                    person_id=person,
-                    option_id=option,
-                    role="head",
-                    ballot_name=choice,
-                    is_independent=False,
-                )
-                options[(day, office, code, party, choice)] = option
+                for role, text, person in people:
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{base}:{person}:{role}"),
+                        person_id=person,
+                        option_id=option,
+                        role=role,
+                        ballot_name=text,
+                        is_independent=False,
+                    )
+                options[(state, day, office, code, party, choice)] = option
+            if party == "":
+                for choice in ranked["choice"][:2]:
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=options[(state, day, office, code, party, choice)],
+                        kind="advanced",
+                    )
+                continue
             votes = ranked["votes"].to_list()
             if not votes or (len(votes) > 1 and votes[0] == votes[1]):
                 continue
-            leader = options[(day, office, code, party, ranked["choice"][0])]
-            runoff = any(
-                (day, later_day) in later and (later_day, office, code, party) in held for later_day in NC_DAYS
-            ) or any(
-                re.fullmatch(
-                    rf"{later_day}:NC:{office}:" + (f"{code}:{etype}runoff" if code is not None else word),
-                    value,
+            leader = options[(state, day, office, code, party, ranked["choice"][0])]
+            runoff = state == "NC" and (
+                any((day, later_day) in later and (later_day, office, code, party) in held for later_day in NC_DAYS)
+                or any(
+                    re.fullmatch(
+                        rf"{later_day}:NC:{office}:" + (f"{code}:{etype}runoff" if code is not None else str(word)),
+                        value,
+                    )
+                    for later_day in NC_DAYS
+                    if (day, later_day) in later
+                    for value in keys
                 )
-                for later_day in NC_DAYS
-                if (day, later_day) in later
-                for value in keys
             )
             if first is None and runoff and len(votes) > 1:
                 for choice in ranked["choice"][:2]:
                     cs.add(
                         "outcome",
                         result_set_id=result_set,
-                        option_id=options[(day, office, code, party, choice)],
+                        option_id=options[(state, day, office, code, party, choice)],
                         kind="advanced",
                     )
-            elif first is not None or len(votes) == 1 or votes[0] * 100 > threshold * total or matched[0]:
+            elif (
+                state in ("MN", "CA")
+                or first is not None
+                or len(votes) == 1
+                or votes[0] * 100 > threshold * total
+                or matched[0]
+            ):
                 cs.add("outcome", result_set_id=result_set, option_id=leader, kind="won")
         print(f"{len(made)} contests, {skipped} already held")
         frame = lines.join(
             pl.DataFrame(
                 [
-                    (day, office, code, party, choice, str(option), str(sets[(day, office, code, party)]))
-                    for (day, office, code, party, choice), option in options.items()
+                    (state, day, office, code, party, choice, str(option), str(sets[(state, day, office, code, party)]))
+                    for (state, day, office, code, party, choice), option in options.items()
                 ],
                 schema={
+                    "state": pl.String,
                     "day": pl.Date,
                     "office": pl.String,
                     "code": pl.String,
@@ -453,55 +923,40 @@ def emit() -> Path:
                 },
                 orient="row",
             ),
-            on=["day", "office", "code", "party", "choice"],
+            on=["state", "day", "office", "code", "party", "choice"],
             nulls_equal=True,
-        ).with_columns(
-            unit=pl.when(pl.col("precinct").is_not_null()).then(
-                pl.concat_str(pl.col("day").cast(pl.String), pl.lit("NC"), "fips", "county", "precinct", separator=":")
-            )
+        ).filter(pl.col("result_set_id").is_in([str(value) for value in sets.values() if value in cs.minted]))
+        frame = frame.with_columns(
+            flags=pl.when(pl.col("scheme") == "us.aggregate").then(UNALLOCATED).otherwise(0).cast(pl.Int16)
         )
         units: dict[str, UUID] = {}
-        for day, fips, county, unit in frame.select("day", "fips", "county", "unit").unique().iter_rows():
-            if unit is None:
-                unit = f"NC:{fips}:county-wide"
-                if unit not in units:
-                    units[unit] = cs.unit("us.aggregate", unit)
-                    if units[unit] in cs.minted:
-                        cs.add(
-                            "reporting_unit",
-                            id=units[unit],
-                            polity_id=state,
-                            scheme_code="us.aggregate",
-                            code=unit,
-                            parent_id=counties[fips][0],
-                            area_relation="within",
-                            area_id=counties[fips][1],
-                            kind="aggregate",
-                            valid_from=None,
-                        )
+        reused = 0
+        for state, day, fips, scheme, unit, flags in (
+            frame.select("state", "day", "fips", "scheme", "unit", "flags").unique().iter_rows()
+        ):
+            if unit in units:
                 continue
-            units[unit] = cs.unit("us.precinct", unit)
-            if units[unit] in cs.minted:
-                cs.add(
-                    "reporting_unit",
-                    id=units[unit],
-                    polity_id=state,
-                    scheme_code="us.precinct",
-                    code=unit,
-                    parent_id=counties[fips][0],
-                    area_relation="within",
-                    area_id=counties[fips][1],
-                    kind="standard",
-                    valid_from=day,
-                    valid_to=day + timedelta(days=1),
-                )
+            units[unit] = counties[fips][0] if scheme == "us.county" else cs.unit(scheme, unit)
+            if units[unit] not in cs.minted:
+                reused += 1
+                continue
+            cs.add(
+                "reporting_unit",
+                id=units[unit],
+                polity_id=polities[state],
+                scheme_code=scheme,
+                code=unit,
+                parent_id=counties[fips][0],
+                area_relation="within",
+                area_id=counties[fips][1],
+                kind="aggregate" if flags else "standard",
+                valid_from=None if flags else day,
+                valid_to=None if flags else day + timedelta(days=1),
+            )
+        print(f"{len(units)} units, {reused} already held")
         cs.frame(
             "result_value",
-            frame.with_columns(
-                flags=pl.when(pl.col("unit").is_null()).then(UNALLOCATED).otherwise(0).cast(pl.Int16),
-                unit=pl.coalesce("unit", pl.concat_str(pl.lit("NC"), "fips", pl.lit("county-wide"), separator=":")),
-            )
-            .with_columns(unit_id=pl.col("unit").replace_strict({key: str(value) for key, value in units.items()}))
+            frame.with_columns(unit_id=pl.col("unit").replace_strict({key: str(value) for key, value in units.items()}))
             .group_by("result_set_id", "unit_id", "option_id", "flags")
             .agg(value=pl.col("votes").sum())
             .with_columns(
