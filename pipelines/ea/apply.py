@@ -317,11 +317,11 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 """from {staged} s join public.{parent} duplicate on duplicate.id = s.entity_id
                    join public.{parent} survivor on survivor.id = s.into_id"""
             ).format(staged=staged, parent=sql.Identifier(parent))
-            target = sql.Identifier(relation)
+            rekeyed = sql.Identifier(relation)
             moved = sql.Identifier(column)
             if conn.execute(
                 sql.SQL("select exists (select {} join public.{} t on t.{} = duplicate.k)").format(
-                    moving, target, moved
+                    moving, rekeyed, moved
                 )
             ).fetchone() != (True,):
                 continue
@@ -339,7 +339,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                        join public.{target} x on x.{moved} = survivor.k and {same})"""
                 ).format(
                     moving=moving,
-                    target=target,
+                    target=rekeyed,
                     moved=moved,
                     same=sql.SQL(" and ").join(sql.SQL("x.{0} = t.{0}").format(sql.Identifier(key)) for key in others),
                 )
@@ -353,7 +353,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                     """update public.{target} t set {moved} = survivor.k {moving} where t.{moved} = duplicate.k
                        returning {others}, duplicate.k, survivor.k"""
                 ).format(
-                    target=target,
+                    target=rekeyed,
                     moved=moved,
                     moving=moving,
                     others=sql.SQL(", ").join(sql.SQL("t.{}").format(sql.Identifier(key)) for key in others),

@@ -4,6 +4,7 @@ import re
 import zipfile
 from collections.abc import Iterator
 from datetime import date
+from difflib import SequenceMatcher
 from pathlib import Path
 
 import polars as pl
@@ -11,7 +12,7 @@ import shapefile
 from pyproj import CRS
 
 from ea import raw
-from ea.changeset import Changeset
+from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.wards"
@@ -19,6 +20,12 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 ARCGIS = "/query?where=1%3D1&outFields=*&outSR=4326&f=geojson&resultOffset={offset}&resultRecordCount={count}"
 LAST = 2026
+ALGED = "American Local Government Elections Database"
+NICKNAMES = {"joe": "joseph", "bill": "william", "mike": "michael", "tony": "anthony", "jackie": "jacqueline"}
+SF_NOTE = (
+    "ALGED lists San Francisco's supervisor races twice, under the city and under the county. This set holds the"
+    " county copy's figures, kept as a non-default set when the two copies were merged into this contest."
+)
 FREE = "Public record; free download from the city's open data portal, no license stated"
 PUBLISHERS = {
     "chicago": (
@@ -1430,4 +1437,216 @@ def emit() -> Path:
                  and not exists (select from entity_merge m where m.entity_id = a.area_id)"""
         ).fetchall():
             cs.merge(duplicate, survivor)
+        pairs = conn.execute(
+            """with c as (
+                 select ct.id, ct.body_id, ct.election_id, e.date_from, ct.district_area_id, ct.kind
+                 from contest ct join election e on e.id = ct.election_id
+                 join entity n on n.id = ct.id join changeset s on s.id = n.changeset_id
+                 where s.pipeline = 'us.alged' and not exists (select from entity_merge m where m.entity_id = ct.id)
+                   and ct.body_id in (select entity_id from name where text in (%(county)s, %(city)s)))
+               select d.id, s.id, d.election_id, s.election_id from c d
+               join c s on s.date_from = d.date_from and s.district_area_id = d.district_area_id and s.kind = d.kind
+               where d.body_id in (select entity_id from name where text = %(county)s)
+                 and s.body_id in (select entity_id from name where text = %(city)s)""",
+            {"county": "San Francisco County Board of Supervisors", "city": "San Francisco City Council"},
+        ).fetchall()
+        doubled = {id for row in pairs for id in row[:2]}
+        if len(doubled) != 2 * len(pairs):
+            raise ValueError("San Francisco supervisor contests pair more than once")
+        staged: set[object] = set()
+        republished = 0
+        people = 0
+        for duplicate, survivor, _, new_election in pairs:
+            options = {
+                contest: conn.execute(
+                    """select o.id, o.kind::text, coalesce(c.ballot_name, o.ballot_label, ''),
+                              count(c.id) over (partition by o.id), c.id, c.person_id,
+                              (select sum(v.value) from result_value v join result_set r on r.k = v.result_set_k
+                               join source s on s.id = r.source_id
+                               where r.contest_id = o.contest_id and v.option_k = o.k and v.measure = 1 and s.title = %s)
+                       from contest_option o left join candidacy c on c.option_id = o.id where o.contest_id = %s""",
+                    [ALGED, contest],
+                ).fetchall()
+                for contest in (duplicate, survivor)
+            }
+            shapes = {}
+            for row in (*options[duplicate], *options[survivor]):
+                text = re.sub(r"['\"‘’“”][^'\"‘’“”]*['\"‘’“”]", " ", row[2])
+                quoted = re.findall(r"['\"‘’“”]([^'\"‘’“”]+)['\"‘’“”]", row[2])
+                shapes[row[0]] = (
+                    [w for w in slug(text).split("-") if len(w) > 1 and w not in ("jr", "sr", "ii", "iii")],
+                    slug(row[2])[:1],
+                    [w for q in quoted for w in slug(q).split("-") if len(w) > 1],
+                )
+            matched = {}
+            for mine in options[duplicate]:
+                words, initial, nicknames = shapes[mine[0]]
+                hits = []
+                for theirs in options[survivor]:
+                    if mine[3] > 1 or theirs[3] > 1:
+                        continue
+                    if mine[1] != "candidate" or theirs[1] != "candidate":
+                        if mine[1] == theirs[1]:
+                            hits.append(theirs)
+                        continue
+                    other, other_initial, other_nicknames = shapes[theirs[0]]
+                    if not words or not other:
+                        continue
+                    firsts = [words[0], *nicknames] if len(words) > 1 else []
+                    other_firsts = [other[0], *other_nicknames] if len(other) > 1 else []
+                    if (
+                        words[-1] == other[-1]
+                        and (
+                            any(
+                                a == b
+                                or a.startswith(b)
+                                or b.startswith(a)
+                                or NICKNAMES.get(a) == b
+                                or NICKNAMES.get(b) == a
+                                for a in firsts
+                                for b in other_firsts
+                            )
+                            or (len(words) == 1 or len(other) == 1)
+                            and initial == other_initial
+                        )
+                        or initial == other_initial
+                        and SequenceMatcher(None, " ".join(words), " ".join(other)).ratio() >= 0.88
+                        or words[0] == other[0]
+                        and (len(words) == 1 or len(other) == 1)
+                        or words[0] == other[0]
+                        and mine[6] is not None
+                        and mine[6] == theirs[6]
+                        and mine[6] > 0
+                        and SequenceMatcher(None, words[-1], other[-1]).ratio() >= 0.8
+                    ):
+                        hits.append(theirs)
+                if len(hits) > 1:
+                    hits = [hit for hit in hits if hit[2] == mine[2]]
+                if len(hits) == 1:
+                    matched[mine[0]] = (mine, hits[0])
+            targets = [theirs[0] for _, theirs in matched.values()]
+            matched = {key: pair for key, pair in matched.items() if targets.count(pair[1][0]) == 1}
+            old = conn.execute(
+                """select r.id, r.k, r.election_id, r.stage::text, r.kind::text, r.source_id, r.as_of, r.completeness
+                   from result_set r join source s on s.id = r.source_id
+                   where r.contest_id = %s and s.title = %s and r.status = 'active'""",
+                [duplicate, ALGED],
+            ).fetchall()
+            if len(old) != 1:
+                raise ValueError(f"{duplicate}: {len(old)} active ALGED sets")
+            id, k, election, stage, kind, source, as_of, completeness = old[0]
+            cs.add(
+                "result_set",
+                id=id,
+                election_id=election,
+                contest_id=duplicate,
+                stage=stage,
+                kind=kind,
+                source_id=source,
+                as_of=as_of,
+                status="superseded",
+                is_default=False,
+                completeness=completeness,
+            )
+            if (
+                len(matched) != len(options[duplicate])
+                or len(options[duplicate]) != len(options[survivor])
+                or any(mine[6] is None or mine[6] != theirs[6] for mine, theirs in matched.values())
+            ):
+                republished += 1
+                result_set = cs.key(f"{SOURCE}.result_set", f"sf:{id}")
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=new_election,
+                    contest_id=survivor,
+                    stage=stage,
+                    kind=kind,
+                    source_id=source,
+                    as_of=as_of,
+                    status="active",
+                    is_default=False,
+                    supersedes_id=id,
+                    completeness=completeness,
+                )
+                cs.add("note", entity_id=result_set, kind="context", body_md=SF_NOTE)
+                remap = {mine[0]: theirs[0] for mine, theirs in matched.values()}
+                cs.frame(
+                    "result_value",
+                    pl.DataFrame(
+                        [
+                            {
+                                "result_set_id": str(result_set),
+                                "unit_id": str(unit),
+                                "option_id": None if option is None else str(remap.get(option, option)),
+                                "channel": channel,
+                                "measure": measure,
+                                "count_round": count_round,
+                                "flags": flags,
+                                "value": float(value),
+                            }
+                            for unit, option, channel, measure, count_round, flags, value in conn.execute(
+                                """select u.id, o.id, v.channel, v.measure, v.count_round, v.flags, v.value
+                                   from result_value v join reporting_unit u on u.k = v.unit_k
+                                   left join contest_option o on o.k = v.option_k and v.option_k <> 0
+                                   where v.result_set_k = %s""",
+                                [k],
+                            ).fetchall()
+                        ],
+                        schema={
+                            "result_set_id": pl.String,
+                            "unit_id": pl.String,
+                            "option_id": pl.String,
+                            "channel": pl.Int16,
+                            "measure": pl.Int16,
+                            "count_round": pl.Int16,
+                            "flags": pl.Int16,
+                            "value": pl.Float64,
+                        },
+                    ),
+                )
+                candidacies = {mine[4]: theirs[4] for mine, theirs in matched.values() if mine[4] is not None}
+                for option, outcome, seats, notes, candidacy in conn.execute(
+                    "select option_id, kind::text, seats, notes, candidacy_id from outcome where result_set_id = %s",
+                    [id],
+                ).fetchall():
+                    cs.add(
+                        "outcome",
+                        result_set_id=result_set,
+                        option_id=remap.get(option, option),
+                        kind=outcome,
+                        seats=seats,
+                        notes=notes,
+                        candidacy_id=candidacies.get(candidacy, candidacy),
+                    )
+            for mine, theirs in matched.values():
+                cs.merge(mine[0], theirs[0])
+                if mine[4] is not None and theirs[4] is not None:
+                    cs.merge(mine[4], theirs[4])
+                if (
+                    mine[5] is not None
+                    and theirs[5] is not None
+                    and mine[5] != theirs[5]
+                    and mine[5] not in staged
+                    and theirs[5] not in staged
+                    and str(mine[5]) not in cs.merged
+                ):
+                    cs.merge(mine[5], theirs[5])
+                    staged.update((mine[5], theirs[5]))
+                    people += 1
+            cs.merge(duplicate, survivor)
+        elections = 0
+        for election, into in {(old, new) for _, _, old, new in pairs}:
+            live = conn.execute(
+                """select array_agg(id) from contest c where election_id = %s
+                   and not exists (select from entity_merge m where m.entity_id = c.id)""",
+                [election],
+            ).fetchone()
+            if live is not None and live[0] is not None and set(live[0]) <= doubled:
+                cs.merge(election, into)
+                elections += 1
+        print(
+            f"{len(pairs)} San Francisco supervisor contests merged, {republished} county sets republished,"
+            f" {people} people and {elections} elections merged"
+        )
         return cs.write()
