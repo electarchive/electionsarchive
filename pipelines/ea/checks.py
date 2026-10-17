@@ -54,7 +54,10 @@ class Stage:
             to=sql.SQL("s.valid_to" if "valid_to" in columns else "null::date"),
             staged=self.staged(table),
             same=sql.SQL(" and ").join(
-                sql.SQL("x.{0} is not distinct from p.{0}").format(sql.Identifier(column)) for column in columns
+                sql.SQL(
+                    "x.{0} = p.{0}" if column in self.temporal[table] else "x.{0} is not distinct from p.{0}"
+                ).format(sql.Identifier(column))
+                for column in columns
             ),
         )
 
