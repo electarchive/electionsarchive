@@ -1393,6 +1393,15 @@ def emit() -> Path:
                    where a.scheme_code = 'us.county'"""
             ).fetchall()
         }
+        existing = pl.DataFrame(
+            conn.execute(
+                """select n.id::text, n.entity_id::text, n.text from name n join changeset c on c.id = n.changeset_id
+                   where c.pipeline = %s and n.kind = 'official' and n.lang = 'en'""",
+                [SOURCE],
+            ).fetchall(),
+            schema={"id": pl.String, "entity_id": pl.String, "old": pl.String},
+            orient="row",
+        )
         retrieved = {
             vintage: raw.cached(
                 SOURCE, LAYERS[vintage] + "?f=json" if vintage in LAYERS else ZIPS[vintage]
@@ -1506,7 +1515,18 @@ def emit() -> Path:
                             for label, county in frame.select("label", "county").iter_rows()
                         ],
                     }
-                ).with_columns(lang=pl.lit("en"), kind=pl.lit("official"), is_preferred=pl.lit(True)),
+                )
+                .join(existing, on="entity_id", how="left")
+                .sort(pl.col("old") == pl.col("text"), descending=True, nulls_last=True)
+                .with_columns(first=pl.int_range(pl.len()).over("entity_id") == 0)
+                .select(
+                    "id",
+                    "entity_id",
+                    text=pl.when("first").then("text").otherwise("old"),
+                    is_preferred="first",
+                    lang=pl.lit("en"),
+                    kind=pl.lit("official"),
+                ),
             )
             print(f"{vintage}: {frame.height} precincts, {start} to {end}")
         return cs.write()
