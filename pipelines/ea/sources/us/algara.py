@@ -205,7 +205,8 @@ def emit() -> Path:
         seated: set[str] = set()
         for value, seats in conn.execute(
             """select x.value, exists (select from contest c where c.election_id = x.entity_id and c.kind = 'body_seats')
-               from external_id x where x.scheme = 'us.election'
+               from external_id x join election e on e.id = x.entity_id where x.scheme = 'us.election'
+                 and split_part(x.value, ':', 1) in (e.date_from::text, extract(year from e.date_from)::text)
                  and not exists (select from entity_merge m where m.entity_id = x.entity_id)"""
         ):
             parts = value.split(":")

@@ -198,6 +198,13 @@ PARTIES = {
         "a973ef8e-c9b3-54df-83cf-80c20cfc21cb",
     ),
 }
+PEOPLE = {
+    "Mark Dayton, senator and governor of Minnesota": (
+        ("bioguide", "D000596"),
+        ("fec.candidate", "S2MN00027"),
+        ("us.algara.person", "MN:mark-dayton"),
+    ),
+}
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
 )
@@ -367,4 +374,19 @@ def emit() -> Path:
             for party in members:
                 if party != survivor:
                     cs.merge(party, survivor)
+        for label, keys in PEOPLE.items():
+            found = [
+                person
+                for scheme, value in keys
+                for (person,) in conn.execute(
+                    """select x.entity_id from external_id x where x.scheme = %s and x.value = %s
+                       and not exists (select from entity_merge m where m.entity_id = x.entity_id)""",
+                    [scheme, value],
+                ).fetchall()
+            ]
+            if len(found) != len(keys):
+                print(f"{label}: already merged or missing")
+            for person in dict.fromkeys(found[1:]):
+                if person != found[0]:
+                    cs.merge(person, found[0])
         return cs.write()
