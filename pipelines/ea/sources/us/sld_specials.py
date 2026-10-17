@@ -33,33 +33,40 @@ RHODE_ISLAND = "https://electionresults.ri.gov/results/public/api/elections/rhod
 LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob={:%Y%m%d}/Votes_Multiparish.htm"
 MASSACHUSETTS = "https://electionstats.state.ma.us/elections/download/{}/precincts_include:0/"
 VIRGINIA = "https://va2.elstats.civera.com/api/download_contest/{}_table.csv?split_party=false"
-GENERALS = {
-    f"{day}:VA": "https://va2.elstats.civera.com/api/download_search.csv?"
-    + urlencode(
-        {
-            "search": json.dumps(
-                {
-                    "global": {"years": {"from": day.year, "to": day.year}},
-                    "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
-                    "contests": {"candidates": [], "divisions": [], "offices": [{"id": 8}, {"id": 9}]},
-                    "specialElectionsOnly": False,
-                    "voterStats": False,
-                    "stages": [],
-                },
-                separators=(",", ":"),
-            )
-        }
-    )
-    for day in (date(2023, 11, 7), date(2025, 11, 4))
-} | {
-    f"{day}:NJ:{chamber}": f"https://www.nj.gov/state/elections/assets/pdf/election-results/{day.year}/"
-    f"{day.year}-official-general-results-{chamber}.pdf"
-    for day, chamber in (
-        (date(2023, 11, 7), "state-senate"),
-        (date(2023, 11, 7), "general-assembly"),
-        (date(2025, 11, 4), "general-assembly"),
-    )
-}
+GENERALS = (
+    {
+        f"{day}:VA": "https://va2.elstats.civera.com/api/download_search.csv?"
+        + urlencode(
+            {
+                "search": json.dumps(
+                    {
+                        "global": {"years": {"from": day.year, "to": day.year}},
+                        "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
+                        "contests": {"candidates": [], "divisions": [], "offices": [{"id": 8}, {"id": 9}]},
+                        "specialElectionsOnly": False,
+                        "voterStats": False,
+                        "stages": [],
+                    },
+                    separators=(",", ":"),
+                )
+            }
+        )
+        for day in (date(2023, 11, 7), date(2025, 11, 4))
+    }
+    | {
+        f"{day}:NJ:{chamber}": f"https://www.nj.gov/state/elections/assets/pdf/election-results/{day.year}/"
+        f"{day.year}-official-general-results-{chamber}.pdf"
+        for day, chamber in (
+            (date(2023, 11, 7), "state-senate"),
+            (date(2023, 11, 7), "general-assembly"),
+            (date(2025, 11, 4), "general-assembly"),
+        )
+    }
+    | {
+        "2023-10-14:LA": LOUISIANA.format(date(2023, 10, 14)),
+        "2023-11-18:LA:runoff": LOUISIANA.format(date(2023, 11, 18)),
+    }
+)
 NJ_ORDINALS = [
     "first",
     "second",
@@ -656,6 +663,7 @@ PARTIES = {
     "rep": "republican-party",
     "gop": "republican-party",
     "libertarian": "libertarian-party",
+    "lbt": "libertarian-party",
     "lib": "libertarian-party",
     "lpf": "libertarian-party",
     "green": "green-party",
@@ -705,8 +713,12 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=SUFFIXES[system] or Path(url.split("?")[0]).suffix)
         if system == "louisiana":
             raw.fetch(SOURCE, url.replace("Votes_", "RacesCandidates_"), suffix=".json")
-    for url in GENERALS.values():
-        raw.fetch(SOURCE, url, suffix=Path(url.split("?")[0]).suffix)
+    for election, url in GENERALS.items():
+        if ":LA" in election:
+            raw.fetch(SOURCE, url, suffix=".json")
+            raw.fetch(SOURCE, url.replace("Votes_", "RacesCandidates_"), suffix=".json")
+        else:
+            raw.fetch(SOURCE, url, suffix=Path(url.split("?")[0]).suffix)
 
 
 def _title(text: str) -> str:
@@ -838,6 +850,31 @@ def parse() -> None:
             rows.append({"key": key, "url": url, "candidate": label, "party": _party(state, party), "votes": votes})
     for election, url in GENERALS.items():
         day, state = election.split(":")[:2]
+        if state == "LA":
+            races = json.loads(raw.cached(SOURCE, url.replace("Votes_", "RacesCandidates_")).path.read_text())
+            counted = {
+                race["ID"]: race for race in json.loads(raw.cached(SOURCE, url).path.read_text())["Races"]["Race"]
+            }
+            for race in races["Races"]["Race"]:
+                if not (match := re.match(r"State (Senator|Representative) -- +(\d+)", race["SpecificTitle"])):
+                    continue
+                key = f"{day}:LA:{'senate' if match[1] == 'Senator' else 'house'}:{match[2]}:" + (
+                    "general-runoff" if election.endswith("runoff") else "general"
+                )
+                choices = {choice["ID"]: choice["Desc"] for choice in race["Choice"]}
+                for choice in counted[race["ID"]]["Choice"]:
+                    named = re.fullmatch(r"(.+) \((\w+)\)", choices[choice["ID"]])
+                    assert named is not None
+                    rows.append(
+                        {
+                            "key": key,
+                            "url": url,
+                            "candidate": named[1],
+                            "party": _party(state, named[2]),
+                            "votes": int(choice["VoteTotal"]),
+                        }
+                    )
+            continue
         if state == "NJ":
             chamber = "senate" if election.endswith("senate") else "assembly"
             text = subprocess.run(
@@ -983,9 +1020,9 @@ def emit() -> Path:
             url = group["url"][0]
             parts = key.split(":")
             day, state, chamber, code = date.fromisoformat(parts[0]), parts[1], parts[2], parts[3]
-            post = parts[4] if len(parts) > 4 and parts[4] not in ("runoff", "general") else None
-            runoff = key.endswith(":runoff")
-            regular = key.endswith(":general")
+            post = parts[4] if len(parts) > 4 and parts[4] not in ("runoff", "general", "general-runoff") else None
+            runoff = key.endswith("runoff")
+            regular = parts[-1].startswith("general")
             kind = "general" if regular else "special"
             publisher = PUBLISHERS.get(key) or PUBLISHERS.get(f"{state}:{day}") or PUBLISHERS[state]
             if (publisher, day) not in sources:
@@ -1019,9 +1056,11 @@ def emit() -> Path:
             if area in cs.minted or unit in cs.minted:
                 raise ValueError(f"{key}: no district {scheme} {full}")
             general = f"{day}:{state}"
-            on_general = regular or general in elections_known
+            on_general = not (regular and runoff) and (regular or general in elections_known)
             election_key = general if on_general else f"{day}:{state}:{'runoff' if runoff else 'special'}"
-            label = "election" if regular else "special election"
+            label = (
+                ("runoff" if runoff else "election") if regular else "special election" + (" runoff" if runoff else "")
+            )
             election = cs.key("us.election", election_key)
             if election in cs.minted and election_key not in elections_known:
                 elections_known.add(election_key)
@@ -1030,7 +1069,7 @@ def emit() -> Path:
                     id=election,
                     polity_id=cs.polity(f"US-{state}"),
                     parent_id=None,
-                    kind="general" if regular else "runoff" if runoff else "special",
+                    kind="runoff" if runoff else "general" if regular else "special",
                     date_from=day,
                     date_to=day,
                     date_precision="day",
@@ -1045,12 +1084,18 @@ def emit() -> Path:
                 cs.add(
                     "slug",
                     path=unique(
-                        f"us/{state.lower()}/{day}-{'general' if regular else 'runoff' if runoff else 'special'}",
+                        f"us/{state.lower()}/{day}-{'runoff' if runoff else 'general' if regular else 'special'}",
                         election,
                     ),
                     entity_id=election,
                 )
-            etype = "g" if regular else ("gs" if on_general else "s") + ("runoff" if runoff else "")
+            sums = group.group_by("candidate").agg(pl.col("votes").sum())["votes"].to_list()
+            if regular and state == "LA":
+                etype = "larunoff" if runoff else "lafsettled" if max(sums) * 2 > sum(sums) else "lafunsettled"
+            elif regular:
+                etype = "g"
+            else:
+                etype = ("gs" if on_general else "s") + ("runoff" if runoff else "")
             contest_key = f"{day}:{state}:{body_slug}:{code}" + (f":{post}" if post else "") + f":{etype}"
             contest = contests[key] = cs.key("us.contest", contest_key)
             if contest_key in published:
@@ -1061,7 +1106,7 @@ def emit() -> Path:
                     (
                         other
                         for other in contests
-                        if other < key and other.split(":")[1:] == key.removesuffix(":runoff").split(":")[1:]
+                        if other < key and other.split(":")[1:] == re.sub(r"[:-]runoff$", "", key).split(":")[1:]
                     ),
                     default=None,
                 )
@@ -1088,7 +1133,7 @@ def emit() -> Path:
             where = shown + (f", Position {post}" if post else "")
             name(
                 contest,
-                f"{day.year} {states[state]} {body_name} {label}{' runoff' if runoff else ''}, {where}",
+                f"{day.year} {states[state]} {body_name} {label}, {where}",
             )
             cs.add(
                 "slug",
