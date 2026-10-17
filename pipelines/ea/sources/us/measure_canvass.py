@@ -1,8 +1,10 @@
 import json
+import re
 from datetime import date
 from pathlib import Path
 from uuid import UUID
 
+import fastexcel
 import httpx
 import polars as pl
 
@@ -21,8 +23,29 @@ ANSWERS = {
     "REJECTED": ("NO", "APPROVED"),
     "MAINTAINED": ("YES", "MAINTAINED"),
     "REPEALED": ("NO", "MAINTAINED"),
+    "FOR": ("YES", "FOR"),
+    "AGAINST": ("NO", "FOR"),
 }
-TAG = r"(?i)(initiative|referendum|advisory vote|resolution|amendment)\D{0,25}?(\d+)"
+TAG = r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question))\D{0,25}?\b(\d+|[A-Z])\b"
+WAYBACK = "https://web.archive.org/web/{}id_/{}"
+UTAH = {
+    date(2014, 11, 4): (
+        "20151220071902",
+        "http://elections.utah.gov/Media/Default/2014%20Election/2014%20Final%20General%20Canvass%20Report.xlsx",
+    ),
+    date(2016, 11, 8): (
+        "20230530231104",
+        "https://elections.utah.gov/Media/Default/2016%20Election/2016%20General%20Election%20-%20Statewide%20Canvass.xlsx",
+    ),
+    date(2018, 11, 6): (
+        "2025",
+        "https://elections.utah.gov/Media/Default/2018%20Election/2018%20General%20Election%20Canvass.xlsx",
+    ),
+    date(2020, 11, 3): (
+        "2025",
+        "https://vote.utah.gov/wp-content/uploads/2021/02/2020-General-Election-Statewide-Canvass.xlsx",
+    ),
+}
 METHOD = (
     "County totals from {document}, the state's certified results. They replace the totals transcribed from the "
     "English Wikipedia as this question's default.{advisory}"
@@ -41,6 +64,12 @@ DOCUMENTS = {
         "https://results.elections.myflorida.com/",
         "the Florida Division of Elections' official results extract",
     ),
+    "UT": (
+        "Utah Lieutenant Governor's Office of Elections",
+        "Official canvass by county",
+        "https://vote.utah.gov",
+        "the Utah Lieutenant Governor's statewide canvass workbook",
+    ),
 }
 
 
@@ -58,6 +87,8 @@ def wikipedia(conn) -> list[tuple[str, date]]:
 
 
 def link(state: str, day: date) -> tuple[str, str]:
+    if state == "UT":
+        return SOURCE, WAYBACK.format(*UTAH[day]) if day in UTAH else ""
     owner, url = (
         (wa_local.SOURCE, wa_local.PRECINCTS.format(day=day).replace("_allstateprecincts.csv", "_AllCounties.csv"))
         if state == "WA"
@@ -72,9 +103,9 @@ def fetch() -> None:
         dates = wikipedia(conn)
     for state, day in dates:
         source, url = link(state, day)
-        if source == SOURCE:
+        if source == SOURCE and url:
             try:
-                raw.fetch(SOURCE, url, suffix=".csv" if state == "WA" else ".tsv")
+                raw.fetch(SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx"}[state])
             except httpx.HTTPStatusError as error:
                 print(f"{state} {day}: {error}")
 
@@ -99,7 +130,27 @@ def parse() -> None:
             path = raw.cached(source, url).path
         except LookupError:
             continue
-        if state == "WA":
+        if state == "UT":
+            records = []
+            reader = fastexcel.read_excel(str(path))
+            for sheet in reader.sheet_names:
+                if not re.search(r"(?i)amend|ballot question", sheet):
+                    continue
+                rows = reader.load_sheet_by_name(sheet, header_row=None).to_polars().cast(pl.String).rows()
+                header = next(i for i, row in enumerate(rows) if (row[0] or "").strip().upper() == "COUNTY")
+                title = None
+                for j in range(1, len(rows[header])):
+                    title = next((rows[i][j] for i in reversed(range(header)) if rows[i][j]), title)
+                    if (rows[header][j] or "").strip().upper() not in ANSWERS or title is None:
+                        continue
+                    for row in rows[header + 1 :]:
+                        if row[0] is None or row[0].strip().upper().startswith("TOTAL"):
+                            break
+                        records.append((row[0], title, rows[header][j], row[j]))
+            table = pl.DataFrame(records, schema=["county", "office", "answer", "votes"], orient="row").with_columns(
+                votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64).cast(pl.String)
+            )
+        elif state == "WA":
             table = (
                 pl.read_csv(path, infer_schema=False, encoding="utf8-lossy")
                 .filter(pl.col("JurisdictionName").is_in(["State Executive", "State Measures", "Advisory Votes"]))
@@ -138,13 +189,14 @@ def parse() -> None:
         answer=pl.col("label").replace_strict({label: answer for label, (answer, _) in ANSWERS.items()}),
         pair=pl.col("label").replace_strict({label: pair for label, (_, pair) in ANSWERS.items()}),
     )
-    counties = frame.group_by("state").agg(pl.col("fips").n_unique().alias("counties"))
+    counties = frame.drop_nulls("fips").group_by("state").agg(pl.col("fips").n_unique().alias("counties"))
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         frame.join(counties, on="state")
         .filter(
             pl.col("answer").n_unique().over("state", "day", "office") == 2,
             pl.col("pair").n_unique().over("state", "day", "office") == 1,
+            pl.col("fips").is_null().sum().over("state", "day", "office") == 0,
             pl.col("fips").n_unique().over("state", "day", "office") == pl.col("counties"),
         )
         .group_by("state", "day", "url", "office", "pair", "fips", "answer")
