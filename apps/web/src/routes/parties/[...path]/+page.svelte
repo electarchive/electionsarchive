@@ -6,6 +6,7 @@
   import { count, date } from "#lib/format.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
   import History from "./history.svelte";
@@ -259,26 +260,43 @@
                 class="font-figures text-[0.9375rem] tracking-[-0.02em] tabular-nums"
                 >{year ?? ""}</span
               >
+              {const prefix = $derived(
+                new RegExp(`^(?:\\p{L}+ (?:\\d{1,2}, )?)?${year} `, "u"),
+              )}
               <ul class="grid gap-1 text-sm">
                 {#each entries as election, index (index)}
-                  {const name = $derived(
-                    election.name.replace(
-                      new RegExp(`^(?:\\p{L}+ (?:\\d{1,2}, )?)?${year} `, "u"),
-                      "",
-                    ),
+                  {const name = $derived(election.name.replace(prefix, ""))}
+                  {const day = $derived(
+                    election.date != null &&
+                      entries.some(
+                        (other) =>
+                          other !== election &&
+                          other.name.replace(prefix, "") === name,
+                      )
+                      ? new Intl.DateTimeFormat(getLocale(), {
+                          month: "long",
+                          day: "numeric",
+                          timeZone: "UTC",
+                        }).format(new Date(`${election.date}T00:00:00Z`))
+                      : null,
                   )}
                   <li
                     class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"
                   >
-                    {#if election.path == null}
-                      <span>{name}</span>
-                    {:else}
-                      <a
-                        class="hover:highlighter"
-                        href={resolve("/[...path]", { path: election.path })}
-                        title={date(election.date)}>{name}</a
-                      >
-                    {/if}
+                    <span>
+                      {#if election.path == null}
+                        {name}
+                      {:else}
+                        <a
+                          class="hover:highlighter"
+                          href={resolve("/[...path]", { path: election.path })}
+                          title={date(election.date)}>{name}</a
+                        >
+                      {/if}
+                      {#if day != null}
+                        <span class="text-muted-foreground">{day}</span>
+                      {/if}
+                    </span>
                     <span
                       class="text-xs whitespace-nowrap text-muted-foreground tabular-nums"
                       >{m.race_contests({
