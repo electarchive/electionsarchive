@@ -27,6 +27,7 @@ VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 CALIFORNIA = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/79-us-rep-congress.xlsx"
+CA_PRESIDENT = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/25-presidential-formatted.xlsx"
 NORTH_CAROLINA = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2024_03_05/results_pct_20240305.zip"
 MINNESOTA = "https://electionresultsfiles.sos.mn.gov/20240813/{}.txt"
 MARYLAND = "https://elections.maryland.gov/elections/archive/2024/election_data/PP24_{:02d}Precincts{}.csv"
@@ -209,6 +210,7 @@ def picks(fips: dict[str, dict[str, str]]) -> list[tuple[str, str, str]]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, CALIFORNIA, suffix=".xlsx")
+    raw.fetch(SOURCE, CA_PRESIDENT, suffix=".xlsx")
     raw.fetch(SOURCE, NORTH_CAROLINA, suffix=".zip")
     for county in range(1, 25):
         for party in ("Democratic", "Republican"):
@@ -330,6 +332,48 @@ def parse() -> None:
                         write_in,
                         int(cell or 0),
                         CALIFORNIA,
+                    )
+                )
+    lines = list(
+        fastexcel.read_excel(raw.cached(SOURCE, CA_PRESIDENT).path)
+        .load_sheet(0, header_row=None, dtypes="string")
+        .to_polars()
+        .iter_rows()
+    )
+    nominees = [
+        (
+            " ".join(str(name).split()).removesuffix("*"),
+            {"DEM": "democratic", "REP": "republican"}.get(party.split()[0]),
+            "(W/I)" in party,
+        )
+        for name, party in zip(lines[0][1:], lines[1][1:], strict=True)
+    ]
+    counted = [0] * len(nominees)
+    for label, *cells in lines[2:]:
+        if label is None or label.strip() == "Percent":
+            continue
+        if label == "State Totals":
+            if [int(cell) for cell in cells] != counted:
+                raise ValueError(f"CA president: the counties sum to {counted}, the sheet prints {cells}")
+            continue
+        county = fips["CA"][re.sub(r"[^a-z]", "", label.lower())]
+        for position, ((name, party, write_in), cell) in enumerate(zip(nominees, cells, strict=True)):
+            counted[position] += int(cell)
+            if party is not None:
+                rows.append(
+                    (
+                        "CA",
+                        date(2024, 3, 5),
+                        "president",
+                        None,
+                        party,
+                        "county",
+                        county,
+                        None,
+                        name,
+                        write_in,
+                        int(cell),
+                        CA_PRESIDENT,
                     )
                 )
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
