@@ -6555,6 +6555,7 @@ export const polities = {
           left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
           where c.allocation_parent_id is null and c.party_scope_id is null
             and e.kind in ('general', 'local') and c.kind in ('body_seats', 'list_allocation', 'office')
+            and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
             and not exists (
               select from contest pc join election pe on pe.id = pc.election_id
               where pc.id = c.previous_round_id and pe.kind in ('general', 'local')
