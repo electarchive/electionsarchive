@@ -29,22 +29,30 @@
     history
       .map((entry) => ({
         ...entry,
-        points: entry.points.map((point) => ({
-          ...point,
-          at:
-            point.year +
-            (Date.parse(`${point.date}T00:00:00Z`) -
-              Date.UTC(Number(point.date.slice(0, 4)), 0, 1)) /
-              31_622_400_000,
-          share:
-            point.votes == null || point.total == null
-              ? null
-              : point.votes / point.total,
-          held:
-            point.seats == null || point.filled == null || point.filled === 0
-              ? null
-              : point.seats / point.filled,
-        })),
+        points: entry.points
+          .filter((point, index) => {
+            const nearest = Math.max(
+              entry.points[index - 1]?.races ?? 0,
+              entry.points[index + 1]?.races ?? 0,
+            );
+            return nearest < 10 || point.races * 2 >= nearest;
+          })
+          .map((point) => ({
+            ...point,
+            at:
+              point.year +
+              (Date.parse(`${point.date}T00:00:00Z`) -
+                Date.UTC(Number(point.date.slice(0, 4)), 0, 1)) /
+                31_622_400_000,
+            share:
+              point.votes == null || point.total == null
+                ? null
+                : point.votes / point.total,
+            held:
+              point.seats == null || point.filled == null || point.filled === 0
+                ? null
+                : point.seats / point.filled,
+          })),
       }))
       .filter((entry) => entry.points.some((point) => point.share != null))
       .toSorted((a, b) => b.points.length - a.points.length),
