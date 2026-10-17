@@ -12,7 +12,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.wikipedia_measures"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
 YEARS = (2012, 2013, 2014, 2015, 2016, 2017, 2018, 2019, 2020, 2021, 2023, 2024, 2025)
@@ -103,9 +103,10 @@ def parse() -> None:
                         f"{year} {state}: no date or votes for {measure[:60]!r} ({when!r}, {yes[:20]!r}, {no[:20]!r})"
                     )
                     continue
+                named = next((text for text in states if measure.startswith(f"{text} ")), None)
                 rows.append(
                     {
-                        "state": state,
+                        "state": states[named] if named is not None and named != label else state,
                         "day": date(year, MONTHS[found[1]], int(found[2])),
                         "origin": re.sub(r"\s+", " ", origin).strip().lower(),
                         "status": re.sub(r"[^A-Za-z]", "", re.split(r"<br", status)[0]).replace("Passed", "Approved"),
@@ -168,6 +169,10 @@ def emit() -> Path:
             ).fetchall()
         }
         known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
+        cs.renamed.update({"2019-10-12:LA:": "2019-10-12:KS:"})
+        misfiled, louisiana = cs.key("us.election", "2019-10-12:KS:referendum"), cs.key("us.election", "2019-10-12:LA")
+        if misfiled not in cs.minted and misfiled != louisiana:
+            cs.merge(misfiled, louisiana)
         paths = dict(
             conn.execute(
                 """select x.value, s.path from external_id x join slug s on s.entity_id = x.entity_id and s.is_current
@@ -200,7 +205,9 @@ def emit() -> Path:
             if state not in states:
                 print(f"no state area for {state}, skipped {measure}")
                 continue
-            if f"{day}:{state}:primary" in known:
+            if f"{day}:{state}:referendum" in known:
+                election_key, kind = f"{day}:{state}:referendum", "referendum"
+            elif f"{day}:{state}:primary" in known:
                 election_key, kind = f"{day}:{state}:primary", "primary"
             elif f"{day}:{state}" in known or day.month == 11:
                 election_key, kind = f"{day}:{state}", "general"
@@ -241,16 +248,15 @@ def emit() -> Path:
             )
             cs.add("ballot_question", contest_id=contest, type=TYPES.get(origin, "mandatory_referendum"))
             name(contest, measure)
-            if contest in cs.minted:
-                path = held.get(contest)
-                if path is None:
-                    base = f"{paths[election_key]}/{slug(measure)[:60].rstrip('-') or 'question'}"
-                    path, n = base, 1
-                    while path in taken:
-                        n += 1
-                        path = f"{base}-{n}"
-                    taken.add(path)
-                cs.add("slug", path=path, entity_id=contest)
+            path = held.get(contest)
+            if path is None or not path.startswith(f"{paths[election_key]}/"):
+                base = f"{paths[election_key]}/{slug(measure)[:60].rstrip('-') or 'question'}"
+                path, n = base, 1
+                while path in taken:
+                    n += 1
+                    path = f"{base}-{n}"
+                taken.add(path)
+            cs.add("slug", path=path, entity_id=contest)
             options = {}
             for position, label in enumerate(("Yes", "No")):
                 options[label] = cs.key("us.option", f"{contest_key}:{label.lower()}")
