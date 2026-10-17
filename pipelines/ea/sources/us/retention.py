@@ -711,6 +711,7 @@ def emit() -> Path:
             return districts[code]
 
         persons: set[str] = set()
+        memberships: set[tuple[UUID, UUID, str]] = set()
         values: list[tuple[str, str, str, int, int]] = []
         units: dict[str, tuple[str, str, str]] = {}
         compared: list[tuple[str, int, int]] = []
@@ -961,13 +962,17 @@ def emit() -> Path:
                     )
                 for unit_kind, code, county, answer, votes in (
                     lines.group_by("unit", "code", "county", "answer").agg(pl.col("votes").sum()).iter_rows()
-                    if fine in cs.minted
-                    else []
                 ):
                     if unit_kind == "precinct":
                         unit = cs.unit("us.precinct", code)
+                        if area in districts.values():
+                            memberships.add((unit, area, day))
+                        if fine not in cs.minted:
+                            continue
                         if code not in existing:
                             units[code] = (state, county, day)
+                    elif fine not in cs.minted:
+                        continue
                     elif unit_kind in ("county", "place"):
                         unit = counties[code][0]
                     else:
@@ -1037,6 +1042,14 @@ def emit() -> Path:
                 },
             ),
         )
+        for unit, area, day in sorted(memberships):
+            cs.add(
+                "reporting_unit_area",
+                unit_id=unit,
+                area_id=area,
+                valid_from=date.fromisoformat(day),
+                valid_to=date.fromisoformat(day) + timedelta(days=1),
+            )
         drift = [item for item in compared if item[1] or item[2]]
         print(f"{len(compared)} questions with both MEDSL and official totals, {len(drift)} differ: {drift[:20]}")
         print(f"{len(values)} values, {len(units)} new precincts, {len(persons)} judges")
