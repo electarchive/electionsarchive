@@ -760,4 +760,20 @@ def emit() -> Path:
             for person in dict.fromkeys(found[1:]):
                 if person != found[0] and person not in cs.survivors:
                     cs.merge(person, found[0])
+        for row in conn.execute(
+            """select n.id, n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from (
+                 select n.*, row_number() over (
+                   partition by n.entity_id, n.lang, n.script
+                   order by c.pipeline = o.pipeline desc, n.recorded_from, n.id) as rank
+                 from name n join changeset c on c.id = n.changeset_id
+                 join entity e on e.id = n.entity_id join changeset o on o.id = e.changeset_id
+                 where n.is_preferred and n.valid_from is null and n.valid_to is null
+                   and not exists (select from entity_merge m where m.entity_id = n.entity_id)
+               ) n where n.rank > 1""",
+        ).fetchall():
+            cs.add(
+                "name",
+                **dict(zip(("id", "entity_id", "text", "lang", "script", "kind", "source_id"), row, strict=True)),
+                is_preferred=False,
+            )
         return cs.write()

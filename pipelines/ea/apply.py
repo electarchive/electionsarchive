@@ -219,6 +219,31 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 target, listed, listed, staged, conflict
             )
         )
+        if table == "name" and "is_preferred" in columns:
+            undated = sql.SQL(" and s.valid_from is null and s.valid_to is null" if "valid_from" in columns else "")
+            conn.execute(
+                sql.SQL(
+                    """update public.name p set is_preferred = true from {} s
+                       where s.id is null and s.is_preferred and not p.is_preferred and {}"""
+                ).format(
+                    staged,
+                    sql.SQL(" and ").join(
+                        sql.SQL("p.{0} is not distinct from s.{0}").format(sql.Identifier(column))
+                        for column in compared
+                        if column != "is_preferred"
+                    ),
+                )
+            )
+            conn.execute(
+                sql.SQL(
+                    """update public.name p set is_preferred = false from {} s
+                       where s.is_preferred and p.is_preferred and p.entity_id = s.entity_id and p.lang = s.lang
+                         and p.text <> s.text and p.valid_from is null and p.valid_to is null{}"""
+                ).format(
+                    staged,
+                    sql.SQL(" and p.script is not distinct from s.script" if "script" in columns else "") + undated,
+                )
+            )
         if compared:
             others = sql.SQL(", ").join(map(sql.Identifier, compared))
             conn.execute(
