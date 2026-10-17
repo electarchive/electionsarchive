@@ -855,6 +855,7 @@ export const reportingUnitArea = pgTable("reporting_unit_area", {
 	valid: daterange().notNull().generatedAlwaysAs(sql`daterange(valid_from, valid_to, '[)'::text)`),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	approximate: boolean().default(false).notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.unitId, table.areaId, table.valid], name: "reporting_unit_area_pkey"}),
 	index("reporting_unit_area_area_idx").using("btree", table.areaId.asc().nullsLast()),
