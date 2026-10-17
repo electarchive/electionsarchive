@@ -7642,6 +7642,7 @@ export const people = {
           ) lp
           left join entity_merge pm on pm.entity_id = lp.party
           where cd.person_id in (select id from ids) and cd.role in ('head', 'list_member')
+            and o.kind <> 'write_in'
         ),
         lines as materialized (
           select o.k from contest_option o
