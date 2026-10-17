@@ -414,6 +414,18 @@ def emit() -> Path:
                     artifact = raw.cached(SOURCE, url(tenant, decade))
                     if artifact.bytes > 1000:
                         cs.artifact(artifact, sources[state])
+        gazetteer = cs.source("U.S. Census Bureau", "2020 Gazetteer Files")
+        if gazetteer in cs.minted:
+            cs.add(
+                "source",
+                id=gazetteer,
+                kind="official_body",
+                publisher="U.S. Census Bureau",
+                title="2020 Gazetteer Files",
+                url="https://www.census.gov/geographies/reference-files/time-series/geo/gazetteer-files.html",
+                license="Public domain",
+            )
+        cs.artifact(raw.cached(SOURCE, GAZETTEER), gazetteer)
 
         nation = cs.polity("US")
         states: dict[str, str] = dict(
