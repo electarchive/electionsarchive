@@ -4,6 +4,7 @@ import re
 import zipfile
 from collections import Counter
 from datetime import date, timedelta
+from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
 
@@ -18,7 +19,8 @@ from ea.sources.us.clerk import LEGISLATORS, STATES, plain
 from ea.store import DATA, connect
 
 SOURCE = "us.thea"
-VERSION = "1"
+VERSION = "2"
+APART = 24 * 365
 PARSED = DATA / "parsed" / SOURCE
 DERIVED = 1
 LOWER = f"{thea.UPLOADS}/2025/10/clea_lc_20251015-L-Z.xlsx"
@@ -502,10 +504,46 @@ def emit() -> Path:
                     identified.add((scheme, person))
             persons[member] = person
 
+        runs: dict[tuple[str, str], dict[int | None, list[date]]] = {}
+        for state, text, district, day in (
+            frame.filter(pl.col("member").is_null() & (pl.col("kind") == "candidate"))
+            .select("state", "name", "district", "day")
+            .unique()
+            .sort("day")
+            .iter_rows()
+        ):
+            handle = slug(str(text))
+            runs.setdefault((state, handle), {}).setdefault(None if "-" in handle else district, []).append(day)
+        held: dict[str, UUID] = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.person"]).fetchall()
+        )
+        eras: dict[tuple[str, str, int | None, date], str] = {}
+        for (state, handle), places in runs.items():
+            segments: list[tuple[int | None, list[date]]] = []
+            for district, days in places.items():
+                segments.append((district, [days[0]]))
+                for earlier, later in pairwise(days):
+                    if (later - earlier).days > APART:
+                        segments.append((district, []))
+                    segments[-1][1].append(later)
+            segments.sort(key=lambda segment: segment[1][0])
+            original = f"{state}:{handle}"
+            for index, (district, days) in enumerate(segments):
+                key = original
+                if index and str(held.get(original)) not in cs.merged:
+                    place = "" if district is None else f"{district}:"
+                    key = f"{original}:{place}{days[0].year}"
+                for day in days:
+                    eras[state, handle, district, day] = key
+
         def person_of(row: dict) -> UUID:
             if row["member"] is not None:
                 return persons[row["member"]]
-            person = cs.key(f"{SOURCE}.person", f"{row['state']}:{slug(str(row['name']))}")
+            handle = slug(str(row["name"]))
+            key = eras[row["state"], handle, None if "-" in handle else row["district"], row["day"]]
+            person = cs.key(f"{SOURCE}.person", key)
+            if person in cs.minted and (old := held.get(f"{row['state']}:{handle}")) is not None:
+                cs.renamed[str(person)] = str(old)
             if person in cs.minted and person not in created:
                 created.add(person)
                 cs.add("person", id=person)

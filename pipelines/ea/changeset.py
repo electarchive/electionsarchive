@@ -15,6 +15,7 @@ from ea.store import DATA, Connection
 
 NAMESPACE = uuid5(NAMESPACE_URL, "https://electionsarchive.com/")
 LATE = ("name", "slug", "external_id", "note", "citation", "entity_merge")
+UUID_TEXT = re.compile(r"[0-9a-f]{8}(?:-[0-9a-f]{4}){3}-[0-9a-f]{12}")
 TRANSLITERATION = str.maketrans(
     {
         "ß": "ss",
@@ -71,9 +72,9 @@ class Changeset:
         self._keyed: set[tuple[str, str]] = set()
         self.renamed: dict[str, str] = {}
         self.survivors: dict[UUID, UUID] = {}
-        self.merged = [
-            (str(into), str(entity)) for entity, into in conn.execute("select entity_id, into_id from entity_merge")
-        ]
+        self.merged: dict[str, list[str]] = {}
+        for entity, into in conn.execute("select entity_id, into_id from entity_merge"):
+            self.merged.setdefault(str(into), []).append(str(entity))
 
     def add(self, table: str, **row: object) -> None:
         self.rows.setdefault(table, []).append(row)
@@ -96,7 +97,8 @@ class Changeset:
         cache = f"external_id:{scheme}"
         id = self._resolve(cache, value, "select value, entity_id from external_id where scheme = %s", [scheme])
         if id in self.minted and (scheme, value) not in self._keyed:
-            for new, old in [*self.renamed.items(), *self.merged]:
+            merged = [(new, old) for new in UUID_TEXT.findall(value) for old in self.merged.get(new, ())]
+            for new, old in [*self.renamed.items(), *merged]:
                 if new in value and (previous := self._known[cache].get(value.replace(new, old))) is not None:
                     self.minted.discard(id)
                     id = self._known[cache][value] = previous
@@ -108,7 +110,7 @@ class Changeset:
     def merge(self, entity: UUID, into: UUID) -> None:
         self.add("entity_merge", entity_id=entity, into_id=into)
         self.survivors[entity] = into
-        self.merged.append((str(into), str(entity)))
+        self.merged.setdefault(str(into), []).append(str(entity))
 
     def polity(self, iso: str) -> UUID:
         return self._resolve("polity", iso, "select iso_code, id from polity where iso_code is not null")
