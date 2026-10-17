@@ -1,5 +1,6 @@
 import json
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -26,7 +27,7 @@ ANSWERS = {
     "FOR": ("YES", "FOR"),
     "AGAINST": ("NO", "FOR"),
 }
-TAG = r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question))\D{0,25}?\b(\d+|[A-Z])\b"
+TAG = r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure))\D{0,25}?\b(\d+|[A-Z])\b"
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
 UTAH = {
     date(2014, 11, 4): (
@@ -45,6 +46,14 @@ UTAH = {
         "2025",
         "https://vote.utah.gov/wp-content/uploads/2021/02/2020-General-Election-Statewide-Canvass.xlsx",
     ),
+}
+OREGON = {
+    date(2012, 11, 6): ("20150430200315", "results-11-2012.pdf"),
+    date(2014, 11, 4): ("20150908230107", "results-2014-general-election.pdf"),
+    date(2016, 11, 8): ("20170510104052", "november-2016-results.pdf"),
+    date(2018, 1, 23): ("20190503173837", "january-2018-results.pdf"),
+    date(2018, 11, 6): ("20190912090619", "november-2018-official-results.pdf"),
+    date(2020, 11, 3): ("20210124071153", "november-general-2020.pdf"),
 }
 METHOD = (
     "County totals from {document}, the state's certified results. They replace the totals transcribed from the "
@@ -70,6 +79,12 @@ DOCUMENTS = {
         "https://vote.utah.gov",
         "the Utah Lieutenant Governor's statewide canvass workbook",
     ),
+    "OR": (
+        "Oregon Secretary of State",
+        "Official results, abstract of votes",
+        "https://sos.oregon.gov/elections/Pages/electionhistory.aspx",
+        "the Oregon Secretary of State's abstract of votes",
+    ),
 }
 
 
@@ -89,6 +104,12 @@ def wikipedia(conn) -> list[tuple[str, date]]:
 def link(state: str, day: date) -> tuple[str, str]:
     if state == "UT":
         return SOURCE, WAYBACK.format(*UTAH[day]) if day in UTAH else ""
+    if state == "OR":
+        return SOURCE, (
+            WAYBACK.format(OREGON[day][0], "https://sos.oregon.gov/elections/Documents/results/" + OREGON[day][1])
+            if day in OREGON
+            else ""
+        )
     owner, url = (
         (wa_local.SOURCE, wa_local.PRECINCTS.format(day=day).replace("_allstateprecincts.csv", "_AllCounties.csv"))
         if state == "WA"
@@ -105,7 +126,7 @@ def fetch() -> None:
         source, url = link(state, day)
         if source == SOURCE and url:
             try:
-                raw.fetch(SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx"}[state])
+                raw.fetch(SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "OR": ".pdf"}[state])
             except httpx.HTTPStatusError as error:
                 print(f"{state} {day}: {error}")
 
@@ -130,7 +151,52 @@ def parse() -> None:
             path = raw.cached(source, url).path
         except LookupError:
             continue
-        if state == "UT":
+        if state == "OR":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                title = None
+                answers = None
+                for line in page.splitlines():
+                    if matched := re.fullmatch(r"(?i)\s*(?:state\s+)?measure\s+(?:no\.\s*)?(\d+)\s*", line):
+                        title, answers = f"Measure {matched[1]}", None
+                    elif title and (
+                        matched := re.fullmatch(
+                            r"\s*County\s+(\*?)(\w+)\s+(\*?)(\w+)(?:\s+County\s+(\*?)(\w+)\s+(\*?)(\w+))?\s*", line
+                        )
+                    ):
+                        groups = matched.groups()[4:] if matched[5] is not None else matched.groups()[:4]
+                        winner = groups[1] if groups[0] else groups[3] if groups[2] else None
+                        answers = (groups[1], groups[3], winner, matched[5] is not None)
+                    elif (
+                        title
+                        and answers
+                        and (
+                            matched := re.fullmatch(
+                                r"\s*(\S.*?)\s{2,}([\d,]+)\s+([\d,]+)(?:\s+(\S.*?)\s{2,}([\d,]+)\s+([\d,]+))?\s*", line
+                            )
+                        )
+                        and (matched[4] is not None) == answers[3]
+                    ):
+                        county, yes, no = matched.groups()[3:] if answers[3] else matched.groups()[:3]
+                        if county.strip().upper() == "TOTAL":
+                            title = answers = None
+                            continue
+                        records.append((county, title, answers[0], yes, number, answers[2]))
+                        records.append((county, title, answers[1], no, number, answers[2]))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                    "winner": pl.String,
+                },
+                orient="row",
+            )
+        elif state == "UT":
             records = []
             reader = fastexcel.read_excel(str(path))
             for sheet in reader.sheet_names:
@@ -147,9 +213,11 @@ def parse() -> None:
                         if row[0] is None or row[0].strip().upper().startswith("TOTAL"):
                             break
                         records.append((row[0], title, rows[header][j], row[j]))
-            table = pl.DataFrame(records, schema=["county", "office", "answer", "votes"], orient="row").with_columns(
-                votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64).cast(pl.String)
-            )
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            ).with_columns(votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64).cast(pl.String))
         elif state == "WA":
             table = (
                 pl.read_csv(path, infer_schema=False, encoding="utf8-lossy")
@@ -183,6 +251,12 @@ def parse() -> None:
                 .replace_strict(names[state], default=None),
                 label=pl.col("answer").str.strip_chars().str.extract(r"(?i)^(\w+)").str.to_uppercase(),
                 votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64, strict=False),
+                page=pl.col("page").cast(pl.Int64) if "page" in table.columns else pl.lit(None, pl.Int64),
+                winner=pl.col("winner")
+                .str.to_uppercase()
+                .replace_strict({label: answer for label, (answer, _) in ANSWERS.items()}, default=None)
+                if "winner" in table.columns
+                else pl.lit(None, pl.String),
             ).filter(pl.col("label").is_in(list(ANSWERS)))
         )
     frame = pl.concat(frames).with_columns(
@@ -199,7 +273,7 @@ def parse() -> None:
             pl.col("fips").is_null().sum().over("state", "day", "office") == 0,
             pl.col("fips").n_unique().over("state", "day", "office") == pl.col("counties"),
         )
-        .group_by("state", "day", "url", "office", "pair", "fips", "answer")
+        .group_by("state", "day", "url", "page", "winner", "office", "pair", "fips", "answer")
         .agg(pl.col("votes").sum())
         .sort("state", "day", "office", "fips", "answer")
         .write_parquet(PARSED / "canvass.parquet")
@@ -257,7 +331,7 @@ def emit() -> Path:
             orient="row",
         )
         questions = (
-            frame.group_by("state", "day", "url", "office", "pair")
+            frame.group_by("state", "day", "url", "page", "winner", "office", "pair")
             .agg(
                 yes=pl.col("votes").filter(pl.col("answer") == "YES").sum(),
                 no=pl.col("votes").filter(pl.col("answer") == "NO").sum(),
@@ -316,6 +390,17 @@ def emit() -> Path:
             if result_set not in cs.minted:
                 continue
             old = UUID(row["set"])
+            outcomes = conn.execute(
+                "select option_id, kind, seats from outcome where result_set_id = %s", [old]
+            ).fetchall()
+            options = {"YES": UUID(row["yes_option"]), "NO": UUID(row["no_option"])}
+            if row["winner"] is not None and [option for option, kind, _ in outcomes if kind == "won"] != [
+                options[row["winner"]]
+            ]:
+                print(
+                    f"{row['key']}: the document marks {row['winner']} as passing, unlike the recorded outcome, skipped"
+                )
+                continue
             cs.add(
                 "result_set",
                 id=old,
@@ -353,13 +438,11 @@ def emit() -> Path:
                 "citation",
                 entity_id=result_set,
                 source_id=sources[row["state"]],
-                locator={"url": row["url"], "artifact": str(artifacts[row["url"]]), "race": row["office"]},
+                locator={"url": row["url"], "artifact": str(artifacts[row["url"]]), "race": row["office"]}
+                | ({} if row["page"] is None else {"page": row["page"]}),
             )
-            for option, kind, seats in conn.execute(
-                "select option_id, kind, seats from outcome where result_set_id = %s", [old]
-            ).fetchall():
+            for option, kind, seats in outcomes:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
-            options = {"YES": UUID(row["yes_option"]), "NO": UUID(row["no_option"])}
             for fips, answer, votes in (
                 frame.filter(
                     pl.col("state") == row["state"], pl.col("day") == row["day"], pl.col("office") == row["office"]
