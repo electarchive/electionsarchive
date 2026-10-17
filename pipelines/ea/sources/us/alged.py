@@ -87,7 +87,9 @@ def parse() -> None:
         (pl.col("winner") == "win").alias("won"),
     )
     frame = frame.filter(
-        pl.col("fips").str.contains(r"^(\d{5}|\d{7})$") & ~((pl.col("state") == "NC") & (pl.col("year") >= 2014))
+        pl.col("fips").str.contains(r"^(\d{5}|\d{7})$"),
+        ~((pl.col("state") == "NC") & (pl.col("year") >= 2014)),
+        ~((pl.col("fips") == "06075") & (pl.col("office") == "County Legislature")),
     ).with_columns(
         fips=pl.when(pl.col("office") == "School Board").then(pl.lit("sd") + pl.col("fips")).otherwise("fips")
     )

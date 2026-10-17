@@ -1273,7 +1273,7 @@ def emit() -> Path:
             return re.sub(r"\b(Ii|Iii|Iv)\b", lambda match: match[0].upper(), text)
 
         def party(state: str, label: str | None) -> tuple[UUID | None, bool]:
-            label = None if label is None else label.strip().removesuffix(" PARTY")
+            label = None if label is None else label.strip().upper().removesuffix(" PARTY")
             if not label or label in NONPARTISAN:
                 return None, False
             label = EXPANDED.get(label, label)
@@ -1490,9 +1490,9 @@ def emit() -> Path:
                 kind="standard",
                 valid_from=None,
             )
-        systems = {"fptp": cs.key("us.electoral_system", "fptp"), "block": cs.key("us.electoral_system", "block")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "two_round")}
         if cs.minted & set(systems.values()):
-            raise ValueError("the fptp and block systems must already exist")
+            raise ValueError("the fptp, block, and two_round systems must already exist")
 
         owners: dict[tuple[str, str], UUID] = {}
         elections: dict[tuple[date, str], UUID] = {}
@@ -1623,7 +1623,9 @@ def emit() -> Path:
                 district_area_id=area,
                 magnitude=magnitude,
                 round_number=1,
-                electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
+                electoral_system_id=systems[
+                    "two_round" if magnitude == 1 and state in ("GA", "LA") else "fptp" if magnitude == 1 else "block"
+                ],
                 default_result_kind="counted",
                 term="remainder" if row["remainder"] else "full",
             )
