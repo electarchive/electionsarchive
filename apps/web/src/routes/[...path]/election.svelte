@@ -390,6 +390,7 @@
           (other) =>
             other !== race && other.name === race.name && other.count === 1,
         );
+      const isTallied = isSplit && districts.length === race.count;
       const noun = race.places?.levels[0]?.noun ?? "";
       return {
         ...race,
@@ -435,8 +436,9 @@
               }
             : seated.length > 1 || (seated.length > 0 && race.count > 1)
               ? {
-                  total:
-                    race.size != null && race.size <= total + 2
+                  total: isTallied
+                    ? race.count
+                    : race.size != null && race.size <= total + 2
                       ? race.size
                       : total,
                   parts: units
@@ -458,12 +460,19 @@
                           ? row.label
                           : (row.short ?? row.label),
                         color: swatch(row.color, row.key),
-                        value: row.seats ?? 0,
-                        delta: change == null ? undefined : delta,
+                        value: isTallied
+                          ? districts.filter((place) =>
+                              row.keys.includes(
+                                legend[place.leader ?? -1]?.key ?? "",
+                              ),
+                            ).length
+                          : (row.seats ?? 0),
+                        delta: change == null || isTallied ? undefined : delta,
                       };
                     }),
                   isCount: true,
-                  isWhole: race.size != null && race.size <= total + 2,
+                  isWhole:
+                    isTallied || (race.size != null && race.size <= total + 2),
                 }
               : {
                   total: 1,
@@ -561,11 +570,7 @@
                   : seated.length > 0 && !race.isOffice && isSplit
                     ? m.race_lede_split({
                         party: named(leader),
-                        seats: count(
-                          districts.length === race.count
-                            ? wins
-                            : (leader.seats ?? 0),
-                        ),
+                        seats: count(isTallied ? wins : (leader.seats ?? 0)),
                         total: count(race.count),
                         noun,
                         share: percent(leader.share),
