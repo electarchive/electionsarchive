@@ -173,7 +173,11 @@ def parse() -> None:
                 return_dtype=pl.String,
             ),
         )
-        .with_columns(kind=pl.when(pl.col("code").str.len_chars() > 5).then(pl.lit("place")).otherwise("kind"))
+        .with_columns(
+            kind=pl.when((pl.col("kind") == "county") & (pl.col("code").str.len_chars() > 5))
+            .then(pl.lit("place"))
+            .otherwise("kind")
+        )
         .filter(~((pl.col("code") == "51515") & (pl.col("year") > BEDFORD.year)))
         .filter(~((pl.col("year") == 2004) & (pl.col("state_po") == "AK")))
     )
@@ -249,9 +253,7 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                         "statewide": r"GOVERNOR|ATTORNEY GENERAL|SECRETARY OF|TREASURER|AUDITOR|COMPTROLLER|CONTROLLER|"
                         r"CHIEF FINANCIAL|SUPERINTENDENT|COMMISSIONER|SUPREME|APPEALS|BOARD OF EDUCATION|REGENT|"
                         r"PUBLIC SERVICE|PUBLIC UTILITIES|MINE INSPECTOR|TRUSTEE",
-                    }.get(
-                        chamber, r"U\.?S\.? HOUSE|HOUSE OF REP"
-                    )
+                    }.get(chamber, r"U\.?S\.? HOUSE|HOUSE OF REP")
                 )
                 & (
                     (pl.col("state_po") != "DC")
@@ -282,10 +284,14 @@ def precincts(files: dict[tuple[str, int], Path]) -> pl.DataFrame:
                 writein=pl.col("writein").str.to_uppercase() == "TRUE",
                 mode=pl.col("mode").fill_null("").str.to_uppercase(),
                 votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-                office=pl.col("office").str.to_uppercase() if chamber in ("state", "statewide") else pl.lit(None, pl.String),
+                office=pl.col("office").str.to_uppercase()
+                if chamber in ("state", "statewide")
+                else pl.lit(None, pl.String),
                 seat=pl.col("district") if chamber in ("state", "statewide") else pl.lit(None, pl.String),
                 party=pl.col("party_detailed") if chamber in ("state", "statewide") else pl.lit(None, pl.String),
-                stage=pl.col("stage").str.to_uppercase() if chamber in ("state", "statewide") else pl.lit(None, pl.String),
+                stage=pl.col("stage").str.to_uppercase()
+                if chamber in ("state", "statewide")
+                else pl.lit(None, pl.String),
                 magnitude=pl.col("magnitude").cast(pl.String)
                 if chamber == "statewide" and year > 2016
                 else pl.lit(None, pl.String),
@@ -452,8 +458,12 @@ def emit() -> Path:
                 scheme_code=scheme,
                 code=code,
                 parent_id=parent,
-                area_relation="within",
-                area_id=cs.area("us.county", "51019") if code == "51515" else area,
+                area_relation="equals" if kind == "district" else "within",
+                area_id=cs.area("us.county", "51019")
+                if code == "51515"
+                else cs.area("us.sldl", f"AK:{int(code[-2:])}")
+                if kind == "district"
+                else area,
                 kind="aggregate" if kind == "aggregate" else "standard",
                 valid_from=days[year] if kind == "district" else None,
                 valid_to=days[year] + timedelta(days=1) if kind == "district" else BEDFORD if code == "51515" else None,
@@ -467,9 +477,12 @@ def emit() -> Path:
             if contest in cs.minted:
                 raise ValueError(f"{key}: the contest must already exist")
             election, official = conn.execute(
-                """select c.election_id, sum(v.value) from contest c
+                """select c.election_id,
+                          coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
+                                   sum(v.value) filter (where v.measure = 1 and v.option_k <> 0))
+                   from contest c
                    join result_set rs on rs.contest_id = c.id and rs.is_default
-                   join result_value v on v.result_set_k = rs.k and v.measure = 4 and v.option_k = 0
+                   join result_value v on v.result_set_k = rs.k
                    where c.id = %s group by c.election_id""",
                 [contest],
             ).fetchone() or (None, None)
@@ -517,7 +530,42 @@ def emit() -> Path:
                     raise ValueError(f"{key}: {candidate} matches no single option: {scores[:2]}")
                 options[(year, state, candidate)] = scores[0][2]
             counted = lines.filter(pl.col("measure") == 1)["votes"].sum()
-            result_sets[(year, state)] = cs.key(f"{SOURCE}.result_set", f"{key}:county")
+            previous = (
+                conn.execute(
+                    """select id, election_id, contest_id, stage, kind, source_id, is_default, as_of, completeness,
+                              supersedes_id from result_set
+                       where id = (select entity_id from external_id where scheme = %s and value = %s)""",
+                    [f"{SOURCE}.result_set", f"{key}:county"],
+                ).fetchone()
+                if state == "AK"
+                else None
+            )
+            if previous is not None:
+                cs.add(
+                    "result_set",
+                    **dict(
+                        zip(
+                            (
+                                "id",
+                                "election_id",
+                                "contest_id",
+                                "stage",
+                                "kind",
+                                "source_id",
+                                "is_default",
+                                "as_of",
+                                "completeness",
+                                "supersedes_id",
+                            ),
+                            previous,
+                            strict=True,
+                        )
+                    ),
+                    status="superseded",
+                )
+            result_sets[(year, state)] = cs.key(
+                f"{SOURCE}.result_set", f"{key}:county" + (":districts" if state == "AK" else "")
+            )
             cs.add(
                 "result_set",
                 id=result_sets[(year, state)],
@@ -529,6 +577,7 @@ def emit() -> Path:
                 source_id=source,
                 is_default=False,
                 completeness=round(float(counted) / float(official), 4),
+                supersedes_id=None if previous is None else previous[0],
             )
 
         minted = {pair for pair, result_set in result_sets.items() if result_set in cs.minted}
@@ -586,6 +635,8 @@ def emit() -> Path:
             .agg(pl.col("day").min())
             .iter_rows()
         ):
+            if code in units:
+                continue
             polity, parent, area = states[state]
             scheme = "us.ak_house_district" if kind == "district" else "us.aggregate"
             cs.add(
@@ -595,8 +646,8 @@ def emit() -> Path:
                 scheme_code=scheme,
                 code=code,
                 parent_id=parent,
-                area_relation="within",
-                area_id=area,
+                area_relation="equals" if kind == "district" else "within",
+                area_id=cs.area("us.sldl", f"AK:{int(code[-2:])}") if kind == "district" else area,
                 kind="standard" if kind == "district" else "aggregate",
                 valid_from=day if kind == "district" else None,
                 valid_to=day + timedelta(days=1) if kind == "district" else None,
