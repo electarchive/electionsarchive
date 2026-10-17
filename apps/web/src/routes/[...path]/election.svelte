@@ -711,7 +711,16 @@
               {/if}
             </div>
             <div class="grid content-end gap-3">
-              {@render balance(race.balance, index === 0)}
+              {#if race.whole == null}
+                {@render balance(race.balance, index === 0)}
+              {:else}
+                <div class="grid gap-1">
+                  <p class="text-[0.8125rem] text-muted-foreground">
+                    {m.board_won()}
+                  </p>
+                  {@render balance(race.balance, index === 0)}
+                </div>
+              {/if}
               {#if race.whole != null}
                 <div class="grid gap-1">
                   <p class="text-[0.8125rem] text-muted-foreground">
