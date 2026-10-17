@@ -68,6 +68,8 @@ ILLINOIS = "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh
 IL_TOTALS = "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1Ze1iXEwZay4hPK3eAEa%2f2we615l6oeLwg6WnqfsqBpfS0q%2bmbe1kY9qqK4nL4jdXPvz3PxN7kL%2fldHLhodL0QRQ%3d"
 IL_WRITE_INS = ("33561", "33562", "33567")
 COLUMBIA = "https://electionresults.dcboe.org/{}"
+LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob=20240323/{}.htm"
+LA_RACES = {"65031": "Democratic", "65033": "Republican"}
 KENTUCKY = "https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf"
 DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
@@ -261,6 +263,11 @@ def fetch() -> None:
         SOURCE, COLUMBIA.format("Downloads/Reports/June_4_2024_Primary_Election_Certified_Results.csv"), suffix=".csv"
     )
     raw.fetch(SOURCE, COLUMBIA.format("cityWide/getCityWide/2024-Primary-Election"), suffix=".json")
+    raw.fetch(SOURCE, LOUISIANA.format("RacesCandidates_Multiparish"), suffix=".json")
+    for race in LA_RACES:
+        raw.fetch(SOURCE, LOUISIANA.format(f"VotesRaceByParish/Votes_{race}"), suffix=".json")
+        for parish in range(1, 65):
+            raw.fetch(SOURCE, LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"), suffix=".json")
     for url in (ILLINOIS, IL_TOTALS):
         raw.fetch(SOURCE, url, suffix=".txt")
     for office, district in PA_OFFICES:
@@ -468,6 +475,11 @@ def parse() -> None:
         ("AR", "county", ARKANSAS.format("GetContestResults", "&contestType=FED")),
         *(("PA", "county", PENNSYLVANIA.format(office, district)) for office, district in PA_OFFICES),
         ("IL", "county", ILLINOIS),
+        *(
+            ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
+            for race in LA_RACES
+            for parish in range(1, 65)
+        ),
         ("DC", "precinct", COLUMBIA.format("Downloads/Reports/June_4_2024_Primary_Election_Certified_Results.csv")),
         ("UT", "county", SUMMIT),
         ("KS", "precinct", KANSAS),
@@ -832,6 +844,47 @@ def parse() -> None:
                                         }
                                     )
             frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
+        elif state == "LA":
+            race, parish = re.findall(r"Votes_(\d+)_(\d+)", url)[0]
+            labels = {
+                choice["ID"]: re.sub(r" \(\w+\)$", "", choice["Desc"])
+                for contest in json.loads(
+                    raw.cached(SOURCE, LOUISIANA.format("RacesCandidates_Multiparish")).path.read_text()
+                )["Races"]["Race"]
+                if contest["ID"] == race
+                for choice in contest["Choice"]
+            }
+            frame = pl.DataFrame(
+                [
+                    {
+                        "county": f"22{int(parish) * 2 - 1:03d}",
+                        "precinct": entry["Precinct"].replace("/", " "),
+                        "office": "President",
+                        "district": None,
+                        "party": LA_RACES[race],
+                        "candidate": labels[choice["ID"]],
+                        "votes": choice["VoteTotal"],
+                    }
+                    for entry in json.loads(raw.cached(SOURCE, url).path.read_text())["Precincts"]["Precinct"]
+                    for choice in entry["Choice"]
+                ],
+                schema=dict.fromkeys(COLUMNS, pl.String),
+            )
+            reported = {
+                labels[choice["ID"]]: int(choice["VoteTotal"])
+                for place in json.loads(
+                    raw.cached(SOURCE, LOUISIANA.format(f"VotesRaceByParish/Votes_{race}")).path.read_text()
+                )["Parishes"]["Parish"]
+                if place["ParishValue"] == parish
+                for choice in place["Choice"]
+            }
+            if any(
+                reported[candidate] != votes
+                for candidate, votes in frame.group_by("candidate")
+                .agg(pl.col("votes").cast(pl.Int64).sum())
+                .iter_rows()
+            ):
+                raise ValueError(f"LA {race}: parish {parish}'s precincts do not add up to its total")
         elif state == "DC":
             frame = (
                 pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False)
@@ -1713,7 +1766,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC"):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC", "LA"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -1777,6 +1830,8 @@ def parse() -> None:
             if url == ILLINOIS
             else date(2024, 6, 4)
             if state == "DC"
+            else date(2024, 3, 23)
+            if state == "LA"
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -2175,6 +2230,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "DC"
+                else (
+                    "Louisiana Secretary of State",
+                    "Election results, March 23, 2024 presidential preference primary, by precinct",
+                    "https://voterportal.sos.la.gov/graphical",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "LA"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
