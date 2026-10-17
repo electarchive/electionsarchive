@@ -284,11 +284,11 @@ def emit() -> Path:
             cs.add(
                 "source",
                 id=sources[state],
-                kind="official_body",
+                kind="aggregator" if state in elstats.HELD else "official_body",
                 publisher=publisher,
                 title=elstats.TITLE,
                 url=site,
-                license="Public record",
+                license=elstats.HELD.get(state, "Public record"),
             )
             cs.artifact(raw.cached(SOURCE, url(tenant, district)), sources[state])
         sources["MA"] = cs.source(elstats.MA_PUBLISHER, elstats.TITLE)
