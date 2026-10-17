@@ -558,19 +558,6 @@ def emit(
                 else f"{contest_key}:folded",
             )
             missing = int(row["counties"] or 0) - len(row["present"])
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=sources[year if cite is None else state],
-                is_default=True,
-                supersedes_id=None if revised is None else revised[0],
-                completeness=None,
-            )
             if revised is not None:
                 cs.add(
                     "result_set",
@@ -589,6 +576,19 @@ def emit(
                     "select option_id, kind, seats from outcome where result_set_id = %s", [revised[0]]
                 ).fetchall():
                     outcomes.append((revised[0], option, kind, seats))
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=sources[year if cite is None else state],
+                is_default=True,
+                supersedes_id=None if revised is None else revised[0],
+                completeness=None,
+            )
             cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
             if missing > 0:
                 cs.add(

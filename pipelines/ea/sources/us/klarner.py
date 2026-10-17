@@ -649,19 +649,6 @@ def emit() -> Path:
                 if first not in cs.minted and group["caseid"].is_in(list(CORRECTED)).any()
                 else first
             )
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=elections[(sab, year, month, day, etype)],
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=source,
-                is_default=contest_key not in RANKED_ROUNDS and first not in demoted,
-                supersedes_id=None if result_set == first else first,
-                completeness=None if group["votes"].is_null().any() else 1,
-            )
             if result_set != first:
                 cs.add(
                     "result_set",
@@ -680,6 +667,19 @@ def emit() -> Path:
                     "select option_id, kind, seats from outcome where result_set_id = %s", [first]
                 ).fetchall():
                     cs.add("outcome", result_set_id=first, option_id=option, kind=outcome, seats=count)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=elections[(sab, year, month, day, etype)],
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=contest_key not in RANKED_ROUNDS and first not in demoted,
+                supersedes_id=None if result_set == first else first,
+                completeness=None if group["votes"].is_null().any() else 1,
+            )
             fresh = result_set in cs.minted
             nomination = "primary" in label
             for index, (candid, rows) in enumerate(group.group_by("candid", maintain_order=True)):
