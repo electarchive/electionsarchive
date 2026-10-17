@@ -89,6 +89,7 @@ ARIZONA = tuple(
         ("20240817161358", "2024_Primary_Election_Official_Canvass_0815b"),
     )
 )
+OKLAHOMA = "https://web.archive.org/web/20240314213731id_/https://oklahoma.gov/content/dam/ok/en/elections/candidate-filing-archives/2024-candidate-filing-archives/2024-ppp-cd-results.pdf"
 MONTANA = "https://web.archive.org/web/20240905130237id_/https://sosmt.gov/wp-content/uploads/wpfd/preview_files/2024-Primary-State-Canvass.pdf"
 WISCONSIN = tuple(
     f"https://web.archive.org/web/{stamp}id_/https://elections.wi.gov/sites/default/files/documents/County%20by%20County%20{name}.pdf"
@@ -307,6 +308,7 @@ def fetch() -> None:
     for url in NEW_YORK:
         raw.fetch(SOURCE, url, suffix=".xlsx")
     raw.fetch(SOURCE, MONTANA, suffix=".pdf")
+    raw.fetch(SOURCE, OKLAHOMA, suffix=".pdf")
     for url in ARIZONA:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
@@ -527,6 +529,7 @@ def parse() -> None:
         *(("WI", "county", url) for url in WISCONSIN),
         *(("NY", "county", url) for url in NEW_YORK),
         ("MT", "county", MONTANA),
+        ("OK", "county", OKLAHOMA),
         *(("AZ", "county", url) for url in ARIZONA),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
@@ -1176,6 +1179,68 @@ def parse() -> None:
                 cells,
                 schema={
                     **dict.fromkeys((*COLUMNS, "write_in"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
+        elif url == OKLAHOMA:
+            pdf = raw.cached(SOURCE, url).path
+            info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+            cells = []
+            for page in range(1, int(info.split("Pages:")[1].split()[0]) + 1):
+                lines: list[list[tuple[str, scan.Box]]] = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][1], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][0][1][1] - box[1]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                district = ""
+                party = ""
+                entries: list[tuple[str, list[int], scan.Box]] = []
+                for line in lines:
+                    text = " ".join(word for word, _ in sorted(line, key=lambda item: item[1][0]))
+                    if found := re.fullmatch(r"District: UNITED STATES CONGRESSIONAL DISTRICT (\d+)", text):
+                        district = f"40{int(found[1]):02d}"
+                    elif text in ("Libertarian", "Republican", "Democrat"):
+                        party = {"Democrat": "Democratic"}.get(text, text)
+                        entries = []
+                    elif found := re.fullmatch(r"(\D*?) ?([\d,]+) ([\d,]+) ([\d,]+) ([\d,]+)(?: [\d.]+%)?", text):
+                        counts = [int(found[position].replace(",", "")) for position in range(2, 6)]
+                        if sum(counts[:3]) != counts[3]:
+                            raise ValueError(f"OK page {page}: {text} does not add up")
+                        if found[1]:
+                            entries.append(
+                                (
+                                    found[1],
+                                    counts,
+                                    max(line, key=lambda item: item[1][0] if "%" not in item[0] else 0)[1],
+                                )
+                            )
+                            continue
+                        if [sum(entry[1][column] for entry in entries) for column in range(4)] != counts:
+                            raise ValueError(f"OK page {page}: {party} in {district} does not sum to {text}")
+                        cells += [
+                            {
+                                "county": district,
+                                "office": "President",
+                                "party": party,
+                                "candidate": name.title(),
+                                "votes": str(counts[3]),
+                                "page": page,
+                                "x0": box[0],
+                                "y0": box[1],
+                                "x1": box[2],
+                                "y1": box[3],
+                            }
+                            for name, counts, box in entries
+                        ]
+                        entries = []
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(COLUMNS, pl.String),
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             )
@@ -2377,7 +2442,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC", "LA"):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC", "LA") or url == OKLAHOMA:
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -2442,7 +2507,7 @@ def parse() -> None:
             else SOUTH_CAROLINA[url]
             if url in SOUTH_CAROLINA
             else date(2024, 3, 5)
-            if state == "AR"
+            if state == "AR" or url == OKLAHOMA
             else date(2024, 4, 23)
             if url.startswith(PENNSYLVANIA.split("?")[0])
             else date(2024, 3, 19)
@@ -2659,7 +2724,9 @@ def emit() -> Path:
                    join name n on n.entity_id = u.area_id and n.kind = 'short' where u.scheme_code = 'us.county'
                    union all select code, id, area_id, 'statewide' from reporting_unit where scheme_code = 'us.state'
                    union all select code, id, area_id, 'Kansas City' from reporting_unit
-                   where scheme_code = 'us.place' and code = '2938000'"""
+                   where scheme_code = 'us.place' and code = '2938000'
+                   union all select code, id, area_id, 'district' from reporting_unit
+                   where scheme_code = 'us.cd' and valid_to is null"""
             ).fetchall()
         }
         columns = (
@@ -2933,6 +3000,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if used in ARIZONA
+                else (
+                    "Oklahoma State Election Board",
+                    "Official Results, Presidential Preferential Primary, March 5, 2024, by congressional district",
+                    "https://oklahoma.gov/elections/elections-results/election-results/2024-election-results/march-ppp-special-elections.html",
+                    "official_body",
+                    "Public record",
+                )
+                if used == OKLAHOMA
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
