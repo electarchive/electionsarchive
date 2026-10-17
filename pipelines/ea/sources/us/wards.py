@@ -1589,6 +1589,10 @@ def emit() -> Path:
         for geoid, (first, seats) in CITYWIDE.items():
             place = cs.area("us.place", geoid)
             city = cs.unit("us.place", geoid)
+            if conn.execute(
+                "select area_id = %s and area_relation = 'equals' from reporting_unit where id = %s", [place, city]
+            ).fetchone() != (True,):
+                raise ValueError(f"{geoid}: the us.place unit does not equal the city's us.place area")
             for contest, election, kind, area in conn.execute(
                 """select ct.id, ct.election_id, ct.kind::text, ct.district_area_id from contest ct
                    join election e on e.id = ct.election_id join area_code c on c.area_id = ct.district_area_id
@@ -1781,12 +1785,12 @@ def emit() -> Path:
             ).fetchall()
             if len(old) != 1:
                 raise ValueError(f"{duplicate}: {len(old)} active ALGED sets")
-            id, k, election, stage, kind, source, as_of, completeness = old[0]
+            id, k, _, stage, kind, source, as_of, completeness = old[0]
             cs.add(
                 "result_set",
                 id=id,
-                election_id=election,
-                contest_id=duplicate,
+                election_id=new_election,
+                contest_id=survivor,
                 stage=stage,
                 kind=kind,
                 source_id=source,
@@ -1896,4 +1900,36 @@ def emit() -> Path:
             f"{len(pairs)} San Francisco supervisor contests merged, {republished} county sets republished,"
             f" {people} people and {elections} elections merged"
         )
+        realigned = 0
+        for row in conn.execute(
+            """select r.id, c.election_id, r.contest_id, r.stage::text, r.kind::text, r.source_id, r.as_of,
+                      r.status::text, r.is_default, r.supersedes_id, r.completeness
+               from result_set r join contest c on c.id = r.contest_id join changeset s on s.id = r.changeset_id
+               where s.pipeline = %s and r.election_id <> c.election_id""",
+            [SOURCE],
+        ).fetchall():
+            realigned += 1
+            cs.add(
+                "result_set",
+                **dict(
+                    zip(
+                        (
+                            "id",
+                            "election_id",
+                            "contest_id",
+                            "stage",
+                            "kind",
+                            "source_id",
+                            "as_of",
+                            "status",
+                            "is_default",
+                            "supersedes_id",
+                            "completeness",
+                        ),
+                        row,
+                        strict=True,
+                    )
+                ),
+            )
+        print(f"{realigned} result sets realigned to their contest's election")
         return cs.write()
