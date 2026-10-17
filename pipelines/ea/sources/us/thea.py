@@ -12,14 +12,14 @@ import fastexcel
 import polars as pl
 from psycopg.types.range import Range
 
-from ea import raw
+from ea import names, raw
 from ea.changeset import Changeset, slug
 from ea.sources import thea
 from ea.sources.us.clerk import LEGISLATORS, STATES, plain
 from ea.store import DATA, connect
 
 SOURCE = "us.thea"
-VERSION = "2"
+VERSION = "3"
 APART = 24 * 365
 PARSED = DATA / "parsed" / SOURCE
 DERIVED = 1
@@ -558,6 +558,7 @@ def emit() -> Path:
         ):
             spans[number] = (first, last)
         contests: set[str] = set()
+        folds: dict[UUID, list[UUID]] = {}
         for (chamber, day, state, district, cst), group in frame.group_by(
             "chamber", "day", "state", "district", "cst", maintain_order=True
         ):
@@ -655,28 +656,6 @@ def emit() -> Path:
                 path=f"us/{state.lower()}/{stamp}-general/{part}{'-special' if special else ''}",
                 entity_id=contest,
             )
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
-            counted = [row["votes"] for row in rows if row["votes"] is not None]
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=parent,
-                contest_id=contest,
-                stage="official",
-                kind="tacit" if tacit else "counted",
-                status="active",
-                source_id=sources[chamber],
-                is_default=True,
-                completeness=None if tacit else 1 if len(counted) == len(rows) else 0,
-            )
-            for applies, kind, body in (
-                (first["roster_winner"], "caveat", ROSTER_NOTE),
-                (precision == "month", "caveat", MONTH_NOTE),
-                (precision == "year", "caveat", YEAR_NOTE),
-            ):
-                if applies:
-                    id = notes.get((result_set, body)) or notes.get((result_set, REWORDED[body]))
-                    cs.add("note", **({"id": id} if id else {}), entity_id=result_set, kind=kind, body_md=body)
             values: list[tuple[UUID | None, int]] = []
             winners: list[UUID] = []
             people: dict[UUID, list[dict]] = {}
@@ -688,10 +667,62 @@ def emit() -> Path:
                         values.append((option, row["votes"]))
                 else:
                     people.setdefault(person_of(row), []).append(row)
+            found = list(people)
+            labels = {person: lines[0]["member_name"] or lines[0]["name"] for person, lines in people.items()}
+            before = {person: list(lines) for person, lines in people.items()}
+            folded = names.fold(
+                [people[person][0]["name"] for person in found],
+                [people[person][0]["member"] is not None for person in found],
+            )
+            duplicates: dict[UUID, UUID] = {}
+            for index, survivor in folded.items():
+                duplicates[found[index]] = found[survivor]
+                people[found[survivor]] += people.pop(found[index])
+            for lines in people.values():
+                lines.sort(key=lambda row: row["line"])
+            counted = [row["votes"] for row in rows if row["votes"] is not None]
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            previous = None
+            if duplicates and result_set not in cs.minted:
+                previous = result_set
+                cs.add(
+                    "result_set",
+                    id=previous,
+                    election_id=parent,
+                    contest_id=contest,
+                    stage="official",
+                    kind="tacit" if tacit else "counted",
+                    status="superseded",
+                    source_id=sources[chamber],
+                    is_default=False,
+                    completeness=None if tacit else 1 if len(counted) == len(rows) else 0,
+                )
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:folded")
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=parent,
+                contest_id=contest,
+                stage="official",
+                kind="tacit" if tacit else "counted",
+                status="active",
+                source_id=sources[chamber],
+                is_default=True,
+                supersedes_id=previous,
+                completeness=None if tacit else 1 if len(counted) == len(rows) else 0,
+            )
+            for applies, kind, body in (
+                (first["roster_winner"], "caveat", ROSTER_NOTE),
+                (precision == "month", "caveat", MONTH_NOTE),
+                (precision == "year", "caveat", YEAR_NOTE),
+            ):
+                if applies:
+                    id = notes.get((result_set, body)) or notes.get((result_set, REWORDED[body]))
+                    cs.add("note", **({"id": id} if id else {}), entity_id=result_set, kind=kind, body_md=body)
             for person, lines in people.items():
                 option_key = f"{contest_key}:{person}"
                 root = cs.key("us.option", option_key)
-                label = lines[0]["member_name"] or lines[0]["name"]
+                label = labels[person]
                 nominated = list(dict.fromkeys(parties[row["party"]] for row in lines if row["party"] is not None))
                 cs.add(
                     "contest_option",
@@ -749,4 +780,41 @@ def emit() -> Path:
                     )
             for option in winners:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+            for duplicate, person in duplicates.items():
+                kept, gone = f"{contest_key}:{person}", f"{contest_key}:{duplicate}"
+                old = cs.key("us.option", gone)
+                if old in cs.minted:
+                    continue
+                lines = before[duplicate]
+                for row in lines:
+                    line = f"{labels[person]} ({row['party_label'] or 'no party'})"
+                    into = cs.key("us.option", f"{kept}:{slug(line)}:{row['line']}")
+                    if len(lines) == 1:
+                        cs.merge(old, into)
+                    else:
+                        line = f"{labels[duplicate]} ({row['party_label'] or 'no party'})"
+                        cs.merge(cs.key("us.option", f"{gone}:{slug(line)}:{row['line']}"), into)
+                if len(lines) > 1:
+                    cs.merge(old, cs.key("us.option", kept))
+                cs.merge(cs.key("us.candidacy", f"{gone}:head"), cs.key("us.candidacy", f"{kept}:head"))
+                folds.setdefault(duplicate, []).append(person)
+            if previous is not None:
+                for option, kind, seats in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [previous]
+                ).fetchall():
+                    cs.add(
+                        "outcome",
+                        result_set_id=previous,
+                        option_id=cs.survivors.get(option, option),
+                        kind=kind,
+                        seats=seats,
+                    )
+        candidacies: dict[UUID, int] = dict(
+            conn.execute(
+                "select person_id, count(*) from candidacy where person_id = any(%s) group by 1", [list(folds)]
+            ).fetchall()
+        )
+        for duplicate, into in folds.items():
+            if len(set(into)) == 1 and candidacies.get(duplicate, 0) == len(into) and duplicate not in cs.minted:
+                cs.merge(duplicate, into[0])
         return cs.write()

@@ -548,6 +548,10 @@ PEOPLE = {
         ("bioguide", "B000028"),
         ("us.alged.person", "15539"),
     ),
+    "Robin Wonsley, Minneapolis Ward 2 council member from 2021, elected as Robin Wonsley Worlobah": (
+        ("us.mpls_evs.person", "robin-wonsley"),
+        ("us.alged.person", "24125"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
