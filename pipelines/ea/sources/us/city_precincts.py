@@ -1,8 +1,11 @@
+import json
 import re
 import zipfile
 from datetime import date, timedelta
 from itertools import pairwise
 from pathlib import Path
+from urllib.parse import urlencode
+from xml.etree import ElementTree
 
 import polars as pl
 
@@ -75,17 +78,58 @@ WA_COUNTIES = {
     "WT": "WHITMAN",
     "YA": "YAKIMA",
 }
+ARCHIVES = {
+    "06097": ("https://sonomaca.elstats3.civera.com", "Sonoma County Registrar of Voters", "SONOMA"),
+    "06013": ("https://pastresults.contracostavote.gov", "Contra Costa County Elections Division", "CONTRA COSTA"),
+}
+ARCHIVE_TITLE = "Election database"
+CLARITY = "https://results.enr.clarityelections.com/CA/Santa_Clara/{}/reports/detailxml.zip"
+SANTA_CLARA = (
+    "43231/113724",
+    "51635/135179",
+    "54209/149818",
+    "106043/272625",
+    "113941/300273",
+    "115971/319093",
+    "120250/334586",
+    "122582/355963",
+)
+CLARITY_PUBLISHER = "Santa Clara County Registrar of Voters"
+CLARITY_TITLE = "Election results"
 KING_PUBLISHER = "King County Elections"
 KING_TITLE = "Final precinct results"
 
 
+def archive(county: str, year: int) -> str:
+    search = {
+        "global": {"years": {"from": year, "to": year}},
+        "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
+        "contests": {
+            "candidates": [],
+            "divisions": [],
+            "offices": [{"free": office} for office in ("City Council", "Town Council", "Mayor")],
+        },
+        "specialElectionsOnly": False,
+        "voterStats": False,
+        "stages": [],
+    }
+    return f"{ARCHIVES[county][0]}/api/download_search.csv?" + urlencode(
+        {"search": json.dumps(search, separators=(",", ":"))}
+    )
+
+
 def fetch() -> None:
     medsl_local.fetch()
-    for url in [*(WA.format(day=day) for day in wa_local.DAYS), *KING.values()]:
+    for url in [
+        *(WA.format(day=day) for day in wa_local.DAYS),
+        *KING.values(),
+        *(archive(county, year) for county in ARCHIVES for year in range(2000, 2026)),
+        *(CLARITY.format(election) for election in SANTA_CLARA),
+    ]:
         try:
             raw.cached(SOURCE, url)
         except LookupError:
-            raw.fetch(SOURCE, url, suffix=".csv")
+            raw.fetch(SOURCE, url, suffix=Path(url).suffix if url.endswith(".zip") else ".csv")
 
 
 def parse() -> None:
@@ -227,6 +271,83 @@ def parse() -> None:
                     .otherwise(pl.lit("FALSE")),
                     mode=pl.lit("TOTAL"),
                     votes="SumOfCount",
+                ),
+            )
+        )
+    for county, year in ((county, year) for county in ARCHIVES for year in range(2000, 2026)):
+        frame = pl.read_csv(
+            raw.cached(SOURCE, archive(county, year)).path, infer_schema=False, truncate_ragged_lines=True
+        )
+        if frame.height == 0:
+            continue
+        for (day,), part in (
+            frame.filter(
+                (pl.col("division_type") == "Precinct")
+                & pl.col("district_type").is_in(list(elstats_local.MUNICIPAL))
+                & ~pl.col("candidate_name").str.contains(
+                    r"(?i)^total |^unknown candidate$|^(?:under|over) ?votes?$|^blank"
+                )
+            )
+            .with_columns(day=pl.col("election_date").str.slice(0, 10).str.to_date())
+            .group_by("day")
+        ):
+            origins.append(
+                (
+                    day,
+                    f"archive:{county}",
+                    part.lazy().select(
+                        state=pl.lit("CA"),
+                        fips=pl.lit(county),
+                        jurisdiction=pl.lit(ARCHIVES[county][2]),
+                        precinct=pl.col("division_name").str.strip_chars().str.to_uppercase(),
+                        office="office_name",
+                        district="contest_id",
+                        candidate="candidate_name",
+                        writein=pl.when(pl.col("candidate_name").str.contains(r"(?i)^write"))
+                        .then(pl.lit("TRUE"))
+                        .otherwise(pl.lit("FALSE")),
+                        mode=pl.lit("TOTAL"),
+                        votes="votes",
+                    ),
+                )
+            )
+    for election in SANTA_CLARA:
+        with zipfile.ZipFile(raw.cached(SOURCE, CLARITY.format(election)).path) as archived:
+            root = ElementTree.fromstring(archived.read("detail.xml"))
+        month, day_of_month, year = (root.findtext("ElectionDate") or "").split("/")
+        origins.append(
+            (
+                date(int(year), int(month), int(day_of_month)),
+                "clarity",
+                pl.LazyFrame(
+                    [
+                        {
+                            "office": contest.get("text"),
+                            "candidate": choice.get("text"),
+                            "mode": kind.get("name"),
+                            "precinct": precinct.get("name"),
+                            "votes": precinct.get("votes"),
+                        }
+                        for contest in root.iter("Contest")
+                        if contest.get("isQuestion") == "false"
+                        for choice in contest.iter("Choice")
+                        for kind in choice.iter("VoteType")
+                        for precinct in kind.iter("Precinct")
+                    ],
+                    schema=dict.fromkeys(("office", "candidate", "mode", "precinct", "votes"), pl.String),
+                ).select(
+                    state=pl.lit("CA"),
+                    fips=pl.lit("06085"),
+                    jurisdiction=pl.lit("SANTA CLARA"),
+                    precinct="precinct",
+                    office="office",
+                    district=pl.lit(""),
+                    candidate="candidate",
+                    writein=pl.when(pl.col("candidate").str.contains(r"(?i)^write"))
+                    .then(pl.lit("TRUE"))
+                    .otherwise(pl.lit("FALSE")),
+                    mode="mode",
+                    votes="votes",
                 ),
             )
         )
@@ -416,10 +537,10 @@ def parse() -> None:
         pl.concat(frames)
         .with_columns(
             rank=pl.col("origin").replace_strict(
-                {"ncsbe": 0, "elstats": 0, "washington": 0, "king": 0, "medsl": 1, "openelections": 2}
+                {"ncsbe": 0, "elstats": 0, "washington": 0, "king": 0, "medsl": 1, "openelections": 2}, default=0
             )
         )
-        .filter(pl.col("rank") == pl.col("rank").min().over("day", "state"))
+        .filter(pl.col("rank") == pl.col("rank").min().over("day", "state", "fips"))
         .drop("rank")
         .with_columns(measure=pl.col("candidate").replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16))
         .filter(pl.col("measure") > 0)
@@ -592,6 +713,31 @@ def emit() -> Path:
         for url in KING.values():
             cs.artifact(raw.cached(SOURCE, url), king)
         sources["king"] = king
+        for county, (url, publisher, _) in ARCHIVES.items():
+            sources[f"archive:{county}"] = cs.source(publisher, ARCHIVE_TITLE)
+            cs.add(
+                "source",
+                id=sources[f"archive:{county}"],
+                kind="official_body",
+                publisher=publisher,
+                title=ARCHIVE_TITLE,
+                url=url,
+                license="Public record",
+            )
+            for year in sorted({day.year for day in rows.filter(pl.col("origin") == f"archive:{county}")["day"]}):
+                cs.artifact(raw.cached(SOURCE, archive(county, year)), sources[f"archive:{county}"])
+        sources["clarity"] = cs.source(CLARITY_PUBLISHER, CLARITY_TITLE)
+        cs.add(
+            "source",
+            id=sources["clarity"],
+            kind="official_body",
+            publisher=CLARITY_PUBLISHER,
+            title=CLARITY_TITLE,
+            url="https://results.enr.clarityelections.com/CA/Santa_Clara/",
+            license="Public record",
+        )
+        for election in SANTA_CLARA:
+            cs.artifact(raw.cached(SOURCE, CLARITY.format(election)), sources["clarity"])
         groups = {key: frame for key, frame in rows.group_by("day", "state")}
         index: dict[tuple[date, str], dict[str, set[str]]] = {}
         for (day, state), frame in groups.items():
@@ -689,10 +835,10 @@ def emit() -> Path:
                 stage=stage,
                 kind=kind,
                 status="active",
-                source_id=sources[day]
+                source_id=sources[origin]
+                if origin in sources
+                else sources[day]
                 if origin == "medsl"
-                else sources["king"]
-                if origin == "king"
                 else sources[(state, day)],
                 is_default=False,
                 completeness=round(sum(counted.values()) / total, 4),
