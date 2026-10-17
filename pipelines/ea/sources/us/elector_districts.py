@@ -1,12 +1,16 @@
+import csv
+import io
 import re
 import struct
 import subprocess
+import tempfile
 from collections import Counter
 from datetime import date, timedelta
 from pathlib import Path
 
 import fastexcel
 import polars as pl
+from PIL import Image
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
@@ -71,11 +75,29 @@ COUNTIES = {
 }
 FIRST = {"Cumberland", "Kennebec", "Knox", "Lincoln", "Sagadahoc", "Waldo", "York"}
 TOWN_NAMES = {"Isleboro": "Islesboro"}
-CANVASS = {2008: "https://sos.nebraska.gov/sites/default/files/doc/elections/2008/2008%20General%20Canvass%20Book.pdf"}
+CANVASS = {
+    2000: "https://sos.nebraska.gov/sites/default/files/doc/elections/2000/2000%20General.pdf",
+    2008: "https://sos.nebraska.gov/sites/default/files/doc/elections/2008/2008%20General%20Canvass%20Book.pdf",
+}
+IMAGES = {
+    2004: [
+        "https://web.archive.org/web/2006id_/http://www.archives.gov/federal-register/electoral-college/2004_certificates/images/ascertainment_nebraska_01.jpg",
+        "https://web.archive.org/web/2006id_/http://www.archives.gov/federal-register/electoral-college/2004_certificates/images/ascertainment_nebraska_02.jpg",
+    ]
+}
+TRANSCRIBED = {
+    "Bush": (512814, 169888, 153041, 189885),
+    "Kerry": (254328, 96314, 97858, 60156),
+    "Badnarik": (2041, 656, 813, 572),
+    "Peroutka": (1314, 405, 305, 604),
+    "Cobb": (978, 453, 261, 264),
+    "Calero": (82, 30, 23, 29),
+    "Nader": (5698, 2025, 1731, 1942),
+}
 PAIRS = (
     [(year, state) for year in YEARS for state in STATES]
     + [(year, "ME") for year in (*TABULATIONS, *TOWNS)]
-    + [(year, "NE") for year in CANVASS]
+    + [(year, "NE") for year in (*CANVASS, *IMAGES)]
 )
 DAYS = {
     1972: "1972-11-07",
@@ -139,10 +161,24 @@ WALDO = (
     "county's row."
 )
 
+WAYBACK = (
+    "The National Archives' 2004 certificates survive only as page images on its former website, as the Internet "
+    "Archive's Wayback Machine captured them in 2006. The images are too coarse to read by machine, so the figures "
+    "were transcribed from them, each keeping its place on the page; every ticket's districts sum to its statewide "
+    "figure, which matches the state's official vote."
+)
+SCANNED = (
+    "The 2000 canvass book is a scan read by optical character recognition, and each figure keeps its place on the "
+    "page. Each district table's total line was read three times and the readings agree, and the three districts sum "
+    "to the statewide official vote for every ticket."
+)
+
 
 def documents(year: int, state: str) -> list[str]:
     if year in YEARS:
         return [CERTIFICATE.format(year=year, prefix=YEARS[year], state=STATES[state])]
+    if year in IMAGES:
+        return IMAGES[year]
     if state == "NE":
         return [CANVASS[year]]
     if year in TABULATIONS:
@@ -342,6 +378,152 @@ def parse() -> None:
                     for name, value in zip(names, district, strict=True):
                         page, box = next(located)
                         cells.append((year, state, name, number, "us.cd", f"23{number:02d}", value, page, *box))
+        elif year in IMAGES:
+            readings = []
+            for number, address in enumerate(addresses, start=1):
+                image = Image.open(raw.cached(SOURCE, address).path).convert("L")
+                buffer = io.BytesIO()
+                image.resize((image.width * 4, image.height * 4), Image.Resampling.LANCZOS).save(buffer, "PNG")
+                lines: dict[tuple[str, str, str], list[tuple[str, scan.Box]]] = {}
+                for word in csv.DictReader(
+                    io.StringIO(
+                        subprocess.run(
+                            ["tesseract", "stdin", "stdout", "--psm", "6", "tsv"],
+                            input=buffer.getvalue(),
+                            capture_output=True,
+                            check=True,
+                        ).stdout.decode()
+                    ),
+                    delimiter="\t",
+                    quoting=csv.QUOTE_NONE,
+                ):
+                    if word["level"] == "5" and word["text"].strip():
+                        lines.setdefault((word["block_num"], word["par_num"], word["line_num"]), []).append(
+                            (
+                                word["text"],
+                                (
+                                    int(word["left"]) // 4,
+                                    int(word["top"]) // 4,
+                                    (int(word["left"]) + int(word["width"])) // 4,
+                                    (int(word["top"]) + int(word["height"])) // 4,
+                                ),
+                            )
+                        )
+                for words in lines.values():
+                    marks = [index for index, (word, _) in enumerate(words) if word.startswith(("Rec", "Ree"))]
+                    tail = [
+                        box
+                        for word, box in (words[marks[0] + 1 :] if marks else [])
+                        if re.fullmatch(r"\$?[\d,.]*\d[\d,.]*", word.translate(scan.CONFUSABLE))
+                    ]
+                    if tail:
+                        readings.append(
+                            (
+                                number,
+                                (
+                                    min(box[0] for box in tail),
+                                    min(box[1] for box in tail),
+                                    max(box[2] for box in tail),
+                                    max(box[3] for box in tail),
+                                ),
+                            )
+                        )
+            if len(readings) != 4 * len(TRANSCRIBED):
+                raise ValueError(f"{year} {state}: {len(readings)} vote lines, not {4 * len(TRANSCRIBED)}")
+            spots = iter(readings)
+            for name, (statewide, *districts) in TRANSCRIBED.items():
+                if statewide != sum(districts):
+                    raise ValueError(f"{year} {state}: {name}'s districts do not sum to {statewide}")
+                rows.append((year, state, name, statewide, *districts))
+                next(spots)
+                for district, value in enumerate(districts, start=1):
+                    page, box = next(spots)
+                    cells.append((year, state, name, district, "us.cd", f"31{district:02d}", value, page, *box))
+        elif state == "NE" and year == 2000:
+            pdf = raw.cached(SOURCE, addresses[0]).path
+            names = ["Bush", "Gore", "Browne", "Hagelin", "Nader", "Buchanan", "Phillips"]
+            districts = []
+            for number in (9, 10):
+                with tempfile.TemporaryDirectory() as folder:
+                    page = scan.rendered(pdf, number, Path(folder))
+                    image = Image.open(page).convert("L")
+                    for lines, columns in scan.tables(page):
+                        left, top = columns[0] + 4, lines[0] + 4
+                        crop = image.crop((left, top, image.width - 60, lines[-1] - 2))
+                        readings = []
+                        for psm, scale in (("6", 1), ("6", 2), ("4", 1)):
+                            buffer = io.BytesIO()
+                            crop.resize((crop.width * scale, crop.height * scale), Image.Resampling.LANCZOS).save(
+                                buffer, "PNG"
+                            )
+                            words = [
+                                (
+                                    word["text"].strip(),
+                                    (
+                                        left + int(word["left"]) // scale,
+                                        top + int(word["top"]) // scale,
+                                        left + (int(word["left"]) + int(word["width"])) // scale,
+                                        top + (int(word["top"]) + int(word["height"])) // scale,
+                                    ),
+                                )
+                                for word in csv.DictReader(
+                                    io.StringIO(
+                                        subprocess.run(
+                                            ["tesseract", "stdin", "stdout", "--psm", psm, "tsv"],
+                                            input=buffer.getvalue(),
+                                            capture_output=True,
+                                            check=True,
+                                        ).stdout.decode()
+                                    ),
+                                    delimiter="\t",
+                                    quoting=csv.QUOTE_NONE,
+                                )
+                                if word["level"] == "5" and word["text"].strip()
+                            ]
+                            band = [
+                                (word, box)
+                                for word, box in sorted(words, key=lambda word: word[1][0])
+                                if lines[2] - 3 <= (box[1] + box[3]) / 2 <= lines[3] + 3
+                            ]
+                            figures: list[tuple[str, scan.Box]] = []
+                            for word, box in band[1:]:
+                                digits = re.sub(r"\D", "", word.translate(scan.CONFUSABLE))
+                                if figures and box[0] - figures[-1][1][2] < 45:
+                                    last = figures[-1][1]
+                                    figures[-1] = (
+                                        figures[-1][0] + digits,
+                                        (last[0], min(last[1], box[1]), box[2], max(last[3], box[3])),
+                                    )
+                                elif digits:
+                                    figures.append((digits, box))
+                            if band and band[0][0].lower() == "total" and len(figures) == len(names):
+                                readings.append(figures)
+                        tally = Counter(tuple(digits for digits, _ in figures) for figures in readings).most_common(1)
+                        if not tally or tally[0][1] < 2:
+                            raise ValueError(f"{year} {state}: page {number}'s district total is unreadable {readings}")
+                        agreed = next(
+                            figures for figures in readings if tuple(digits for digits, _ in figures) == tally[0][0]
+                        )
+                        districts.append((number, [int(digits) for digits, _ in agreed], [box for _, box in agreed]))
+            if len(districts) != 3:
+                raise ValueError(f"{year} {state}: {len(districts)} district tables, not 3")
+            for index, name in enumerate(names):
+                values = [counts[index] for _, counts, _ in districts]
+                rows.append((year, state, name, sum(values), *values))
+                for district, (number, counts, boxes) in enumerate(districts, start=1):
+                    cells.append(
+                        (
+                            year,
+                            state,
+                            name,
+                            district,
+                            "us.cd",
+                            f"31{district:02d}",
+                            counts[index],
+                            number,
+                            *boxes[index],
+                        )
+                    )
         elif state == "NE":
             book = text(addresses[0])
             heading = re.search(r"^For President of the United States\s*$", book, re.MULTILINE)
@@ -577,7 +759,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's presidential votes by congressional district 1972–2024 and Nebraska's 2008–2024, from the states' certificates of ascertainment, Maine's official vote by town, and Nebraska's canvass book",
+            summary="Maine's presidential votes by congressional district 1972–2024 and Nebraska's 2000–2024, from the states' certificates of ascertainment, Maine's official vote by town, and Nebraska's canvass book",
             polity="US",
         )
         for (year, state), lines in frame.group_by("year", "state", maintain_order=True):
@@ -588,7 +770,7 @@ def emit() -> Path:
             lines = lines.filter(pl.col("candidate") != "")
             kind = (
                 "certificate"
-                if year in YEARS
+                if year in YEARS or year in IMAGES
                 else "counties"
                 if year == 1972
                 else "tabulation"
@@ -635,27 +817,31 @@ def emit() -> Path:
             located = cells.filter((pl.col("year") == year) & (pl.col("state") == state))
             pages = {}
             for number in located["page"].unique().sort():
-                pdf = raw.cached(SOURCE, addresses[0])
-                image = PAGES / f"{pdf.sha256}-{number}.png"
+                scanned = int(year) in IMAGES
+                pdf = raw.cached(SOURCE, addresses[number - 1 if scanned else 0])
+                image = PAGES / f"{pdf.sha256}-{1 if scanned else number}.png"
                 if not image.exists():
                     PAGES.mkdir(parents=True, exist_ok=True)
-                    subprocess.run(
-                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
-                        + [str(pdf.path), str(image.with_suffix(""))],
-                        check=True,
-                    )
+                    if scanned:
+                        Image.open(pdf.path).save(image)
+                    else:
+                        subprocess.run(
+                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                            + [str(pdf.path), str(image.with_suffix(""))],
+                            check=True,
+                        )
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
-                page = cs.page(artifacts[0], number)
+                page = cs.page(artifacts[number - 1 if scanned else 0], 1 if scanned else number)
                 cs.add(
                     "source_page",
                     id=page,
-                    artifact_id=artifacts[0],
-                    page_number=number,
-                    image_key=f"pages/{SOURCE}/{pdf.sha256}-{number}.png",
+                    artifact_id=artifacts[number - 1 if scanned else 0],
+                    page_number=1 if scanned else number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
                     width=width,
                     height=height,
                 )
-                pages[number] = (page, width * 3, height * 3)
+                pages[number] = (page, width * (1 if scanned else 3), height * (1 if scanned else 3))
             options = conn.execute(
                 """select o.id, o.kind, o.party_id, sum(v.value)::bigint,
                           (select array_agg(array[cy.role::text, cy.person_id::text, n.text] order by cy.role)
@@ -796,6 +982,10 @@ def emit() -> Path:
                     )
                 if year == 1988 and state == "ME":
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=WALDO)
+                if year == 2000 and state == "NE":
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=SCANNED)
+                if year in IMAGES:
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=WAYBACK)
                 ranked = []
                 joined: set[tuple[str, str]] = set()
                 for index, (option_kind, party, candidacies, districts, label) in enumerate(tickets):
