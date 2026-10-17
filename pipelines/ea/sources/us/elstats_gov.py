@@ -253,9 +253,20 @@ def emit() -> Path:
             [SOURCE],
         ).fetchall():
             existing.setdefault(key, []).append((option, slug(label or "")))
-        fptp = cs.key("us.electoral_system", "fptp")
-        if fptp in cs.minted:
-            raise ValueError("the fptp system must exist")
+        fptp, two_round = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "two_round")
+        if cs.minted & {fptp, two_round}:
+            raise ValueError("the fptp and two-round systems must exist")
+        firsts: dict[tuple[str, str], UUID] = {}
+        published: dict[UUID, UUID | None] = dict(
+            conn.execute(
+                """select o.id, coalesce(h.party_id, o.party_id) from contest_option o
+                   join changeset c on c.id = o.changeset_id
+                   left join lateral (select party_id from contest_option_history h where h.id = o.id
+                                      order by h.recorded_from limit 1) h on true
+                   where c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
 
         sources: dict[str, UUID] = {}
         for state in sorted(frame["state"].unique()):
@@ -345,6 +356,8 @@ def emit() -> Path:
             scope = "" if primary is None else f"-{slug(primary) or 'open'}"
             contest_key = f"{day}:{state}:governor" + scope.replace("-", ":", 1)
             contest = cs.key("us.contest", contest_key)
+            if advancing and primary is not None:
+                firsts[(state, primary)] = contest
             reused = contest_key in existing
             if not reused:
                 cs.add(
@@ -358,7 +371,10 @@ def emit() -> Path:
                     term="full",
                     magnitude=1,
                     round_number=2 if runoff else 1,
-                    electoral_system_id=fptp,
+                    previous_round_id=firsts.get((state, primary)) if runoff and primary is not None else None,
+                    electoral_system_id=two_round
+                    if primary is not None and (runoff or (state == "VA" and 1953 <= day.year <= 1969))
+                    else fptp,
                     default_result_kind="counted",
                 )
                 name(
@@ -429,7 +445,7 @@ def emit() -> Path:
                     id=options[candidate],
                     contest_id=contest,
                     kind="candidate",
-                    party_id=party_id,
+                    party_id=published.get(options[candidate], party_id),
                     ballot_label=candidate,
                 )
                 for role, text in (("head", head), ("running_mate", mate)):
@@ -450,7 +466,7 @@ def emit() -> Path:
             ):
                 totals[candidate] = totals.get(candidate, 0) + votes
                 cells[(options[candidate], code)] = cells.get((options[candidate], code), 0) + votes
-            for (option, code), votes in cells.items():
+            for (option, code), votes in cells.items() if result_set in cs.minted else ():
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
@@ -473,7 +489,7 @@ def emit() -> Path:
             ):
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=LEGISLATURE.format(state=state_name))
                 continue
-            for candidate in won if advancing else won[:1]:
+            for candidate in won[:2] if advancing else won[:1]:
                 cs.add(
                     "outcome",
                     result_set_id=result_set,
