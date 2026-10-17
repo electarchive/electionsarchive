@@ -41,6 +41,12 @@ PUBLISHERS = {
     "chattanooga": ("City of Chattanooga", FREE, None),
     "delaware": ("Delaware FirstMap", FREE, None),
     "rockford": ("City of Rockford", FREE, None),
+    "riverside": ("City of Riverside, California", FREE, None),
+    "long-beach": (
+        "City of Long Beach",
+        "MapsLB Terms of Use: license to copy, publish, distribute, adapt, and exploit the data, including commercially",
+        "https://maps.longbeach.gov/pages/termsofuse",
+    ),
     "yonkers": ("City of Yonkers", FREE, None),
     "guilford": ("Guilford County, North Carolina", FREE, None),
     "high-point": ("City of High Point", FREE, None),
@@ -1007,6 +1013,34 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
             "Wards 2022",
         ),
     ],
+    "0643000": [
+        (
+            2022,
+            None,
+            "arcgis:https://services6.arcgis.com/yCArG7wGXGyWLqav/ArcGIS/rest/services/City_of_Long_Beach_Council_Districts/FeatureServer/0",
+            "COUNCIL_NUMBER",
+            "long-beach",
+            "City of Long Beach Council Districts",
+        ),
+    ],
+    "0665000": [
+        (
+            2013,
+            2024,
+            "arcgis:https://services.arcgis.com/Fu2oOWg1Aw7azh41/ArcGIS/rest/services/Wards2010/FeatureServer/0",
+            "WardNumber",
+            "riverside",
+            "City of Riverside 2010-2019 Ward Boundaries",
+        ),
+        (
+            2024,
+            None,
+            "arcgis:https://services.arcgis.com/Fu2oOWg1Aw7azh41/ArcGIS/rest/services/WardsBoundaryWCouncilNames/FeatureServer/0",
+            "WardNumber",
+            "riverside",
+            "City of Riverside Ward Boundaries",
+        ),
+    ],
     "1765000": [
         (
             2013,
@@ -1164,6 +1198,8 @@ AREAS = {
     "0606000",
     "0627000",
     "0653000",
+    "0643000",
+    "0665000",
 }
 PREFIXES = ("council district", "district", "ward", "cd", "area")
 
