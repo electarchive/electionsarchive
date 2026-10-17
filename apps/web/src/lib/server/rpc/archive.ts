@@ -4544,10 +4544,11 @@ async function races(
               from winners w
               join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id and ch.party_id is not null
               join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
-              join result_rollup y on y.result_set_k = rs.k and y.option_k = ch.k
-              where w.party_id is null
-              group by ch.parent_option_id, ch.party_id, ch.k
-              order by ch.parent_option_id, max(y.value) desc
+              cross join lateral (
+                select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = ch.k
+              ) y
+              where w.party_id is null and y.value is not null
+              order by ch.parent_option_id, y.value desc
             )
             select coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id) as party,
               sum(w.seats)::int as seats
@@ -5764,10 +5765,11 @@ export const elections = {
           from winners w
           join contest_option ch on ch.contest_id = w.leaf and ch.parent_option_id = w.id and ch.party_id is not null
           join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
-          join result_rollup y on y.result_set_k = rs.k and y.option_k = ch.k
-          where w.party_id is null
-          group by ch.parent_option_id, ch.party_id, ch.k
-          order by ch.parent_option_id, max(y.value) desc
+          cross join lateral (
+            select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = ch.k
+          ) y
+          where w.party_id is null and y.value is not null
+          order by ch.parent_option_id, y.value desc
         ),
         up(leaf, area, day, depth) as (
           select l.id, l.area, l.day, 0 from leaves l where l.area is not null
@@ -6027,9 +6029,11 @@ export const elections = {
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
-          join result_rollup y on y.result_set_k = rs.k and y.option_k = l.k
-          group by l.parent, l.party_id, l.k
-          order by l.parent, max(y.value) desc
+          cross join lateral (
+            select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = l.k
+          ) y
+          where y.value is not null
+          order by l.parent, y.value desc
         ),
         measures as (
           select r.part, count(*)::int as races,
@@ -6667,9 +6671,11 @@ export const polities = {
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
-          join result_rollup y on y.result_set_k = rs.k and y.option_k = l.k
-          group by l.parent, l.party_id, l.k
-          order by l.parent, max(y.value) desc
+          cross join lateral (
+            select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = l.k
+          ) y
+          where y.value is not null
+          order by l.parent, y.value desc
         ),
         won as materialized (
           select w.root, w.contest, w.id, w.seats,
