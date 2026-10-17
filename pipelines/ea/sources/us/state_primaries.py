@@ -7,11 +7,12 @@ from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
 
+import fastexcel
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import wa_local
+from ea.sources.us import medsl, wa_local
 from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
@@ -49,31 +50,134 @@ WA_DAYS = [
     date(2020, 8, 4),
     date(2022, 8, 2),
 ]
+CA_SOV = "https://elections.cdn.sos.ca.gov/sov/{path}"
+CA_KINDS = [
+    (r"us.?s(en|-ft)|uss", "us-senate"),
+    (r"congress|us.?rep|-cd$", "house"),
+    (r"assem|-ad$", "assembly"),
+    (r"senat|stsen", "senate"),
+    (r"lt|lg|lieutenant", "lieutenant-governor"),
+    (r"gov", "governor"),
+    (r"sos|secretary", "secretary-of-state"),
+    (r"cont", "controller"),
+    (r"trea|tres", "treasurer"),
+    (r"ag$|attorney", "attorney-general"),
+    (r"ic$|ins|commissioner", "insurance-commissioner"),
+]
+CA_TITLE = re.compile(
+    r"(\d+)(?:st|nd|rd|th) (?:Congressional|Senatorial|State Senate|Senate|Assembly) District", re.IGNORECASE
+)
+CA_PARTY = re.compile(r"(DEM|REP|LIB|NPP|GRN|PF|AI|REF|NL|Libertarian|Natural Law|Green|Reform)(?: \(W/I\))?")
+CA_CODES = {"PF": "PAF", "AI": "AIP", "Libertarian": "LIB", "Natural Law": "NL", "Green": "GRN", "Reform": "REF"}
+CA_STATEWIDE = (
+    "governor",
+    "lieutenant-governor",
+    "secretary-of-state",
+    "controller",
+    "treasurer",
+    "attorney-general",
+    "insurance-commissioner",
+)
 CA_DAYS = {
-    date(2004, 3, 2): "P04",
-    date(2006, 6, 6): "P06",
-    date(2008, 6, 3): "P08",
-    date(2010, 6, 8): "P10",
-    date(2012, 6, 5): "P12",
-    date(2014, 6, 3): "P14",
-    date(2016, 6, 7): "P16",
-    date(2018, 6, 5): "P18",
-    date(2020, 3, 3): "P20",
-    date(2022, 6, 7): "P22",
+    date(2002, 3, 5): (
+        "2002-primary/{}.xls",
+        ["gov", "ltgov", "sos", "controller", "treasurer", "ag", "ic", "congress", "state-senate", "state-assemb"],
+    ),
+    date(2004, 3, 2): ("2004-primary/{}.xls", ["us_senate_formatted", "congress", "senate", "assembly"]),
+    date(2006, 6, 6): (
+        "2006-primary/sov_detail_primary_{}.xls",
+        ["gov", "ltgov", "sos", "controller", "treas", "ag", "inscomm", "ussenate", "congress", "senate", "assembly"],
+    ),
+    date(2008, 6, 3): (
+        "2008-statewide-direct-primary/{}.xls",
+        ["us_reps08primary", "stsen08primary", "stassem08primary"],
+    ),
+    date(2010, 6, 8): (
+        "2010-primary/{}.xls",
+        [
+            "40-51-gov",
+            "52-57-lg",
+            "58-60-sos",
+            "61-63-cont",
+            "64-66-tres",
+            "67-72-ag",
+            "73-75-ins",
+            "79-84-ussen",
+            "85-95-cd",
+            "96-100-senate",
+            "101-118-ad",
+        ],
+    ),
+    date(2012, 6, 5): (
+        "2012-primary/{}.xls",
+        [
+            "70-us-senate-formatted",
+            "82-us-reps-formatted",
+            "97-state-senators-formatted",
+            "102-state-assembly1-80formattted",
+        ],
+    ),
+    date(2014, 6, 3): (
+        "2014-primary/xls/{}.xls",
+        [
+            "33-governor",
+            "42-lieutenant-governor",
+            "45-secretary-of-state",
+            "48-controller",
+            "51-treasurer",
+            "54-attorney-general",
+            "57-insurance-commissioner",
+            "63-congress",
+            "78-state-senator",
+            "84-state-assemblymember",
+        ],
+    ),
+    date(2016, 6, 7): (
+        "2016-primary/{}.xls",
+        [
+            "75-us-senate-formatted",
+            "90-us-reps-formatted",
+            "105-state-senators-formatted",
+            "110-state-assembly-formatted",
+        ],
+    ),
+    date(2018, 6, 5): (
+        "2018-primary/sov/{}.xls",
+        [
+            "31-governor",
+            "43-lieutenant-governor",
+            "49-secretary-of-state",
+            "52-controller",
+            "55-treasurer",
+            "58-attorney-general",
+            "61-insurance-commissioner",
+            "67-us-senators",
+            "82-congress",
+            "101-state-senator",
+            "107-state-assemblymember",
+        ],
+    ),
+    date(2020, 3, 3): (
+        "2020-primary/sov/{}.xls",
+        ["126-us-rep-congress", "143-state-senators-formatted", "148-state-assembly-formatted"],
+    ),
+    date(2022, 6, 7): (
+        "2022-primary/sov/{}.xlsx",
+        [
+            "30-governor",
+            "42-lieutenant-governor",
+            "48-secretary-of-state",
+            "51-controller",
+            "54-treasurer",
+            "57-ag",
+            "60-commissioner",
+            "68-uss-ft",
+            "86-congress",
+            "99-state-senator",
+            "104-state-assemblymember",
+        ],
+    ),
 }
-CA_FILES = "https://statewidedatabase.org/pub/data/{code}/c{county:03d}/{county:03d}.codes"
-CA_OFFICES = {
-    "ASS": "assembly",
-    "SEN": "senate",
-    "GOV": "governor",
-    "LTG": "lieutenant-governor",
-    "ATG": "attorney-general",
-    "SOS": "secretary-of-state",
-    "CON": "controller",
-    "TRS": "treasurer",
-    "INS": "insurance-commissioner",
-}
-CA_LINE = re.compile(rf"({'|'.join(CA_OFFICES)})(\d\d)?([A-Z]{{3}})\d\d\t(.+?)\t(\d+)\s*")
 WA_OFFICES = {
     "GOVERNOR": "governor",
     "LT. GOVERNOR": "lieutenant-governor",
@@ -107,6 +211,13 @@ STATES = {
         "https://www.ncsbe.gov/results-data/election-results/historical-election-results-data",
     ),
     "WA": ("53", "Washington", wa_local.PUBLISHER, wa_local.TITLE, "https://results.vote.wa.gov"),
+    "CA": (
+        "06",
+        "California",
+        "California Secretary of State",
+        "Statement of Vote",
+        "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
+    ),
     "MN": (
         "27",
         "Minnesota",
@@ -161,10 +272,7 @@ PARTIES = {
     ),
 }
 UNALLOCATED = 32
-CA_METHOD = (
-    "Totals are the county totals of the Secretary of State's Statement of Vote, as the Statewide Database "
-    "republishes them. {rule}"
-)
+CA_METHOD = "Totals are the county totals of the Secretary of State's Statement of Vote. {rule}"
 WA_METHOD = (
     "Totals are the precinct rows of the Secretary of State's statewide precinct export where they add up to its "
     "county results, and the county results elsewhere. The top two candidates advance to the general election."
@@ -187,6 +295,9 @@ def fetch() -> None:
     for day in MN_DAYS:
         for name in ("allracesbyprecinct", "PrctTbl"):
             raw.fetch(SOURCE, MN_FILES.format(day=day, name=name), suffix=".txt")
+    for path, names in CA_DAYS.values():
+        for name in names:
+            raw.fetch(SOURCE, CA_SOV.format(path=path.format(name)), suffix=Path(path).suffix)
 
 
 def parse() -> None:
@@ -196,7 +307,7 @@ def parse() -> None:
             for code, text in conn.execute(
                 """select u.code, n.text from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'short'
-                   where u.scheme_code = 'us.county' and u.code ~ '^(37|53)'"""
+                   where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06)'"""
             ).fetchall()
         }
     frames = []
@@ -489,7 +600,109 @@ def parse() -> None:
                 votes="votes",
             )
         )
+    rows = []
+    for day, (path, names) in CA_DAYS.items():
+        for name in names:
+            office = next(office for pattern, office in CA_KINDS if re.search(pattern, name))
+            sheet = fastexcel.read_excel(raw.cached(SOURCE, CA_SOV.format(path=path.format(name))).path)
+            district = columns = previous = None
+            for row in sheet.load_sheet(0, header_row=None).to_polars().iter_rows():
+                cells = [None if cell is None else re.sub(r"\s+", " ", str(cell)).strip() or None for cell in row]
+                filled = [(index, cell) for index, cell in enumerate(cells) if cell is not None]
+                if len(filled) == 1 and (title := CA_TITLE.match(filled[0][1])):
+                    district, columns = title[1], None
+                elif (
+                    previous is not None
+                    and filled
+                    and filled[0][0] > 0
+                    and all(CA_PARTY.fullmatch(cell) for _, cell in filled)
+                ):
+                    columns = [
+                        (
+                            index,
+                            re.sub(r"\s*\(write-in\)$", "", who).rstrip("*").strip(),
+                            CA_CODES.get(found[1], found[1]),
+                            cell.endswith("(W/I)") or who.endswith("(write-in)"),
+                        )
+                        for index, cell in filled
+                        if (found := CA_PARTY.fullmatch(cell))
+                        and index < len(previous)
+                        and (who := previous[index]) is not None
+                        and not who.lower().startswith("votes not cast")
+                    ]
+                elif columns and (fips := counties.get(("06", re.sub(r"[^a-z]", "", (cells[0] or "").lower())))):
+                    rows.extend(
+                        (day, office, district, party, writein, fips, choice, int(float(value)))
+                        for index, choice, party, writein in columns
+                        if (value := cells[index]) is not None
+                    )
+                previous = cells
+    ca = pl.DataFrame(
+        rows,
+        schema={
+            "day": pl.Date,
+            "office": pl.String,
+            "code": pl.String,
+            "party": pl.String,
+            "writein": pl.Boolean,
+            "fips": pl.String,
+            "choice": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    ).with_columns(code=pl.col("code").cast(pl.Int64).cast(pl.String))
+    for (day, office), lines in ca.group_by("day", "office"):
+        print(
+            day, office, lines["code"].n_unique(), "districts,", lines.select("code", "choice").n_unique(), "candidates"
+        )
+    federal = ca.filter(pl.col("office").is_in(["house", "us-senate"]))
     PARSED.mkdir(parents=True, exist_ok=True)
+    federal.select(
+        year=pl.col("day").dt.year(),
+        chamber=pl.concat_str(
+            pl.col("office").replace({"us-senate": "senate"}),
+            pl.when(pl.col("day").dt.year() < 2012).then(
+                pl.concat_str(
+                    pl.lit(":"),
+                    pl.col("party").replace_strict(
+                        {code: word for code, (_, word, *_) in PARTIES.items()}, default=None
+                    ),
+                )
+            ),
+            ignore_nulls=True,
+        ),
+        day="day",
+        special=pl.lit(False),
+        state=pl.lit("CA"),
+        district=pl.col("code").cast(pl.Int64),
+        candidate="choice",
+        writein="writein",
+        votes="votes",
+        measure=pl.lit(1, pl.Int16),
+        code="fips",
+        kind=pl.lit("county"),
+        source=pl.lit("CA"),
+    ).filter(pl.col("chamber").str.contains(":") | (pl.col("year") >= 2012)).write_parquet(PARSED / "congress.parquet")
+    partisan = pl.col("day").dt.year() < 2012
+    frames.append(
+        ca.filter(~pl.col("office").is_in(["house", "us-senate"]))
+        .with_columns(party=pl.when(partisan).then("party").otherwise(pl.lit("")), label="party")
+        .filter(pl.col("party").is_in(list(PARTIES)))
+        .select(
+            state=pl.lit("CA"),
+            day="day",
+            office="office",
+            code="code",
+            party="party",
+            label=pl.when(pl.col("label").is_in(list(PARTIES))).then("label"),
+            fips="fips",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            choice="choice",
+            writein=pl.lit(False),
+            votes="votes",
+        )
+    )
     (
         pl.concat(frames)
         .group_by("state", "day", "office", "code", "party", "fips", "scheme", "unit", "choice", "writein")
@@ -535,6 +748,9 @@ def emit() -> Path:
         for day in WA_DAYS:
             for url in (wa_local.FILES[day], wa_local.PRECINCTS.format(day=day)):
                 cs.artifact(raw.cached(wa_local.SOURCE, url), sources["WA"])
+        for path, names in CA_DAYS.values():
+            for file in names:
+                cs.artifact(raw.cached(SOURCE, CA_SOV.format(path=path.format(file))), sources["CA"])
         polities = {state: cs.polity(f"US-{state}") for state in STATES}
         keys = {
             value
@@ -614,6 +830,7 @@ def emit() -> Path:
             *(("NC", day, first) for day, first in NC_DAYS.items()),
             *(("MN", day, None) for day in MN_DAYS),
             *(("WA", day, None) for day in WA_DAYS),
+            *(("CA", day, None) for day in CA_DAYS),
         ]:
             kind = "runoff" if first else "primary"
             election = elections[(state, day)] = cs.key("us.election", f"{day}:{state}:{kind}")
@@ -915,4 +1132,32 @@ def emit() -> Path:
                 count_round=pl.lit(0, pl.Int16),
             ),
         )
+        held = [
+            value
+            for (value,) in conn.execute(
+                """select e.value from external_id e
+                   where e.scheme = 'us.contest' and e.value ~ '^20[0-2][0-9]-0[2-6]-[0-9]{2}:CA:(house|senate)'
+                     and exists (select 1 from result_set rs join source s on s.id = rs.source_id
+                                 where rs.contest_id = e.entity_id
+                                   and s.publisher not in ('Federal Election Commission', %s))""",
+                [STATES["CA"][2]],
+            ).fetchall()
+        ]
+        congress = pl.read_parquet(PARSED / "congress.parquet").filter(
+            ~pl.concat_str(
+                pl.col("day").cast(pl.String),
+                pl.lit("CA"),
+                pl.when(pl.col("district").is_not_null())
+                .then(
+                    pl.concat_str(
+                        pl.lit("house:"),
+                        pl.col("district").cast(pl.String),
+                        pl.col("chamber").str.strip_prefix("house"),
+                    )
+                )
+                .otherwise("chamber"),
+                separator=":",
+            ).is_in(held)
+        )
+        medsl.attach(cs, conn, congress, sources)
         return cs.write()
