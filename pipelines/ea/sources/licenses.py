@@ -2,10 +2,11 @@ from pathlib import Path
 
 from ea.changeset import Changeset
 from ea.sources.tr.ysk import LICENSE as TURKISH_OFFICIAL_ACTS
+from ea.sources.us import elstats
 from ea.store import connect
 
 SOURCE = "licenses"
-VERSION = "5"
+VERSION = "6"
 PUBLIC_RECORD = "Public record"
 UNLICENSED = "No license stated: facts published with attribution, raw files not redistributed"
 NEWS = "All rights reserved: a news article cited for one fact, not redistributed"
@@ -41,6 +42,14 @@ ATTRIBUTIONS = {
     "site is subject to change at any time. It is understood that the data provided at this site is being used at one's "
     "own risk.",
 }
+RESTAMPS = {
+    "https://nh.electionstats.com": {
+        "kind": "aggregator",
+        "publisher": elstats.TENANTS["NH"][1],
+        "url": elstats.TENANTS["NH"][2],
+        "license": elstats.HELD["NH"],
+    },
+}
 COLUMNS = ("id", "kind", "publisher", "title", "url", "license", "license_url", "attribution", "notes")
 
 
@@ -60,14 +69,15 @@ def emit() -> Path | None:
         for values in conn.execute(
             "select id, kind, publisher, title, url, license, license_url, attribution, notes from source "
             "where (publisher = any(%s) and (license is null or license like 'No license stated%%'))"
-            " or publisher = any(%s)",
-            [list(PUBLISHERS), list(ATTRIBUTIONS)],
+            " or publisher = any(%s) or url = any(%s)",
+            [list(PUBLISHERS), list(ATTRIBUTIONS), list(RESTAMPS)],
         ).fetchall():
             row = dict(zip(COLUMNS, values, strict=True))
             fixed = {
                 **row,
                 "license": PUBLISHERS.get(values[2], values[5]),
                 "attribution": ATTRIBUTIONS.get(values[2], values[7]),
+                **RESTAMPS.get(values[4], {}),
             }
             if fixed != row:
                 changed.append(fixed)
@@ -77,7 +87,8 @@ def emit() -> Path | None:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Record the license of sources published without one, and the attribution their terms require",
+            summary="Record the license of sources published without one, the attribution their terms require, and "
+            "the publisher and terms of sources first stamped with the wrong ones",
             polity=None,
             kind="correction",
         )

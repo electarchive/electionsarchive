@@ -28,12 +28,13 @@ TENANTS = {
     "CO": ("co.elstats", "Colorado Secretary of State", "https://historicalelectiondata.coloradosos.gov"),
     "CT": ("ct.elstats", "Connecticut Secretary of the State", "https://electionhistory.ct.gov"),
     "ID": ("id.elstats", "Idaho Secretary of State", "https://idaho.electionstats.com"),
-    "NH": ("nh2.elstats", "New Hampshire Secretary of State", "https://nh.electionstats.com"),
+    "NH": ("nh2.elstats", "New Hampshire Public Radio", "https://electiondatabase.nhpr.org"),
     "NM": ("nm.elstats3", "New Mexico Secretary of State", "https://electionresults.sos.nm.gov"),
     "NY": ("ny.elstats3", "New York State Board of Elections", "https://results.elections.ny.gov"),
     "VT": ("vt2.elstats", "Vermont Secretary of State", "https://electionarchive.vermont.gov"),
     "VA": ("va2.elstats", "Virginia Department of Elections", "https://historical.elections.virginia.gov"),
 }
+HELD = {"NH": "No terms stated; held out of releases while NHPR's permission to redistribute is pending"}
 MA_PUBLISHER = "Massachusetts Secretary of the Commonwealth"
 TITLE = "Election statistics archive"
 MASSACHUSETTS = "https://electionstats.state.ma.us/elections/"
@@ -325,11 +326,11 @@ def emit() -> Path:
             cs.add(
                 "source",
                 id=sources[state],
-                kind="official_body",
+                kind="aggregator" if state in HELD else "official_body",
                 publisher=publisher,
                 title=TITLE,
                 url=site,
-                license="Public record",
+                license=HELD.get(state, "Public record"),
             )
             for year in frame.filter(pl.col("state") == state)["year"].unique().sort():
                 cs.artifact(raw.cached(SOURCE, url(tenant, year)), sources[state])

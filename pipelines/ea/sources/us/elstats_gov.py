@@ -11,7 +11,7 @@ import polars as pl
 
 from ea import names, raw
 from ea.changeset import Changeset, slug
-from ea.sources.us.elstats import FORMER, GAZETTEER, SEARCH, SUFFIXES, TENANTS, TITLE, plain
+from ea.sources.us.elstats import FORMER, GAZETTEER, HELD, SEARCH, SUFFIXES, TENANTS, TITLE, plain
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_gov"
@@ -307,11 +307,11 @@ def emit() -> Path:
             cs.add(
                 "source",
                 id=sources[state],
-                kind="official_body",
+                kind="aggregator" if state in HELD else "official_body",
                 publisher=publisher,
                 title=TITLE,
                 url=site,
-                license="Public record",
+                license=HELD.get(state, "Public record"),
             )
             cs.artifact(raw.cached(SOURCE, url(state)), sources[state])
 
