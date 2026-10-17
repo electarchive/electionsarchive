@@ -170,11 +170,11 @@
     const median =
       rows.toSorted((a, b) => a.valid - b.valid)[Math.floor(rows.length / 2)]
         ?.valid ?? 0;
+    const sizable = rows.filter((row) => row.valid >= median / 2);
     return [
       {
         label: m.key_closest(),
-        rows: rows
-          .filter((row) => row.valid >= median / 2)
+        rows: sizable
           .toSorted((a, b) => (a.margin ?? 0) - (b.margin ?? 0))
           .slice(0, 3),
         value: margin,
@@ -188,7 +188,7 @@
         .filter((index) => titles[index] != null)
         .map((index) => ({
           label: m.key_strongest({ name: titles[index] ?? "" }),
-          rows: rows
+          rows: sizable
             .toSorted((a, b) => (b.shares[index] ?? 0) - (a.shares[index] ?? 0))
             .slice(0, 1),
           value: (row: (typeof rows)[number]) =>
