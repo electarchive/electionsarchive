@@ -19,7 +19,7 @@ from ea.sources.us.party_labels import NATIONAL, UNAFFILIATED
 from ea.store import DATA, connect
 
 SOURCE = "us.nnv"
-VERSION = "4"
+VERSION = "5"
 COMMIT = "13e2f82692c76e3695f6cd609a5e710d6cab5e26"
 ARCHIVE = f"https://codeload.github.com/mapping-elections/nnv-xml/tar.gz/{COMMIT}"
 PUBLISHER = "American Antiquarian Society and Tufts University"
@@ -92,7 +92,9 @@ ADMITTED = {
     "MO": 1821,
 }
 POOLED = {"scattering", "unknown", "scattering votes", "scatterings", "others", "all others"}
+SINGLE = {"the House", "the House, trials of THEA contests", "governor"}
 BLANK = re.compile(r"(?i)^blanks?\b")
+DECLARED = re.compile(r"(?i)^((re-?)?elected\b|[^,.;]*\b(is|was) (re-?)?elected\b|[^,.;]* (re-?)?elected\.?$)")
 KINDS = {"Populated Place": "place"}
 SUCCESSORS = {
     "MA": ("ME",),
@@ -221,7 +223,7 @@ def parse() -> None:
                         "affiliation": _null(candidate.get("affiliation")),
                         "affiliation_id": _null(candidate.get("affiliation_id")),
                         "total": totals.get(candidate.get("candidate_num")),
-                        "elected": any(re.match(r"(?i)elected\b", note) for note in notes),
+                        "elected": any(DECLARED.match(note) for note in notes),
                         "notes": [note for note in notes if note],
                     }
                 )
@@ -622,6 +624,7 @@ def emit() -> Path:
                         "id": option,
                         "kind": option_kind,
                         "words": _words(label or ""),
+                        "ballot": label or "",
                         "votes": votes,
                         "won": won,
                         "nested": nested,
@@ -743,6 +746,30 @@ def emit() -> Path:
             result_set = cs.key(f"{SOURCE}.result_set", key)
             tally["attached" + (" (THEA has no votes)" if not official else "")] += 1
             tally[f"attached {postal}"] += 1
+            differs = [
+                f"{option['ballot']} has {sums.get(candidate, 0):,.0f} here and {option['votes']:,} in THEA"
+                for candidate, chosen_id in picked.items()
+                if chosen_id is not None
+                for option in entry["options"]
+                if option["id"] == chosen_id
+                and option["votes"] is not None
+                and abs(sums.get(candidate, 0) - option["votes"]) > 2
+            ]
+            if differs:
+                tally["attached, figures differ from THEA's (caveat)"] += 1
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="A New Nation Votes' town and county returns here differ from THEA's figures: "
+                    + "; ".join(differs)
+                    + (
+                        f". The returns hold {counted / known:.0%} of the totals NNV prints"
+                        if known and counted < known
+                        else ""
+                    )
+                    + ". THEA's figures stay the default.",
+                )
             if result_set not in cs.minted:
                 continue
             pool = None
@@ -866,6 +893,34 @@ def emit() -> Path:
                 rules_version=1,
             )
             named(systems["majority"], "Majority of votes cast, with repeated trials")
+        published: dict[UUID, list[str]] = {}
+        magnitudes: dict[UUID, int | None] = {}
+        for contest_id, magnitude, labels in conn.execute(
+            """select c.id, c.magnitude,
+                      array_agg(o.ballot_label order by o.ballot_label) filter (where o.id is not null)
+               from contest c join entity n on n.id = c.id join changeset s on s.id = n.changeset_id
+               left join result_set r on r.contest_id = c.id and r.is_default
+               left join outcome oc on oc.result_set_id = r.id and oc.kind = 'elected'
+               left join contest_option o on o.id = oc.option_id
+               where s.pipeline = %s group by c.id, c.magnitude""",
+            [SOURCE],
+        ).fetchall():
+            published[contest_id] = sorted(labels or [])
+            magnitudes[contest_id] = magnitude
+        old_sets: dict[str, dict[str, object]] = {}
+        for value, *fields in conn.execute(
+            """select x.value, r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness
+               from result_set r join external_id x on x.entity_id = r.id and x.scheme = %s
+               where r.status = 'active'""",
+            [f"{SOURCE}.result_set"],
+        ).fetchall():
+            old_sets[value] = dict(
+                zip(
+                    ["id", "election_id", "contest_id", "stage", "kind", "source_id", "completeness"],
+                    fields,
+                    strict=True,
+                )
+            )
 
         def day_of(record: str) -> tuple[date, str, str]:
             row = info[record]
@@ -1156,16 +1211,51 @@ def emit() -> Path:
                     cs.add("slug", path=f"us/{postal.lower()}/{stamp}-{part}", entity_id=election)
                 first_election = first_election or election
                 contest = cs.key("us.contest", key)
-                if contest not in cs.minted:
-                    tally["NNV trials already on file, from THEA or an earlier emit"] += 1
-                    previous = contest
-                    continue
                 totals = {line["candidate"]: line["total"] for line in lines.get(record, [])}
                 local = {place_key: cell for place_key, cell in returns.get(record, {}).items() if place_key}
                 sums: dict[str, float] = {}
                 for cell in local.values():
                     for candidate, vote in cell.items():
                         sums[candidate] = sums.get(candidate, 0) + vote
+                gap = [
+                    f"{line['name']} has {sums.get(line['candidate'], 0):,.0f} in the returns "
+                    f"and {line['total']:,.0f} printed"
+                    for line in lines.get(record, [])
+                    if local and line["total"] is not None and sums.get(line["candidate"], 0) != line["total"]
+                ]
+                units_note = (
+                    "These town and county returns do not add up to the totals A New Nation Votes prints: "
+                    + "; ".join(gap)
+                    + "."
+                    if gap
+                    else None
+                )
+                existing = contest not in cs.minted
+                declared = sorted(
+                    line["name"]
+                    for line in lines.get(record, [])
+                    if line["elected"] and not BLANK.match(line["name"]) and line["name"].lower() not in POOLED
+                )
+                revise = existing and declared != published.get(contest, [])
+                reopen = (
+                    existing
+                    and not revise
+                    and not declared
+                    and body_label not in SINGLE
+                    and magnitudes.get(contest) == 1
+                )
+                if existing and not revise and units_note and f"{key}:units" in old_sets:
+                    cs.add(
+                        "note",
+                        entity_id=cs.key(f"{SOURCE}.result_set", f"{key}:units"),
+                        kind="caveat",
+                        body_md=units_note,
+                    )
+                if existing and not revise and not reopen:
+                    tally["NNV trials already on file, from THEA or an earlier emit"] += 1
+                    filled += len([line for line in lines.get(record, []) if line["elected"]])
+                    previous = contest
+                    continue
                 tallied = {
                     line["candidate"]: sums.get(line["candidate"], 0) if line["total"] is None else line["total"]
                     for line in lines.get(record, [])
@@ -1184,6 +1274,8 @@ def emit() -> Path:
                 ):
                     magnitude = None
                     tally["added, winners marked are not the top vote-getters (magnitude left open)"] += 1
+                if not chosen and body_label not in SINGLE:
+                    magnitude = None
                 filled += len([line for line in lines.get(record, []) if line["elected"]])
                 cs.add(
                     "contest",
@@ -1212,8 +1304,14 @@ def emit() -> Path:
                     entity_id=contest,
                 )
                 previous = contest
-                tally[f"added {body_label}"] += 1
-                tally[f"added {body_label}, {postal}"] += 1
+                if reopen:
+                    tally["NNV races with no winner marked, magnitude left open"] += 1
+                    continue
+                if revise:
+                    tally["NNV races with winners declared in a note, sets superseded"] += 1
+                else:
+                    tally[f"added {body_label}"] += 1
+                    tally[f"added {body_label}, {postal}"] += 1
                 options: dict[str, UUID | None] = {}
                 winners: list[UUID] = []
                 for line in lines.get(record, []):
@@ -1237,6 +1335,8 @@ def emit() -> Path:
                         held_key += f":{line['candidate']}"
                     option = cs.key("us.option", held_key)
                     options[line["candidate"]] = option
+                    if line["elected"] and option not in winners:
+                        winners.append(option)
                     if option not in cs.minted or option in listed:
                         continue
                     listed.add(option)
@@ -1267,8 +1367,6 @@ def emit() -> Path:
                         is_independent=affiliation == "Independent",
                         is_incumbent=None,
                     )
-                    if line["elected"]:
-                        winners.append(option)
                 whole = (
                     bool(local)
                     and all(totals.get(candidate) == vote for candidate, vote in sums.items())
@@ -1276,14 +1374,25 @@ def emit() -> Path:
                     and all(line["candidate"] in sums for line in lines.get(record, []) if line["elected"])
                 )
                 grains: list[tuple[UUID, dict[tuple[tuple[str, str], ...], dict[str, float]], bool]] = []
-                default = cs.key(f"{SOURCE}.result_set", key)
+                suffix = ":declared" if revise else ""
+                default = cs.key(f"{SOURCE}.result_set", f"{key}{suffix}")
                 if whole:
                     grains.append((default, local, True))
                 else:
                     printed = totals if None not in totals.values() else {}
                     grains.append((default, {(): printed} if printed else {}, True))
                     if local:
-                        grains.append((cs.key(f"{SOURCE}.result_set", f"{key}:units"), local, False))
+                        grains.append((cs.key(f"{SOURCE}.result_set", f"{key}:units{suffix}"), local, False))
+                if revise:
+                    for old_key in (key, f"{key}:units"):
+                        if old_key in old_sets:
+                            cs.add(
+                                "result_set",
+                                **old_sets[old_key],
+                                status="superseded",
+                                is_default=False,
+                                supersedes_id=None,
+                            )
                     if any(
                         totals.get(candidate) is not None and vote > totals[candidate]
                         for candidate, vote in sums.items()
@@ -1307,8 +1416,11 @@ def emit() -> Path:
                         status="active",
                         source_id=source,
                         is_default=is_default,
+                        supersedes_id=old_sets[key]["id"] if revise and is_default and key in old_sets else None,
                         completeness=round(min(counted / known, 1), 4) if known else None if counted else 0,
                     )
+                    if not is_default and units_note:
+                        cs.add("note", entity_id=result_set, kind="caveat", body_md=units_note)
                     cs.add(
                         "citation",
                         entity_id=result_set,
@@ -1358,6 +1470,41 @@ def emit() -> Path:
                                 }
                             )
 
+        for unit_id, area_id, day in conn.execute(
+            """with recursive
+               sets as (
+                 select r.k, c.district_area_id as district, e.date_from as day
+                 from result_set r join changeset s on s.id = r.changeset_id
+                 join contest c on c.id = r.contest_id join election e on e.id = r.election_id
+                 where s.pipeline = %s and c.district_area_id is not null
+               ),
+               units as (
+                 select distinct sets.district, sets.day, u.id as unit_id, u.area_id
+                 from sets join result_value v on v.result_set_k = sets.k
+                 join reporting_unit u on u.k = v.unit_k
+                 where u.area_id is not null
+               ),
+               reach as (
+                 select district, day, unit_id, area_id from units
+                 union
+                 select reach.district, reach.day, reach.unit_id, p.parent_id
+                 from reach join area_parent p on p.area_id = reach.area_id and p.valid @> reach.day
+               )
+               select u.unit_id, u.district, u.day from units u
+               where not exists (
+                 select from reach where reach.district = u.district and reach.day = u.day
+                   and reach.unit_id = u.unit_id and reach.area_id = u.district
+               )""",
+            [SOURCE],
+        ).fetchall():
+            tally["units given their contest's district as an area"] += 1
+            cs.add(
+                "reporting_unit_area",
+                unit_id=unit_id,
+                area_id=area_id,
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
         for what, count in sorted(tally.items()):
             print(f"{what}: {count}")
         if values:
