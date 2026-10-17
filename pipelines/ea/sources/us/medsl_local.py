@@ -11,12 +11,13 @@ import shapefile
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.licenses import UNLICENSED
 from ea.sources.us.medsl import RECODED
 from ea.sources.us.medsl_state import DROPPED, EXPANDED, INDEPENDENT, NATIONAL, POOLED, PUBLISHER
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_local"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 LISTING = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/NYTPDU"
 LISTING2022 = "https://dataverse.harvard.edu/api/datasets/:persistentId/?persistentId=doi:10.7910/DVN/UYQIEP"
@@ -203,7 +204,7 @@ OFFICES = [
         (
             r"(?:(?:COUNTY )?SOIL (?:AND |& )?(?:WATER )?)?CONSERVATION(?: DISTRICT| DIST\.?)?"
             r"(?: (?:BOARD )?(?:SUPERVISORS?|DIRECTORS?|COMMISSIONERS?|BOARD))?"
-            r"|(?:COUNTY )?SOIL (?:AND|&) WATER(?: (?:SUPERVISORS?|DIRECTORS?|COMMISSIONERS?))?"
+            r"|(?:COUNTY )?SOIL (?:AND|&) WATER(?: DISTRICT)?(?: (?:SUPERVISORS?|DIRECTORS?|COMMISSIONERS?|COMMISSION))?"
         ),
     ),
 ]
@@ -333,6 +334,94 @@ UNLISTED = re.compile(
     r"|PRO TEM|JUDGE|COURT|COUNTY|CHAIR|PRESIDENT"
 )
 VACANCY = re.compile(r"UNEXPIRED|VACANCY|\bT?FV\b|SHORT TERM")
+SPECIAL_KINDS = [
+    (
+        "conservation",
+        (
+            r"(?:SOIL (?:AND |& )?(?:WATER )?)?(?:CONSERVATION|CONSER\.?)(?: ZONE)?(?: DISTRICT| DIST\.?)?"
+            r"|SOIL ?(?:AND|&|/) ?WATER(?: CONSER\.?)?(?: (?:CONSERVATION )?DIST(?:RICT|\.)?)?"
+            r"|WATERSHED CONSERVATION DISTRICT|SOIL AND CONSERVATION DISTRICT"
+        ),
+    ),
+    (
+        "hospital",
+        (
+            r"(?:PUBLIC |MEMORIAL |COUNTY )*HOSPITAL(?: DISTRICT| DIST\.?| AUTHORITY| BOARD DISTRICT)?"
+            r"|SPECIAL HEALTH CARE DISTRICT"
+        ),
+    ),
+    (
+        "fire",
+        (
+            r"(?:RURAL |SPECIAL |VOLUNTEER )?FIRE(?: (?:CONTROL AND RESCUE|CONTROL|PROTECTION|RESCUE|AND RESCUE|& RESCUE"
+            r"|AND MEDICAL|& MED|AND EMS|DEPARTMENT|SERVICES?|AND|EMERGENCY|MEDICAL))*(?: DISTRICT| DIST\.?)?"
+            r"(?: (?:NO\.? ?|# ?)?\d+)?|FD ?\d+"
+        ),
+    ),
+    ("power", r"(?:RURAL )?PUBLIC POWER(?: AND IRRIGATION)? DISTRICT|(?:ELECTRIC )?POWER AUTHORITY"),
+    (
+        "utility",
+        (
+            r"(?:WATER )?(?:PEOPLE'S UTILITY DISTRICT|PUD)|UTILIT(?:Y|IES)(?: DEPENDENT)? (?:DISTRICT|AUTHORITY)"
+            r"|METROPOLITAN UTILITIES DISTRICT|MUNICIPAL UTILITY DISTRICT(?: (?:NO\.? ?)?\d+)?"
+        ),
+    ),
+    (
+        "improvement",
+        (
+            r"(?:GENERAL |COMMUNITY |MUNICIPAL SERVICES )?IMPROVEMENT (?:DISTRICT|ZONE)|COMMUNITY DEVELOPMENT DISTRICT"
+            r"|DOMESTIC WATER IMPROVE(?:MENT)?(?: DISTRICT)?"
+        ),
+    ),
+    (
+        "sanitary",
+        (
+            r"(?:WATER (?:AND|&) )?(?:REGIONAL )?(?:SANITARY|SANITATION)(?: (?:AND|&) WATER)?(?: SEWER)?(?: DISTRICT| DIST\.?)?"
+            r"|(?:REGIONAL )?SEWER(?: DISTRICT| DIST\.?)?|WATER (?:AND|&) SEWER(?: DISTRICT)?|LEVEE AND SANITARY DISTRICT"
+        ),
+    ),
+    (
+        "water",
+        (
+            r"(?:SPECIAL |BENEFITED )?WATER (?:CONTROL |CONSERVATION |DEVELOPMENT )?(?:DISTRICT|AUTHORITY|DIST\.?)"
+            r"|DRAINAGE DISTRICT|FLOOD SAFETY AND WATER QUALITY DISTRICT"
+        ),
+    ),
+    ("park", r"(?:PARK AND )?RECREATION DISTRICT|PARK DISTRICT"),
+    ("library", r"LIBRARY DISTRICT"),
+    ("levee", r"(?:DELTA )?LEVEE DISTRICT|RECLAMATION DISTRICT"),
+    ("port", r"PORT AUTHORITY|PORT(?! OF)(?: WATERWAY AND BEACH COMMISSION)?|AIRPORT AUTHORITY"),
+]
+SPECIAL = re.compile(r"\b(?:" + "|".join(f"(?P<{kind}>{pattern})" for kind, pattern in SPECIAL_KINDS) + r")(?![A-Z])")
+SPECIAL_SKIP = re.compile(
+    r"COUNCIL|MAYOR|SCHOOL|EDUCATION|\bBOE\b|\bBD OF ED\b|CLERK|JUDGE|TOWNSHIP (?:TRUSTEE|COMMITTEE)|COMMITTEE"
+    r"|FUNDING|FLUORIDATION|ANNEXATION"
+    r"|R?E?[DV]ELOPMENT POWER|FIRE CODE|STATEWIDE|COMMISSIONER OF|VILLAGE|TOWN COMMITTEE|CITY COMMISSIONER|TRANSIT"
+    r"|QUESTION|PROPOSITION|MEASURE|SHALL|RECALL|\bTAX\b|LEVY|BOND"
+)
+SPECIAL_ROLE = re.compile(
+    r"^(?:(?:FOR MEMBERSHIP TO THE |MEMBERS? OF (?:THE )?)?(?:BOARD MEMBER\b-?|FIRE BOARD\s*-|(?:PERMANENT )?DIRECTORS?,?(?= )|MEMBER OF THE BOARD OF DIRECTORS"
+    r"|BOARD OF DIRECTORS|(?:BRD|BOARD|BD) OF FIRE COMM\w*(?: S)?|FIRE DISTRICT COMMISSIONER|FIRE COMMISSIONER"
+    r"|(?:SOIL )?CONSERVATION DISTRICT SUPERVISOR|DIRECTOR OF|MEMBER,|MEMBER OF)\s*-?\s*)+"
+)
+SPECIAL_TAIL = re.compile(
+    r"(?:\s*\(VOTE FOR \d+\)|\s*-?\s*\(?UNEXPIRED[^)]*\)?|\s*-?\s*UNEXP\w* (?:\d-YR )?TERM|\s+TO FILL A VACANCY"
+    r"|\s+(?:19|20)\d\d|\s+\d+ ?(?:YR|YEAR)S?(?: TERM)?|\s*-\s*\d YEAR TERM|\s*/\s*\d ?YR|\s+\d{8} THRU \d{8}|\s+T?FV"
+    r"|\s+(?:BOARD MEMBERS?|BOARD OF (?:DIRECTORS|TRU?E?STEES|COMMISSIONERS|SUPERVISORS)|ADVISORY BOARD|BOARD|TRUSTEES?"
+    r"|DIRECTORS?|DIR|SUPERVISORS?|COMMISSIONERS?|COMMISSION|COMMITTEE|MEMBERS?|LEVEE BOARD|BOARD DISTRICT TRUSTEE)"
+    r"|\s+POS\.?)+$"
+)
+SPECIAL_WORDS = {
+    r"\bDIST\b\.?": "DISTRICT",
+    r"\bCONSER\b\.?": "CONSERVATION",
+    r"\bIMPROVE$": "IMPROVEMENT",
+    r"\bMED\b": "MEDICAL",
+    r"\s*&\s*": " AND ",
+    r"\s*/\s*": " AND ",
+    r"\bNO\.? ?(?=\d)": "",
+    r"#\s*": "",
+    r"^FD ?(\d+)$": r"FIRE DISTRICT \1",
+}
 
 
 def fetch() -> None:
@@ -498,6 +587,89 @@ def _town(
             "stem": f"Mayor of {proper}" if key == "mayor" else f"{stem} {title}",
         }
     return None
+
+
+def _special(office: str, county: str) -> dict[str, object] | None:
+    text = re.sub(r"\s+", " ", office.upper().replace("&AMP;", "&")).strip()
+    if SPECIAL_SKIP.search(text):
+        return None
+    remainder = VACANCY.search(text) is not None
+    text = re.sub(r"\bBORO\b", "BOROUGH", re.sub(r"\bTWP\b", "TOWNSHIP", text))
+    role = SPECIAL_ROLE.match(text)
+    text = re.sub(r"\s*\((?:UNEXPIRED TERM|VOTE (?:FOR )?\d+)\)", "", text)
+    text = SPECIAL_TAIL.sub("", SPECIAL_ROLE.sub("", text)).strip(" ,-/:")
+    text = re.sub(r"^(TOWNSHIP|BOROUGH|CITY|TOWN|VILLAGE) OF (.+)$", r"\2 \1", text)
+    port = re.fullmatch(r"(?!.*IMPROVEMENT)(PORT OF (?:THE )?[A-Z .'-]+?)(?: DISTRICT)?", text)
+    found = None if port else SPECIAL.search(text)
+    if port:
+        kind, phrase, head, tail = "port", "", port[1], ""
+    elif found is not None and found.lastgroup is not None:
+        kind, phrase, head, tail = found.lastgroup, found[0], text[: found.start()], text[found.end() :]
+    elif role is not None and "FIRE" in role[0] and (bare := re.fullmatch(r"([A-Z .'-]+?)(?: (\d+))?", text)):
+        kind, phrase, head, tail = "fire", "FIRE DISTRICT", bare[1], bare[2] or ""
+    else:
+        return None
+    head, tail = re.sub(r"^(?:CITY|TOWN) OF\s+", "", head.strip(" ,-/:")), tail.strip(" ,-/:")
+    tail = re.sub(r"^(?:BOARD OF [A-Z]+|BOARD|DIRECTOR|COMMISSIONER|TRUSTEE|MEMBER)S?\b\s*[-,]?\s*", "", tail)
+    seat = re.match(r"((?:ZONE|AT[- ]LARGE|PRECINCT|PLACE|POSITION(?: NO\.?)?|SEAT|OFFICE) ?#? ?\d*)\s+(.+)$", head)
+    if seat and not tail:
+        tail, head = seat[1], seat[2]
+    named = head not in ("", "COUNTY")
+    if ", " in head and not tail:
+        tail, head = head.split(", ", 1)
+        nested = _special(f"{head} {phrase}", county)
+        return None if nested is None else {**nested, "office": office, "rest": tail, "remainder": remainder}
+    number = re.fullmatch(r"(?:BOARD )?NO\.? ?(\d+)", tail)
+    if number:
+        phrase, tail = f"{phrase} {number[1]}", ""
+    if tail.startswith("OF "):
+        phrase, tail, named = f"{phrase} {tail}", "", True
+    if not named and tail and not SEAT.fullmatch(tail):
+        head, tail, named = tail, "", True
+        if number := re.fullmatch(r"(.+?) (\d+)", head):
+            head, tail = number[1], number[2]
+    if re.search(
+        r"\b(?:BOARD|SUPERVISORS?|DIRECTORS?|COMMISS?IONE?R?S?|COMMISSON|PLACE|SEAT|ZONE|AT LARGE|POSITION|OFFICE|PRECINCT"
+        r"|NO|MILLS|YRS|VOTE|PERMANENT|DISTRICT)\b|[()&#,]|^\d|^[A-Z]\d+$",
+        head,
+    ):
+        return None
+    if tail and SPECIAL.search(tail) and head in tail:
+        tail = ""
+    if tail and (not SEAT.fullmatch(tail) or SPECIAL.search(tail)):
+        return None
+    if not named:
+        head = county.upper() if kind == "conservation" else f"{county.upper()} COUNTY"
+    if head.endswith(" COUNTY") and phrase.startswith("COUNTY "):
+        phrase = phrase.removeprefix("COUNTY ")
+    for pattern, word in SPECIAL_WORDS.items():
+        phrase = re.sub(pattern, word, phrase)
+    phrase = re.sub(r"\s+", " ", phrase).strip()
+    phrase = re.sub(r"^((?:(?!DISTRICT).)+?) (\d+)$", r"\1 DISTRICT \2", phrase) if "DISTRICT" not in phrase else phrase
+    if phrase and not re.search(r"DISTRICT|AUTHORITY|ZONE|PORT|COMMISSION|DEPARTMENT|HOSPITAL|PUD|\d|OF .+$", phrase):
+        phrase += " DISTRICT"
+    place = re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), f"{head} {phrase}".strip().title())
+    place = re.sub(r"(?<=[a-z])'S\b", "'s", place)
+    place = re.sub(r"(?<=\s)(Of|The|And)\b", lambda match: match[0].lower(), place)
+    place = re.sub(
+        r"\b(?:Pud|Ii|Iii|Iv|(?!St\b|Mt\b|Ft\b)[B-DF-HJ-NP-TV-Z][b-df-hj-np-tv-z]{1,3})\b",
+        lambda match: match[0].upper(),
+        place,
+    )
+    title = {"hospital": "Board of Trustees", "conservation": "Board of Supervisors"}.get(kind, "Board of Directors")
+    return {
+        "office": office,
+        "code": f"{kind}:{slug(place)}",
+        "scheme": "us.special_district",
+        "place": place,
+        "key": "special",
+        "title": title,
+        "body": True,
+        "rest": tail or None,
+        "remainder": remainder,
+        "stem": f"{place} {title}",
+        "named": named,
+    }
 
 
 def _seat(text: str | None) -> str | None:
@@ -833,6 +1005,8 @@ def parse() -> None:
                 found is None and (town := _town(state, office, county or "", municipalities.get(fips, []))) is not None
             ):
                 labels.append({**town, "county_fips": fips})
+            elif found is None and state != "WA" and (served := _special(office, county or "")) is not None:
+                labels.append({**served, "county_fips": fips})
         if not labels:
             continue
         frame = frame.join(pl.DataFrame(labels, infer_schema_length=None), on=["office", "county_fips"])
@@ -845,6 +1019,31 @@ def parse() -> None:
         )
         frame = frame.join(chosen, on=["county_fips", "office"])
         race = ["office", "district", "special"]
+        special = frame.filter(pl.col("scheme") == "us.special_district")
+        if special.height:
+            merged = (
+                special.filter(~pl.col("pooled"))
+                .group_by("code", "county_fips", "office")
+                .agg(pl.col("votes").sum(), pl.col("place").first(), pl.col("stem").first())
+                .sort("county_fips", "votes", "office", descending=[False, True, False])
+                .group_by("code", maintain_order=True)
+                .agg(
+                    pl.col("county_fips").first().alias("recoded"),
+                    pl.col("office").first().alias("label"),
+                    pl.col("place").first().alias("name"),
+                    pl.col("stem").first().alias("heading"),
+                )
+                .with_columns(recoded=pl.concat_str("recoded", pl.lit(":"), "code"))
+            )
+            frame = pl.concat(
+                [
+                    frame.filter(pl.col("scheme") != "us.special_district"),
+                    special.join(merged, on="code")
+                    .with_columns(code="recoded", office="label", place="name", stem="heading")
+                    .drop("recoded", "label", "name", "heading"),
+                ],
+                how="diagonal_relaxed",
+            )
         candidates = frame.filter(~pl.col("pooled"), pl.col("scheme") == "us.county")
         spread = (
             candidates.join(
@@ -1007,7 +1206,10 @@ def parse() -> None:
             )
             .group_by(*contest, "candidate", "pooled", "unit")
             .agg(
-                pl.col("party_detailed").drop_nulls().mode().first(),
+                pl.col("party_detailed")
+                .sort_by(pl.col("votes").fill_null(0), "party_detailed", descending=[True, False], nulls_last=True)
+                .drop_nulls()
+                .first(),
                 pl.when(pl.col("votes").is_null().all()).then(None).otherwise(pl.col("votes").sum()).alias("votes"),
             )
         )
@@ -1126,6 +1328,7 @@ def emit() -> Path:
                     publisher="OpenElections",
                     title=f"{state} precinct-level results",
                     url=f"https://github.com/openelections/openelections-data-{state.lower()}",
+                    license=UNLICENSED,
                 )
             cs.artifact(
                 raw.cached(SOURCE, OPENELECTIONS.format(state=state.lower(), commit=commit, day=day)),
@@ -1244,6 +1447,47 @@ def emit() -> Path:
                 id=cs.unit("us.judicial_district", code),
                 polity_id=polity,
                 scheme_code="us.judicial_district",
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
+        special = contests.filter(pl.col("scheme") == "us.special_district").select("state_po", "code", "place")
+        if special.height:
+            cs.add(
+                "scheme",
+                code="us.special_district",
+                polity_id=cs.polity("US"),
+                kind="administrative",
+                rank=3,
+                noun="special district",
+            )
+        for state, code, display in special.unique(["code"]).sort("code").iter_rows():
+            polity = cs.key("us.polity", f"special:{code}")
+            county, _, path = polities[("us.county", code[:5])]
+            path = f"{path}/{slug(display)}"
+            if slugs.get(path, polity) != polity:
+                raise ValueError(f"{display} would take {path}")
+            slugs[path] = polity
+            polities[("us.special_district", code)] = (polity, display, path)
+            if polity not in cs.minted:
+                continue
+            cs.add("polity", id=polity, kind="special_district", iso_code=None)
+            name(polity, display)
+            cs.add("polity_parent", polity_id=polity, parent_id=county)
+            cs.add("slug", path=path, entity_id=polity)
+            area = cs.area("us.special_district", code)
+            cs.add("area", id=area, scheme_code="us.special_district")
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.county", code[:5]))
+            name(area, f"{display}, {state}")
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.special_district", code),
+                polity_id=polity,
+                scheme_code="us.special_district",
                 code=code,
                 area_relation="equals",
                 area_id=area,
