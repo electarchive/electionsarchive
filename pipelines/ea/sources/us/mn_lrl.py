@@ -65,6 +65,44 @@ TABLES = {
                 8: ("James G. Miles", None),
             },
         ),
+        (
+            "secretary-of-state",
+            9,
+            10,
+            {
+                0: ("Joan Anderson Growe", "DFL"),
+                1: ("Arlen Erdahl", "R"),
+                2: ("Daniel J. Slater", "AM"),
+            },
+        ),
+        (
+            "auditor",
+            9,
+            10,
+            {
+                3: ("Robert W. Mattson", "DFL"),
+                4: ("Rolland F. Hatfield", "R"),
+            },
+        ),
+        (
+            "treasurer",
+            9,
+            10,
+            {
+                5: ("Jim Lord", "DFL"),
+                6: ("J. Robert Stassen", "R"),
+            },
+        ),
+        (
+            "attorney-general",
+            11,
+            12,
+            {
+                0: ("Warren Spannaus", "DFL"),
+                1: ("Dean A. Nyquist", "R"),
+                2: ("Allan W. Lamkin", "AM"),
+            },
+        ),
     ],
     "1976-11-02": [
         (
@@ -140,6 +178,46 @@ TABLES = {
                 21: ("Edwin C. Pommerening", "SA"),
             },
         ),
+        (
+            "secretary-of-state",
+            4,
+            5,
+            {
+                0: ("Dianna Jenkins", "AM"),
+                1: ("Gerald W. Brekke", "IR"),
+                2: ("Joan Anderson Growe", "DFL"),
+            },
+        ),
+        (
+            "auditor",
+            4,
+            5,
+            {
+                3: ("Arne Carlson", "IR"),
+                4: ("Robert W. Mattson", "DFL"),
+                5: ("Helen S. Kruth", "C"),
+            },
+        ),
+        (
+            "treasurer",
+            4,
+            5,
+            {
+                6: ("Donald G. Hanson", "AM"),
+                7: ("Rick Teske", "IR"),
+                8: ("Jim Lord", "DFL"),
+            },
+        ),
+        (
+            "attorney-general",
+            4,
+            5,
+            {
+                9: ("Arnie Olsen", "AM"),
+                10: ("Howard A. Knutson", "IR"),
+                11: ("Warren Spannaus", "DFL"),
+            },
+        ),
     ],
     "1980-11-04": [
         (
@@ -183,6 +261,45 @@ TABLES = {
                 2: ("Kathy Wheeler", "SW"),
                 3: ("Tom McDonald", None),
                 4: ("Franklin H. Haws", "LP"),
+            },
+        ),
+        (
+            "secretary-of-state",
+            6,
+            7,
+            {
+                5: ("Mark Hanson", "IR"),
+                6: ("Joan Anderson Growe", "DFL"),
+                7: ("Linda Taylor", "LP"),
+            },
+        ),
+        (
+            "auditor",
+            8,
+            9,
+            {
+                0: ("Arne Carlson", "IR"),
+                1: ("Paul Wellstone", "DFL"),
+            },
+        ),
+        (
+            "treasurer",
+            8,
+            9,
+            {
+                2: ("Bonn Clayton", "IR"),
+                3: ("Robert W. Mattson", "DFL"),
+                4: ("Helen Kruth", "C"),
+            },
+        ),
+        (
+            "attorney-general",
+            8,
+            9,
+            {
+                5: ("Elliot Rothenberg", "IR"),
+                6: ("Hubert H. Humphrey III", "DFL"),
+                7: ("Samuel A. Faulk", "CPP"),
             },
         ),
     ],
@@ -229,7 +346,45 @@ TABLES = {
                 6: ("Tom Jaax", "SWP"),
                 7: ("Joseph A. Rohner III", "LIB"),
             },
-        )
+        ),
+        (
+            "secretary-of-state",
+            2,
+            3,
+            {
+                8: ("Joan Anderson Growe", "DFL"),
+                9: ("Don Koenig", "IR"),
+            },
+        ),
+        (
+            "auditor",
+            2,
+            3,
+            {
+                10: ("John Dooley", "DFL"),
+                11: ("Arne Carlson", "IR"),
+            },
+        ),
+        (
+            "treasurer",
+            2,
+            3,
+            {
+                12: ("Michael A. McGrath", "DFL"),
+                13: ("John Drew", "IR"),
+                14: ("Helen Kruth", "C"),
+            },
+        ),
+        (
+            "attorney-general",
+            2,
+            3,
+            {
+                15: ("Hubert H. Humphrey III", "DFL"),
+                16: ("Lew Freeman", "IR"),
+                17: ("Derrick P. Grimmer", "GRP"),
+            },
+        ),
     ],
     "1988-11-08": [
         (
@@ -282,6 +437,44 @@ TABLES = {
                 3: ("Ross S. Culverhouse", "GRP"),
                 4: ("Heartwarrior Chosa", None),
                 5: ("Jon Grunseth", "IR"),
+            },
+        ),
+        (
+            "secretary-of-state",
+            5,
+            6,
+            {
+                6: ("Joan Anderson Growe", "DFL"),
+                7: ("David Jennings", "IR"),
+                8: ("Candice Sjostrom", "GRP"),
+            },
+        ),
+        (
+            "auditor",
+            7,
+            8,
+            {
+                0: ("Mark Dayton", "DFL"),
+                1: ("Bob Heinrich", "IR"),
+            },
+        ),
+        (
+            "treasurer",
+            7,
+            8,
+            {
+                2: ("Michael A. McGrath", "DFL"),
+                3: ("John Burger", "IR"),
+                4: ("Colleen Bonniwell", "GRP"),
+            },
+        ),
+        (
+            "attorney-general",
+            7,
+            8,
+            {
+                5: ("Hubert H. Humphrey III", "DFL"),
+                6: ("Kevin E. Johnson", "IR"),
             },
         ),
     ],
@@ -338,6 +531,46 @@ TABLES = {
                 3: ("Jon Hillson", "SWP"),
                 4: ("Eric Arthur Olson", "LIB"),
                 5: ("Leslie Davis", None),
+            },
+        ),
+        (
+            "secretary-of-state",
+            5,
+            6,
+            {
+                6: ("Dick Kimbler", "IR"),
+                7: ("Joan Anderson Growe", "DFL"),
+                8: ("Dale D. Wilkinson", "GRP"),
+            },
+        ),
+        (
+            "auditor",
+            7,
+            8,
+            {
+                0: ("Judi Dutcher", "IR"),
+                1: ("Donald M. Moe", "DFL"),
+                2: ("Steven C. Anderson", "GRP"),
+            },
+        ),
+        (
+            "treasurer",
+            7,
+            8,
+            {
+                3: ("James C. Olson", "IR"),
+                4: ("Michael A. McGrath", "DFL"),
+                5: ("Colleen Bonniwell", "GRP"),
+            },
+        ),
+        (
+            "attorney-general",
+            7,
+            8,
+            {
+                6: ("Sharon Anderson", "IR"),
+                7: ("Hubert H. Humphrey III", "DFL"),
+                8: ("Dean W. Amundson", "GRP"),
             },
         ),
     ],
@@ -399,9 +632,325 @@ TABLES = {
             6,
             {0: ("Thomas A. Fiske", "SWP"), 1: ("Fancy Ray McCloney", None), 2: ("Ken Pentel", "GPM"), 3: WRITE_IN},
         ),
+        (
+            "secretary-of-state",
+            5,
+            6,
+            {
+                4: ("Alan Shilepsky", "RP"),
+                5: ("Mary Kiffmeyer", "R"),
+                6: ("Edwina Garcia", "DFL"),
+                7: ("Kenneth Iverson", "LIB"),
+                8: WRITE_IN,
+            },
+        ),
+        (
+            "auditor",
+            7,
+            8,
+            {
+                0: ("Judi Dutcher", "R"),
+                1: ("Nancy A. Larson", "DFL"),
+                2: ("Joseph G. Peschek", "PM"),
+                3: ("Bob Odden", "LIB"),
+                4: ("Patricia G. V. Becker", "MTP"),
+                5: WRITE_IN,
+            },
+        ),
+        (
+            "treasurer",
+            7,
+            8,
+            {
+                6: ("James N. Dunlop", "RP"),
+                7: ("Kevin Knight", "R"),
+                8: ("Carol Johnson", "DFL"),
+                9: ("Mitchell Berg", "LIB"),
+                10: WRITE_IN,
+            },
+        ),
+        (
+            "attorney-general",
+            9,
+            10,
+            {
+                0: ("Jim Mangan", "RP"),
+                1: ("Charlie Weaver", "R"),
+                2: ("Mike Hatch", "DFL"),
+                3: ("Ruth A. Mason", "LIB"),
+                4: WRITE_IN,
+            },
+        ),
     ],
 }
 READ = {
+    ("1974-11-05", 11, "Warren Spannaus"): {
+        "Aitkin": 2782,
+        "Anoka": 28271,
+        "Becker": 5057,
+        "Beltrami": 4692,
+        "Benton": 4459,
+        "Big Stone": 1807,
+        "Blue Earth": 10236,
+        "Brown": 6041,
+        "Carlton": 7262,
+        "Carver": 5415,
+        "Cass": 4217,
+        "Chippewa": 4206,
+        "Chisago": 4555,
+        "Clay": 7871,
+        "Clearwater": 1917,
+        "Cook": 932,
+        "Cottonwood": 3032,
+        "Crow Wing": 7897,
+        "Dakota": 30552,
+        "Dodge": 2513,
+        "Douglas": 5921,
+        "Faribault": 4744,
+        "Fillmore": 3872,
+        "Freeborn": 7302,
+        "Goodhue": 8107,
+        "Grant": 1821,
+        "Hennepin": 177542,
+        "Houston": 3283,
+        "Hubbard": 2809,
+        "Isanti": 4003,
+        "Itasca": 9980,
+        "Jackson": 3169,
+        "Kanabec": 2327,
+        "Kandiyohi": 7264,
+        "Kittson": 2050,
+        "Koochiching": 4694,
+        "Lac qui Parle": 2861,
+        "Lake": 3551,
+        "Lake of the Woods": 1080,
+        "Le Sueur": 4951,
+        "Lincoln": 2363,
+        "Lyon": 5718,
+        "McLeod": 4572,
+        "Mahnomen": 1480,
+        "Marshall": 3709,
+        "Martin": 4627,
+        "Meeker": 4471,
+        "Mille Lacs": 4165,
+        "Morrison": 6895,
+        "Mower": 9716,
+        "Murray": 2987,
+        "Nicollet": 5223,
+        "Nobles": 4662,
+        "Norman": 2295,
+        "Olmsted": 12477,
+        "Otter Tail": 8069,
+        "Pennington": 2968,
+        "Pine": 4257,
+        "Pipestone": 2659,
+        "Polk": 7808,
+        "Pope": 2876,
+        "Ramsey": 91285,
+        "Red Lake": 1435,
+        "Redwood": 3449,
+        "Renville": 5216,
+        "Rice": 7990,
+        "Rock": 1994,
+        "Roseau": 2864,
+        "St. Louis": 56330,
+        "Scott": 7963,
+        "Sherburne": 4498,
+        "Sibley": 3491,
+        "Stearns": 19207,
+        "Steele": 4144,
+        "Stevens": 2526,
+        "Swift": 3991,
+        "Todd": 4552,
+        "Traverse": 2058,
+        "Wabasha": 4423,
+        "Wadena": 2604,
+        "Waseca": 2949,
+        "Washington": 18692,
+        "Watonwan": 3062,
+        "Wilkin": 1908,
+        "Winona": 8854,
+        "Wright": 8729,
+        "Yellow Medicine": 3601,
+    },
+    ("1974-11-05", 11, "Dean A. Nyquist"): {
+        "Aitkin": 1551,
+        "Anoka": 11371,
+        "Becker": 2969,
+        "Beltrami": 2819,
+        "Benton": 2215,
+        "Big Stone": 762,
+        "Blue Earth": 5486,
+        "Brown": 3964,
+        "Carlton": 2629,
+        "Carver": 3912,
+        "Cass": 3169,
+        "Chippewa": 2038,
+        "Chisago": 2312,
+        "Clay": 4481,
+        "Clearwater": 818,
+        "Cook": 692,
+        "Cottonwood": 2536,
+        "Crow Wing": 4883,
+        "Dakota": 13805,
+        "Dodge": 1863,
+        "Douglas": 3517,
+        "Faribault": 3496,
+        "Fillmore": 3154,
+        "Freeborn": 5071,
+        "Goodhue": 5495,
+        "Grant": 1150,
+        "Hennepin": 90732,
+        "Houston": 2728,
+        "Hubbard": 2042,
+        "Isanti": 1824,
+        "Itasca": 4247,
+        "Jackson": 1582,
+        "Kanabec": 1203,
+        "Kandiyohi": 3319,
+        "Kittson": 931,
+        "Koochiching": 1815,
+        "Lac qui Parle": 1440,
+        "Lake": 1399,
+        "Lake of the Woods": 567,
+        "Le Sueur": 2542,
+        "Lincoln": 943,
+        "Lyon": 2630,
+        "McLeod": 3800,
+        "Mahnomen": 571,
+        "Marshall": 1532,
+        "Martin": 4001,
+        "Meeker": 3256,
+        "Mille Lacs": 2198,
+        "Morrison": 2837,
+        "Mower": 3954,
+        "Murray": 1758,
+        "Nicollet": 3004,
+        "Nobles": 2411,
+        "Norman": 1101,
+        "Olmsted": 9070,
+        "Otter Tail": 6401,
+        "Pennington": 1296,
+        "Pine": 1782,
+        "Pipestone": 1863,
+        "Polk": 3103,
+        "Pope": 1331,
+        "Ramsey": 34543,
+        "Red Lake": 425,
+        "Redwood": 2999,
+        "Renville": 2714,
+        "Rice": 4505,
+        "Rock": 2004,
+        "Roseau": 1989,
+        "St. Louis": 18855,
+        "Scott": 3108,
+        "Sherburne": 2122,
+        "Sibley": 2487,
+        "Stearns": 9169,
+        "Steele": 3293,
+        "Stevens": 1421,
+        "Swift": 1367,
+        "Todd": 2621,
+        "Traverse": 787,
+        "Wabasha": 2631,
+        "Wadena": 1979,
+        "Waseca": 2746,
+        "Washington": 8708,
+        "Watonwan": 2237,
+        "Wilkin": 1082,
+        "Winona": 4577,
+        "Wright": 4822,
+        "Yellow Medicine": 1879,
+    },
+    ("1974-11-05", 11, "Allan W. Lamkin"): {
+        "Aitkin": 219,
+        "Anoka": 1661,
+        "Becker": 255,
+        "Beltrami": 424,
+        "Benton": 549,
+        "Big Stone": 58,
+        "Blue Earth": 371,
+        "Brown": 677,
+        "Carlton": 315,
+        "Carver": 1148,
+        "Cass": 389,
+        "Chippewa": 167,
+        "Chisago": 311,
+        "Clay": 121,
+        "Clearwater": 147,
+        "Cook": 37,
+        "Cottonwood": 175,
+        "Crow Wing": 929,
+        "Dakota": 1129,
+        "Dodge": 204,
+        "Douglas": 474,
+        "Faribault": 237,
+        "Fillmore": 197,
+        "Freeborn": 198,
+        "Goodhue": 275,
+        "Grant": 43,
+        "Hennepin": 6372,
+        "Houston": 157,
+        "Hubbard": 203,
+        "Isanti": 241,
+        "Itasca": 695,
+        "Jackson": 145,
+        "Kanabec": 234,
+        "Kandiyohi": 571,
+        "Kittson": 73,
+        "Koochiching": 241,
+        "Lac qui Parle": 184,
+        "Lake": 242,
+        "Lake of the Woods": 81,
+        "Le Sueur": 206,
+        "Lincoln": 85,
+        "Lyon": 247,
+        "McLeod": 245,
+        "Mahnomen": 71,
+        "Marshall": 140,
+        "Martin": 478,
+        "Meeker": 369,
+        "Mille Lacs": 303,
+        "Morrison": 587,
+        "Mower": 210,
+        "Murray": 134,
+        "Nicollet": 179,
+        "Nobles": 196,
+        "Norman": 91,
+        "Olmsted": 782,
+        "Otter Tail": 300,
+        "Pennington": 177,
+        "Pine": 497,
+        "Pipestone": 96,
+        "Polk": 417,
+        "Pope": 153,
+        "Ramsey": 3000,
+        "Red Lake": 90,
+        "Redwood": 346,
+        "Renville": 261,
+        "Rice": 226,
+        "Rock": 64,
+        "Roseau": 156,
+        "St. Louis": 2597,
+        "Scott": 406,
+        "Sherburne": 359,
+        "Sibley": 160,
+        "Stearns": 2797,
+        "Steele": 92,
+        "Stevens": 84,
+        "Swift": 134,
+        "Todd": 421,
+        "Traverse": 90,
+        "Wabasha": 277,
+        "Wadena": 190,
+        "Waseca": 112,
+        "Washington": 943,
+        "Watonwan": 139,
+        "Wilkin": 52,
+        "Winona": 422,
+        "Wright": 905,
+        "Yellow Medicine": 182,
+    },
     ("1978-11-07", 2, "Jean T. Brust"): {
         "Aitkin": 21,
         "Anoka": 126,
@@ -490,7 +1039,7 @@ READ = {
         "Winona": 59,
         "Wright": 60,
         "Yellow Medicine": 28,
-    }
+    },
 }
 FIXES = {
     **{
@@ -510,6 +1059,9 @@ FIXES = {
             "Kandiyohi": 24,
         }.items()
     },
+    ("1974-11-05", 9, "Cass", 6): 3437,
+    ("1974-11-05", 9, "Chippewa", 6): 2567,
+    ("1974-11-05", 9, "Hennepin", 6): 120747,
     ("1976-11-02", 4, "Hennepin", 15): 119121,
     ("1976-11-02", 4, "Hennepin", 16): 316130,
     ("1976-11-02", 4, "Hennepin", 17): 2489,
@@ -525,11 +1077,29 @@ FIXES = {
     ("1980-11-04", 2, "Pennington", 10): 465,
     ("1992-11-03", 3, "Mahnomen", 8): 483,
     ("1998-11-03", 3, "Beltrami", 5): 5872,
+    ("1998-11-03", 7, "Murray", 1): 2274,
+    ("1998-11-03", 7, "Lincoln", 2): 57,
+    ("1998-11-03", 9, "Mahnomen", 0): 69,
+    ("1998-11-03", 7, "Lake of the Woods", 3): 23,
+    ("1998-11-03", 7, "Pine", 3): 227,
+    ("1998-11-03", 7, "Le Sueur", 4): 823,
+    ("1998-11-03", 7, "Nicollet", 4): 757,
+    ("1998-11-03", 7, "Nicollet", 7): 5287,
+    ("1998-11-03", 7, "Nobles", 7): 3275,
+    ("1998-11-03", 7, "Olmsted", 7): 21457,
+    ("1998-11-03", 7, "Otter Tail", 7): 11678,
+    ("1998-11-03", 7, "Freeborn", 8): 6722,
+    ("1998-11-03", 7, "Lincoln", 8): 1578,
+    ("1998-11-03", 7, "Pipestone", 8): 2067,
+    ("1998-11-03", 7, "Lake of the Woods", 9): 27,
+    ("1998-11-03", 7, "Le Sueur", 9): 227,
+    ("1998-11-03", 7, "Marshall", 9): 67,
     ("1998-11-03", 3, "Isanti", 6): 2665,
     ("1998-11-03", 3, "Jackson", 6): 1728,
     ("1998-11-03", 3, "Lake", 6): 2472,
 }
 MISPRINTS = {
+    ("1990-11-06", 5, "TOTAL", 6): 1094698,
     ("1972-11-07", 9, "TOTAL", 0): 981340,
     ("1976-11-02", 4, "TOTAL", 15): 478611,
     ("1980-11-04", 2, "TOTAL", 3): 6139,
@@ -542,6 +1112,9 @@ MISPRINTS = {
 SHIFTED = {("1990-11-06", 5): {"McLeod": "Martin", "Mahnomen": "McLeod", "Marshall": "Mahnomen", "Martin": "Marshall"}}
 MISPRINTED = "The printed canvass shows {} in {} County; this set uses {:,}, which the statewide total and the other tables support."
 NOTES = {
+    "1990-11-06:MN:secretary-of-state": "Joan Anderson Growe's county figures sum to 1,094,698; the canvass prints "
+    "a statewide total of 1,094,696. The same table prints Martin, McLeod, Mahnomen, and Marshall counties one row "
+    "out of place; each row is assigned here to the county whose turnout it fits.",
     "1972-11-07:MN:senate": "Walter Mondale's county figures sum to 981,340; the canvass and the state canvassing "
     "board's certificate give a statewide total of 981,320.",
     "1974-11-05:MN:governor": "The canvass lists write-in votes for Tom McDonald (71) and others (77) for only a few "
@@ -557,6 +1130,12 @@ NOTES = {
     "out of place; each row is assigned here to the county whose turnout it fits. Jon Grunseth withdrew as the "
     "Independent-Republican nominee on October 29, 1990, and the votes cast for him are kept as printed.",
     "1998-11-03:MN:governor": MISPRINTED.format("32,564 votes for Norm Coleman", "Washington", 32565),
+}
+OFFICES = {
+    "secretary-of-state": "Secretary of State",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer",
+    "attorney-general": "Attorney General",
 }
 PARTIES = {
     "A": "MN:american",
@@ -794,7 +1373,11 @@ def parse() -> None:
                         cells["TOTAL"] = values
                     else:
                         cells.setdefault(name, []).extend(values)
-            missing = [name for name in counties if name not in cells]
+            missing = [
+                name
+                for name in counties
+                if name not in cells and any((day, first, candidate) not in READ for candidate, _ in columns.values())
+            ]
             if missing or "TOTAL" not in cells:
                 raise ValueError(f"{day} {office} pages {first}–{last}: no row for {missing or 'the total'}")
             if len(cells["TOTAL"]) <= max(columns):
@@ -849,7 +1432,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Minnesota's president, U.S. Senate, and governor by county 1976–1998, "
+            summary="Minnesota's president, U.S. Senate, governor, and statewide offices by county 1972–1998, "
             "from the Secretary of State's results archived by the Legislative Reference Library",
             polity="US",
         )
@@ -881,8 +1464,9 @@ def emit() -> Path:
             ).fetchall()
         )
         people: dict[str, set[UUID]] = {}
-        for person, text in conn.execute(
-            """select distinct cd.person_id, n.text from candidacy cd
+        years: dict[UUID, set[int]] = {}
+        for person, text, year in conn.execute(
+            """select distinct cd.person_id, n.text, left(x.value, 4)::int from candidacy cd
                join contest_option o on o.id = cd.option_id
                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                  and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:MN:[a-z-]+(:special)?$'
@@ -890,22 +1474,68 @@ def emit() -> Path:
         ).fetchall():
             people.setdefault(plain(text), set()).add(person)
             people.setdefault(f"{plain(text.split()[0])}|{surname(text)}", set()).add(person)
+            years.setdefault(person, set()).add(year)
+        fptp = cs.key("us.electoral_system", "fptp")
         parties = {code: cs.key("us.party", key) for code, key in PARTIES.items()}
-        if cs.minted & set(parties.values()):
-            raise ValueError("the parties must exist")
+        if cs.minted & {fptp, *parties.values()}:
+            raise ValueError("the electoral system and parties must exist")
         contests: dict[str, UUID] = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':MN:'")
         )
         made: set[UUID] = set()
         for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
             key = f"{day}:MN:{office}"
-            (contest,) = [
-                entity for value, entity in contests.items() if value[:4] == day[:4] and value[10:] == key[10:]
-            ]
-            ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             result_set = cs.key(f"{SOURCE}.result_set", key)
             if result_set not in cs.minted:
                 continue
+            found = [value for value in contests if value[:4] == day[:4] and value[10:] == key[10:]]
+            if found:
+                contest = contests[found[0]]
+                ((election, area),) = conn.execute(
+                    "select election_id, district_area_id from contest where id = %s", [contest]
+                ).fetchall()
+            else:
+                ((stamp, election, area),) = conn.execute(
+                    """select left(x.value, 10), c.election_id, c.district_area_id from contest c
+                       join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
+                       where x.value ~ %s""",
+                    [f"^{day[:4]}-..-..:MN:governor$"],
+                ).fetchall()
+                office_id = cs.key("us.office", f"{office}:MN")
+                if office_id in cs.minted and office_id not in made:
+                    made.add(office_id)
+                    cs.add("office", id=office_id, polity_id=cs.polity("US-MN"), kind="other")
+                    cs.add(
+                        "name",
+                        entity_id=office_id,
+                        text=f"{OFFICES[office].removeprefix('State ')} of Minnesota",
+                        lang="en",
+                        kind="official",
+                        is_preferred=True,
+                    )
+                contest = cs.key("us.contest", f"{stamp}:MN:{office}")
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="office",
+                    office_id=office_id,
+                    district_area_id=area,
+                    term="full",
+                    magnitude=1,
+                    round_number=1,
+                    electoral_system_id=fptp,
+                    default_result_kind="counted",
+                )
+                cs.add(
+                    "name",
+                    entity_id=contest,
+                    text=f"{day[:4]} Minnesota {OFFICES[office]} election",
+                    lang="en",
+                    kind="official",
+                    is_preferred=True,
+                )
+                cs.add("slug", path=f"us/mn/{stamp}-general/{office}", entity_id=contest)
             options = conn.execute(
                 """select id, kind, ballot_label from contest_option
                    where contest_id = %s and parent_option_id is null and kind <> 'others'""",
@@ -980,12 +1610,13 @@ def emit() -> Path:
                             f"{plain(candidate.split()[0])}|{surname(candidate)}", set()
                         )
                         person = (
-                            next(iter(known))
-                            if len(known) == 1
+                            min(known, key=lambda one: min(abs(year - int(day[:4])) for year in years.get(one, {0})))
+                            if known
                             else cs.key(f"{SOURCE}.person", f"MN:{slug(candidate)}")
                         )
                         if person in cs.minted and person not in made:
                             made.add(person)
+                            people.setdefault(f"{plain(candidate.split()[0])}|{surname(candidate)}", set()).add(person)
                             cs.add("person", id=person)
                             cs.add(
                                 "name", entity_id=person, text=candidate, lang="en", kind="official", is_preferred=True
