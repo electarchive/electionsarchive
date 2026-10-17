@@ -368,6 +368,13 @@
     const [top, next] = contest.rows
       .filter((row) => row.current != null && !row.key.startsWith("kind:"))
       .toSorted((a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0));
+    if (top?.current != null && next == null) {
+      return (
+        ["won", "elected"].includes(top.current.outcome ?? "")
+          ? m.race_lede_unopposed
+          : m.race_lede_unopposed_led
+      )({ party: named(top) });
+    }
     if (top?.current == null || next?.current == null) {
       return null;
     }

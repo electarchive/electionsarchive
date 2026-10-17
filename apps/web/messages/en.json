@@ -119,6 +119,8 @@
   "term_exhausted": "Ballots that rank no candidate still in the count are exhausted.",
   "count_derived": "Small-area results were tabulated from ballot records by this archive rather than reported by officials.",
   "count_derived_link": "How they were counted",
+  "race_lede_unopposed": "{party} won unopposed.",
+  "race_lede_unopposed_led": "{party} ran unopposed.",
   "declared_tacit": "Returned unopposed, so no vote was held.",
   "declared_show_of_hands": "Decided by a show of hands, so there is no vote count.",
   "declared_appointed": "Filled by appointment, so no vote was held.",
