@@ -14,6 +14,7 @@
 
   let width = $state(720);
   let hovered = $state<{ series: number; point: number } | null>(null);
+  let opened = $state<Array<string>>([]);
 
   const sides = $derived(
     data.parties.map((party) => ({
@@ -279,7 +280,9 @@
           </tr>
         </thead>
         <tbody>
-          {#each chart.points.toReversed() as row (row.date)}
+          {#each opened.includes(chart.id) ? chart.points.toReversed() : chart.points
+                .toReversed()
+                .slice(0, 12) as row (row.date)}
             {const a = $derived(row.sides[0]?.share ?? null)}
             {const b = $derived(row.sides[1]?.share ?? null)}
             {const lead = $derived(
@@ -325,7 +328,8 @@
                     <span
                       class="shrink-0 rounded-xs bg-(--party) block-2 inline-2"
                     ></span>
-                    <span class="font-sans text-xs text-muted-foreground"
+                    <span
+                      class="font-sans text-xs text-muted-foreground max-sm:sr-only"
                       >{lead.label}</span
                     >
                     {points(Math.abs(a - b)).replace(/^-/u, "+")}
@@ -337,5 +341,22 @@
         </tbody>
       </table>
     </div>
+    {#if chart.points.length > 12}
+      {const isOpen = $derived(opened.includes(chart.id))}
+      <button
+        type="button"
+        class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+        aria-expanded={isOpen}
+        onclick={() =>
+          (opened = isOpen
+            ? opened.filter((id) => id !== chart.id)
+            : [...opened, chart.id])}
+        >{isOpen
+          ? m.polity_results_fewer()
+          : m.polity_results_more({
+              count: String(chart.points.length),
+            })}</button
+      >
+    {/if}
   </section>
 {/each}

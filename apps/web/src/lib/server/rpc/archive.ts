@@ -8125,8 +8125,16 @@ export const parties = {
         home as (
           select polity_id as polity from party where id = (select id from ids limit 1)
         ),
+        branches as (
+          select pa.party_id as id from party_affiliation pa
+          where pa.kind = 'regional_branch' and pa.parent_party_id in (select id from ids)
+        ),
+        family as (
+          select id from ids union select id from branches
+          union select em.entity_id from entity_merge em where em.into_id in (select id from branches)
+        ),
         mine as materialized (
-          select o.id as option, o.contest_id from contest_option o where o.party_id in (select id from ids)
+          select o.id as option, o.contest_id from contest_option o where o.party_id in (select id from family)
         ),
         up(id, parent) as (
           select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
@@ -8177,7 +8185,7 @@ export const parties = {
         tallied as (
           select f.root, sum(f.value) as total,
             coalesce(sum(f.value) filter (
-              where o.party_id in (select id from ids) or o.parent_option_id in (select option from mine)
+              where o.party_id in (select id from family) or o.parent_option_id in (select option from mine)
             ), 0) as votes
           from fetched f join mains m on m.root = f.root and m.main = f.measure
           join contest_option o on o.k = f.option_k
@@ -8188,7 +8196,7 @@ export const parties = {
           select w.root, coalesce(sum(w.seats) filter (where w.mine), 0) as seats, sum(w.seats) as filled
           from (
             select r.id as root, o.id,
-              bool_or(coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) in (select id from ids)) as mine,
+              bool_or(coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) in (select id from family)) as mine,
               max(coalesce(x.seats, 1)) as seats
             from roots r
             join lateral (
@@ -8307,6 +8315,13 @@ export const parties = {
           name: labels.full.get(seat) ?? "",
           points: found.rows
             .filter((row) => row.seat === seat)
+            .filter((row, index, rows) => {
+              const nearest = Math.max(
+                rows[index - 1]?.races ?? 0,
+                rows[index + 1]?.races ?? 0,
+              );
+              return nearest < 10 || row.races * 2 >= nearest;
+            })
             .map((row) => {
               const target = row.races === 1 ? row.root : row.grp;
               return {
