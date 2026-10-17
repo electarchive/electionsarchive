@@ -17,6 +17,7 @@ YEARS = range(4, 15, 2)
 COUNTIES = range(1, 116, 2)
 PUBLISHER = "Statewide Database, University of California, Berkeley"
 TITLE = "Statement of Vote data by county"
+MERGED = {"CINDY SHEEHAN LEA SHERMAN": "CINDY SHEEHAN"}
 LINE = re.compile(r"^(USS|CNG(\d\d))([A-Z]{3})(?:\d\d)?\s+(.*?)\s+(\d+)\s*$")
 
 
@@ -35,13 +36,14 @@ def parse() -> None:
                 found = LINE.match(line)
                 if found is None or found.group(3) == "VNC":
                     continue
+                candidate = found.group(4).rstrip("*").strip().upper()
                 rows.append(
                     (
                         2000 + year,
                         "senate" if found.group(1) == "USS" else "house",
                         None if found.group(2) is None else int(found.group(2)),
                         f"06{county:03d}",
-                        found.group(4).rstrip("*").strip().upper(),
+                        MERGED.get(candidate, candidate),
                         int(found.group(5)),
                     )
                 )
@@ -94,10 +96,10 @@ def emit() -> Path:
             publisher=PUBLISHER,
             title=TITLE,
             url="https://statewidedatabase.org/election.html",
-            license=None,
+            license="No license stated: facts published with attribution, raw files not redistributed",
         )
         for year in YEARS:
             for county in COUNTIES:
                 cs.artifact(raw.cached(SOURCE, CODES.format(year=year, county=county)), source)
-        medsl.attach(cs, conn, frame, {"CA": source})
+        medsl.attach(cs, conn, frame, {"CA": source}, redone=frozenset({"2008-11-04:CA:house:8"}))
         return cs.write()
