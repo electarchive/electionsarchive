@@ -67,6 +67,7 @@ PA_OFFICES = ((1, 1), (2, 1), *((11, district) for district in range(2, 19)))
 ILLINOIS = "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1Ze1iXEwZay4hPK3eAEa%2f2wcdY8MIeoGR39sSBMsL2x%2bcO%2bo4b1aWap6eXuodBvDiO9C3KC9P%2fqVu"
 IL_TOTALS = "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1Ze1iXEwZay4hPK3eAEa%2f2we615l6oeLwg6WnqfsqBpfS0q%2bmbe1kY9qqK4nL4jdXPvz3PxN7kL%2fldHLhodL0QRQ%3d"
 IL_WRITE_INS = ("33561", "33562", "33567")
+COLUMBIA = "https://electionresults.dcboe.org/{}"
 KENTUCKY = "https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf"
 DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
@@ -256,6 +257,10 @@ def fetch() -> None:
     raw.fetch(SOURCE, UTAH, suffix=".json")
     raw.fetch(SOURCE, KENTUCKY, suffix=".pdf")
     raw.fetch(SOURCE, ARKANSAS.format("GetContestResults", "&contestType=FED"), suffix=".json")
+    raw.fetch(
+        SOURCE, COLUMBIA.format("Downloads/Reports/June_4_2024_Primary_Election_Certified_Results.csv"), suffix=".csv"
+    )
+    raw.fetch(SOURCE, COLUMBIA.format("cityWide/getCityWide/2024-Primary-Election"), suffix=".json")
     for url in (ILLINOIS, IL_TOTALS):
         raw.fetch(SOURCE, url, suffix=".txt")
     for office, district in PA_OFFICES:
@@ -463,6 +468,7 @@ def parse() -> None:
         ("AR", "county", ARKANSAS.format("GetContestResults", "&contestType=FED")),
         *(("PA", "county", PENNSYLVANIA.format(office, district)) for office, district in PA_OFFICES),
         ("IL", "county", ILLINOIS),
+        ("DC", "precinct", COLUMBIA.format("Downloads/Reports/June_4_2024_Primary_Election_Certified_Results.csv")),
         ("UT", "county", SUMMIT),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
@@ -826,6 +832,35 @@ def parse() -> None:
                                         }
                                     )
             frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
+        elif state == "DC":
+            frame = (
+                pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False)
+                .filter(pl.col("ContestName").str.contains("PRESIDENTIAL"), pl.col("Party") == "DEM")
+                .select(
+                    county=pl.lit("11001"),
+                    precinct="PrecinctNumber",
+                    office=pl.lit("President"),
+                    district=pl.lit(None, pl.String),
+                    party="Party",
+                    candidate="Candidate",
+                    votes="Votes",
+                )
+            )
+            citywide = {
+                entry["Contestant"]: entry["Votes"]
+                for contest in json.loads(
+                    raw.cached(SOURCE, COLUMBIA.format("cityWide/getCityWide/2024-Primary-Election")).path.read_text()
+                )
+                if contest["OfficeName"] == "DEM DEMOCRATIC PRESIDENTIAL PREFERENCE CITYWIDE"
+                for entry in contest["ElectionData"]
+            }
+            if any(
+                citywide[candidate] != votes
+                for candidate, votes in frame.group_by("candidate")
+                .agg(pl.col("votes").cast(pl.Int64).sum())
+                .iter_rows()
+            ):
+                raise ValueError("DC: the precincts do not add up to the citywide totals")
         elif url == ILLINOIS:
             frame = (
                 pl.read_csv(raw.cached(SOURCE, url).path, separator="\t", infer_schema=False, encoding="utf8-lossy")
@@ -1678,7 +1713,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR"):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -1740,6 +1775,8 @@ def parse() -> None:
             if url.startswith(PENNSYLVANIA.split("?")[0])
             else date(2024, 3, 19)
             if url == ILLINOIS
+            else date(2024, 6, 4)
+            if state == "DC"
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -2130,6 +2167,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if used == ILLINOIS
+                else (
+                    "District of Columbia Board of Elections",
+                    "Primary Election 2024, certified results by precinct",
+                    "https://electionresults.dcboe.org/election_results/2024-Primary-Election",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "DC"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
