@@ -233,15 +233,13 @@ def emit() -> Path:
         if cs.minted & {two_round, *parties.values()}:
             raise ValueError("the two-round system and the national parties must exist")
         persons: dict[str, UUID] = {}
-        runoffs: dict[str, date] = {}
+        runoffs: dict[str, tuple[date, UUID]] = {}
         races = frame.group_by("day", "race", maintain_order=True).agg(
             pl.col("office", "title", "seats").first(), pl.col("outcome")
         )
         for day, race, office, title, seats, outcomes in races.sort("day").iter_rows():
             pending = runoffs.get(office)
-            round_number = 2 if pending is not None and 0 < (day - pending).days <= 70 else 1
-            if "Runoff" in outcomes:
-                runoffs[office] = day
+            round_number = 2 if pending is not None and 0 < (day - pending[0]).days <= 70 else 1
             kind = "runoff" if round_number == 2 else "general"
             election_key = f"{day}:LA" + (":runoff" if round_number == 2 else "")
             election = cs.key("us.election", election_key)
@@ -276,6 +274,8 @@ def emit() -> Path:
             remainder = bool(re.search(r"(?i)unexpired|special", title))
             contest_key = f"{day}:LA:{office_slug}" + (":special" if remainder else "")
             contest = cs.key("us.contest", contest_key)
+            if "Runoff" in outcomes:
+                runoffs[office] = (day, contest)
             reused = contest_key in others
             if not reused:
                 cs.add(
@@ -288,6 +288,7 @@ def emit() -> Path:
                     term="remainder" if remainder else "full",
                     magnitude=seats,
                     round_number=round_number,
+                    previous_round_id=pending[1] if round_number == 2 and pending is not None else None,
                     electoral_system_id=two_round,
                     default_result_kind="counted",
                 )
@@ -347,7 +348,7 @@ def emit() -> Path:
                         ballot_name=candidate,
                         is_independent=label in INDEPENDENT,
                     )
-                for parish, votes in cells.select("parish", "votes").iter_rows():
+                for parish, votes in cells.select("parish", "votes").iter_rows() if result_set in cs.minted else ():
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
