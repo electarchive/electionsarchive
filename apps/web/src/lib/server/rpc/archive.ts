@@ -1432,22 +1432,32 @@ async function places(
     .filter((level) => level.count > 1)
     .toArray();
   if (eligible.length === 0) {
-    const sets = await db.execute<{ k: number }>(sql`
+    const sets = await db.execute<{ k: number; isDefault: boolean }>(sql`
       with recursive grp(id) as (
         select ${contest.id}::uuid
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
-      select rs.k from result_set rs join grp on grp.id = rs.contest_id where rs.is_default
+      select rs.k, rs.is_default as "isDefault" from result_set rs join grp on grp.id = rs.contest_id
+      where rs.status = 'active'
     `);
+    const defaults = sets.rows
+      .filter((row) => row.isDefault)
+      .map((row) => row.k);
     const units = await db.execute<{
       k: number;
       id: string;
       code: string;
       scheme: string;
       noun: string;
+      isDefault: boolean;
     }>(sql`
-      select u.k, u.id, u.code, u.scheme_code as scheme, s.noun
+      select u.k, u.id, u.code, u.scheme_code as scheme, s.noun,
+        exists (
+          select from result_value v
+          where v.result_set_k = any(${sql.param(defaults)}::int[]) and v.unit_k = u.k
+            and v.measure = any(${COUNTED})
+        ) as "isDefault"
       from reporting_unit u join scheme s on s.code = u.scheme_code
       where u.area_relation = 'within'
         and (u.area_id = ${area.id}::uuid or u.id in (select m.unit_id from reporting_unit_area m where m.area_id = ${area.id}::uuid))
@@ -1457,11 +1467,20 @@ async function places(
             and v.measure = any(${COUNTED})
         )
     `);
-    const schemes = Map.groupBy(units.rows, (row) => row.scheme)
-      .values()
-      .filter((group) => group.length > 1)
-      .toArray()
-      .toSorted((a, b) => b.length - a.length);
+    let schemes: Array<typeof units.rows> = [];
+    for (const pool of [
+      units.rows.filter((row) => row.isDefault),
+      units.rows,
+    ]) {
+      schemes = Map.groupBy(pool, (row) => row.scheme)
+        .values()
+        .filter((group) => group.length > 1)
+        .toArray()
+        .toSorted((a, b) => b.length - a.length);
+      if (schemes.length > 0) {
+        break;
+      }
+    }
     const group =
       schemes.find((entry) => `unit:${entry[0]?.scheme ?? ""}` === by) ??
       schemes[0];
@@ -1492,7 +1511,9 @@ async function places(
           k: row.k,
           name:
             labels.full.get(row.id) ??
-            (/^\d/u.test(cased) ? `${noun} ${cased}` : cased),
+            (/^\d/u.test(cased)
+              ? `${noun} ${cased.replace(/^0+(?=\d)/u, "")}`
+              : cased),
           path: null,
           isContest: false,
           owner: null,
@@ -3263,7 +3284,11 @@ export const contests = {
               },
             ]),
       ].filter((group) => group.ids.length > 0);
-      const frames = await framing(area.id, day);
+      const frames = await framing(
+        area.id,
+        day,
+        kids.filter((kid) => kid.scheme === input.level).map((kid) => kid.k),
+      );
       const drawn = await Promise.all(
         groups.map(async (group) => {
           const found = await db.execute<{
@@ -3871,13 +3896,14 @@ export const contests = {
     }),
 };
 
-async function framing(area: string, day: string) {
+async function framing(area: string, day: string, ks: Array<number> = []) {
   const parts = await db.execute<{
     west: number;
     south: number;
     east: number;
     north: number;
     share: number;
+    isFilled: boolean;
   }>(sql`
     with parts as (
       select (ST_Dump(ST_SimplifyPreserveTopology(g.geom, 0.02))).geom as geom
@@ -3893,10 +3919,15 @@ async function framing(area: string, day: string) {
       from clustered group by cluster
     )
     select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north,
-      size / nullif(sum(size) over (), 0) as share
+      size / nullif(sum(size) over (), 0) as share,
+      cardinality(${sql.param(ks)}::int[]) = 0 or exists (
+        select from area x join area_geometry g on g.area_id = x.id
+        where x.k = any(${sql.param(ks)}::int[]) and g.valid @> ${day}::date and g.geom && ST_SetSRID(box::geometry, 4326)
+      ) as "isFilled"
     from grouped order by size desc
   `);
-  return parts.rows
+  const filled = parts.rows.filter((part) => part.isFilled);
+  return (filled.length > 0 ? filled : parts.rows)
     .filter((part) => part.share >= 0.0005)
     .slice(0, 6)
     .map((part) => ({
@@ -3914,7 +3945,7 @@ async function sketch(
   ks: Array<number> = [],
 ) {
   const [frames, found] = await Promise.all([
-    framing(area.id, day),
+    framing(area.id, day, ks),
     db.execute<{
       scheme: string;
       tiles: string;
