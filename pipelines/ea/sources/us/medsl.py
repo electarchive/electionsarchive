@@ -690,6 +690,7 @@ def attach(
     unmatched: list[tuple[str, str, int, int]] = []
     drifted: list[tuple[str, str, int, int]] = []
     taken: set[str] = set()
+    parts: set[str] = set()
     values: list[pl.DataFrame] = []
     for (year, chamber, day, special, state, district), lines in congress.group_by(
         "year", "chamber", "day", "special", "state", "district", maintain_order=True
@@ -697,11 +698,14 @@ def attach(
         base = (
             f"{day}:{state}-{district:02}:president"
             if chamber == "president" and district is not None
-            else f"{day}:{state}:{chamber}" + ("" if district is None else f":{district}")
+            else f"{day}:{state}:{chamber}"
+            if district is None
+            else f"{day}:{state}:house:{district}{chamber.removeprefix('house')}"
         )
+        at_large = f"{day}:{state}:house:0{chamber.removeprefix('house')}"
         tried = [*([f"{base}:special"] if special else []), base]
-        if chamber == "house":
-            tried.append(f"{day}:{state}:house:0")
+        if chamber.startswith("house"):
+            tried.append(at_large)
         key = next((k for k in tried if k in contests), None)
         if key is None or key in taken:
             print(
@@ -875,12 +879,15 @@ def attach(
             if (
                 kind in ("county", "place")
                 and district is not None
-                and (chamber == "president" or f"{day}:{state}:house:0" not in contests)
+                and (chamber == "president" or at_large not in contests)
             ):
                 part = f"{year}:{code}:{district}" + (":special" if special else "")
-                members[code] = str(cs.unit("us.county_part", part))
+                members[code] = str(cs.unit("us.county_part", part, on=day))
                 if code not in counties:
                     raise ValueError(f"{key}: no county {code}")
+                if members[code] in parts:
+                    continue
+                parts.add(members[code])
                 cs.add(
                     "reporting_unit",
                     id=UUID(members[code]),

@@ -12,7 +12,7 @@ from ea.sources.us import medsl, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.oe_primary"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 NAME = re.compile(r"(?:.*/)?(\d{8})__([a-z]{2})__(.+)\.csv")
 KINDS = {
@@ -23,6 +23,10 @@ KINDS = {
     "president",
     "presidential",
     "senate",
+    "house",
+    "congressional",
+    "congressional_district",
+    "federal",
     "democratic",
     "democrat",
     "republican",
@@ -33,12 +37,9 @@ SKIPPED = {
     "general",
     "general_runoff",
     "governor",
-    "house",
     "state_house",
     "state_senate",
     "house_of_delegates",
-    "congressional",
-    "congressional_district",
     "turnout",
     "headers",
     "town",
@@ -85,7 +86,8 @@ ALIASES = {
     "total_votes": "votes",
     "vote_total": "votes",
 }
-TARGET = r"^\d{4}-\d\d-\d\d:[A-Z]{2}:(senate|president)(:special)?:[a-z][a-z-]*$"
+TARGET = r"^\d{4}-\d\d-\d\d:[A-Z]{2}:(senate|president|house:\d+)(:special)?:[a-z][a-z-]*$|^\d{4}-\d\d-\d\d:[A-Z]{2}:house:\d+$"
+KEY = re.compile(r"(\d{4}-\d\d-\d\d):([A-Z]{2}):((?:senate|president|house:\d+)(?::special)?)(?::([a-z][a-z-]*))?")
 
 
 def picks() -> dict[tuple[str, str], list[str]]:
@@ -157,8 +159,11 @@ def parse() -> None:
             "select value, entity_id from external_id where scheme = 'us.contest' and value ~ %s order by value",
             [TARGET],
         ).fetchall():
-            day, state, *rest = value.split(":")
-            parties.setdefault((day, state, ":".join(rest[:-1])), {})[rest[-1]] = str(contest)
+            found = KEY.fullmatch(value)
+            if found is None:
+                continue
+            day, state, chamber, party = found.groups()
+            parties.setdefault((day, state, chamber), {})[party or ""] = str(contest)
     frames = []
     for (state, stamp), paths in picks().items():
         day = date(int(stamp[:4]), int(stamp[4:6]), int(stamp[6:]))
@@ -212,6 +217,7 @@ def parse() -> None:
                 else (pl.col("party") if "party" in frame.columns else pl.lit(None, pl.String))
             )
             office = pl.col("office").fill_null("").str.to_lowercase()
+            district = (pl.col("district") if "district" in frame.columns else pl.lit(None, pl.String)).fill_null("")
             frames.append(
                 frame.select(
                     state=pl.lit(state),
@@ -228,7 +234,15 @@ def parse() -> None:
                         .otherwise(pl.lit("senate"))
                     )
                     .when(pl.lit("special" in tokens) & office.str.contains(r"^(u\.?s\.?\s*)?senat"))
-                    .then(pl.lit("senate:special")),
+                    .then(pl.lit("senate:special"))
+                    .when(
+                        (office.str.contains(openelections.HOUSE.pattern) | (office == "house") & (state == "WI"))
+                        & ~office.str.contains(r"\bstate\b")
+                    )
+                    .then(pl.lit("house")),
+                    district=pl.coalesce(district.str.extract(r"(\d+)"), office.str.extract(r"(\d+)")).cast(
+                        pl.Int16, strict=False
+                    ),
                     party=party.fill_null("").str.to_lowercase().str.strip_chars().str.replace(r"\s+party$", ""),
                     code=pl.col("county")
                     .fill_null("")
@@ -249,28 +263,74 @@ def parse() -> None:
     frame = pl.concat(frames).filter(
         pl.col("votes").is_not_null() & ~pl.col("candidate").str.contains(openelections.NOT_COUNTED)
     )
-    resolved: dict[tuple[str, str, str, str], str] = {}
-    for state, day, office, party in frame.select("state", "day", "office", "party").unique().iter_rows():
+    frame = frame.with_columns(district=pl.when(pl.col("office") == "house").then("district"))
+    resolved = []
+    for state, day, office, district, party in (
+        frame.select("state", "day", "office", "district", "party").unique().iter_rows()
+    ):
         wanted = PARTIES.get(party, slug(party) if party else "")
-        for chamber in (office, f"{office}:special") if office == "senate" else (office,):
+        tried = (
+            (office, f"{office}:special")
+            if office == "senate"
+            else (*([f"house:{district}"] if district is not None else []), "house:0")
+            if office == "house"
+            else (office,)
+        )
+        for chamber in tried:
             known = parties.get((day.isoformat(), state, chamber), {})
             matches = (
-                {wanted: known[wanted]}
+                known
+                if office == "house" and set(known) == {""}
+                else {wanted: known[wanted]}
                 if wanted in known
                 else {name: contest for name, contest in known.items() if wanted and wanted in name}
             )
             if len(set(matches.values())) == 1:
-                resolved[(state, day.isoformat(), office, party)] = f"{chamber}:{min(matches)}"
+                named = min(matches)
+                resolved.append(
+                    {
+                        "state": state,
+                        "day": day,
+                        "office": office,
+                        "district": district,
+                        "party": party,
+                        "chamber": (f"house:{named}" if named else "house")
+                        if office == "house"
+                        else f"{chamber}:{named}",
+                        "seat": int(chamber.split(":")[1]) if office == "house" else None,
+                    }
+                )
                 break
-    frame = frame.with_columns(
-        chamber=pl.concat_str(
-            "state", pl.col("day").cast(pl.String), "office", "party", separator="\x1f"
-        ).replace_strict({"\x1f".join(key): chamber for key, chamber in resolved.items()}, default=None)
+    frame = frame.join(
+        pl.DataFrame(
+            resolved,
+            schema={
+                "state": pl.String,
+                "day": pl.Date,
+                "office": pl.String,
+                "district": pl.Int16,
+                "party": pl.String,
+                "chamber": pl.String,
+                "seat": pl.Int16,
+            },
+        ),
+        on=["state", "day", "office", "district", "party"],
+        how="left",
+        nulls_equal=True,
+    )
+    totals = frame.group_by("state", "day", "chamber", "seat", "code", "path").agg(pl.col("votes").sum())
+    frame = frame.join(
+        totals.sort("votes", "path", descending=True)
+        .unique(["state", "day", "chamber", "seat", "code"], keep="first", maintain_order=True)
+        .select("state", "day", "chamber", "seat", "code", "path"),
+        on=["state", "day", "chamber", "seat", "code", "path"],
+        how="semi",
+        nulls_equal=True,
     )
     dropped = frame.filter(pl.col("chamber").is_null())
     if dropped.height:
         print(
-            dropped.group_by("state", "day", "office", "party")
+            dropped.group_by("state", "day", "office", "district", "party")
             .agg(pl.col("votes").sum())
             .sort("votes", descending=True)
             .head(40)
@@ -286,12 +346,12 @@ def parse() -> None:
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
         .filter(pl.col("measure") > 0)
-        .group_by("chamber", "day", "state", "code", "candidate", "measure")
+        .group_by("chamber", "day", "state", "seat", "code", "candidate", "measure")
         .agg(pl.col("writein").any(), pl.col("votes").sum())
+        .rename({"seat": "district"})
         .with_columns(
             year=pl.col("day").dt.year(),
             special=pl.lit(False),
-            district=pl.lit(None, pl.Int16),
             kind=pl.lit("county"),
             source="state",
         )
@@ -306,7 +366,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Senate and presidential primaries and runoffs by county from OpenElections",
+            summary="House, Senate, and presidential primaries and runoffs by county from OpenElections",
             polity="US",
         )
         sources = {}
