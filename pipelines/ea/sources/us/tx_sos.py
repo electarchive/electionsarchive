@@ -35,6 +35,7 @@ VOLUMES = {
     1900: ("biennialreports05texagoog", date(1900, 11, 6), [86, 87, 88, 89]),
     1904: ("biennialreportof1903texa", date(1904, 11, 8), [210, 211, 212, 213]),
     1906: ("biennialreportof1903texa", date(1906, 11, 6), [401, 402, 403, 404]),
+    1908: ("biennialreportof1903texa", date(1908, 11, 3), [727, 728, 729, 730]),
 }
 FORMER = {"greer": ("Greer", "40055", date(1896, 3, 16))}
 CORRECTED: dict[tuple[int, int, str, int], int] = {}
@@ -54,10 +55,20 @@ UNBALANCED = {
     (1900, 13, 1),
     (1906, 9, 2),
     (1906, 14, 0),
+    (1908, 4, 0),
+    (1908, 13, 1),
+    (1908, 14, 0),
+    (1908, 14, 2),
+    (1908, 16, 1),
 }
+CUT = {(1908, 13): ("tramblade", 886)}
 GAP = (
     "The county figures printed for {candidate} sum to {counted} votes, but the report gives a district total of "
     "{printed}. We show the county figures as they were printed."
+)
+CUTOFF = (
+    "The scan cuts off {candidate}'s column at the binding, so his county figures are omitted. His district total "
+    "is {printed} votes."
 )
 
 
@@ -469,6 +480,16 @@ def emit() -> Path:
                         else next(name for option, _, name, _ in known if option == picked[str(label)]),
                         counted=f"{summed:,}",
                         printed=f"{printed:,}",
+                    ),
+                )
+            if (cut := CUT.get((int(year), int(district)))) is not None:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=CUTOFF.format(
+                        candidate=next(name for _, _, name, _ in known if _plain(name).endswith(cut[0])),
+                        printed=f"{cut[1]:,}",
                     ),
                 )
             for (county, option), cells in lines.group_by("county", "option", maintain_order=True):
