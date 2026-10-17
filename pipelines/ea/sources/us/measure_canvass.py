@@ -11,7 +11,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import elstats, fl_sos, wa_local
+from ea.sources.us import elstats, fl_sos, mo_sos, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_canvass"
@@ -27,7 +27,10 @@ ANSWERS = {
     "FOR": ("YES", "FOR"),
     "AGAINST": ("NO", "FOR"),
 }
-TAG = r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure))\D{0,25}?\b(\d+|[A-Z])\b"
+TAG = (
+    r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure)"
+    r"(?:\s+measure)?(?:\s+to the legislature)?\s*(?:no\.|#)?)\s*(\d+|[A-Z])\b"
+)
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
 UTAH = {
     date(2014, 11, 4): (
@@ -55,9 +58,25 @@ OREGON = {
     date(2018, 11, 6): ("20190912090619", "november-2018-official-results.pdf"),
     date(2020, 11, 3): ("20210124071153", "november-general-2020.pdf"),
 }
+MISSOURI = {
+    date(2012, 8, 7): "2012PrimaryElection.pdf",
+    date(2012, 11, 6): "2012GeneralElection.pdf",
+    date(2014, 8, 5): "2014PrimaryElection.pdf",
+    date(2014, 11, 4): "2014GeneralElection.pdf",
+    date(2016, 11, 8): "ActualResults-November82016-GeneralElection.pdf",
+    date(2018, 8, 7): "ActualResults-August72018.pdf",
+    date(2018, 11, 6): "ActualResults-November62018-FINAL.pdf",
+    date(2020, 8, 4): "ActualResults-August42020.pdf",
+    date(2020, 11, 3): "ActualResults-November32020.pdf",
+    date(2024, 8, 6): "ActualResults-August62024.pdf",
+}
 METHOD = (
-    "County totals from {document}, the state's certified results. They replace the totals transcribed from the "
+    "{level} totals from {document}, the state's certified results. They replace the totals transcribed from the "
     "English Wikipedia as this question's default.{advisory}"
+)
+KANSAS_CITY = (
+    " Kansas City, its own election authority, is reported apart from the Jackson, Clay, Platte, and Cass county "
+    "authorities and is credited to the city."
 )
 ADVISORY = " As in the question's existing options, the export's Maintained is recorded as Yes and Repealed as No."
 DOCUMENTS = {
@@ -85,6 +104,12 @@ DOCUMENTS = {
         "https://sos.oregon.gov/elections/Pages/electionhistory.aspx",
         "the Oregon Secretary of State's abstract of votes",
     ),
+    "MO": (
+        mo_sos.PUBLISHER,
+        mo_sos.TITLE,
+        "https://www.sos.mo.gov/elections/resultsandstats",
+        "the Missouri Secretary of State's official results",
+    ),
 }
 
 
@@ -104,6 +129,8 @@ def wikipedia(conn) -> list[tuple[str, date]]:
 def link(state: str, day: date) -> tuple[str, str]:
     if state == "UT":
         return SOURCE, WAYBACK.format(*UTAH[day]) if day in UTAH else ""
+    if state == "MO":
+        return SOURCE, mo_sos.SITE + MISSOURI[day] if day in MISSOURI else ""
     if state == "OR":
         return SOURCE, (
             WAYBACK.format(OREGON[day][0], "https://sos.oregon.gov/elections/Documents/results/" + OREGON[day][1])
@@ -126,7 +153,9 @@ def fetch() -> None:
         source, url = link(state, day)
         if source == SOURCE and url:
             try:
-                raw.fetch(SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "OR": ".pdf"}[state])
+                raw.fetch(
+                    SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "OR": ".pdf", "MO": ".pdf"}[state]
+                )
             except httpx.HTTPStatusError as error:
                 print(f"{state} {day}: {error}")
 
@@ -140,10 +169,14 @@ def parse() -> None:
                join name n on n.entity_id = u.area_id and n.kind = 'short'
                join reporting_unit s on s.scheme_code = 'us.state' and s.code = left(u.code, 2)
                join polity p on p.id = s.polity_id
-               where u.scheme_code = 'us.county' and p.iso_code = any(%s)""",
+               where u.scheme_code = 'us.county' and p.iso_code = any(%s) order by u.code""",
             [[f"US-{state}" for state in DOCUMENTS]],
         ).fetchall():
-            names.setdefault(iso.removeprefix("US-"), {})[elstats.plain(text)] = code
+            plain = elstats.plain(text)
+            names.setdefault(iso.removeprefix("US-"), {}).setdefault(plain, code)
+            if int(code[2:]) >= 500:
+                names[iso.removeprefix("US-")][f"{plain}city"] = code
+    names["MO"] |= {"kansascity": "2938000", "statewide": "29"}
     frames = []
     for state, day in dates:
         source, url = link(state, day)
@@ -151,7 +184,42 @@ def parse() -> None:
             path = raw.cached(source, url).path
         except LookupError:
             continue
-        if state == "OR":
+        if state == "MO":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                title = None
+                lines = page.splitlines()
+                for index, line in enumerate(lines):
+                    if matched := re.fullmatch(r"\s*((?:Amendment|Proposition)\s+\w+)\s+(YES)\s+(NO)\s+Total\s*", line):
+                        title = matched[1]
+                    elif title and (matched := re.fullmatch(r"\s*(\S.*?)\s{2,}(\d+)\s+(\d+)\s+(\d+)\s*", line)):
+                        if matched[1].strip().upper() == "TOTAL":
+                            title = None
+                            continue
+                        records.append((matched[1], title, "YES", matched[2], number))
+                        records.append((matched[1], title, "NO", matched[3], number))
+                    elif matched := re.fullmatch(
+                        r"\s*((?:Constitutional\s+)?(?:Amendment|Proposition)\s+\w+)\s+(?:Ballot Issue\s+Yes:|Yes Votes)"
+                        r"\s+([\d,]+).*",
+                        line,
+                    ):
+                        following = next((rest for rest in lines[index + 1 :] if rest.strip()), "")
+                        if no := re.fullmatch(r"\s*(?:No:|No Votes)\s+([\d,]+).*", following):
+                            records.append(("statewide", matched[1], "YES", matched[2], number))
+                            records.append(("statewide", matched[1], "NO", no[1], number))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            )
+        elif state == "OR":
             records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             for number, page in enumerate(text.stdout.split("\f"), start=1):
@@ -263,10 +331,11 @@ def parse() -> None:
         answer=pl.col("label").replace_strict({label: answer for label, (answer, _) in ANSWERS.items()}),
         pair=pl.col("label").replace_strict({label: pair for label, (_, pair) in ANSWERS.items()}),
     )
-    counties = frame.drop_nulls("fips").group_by("state").agg(pl.col("fips").n_unique().alias("counties"))
+    counties = frame.drop_nulls("fips").group_by("state", "url").agg(pl.col("fips").n_unique().alias("counties"))
     PARSED.mkdir(parents=True, exist_ok=True)
     (
-        frame.join(counties, on="state")
+        frame.join(counties, on=["state", "url"])
+        .with_columns(page=pl.col("page").min().over("state", "day", "url", "office"))
         .filter(
             pl.col("answer").n_unique().over("state", "day", "office") == 2,
             pl.col("pair").n_unique().over("state", "day", "office") == 1,
@@ -333,6 +402,8 @@ def emit() -> Path:
         questions = (
             frame.group_by("state", "day", "url", "page", "winner", "office", "pair")
             .agg(
+                statewide=(pl.col("fips").str.len_chars() == 2).all(),
+                kansas=(pl.col("fips") == "2938000").any(),
                 yes=pl.col("votes").filter(pl.col("answer") == "YES").sum(),
                 no=pl.col("votes").filter(pl.col("answer") == "NO").sum(),
             )
@@ -431,7 +502,9 @@ def emit() -> Path:
                 entity_id=result_set,
                 kind="methodology",
                 body_md=METHOD.format(
-                    document=DOCUMENTS[row["state"]][3], advisory=ADVISORY if row["pair"] == "MAINTAINED" else ""
+                    level="Statewide" if row["statewide"] else "County",
+                    document=DOCUMENTS[row["state"]][3],
+                    advisory=ADVISORY if row["pair"] == "MAINTAINED" else KANSAS_CITY if row["kansas"] else "",
                 ),
             )
             cs.add(
@@ -453,7 +526,7 @@ def emit() -> Path:
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
-                    unit_id=cs.unit("us.county", fips),
+                    unit_id=cs.unit({2: "us.state", 5: "us.county", 7: "us.place"}[len(fips)], fips),
                     option_id=options[answer],
                     channel=0,
                     measure=1,
