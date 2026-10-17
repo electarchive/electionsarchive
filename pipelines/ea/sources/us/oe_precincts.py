@@ -145,6 +145,13 @@ def fetch() -> None:
 def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)
+        towns = {
+            (state, re.sub(r"[^a-z]", "", town.lower())): county
+            for state, county, town in conn.execute(
+                """select distinct split_part(code, ':', 2), split_part(code, ':', 3), split_part(code, ':', 4)
+                   from reporting_unit where scheme_code = 'us.precinct' and code ~ '^20(16|18|20):(MA|CT):[0-9]{5}:'"""
+            ).fetchall()
+        }
     for (state, typo), plain in COUNTIES.items():
         fips[state][typo] = fips[state][plain]
     frames = []
@@ -182,6 +189,14 @@ def parse() -> None:
         frame = frame.rename(renamed)
         if "votes" not in frame.columns and "total" in frame.columns:
             frame = frame.rename({"total": "votes"})
+        if "votes" not in frame.columns and {"poll", "abs"} <= set(frame.columns):
+            frame = frame.with_columns(
+                votes=pl.sum_horizontal(
+                    pl.col(column).str.replace_all(r"[,\s]", "").cast(pl.Int64, strict=False)
+                    for column in ("poll", "abs", "edr", "prov", "unknown")
+                    if column in frame.columns
+                ).cast(pl.String)
+            )
         for column in ("vote_type", "votetype"):
             if column in frame.columns:
                 frame = frame.filter(pl.col(column).str.to_lowercase() != "total")
@@ -192,6 +207,27 @@ def parse() -> None:
         named = re.search(r"__general__([a-z_]+)__precinct", path)
         if "county" not in frame.columns and named:
             frame = frame.with_columns(county=pl.lit(named[1].replace("_", " ")))
+        if "county" not in frame.columns and "town" in frame.columns:
+            frame = frame.with_columns(
+                county=pl.col("town")
+                .str.to_lowercase()
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict(
+                    {
+                        town: next(name for name, code in fips[state].items() if code == county)
+                        for (known, town), county in towns.items()
+                        if known == state
+                    },
+                    default=None,
+                ),
+                precinct=pl.concat_str(
+                    "town",
+                    *(["ward"] if "ward" in frame.columns else []),
+                    "precinct",
+                    separator=" ",
+                    ignore_nulls=True,
+                ),
+            )
         if not {"county", "precinct", "office", "candidate", "votes"} <= set(frame.columns):
             print(f"{path}: columns {frame.columns}, skipped")
             continue
