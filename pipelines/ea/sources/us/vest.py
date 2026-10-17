@@ -576,8 +576,29 @@ def emit() -> Path:
         )
         cs.frame(
             "name",
-            pl.DataFrame({"entity_id": ids, "text": [text for _, _, _, text in areas]}).with_columns(
-                lang=pl.lit("en"), kind=pl.lit("official"), is_preferred=pl.lit(True)
+            pl.DataFrame({"entity_id": ids, "text": [text for _, _, _, text in areas]})
+            .join(
+                pl.DataFrame(
+                    conn.execute(
+                        """select n.id::text, n.entity_id::text, n.text from name n join changeset c on c.id = n.changeset_id
+                           where c.pipeline = %s and n.kind = 'official' and n.lang = 'en'""",
+                        [SOURCE],
+                    ).fetchall(),
+                    schema={"id": pl.String, "entity_id": pl.String, "old": pl.String},
+                    orient="row",
+                ),
+                on="entity_id",
+                how="left",
+            )
+            .sort(pl.col("old") == pl.col("text"), descending=True, nulls_last=True)
+            .with_columns(first=pl.int_range(pl.len()).over("entity_id") == 0)
+            .select(
+                "id",
+                "entity_id",
+                text=pl.when("first").then("text").otherwise("old"),
+                is_preferred="first",
+                lang=pl.lit("en"),
+                kind=pl.lit("official"),
             ),
         )
         pl.DataFrame(report, schema=["contest", "vest", "official"], orient="row").write_parquet(
