@@ -13,7 +13,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import elstats, ncsbe, openelections
+from ea.sources.us import elstats, ncsbe, openelections, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.primaries"
@@ -21,6 +21,13 @@ VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 CALIFORNIA = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/79-us-rep-congress.xlsx"
 NORTH_CAROLINA = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2024_03_05/results_pct_20240305.zip"
+MINNESOTA = "https://electionresultsfiles.sos.mn.gov/20240813/{}.txt"
+MARYLAND = "https://elections.maryland.gov/elections/archive/2024/election_data/PP24_{:02d}Precincts{}.csv"
+WASHINGTON = "https://results.vote.wa.gov/results/{0}/export/{0}_allcounties.csv"
+MASSACHUSETTS = [
+    f"{elstats.MASSACHUSETTS}search/year_from:2024/year_to:2024/office_id:{office}{stage}"
+    for office, stage in (("1", ""), ("6", ""), ("5", "/stage:Democratic"), ("5", "/stage:Republican"))
+]
 OPENELECTIONS = {
     "CT": "f948d0a1ce36871de4a1d696612ab2a268fd0758",
     "GA": "36b7453793848c02d8f41601d9304a66ad828dd0",
@@ -39,17 +46,21 @@ OPENELECTIONS = {
 ELECTIONSTATS = ("CO", "CT", "ID", "NH", "NM", "NY", "VA", "VT")
 TYPOS = {"MS": {"jeffdavis": "28065"}, "TN": {"williamsonx": "47187"}, "VT": {"essexjunction": "50007"}}
 DAYS = {("RI", date(2024, 8, 13)): date(2024, 9, 10)}
+CHECKED = {"2024-05-14:MD:president:republican", "2024-05-14:MD:house:3:democratic"}
 PARTIES = {
+    "d": "democratic",
     "dem": "democratic",
     "democrat": "democratic",
     "democratic": "democratic",
     "democratic party": "democratic",
+    "r": "republican",
     "rep": "republican",
     "republican": "republican",
     "republican party": "republican",
     "lib": "libertarian",
     "lbn": "libertarian",
     "libertarian": "libertarian",
+    "dfl": "minnesota-democratic-farmer-labor",
     "grn": "green",
     "green": "green",
 }
@@ -123,6 +134,16 @@ def picks(fips: dict[str, dict[str, str]]) -> list[tuple[str, str, str]]:
 def fetch() -> None:
     raw.fetch(SOURCE, CALIFORNIA, suffix=".xlsx")
     raw.fetch(SOURCE, NORTH_CAROLINA, suffix=".zip")
+    for county in range(1, 25):
+        for party in ("Democratic", "Republican"):
+            raw.fetch(SOURCE, MARYLAND.format(county, party), suffix=".csv")
+    for name in ("ushousepct", "ussenatepct", "PrctTbl"):
+        raw.fetch(SOURCE, MINNESOTA.format(name), suffix=".txt")
+    for day in ("20240312", "20240806"):
+        raw.fetch(SOURCE, WASHINGTON.format(day), suffix=".csv")
+    for listing in MASSACHUSETTS:
+        for election, *_ in elstats.MA_ROW.findall(raw.fetch(SOURCE, listing, suffix=".html").path.read_text()):
+            raw.fetch(SOURCE, f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/", suffix=".csv")
     for state in ELECTIONSTATS:
         raw.fetch(SOURCE, search(state), suffix=".csv")
     for state, commit in OPENELECTIONS.items():
@@ -191,6 +212,20 @@ def parse() -> None:
                         CALIFORNIA,
                     )
                 )
+    with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS").is_in([*ELECTIONSTATS, "MA"]))
+    places: dict[str, dict[str, str]] = defaultdict(dict)
+    for state, geoid, name in (
+        gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
+        .select("USPS", "GEOID", "NAME")
+        .iter_rows()
+    ):
+        places[state].setdefault(elstats.plain(name), geoid[:5])
+        places[state].setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+    for (state, name), code in elstats.FORMER.items():
+        places[state].setdefault(name, code)
     frames = [
         pl.DataFrame(
             rows,
@@ -213,6 +248,23 @@ def parse() -> None:
     ]
     for state, grain, url in [
         ("NC", "precinct", NORTH_CAROLINA),
+        ("MN", "precinct", MINNESOTA.format("ushousepct")),
+        ("MN", "precinct", MINNESOTA.format("ussenatepct")),
+        ("WA", "county", WASHINGTON.format("20240312")),
+        ("WA", "county", WASHINGTON.format("20240806")),
+        *(
+            ("MA", "precinct", f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/")
+            for election in dict.fromkeys(
+                election
+                for listing in MASSACHUSETTS
+                for election, _, _, _ in elstats.MA_ROW.findall(raw.cached(SOURCE, listing).path.read_text())
+            )
+        ),
+        *(
+            ("MD", "precinct", MARYLAND.format(county, party))
+            for county in range(1, 25)
+            for party in ("Democratic", "Republican")
+        ),
         *(
             (state, grain, openelections.REPOSITORY.format(state=state.lower(), commit=OPENELECTIONS[state], path=path))
             for state, grain, path in picks(fips)
@@ -233,6 +285,122 @@ def parse() -> None:
                 candidate="Choice",
                 votes="Total Votes",
             )
+        elif state == "WA":
+            race = pl.col("Race").str.strip_chars()
+            frame = (
+                pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False).unique(
+                    subset=["County", "Race", "Candidate"], keep="first", maintain_order=True
+                )
+            ).select(
+                county="County",
+                office=race.str.replace(r"^Washington State ", "").str.replace(r" - \w+ Party$", ""),
+                district=race.str.extract(r"(?i)congressional district (\d+)"),
+                party=race.str.extract(r" - (\w+) Party$"),
+                candidate="Candidate",
+                votes="Votes",
+            )
+        elif state == "MA":
+            listed: dict[str, tuple[str, str, str]] = {
+                election: (office, district, stage)
+                for listing in MASSACHUSETTS
+                for election, _, office, district, stage in re.findall(
+                    r'id="election-id-(\d+)".*?<td[^>]*>(\d{4})</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>',
+                    raw.cached(SOURCE, listing).path.read_text(),
+                    re.DOTALL,
+                )
+            }
+            office_text, district, stage = listed[url.split("/")[-3]]
+            if "Primary" not in stage:
+                continue
+            table = pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False, skip_rows_after_header=1)
+            table = table.rename({table.columns[0]: "City/Town"})
+            frame = (
+                table.filter(pl.col("City/Town").is_not_null(), pl.col("City/Town") != "TOTALS")
+                .unpivot(
+                    [column for column in table.columns[3:] if column not in ("Blanks", "Total Votes Cast")],
+                    index=["City/Town", "Ward", "Pct"],
+                    variable_name="candidate",
+                    value_name="votes",
+                )
+                .select(
+                    county=pl.col("City/Town"),
+                    precinct=pl.concat_str(
+                        "City/Town",
+                        pl.when(pl.col("Ward") != "-").then(pl.col("Ward")),
+                        "Pct",
+                        separator=" ",
+                        ignore_nulls=True,
+                    ),
+                    office=pl.lit(office_text),
+                    district=pl.lit(district),
+                    party=pl.lit(stage.removesuffix(" Primary")),
+                    candidate=pl.when(pl.col("candidate") == "All Others")
+                    .then(pl.lit("Write-ins"))
+                    .otherwise("candidate"),
+                    votes=pl.col("votes").str.replace_all(",", ""),
+                )
+            )
+        elif state == "MD":
+            frame = pl.read_csv(
+                io.BytesIO(re.sub(rb'" *\r?\n', b'"\n', raw.cached(SOURCE, url).path.read_bytes())),
+                infer_schema=False,
+            )
+            frame = frame.filter(
+                (pl.col("Office Name") != "President - Vice Pres")
+                | (pl.col("Office District").fill_null("").str.strip_chars() == "")
+            ).select(
+                county="County Name",
+                precinct="Election District - Precinct",
+                office="Office Name",
+                district="Office District",
+                party="Party",
+                candidate="Candidate Name",
+                votes=pl.sum_horizontal(
+                    pl.col(column).str.strip_chars().cast(pl.Int64)
+                    for column in (
+                        "Early Votes",
+                        "Election Night Votes",
+                        "Mail-In Ballot 1 Votes",
+                        "Provisional Votes",
+                        "Mail-In Ballot 2 Votes",
+                    )
+                ).cast(pl.String),
+            )
+        elif state == "MN":
+            minnesota = {
+                "column_1": "county",
+                "column_2": "precinct",
+                "column_4": "office",
+                "column_5": "district",
+                "column_7": "candidate",
+                "column_10": "party",
+                "column_13": "votes",
+            }
+            precincts = pl.read_csv(
+                raw.cached(SOURCE, MINNESOTA.format("PrctTbl")).path,
+                separator=";",
+                has_header=False,
+                infer_schema=False,
+                encoding="utf8-lossy",
+            ).select(county="column_0", precinct="column_1", name="column_2")
+            frame = (
+                pl.read_csv(
+                    raw.cached(SOURCE, url).path,
+                    separator=";",
+                    has_header=False,
+                    infer_schema=False,
+                    encoding="utf8-lossy",
+                    quote_char=None,
+                )
+                .rename(minnesota)
+                .select(*minnesota.values())
+                .join(precincts, on=["county", "precinct"], how="left", validate="m:1")
+                .with_columns(
+                    county=pl.lit("27") + (pl.col("county").cast(pl.Int64) * 2 - 1).cast(pl.String).str.zfill(3),
+                    precinct=pl.coalesce("name", "precinct"),
+                )
+                .drop("name")
+            )
         else:
             text = raw.cached(SOURCE, url).path.read_bytes()
             frame = pl.read_csv(
@@ -248,7 +416,20 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if "county" not in frame.columns or state in ("CT", "RI"):
+        if state == "MN":
+            pass
+        elif state == "MA":
+            frame = frame.with_columns(
+                county=pl.col("county")
+                .str.replace(r"^N\. ", "North ")
+                .str.replace(r"^S\. ", "South ")
+                .str.replace(r"^E\. ", "East ")
+                .str.replace(r"^W\. ", "West ")
+                .str.replace(r" City$", "")
+                .map_elements(elstats.plain, return_dtype=pl.String)
+                .replace_strict(places["MA"], default=None)
+            )
+        elif "county" not in frame.columns or state in ("CT", "RI"):
             frame = frame.with_columns(
                 county=pl.col("town" if "town" in frame.columns else "county")
                 .str.to_lowercase()
@@ -272,13 +453,22 @@ def parse() -> None:
                 .replace_strict({**fips[state], **TYPOS.get(state, {})}, default=None)
             )
         office = pl.col("office").str.to_lowercase().str.strip_chars()
-        day = datetime.strptime(re.findall(r"2024\d{4}", url)[-1], "%Y%m%d").date()
+        day = (
+            date(2024, 5, 14)
+            if state == "MD"
+            else (date(2024, 3, 5) if frame["office"][0] == "President" else date(2024, 9, 3))
+            if state == "MA"
+            else datetime.strptime(re.findall(r"2024\d{4}", url)[-1], "%Y%m%d").date()
+        )
         frames.append(
             frame.with_columns(
                 [pl.lit(None, pl.String).alias(column) for column in COLUMNS if column not in frame.columns]
             )
             .with_columns(
-                kind=pl.when(office.str.contains(r"^(u\.?s\.? )?president|^presidential"))
+                kind=pl.when(
+                    office.str.contains(r"^(united states |u\.?s\.? )?president|^presidential")
+                    & ~office.str.contains("council|board|commission|delegate")
+                )
                 .then(pl.lit("president"))
                 .when(office.str.contains(openelections.SENATE.pattern))
                 .then(pl.lit("senate"))
@@ -301,7 +491,9 @@ def parse() -> None:
                     if state in ("AK", "DE", "ND", "SD", "VT", "WY")
                     else pl.col("district").fill_null("").str.extract(r"(\d+)").cast(pl.Int64).fill_null(0)
                 ),
-                party=pl.col("party")
+                party=pl.lit(None, pl.String)
+                if state == "WA" and day.month == 8
+                else pl.col("party")
                 .str.to_lowercase()
                 .str.strip_chars()
                 .replace_strict(
@@ -320,20 +512,6 @@ def parse() -> None:
             )
             .filter(pl.col("votes").is_not_null())
         )
-    with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
-        gazetteer = pl.read_csv(
-            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
-        ).filter(pl.col("USPS").is_in(ELECTIONSTATS))
-    places: dict[str, dict[str, str]] = defaultdict(dict)
-    for state, geoid, name in (
-        gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
-        .select("USPS", "GEOID", "NAME")
-        .iter_rows()
-    ):
-        places[state].setdefault(elstats.plain(name), geoid[:5])
-        places[state].setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
-    for (state, name), code in elstats.FORMER.items():
-        places[state].setdefault(name, code)
     for state in ELECTIONSTATS:
         places[state].update(TYPOS.get(state, {}))
         url = search(state)
@@ -479,6 +657,38 @@ def emit() -> Path:
                 )
                 if state == "NC"
                 else (
+                    "Minnesota Secretary of State",
+                    "Election results media files",
+                    "https://electionresults.sos.mn.gov",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "MN"
+                else (
+                    "Maryland State Board of Elections",
+                    "Election data",
+                    "https://elections.maryland.gov/elections/archive/2024/election_data/index.html",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "MD"
+                else (
+                    wa_local.PUBLISHER,
+                    wa_local.TITLE,
+                    "https://results.vote.wa.gov/results/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "WA"
+                else (
+                    elstats.MA_PUBLISHER,
+                    elstats.TITLE,
+                    "https://electionstats.state.ma.us",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "MA"
+                else (
                     elstats.TENANTS[state][1],
                     elstats.TITLE,
                     elstats.TENANTS[state][2],
@@ -495,7 +705,7 @@ def emit() -> Path:
                 )
             )
             sources[used] = cs.source(publisher, title)
-            if sources[used] in cs.minted:
+            if sources[used] in cs.minted and sources[used] not in list(sources.values())[:-1]:
                 cs.add(
                     "source", id=sources[used], kind=kind, publisher=publisher, title=title, url=url, license=license
                 )
@@ -627,7 +837,7 @@ def emit() -> Path:
                 if known.get(option) is not None
                 and abs(votes - (known[option] or 0)) > 10 + (known[option] or 0) // 100
             ]
-            if drift:
+            if drift and key not in CHECKED:
                 print(f"{key}: drift from the earlier default {drift}, skipped")
                 continue
             for candidate, option in list(picked.items()):
