@@ -2,6 +2,7 @@ import io
 import json
 import re
 import zipfile
+from collections import defaultdict
 from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
@@ -73,6 +74,7 @@ NAMES = (
 )
 PARTIES = {"R": "republican", "D": "democratic", "L": "libertarian", "G": "green", "C": "constitution"}
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
+MISSPELLED = {"OR:G16TRERDUG": "gud", "MI:G18GOVUSCH": "schl"}
 METHOD = (
     "The Voting and Election Science Team compiled these precinct returns from the state's and counties' official "
     "results and joined them to precinct shapes. Where absentee, early, or provisional ballots were reported only "
@@ -317,12 +319,14 @@ def emit() -> Path:
         )
         options: dict[UUID, list[tuple[UUID, str, list[str], str]]] = {}
         for contest, option, kind, words, party in conn.execute(
-            """select o.contest_id, o.id, o.kind, concat_ws(' ', n.text, o.ballot_label), coalesce(p.text, '')
+            """select o.contest_id, o.id, o.kind, concat_ws(' ', string_agg(distinct n.text, ' '), o.ballot_label),
+                      coalesce(min(p.text), '')
                from contest_option o
                left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
                left join name n on n.entity_id = cy.person_id and n.is_preferred
                left join name p on p.entity_id = o.party_id and p.is_preferred and p.lang = 'en'
-               where o.contest_id = any(%s) and o.parent_option_id is null""",
+               where o.contest_id = any(%s) and o.parent_option_id is null
+               group by o.contest_id, o.id, o.kind, o.ballot_label""",
             [list(contests.values())],
         ).fetchall():
             options.setdefault(contest, []).append(
@@ -456,7 +460,7 @@ def emit() -> Path:
                 )
                 if key is None or (state == "DC" and office == "HAL"):
                     continue
-                surname = surname.lower()
+                surname = MISSPELLED.get(f"{state}:{column}", surname.lower())
                 candidates = options.get(contests[key], [])
                 others = next(
                     (
@@ -485,7 +489,7 @@ def emit() -> Path:
                             3
                             if words[-1:] and words[-1].startswith(surname)
                             else 2
-                            if any(word.startswith(surname) for word in words)
+                            if any("".join(words[index:]).startswith(surname) for index in range(len(words)))
                             else 0
                         ]
                     ),
@@ -515,6 +519,18 @@ def emit() -> Path:
                     ),
                 )
             )
+            published: dict[str, dict[str, int]] = defaultdict(dict)
+            for key, option, votes in conn.execute(
+                """select regexp_replace(x.value, ':revised$', ''), o.id::text, sum(v.value)::bigint
+                   from external_id x join result_set r on r.id = x.entity_id
+                   join result_value v on v.result_set_k = r.k join contest_option o on o.k = v.option_k
+                   where x.scheme = %s and r.status = 'active' and x.value like %s group by 1, 2""",
+                [f"{SOURCE}.result_set", f"{year}-%"],
+            ).fetchall():
+                published[key][option] = votes
+            counted: dict[str, dict[str, int]] = defaultdict(dict)
+            for key, option, votes in mapped.group_by("contest", "option").agg(pl.col("votes").sum()).iter_rows():
+                counted[key][option] = votes
             result_sets: dict[str, UUID] = {}
             for key, total in mapped.group_by("contest").agg(pl.col("votes").sum()).sort("contest").iter_rows():
                 election, expected = official.get(contests[key], (None, None))
@@ -522,7 +538,14 @@ def emit() -> Path:
                     (election,) = conn.execute(
                         "select election_id from contest where id = %s", [contests[key]]
                     ).fetchone() or (None,)
-                result_sets[key] = cs.key(f"{SOURCE}.result_set", key)
+                first = cs.key(f"{SOURCE}.result_set", key)
+                result_sets[key] = (
+                    cs.key(f"{SOURCE}.result_set", f"{key}:revised")
+                    if first not in cs.minted and key in published and published[key] != counted[key]
+                    else first
+                )
+                if result_sets[key] != first:
+                    print(f"{key}: {published[key]} revised to {counted[key]}")
                 cs.add(
                     "result_set",
                     id=result_sets[key],
@@ -533,8 +556,23 @@ def emit() -> Path:
                     status="active",
                     source_id=sources[year],
                     is_default=False,
+                    supersedes_id=None if result_sets[key] == first else first,
                     completeness=round(total / expected, 4) if expected else None,
                 )
+                if result_sets[key] != first:
+                    cs.add(
+                        "result_set",
+                        id=first,
+                        election_id=election,
+                        contest_id=contests[key],
+                        stage="certified",
+                        kind="counted",
+                        status="superseded",
+                        source_id=sources[year],
+                        is_default=False,
+                        supersedes_id=None,
+                        completeness=round(total / expected, 4) if expected else None,
+                    )
                 cs.add("note", entity_id=result_sets[key], kind="methodology", body_md=METHOD)
                 report.append((key, total, expected))
             minted = [key for key, result_set in result_sets.items() if result_set in cs.minted]
