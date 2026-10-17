@@ -1,21 +1,25 @@
 import re
+import struct
 import subprocess
 from collections import Counter
+from datetime import date, timedelta
 from pathlib import Path
 
 import fastexcel
 import polars as pl
 
-from ea import raw
+from ea import raw, scan
 from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.elector_districts"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
+PAGES = DATA / "pages" / SOURCE
 CERTIFICATE = "https://www.archives.gov/files/electoral-college/{year}/{prefix}ascertainment-{state}.pdf"
 YEARS = {2012: "2012-", 2016: "", 2020: "", 2024: ""}
 STATES = {"ME": "maine", "NE": "nebraska"}
+STATE_CODES = {"ME": "23", "NE": "31"}
 LLDC = "https://lldc.mainelegislature.org/Open/Elections/Returns/{year}/{day}/elec_{day}{file}"
 TOWNS = {
     1988: ("19881108", "i.pdf", ["h.pdf"]),
@@ -66,6 +70,7 @@ COUNTIES = {
     "York": (22464, 30452),
 }
 FIRST = {"Cumberland", "Kennebec", "Knox", "Lincoln", "Sagadahoc", "Waldo", "York"}
+TOWN_NAMES = {"Isleboro": "Islesboro"}
 CANVASS = {2008: "https://sos.nebraska.gov/sites/default/files/doc/elections/2008/2008%20General%20Canvass%20Book.pdf"}
 PAIRS = (
     [(year, state) for year in YEARS for state in STATES]
@@ -107,11 +112,11 @@ METHOD = {
         "write-ins are not here, and completeness is the tickets' share of the statewide vote."
     ),
     "counties": (
-        "Votes by congressional district for each ticket, summed from the county totals in the Secretary of State's "
-        "official tabulation, a scan that the Maine State Library keeps on DigitalMaine. The county figures were "
-        "transcribed from the scan and add up to its printed state totals; every county lay wholly in one district from "
-        "1972 through 1980. The tabulation lists only the two major tickets, so write-ins are not here; completeness is "
-        "the tickets' share of the statewide vote."
+        "Votes for each ticket by county, from the Secretary of State's official tabulation, a scan that the Maine "
+        "State Library keeps on DigitalMaine; each figure keeps its place on the page. The county figures were "
+        "transcribed from the scan and add up to its printed state totals. Every county lay wholly in one district "
+        "from 1972 through 1980, so a district's vote is the sum of its counties. The tabulation lists only the two "
+        "major tickets, so write-ins are not here; completeness is the tickets' share of the statewide vote."
     ),
     "canvass": (
         "Votes by congressional district for each ticket, from the Secretary of State's official canvass book, "
@@ -128,9 +133,10 @@ POOLED = (
     "are counted under Others here too."
 )
 WALDO = (
-    "Waldo County was split between the districts in 1988. Its towns' votes come from the vote book's town table, "
-    "read by optical character recognition and checked against the county total; every other county lies wholly in "
-    "one district."
+    "The 1988 vote book is a scan read by optical character recognition, and each figure keeps its place on the "
+    "page. Votes are by county from the book's state summary, which sums to its state totals, except in Waldo County, "
+    "which was split between the districts: its votes are by town from the book's Waldo table, which sums to the "
+    "county's row."
 )
 
 
@@ -160,6 +166,43 @@ def text(address: str) -> str:
     ).stdout
 
 
+def runs(pdf: Path, limit: int) -> list[tuple[int, str, scan.Box]]:
+    found: list[tuple[int, str, scan.Box]] = []
+    info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+    for page in range(1, min(limit, int(info.split("Pages:")[1].split()[0])) + 1):
+        joining = False
+        for word, box in scan.layer(pdf, page):
+            if re.fullmatch(r"[\d,.]*\d[\d,.]*", word) is None:
+                joining = False
+                continue
+            if joining:
+                _, digits, last = found[-1]
+                if 0 <= box[0] - last[2] < 45 and min(box[3], last[3]) > max(box[1], last[1]):
+                    found[-1] = (
+                        page,
+                        digits + re.sub(r"\D", "", word),
+                        (last[0], min(last[1], box[1]), box[2], max(last[3], box[3])),
+                    )
+                    continue
+            found.append((page, re.sub(r"\D", "", word), box))
+            joining = True
+    return found
+
+
+def locate(found: list[tuple[int, str, scan.Box]], values: list[int]) -> list[tuple[int, scan.Box]]:
+    located = []
+    cursor = 0
+    for value in values:
+        after = [index for index in range(cursor, len(found)) if found[index][1] == str(value)]
+        anywhere = [index for index in range(len(found)) if found[index][1] == str(value)]
+        if not after and len(anywhere) != 1:
+            raise ValueError(f"{value} is not in the word layer")
+        index = after[0] if after else anywhere[0]
+        located.append((found[index][0], found[index][2]))
+        cursor = max(cursor, index + 1)
+    return located
+
+
 def place(county: str, town: str, ward: str | None) -> tuple[str, str, str]:
     return (
         county.strip().upper(),
@@ -170,10 +213,13 @@ def place(county: str, town: str, ward: str | None) -> tuple[str, str, str]:
 
 def parse() -> None:
     rows = []
+    cells = []
     for year, state in PAIRS:
         addresses = documents(year, state)
         uocava = short = 0
+        start = len(rows)
         if year in YEARS and state == "NE":
+            spans = runs(raw.cached(SOURCE, addresses[0]).path, 3)
             for block in re.split(r"\n(?=\S[^\n]*,\s*Pre[^\n]*/)", text(addresses[0]))[1:]:
                 numbers = [
                     int(re.sub(r"\D", "", found)) for found in re.findall(r"Vote\w*\s+Rec[^:\n]*:\s*(\d[\d ,]*)", block)
@@ -186,6 +232,7 @@ def parse() -> None:
             certificate = text(addresses[0])
             found = re.search(r"There were ([\d,]+) votes", certificate)
             uocava = int(found.group(1).replace(",", "")) if found else 0
+            spans = runs(raw.cached(SOURCE, addresses[0]).path, 3)
             for block in re.split(r"(?=The [A-Z ]+(?:PARTY|ALL)\s+Electors)", certificate)[1:]:
                 numbers = [
                     int(re.sub(r"\D", "", found.group(1)))
@@ -201,6 +248,35 @@ def parse() -> None:
                 short += numbers[2] - numbers[0] - numbers[1]
             if short > uocava:
                 raise ValueError(f"{year} {state}: the districts fall short by more than the {uocava} overseas votes")
+        if year in YEARS:
+            tickets = rows[start:]
+            located = iter(
+                locate(
+                    spans,
+                    [
+                        value
+                        for _, _, _, statewide, *districts in tickets
+                        for value in ([statewide, *districts] if state == "NE" else [*districts[:2], statewide])
+                        if value is not None
+                    ],
+                )
+            )
+            for _, _, candidate, _, *districts in tickets:
+                spots = [next(located) for _ in range(4 if state == "NE" else 3)]
+                for number, (page, box) in enumerate(spots[1:] if state == "NE" else spots[:2], start=1):
+                    cells.append(
+                        (
+                            year,
+                            state,
+                            candidate,
+                            number,
+                            "us.cd",
+                            STATE_CODES[state] + f"{number:02d}",
+                            districts[number - 1],
+                            page,
+                            *box,
+                        )
+                    )
         elif year in TABULATIONS:
             names = TABULATIONS[year][2]
             document = text(addresses[0])
@@ -232,6 +308,40 @@ def parse() -> None:
                 raise ValueError(f"{year} {state}: unreadable district totals {districts}")
             for name, one, two in zip(names, *districts, strict=True):
                 rows.append((year, state, name, one + two, one, two, None))
+            pdf = raw.cached(SOURCE, addresses[0]).path
+            if year == 1972:
+                words = scan.layer(pdf, 1)
+                clean = [box for word, box in words if re.fullmatch(r"\d{1,3}(?:,\d{3})+", word)]
+                left = sorted(box[2] for box in clean if box[0] + box[2] < 4400)
+                right = sorted(box[2] for box in clean if box[0] + box[2] >= 4400)
+                edges = [left[len(left) // 2], right[len(right) // 2]]
+                for county, votes in COUNTIES.items():
+                    (anchor,) = [
+                        box for word, box in words if word == (county[:6] if county == "Penobscot" else county)
+                    ]
+                    for name, value, edge in zip(names, votes, edges, strict=True):
+                        cells.append(
+                            (
+                                year,
+                                state,
+                                name,
+                                1 if county in FIRST else 2,
+                                "us.county",
+                                county,
+                                value,
+                                1,
+                                edge - 270,
+                                anchor[1] - 5,
+                                edge + 25,
+                                anchor[3] + 20,
+                            )
+                        )
+            else:
+                located = iter(locate(runs(pdf, 5), [value for district in districts for value in district]))
+                for number, district in enumerate(districts, start=1):
+                    for name, value in zip(names, district, strict=True):
+                        page, box = next(located)
+                        cells.append((year, state, name, number, "us.cd", f"23{number:02d}", value, page, *box))
         elif state == "NE":
             book = text(addresses[0])
             heading = re.search(r"^For President of the United States\s*$", book, re.MULTILINE)
@@ -257,18 +367,57 @@ def parse() -> None:
                     )
                 rows.append((year, state, name, statewide[number], *values))
         elif year == 1988:
-            book, house = text(addresses[0]), text(addresses[1])
+            pdf, house = raw.cached(SOURCE, addresses[0]).path, text(addresses[1])
             names = ["Bush", "Dukakis", "Fulani", "Paul", "Others"]
-            summary = book[book.index("STATE SUMMARY OF RESULTS") :]
-            counties = {
-                found.group(1): [int(number) for number in found.group(2).split()]
-                for found in re.finditer(
-                    r"^\s*([A-Z][a-z]+) +((?:\d+ +){4}\d+) *$", summary[: summary.index("STATE TOTALS")], re.MULTILINE
+            tables = {}
+            for number, marker, reach in ((4, "TOTALS", 45), (20, "TOTALS:", 22)):
+                words = scan.layer(pdf, number)
+                (anchor,) = [box for word, box in words if word == marker]
+                line = sorted(
+                    (box, word) for word, box in words if re.search(r"\d", word) and abs(box[1] - anchor[1]) < 30
                 )
-            }
-            totals = re.search(r"STATE TOTALS\s+(.*)", summary)
-            statewide = [int(number.replace(",", "")) for number in totals.group(1).split()] if totals else []
-            if len(counties) != 16 or [sum(column) for column in zip(*counties.values(), strict=True)] != statewide:
+                edges = [box[2] for box, _ in line]
+                labels = (
+                    {county: county for county in COUNTIES}
+                    if number == 4
+                    else {
+                        TOWN_NAMES.get(word, word) + (" Springs" if word == "Stockton" else ""): word
+                        for word, box in words
+                        if re.fullmatch(r"[A-Z][a-z]+", word) and box[0] < 200
+                    }
+                )
+                table = {}
+                for key, label in labels.items():
+                    (name,) = [box for word, box in words if word == label]
+                    middle = (name[1] + name[3]) / 2
+                    columns: list[list[tuple[scan.Box, str]]] = [[] for _ in edges]
+                    for word, box in words:
+                        nearest = min(range(len(edges)), key=lambda index: abs(edges[index] - box[2]))
+                        if (
+                            re.search(r"\d", word)
+                            and box[0] > name[2]
+                            and abs(edges[nearest] - box[2]) <= 60
+                            and abs((box[1] + box[3]) / 2 - middle) <= reach
+                        ):
+                            columns[nearest].append((box, word))
+                    table[key] = [
+                        (
+                            int(re.sub(r"\D", "", "".join(word for _, word in sorted(hits))) or 0),
+                            (
+                                min(box[0] for box, _ in hits),
+                                min(box[1] for box, _ in hits),
+                                max(box[2] for box, _ in hits),
+                                max(box[3] for box, _ in hits),
+                            )
+                            if hits
+                            else (edge - 180, name[1], edge + 20, name[3]),
+                        )
+                        for edge, hits in zip(edges, columns, strict=True)
+                    ]
+                tables[number] = ([int(word.replace(",", "")) for _, word in line], table)
+            (totals, summary), (waldo, towns) = tables[4], tables[20]
+            counties = {county: [value for value, _ in row] for county, row in summary.items()}
+            if len(totals) != 5 or [sum(column) for column in zip(*counties.values(), strict=True)] != totals:
                 raise ValueError(f"{year} {state}: the county summary does not sum to the state totals")
             first = house[house.index("DISTRICT 1 SUMMARY") : house.index("DISTRICT 2 SUMMARY")]
             second = house[house.index("DISTRICT 2 SUMMARY") :]
@@ -278,36 +427,57 @@ def parse() -> None:
                 raise ValueError(f"{year} {state}: the districts do not partition the counties apart from Waldo")
             section = house[house.index("COUNTY: WALDO") :]
             section = section[: section.index("TOTALS:")]
-            west = {found.group(1) for found in re.finditer(r"^([A-Z][A-Za-z.' ]*?)\s{2,}\d", section, re.MULTILINE)}
-            section = book[book.index("COUNTY: WALDO") :]
-            lines = section[: section.index("\n", section.index("TOTALS:"))].split("\n")
-            ends = [number.end() for number in re.finditer(r"\d[\d,]*", lines[-1])]
-            towns = {}
-            for line in lines[:-1]:
-                found = re.match(r"([A-Z][A-Za-z.' ]*?)\s{2,}(?=\d)", line)
-                if found is None:
-                    continue
-                votes = [0] * 5
-                for figure in re.compile(r"\d[\d,]*").finditer(line, found.end()):
-                    column = min(range(5), key=lambda index: abs(ends[index] - figure.end()))
-                    votes[column] += int(figure.group().replace(",", ""))
-                towns[found.group(1)] = votes
+            west = {
+                TOWN_NAMES.get(found.group(1), found.group(1))
+                for found in re.finditer(r"^([A-Z][A-Za-z.' ]*?)\s{2,}\d", section, re.MULTILINE)
+            }
             if (
-                len(ends) != 5
+                len(towns) != 26
                 or not west <= set(towns)
-                or [sum(column) for column in zip(*towns.values(), strict=True)] != counties["Waldo"]
+                or [sum(value for value, _ in column) for column in zip(*towns.values(), strict=True)]
+                != counties["Waldo"]
+                or waldo != counties["Waldo"]
             ):
                 raise ValueError(f"{year} {state}: Waldo's towns do not sum to its county total")
             for number, name in enumerate(names):
                 one = sum(counties[county][number] for county in ones - {"Waldo"}) + sum(
-                    towns[town][number] for town in west
+                    towns[town][number][0] for town in west
                 )
                 two = sum(counties[county][number] for county in twos - {"Waldo"}) + sum(
-                    votes[number] for town, votes in towns.items() if town not in west
+                    row[number][0] for town, row in towns.items() if town not in west
                 )
-                if one + two != statewide[number]:
+                if one + two != totals[number]:
                     raise ValueError(f"{year} {state}: {name}'s districts do not sum to the state total")
-                rows.append((year, state, name, statewide[number], one, two, None))
+                rows.append((year, state, name, totals[number], one, two, None))
+                for county, row in summary.items():
+                    if county != "Waldo":
+                        cells.append(
+                            (
+                                year,
+                                state,
+                                name,
+                                1 if county in ones else 2,
+                                "us.county",
+                                county,
+                                row[number][0],
+                                4,
+                                *row[number][1],
+                            )
+                        )
+                for town, row in towns.items():
+                    cells.append(
+                        (
+                            year,
+                            state,
+                            name,
+                            1 if town in west else 2,
+                            "us.town",
+                            town,
+                            row[number][0],
+                            20,
+                            *row[number][1],
+                        )
+                    )
         else:
             sheets = [
                 fastexcel.read_excel(raw.cached(SOURCE, address).path)
@@ -370,11 +540,39 @@ def parse() -> None:
         },
         orient="row",
     ).write_parquet(PARSED / "certificates.parquet")
+    pl.DataFrame(
+        cells,
+        schema={
+            "year": pl.Int16,
+            "state": pl.String,
+            "candidate": pl.String,
+            "district": pl.Int8,
+            "scheme": pl.String,
+            "unit": pl.String,
+            "value": pl.Int64,
+            "page": pl.Int32,
+            "x0": pl.Int32,
+            "y0": pl.Int32,
+            "x1": pl.Int32,
+            "y1": pl.Int32,
+        },
+        orient="row",
+    ).write_parquet(PARSED / "cells.parquet")
 
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "certificates.parquet")
+    cells = pl.read_parquet(PARSED / "cells.parquet")
     with connect() as conn:
+        places = {
+            (scheme, text.removesuffix(", ME").removesuffix(" County")): code
+            for scheme, code, text in conn.execute(
+                """select u.scheme_code, u.code, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.is_preferred
+                   where (u.scheme_code = 'us.county' and u.code like '23%')
+                      or (u.scheme_code = 'us.town' and u.code like '23027%')"""
+            ).fetchall()
+        }
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -433,17 +631,41 @@ def emit() -> Path:
                 url=TABULATIONS[int(year)][0] if int(year) in TABULATIONS else addresses[0],
                 license=license,
             )
-            for address in addresses:
-                cs.artifact(raw.cached(SOURCE, address), source)
+            artifacts = [cs.artifact(raw.cached(SOURCE, address), source) for address in addresses]
+            located = cells.filter((pl.col("year") == year) & (pl.col("state") == state))
+            pages = {}
+            for number in located["page"].unique().sort():
+                pdf = raw.cached(SOURCE, addresses[0])
+                image = PAGES / f"{pdf.sha256}-{number}.png"
+                if not image.exists():
+                    PAGES.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                        + [str(pdf.path), str(image.with_suffix(""))],
+                        check=True,
+                    )
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                page = cs.page(artifacts[0], number)
+                cs.add(
+                    "source_page",
+                    id=page,
+                    artifact_id=artifacts[0],
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{pdf.sha256}-{number}.png",
+                    width=width,
+                    height=height,
+                )
+                pages[number] = (page, width * 3, height * 3)
             options = conn.execute(
-                """select o.id, o.kind, o.party_id, v.value::bigint,
+                """select o.id, o.kind, o.party_id, sum(v.value)::bigint,
                           (select array_agg(array[cy.role::text, cy.person_id::text, n.text] order by cy.role)
                            from candidacy cy join name n on n.entity_id = cy.person_id and n.is_preferred
                            where cy.option_id = o.id), o.ballot_label
                    from external_id x join contest_option o on o.contest_id = x.entity_id and o.kind in ('ticket', 'write_in', 'others')
                    join result_set rs on rs.contest_id = x.entity_id and rs.is_default
                    join result_value v on v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
-                   where x.scheme = 'us.contest' and x.value = %s""",
+                   where x.scheme = 'us.contest' and x.value = %s
+                   group by o.id, o.kind, o.party_id, o.ballot_label""",
                 [f"{day}:{state}:president"],
             ).fetchall()
             total = conn.execute(
@@ -457,6 +679,7 @@ def emit() -> Path:
                 raise ValueError(f"{day}:{state}:president has no default votes")
             tickets = []
             pooled: list[tuple[str, int, list[int]]] = []
+            members: dict[int, list[str]] = {}
             for candidate, statewide, *districts in lines.select(
                 "candidate", "statewide", "d1", "d2", "d3"
             ).iter_rows():
@@ -469,6 +692,7 @@ def emit() -> Path:
                 ]
                 scattered = [row for row in options if row[1] == "write_in" and not row[4] and row[3] == statewide]
                 if not found and len(scattered) == 1:
+                    members[len(tickets)] = [candidate]
                     tickets.append(("write_in", None, [], values, scattered[0][5]))
                     continue
                 if not found and any(row[1] == "others" for row in options):
@@ -477,6 +701,7 @@ def emit() -> Path:
                 if not found and candidate == "Others":
                     if statewide != sum(row[3] for row in options if row[1] == "write_in"):
                         raise ValueError(f"{day}:{state}: others ({statewide}) are not the write-ins on file")
+                    members[len(tickets)] = [candidate]
                     tickets.append(("others", None, [], values, "Write-ins"))
                     continue
                 if len(found) != 1:
@@ -484,11 +709,13 @@ def emit() -> Path:
                 option, option_kind, party, held, candidacies, _ = found[0]
                 if abs(held - statewide) > max(5, held * 0.001):
                     raise ValueError(f"{day}:{state}: {candidate} {statewide} against {held} on file")
+                members[len(tickets)] = [candidate]
                 tickets.append((option_kind, party, candidacies, values, None))
             if pooled:
                 residual = next(row[3] for row in options if row[1] == "others")
                 if sum(statewide for _, statewide, _ in pooled) > residual:
                     raise ValueError(f"{day}:{state}: {pooled} exceed the {residual} others on file")
+                members[len(tickets)] = [candidate for candidate, *_ in pooled]
                 tickets.append(
                     (
                         "others",
@@ -501,13 +728,14 @@ def emit() -> Path:
             counted = int(lines["statewide"].sum())
             for number in range(1, 3 if state == "ME" else 4):
                 district_key = f"{day}:{state}-{number:02d}:president"
-                contest, election, unit, existing = conn.execute(
-                    """select c.id, c.election_id, u.id, rs.id from external_id x join contest c on c.id = x.entity_id
+                contest, election, area, unit, existing = conn.execute(
+                    """select c.id, c.election_id, c.district_area_id, u.id, rs.id
+                       from external_id x join contest c on c.id = x.entity_id
                        join reporting_unit u on u.area_id = c.district_area_id and u.scheme_code = 'us.cd'
                        join result_set rs on rs.contest_id = c.id and rs.is_default
                        where x.scheme = 'us.contest' and x.value = %s""",
                     [district_key],
-                ).fetchone() or (None, None, None, None)
+                ).fetchone() or (None, None, None, None, None)
                 if contest is None:
                     raise ValueError(f"{district_key} is not held")
                 declared = conn.execute(
@@ -569,7 +797,8 @@ def emit() -> Path:
                 if year == 1988 and state == "ME":
                     cs.add("note", entity_id=result_set, kind="caveat", body_md=WALDO)
                 ranked = []
-                for option_kind, party, candidacies, districts, label in tickets:
+                joined: set[tuple[str, str]] = set()
+                for index, (option_kind, party, candidacies, districts, label) in enumerate(tickets):
                     head = next((person for role, person, _ in candidacies if role == "head"), None)
                     option_key = f"{district_key}:{head or 'others'}"
                     option = cs.key("us.option", option_key)
@@ -592,17 +821,65 @@ def emit() -> Path:
                                 ballot_name=text,
                                 is_independent=False,
                             )
-                    cs.add(
-                        "result_value",
-                        result_set_id=result_set,
-                        unit_id=unit,
-                        option_id=option,
-                        channel=0,
-                        measure=1,
-                        count_round=0,
-                        value=districts[number - 1],
-                        flags=0,
-                    )
+                    spots = located.filter(
+                        pl.col("candidate").is_in(members[index]) & (pl.col("district") == number)
+                    ).group_by("scheme", "unit", maintain_order=True)
+                    placed = 0
+                    for (scheme, name), group in spots:
+                        place = unit if scheme == "us.cd" else cs.unit(str(scheme), places[(str(scheme), str(name))])
+                        if scheme != "us.cd" and (str(scheme), str(name)) not in joined:
+                            joined.add((str(scheme), str(name)))
+                            cs.add(
+                                "reporting_unit_area",
+                                unit_id=place,
+                                area_id=area,
+                                valid_from=date.fromisoformat(day),
+                                valid_to=date.fromisoformat(day) + timedelta(days=1),
+                            )
+                        if group["page"].n_unique() != 1:
+                            raise ValueError(f"{district_key}: {name} spans pages")
+                        page, width, height = pages[int(group["page"][0])]
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=place,
+                            option_id=option,
+                            channel=0,
+                            measure=1,
+                            count_round=0,
+                            value=int(group["value"].sum()),
+                            flags=8 | (1 if group.height > 1 else 0),
+                        )
+                        cs.add(
+                            "value_locator",
+                            result_set_id=result_set,
+                            unit_id=place,
+                            option_id=option,
+                            channel=0,
+                            measure=1,
+                            count_round=0,
+                            page_id=page,
+                            source_id=None,
+                            x0=min(group["x0"].to_list()) / width,
+                            y0=min(group["y0"].to_list()) / height,
+                            x1=max(group["x1"].to_list()) / width,
+                            y1=max(group["y1"].to_list()) / height,
+                        )
+                        placed += int(group["value"].sum())
+                    if located.height and placed != districts[number - 1]:
+                        raise ValueError(f"{district_key}: the cells sum to {placed}, not {districts[number - 1]}")
+                    if not located.height:
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=option,
+                            channel=0,
+                            measure=1,
+                            count_round=0,
+                            value=districts[number - 1],
+                            flags=0,
+                        )
                     ranked.append((districts[number - 1], head, option))
                 ranked.sort(key=lambda item: item[0], reverse=True)
                 if declared is None or str(declared[0]) != ranked[0][1] or ranked[0][0] == ranked[1][0]:
