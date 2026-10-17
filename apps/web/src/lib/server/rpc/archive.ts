@@ -146,6 +146,7 @@ const PlaceRow = v.object({
   prior: v.nullable(v.number()),
   within: v.optional(v.number()),
   seats: v.optional(v.nullable(v.number())),
+  isCounted: v.optional(v.boolean()),
 });
 
 const Places = v.nullable(
@@ -1680,6 +1681,7 @@ async function tabulate(
     path: string | null;
     isContest: boolean;
     isRemainder?: boolean;
+    isCounted?: boolean;
     owner: string | null;
   }>,
   date: string | null,
@@ -1813,6 +1815,42 @@ async function tabulate(
     }
     return { row, result, leader, before, valid: current?.side.valid ?? 0 };
   });
+  const silent = rows.flatMap((row, index) =>
+    row.owner == null || now[tier[index] ?? 0]?.has(row.k) === true
+      ? []
+      : [row.owner],
+  );
+  const root = ancestry(lineage, "party");
+  const declared = await db.execute<{
+    contest: string;
+    party: string | null;
+    person: string | null;
+  }>(sql`
+    select distinct on (o.contest_id) o.contest_id as contest, coalesce(pm.into_id, o.party_id) as party,
+      coalesce(m.into_id, cy.person_id) as person
+    from contest_option o
+    join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+    join result_set rs on rs.id = x.result_set_id and rs.is_default
+    left join entity_merge pm on pm.entity_id = o.party_id
+    left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+    left join entity_merge m on m.entity_id = cy.person_id
+    where o.contest_id = any(${sql.param(silent)}::uuid[])
+    order by o.contest_id, o.k
+  `);
+  const unopposed = new Map(
+    declared.rows.flatMap((row) => {
+      const key = [
+        row.party == null ? null : `party:${root(row.party)}`,
+        row.person == null ? null : `person:${row.person}`,
+      ].find((entry) => entry != null && legend.has(entry));
+      const item = legend.get(key ?? "");
+      if (key == null || item == null) {
+        return [];
+      }
+      item.lead = true;
+      return [[row.contest, key] as const];
+    }),
+  );
   const ranked = legend
     .values()
     .filter((item) => item.votes > 0 || item.lead)
@@ -1845,12 +1883,15 @@ async function tabulate(
         path: row.path,
         contest: row.isContest,
         isRemainder: row.isRemainder ?? false,
+        isCounted: row.isCounted,
         valid,
         shares: kept.map(
           (item) =>
             result.find((entry) => entry.key === item.key)?.current?.share ?? 0,
         ),
-        leader: leader == null ? null : (position.get(leader.key) ?? null),
+        leader:
+          position.get(leader?.key ?? unopposed.get(row.owner ?? "") ?? "") ??
+          null,
         margin:
           leader?.current == null
             ? null
@@ -4340,6 +4381,7 @@ async function races(
                     path: slugs.get(row.id) ?? null,
                     isContest: true,
                     isRemainder: row.isRemainder,
+                    isCounted: row.isCounted,
                     owner: row.id,
                   })),
                   date,

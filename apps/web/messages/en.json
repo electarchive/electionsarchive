@@ -636,6 +636,7 @@
   "map_swing_scale": "{low} to {high}+ points",
   "map_flips_none": "No place changed hands since {year}",
   "map_flipped": "Flipped",
+  "map_unopposed": "Unopposed",
   "scatter_lede": "Each circle is a place, sized by votes. The horizontal axis shows the margin between {a} and {b} in {from}; the vertical axis shows how much that margin shifted by {to}. Ringed circles changed hands.",
   "scatter_label": "{noun} margin in {from} vs. margin shift by {to}",
   "scatter_even": "Even",

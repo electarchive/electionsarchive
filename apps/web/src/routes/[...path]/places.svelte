@@ -69,7 +69,13 @@
       (row) => row.leader ?? 0,
     )
       .entries()
-      .map(([index, rows]) => [index, rows.length] as const)
+      .map(
+        ([index, rows]) =>
+          [
+            index,
+            rows.filter((row) => row.isCounted !== false).length,
+          ] as const,
+      )
       .toArray()
       .toSorted((a, b) => b[1] - a[1]),
   );
@@ -402,9 +408,11 @@
       >
         <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
         <span class="font-semibold">{titles[index]}</span>
-        <span class="font-figures text-xs text-muted-foreground tabular-nums"
-          >{won}</span
-        >
+        {#if won > 0}
+          <span class="font-figures text-xs text-muted-foreground tabular-nums"
+            >{won}</span
+          >
+        {/if}
       </button>
     {/each}
     {#if comparing && flips > 0}
@@ -628,12 +636,12 @@
                   />
                   <span
                     class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                    >{@render cite(
-                      percent(row.shares[row.leader] ?? 0),
-                      "share",
-                      row,
-                      `${titles[row.leader] ?? ""} ${m.col_share()}`,
-                    )}</span
+                    >{#if row.valid === 0}{m.map_unopposed()}{:else}{@render cite(
+                        percent(row.shares[row.leader] ?? 0),
+                        "share",
+                        row,
+                        `${titles[row.leader] ?? ""} ${m.col_share()}`,
+                      )}{/if}</span
                   >
                 </span>
               {/if}
@@ -656,7 +664,9 @@
             <td
               class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums max-sm:hidden"
             >
-              {@render cite(count(row.valid), "votes", row, votes)}
+              {#if row.valid > 0}
+                {@render cite(count(row.valid), "votes", row, votes)}
+              {/if}
             </td>
             {#if comparing}
               <td class="px-2 py-1.5">

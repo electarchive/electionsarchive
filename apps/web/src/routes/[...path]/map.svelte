@@ -201,7 +201,10 @@
       (row) => row.leader ?? 0,
     )
       .entries()
-      .map(([index, won]) => [index, won.length] as const)
+      .map(
+        ([index, won]) =>
+          [index, won.filter((row) => row.isCounted !== false).length] as const,
+      )
       .toArray()
       .toSorted((a, b) => b[1] - a[1]),
   );
@@ -375,7 +378,7 @@
         only != null && typeof only === "number" && only !== row.leader;
       let strength = dimmed
         ? 10
-        : isDeclared
+        : isDeclared || row.valid === 0
           ? 100
           : (STRENGTHS[bin(row.margin)] ?? 100);
       let tone = colors[row.leader] ?? "var(--muted-foreground)";
@@ -1387,10 +1390,12 @@
           >
             <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
             <span class="font-semibold">{names[index]}</span>
-            <span
-              class="font-figures text-xs text-muted-foreground tabular-nums"
-              >{won}</span
-            >
+            {#if won > 0}
+              <span
+                class="font-figures text-xs text-muted-foreground tabular-nums"
+                >{won}</span
+              >
+            {/if}
           </button>
         {/each}
       </div>
@@ -1570,7 +1575,7 @@
         </span>
       {/each}
     </span>
-    {#if isDeclared && current.leader != null}
+    {#if current.valid === 0 && current.leader != null}
       <span
         class="flex items-center gap-2 text-[0.8125rem]"
         style:--party={colors[current.leader]}
@@ -1579,11 +1584,14 @@
         <span class="font-semibold"
           >{places.legend[current.leader]?.label ?? names[current.leader]}</span
         >
+        {#if !isDeclared}
+          <span class="text-muted-foreground">{m.map_unopposed()}</span>
+        {/if}
       </span>
     {/if}
     <span class="flex items-baseline justify-between gap-3 text-xs">
       <span class="text-muted-foreground"
-        >{#if !isDeclared}{votes}
+        >{#if current.valid > 0}{votes}
           <span class="font-figures tabular-nums">{count(current.valid)}</span
           >{/if}</span
       >
