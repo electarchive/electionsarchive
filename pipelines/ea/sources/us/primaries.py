@@ -51,6 +51,7 @@ OHIO = (
 )
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
+MISSOURI = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/ActualResults-August62024.pdf"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
 NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
 NEBRASKA = "https://sos.nebraska.gov/sites/default/files/doc/elections/2024/2024%20Primary%20Canvass%20Book.pdf"
@@ -98,7 +99,12 @@ OPENELECTIONS = {
 }
 PARTIAL = ("AZ", "PA")
 ELECTIONSTATS = ("CO", "CT", "ID", "NH", "NM", "NY", "VA", "VT")
-TYPOS = {"MS": {"jeffdavis": "28065"}, "TN": {"williamsonx": "47187"}, "VT": {"essexjunction": "50007"}}
+TYPOS = {
+    "MO": {"kansascity": "2938000"},
+    "MS": {"jeffdavis": "28065"},
+    "TN": {"williamsonx": "47187"},
+    "VT": {"essexjunction": "50007"},
+}
 DAYS = {("RI", date(2024, 8, 13)): date(2024, 9, 10)}
 CHECKED = {
     "2024-05-14:MD:president:republican",
@@ -220,6 +226,7 @@ def fetch() -> None:
     for day in ("20240319", "20240820"):
         raw.fetch(SOURCE, FLORIDA.format(day), suffix=".txt")
     raw.fetch(SOURCE, OREGON, suffix=".pdf")
+    raw.fetch(SOURCE, MISSOURI, suffix=".pdf")
     for package in TEXAS:
         for resource in json.loads(raw.fetch(SOURCE, TED.format(package), suffix=".json").path.read_text())["result"][
             "resources"
@@ -356,6 +363,7 @@ def parse() -> None:
         *(("OH", "precinct", url) for url in OHIO),
         *(("FL", "county", FLORIDA.format(day)) for day in ("20240319", "20240820")),
         ("OR", "county", OREGON),
+        ("MO", "county", MISSOURI),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
         *(
@@ -659,6 +667,106 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif state == "MO":
+            pdf = raw.cached(SOURCE, url).path
+            info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+            cells = []
+            running: dict[tuple[str, str, str], int] = defaultdict(int)
+            for page in range(1, int(info.split("Pages:")[1].split()[0]) + 1):
+                lines = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][3], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][0][1][3] - box[3]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                for words in lines:
+                    words.sort(key=lambda item: item[1][0])
+                start = next(index for index, words in enumerate(lines) if words[0][0] == "Primary") + 1
+                header: list[list[tuple[str, scan.Box]]] = []
+                edges: list[int] = []
+                for words in lines[start:]:
+                    if re.fullmatch(r"\d+", words[0][0]) or not re.fullmatch(r"\d+", words[-1][0]):
+                        if edges:
+                            raise ValueError(f"MO page {page}: {words[0][0]} interrupts a table")
+                        header.append(words)
+                        continue
+                    if not edges:
+                        margin = words[0][1][0]
+                        edges = [box[2] for word, box in words if re.fullmatch(r"\d+", word)]
+                        label: list[str] = []
+                        banners: list[str | None] = [None] * len(edges)
+                        heads: list[list[str]] = [[] for _ in edges]
+                        for line in header:
+                            chain = 0
+                            if line[0][1][0] < margin + 120:
+                                chain = 1
+                                while chain < len(line) and line[chain][1][0] - line[chain - 1][1][2] < 60:
+                                    chain += 1
+                            label.extend(word for word, _ in line[:chain])
+                            for word, box in line[chain:]:
+                                column = next((i for i, edge in enumerate(edges) if box[2] <= edge + 30), None)
+                                if column is None:
+                                    raise ValueError(f"MO page {page}: {word} sits past the last column")
+                                if word in ("Republican", "Democratic", "Libertarian", "Green", "Constitution"):
+                                    banners[column] = word
+                                else:
+                                    heads[column].append(word)
+                        title = " ".join(label)
+                        numbered = re.search(r"District (\d+)", title)
+                        kept = (
+                            "U.S. Senate"
+                            if title == "United States Senator"
+                            else "Governor"
+                            if title == "Governor"
+                            else "U.S. House"
+                            if title.startswith("U.S. Representative District")
+                            else None
+                        )
+                    numbers = [(word, box) for word, box in words if re.fullmatch(r"\d+", word)]
+                    place = " ".join(word for word, _ in words if not re.fullmatch(r"\d+", word))
+                    if len(numbers) != len(edges):
+                        raise ValueError(f"MO page {page}: {place} has {len(numbers)} numbers for {len(edges)} columns")
+                    for column, (word, box) in enumerate(numbers):
+                        affiliation = banners[column]
+                        if affiliation is None or kept is None:
+                            continue
+                        key = (title, affiliation, " ".join(heads[column]))
+                        if place == "Total":
+                            summed = running.pop(key, 0)
+                            if summed != int(word):
+                                raise ValueError(f"MO page {page}: {key} sums to {summed}, the total is {word}")
+                            continue
+                        running[key] += int(word)
+                        cells.append(
+                            {
+                                "county": place,
+                                "office": kept,
+                                "district": numbered[1] if numbered else None,
+                                "party": affiliation,
+                                "candidate": key[2],
+                                "votes": word,
+                                "page": page,
+                                "x0": box[0],
+                                "y0": box[1],
+                                "x1": box[2],
+                                "y1": box[3],
+                            }
+                        )
+                    if place == "Total":
+                        header = []
+                        edges = []
+            if running:
+                raise ValueError(f"MO: {sorted(running)} have no total row")
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(("county", "office", "district", "party", "candidate", "votes"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
         elif state == "OR":
             pdf = raw.cached(SOURCE, url).path
             cells = []
@@ -1177,6 +1285,8 @@ def parse() -> None:
             if state == "OH"
             else date(2024, 5, 21)
             if state == "OR"
+            else date(2024, 8, 6)
+            if state == "MO"
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1360,7 +1470,9 @@ def emit() -> Path:
             for code, unit, area, name in conn.execute(
                 """select u.code, u.id, u.area_id, n.text from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'short' where u.scheme_code = 'us.county'
-                   union all select code, id, area_id, 'statewide' from reporting_unit where scheme_code = 'us.state'"""
+                   union all select code, id, area_id, 'statewide' from reporting_unit where scheme_code = 'us.state'
+                   union all select code, id, area_id, 'Kansas City' from reporting_unit
+                   where scheme_code = 'us.place' and code = '2938000'"""
             ).fetchall()
         }
         columns = (
@@ -1492,6 +1604,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "OR"
+                else (
+                    "Missouri Secretary of State",
+                    "Official results, Primary Election - August 6, 2024",
+                    "https://www.sos.mo.gov/elections/results",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "MO"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
