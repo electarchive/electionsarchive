@@ -27,6 +27,7 @@ TYPES = {
     "veto referendum": "optional_referendum",
     "advisory question": "plebiscite",
 }
+DATES = {("MO", "Missouri Amendment 1, State Executive Term Limits Amendment"): (date(2020, 3, 3), date(2020, 11, 3))}
 TITLE = "United States ballot measures, by year"
 NOTE = (
     "Statewide totals as tabulated in the English Wikipedia's yearly lists of ballot measures, which transcribe "
@@ -104,13 +105,16 @@ def parse() -> None:
                     )
                     continue
                 named = next((text for text in states if measure.startswith(f"{text} ")), None)
+                measure = re.sub(r"\s+", " ", re.sub(r"'{2,}", "", measure)).strip()
+                day = date(year, MONTHS[found[1]], int(found[2]))
+                printed, corrected = DATES.get((state, measure), (None, day))
                 rows.append(
                     {
                         "state": states[named] if named is not None and named != label else state,
-                        "day": date(year, MONTHS[found[1]], int(found[2])),
+                        "day": corrected if day == printed else day,
                         "origin": re.sub(r"\s+", " ", origin).strip().lower(),
                         "status": re.sub(r"[^A-Za-z]", "", re.split(r"<br", status)[0]).replace("Passed", "Approved"),
-                        "measure": re.sub(r"\s+", " ", re.sub(r"'{2,}", "", measure)).strip(),
+                        "measure": measure,
                         "yes": int(votes[0][0].replace(",", "")),
                         "no": int(votes[1][0].replace(",", "")),
                     }
@@ -198,6 +202,14 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
+        retained = {
+            id
+            for (id,) in conn.execute(
+                """select rs.id from result_set rs join external_id x on x.entity_id = rs.id and x.scheme = %s
+                   where not (rs.status = 'active' and rs.is_default)""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        }
         created: set[str] = set()
         for state, day, origin, status, measure, yes, no in frame.sort("state", "day").iter_rows():
             if day.year == 2024 and (state, day) in covered:
@@ -234,7 +246,7 @@ def emit() -> Path:
                 )
                 paths[election_key] = f"us/{state.lower()}/{day}-{kind}"
                 cs.add("slug", path=paths[election_key], entity_id=election)
-            contest_key = f"{day}:{state}:question:wikipedia:{slug(measure)[:80]}"
+            contest_key = f"{DATES.get((state, measure), (day,))[0]}:{state}:question:wikipedia:{slug(measure)[:80]}"
             contest = cs.key("us.contest", contest_key)
             cs.add(
                 "contest",
@@ -269,6 +281,8 @@ def emit() -> Path:
                     ballot_label=label,
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            if result_set in retained:
+                continue
             cs.add(
                 "result_set",
                 id=result_set,

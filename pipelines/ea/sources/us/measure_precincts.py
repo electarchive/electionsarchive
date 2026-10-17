@@ -870,6 +870,14 @@ def emit() -> Path:
         aggregates: dict[str, UUID] = dict(
             conn.execute("select code, id from reporting_unit where scheme_code = 'us.aggregate'").fetchall()
         )
+        elections = {
+            id: election
+            for id, election in conn.execute(
+                """select rs.id, rs.election_id::text from result_set rs
+                   join external_id x on x.entity_id = rs.id and x.scheme = %s""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        }
         defaults = pl.DataFrame(
             conn.execute(
                 """select cx.value, substr(p.iso_code, 4), e.date_from, rs.election_id::text, rs.contest_id::text,
@@ -1024,7 +1032,7 @@ def emit() -> Path:
             )
             codes = {}
             for code, fips in rows.select("code", "fips").unique().iter_rows():
-                if fips in aggregates:
+                if fips in aggregates and not fips.isdigit():
                     codes[code] = str(aggregates[fips])
                     continue
                 codes[code] = str(cs.unit("us.precinct", code, on=day))
@@ -1046,12 +1054,20 @@ def emit() -> Path:
             staged, supersedes = result_set, None
             if result_set not in cs.minted:
                 gap = complete.join(present, on=["unit_id", "option_id"], how="anti")
-                if gap.height == 0 or not present["unit_id"].is_in(list(codes.values())).all():
+                moved = elections.get(result_set, first["election"]) != first["election"]
+                if not moved and (gap.height == 0 or not present["unit_id"].is_in(list(codes.values())).all()):
                     continue
-                staged, supersedes = cs.key(f"{SOURCE}.result_set", f"{key}:precinct:complete"), result_set
+                staged = cs.key(
+                    f"{SOURCE}.result_set", f"{key}:precinct:{day}" if moved else f"{key}:precinct:complete"
+                )
+                supersedes = result_set
                 if staged not in cs.minted:
                     continue
-                print(f"{key}: {present.height} of its values on file, superseded by a complete set")
+                print(
+                    f"{key}: moved to {day}"
+                    if moved
+                    else f"{key}: {present.height} of its values on file, superseded by a complete set"
+                )
             for id, status in [(supersedes, "superseded"), (staged, "active")] if supersedes else [(staged, "active")]:
                 cs.add(
                     "result_set",
