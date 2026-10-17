@@ -11,12 +11,35 @@ from ea.store import DATA, connect
 SOURCE = "us.vtd_links"
 VERSION = "1"
 NOISE = re.compile(r"\b(VOTING DISTRICT|VTD|PRECINCT|PREC|PCT|DISTRICT|DIST|WARD|WD|NO)\b")
+PENNSYLVANIA = re.compile(r"\b(TWP|TOWNSHIP|BORO|BOROUGH|ED)\b")
 
 
 def emit() -> Path:
     def norm(text: str) -> str:
         words = NOISE.sub(" ", text.upper())
         return "".join(part.lstrip("0") or "0" if part.isdigit() else part for part in re.findall(r"[A-Z]+|\d+", words))
+
+    def unit(state: str, vintage: int, name: str) -> tuple[str, str]:
+        if state == "PA":
+            name = PENNSYLVANIA.sub(" ", re.sub(r"^\d+\s+(?=[A-Za-z])|\(\d+\)", "", name.upper()))
+        elif state == "FL":
+            name = re.sub(r"^[A-Z]{3}(?=\w*\d)", "", name)
+        elif state == "VA" and (split := re.fullmatch(r"(\w+)\s+-\s+(.+)", name)):
+            return norm(split[1]), norm(split[2])
+        elif state == "OK" and re.fullmatch(r"\d{6}", name):
+            return norm(name[2:]), ""
+        elif state == "CO" and re.fullmatch(r"\d{10}", name):
+            return norm(name[-5:] if vintage == 2010 else name[-3:]), norm(name)
+        elif state == "WI" and (ward := re.search(r"([A-Za-z][A-Za-z .'-]*? - [CTV] \d+(?: [A-Z])?)$", name)):
+            name = ward[1]
+        elif state == "WY" and (pair := re.search(r"(\d+)-(\d+)$", name)):
+            return f"D{int(pair[1])}P{int(pair[2])}", ""
+        return norm(name), norm(name)
+
+    def district(state: str, code: str, name: str) -> tuple[str, str]:
+        if state == "56" and (pair := re.fullmatch(r"(\d+)-(\d+)|(\d{2})(\d{2})", code)):
+            return f"D{int(pair[1] or pair[3])}P{int(pair[2] or pair[4])}", norm(name)
+        return norm(code), norm(name)
 
     with connect() as conn:
         cs = Changeset(
@@ -41,17 +64,30 @@ def emit() -> Path:
             vintage=pl.when(pl.col("valid_from") < date(2010, 4, 1)).then(2000).otherwise(2010),
             year=pl.col("valid_from").dt.year(),
             state=pl.col("code").str.split(":").list.get(1),
-            key=pl.col("code").str.split(":").list.last().map_elements(norm, return_dtype=pl.String),
         )
+        units = units.with_columns(
+            pl.Series(
+                "keys",
+                [
+                    list(unit(state, vintage, code.split(":")[-1].strip()))
+                    for state, vintage, code in units.select("state", "vintage", "code").iter_rows()
+                ],
+                dtype=pl.List(pl.String),
+            )
+        ).with_columns(code_key=pl.col("keys").list.get(0), name_key=pl.col("keys").list.get(1))
         vtds = pl.concat(
             [
-                pl.read_parquet(DATA / "parsed" / "us.vtd" / f"vtd_{vintage}.parquet").select(
+                pl.read_parquet(DATA / "parsed" / "us.vtd" / f"vtd_{vintage}.parquet")
+                .select(
                     vintage=pl.lit(vintage),
                     area=pl.lit(f"{vintage}:") + pl.col("geoid"),
                     county=pl.col("geoid").str.slice(0, 5),
-                    code=pl.col("vtdst").map_elements(norm, return_dtype=pl.String),
-                    name=pl.col("name").map_elements(norm, return_dtype=pl.String),
+                    keys=pl.struct("geoid", "vtdst", "name").map_elements(
+                        lambda row: list(district(row["geoid"][:2], row["vtdst"], row["name"])),
+                        return_dtype=pl.List(pl.String),
+                    ),
                 )
+                .select("vintage", "area", "county", code=pl.col("keys").list.get(0), name=pl.col("keys").list.get(1))
                 for vintage in (2000, 2010)
             ]
         )
@@ -64,10 +100,10 @@ def emit() -> Path:
         }
         links = pl.DataFrame(schema={"unit": pl.String, "area": pl.String, "pass": pl.String})
         for side in ("code", "name"):
-            left = units.join(links, on="unit", how="anti").filter(pl.col("key") != "")
+            left = units.join(links, on="unit", how="anti").rename({f"{side}_key": "key"}).filter(pl.col("key") != "")
             right = vtds.join(links.select("area").unique(), on="area", how="anti").filter(pl.col(side) != "")
             once = ["vintage", "county", "key"]
-            left = left.filter(pl.len().over([*once, "valid_from"]) == 1)
+            left = left.filter(pl.col("code").str.split(":").list.last().n_unique().over([*once, "valid_from"]) == 1)
             right = right.rename({side: "key"}).filter(pl.len().over(once) == 1)
             links = pl.concat([links, left.join(right, on=once).select("unit", "area", **{"pass": pl.lit(side)})])
         counts = Counter(links["area"].to_list())
