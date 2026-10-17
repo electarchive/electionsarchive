@@ -497,6 +497,7 @@ def emit() -> Path:
         for code, label in UFS.items():
             polity = cs.polity(f"BR-{code}")
             cs.add("polity", id=polity, kind="federal_unit", iso_code=f"BR-{code}")
+            cs.add("slug", path=f"br/{code.lower()}", entity_id=polity)
             cs.add("polity_parent", polity_id=polity, parent_id=brazil)
             states[code] = cs.area("br.uf", code)
             cs.add("area", id=states[code], scheme_code="br.uf")

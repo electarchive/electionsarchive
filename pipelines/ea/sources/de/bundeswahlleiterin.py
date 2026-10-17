@@ -788,6 +788,7 @@ def emit() -> Path:
         for code, (abbreviation, label, english) in LAENDER.items():
             polity = cs.polity(f"DE-{abbreviation}")
             cs.add("polity", id=polity, kind="federal_unit", iso_code=f"DE-{abbreviation}")
+            cs.add("slug", path=f"de/{abbreviation.lower()}", entity_id=polity)
             cs.add("polity_parent", polity_id=polity, parent_id=germany)
             laender[code] = cs.area("de.land", code)
             cs.add("area", id=laender[code], scheme_code="de.land")

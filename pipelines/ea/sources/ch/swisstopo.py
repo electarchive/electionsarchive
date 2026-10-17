@@ -186,6 +186,7 @@ def emit() -> Path:
             abbreviation, native, lang, english = CANTONS[number]
             polity = cs.polity(f"CH-{abbreviation}")
             cs.add("polity", id=polity, kind="federal_unit", iso_code=f"CH-{abbreviation}")
+            cs.add("slug", path=f"ch/{abbreviation.lower()}", entity_id=polity)
             cs.add("polity_parent", polity_id=polity, parent_id=switzerland)
             cantons[number] = cs.area("ch.canton", abbreviation)
             cs.add("area", id=cantons[number], scheme_code="ch.canton")

@@ -519,6 +519,7 @@ def emit() -> Path:
         for code, (abbreviation, label) in PROVINCES.items():
             province = cs.polity(f"CA-{abbreviation}")
             cs.add("polity", id=province, kind="federal_unit", iso_code=f"CA-{abbreviation}")
+            cs.add("slug", path=f"ca/{abbreviation.lower()}", entity_id=province)
             name(province, label)
             cs.add("polity_parent", polity_id=province, parent_id=ca)
             cs.add("area_code", area_id=province_areas[code], code=code, valid_from=None)
