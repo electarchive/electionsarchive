@@ -303,6 +303,30 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [(31682, 0.13, 0.87, 0, 0.49), (31682, 0.13, 0.87, 0.49, 1)],
         [("DEM", "Stevenson"), ("REP", "Eisenhower")],
     ),
+    (
+        "1924-11-04",
+        "governor",
+        [(12677, 0.155, 0.91, 0, 1), (12678, 0.12, 0.62, 0, 1)],
+        [("REP", "Baker"), ("DEM", "Nelson"), ("SOC", "Brandt"), ("SLP", "Cox")],
+    ),
+    (
+        "1940-11-05",
+        "governor",
+        [(22001, 0.625, 0.955, 0, 1), (22002, 0.115, 0.945, 0, 1), (22003, 0.115, 0.39, 0, 1)],
+        [("DEM", "McDaniel"), ("REP", "Donnell"), ("SOC", "High"), ("SLP", "Cox")],
+    ),
+    (
+        "1948-11-02",
+        "governor",
+        [(26106, 0.09, 0.935, 0, 1), (26107, 0.085, 0.535, 0, 1)],
+        [("DEM", "Smith"), ("REP", "Thompson"), ("SOC", "Gipe"), ("SLP", "Genck"), ("WPRG", "Logsdon")],
+    ),
+    (
+        "1956-11-06",
+        "governor",
+        [(31684, 0.135, 0.86, 0, 0.5), (31684, 0.135, 0.86, 0.5, 1)],
+        [("DEM", "Blair"), ("REP", "Hocker")],
+    ),
 ]
 MISORDERED: dict[tuple[str, str], list[tuple[str, str]]] = {
     ("1924-11-04", "president"): [("perry", "pettis")],
@@ -464,6 +488,43 @@ NAMES: dict[tuple[str, str, str], str] = {
     ("1952-11-04", "Hoopes", "SOC"): "Darlington Hoopes",
     ("1952-11-04", "MacArthur", "CN"): "Douglas MacArthur",
     ("1952-11-04", "MacArthur", "AF"): "Douglas MacArthur",
+    ("1892-11-08", "Leonard", "PPL"): "Leverett Leonard",
+    ("1892-11-08", "Sobieski", "PRO"): "John Sobieski",
+    ("1896-11-03", "Faris", "PRO"): "Herman P. Faris",
+    ("1896-11-03", "Fry", "SLP"): "Lewis C. Fry",
+    ("1900-11-06", "Hillis", "PPL"): "J. H. Hillis",
+    ("1900-11-06", "Stokes", "PRO"): "Charles E. Stokes",
+    ("1900-11-06", "Lipscomb", "SDEM"): "Caleb Lipscomb",
+    ("1900-11-06", "Fry", "SLP"): "Lewis C. Fry",
+    ("1904-11-08", "Hill", "PRO"): "Orange J. Hill",
+    ("1904-11-08", "Behrens", "SOC"): "E. T. Behrens",
+    ("1904-11-08", "White", "SLP"): "J. Edward White",
+    ("1904-11-08", "Alldredge", "PPL"): "William C. Alldredge",
+    ("1912-11-05", "Stokes", "PRO"): "Charles E. Stokes",
+    ("1912-11-05", "Rogers", "SLP"): "Charles Rogers",
+    ("1912-11-05", "Nortoni", "PRG"): "Albert D. Nortoni",
+    ("1920-11-02", "Aldrich", "SOC"): "Marvin M. Aldrich",
+    ("1920-11-02", "Middlecoff", "SLP"): "E. T. Middlecoff",
+    ("1920-11-02", "Faris", "PRO"): "Herman P. Faris",
+    ("1920-11-02", "Hickman", "FW"): "Vaughan Hickman",
+    ("1924-11-04", "Baker", "REP"): "Sam Aaron Baker",
+    ("1924-11-04", "Brandt", "SOC"): "William E. Brandt",
+    ("1924-11-04", "Cox", "SLP"): "William W. Cox",
+    ("1928-11-06", "Hodges", "SOC"): "Joseph G. Hodges",
+    ("1928-11-06", "Middlecoff", "SLP"): "Edward G. Middlecoff",
+    ("1932-11-08", "Wolf", "SOC"): "Louis Martin Wolf",
+    ("1932-11-08", "Cox", "SLP"): "William W. Cox",
+    ("1932-11-08", "Penney", "COM"): "Owen W. Penney",
+    ("1936-11-03", "Duemler", "SOC"): "George K. Duemler",
+    ("1936-11-03", "Cox", "SLP"): "William W. Cox",
+    ("1936-11-03", "Williams", "COM"): "Frank A. Williams",
+    ("1940-11-05", "High", "SOC"): "Jed A. High",
+    ("1940-11-05", "Cox", "SLP"): "William W. Cox",
+    ("1944-11-07", "Rinck", "SOC"): "William F. Rinck",
+    ("1944-11-07", "Tendler", "SLP"): "Stephen Tendler",
+    ("1948-11-02", "Gipe", "SOC"): "Gipe",
+    ("1948-11-02", "Genck", "SLP"): "Henry W. Genck",
+    ("1948-11-02", "Logsdon", "WPRG"): "Robert B. Logsdon",
 }
 LANGUAGES = ("eng", "deu", "ita", "spa", "nld", "por", "swe", "pol", "frk")
 DEBUG: set[str] = set()
@@ -904,7 +965,8 @@ def parse() -> None:
                        join result_set rs on rs.k = v.result_set_k join source s on s.id = rs.source_id
                        join contest_option o on o.k = v.option_k join reporting_unit u on u.k = v.unit_k
                        join external_id x on x.entity_id = rs.contest_id and x.scheme = 'us.contest'
-                       where x.value = %s and (s.title like '%%(ICPSR 1)' or s.title like '%%(ICPSR 13)')
+                       where x.value = %s and (s.title like '%%(ICPSR 1)' or s.title like '%%(ICPSR 13)'
+                       or s.title = 'Gubernatorial county returns, 1865–2020')
                        and v.measure = 1""",
                     [f"{day}:MO:{each}"],
                 ).fetchall():
@@ -935,6 +997,10 @@ def parse() -> None:
                     )
                     if column is not None:
                         diagnostic[(county, column)] = diagnostic.get((county, column), 0) + votes
+            if office == "governor":
+                for column in range(len(candidates)):
+                    if diagnostic.get(("29189", column), 0) > diagnostic.get(("29510", column), 0) > 0:
+                        diagnostic[("29189", column)] -= diagnostic[("29510", column)]
             totals: dict[int, int] = {}
             for each in set(offices):
                 for text, votes in conn.execute(
@@ -1215,16 +1281,23 @@ def emit() -> Path:
                     if full is None:
                         raise ValueError(f"{key}: no option or name for {label} ({party})")
                     known = [
-                        person
+                        (person, text)
                         for person, text in conn.execute(
                             """select distinct cd.person_id, n.text from candidacy cd
                                join contest_option o on o.id = cd.option_id
                                join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                                join name n on n.entity_id = cd.person_id and n.is_preferred
-                               where x.value ~ %s and left(x.value, 4)::int between %s and %s""",
+                               where x.value ~ %s and case when x.value ~ '^[0-9]{4}' then left(x.value, 4)::int end between %s and %s""",
                             [":president$" if office == "president" else ":MO:", int(day[:4]) - 12, int(day[:4]) + 12],
                         ).fetchall()
                         if surname(text) == wanted and text[:1].lower() == full[:1].lower()
+                    ]
+                    known = [
+                        person
+                        for person, text in known
+                        if len({person for person, _ in known}) == 1
+                        or text == full
+                        and len({person for person, other in known if other == full}) == 1
                     ]
                     if len(set(known)) > 1:
                         raise ValueError(f"{key}: {len(set(known))} people for {full}")
@@ -1300,13 +1373,19 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
+            top = max(totals, key=totals.__getitem__)
+            outcomes = [
+                (option, kind, seats)
+                for option, kind, seats in outcomes
+                if kind not in {"elected", "won"} or option == top
+            ]
             for option, kind, seats in outcomes:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
-            if not outcomes:
+            if not any(kind in {"elected", "won"} for _, kind, _ in outcomes):
                 cs.add(
                     "outcome",
                     result_set_id=result_set,
-                    option_id=max(totals, key=totals.__getitem__),
+                    option_id=top,
                     kind="elected",
                     seats=1,
                 )
