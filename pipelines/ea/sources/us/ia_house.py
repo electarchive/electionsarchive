@@ -36,6 +36,7 @@ VOLUMES = {
 ERRATA = {(1982, 1), (1994, 5), (1996, 1)}
 ALIASES = {"Write-Ins": ("sc", "scat", "scattering", "scattered")}
 BESIDE = ("counties",)
+REVISION = 1
 TURNED = {(1984, 8), (1984, 9)}
 
 

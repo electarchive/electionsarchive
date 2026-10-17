@@ -510,7 +510,17 @@ def emit(source: ModuleType) -> Path:
                     lines = lines.filter(pl.col("column") != column)
                 else:
                     print(f"{key}: no option for {label} ({summed})")
-            result_set = cs.key(f"{source.SOURCE}.result_set", f"{key}:county")
+            result_set = cs.key(
+                f"{source.SOURCE}.result_set", f"{key}:county" + (f":{source.REVISION}" if source.REVISION > 1 else "")
+            )
+            previous = (
+                cs.key(
+                    f"{source.SOURCE}.result_set",
+                    f"{key}:county" + (f":{source.REVISION - 1}" if source.REVISION > 2 else ""),
+                )
+                if source.REVISION > 1
+                else None
+            )
             if result_set not in cs.minted:
                 continue
             if len(picked) < lines["column"].n_unique():
@@ -540,18 +550,21 @@ def emit(source: ModuleType) -> Path:
                 sum_ = int(lines.filter(pl.col("option") == str(option))["votes"].sum())
                 if total and sum_ != total:
                     print(f"{key}: {name or kind} {sum_} by county, {total} in the default set")
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=sources[int(year)],
-                is_default=False,
-                completeness=round(min(counted / official, 1), 4) if official else None,
-            )
+            for id, status in ((previous, "superseded"), (result_set, "active")):
+                if id is not None:
+                    cs.add(
+                        "result_set",
+                        id=id,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="certified",
+                        kind="counted",
+                        status=status,
+                        source_id=sources[int(year)],
+                        is_default=False,
+                        supersedes_id=previous if id == result_set else None,
+                        completeness=round(min(counted / official, 1), 4) if official else None,
+                    )
             units: dict[str, UUID] = {}
             for county in lines["county"].unique(maintain_order=True):
                 code, parent, area = counties[_plain(county)]

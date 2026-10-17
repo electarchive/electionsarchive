@@ -6,7 +6,7 @@ from ea.sources.us import house_books
 
 SOURCE = "us.il_sbe"
 RAW = SOURCE
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Illinois State Board of Elections"
 TITLE = "Official Vote Cast at the General Election, November {day:%-d, %Y}"
 LICENSE = "Public domain"
@@ -43,6 +43,7 @@ VOLUMES = {
 ERRATA = {(1972, 12), (1982, 6), (1986, 3)}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
+REVISION = 2
 TURNED: set[tuple[int, int]] = set()
 
 
