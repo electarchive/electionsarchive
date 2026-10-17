@@ -27,6 +27,15 @@ FILE = "https://archive.org/download/{item}/{item}.pdf"
 DIGITIZED = 8
 DERIVED = 1
 VOLUMES = {
+    1966: ("officialvote66illi", date(1966, 11, 8), range(34, 39)),
+    1968: ("officialvote1968illi", date(1968, 11, 5), range(67, 72)),
+    1970: ("officialvoteofst1970illi", date(1970, 11, 3), range(37, 42)),
+    1972: ("officialvote72illi", date(1972, 11, 7), range(57, 61)),
+    1974: ("officialvote1974illi", date(1974, 11, 5), range(29, 35)),
+    1976: ("officialvoteofst1976illi", date(1976, 11, 2), range(47, 53)),
+    1978: ("officialvote78illi", date(1978, 11, 7), range(58, 64)),
+    1980: ("officialvote1980illi", date(1980, 11, 4), range(28, 35)),
+    1982: ("officialvoteofst1982illi", date(1982, 11, 2), range(36, 43)),
     1984: ("officialvote84illi", date(1984, 11, 6), range(34, 40)),
     1986: ("officialvote1986illi", date(1986, 11, 4), range(34, 43)),
     1988: ("officialvoteofst1988illi", date(1988, 11, 8), range(33, 44)),
@@ -40,7 +49,7 @@ VOLUMES = {
     2004: ("stateofillinoiso2004illi", date(2004, 11, 2), range(35, 48)),
     2006: ("officialvote2006illi", date(2006, 11, 7), range(37, 51)),
 }
-ERRATA = {(1984, 1), (1986, 3)}
+ERRATA = {(1972, 12), (1982, 6), (1986, 3)}
 
 
 def _artifact(year: int) -> raw.Artifact:
@@ -170,12 +179,13 @@ def parse() -> None:
                     top = sorted((settled[(r, k)] for k in range(1, len(columns)) if (r, k) in settled), reverse=True)
                     if (
                         (year, table["district"]) not in ERRATA
+                        and columns[0] == "Plurality"
                         and (r, 0) in settled
                         and len(top) == len(columns) - 1
-                        and settled[(r, 0)] != top[0] - (top[1] if len(top) > 1 else 0)
+                        and settled[(r, 0)] not in (top[0], top[0] - (top[1] if len(top) > 1 else 0))
                     ):
                         failed.append(f"{year} district {table['district']} row {r}: the plurality does not fit")
-                for c in range(1, len(columns)):
+                for c in range(int(columns[0] == "Plurality"), len(columns)):
                     column = columns_by.setdefault((year, table["district"], c), [])
                     column.extend(settled.get((k, c), -(10**9)) for k in lines)
                     if total is not None:
@@ -225,7 +235,7 @@ def parse() -> None:
                         pairs := [
                             (k[1] - h[3], h)
                             for name, h in words
-                            if name == _plain(columns[c])
+                            if name == _plain(columns[c]) or (len(name) >= 5 and _plain(columns[c]).startswith(name))
                             for place, k in words
                             if place == _plain(table["rows"][lines[0]][0]) and 0 < k[1] - h[3] < 400
                         ]
@@ -289,7 +299,7 @@ def parse() -> None:
                             else xs[max(left)] + step * (c - max(left))
                         )
                 for r, c, county, value, again in cells:
-                    if r == total or c == 0 or (r, c) not in settled:
+                    if r == total or columns[c] == "Plurality" or (r, c) not in settled:
                         continue
                     votes = settled[(r, c)]
                     box, how = None, None
@@ -298,12 +308,13 @@ def parse() -> None:
                     elif pairs := sorted(
                         (k[1] - h[3], h, k)
                         for name, h in words
-                        if name == _plain(columns[c])
+                        if name == _plain(columns[c]) or (len(name) >= 5 and _plain(columns[c]).startswith(name))
                         for place, k in words
                         if place == _plain(county) and k[1] > h[3]
                     ):
                         _, h, k = pairs[0]
-                        right, down = xs.get(c, (h[0] + h[2]) / 2 + 25), (k[1] + k[3]) / 2
+                        right = xs[c] if any(cc == c for _, cc in anchors) else (h[0] + h[2]) / 2 + 25
+                        down = (k[1] + k[3]) / 2
                         if r in ys and abs(ys[r] - down) < 15:
                             down = ys[r]
                         near = sorted(
@@ -495,7 +506,12 @@ def emit() -> Path:
             if len(picked) < lines["column"].n_unique():
                 rest = int(lines.filter(~pl.col("column").is_in(list(picked)))["votes"].sum())
                 lumped = [
-                    o for o, k, _, t in known if k in ("write_in", "others") and t == rest and o not in picked.values()
+                    o
+                    for o, k, _, t in known
+                    if k in ("write_in", "others")
+                    and t
+                    == rest
+                    + int(lines.filter(pl.col("column").is_in([c for c, p in picked.items() if p == o]))["votes"].sum())
                 ]
                 if len(lumped) == 1:
                     pool = lumped[0]
