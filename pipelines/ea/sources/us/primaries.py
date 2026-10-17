@@ -1,5 +1,6 @@
 import html
 import io
+import itertools
 import json
 import re
 import struct
@@ -43,6 +44,7 @@ IOWA = "https://electionresults.iowa.gov/IA/121508/344769/reports/detailxml.zip"
 KANSAS = "https://sos.ks.gov/elections/24elec/2024-Primary-Election-United-States-House-of-Representatives-Precinct%20Results.xlsx"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
 NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
+NEBRASKA = "https://sos.nebraska.gov/sites/default/files/doc/elections/2024/2024%20Primary%20Canvass%20Book.pdf"
 NJ_FILES = {"president": "President", "us-senate": "U.S. Senate", "us-house": "U.S. House"}
 ORDINALS = (
     "First",
@@ -113,6 +115,7 @@ PARTIES = {
     "dfl": "minnesota-democratic-farmer-labor",
     "grn": "green",
     "green": "green",
+    "legal marijuana now": "legal-marijuana-now",
 }
 SKIPPED = r"(?i)^(registered voters|ballots cast|total ballots|times (blank|over|under) voted|total ?votes|under ?votes?|over ?votes?|no candidate qualified|blank|void)\b"
 COLUMNS = ("county", "precinct", "office", "district", "party", "candidate", "votes")
@@ -202,6 +205,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, IOWA, suffix=".zip")
     for name in NJ_FILES:
         raw.fetch(SOURCE, NEW_JERSEY.format(name), suffix=".pdf")
+    raw.fetch(SOURCE, NEBRASKA, suffix=".pdf")
     raw.fetch(SOURCE, KANSAS, suffix=".xlsx")
     for listing in MASSACHUSETTS:
         for election, *_ in elstats.MA_ROW.findall(raw.fetch(SOURCE, listing, suffix=".html").path.read_text()):
@@ -319,6 +323,7 @@ def parse() -> None:
         *(("ME", "precinct", MAINE.format(path)) for path in ME_FILES),
         ("IA", "county", IOWA),
         *(("NJ", "county", NEW_JERSEY.format(name)) for name in NJ_FILES),
+        ("NE", "county", NEBRASKA),
         ("KS", "precinct", KANSAS),
         *(
             ("MA", "precinct", f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:1/")
@@ -557,6 +562,124 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif state == "NE":
+            pdf = raw.cached(SOURCE, url).path
+            cells = []
+            printed: dict[tuple[str | None, str | None, str, str], int] = {}
+            office_text: str | None = None
+            seat: int | None = None
+            parties: list[tuple[int, str]] = []
+            above: list[list[tuple[str, scan.Box]]] = []
+            sections: list[tuple[int, int, str, list[str]]] = []
+            for page in range(13, 24):
+                lines = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][3], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][0][1][3] - box[3]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                for words in lines:
+                    words.sort(key=lambda item: item[1][0])
+                    text = " ".join(word for word, _ in words)
+                    if text.startswith("Primary Election"):
+                        break
+                    heading = (
+                        ("President", None)
+                        if "President of the United States" in text
+                        else ("U.S. Senate", None)
+                        if "Six Year Term" in text
+                        else (None, None)
+                        if "Two Year Term" in text and "Senate" in text
+                        else ("U.S. House", int(found[1]))
+                        if (found := re.search(r"Congressional District (\d+)", text))
+                        else False
+                    )
+                    if heading:
+                        office_text, seat = heading
+                    if found := re.findall(
+                        r"(Republican|Democratic|Libertarian|Legal Marijuana NOW) Party Nomination", text
+                    ):
+                        parties = [
+                            (box[0], party) for party in found for word, box in words if word == party.split()[0]
+                        ]
+                        above, sections = [], []
+                        continue
+                    if heading:
+                        above, sections = [], []
+                        continue
+                    if words[0][0] == "County":
+                        starts = [box[0] for word, box in words if word == "County"] + [10**6]
+                        sections = []
+                        for start, end in itertools.pairwise(starts):
+                            party = min(parties, key=lambda item: abs(item[0] - start) if len(parties) > 1 else 0)[1]
+                            sections.append((start, end, party, []))
+                        above.append(words)
+                        continue
+                    if not sections:
+                        above.append(words)
+                        continue
+                    for start, end, party, labels in sections:
+                        part = [(word, box) for word, box in words if start - 20 <= box[0] < end - 20]
+                        numbers = [(word, box) for word, box in part if re.fullmatch(r"[\d,]+", word)]
+                        if not numbers:
+                            continue
+                        if not labels:
+                            edges = [box[2] for _, box in numbers]
+                            stacks: list[list[str]] = [[] for _ in edges]
+                            for header in above:
+                                for word, box in header:
+                                    if word != "County" and start - 20 <= box[0] < end - 20:
+                                        stacks[next(i for i, edge in enumerate(edges) if box[2] <= edge + 20)].append(
+                                            word
+                                        )
+                            labels.extend(" ".join(column) for column in stacks)
+                        place = re.sub(
+                            r"\s*\(.*\)$", "", " ".join(word for word, _ in part if not re.fullmatch(r"[\d,]+", word))
+                        )
+                        if len(numbers) != len(labels):
+                            raise ValueError(f"NE page {page}: {place} has {len(numbers)} numbers for {labels}")
+                        for name, (word, box) in zip(labels, numbers, strict=True):
+                            if office_text is None:
+                                continue
+                            if place == "Total":
+                                printed[(office_text, None if seat is None else str(seat), party, name)] = int(
+                                    word.replace(",", "")
+                                )
+                                continue
+                            cells.append(
+                                {
+                                    "county": fips["NE"][re.sub(r"[^a-z]", "", place.lower())],
+                                    "office": office_text,
+                                    "district": None if seat is None else str(seat),
+                                    "party": party,
+                                    "candidate": name,
+                                    "votes": word,
+                                    "page": page,
+                                    "x0": box[0],
+                                    "y0": box[1],
+                                    "x1": box[2],
+                                    "y1": box[3],
+                                }
+                            )
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(("county", "office", "district", "party", "candidate", "votes"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
+            summed = frame.group_by("office", "district", "party", "candidate").agg(
+                pl.col("votes").str.replace_all(",", "").cast(pl.Int64).sum()
+            )
+            if {(*key, votes) for *key, votes in summed.iter_rows()} != {
+                (*key, votes) for key, votes in printed.items()
+            }:
+                raise ValueError(
+                    f"NE: the counties sum to {summed.sort('office', 'district').rows()}, the book prints {printed}"
+                )
         elif state == "ME":
             office_text, district, stage = ME_FILES[url.removeprefix(MAINE[:-7]).removesuffix(".xlsx")]
             table = (
@@ -762,7 +885,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ"):
+        if state in ("MN", "IN", "ME", "NJ", "NE"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -801,7 +924,7 @@ def parse() -> None:
         office = pl.col("office").str.to_lowercase().str.strip_chars()
         day = (
             date(2024, 5, 14)
-            if state == "MD"
+            if state in ("MD", "NE")
             else date(2024, 8, 6)
             if state == "KS"
             else date(2024, 6, 4)
@@ -1091,6 +1214,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "NJ"
+                else (
+                    "Nebraska Secretary of State",
+                    "Official report of the Board of State Canvassers, 2024 primary election",
+                    NEBRASKA,
+                    "official_body",
+                    "Public record",
+                )
+                if state == "NE"
                 else (
                     elstats.MA_PUBLISHER,
                     elstats.TITLE,
