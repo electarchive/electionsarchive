@@ -17,7 +17,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.sf_doe"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ORIGIN = "https://www.sfelections.org/results/"
 WAYBACK = "https://web.archive.org/web/{}id_/" + ORIGIN + "{}"
@@ -387,8 +387,6 @@ def emit() -> Path:
             number, unit, polity, code = row[:4]
             precincts["2022-11-08"].setdefault(number, []).append(unit)
             area = cs.area("us.precinct", code)
-            if area not in cs.minted:
-                raise ValueError(f"{code} already has a precinct area")
             cs.add("area", id=area, scheme_code="us.precinct")
             cs.add("area_code", area_id=area, code=code, valid_from=None)
             cs.add("area_parent", area_id=area, parent_id=county)
@@ -437,14 +435,36 @@ def emit() -> Path:
             words = re.findall(r"[\w'-]+", text.casefold())
             people.setdefault((words[0], words[-1]), set()).add(person)
 
+        irv = cs.key("us.electoral_system", "irv")
+        if irv in cs.minted:
+            raise ValueError("the IRV electoral system must already exist")
         for key, (existing, (stamp, path)) in CONTESTS.items():
             day = date.fromisoformat(key[:10])
             rounds = official[key]
             contest = cs.key("us.contest", existing)
-            row = conn.execute("select election_id, district_area_id from contest where id = %s", [contest]).fetchone()
+            columns = (
+                "election_id",
+                "kind",
+                "office_id",
+                "body_id",
+                "district_area_id",
+                "seat_id",
+                "boundary_set_id",
+                "magnitude",
+                "party_scope_id",
+                "round_number",
+                "previous_round_id",
+                "allocation_parent_id",
+                "rules_override",
+                "default_result_kind",
+                "term",
+            )
+            row = conn.execute(f"select {', '.join(columns)} from contest where id = %s", [contest]).fetchone()
             if contest in cs.minted or row is None:
                 raise ValueError(f"{key}: {existing} must already exist")
-            election, district = row
+            contest_row = dict(zip(columns, row, strict=True))
+            cs.add("contest", id=contest, **contest_row, electoral_system_id=irv)
+            election, district = contest_row["election_id"], contest_row["district_area_id"]
             tops = conn.execute(
                 "select id from reporting_unit where area_id = %s and area_relation = 'equals'", [district]
             ).fetchall()
