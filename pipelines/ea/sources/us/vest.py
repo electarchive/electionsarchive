@@ -358,7 +358,14 @@ def emit() -> Path:
         areas: list[tuple[UUID, str, UUID, str]] = []
         for code, text, geom, point in georgia.select("code", "name", "geom", "point").iter_rows():
             area = cs.area("us.precinct", code)
-            areas.append((area, code, counties[code[:5]][0], f"{text.title()}, {counties[code[:5]][2]}"))
+            areas.append(
+                (
+                    area,
+                    code,
+                    counties[code[:5]][0],
+                    f"{re.sub(r'\w+', lambda word: word[0] if re.search(r'\d', word[0]) else word[0].title(), text)}, {counties[code[:5]][2]}",
+                )
+            )
             cs.add(
                 "area_geometry",
                 area_id=area,
@@ -387,7 +394,11 @@ def emit() -> Path:
             for state, n, text, county in precincts.select("state", "n", "name", "county").iter_rows():
                 code = f"{year}:{state}:{n}"
                 county_area, _, county_name = counties[county]
-                label = text.title() if text.isupper() else text
+                label = (
+                    re.sub(r"\w+", lambda word: word[0] if re.search(r"\d", word[0]) else word[0].title(), text)
+                    if text.isupper()
+                    else text
+                )
                 label = f"Precinct {label or n}" if label.isdigit() or not label else label
                 areas.append((cs.area("us.precinct", code), code, county_area, f"{label}, {county_name}"))
                 units[(state, n)] = cs.unit("us.precinct", code)
