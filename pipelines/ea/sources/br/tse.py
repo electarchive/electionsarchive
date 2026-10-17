@@ -1,6 +1,7 @@
 import io
 import re
 import shutil
+import unicodedata
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -22,6 +23,8 @@ FILES = {
     "detail": f"{TSE}detalhe_votacao_secao/detalhe_votacao_secao_2022.zip",
     "candidates": f"{TSE}consulta_cand/consulta_cand_2022.zip",
     "places": f"{TSE}eleitorado_locais_votacao/eleitorado_local_votacao_2022.zip",
+    "deputies": f"{TSE}votacao_candidato_munzona/votacao_candidato_munzona_2022.zip",
+    "legends": f"{TSE}votacao_partido_munzona/votacao_partido_munzona_2022.zip",
 }
 MEMBERS = (
     ("president", "votacao_secao_2022_BR.csv", "1"),
@@ -57,7 +60,35 @@ CANDIDATE = [
 FIRST, SECOND, STATE = "544", "545", "546"
 DAYS = {FIRST: date(2022, 10, 2), SECOND: date(2022, 10, 30), STATE: date(2022, 10, 2)}
 CLOSED = date(2022, 10, 31)
-SEATS = 8
+SEATS = {
+    "SP": 70,
+    "MG": 53,
+    "RJ": 46,
+    "BA": 39,
+    "RS": 31,
+    "PR": 30,
+    "PE": 25,
+    "CE": 22,
+    "MA": 18,
+    "GO": 17,
+    "PA": 17,
+    "SC": 16,
+    "PB": 12,
+    "ES": 10,
+    "PI": 10,
+    "AL": 9,
+    "AC": 8,
+    "AM": 8,
+    "AP": 8,
+    "DF": 8,
+    "MS": 8,
+    "MT": 8,
+    "RN": 8,
+    "RO": 8,
+    "RR": 8,
+    "SE": 8,
+    "TO": 8,
+}
 COORDINATES = {"NR_LATITUDE": (-34.0, 6.0), "NR_LONGITUDE": (-74.5, -28.5)}
 UFS = {
     "AC": "Acre",
@@ -131,6 +162,11 @@ DISQUALIFIED = (
     "The electoral court rejected this candidate's registration. The name stayed on the voting machines, but votes "
     "cast for it were annulled and count for neither the candidate nor the party."
 )
+RESIDUAL = (
+    "Outside Acre, the electoral court's municipal totals leave out votes for some candidates whose registrations it "
+    "rejected. Those votes count as null here, so each municipality's null votes are its section totals minus every "
+    "vote the municipal files assign."
+)
 NOT_OPENED = "This section did not open on {day}."
 ANNULLED = "The electoral court annulled this section's vote on {day}."
 
@@ -165,8 +201,14 @@ def parse() -> None:
     section = pl.concat_str(
         municipality, pl.col("NR_ZONA").cast(pl.Int64), pl.col("NR_SECAO").cast(pl.Int64), separator=":"
     )
+    contest = (
+        pl.when(pl.col("CD_ELEICAO") == STATE)
+        .then(pl.concat_str("CD_ELEICAO", "SG_UF", separator=":"))
+        .otherwise(pl.col("CD_ELEICAO"))
+    )
+    deputies = pl.col("contest").str.starts_with(STATE)
     place = {
-        "contest": pl.col("CD_ELEICAO"),
+        "contest": contest,
         "uf": pl.col("SG_UF"),
         "municipality": municipality,
         "municipality_label": pl.col("NM_MUNICIPIO"),
@@ -210,7 +252,7 @@ def parse() -> None:
         .then(pl.lit("blank"))
         .when(pl.col("choice") == "96")
         .then(pl.lit("null"))
-        .when((pl.col("contest") == STATE) & (pl.col("choice").str.len_chars() <= 2))
+        .when(deputies & (pl.col("choice").str.len_chars() <= 2))
         .then(pl.lit("legend"))
         .otherwise(pl.lit("nominal"))
     )
@@ -247,13 +289,74 @@ def parse() -> None:
     if sections.filter(pl.col("uf") != "ZZ")["uf"].unique().len() != len(UFS):
         raise ValueError("sections do not cover every state")
 
+    municipal: dict[str, pl.DataFrame] = {}
+    for key, columns in (
+        (
+            "deputies",
+            {
+                "candidate": pl.col("SQ_CANDIDATO"),
+                "choice": pl.col("NR_CANDIDATO"),
+                "void": pl.col("NM_TIPO_DESTINACAO_VOTOS").str.starts_with("Anulado"),
+                "votes": pl.col("QT_VOTOS_NOMINAIS").cast(pl.Int64),
+            },
+        ),
+        (
+            "legends",
+            {
+                "choice": pl.col("NR_PARTIDO"),
+                "valid": pl.col("QT_VOTOS_LEGENDA_VALIDOS").cast(pl.Int64),
+                "void": pl.col("QT_VOTOS_LEGENDA_ANULADOS").cast(pl.Int64)
+                + pl.col("QT_VOTOS_LEGENDA_ANUL_SUBJUD").cast(pl.Int64),
+            },
+        ),
+        ("detail", {field: pl.col(column).cast(pl.Int64) for field, column in counts.items()}),
+    ):
+        frames: list[pl.DataFrame] = []
+        with zipfile.ZipFile(raw.cached(SOURCE, FILES[key]).path) as archive:
+            for uf in UFS:
+                if uf == "AC":
+                    continue
+                member = next(name for name in archive.namelist() if name.endswith(f"_2022_{uf}.csv"))
+                with archive.open(member) as source, (PARSED / member).open("w", encoding="utf-8") as target:
+                    shutil.copyfileobj(io.TextIOWrapper(source, encoding="latin-1"), target, 16 << 20)
+                frames.append(
+                    pl.scan_csv(PARSED / member, separator=";", infer_schema=False)
+                    .filter(pl.col("CD_CARGO") == "6")
+                    .select(contest=contest, municipality=municipality, **columns)
+                    .collect()
+                )
+                (PARSED / member).unlink()
+        frame = pl.concat(frames)
+        keys = [column for column in ("contest", "municipality", "candidate", "choice") if column in frame.columns]
+        keys += ["void"] if key == "deputies" else []
+        municipal[key] = frame.group_by(keys).agg(pl.exclude(keys).sum())
+    assigned = (
+        pl.concat(
+            [
+                municipal["deputies"].select("contest", "municipality", "votes"),
+                municipal["legends"].select("contest", "municipality", votes=pl.col("valid") + pl.col("void")),
+            ]
+        )
+        .group_by("contest", "municipality")
+        .agg(assigned=pl.col("votes").sum())
+    )
+    municipal["detail"] = (
+        municipal["detail"]
+        .join(assigned, on=["contest", "municipality"], how="full", coalesce=True)
+        .with_columns(pl.col("assigned").fill_null(0))
+    )
+    residual = pl.col("nominal") + pl.col("legend") - pl.col("assigned")
+    if municipal["detail"].filter(residual.is_null() | (residual < 0)).height:
+        raise ValueError(f"municipal votes exceed the section details: {municipal['detail'].filter(residual < 0)}")
+    municipal["detail"] = municipal["detail"].with_columns(null=pl.col("null") + residual)
+
     with zipfile.ZipFile(raw.cached(SOURCE, FILES["candidates"]).path) as archive:
         roster = pl.read_csv(
             io.TextIOWrapper(archive.open("consulta_cand_2022_BRASIL.csv"), encoding="latin-1").read().encode(),
             separator=";",
             infer_schema=False,
             columns=CANDIDATE,
-        )
+        ).with_columns(contest=contest)
     parties = roster.select(number="NR_PARTIDO", abbreviation="SG_PARTIDO", label="NM_PARTIDO").unique().sort("number")
     federations = (
         roster.filter(pl.col("NR_FEDERACAO") != "-1")
@@ -270,14 +373,16 @@ def parse() -> None:
         raise ValueError(f"party numbers or abbreviations repeat: {parties}")
 
     voted = (
-        votes.filter(pl.col("kind") == "nominal").group_by("contest", "candidate", "choice").agg(pl.col("votes").sum())
+        pl.concat([votes.filter(pl.col("kind") == "nominal"), municipal["deputies"]], how="diagonal_relaxed")
+        .group_by("contest", "candidate", "choice")
+        .agg(pl.col("votes").sum())
     )
     standing = roster.filter(
         (pl.col("CD_ELEICAO").is_in([FIRST, SECOND]) & pl.col("CD_CARGO").is_in(["1", "2"]))
-        | ((pl.col("CD_ELEICAO") == STATE) & (pl.col("CD_CARGO") == "6") & (pl.col("SG_UF") == "AC"))
+        | ((pl.col("CD_ELEICAO") == STATE) & (pl.col("CD_CARGO") == "6"))
     ).join(
         voted.select("contest", "candidate", "votes"),
-        left_on=["CD_ELEICAO", "SQ_CANDIDATO"],
+        left_on=["contest", "SQ_CANDIDATO"],
         right_on=["contest", "candidate"],
         how="left",
     )
@@ -289,34 +394,56 @@ def parse() -> None:
         )
     )
     mates = standing.filter((pl.col("CD_CARGO") == "2") & (pl.col("DS_SITUACAO_CANDIDATURA") == "APTO")).join(
-        heads.select("CD_ELEICAO", "NR_CANDIDATO"), on=["CD_ELEICAO", "NR_CANDIDATO"], how="semi"
+        heads.select("contest", "NR_CANDIDATO"), on=["contest", "NR_CANDIDATO"], how="semi"
     )
     unknown = voted.join(
-        heads.select("CD_ELEICAO", "SQ_CANDIDATO", "NR_CANDIDATO"),
+        heads.select("contest", "SQ_CANDIDATO", "NR_CANDIDATO"),
         left_on=["contest", "candidate", "choice"],
-        right_on=["CD_ELEICAO", "SQ_CANDIDATO", "NR_CANDIDATO"],
+        right_on=["contest", "SQ_CANDIDATO", "NR_CANDIDATO"],
         how="anti",
     )
     if unknown.height:
         raise ValueError(f"votes for unknown candidates: {unknown}")
     if mates.height != heads.filter(pl.col("CD_CARGO") == "1").height:
         raise ValueError("every presidential candidate needs exactly one running mate")
-    if heads.filter(pl.col("CD_ELEICAO") == STATE)["NR_CANDIDATO"].is_duplicated().any():
-        raise ValueError("two Acre candidates share a number")
-    legends = votes.filter(pl.col("kind") == "legend")["choice"].unique()
-    if not legends.is_in(heads.filter(pl.col("CD_ELEICAO") == STATE)["NR_PARTIDO"].implode()).all():
-        raise ValueError(f"legend votes for parties without Acre candidates: {legends.to_list()}")
+    if heads.filter(deputies).select("contest", "NR_CANDIDATO").is_duplicated().any():
+        raise ValueError("two candidates for the same state's deputies share a number")
+    lists = (
+        pl.concat(
+            [
+                votes.filter(pl.col("kind") == "legend").select("contest", number="choice"),
+                municipal["legends"].filter(pl.col("valid") + pl.col("void") > 0).select("contest", number="choice"),
+                heads.filter(deputies).select("contest", number="NR_PARTIDO"),
+            ]
+        )
+        .unique()
+        .join(parties, on="number", how="left")
+        .join(
+            federations.explode("members").select(abbreviation="members", federation="number"),
+            on="abbreviation",
+            how="left",
+        )
+        .select(
+            "contest",
+            party=pl.concat_str("number", "abbreviation", separator=":"),
+            party_number="number",
+            party_abbreviation="abbreviation",
+            federation="federation",
+        )
+    )
+    if lists["party"].is_null().any():
+        raise ValueError(f"legend votes for unknown parties: {lists.filter(pl.col('party').is_null())}")
 
     outcome = (
-        pl.when(pl.col("DS_SITUACAO_CANDIDATURA") != "APTO")
+        pl.when(pl.col("DS_SIT_TOT_TURNO").is_in(["ELEITO", "ELEITO POR QP", "ELEITO POR MÉDIA"]))
+        .then(pl.lit("elected"))
+        .when(pl.col("DS_SITUACAO_CANDIDATURA") != "APTO")
         .then(pl.lit("disqualified"))
         .when(pl.col("DS_SIT_TOT_TURNO") == "2º TURNO")
         .then(pl.lit("advanced"))
-        .when(pl.col("DS_SIT_TOT_TURNO").is_in(["ELEITO", "ELEITO POR QP", "ELEITO POR MÉDIA"]))
-        .then(pl.lit("elected"))
     )
     candidates = pl.concat([heads, mates], how="diagonal").select(
-        contest="CD_ELEICAO",
+        "contest",
         role=pl.col("CD_CARGO").replace_strict({"1": "head", "2": "running_mate", "6": "list_member"}),
         candidate="SQ_CANDIDATO",
         number="NR_CANDIDATO",
@@ -337,7 +464,7 @@ def parse() -> None:
         votes=pl.col("votes").fill_null(0),
     )
 
-    president = candidates.filter((pl.col("role") == "head") & (pl.col("contest") != STATE))
+    president = candidates.filter((pl.col("role") == "head") & ~deputies)
     valid = detail.group_by("contest").agg(pl.col("nominal").sum())
     ranked = president.join(valid, on="contest", suffix="_valid").with_columns(
         rank=pl.col("votes").rank("ordinal", descending=True).over("contest")
@@ -357,9 +484,11 @@ def parse() -> None:
         ),
     }
     failures = [f"{label}: {frame.head(3)}" for label, frame in problems.items() if frame.height]
-    elected = candidates.filter((pl.col("contest") == STATE) & (pl.col("outcome") == "elected")).height
-    if elected != SEATS:
-        failures.append(f"{elected} Acre deputies elected, expected {SEATS}")
+    for (code,), frame in candidates.filter(deputies & (pl.col("outcome") == "elected")).group_by("contest"):
+        if frame.height != SEATS[str(code)[-2:]]:
+            failures.append(f"{frame.height} deputies elected in {code}, expected {SEATS[str(code)[-2:]]}")
+    if candidates.filter(deputies & (pl.col("outcome") == "elected")).height != sum(SEATS.values()):
+        failures.append("the states' deputies do not add up to the chamber")
     if failures:
         raise ValueError("\n".join(failures))
 
@@ -399,8 +528,36 @@ def parse() -> None:
                 measure=pl.col("variable").replace_strict({"registered": 2, "voters": 14}),
                 value="value",
             ),
-            detail.filter(pl.col("contest") != STATE).select(
+            detail.filter(~deputies).select(
                 "contest", "section", option=pl.lit(None, pl.String), measure=pl.lit(4), value="nominal"
+            ),
+            municipal["deputies"]
+            .filter(pl.col("votes") > 0)
+            .select(
+                "contest",
+                section="municipality",
+                option="candidate",
+                measure=pl.when(pl.col("void")).then(5).otherwise(1),
+                value="votes",
+            ),
+            municipal["legends"]
+            .unpivot(on=["valid", "void"], index=["contest", "municipality", "choice"])
+            .filter(pl.col("value") > 0)
+            .select(
+                "contest",
+                section="municipality",
+                option=pl.lit("legend:") + pl.col("choice"),
+                measure=pl.col("variable").replace_strict({"valid": 1, "void": 5}),
+                value="value",
+            ),
+            municipal["detail"]
+            .unpivot(on=["registered", "voters", "blank", "null"], index=["contest", "municipality"])
+            .select(
+                "contest",
+                section="municipality",
+                option=pl.lit(None, pl.String),
+                measure=pl.col("variable").replace_strict({"registered": 2, "voters": 14, "blank": 6, "null": 5}),
+                value="value",
             ),
         ],
         how="vertical_relaxed",
@@ -408,15 +565,18 @@ def parse() -> None:
 
     sections.sort("section").write_parquet(PARSED / "sections.parquet")
     parties.write_parquet(PARSED / "parties.parquet")
-    used = {member for _, kind, member in coalitions if kind == "federation"} | set(
-        candidates["federation"].drop_nulls()
+    used = (
+        {member for _, kind, member in coalitions if kind == "federation"}
+        | set(candidates["federation"].drop_nulls())
+        | set(lists["federation"].drop_nulls())
     )
     federations.filter(pl.col("number").is_in(list(used))).write_parquet(PARSED / "federations.parquet")
     pl.DataFrame(coalitions, schema=["coalition", "kind", "member"], orient="row").write_parquet(
         PARSED / "coalitions.parquet"
     )
     candidates.write_parquet(PARSED / "candidates.parquet")
-    detail.filter((pl.col("contest") != STATE) & (~pl.col("opened") | pl.col("annulled"))).select(
+    lists.write_parquet(PARSED / "lists.parquet")
+    detail.filter(~deputies & (~pl.col("opened") | pl.col("annulled"))).select(
         "contest", "section", "opened", "annulled"
     ).write_parquet(PARSED / "events.parquet")
     values.write_parquet(PARSED / "values.parquet")
@@ -428,6 +588,7 @@ def emit() -> Path:
     federations = pl.read_parquet(PARSED / "federations.parquet")
     coalitions = pl.read_parquet(PARSED / "coalitions.parquet")
     candidates = pl.read_parquet(PARSED / "candidates.parquet")
+    slates = pl.read_parquet(PARSED / "lists.parquet")
     events = pl.read_parquet(PARSED / "events.parquet")
     values = pl.read_parquet(PARSED / "values.parquet")
     with connect() as conn:
@@ -435,7 +596,10 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="2022 Brazilian presidential election, both rounds, and Acre's federal deputies, by polling section",
+            summary=(
+                "2022 Brazilian presidential election, both rounds, and federal deputies, by polling section in Acre "
+                "and by municipality elsewhere"
+            ),
             polity="BR",
         )
 
@@ -538,6 +702,22 @@ def emit() -> Path:
         )
 
         unit_ids = {code: str(cs.unit("br.secao", code)) for code in sections["section"]}
+        counted = values.filter(~pl.col("section").str.contains(":")).select(municipality="section").unique()
+        unit_ids |= {code: str(cs.unit("br.municipality", code)) for code in counted["municipality"]}
+        cs.frame(
+            "reporting_unit",
+            counted.select(
+                id=pl.col("municipality").replace_strict(unit_ids),
+                polity_id=pl.lit(str(brazil)),
+                scheme_code=pl.lit("br.municipality"),
+                code="municipality",
+                area_relation=pl.lit("equals"),
+                area_id=municipality,
+                kind=pl.lit("standard"),
+                valid_from=pl.lit(DAYS[FIRST]),
+                valid_to=pl.lit(CLOSED),
+            ),
+        )
         section = pl.col("section").replace_strict(unit_ids)
         cs.frame(
             "reporting_unit",
@@ -645,7 +825,7 @@ def emit() -> Path:
             )
             name(elections[code], f"2022 Brazilian general election, {ordinal} round", "en")
             cs.add("slug", path=f"br/{DAYS[code]}-{stage}", entity_id=elections[code])
-        elections[STATE] = elections[FIRST]
+        elections |= {f"{STATE}:{uf}": elections[FIRST] for uf in UFS}
 
         coalition_ids: dict[str, UUID] = {}
         for coalition, label in (
@@ -668,29 +848,35 @@ def emit() -> Path:
         for code, key, slug_path, label in (
             (FIRST, f"{DAYS[FIRST]}:president", f"br/{DAYS[FIRST]}-general/president", "first round"),
             (SECOND, f"{DAYS[SECOND]}:president", f"br/{DAYS[SECOND]}-runoff/president", "second round"),
-            (
-                STATE,
-                f"{DAYS[STATE]}:chamber-of-deputies:AC",
-                f"br/{DAYS[STATE]}-general/chamber-of-deputies-acre",
-                "Acre",
+            *(
+                (
+                    f"{STATE}:{uf}",
+                    f"{DAYS[STATE]}:chamber-of-deputies:{uf}",
+                    f"br/{DAYS[STATE]}-general/chamber-of-deputies-"
+                    + unicodedata.normalize("NFKD", label).encode("ascii", "ignore").decode().lower().replace(" ", "-"),
+                    "the Federal District" if uf == "DF" else label,
+                )
+                for uf, label in UFS.items()
             ),
         ):
             contests[code] = cs.key("br.contest", key)
-            if code == STATE:
+            if code.startswith(STATE):
                 cs.add(
                     "contest",
                     id=contests[code],
                     election_id=elections[code],
                     kind="list_allocation",
                     body_id=chamber,
-                    district_area_id=states["AC"],
-                    magnitude=SEATS,
+                    district_area_id=states[code[-2:]],
+                    magnitude=SEATS[code[-2:]],
                     round_number=1,
                     electoral_system_id=systems["chamber-open-list"],
-                    rules_override={"threshold": {"percent": 80 / SEATS, "level": "list"}},
+                    rules_override={"threshold": {"percent": 80 / SEATS[code[-2:]], "level": "list"}},
                     default_result_kind="counted",
                 )
-                name(contests[code], "2022 Chamber of Deputies election in Acre", "en")
+                name(contests[code], f"2022 Chamber of Deputies election in {label}", "en")
+                if code[-2:] != "AC":
+                    cs.add("note", entity_id=contests[code], kind="caveat", body_md=RESIDUAL)
             else:
                 cs.add(
                     "contest",
@@ -724,10 +910,10 @@ def emit() -> Path:
 
             standing = candidates.filter(pl.col("contest") == code)
             lists: dict[str, UUID] = {}
-            if code == STATE:
+            if code.startswith(STATE):
                 for party, number, abbreviation, federation in (
-                    standing.select("party", "party_number", "party_abbreviation", "federation")
-                    .unique()
+                    slates.filter(pl.col("contest") == code)
+                    .select("party", "party_number", "party_abbreviation", "federation")
                     .sort("party")
                     .rows()
                 ):
@@ -770,7 +956,7 @@ def emit() -> Path:
                 group = f"federation:{row['federation']}" if row["federation"] is not None else row["party"]
                 if row["role"] == "running_mate":
                     option = tickets[row["number"]]
-                elif code == STATE:
+                elif code.startswith(STATE):
                     option = cs.key("br.option", f"{key}:{row['candidate']}")
                     cs.add(
                         "contest_option",
@@ -812,7 +998,7 @@ def emit() -> Path:
                         kind=row["outcome"],
                         notes=DISQUALIFIED if row["outcome"] == "disqualified" else None,
                     )
-                    if code == STATE and row["outcome"] == "elected":
+                    if code.startswith(STATE) and row["outcome"] == "elected":
                         seats[group] = seats.get(group, 0) + 1
             for group, count in seats.items():
                 cs.add("outcome", result_set_id=result_set, option_id=lists[group], kind="won", seats=count)
