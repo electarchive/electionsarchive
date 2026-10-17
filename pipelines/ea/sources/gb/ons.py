@@ -48,6 +48,7 @@ NOTES = {
     LATEST: "Generalized boundaries clipped to the coastline.",
 }
 COUNTRIES = {"E": "ENG", "W": "WLS", "S": "SCT", "N": "NIR"}
+PARTITION = date(1922, 12, 6)
 PUBLISHER = "Office for National Statistics"
 LICENSE = "Open Government Licence v3.0"
 LICENSE_URL = "https://www.nationalarchives.gov.uk/doc/open-government-licence/version/3/"
@@ -112,6 +113,15 @@ def parse() -> None:
                select code, geom from shape where vintage = '2010'"""
         )
         conn.execute("create index on coast using gist (geom)")
+        wholes = conn.execute(
+            """select code, encode(st_asewkb(st_multi(st_transform(geom, 4326))), 'hex'),
+                      encode(st_asewkb(st_transform(st_pointonsurface(geom), 4326)), 'hex')
+               from (select left(code, 1) as code, st_multi(st_collectionextract(st_makevalid(st_union(geom)), 3)) as geom
+                     from shape where vintage = '2010' group by 1
+                     union all
+                     select 'GBR', st_multi(st_collectionextract(st_makevalid(st_union(geom)), 3))
+                     from shape where vintage = '2010') whole"""
+        ).fetchall()
         rows = conn.execute(
             """with early as (
                  select vintage, code, name, st_setsrid(st_coveragesimplify(geom, %s) over (partition by vintage), 27700)
@@ -153,6 +163,9 @@ def parse() -> None:
         raise ValueError(f"expected {expected}, got {counts}")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "areas.parquet")
+    pl.DataFrame(
+        wholes, schema={"code": pl.String, "geom": pl.String, "label_point": pl.String}, orient="row"
+    ).write_parquet(PARSED / "wholes.parquet")
 
 
 def emit() -> Path:
@@ -211,4 +224,22 @@ def emit() -> Path:
                     source_id=sources[url],
                 )
             cs.add("boundary_set", scheme_code="gb.pcon", vintage=vintage, valid_from=start, valid_to=end, as_of=start)
+        for code, geom, point in pl.read_parquet(PARSED / "wholes.parquet").sort("code").iter_rows():
+            area = (
+                cs.area("gb.nation", code, on=PARTITION)
+                if code == "GBR"
+                else cs.area("gb.country", COUNTRIES[code], on=PARTITION)
+            )
+            if area in cs.minted:
+                raise ValueError(f"no area for {code}; publish gb.umit first")
+            cs.add(
+                "area_geometry",
+                area_id=area,
+                valid_from=PARTITION,
+                valid_to=None,
+                geom=geom,
+                label_point=point,
+                quality="official",
+                source_id=sources[MIDDLE],
+            )
         return cs.write()
