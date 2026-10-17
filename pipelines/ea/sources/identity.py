@@ -204,6 +204,14 @@ PEOPLE = {
         ("fec.candidate", "S2MN00027"),
         ("us.algara.person", "MN:mark-dayton"),
     ),
+    "Kimberly Yee, Arizona legislator 2011-2019 and treasurer": (
+        ("us.klarner.person", "295403"),
+        ("us.medsl_statewide.person", "AZ:kimberly-yee"),
+    ),
+    "Sandra Kennedy, Arizona legislator 1987-1999 and corporation commissioner": (
+        ("us.klarner.person", "10465"),
+        ("us.medsl_statewide.person", "AZ:sandra-kennedy"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
@@ -406,6 +414,6 @@ def emit() -> Path:
             if len(found) != len(keys):
                 print(f"{label}: already merged or missing")
             for person in dict.fromkeys(found[1:]):
-                if person != found[0]:
+                if person != found[0] and person not in cs.survivors:
                     cs.merge(person, found[0])
         return cs.write()
