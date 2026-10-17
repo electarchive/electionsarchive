@@ -45,6 +45,11 @@ KANSAS = "https://sos.ks.gov/elections/24elec/2024-Primary-Election-United-State
 KS_PRESIDENT = "https://sos.ks.gov/elections/24elec/2024-Presidential-Preference-Primary-Official-Vote-Totals{}.pdf"
 TED = "https://data.capitol.texas.gov/api/3/action/package_show?id=2024_{}"
 TEXAS = ("democratic_primary", "republican_primary", "democratic_runoff", "republican_runoff")
+OHIO = (
+    "https://web.archive.org/web/20240420171448id_/https://www.ohiosos.gov/globalassets/elections/2024/pri/official/precinct-level-official-results-2024-primary---republican.xlsx",
+    "https://web.archive.org/web/20240420171451id_/https://www.ohiosos.gov/globalassets/elections/2024/pri/official/precinct-level-official-results-primary-2024---democratic.xlsx",
+)
+FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
 NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
 NEBRASKA = "https://sos.nebraska.gov/sites/default/files/doc/elections/2024/2024%20Primary%20Canvass%20Book.pdf"
@@ -209,6 +214,10 @@ def fetch() -> None:
     for name in NJ_FILES:
         raw.fetch(SOURCE, NEW_JERSEY.format(name), suffix=".pdf")
     raw.fetch(SOURCE, NEBRASKA, suffix=".pdf")
+    for url in OHIO:
+        raw.fetch(SOURCE, url, suffix=".xlsx")
+    for day in ("20240319", "20240820"):
+        raw.fetch(SOURCE, FLORIDA.format(day), suffix=".txt")
     for package in TEXAS:
         for resource in json.loads(raw.fetch(SOURCE, TED.format(package), suffix=".json").path.read_text())["result"][
             "resources"
@@ -342,6 +351,8 @@ def parse() -> None:
         *(("NJ", "county", NEW_JERSEY.format(name)) for name in NJ_FILES),
         ("NE", "county", NEBRASKA),
         *(("TX", "precinct", url) for url in texas),
+        *(("OH", "precinct", url) for url in OHIO),
+        *(("FL", "county", FLORIDA.format(day)) for day in ("20240319", "20240820")),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
         *(
@@ -645,6 +656,51 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif state == "FL":
+            frame = (
+                pl.read_csv(raw.cached(SOURCE, url).path, separator="\t", infer_schema=False, quote_char=None)
+                .filter(pl.col("RaceCode").is_in(["PRE", "USS", "USR"]))
+                .select(
+                    county="CountyName",
+                    office="RaceName",
+                    district="RaceName",
+                    party="PartyName",
+                    candidate=pl.concat_str(
+                        "CanNameFirst", "CanNameMiddle", "CanNameLast", separator=" ", ignore_nulls=True
+                    ),
+                    votes="CanVotes",
+                )
+            )
+        elif state == "OH":
+            reader = fastexcel.read_excel(raw.cached(SOURCE, url).path)
+            sheets = []
+            for sheet_name in ("Presidential Delegates", "U.S. Congress"):
+                table = reader.load_sheet(sheet_name, header_row=None, dtypes="string").to_polars()
+                body = table.slice(4).filter(pl.col(table.columns[0]).is_not_null())
+                heading = ""
+                for index, (label, name, total) in enumerate(
+                    zip(table.row(0), table.row(1), table.row(2), strict=True)
+                ):
+                    heading = (label or "").strip() or heading
+                    if index < 8 or "(district)" in heading or "Unexpired" in heading:
+                        continue
+                    column = table.columns[index]
+                    if body[column].cast(pl.Int64).sum() != int(total):
+                        raise ValueError(
+                            f"OH {heading} {name}: the precincts sum to {body[column].cast(pl.Int64).sum()}, not {total}"
+                        )
+                    sheets.append(
+                        body.select(
+                            county=table.columns[0],
+                            precinct=table.columns[1],
+                            office=pl.lit(heading),
+                            district=pl.lit(heading),
+                            party=pl.lit(re.sub(r"^.*\((\w+)\)$", r"\1", name)),
+                            candidate=pl.lit(re.sub(r"\s*\(\w+\)$", "", name)),
+                            votes=column,
+                        )
+                    )
+            frame = pl.concat(sheets)
         elif state == "TX":
             frame = (
                 pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False)
@@ -1025,6 +1081,8 @@ def parse() -> None:
         day = (
             date(2024, 5, 14)
             if state in ("MD", "NE")
+            else date(2024, 3, 19)
+            if state == "OH"
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1316,6 +1374,22 @@ def emit() -> Path:
                     "Creative Commons Attribution",
                 )
                 if state == "TX"
+                else (
+                    "Ohio Secretary of State",
+                    "March 19, 2024 Presidential Primary Election official canvass by precinct",
+                    "https://www.ohiosos.gov/elections/election-results-and-data/2024-official-election-results/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "OH"
+                else (
+                    "Florida Division of Elections",
+                    "Election results file, 2024 presidential preference primary and primary election",
+                    "https://results.elections.myflorida.com/",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "FL"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
