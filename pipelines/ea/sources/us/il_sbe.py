@@ -31,6 +31,10 @@ VOLUMES = {
     1994: ("stateofillinoiso1994illi", date(1994, 11, 8), range(39, 52)),
     1996: ("stateofillinois1996illi", date(1996, 11, 5), range(32, 45)),
     1998: ("officialvoteof1998illi", date(1998, 11, 3), range(33, 45)),
+    2000: ("stateofillinois2000illi", date(2000, 11, 7), range(15, 28)),
+    2002: ("officialvoteof2002illi", date(2002, 11, 5), range(31, 44)),
+    2004: ("stateofillinoiso2004illi", date(2004, 11, 2), range(35, 48)),
+    2006: ("officialvote2006illi", date(2006, 11, 7), range(37, 51)),
 }
 
 
@@ -85,6 +89,8 @@ def _tables(path: Path) -> list[dict[str, object]]:
 def parse() -> None:
     rows: list[dict[str, object]] = []
     failed: list[str] = []
+    columns_by: dict[tuple[int, object, int], list[int]] = {}
+    printed: dict[tuple[int, object, int], int] = {}
     for year, (_, _, pages) in VOLUMES.items():
         book = _artifact(year)
         firsts = _tables(PARSED / "model" / f"{year}.txt")
@@ -150,7 +156,7 @@ def parse() -> None:
                     for c, value in enumerate(votes)
                 ]
                 lines = [r for r, (county, _) in enumerate(table["rows"]) if county != "Totals"]
-                total = next(r for r, (county, _) in enumerate(table["rows"]) if county == "Totals")
+                total = next((r for r, (county, _) in enumerate(table["rows"]) if county == "Totals"), None)
                 settled: dict[tuple[int, int], int] = {(r, c): v for r, c, _, v, w in cells if v == w}
                 for r, c, _, value, again in cells:
                     if (r, c) not in settled:
@@ -164,11 +170,10 @@ def parse() -> None:
                     ):
                         failed.append(f"{year} district {table['district']} row {r}: the plurality does not fit")
                 for c in range(1, len(columns)):
-                    if (
-                        all((k, c) in settled for k in [*lines, total])
-                        and sum(settled[(k, c)] for k in lines) != (settled[(total, c)])
-                    ):
-                        failed.append(f"{year} district {table['district']} {columns[c]}: the column does not add up")
+                    column = columns_by.setdefault((year, table["district"], c), [])
+                    column.extend(settled.get((k, c), -(10**9)) for k in lines)
+                    if total is not None:
+                        printed[(year, table["district"], c)] = settled.get((total, c), -1)
                 found = {
                     (r, c): list(
                         dict.fromkeys(
@@ -196,10 +201,17 @@ def parse() -> None:
                             for c, box in zip(repeated, sorted(boxes[(r, repeated[0])]), strict=True):
                                 anchors[(r, c)] = box
                 if len(lines) == 1:
-                    for c in range(len(columns)):
-                        pair = sorted(boxes.get((lines[0], c), []), key=lambda b: b[1])
-                        if len(pair) == 2:
-                            anchors[(lines[0], c)] = pair[1]
+                    same = [c for c in range(len(columns)) if (lines[0], c) in settled]
+                    for value in {settled[(lines[0], c)] for c in same}:
+                        repeated = [c for c in same if settled[(lines[0], c)] == value]
+                        found_ = boxes.get((lines[0], repeated[0]), [])
+                        if len(found_) < 2:
+                            continue
+                        lowest = max(b[1] for b in found_)
+                        bottom = sorted(b for b in found_ if lowest - b[1] < 12)
+                        if len(bottom) == len(repeated):
+                            for c, box in zip(repeated, bottom, strict=True):
+                                anchors[(lines[0], c)] = box
                 for _ in range(2):
                     if not anchors:
                         break
@@ -270,11 +282,14 @@ def parse() -> None:
                         right, down = xs.get(c, (h[0] + h[2]) / 2 + 25), (k[1] + k[3]) / 2
                         if r in ys and abs(ys[r] - down) < 15:
                             down = ys[r]
-                        near = [
-                            b
-                            for b in boxes.get((r, c), [])
-                            if abs((b[1] + b[3]) / 2 - down) < 12 and abs(b[2] - right) < 40
-                        ]
+                        near = sorted(
+                            (
+                                b
+                                for b in boxes.get((r, c), [])
+                                if abs((b[1] + b[3]) / 2 - down) < 12 and abs(b[2] - right) < 80
+                            ),
+                            key=lambda b: abs(b[2] - right),
+                        )
                         if near:
                             box, how = near[0], "aligned"
                         else:
@@ -320,6 +335,9 @@ def parse() -> None:
                             "located": how,
                         }
                     )
+    for (year, district, c), column in columns_by.items():
+        if sum(column) != printed.get((year, district, c)):
+            failed.append(f"{year} district {district} column {c}: the column does not add up")
     frame = pl.DataFrame(rows, infer_schema_length=None)
     print(frame.group_by("located").len().sort("located"))
     if failed:
