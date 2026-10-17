@@ -60,6 +60,17 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         ],
     ),
     (
+        "1928-11-06",
+        "senate",
+        [(15382, 0.53, 1, 0, 1), (15383, 0.2, 0.95, 0, 1)],
+        [
+            ("REP", "Patterson"),
+            ("DEM", "Hay"),
+            ("SOC", "Harrison"),
+            ("SLP", "Cox"),
+        ],
+    ),
+    (
         "1932-11-08",
         "senate",
         [(17054, 0.58, 1, 0, 1), (17055, 0.1, 0.96, 0, 1)],
@@ -119,6 +130,19 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Hennings"), ("REP", "Donnell"), ("SLP", "Genck"), ("CN", "Hamilton")],
     ),
     (
+        "1952-11-04",
+        "senate",
+        [(28866, 0, 1, 0, 1), (28867, 0, 0.6, 0, 1)],
+        [
+            ("DEM", "Symington"),
+            ("REP", "Kem"),
+            ("WPRG", "Perkins"),
+            ("SOC", "Hodges"),
+            ("SLP", "Genck"),
+            ("CN", "Frederick"),
+        ],
+    ),
+    (
         "1956-11-06",
         "senate",
         [(31683, 0, 0.85, 0, 0.5), (31683, 0, 0.85, 0.5, 1)],
@@ -157,6 +181,18 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         ],
     ),
     (
+        "1916-11-07",
+        "president",
+        [(10609, 0.11, 0.95, 0, 1), (10610, 0.11, 0.66, 0, 1)],
+        [("DEM", "Wilson"), ("REP", "Hughes"), ("PRO", "Hanly"), ("SOC", "Benson"), ("SLP", "Reimer")],
+    ),
+    (
+        "1928-11-06",
+        "president",
+        [(15353, 0.12, 0.94, 0, 1), (15354, 0.1, 0.5, 0, 1)],
+        [("REP", "Hoover"), ("DEM", "Smith"), ("SOC", "Thomas"), ("SLP", "Reynolds")],
+    ),
+    (
         "1936-11-03",
         "president",
         [(18904, 0.14, 0.96, 0, 1), (18905, 0.11, 0.55, 0, 1)],
@@ -171,10 +207,37 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         ],
     ),
     (
+        "1940-11-05",
+        "president",
+        [(22000, 0.12, 0.96, 0, 1), (22001, 0.11, 0.62, 0, 1)],
+        [("DEM", "Roosevelt"), ("REP", "Willkie"), ("SOC", "Thomas"), ("SLP", "Aiken"), ("PRO", "Babson")],
+    ),
+    (
+        "1944-11-07",
+        "president",
+        [(23209, 0.12, 0.96, 0, 1), (23210, 0.11, 0.58, 0, 1)],
+        [("DEM", "Roosevelt"), ("REP", "Dewey"), ("SOC", "Thomas"), ("SLP", "Teichert"), ("PRO", "Watson")],
+    ),
+    (
         "1948-11-02",
         "president",
         [(26104, 0.5, 0.94, 0, 1), (26105, 0.11, 0.92, 0, 1)],
         [("DEM", "Truman"), ("REP", "Dewey"), ("SOC", "Thomas"), ("WPRG", "Wallace")],
+    ),
+    (
+        "1952-11-04",
+        "president",
+        [(28864, 0.46, 0.94, 0, 1), (28865, 0.11, 0.93, 0, 1)],
+        [
+            ("DEM", "Stevenson"),
+            ("REP", "Eisenhower"),
+            ("WPRG", "Hallinan"),
+            ("SOC", "Hoopes"),
+            ("SLP", "Hass"),
+            ("PRO", "Hamblen"),
+            ("CN", "MacArthur"),
+            ("AF", "MacArthur"),
+        ],
     ),
     (
         "1956-11-06",
@@ -188,8 +251,16 @@ CHECKED: set[tuple[str, str, int]] = {
     ("1926-11-02", "senate", 0),
     ("1926-11-02", "senate", 1),
     ("1938-11-08", "senate", 3),
+    ("1916-11-07", "president", 4),
+    ("1928-11-06", "president", 1),
+    ("1944-11-07", "president", 4),
 }
 NOTES: list[tuple[str, str, str]] = [
+    (
+        "1928-11-06",
+        "president",
+        "Monroe's figure for Smith prints with a broken third digit; it is read as 4,957, the figure ICPSR has.",
+    ),
     (
         "1944-11-07",
         "senate",
@@ -206,6 +277,16 @@ FIXES: dict[tuple[str, str, str, int], int] = {
     ("1944-11-07", "senate", "29117", 2): 3,
     ("1944-11-07", "senate", "29135", 2): 3,
     ("1944-11-07", "senate", "TOTAL", 2): 1320,
+    ("1916-11-07", "president", "29147", 4): 9,
+    ("1928-11-06", "president", "29137", 1): 4957,
+    ("1940-11-05", "president", "29023", 4): 23,
+    ("1940-11-05", "president", "29039", 4): 16,
+    ("1940-11-05", "president", "29053", 4): 13,
+    ("1940-11-05", "president", "29065", 4): 3,
+    ("1940-11-05", "president", "29109", 4): 39,
+    ("1940-11-05", "president", "29127", 4): 33,
+    ("1944-11-07", "president", "29007", 3): 0,
+    ("1952-11-04", "president", "29173", 3): 1,
     ("1934-11-06", "senate", "29123", 2): 5,
     ("1934-11-06", "senate", "29153", 2): 14,
     ("1934-11-06", "senate", "29063", 3): 1,
@@ -482,7 +563,7 @@ def segment(
         for _, y, x, text in found_words
         if top <= y <= bottom and left <= x <= right and re.match(r"Totals?\b", text)
     ]
-    if labeled and "TOTAL" not in lines:
+    if labeled and "TOTAL" not in anchored:
         lines["TOTAL"] = statistics.median(labeled)
     if DEBUG and "rows" in DEBUG:
         print(
@@ -524,19 +605,42 @@ def segment(
         if len(clusters) == len(run) and all(len(cluster) >= 2 for cluster in clusters):
             for column, cluster in zip(run, clusters, strict=True):
                 spots[column] = statistics.median(cluster)
+        elif run[0] - 1 in spots:
+            picks: dict[int, float] = {}
+            previous = spots[run[0] - 1]
+            for column in run:
+                near = [
+                    cluster
+                    for cluster in clusters
+                    if len(cluster) >= 2 and abs(statistics.median(cluster) - previous - spacing) <= spacing / 4
+                ]
+                previous = statistics.median(max(near, key=len)) if near else previous + spacing
+                if near:
+                    picks[column] = previous
+            if picks and run[-1] in picks or run[-1] + 1 in spots:
+                for column in run:
+                    if column not in picks:
+                        before = max((one for one in picks if one < column), default=None)
+                        after = min((one for one in picks if one > column), default=None)
+                        if before is not None and after is not None:
+                            picks[column] = picks[before] + (picks[after] - picks[before]) * (column - before) / (
+                                after - before
+                            )
+                spots.update(picks)
     missing = [column for column in range(size) if column not in spots]
     if missing:
         raise ValueError(f"{page}: no column found for {missing}")
     cache = PARSED / "ocr" / f"{page}-{box[0]}-{box[1]}-{box[2]}-{box[3]}-cells.json"
     known: dict[str, list[str]] = json.loads(cache.read_text()) if cache.exists() else {}
+    reach = min(150, int(spacing) - 12)
     jobs: dict[str, list[tuple[bytes, str, str]]] = {}
     for middle in lines.values():
         for spot in spots.values():
-            key = f"{round(spot)},{round(middle)}"
+            key = f"{round(spot)},{round(middle)}" + ("" if reach == 150 else f",{reach}")
             if key in known or key in jobs:
                 continue
             actual = middle + slope * spot
-            crop = picture.crop((int(spot - 150), int(actual - 15), int(spot + 8), int(actual + 10)))
+            crop = picture.crop((int(spot - reach), int(actual - 15), int(spot + 8), int(actual + 10)))
             ink = crop.tobytes()
             inked = [x for x in range(crop.width) if any(ink[y * crop.width + x] < 110 for y in range(6, 13))]
             group = [inked[-1]] if inked and inked[-1] >= crop.width - 30 else []
@@ -610,7 +714,7 @@ def segment(
             cell = [
                 value for x, y, value in tokens if abs(x - spot) <= 14 and abs(y - slope * x - middle) <= pitch * 0.4
             ]
-            key = f"{round(spot)},{round(middle)}"
+            key = f"{round(spot)},{round(middle)}" + ("" if reach == 150 else f",{reach}")
             if not known[key]:
                 cell = []
             for found_text in known[key]:
@@ -721,6 +825,7 @@ def parse() -> None:
         swapped[francois], swapped[genevieve] = swapped[genevieve], swapped[francois]
         readings: dict[str, tuple[int, list[list[int]]]] = {}
         missing: list[str] = []
+        fallback: dict[str, tuple[int, list[list[int]]]] = {}
         for order in (
             arrangement
             for each in (base, swapped)
@@ -737,6 +842,11 @@ def parse() -> None:
             missing = sorted((set(base) - set(readings)) - ({jackson} if "KC" in readings else set()))
             if not missing and (jackson in readings and readings[jackson][0] or "KC" in readings):
                 break
+            if not missing and not fallback:
+                fallback = readings
+        else:
+            if fallback:
+                readings, missing = fallback, []
         if missing:
             raise ValueError(f"{day} {office}: missing {missing}")
         order = sorted(set(readings) - {"TOTAL"})
@@ -967,6 +1077,14 @@ def emit() -> Path:
                     ]
                     if len(set(known)) > 1:
                         raise ValueError(f"{key}: {len(set(known))} people for {full}")
+                    known = known or [
+                        person
+                        for (person,) in conn.execute(
+                            "select distinct entity_id from name where text = %s and is_preferred", [full]
+                        ).fetchall()
+                    ]
+                    if len(set(known)) > 1:
+                        raise ValueError(f"{key}: {len(set(known))} people named {full}")
                     person = (
                         known[0] if known else cs.key(f"{SOURCE}.person", f"MO:{re.sub(r'[^a-z]+', '-', full.lower())}")
                     )
