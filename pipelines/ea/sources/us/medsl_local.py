@@ -1204,12 +1204,8 @@ def parse() -> None:
                 )
                 .otherwise(pl.lit(""))
             )
-            .group_by(*contest, "candidate", "pooled", "unit")
+            .group_by(*contest, "candidate", "pooled", "unit", "party_detailed")
             .agg(
-                pl.col("party_detailed")
-                .sort_by(pl.col("votes").fill_null(0), "party_detailed", descending=[True, False], nulls_last=True)
-                .drop_nulls()
-                .first(),
                 pl.when(pl.col("votes").is_null().all()).then(None).otherwise(pl.col("votes").sum()).alias("votes"),
             )
         )
@@ -1643,7 +1639,26 @@ def emit() -> Path:
             if row["masked"]:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=MASKED)
             source = sources[day] if row["origin"] == "medsl" else contributed[state]
-            previous = cs.key(f"{SOURCE}.result_set", contest_key) if contest_key in sets else None
+            counted = grouped[(day, code, key, seat, row["remainder"])].with_columns(
+                token=pl.col("candidate").map_elements(slug, return_dtype=pl.String),
+                line=pl.col("party_detailed")
+                .map_elements(lambda label, state=state: str(party(state, label)[0] or ""), return_dtype=pl.String)
+                .fill_null(""),
+            )
+            fused = set(
+                counted.filter(~pl.col("pooled"), pl.col("line") != "")
+                .group_by("token")
+                .agg(pl.col("line").n_unique())
+                .filter(pl.col("line") > 1)["token"]
+            )
+            stem = f"{contest_key}:precinct"
+            previous = (
+                cs.key(f"{SOURCE}.result_set", stem)
+                if fused and stem in sets
+                else cs.key(f"{SOURCE}.result_set", contest_key)
+                if contest_key in sets
+                else None
+            )
             if previous is not None:
                 cs.add(
                     "result_set",
@@ -1657,7 +1672,7 @@ def emit() -> Path:
                     is_default=False,
                     completeness=None if row["masked"] else 1,
                 )
-            result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
+            result_set = cs.key(f"{SOURCE}.result_set", f"{stem}:lines" if fused else stem)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -1677,9 +1692,6 @@ def emit() -> Path:
                 kind="methodology",
                 body_md=METHOD.replace("2024", str(day.year)) if row["origin"] == "medsl" else CONTRIBUTED,
             )
-            counted = grouped[(day, code, key, seat, row["remainder"])].with_columns(
-                token=pl.col("candidate").map_elements(slug, return_dtype=pl.String)
-            )
             rows = (
                 counted.group_by("token", "pooled")
                 .agg(
@@ -1693,7 +1705,7 @@ def emit() -> Path:
                 .sort("votes", "candidate", descending=[True, False], nulls_last=True)
             )
             totals: list[tuple[int, UUID]] = []
-            options: dict[tuple[str, bool], UUID] = {}
+            options: dict[tuple[str, bool, str], UUID] = {}
             for token, candidate, pooled, label, votes in rows.select(
                 "token", "candidate", "pooled", "party_detailed", "votes"
             ).iter_rows():
@@ -1702,7 +1714,7 @@ def emit() -> Path:
                     cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
                 else:
                     ballot = title(candidate)
-                    party_id, independent = party(state, label)
+                    party_id, independent = (None, False) if token in fused else party(state, label)
                     person_key = (code, slug(candidate))
                     if person_key not in persons:
                         persons[person_key] = cs.key(f"{SOURCE}.person", f"{state}:{code}:{slug(candidate)}")
@@ -1728,10 +1740,37 @@ def emit() -> Path:
                         is_independent=independent,
                     )
                     totals.append((votes or 0, option))
-                options[(token, pooled)] = option
+                    if token in fused:
+                        head = cs.key("us.candidacy", f"{contest_key}:{slug(candidate)}:head")
+                        for line, labels in (
+                            counted.filter(pl.col("token") == token)
+                            .group_by("line")
+                            .agg(pl.col("party_detailed").drop_nulls().unique().sort(), pl.col("votes").sum())
+                            .sort("votes", "line", descending=[True, False])
+                            .select("line", "party_detailed")
+                            .iter_rows()
+                        ):
+                            label = labels[0] if labels else None
+                            line_party = party(state, label)[0] if line else None
+                            child = cs.key("us.option", f"{contest_key}:{slug(candidate)}:{slug(label or 'other')}")
+                            cs.add(
+                                "contest_option",
+                                id=child,
+                                contest_id=contest,
+                                parent_option_id=option,
+                                kind="ticket",
+                                party_id=line_party,
+                                ballot_label=f"{ballot} ({title(label) if label else 'Other lines'})",
+                            )
+                            if line_party is not None:
+                                cs.add("candidacy_nomination", candidacy_id=head, party_id=line_party, kind="nominated")
+                            options[(token, pooled, line)] = child
+                options[(token, pooled, "")] = option
             if result_set in cs.minted:
-                for token, pooled, place, votes in (
-                    counted.filter(pl.col("votes").is_not_null()).select("token", "pooled", "unit", "votes").iter_rows()
+                for token, pooled, line, place, votes in (
+                    counted.filter(pl.col("votes").is_not_null())
+                    .select("token", "pooled", "line", "unit", "votes")
+                    .iter_rows()
                 ):
                     county = place.split(":")[2] if place else ""
                     target = unit
@@ -1741,7 +1780,11 @@ def emit() -> Path:
                             minted[place] = (county, day)
                         if area != parents[county][1]:
                             memberships.add((target, area, day))
-                    cell = (str(result_set), str(target), str(options[(token, pooled)]))
+                    cell = (
+                        str(result_set),
+                        str(target),
+                        str(options[(token, pooled, line if token in fused else "")]),
+                    )
                     values[cell] = values.get(cell, 0) + votes
             if magnitude is None or len(totals) > magnitude and totals[magnitude - 1][0] == totals[magnitude][0]:
                 continue
