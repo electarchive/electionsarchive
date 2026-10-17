@@ -35,6 +35,7 @@ from docs
 def build() -> str:
     started = time.monotonic()
     with connect() as conn:
+        conn.execute("select pg_advisory_xact_lock(hashtext('ea.search'))")
         conn.execute("delete from search_document")
         inserted = conn.execute(BUILD_SQL).rowcount
         conn.execute("analyze search_document")
