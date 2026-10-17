@@ -5033,6 +5033,7 @@ export const elections = {
               person: v.nullable(v.string()),
               share: v.number(),
               seats: v.nullable(v.number()),
+              isLost: v.optional(v.boolean()),
             }),
           ),
         }),

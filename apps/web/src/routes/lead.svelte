@@ -49,6 +49,11 @@
                 ? (row.short ?? row.label)
                 : row.label}</span
             >
+            {#if row.isLost === true}
+              <span class="shrink-0 text-xs text-muted-foreground"
+                >{m.outcome_lost()}</span
+              >
+            {/if}
           </span>
         </span>
       {/each}
