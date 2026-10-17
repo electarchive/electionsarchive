@@ -5407,8 +5407,14 @@ export const elections = {
             select c.*, e.kind as election_kind from contest c join election e on e.id = c.election_id
             where c.id = ${input.contest}::uuid
           ),
+          candidates as (
+            select c.* from s join contest c on c.body_id = s.body_id
+            union all
+            select c.* from s join contest c on c.office_id = s.office_id
+            where s.body_id is null
+          ),
           pool as (
-            select c.id, e.date_from from s, contest c
+            select c.id, e.date_from from s, candidates c
             join election e on e.id = c.election_id
             left join seat st on st.id = c.seat_id
             where c.kind = s.kind and c.body_id is not distinct from s.body_id
