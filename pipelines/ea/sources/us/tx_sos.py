@@ -34,6 +34,7 @@ VOLUMES = {
     1888: ("biennialreports06texagoog", date(1888, 11, 6), [192, 193, 194]),
     1900: ("biennialreports05texagoog", date(1900, 11, 6), [86, 87, 88, 89]),
     1904: ("biennialreportof1903texa", date(1904, 11, 8), [210, 211, 212, 213]),
+    1906: ("biennialreportof1903texa", date(1906, 11, 6), [401, 402, 403, 404]),
 }
 FORMER = {"greer": ("Greer", "40055", date(1896, 3, 16))}
 CORRECTED: dict[tuple[int, int, str, int], int] = {}
@@ -51,6 +52,8 @@ UNBALANCED = {
     (1900, 12, 0),
     (1900, 12, 1),
     (1900, 13, 1),
+    (1906, 9, 2),
+    (1906, 14, 0),
 }
 GAP = (
     "The county figures printed for {candidate} sum to {counted} votes, but the report gives a district total of "
