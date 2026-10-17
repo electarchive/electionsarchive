@@ -31,10 +31,14 @@ VOLUMES = {
     1872: ("eveningjournalal1873slsn", 1873, date(1872, 11, 5), [70, 71]),
     1874: ("eveningjournalal1875slsn", 1875, date(1874, 11, 3), [89, 90, 91, 92]),
     1882: ("eveningjournalal1883slsn", 1883, date(1882, 11, 7), [80, 81]),
+    1884: ("eveningjournalal1885slsn", 1885, date(1884, 11, 4), [84, 85, 86]),
+    1886: ("eveningjournalal1887slsn", 1887, date(1886, 11, 2), [96, 97]),
+    1890: ("eveningjournalal1891slsn", 1891, date(1890, 11, 4), [84, 85]),
 }
 JOINT = {"fultonandhamilton": ("Fulton and Hamilton", ["36035", "36041"])}
 CORRECTED: dict[tuple[int, int, str, int], int] = {}
-UNBALANCED = {(1870, 12, 0), (1870, 13, 1), (1872, 17, 0)}
+UNBALANCED = {(1870, 12, 0), (1870, 13, 1), (1872, 17, 0), (1886, 15, 2), (1886, 17, 1), (1886, 21, 1), (1890, 20, 1)}
+ANCHORS = {(1886, 96, 11, 0, 0): (551, 2610, 632, 2625), (1886, 96, 11, 0, 1): (753, 2606, 789, 2629)}
 WITHHELD = {(1882, 3)}
 MISPRINTED = {(1870, 22, 1), (1870, 26, 0), (1872, 32, 0), (1874, 26, 1), (1882, 21, 1)}
 GAP = (
@@ -70,6 +74,9 @@ def _tables(path: str) -> list[dict[str, object]]:
         if line.startswith("@"):
             page = int(line[1:])
             continue
+        if line == "~":
+            tables.append({**tables[-1], "rows": []})
+            continue
         head, rest = line.split("|", 1)
         head, rest = head.strip(), rest.replace("|", " ").strip()
         if head.isdigit():
@@ -97,42 +104,50 @@ def parse() -> None:
         for page in pages:
             cache = PARSED / "ocr" / f"{book.sha256}-{page}.tsv"
             cache.parent.mkdir(parents=True, exist_ok=True)
-            sparse = PARSED / "ocr" / f"{book.sha256}-{page}.sparse.tsv"
-            if not sparse.exists():
-                with tempfile.TemporaryDirectory() as folder:
-                    sparse.write_text(
+            words: list[tuple[str, tuple[int, int, int, int]]] = []
+            for dpi in (300, 600):
+                sparse = PARSED / "ocr" / f"{book.sha256}-{page}.sparse{'' if dpi == 300 else dpi}.tsv"
+                if not sparse.exists():
+                    with tempfile.TemporaryDirectory() as folder:
+                        image = Path(folder) / "page"
                         subprocess.run(
-                            [
-                                "tesseract",
-                                str(scan.rendered(book.path, page, Path(folder))),
-                                "stdout",
-                                "--psm",
-                                "11",
-                                "tsv",
-                            ],
-                            capture_output=True,
-                            text=True,
+                            ["pdftoppm", "-r", str(dpi), "-gray", "-png", "-f", str(page), "-l", str(page)]
+                            + ["-singlefile", str(book.path), str(image)],
                             check=True,
-                        ).stdout
-                    )
-            words = [
-                (
-                    row["text"],
+                        )
+                        sparse.write_text(
+                            subprocess.run(
+                                ["tesseract", str(image.with_suffix(".png")), "stdout", "--psm", "11", "tsv"],
+                                capture_output=True,
+                                text=True,
+                                check=True,
+                            ).stdout
+                        )
+                scale = dpi // 300
+                words += [
                     (
-                        int(row["left"]),
-                        int(row["top"]),
-                        int(row["left"]) + int(row["width"]),
-                        int(row["top"]) + int(row["height"]),
-                    ),
-                )
-                for row in csv.DictReader(io.StringIO(sparse.read_text()), delimiter="\t", quoting=csv.QUOTE_NONE)
-                if row["level"] == "5" and row["text"].strip()
+                        row["text"],
+                        (
+                            int(row["left"]) // scale,
+                            int(row["top"]) // scale,
+                            (int(row["left"]) + int(row["width"])) // scale,
+                            (int(row["top"]) + int(row["height"])) // scale,
+                        ),
+                    )
+                    for row in csv.DictReader(io.StringIO(sparse.read_text()), delimiter="\t", quoting=csv.QUOTE_NONE)
+                    if row["level"] == "5" and row["text"].strip()
+                ]
+            pool = [(w[0], w[1]) for w in scan.words(book.path, page, cache)] + scan.layer(book.path, page) + words
+            pool += [
+                (head + tail, (one[0], min(one[1], two[1]), two[2], max(one[3], two[3])))
+                for head, one in pool
+                if re.fullmatch(r"\d{1,3}[,.]", head)
+                for tail, two in pool
+                if re.fullmatch(r"\d{3}\W?", tail) and 0 <= two[0] - one[2] < 40 and abs(two[1] - one[1]) < 10
             ]
             tokens = [
                 (digits, box)
-                for text, box in [(w[0], w[1]) for w in scan.words(book.path, page, cache)]
-                + scan.layer(book.path, page)
-                + words
+                for text, box in pool
                 if re.search(r"\d", text)
                 for digits in {re.sub(r"\D", "", text), re.sub(r"\D", "", text.translate(scan.CONFUSABLE))}
             ]
@@ -158,6 +173,18 @@ def parse() -> None:
                                 boxes.append(box)
                         found[(r, c)] = boxes
                 anchors = {key: boxes[0] for key, boxes in found.items() if len(boxes) == 1}
+                if not anchors:
+                    for r, c, _, value, _ in cells:
+                        if value is None or len(str(value)) < 4:
+                            continue
+                        close = {
+                            box
+                            for digits, box in tokens
+                            if abs(len(digits) - len(str(value))) <= 2
+                            and difflib.SequenceMatcher(None, digits, str(value)).ratio() >= 0.7
+                        }
+                        if len(close) == 1:
+                            anchors[(r, c)] = close.pop()
                 for _ in range(2):
                     ys = {
                         r: statistics.median((b[1] + b[3]) / 2 for (rr, _), b in anchors.items() if rr == r)
@@ -171,6 +198,12 @@ def parse() -> None:
                         (r, c): b
                         for (r, c), b in anchors.items()
                         if abs((b[1] + b[3]) / 2 - ys[r]) < 40 and abs(b[2] - xs[c]) < 120
+                    }
+                if not anchors:
+                    anchors = {
+                        (r, c): box
+                        for (y, p, d, r, c), box in ANCHORS.items()
+                        if (y, p, d) == (year, page, table["district"])
                     }
                 if not anchors:
                     raise ValueError(f"{year} page {page} district {table['district']}: no cell found on the page")
