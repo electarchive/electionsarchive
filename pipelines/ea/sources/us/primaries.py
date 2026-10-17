@@ -62,6 +62,8 @@ OHIO = (
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
 ARKANSAS = "https://enr-results-api.totalresults.com/Contest/{}?cId=arkansas&electionID=1845{}"
+PENNSYLVANIA = "https://www.electionreturns.pa.gov/api/ElectionReturn/GetCountyBreak?officeId={}&districtId={}&methodName=GetCountyBreak&electionid=105&electiontype=P&isactive=0"
+PA_OFFICES = ((1, 1), (2, 1), *((11, district) for district in range(2, 19)))
 KENTUCKY = "https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf"
 DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
@@ -251,6 +253,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, UTAH, suffix=".json")
     raw.fetch(SOURCE, KENTUCKY, suffix=".pdf")
     raw.fetch(SOURCE, ARKANSAS.format("GetContestResults", "&contestType=FED"), suffix=".json")
+    for office, district in PA_OFFICES:
+        raw.fetch(SOURCE, PENNSYLVANIA.format(office, district), suffix=".json")
     raw.fetch(SOURCE, ARKANSAS.format("GetContestSearchList", ""), suffix=".json")
     for suffix in ("html", "csv"):
         raw.fetch(SOURCE, DELAWARE.format(suffix), suffix=f".{suffix}")
@@ -452,6 +456,7 @@ def parse() -> None:
         ("DE", "precinct", DELAWARE.format("html")),
         ("KY", "county", KENTUCKY),
         ("AR", "county", ARKANSAS.format("GetContestResults", "&contestType=FED")),
+        *(("PA", "county", PENNSYLVANIA.format(office, district)) for office, district in PA_OFFICES),
         ("UT", "county", SUMMIT),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
@@ -783,6 +788,37 @@ def parse() -> None:
                         )
                 if any(summed[choice["choiceID"]] != choice["totalVotes"] for choice in contest["choices"]):
                     raise ValueError(f"AR: the counties do not add up to {heading}'s totals")
+            frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
+        elif url.startswith(PENNSYLVANIA.split("?")[0]):
+            cells = []
+            for heading, blocks in json.loads(json.loads(raw.cached(SOURCE, url).path.read_text()))["Election"].items():
+                for block in blocks:
+                    for county, bands in block.items():
+                        for band in bands:
+                            for side, entries in band.items():
+                                for entry in entries:
+                                    if int(entry["Votes"]) != sum(
+                                        int(entry[f"{kind}Votes"]) for kind in ("ElectionDay", "MailIn", "Provisional")
+                                    ):
+                                        raise ValueError(
+                                            f"PA {heading}: {entry['CandidateName']}'s votes do not add up"
+                                        )
+                                    cells.append(
+                                        {
+                                            "county": county,
+                                            "office": "President"
+                                            if "officeId=1&" in url
+                                            else "U.S. Senate"
+                                            if "officeId=2&" in url
+                                            else "U.S. House",
+                                            "district": heading,
+                                            "party": side,
+                                            "candidate": re.sub(r"\(\w+\)$", "", entry["CandidateName"])
+                                            .strip()
+                                            .title(),
+                                            "votes": entry["Votes"],
+                                        }
+                                    )
             frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
         elif url == KENTUCKY:
             pdf = raw.cached(SOURCE, url).path
@@ -1661,6 +1697,8 @@ def parse() -> None:
             if url in SOUTH_CAROLINA
             else date(2024, 3, 5)
             if state == "AR"
+            else date(2024, 4, 23)
+            if url.startswith(PENNSYLVANIA.split("?")[0])
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -2034,6 +2072,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "AR"
+                else (
+                    "Pennsylvania Department of State",
+                    "2024 Presidential Primary, official returns by county",
+                    "https://www.electionreturns.pa.gov/",
+                    "official_body",
+                    "Public record",
+                )
+                if used.startswith(PENNSYLVANIA.split("?")[0])
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
