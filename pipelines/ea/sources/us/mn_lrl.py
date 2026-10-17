@@ -22,6 +22,50 @@ TITLE = "Minnesota Election Results, by county"
 WRITE_IN = ("Write-in", None)
 UNNAMED = ("American Party, no candidates specified", "A")
 TABLES = {
+    "1972-11-07": [
+        (
+            "president",
+            7,
+            8,
+            {
+                1: ("George McGovern", "DFL"),
+                2: ("Richard Nixon", "R"),
+                3: ("Louis Fisher", "IG"),
+                4: ("Linda Jenness", "SW"),
+                5: ("Gus Hall", "C"),
+                6: ("John G. Schmitz", "AM"),
+                7: ("Benjamin Spock", "PP"),
+                8: WRITE_IN,
+            },
+        ),
+        (
+            "senate",
+            9,
+            10,
+            {
+                0: ("Walter F. Mondale", "DFL"),
+                1: ("Phil Hansen", "R"),
+                2: ("Karl H. Heck", "IG"),
+            },
+        ),
+    ],
+    "1974-11-05": [
+        (
+            "governor",
+            7,
+            8,
+            {
+                1: ("Wendell R. Anderson", "DFL"),
+                2: ("John W. Johnson", "R"),
+                3: ("Jane Van Deusen", "SW"),
+                4: ("Erwin Marquit", "C"),
+                5: ("Harry M. Pool", "AM"),
+                6: ("Richard R. Kleinow", "LIB"),
+                7: ("Genevieve Gunderson", "IG"),
+                8: ("James G. Miles", None),
+            },
+        ),
+    ],
     "1976-11-02": [
         (
             "president",
@@ -449,6 +493,23 @@ READ = {
     }
 }
 FIXES = {
+    **{
+        ("1974-11-05", 7, county, 4): votes
+        for county, votes in {
+            "Becker": 14,
+            "Benton": 20,
+            "Blue Earth": 25,
+            "Brown": 14,
+            "Carlton": 32,
+            "Chisago": 14,
+            "Crow Wing": 29,
+            "Dakota": 89,
+            "Hennepin": 1497,
+            "Isanti": 47,
+            "Itasca": 34,
+            "Kandiyohi": 24,
+        }.items()
+    },
     ("1976-11-02", 4, "Hennepin", 15): 119121,
     ("1976-11-02", 4, "Hennepin", 16): 316130,
     ("1976-11-02", 4, "Hennepin", 17): 2489,
@@ -469,6 +530,7 @@ FIXES = {
     ("1998-11-03", 3, "Lake", 6): 2472,
 }
 MISPRINTS = {
+    ("1972-11-07", 9, "TOTAL", 0): 981340,
     ("1976-11-02", 4, "TOTAL", 15): 478611,
     ("1980-11-04", 2, "TOTAL", 3): 6139,
     ("1980-11-04", 2, "TOTAL", 4): 954174,
@@ -480,6 +542,10 @@ MISPRINTS = {
 SHIFTED = {("1990-11-06", 5): {"McLeod": "Martin", "Mahnomen": "McLeod", "Marshall": "Mahnomen", "Martin": "Marshall"}}
 MISPRINTED = "The printed canvass shows {} in {} County; this set uses {:,}, which the statewide total and the other tables support."
 NOTES = {
+    "1972-11-07:MN:senate": "Walter Mondale's county figures sum to 981,340; the canvass and the state canvassing "
+    "board's certificate give a statewide total of 981,320.",
+    "1974-11-05:MN:governor": "The canvass lists write-in votes for Tom McDonald (71) and others (77) for only a few "
+    "counties; they are left out of this set.",
     "1976-11-02:MN:senate": "Jerry Brekke's county figures sum to 478,611; the canvass prints a statewide total of "
     "478,602.",
     "1980-11-04:MN:president": "The canvass prints statewide totals of 954,173 for Jimmy Carter and 6,138 for the "
@@ -560,6 +626,7 @@ def parse() -> None:
         document = raw.cached(SOURCE, URL.format(day)).path
         for office, first, last, columns in tables:
             cells: dict[str, list[str]] = {}
+            previous = orders[0]
             for number in range(first, last + 1):
                 text = subprocess.run(
                     ["pdftotext", "-bbox", "-f", str(number), "-l", str(number), str(document), "-"],
@@ -582,6 +649,16 @@ def parse() -> None:
                 ]
                 margin = min(word[0] for word in starts)
                 top = min(word[1] for word in starts if word[0] < margin + 15) - 2
+                if all(county(word[3]) == "TOTAL" or plain(word[3]) == "state" for word in starts):
+                    top = min(word[1] for word in words if re.fullmatch(r"\d+", word[3])) - 2
+                while above := [
+                    word
+                    for word in words
+                    if top - 8 < word[1] < top and word[0] < margin + 70 and re.fullmatch(r"[A-Za-z.,']+", word[3])
+                ]:
+                    if county(" ".join(word[3] for word in sorted(above))) in (None, "TOTAL"):
+                        break
+                    top = min(word[1] for word in above) - 2
                 left = [
                     word for word in words if word[0] < margin + 15 and word[1] > top and re.search("[A-Za-z]", word[3])
                 ]
@@ -656,6 +733,18 @@ def parse() -> None:
                     score = (len(chain), -max((abs(step - statistics.median(steps)) for step in steps), default=0))
                     if score > best:
                         best, anchors, order = score, chain, candidate
+                if not anchors:
+                    order = previous
+                    start = max((order.index(name) for name in cells if name != "TOTAL"), default=-1) + 1
+                    ending = [y for y, name in named if name == "TOTAL"]
+                    anchors = list(
+                        zip(
+                            [word[1] for word in max(found, key=len) if not ending or word[1] < ending[0] - 3],
+                            order[start:],
+                            strict=True,
+                        )
+                    )
+                previous = order
                 grid = list(anchors)
                 for (y, name), (after, later) in itertools.pairwise(anchors):
                     gap = order.index(later) - order.index(name)
@@ -810,7 +899,9 @@ def emit() -> Path:
         made: set[UUID] = set()
         for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
             key = f"{day}:MN:{office}"
-            contest = contests[key]
+            (contest,) = [
+                entity for value, entity in contests.items() if value[:4] == day[:4] and value[10:] == key[10:]
+            ]
             ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             result_set = cs.key(f"{SOURCE}.result_set", key)
             if result_set not in cs.minted:
