@@ -208,12 +208,51 @@ PLANS: dict[str, list[tuple[int, int | None, str, str, str, str]]] = {
     ],
     "3712000": [
         (
+            2015,
+            2022,
+            "https://www2.census.gov/geo/tiger/TIGER2020PL/LAYER/VTD/2020/tl_2020_37_vtd20.zip",
+            r"VTDST20~0*(\d{3}(?:\.\d+)?)@COUNTYFP20=119#2015,2017,2019",
+            "census-vtd",
+            "Charlotte council districts, 2011 plan, rebuilt from 2015-2019 precinct results and Census 2020 voting districts",
+        ),
+        (
             2022,
             None,
             "arcgis:https://gis.charlottenc.gov/arcgis/rest/services/PLN/CouncilDistricts/MapServer/0",
             "District",
             "charlotte",
             "Council Districts",
+        ),
+    ],
+    "2146027": [
+        (
+            2012,
+            2022,
+            "https://www2.census.gov/geo/tiger/TIGER2020PL/LAYER/VTD/2020/tl_2020_21_vtd20.zip",
+            r"VTDST20~00(\w+)@COUNTYFP20=067#2016,2018",
+            "census-vtd",
+            (
+                "Lexington-Fayette council districts, 2011 plan, rebuilt from 2016-2018 precinct results and Census 2020 voting"
+                " districts"
+            ),
+        ),
+    ],
+    "1982425": [
+        (
+            1999,
+            2001,
+            "https://www2.census.gov/geo/tiger/TIGER2010/VTD/2000/tl_2010_19013_vtd00.zip",
+            r"NAME00~WATERLOO WARD (\d) PCT .*",
+            "census-vtd",
+            "Waterloo wards in 1999, rebuilt from Census 2000 voting districts",
+        ),
+        (
+            2009,
+            2023,
+            "https://www2.census.gov/geo/tiger/TIGER2020PL/LAYER/VTD/2020/tl_2020_19_vtd20.zip",
+            r"NAME20~WATERLOO W(\d)P\d+",
+            "census-vtd",
+            "Waterloo wards, 2009-2021, rebuilt from Census 2010 and 2020 voting districts",
         ),
     ],
     "0952000": [
@@ -1379,6 +1418,26 @@ def parse() -> None:
             "create temp table feature (geoid text, plan int, label text, geojson text, srid int, clip bool)"
             " on commit drop"
         )
+        precincts = {
+            (geoid, start): dict(
+                conn.execute(
+                    """select regexp_replace(u.code, '^[0-9]{4}:[A-Z]{2}:[0-9]{5}:[^:]*:', ''),
+                              min(split_part(c.code, ':', 4))
+                       from contest ct join election e on e.id = ct.election_id
+                       join area_code c on c.area_id = ct.district_area_id
+                       join result_set r on r.contest_id = ct.id and r.status = 'active'
+                       join result_value v on v.result_set_k = r.k
+                       join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct'
+                       where split_part(c.code, ':', 2) = %s and split_part(c.code, ':', 4) ~ '^(district|ward)-[0-9]+$'
+                         and extract(year from e.date_from)::int = any(%s) and v.value > 0
+                       group by 1 having count(distinct split_part(c.code, ':', 4)) = 1""",
+                    [geoid, [int(year) for year in field.partition("#")[2].split(",")]],
+                ).fetchall()
+            )
+            for geoid, plans in PLANS.items()
+            for start, _, _, field, _, _ in plans
+            if "#" in field
+        }
         with (
             conn.cursor() as cursor,
             cursor.copy("copy feature (geoid, plan, label, geojson, srid, clip) from stdin") as copy,
@@ -1386,7 +1445,7 @@ def parse() -> None:
             for geoid, plans in PLANS.items():
                 for start, _, url, field, publisher, _ in plans:
                     for properties, geometry, srid in features(url):
-                        spec, _, condition = field.partition("@")
+                        spec, _, condition = field.partition("#")[0].partition("@")
                         name, _, pattern = spec.partition("~")
                         key, _, value = condition.partition("=")
                         if condition and str(properties.get(key)) != value:
@@ -1395,6 +1454,8 @@ def parse() -> None:
                         if label is not None and pattern:
                             match = re.fullmatch(pattern, str(label).strip())
                             label = match[1] if match else None
+                        if label is not None and (geoid, start) in precincts:
+                            label = precincts[(geoid, start)].get(str(label))
                         if label is not None and token(str(label)):
                             copy.write_row((geoid, start, token(str(label)), geometry, srid, publisher in DERIVED))
         rows = conn.execute(
