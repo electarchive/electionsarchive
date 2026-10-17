@@ -817,7 +817,7 @@ def emit() -> Path:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT.format(whole=whole))
             counted = grouped.get((state, contest_id))
             previous = None
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key) if counted is None or contest_key in sets else None
             if counted is not None:
                 if contest_key in sets:
                     previous = result_set

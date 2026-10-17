@@ -16,7 +16,7 @@ from ea.sources.us.ncsbe import SOURCE as NCSBE
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_local"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 DAYS = [date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in range(2014, 2026)]
 PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_37_place_500k.zip"
@@ -59,7 +59,10 @@ OFFICES = {
     "coroner": (r"(?:COUNTY )?CORONER", "Coroner"),
     "surveyor": (r"(?:COUNTY )?SURVEYOR", "Surveyor"),
 }
-BODIES = {"board-of-commissioners", "board-of-education", "soil-and-water", "council"}
+BODIES = {"board-of-commissioners", "board-of-education", "soil-and-water", "council", "special"}
+SPECIAL = re.compile(
+    r"(?:(?:[A-Z]+ )?CO(?:UNTY|\.) ?- ?|[A-Z]+ - )?(?:CITY OF )?(.+?) (SANITARY(?: (LAND|WATER AND SEWER))? (?:DIST\w*|BOARD)|HOSPITAL)\b.*"
+)
 MUNICIPAL = re.compile(
     r"(?:CITY |TOWN |VILLAGE )?(?:(MAYOR)|(COUNCIL)(?: ?(?:MEMBERS?|M[AE]N|WOMAN|PERSONS?))?|BOARD OF (COMMISSIONERS)"
     r"|(COMMISSIONERS?)|BOARD OF (ALDERMEN)|(ALDERM[AE]N)|BOARD OF (TRUSTEES)|(TRUSTEES?))\b\s*-?\s*(.*)"
@@ -161,6 +164,28 @@ def parse() -> None:
                 continue
             code, word = fips, None
             name = re.sub(rf"^{re.escape(short.upper())}( COUNTY)?( -)? ", "", name)
+            special = SPECIAL.fullmatch(name)
+            if special:
+                kind = "hospital" if special[2] == "HOSPITAL" else "sanitary"
+                labels.append(
+                    {
+                        "county": county,
+                        "contest": contest,
+                        "code": f"{fips}:{kind}:{slug(special[1].replace('REIGELWOOD', 'RIEGELWOOD'))}",
+                        "office": "special",
+                        "seat": None,
+                        "remainder": remainder,
+                        "word": special[1].replace("REIGELWOOD", "RIEGELWOOD").title()
+                        + (
+                            " Hospital"
+                            if kind == "hospital"
+                            else f" Sanitary {(special[3] or '').title().replace(' And ', ' and ')} District".replace(
+                                "  ", " "
+                            )
+                        ),
+                    }
+                )
+                continue
             office = next(
                 (
                     (key, found[1])
@@ -258,11 +283,32 @@ def parse() -> None:
             )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(contests, infer_schema_length=None)
+    merged = pl.concat(results)
+    homes = (
+        merged.filter(pl.col("code").str.contains(":"))
+        .group_by("day", "contest", "code")
+        .agg(pl.col("votes").sum())
+        .with_columns(name=pl.col("code").str.split_exact(":", 1).struct.field("field_1"))
+        .sort("votes", "code", descending=[True, False])
+        .with_columns(home=pl.col("code").first().over("day", "contest", "name"))
+        .select("day", "contest", "code", "home")
+    )
+    merged = (
+        merged.join(homes, on=["day", "contest", "code"], how="left")
+        .with_columns(code=pl.coalesce("home", "code"))
+        .drop("home")
+    )
+    frame = (
+        frame.join(homes, on=["day", "contest", "code"], how="left")
+        .with_columns(code=pl.coalesce("home", "code"))
+        .drop("home")
+        .unique(["day", "code", "contest"], keep="first", maintain_order=True)
+    )
     duplicated = frame.filter(pl.struct("day", "code", "office", "seat", "remainder").is_duplicated())
     if duplicated.height:
         raise ValueError(f"contests that share a key: {duplicated.rows()[:10]}")
     frame.write_parquet(PARSED / "contests.parquet")
-    pl.concat(results).write_parquet(PARSED / "results.parquet")
+    merged.write_parquet(PARSED / "results.parquet")
     places.write_parquet(PARSED / "places.parquet")
 
 
@@ -353,6 +399,36 @@ def emit() -> Path:
         if cs.minted & {systems["fptp"], *parties.values()}:
             raise ValueError("the fptp system and the parties must already exist")
         cs.add("scheme", code="us.local_district", polity_id=us, kind="electoral_district", rank=3, noun="district")
+        cs.add(
+            "scheme", code="us.special_district", polity_id=us, kind="administrative", rank=3, noun="special district"
+        )
+        for code, text in contests.filter(pl.col("office") == "special").select("code", "word").unique().iter_rows():
+            polity = cs.key("us.polity", f"special:{code}")
+            path = f"{polities[code[:5]][2]}/{slug(text)}"
+            if path in taken and polity in cs.minted:
+                raise ValueError(f"{text} would take {path}")
+            polities[code] = (polity, text, path, "district")
+            cs.add("polity", id=polity, kind="special_district", iso_code=None)
+            name(polity, text)
+            cs.add("polity_parent", polity_id=polity, parent_id=polities[code[:5]][0])
+            cs.add("slug", path=path, entity_id=polity)
+            area = cs.area("us.special_district", code)
+            cs.add("area", id=area, scheme_code="us.special_district")
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add("area_parent", area_id=area, parent_id=cs.area("us.county", code[:5]))
+            name(area, f"{text}, NC")
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.special_district", code),
+                polity_id=polity,
+                scheme_code="us.special_district",
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
 
         owners: dict[tuple[str, str], UUID] = {}
         elections: dict[tuple[date, str], UUID] = {}
@@ -384,8 +460,10 @@ def emit() -> Path:
             day, code, office = row["day"], row["code"], row["office"]
             polity, place, path, kind = polities[code]
             town = len(code) == 7
-            scheme = "us.place" if town else "us.county"
-            if office == "mayor":
+            scheme = "us.special_district" if office == "special" else "us.place" if town else "us.county"
+            if office == "special":
+                title = f"{place} Board of {'Trustees' if place.endswith('Hospital') else 'Directors'}"
+            elif office == "mayor":
                 title = f"Mayor of {place}"
             elif office == "council":
                 title = f"{place} {BOARDS[row['word']].format(kind=kind)}"
@@ -432,7 +510,7 @@ def emit() -> Path:
                 name(election, f"{day.year} {place} {'general' if general else 'municipal'} election")
                 cs.add("slug", path=f"{path}/{day}-{kind_of}", entity_id=election)
             election = elections[(day, code)]
-            whole = cs.area(scheme, code)
+            whole = area = cs.area(scheme, code)
             unit = cs.unit(scheme, code)
             seat = row["seat"]
             if row["district"]:
@@ -497,7 +575,7 @@ def emit() -> Path:
                     body_md=DISTRICT.format(whole=kind.lower() if town else "county"),
                 )
             previous = None
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key) if town or contest_key in sets else None
             if not town:
                 if contest_key in sets:
                     previous = result_set
@@ -593,7 +671,7 @@ def emit() -> Path:
                         target = precincts.get(place) or cs.unit("us.precinct", place)
                         if place not in precincts:
                             minted.setdefault(place, day)
-                        if row["district"]:
+                        if row["district"] or office == "special":
                             memberships.add((target, area, day))
                     cell = (target, options["Write-ins" if writein else choice])
                     cells[cell] = cells.get(cell, 0) + (votes or 0)
