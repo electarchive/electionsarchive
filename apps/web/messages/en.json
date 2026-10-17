@@ -243,6 +243,8 @@
   "race_lede_districts": "{seats} seats filled in {count} separate district races.",
   "race_lede_won": "{party} won with {share} of the vote, {margin} points ahead of {runner}.",
   "race_lede_votes": "{party} led with {share} of the vote, {margin} points ahead of {runner}.",
+  "race_lede_runoff_won": "{party} won the {date} runoff with {share}, {margin} points ahead of {runner}.",
+  "race_lede_runoff_led": "{party} led the {date} runoff with {share}, {margin} points ahead of {runner}.",
   "race_lede_final": "{party} won with {share} of the final-round vote, {margin} points ahead of {runner}.",
   "race_lede_final_led": "{party} led with {share} of the final-round vote, {margin} points ahead of {runner}.",
   "race_contests": [

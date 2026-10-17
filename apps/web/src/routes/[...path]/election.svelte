@@ -1,12 +1,14 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import {
     createQueries,
     createQuery,
     useQueryClient,
   } from "@tanstack/svelte-query";
   import { untrack } from "svelte";
-  import { count, date, percent } from "#lib/format.js";
+  import { count, date, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
@@ -544,17 +546,37 @@
                         })
                       : runner == null
                         ? null
-                        : (seated.length > 0
+                        : (seated.length > 0 || race.results[0]?.isWon === true
                             ? m.race_lede_won
                             : m.race_lede_votes)({
                             party: named(leader),
                             share: percent(leader.share),
-                            margin: count(
-                              Math.round((leader.share - runner.share) * 1000) /
-                                10,
+                            margin: points(leader.share - runner.share).replace(
+                              /^\+/u,
+                              "",
                             ),
                             runner: named(runner),
                           }),
+        next:
+          race.runoff?.runner == null
+            ? null
+            : (race.runoff.isWon
+                ? m.race_lede_runoff_won
+                : m.race_lede_runoff_led)({
+                party: race.runoff.label,
+                date: new Intl.DateTimeFormat(getLocale(), {
+                  month: "long",
+                  day: "numeric",
+                  year:
+                    race.runoff.date?.slice(0, 4) === election.date?.slice(0, 4)
+                      ? undefined
+                      : "numeric",
+                  timeZone: "UTC",
+                }).format(new Date(`${race.runoff.date ?? ""}T00:00:00Z`)),
+                share: percent(race.runoff.share),
+                margin: points(race.runoff.margin).replace(/^\+/u, ""),
+                runner: race.runoff.runner,
+              }),
       };
     }),
   );
@@ -633,6 +655,17 @@
                   })}
                 >
                   {race.sequel ?? race.lede}
+                  {#if race.next != null}
+                    {#if race.runoff?.path == null}
+                      {race.next}
+                    {:else}
+                      <a
+                        class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                        href={resolve("/[...path]", { path: race.runoff.path })}
+                        >{race.next}</a
+                      >
+                    {/if}
+                  {/if}
                 </p>
               {/if}
             </div>

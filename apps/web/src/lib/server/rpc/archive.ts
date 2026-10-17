@@ -3994,6 +3994,52 @@ async function sketch(
       };
 }
 
+async function sequel(
+  group: Array<{ isRunoff: boolean; runoffs: Array<string> }>,
+  isBrief: boolean,
+  area: number,
+  lineage: Array<Relation>,
+) {
+  const head = !isBrief && group.length === 1 ? group[0] : undefined;
+  const id = head?.isRunoff === true ? undefined : head?.runoffs[0];
+  if (id == null) {
+    return null;
+  }
+  const [meta, linked] = await Promise.all([
+    db.execute<{ date: string }>(sql`
+      select e.date_from::text as date from contest c join election e on e.id = c.election_id
+      where c.id = ${id}::uuid
+    `),
+    paths([id]),
+  ]);
+  const when = meta.rows[0]?.date ?? null;
+  const all = await load([id], [area], when ?? "infinity", [id]);
+  const loaded = all.get(area);
+  const [lead, runner] = (
+    loaded == null
+      ? []
+      : compare(loaded.side, null, lineage, "party").flatMap((row) =>
+          row.current == null ? [] : [row.current],
+        )
+  ).toSorted((a, b) => b.votes - a.votes);
+  if (lead == null) {
+    return null;
+  }
+  const people = await names(
+    [lead.person, runner?.person].filter((person) => person != null),
+    when,
+  );
+  return {
+    path: linked.get(id) ?? null,
+    date: when,
+    label: people.full.get(lead.person ?? "") ?? "",
+    runner: people.full.get(runner?.person ?? "") ?? null,
+    share: lead.share,
+    margin: lead.share - (runner?.share ?? 0),
+    isWon: lead.outcome === "elected" || lead.outcome === "won",
+  };
+}
+
 async function races(
   election: string,
   polity: string,
@@ -4304,6 +4350,7 @@ async function races(
             votes,
             share,
             seats,
+            isWon: ["elected", "won"].includes(String(lead?.cell.outcome)),
           };
         })
         .filter((row) => !row.key.startsWith("kind:") || row.votes > 0)
@@ -4314,7 +4361,7 @@ async function races(
       for (const row of results) {
         filled += row.seats ?? 0;
       }
-      const [map, previous] = await Promise.all([
+      const [map, previous, runoff] = await Promise.all([
         level == null || isBrief
           ? null
           : sketch(
@@ -4384,6 +4431,7 @@ async function races(
             left join entity_merge pm on pm.entity_id = coalesce(w.party_id, ld.party_id)
             group by 1
           `),
+        sequel(group, isBrief, place.k, lineage),
       ]);
       const prior = previous?.rows ?? [];
       let earlier = 0;
@@ -4410,6 +4458,7 @@ async function races(
       return {
         map,
         before,
+        runoff,
         contest: single?.id ?? null,
         name:
           labels.full.get(
@@ -4688,11 +4737,23 @@ export const elections = {
                 votes: v.number(),
                 share: v.number(),
                 seats: v.nullable(v.number()),
+                isWon: v.optional(v.boolean()),
               }),
             ),
             places: Places,
             before: v.nullable(
               v.array(v.object({ key: v.string(), seats: v.number() })),
+            ),
+            runoff: v.nullable(
+              v.object({
+                path: v.nullable(v.string()),
+                date: v.nullable(v.string()),
+                label: v.string(),
+                runner: v.nullable(v.string()),
+                share: v.number(),
+                margin: v.number(),
+                isWon: v.boolean(),
+              }),
             ),
             map: v.nullable(Sketch),
           }),

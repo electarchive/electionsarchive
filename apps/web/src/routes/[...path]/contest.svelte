@@ -410,8 +410,9 @@
     return (isWon ? m.race_lede_won : m.race_lede_votes)({
       party: named(top),
       share: percent(top.current.share),
-      margin: count(
-        Math.round((top.current.share - next.current.share) * 1000) / 10,
+      margin: points(top.current.share - next.current.share).replace(
+        /^\+/u,
+        "",
       ),
       runner: named(next),
     });
