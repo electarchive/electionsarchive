@@ -2116,12 +2116,19 @@ def emit() -> Path:
                 [frame["key"].unique().to_list()],
             ).fetchall()
         )
-        done = {
-            value
-            for (value,) in conn.execute(
-                "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
-            ).fetchall()
-        }
+        done: dict[str, tuple[str, UUID, dict[str, int]]] = {}
+        for value, result_set, county, votes in conn.execute(
+            """select x.value, r.id,
+                      case u.scheme_code when 'us.county_part' then split_part(u.code, ':', 2)
+                      when 'us.precinct' then split_part(u.code, ':', 3) else u.code end,
+                      sum(v.value)::bigint
+               from external_id x join result_set r on r.id = x.entity_id and r.is_default
+               join result_value v on v.result_set_k = r.k and v.measure = 1
+               join reporting_unit u on u.k = v.unit_k
+               where x.scheme = %s group by 1, 2, 3 having sum(v.value) > 0""",
+            [f"{SOURCE}.result_set"],
+        ).fetchall():
+            done.setdefault(re.sub(r":r\d+$", "", value), (value, result_set, {}))[2][county] = votes
         counties = {
             code: (unit, area, name)
             for code, unit, area, name in conn.execute(
@@ -2448,8 +2455,6 @@ def emit() -> Path:
                 if rows["votes"].sum() > 0:
                     print(f"{key}: no contest, {rows['votes'].sum()} votes skipped")
                 continue
-            if key in done:
-                continue
             fine = rows.filter(pl.col("grain") == "precinct")
             coarse = rows.filter(pl.col("grain") == "county")
             if fine.height and coarse.height:
@@ -2460,6 +2465,13 @@ def emit() -> Path:
                     print(f"{key}: precinct and county files disagree, the county file used")
                     fine = fine.clear()
             lines = fine if fine.height else coarse
+            revised = done.get(key)
+            if revised is not None and any(
+                revised[2]
+                == dict(part.group_by("county").agg(pl.col("votes").sum()).filter(pl.col("votes") > 0).iter_rows())
+                for part in (rows.filter(pl.col("grain") == "precinct"), coarse)
+            ):
+                continue
             if state in PARTIAL:
                 prefix = lines["county"][0][:2]
                 needed: set[str] = (
@@ -2582,11 +2594,26 @@ def emit() -> Path:
                             kind="write_in",
                             ballot_label=candidate,
                         )
-            result_set = cs.key(f"{SOURCE}.result_set", key)
+            result_set = cs.key(
+                f"{SOURCE}.result_set",
+                key
+                if revised is None
+                else f"{key}:r{int(found[1]) + 1 if (found := re.search(r':r(\d+)$', revised[0])) else 2}",
+            )
             for row in conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
             ).fetchall():
-                cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
+                cs.add(
+                    "result_set",
+                    **{
+                        **dict(zip(columns, row, strict=True)),
+                        **({"status": "superseded"} if revised is not None and row[0] == revised[1] else {}),
+                    },
+                    is_default=False,
+                )
+            if revised is not None:
+                for option, kind, seats in outcomes:
+                    cs.add("outcome", result_set_id=revised[1], option_id=option, kind=kind, seats=seats)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -2597,6 +2624,7 @@ def emit() -> Path:
                 status="active",
                 source_id=sources[lines["url"][0]],
                 is_default=True,
+                supersedes_id=None if revised is None else revised[1],
             )
             for option, kind, seats in outcomes:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
