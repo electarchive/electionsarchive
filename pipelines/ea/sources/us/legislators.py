@@ -285,6 +285,7 @@ def emit() -> Path:
                             voting=True,
                             valid_from=None,
                             valid_to=None,
+                            valid_to_precision="day",
                         )
                 scheduled = end.year % 2 == 1 and (end.month, end.day) in ((3, 3), (3, 4), (1, 3))
                 tenure = cs.key(f"{SOURCE}.tenure", f"{ids['bioguide']}:{chamber}:{term['start']}")
