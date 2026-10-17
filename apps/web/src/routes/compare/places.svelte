@@ -285,16 +285,28 @@
             >{tick === 0 ? "0" : Math.round(Math.abs(tick) * 100)}</text
           >
         {/each}
-        {#each race.rows as row, point (row.date)}
-          <text
-            x={sx(race, row.year)}
-            y={height - 6}
-            text-anchor="middle"
-            class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
-              "max-sm:hidden": point % 2 === 1 && race.rows.length > 6,
-              "fill-foreground": focus === row,
-            })}>{row.year}</text
-          >
+        {#each race.rows as row (row.date)}
+          {const stride = $derived(
+            Math.max(
+              1,
+              Math.ceil(
+                (race.rows.length * 34) / (width - PAD.left - PAD.right),
+              ),
+            ),
+          )}
+          {const rank = $derived(
+            race.rows.filter((other) => other.year > row.year).length,
+          )}
+          {#if rank % stride === 0 || focus === row}
+            <text
+              x={sx(race, row.year)}
+              y={height - 6}
+              text-anchor="middle"
+              class={cn("fill-muted-foreground font-figures text-[0.625rem]", {
+                "fill-foreground": focus === row,
+              })}>{row.year}</text
+            >
+          {/if}
         {/each}
         {#if focus != null}
           <line
