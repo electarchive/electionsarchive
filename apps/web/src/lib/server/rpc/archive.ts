@@ -597,16 +597,6 @@ async function load(
       join lateral (
         select 1 from (${FACTS[facts](sql`rs.k`, sql`a.k`)}) f where f.measure = any(${COUNTED}) limit 1
       ) hit on true
-      where not exists (
-        select from contest x
-        join area_parent ap on ap.area_id = x.district_area_id
-        join contest y on y.allocation_parent_id = x.allocation_parent_id and y.district_area_id = ap.parent_id
-        join result_set ys on ys.contest_id = y.id
-        join lateral (
-          select 1 from result_rollup yr where yr.result_set_k = ys.k and yr.area_k = a.k and yr.measure = 1 limit 1
-        ) yr on true
-        where x.id = rs.contest_id
-      )
       order by rs.contest_id, a.k, rs.is_default desc, array_position(${STAGES}, rs.stage),
         rs.completeness desc nulls last
     )
