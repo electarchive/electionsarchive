@@ -18,7 +18,7 @@ RESTRICTED = {
 }
 # The first rule a license matches sets its class; a file cited under several licenses takes the strictest.
 CLASSES = [
-    ("restricted", re.compile(r"ICPSR|terms of use", re.IGNORECASE)),
+    ("restricted", re.compile(r"ICPSR|All rights reserved", re.IGNORECASE)),
     ("non-commercial", re.compile(r"non-?commercial", re.IGNORECASE)),
     ("share-alike", re.compile(r"ShareAlike|BY-SA|ODbL|Open Database License", re.IGNORECASE)),
     (
@@ -31,7 +31,8 @@ CLASSES = [
         "attribution",
         re.compile(
             r"CC BY|Creative Commons Attribution|Licence Ouverte|Open Government|Open Parliament|Datenlizenz"
-            r"|reuse is authorized|2011/833/EU|Open use|free use|free to distribute",
+            r"|reuse is authorized|2011/833/EU|Open use|free use|free to distribute|free to copy|freely reproducible"
+            r"|City of Chicago Data Portal Terms of Use",
             re.IGNORECASE,
         ),
     ),

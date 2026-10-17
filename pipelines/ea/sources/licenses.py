@@ -5,10 +5,11 @@ from ea.sources.tr.ysk import LICENSE as TURKISH_OFFICIAL_ACTS
 from ea.store import connect
 
 SOURCE = "licenses"
-VERSION = "2"
+VERSION = "3"
 PUBLIC_RECORD = "Public record"
-# Government publishers whose source rows were recorded with no license: results are public records, and Turkish court
-# decisions are free to reproduce once published.
+NEWS = "All rights reserved: a news article cited for one fact, not redistributed"
+# Publishers whose source rows were recorded with no license: government results are public records, Turkish court
+# decisions are free to reproduce once published, and news articles are cited for single facts, never redistributed.
 PUBLISHERS = {
     "Cork Returning Officer": PUBLIC_RECORD,
     "Dublin County Returning Officer": PUBLIC_RECORD,
@@ -18,6 +19,12 @@ PUBLISHERS = {
     "Wisconsin Elections Commission": PUBLIC_RECORD,
     "Minnesota Legislative Reference Library": PUBLIC_RECORD,
     "New York City Department of City Planning": f"{PUBLIC_RECORD}; free download with DCP's disclaimer of warranty",
+    "Conseil constitutionnel": "Freely reproducible with the Conseil constitutionnel's site cited as the source, without "
+    "altering the text (legal notice)",
+    "Hürriyet": NEWS,
+    "Memurlar.net": NEWS,
+    "Yeni Şafak": NEWS,
+    "Son Dakika": NEWS,
 }
 COLUMNS = ("id", "kind", "publisher", "title", "url", "license", "license_url", "attribution", "notes")
 
@@ -49,7 +56,7 @@ def emit() -> Path | None:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Record government sources published without a license as public records",
+            summary="Record the license of sources published without one",
             polity=None,
             kind="correction",
         )
