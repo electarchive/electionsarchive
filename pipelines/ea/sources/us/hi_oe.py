@@ -540,9 +540,23 @@ FILES = {
         "https://files.hawaii.gov/elections/files/results/2024/Primary/com.pdf",
     ),
 }
+STATEWIDE = {
+    (year, "general"): f"https://files.hawaii.gov/elections/files/results/{year}/general/histatewide.pdf"
+    for year in (2004, 2008, 2012)
+}
+UNASSIGNED = (
+    "The Office of Elections' statewide summary counts more ballots than its four county reports, which were printed "
+    "earlier. The difference is shown as votes not assigned to any county."
+)
 
 
 def fetch() -> None:
+    for url in STATEWIDE.values():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            time.sleep(30)
+            raw.fetch(SOURCE, url, suffix=".pdf")
     for stamp, url in FILES.values():
         address = WAYBACK.format(stamp, url)
         try:
@@ -613,11 +627,14 @@ def streams(path: Path) -> list[str]:
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
-    for (year, stage, county), (stamp, url) in FILES.items():
+    reports = [
+        (year, stage, county, WAYBACK.format(stamp, url)) for (year, stage, county), (stamp, url) in FILES.items()
+    ] + [(year, stage, "hi", url) for (year, stage), url in STATEWIDE.items()]
+    for year, stage, county, address in reports:
         title = ""
         pending = ""
         closed = True
-        for line in streams(raw.cached(SOURCE, WAYBACK.format(stamp, url)).path):
+        for line in streams(raw.cached(SOURCE, address).path):
             spaced = re.match(r"^\s*(\S.*[A-Za-z)\]])\s{4,}\d+$", line)
             line = re.sub(r"\s+", " ", line).strip()
             if spaced:
@@ -685,6 +702,12 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "lines.parquet")
+    statewide: dict[tuple[int, str, str], dict[str, int]] = {}
+    for year, stage, title, candidate, votes in (
+        frame.filter(pl.col("county") == "hi").select("year", "stage", "title", "name", "votes").iter_rows()
+    ):
+        statewide.setdefault((year, stage, title), {})[candidate] = votes
+    frame = frame.filter(pl.col("county") != "hi")
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -750,6 +773,20 @@ def emit() -> Path:
                join polity p on p.id = t.polity_id and p.iso_code = 'US-HI'
                where u.scheme_code = 'us.state'"""
         ).fetchall()
+        aggregate = cs.unit("us.aggregate", "HI:statewide")
+        cs.add(
+            "reporting_unit",
+            id=aggregate,
+            polity_id=cs.polity("US-HI"),
+            scheme_code="us.aggregate",
+            code="HI:statewide",
+            parent_id=cs.unit("us.state", "15"),
+            area_relation="within",
+            area_id=area,
+            kind="aggregate",
+            valid_from=None,
+            valid_to=None,
+        )
         elections: dict[tuple[int, str], tuple[date, UUID]] = {}
         for value, day, election in conn.execute(
             """select x.value, e.date_from, e.id from election e join polity p on p.id = e.polity_id and p.iso_code = 'US-HI'
@@ -848,23 +885,43 @@ def emit() -> Path:
                     name(contest, f"{year} Hawaii Governor {party[2]} primary")
                     cs.add("slug", path=f"us/hi/{day}-primary/governor-{party[1]}", entity_id=contest)
             used.add(key)
+            summed: dict[str, int] = dict(lines.group_by("name").agg(pl.col("votes").sum()).iter_rows())
+            printed = statewide.get((year, stage, title), {})
+            remainder = {
+                candidate: printed[candidate] - votes
+                for candidate, votes in summed.items()
+                if candidate in printed and printed[candidate] != votes
+            }
+            if printed and (set(printed) != set(summed) or any(votes < 0 for votes in remainder.values())):
+                raise ValueError(f"{key}: statewide summary {printed} does not cover the counties' {summed}")
             result_set = cs.key(f"{SOURCE}.result_set", key)
+            previous = None
             if result_set not in cs.minted:
-                continue
+                if not remainder:
+                    continue
+                previous = result_set
+                result_set = cs.key(f"{SOURCE}.result_set", f"{key}:statewide")
+                if result_set not in cs.minted:
+                    continue
             options: list[tuple[UUID, str, str]] = []
             outcomes: list[tuple[UUID, str, int | None]] = []
             on_file: dict[UUID, int] = {}
+            default = True
             if existing:
                 options = conn.execute(
                     """select id, kind, ballot_label from contest_option
                        where contest_id = %s and kind in ('candidate', 'ticket') and parent_option_id is null""",
                     [contest],
                 ).fetchall()
-                for row in conn.execute(
+                for *fields, flagged in conn.execute(
                     """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
-                         supersedes_id from result_set where contest_id = %s and is_default""",
-                    [contest],
+                         supersedes_id, is_default from result_set
+                       where contest_id = %s and coalesce(id = %s, is_default)""",
+                    [contest, previous],
                 ).fetchall():
+                    if fields[0] == previous:
+                        fields[5] = "superseded"
+                        default = flagged
                     cs.add(
                         "result_set",
                         **dict(
@@ -881,7 +938,7 @@ def emit() -> Path:
                                     "completeness",
                                     "supersedes_id",
                                 ),
-                                row,
+                                fields,
                                 strict=True,
                             )
                         ),
@@ -889,9 +946,13 @@ def emit() -> Path:
                     )
                 outcomes = conn.execute(
                     """select o.option_id, o.kind, o.seats from outcome o
-                       join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
-                    [contest],
+                       join result_set rs on rs.id = o.result_set_id
+                       where rs.contest_id = %s and coalesce(rs.id = %s, rs.is_default)""",
+                    [contest, previous],
                 ).fetchall()
+                if previous is not None:
+                    for option, kind, seats in outcomes:
+                        cs.add("outcome", result_set_id=previous, option_id=option, kind=kind, seats=seats)
                 on_file = dict(
                     conn.execute(
                         """select o.id, sum(v.value)::bigint from result_value v
@@ -975,7 +1036,7 @@ def emit() -> Path:
                     raise ValueError(f"{key}: two candidates share an option with {candidate}")
                 if option in on_file and abs(on_file[option] - votes) > max(50, on_file[option] // 100):
                     print(f"{key}: {candidate} has {votes}, {on_file[option]} on file")
-                totals[option] = votes
+                totals[option] = votes + remainder.get(candidate, 0)
                 picked[candidate] = option
             cs.add(
                 "result_set",
@@ -986,7 +1047,8 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=True,
+                is_default=default,
+                supersedes_id=previous,
                 completeness=1,
             )
             cs.add("note", entity_id=result_set, kind="caveat", body_md=KALAWAO)
@@ -995,6 +1057,23 @@ def emit() -> Path:
                     attached.add((year, stage, county))
                     stamp, url = FILES[(year, stage, county)]
                     cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, url)), source)
+            if remainder:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNASSIGNED)
+                if (year, stage, "hi") not in attached:
+                    attached.add((year, stage, "hi"))
+                    cs.artifact(raw.cached(SOURCE, STATEWIDE[(year, stage)]), source)
+            for candidate, votes in remainder.items():
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=aggregate,
+                    option_id=picked[candidate],
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=32,
+                    value=votes,
+                )
             for candidate, county, votes in lines.select("name", "county", "votes").iter_rows():
                 cs.add(
                     "result_value",
