@@ -18,7 +18,7 @@ from ea.sources.us.fec import NOTES
 from ea.store import DATA, connect
 
 SOURCE = "us.me_sos"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ORIGIN = "https://www.maine.gov/sos/cec/elec/results/"
 WAYBACK = "https://web.archive.org/web/{}id_/" + ORIGIN + "{}"
@@ -46,6 +46,41 @@ CONTESTS: dict[
             {"Golden": 23611, "St. Clair": 19853, None: 7381},
         ],
         50845,
+    ),
+    "2018-06-12:ME:governor:democratic": (
+        "2018 Democratic Primary Election: Governor",
+        ("20200622224601", "2018/democraticgovfinal.xls"),
+        None,
+        [
+            ("20200622224602", "2018/govd-1.xlsx"),
+            ("20200622180202", "2018/govd-2.xlsx"),
+            ("20200622145207", "2018/govd-3.xlsx"),
+            ("20200622132212", "2018/govd-4.xlsx"),
+            ("20200622065941", "2018/govd-5.xlsx"),
+        ],
+        [
+            {
+                "Mills, Janet T.": 41735,
+                "Cote, Adam Roland": 35478,
+                "Sweet, Elizabeth A.": 20767,
+                "Eves, Mark W.": 17887,
+                "Dion, Mark N.": 5200,
+                "Russell, Diane Marie": 2728,
+                "Dion, Donna J.": 1596,
+                WRITE_IN: 748,
+                None: 6111,
+            },
+            {
+                "Mills, Janet T.": 44042,
+                "Cote, Adam Roland": 37543,
+                "Sweet, Elizabeth A.": 22987,
+                "Eves, Mark W.": 19521,
+                None: 8157,
+            },
+            {"Mills, Janet T.": 49945, "Cote, Adam Roland": 42623, "Sweet, Elizabeth A.": 29944, None: 9738},
+            {"Mills, Janet T.": 63384, "Cote, Adam Roland": 53866, None: 15000},
+        ],
+        132250,
     ),
     "2018-11-06:ME:house:2": (
         "2018 General Election: Representative to Congress, District 2",
@@ -83,6 +118,95 @@ CONTESTS: dict[
             {"Crafts": 28019, "Bennett": 20295, None: 10192},
         ],
         58506,
+    ),
+    "2020-07-14:ME:senate:11:dp": (
+        "2020 Democratic Primary Election: State Senator, District 11",
+        ("20201020031303", "2020/offss11summary.xls"),
+        None,
+        [
+            ("20201020081412", "2020/offss11cvr.xlsx"),
+            ("20201020130911", "2020/offss11manual.xlsx"),
+            ("20201020074944", "2020/offss11dUOCAVA.xlsx"),
+        ],
+        [
+            {"Curry, Glenn Chip": 2294, "Stanicki, Robyn M.": 1669, "Pattavina, Charles F.": 1316, None: 444},
+            {"Curry, Glenn Chip": 2807, "Stanicki, Robyn M.": 2212, None: 704},
+        ],
+        5723,
+    ),
+    "2020-07-14:ME:house:41:dp": (
+        "2020 Democratic Primary Election: Representative to the Legislature, District 41",
+        ("20201022080414", "2020/offsr41summary.xls"),
+        None,
+        [
+            ("20201022052555", "2020/offsr41cvr.xlsx"),
+            ("20201022050325", "2020/offsr41dmanual.xlsx"),
+            ("20201022080351", "2020/offsr41dUOCAVA.xlsx"),
+        ],
+        [
+            {"Zager, Samuel Lewis": 1239, "Grant, Benjamin K.": 912, "Davis, Laurie J.": 368, None: 119},
+            {"Zager, Samuel Lewis": 1397, "Grant, Benjamin K.": 1067, None: 174},
+        ],
+        2638,
+    ),
+    "2020-07-14:ME:house:47:dp": (
+        "2020 Democratic Primary Election: Representative to the Legislature, District 47",
+        ("20201020081418", "2020/offsr47summary.xls"),
+        None,
+        [
+            ("20201020062516", "2020/offsr47cvr20200803.xlsx"),
+            ("20201020031306", "2020/offsr47manual.xlsx"),
+            ("20201021075429", "2020/offsr47UOCAVA.xlsx"),
+        ],
+        [
+            {"Bell, Arthur L.": 978, "Abbott, Heather": 892, "Fromuth, Peter J.": 623, None: 131},
+            {"Bell, Arthur L.": 1274, "Abbott, Heather": 1139, None: 211},
+        ],
+        2624,
+    ),
+    "2020-07-14:ME:house:49:dp": (
+        "2020 Democratic Primary Election: Representative to the Legislature, District 49",
+        ("20201022050330", "2020/offsr49summary.xls"),
+        None,
+        [
+            ("20201020202049", "2020/offcvrsr49.xlsx"),
+            ("20201020213051", "2020/offsr49dmanual.xlsx"),
+            ("20201020213755", "2020/offsr49dUOCAVA.xlsx"),
+        ],
+        [
+            {"Arford, Poppy": 899, "Wilson, Katherine E.": 657, "Perreault, Corinne Ann": 613, None: 189},
+            {"Arford, Poppy": 1189, "Wilson, Katherine E.": 886, None: 283},
+        ],
+        2358,
+    ),
+    "2020-07-14:ME:house:90:dp": (
+        "2020 Democratic Primary Election: Representative to the Legislature, District 90",
+        ("20201020081405", "2020/offsr90summary.xls"),
+        None,
+        [
+            ("20201020130827", "2020/offsr90cvr20200803.xlsx"),
+            ("20201020024534", "2020/offsr90dmanual.xlsx"),
+            ("20201022205738", "2020/offsr90dUOCAVA.xlsx"),
+        ],
+        [
+            {"Crafts, Lydia V.": 1010, "Pieh, Wendy": 741, "Levesque, David J.": 273, None: 59},
+            {"Crafts, Lydia V.": 1143, "Pieh, Wendy": 838, None: 102},
+        ],
+        2083,
+    ),
+    "2022-06-14:ME:senate:16:rp": (
+        "2022 Republican Primary Election: State Senator, District 16",
+        ("20220930192040", "2022/ss16rep622.xls"),
+        None,
+        [
+            ("20220930113202", "2022/ss16622.xlsx"),
+            ("20220929204101", "2022/ss16uocava622.xlsx"),
+        ],
+        [
+            {"Perkins, Michael D.": 846, "Kitchin, Kevin D.": 733, "Andre, Mark R.": 335, None: 65},
+            {"Perkins, Michael D.": 922, "Kitchin, Kevin D.": 845, None: 212},
+        ],
+        1979,
     ),
     "2022-11-08:ME:house:2": (
         "2022 General Election: Representative to Congress, District 2",
@@ -123,6 +247,70 @@ CONTESTS: dict[
     ),
 }
 KEPT = {"2022-11-08:ME:house:2"}
+RECORDS = {
+    ("2018-06-12:ME:governor:democratic", 4): {"Mills, Janet T.": 63387, "Cote, Adam Roland": 53866, None: 14997},
+}
+PRIMARIES = {
+    "2018-06-12:ME:governor:democratic": (
+        "2018-11-06:ME:governor",
+        "democratic-party",
+        "2018 Maine gubernatorial Democratic primary",
+        "us/me/2018-06-12-primary/governor-democratic",
+    ),
+    "2020-07-14:ME:senate:11:dp": (
+        "2020-11-03:ME:senate:11:g",
+        "democratic-party",
+        "2020 Maine Senate Democratic primary, District 11",
+        "us/me/2020-07-14-primary/state-senate-11-democratic-primary",
+    ),
+    "2020-07-14:ME:house:41:dp": (
+        "2020-11-03:ME:house:41:g",
+        "democratic-party",
+        "2020 Maine House of Representatives Democratic primary, District 41",
+        "us/me/2020-07-14-primary/state-house-41-democratic-primary",
+    ),
+    "2020-07-14:ME:house:47:dp": (
+        "2020-11-03:ME:house:47:g",
+        "democratic-party",
+        "2020 Maine House of Representatives Democratic primary, District 47",
+        "us/me/2020-07-14-primary/state-house-47-democratic-primary",
+    ),
+    "2020-07-14:ME:house:49:dp": (
+        "2020-11-03:ME:house:49:g",
+        "democratic-party",
+        "2020 Maine House of Representatives Democratic primary, District 49",
+        "us/me/2020-07-14-primary/state-house-49-democratic-primary",
+    ),
+    "2020-07-14:ME:house:90:dp": (
+        "2020-11-03:ME:house:90:g",
+        "democratic-party",
+        "2020 Maine House of Representatives Democratic primary, District 90",
+        "us/me/2020-07-14-primary/state-house-90-democratic-primary",
+    ),
+    "2022-06-14:ME:senate:16:rp": (
+        "2022-11-08:ME:senate:16:g",
+        "republican-party",
+        "2022 Maine Senate Republican primary, District 16",
+        "us/me/2022-06-14-primary/state-senate-16-republican-primary",
+    ),
+}
+PEOPLE = {
+    "Mills, Janet T.": "2018-11-06:ME:governor",
+    "Cote, Adam Roland": "2008-06-10:ME:house:1:democratic",
+    "Sweet, Elizabeth A.": "2020-07-14:ME:senate:democratic",
+    "Eves, Mark W.": "2014-11-04:ME:house:6:g",
+    "Dion, Mark N.": "2016-11-08:ME:senate:28:g",
+    "Russell, Diane Marie": "2014-11-04:ME:house:39:g",
+    "Curry, Glenn Chip": "2020-11-03:ME:senate:11:g",
+    "Stanicki, Robyn M.": "2022-11-08:ME:house:38:g",
+    "Zager, Samuel Lewis": "2020-11-03:ME:house:41:g",
+    "Bell, Arthur L.": "2020-11-03:ME:house:47:g",
+    "Arford, Poppy": "2020-11-03:ME:house:49:g",
+    "Crafts, Lydia V.": "2020-11-03:ME:house:90:g",
+    "Pieh, Wendy": "2008-11-04:ME:house:50:g",
+    "Perkins, Michael D.": "2022-11-08:ME:senate:16:g",
+    "Andre, Mark R.": "2020-11-03:ME:house:110:g",
+}
 RENAMES = {
     "Mattawamkeg": "Mattawamkeag",
     "Penobscott Nation": "Penobscot Indian Island",
@@ -130,6 +318,7 @@ RENAMES = {
     "Indian Township": "Passamaquoddy Indian Township",
     "Pleasant Point Voting District": "Passamaquoddy Pleasant Point",
     "Carrabassett": "Carrabassett Valley",
+    "Monhegan Island": "Monhegan",
 }
 OFFICIAL = (
     "The Secretary of State's ranked-choice tabulation for the district. Ballots exhausted in a round are the "
@@ -151,6 +340,10 @@ DERIVED = (
     "overseas, and from records that name no municipality are one unit for the rest of the district."
 )
 EXACT = " Summed over the district, every round reproduces the Secretary of State's count exactly."
+EXACT_GOVERNOR = (
+    " Summed over the state, rounds 1 to 3 reproduce the Secretary of State's count exactly. In round 4 the records "
+    "give Mills 3 more votes and leave 3 fewer ballots exhausted than the report."
+)
 EXACT_FINAL = (
     " Summed over the district, the final round reproduces the Secretary of State's count exactly. The first round "
     "differs from the published first-choice count: the records give Golden 145 more votes, Theriault 129 more, and "
@@ -221,12 +414,13 @@ def parse() -> None:
                 sheet.select(
                     precinct=pl.col("Precinct").str.strip_chars(),
                     choices=pl.concat_list(
-                        pl.col(column)
-                        .str.replace(r"\s*\(\d+\)$", "")
-                        .str.replace(r"^(?:DEM|REP|GRN|GRE|LIB|IND|UNE) ", "")
-                        .str.replace(r",.*$", "")
-                        .str.strip_chars()
-                        for column in ranks
+                        (choice if key in PRIMARIES else choice.str.replace(r",.*$", "")).str.strip_chars()
+                        for choice in (
+                            pl.col(column)
+                            .str.replace(r"\s*\(\d+\)$", "")
+                            .str.replace(r"^(?:DEM|REP|GRN|GRE|LIB|IND|UNE) ", "")
+                            for column in ranks
+                        )
                     ),
                 )
             )
@@ -280,7 +474,7 @@ def parse() -> None:
             if first is not None and number == 1:
                 continue
             found = {label: votes for _, label, votes in sums.filter(pl.col("round") == number).iter_rows() if votes}
-            if found != {label: votes for label, votes in official.items() if votes}:
+            if found != {label: votes for label, votes in RECORDS.get((key, number), official).items() if votes}:
                 raise ValueError(f"{key} round {number}: the records give {found}, the official count {official}")
         frames.append(
             tally.with_columns(key=pl.lit(key), town=pl.col("precinct").map_elements(town, return_dtype=pl.String))
@@ -329,8 +523,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's ranked-choice contests for the 2nd congressional district, 2018 to 2024, with each "
-            "round by municipality from the cast vote records",
+            summary="Maine's ranked-choice contests for the 2nd congressional district, 2018 to 2024, and its state "
+            "primaries that went past round 1, 2018 to 2022, with each round by municipality from the cast vote records",
             polity="US",
         )
 
@@ -389,27 +583,59 @@ def emit() -> Path:
             valid_to=None,
             as_of=date(2020, 1, 1),
         )
-        district = cs.area("us.cd", DISTRICT)
-        other = cs.unit("us.aggregate", OTHER)
-        cs.add(
-            "reporting_unit",
-            id=other,
-            polity_id=state,
-            scheme_code="us.aggregate",
-            code=OTHER,
-            area_relation="within",
-            area_id=district,
-            kind="aggregate",
-            valid_from=None,
-        )
-
+        aggregates: set[UUID] = set()
         for key, (title, summary, first, records, rounds, total) in CONTESTS.items():
             day = date.fromisoformat(key[:10])
+            seat = re.fullmatch(r".*:(house|senate):(\d+):[dr]p", key)
+            scheme, code = (
+                ("us.state", "23")
+                if ":governor:" in key
+                else ("us.cd", DISTRICT)
+                if seat is None
+                else ("us.sldl" if seat[1] == "house" else "us.sldu", f"ME:{seat[2]}")
+            )
+            top = cs.unit(scheme, code, day) if scheme == "us.cd" else cs.unit(scheme, code)
+            area = cs.area(scheme, code)
+            rest = OTHER if scheme == "us.cd" else f"ME:{scheme.removeprefix('us.')}:{code.removeprefix('ME:')}:other"
+            where = (lambda text: text.replace("the district", "the state")) if scheme == "us.state" else str
             contest = cs.key("us.contest", key)
-            row = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()
-            if contest in cs.minted or row is None:
-                raise ValueError(f"{key} must already exist")
-            election = row[0]
+            if key in PRIMARIES:
+                general_key, party_key, contest_name, path = PRIMARIES[key]
+                general = cs.key("us.contest", general_key)
+                party = cs.key("us.party", party_key)
+                election = cs.key("us.election", f"{key[:10]}:ME:primary")
+                irv = cs.key("us.electoral_system", "irv")
+                row = conn.execute(
+                    "select kind, office_id, body_id, district_area_id, boundary_set_id, term from contest where id = %s",
+                    [general],
+                ).fetchone()
+                if row is None or cs.minted & {general, party, election, irv}:
+                    raise ValueError(f"{key}: its general, party, primary election, and IRV must already exist")
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind=row[0],
+                    office_id=row[1],
+                    body_id=row[2],
+                    district_area_id=row[3],
+                    seat_id=None,
+                    boundary_set_id=row[4],
+                    term=row[5],
+                    party_scope_id=party,
+                    magnitude=1,
+                    round_number=1,
+                    previous_round_id=None,
+                    electoral_system_id=irv,
+                    default_result_kind="counted",
+                )
+                name(contest, contest_name)
+                cs.add("slug", path=path, entity_id=contest)
+            else:
+                row = conn.execute("select election_id from contest where id = %s", [contest]).fetchone()
+                if contest in cs.minted or row is None:
+                    raise ValueError(f"{key} must already exist")
+                election = row[0]
             source = cs.source(PUBLISHER, title)
             cs.add(
                 "source",
@@ -440,6 +666,44 @@ def emit() -> Path:
                             ballot_label="Scattered",
                         )
                         continue
+                elif key in PRIMARIES:
+                    surname, given = label.split(", ")
+                    display = f"{given} {surname}"
+                    if label in PEOPLE:
+                        reference = cs.key("us.contest", PEOPLE[label])
+                        people = conn.execute(
+                            """select c.person_id from candidacy c join contest_option o on o.id = c.option_id
+                               where o.contest_id = %s and o.ballot_label ilike %s""",
+                            [reference, f"%{surname}%"],
+                        ).fetchall()
+                        if reference in cs.minted or len(people) != 1:
+                            raise ValueError(f"{key}: {len(people)} candidates for {label} in {PEOPLE[label]}")
+                        person = people[0][0]
+                    else:
+                        person = cs.key(f"{SOURCE}.person", slug(display))
+                        cs.add("person", id=person)
+                        name(person, display)
+                    options[label] = cs.key("us.option", f"{key}:{person}")
+                    cs.add(
+                        "contest_option",
+                        id=options[label],
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=party,
+                        ballot_label=display,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{key}:{person}:head"),
+                        person_id=person,
+                        option_id=options[label],
+                        role="head",
+                        ballot_name=display,
+                        member_of_party_id=party,
+                        is_independent=False,
+                        is_incumbent=None,
+                    )
+                    continue
                 else:
                     found = [option for option, kind, text in existing if kind == "candidate" and label in text]
                 if len(found) != 1:
@@ -448,42 +712,43 @@ def emit() -> Path:
 
             sets = []
             if key not in KEPT:
-                federal = cs.key("us.fec.result_set", key)
-                if federal in cs.minted:
-                    raise ValueError(f"{key}: us.fec's result set must already exist")
-                if key in NOTES:
-                    kind, body = NOTES[key]
-                    for (note,) in conn.execute(
-                        "select id from note where entity_id = %s and kind = %s", [federal, kind]
+                if key not in PRIMARIES:
+                    federal = cs.key("us.fec.result_set", key)
+                    if federal in cs.minted:
+                        raise ValueError(f"{key}: us.fec's result set must already exist")
+                    if key in NOTES:
+                        kind, body = NOTES[key]
+                        for (note,) in conn.execute(
+                            "select id from note where entity_id = %s and kind = %s", [federal, kind]
+                        ).fetchall():
+                            cs.add("note", id=note, entity_id=federal, kind=kind, body_md=body)
+                    for previous in conn.execute(
+                        """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
+                             supersedes_id from result_set where id = %s""",
+                        [federal],
                     ).fetchall():
-                        cs.add("note", id=note, entity_id=federal, kind=kind, body_md=body)
-                for previous in conn.execute(
-                    """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
-                         supersedes_id from result_set where id = %s""",
-                    [federal],
-                ).fetchall():
-                    cs.add(
-                        "result_set",
-                        **dict(
-                            zip(
-                                (
-                                    "id",
-                                    "election_id",
-                                    "contest_id",
-                                    "stage",
-                                    "kind",
-                                    "status",
-                                    "source_id",
-                                    "as_of",
-                                    "completeness",
-                                    "supersedes_id",
-                                ),
-                                previous,
-                                strict=True,
-                            )
-                        ),
-                        is_default=False,
-                    )
+                        cs.add(
+                            "result_set",
+                            **dict(
+                                zip(
+                                    (
+                                        "id",
+                                        "election_id",
+                                        "contest_id",
+                                        "stage",
+                                        "kind",
+                                        "status",
+                                        "source_id",
+                                        "as_of",
+                                        "completeness",
+                                        "supersedes_id",
+                                    ),
+                                    previous,
+                                    strict=True,
+                                )
+                            ),
+                            is_default=False,
+                        )
                 official = cs.key(f"{SOURCE}.result_set", key)
                 final = rounds[-1]
                 winner = max((label for label in final if label is not None), key=lambda label: final[label])
@@ -497,7 +762,7 @@ def emit() -> Path:
                         )
                 values = pl.DataFrame(
                     [
-                        (DISTRICT, number, label, tally.get(label, 0))
+                        ("top", number, label, tally.get(label, 0))
                         for number, tally in enumerate(rounds, 1)
                         for label in rounds[0]
                         if label in tally or label in rounds[number - 2]
@@ -505,30 +770,49 @@ def emit() -> Path:
                     schema={"town": pl.String, "round": pl.Int16, "label": pl.String, "votes": pl.Int64},
                     orient="row",
                 )
-                sets.append((official, True, OFFICIAL + ("" if first is None else FIRST), values, 0))
+                sets.append((official, True, where(OFFICIAL + ("" if first is None else FIRST)), values, 0))
 
-            rows = tallies.filter(pl.col("key") == key).with_columns(pl.col("town").fill_null(OTHER))
-            towns = sorted(set(rows["town"]) - {OTHER})
-            cs.frame(
-                "reporting_unit_area",
-                pl.DataFrame(
-                    {
-                        "unit_id": [str(cs.unit("us.town", code)) for code in towns],
-                        "area_id": str(district),
-                        "valid_from": day,
-                        "valid_to": day + timedelta(days=1),
-                    }
-                ),
-            )
-            sets.append(
-                (
-                    cs.key(f"{SOURCE}.result_set", f"{key}:municipalities"),
-                    False,
-                    DERIVED + (EXACT if first is None else EXACT_FINAL),
-                    rows.group_by("town", "round", "label").agg(pl.col("votes").sum()),
-                    1,
+            rows = tallies.filter(pl.col("key") == key).with_columns(pl.col("town").fill_null("other"))
+            towns = sorted(set(rows["town"]) - {"other"})
+            if len(towns) > 1:
+                other = cs.unit("us.aggregate", rest)
+                if other not in aggregates:
+                    aggregates.add(other)
+                    cs.add(
+                        "reporting_unit",
+                        id=other,
+                        polity_id=state,
+                        scheme_code="us.aggregate",
+                        code=rest,
+                        area_relation="within",
+                        area_id=area,
+                        kind="aggregate",
+                        valid_from=None,
+                    )
+                if scheme != "us.state":
+                    cs.frame(
+                        "reporting_unit_area",
+                        pl.DataFrame(
+                            {
+                                "unit_id": [str(cs.unit("us.town", town)) for town in towns],
+                                "area_id": str(area),
+                                "valid_from": day,
+                                "valid_to": day + timedelta(days=1),
+                            }
+                        ),
+                    )
+                sets.append(
+                    (
+                        cs.key(f"{SOURCE}.result_set", f"{key}:municipalities"),
+                        False,
+                        where(
+                            DERIVED
+                            + (EXACT_GOVERNOR if scheme == "us.state" else EXACT if first is None else EXACT_FINAL)
+                        ),
+                        rows.group_by("town", "round", "label").agg(pl.col("votes").sum()),
+                        1,
+                    )
                 )
-            )
 
             for result_set, default, note, values, flags in sets:
                 cs.add(
@@ -547,14 +831,8 @@ def emit() -> Path:
                     continue
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
                 units = {
-                    code: str(
-                        cs.unit("us.cd", code, day)
-                        if code == DISTRICT
-                        else other
-                        if code == OTHER
-                        else cs.unit("us.town", code)
-                    )
-                    for code in values["town"].unique()
+                    town: str(top if town == "top" else other if town == "other" else cs.unit("us.town", town))
+                    for town in values["town"].unique()
                 }
                 unknown = set(values["label"].drop_nulls()) - set(options)
                 if unknown:
@@ -566,11 +844,11 @@ def emit() -> Path:
                             frame,
                             pl.DataFrame(
                                 {
-                                    "town": [DISTRICT],
+                                    "town": ["top"],
                                     "round": [0],
                                     "label": ["ballots"],
                                     "votes": [total],
-                                    "unit_id": [units[DISTRICT]],
+                                    "unit_id": [units["top"]],
                                 },
                                 schema=frame.schema,
                             ),
