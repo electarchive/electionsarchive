@@ -347,14 +347,23 @@
     >
       {#each polity.latest.races as race, index (index)}
         {const isSeated = $derived(race.contested > 1)}
+        {const stripped = $derived(
+          race.name
+            .replace(/^\d{4} /u, "")
+            .replace(new RegExp(`^${RegExp.escape(polity.name)} `, "u"), "")
+            .replace(/ election$/u, ""),
+        )}
+        {const label = $derived(
+          stripped.charAt(0).toUpperCase() + stripped.slice(1),
+        )}
         <li class="grid content-start gap-1.5">
           <p class="text-sm font-semibold text-pretty">
             {#if race.path == null}
-              {race.name}
+              {label}
             {:else}
               <Preview
                 class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                path={race.path}>{race.name}</Preview
+                path={race.path}>{label}</Preview
               >
             {/if}
           </p>
