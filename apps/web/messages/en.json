@@ -788,6 +788,7 @@
   "polity_versus_lede": "Margins in {place} next to {parent} as a whole for the two most recent shared races.",
   "polity_versus_all": "Compare {place} with {parent} in every race",
   "person_lede": "Won {won} of {count} elections between {first} and {last}.",
+  "person_lede_advanced": "Won {won} and advanced from {advanced} of {count} races between {first} and {last}.",
   "person_lede_single": "Ran in one election in {year}.",
   "person_served": "Served in",
   "person_served_span": "{from}–{to}",

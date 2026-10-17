@@ -23,6 +23,9 @@
   const entries = $derived(
     person.record.map((entry) => ({
       ...entry,
+      name: entry.name.startsWith(`${entry.year} `)
+        ? entry.name.slice(String(entry.year).length + 1)
+        : entry.name,
       share:
         entry.votes == null || entry.total == null || entry.total === 0
           ? null
@@ -33,6 +36,9 @@
     entries.filter(
       (entry) => entry.outcome === "elected" || entry.outcome === "won",
     ).length,
+  );
+  const advanced = $derived(
+    entries.filter((entry) => entry.outcome === "advanced").length,
   );
   const years = $derived(entries.map((entry) => entry.year));
   const today = new Date().toISOString().slice(0, 10);
@@ -119,8 +125,9 @@
           >
             {entries.length === 1
               ? m.person_lede_single({ year: String(years[0]) })
-              : m.person_lede({
+              : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
                   won: count(won),
+                  advanced: count(advanced),
                   count: count(entries.length),
                   first: String(Math.min(...years)),
                   last: String(Math.max(...years)),
@@ -209,7 +216,7 @@
                     >
                   {/if}
                 </span>
-                {#if entry.party != null}
+                {#if entry.party != null && entry.party.id !== person.party?.id}
                   <Name
                     class="justify-self-start text-[0.8125rem] text-muted-foreground"
                     label={entry.party.label}

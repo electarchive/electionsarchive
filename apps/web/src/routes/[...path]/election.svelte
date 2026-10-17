@@ -960,6 +960,9 @@
       .slice(0, 2)
       .toSorted((a, b) => bar.parts.indexOf(a) - bar.parts.indexOf(b)),
   )}
+  {const isCrowded = $derived(
+    bar.isCount && bar.parts.filter((part) => part.value > 0).length > 2,
+  )}
   <div class="grid gap-1.5">
     <div class="flex items-end justify-between gap-4">
       {#each shown as part, at (part.key)}
@@ -977,6 +980,12 @@
           <span
             class="flex items-baseline gap-1.5 text-[0.9375rem] font-semibold min-inline-0"
           >
+            {#if isCrowded}
+              <span
+                class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
+                style:background-color={part.color}
+              ></span>
+            {/if}
             <span class="truncate">{part.label}</span>
             {#if part.delta !== undefined}
               <span

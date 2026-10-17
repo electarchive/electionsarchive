@@ -14,6 +14,12 @@
 
   const race = $derived(lead.data ?? null);
   const isSeated = $derived(race != null && race.contested > 1);
+  const isCrowded = $derived(
+    race != null &&
+      race.results.filter((row) =>
+        isSeated ? (row.seats ?? 0) > 0 : row.share > 0.005,
+      ).length > 2,
+  );
 </script>
 
 <span class="grid gap-1.5 block-19">
@@ -29,11 +35,21 @@
             class="font-figures text-[1.75rem] leading-none font-[780] tracking-[-0.02em]"
             >{isSeated ? count(row.seats ?? 0) : percent(row.share)}</span
           >
-          <span class="truncate text-[0.875rem] font-semibold max-inline-full"
-            >{isSeated && row.person == null
-              ? (row.short ?? row.label)
-              : row.label}</span
+          <span
+            class="flex items-baseline gap-1.5 text-[0.875rem] font-semibold max-inline-full"
           >
+            {#if isCrowded}
+              <span
+                class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
+                style:background={swatch(row.color, row.key)}
+              ></span>
+            {/if}
+            <span class="truncate"
+              >{isSeated && row.person == null
+                ? (row.short ?? row.label)
+                : row.label}</span
+            >
+          </span>
         </span>
       {/each}
     </span>
