@@ -27,6 +27,8 @@ FILE = "https://archive.org/download/{item}/{item}.pdf"
 DIGITIZED = 8
 DERIVED = 1
 VOLUMES = {
+    1904: ("manualforuseofle00newy_12", 1905, date(1904, 11, 8), range(826, 847), True),
+    1906: ("manualforuseofle00newy_14", 1908, date(1906, 11, 6), range(858, 885), True),
     1912: ("manualforuseofle1913newy", 1913, date(1912, 11, 5), range(722, 744), True),
     1926: ("manualforuseofle0000robe", 1927, date(1926, 11, 2), range(897, 909), False),
 }
@@ -159,20 +161,28 @@ def parse() -> None:
                 for r, c, value, again in disputed:
                     if (r, c) not in settled:
                         failed.append(f"{year} district {table['district']} row {r} column {c}: {value} or {again}")
+                unbalanced: list[tuple[int | None, str]] = []
                 for r in range(len(table["rows"])):
                     if (
                         whole is not None
                         and all((r, k) in settled for k in range(len(columns)))
                         and sum(settled[(r, k)] or 0 for k in range(whole)) != (settled[(r, whole)] or 0)
                     ):
-                        failed.append(f"{year} district {table['district']} row {r}: the row does not add up")
+                        unbalanced.append((r, f"row {r}: the row does not add up"))
                 for c in range(len(columns)):
                     if (
                         totals
                         and all((k, c) in settled for k in [*lines, totals[0]])
                         and sum(settled[(k, c)] or 0 for k in lines) != (settled[(totals[0], c)] or 0)
                     ):
-                        failed.append(f"{year} district {table['district']} {columns[c]}: the column does not add up")
+                        unbalanced.append(
+                            (None if c == whole else totals[0], f"{columns[c]}: the column does not add up")
+                        )
+                for _, problem in unbalanced:
+                    if all(r == totals[0] for r, _ in unbalanced):
+                        print(f"{year} district {table['district']} {problem} (misprinted total, not emitted)")
+                    else:
+                        failed.append(f"{year} district {table['district']} {problem}")
                 found = {
                     (r, c): list(
                         dict.fromkeys(
@@ -192,6 +202,11 @@ def parse() -> None:
                             merged.append(box)
                     boxes[key] = merged
                 anchors = {key: merged[0] for key, merged in boxes.items() if len(merged) == 1}
+                if len(lines) == 1 and totals:
+                    for c in range(len(columns)):
+                        pair = sorted(boxes.get((lines[0], c), []), key=lambda b: b[1])
+                        if len(pair) == 2 and pair == sorted(boxes.get((totals[0], c), []), key=lambda b: b[1]):
+                            anchors[(lines[0], c)], anchors[(totals[0], c)] = pair
                 for _ in range(2):
                     if not anchors:
                         break
@@ -233,6 +248,13 @@ def parse() -> None:
                     if left and right:
                         lo, hi = max(left), min(right)
                         xs[c] = xs[lo] + (xs[hi] - xs[lo]) * (c - lo) / (hi - lo)
+                    elif len(xs) >= 2:
+                        step = statistics.median(xs[b] - xs[a] for a, b in zip(sorted(xs), sorted(xs)[1:]))
+                        xs[c] = (
+                            xs[min(right)] - step * (min(right) - c)
+                            if right
+                            else xs[max(left)] + step * (c - max(left))
+                        )
                 for r, c, county, value, again in cells:
                     votes = settled.get((r, c))
                     if votes is None or columns[c] == "Whole":
@@ -399,6 +421,8 @@ def emit() -> Path:
                     picked[int(column)] = exact[0]
                 elif len({option for option, _ in named}) == 1:
                     picked[int(column)] = named[0][0]
+                elif not named and len(same := [o for o, k, _, t in known if k == "candidate" and t == summed]) == 1:
+                    picked[int(column)] = same[0]
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
             if result_set not in cs.minted:
                 continue
