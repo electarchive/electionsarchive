@@ -26,6 +26,11 @@ SF_NOTE = (
     "ALGED lists San Francisco's supervisor races twice, under the city and under the county. This set holds the"
     " county copy's figures, kept as a non-default set when the two copies were merged into this contest."
 )
+CITYWIDE = {"4159000": (2024, "[0-9]+"), "5363000": (2015, "[1-7]"), "5322640": (2019, "[1-5]")}
+CITYWIDE_NOTE = (
+    "ALGED numbers this citywide seat as a district. The seat was elected by the whole city before the city's first district"
+    " election, so the archive shows the contest and its results on the city."
+)
 FREE = "Public record; free download from the city's open data portal, no license stated"
 PUBLISHERS = {
     "chicago": (
@@ -1508,7 +1513,7 @@ def emit() -> Path:
         for code, id in conn.execute(
             """select c.code, a.id from area a join area_code c on c.area_id = a.id
                where a.scheme_code = 'us.local_district' and split_part(c.code, ':', 2) = any(%s)
-                 and split_part(c.code, ':', 3) not in ('mayor', 'board-of-education')""",
+                 and split_part(c.code, ':', 3) in ('council', 'board-of-aldermen')""",
             [list(PLANS)],
         ).fetchall():
             geoid, label = code.split(":")[1], code.split(":")[3]
@@ -1580,6 +1585,98 @@ def emit() -> Path:
                     source_id=sources[(geoid, plan)],
                 )
         print(f"{shaped} geometry versions on {len({id for ids in areas.values() for id in ids})} candidate areas")
+        moved = 0
+        for geoid, (first, seats) in CITYWIDE.items():
+            place = cs.area("us.place", geoid)
+            city = cs.unit("us.place", geoid)
+            for contest, election, kind, area in conn.execute(
+                """select ct.id, ct.election_id, ct.kind::text, ct.district_area_id from contest ct
+                   join election e on e.id = ct.election_id join area_code c on c.area_id = ct.district_area_id
+                   where c.code ~ %s and e.date_from < %s
+                     and not exists (select from entity_merge m where m.entity_id = ct.id)""",
+                [f"^[0-9]{{2}}:{geoid}:council:district-{seats}$", date(first, 1, 1)],
+            ).fetchall():
+                moved += 1
+                cs.add("contest", id=contest, election_id=election, kind=kind, district_area_id=place)
+                for note, note_kind in conn.execute(
+                    "select id, kind::text from note where entity_id = %s and body_md like 'Only part of the %%'",
+                    [contest],
+                ).fetchall():
+                    cs.add("note", id=note, entity_id=contest, kind=note_kind, body_md=CITYWIDE_NOTE)
+                for id, k, stage, set_kind, source, as_of, completeness, is_default in conn.execute(
+                    """select r.id, r.k, r.stage::text, r.kind::text, r.source_id, r.as_of, r.completeness, r.is_default
+                       from result_set r where r.contest_id = %s and r.status = 'active' and exists (
+                         select from result_value v join reporting_unit u on u.k = v.unit_k
+                         where v.result_set_k = r.k and u.area_id = %s)""",
+                    [contest, area],
+                ).fetchall():
+                    common = {
+                        "election_id": election,
+                        "contest_id": contest,
+                        "stage": stage,
+                        "kind": set_kind,
+                        "source_id": source,
+                        "as_of": as_of,
+                        "completeness": completeness,
+                    }
+                    cs.add("result_set", id=id, status="superseded", is_default=False, **common)
+                    result_set = cs.key(f"{SOURCE}.result_set", f"citywide:{id}")
+                    cs.add(
+                        "result_set",
+                        id=result_set,
+                        status="active",
+                        is_default=is_default,
+                        supersedes_id=id,
+                        **common,
+                    )
+                    cs.frame(
+                        "result_value",
+                        pl.DataFrame(
+                            [
+                                {
+                                    "result_set_id": str(result_set),
+                                    "unit_id": str(city if unit_area == area else unit),
+                                    "option_id": None if option is None else str(option),
+                                    "channel": channel,
+                                    "measure": measure,
+                                    "count_round": count_round,
+                                    "flags": flags,
+                                    "value": float(value),
+                                }
+                                for unit, unit_area, option, channel, measure, count_round, flags, value in conn.execute(
+                                    """select u.id, u.area_id, o.id, v.channel, v.measure, v.count_round, v.flags, v.value
+                                       from result_value v join reporting_unit u on u.k = v.unit_k
+                                       left join contest_option o on o.k = v.option_k and v.option_k <> 0
+                                       where v.result_set_k = %s""",
+                                    [k],
+                                ).fetchall()
+                            ],
+                            schema={
+                                "result_set_id": pl.String,
+                                "unit_id": pl.String,
+                                "option_id": pl.String,
+                                "channel": pl.Int16,
+                                "measure": pl.Int16,
+                                "count_round": pl.Int16,
+                                "flags": pl.Int16,
+                                "value": pl.Float64,
+                            },
+                        ),
+                    )
+                    for option, outcome, outcome_seats, notes, candidacy in conn.execute(
+                        "select option_id, kind::text, seats, notes, candidacy_id from outcome where result_set_id = %s",
+                        [id],
+                    ).fetchall():
+                        cs.add(
+                            "outcome",
+                            result_set_id=result_set,
+                            option_id=option,
+                            kind=outcome,
+                            seats=outcome_seats,
+                            notes=notes,
+                            candidacy_id=candidacy,
+                        )
+        print(f"{moved} citywide seat contests moved to their city")
         for duplicate, survivor in conn.execute(
             """select a.area_id, b.area_id from area_code a
                join area_code b on b.code = replace(a.code, '06075:board-of-supervisors', '0667000:council')

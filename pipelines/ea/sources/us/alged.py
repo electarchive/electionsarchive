@@ -286,13 +286,17 @@ def emit() -> Path:
             value
             for (value,) in conn.execute(
                 """select h.value from external_id_history h join entity_merge m on m.entity_id = h.entity_id
-                   where h.scheme = 'us.contest' and h.value like 'alged:%'"""
+                   where h.scheme = 'us.contest' and h.value like 'alged:%'
+                   union
+                   select x.value from external_id x join contest c on c.id = x.entity_id
+                   join changeset s on s.id = c.changeset_id
+                   where x.scheme = 'us.contest' and x.value like 'alged:%' and s.pipeline = 'us.wards'"""
             )
         }
         for (contest_id,), rows in frame.sort("contest", "votes", descending=[False, True]).group_by(
             "contest", maintain_order=True
         ):
-            # us.wards merged these duplicates (San Francisco's county supervisor copies); their keys now name the survivors
+            # us.wards owns these: San Francisco's merged county supervisor copies, and citywide seats ALGED numbers as districts
             if f"alged:{contest_id}" in merged:
                 continue
             first = rows.row(0, named=True)
