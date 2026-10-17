@@ -1,5 +1,6 @@
 import re
 from collections import defaultdict
+from collections.abc import Callable
 from pathlib import Path
 from uuid import UUID
 
@@ -302,9 +303,18 @@ def parse() -> None:
     print(races.group_by("year").len().sort("year"))
 
 
-def emit() -> Path:
-    returns = pl.read_parquet(PARSED / "returns.parquet").filter(pl.col("measure") == 1)
-    races = pl.read_parquet(PARSED / "races.parquet")
+def emit(
+    pipeline: str = SOURCE,
+    version: str = VERSION,
+    parsed: Path = PARSED,
+    summary: str = "Statewide executive, judicial, and board elections 2016–2024 by county from MEDSL's precinct returns",
+    cite: Callable[[Changeset], dict[str, UUID]] | None = None,
+    method: str = METHOD,
+    absent: str = MISSING,
+    close: str = CLOSE,
+) -> Path:
+    returns = pl.read_parquet(parsed / "returns.parquet").filter(pl.col("measure") == 1)
+    races = pl.read_parquet(parsed / "races.parquet")
     days = sorted({str(day) for day in races["day"].unique()})
     with connect() as conn:
         existing: dict[tuple[str, str], dict[str, list[list[str]]]] = defaultdict(lambda: defaultdict(list))
@@ -349,14 +359,14 @@ def emit() -> Path:
                            where v.result_set_k = r.k and v.measure = 1 and v.count_round = 0)
                    from external_id x join result_set r on r.id = x.entity_id and r.is_default
                    where x.scheme = %s""",
-                [f"{SOURCE}.result_set"],
+                [f"{pipeline}.result_set"],
             ).fetchall()
         }
         cs = Changeset(
             conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="Statewide executive, judicial, and board elections 2016–2024 by county from MEDSL's precinct returns",
+            pipeline=pipeline,
+            version=version,
+            summary=summary,
             polity="US",
         )
 
@@ -391,8 +401,8 @@ def emit() -> Path:
             ]
             return re.sub(r"[^a-z]", "", slug(words[-1])) if words else ""
 
-        sources: dict[int, UUID] = {}
-        for year, (text, doi) in TITLES.items():
+        sources: dict[int | str, UUID] = {} if cite is None else dict(cite(cs))
+        for year, (text, doi) in TITLES.items() if cite is None else ():
             sources[year] = cs.source(medsl_state.PUBLISHER, text)
             if sources[year] in cs.minted:
                 raise ValueError(f"no source {text}")
@@ -540,7 +550,7 @@ def emit() -> Path:
             cs.add("slug", path=path, entity_id=contest)
             total = int(lines["votes"].sum())
             result_set = cs.key(
-                f"{SOURCE}.result_set",
+                f"{pipeline}.result_set",
                 contest_key
                 if revised is None
                 else f"{contest_key}:{total}"
@@ -556,7 +566,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources[year],
+                source_id=sources[year if cite is None else state],
                 is_default=True,
                 supersedes_id=None if revised is None else revised[0],
                 completeness=None,
@@ -579,13 +589,13 @@ def emit() -> Path:
                     "select option_id, kind, seats from outcome where result_set_id = %s", [revised[0]]
                 ).fetchall():
                     outcomes.append((revised[0], option, kind, seats))
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=method)
             if missing > 0:
                 cs.add(
                     "note",
                     entity_id=result_set,
                     kind="caveat",
-                    body_md=MISSING.format(counties=f"{missing} of the state's {row['counties']} counties"),
+                    body_md=absent.format(counties=f"{missing} of the state's {row['counties']} counties"),
                 )
             totals: list[tuple[int, UUID]] = []
             members: dict[int, list[int]] = defaultdict(list)
@@ -619,7 +629,7 @@ def emit() -> Path:
                 )
                 if not (pooled or nota):
                     person_key = f"{state}:{slug(str(candidate))}"
-                    person = cs.key(f"{SOURCE}.person", person_key)
+                    person = cs.key(f"{pipeline}.person", person_key)
                     if person in cs.minted and person_key not in persons:
                         persons.add(person_key)
                         cs.add("person", id=person)
@@ -689,15 +699,15 @@ def emit() -> Path:
                     if len(lost) > 1:
                         cs.merge(old, root)
                     cs.merge(cs.key("us.candidacy", f"{gone_key}:head"), cs.key("us.candidacy", f"{option_key}:head"))
-                    folds.setdefault(cs.key(f"{SOURCE}.person", f"{state}:{slug(gone)}"), []).append(
-                        cs.key(f"{SOURCE}.person", f"{state}:{slug(str(candidate))}")
+                    folds.setdefault(cs.key(f"{pipeline}.person", f"{state}:{slug(gone)}"), []).append(
+                        cs.key(f"{pipeline}.person", f"{state}:{slug(str(candidate))}")
                     )
             if missing > 0:
                 continue
             totals.sort(key=lambda pair: -pair[0])
             if len(totals) > magnitude and totals[magnitude - 1][0] - totals[magnitude][0] <= total * 0.005:
                 print(f"{contest_key}: within half a percent, no outcome")
-                cs.add("note", entity_id=result_set, kind="caveat", body_md=CLOSE)
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=close)
                 continue
             if state in MAJORITY and totals and totals[0][0] * 2 <= total:
                 for _, root in totals[:2]:
@@ -744,5 +754,5 @@ def emit() -> Path:
                 "key": pl.String,
             },
             orient="row",
-        ).write_parquet(PARSED / "contests.parquet")
+        ).write_parquet(parsed / "contests.parquet")
         return cs.write()
