@@ -270,10 +270,33 @@
       for (const row of winners) {
         total += row.seats ?? 0;
       }
+      const loose = winners.filter(
+        (row) => row.party == null && row.key.startsWith("person:"),
+      );
+      let unaffiliated = 0;
+      for (const row of loose) {
+        unaffiliated += row.seats ?? 0;
+      }
+      const grouped =
+        loose[0] == null || loose.length < 2
+          ? winners
+          : [
+              ...winners.filter((row) => !loose.includes(row)),
+              {
+                ...loose[0],
+                key: "independents",
+                label: m.seats_independents(),
+                short: null,
+                color: null,
+                lean: null,
+                person: null,
+                seats: unaffiliated,
+              },
+            ];
       const seated =
         race.count === 1 && total <= 1 && race.kind !== "elector_slate"
           ? []
-          : winners;
+          : grouped;
       const units = Map.groupBy(
         seated,
         (row) =>

@@ -440,6 +440,7 @@
   "lists_reason_expelled": "was expelled",
   "lists_reason_disqualified": "was disqualified",
   "lists_reason_lost_seat": "lost the seat",
+  "seats_independents": "Independent",
   "lists_independents": "Independent candidates",
   "lists_rank": "Rank {position}",
   "term_cut": "The line after the last member elected from a list. Members above it took the list's seats in rank order.",
