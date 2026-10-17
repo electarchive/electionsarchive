@@ -277,7 +277,7 @@
         {#each sides as side, index (side.id)}
           <polyline
             points={side.marks
-              .filter((mark) => mark.share != null)
+              .filter((mark) => mark.share != null && mark.kind !== "primary")
               .toSorted((a, b) => a.at - b.at)
               .map((mark) => `${sx(mark.at)},${sy(mark.share ?? 0)}`)
               .join(" ")}
@@ -288,6 +288,9 @@
         {/each}
         {#each marks as mark (mark.id)}
           <g
+            class={cn({
+              "opacity-45": mark.kind === "primary" && focus !== mark,
+            })}
             transform="translate({sx(mark.at) - (focus === mark ? 7 : 5)} {sy(
               mark.share ?? 0,
             ) - (focus === mark ? 7 : 5)})"
