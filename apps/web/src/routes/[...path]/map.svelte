@@ -371,6 +371,17 @@
           ? 100
           : (STRENGTHS[bin(row.margin)] ?? 100);
       let tone = colors[row.leader] ?? "var(--muted-foreground)";
+      const [red = 0, green = 0, blue = 0] = (
+        /\d+, \d+, \d+/u.exec(read(tone))?.[0] ?? ""
+      )
+        .split(", ")
+        .map(Number);
+      if (
+        !dimmed &&
+        Math.max(red, green, blue) - Math.min(red, green, blue) < 24
+      ) {
+        strength = 100;
+      }
       if (view === "bubbles") {
         strength = dimmed ? 18 : 100;
       }
