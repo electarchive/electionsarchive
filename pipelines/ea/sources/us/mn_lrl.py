@@ -2,6 +2,7 @@ import difflib
 import html
 import itertools
 import re
+import statistics
 import subprocess
 from pathlib import Path
 from uuid import UUID
@@ -19,7 +20,102 @@ URL = "https://www.lrl.mn.gov/archive/sessions/electionresults/{}-g-sec.pdf"
 PUBLISHER = "Minnesota Secretary of State"
 TITLE = "Minnesota Election Results, by county"
 WRITE_IN = ("Write-in", None)
+UNNAMED = ("American Party, no candidates specified", "A")
 TABLES = {
+    "1976-11-02": [
+        (
+            "president",
+            4,
+            6,
+            {
+                3: ("Gerald Ford", "IR"),
+                4: ("Jimmy Carter", "DFL"),
+                5: ("Peter Camejo", "SW"),
+                6: ("Roger MacBride", "LIB"),
+                7: ("Gus Hall", "C"),
+                8: ("Jules Levin", "IG"),
+                9: ("Tom Anderson", "AM"),
+                10: ("Eugene McCarthy", None),
+                11: ("Lyndon LaRouche", "IDB"),
+                12: ("Frank Zeidler", "SP"),
+                13: ("Margaret Wright", "PP"),
+            },
+        ),
+        (
+            "senate",
+            4,
+            6,
+            {
+                15: ("Jerry Brekke", "IR"),
+                16: ("Hubert H. Humphrey", "DFL"),
+                17: ("Bill Peterson", "SW"),
+                18: ("Robin E. Miller", "LIB"),
+                19: ("Matt Savola", "C"),
+                20: ("Paul Helm", "AM"),
+            },
+        ),
+    ],
+    "1978-11-07": [
+        (
+            "senate:special",
+            2,
+            3,
+            {
+                3: ("Paul Helm", "AM"),
+                4: ("David Durenberger", "IR"),
+                5: ("Bob Short", "DFL"),
+                6: ("Christine Frank", "SW"),
+                7: ("Fred G. Hewitt", "LP"),
+            },
+        ),
+        (
+            "senate",
+            2,
+            3,
+            {
+                8: ("Sal Carlone", "AM"),
+                9: ("Rudy Boschwitz", "IR"),
+                10: ("Wendell Anderson", "DFL"),
+                11: ("Bill Peterson", "SW"),
+                12: ("Leonard Richards", "LP"),
+                13: ("Jean T. Brust", "WP"),
+                14: ("Brian John Coyle", "PI"),
+            },
+        ),
+        (
+            "governor",
+            2,
+            3,
+            {
+                15: ("Richard Pedersen", "AM"),
+                16: ("Al Quie", "IR"),
+                17: ("Rudy Perpich", "DFL"),
+                18: ("Jill Lakowske", "SW"),
+                19: ("Tom McDonald", "HG"),
+                20: ("Robin E. Miller", "LP"),
+                21: ("Edwin C. Pommerening", "SA"),
+            },
+        ),
+    ],
+    "1980-11-04": [
+        (
+            "president",
+            2,
+            3,
+            {
+                3: UNNAMED,
+                4: ("Jimmy Carter", "DFL"),
+                5: ("Ronald Reagan", "IR"),
+                6: ("Ed Clark", "LIB"),
+                7: ("Clifton DeBerry", "SW"),
+                8: ("Deirdre Griswold", "WW"),
+                9: ("Gus Hall", "C"),
+                10: ("John Anderson", None),
+                11: ("David McReynolds", "SP"),
+                12: ("Barry Commoner", "CP"),
+            },
+        ),
+    ],
     "1982-11-02": [
         (
             "senate",
@@ -46,6 +142,37 @@ TABLES = {
             },
         ),
     ],
+    "1984-11-06": [
+        (
+            "president",
+            2,
+            3,
+            {
+                3: ("Ronald Reagan", "IR"),
+                4: ("Walter F. Mondale", "DFL"),
+                5: ("Mel Mason", "SWP"),
+                6: ("David Bergland", "LIB"),
+                7: ("Lyndon LaRouche", None),
+                8: ("Gus Hall", None),
+                9: ("Ed Winn", None),
+                10: ("Bob Richards", None),
+                11: ("Sonia Johnson", None),
+                12: ("Dennis Serrette", None),
+            },
+        ),
+        (
+            "senate",
+            2,
+            3,
+            {
+                13: ("Rudy Boschwitz", "IR"),
+                14: ("Joan Anderson Growe", "DFL"),
+                15: ("Eleanor Garcia", "SWP"),
+                16: ("Jeffrey M. Miller", None),
+                17: ("Richard Putman", None),
+            },
+        ),
+    ],
     "1986-11-04": [
         (
             "governor",
@@ -59,6 +186,39 @@ TABLES = {
                 7: ("Joseph A. Rohner III", "LIB"),
             },
         )
+    ],
+    "1988-11-08": [
+        (
+            "president",
+            2,
+            3,
+            {
+                3: ("George Bush", "IR"),
+                4: ("Michael Dukakis", "DFL"),
+                5: ("James Warren", "SWP"),
+                6: ("Lenora Fulani", None),
+                7: ("Lyndon LaRouche", None),
+                8: ("Jack Herer", "GRP"),
+                9: ("Ron Paul", "LIB"),
+                10: ("Ed Winn", None),
+                11: ("Delmar Dennis", None),
+                12: ("David Duke", None),
+                13: ("Eugene McCarthy", None),
+            },
+        ),
+        (
+            "senate",
+            2,
+            3,
+            {
+                14: ("Dave Durenberger", "IR"),
+                15: ("Hubert H. Humphrey III", "DFL"),
+                16: ("Derrick P. Grimmer", "GRP"),
+                17: ("Wendy Lyons", "SWP"),
+                18: ("Arlen Overvig", "LIB"),
+                19: ("Polly Mann", None),
+            },
+        ),
     ],
     "1990-11-06": [
         (
@@ -197,7 +357,111 @@ TABLES = {
         ),
     ],
 }
+READ = {
+    ("1978-11-07", 2, "Jean T. Brust"): {
+        "Aitkin": 21,
+        "Anoka": 126,
+        "Becker": 37,
+        "Beltrami": 30,
+        "Benton": 41,
+        "Big Stone": 8,
+        "Blue Earth": 44,
+        "Brown": 19,
+        "Carlton": 55,
+        "Carver": 34,
+        "Cass": 28,
+        "Chippewa": 17,
+        "Chisago": 29,
+        "Clay": 40,
+        "Clearwater": 19,
+        "Cook": 24,
+        "Cottonwood": 8,
+        "Crow Wing": 52,
+        "Dakota": 133,
+        "Dodge": 13,
+        "Douglas": 30,
+        "Faribault": 15,
+        "Fillmore": 26,
+        "Freeborn": 36,
+        "Goodhue": 35,
+        "Grant": 2,
+        "Hennepin": 599,
+        "Houston": 27,
+        "Hubbard": 16,
+        "Isanti": 21,
+        "Itasca": 109,
+        "Jackson": 14,
+        "Kanabec": 9,
+        "Kandiyohi": 23,
+        "Kittson": 11,
+        "Koochiching": 20,
+        "Lac qui Parle": 8,
+        "Lake": 41,
+        "Lake of the Woods": 7,
+        "Le Sueur": 21,
+        "Lincoln": 10,
+        "Lyon": 34,
+        "Mahnomen": 18,
+        "Marshall": 23,
+        "Martin": 20,
+        "McLeod": 28,
+        "Meeker": 14,
+        "Mille Lacs": 44,
+        "Morrison": 34,
+        "Mower": 37,
+        "Murray": 16,
+        "Nicollet": 14,
+        "Nobles": 22,
+        "Norman": 6,
+        "Olmsted": 36,
+        "Otter Tail": 37,
+        "Pennington": 22,
+        "Pine": 29,
+        "Pipestone": 25,
+        "Polk": 39,
+        "Pope": 19,
+        "Ramsey": 305,
+        "Red Lake": 10,
+        "Redwood": 14,
+        "Renville": 23,
+        "Rice": 45,
+        "Rock": 7,
+        "Roseau": 14,
+        "St. Louis": 430,
+        "Scott": 37,
+        "Sherburne": 53,
+        "Sibley": 15,
+        "Stearns": 132,
+        "Steele": 20,
+        "Stevens": 13,
+        "Swift": 18,
+        "Todd": 33,
+        "Traverse": 3,
+        "Wabasha": 26,
+        "Wadena": 12,
+        "Waseca": 26,
+        "Washington": 116,
+        "Watonwan": 10,
+        "Wilkin": 7,
+        "Winona": 59,
+        "Wright": 60,
+        "Yellow Medicine": 28,
+    }
+}
 FIXES = {
+    ("1976-11-02", 4, "Hennepin", 15): 119121,
+    ("1976-11-02", 4, "Hennepin", 16): 316130,
+    ("1976-11-02", 4, "Hennepin", 17): 2489,
+    ("1976-11-02", 4, "Hennepin", 18): 1630,
+    ("1976-11-02", 4, "Hennepin", 19): 723,
+    ("1976-11-02", 4, "Hennepin", 20): 27435,
+    ("1976-11-02", 4, "TOTAL", 15): 478602,
+    ("1976-11-02", 4, "TOTAL", 19): 2214,
+    ("1976-11-02", 4, "TOTAL", 20): 125612,
+    ("1980-11-04", 2, "Otter Tail", 9): 14,
+    ("1980-11-04", 2, "Otter Tail", 10): 1538,
+    ("1980-11-04", 2, "Pennington", 9): 14,
+    ("1980-11-04", 2, "Pennington", 10): 465,
     ("1992-11-03", 3, "Mahnomen", 8): 483,
     ("1998-11-03", 3, "Beltrami", 5): 5872,
     ("1998-11-03", 3, "Isanti", 6): 2665,
@@ -205,6 +469,9 @@ FIXES = {
     ("1998-11-03", 3, "Lake", 6): 2472,
 }
 MISPRINTS = {
+    ("1976-11-02", 4, "TOTAL", 15): 478611,
+    ("1980-11-04", 2, "TOTAL", 3): 6139,
+    ("1980-11-04", 2, "TOTAL", 4): 954174,
     ("1982-11-02", 6, "Becker", 0): 5158,
     ("1982-11-02", 6, "TOTAL", 0): 715796,
     ("1990-11-06", 5, "Aitkin", 1): 2735,
@@ -213,6 +480,10 @@ MISPRINTS = {
 SHIFTED = {("1990-11-06", 5): {"McLeod": "Martin", "Mahnomen": "McLeod", "Marshall": "Mahnomen", "Martin": "Marshall"}}
 MISPRINTED = "The printed canvass shows {} in {} County; this set uses {:,}, which the statewide total and the other tables support."
 NOTES = {
+    "1976-11-02:MN:senate": "Jerry Brekke's county figures sum to 478,611; the canvass prints a statewide total of "
+    "478,602.",
+    "1980-11-04:MN:president": "The canvass prints statewide totals of 954,173 for Jimmy Carter and 6,138 for the "
+    "American Party line; their county figures sum to 954,174 and 6,139.",
     "1982-11-02:MN:governor": MISPRINTED.format("1,158 votes for Wheelock Whitney", "Becker", 5158)
     + " The printed statewide total, 711,796, carries the same slip.",
     "1990-11-06:MN:governor": MISPRINTED.format("2,753 votes for Arne Carlson", "Aitkin", 2735)
@@ -222,6 +493,12 @@ NOTES = {
     "1998-11-03:MN:governor": MISPRINTED.format("32,564 votes for Norm Coleman", "Washington", 32565),
 }
 PARTIES = {
+    "A": "MN:american",
+    "AM": "MN:american",
+    "C": "MN:communist",
+    "CP": "MN:citizens",
+    "SP": "socialist-party-usa",
+    "WW": "workers-world-party",
     "DFL": "MN:dem-farmer-labor",
     "IR": "MN:independent-republican",
     "R": "republican-party",
@@ -233,6 +510,7 @@ PARTIES = {
     "NLP": "natural-law-party",
     "GRP": "MN:grassroots",
 }
+DEBUG = False
 ZEROS = {"a", "o", "O", "D"}
 
 
@@ -255,6 +533,16 @@ def parse() -> None:
         )
     if len(counties) != 87:
         raise ValueError("Minnesota needs 87 counties")
+    orders = [
+        sorted(
+            counties,
+            key=lambda text, mac=mac, saint=saint: re.sub(
+                "^stl", saint, re.sub(r"^mc" if mac else "^$", "mac", re.sub(r"[^a-z]", "", text.lower()))
+            ),
+        )
+        for mac in (True, False)
+        for saint in ("saintl", "stl", "st l")
+    ]
 
     def plain(text: str) -> str:
         return re.sub(r"[^a-z]", "", text.lower())
@@ -262,9 +550,9 @@ def parse() -> None:
     keys = {plain(county): county for county in counties} | {"saintlouis": "St. Louis"}
 
     def county(text: str) -> str | None:
-        if re.fullmatch(r"[a-z]{0,3}tot[a-z]{0,3}", plain(text)):
+        if re.fullmatch(r"[a-z]{0,3}(state)?tot[a-z]{0,3}", plain(text)):
             return "TOTAL"
-        found = difflib.get_close_matches(plain(text), keys, 1, 0.6)
+        found = difflib.get_close_matches(plain(text), keys, 1, 0.75)
         return keys[found[0]] if found else None
 
     rows: list[dict[str, object]] = []
@@ -318,22 +606,18 @@ def parse() -> None:
                     (y, county(" ".join(word[3] for word in group if not re.fullmatch(r"[.·…,]+", word[3]))))
                     for y, group in lines
                 ]
-                for index in range(1, len(named) - 1):
-                    before, after = named[index - 1][1], named[index + 1][1]
-                    if (
-                        named[index][1] is None
-                        and before in counties
-                        and after in counties
-                        and counties.index(after) - counties.index(before) == 2
-                    ):
-                        named[index] = (named[index][0], counties[counties.index(before) + 1])
                 edge = max(word[2] for y, group in lines for word in group if county(" ".join(w[3] for w in group))) + 2
-                named = [(y, found) for y, found in named if found]
                 tokens = sorted(
                     (
                         word
                         for word in words
-                        if word[0] > edge and word[1] > top and (re.search(r"\d", word[3]) or len(word[3]) <= 3)
+                        if word[0] > edge
+                        and word[1] > top
+                        and (
+                            re.search(r"\d", word[3])
+                            or word[3] == "*"
+                            or (len(word[3]) <= 3 and re.search("[A-Za-z]", word[3]))
+                        )
                     ),
                     key=lambda word: word[2],
                 )
@@ -353,6 +637,51 @@ def parse() -> None:
                         pending[:0] = [across[:cut], across[cut:]]
                     else:
                         found.append(sorted(column, key=lambda word: word[1]))
+                anchors: list[tuple[float, str]] = []
+                order = counties
+                best: tuple[int, float] = (0, 0.0)
+                for candidate in orders:
+                    chains: list[list[tuple[float, str]]] = []
+                    for y, name in named:
+                        if name in candidate:
+                            prior = [chain for chain in chains if candidate.index(chain[-1][1]) < candidate.index(name)]
+                            chains.append([*max(prior, key=len, default=[]), (y, name)])
+                    if not chains:
+                        continue
+                    chain = max(chains, key=len)
+                    steps = [
+                        (after - y) / (candidate.index(later) - candidate.index(name))
+                        for (y, name), (after, later) in itertools.pairwise(chain)
+                    ]
+                    score = (len(chain), -max((abs(step - statistics.median(steps)) for step in steps), default=0))
+                    if score > best:
+                        best, anchors, order = score, chain, candidate
+                grid = list(anchors)
+                for (y, name), (after, later) in itertools.pairwise(anchors):
+                    gap = order.index(later) - order.index(name)
+                    grid.extend(
+                        (y + (after - y) * step / gap, order[order.index(name) + step]) for step in range(1, gap)
+                    )
+                spacing = (anchors[-1][0] - anchors[0][0]) / max(
+                    1, order.index(anchors[-1][1]) - order.index(anchors[0][1])
+                )
+                totals = [(y, name) for y, name in named if name == "TOTAL" and y > anchors[-1][0]]
+                longest = max(found, key=len)
+                shift = longest[0][1] - anchors[0][0]
+                beyond = [
+                    word[1] - shift
+                    for word in longest
+                    if word[1] - shift > anchors[-1][0] + spacing / 2
+                    and (not totals or word[1] - shift < totals[0][0] - spacing / 2)
+                ]
+                grid.extend(
+                    (y, order[order.index(anchors[-1][1]) + step])
+                    for step, y in enumerate(beyond, 1)
+                    if order.index(anchors[-1][1]) + step < len(order)
+                )
+                named = sorted([*grid, *totals[:1]])
+                if DEBUG:
+                    print([(round(y, 1), name) for y, name in named])
                 heights = [y for y, _ in named]
                 page: dict[str, list[str]] = {name: [] for _, name in named}
                 for column in (column for column in found if len(column) > len(named) / 3):
@@ -362,7 +691,11 @@ def parse() -> None:
                         index = min(range(len(heights)), key=lambda k: abs(heights[k] + shift - word[1]))
                         if abs(heights[index] + shift - word[1]) <= 3.5:
                             placed.setdefault(named[index][1], []).append(
-                                "0" if word[3] in ZEROS else re.sub(r"[.,*·;'\-]", "", word[3])
+                                "0"
+                                if word[3] in ZEROS
+                                else "*"
+                                if word[3] == "*"
+                                else re.sub(r"[.,*·;:'+\-]", "", word[3])
                             )
                     for name, values in page.items():
                         values.append(" ".join(placed.get(name, ["?"])))
@@ -378,16 +711,25 @@ def parse() -> None:
             if len(cells["TOTAL"]) <= max(columns):
                 raise ValueError(f"{day} {office} pages {first}–{last}: the total row has {cells['TOTAL']}")
             for index, (candidate, party) in columns.items():
-                total = int(MISPRINTS.get((day, first, "TOTAL", index), cells["TOTAL"][index]))
-                values = {
+                total = int(
+                    MISPRINTS.get(
+                        (day, first, "TOTAL", index), FIXES.get((day, first, "TOTAL", index), cells["TOTAL"][index])
+                    )
+                )
+                values = READ.get((day, first, candidate)) or {
                     name: MISPRINTS.get(
                         (day, first, name, index),
                         FIXES.get((day, first, name, index), cells[name][index] if index < len(cells[name]) else "?"),
                     )
                     for name in counties
                 }
-                unread = [name for name, value in values.items() if not re.fullmatch(r"\d+", str(value))]
-                rest = sum(int(value) for name, value in values.items() if name not in unread)
+                absent = [name for name, value in values.items() if value == "*"]
+                unread = [
+                    name
+                    for name, value in values.items()
+                    if name not in absent and not re.fullmatch(r"\d+", str(value))
+                ]
+                rest = sum(int(value) for name, value in values.items() if name not in unread and name not in absent)
                 if len(unread) == 1 and total - rest >= 0:
                     values[unread[0]] = total - rest
                 elif unread or rest != total:
@@ -405,6 +747,7 @@ def parse() -> None:
                         "votes": int(value),
                     }
                     for name, value in values.items()
+                    if name not in absent
                 )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows).write_parquet(PARSED / "lines.parquet")
@@ -417,7 +760,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Minnesota's president, U.S. Senate, and governor by county 1982–1998, "
+            summary="Minnesota's president, U.S. Senate, and governor by county 1976–1998, "
             "from the Secretary of State's results archived by the Legislative Reference Library",
             polity="US",
         )
@@ -426,6 +769,7 @@ def emit() -> Path:
             return re.sub(r"[^a-z]", "", text.lower())
 
         def surname(text: str) -> str:
+            text = re.sub(r"\([^)]*\)", " ", text)
             words = [word for word in text.split() if plain(word) not in {"jr", "sr", "ii", "iii", "iv"}]
             return plain(words[-1]) if words else ""
 
@@ -469,6 +813,8 @@ def emit() -> Path:
             contest = contests[key]
             ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             result_set = cs.key(f"{SOURCE}.result_set", key)
+            if result_set not in cs.minted:
+                continue
             options = conn.execute(
                 """select id, kind, ballot_label from contest_option
                    where contest_id = %s and parent_option_id is null and kind <> 'others'""",
@@ -511,7 +857,17 @@ def emit() -> Path:
                 .agg(pl.col("party").first(), pl.col("votes").sum())
                 .iter_rows()
             ):
-                if candidate == WRITE_IN[0]:
+                if candidate == UNNAMED[0]:
+                    option = cs.key("us.option", f"{key}:legend:A")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="legend",
+                        party_id=parties[party],
+                        ballot_label=candidate,
+                    )
+                elif candidate == WRITE_IN[0]:
                     generic = [option for option, kind, _ in options if kind == "write_in"]
                     option = generic[0] if len(generic) == 1 else cs.key("us.option", f"{key}:write_in:mn_lrl")
                     if option in cs.minted:
@@ -529,8 +885,6 @@ def emit() -> Path:
                     if matches:
                         option = matches[0]
                     else:
-                        if office == "president":
-                            raise ValueError(f"{key}: {candidate} matches no ticket")
                         known = people.get(plain(candidate)) or people.get(
                             f"{plain(candidate.split()[0])}|{surname(candidate)}", set()
                         )
@@ -550,7 +904,7 @@ def emit() -> Path:
                             "contest_option",
                             id=option,
                             contest_id=contest,
-                            kind="candidate",
+                            kind="ticket" if office == "president" else "candidate",
                             party_id=parties.get(party or ""),
                             ballot_label=candidate,
                         )
@@ -583,6 +937,20 @@ def emit() -> Path:
             )
             if key in NOTES:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=NOTES[key])
+            blank = [
+                f"{candidate} in {', '.join(sorted(set(counties) - set(group['county'])))}"
+                for (candidate,), group in lines.group_by("candidate", maintain_order=True)
+                if group.height < len(counties)
+            ]
+            if blank:
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md="The county canvassing boards supplied no figure for "
+                    + "; ".join(blank)
+                    + ". Those counties have no value for those candidates here.",
+                )
             for name, candidate, votes in lines.select("county", "candidate", "votes").iter_rows():
                 cs.add(
                     "result_value",
