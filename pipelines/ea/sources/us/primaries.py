@@ -61,6 +61,7 @@ OHIO = (
 )
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
 OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
+ARKANSAS = "https://enr-results-api.totalresults.com/Contest/{}?cId=arkansas&electionID=1845{}"
 KENTUCKY = "https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf"
 DELAWARE = "https://elections.delaware.gov/reports/PR2024.{}"
 UTAH = "https://electionresults.utah.gov/cdn/results/utah/export-primary06252024.json"
@@ -249,6 +250,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, HAWAII.format(name), suffix=".txt")
     raw.fetch(SOURCE, UTAH, suffix=".json")
     raw.fetch(SOURCE, KENTUCKY, suffix=".pdf")
+    raw.fetch(SOURCE, ARKANSAS.format("GetContestResults", "&contestType=FED"), suffix=".json")
+    raw.fetch(SOURCE, ARKANSAS.format("GetContestSearchList", ""), suffix=".json")
     for suffix in ("html", "csv"):
         raw.fetch(SOURCE, DELAWARE.format(suffix), suffix=f".{suffix}")
     raw.fetch(SOURCE, SUMMIT, suffix=".pdf")
@@ -448,6 +451,7 @@ def parse() -> None:
         ("UT", "county", UTAH),
         ("DE", "precinct", DELAWARE.format("html")),
         ("KY", "county", KENTUCKY),
+        ("AR", "county", ARKANSAS.format("GetContestResults", "&contestType=FED")),
         ("UT", "county", SUMMIT),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
@@ -757,6 +761,29 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif state == "AR":
+            listed = json.loads(raw.cached(SOURCE, ARKANSAS.format("GetContestSearchList", "")).path.read_text())
+            cells = []
+            for number, contest in json.loads(raw.cached(SOURCE, url).path.read_text())["response"]["contests"].items():
+                heading = listed["response"]["contests"][number]["contestName"]
+                labels = listed["response"]["contests"][number]["choices"]
+                summed: dict[str, int] = defaultdict(int)
+                for place in contest["locations"].values():
+                    for choice in place["choices"]:
+                        summed[choice["choiceID"]] += choice["totalVotes"]
+                        cells.append(
+                            {
+                                "county": place["locationId"],
+                                "office": heading.rsplit(" - ", 1)[0],
+                                "district": heading.rsplit(" - ", 1)[0],
+                                "party": heading.rsplit(" - ", 1)[1],
+                                "candidate": re.sub(r"^(Congressman|Senator) ", "", labels[choice["choiceID"]]["name"]),
+                                "votes": str(choice["totalVotes"]),
+                            }
+                        )
+                if any(summed[choice["choiceID"]] != choice["totalVotes"] for choice in contest["choices"]):
+                    raise ValueError(f"AR: the counties do not add up to {heading}'s totals")
+            frame = pl.DataFrame(cells, schema=dict.fromkeys(COLUMNS, pl.String))
         elif url == KENTUCKY:
             pdf = raw.cached(SOURCE, url).path
             cells = []
@@ -1576,7 +1603,7 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE"):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR"):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -1632,6 +1659,8 @@ def parse() -> None:
             if url == KENTUCKY
             else SOUTH_CAROLINA[url]
             if url in SOUTH_CAROLINA
+            else date(2024, 3, 5)
+            if state == "AR"
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1997,6 +2026,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if used in SOUTH_CAROLINA
+                else (
+                    "Arkansas Secretary of State",
+                    "2024 Primary, official results",
+                    "https://arkansas.tally-enr.com/#election=1845",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "AR"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
