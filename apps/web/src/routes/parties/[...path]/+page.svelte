@@ -262,9 +262,10 @@
               <ul class="grid gap-1 text-sm">
                 {#each entries as election, index (index)}
                   {const name = $derived(
-                    year != null && election.name.startsWith(`${year} `)
-                      ? election.name.slice(5)
-                      : election.name,
+                    election.name.replace(
+                      new RegExp(`^(?:\\p{L}+ (?:\\d{1,2}, )?)?${year} `, "u"),
+                      "",
+                    ),
                   )}
                   <li
                     class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"

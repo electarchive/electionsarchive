@@ -253,7 +253,21 @@
           {/if}
         </p>
       </div>
-      {#if series.length > 1}
+      {#if series.length > 4}
+        <select
+          class="rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold keycap block-9 max-inline-full min-inline-0"
+          aria-label={m.record_tabs()}
+          value={current?.id}
+          onchange={(event) => {
+            chosen = event.currentTarget.value;
+            hovered = null;
+          }}
+        >
+          {#each series as entry (entry.id)}
+            <option value={entry.id}>{entry.name}</option>
+          {/each}
+        </select>
+      {:else if series.length > 1}
         <div class="flex flex-wrap" role="group" aria-label={m.record_tabs()}>
           {#each series as entry (entry.id)}
             <button

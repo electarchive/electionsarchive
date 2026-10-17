@@ -370,11 +370,12 @@
           plain.replace(new RegExp(`^${RegExp.escape(polity.name)} `, "u"), ""),
         )}
         {const stripped = $derived(
-          polity.latest.races.some(
-            (other) =>
-              other !== race &&
-              other.name.replace(/ election$/u, "").endsWith(` ${short}`),
-          )
+          polity.parent != null ||
+            polity.latest.races.some(
+              (other) =>
+                other !== race &&
+                other.name.replace(/ election$/u, "").endsWith(` ${short}`),
+            )
             ? plain
             : short,
         )}
