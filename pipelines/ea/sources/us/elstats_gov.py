@@ -9,7 +9,7 @@ from uuid import UUID
 
 import polars as pl
 
-from ea import raw
+from ea import names, raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.elstats import FORMER, GAZETTEER, SEARCH, SUFFIXES, TENANTS, TITLE, plain
 from ea.store import DATA, connect
@@ -76,6 +76,10 @@ ALIASES = {
     ("VT", "orleans"): "barton",
 }
 MAJORITY = {"VT": 9999, "CT": 1901}
+OVERCOUNTED = (
+    "Candidate votes exceed the total votes cast by more than 0.5% in this archive. "
+    "Results from another source are shown by default."
+)
 LEGISLATURE = (
     "No candidate won a majority of the popular vote. Under {state}'s constitution at the time, the legislature chose "
     "the governor."
@@ -175,6 +179,14 @@ def parse() -> None:
                 votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
             )
         )
+    cast = (
+        pl.concat(frames)
+        .filter(pl.col("candidate").str.to_lowercase().is_in(["total votes cast", "total votes"]))
+        .group_by("state", "day", "primary", "candidate")
+        .agg(pl.col("votes").sum())
+        .group_by("state", "day", "primary")
+        .agg(cast=pl.col("votes").max())
+    )
     frame = (
         pl.concat(frames)
         .filter(pl.col("votes").is_not_null() & ~pl.col("candidate").str.to_lowercase().is_in(list(PSEUDO)))
@@ -193,7 +205,17 @@ def parse() -> None:
         f"{coarse['coarse'].sum()} of {coarse.height} contests have a division with no current county or town; "
         "they are stored as state totals"
     )
+    overcounted = (
+        frame.group_by(contest)
+        .agg(pl.col("votes").sum())
+        .join(cast, on=contest, nulls_equal=True)
+        .filter(pl.col("votes") > pl.col("cast") * 1.005)
+    )
+    print(
+        f"{overcounted.height} contests whose candidate votes exceed the archive's total votes cast: {overcounted.rows()}"
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
+    overcounted.write_parquet(PARSED / "overcounted.parquet")
     option = [*contest, "candidate", "pooled"]
     (
         frame.join(coarse, on=contest, nulls_equal=True)
@@ -216,6 +238,7 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "governors.parquet")
+    overcounted = set(pl.read_parquet(PARSED / "overcounted.parquet").select("state", "day", "primary").iter_rows())
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -253,6 +276,15 @@ def emit() -> Path:
             [SOURCE],
         ).fetchall():
             existing.setdefault(key, []).append((option, slug(label or "")))
+        demoted = {
+            result_set
+            for (result_set,) in conn.execute(
+                """select r.id from result_set r join changeset c on c.id = r.changeset_id
+                   join external_id e on e.entity_id = r.id and e.scheme = %s
+                   where c.pipeline <> %s and not r.is_default""",
+                [f"{SOURCE}.result_set", SOURCE],
+            ).fetchall()
+        }
         fptp, two_round = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "two_round")
         if cs.minted & {fptp, two_round}:
             raise ValueError("the fptp and two-round systems must exist")
@@ -315,6 +347,7 @@ def emit() -> Path:
                 name(persons[(state, slug(text))], text)
             return persons[(state, slug(text))]
 
+        folds: dict[UUID, list[UUID]] = {}
         primaries: dict[tuple[str, str], list[date]] = {}
         for state, day, primary in (
             frame.filter(pl.col("primary").is_not_null()).select("state", "day", "primary").unique().iter_rows()
@@ -391,7 +424,54 @@ def emit() -> Path:
                     path=f"us/{state.lower()}/{day}-{kind}/governor{scope}",
                     entity_id=contest,
                 )
+            polled: dict[str, int] = dict(lines.group_by("candidate").agg(pl.col("votes").sum()).iter_rows())
+            named = sorted(
+                {candidate for candidate, pooled in lines.select("candidate", "pooled").iter_rows() if not pooled},
+                key=lambda candidate: (-polled[candidate], candidate),
+            )
+            folded = (
+                {}
+                if reused
+                else {
+                    named[index]: named[survivor]
+                    for index, survivor in names.fold(
+                        [candidate.partition(" and ")[0] if primary is None else candidate for candidate in named]
+                    ).items()
+                }
+            )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            previous = None
+            if folded and result_set not in cs.minted:
+                previous = result_set
+                cs.add(
+                    "result_set",
+                    id=previous,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=sources[state],
+                    is_default=False,
+                    completeness=1,
+                )
+                for option, kind_, seats in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [previous]
+                ).fetchall():
+                    cs.add("outcome", result_set_id=previous, option_id=option, kind=kind_, seats=seats)
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:folded")
+            instead = (
+                conn.execute(
+                    """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.status, r.source_id, r.as_of,
+                              r.completeness, r.supersedes_id
+                       from result_set r join changeset c on c.id = r.changeset_id
+                       where r.contest_id = %s and c.pipeline <> %s and r.stage = 'certified' and r.status = 'active'
+                       order by c.pipeline = 'us.algara' desc, r.k limit 1""",
+                    [contest, SOURCE],
+                ).fetchone()
+                if not reused and (state, day, primary) in overcounted
+                else None
+            )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -401,14 +481,41 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[state],
-                is_default=not reused,
+                is_default=not reused and instead is None and (previous or result_set) not in demoted,
+                supersedes_id=previous,
                 completeness=1,
             )
+            if instead is not None:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=OVERCOUNTED)
+                cs.add(
+                    "result_set",
+                    **dict(
+                        zip(
+                            (
+                                "id",
+                                "election_id",
+                                "contest_id",
+                                "stage",
+                                "kind",
+                                "status",
+                                "source_id",
+                                "as_of",
+                                "completeness",
+                                "supersedes_id",
+                            ),
+                            instead,
+                            strict=True,
+                        )
+                    ),
+                    is_default=True,
+                )
 
             options: dict[str, UUID] = {}
             for candidate, pooled, party in (
                 lines.select("candidate", "pooled", "party").unique().sort("candidate").iter_rows()
             ):
+                if candidate in folded:
+                    continue
                 if pooled:
                     options[candidate] = cs.key("us.option", f"{contest_key}:other")
                     cs.add(
@@ -459,13 +566,45 @@ def emit() -> Path:
                             ballot_name=text,
                             is_independent=party_id is None,
                         )
+            targets: dict[str, UUID] = {}
+            for survivor in dict.fromkeys(folded.values()):
+                kept = person(state, survivor.partition(" and ")[0] if primary is None else survivor)
+                for printed in [survivor, *(candidate for candidate, into in folded.items() if into == survivor)]:
+                    party_id = party_of(state, lines.filter(pl.col("candidate") == printed)["party"][0])
+                    targets[printed] = cs.key("us.option", f"{contest_key}:{kept}:{slug(printed)}")
+                    cs.add(
+                        "contest_option",
+                        id=targets[printed],
+                        contest_id=contest,
+                        parent_option_id=options[survivor],
+                        kind="candidate",
+                        party_id=published.get(targets[printed], party_id),
+                        ballot_label=printed,
+                    )
+                    if printed == survivor:
+                        continue
+                    options[printed] = options[survivor]
+                    gone = cs.key(
+                        f"{SOURCE}.person",
+                        f"{state}:{slug(printed.partition(' and ')[0] if primary is None else printed)}",
+                    )
+                    old = cs.key("us.option", f"{contest_key}:{gone}")
+                    if previous is None or old in cs.minted or old == targets[printed]:
+                        continue
+                    cs.merge(old, targets[printed])
+                    cs.merge(
+                        cs.key("us.candidacy", f"{contest_key}:{gone}:head"),
+                        cs.key("us.candidacy", f"{contest_key}:{kept}:head"),
+                    )
+                    folds.setdefault(gone, []).append(kept)
             totals: dict[str, int] = {}
             cells: dict[tuple[UUID, str | None], int] = {}
-            for candidate, code, votes in (
+            for candidate, code, count in (
                 lines.group_by("candidate", "code").agg(pl.col("votes").sum()).sort("candidate", "code").iter_rows()
             ):
-                totals[candidate] = totals.get(candidate, 0) + votes
-                cells[(options[candidate], code)] = cells.get((options[candidate], code), 0) + votes
+                target = targets.get(candidate, options[candidate])
+                totals[folded.get(candidate, candidate)] = totals.get(folded.get(candidate, candidate), 0) + count
+                cells[(target, code)] = cells.get((target, code), 0) + count
             for (option, code), votes in cells.items() if result_set in cs.minted else ():
                 cs.add(
                     "result_value",
@@ -480,7 +619,10 @@ def emit() -> Path:
                 )
             if reused:
                 continue
-            won = sorted(set(lines.filter(pl.col("winner") & ~pl.col("pooled"))["candidate"]), key=lambda c: -totals[c])
+            won = sorted(
+                {folded.get(c, c) for c in lines.filter(pl.col("winner") & ~pl.col("pooled"))["candidate"]},
+                key=lambda c: -totals[c],
+            )
             if (
                 primary is None
                 and won
@@ -497,4 +639,12 @@ def emit() -> Path:
                     kind="advanced" if advancing else "elected" if primary is None else "won",
                     seats=None,
                 )
+        candidacies: dict[UUID, int] = dict(
+            conn.execute(
+                "select person_id, count(*) from candidacy where person_id = any(%s) group by 1", [list(folds)]
+            ).fetchall()
+        )
+        for duplicate, into in folds.items():
+            if len(set(into)) == 1 and candidacies.get(duplicate, 0) == len(into) and duplicate not in cs.minted:
+                cs.merge(duplicate, into[0])
         return cs.write()
