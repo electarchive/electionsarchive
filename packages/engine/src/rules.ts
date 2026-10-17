@@ -96,6 +96,7 @@ export const rules = v.variant("formula", [
         "gregory",
         "weighted_inclusive_gregory",
         "meek",
+        "cincinnati",
       ]),
       "gregory",
     ),

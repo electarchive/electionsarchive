@@ -254,7 +254,8 @@
             "last_parcel",
             "gregory",
             "weighted_inclusive_gregory",
-            "meek"
+            "meek",
+            "cincinnati"
           ],
           "type": "string",
           "default": "gregory"
