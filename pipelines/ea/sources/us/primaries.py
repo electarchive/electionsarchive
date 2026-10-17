@@ -6,8 +6,9 @@ import json
 import re
 import struct
 import subprocess
+import tempfile
 import zipfile
-from collections import defaultdict
+from collections import Counter, defaultdict
 from datetime import date, datetime, timedelta
 from pathlib import Path
 from urllib.parse import urlencode
@@ -16,6 +17,7 @@ from xml.etree import ElementTree
 
 import fastexcel
 import polars as pl
+from PIL import Image
 
 from ea import raw, scan
 from ea.changeset import Changeset, slug
@@ -78,6 +80,13 @@ NEW_YORK = tuple(
         ("20240503020451", "05/2024-democratic-presidential-primary"),
         ("20240520213959", "05/2024-republican-presidential-primary"),
         ("20240917001213", "08/2024-june-primary-results-for-certification_0"),
+    )
+)
+ARIZONA = tuple(
+    f"https://web.archive.org/web/{stamp}id_/https://azsos.gov/sites/default/files/docs/{name}.pdf"
+    for stamp, name in (
+        ("20240407175415", "2024_PPE_Official_Canvass_20240404"),
+        ("20240817161358", "2024_Primary_Election_Official_Canvass_0815b"),
     )
 )
 MONTANA = "https://web.archive.org/web/20240905130237id_/https://sosmt.gov/wp-content/uploads/wpfd/preview_files/2024-Primary-State-Canvass.pdf"
@@ -298,6 +307,8 @@ def fetch() -> None:
     for url in NEW_YORK:
         raw.fetch(SOURCE, url, suffix=".xlsx")
     raw.fetch(SOURCE, MONTANA, suffix=".pdf")
+    for url in ARIZONA:
+        raw.fetch(SOURCE, url, suffix=".pdf")
     for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
         raw.fetch(SOURCE, NC_RUNOFF.format(f"results_{place['cid']}"), suffix=".json")
     for url in (ILLINOIS, IL_TOTALS):
@@ -516,6 +527,7 @@ def parse() -> None:
         *(("WI", "county", url) for url in WISCONSIN),
         *(("NY", "county", url) for url in NEW_YORK),
         ("MT", "county", MONTANA),
+        *(("AZ", "county", url) for url in ARIZONA),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
             for race in LA_RACES
@@ -978,6 +990,195 @@ def parse() -> None:
                         for head, count in zip(grid[top][1:-1], counts, strict=True)
                     ]
             frame = pl.DataFrame(cells, schema=dict.fromkeys((*COLUMNS, "write_in"), pl.String))
+        elif url in ARIZONA:
+            artifact = raw.cached(SOURCE, url)
+            cells = []
+            for page in (5,) if url == ARIZONA[0] else (1, 2, 3):
+                cache = PARSED / "ocr" / f"{artifact.sha256}-{page}.tsv"
+                upright = cache.with_suffix(".png")
+                if not cache.exists():
+                    cache.parent.mkdir(parents=True, exist_ok=True)
+                    with tempfile.TemporaryDirectory() as folder:
+                        Image.open(scan.rendered(artifact.path, page, Path(folder))).convert("L").transpose(
+                            Image.Transpose.ROTATE_270
+                        ).save(upright)
+                    cache.write_text(
+                        subprocess.run(
+                            ["tesseract", str(upright), "stdout", "--psm", "6", "-l", "eng", "tsv"],
+                            capture_output=True,
+                            text=True,
+                            check=True,
+                        ).stdout
+                    )
+                read = list(csv.DictReader(io.StringIO(cache.read_text()), delimiter="\t", quoting=csv.QUOTE_NONE))
+                width = int(read[0]["width"])
+                grouped: dict[tuple[str, str, str], list[tuple[str, scan.Box]]] = {}
+                for row in read:
+                    if row["level"] == "5" and row["text"].strip():
+                        left, top = int(row["left"]), int(row["top"])
+                        grouped.setdefault((row["block_num"], row["par_num"], row["line_num"]), []).append(
+                            (row["text"], (left, top, left + int(row["width"]), top + int(row["height"])))
+                        )
+                ordered = sorted(grouped.values(), key=lambda words: min(box[1] for _, box in words))
+                header = next(words for words in ordered if any(word == "Maricopa" for word, _ in words))
+                heads = {
+                    county: next(box[2] for word, box in header if re.fullmatch(pattern, word))
+                    for county, pattern in (
+                        ("Apache", "Apache"),
+                        ("Cochise", "Cochise"),
+                        ("Coconino", "Coconino"),
+                        ("Gila", "Gi.a"),
+                        ("Graham", "Graham"),
+                        ("Greenlee", "Greenlee"),
+                        ("La Paz", "(La)?Paz"),
+                        ("Maricopa", "Maricopa"),
+                        ("Mohave", "Mohave"),
+                        ("Navajo", "Navajo"),
+                        ("Pima", "Pima"),
+                        ("Pinal", "Pinal"),
+                        ("Santa Cruz", "Cruz"),
+                        ("Yavapai", "Yavapai"),
+                        ("Yuma", "Yuma"),
+                        ("TOTAL", r"TOTAL\.?"),
+                    )
+                }
+                office = affiliation = seat = None
+                for words in ordered[ordered.index(header) + 1 :]:
+                    text = " ".join(word for word, _ in words)
+                    if "U.S. Senator" in text:
+                        office, seat = "U.S. Senate", None
+                    elif found := re.search(r"Representative in Congress\W+District No\. (\d+)", text):
+                        office, seat = "U.S. House", found[1]
+                    elif "President of the United States" in text:
+                        office, seat = "President", None
+                    elif text in ("Republican", "Democratic"):
+                        affiliation = text
+                    elif re.match(r"State |Corporation|Superior|Justice|County|Precinct", text):
+                        office = None
+                    elif office is not None and any(abs(box[2] - heads["TOTAL"]) < 30 for _, box in words):
+                        named = " ".join(
+                            word
+                            for word, box in words
+                            if box[2] < heads["Apache"] - 120 and re.search(r"[A-Za-z]", word)
+                        )
+                        marked = re.match(r"[({](REP|DEM|GRN|LBT)[)}] ", named)
+                        options: list[list[int | None]] = []
+                        located: list[scan.Box] = []
+                        reading: list[str] = []
+                        for county, right in heads.items():
+                            inside = [(word, box) for word, box in words if abs(box[2] - right) < 30]
+                            reading.append("".join(word for word, _ in inside))
+                            located.append(
+                                (
+                                    min((box[0] for _, box in inside), default=right - 110),
+                                    min(box[1] for word, box in words if re.search(r"[A-Za-z0-9]", word)),
+                                    right + 5,
+                                    max(box[3] for word, box in words if re.search(r"[A-Za-z0-9]", word)),
+                                )
+                            )
+                            if re.fullmatch(r"\d", reading[-1]) and inside[0][1][2] - inside[0][1][0] < 13:
+                                options.append([1])
+                            elif re.fullmatch(r"\d{1,3}(,\d{3})*", reading[-1]):
+                                options.append([int(reading[-1].replace(",", ""))])
+                            elif (
+                                office == "U.S. House" and county != "TOTAL" and re.fullmatch(r"[—_~=–-]*", reading[-1])
+                            ):
+                                options.append([None])
+                            else:
+                                options.append([])
+                        support = [Counter(choices) for choices in options]
+                        if (
+                            any(not choices for choices in options)
+                            or sum(choices[0] or 0 for choices in options[:-1]) != options[-1][0]
+                        ):
+                            reread = [position for position, choices in enumerate(options) if choices != [None]]
+                            for position, texts in zip(
+                                reread,
+                                scan.read(
+                                    upright,
+                                    [
+                                        (
+                                            (
+                                                list(heads.values())[position] - 140,
+                                                located[position][1] - 12,
+                                                list(heads.values())[position] + 12,
+                                                located[position][3] + 12,
+                                            ),
+                                            True,
+                                        )
+                                        for position in reread
+                                    ],
+                                    "eng",
+                                ),
+                                strict=True,
+                            ):
+                                for text in texts:
+                                    found = scan.numbers(text)
+                                    if found:
+                                        support[position][max(found, key=found.__getitem__)] += 1
+                                options[position] = list(
+                                    dict.fromkeys(
+                                        [
+                                            *options[position],
+                                            *(number for text in texts for number in scan.numbers(text)),
+                                        ]
+                                    )
+                                ) or ([None] if office == "U.S. House" else [])
+                        fits = [
+                            combination
+                            for combination in itertools.product(*options)
+                            if combination[-1] is not None
+                            and sum(value or 0 for value in combination[:-1]) == combination[-1]
+                        ]
+                        if not fits:
+                            raise ValueError(f"AZ {url} page {page}: {named} reads {reading}, which never sums")
+                        best = max(
+                            sum(votes[value] for value, votes in zip(combination, support, strict=True))
+                            for combination in fits
+                        )
+                        chosen = {
+                            combination
+                            for combination in fits
+                            if sum(votes[value] for value, votes in zip(combination, support, strict=True)) == best
+                        }
+                        if len(chosen) != 1:
+                            raise ValueError(f"AZ {url} page {page}: {named} reads {reading} {len(chosen)} ways")
+                        cells += [
+                            {
+                                "county": county,
+                                "office": office,
+                                "district": seat,
+                                "party": {
+                                    "REP": "Republican",
+                                    "DEM": "Democratic",
+                                    "GRN": "Green",
+                                    "LBT": "Libertarian",
+                                }[marked[1]]
+                                if marked
+                                else affiliation,
+                                "candidate": re.sub(
+                                    r"\s*(\*|\((?i:Write-In)\)|\(WITHDRAWN\))\s*",
+                                    " ",
+                                    re.sub(r"\b([A-Z]), ", r"\1. ", named[marked.end() if marked else 0 :]),
+                                ).strip(),
+                                "write_in": "1" if re.search(r"(?i)\(write-in\)", named) else "0",
+                                "votes": str(value),
+                                "page": page,
+                                "x0": box[1],
+                                "y0": width - box[2],
+                                "x1": box[3],
+                                "y1": width - box[0],
+                            }
+                            for county, value, box in zip(heads, next(iter(chosen)), located, strict=True)
+                            if county != "TOTAL" and value is not None
+                        ]
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys((*COLUMNS, "write_in"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
         elif state == "MT":
             pdf = raw.cached(SOURCE, url).path
             info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
@@ -2214,7 +2415,11 @@ def parse() -> None:
             )
         office = pl.col("office").str.to_lowercase().str.strip_chars()
         day = (
-            date(2024, 6, 25)
+            date(2024, 3, 19)
+            if url == ARIZONA[0]
+            else date(2024, 7, 30)
+            if url == ARIZONA[1]
+            else date(2024, 6, 25)
             if url == NEW_YORK[2]
             else date(2024, 4, 2)
             if state == "NY"
@@ -2719,6 +2924,16 @@ def emit() -> Path:
                 )
                 if state == "MT"
                 else (
+                    "Arizona Secretary of State",
+                    "State of Arizona Official Canvass, 2024 Presidential Preference Election"
+                    if used == ARIZONA[0]
+                    else "State of Arizona Official Canvass, 2024 Primary Election",
+                    "https://azsos.gov/elections/results-data",
+                    "official_body",
+                    "Public record",
+                )
+                if used in ARIZONA
+                else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
                     "https://sos.ks.gov/elections/election-results.html",
@@ -3007,7 +3222,7 @@ def emit() -> Path:
                     channel=pl.lit(0, pl.Int16),
                     measure=pl.lit(1, pl.Int16),
                     count_round=pl.lit(0, pl.Int16),
-                    flags=pl.when(pl.col("url") == KENTUCKY).then(8).otherwise(0).cast(pl.Int16),
+                    flags=pl.when(pl.col("url").is_in([KENTUCKY, *ARIZONA])).then(8).otherwise(0).cast(pl.Int16),
                     value="votes",
                 )
                 .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
