@@ -72,6 +72,14 @@ LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data
 LA_RACES = {"65031": "Democratic", "65033": "Republican"}
 MS_RUNOFF = "https://www.sos.ms.gov/elections/electionResults/Republican%20Primary%20Runoff%20Certified%20Results24.pdf"
 NC_RUNOFF = "https://er.ncsbe.gov/enr/20240514/data/{}.txt"
+NEW_YORK = tuple(
+    f"https://web.archive.org/web/{stamp}id_/https://elections.ny.gov/system/files/documents/2024/{name}.xlsx"
+    for stamp, name in (
+        ("20240503020451", "05/2024-democratic-presidential-primary"),
+        ("20240520213959", "05/2024-republican-presidential-primary"),
+        ("20240917001213", "08/2024-june-primary-results-for-certification_0"),
+    )
+)
 WISCONSIN = tuple(
     f"https://web.archive.org/web/{stamp}id_/https://elections.wi.gov/sites/default/files/documents/County%20by%20County%20{name}.pdf"
     for stamp, name in (
@@ -147,6 +155,9 @@ CHECKED = {
     "2024-03-05:AL:house:3:republican",
     "2024-03-05:AL:house:4:republican",
     "2024-06-04:NJ:president:republican",
+    "2024-06-25:NY:house:1:democratic",
+    "2024-06-25:NY:house:10:democratic",
+    "2024-06-25:NY:house:14:democratic",
 }
 PARTIES = {
     "d": "democratic",
@@ -165,6 +176,7 @@ PARTIES = {
     "grn": "green",
     "green": "green",
     "legal marijuana now": "legal-marijuana-now",
+    "working families": "working-families",
 }
 SKIPPED = r"(?i)^(registered voters|ballots cast|total ballots|times (blank|over|under) voted|total ?votes|under ?votes?|over ?votes?|no candidate qualified|blank|void)\b"
 COLUMNS = ("county", "precinct", "office", "district", "party", "candidate", "votes")
@@ -281,6 +293,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, MS_RUNOFF, suffix=".pdf")
     for url in WISCONSIN:
         raw.fetch(SOURCE, url, suffix=".pdf")
+    for url in NEW_YORK:
+        raw.fetch(SOURCE, url, suffix=".xlsx")
     for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
         raw.fetch(SOURCE, NC_RUNOFF.format(f"results_{place['cid']}"), suffix=".json")
     for url in (ILLINOIS, IL_TOTALS):
@@ -497,6 +511,7 @@ def parse() -> None:
         ),
         ("MS", "county", MS_RUNOFF),
         *(("WI", "county", url) for url in WISCONSIN),
+        *(("NY", "county", url) for url in NEW_YORK),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
             for race in LA_RACES
@@ -893,6 +908,72 @@ def parse() -> None:
                 ],
                 schema=dict.fromkeys(COLUMNS, pl.String),
             )
+        elif state == "NY":
+            book = fastexcel.read_excel(raw.cached(SOURCE, url).path)
+            cells = []
+            for name in book.sheet_names:
+                if name not in ("County DEM 2024", "Rep Pres by County") and not re.fullmatch(
+                    r"\d+\w\w CD \w+ Primary", name
+                ):
+                    continue
+                grid = [list(row) for row in book.load_sheet(name, header_row=None).to_polars().iter_rows()]
+                if url == NEW_YORK[2]:
+                    titled = re.match(
+                        r"Representative in Congress (\d+)\w\w Congressional District - (.+?) - ", grid[0][0]
+                    )
+                    if titled is None:
+                        raise ValueError(f"NY {name}: {grid[0][0]}")
+                    heads = [
+                        re.sub(r"^Part of | County Vote Results$", "", " ".join(str(cell).split()))
+                        for cell in grid[1][1:-2]
+                    ]
+                    added = [0] * len(heads)
+                    for row in grid[2:]:
+                        counts = [int(cell or 0) for cell in row[1:-2]]
+                        if row[0] == "Total Votes by County":
+                            if counts != added:
+                                raise ValueError(f"NY {name}: counties sum to {added}, not {counts}")
+                            break
+                        if sum(counts) != int(row[-2]):
+                            raise ValueError(f"NY {name}: {row[0]} sums to {sum(counts)}, not {row[-2]}")
+                        added = [total + count for total, count in zip(added, counts, strict=True)]
+                        cells += [
+                            {
+                                "county": head,
+                                "office": "Representative in Congress",
+                                "district": titled[1],
+                                "party": titled[2],
+                                "candidate": re.sub(r" \(\w+\)$", "", row[0]),
+                                "write_in": "1" if row[0] == "Scattering" else "0",
+                                "votes": str(count),
+                            }
+                            for head, count in zip(heads, counts, strict=True)
+                        ]
+                    continue
+                top = next(index for index, row in enumerate(grid) if row[0] == "County")
+                added = [0] * (len(grid[top]) - 2)
+                for row in grid[top + 1 :]:
+                    if row[0] is None or row[0] in ("Total", "Total NYC"):
+                        continue
+                    counts = [int(cell or 0) for cell in row[1:-1]]
+                    if row[0] in ("Total Votes by Candidate", "Grand Total"):
+                        if counts != added:
+                            raise ValueError(f"NY {name}: counties sum to {added}, not {counts}")
+                        break
+                    if sum(counts) != int(row[-1]):
+                        raise ValueError(f"NY {name}: {row[0]} sums to {sum(counts)}, not {row[-1]}")
+                    added = [total + count for total, count in zip(added, counts, strict=True)]
+                    cells += [
+                        {
+                            "county": row[0],
+                            "office": "President",
+                            "party": "Democratic" if "DEM" in name else "Republican",
+                            "candidate": re.sub(r" \(\w+\)$", "", head),
+                            "votes": str(count),
+                        }
+                        for head, count in zip(grid[top][1:-1], counts, strict=True)
+                    ]
+            frame = pl.DataFrame(cells, schema=dict.fromkeys((*COLUMNS, "write_in"), pl.String))
         elif state == "WI":
             pdf = raw.cached(SOURCE, url).path
             info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
@@ -2023,7 +2104,11 @@ def parse() -> None:
             )
         office = pl.col("office").str.to_lowercase().str.strip_chars()
         day = (
-            date(2024, 5, 14)
+            date(2024, 6, 25)
+            if url == NEW_YORK[2]
+            else date(2024, 4, 2)
+            if state == "NY"
+            else date(2024, 5, 14)
             if state in ("MD", "NE")
             else date(2024, 3, 19)
             if state == "OH"
@@ -2194,6 +2279,17 @@ def parse() -> None:
             .filter(pl.col("votes").is_not_null())
         )
     frame = pl.concat(frames, how="diagonal")
+    frame = pl.concat(
+        [
+            frame.filter(~pl.col("url").is_in(NEW_YORK)),
+            frame.filter(pl.col("url").is_in(NEW_YORK)).join(
+                frame.filter(pl.col("url") == search("NY")).select("day", "office", "district", "party").unique(),
+                on=["day", "office", "district", "party"],
+                how="anti",
+                nulls_equal=True,
+            ),
+        ]
+    )
     print(frame.filter(pl.col("county").is_null()).group_by("state", "url").agg(pl.col("votes").sum()))
     frame = frame.filter(pl.col("county").is_not_null())
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -2494,6 +2590,16 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "WI"
+                else (
+                    "New York State Board of Elections",
+                    "Certified results, June 25, 2024 primary election"
+                    if used == NEW_YORK[2]
+                    else "Certified results, April 2, 2024 presidential primary, by county",
+                    "https://elections.ny.gov/election-results",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "NY"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
