@@ -1,4 +1,5 @@
 import io
+import itertools
 import json
 import re
 import zipfile
@@ -276,15 +277,16 @@ def emit() -> Path:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         source = cs.source(PUBLISHER, TITLE)
-        cs.add(
-            "source",
-            id=source,
-            kind="academic",
-            publisher=PUBLISHER,
-            title=TITLE,
-            url="https://hdl.handle.net/10211.3/210187",
-            license=None,
-        )
+        if source in cs.minted:
+            cs.add(
+                "source",
+                id=source,
+                kind="academic",
+                publisher=PUBLISHER,
+                title=TITLE,
+                url="https://hdl.handle.net/10211.3/210187",
+                license=None,
+            )
         cs.artifact(raw.cached(SOURCE, CODEBOOK), source)
         for url in FILES.values():
             cs.artifact(raw.cached(SOURCE, url), source)
@@ -383,9 +385,31 @@ def emit() -> Path:
                     kind="standard",
                     valid_from=None,
                 )
-        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "irv")}
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "irv", "two_round")}
         if cs.minted & set(systems.values()):
-            raise ValueError("the fptp, block, and irv systems must already exist")
+            raise ValueError("the fptp, block, irv, and two-round systems must already exist")
+        previous: dict[str, str] = {}
+        races = (
+            frame.group_by("race")
+            .agg(
+                pl.first("code", "key", "area", "remainder", "day"),
+                advanced=(pl.col("elected") == "3").any(),
+            )
+            .filter(
+                ~pl.struct("code", "key", "day").map_elements(
+                    lambda row: (f"CA:{row['code']}:{row['key']}", row["day"].year, row["day"].month) in held,
+                    pl.Boolean,
+                )
+            )
+            .sort("day", "race")
+        )
+        for _, group in races.group_by(
+            "code", "key", "area", "remainder", pl.col("day").dt.year(), maintain_order=True
+        ):
+            for first_round, runoff in itertools.pairwise(group.iter_rows(named=True)):
+                if first_round["advanced"]:
+                    previous[runoff["race"]] = first_round["race"]
+        majority = set(previous) | set(previous.values())
 
         owners: set[UUID] = set()
         elections: set[UUID] = set()
@@ -497,8 +521,17 @@ def emit() -> Path:
                 body_id=owner if first["body"] else None,
                 district_area_id=area,
                 magnitude=magnitude,
-                round_number=1,
-                electoral_system_id=systems["irv" if rcv and magnitude == 1 else "fptp" if magnitude == 1 else "block"],
+                round_number=2 if race in previous else 1,
+                previous_round_id=cs.key("us.contest", f"ceda:{previous[race]}") if race in previous else None,
+                electoral_system_id=systems[
+                    "irv"
+                    if rcv and magnitude == 1
+                    else "block"
+                    if magnitude != 1
+                    else "two_round"
+                    if race in majority or (len(code) == 5 and key != "board-of-education")
+                    else "fptp"
+                ],
                 default_result_kind="counted",
                 term="remainder" if first["remainder"] else "full",
             )
