@@ -712,7 +712,7 @@
   "versus_head_lede": "Contests both candidates ran in.",
   "versus_head_none": "They never ran in the same contest.",
   "versus_shares_title": "Vote share over time",
-  "versus_shares_lede": "Every recorded race for both. Filled marks are wins and hollow marks are losses.",
+  "versus_shares_lede": "Includes every race where either person received votes. Filled marks are wins and hollow marks are losses.",
   "versus_action": "Compare",
   "versus_even": "Even",
   "governments_title": "Governments",

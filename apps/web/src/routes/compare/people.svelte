@@ -16,6 +16,7 @@
     won: m.outcome_won,
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
+    lost: m.person_lost_mark,
   };
 
   let width = $state(720);
@@ -163,12 +164,12 @@
             party={side.party.id}
           />
         {/if}
-        <span class="grid grid-cols-3 gap-2">
+        <span class="flex flex-wrap gap-x-4 gap-y-1.5">
           {#each [[m.person_ran(), count(side.marks.length)], [m.person_won(), count(side.won)], [m.person_years(), side.span]] as [label, value] (label)}
             <span class="grid gap-0.5">
               <span class="text-xs text-muted-foreground">{label}</span>
               <span
-                class="font-figures text-xl tracking-[-0.02em] tabular-nums max-sm:text-base"
+                class="font-figures text-xl tracking-[-0.02em] whitespace-nowrap tabular-nums max-sm:text-base"
                 >{value}</span
               >
             </span>
@@ -335,7 +336,7 @@
           >
           {#each match.pair as mark (mark.id)}
             <span
-              class="col-start-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,8rem)] items-center gap-x-3"
+              class="col-start-2 grid grid-cols-[minmax(0,1fr)_auto_minmax(0,3rem)] items-center gap-x-3 sm:grid-cols-[minmax(0,1fr)_auto_minmax(0,8rem)]"
             >
               <span class="flex items-center gap-1.5 truncate">
                 {@render glyph(mark.side, mark.isWon, mark.tint)}
@@ -343,8 +344,12 @@
                   >{sides[mark.side]?.name}</span
                 >
                 {#if mark.outcome != null}
-                  <span class="highlighter px-1 text-xs font-semibold"
-                    >{OUTCOMES[mark.outcome]?.() ?? mark.outcome}</span
+                  <span
+                    class={cn("px-1 text-xs font-semibold whitespace-nowrap", {
+                      highlighter: mark.outcome !== "lost",
+                      "rounded-xs bg-secondary text-muted-foreground":
+                        mark.outcome === "lost",
+                    })}>{OUTCOMES[mark.outcome]?.() ?? mark.outcome}</span
                   >
                 {/if}
               </span>
