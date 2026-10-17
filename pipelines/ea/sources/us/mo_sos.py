@@ -8,7 +8,7 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
-from PIL import Image
+from PIL import Image, ImageFilter
 
 from ea import raw
 from ea.changeset import Changeset, slug
@@ -27,6 +27,158 @@ IMAGE = "https://mdh.contentdm.oclc.org/iiif/2/bluebook:{}/full/full/0/default.j
 TEXT = "https://mdh.contentdm.oclc.org/digital/api/collections/bluebook/items/{}/false"
 DAY = "1996-11-05"
 MANUAL = [
+    (
+        "1968-11-05",
+        "president",
+        (41027, 41028),
+        [
+            ("DEM", "Hubert H. Humphrey, Edmund S. Muskie"),
+            ("REP", "Richard M. Nixon, Spiro T. Agnew"),
+            ("AIP", "George C. Wallace, Marvin Griffin"),
+        ],
+    ),
+    ("1968-11-05", "senate", (41029,), [("DEM", "Eagleton, Thomas F."), ("REP", "Curtis, Thomas B.")]),
+    ("1968-11-05", "governor", (41030,), [("DEM", "Hearnes, Warren E."), ("REP", "Roos, Lawrence K.")]),
+    ("1968-11-05", "lieutenant-governor", (41031,), [("DEM", "Morris, W. S. (Bill)"), ("REP", "Jones Jr., Lem T.")]),
+    (
+        "1968-11-05",
+        "secretary-of-state",
+        (41032,),
+        [("DEM", "Kirkpatrick, James C. (Jim)"), ("REP", "Colbert, Murray C.")],
+    ),
+    ("1968-11-05", "treasurer", (41033,), [("DEM", "Robinson, William E."), ("REP", "Zimmerman, William T.")]),
+    ("1968-11-05", "attorney-general", (41034,), [("DEM", "Anderson, Norman H."), ("REP", "Danforth, John C.")]),
+    (
+        "1976-11-02",
+        "president",
+        (47255,),
+        [
+            ("REP", "Gerald R. Ford, Robert J. Dole"),
+            ("DEM", "Jimmy Carter, Walter F. Mondale"),
+            ("IND", "Eugene J. McCarthy, Marlene K. Barrett"),
+        ],
+    ),
+    (
+        "1976-11-02",
+        "senate",
+        (47256,),
+        [("REP", "Danforth, John C."), ("DEM", "Hearnes, Warren E."), ("IND", "Petty, Lawrence (Red)")],
+    ),
+    (
+        "1976-11-02",
+        "governor",
+        (47257,),
+        [("REP", "Bond, Christopher (Kit)"), ("DEM", "Teasdale, Joseph P."), ("IND", "Striler, Leon")],
+    ),
+    (
+        "1976-11-02",
+        "lieutenant-governor",
+        (47258,),
+        [("REP", "Phelps, William (Bill)"), ("DEM", "Rabbitt, Richard J. (Dick)"), ("IND", "Fischer, Leo J.")],
+    ),
+    (
+        "1976-11-02",
+        "secretary-of-state",
+        (47259,),
+        [("REP", "Huffman, Mildred P."), ("DEM", "Kirkpatrick, James C."), ("IND", "Carmack, Evelyn F.")],
+    ),
+    ("1976-11-02", "treasurer", (47260,), [("REP", "Kemp Jr., Albert L. (Al)"), ("DEM", "Spainhower, James I.")]),
+    ("1976-11-02", "attorney-general", (47261,), [("REP", "Ashcroft, John"), ("DEM", "Baker, James G.")]),
+    ("1978-11-07", "auditor", (48822,), [("DEM", "Hearnes, Warren E."), ("REP", "Antonio, James F.")]),
+    (
+        "1980-11-04",
+        "president",
+        (50270, 50271),
+        [
+            ("DEM", "Jimmy Carter, Walter F. Mondale"),
+            ("REP", "Ronald Reagan, George Bush"),
+            ("SWP", "Clifton DeBerry, Matilde Zimmermann"),
+            ("LIB", "Ed Clark, David Koch"),
+            ("IND", "John B. Anderson, Patrick J. Lucey"),
+        ],
+    ),
+    (
+        "1980-11-04",
+        "senate",
+        (50272,),
+        [("DEM", "Eagleton, Thomas F."), ("REP", "McNary, Gene"), ("SWP", "Pettit, Martha")],
+    ),
+    (
+        "1980-11-04",
+        "governor",
+        (50273,),
+        [("DEM", "Teasdale, Joseph P."), ("REP", "Bond, Christopher (Kit)"), ("SWP", "Savio, Helen")],
+    ),
+    ("1980-11-04", "lieutenant-governor", (50274,), [("DEM", "Rothman, Kenneth J."), ("REP", "Blunt, Roy")]),
+    (
+        "1980-11-04",
+        "secretary-of-state",
+        (50275,),
+        [("DEM", "Kirkpatrick, James C."), ("REP", "Pfeffer II, Walter L.")],
+    ),
+    ("1980-11-04", "treasurer", (50276,), [("DEM", "Carnahan, Mel"), ("REP", "Winship, Gerald E.")]),
+    ("1980-11-04", "attorney-general", (50277,), [("DEM", "Baine, Robert"), ("REP", "Ashcroft, John")]),
+    ("1982-11-02", "senate", (51653,), [("REP", "Danforth, John C."), ("DEM", "Woods, Harriett")]),
+    ("1982-11-02", "auditor", (51654,), [("REP", "Antonio, James"), ("DEM", "Butler, James R. (Russ)")]),
+    (
+        "1984-11-06",
+        "president",
+        (53069,),
+        [("REP", "Ronald Reagan, George Bush"), ("DEM", "Walter F. Mondale, Geraldine A. Ferraro")],
+    ),
+    ("1984-11-06", "governor", (53070,), [("REP", "Ashcroft, John"), ("DEM", "Rothman, Kenneth J.")]),
+    ("1984-11-06", "lieutenant-governor", (53071,), [("REP", "Hancock, Mel"), ("DEM", "Woods, Harriett")]),
+    ("1984-11-06", "secretary-of-state", (53072,), [("REP", "Blunt, Roy D."), ("DEM", "Sharpe, Gary D.")]),
+    ("1984-11-06", "treasurer", (53073,), [("REP", "Bailey, Wendell"), ("DEM", "Villa, Thomas A.")]),
+    ("1984-11-06", "attorney-general", (53074,), [("REP", "Webster, William L."), ("DEM", "Beard, Richard P.")]),
+    (
+        "1986-11-04",
+        "senate",
+        (54491,),
+        [("REP", "Bond, Christopher (Kit)"), ("DEM", "Woods, Harriett"), ("IND", "Shepherd, Betty")],
+    ),
+    ("1986-11-04", "auditor", (54492,), [("REP", "Kelly, Margaret"), ("DEM", "Morrison, Travis")]),
+    (
+        "1988-11-08",
+        "president",
+        (55349,),
+        [
+            ("REP", "George Bush, Dan Quayle"),
+            ("DEM", "Michael Dukakis, Lloyd Bentsen"),
+            ("IND", "Lenora Fulani, Joyce Dattner"),
+        ],
+    ),
+    (
+        "1988-11-08",
+        "senate",
+        (55350,),
+        [("REP", "Danforth, John C."), ("DEM", "Nixon, Jeremiah W."), ("LIB", "Guze, John")],
+    ),
+    (
+        "1988-11-08",
+        "governor",
+        (55351,),
+        [("REP", "Ashcroft, John"), ("DEM", "Hearnes, Betty C."), ("LIB", "Roberts, Mike")],
+    ),
+    (
+        "1988-11-08",
+        "lieutenant-governor",
+        (55352,),
+        [("REP", "Grisham, R. B."), ("DEM", "Carnahan, Mel"), ("LIB", "Rosenberg, Richard")],
+    ),
+    (
+        "1988-11-08",
+        "secretary-of-state",
+        (55353,),
+        [("REP", "Blunt, Roy D."), ("DEM", "Askew, James J."), ("LIB", "Manifold, Jay")],
+    ),
+    (
+        "1988-11-08",
+        "treasurer",
+        (55354,),
+        [("REP", "Bailey, Wendell"), ("DEM", "Holden, Bob"), ("LIB", "Geier, Gerald")],
+    ),
+    ("1988-11-08", "attorney-general", (55355,), [("REP", "Webster, William L."), ("DEM", "Wolff, Michael A.")]),
     ("1990-11-06", "auditor", (56834,), [("REP", "Kelly, Margaret"), ("DEM", "Hendren, Connie B.")]),
     (
         "1992-11-03",
@@ -107,8 +259,28 @@ MANUAL = [
     ),
 ]
 ALONE = {"Eric Harris", "George D. Weber"}
-CHECKED = {("1992-11-03", "treasurer")}
-FIXES: dict[tuple[str, str, str], list[int]] = {("1994-11-08", "auditor", "29141"): [1963, 3734, 222]}
+CHECKED = {
+    ("1992-11-03", "treasurer", 1),
+    ("1976-11-02", "governor", 0),
+    ("1976-11-02", "treasurer", 0),
+    ("1976-11-02", "attorney-general", 0),
+    ("1980-11-04", "senate", 0),
+    ("1982-11-02", "auditor", 0),
+    ("1988-11-08", "president", 2),
+}
+FIXES: dict[tuple[str, str, str], list[int]] = {
+    ("1994-11-08", "auditor", "29141"): [1963, 3734, 222],
+    ("1968-11-05", "attorney-general", "29097"): [13153, 15852],
+    ("1968-11-05", "attorney-general", "29229"): [1454, 3564],
+    ("1968-11-05", "governor", "29097"): [19198, 11034],
+    ("1976-11-02", "attorney-general", "29227"): [734, 936],
+    ("1976-11-02", "attorney-general", "29135"): [3390, 2052],
+    ("1982-11-02", "senate", "29029"): [4190, 3773],
+    ("1982-11-02", "senate", "29107"): [5939, 5550],
+    ("1982-11-02", "senate", "29147"): [3805, 3564],
+    ("1982-11-02", "auditor", "29073"): [3625, 904],
+    ("1982-11-02", "auditor", "29175"): [4043, 3688],
+}
 OFFICES = {
     "U.S. President And Vice President": "president",
     "Governor": "governor",
@@ -132,6 +304,8 @@ PARTIES = {
     "REF": "reform-party",
     "NAT": "natural-law-party",
     "IND": None,
+    "AIP": "american-independent-party",
+    "SWP": "socialist-workers-party",
 }
 WRITE_IN = "Write-ins"
 
@@ -146,7 +320,19 @@ def fetch() -> None:
 
 
 def readings(text: str, width: int, names: dict[str, str]) -> dict[str, list[int]]:
-    text = re.sub(r"(?<=\d)[)\]]|[|]", " ", re.sub(r"\bS[1l]\.", "St.", text))
+    text = re.sub(
+        r"(?<=\d)[)\]]|[|]",
+        " ",
+        re.sub(
+            r"\bS[1l]\.",
+            "St.",
+            re.sub(
+                r"(?<=\d) ,(?=\d{3}\b)",
+                ",",
+                re.sub(r"(?<=\d )[lI](?=\s|$)", "1", re.sub(r"(?m)^(\s*TOTALS)[^\d\n]*", r"\1 ", text)),
+            ),
+        ),
+    )
     found: dict[str, list[int]] = {}
     pattern = r"((?:[A-Za-z.']+ ){0,2}[A-Za-z.']+)\s+((?:\d[\d,./]*\s+){" + str(width - 1) + r"}\d[\d,./]*)(?=\s|$)"
     for line in text.splitlines():
@@ -187,18 +373,20 @@ def manual(names: dict[str, str]) -> list[dict[str, object]]:
     caveats: list[dict[str, object]] = []
     for day, office, pages, candidates in MANUAL:
         width = len(candidates)
-        reads: list[dict[str, list[int]]] = [{}, {}, {}, {}]
+        reads: list[dict[str, list[int]]] = [{}, {}, {}, {}, {}, {}]
         for page in pages:
             texts = []
-            for mode in ("gray", "150", "halves"):
+            for mode in ("gray", "150", "halves", "halves150", "sharp"):
                 cache = PARSED / "ocr" / f"{page}-{mode}.txt"
                 if not cache.exists():
                     image = Image.open(raw.cached(SOURCE, IMAGE.format(page)).path).convert("L")
                     image = image.resize((image.width * 2, image.height * 2), Image.Resampling.LANCZOS)
-                    if mode == "150":
+                    if mode in ("150", "halves150"):
                         image = image.point(lambda value: 255 if value > 150 else 0)
+                    if mode == "sharp":
+                        image = image.filter(ImageFilter.UnsharpMask(4, 200, 2))
                     parts = [image]
-                    if mode == "halves":
+                    if mode in ("halves", "halves150"):
                         parts = [
                             image.crop((0, 0, image.width // 2, image.height)),
                             image.crop((image.width // 2, 0, image.width, image.height)),
@@ -218,12 +406,21 @@ def manual(names: dict[str, str]) -> list[dict[str, object]]:
                     cache.write_text("\n".join(output))
                 texts.append(cache.read_text())
             texts.append(
-                " ".join((json.loads(raw.cached(SOURCE, TEXT.format(page)).path.read_text())["text"] or "").split())
+                re.sub(
+                    r"(TOTALS(?: [\d,]+){" + str(width) + r"}) \d+$",
+                    r"\1",
+                    " ".join(
+                        (json.loads(raw.cached(SOURCE, TEXT.format(page)).path.read_text())["text"] or "").split()
+                    ),
+                )
             )
             for read, text in zip(reads, texts, strict=True):
                 for county, values in readings(text, width, names).items():
                     read.setdefault(county, values)
-        totals = next(read["TOTALS"] for read in reads if "TOTALS" in read)
+        printed = [read["TOTALS"] for read in reversed(reads) if "TOTALS" in read]
+        if not printed:
+            raise ValueError(f"{day} {office}: no TOTALS row")
+        totals = max(printed, key=printed.count)
         for read in reads:
             read.pop("TOTALS", None)
         counties = {
@@ -238,17 +435,18 @@ def manual(names: dict[str, str]) -> list[dict[str, object]]:
             ]
             for county in set().union(*reads)
         }
+        for (when, what, county), values in FIXES.items():
+            if (when, what) == (day, office):
+                counties[county] = values
         if len(counties) != (116 if "KC" in counties else 115):
             raise ValueError(
                 f"{day} {office}: missing {sorted(set(names.values()) - set(counties) - {'TOTALS', 'KC'})}"
             )
-        for (when, what, county), values in FIXES.items():
-            if (when, what) == (day, office):
-                counties[county] = values
         for column in range(width):
-            gap = totals[column] - sum(values[column] for values in counties.values())
-            if gap == 0:
+            total = sum(values[column] for values in counties.values())
+            if any(read[column] == total for read in printed):
                 continue
+            gap = totals[column] - total
             others = sorted(
                 {
                     (county, read[county][column])
@@ -270,7 +468,7 @@ def manual(names: dict[str, str]) -> list[dict[str, object]]:
                 for county, values in counties.items()
                 if (day, office, county) not in FIXES
             )
-            if not swaps and (agreed or (day, office) in CHECKED):
+            if (day, office, column) in CHECKED or (not swaps and agreed):
                 caveats.append(
                     {
                         "day": day,
@@ -394,7 +592,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Missouri's president, governor, U.S. Senate, and statewide offices by county 1990–1998 "
+            summary="Missouri's president, governor, U.S. Senate, and statewide offices by county 1968–1998 "
             "from the Secretary of State's official returns and the Official Manual",
             polity="US",
         )
