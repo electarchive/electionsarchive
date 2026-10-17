@@ -286,19 +286,20 @@
             >{tick === 0 ? "0" : Math.round(Math.abs(tick) * 100)}</text
           >
         {/each}
+        {const labeled = $derived.by(() => {
+          const kept: Array<number> = [];
+          let last = Infinity;
+          for (const row of race.rows.toSorted((a, b) => b.year - a.year)) {
+            const x = sx(race, row.year);
+            if (last - x >= 34) {
+              kept.push(row.year);
+              last = x;
+            }
+          }
+          return kept;
+        })}
         {#each race.rows as row (row.date)}
-          {const stride = $derived(
-            Math.max(
-              1,
-              Math.ceil(
-                (race.rows.length * 34) / (width - PAD.left - PAD.right),
-              ),
-            ),
-          )}
-          {const rank = $derived(
-            race.rows.filter((other) => other.year > row.year).length,
-          )}
-          {#if rank % stride === 0 || focus === row}
+          {#if labeled.includes(row.year) || focus === row}
             <text
               x={sx(race, row.year)}
               y={height - 6}
