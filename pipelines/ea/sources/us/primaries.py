@@ -50,6 +50,7 @@ OHIO = (
     "https://web.archive.org/web/20240420171451id_/https://www.ohiosos.gov/globalassets/elections/2024/pri/official/precinct-level-official-results-primary-2024---democratic.xlsx",
 )
 FLORIDA = "https://flelectionfiles.floridados.gov/enightfilespublic/{}_ElecResultsFL.txt"
+OREGON = "https://records.sos.state.or.us/ORSOSCMSearch/Search/DocumentStream.ashx?uri=13735456"
 MAINE = "https://lldc.mainelegislature.org/Open/Elections/Returns/2024/{}.xlsx"
 NEW_JERSEY = "https://www.nj.gov/state/elections/assets/pdf/election-results/2024/2024-official-primary-results-{}.pdf"
 NEBRASKA = "https://sos.nebraska.gov/sites/default/files/doc/elections/2024/2024%20Primary%20Canvass%20Book.pdf"
@@ -218,6 +219,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=".xlsx")
     for day in ("20240319", "20240820"):
         raw.fetch(SOURCE, FLORIDA.format(day), suffix=".txt")
+    raw.fetch(SOURCE, OREGON, suffix=".pdf")
     for package in TEXAS:
         for resource in json.loads(raw.fetch(SOURCE, TED.format(package), suffix=".json").path.read_text())["result"][
             "resources"
@@ -353,6 +355,7 @@ def parse() -> None:
         *(("TX", "precinct", url) for url in texas),
         *(("OH", "precinct", url) for url in OHIO),
         *(("FL", "county", FLORIDA.format(day)) for day in ("20240319", "20240820")),
+        ("OR", "county", OREGON),
         ("KS", "precinct", KANSAS),
         ("KS", "county", KS_PRESIDENT.format("-by-County")),
         *(
@@ -656,6 +659,95 @@ def parse() -> None:
                     **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
                 },
             ).with_columns(candidate=pl.col("candidate").str.replace_all(r"\(w\)|\*", "").str.strip_chars())
+        elif state == "OR":
+            pdf = raw.cached(SOURCE, url).path
+            cells = []
+            office_text = None
+            seat = None
+            party = ""
+            stacked: list[list[tuple[str, scan.Box]]] = []
+            labels = []
+            sums: list[int] = []
+            for page in range(1, 10):
+                lines = []
+                for word, box in sorted(
+                    ((html.unescape(word), box) for word, box in scan.layer(pdf, page)),
+                    key=lambda item: (item[1][3], item[1][0]),
+                ):
+                    if lines and abs(lines[-1][0][1][3] - box[3]) < 12:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+                for words in lines:
+                    words.sort(key=lambda item: item[1][0])
+                    text = " ".join(word for word, _ in words)
+                    numbers = [(word, box) for word, box in words if re.fullmatch(r"\d{1,3}(,\d{3})*", word)]
+                    place = " ".join(word for word, _ in words if not re.fullmatch(r"\d{1,3}(,\d{3})*", word))
+                    if "Abstract of Votes" in text:
+                        party, labels = "", []
+                    elif text in ("US President", "US Representative"):
+                        office_text, seat = ("President" if text == "US President" else "U.S. House"), None
+                    elif found := re.fullmatch(r"(\d+)\w\w District", text):
+                        seat = int(found[1])
+                    elif text in ("Democrat", "Republican"):
+                        party, stacked, labels = text, [], []
+                    elif numbers and len(numbers) == len(words) - len(place.split()) and place:
+                        if not labels:
+                            edges = [box[2] for _, box in numbers]
+                            columns: list[list[list[str]]] = [[] for _ in edges]
+                            for header in stacked:
+                                for column in columns:
+                                    column.append([])
+                                for word, box in header:
+                                    if word != "County":
+                                        columns[next(i for i, edge in enumerate(edges) if box[2] <= edge + 30)][
+                                            -1
+                                        ].append(word)
+                            headers = [[" ".join(line) for line in column if line] for column in columns]
+                            if not all(headers):
+                                raise ValueError(f"OR page {page}: {place}'s columns have the headers {headers}")
+                            labels = [
+                                "Write-ins" if name == ["Misc."] else " ".join([*name[1:], name[0].lstrip("*")])
+                                for name in headers
+                            ]
+                            sums = [0] * len(labels)
+                        if len(numbers) != len(labels):
+                            raise ValueError(f"OR page {page}: {place} has {len(numbers)} numbers for {labels}")
+                        votes = [int(word.replace(",", "")) for word, _ in numbers]
+                        if place == "Total":
+                            if votes != sums:
+                                raise ValueError(
+                                    f"OR page {page}: the counties sum to {sums}, the abstract prints {votes}"
+                                )
+                            continue
+                        if not any(votes):
+                            continue
+                        for position, (label, (word, box)) in enumerate(zip(labels, numbers, strict=True)):
+                            sums[position] += votes[position]
+                            cells.append(
+                                {
+                                    "county": place,
+                                    "office": office_text,
+                                    "district": None if seat is None else str(seat),
+                                    "party": party,
+                                    "candidate": label,
+                                    "votes": word,
+                                    "page": page,
+                                    "x0": box[0],
+                                    "y0": box[1],
+                                    "x1": box[2],
+                                    "y1": box[3],
+                                }
+                            )
+                    elif party and not labels:
+                        stacked.append(words)
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(("county", "office", "district", "party", "candidate", "votes"), pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
         elif state == "FL":
             frame = (
                 pl.read_csv(raw.cached(SOURCE, url).path, separator="\t", infer_schema=False, quote_char=None)
@@ -1083,6 +1175,8 @@ def parse() -> None:
             if state in ("MD", "NE")
             else date(2024, 3, 19)
             if state == "OH"
+            else date(2024, 5, 21)
+            if state == "OR"
             else (date(2024, 5, 28) if re.search(r"/50[89]/", url) else date(2024, 3, 5))
             if state == "TX"
             else (date(2024, 3, 19) if url.endswith("by-County.pdf") else date(2024, 8, 6))
@@ -1390,6 +1484,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if state == "FL"
+                else (
+                    "Oregon Secretary of State",
+                    "May 21, 2024, Primary Election Abstract of Votes",
+                    "https://records.sos.state.or.us/ORSOSCMSearch/Search/SearchDetail.aspx?uri=13735456",
+                    "official_body",
+                    "Public record",
+                )
+                if state == "OR"
                 else (
                     "Kansas Secretary of State",
                     "Election results, 2024 primary election",
