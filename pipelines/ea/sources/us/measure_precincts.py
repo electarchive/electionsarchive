@@ -182,20 +182,44 @@ MASSACHUSETTS = (
     "Precinct rows of the Secretary of the Commonwealth's election statistics archive for this question. Each "
     "answer's precinct rows add up to the totals of this question's default results{counties}."
 )
-HARNEY = "https://records.sos.state.or.us/ORSOSWebDrawer/Record/10574992/File/document?inline=true"
-HARNEY_2024 = {
-    115: (12, (582, 382, 716), (708, 441, 1204)),
-    116: (13, (473, 283, 514), (815, 536, 1389)),
-    117: (14, (323, 214, 327), (990, 617, 1607)),
-    118: (15, (214, 99, 158), (1107, 736, 1782)),
-    119: (16, (550, 354, 483), (730, 453, 1380)),
-}
-HARNEY_NOTE = (
-    " MEDSL's file has no rows for Harney County, so its three precincts (21, 25, and 26) come from the County "
-    "Clerk's official abstract of votes filed with the Secretary of State (record EPD/24/216), a scan read by hand; "
-    "they add up to the abstract's totals and to Harney's certified county totals."
-)
 OR_RECORDS = {date(2020, 11, 3): 7879432}
+OR_2024 = {
+    "Baker": 10575038,
+    "Benton": 10575039,
+    "Clackamas": 10575040,
+    "Clatsop": 10575041,
+    "Columbia": 10574984,
+    "Coos": 10574985,
+    "Crook": 10574986,
+    "Curry": 10574987,
+    "Deschutes": 10574988,
+    "Douglas": 10574989,
+    "Gilliam": 10574990,
+    "Grant": 10574991,
+    "Harney": 10574992,
+    "Hood River": 10574993,
+    "Jackson": 10574994,
+    "Jefferson": 10574995,
+    "Josephine": 10574996,
+    "Klamath": 10574997,
+    "Lake": 10574998,
+    "Lane": 10574999,
+    "Lincoln": 10575000,
+    "Linn": 10575001,
+    "Malheur": 10575002,
+    "Marion": 10575003,
+    "Morrow": 10575004,
+    "Multnomah": 10575026,
+    "Polk": 10575028,
+    "Sherman": 10575029,
+    "Tillamook": 10575030,
+    "Umatilla": 10575031,
+    "Union": 10575032,
+    "Wallowa": 10575033,
+    "Wasco": 10575034,
+    "Washington": 10575036,
+    "Yamhill": 10575037,
+}
 OR_DETAIL = "https://records.sos.state.or.us/ORSOSCMSearch/Search/SearchDetail.aspx?uri={}"
 OR_PUBLISHER = "Oregon Secretary of State"
 OR_TITLE = "County precinct results filed with the Secretary of State"
@@ -216,6 +240,10 @@ OR_2020_NOTE = " Harney County's report labels the state measures Question 13-10
 OR_2020_110_NOTE = (
     " Hood River County's report also lists a county measure numbered Question 14-110; it is not Measure 110 and is "
     "left out."
+)
+OR_2024_NOTE = (
+    " Each county's report is its own record. Wheeler County filed no precinct report, so its votes are one "
+    "county-level row taken from its totals in the Secretary of State's certified abstract of votes."
 )
 CA_ELECTIONS = ("P12", "G12", "P14", "P16", "G16", "P18", "P20", "G20", "P24")
 CA_SOV = swdb_precincts.SWDB + "{0}/state/state_{1}_sov_data_by_{1}_svprec.zip"
@@ -245,8 +273,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, CA_SOV.format(election, election.lower()), suffix=".zip")
     raw.fetch(SOURCE, MONO_2016, suffix=".pdf")
     measures.fetch()
-    raw.fetch(SOURCE, HARNEY, suffix=".pdf")
-    for uri in OR_RECORDS.values():
+    for uri in [*OR_RECORDS.values(), *OR_2024.values()]:
         url = OR_DETAIL.format(uri)
         try:
             record = raw.cached(SOURCE, url)
@@ -261,14 +288,17 @@ def fetch() -> None:
                 }
                 response = client.post(url, data=fields | {"ctl00$ContentPlaceHolder1$lnkDownload": "Download"})
                 response.raise_for_status()
+            media_type = response.headers.get("content-type", "application/zip").split(";")[0]
             record = raw.store(
                 SOURCE,
                 url,
                 response.content,
-                suffix=".zip",
+                suffix={"application/pdf": ".pdf", "text/csv": ".csv"}.get(media_type, ".zip"),
                 retrieved_at=datetime.now(UTC),
-                media_type=response.headers.get("content-type", "application/zip"),
+                media_type=media_type,
             )
+        if record.path.suffix != ".zip":
+            continue
         with zipfile.ZipFile(record.path) as archive:
             for member in archive.namelist():
                 try:
@@ -986,14 +1016,18 @@ def parse() -> None:
         [
             (day.year, day, "OR", f"MEASURE {measure}", *counties["OR"][elstats.plain(county)], precinct, answer, votes)
             + (
-                (f"{OR_DETAIL.format(uri)}#{day:%m.%d.%y}/{county}.pdf", page, *box, 8 if digitized else 0)
-                if page is not None
-                else (f"{OR_DETAIL.format(uri)}#{day:%m.%d.%y}/{county}.csv", None, None, None, None, None, 0)
+                file
+                if day.year == 2024
+                else f"{OR_DETAIL.format(OR_RECORDS[day])}#{day:%m.%d.%y}/{county}.{'csv' if page is None else 'pdf'}",
+                page,
+                *(box or (None, None, None, None)),
+                8 if digitized and page is not None else 0,
             )
-            for day, uri in OR_RECORDS.items()
+            for day in (date(2020, 11, 3), date(2024, 11, 5))
             for county, measure, precinct, yes, no, *cells, digitized in json.loads(
                 (PARSED / "model" / f"or-{day.year}.json").read_text()
             )
+            for file in [OR_DETAIL.format(OR_2024[county]) if county in OR_2024 else None]
             for answer, votes, page, box in (("YES", yes, cells[0], cells[1]), ("NO", no, cells[2], cells[3]))
         ],
         schema={
@@ -1201,7 +1235,6 @@ def emit() -> Path:
             candidates.append((str(key), str(state), source, method, rows))
 
         landed: dict[str, int] = {}
-        records: tuple[UUID, UUID] | None = None
         skipped = 0
         minted: dict[tuple[str, date], tuple[str, str]] = {}
         values = []
@@ -1267,7 +1300,10 @@ def emit() -> Path:
                 code=pl.concat_str(pl.lit(f"{day.year}:{state}"), "fips", "jurisdiction", "precinct", separator=":")
             )
             codes = {}
-            for code, fips in rows.select("code", "fips").unique().iter_rows():
+            for code, fips, precinct in rows.select("code", "fips", "precinct").unique().iter_rows():
+                if precinct == "county":
+                    codes[code] = str(counties[fips][0])
+                    continue
                 if fips == "ME:emergency" and fips not in aggregates:
                     aggregates[fips] = cs.unit("us.aggregate", fips)
                     cs.add(
@@ -1334,29 +1370,44 @@ def emit() -> Path:
                     supersedes_id=supersedes if id == staged else None,
                     completeness=1,
                 )
-            harney = state == "OR" and day == date(2024, 11, 5) and method == MEDSL
             mono = method == CALIFORNIA and day == swdb_precincts.DAYS["P16"]
             cs.add(
                 "note",
                 entity_id=staged,
                 kind="methodology",
                 body_md=method.format(counties=" and to each county's" if by_county else "")
-                + (HARNEY_NOTE if harney else "")
                 + (MONO_NOTE if mono else "")
                 + (OR_2020_NOTE if method == OREGON and day == date(2020, 11, 3) else "")
-                + (OR_2020_110_NOTE if method == OREGON and day == date(2020, 11, 3) and "measure-110" in key else ""),
+                + (OR_2020_110_NOTE if method == OREGON and day == date(2020, 11, 3) and "measure-110" in key else "")
+                + (OR_2024_NOTE if method == OREGON and day == date(2024, 11, 5) else ""),
             )
             if method == OREGON:
                 source = sources[("oregon", "OR")][0]
-                record = OR_DETAIL.format(OR_RECORDS[day])
-                if record not in artifacts:
-                    artifacts[record] = cs.artifact(raw.cached(SOURCE, record), source)
-                cs.add(
-                    "citation",
-                    entity_id=staged,
-                    source_id=source,
-                    locator={"url": record, "artifact": str(artifacts[record])},
-                )
+                for record in (
+                    [OR_DETAIL.format(uri) for uri in OR_2024.values()]
+                    if day.year == 2024
+                    else [OR_DETAIL.format(OR_RECORDS[day])]
+                ):
+                    if record not in artifacts:
+                        artifacts[record] = cs.artifact(raw.cached(SOURCE, record), source)
+                    cs.add(
+                        "citation",
+                        entity_id=staged,
+                        source_id=source,
+                        locator={"url": record, "artifact": str(artifacts[record])},
+                    )
+                if day.year == 2024:
+                    cs.add(
+                        "citation",
+                        entity_id=staged,
+                        source_id=UUID(first["source"]),
+                        locator={
+                            "url": conn.execute("select url from source where id = %s", [first["source"]]).fetchall()[
+                                0
+                            ][0],
+                            "text": "Wheeler",
+                        },
+                    )
                 located = rows.filter(pl.col("page").is_not_null())
                 for file, number in located.select("file", "page").unique().iter_rows():
                     if (file, number) in pages:
@@ -1424,30 +1475,6 @@ def emit() -> Path:
                         "url": MONO_2016,
                         "artifact": str(cs.artifact(raw.cached(SOURCE, MONO_2016), clerk)),
                         "page": 16,
-                    },
-                )
-            if harney:
-                if records is None:
-                    secretary = cs.source("Oregon Secretary of State", "County precinct-level results")
-                    if secretary in cs.minted:
-                        cs.add(
-                            "source",
-                            id=secretary,
-                            kind="official_body",
-                            publisher="Oregon Secretary of State",
-                            title="County precinct-level results",
-                            url="https://records.sos.state.or.us/ORSOSCMSearch/",
-                            license="Public record",
-                        )
-                    records = secretary, cs.artifact(raw.cached(SOURCE, HARNEY), secretary)
-                cs.add(
-                    "citation",
-                    entity_id=staged,
-                    source_id=records[0],
-                    locator={
-                        "url": HARNEY,
-                        "artifact": str(records[1]),
-                        "page": HARNEY_2024[int(re.findall(r"measure-(\d+)", first["key"])[0])][0],
                     },
                 )
             values.append(complete.select(pl.lit(str(staged)).alias("result_set_id"), pl.all()))
