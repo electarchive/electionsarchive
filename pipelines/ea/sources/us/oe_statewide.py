@@ -77,6 +77,17 @@ NEW_MEXICO = "https://nm.elstats2.civera.com/eng/files/serve/18"
 OREGON = (
     "https://web.archive.org/web/2025id_/https://records.sos.state.or.us/ORSOSWebDrawer/Record/6873690/File/document"
 )
+NEW_MEXICO_2014 = "https://nm.elstats2.civera.com/eng/files/serve/791"
+SOUTH_CAROLINA = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_2006.pdf"
+NORTH_DAKOTA = (
+    "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/2000%20through%202008%20Statewide%20Election%20Results/2000/"
+    "General%20Election%2011-07-2000.pdf"
+)
+ILLINOIS = "https://www.elections.il.gov/Downloads/ElectionOperations/VoteTotals/2014GEOfficialVote.pdf"
+MICHIGAN = (
+    "https://web.archive.org/web/20160614235202id_/http://miboecfr.nictusa.com/election/results.old/02GEN/02GENall.html"
+)
+MONTANA = "https://sosmt.gov/wp-content/uploads/attachments/2012_General_Canvass.pdf"
 ARKANSAS = "https://web.archive.org/web/20180216174010id_/http://results.enr.clarityelections.com/AR/53237/149792/json/sum.json"
 CANVASSES = {
     "MO": (
@@ -95,6 +106,23 @@ CANVASSES = {
         "2014 General Election, official results",
         "https://results.enr.clarityelections.com/AR/53237/149792/Web01/en/summary.html",
     ),
+    "SC": ("South Carolina Election Commission", "Election results", "https://scvotes.gov/election-results/"),
+    "ND": (
+        "North Dakota Secretary of State",
+        "Official abstracts of votes cast at the general elections, 2000–2008",
+        "https://www.sos.nd.gov/elections/election-results",
+    ),
+    "IL": (
+        "Illinois State Board of Elections",
+        "Official Vote Cast at the General Election, November 4, 2014",
+        ILLINOIS,
+    ),
+    "MI": (
+        "Michigan Department of State, Bureau of Elections",
+        "Official election results",
+        "https://mielections.us/election/results/",
+    ),
+    "MT": ("Montana Secretary of State", "2012 Statewide General Election Canvass", MONTANA),
 }
 DECLARATIONS = {
     "2000-11-07:MO:lieutenant-governor": (MISSOURI.format(stamp=2024, year=2000), {"page": 1}),
@@ -113,6 +141,13 @@ DECLARATIONS = {
     "2014-11-04:AR:lieutenant-governor": (ARKANSAS, {"contest": "Lieutenant Governor"}),
     "2014-11-04:AR:secretary-of-state": (ARKANSAS, {"contest": "Secretary of State"}),
     "2014-11-04:AR:commissioner-of-state-lands": (ARKANSAS, {"contest": "Commissioner of State Lands"}),
+    "2006-11-07:SC:lieutenant-governor": (SOUTH_CAROLINA, {"pages": [43, 149]}),
+    "2006-11-07:SC:superintendent-of-education": (SOUTH_CAROLINA, {"pages": [48, 149]}),
+    "2014-11-04:NM:commissioner-of-public-lands": (NEW_MEXICO_2014, {"document": 791, "page": 1}),
+    "2000-11-07:ND:public-service-commissioner": (NORTH_DAKOTA, {"page": 1}),
+    "2014-11-04:IL:treasurer": (ILLINOIS, {"page": 54}),
+    "2002-11-05:MI:attorney-general": (MICHIGAN, {"section": "Attorney General 4 Year Term (1) Position"}),
+    "2012-11-06:MT:superintendent-of-public-instruction": (MONTANA, {"page": 9}),
 }
 CLOSE_WINNER = (
     "The race was within 0.5% in these sums. {winner} was declared the winner in the state's official canvass and "
@@ -226,7 +261,7 @@ ABSENT_WINNERS = {
 def fetch() -> None:
     openelections.fetch()
     for url in {url for url, _ in DECLARATIONS.values()}:
-        raw.fetch(SOURCE, url, suffix=".json" if url.endswith(".json") else ".pdf")
+        raw.fetch(SOURCE, url, suffix=next((end for end in (".json", ".html") if url.endswith(end)), ".pdf"))
 
 
 def parse() -> None:
