@@ -178,6 +178,19 @@ MASSACHUSETTS = (
     "Precinct rows of the Secretary of the Commonwealth's election statistics archive for this question. Each "
     "answer's precinct rows add up to the totals of this question's default results{counties}."
 )
+HARNEY = "https://records.sos.state.or.us/ORSOSWebDrawer/Record/10574992/File/document?inline=true"
+HARNEY_2024 = {
+    115: (12, (582, 382, 716), (708, 441, 1204)),
+    116: (13, (473, 283, 514), (815, 536, 1389)),
+    117: (14, (323, 214, 327), (990, 617, 1607)),
+    118: (15, (214, 99, 158), (1107, 736, 1782)),
+    119: (16, (550, 354, 483), (730, 453, 1380)),
+}
+HARNEY_NOTE = (
+    " MEDSL's file has no rows for Harney County, so its three precincts (21, 25, and 26) come from the County "
+    "Clerk's official abstract of votes filed with the Secretary of State (record EPD/24/216), a scan read by hand; "
+    "they add up to the abstract's totals and to Harney's certified county totals."
+)
 COMMITS = openelections.COMMITS | county_measures.COMMITS
 FILE = re.compile(
     r"(?:.*/)?(\d{8})__([a-z]{2})__((?:general|primary|special|runoff)(?:__(?:general|primary|runoff))?)(__[a-z_]+)?__(precinct|town)\.csv"
@@ -186,6 +199,7 @@ FILE = re.compile(
 
 def fetch() -> None:
     measures.fetch()
+    raw.fetch(SOURCE, HARNEY, suffix=".pdf")
     with connect() as conn:
         dates = conn.execute(
             """select distinct substr(p.iso_code, 4), e.date_from from contest c
@@ -840,6 +854,37 @@ def emit() -> Path:
         ],
         how="diagonal_relaxed",
     )
+    oregon = returns.filter(pl.col("origin") == "medsl", pl.col("state") == "OR", pl.col("year") == 2024)
+    if "41025" not in oregon["fips"].to_list():
+        returns = pl.concat(
+            [
+                returns,
+                pl.DataFrame(
+                    [
+                        (2024, date(2024, 11, 5), "OR", office, district, "41025", "HARNEY", precinct, answer, votes)
+                        for office, district in oregon.select("office", "district").unique().iter_rows()
+                        for answer, counts in zip(
+                            ("YES", "NO"), HARNEY_2024[int(re.findall(r"MEASURE (\d+)", office)[0])][1:], strict=True
+                        )
+                        for precinct, votes in zip(("21", "25", "26"), counts, strict=True)
+                    ],
+                    schema=[
+                        "year",
+                        "day",
+                        "state",
+                        "office",
+                        "district",
+                        "fips",
+                        "jurisdiction",
+                        "precinct",
+                        "answer",
+                        "votes",
+                    ],
+                    orient="row",
+                ).with_columns(origin=pl.lit("medsl")),
+            ],
+            how="diagonal_relaxed",
+        )
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -973,6 +1018,7 @@ def emit() -> Path:
             candidates.append((str(key), str(state), source, method, rows))
 
         landed: dict[str, int] = {}
+        records: tuple[UUID, UUID] | None = None
         skipped = 0
         minted: dict[tuple[str, date], tuple[str, str]] = {}
         values = []
@@ -1102,12 +1148,38 @@ def emit() -> Path:
                     supersedes_id=supersedes if id == staged else None,
                     completeness=1,
                 )
+            harney = state == "OR" and day == date(2024, 11, 5) and method == MEDSL
             cs.add(
                 "note",
                 entity_id=staged,
                 kind="methodology",
-                body_md=method.format(counties=" and to each county's" if by_county else ""),
+                body_md=method.format(counties=" and to each county's" if by_county else "")
+                + (HARNEY_NOTE if harney else ""),
             )
+            if harney:
+                if records is None:
+                    secretary = cs.source("Oregon Secretary of State", "County precinct-level results")
+                    if secretary in cs.minted:
+                        cs.add(
+                            "source",
+                            id=secretary,
+                            kind="official_body",
+                            publisher="Oregon Secretary of State",
+                            title="County precinct-level results",
+                            url="https://records.sos.state.or.us/ORSOSCMSearch/",
+                            license="Public record",
+                        )
+                    records = secretary, cs.artifact(raw.cached(SOURCE, HARNEY), secretary)
+                cs.add(
+                    "citation",
+                    entity_id=staged,
+                    source_id=records[0],
+                    locator={
+                        "url": HARNEY,
+                        "artifact": str(records[1]),
+                        "page": HARNEY_2024[int(re.findall(r"measure-(\d+)", first["key"])[0])][0],
+                    },
+                )
             values.append(complete.select(pl.lit(str(staged)).alias("result_set_id"), pl.all()))
             landed[state] = landed.get(state, 0) + 1
         for (code, day), (state, fips) in minted.items():
