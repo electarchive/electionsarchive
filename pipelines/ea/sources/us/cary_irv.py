@@ -43,8 +43,7 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     text = raw.cached(SOURCE, url("canvass")).path.read_text(encoding="cp1252")
     lines = [
-        html.unescape(re.sub(r"<[^>]+>", "", block)).replace("\xa0", " ")
-        for block in re.split(r"(?i)</pre>", text)
+        html.unescape(re.sub(r"<[^>]+>", "", block)).replace("\xa0", " ") for block in re.split(r"(?i)</pre>", text)
     ]
     start = next(number for number, line in enumerate(lines) if HEADING in line)
     names: dict[str, str] = {}
@@ -89,7 +88,7 @@ def parse() -> None:
     for label, values in columns.items():
         if sum(values) != second[label]:
             raise ValueError(f"irv: the precincts do not add up for {label}")
-    if sum(second.values()) != int(re.search(r"Total\s*</td>.*?=\s*</td>.*?>(\d+)<", sheet, re.S)[1]):
+    if sum(second.values()) != int(re.search(r"Total\s*</td>.*?=\s*</td>.*?>(\d+)<", sheet, re.DOTALL)[1]):
         raise ValueError("irv: the finalists do not add up to the total")
     (PARSED / "contest.json").write_text(json.dumps({"first": first, "second": second, "columns": columns}))
 
@@ -201,7 +200,9 @@ def emit() -> Path:
                 cs.add("outcome", result_set_id=result, option_id=option, kind="eliminated")
             else:
                 option = options[label]
-                for outcome in ("won", "elected") if label == winner else ("lost" if label in second else "eliminated",):
+                for outcome in (
+                    ("won", "elected") if label == winner else ("lost" if label in second else "eliminated",)
+                ):
                     cs.add("outcome", result_set_id=result, option_id=option, kind=outcome)
             values.append((option, 1, 1, votes))
             if label in second:
