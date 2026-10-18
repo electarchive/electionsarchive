@@ -49,12 +49,50 @@ PARTIES = {
     "UST": "TX:u-s-taxpayers-party",
     "SWP": "socialist-workers-party",
 }
+WON_ALONE = "Derived: the only candidate in the certified contest totals."
+WON_MAJORITY = "Derived: a majority of the certified contest totals."
+RUNOFF_WON = "Derived: the leader of the certified runoff totals."
+ADVANCED = "Derived: one of the top two of the certified contest totals, and a runoff followed."
 RUNOFF_DATE = (
     "The Secretary of State's page dates this runoff 6/2/1993. The runoff was held on Saturday, June 5, 1993, "
     "and we show it on that date."
 )
 ELECTIONS = (1, 2, 3, 4, 5, 6, 7, 8, 9, 10, 11, 12, 52, 53, 54, 55, 56, 57, 58, 62, 63, 69, 70, 72)
 GENERALS = (82, 95, 114, 127, 141, 154, 164, 175)
+PRIMARIES = (
+    76,
+    77,
+    80,
+    81,
+    88,
+    89,
+    90,
+    91,
+    104,
+    105,
+    112,
+    113,
+    118,
+    119,
+    125,
+    126,
+    135,
+    136,
+    139,
+    140,
+    148,
+    149,
+    150,
+    151,
+    160,
+    161,
+    162,
+    163,
+    169,
+    170,
+    173,
+    174,
+)
 
 
 def races(election: int) -> list[tuple[int, str]]:
@@ -67,7 +105,7 @@ def races(election: int) -> list[tuple[int, str]]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, f"{SITE}index.htm", suffix=".htm")
-    for election in (*ELECTIONS, *GENERALS):
+    for election in (*ELECTIONS, *PRIMARIES, *GENERALS):
         raw.fetch(SOURCE, f"{SITE}elchist{election}_raceselect.htm", suffix=".htm")
         time.sleep(1)
         for race, title in races(election):
@@ -89,7 +127,7 @@ def cells(row: str, tag: str) -> list[str]:
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
-    for election in (*ELECTIONS, *GENERALS):
+    for election in (*ELECTIONS, *PRIMARIES, *GENERALS):
         for race, title in races(election):
             if not STATEWIDE.match(title):
                 continue
@@ -154,8 +192,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas statewide elections of 1992 to 1998 and generals of 2000 to 2014 by county from the Secretary "
-            "of State's election history",
+            summary="Texas statewide elections of 1992 to 1998 and primaries, runoffs, and generals of 2000 to 2014 by "
+            "county from the Secretary of State's election history",
             polity="US",
         )
 
@@ -197,7 +235,7 @@ def emit() -> Path:
             license="Public record",
         )
         pages: dict[tuple[int, str], str] = {}
-        for election in (*ELECTIONS, *GENERALS):
+        for election in (*ELECTIONS, *PRIMARIES, *GENERALS):
             for race, title in races(election):
                 if STATEWIDE.match(title):
                     pages[(election, title)] = f"{SITE}elchist{election}_race{race}.htm"
@@ -247,6 +285,13 @@ def emit() -> Path:
         if cs.minted & {*systems.values(), *parties.values()}:
             raise ValueError("the electoral systems and parties must already exist")
         firsts: dict[tuple[int, str], UUID] = {}
+        runoffs = {
+            (day.year, race, "Democratic" in label)
+            for label, day, race in frame.filter(pl.col("name").str.contains("Runoff"))
+            .select("name", "day", "race")
+            .unique()
+            .iter_rows()
+        }
         filled = 0
         made: set[UUID] = set()
         for (election, label, day, race), lines in frame.sort("day", "election").group_by(
@@ -375,7 +420,7 @@ def emit() -> Path:
             options: list[tuple[UUID, str, str]] = []
             outcomes: list[tuple[UUID, str, int | None]] = []
             on_file: dict[UUID, int] = {}
-            promoted = not existing or election not in GENERALS
+            promoted = not existing
             if existing:
                 options = conn.execute(
                     "select id, kind, ballot_label from contest_option where contest_id = %s and kind <> 'others'",
@@ -485,13 +530,13 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=later if election in GENERALS else source,
+                source_id=source if election in ELECTIONS else later,
                 is_default=promoted,
                 completeness=1,
             )
             if election in DAYS:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=RUNOFF_DATE)
-            cs.artifact(raw.cached(SOURCE, pages[(election, race)]), later if election in GENERALS else source)
+            cs.artifact(raw.cached(SOURCE, pages[(election, race)]), source if election in ELECTIONS else later)
             for candidate, county, votes in lines.select("candidate", "county", "votes").iter_rows():
                 cs.add(
                     "result_value",
@@ -507,7 +552,20 @@ def emit() -> Path:
             kept = [row for row in outcomes if row[0] in totals]
             for option, kind, seats in kept:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
-            if not kept:
+            if not kept and election in PRIMARIES:
+                ranked = sorted(totals, key=totals.__getitem__, reverse=True)
+                total = sum(totals.values())
+                clear = len(ranked) == 1 or (totals[ranked[0]] - totals[ranked[1]]) * 100 > total
+                if stage == "runoff" and clear:
+                    cs.add("outcome", result_set_id=result_set, option_id=ranked[0], kind="won", notes=RUNOFF_WON)
+                elif stage == "primary" and len(ranked) == 1:
+                    cs.add("outcome", result_set_id=result_set, option_id=ranked[0], kind="won", notes=WON_ALONE)
+                elif stage == "primary" and totals[ranked[0]] * 2 > total and clear:
+                    cs.add("outcome", result_set_id=result_set, option_id=ranked[0], kind="won", notes=WON_MAJORITY)
+                elif stage == "primary" and (day.year, race, "Democratic" in label) in runoffs:
+                    for option in ranked[:2]:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced", notes=ADVANCED)
+            elif not kept:
                 ranked = sorted(totals, key=totals.__getitem__, reverse=True)
                 majority = totals[ranked[0]] * 2 > sum(totals.values())
                 if stage == "general" or (special and (stage == "runoff" or majority)):
