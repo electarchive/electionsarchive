@@ -44,7 +44,7 @@
   const STEPS = [14, 30, 48, 66, 84, 100];
   const SWINGS = [0.02, 0.05, 0.1];
   const DIM = "color-mix(in oklab, var(--muted-foreground) 11%, var(--card))";
-  const VIEWS = ["winner", "share", "swing", "flips"] as const;
+  const VIEWS = ["winner", "share", "votes", "swing", "flips"] as const;
 
   const uid = $props.id();
   const calm =
@@ -103,6 +103,10 @@
   let lookup: Record<number, { set: Sheet; i: number; source: string }> = {};
   let seen = $state(0);
   let search = $state<HTMLInputElement | null>(null);
+  let labels = $state.raw<
+    Array<{ k: number; name: string; x: number; y: number }>
+  >([]);
+  let isQueued = false;
 
   const isCompared = $derived(
     sheet.target != null &&
@@ -114,6 +118,11 @@
     !isCompared && (view === "swing" || view === "flips") ? "winner" : view,
   );
   const needsBefore = $derived(shown === "swing" || shown === "flips");
+  const isEstimated = $derived(
+    isCompared &&
+      (sheet.estimated ||
+        Object.values(detail).some((held) => held.set.estimated)),
+  );
   const first = $derived(sheet.legend[0] ?? null);
   const second = $derived(sheet.legend[1] ?? null);
   const whom = $derived(
@@ -630,6 +639,25 @@
     );
     gl.addLayer(
       {
+        id: `hatch:${id}`,
+        type: "fill",
+        source: id,
+        "source-layer": "areas",
+        minzoom: from,
+        paint: {
+          "fill-pattern": "hatch",
+          "fill-opacity": [
+            "case",
+            ["boolean", ["feature-state", "hatched"], false],
+            1,
+            0,
+          ],
+        },
+      },
+      before,
+    );
+    gl.addLayer(
+      {
         id: `seam:${id}`,
         type: "line",
         source: id,
@@ -709,16 +737,80 @@
       },
       "anchor-focus",
     );
-    layers.push(fill, `seam:${id}`, `edge:${id}`, `focus:${id}`);
+    layers.push(fill, `hatch:${id}`, `seam:${id}`, `edge:${id}`, `focus:${id}`);
     groups.push({ rank, first: fill });
     return id;
   }
 
-  function index(set: Sheet, id: string) {
+  function index(gl: Maplibre.Map, set: Sheet, id: string, rank: number) {
     for (const [i, k] of set.places.k.entries()) {
       lookup[k] = { set, i, source: id };
     }
     seen += 1;
+    const dots = `dots:${id}:${set.scope.k}:${set.level ?? ""}`;
+    if (gl.getSource(dots) != null) {
+      return;
+    }
+    gl.addSource(dots, {
+      type: "geojson",
+      data: {
+        type: "FeatureCollection",
+        features: set.places.k.flatMap((k, i) => {
+          const x = set.places.x[i];
+          const y = set.places.y[i];
+          return x == null || y == null
+            ? []
+            : [
+                {
+                  type: "Feature" as const,
+                  id: k,
+                  properties: { votes: set.places.valid[i] ?? 0 },
+                  geometry: { type: "Point" as const, coordinates: [x, y] },
+                },
+              ];
+        }),
+      },
+    });
+    sources.push(dots);
+    const reader = probe(gl.getContainer());
+    const paper = reader.color("var(--card)");
+    reader.done();
+    const size: Maplibre.ExpressionSpecification = [
+      "coalesce",
+      ["feature-state", "size"],
+      0,
+    ];
+    gl.addLayer(
+      {
+        id: dots,
+        type: "circle",
+        source: dots,
+        minzoom: rank === 0 ? 0 : rank === 1 ? MID : FINE,
+        maxzoom: rank === 0 ? (mid == null ? 24 : MID) : rank === 1 ? FINE : 24,
+        layout: { "circle-sort-key": ["-", 0, ["get", "votes"]] },
+        paint: {
+          "circle-radius": [
+            "interpolate",
+            ["exponential", 2],
+            ["zoom"],
+            0,
+            ["*", size, 2 ** -4],
+            22,
+            ["*", size, 2 ** 18],
+          ],
+          "circle-color": [
+            "coalesce",
+            ["feature-state", "dot"],
+            "rgba(0, 0, 0, 0)",
+          ],
+          "circle-opacity": 0.9,
+          "circle-stroke-color": paper,
+          "circle-stroke-width": ["case", [">", size, 0], 0.6, 0],
+        },
+      },
+      "anchor-edges",
+    );
+    layers.push(dots);
   }
 
   function build(gl: Maplibre.Map, next: Sheet) {
@@ -788,7 +880,12 @@
     reader.done();
     const level = next.levels.find((entry) => entry.code === next.level);
     if (level?.tiles != null) {
-      index(next, tier(gl, level.tiles, 0, 0, next.places.k.length > 400));
+      index(
+        gl,
+        next,
+        tier(gl, level.tiles, 0, 0, next.places.k.length > 400),
+        0,
+      );
     }
   }
 
@@ -798,11 +895,30 @@
     }
     painted[`${id}|${set.scope.k}|${set.level}`] = mark;
     const reader = probe(gl.getContainer());
+    const dots = `dots:${id}:${set.scope.k}:${set.level ?? ""}`;
+    const isDotted = shown === "votes" && gl.getSource(dots) != null;
+    const ground = reader.color(
+      "color-mix(in oklab, var(--muted-foreground) 15%, var(--card))",
+    );
     for (const [i, k] of set.places.k.entries()) {
+      const color = reader.color(tone(set, i));
       gl.setFeatureState(
         { source: id, sourceLayer: "areas", id: k },
-        { color: reader.color(tone(set, i)), on: true },
+        {
+          color: isDotted ? ground : color,
+          on: true,
+          hatched: set.estimated && needsBefore,
+        },
       );
+      if (gl.getSource(dots) != null) {
+        gl.setFeatureState(
+          { source: dots, id: k },
+          {
+            dot: color,
+            size: isDotted ? 0.015 * Math.sqrt(set.places.valid[i] ?? 0) : 0,
+          },
+        );
+      }
     }
     reader.done();
   }
@@ -821,7 +937,7 @@
     if (mid?.tiles != null && zoom >= MID - 0.5) {
       wanted.push({ key: "mid", where: "", level: mid.code });
     }
-    if (!needsBefore && zoom >= FINE - 0.6) {
+    if (zoom >= FINE - 0.6) {
       const ids = gl
         .queryRenderedFeatures({ layers: groups.map((group) => group.first) })
         .map((feature) => feature.id);
@@ -849,7 +965,7 @@
         continue;
       }
       pending += 1;
-      void request(want.where, want.level, want.key === "mid" ? vs : null)
+      void request(want.where, want.level, vs)
         .then((set) => {
           const level = set.levels.find((entry) => entry.code === set.level);
           if (
@@ -863,7 +979,7 @@
           }
           const rank = want.key === "mid" ? 1 : 2;
           const id = tier(gl, level.tiles, rank, rank === 1 ? MID : FINE, true);
-          index(set, id);
+          index(gl, set, id, rank);
           detail = { ...detail, [want.key]: { set, source: id, rank } };
         })
         .finally(() => {
@@ -885,10 +1001,11 @@
   }
 
   function room() {
-    const wide = globalThis.innerWidth >= 768;
-    return wide
-      ? { top: 32, right: 340, bottom: 32, left: 340 }
-      : { top: 24, right: 24, bottom: 120, left: 24 };
+    const width = globalThis.innerWidth;
+    const side = Math.round(Math.min(320, width * 0.16));
+    return width >= 768
+      ? { top: 64, right: side, bottom: 24, left: side }
+      : { top: 64, right: 16, bottom: 120, left: 16 };
   }
 
   function fly(k: number) {
@@ -955,6 +1072,65 @@
     );
   }
 
+  function letter(gl: Maplibre.Map) {
+    isQueued = false;
+    const held = detail.mid;
+    const set = held != null && gl.getZoom() >= MID ? held.set : sheet;
+    const finest = sheet.levels.findLast((level) => level.tiles != null);
+    if (set.level === finest?.code && set.places.k.length > 500) {
+      labels = [];
+      return;
+    }
+    const box = gl.getBounds();
+    const width = gl.getCanvas().clientWidth;
+    const height = gl.getCanvas().clientHeight;
+    const order: Array<number> = [];
+    for (const [i, x] of set.places.x.entries()) {
+      const y = set.places.y[i];
+      if (x != null && y != null && box.contains([x, y])) {
+        order.push(i);
+      }
+    }
+    order.sort(
+      (a, b) => (set.places.valid[b] ?? 0) - (set.places.valid[a] ?? 0),
+    );
+    const taken: Array<[number, number, number, number]> = [];
+    const next: Array<{ k: number; name: string; x: number; y: number }> = [];
+    for (const i of order) {
+      const name = set.places.name[i] ?? "";
+      const at = gl.project([set.places.x[i] ?? 0, set.places.y[i] ?? 0]);
+      const half = name.length * 3.4 + 4;
+      const edge: [number, number, number, number] = [
+        at.x - half,
+        at.y - 9,
+        at.x + half,
+        at.y + 9,
+      ];
+      if (
+        name === "" ||
+        edge[0] < 4 ||
+        edge[1] < 4 ||
+        edge[2] > width - 4 ||
+        edge[3] > height - 4 ||
+        taken.some(
+          (other) =>
+            other[0] < edge[2] &&
+            edge[0] < other[2] &&
+            other[1] < edge[3] &&
+            edge[1] < other[3],
+        )
+      ) {
+        continue;
+      }
+      taken.push(edge);
+      next.push({ k: set.places.k[i] ?? 0, name, x: at.x, y: at.y });
+      if (next.length >= 40) {
+        break;
+      }
+    }
+    labels = next;
+  }
+
   const mount = (host: HTMLElement) => {
     const stop = new AbortController();
     let built: Maplibre.Map | null = null;
@@ -1013,6 +1189,12 @@
         map = gl;
       });
       gl.on("moveend", deepen);
+      gl.on("move", () => {
+        if (!isQueued) {
+          isQueued = true;
+          requestAnimationFrame(() => letter(gl));
+        }
+      });
       gl.on("mousemove", (event) => {
         const fills = groups
           .toSorted((a, b) => b.rank - a.rank)
@@ -1084,6 +1266,13 @@
   });
 
   $effect(() => {
+    const gl = map;
+    if (gl != null) {
+      letter(gl);
+    }
+  });
+
+  $effect(() => {
     const theme = mode.current;
     const gl = map;
     if (gl == null || theme == null) {
@@ -1093,9 +1282,31 @@
       const reader = probe(gl.getContainer());
       const paper = reader.color("var(--card)");
       gl.setPaintProperty("paper", "background-color", paper);
+      const [r = 255, g = 255, b = 255] = (paper.match(/[\d.]+/g) ?? []).map(
+        Number,
+      );
+      const stripes = new Uint8Array(12 * 12 * 4);
+      for (let y = 0; y < 12; y += 1) {
+        for (let x = 0; x < 12; x += 1) {
+          if ((x + y) % 12 < 2) {
+            stripes.set([r, g, b, 150], (y * 12 + x) * 4);
+          }
+        }
+      }
+      if (gl.hasImage("hatch")) {
+        gl.removeImage("hatch");
+      }
+      gl.addImage(
+        "hatch",
+        { width: 12, height: 12, data: stripes },
+        { pixelRatio: 2 },
+      );
       for (const id of layers) {
         if (id.startsWith("seam:") || id.startsWith("edge:")) {
           gl.setPaintProperty(id, "line-color", paper);
+        }
+        if (id.startsWith("dots:")) {
+          gl.setPaintProperty(id, "circle-stroke-color", paper);
         }
         if (id.startsWith("focus:") || id === "scope") {
           gl.setPaintProperty(
@@ -1155,8 +1366,13 @@
       return;
     }
     for (const held of Object.values(detail)) {
-      if (held.rank === 2) {
-        for (const kind of ["fill", "seam", "edge", "focus"]) {
+      if (
+        held.rank === 2 &&
+        held.set.places.before.every((column) =>
+          column.every((value) => value == null),
+        )
+      ) {
+        for (const kind of ["fill", "hatch", "seam", "edge", "focus"]) {
           if (gl.getLayer(`${kind}:${held.source}`) != null) {
             gl.setLayoutProperty(
               `${kind}:${held.source}`,
@@ -1395,6 +1611,11 @@
             class="rounded-xs px-1.5 text-xs/5 font-semibold ring-1 ring-foreground"
             >{m.atlas_flipped({ year })}</span
           >
+          {#if hit.set.estimated}
+            <span class="text-xs text-muted-foreground"
+              >{m.atlas_estimated()}</span
+            >
+          {/if}
         {/if}
       </p>
     {/if}
@@ -1441,6 +1662,11 @@
           points: Math.abs(reading.swing * 100).toFixed(1),
           year,
         })}
+        {#if hit.set.estimated}
+          <span class="font-semibold text-foreground"
+            >({m.atlas_estimated()})</span
+          >
+        {/if}
         <span class="block">{m.atlas_ticks({ year })}</span>
       </p>
     {/if}
@@ -1534,6 +1760,18 @@
     >
       <div class="block-full inline-full" {@attach mount}></div>
     </div>
+    <div
+      class="pointer-events-none absolute inset-0 overflow-hidden"
+      aria-hidden="true"
+    >
+      {#each labels as label (label.k)}
+        <span
+          class="absolute inset-s-0 inset-bs-0 text-[0.75rem] font-semibold whitespace-nowrap text-foreground [-webkit-text-stroke:3px_var(--card)] [paint-order:stroke_fill]"
+          style:transform="translate({label.x}px, {label.y}px) translate(-50%,
+          -50%)">{label.name}</span
+        >
+      {/each}
+    </div>
     <p id="{uid}-hint" class="sr-only">{m.atlas_hint()}</p>
 
     {#if isLoading || pending > 0}
@@ -1565,7 +1803,7 @@
           >{m.map_color_by()}</span
         >
         <div class="flex flex-wrap gap-1.5">
-          {#each [{ value: "winner" as const, label: m.map_mode_winner(), key: null }, ...sheet.legend
+          {#each [{ value: "winner" as const, label: m.map_mode_winner(), key: null }, { value: "votes" as const, label: m.map_mode_bubbles(), key: null }, ...sheet.legend
               .slice(0, 3)
               .map( (item) => ({ value: "share" as const, label: item.label, key: item.key }) ), ...(isCompared ? [{ value: "swing" as const, label: m.map_mode_swing(), key: null }, { value: "flips" as const, label: m.map_mode_flips(), key: null }] : [])] as choice (`${choice.value}:${choice.key ?? ""}`)}
             {const isOn = $derived(
@@ -1619,6 +1857,13 @@
       {#if sheet.target != null && !isCompared}
         <p class="text-[0.8125rem] text-muted-foreground">
           {m.atlas_no_comparison()}
+        </p>
+      {/if}
+      {#if isEstimated && year != null}
+        <p
+          class="border-s-2 border-foreground ps-2 text-[0.8125rem] text-muted-foreground"
+        >
+          {m.atlas_estimated_note({ year })}
         </p>
       {/if}
       <div class="flex flex-wrap gap-1">

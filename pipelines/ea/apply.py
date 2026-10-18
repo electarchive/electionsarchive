@@ -66,7 +66,17 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         and table not in temporal
         and table not in (*FACTS, "external_id", "slug", "entity_merge", "entity_retirement")
     }
-    return Stage(schema, tables, entities, pipeline, polity, temporal, parents)
+    owners: dict[str, str] = {
+        table: owner
+        for table, owner in conn.execute(
+            """select f.conrelid::regclass::text, f.confrelid::regclass::text from pg_constraint f
+               where f.contype = 'f' and f.connamespace = 'public'::regnamespace
+                 and not exists (select from pg_attribute i
+                                 where i.attrelid = f.conrelid and i.attname = 'changeset_id' and not i.attisdropped)"""
+        ).fetchall()
+        if table in parents
+    }
+    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners)
 
 
 def _not_null(conn: Connection, table: str) -> set[str]:

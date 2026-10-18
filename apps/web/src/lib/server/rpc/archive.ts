@@ -564,6 +564,7 @@ async function load(
   owners: Array<string> = [],
   round: number | null = null,
   facts: keyof typeof FACTS = "area",
+  spread: Map<number, Array<[number, number]>> | null = null,
 ) {
   const loaded = new Map<
     number,
@@ -674,8 +675,23 @@ async function load(
     select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, r.rank::float8
     from flagged r where r.rank is not null
   `);
-  const counts = rollup.rows.filter((row) => row.role !== "rank");
+  const counts = rollup.rows
+    .filter((row) => row.role !== "rank")
+    .flatMap((row) =>
+      (spread?.get(row.area) ?? [[row.area, 1] as const]).map(
+        ([area, weight]) => ({ ...row, area, value: row.value * weight }),
+      ),
+    );
   const kept = new Set(counts.map((row) => `${row.set}:${row.area}`));
+  picked.rows = new Map(
+    picked.rows.flatMap((row) =>
+      (spread?.get(row.area) ?? [[row.area, 1] as const]).map(
+        ([area]) => [`${row.k}:${area}`, { ...row, area }] as const,
+      ),
+    ),
+  )
+    .values()
+    .toArray();
   const tallies = new Map(
     rollup.rows
       .filter((row) => row.role === "rank")
@@ -1709,6 +1725,7 @@ async function tabulate(
     ids: Array<string>;
     date: string | null;
     pairs?: Array<{ k: number; id: string }>;
+    spread?: Map<number, Array<[number, number]>>;
   } | null,
   lineage: Array<Relation>,
   match: Match,
@@ -1742,10 +1759,15 @@ async function tabulate(
       ? null
       : load(
           chosen.ids,
-          chosen.pairs?.map((pair) => pair.k) ?? ks,
+          chosen.spread == null
+            ? (chosen.pairs?.map((pair) => pair.k) ?? ks)
+            : chosen.spread.keys().toArray(),
           chosen.date ?? "infinity",
           [],
-          chosen.pairs?.map((pair) => pair.id),
+          chosen.spread == null ? chosen.pairs?.map((pair) => pair.id) : [],
+          null,
+          "area",
+          chosen.spread ?? null,
         ),
   ]);
   const legend = new Map<
@@ -3568,6 +3590,7 @@ export const contests = {
           v.object({ id: v.string(), label: v.string(), date: v.string() }),
         ),
         target: v.nullable(v.string()),
+        estimated: v.boolean(),
         legend: v.array(
           v.object({
             key: v.string(),
@@ -3821,6 +3844,33 @@ export const contests = {
             where coalesce(c.district_area_id, pt.area_id) = ${owner.place}::uuid
             limit 1
           `);
+      const crosswalk = await db.execute<{
+        from_k: number;
+        to_k: number;
+        weight: number;
+      }>(sql`
+        select w.from_k, w.to_k, w.weight::float8 as weight
+        from crosswalk x
+        join crosswalk_weight w on w.crosswalk_id = x.id
+        where x.to_boundary_set_id = (
+            select id from boundary_set
+            where scheme_code = ${level?.code ?? null} and coalesce(tiles_key, scheme_code || '/' || vintage) = ${level?.tiles ?? null}
+            limit 1
+          )
+          and x.from_boundary_set_id = (
+            select id from boundary_set
+            where scheme_code = ${level?.code ?? null} and valid @> ${wanted?.date ?? null}::date
+            order by valid_from desc nulls last
+            limit 1
+          )
+          and w.to_k = any(${sql.param(shown.map((row) => row.k))}::int[])
+      `);
+      const spread = new Map<number, Array<[number, number]>>();
+      for (const row of crosswalk.rows) {
+        const list = spread.get(row.from_k) ?? [];
+        list.push([row.to_k, row.weight]);
+        spread.set(row.from_k, list);
+      }
       const [tabulated, points] = await Promise.all([
         tabulate(
           [owner.id],
@@ -3837,6 +3887,7 @@ export const contests = {
             : {
                 ids: [counterpart?.rows[0]?.id ?? wanted.id],
                 date: wanted.date,
+                ...(spread.size > 0 && { spread }),
               },
           relations,
           "party",
@@ -3893,6 +3944,7 @@ export const contests = {
           date: row.date,
         })),
         target: wanted?.id ?? null,
+        estimated: spread.size > 0,
         legend: tabulated.legend.map((item) => ({
           key: item.key,
           label:

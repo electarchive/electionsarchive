@@ -659,6 +659,8 @@
   "atlas_alone": "Map {place} alone",
   "atlas_versus": "{name} +{points} vs. {place}",
   "atlas_explore": "Open full map",
+  "atlas_estimated_note": "Boundaries changed since {year}. {year} results are estimated by splitting each earlier precinct's votes based on 2020 census block populations within current areas.",
+  "atlas_estimated": "Estimated",
   "map_gesture_windows": "Hold Ctrl and scroll to zoom",
   "map_gesture_mac": "Hold ⌘ and scroll to zoom",
   "map_gesture_mobile": "Use two fingers to move the map",
