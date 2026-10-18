@@ -49,13 +49,19 @@ ARIZONA = (
 )
 AZ_PUBLISHER = "Arizona Secretary of State"
 AZ_TITLE = "State of Arizona Official Canvass, 2022 General Election"
-OREGON = (
-    "https://web.archive.org/web/20230216221024id_/"
-    "https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf"
-)
+OREGON = {
+    date(2022, 11, 8): (
+        "https://web.archive.org/web/20230216221024id_/"
+        "https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf"
+    ),
+    date(2024, 11, 5): "https://records.sos.state.or.us/ORSOSWebDrawer/Record/13735458/File/Document",
+}
 OR_PUBLISHER = "Oregon Secretary of State"
-OR_TITLE = "November 8, 2022, General Election Abstract of Votes"
-OR_OFFICES = {"Commissioner of the Bureau of Labor and Industries"}
+OR_TITLE = "{day:%B} {day.day}, {day.year}, General Election Abstract of Votes"
+OR_OFFICES = {
+    date(2022, 11, 8): {"Commissioner of the Bureau of Labor and Industries"},
+    date(2024, 11, 5): {"Secretary of State", "State Treasurer", "Attorney General"},
+}
 AZ_COUNTIES = [f"040{code:02d}" for code in (1, 3, 5, 7, 9, 11, 12, 13, 15, 17, 19, 21, 23, 25, 27)]
 SEATS = {
     "Corporation Commissioner": 2,
@@ -186,7 +192,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, INDIANA.format(year=day.year, category=category), suffix=".json")
     raw.fetch(SOURCE, MICHIGAN, suffix=".csv")
     raw.fetch(SOURCE, ARIZONA, suffix=".pdf")
-    raw.fetch(SOURCE, OREGON, suffix=".pdf")
+    for url in OREGON.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
 
 
 def parse() -> None:
@@ -372,16 +379,17 @@ def parse() -> None:
             ).fetchall()
         }
     office = None
-    for text in (
-        line.strip()
+    for day, text in (
+        (day, line.strip())
+        for day, url in OREGON.items()
         for line in subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, OREGON).path), "-"],
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
             check=False,
             capture_output=True,
             text=True,
         ).stdout.splitlines()
     ):
-        if text in OR_OFFICES:
+        if text in OR_OFFICES[day]:
             office, header, tallied = text, [], []
             continue
         if office is None or not text:
@@ -396,7 +404,7 @@ def parse() -> None:
             raise ValueError(f"Oregon {office}: cannot read {found[1]} under {header}")
         if not tallied:
             tallied = [0] * (len(votes) + 1)
-        if found[1] == "TOTAL":
+        if found[1].upper() == "TOTAL":
             if tallied != [*votes, 36]:
                 raise ValueError(f"Oregon {office}: the counties do not add up to the printed totals")
             office = None
@@ -404,14 +412,15 @@ def parse() -> None:
         tallied[-1] += 1
         for index, (surname, count) in enumerate(zip(surnames, votes, strict=True)):
             tallied[index] += count
+            first = re.fullmatch(r"(.+?)(?: \((\w+)\))?", firsts[index]) if index < len(firsts) else None
             rows.append(
                 {
                     "state": "OR",
-                    "day": date(2022, 11, 8),
+                    "day": day,
                     "office": office,
-                    "candidate": "Write-ins" if surname == "Misc." else f"{firsts[index]} {surname.lstrip('*')}",
+                    "candidate": "Write-ins" if first is None else f"{first[1]} {surname.lstrip('*')}",
                     "mate": None,
-                    "party": None,
+                    "party": None if first is None else first[2],
                     "fips": oregon_fips[slug(found[1]).replace("-", "")],
                     "votes": count,
                     "write_in": surname == "Misc.",
@@ -493,8 +502,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's, Arizona's, and Oregon's 2022, and "
-                "Kentucky's 2023 statewide general elections by county"
+                "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's, Arizona's, and Oregon's 2022, Kentucky's "
+                "2023, and Oregon's 2024 statewide general elections by county"
             ),
             polity="US",
         )
@@ -588,19 +597,21 @@ def emit() -> Path:
                 width=width,
                 height=height,
             )
-        oregon = cs.source(OR_PUBLISHER, OR_TITLE)
-        cs.add(
-            "source",
-            id=oregon,
-            kind="official_body",
-            publisher=OR_PUBLISHER,
-            title=OR_TITLE,
-            url="https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf",
-            license="Public record",
-        )
-        cs.artifact(raw.cached(SOURCE, OREGON), oregon)
-        sources = {"RI": board, "KY": kentucky, "MI": michigan, "AZ": secretary, "OR": oregon}
-        isos = [f"US-{state}" for state in (*sources, "IN")]
+        oregon: dict[int, UUID] = {}
+        for day, url in OREGON.items():
+            oregon[day.year] = cs.source(OR_PUBLISHER, OR_TITLE.format(day=day))
+            cs.add(
+                "source",
+                id=oregon[day.year],
+                kind="official_body",
+                publisher=OR_PUBLISHER,
+                title=OR_TITLE.format(day=day),
+                url=url.split("id_/")[-1],
+                license="Public record",
+            )
+            cs.artifact(raw.cached(SOURCE, url), oregon[day.year])
+        sources = {"RI": board, "KY": kentucky, "MI": michigan, "AZ": secretary}
+        isos = [f"US-{state}" for state in (*sources, "IN", "OR")]
         states = dict(
             conn.execute(
                 """select substr(p.iso_code, 4), n.text from polity p
@@ -802,7 +813,11 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=divisions[day.year] if state == "IN" else sources[state],
+                source_id=divisions[day.year]
+                if state == "IN"
+                else oregon[day.year]
+                if state == "OR"
+                else sources[state],
                 is_default=True,
                 supersedes_id=None if result_set == first else first,
                 completeness=1,
