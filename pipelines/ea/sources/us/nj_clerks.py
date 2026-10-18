@@ -60,6 +60,99 @@ COUNTIES = {
             127278: 379486,
         },
     ),
+    "34001": (
+        "Atlantic",
+        "Atlantic County Clerk",
+        {
+            111509: 285597,
+        },
+    ),
+    "34005": (
+        "Burlington",
+        "Burlington County Clerk",
+        {
+            115745: 304047,
+        },
+    ),
+    "34011": (
+        "Cumberland",
+        "Cumberland County Clerk",
+        {
+            57844: 157222,
+            58625: 157591,
+            64715: 183815,
+            72006: 191793,
+            93016: 222459,
+            99212: 235827,
+            119033: 324797,
+            122757: 355708,
+            125167: 367287,
+        },
+    ),
+    "34021": (
+        "Mercer",
+        "Mercer County Clerk",
+        {
+            122320: 346005,
+            122845: 355689,
+        },
+    ),
+    "34029": (
+        "Ocean",
+        "Ocean County Clerk",
+        {
+            49398: 123230,
+            50446: 123670,
+            53405: 140398,
+            54203: 149081,
+            57186: 154255,
+            57818: 157041,
+            58791: 158028,
+            59378: 163466,
+            63889: 175621,
+            64650: 183572,
+            72001: 191335,
+            72649: 192506,
+            92666: 222288,
+            93876: 224884,
+            94209: 225363,
+            98863: 235870,
+            99696: 236497,
+            106715: 272713,
+            111502: 285027,
+            112180: 286485,
+            116150: 314049,
+        },
+    ),
+    "34031": (
+        "Passaic",
+        "Passaic County Clerk",
+        {
+            111517: 285136,
+            111875: 285584,
+            112430: 288484,
+            112986: 289715,
+        },
+    ),
+    "34035": (
+        "Somerset",
+        "Somerset County Clerk",
+        {
+            47457: 117708,
+            48657: 119515,
+            49988: 122782,
+            54232: 149079,
+            57828: 156959,
+            59376: 163294,
+            64714: 183691,
+            71997: 191273,
+            92896: 222712,
+            111878: 285578,
+            112011: 285767,
+            116175: 314304,
+            116897: 316360,
+        },
+    ),
 }
 SUBDIVISIONS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_34_cousub_500k.zip"
 DISTRICTS = tuple(
@@ -70,7 +163,12 @@ ALIASES = {
     "WETS ORANGE": "WEST ORANGE",
     "FAIRFEILD": "FAIRFIELD",
     "N CALDWELL": "NORTH CALDWELL",
+    "GREENBROOK": "GREEN BROOK",
+    "MONTOMGERY": "MONTGOMERY",
 }
+DATES = {122845: date(2024, 11, 5)}
+SUFFIXES = {"borough": ("BOROUGH", "BORO"), "township": ("TOWNSHIP", "TWP"), "city": ("CITY",), "town": ("TOWN",)}
+GENERIC = re.compile(r"(?i)\b(?:regional|school|schools|district|public|consolidated|of|the)\b|[^A-Za-z]")
 REGIONAL = {
     r"W[ES]+T ESS?EX": "West Essex Regional School District",
     r"CALDWELL ?[-/]+ ?W(?:EST|\.)? CALDWELL": "Caldwell-West Caldwell School District",
@@ -81,6 +179,7 @@ SKIPPED = re.compile(
     r"PRESIDENT|GOVERNOR|SHERIFF|SURROGATE|COUNTY CLERK|COUNTY EXECUTIVE|COMMISSIONER|FREEHOLDER|REGISTER|DELEGATE|"
     r"U\.S\.|\((?:DEM|REP)\)"
 )
+NUMBERS = {"ONE": "1", "TWO": "2", "THREE": "3", "FOUR": "4", "FIVE": "5"}
 ORDINALS = {"FIRST": "1", "SECOND": "2", "THIRD": "3", "FOURTH": "4", "FIFTH": "5"}
 PARTIES = {"DEM": "democratic-party", "REP": "republican-party"}
 METHOD = (
@@ -119,7 +218,7 @@ def _shapes(link: str) -> list[tuple[Mapping[str, object], str]]:
 
 
 def parse() -> None:
-    towns: dict[str, dict[str, tuple[str, str, str]]] = {}
+    entries: dict[str, list[tuple[str, tuple[str, str, str]]]] = {}
     shapes = []
     for record, geom in _shapes(SUBDIVISIONS):
         county = str(record["GEOID"])[:5]
@@ -129,13 +228,21 @@ def parse() -> None:
         kind = whole[len(proper) :].strip().lower()
         bare = re.sub(r"^CITY OF | VILLAGE$", "", proper.upper())
         display = f"{proper} {kind.title()}" if kind in ("township", "borough") and "Village" not in proper else proper
-        towns.setdefault(county, {})[bare] = (str(record["GEOID"]), display, kind)
+        entries.setdefault(county, []).append((bare, (str(record["GEOID"]), display, kind)))
         shapes.append((str(record["GEOID"]), display, geom))
-    schools = []
+    towns: dict[str, dict[str, tuple[str, str, str]]] = {}
+    for county, listed in entries.items():
+        counts = {bare: sum(other == bare for other, _ in listed) for bare, _ in listed}
+        for bare, entry in listed:
+            for key in [bare] if counts[bare] == 1 else [f"{bare} {suffix}" for suffix in SUFFIXES[entry[2]]]:
+                towns.setdefault(county, {})[key] = entry
+    districts = {}
     for link in DISTRICTS:
         for record, geom in _shapes(link):
-            if str(record["NAME"]) in REGIONAL.values():
-                schools.append((str(record["GEOID"]), str(record["NAME"]), geom))
+            named = str(record["NAME"])
+            if "scsd" in link or "Regional" in named or "-" in named:
+                districts[named] = (str(record["GEOID"]), named, geom, GENERIC.sub("", named).upper())
+    used: set[str] = set()
     contests, lines = [], []
     for county, (_, publisher, elections) in COUNTIES.items():
         names = sorted(towns[county], key=len, reverse=True)
@@ -149,7 +256,7 @@ def parse() -> None:
         for election, version in elections.items():
             with zipfile.ZipFile(raw.cached(SOURCE, url(county, election, version)).path) as archive:
                 root = ElementTree.fromstring(archive.read("detail.xml"))
-            day = datetime.strptime(root.findtext("ElectionDate") or "", "%m/%d/%Y").date()
+            day = DATES.get(election) or datetime.strptime(root.findtext("ElectionDate") or "", "%m/%d/%Y").date()
             title = root.findtext("ElectionName") or ""
             if "PRIMARY" in title.upper():
                 continue
@@ -177,9 +284,6 @@ def parse() -> None:
                     key, body = "council", True
                 else:
                     continue
-                regional = next(
-                    (name for pattern, name in REGIONAL.items() if school and re.search(pattern, upper)), None
-                )
                 ward = re.search(
                     r"(\d)(?:ST|ND|RD|TH)?\s*WARD|WARD\s*-?\s*(\d)|(NORTH|SOUTH|EAST|WEST|CENTRAL|FIRST|SECOND|THIRD|FOURTH|FIFTH)\s+WARD",
                     re.sub(r"\(|\)", " ", upper),
@@ -197,9 +301,11 @@ def parse() -> None:
                     for choice in node.iter("Choice")
                 ):
                     continue
-                remainder = re.search(r"UNEXP|UNXP|SHORT TERM", upper) is not None
+                remainder = re.search(r"UNEX|UNXP|SHORT TERM", upper) is not None
                 rows = []
                 for choice in node.iter("Choice"):
+                    if re.match(r"(?i)\s*no (?:nomination|candidate)", choice.get("text") or ""):
+                        continue
                     label = re.sub(r"\s+", " ", choice.get("text") or "").strip()
                     for kind in choice.iter("VoteType"):
                         for place in kind.iter("Precinct"):
@@ -224,12 +330,24 @@ def parse() -> None:
                         }
                     )
                 found = {
-                    name
+                    towns[county][name][0]
                     for _, _, place, votes in rows
                     if (votes or len(rows) < 500) and (name := town(place)) is not None
                 }
                 if not found:
                     continue
+                letters = re.sub(r"[^A-Z]", "", upper)
+                regional = next(
+                    (name for pattern, name in REGIONAL.items() if school and re.search(pattern, upper)), None
+                )
+                if regional is None and school and (len(found) > 1 or "REGIONAL" in upper):
+                    regional = max(
+                        (entry for entry in districts.values() if entry[3] and entry[3] in letters),
+                        key=lambda entry: len(entry[3]),
+                        default=(None, None),
+                    )[1]
+                if regional is not None:
+                    used.add(regional)
                 if len(found) > 1 and regional is None:
                     continue
                 for label, party, place, votes in rows:
@@ -244,7 +362,6 @@ def parse() -> None:
                             "votes": votes,
                         }
                     )
-                home = min(found)
                 contests.append(
                     {
                         "county": county,
@@ -259,18 +376,46 @@ def parse() -> None:
                         "seat": seat,
                         "remainder": remainder,
                         "magnitude": int(node.get("voteFor") or 1),
-                        "town": towns[county][home][0] if len(found) == 1 else None,
+                        "town": min(found) if len(found) == 1 else None,
                         "regional": regional,
                         "runoff": runoff,
                         "school": school,
+                        "variant": None,
                     }
                 )
+    groups: dict[tuple[object, ...], list[dict[str, object]]] = {}
+    for row in contests:
+        groups.setdefault(
+            (
+                *(row[k] for k in ("county", "election", "town", "regional", "key", "seat", "remainder")),
+                row["text"] if row["key"] == "question" else None,
+            ),
+            [],
+        ).append(row)
+    for rows in groups.values():
+        if len(rows) == 1:
+            continue
+        terms = [re.search(r"(\d|ONE|TWO|THREE|FOUR|FIVE)[ -]*(?:YR|YEAR)", str(row["text"]).upper()) for row in rows]
+        named = [f"{NUMBERS.get(term[1], term[1])}-year term" if term else None for term in terms]
+        ambiguous = 0
+        for row, term in zip(rows, named, strict=True):
+            if term and named.count(term) == 1:
+                row["variant"] = term
+            else:
+                ambiguous += 1
+                row["variant"] = f"contest {ambiguous}" if ambiguous > 1 else None
     councils = {(row["county"], row["town"]) for row in contests if row["key"] == "council"}
     for row in contests:
         if row["key"] == "committee" and (row["county"], row["town"]) in councils:
             row["key"] = "council"
-    frame = pl.DataFrame(lines, schema_overrides={"votes": pl.Int64, "place": pl.String, "party": pl.String})
-    contests_frame = pl.DataFrame(contests)
+    frame = (
+        pl.DataFrame(lines, schema_overrides={"votes": pl.Int64, "place": pl.String, "party": pl.String})
+        .with_columns(same=pl.col("choice").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", ""))
+        .group_by("county", "election", "contest", "same", "place", maintain_order=True)
+        .agg(pl.col("choice").first(), pl.col("party").drop_nulls().first(), pl.col("votes").sum())
+        .drop("same")
+    )
+    contests_frame = pl.DataFrame(contests, infer_schema_length=None)
     totals = frame.filter(pl.col("place").is_null()).drop("place")
     counted = (
         frame.filter(pl.col("place").is_not_null())
@@ -293,6 +438,7 @@ def parse() -> None:
         contests_frame.select("county", "election", "contest"), on=["county", "election", "contest"]
     ).write_parquet(PARSED / "lines.parquet")
     pl.DataFrame(shapes, schema=["code", "display", "geom"], orient="row").write_parquet(PARSED / "towns.parquet")
+    schools = [(districts[name][0], name, districts[name][2]) for name in sorted(used)]
     pl.DataFrame(schools, schema=["code", "display", "geom"], orient="row").write_parquet(PARSED / "schools.parquet")
 
 
@@ -335,18 +481,6 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
-        asked = {
-            (day, re.sub(r"[^A-Z]", "", text.upper()))
-            for day, text in conn.execute(
-                """select e.date_from, n.text from contest c join election e on e.id = c.election_id
-                   join name n on n.entity_id = c.id and n.is_preferred
-                   join changeset g on g.id = c.changeset_id
-                   join polity p on p.id = e.polity_id
-                   where c.kind = 'ballot_question' and g.pipeline <> %s and p.iso_code is null
-                     and n.text like '%% County: %%'""",
-                [SOURCE],
-            ).fetchall()
-        }
         precincts: dict[str, UUID] = dict(
             conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'us.precinct' and split_part(code, ':', 2) = 'NJ'"
@@ -531,16 +665,6 @@ def emit() -> Path:
                 seat = polities[f"us.town:{row['town']}"][1]
             if not question and (day, f"NJ:{code}:{key}") in taken:
                 continue
-            if question and any(
-                (day, re.sub(r"[^A-Z]", "", f"Essex County: {place.removesuffix(' Township')}".upper()))
-                <= (day, asked_text)
-                for asked_day, asked_text in asked
-                if asked_day == day
-                and asked_text.startswith(
-                    re.sub(r"[^A-Z]", "", f"Essex County: {place.removesuffix(' Township')}".upper())
-                )
-            ):
-                continue
             kind = "general" if day.month == 11 and day.day <= 8 else "runoff" if row["runoff"] else "local"
             parent = cs.key("us.election", f"{day}:NJ")
             if parent in cs.minted and parent not in elections:
@@ -587,6 +711,7 @@ def emit() -> Path:
                 + (f":{slug(row['text'])}" if question else "")
                 + (f":{slug(seat)}" if seat else "")
                 + (":remainder" if row["remainder"] else "")
+                + (f":{slug(row['variant'])}" if row["variant"] else "")
             )
             label = row["text"]
             if question and row["school"] and "EDUCATION" not in label.upper() and "SCHOOL" not in label.upper():
@@ -596,6 +721,7 @@ def emit() -> Path:
                 + (slug(label)[:60].rstrip("-") if question else key)
                 + (f"-{slug(seat)}" if seat else "")
                 + ("-unexpired" if row["remainder"] else "")
+                + (f"-{slug(row['variant'])}" if row["variant"] else "")
             )
             contest = cs.key("us.contest", contest_key)
             if contest_path in slugs and slugs[contest_path] not in (contest, known.get(contest_key)):
@@ -691,6 +817,7 @@ def emit() -> Path:
                     )
                     + (f", {seat}" if seat else "")
                     + (" (unexpired term)" if row["remainder"] else "")
+                    + (f" ({row['variant']})" if row["variant"] else "")
                     + (" runoff" if previous else ""),
                 )
                 if not row["runoff"]:
