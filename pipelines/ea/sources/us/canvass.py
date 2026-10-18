@@ -66,6 +66,7 @@ OR_OFFICES = {
         "Attorney General",
         "State Senator",
         "State Representative",
+        *(f"Measure {number}" for number in range(115, 120)),
     },
 }
 OR_DISTRICTS = {"State Senator": {1, 5, 27, 29, 30}, "State Representative": {1, 9, 15, 16, 31, 32, 57, 58, 59}}
@@ -415,13 +416,16 @@ def parse() -> None:
             if not tallied:
                 oregon_header.append(text)
             continue
-        if len(oregon_header) != 2:
+        question = office.startswith("Measure ")
+        if len(oregon_header) != 2 and not question or not oregon_header[-1].startswith("County"):
             raise ValueError(f"Oregon {office} {district}: cannot read the header {oregon_header}")
-        names, given = oregon_header[0], oregon_header[1].removeprefix("County").strip()
+        names, given = oregon_header[0], oregon_header[-1].removeprefix("County").strip()
         votes = [int(figure.replace(",", "")) for figure in found[2].split()]
         surnames = re.split(r"\s{2,}", names) if len(re.split(r"\s{2,}", names)) == len(votes) else names.split()
         firsts = re.findall(r"(\S.*?) \(([A-Z]+)\)", given) or [(first, None) for first in re.split(r"\s{2,}", given)]
-        if len(votes) != len(surnames) or len(firsts) != len(surnames) - 1:
+        if question:
+            surnames, firsts = re.split(r"\s{2,}", given), []
+        if len(votes) != len(surnames) or not question and len(firsts) != len(surnames) - 1:
             raise ValueError(f"Oregon {office} {district}: cannot read {found[1]} under {oregon_header}")
         if not tallied:
             tallied = [0] * (len(votes) + 1)
@@ -442,13 +446,17 @@ def parse() -> None:
                     "day": day,
                     "office": office,
                     "district": district,
-                    "candidate": "Write-ins" if first is None else f"{first} {surname.lstrip('*')}",
+                    "candidate": surname.lstrip("*")
+                    if question
+                    else "Write-ins"
+                    if first is None
+                    else f"{first} {surname.lstrip('*')}",
                     "mate": None,
                     "party": label,
                     "fips": oregon_fips[slug(found[1]).replace("-", "")],
                     "votes": count,
                     "write_in": surname == "Misc.",
-                    "winner": surname.startswith("**"),
+                    "winner": surname.startswith("*"),
                 }
             )
     michigan = (
@@ -527,8 +535,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's, Arizona's, and Oregon's 2022, Kentucky's "
-                "2023, and Oregon's 2024 statewide general elections by county, and 14 of Oregon's 2024 legislative "
-                "contests by county"
+                "2023, and Oregon's 2024 statewide general elections and measures by county, and 14 of Oregon's 2024 "
+                "legislative contests by county"
             ),
             polity="US",
         )
@@ -754,10 +762,20 @@ def emit() -> Path:
             state, office_text, seats = str(state), str(office_text), int(str(seats))
             assert isinstance(day, date)
             units = counties
+            question = office_text.startswith("Measure ")
+            contest_key = (
+                f"{day}:{state}:{OR_CHAMBERS[office_text]}:{district}:g"
+                if district is not None
+                else next(
+                    (key for key in existing if key.startswith(f"{day}:{state}:question:medsl:state-{slug(office_text)}-")),
+                    office_text,
+                )
+                if question
+                else f"{day}:{state}:{OFFICES[office_text][1]}"
+            )
+            if (district is not None or question) and contest_key not in existing:
+                raise ValueError(f"{contest_key}: no such contest")
             if district is not None:
-                contest_key = f"{day}:{state}:{OR_CHAMBERS[office_text]}:{district}:g"
-                if contest_key not in existing:
-                    raise ValueError(f"{contest_key}: no such contest")
                 units = {}
                 for fips in lines["fips"].unique().to_list():
                     part = f"{fips}:{day}:{OR_CHAMBERS[office_text]}:{district}"
@@ -799,7 +817,7 @@ def emit() -> Path:
                 name(election, f"{day.year} {states[state]} general election")
                 cs.add("slug", path=f"us/{state.lower()}/{day}-general", entity_id=election)
             office_key = f"{office_slug}:{state}"
-            office_id = cs.key("us.office", office_key) if district is None else None
+            office_id = cs.key("us.office", office_key) if district is None and not question else None
             if office_id is not None and office_key not in offices_known:
                 offices_known.add(office_key)
                 cs.add(
@@ -809,7 +827,6 @@ def emit() -> Path:
                     kind="governor" if office_slug == "governor" else "other",
                 )
                 name(office_id, f"{office} of {states[state]}")
-            contest_key = f"{day}:{state}:{office_slug}" if district is None else contest_key
             contest = cs.key("us.contest", contest_key)
             options, defaults, _ = existing.get(contest_key, ([], [], None))
             if contest_key not in existing or state == "KY":
@@ -960,5 +977,11 @@ def emit() -> Path:
             if declared and declared != set(elected):
                 raise ValueError(f"{contest_key}: the declared winners are not the leaders")
             for option in elected:
-                cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind="won" if question else "elected",
+                    seats=None if question else 1,
+                )
         return cs.write()
