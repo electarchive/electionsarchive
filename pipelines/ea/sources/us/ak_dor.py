@@ -1,3 +1,4 @@
+import csv
 import io
 import json
 import re
@@ -28,6 +29,11 @@ SHAPES = (
 )
 SHAPES_TITLE = "Alaska Election Precincts, 2022 interim plan"
 SPECIAL = "2022-08-16:AK:house:0:special"
+PRIMARY = "2022-06-11:AK:house:0:special-primary"
+PRIMARY_REPORT = ("20220815153719", "22SPECPRIM/ElectionSummaryReportRPT.txt")
+PRIMARY_CERTIFICATE = ("20220909011504", "22SPECPRIM/22specprimresultsSRBcert.pdf")
+PRIMARY_TITLE = "Election Summary Report: Special Primary Election, June 11, 2022, official results"
+PRIMARY_NOTE = "Official results were certified by the State Review Board on June 24, 2022. The Division of Elections reports this mostly by-mail primary by House district; absentee and early votes are in separate rows, along with a row for federal overseas ballots. The four candidates with the most votes advanced to the August 16 special general election."
 Rounds = list[dict[str | None, int]]
 CONTESTS: dict[
     str,
@@ -370,6 +376,7 @@ DERIVED = (
 
 def fetch() -> None:
     downloads = [(SHAPES, ".zip")]
+    downloads += [(WAYBACK.format(*PRIMARY_REPORT), ".txt"), (WAYBACK.format(*PRIMARY_CERTIFICATE), ".pdf")]
     for _, report, records, _, _, _, before in CONTESTS.values():
         for stamp, path in [report, *([] if before is None else [before[0]])]:
             downloads.append((WAYBACK.format(stamp, path), "." + path.rsplit(".", 1)[1]))
@@ -388,6 +395,24 @@ def fetch() -> None:
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
+    table = list(
+        csv.reader(io.StringIO(raw.cached(SOURCE, WAYBACK.format(*PRIMARY_REPORT)).path.read_text()), delimiter="\t")
+    )
+    header, *body = table
+    primary: dict[str, dict[str, int]] = {}
+    for row in body:
+        label = re.sub(r"\s+", " ", row[0]).strip()
+        if found := re.fullmatch(r"District (\d+) - (Absentee|Early Voting)", label):
+            unit = f"{int(found[1]):02d}:{found[2].split()[0].lower()}"
+        elif label in ("HD99 Fed Overseas Absentee", "Total"):
+            unit = {"HD99 Fed Overseas Absentee": "overseas", "Total": "total"}[label]
+        else:
+            raise ValueError(f"special primary: no unit for {label}")
+        primary[unit] = {name: int(votes) for name, votes in zip(header[1:], row[1:], strict=True)}
+    total = primary.pop("total")
+    if len(primary) != 81 or any(sum(votes[name] for votes in primary.values()) != total[name] for name in total):
+        raise ValueError("special primary: the units do not add up to the total row")
+    (PARSED / "special_primary.json").write_text(json.dumps(primary))
     frames = []
     for records in dict.fromkeys(records for _, _, records, _, _, _, _ in CONTESTS.values() if records is not None):
         with zipfile.ZipFile(raw.cached(SOURCE, WAYBACK.format(*records)).path) as archive:
@@ -597,7 +622,8 @@ def emit() -> Path:
         )
         precinct_codes = set(precincts["code"])
         early = set(tallies.filter(pl.col("key").str.starts_with("2022"))["unit"])
-        for unit in sorted(early - precinct_codes):
+        primary: dict[str, dict[str, int]] = json.loads((PARSED / "special_primary.json").read_text())
+        for unit in sorted(early - precinct_codes | set(primary)):
             cs.add(
                 "reporting_unit",
                 id=cs.unit("us.aggregate", f"AK:2022:{unit}"),
@@ -607,13 +633,13 @@ def emit() -> Path:
                 area_relation="within",
                 area_id=state_area,
                 kind="aggregate",
-                valid_from=first,
+                valid_from=date.fromisoformat(PRIMARY[:10]),
             )
         units = {
             unit: cs.unit("us.precinct", f"2022:AK:{unit}")
             if unit in precinct_codes
             else cs.unit("us.aggregate", f"AK:2022:{unit}")
-            for unit in early
+            for unit in early | set(primary)
         }
         for unit in set(tallies.filter(pl.col("key").str.starts_with("2024"))["unit"]):
             units[unit] = cs.unit("us.precinct", f"2024:AK:02:STATEWIDE:{unit}")
@@ -911,4 +937,171 @@ def emit() -> Path:
                         value="votes",
                     ),
                 )
+        day = date.fromisoformat(PRIMARY[:10])
+        general = cs.key("us.contest", "2022-11-08:AK:house:0")
+        row = conn.execute("select district_area_id, body_id from contest where id = %s", [general]).fetchone()
+        plan = conn.execute("select id from boundary_set where scheme_code = 'us.cd' and vintage = '117'").fetchone()
+        top_four = conn.execute(
+            """select es.id from electoral_system es join name n on n.entity_id = es.id
+               where n.text = 'Top-four primary' and es.rules->>'advance' = '4'"""
+        ).fetchone()
+        if row is None or plan is None or top_four is None:
+            raise ValueError(
+                "the 2022 Alaska House general, the 117th Congress's plan, and the top-four system must exist"
+            )
+        election = cs.key("us.election", "2022-06-11:AK:special-primary")
+        cs.add(
+            "election",
+            id=election,
+            polity_id=state,
+            parent_id=None,
+            kind="primary",
+            date_from=day,
+            date_to=day,
+            status="held",
+        )
+        name(election, "June 11, 2022 Alaska special primary election")
+        cs.add("slug", path="us/ak/2022-06-11-special-primary", entity_id=election)
+        contest = cs.key("us.contest", PRIMARY)
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=election,
+            kind="body_seats",
+            body_id=row[1],
+            district_area_id=row[0],
+            seat_id=None,
+            term="remainder",
+            boundary_set_id=plan[0],
+            party_scope_id=None,
+            magnitude=1,
+            round_number=1,
+            previous_round_id=None,
+            electoral_system_id=top_four[0],
+            default_result_kind="counted",
+        )
+        name(contest, "2022 U.S. House special primary in Alaska's at-large congressional district")
+        cs.add("slug", path="us/ak/2022-06-11-special-primary/house-at-large-special", entity_id=contest)
+        parties = {
+            code: party
+            for code, text in (
+                ("REP", "Republican Party"),
+                ("DEM", "Democratic Party"),
+                ("LIB", "Libertarian Party"),
+                ("AIP", "Alaskan Independence Party"),
+            )
+            for (party,) in conn.execute(
+                """select distinct o.party_id from contest_option o join name n on n.entity_id = o.party_id
+                   join contest k on k.id = o.contest_id join election e on e.id = k.election_id
+                   where e.polity_id = %s and n.text = %s and n.is_preferred""",
+                [state, text],
+            ).fetchall()
+        }
+        if len(parties) != 4:
+            raise ValueError(f"special primary: parties {sorted(parties)} only")
+
+        def words(text: str) -> list[str]:
+            plain = re.sub(r'"[^"]*"', "", text).casefold()
+            return [word for word in re.findall(r"[a-z'-]+", plain) if word not in ("jr", "sr", "ii", "iii")]
+
+        people: dict[tuple[str, str], set[UUID]] = {}
+        for text, person in conn.execute(
+            """select coalesce(c.ballot_name, o.ballot_label), c.person_id from candidacy c
+               join contest_option o on o.id = c.option_id join contest k on k.id = o.contest_id
+               join election e on e.id = k.election_id where e.polity_id = %s""",
+            [state],
+        ).fetchall():
+            spelled = words(text)
+            if spelled:
+                people.setdefault((spelled[0], spelled[-1]), set()).add(person)
+        source = cs.source(PUBLISHER, PRIMARY_TITLE)
+        cs.add(
+            "source",
+            id=source,
+            kind="official_body",
+            publisher=PUBLISHER,
+            title=PRIMARY_TITLE,
+            url=ORIGIN + PRIMARY_REPORT[1],
+            license="Public record",
+        )
+        for capture in (PRIMARY_REPORT, PRIMARY_CERTIFICATE):
+            cs.artifact(raw.cached(SOURCE, WAYBACK.format(*capture)), source)
+        options: dict[str, UUID] = {}
+        for header in next(iter(primary.values())):
+            entry, _, code = header.rpartition(" - ") if " - " in header else (header, "", "")
+            last, given = entry.split(", ", 1)
+            suffix = re.search(r" (Jr\.|Sr\.|II|III)(?= |$)", given)
+            given = given if suffix is None else (given[: suffix.start()] + given[suffix.end() :]).strip()
+            label = f"{given} {last}" + ("" if suffix is None else f" {suffix[1]}")
+            spelled = words(label)
+            matches = people.get((spelled[0], spelled[-1]), set())
+            if len(matches) == 1:
+                (person,) = matches
+            else:
+                person = cs.key(f"{SOURCE}.person", f"{spelled[0]}-{spelled[-1]}")
+                cs.add("person", id=person)
+                name(person, label)
+                people[(spelled[0], spelled[-1])] = {person}
+            options[header] = cs.key("us.option", f"{PRIMARY}:{person}")
+            cs.add(
+                "contest_option",
+                id=options[header],
+                contest_id=contest,
+                kind="candidate",
+                party_id=parties.get(code),
+                ballot_label=label,
+            )
+            cs.add(
+                "candidacy",
+                id=cs.key("us.candidacy", f"{PRIMARY}:{person}:head"),
+                person_id=person,
+                option_id=options[header],
+                role="head",
+                ballot_name=label,
+                is_independent=code not in parties,
+                is_incumbent=False,
+            )
+        result = cs.key(f"{SOURCE}.result_set", PRIMARY)
+        cs.add(
+            "result_set",
+            id=result,
+            election_id=election,
+            contest_id=contest,
+            stage="certified",
+            kind="counted",
+            status="active",
+            source_id=source,
+            is_default=True,
+            completeness=1,
+        )
+        cs.add("note", entity_id=result, kind="methodology", body_md=PRIMARY_NOTE)
+        totals = {header: sum(votes[header] for votes in primary.values()) for header in options}
+        advanced = sorted(totals, key=lambda header: -totals[header])[:4]
+        for header, option in options.items():
+            cs.add("outcome", result_set_id=result, option_id=option, kind="won" if header in advanced else "lost")
+        cs.frame(
+            "result_value",
+            pl.DataFrame(
+                [
+                    (str(result), str(units[unit]), str(options[header]), 0, 1, 0, 0, votes)
+                    for unit, tally in primary.items()
+                    for header, votes in tally.items()
+                ]
+                + [
+                    (str(result), str(units[unit]), None, 0, 4, 0, 0, sum(tally.values()))
+                    for unit, tally in primary.items()
+                ],
+                schema={
+                    "result_set_id": pl.String,
+                    "unit_id": pl.String,
+                    "option_id": pl.String,
+                    "channel": pl.Int16,
+                    "measure": pl.Int16,
+                    "count_round": pl.Int16,
+                    "flags": pl.Int16,
+                    "value": pl.Int64,
+                },
+                orient="row",
+            ),
+        )
         return cs.write()
