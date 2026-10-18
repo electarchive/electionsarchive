@@ -3515,6 +3515,425 @@ export const contests = {
       );
       return drawn.flat();
     }),
+  atlas: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/contests/{id}/atlas",
+        summary:
+          "Every place at one level within a contest's place, as compact columns for a map, with each place's shares and an optional comparison",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        unit: v.optional(v.string()),
+        level: v.optional(v.string()),
+        vs: v.optional(v.string()),
+      }),
+    )
+    .output(
+      v.object({
+        title: v.string(),
+        scope: v.object({
+          name: v.string(),
+          k: v.number(),
+          unit: v.string(),
+          path: v.nullable(v.string()),
+        }),
+        trail: v.array(v.object({ name: v.string(), unit: v.string() })),
+        date: v.nullable(v.string()),
+        outline: v.nullable(v.string()),
+        frames: v.array(
+          v.object({
+            west: v.number(),
+            south: v.number(),
+            east: v.number(),
+            north: v.number(),
+          }),
+        ),
+        levels: v.array(
+          v.object({
+            code: v.string(),
+            noun: v.string(),
+            count: v.number(),
+            tiles: v.nullable(v.string()),
+          }),
+        ),
+        level: v.nullable(v.string()),
+        parts: v.array(
+          v.object({ k: v.number(), name: v.string(), unit: v.string() }),
+        ),
+        targets: v.array(
+          v.object({ id: v.string(), label: v.string(), date: v.string() }),
+        ),
+        target: v.nullable(v.string()),
+        legend: v.array(
+          v.object({
+            key: v.string(),
+            label: v.string(),
+            short: v.nullable(v.string()),
+            color: v.nullable(v.string()),
+          }),
+        ),
+        places: v.object({
+          k: v.array(v.number()),
+          name: v.array(v.string()),
+          valid: v.array(v.number()),
+          x: v.array(v.nullable(v.number())),
+          y: v.array(v.nullable(v.number())),
+          leader: v.array(v.nullable(v.number())),
+          prior: v.array(v.nullable(v.number())),
+          shares: v.array(v.array(v.number())),
+          before: v.array(v.array(v.nullable(v.number()))),
+        }),
+      }),
+    )
+    .handler(async ({ input }) => {
+      const contest = await find(input.id);
+      const chain = await descend(contest, input.unit);
+      const area = chain.at(-1) ?? contest.place;
+      if (area == null) {
+        throw new ORPCError("NOT_FOUND");
+      }
+      const day = contest.date ?? "infinity";
+      const owners = await db.execute<{
+        id: string;
+        place: string;
+        depth: number;
+        parts: number;
+      }>(sql`
+        with recursive anc(id, depth) as (
+          select ${area.id}::uuid, 0
+          union all
+          select p.parent_id, anc.depth + 1 from area_parent p join anc on p.area_id = anc.id
+          where p.valid @> ${day}::date and anc.depth < 8
+        ),
+        grp(id) as (
+          select ${contest.root}::uuid
+          union all
+          select c.id from contest c join grp on c.allocation_parent_id = grp.id
+        )
+        select c.id, anc.id as place, anc.depth,
+          (select count(*) from contest k where k.allocation_parent_id = c.id)::int as parts
+        from grp
+        join contest c on c.id = grp.id
+        join election e on e.id = c.election_id
+        left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+        join anc on anc.id = coalesce(c.district_area_id, pt.area_id)
+        order by anc.depth, c.allocation_parent_id is null
+        limit 1
+      `);
+      const owner = owners.rows[0] ?? {
+        id: contest.root,
+        place: area.id,
+        depth: 0,
+        parts: 0,
+      };
+      const isFederal = owner.depth === 0 && owner.parts >= 3;
+      const base = chain.map((entry) => entry.segment);
+      let found: Array<{ id: string; k: number; scheme: string }> = [];
+      let parts: Array<{ k: number; name: string; unit: string }> = [];
+      let federal: string | null = null;
+      if (isFederal) {
+        const [kids, districts] = await Promise.all([
+          children(owner.id, area, chain.length === 0, day),
+          db.execute<{ id: string }>(sql`
+            select district_area_id as id from contest
+            where allocation_parent_id = ${owner.id}::uuid and district_area_id is not null
+          `),
+        ]);
+        const owned = new Set(districts.rows.map((row) => row.id));
+        const scheme =
+          kids.find((kid) => owned.has(kid.id))?.scheme ?? kids[0]?.scheme;
+        const shown = kids.filter((kid) => kid.scheme === scheme);
+        const below = await db.execute<{
+          id: string;
+          k: number;
+          scheme: string;
+        }>(sql`
+          select a.id, a.k, a.scheme_code as scheme
+          from area_parent p
+          join area a on a.id = p.area_id
+          join contest c on c.allocation_parent_id = ${owner.id}::uuid and c.district_area_id = p.parent_id
+          cross join lateral (
+            select from result_set rs
+            cross join lateral (
+              select from result_rollup r
+              where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED})
+              limit 1
+            ) r
+            where rs.contest_id = c.id and rs.status = 'active'
+            limit 1
+          ) hit
+          where p.parent_id = any(${sql.param(shown.map((kid) => kid.id))}::uuid[])
+            and p.valid @> ${day}::date
+        `);
+        const tiers = Map.groupBy(below.rows, (row) => row.scheme);
+        found = [
+          ...shown,
+          ...below.rows.filter(
+            (row) =>
+              row.scheme !== scheme &&
+              (tiers.get(row.scheme)?.length ?? 0) >= shown.length,
+          ),
+        ];
+        federal = scheme ?? null;
+        parts = shown
+          .filter((kid) => owned.has(kid.id))
+          .map((kid) => ({
+            k: kid.k,
+            name: kid.name,
+            unit: [...base, kid.segment].join("/"),
+          }));
+      } else {
+        const listed = await db.execute<{
+          id: string;
+          k: number;
+          scheme: string;
+        }>(sql`
+          with recursive grp(id) as (
+            select ${owner.id}::uuid
+            union all
+            select c.id from contest c join grp on c.allocation_parent_id = grp.id
+          ),
+          sets as (
+            select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
+            where rs.status = 'active'
+          ),
+          up(id, depth) as (
+            select ${area.id}::uuid, 0
+            union all
+            select p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id where up.depth < 8
+          ),
+          down(id, depth) as (
+            select ${area.id}::uuid, 0
+            union all
+            select p.area_id, down.depth + 1 from area_parent p join down on p.parent_id = down.id
+            where p.valid @> ${day}::date and down.depth < 4 and ${owner.depth}::int > 0
+          )
+          select a.id, a.k, a.scheme_code as scheme
+          from (
+            select distinct r.area_k from sets
+            cross join lateral (
+              select x.area_k from result_rollup x where x.result_set_k = sets.k and x.measure = any(${COUNTED}) offset 0
+            ) r
+          ) r
+          join area a on a.k = r.area_k
+          where a.id not in (select id from up)
+            and (${owner.depth}::int = 0 or a.id in (select id from down))
+        `);
+        found = listed.rows;
+      }
+      const counted = Map.groupBy(found, (row) => row.scheme);
+      const schemes = await db.execute<{
+        code: string;
+        noun: string;
+        rank: number;
+        tiles: string | null;
+      }>(sql`
+        select s.code, s.noun, s.rank, (
+          select coalesce(bs.tiles_key, bs.scheme_code || '/' || bs.vintage) from boundary_set bs
+          where bs.scheme_code = s.code
+            and (bs.id = (select boundary_set_id from contest where id = ${contest.id}::uuid) or bs.valid @> ${day}::date)
+          order by bs.id = (select boundary_set_id from contest where id = ${contest.id}::uuid) desc, bs.valid_from desc nulls last
+          limit 1
+        ) as tiles
+        from scheme s
+        where s.code = any(${sql.param([...counted.keys(), ""])}::text[])
+          or s.code = (select scheme_code from area where id = ${area.id}::uuid)
+      `);
+      const own = await db.execute<{ scheme: string }>(sql`
+        select scheme_code as scheme from area where id = ${area.id}::uuid
+      `);
+      const known = new Map(schemes.rows.map((row) => [row.code, row]));
+      const levels = counted
+        .entries()
+        .filter(([, rows]) => rows.length > 1)
+        .map(([code, rows]) => ({
+          code,
+          noun: known.get(code)?.noun ?? "",
+          count: rows.length,
+          tiles: known.get(code)?.tiles ?? null,
+          rank: known.get(code)?.rank ?? 0,
+        }))
+        .toArray()
+        .toSorted((a, b) => a.count - b.count || a.rank - b.rank);
+      const level =
+        levels.find((entry) => entry.code === input.level) ??
+        levels.find((entry) => entry.code === federal) ??
+        (input.level === "coarse"
+          ? levels.find((entry) => entry.tiles != null)
+          : undefined) ??
+        levels.findLast((entry) => entry.tiles != null) ??
+        levels.at(-1) ??
+        null;
+      const shown = level == null ? [] : (counted.get(level.code) ?? []);
+      const [labels, slugs, frames, targets, relations] = await Promise.all([
+        names(
+          [
+            contest.id,
+            area.id,
+            contest.place?.id ?? area.id,
+            ...shown.map((row) => row.id),
+          ],
+          contest.date,
+        ),
+        paths([contest.id]),
+        framing(
+          area.id,
+          day,
+          shown.map((row) => row.k),
+        ),
+        db.execute<{ id: string; date: string }>(sql`
+          select c.id, e.date_from::text as date
+          from contest c
+          join election e on e.id = c.election_id
+          where c.allocation_parent_id is null and c.id <> ${contest.root}::uuid
+            and e.polity_id = (select polity_id from election where id = ${contest.election}::uuid)
+            and e.date_from < ${day}::date and e.status not in ('annulled', 'canceled')
+            and (e.kind = 'indirect') = ${contest.indirect}
+            and case when c.kind = 'ballot_question' then c.id::text
+              else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end = ${contest.series}
+          order by e.date_from desc
+          limit 16
+        `),
+        branches(day),
+      ]);
+      const wanted =
+        input.vs == null || input.vs === "" || input.vs === "none"
+          ? null
+          : input.vs === "previous"
+            ? (targets.rows[0] ?? null)
+            : (targets.rows.find((row) => row.id === input.vs) ?? null);
+      const counterpart =
+        wanted == null
+          ? null
+          : await db.execute<{ id: string }>(sql`
+            with recursive grp(id) as (
+              select ${wanted.id}::uuid
+              union all
+              select c.id from contest c join grp on c.allocation_parent_id = grp.id
+            )
+            select c.id from grp join contest c on c.id = grp.id
+            join election e on e.id = c.election_id
+            left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            where coalesce(c.district_area_id, pt.area_id) = ${owner.place}::uuid
+            limit 1
+          `);
+      const [tabulated, points] = await Promise.all([
+        tabulate(
+          [owner.id],
+          shown.map((row) => ({
+            k: row.k,
+            name: labels.full.get(row.id) ?? "",
+            path: null,
+            isContest: false,
+            owner: null,
+          })),
+          contest.date,
+          wanted == null
+            ? null
+            : {
+                ids: [counterpart?.rows[0]?.id ?? wanted.id],
+                date: wanted.date,
+              },
+          relations,
+          "party",
+        ),
+        db.execute<{ k: number; x: number; y: number }>(sql`
+          select distinct on (a.k) a.k,
+            ST_X(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as x,
+            ST_Y(coalesce(g.label_point, ST_PointOnSurface(g.geom))) as y
+          from area a join area_geometry g on g.area_id = a.id
+          where a.k = any(${sql.param(shown.map((row) => row.k))}::int[])
+            and g.valid @> ${day}::date
+          order by a.k
+        `),
+      ]);
+      const at = new Map(points.rows.map((row) => [row.k, row]));
+      const titles = await names(
+        targets.rows.map((row) => row.id),
+        null,
+      );
+      const rows = tabulated.rows;
+      const tail = /, [^,]+$/u.exec(rows[0]?.name ?? "")?.[0];
+      const isShared =
+        tail != null &&
+        rows.length > 1 &&
+        rows.every((row) => row.name.endsWith(tail));
+      const path = slugs.get(contest.id) ?? null;
+      return {
+        title: labels.full.get(contest.id) ?? "",
+        scope: {
+          name: labels.full.get(area.id) ?? "",
+          k: area.k,
+          unit: base.join("/"),
+          path: path == null ? null : [path, ...base].join("/"),
+        },
+        trail: [
+          {
+            name: labels.full.get(contest.place?.id ?? area.id) ?? "",
+            unit: "",
+          },
+          ...chain.map((entry, index) => ({
+            name: entry.name,
+            unit: base.slice(0, index + 1).join("/"),
+          })),
+        ],
+        date: contest.date,
+        outline: known.get(own.rows[0]?.scheme ?? "")?.tiles ?? null,
+        frames,
+        levels: levels.map(({ rank: _rank, ...entry }) => entry),
+        level: level?.code ?? null,
+        parts,
+        targets: targets.rows.map((row) => ({
+          id: row.id,
+          label: titles.full.get(row.id) ?? "",
+          date: row.date,
+        })),
+        target: wanted?.id ?? null,
+        legend: tabulated.legend.map((item) => ({
+          key: item.key,
+          label:
+            item.short != null &&
+            tabulated.legend.some(
+              (other) => other !== item && other.label === item.label,
+            )
+              ? `${item.label} (${item.short})`
+              : item.label,
+          short: item.short,
+          color: item.color,
+        })),
+        places: {
+          k: rows.map((row) => row.k),
+          name: rows.map((row) =>
+            isShared ? row.name.slice(0, -tail.length) : row.name,
+          ),
+          valid: rows.map((row) => row.valid),
+          x: rows.map((row) => {
+            const point = at.get(row.k);
+            return point == null ? null : Math.round(point.x * 1e4) / 1e4;
+          }),
+          y: rows.map((row) => {
+            const point = at.get(row.k);
+            return point == null ? null : Math.round(point.y * 1e4) / 1e4;
+          }),
+          leader: rows.map((row) => row.leader),
+          prior: rows.map((row) => row.prior),
+          shares: tabulated.legend.map((_, index) =>
+            rows.map((row) => Math.round((row.shares[index] ?? 0) * 10_000)),
+          ),
+          before: tabulated.legend.map((_, index) =>
+            rows.map((row) =>
+              row.earlier == null
+                ? null
+                : Math.round((row.earlier[index] ?? 0) * 10_000),
+            ),
+          ),
+        },
+      };
+    }),
   rounds: os
     .meta(
       openapi({

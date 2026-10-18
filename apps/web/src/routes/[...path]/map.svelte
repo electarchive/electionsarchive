@@ -47,6 +47,7 @@
     isLinked = false,
     pick,
     sources = null,
+    explore = null,
   }: {
     places: Places;
     colors: Array<string>;
@@ -73,6 +74,7 @@
     isLinked?: boolean;
     pick?: (code: string) => void;
     sources?: Array<string> | null;
+    explore?: string | null;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -1253,7 +1255,16 @@
         {/each}
       </div>
     {/if}
-    <Export name="map" class="ms-auto" />
+    <div class="ms-auto flex items-center gap-2">
+      {#if explore != null}
+        <a
+          href={resolve("/map/[...path]", { path: explore })}
+          class="flex items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
+          >{m.atlas_explore()}</a
+        >
+      {/if}
+      <Export name="map" />
+    </div>
   </div>
   <div
     class="relative overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full max-block-[min(38rem,70svh)]"

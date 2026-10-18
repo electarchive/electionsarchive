@@ -878,6 +878,7 @@
           isApproximate={drawn.isApproximate}
           noun={drawn.noun}
           sources={drawn.sources}
+          explore={here}
           votes={counted ?? m.col_votes()}
           names={titles}
           {levels}
