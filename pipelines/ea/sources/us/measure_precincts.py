@@ -37,7 +37,7 @@ FIRST = 2000
 LAST = 2025
 ANSWERS = {"YES": "YES", "NO": "NO", "FOR": "YES", "AGAINST": "NO", "APPROVE": "YES", "REJECT": "NO"}
 ARCHIVE = "Precinct rows of the state's election statistics archive, which add up to its county totals for each answer."
-TOWNS = ("VT", "CT")
+TOWNS = ("VT", "CT", "NH")
 TOWN_ARCHIVE = (
     "City and town rows of the state's election statistics archive, which add up to its county totals for each "
     "answer. The state reports by municipality, so the units are whole towns rather than precincts."
@@ -358,6 +358,7 @@ def parse() -> None:
         places.setdefault(state, {}).setdefault(elstats.plain(name), geoid[:5])
         places[state].setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
     places["VT"]["essexjunction"] = "50007"
+    places["NH"] |= {"hartslocation": "33003", "wentworthslocation": "33007", "wentworth": "33009"}
     for state in TOWNS:
         frames = [table for table in frames if table["state"][0] != state]
         frames.append(
