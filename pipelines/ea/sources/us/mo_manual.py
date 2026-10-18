@@ -433,6 +433,11 @@ MISORDERED: dict[tuple[str, str], list[tuple[str, str]]] = {
     ("1924-11-04", "president"): [("perry", "pettis")],
 }
 CHECKED: set[tuple[str, str, int]] = {
+    ("1940-11-05", "governor", 3),
+    ("1916-11-07", "president", 3),
+    ("1896-11-03", "president", 2),
+    ("1908-11-03", "governor", 3),
+    ("1908-11-03", "governor", 0),
     ("1912-11-05", "governor", 3),
     ("1944-11-07", "governor", 2),
     ("1932-11-08", "governor", 2),
@@ -473,6 +478,49 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1940-11-05", "governor", "29129", 3): 2,
+    ("1936-11-03", "governor", "29057", 4): 0,
+    ("1936-11-03", "governor", "29217", 4): 0,
+    ("1936-11-03", "president", "29141", 5): 0,
+    ("1936-11-03", "president", "29157", 5): 0,
+    ("1916-11-07", "president", "29163", 3): 45,
+    ("1896-11-03", "president", "29095", 2): 98,
+    ("1944-11-07", "senate", "29199", 2): 3,
+    ("1940-11-05", "governor", "29097", 2): 36,
+    ("1936-11-03", "governor", "29049", 4): 2,
+    ("1932-11-08", "governor", "29221", 4): 2,
+    ("1928-11-06", "governor", "29127", 3): 0,
+    ("1928-11-06", "governor", "29049", 2): 0,
+    ("1928-11-06", "governor", "29173", 2): 0,
+    ("1924-11-04", "governor", "29143", 3): 0,
+    ("1924-11-04", "governor", "29217", 3): 0,
+    ("1900-11-06", "governor", "29073", 1): 2034,
+    ("1936-11-03", "president", "29099", 5): 4,
+    ("1904-11-08", "president", "29209", 3): 53,
+    ("1904-11-08", "president", "29186", 0): 1163,
+    ("1900-11-06", "president", "29011", 4): 83,
+    ("1900-11-06", "president", "29083", 0): 3777,
+    ("1896-11-03", "president", "29223", 3): 0,
+    ("1896-11-03", "president", "29117", 2): 28,
+    ("1892-11-08", "president", "29137", 0): 3863,
+    ("1892-11-08", "president", "29205", 0): 2252,
+    ("1944-11-07", "senate", "29145", 2): 9,
+    ("1944-11-07", "senate", "29155", 2): 5,
+    ("1928-11-06", "senate", "29027", 3): 0,
+    ("1928-11-06", "senate", "29173", 2): 0,
+    ("1908-11-03", "governor", "29229", 3): 11,
+    ("1908-11-03", "governor", "29089", 0): 2053,
+    ("1908-11-03", "governor", "29229", 4): 5,
+    ("1908-11-03", "governor", "29229", 2): 56,
+    ("1908-11-03", "governor", "29175", 1): 2027,
+    ("1908-11-03", "governor", "29229", 1): 2192,
+    ("1908-11-03", "governor", "29021", 0): 9224,
+    ("1908-11-03", "governor", "29113", 0): 2521,
+    ("1908-11-03", "governor", "29119", 0): 1264,
+    ("1908-11-03", "governor", "29133", 0): 1580,
+    ("1908-11-03", "governor", "29079", 0): 1308,
+    ("1908-11-03", "governor", "29229", 0): 1432,
+    ("1908-11-03", "governor", "TOTAL", 0): 340053,
     ("1928-11-06", "governor", "29095", 0): 107579,
     ("1928-11-06", "governor", "29510", 0): 175867,
     ("1928-11-06", "governor", "TOTAL", 0): 784293,
@@ -875,6 +923,7 @@ PARTIES = {
     "CWL": None,
     "AF": None,
     "NP": None,
+    "INDP": None,
     "MO:SOC": "MO:socialist",
     "MO:SLP": "MO:socialist-labor",
 }
@@ -1545,13 +1594,6 @@ def parse() -> None:
                     if value != chosen[county][column] and (day, office, county, column) not in FIXES
                 }
             )
-            swaps = [
-                picked
-                for size in (1, 2)
-                for picked in itertools.combinations(others, size)
-                if len({county for county, _ in picked}) == size
-                and sum(value - chosen[county][column] for county, value in picked) == gap
-            ]
             if (day, office, column) in CHECKED or (
                 column in informed
                 and abs(gap) <= max(10, total // 100)
@@ -1571,21 +1613,11 @@ def parse() -> None:
                     }
                 )
                 continue
-            swaps = [one for one in swaps if len(one) == len(swaps[0])]
-            if len(swaps) > 1:
-                swaps = [
-                    one
-                    for one in swaps
-                    if all(county in expected and expected[county][column] == value for county, value in one)
-                ] or swaps
-            if len(swaps) != 1:
-                raise ValueError(
-                    f"{day} {office} {label}: off by {gap}, "
-                    f"other readings {[(county, value) for county, value in others if value]}, "
-                    f"unlike ICPSR {[(county, chosen[county][column], expected[county][column]) for county in order if county in expected and chosen[county][column] != expected[county][column]]}"
-                )
-            for county, value in swaps[0]:
-                chosen[county][column] = value
+            raise ValueError(
+                f"{day} {office} {label}: off by {gap}, "
+                f"other readings {[(county, value) for county, value in others if value]}, "
+                f"unlike ICPSR {[(county, chosen[county][column], expected[county][column]) for county in order if county in expected and chosen[county][column] != expected[county][column]]}"
+            )
         for county in order:
             for (party, label, *_), each, votes in zip(candidates, offices, chosen[county], strict=True):
                 rows.append(
