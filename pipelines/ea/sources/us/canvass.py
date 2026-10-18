@@ -49,6 +49,13 @@ ARIZONA = (
 )
 AZ_PUBLISHER = "Arizona Secretary of State"
 AZ_TITLE = "State of Arizona Official Canvass, 2022 General Election"
+OREGON = (
+    "https://web.archive.org/web/20230216221024id_/"
+    "https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf"
+)
+OR_PUBLISHER = "Oregon Secretary of State"
+OR_TITLE = "November 8, 2022, General Election Abstract of Votes"
+OR_OFFICES = {"Commissioner of the Bureau of Labor and Industries"}
 AZ_COUNTIES = [f"040{code:02d}" for code in (1, 3, 5, 7, 9, 11, 12, 13, 15, 17, 19, 21, 23, 25, 27)]
 SEATS = {
     "Corporation Commissioner": 2,
@@ -58,7 +65,7 @@ SEATS = {
     "Trustee of Michigan State University": 2,
     "Governor of Wayne State University": 2,
 }
-NONPARTISAN = {"Justice of Supreme Court"}
+NONPARTISAN = {"Justice of Supreme Court", "Commissioner of the Bureau of Labor and Industries"}
 TOWNS = {
     "44001": ["Barrington", "Bristol", "Warren"],
     "44003": ["Coventry", "East Greenwich", "Warwick", "West Greenwich", "West Warwick"],
@@ -125,6 +132,10 @@ OFFICES = {
         "trustee-of-michigan-state-university",
     ),
     "Governor of Wayne State University": ("Governor of Wayne State University", "governor-of-wayne-state-university"),
+    "Commissioner of the Bureau of Labor and Industries": (
+        "Commissioner of the Bureau of Labor and Industries",
+        "commissioner-of-the-bureau-of-labor-and-industries",
+    ),
 }
 PARTIES = {
     "DEM": "democratic-party",
@@ -175,6 +186,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, INDIANA.format(year=day.year, category=category), suffix=".json")
     raw.fetch(SOURCE, MICHIGAN, suffix=".csv")
     raw.fetch(SOURCE, ARIZONA, suffix=".pdf")
+    raw.fetch(SOURCE, OREGON, suffix=".pdf")
 
 
 def parse() -> None:
@@ -352,6 +364,60 @@ def parse() -> None:
         rows.extend(arizona(line, office))
     with connect() as conn:
         michigan_fips = openelections.counties(conn)["MI"]
+        oregon_fips = {
+            slug(text).replace("-", ""): code
+            for text, code in conn.execute(
+                """select n.text, u.code from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '41%'"""
+            ).fetchall()
+        }
+    office = None
+    for text in (
+        line.strip()
+        for line in subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, OREGON).path), "-"],
+            check=False,
+            capture_output=True,
+            text=True,
+        ).stdout.splitlines()
+    ):
+        if text in OR_OFFICES:
+            office, header, tallied = text, [], []
+            continue
+        if office is None or not text:
+            continue
+        found = re.fullmatch(r"([A-Z][A-Za-z ]*?)\s{2,}([\d,]+(?:\s+[\d,]+)*)", text)
+        if found is None:
+            header.append(re.split(r"\s{2,}", text))
+            continue
+        surnames, (_, *firsts) = header
+        votes = [int(figure.replace(",", "")) for figure in found[2].split()]
+        if len(votes) != len(surnames) or len(firsts) != len(surnames) - 1:
+            raise ValueError(f"Oregon {office}: cannot read {found[1]} under {header}")
+        if not tallied:
+            tallied = [0] * (len(votes) + 1)
+        if found[1] == "TOTAL":
+            if tallied != [*votes, 36]:
+                raise ValueError(f"Oregon {office}: the counties do not add up to the printed totals")
+            office = None
+            continue
+        tallied[-1] += 1
+        for index, (surname, count) in enumerate(zip(surnames, votes, strict=True)):
+            tallied[index] += count
+            rows.append(
+                {
+                    "state": "OR",
+                    "day": date(2022, 11, 8),
+                    "office": office,
+                    "candidate": "Write-ins" if surname == "Misc." else f"{firsts[index]} {surname.lstrip('*')}",
+                    "mate": None,
+                    "party": None,
+                    "fips": oregon_fips[slug(found[1]).replace("-", "")],
+                    "votes": count,
+                    "write_in": surname == "Misc.",
+                    "winner": surname.startswith("**"),
+                }
+            )
     michigan = (
         pl.read_csv(raw.cached(SOURCE, MICHIGAN).path, infer_schema_length=0)
         .filter(
@@ -427,8 +493,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's and Arizona's 2022, and Kentucky's 2023 "
-                "statewide general elections by county"
+                "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's, Arizona's, and Oregon's 2022, and "
+                "Kentucky's 2023 statewide general elections by county"
             ),
             polity="US",
         )
@@ -522,7 +588,18 @@ def emit() -> Path:
                 width=width,
                 height=height,
             )
-        sources = {"RI": board, "KY": kentucky, "MI": michigan, "AZ": secretary}
+        oregon = cs.source(OR_PUBLISHER, OR_TITLE)
+        cs.add(
+            "source",
+            id=oregon,
+            kind="official_body",
+            publisher=OR_PUBLISHER,
+            title=OR_TITLE,
+            url="https://sos.oregon.gov/elections/Documents/results/november-general-2022.pdf",
+            license="Public record",
+        )
+        cs.artifact(raw.cached(SOURCE, OREGON), oregon)
+        sources = {"RI": board, "KY": kentucky, "MI": michigan, "AZ": secretary, "OR": oregon}
         isos = [f"US-{state}" for state in (*sources, "IN")]
         states = dict(
             conn.execute(
@@ -544,7 +621,7 @@ def emit() -> Path:
         counties: dict[str, UUID] = dict(
             conn.execute(
                 """select code, id from reporting_unit
-                   where scheme_code = 'us.county' and left(code, 2) in ('21', '44', '18', '26', '04')"""
+                   where scheme_code = 'us.county' and left(code, 2) in ('21', '44', '18', '26', '04', '41')"""
             ).fetchall()
         )
         cs.add(
