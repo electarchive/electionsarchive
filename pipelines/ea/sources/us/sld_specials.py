@@ -72,6 +72,23 @@ GENERALS = (
         "State%20District%20Offices%20and%20Multi-County%20Legislative%20District%20Offices.pdf",
     }
 )
+COUNTY_SHEETS = {
+    "2023-01-10:MS:house:23": [
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election/Grenada.pdf",
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election/Lafayette.pdf",
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election/Webster.pdf",
+    ],
+    "2023-01-31:MS:house:23:runoff": [
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election%20Runoff/Grenada.pdf",
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election%20Runoff/Lafayette.pdf",
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election%20Runoff/Webster.pdf",
+    ],
+    "2025-03-25:MS:house:23": [
+        "https://www.sos.ms.gov/elections/electionresults/2025LegislativeSpecial/HD%2023%20Special%20Election/Lafayette.pdf",
+        "https://www.sos.ms.gov/elections/electionresults/2025LegislativeSpecial/HD%2023%20Special%20Election/Pontotoc%20County.pdf",
+        "https://www.sos.ms.gov/elections/electionresults/2025LegislativeSpecial/HD%2023%20Special%20Election/Webster_Special.pdf",
+    ],
+}
 MISSISSIPPI_QUALIFYING = (
     "https://www.sos.ms.gov/Content/documents/Elections/candidate%20qualifying/2023%20Qualifying%20List%202023.6.3.pdf"
 )
@@ -242,6 +259,31 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2025-02-15:DE:senate:5": (
         "transcribed",
         "https://elections.delaware.gov/elections/special/20250215_sd05/2025SpecialElection_SD05_OfficialResults.pdf",
+        None,
+    ),
+    "2023-12-21:DE:house:37": (
+        "transcribed",
+        "https://elections.delaware.gov/elections/special/20231221_rd37/2023SpecialElection_RD37.pdf",
+        None,
+    ),
+    "2023-01-10:MS:house:23": (
+        "transcribed",
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election/Calhoun.pdf",
+        None,
+    ),
+    "2023-01-31:MS:house:23:runoff": (
+        "transcribed",
+        "https://www.sos.ms.gov/elections/electionresults/2023StateSpecial/HD%2023%20Special%20Election%20Runoff/Calhoun.pdf",
+        None,
+    ),
+    "2025-03-25:MS:house:23": (
+        "transcribed",
+        "https://www.sos.ms.gov/elections/electionresults/2025LegislativeSpecial/HD%2023%20Special%20Election/Calhoun_Results%20(2).pdf",
+        None,
+    ),
+    "2025-03-25:MS:house:82": (
+        "transcribed",
+        "https://www.sos.ms.gov/elections/electionresults/2025LegislativeSpecial/HD%2082%20Special%20Election/Lauderdale.pdf",
         None,
     ),
     "2025-08-05:DE:house:20": (
@@ -586,6 +628,29 @@ TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
         ("Brent Burdge", "Republican", 2015),
         (None, None, 12),
     ],
+    "2023-12-21:DE:house:37": [
+        ("Jane Hovington", "Democratic", 1068),
+        ("Valerie Jones Giltner", "Republican", 1805),
+        (None, None, 4),
+    ],
+    "2023-01-10:MS:house:23": [
+        ("Perry Van Bailey", None, 900),
+        ("Andy Clark", None, 317),
+        ("Andrew 'Andy' Stepp", None, 1142),
+    ],
+    "2023-01-31:MS:house:23:runoff": [("Perry Van Bailey", None, 1195), ("Andrew 'Andy' Stepp", None, 1188)],
+    "2025-03-25:MS:house:23": [
+        ("Perry Van Bailey", None, 1190),
+        ("Colby Bollinger", None, 939),
+        ("Andy Clark", None, 171),
+        ("Danny Lampley", None, 30),
+        ("Travis E. Wright", None, 583),
+    ],
+    "2025-03-25:MS:house:82": [
+        ("Joseph A. Denson", None, 410),
+        ("Gregory Elliott", None, 556),
+        ("Joseph Joe Norwood", None, 413),
+    ],
     "2025-08-05:DE:house:20": [
         ("Alonna Berry", "Democratic", 4653),
         ("Nikki Miller", "Republican", 4536),
@@ -744,6 +809,8 @@ def fetch() -> None:
         if system == "louisiana":
             raw.fetch(SOURCE, url.replace("Votes_", "RacesCandidates_"), suffix=".json")
     raw.fetch(SOURCE, MISSISSIPPI_QUALIFYING, suffix=".pdf")
+    for url in (url for sheets in COUNTY_SHEETS.values() for url in sheets):
+        raw.fetch(SOURCE, url, suffix=".pdf")
     for election, url in GENERALS.items():
         if ":LA" in election:
             raw.fetch(SOURCE, url, suffix=".json")
@@ -1134,7 +1201,9 @@ def emit() -> Path:
                     license="Public record",
                 )
             source = sources[(publisher, day)]
-            for cite in (url, MISSISSIPPI_QUALIFYING) if regular and state == "MS" else (url,):
+            for cite in (
+                (url, MISSISSIPPI_QUALIFYING) if regular and state == "MS" else (url, *COUNTY_SHEETS.get(key, ()))
+            ):
                 if cite not in cited:
                     cited.add(cite)
                     cs.artifact(raw.cached(SOURCE, cite), source)
