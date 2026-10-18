@@ -299,6 +299,13 @@ STATES = {
         "Election results extracts and detail reports: primaries by county, 2000–2022",
         "https://results.elections.myflorida.com/",
     ),
+    "KY": (
+        "21",
+        "Kentucky",
+        "Kentucky State Board of Elections",
+        "Election results: primary county reports, 2000–2008",
+        "https://elect.ky.gov/",
+    ),
     "TX": (
         "48",
         "Texas",
@@ -511,6 +518,30 @@ ME_METHOD = (
     "or more candidates, the candidate with a majority of first choices. Votes are first choices."
 )
 WON_MAJORITY = "Derived: a majority of first choices in the certified contest totals."
+KY_DAYS = {
+    2000: date(2000, 5, 23),
+    2002: date(2002, 5, 28),
+    2004: date(2004, 5, 18),
+    2006: date(2006, 5, 16),
+    2007: date(2007, 5, 22),
+    2008: date(2008, 5, 20),
+}
+KY_PAGE = "https://elect.ky.gov/results/2000-2009/Pages/{}primaryandgeneralelectionresults.aspx"
+KY_OFFICES = {
+    "D07": "SECRETARY OF STATE",
+    "D08": "ATTORNEY GENERAL",
+    "D09": "AUDITOR",
+    "D10": "TREASURER",
+    "D12": "COMMISSIONER OF AGRICULTURE",
+    "D14": "senate",
+    "D15": "house",
+}
+KY_LINE = re.compile(r"^ {3,}([DR]?) {2,}(\S.*?) {2,}([\d,]*) +[\d.]+% +\d+ *$", re.MULTILINE)
+KY_METHOD = (
+    "Totals are the State Board of Elections' official election night tally from its county reports, each "
+    "candidate's county rows checked against the statewide report by office; a county the district splits holds "
+    "only the district's part. The reports do not mark winners, so the winner shown is the leading candidate."
+)
 FL_DAYS = {
     date(2000, 9, 5): None,
     date(2000, 10, 3): date(2000, 9, 5),
@@ -796,6 +827,21 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
+    for year in KY_DAYS:
+        page = raw.fetch(SOURCE, KY_PAGE.format(year), suffix=".htm")
+        for path in re.findall(
+            rf'href="(/SiteCollectionDocuments/Election%20Results/2000-2009/{year}/[^"]*\.txt)"',
+            page.path.read_text(errors="replace"),
+            re.IGNORECASE,
+        ):
+            if re.search("pri", path, re.IGNORECASE) and not re.search(
+                r"reg%20stat|regstat|by%20cong|by%20candidate|by%20county|bycounty", path, re.IGNORECASE
+            ):
+                try:
+                    raw.cached(SOURCE, f"https://elect.ky.gov{path}")
+                except LookupError:
+                    raw.fetch(SOURCE, f"https://elect.ky.gov{path}", suffix=".txt")
+                    time.sleep(0.5)
     for day in FL_DAYS:
         extract = raw.fetch(SOURCE, fl_sos.EXTRACT.format(day=day), suffix=".txt")
         for race, party, district in sorted(
@@ -841,7 +887,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|33|35|36|48|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|21|33|35|36|48|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -2029,6 +2075,67 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    ky: list[tuple[date, str, str | None, str, str, str, int]] = []
+    for year, day in KY_DAYS.items():
+        files = [
+            f"https://elect.ky.gov{path}"
+            for path in re.findall(
+                rf'href="(/SiteCollectionDocuments/Election%20Results/2000-2009/{year}/[^"]*\.txt)"',
+                raw.cached(SOURCE, KY_PAGE.format(year)).path.read_text(errors="replace"),
+                re.IGNORECASE,
+            )
+            if re.search("pri", path, re.IGNORECASE)
+            and not re.search(r"reg%20stat|regstat|by%20cong|by%20candidate|by%20county|bycounty", path, re.IGNORECASE)
+        ]
+        office = next(url for url in files if re.search(r"by%20office|byoffice", url, re.IGNORECASE))
+        totals = {
+            (block[:11], party, re.sub(r"\s+", " ", name).strip()): int(votes.replace(",", "") or 0)
+            for block in raw.cached(SOURCE, office).path.read_text(errors="replace").split("OFF/DST/DIV: ")[1:]
+            if block[:3] in KY_OFFICES
+            for party, name, votes in KY_LINE.findall(block)
+        }
+        sums: dict[tuple[str, str, str], int] = {}
+        for url in files:
+            if url == office:
+                continue
+            text = raw.cached(SOURCE, url).path.read_text(errors="replace")
+            banner = re.search(r"^\s*(\S.*?)\s+COUNTY REPORT", text, re.MULTILINE)
+            if banner is None:
+                raise ValueError(f"{url}: no county heading")
+            fips = counties[("21", re.sub(r"[^a-z]", "", banner[1].lower()))]
+            for block in text.split("OFF/DST/DIV: ")[1:]:
+                if block[:3] not in KY_OFFICES:
+                    continue
+                for party, name, votes in KY_LINE.findall(block):
+                    choice = re.sub(r"\s+", " ", name).strip()
+                    sums[(block[:11], party, choice)] = sums.get((block[:11], party, choice), 0) + int(
+                        votes.replace(",", "") or 0
+                    )
+                    ky.append(
+                        (
+                            day,
+                            KY_OFFICES[block[:3]] if block[:3] in ("D14", "D15") else OFFICES[KY_OFFICES[block[:3]]][0],
+                            str(int(block[4:7])) if block[:3] in ("D14", "D15") else None,
+                            {"D": "DEM", "R": "REP"}[party],
+                            fips,
+                            choice,
+                            int(votes.replace(",", "") or 0),
+                        )
+                    )
+        if sums != totals:
+            raise ValueError(f"{year} Kentucky: the county reports do not match the statewide report by office")
+    frames.append(
+        pl.DataFrame(
+            ky, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row"
+        ).with_columns(
+            state=pl.lit("KY"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     fl: list[tuple[date, str, str | None, str, str, str, int]] = []
     counties[("12", "dade")] = counties[("12", "miamidade")]
     for day in FL_DAYS:
@@ -2212,7 +2319,8 @@ def emit() -> Path:
             "New York, Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine "
             "2000–2024 by county from the Secretary of State's tabulations, Illinois 2000–2022 by county from the "
             "State Board of Elections' vote totals, Texas 2000–2014 by county from the Secretary of State's "
-            "election history, and Florida 2000–2022 by county from the Division of Elections' results extracts",
+            "election history, Florida 2000–2022 by county from the Division of Elections' results extracts, and "
+            "Kentucky 2000–2008 by county from the State Board of Elections' county reports",
             polity="US",
         )
 
@@ -2268,6 +2376,18 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, IL_DOWNLOAD.format(token)), sources["IL"])
         for day in NC_DAYS:
             cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), sources["NC"])
+        for year in KY_DAYS:
+            page = raw.cached(SOURCE, KY_PAGE.format(year))
+            cs.artifact(page, sources["KY"])
+            for path in re.findall(
+                rf'href="(/SiteCollectionDocuments/Election%20Results/2000-2009/{year}/[^"]*\.txt)"',
+                page.path.read_text(errors="replace"),
+                re.IGNORECASE,
+            ):
+                if re.search("pri", path, re.IGNORECASE) and not re.search(
+                    r"reg%20stat|regstat|by%20cong|by%20candidate|by%20county|bycounty", path, re.IGNORECASE
+                ):
+                    cs.artifact(raw.cached(SOURCE, f"https://elect.ky.gov{path}"), sources["KY"])
         for day in FL_DAYS:
             extract = raw.cached(SOURCE, fl_sos.EXTRACT.format(day=day))
             cs.artifact(extract, sources["FL"])
@@ -2438,6 +2558,7 @@ def emit() -> Path:
             *(("IL", day, None) for day in IL_DAYS.values()),
             *(("TX", day, first) for day, first in TX_DAYS.items()),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
+            *(("KY", day, None) for day in KY_DAYS.values()),
             *(
                 (state, day, None)
                 for state, day in lines.filter(pl.col("state").is_in(list(ELSTATS)))
@@ -2569,7 +2690,7 @@ def emit() -> Path:
                     else "irv"
                     if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", "ME", "IL", *ELSTATS)
+                    if state in ("MN", "CA", "ME", "IL", "KY", *ELSTATS)
                     else "two_round"
                     if state == "TX" or (state == "FL" and day.year == 2000)
                     else "fptp"
@@ -2730,7 +2851,7 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_MAJORITY)]
                 elif tallies[0] > tallies[1] and nominated.get(names[0]) and day.year < 2024:
                     wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", "IL", *ELSTATS) or (state == "FL" and day.year > 2000):
+            elif state in ("MN", "CA", "ME", "IL", "KY", *ELSTATS) or (state == "FL" and day.year > 2000):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
@@ -2862,6 +2983,8 @@ def emit() -> Path:
                     if state == "IL"
                     else TX_METHOD
                     if state == "TX"
+                    else KY_METHOD
+                    if state == "KY"
                     else FL_METHOD.format(
                         rule=", with more than half the votes, or the leader of the second primary; when a second "
                         "primary followed, the top two are shown as advancing"
