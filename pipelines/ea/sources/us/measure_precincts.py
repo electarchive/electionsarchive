@@ -25,6 +25,7 @@ from ea.sources.us import (
     medsl_state_precincts,
     oe_precincts,
     openelections,
+    swdb_precincts,
     wa_local,
 )
 from ea.store import DATA, connect
@@ -191,6 +192,15 @@ HARNEY_NOTE = (
     "Clerk's official abstract of votes filed with the Secretary of State (record EPD/24/216), a scan read by hand; "
     "they add up to the abstract's totals and to Harney's certified county totals."
 )
+CA_ELECTIONS = ("P12", "G12", "P14", "P16", "G16", "P18", "P20", "G20", "P24")
+CA_SOV = swdb_precincts.SWDB + "{0}/state/state_{1}_sov_data_by_{1}_svprec.zip"
+CA_TITLE = "Statement of Vote data by SOV precinct"
+CALIFORNIA = (
+    "Precinct rows of the Statewide Database's Statement of Vote data by SOV precinct, the counties' own reporting "
+    "precincts, with their vote-by-mail precincts. Each answer's precinct rows add up to the totals of this question's "
+    "default results{counties}. The Database's permission to redistribute its files is pending, so this set is held "
+    "under that pending license."
+)
 COMMITS = openelections.COMMITS | county_measures.COMMITS
 FILE = re.compile(
     r"(?:.*/)?(\d{8})__([a-z]{2})__((?:general|primary|special|runoff)(?:__(?:general|primary|runoff))?)(__[a-z_]+)?__(precinct|town)\.csv"
@@ -198,6 +208,8 @@ FILE = re.compile(
 
 
 def fetch() -> None:
+    for election in CA_ELECTIONS:
+        raw.fetch(SOURCE, CA_SOV.format(election, election.lower()), suffix=".zip")
     measures.fetch()
     raw.fetch(SOURCE, HARNEY, suffix=".pdf")
     with connect() as conn:
@@ -836,6 +848,38 @@ def parse() -> None:
         "day", "office", "fips", "precinct", "answer"
     ).write_parquet(PARSED / "louisiana.parquet")
 
+    frames = []
+    for election in CA_ELECTIONS:
+        with zipfile.ZipFile(raw.cached(SOURCE, CA_SOV.format(election, election.lower())).path) as archive:
+            table = pl.read_csv(
+                io.BytesIO(archive.read(next(name for name in archive.namelist() if name.endswith(".csv")))),
+                infer_schema=False,
+            )
+        day = swdb_precincts.DAYS[election]
+        frames.append(
+            table.filter(~pl.col("SVPREC").str.contains("TOT"), ~pl.col("SVPREC").str.starts_with("SOV_"))
+            .unpivot(
+                [column for column in table.columns if re.fullmatch(r"PR_\w+_[YN]", column)],
+                index=["FIPS", "SVPREC"],
+                variable_name="column",
+                value_name="votes",
+            )
+            .select(
+                year=pl.lit(day.year, pl.Int32),
+                day=pl.lit(day),
+                state=pl.lit("CA"),
+                office=pl.concat_str(pl.lit("PROPOSITION "), pl.col("column").str.extract(r"^PR_0*(\w+)_[YN]$")),
+                district=pl.lit(None, pl.String),
+                fips="FIPS",
+                jurisdiction=pl.lit(""),
+                precinct="SVPREC",
+                answer=pl.when(pl.col("column").str.ends_with("_Y")).then(pl.lit("YES")).otherwise(pl.lit("NO")),
+                votes=pl.col("votes").cast(pl.Int64, strict=False),
+            )
+            .filter(pl.col("votes").is_not_null().all().over("office"))
+        )
+    pl.concat(frames).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "california.parquet")
+
 
 def emit() -> Path:
     archives = pl.read_parquet(PARSED / "archives.parquet").with_columns(
@@ -851,6 +895,7 @@ def emit() -> Path:
             pl.read_parquet(PARSED / "maine.parquet").with_columns(origin=pl.lit("maine")),
             pl.read_parquet(PARSED / "massachusetts.parquet").with_columns(origin=pl.lit("massachusetts")),
             pl.read_parquet(PARSED / "alabama.parquet").with_columns(origin=pl.lit("alabama")),
+            pl.read_parquet(PARSED / "california.parquet").with_columns(origin=pl.lit("california")),
         ],
         how="diagonal_relaxed",
     )
@@ -983,8 +1028,24 @@ def emit() -> Path:
                     cs.source("Alabama Secretary of State", "Election data downloads"),
                     ALABAMA,
                 ),
+                ("california", "CA"): (cs.source(swdb_precincts.PUBLISHER, CA_TITLE), CALIFORNIA),
             }
         )
+        if sources[("california", "CA")][0] in cs.minted:
+            cs.add(
+                "source",
+                id=sources[("california", "CA")][0],
+                kind="academic",
+                publisher=swdb_precincts.PUBLISHER,
+                title=CA_TITLE,
+                url=swdb_precincts.SWDB,
+                license=swdb_precincts.LICENSE,
+                attribution=swdb_precincts.PUBLISHER,
+            )
+            for election in CA_ELECTIONS:
+                cs.artifact(
+                    raw.cached(SOURCE, CA_SOV.format(election, election.lower())), sources[("california", "CA")][0]
+                )
 
         candidates: list[tuple[str, str, UUID | None, str, pl.DataFrame]] = [
             (key, state, None, TOWN_ARCHIVE if state in TOWNS else ARCHIVE, rows)

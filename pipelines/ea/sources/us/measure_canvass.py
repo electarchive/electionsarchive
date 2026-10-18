@@ -14,7 +14,18 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import al_sos, elstats, fl_sos, la_sos, me_canvass, measure_precincts, mo_sos, ncsbe, wa_local
+from ea.sources.us import (
+    al_sos,
+    ca_sos,
+    elstats,
+    fl_sos,
+    la_sos,
+    me_canvass,
+    measure_precincts,
+    mo_sos,
+    ncsbe,
+    wa_local,
+)
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_canvass"
@@ -132,6 +143,19 @@ NORTH_CAROLINA_QUESTIONS = {
     "NONPARTISAN JUDICIAL MERIT COMMISSION": "North Carolina Judicial Selection for Midterm Vacancies Amendment",
     "BIPARTISAN BOARD OF ETHICS AND ELECTIONS": "North Carolina Legislative Appointments to Elections Board Amendment",
 }
+CALIFORNIA = {
+    date(2012, 6, 5): "2012-primary/123-ballot-measures-formatted.xls",
+    date(2012, 11, 6): "2012-general/15-ballot-measures.xls",
+    date(2014, 6, 3): "2014-primary/xls/107-ballot%20measures.xls",
+    date(2014, 11, 4): "2014-general/xls/88-ballot-measures.xls",
+    date(2016, 6, 7): "2016-primary/130-state-ballot-measures-formatted.xls",
+    date(2016, 11, 8): "2016-general/sov/65-ballot-measures-formatted.xls",
+    date(2018, 6, 5): "2018-primary/sov/csv-ballot-measures.xls",
+    date(2018, 11, 6): "2018-general/sov/92-ballot-measures.xls",
+    date(2020, 3, 3): "2020-primary/sov/170-state-ballot-measures-formatted.xls",
+    date(2020, 11, 3): "2020-general/sov/58-ballot-measures.xlsx",
+    date(2024, 3, 5): "2024-primary/sov/csv-ballot-measures.xlsx",
+}
 NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
 METHOD = (
     "{level} totals from {document}, the state's certified results. They replace the totals transcribed from the "
@@ -210,6 +234,12 @@ DOCUMENTS = {
         "https://sosmt.gov/elections/results/",
         "the Montana Secretary of State's statewide canvass",
     ),
+    "CA": (
+        ca_sos.PUBLISHER,
+        ca_sos.TITLE,
+        "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
+        "the California Secretary of State's Statement of Vote",
+    ),
     "MO": (
         mo_sos.PUBLISHER,
         mo_sos.TITLE,
@@ -253,6 +283,8 @@ def link(state: str, day: date) -> tuple[str, str]:
             if str(day) in measure_precincts.ME_FILES
             else ""
         )
+    if state == "CA":
+        return SOURCE, ca_sos.SOV + CALIFORNIA[day] if day in CALIFORNIA else ""
     if state == "MO":
         return SOURCE, mo_sos.SITE + MISSOURI[day] if day in MISSOURI else ""
     if state == "OR":
@@ -297,7 +329,9 @@ def fetch() -> None:
                     raw.fetch(
                         SOURCE,
                         each,
-                        suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "GA": ".zip"}.get(state, ".pdf"),
+                        suffix="." + each.rsplit(".", 1)[1]
+                        if state == "CA"
+                        else {"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "GA": ".zip"}.get(state, ".pdf"),
                     )
                 except httpx.HTTPStatusError as error:
                     print(f"{state} {day}: {error}")
@@ -712,6 +746,30 @@ def parse() -> None:
                 },
                 orient="row",
             )
+        elif state == "CA":
+            rows = fastexcel.read_excel(str(path)).load_sheet(0, header_row=None, dtypes="string").to_polars().rows()
+            if rows[0][3:4] in (("COUNTY_NAME",), ("County Name",)):
+                records = [
+                    (row[3], row[5], answer, votes)
+                    for row in rows[1:]
+                    for answer, votes in zip(("YES", "NO"), row[7:9], strict=True)
+                ]
+            else:
+                header = next(
+                    i for i, row in enumerate(rows) if "YES" in [(cell or "").strip().upper() for cell in row]
+                )
+                records = []
+                title = None
+                for j in range(1, len(rows[0])):
+                    title = rows[0][j] or title
+                    if (rows[header][j] or "").strip().upper() not in ANSWERS or title is None:
+                        continue
+                    records += [(row[0], title, rows[header][j], row[j]) for row in rows[header + 1 :] if row[0]]
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            ).filter(pl.col("county").map_elements(elstats.plain, return_dtype=pl.String).is_in(list(names["CA"])))
         elif state == "UT":
             records = []
             reader = fastexcel.read_excel(str(path))
