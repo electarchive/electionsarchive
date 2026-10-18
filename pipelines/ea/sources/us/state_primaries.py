@@ -1,3 +1,4 @@
+import csv
 import html
 import io
 import json
@@ -7,7 +8,7 @@ import unicodedata
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
-from urllib.parse import urlencode
+from urllib.parse import quote, urlencode
 from uuid import UUID
 
 import fastexcel
@@ -16,7 +17,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import elstats, me_legislature, medsl, wa_local
+from ea.sources.us import elstats, me_legislature, medsl, nyc_general, wa_local
 from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
@@ -487,6 +488,55 @@ WITHHELD = (
     "many votes; no winner is shown unless the leader's margin is larger."
 )
 EMPTY = "The source lists this primary with zero votes for every candidate, so its returns are missing; the set is withdrawn."
+NYC_SITE = "https://www.vote.nyc"
+NYC_TITLE = "Election Results Summary"
+NYC_PAGE = NYC_SITE + "/page/election-results-summary-{}"
+NYC_YEARS = (2014, 2016, 2018, 2020, 2022)
+NYC_FILE = re.compile(
+    r'href="(/sites/default/files/(?:pdf|downloads/csv)/election_results/\d{4}/(\d{8})Primary Election/\d{11}'
+    r'(Crossover|New York|Bronx|Kings|Queens|Richmond) ([^"/<>]+?) '
+    r"(Representative in Congress|State Senator|Member of the Assembly) "
+    r'(\d+)(?:st|nd|rd|th) (?:Congressional|Senatorial|Assembly) District) EDLevel\.csv"'
+)
+NYC_METHOD = (
+    "Election district returns from the Board of Elections in the City of New York's certified ED-level reports; "
+    "summed by borough, every candidate's votes match the Board's certified recap. Election districts the Board "
+    "combined into another for the count hold no votes and are left out, and write-ins are one line, as the report "
+    "gives them."
+)
+NYC_COUNTERS = [
+    "Public Counter",
+    "Emergency",
+    "Manually Counted Emergency",
+    "Absentee/Military",
+    "Absentee / Military",
+    "Federal",
+    "Affidavit",
+]
+NYC_TOTALS = [
+    "Total Ballots",
+    "Less - Inapplicable Federal/Special Presidential Ballots",
+    "Total Applicable Ballots",
+    "Total Votes",
+    "Unrecorded",
+]
+NYC_OFFICES = {"Representative in Congress": "house", "State Senator": "senate", "Member of the Assembly": "assembly"}
+
+
+def nyc_files() -> dict[tuple[date, str, str, str], str]:
+    found: dict[tuple[date, str, str, str], dict[str, str]] = {}
+    for year in NYC_YEARS:
+        page = html.unescape(raw.cached(SOURCE, NYC_PAGE.format(year)).path.read_text()).replace("%20", " ")
+        for path, day, borough, party, office, district in NYC_FILE.findall(page):
+            found.setdefault(
+                (date(int(day[:4]), int(day[4:6]), int(day[6:])), party, NYC_OFFICES[office], district), {}
+            )[borough] = NYC_SITE + quote(path)
+    files = {}
+    for contest, boroughs in found.items():
+        if "Crossover" not in boroughs and len(boroughs) > 1:
+            raise ValueError(f"{contest}: {sorted(boroughs)} files and no crossover file")
+        files[contest] = boroughs.get("Crossover") or next(iter(boroughs.values()))
+    return files
 
 
 def search(state: str, office: int, year: int) -> str:
@@ -506,6 +556,11 @@ def search(state: str, office: int, year: int) -> str:
 
 
 def fetch() -> None:
+    for year in NYC_YEARS:
+        raw.fetch(SOURCE, NYC_PAGE.format(year), suffix=".html")
+    for stem in nyc_files().values():
+        for suffix in ("EDLevel", "Recap"):
+            raw.fetch(SOURCE, f"{stem}%20{suffix}.csv", suffix=".csv")
     for stamp, path, *_ in ME_FILES:
         for attempt in range(5):
             try:
@@ -1335,34 +1390,189 @@ def parse() -> None:
         print(
             day, office, lines["code"].n_unique(), "districts,", lines.select("code", "choice").n_unique(), "candidates"
         )
+    nyc = []
+    for (day, party, office, district), stem in nyc_files().items():
+        code = ELSTATS_PARTIES.get(party, f"NY:{party}")
+        if code not in PARTIES:
+            raise ValueError(f"{stem}: unknown party {party}")
+        table = list(csv.reader(io.StringIO(raw.cached(SOURCE, f"{stem}%20EDLevel.csv").path.read_text("utf-8-sig"))))
+        records = (
+            [dict(zip(table[0], row, strict=True)) for row in table[1:]]
+            if table[0][0] == "AD" and table[0][-1] == "Tally"
+            else [dict(zip(row[: len(row) // 2], row[len(row) // 2 :], strict=True)) for row in table]
+        )
+        rows = pl.DataFrame(records).select(
+            fips=pl.col("County").replace_strict(nyc_general.COUNTIES),
+            ed=pl.col("AD") + pl.col("ED"),
+            status="EDAD Status",
+            choice=pl.col("Unit Name").str.strip_chars(),
+            votes=pl.col("Tally").str.replace_all(",", "").cast(pl.Int64),
+            heading=pl.col("Office/Position Title")
+            + ":"
+            + pl.col("District Key").cast(pl.Int64).cast(pl.String)
+            + ":"
+            + pl.col("Party/Independent Body"),
+        )
+        if set(rows["heading"]) != {
+            f"{office_title}:{int(district)}:{party}" for office_title, body in NYC_OFFICES.items() if body == office
+        }:
+            raise ValueError(f"{stem}: the file holds {set(rows['heading'])}")
+        if rows.filter(
+            pl.col("status") != "IN-PLAY", ~pl.col("status").str.contains(r"^COMBINED INTO \d{3}/\d{2}$")
+        ).height:
+            raise ValueError(f"{stem}: unknown ED statuses {rows['status'].unique().to_list()}")
+        if rows.filter(pl.col("status") != "IN-PLAY", pl.col("votes") != 0).height:
+            raise ValueError(f"{stem}: a combined election district holds votes")
+        borough = None
+        tallies = []
+        for row in csv.reader(io.StringIO(raw.cached(SOURCE, f"{stem}%20Recap.csv").path.read_text("utf-8-sig"))):
+            if len(row) >= 6:
+                if found := re.fullmatch(r"(?:Total for .* - )?(New York|Bronx|Kings|Queens|Richmond) County", row[3]):
+                    tallies.append((found[1], row[4], row[5]))
+                continue
+            for cell in row:
+                if found := re.search(r"(?:^|\n)(New York|Bronx|Kings|Queens|Richmond) County(?:\n|$)", cell):
+                    borough = found[1]
+                elif cell.startswith("Total for "):
+                    borough = None
+            if borough is not None and len(row) == 2 and re.fullmatch(r"[\d,]+", row[1]):
+                tallies.append((borough, row[0], row[1]))
+        recap = (
+            pl.DataFrame(tallies, schema=["fips", "choice", "votes"], orient="row")
+            .select(
+                fips=pl.col("fips").replace_strict(nyc_general.COUNTIES),
+                choice=pl.when(pl.col("choice").str.ends_with("(Write-In)"))
+                .then(pl.lit(nyc_general.SCATTERED))
+                .otherwise(pl.col("choice").str.strip_chars()),
+                votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
+            )
+            .filter(~pl.col("choice").is_in([*NYC_COUNTERS, *NYC_TOTALS]))
+            .group_by("fips", "choice")
+            .agg(pl.col("votes").sum())
+        )
+        differences = (
+            rows.filter(~pl.col("choice").is_in(NYC_COUNTERS))
+            .group_by("fips", "choice")
+            .agg(pl.col("votes").sum())
+            .join(recap, on=["fips", "choice"], how="full", coalesce=True, suffix="_recap")
+            .filter(pl.col("votes").fill_null(0) != pl.col("votes_recap").fill_null(0))
+        )
+        if differences.height:
+            raise ValueError(f"{stem}: the ED-level report differs from the recap:\n{differences}")
+        nyc.append(
+            rows.filter(pl.col("status") == "IN-PLAY", ~pl.col("choice").is_in(NYC_COUNTERS)).select(
+                state=pl.lit("NY"),
+                day=pl.lit(day),
+                office=pl.lit(office),
+                code=pl.lit(str(int(district))),
+                party=pl.lit(code),
+                label=pl.lit(code),
+                fips="fips",
+                scheme=pl.lit("us.precinct"),
+                unit=pl.concat_str(pl.lit(f"{day}:NY"), "fips", "ed", separator=":"),
+                choice=pl.when(pl.col("choice") == nyc_general.SCATTERED).then(pl.lit("Write-ins")).otherwise("choice"),
+                writein=pl.col("choice") == nyc_general.SCATTERED,
+                votes="votes",
+                seats=pl.lit(1, pl.Int16),
+                seat=pl.lit(str(int(district))),
+                chamber=pl.lit(f"house:{slug(party)}"),
+            )
+        )
+    city = pl.concat(nyc)
+    contest = ["day", "office", "code", "party"]
+    signature = (
+        pl.col("choice")
+        .str.replace_all(r"\(.*?\)|\".*?\"|,", " ")
+        .str.to_lowercase()
+        .str.split(" ")
+        .list.eval(pl.element().filter(~pl.element().str.strip_chars(".").is_in(["", "jr", "sr", "ii", "iii", "iv"])))
+    )
+    signature = signature.list.first().str.slice(0, 1) + ":" + signature.list.last().str.replace_all("[^a-z0-9]", "")
+    archive = pl.concat(frames, how="diagonal_relaxed").filter(pl.col("state") == "NY")
+    overlap = (
+        archive.group_by(contest)
+        .agg(inside=pl.col("fips").is_in(list(nyc_general.COUNTIES.values())).all())
+        .join(city.select(contest).unique(), on=contest)
+    )
+    print(f"NYC: {overlap.height} contests also in the archive, {overlap['inside'].sum()} wholly inside the city")
+    names = (
+        archive.join(overlap.filter("inside"), on=contest, how="semi")
+        .filter(~pl.col("writein"))
+        .group_by(*contest, "choice")
+        .agg(pl.col("votes").sum())
+        .with_columns(signature=signature)
+    )
+    totals = (
+        city.join(overlap.filter("inside"), on=contest, how="semi")
+        .filter(~pl.col("writein"))
+        .group_by(*contest, "choice")
+        .agg(pl.col("votes").sum())
+        .with_columns(signature=signature)
+        .join(names, on=[*contest, "signature"], how="left", suffix="_archive")
+    )
+    for row in totals.filter(pl.col("votes") != pl.col("votes_archive").fill_null(-1)).iter_rows(named=True):
+        print(
+            f"{row['day']} NY {row['office']} {row['code']} {row['party']}: {row['choice']} {row['votes']} "
+            f"by election district against {row['choice_archive']} {row['votes_archive']} in the archive"
+        )
+    if totals.select(*contest, "choice").is_duplicated().any():
+        raise ValueError("an election district candidate matches two archive names")
+    city = (
+        city.join(overlap.filter(~pl.col("inside")), on=contest, how="anti")
+        .join(totals.select(*contest, "choice", "choice_archive"), on=[*contest, "choice"], how="left")
+        .with_columns(choice=pl.coalesce("choice_archive", "choice"))
+        .drop("choice_archive")
+    )
+    replaced = overlap.filter("inside").select(*contest, state=pl.lit("NY"), scheme=pl.lit("us.county"))
+    frames.append(city.filter(pl.col("office") != "house").drop("chamber"))
     federal = ca.filter(pl.col("office").is_in(["house", "us-senate"]))
-    PARSED.mkdir(parents=True, exist_ok=True)
-    federal.select(
+    house = city.filter(pl.col("office") == "house").select(
         year=pl.col("day").dt.year(),
-        chamber=pl.concat_str(
-            pl.col("office").replace({"us-senate": "senate"}),
-            pl.when(pl.col("day").dt.year() < 2012).then(
-                pl.concat_str(
-                    pl.lit(":"),
-                    pl.col("party").replace_strict(
-                        {code: word for code, (_, word, *_) in PARTIES.items()}, default=None
-                    ),
-                )
-            ),
-            ignore_nulls=True,
-        ),
+        chamber="chamber",
         day="day",
         special=pl.lit(False),
-        state=pl.lit("CA"),
+        state="state",
         district=pl.col("code").cast(pl.Int64),
         candidate="choice",
         writein="writein",
         votes="votes",
         measure=pl.lit(1, pl.Int16),
-        code="fips",
-        kind=pl.lit("county"),
-        source=pl.lit("CA"),
-    ).filter(pl.col("chamber").str.contains(":") | (pl.col("year") >= 2012)).write_parquet(PARSED / "congress.parquet")
+        code="unit",
+        kind=pl.lit("precinct"),
+        source=pl.lit("NYC"),
+    )
+    PARSED.mkdir(parents=True, exist_ok=True)
+    pl.concat(
+        [
+            federal.select(
+                year=pl.col("day").dt.year(),
+                chamber=pl.concat_str(
+                    pl.col("office").replace({"us-senate": "senate"}),
+                    pl.when(pl.col("day").dt.year() < 2012).then(
+                        pl.concat_str(
+                            pl.lit(":"),
+                            pl.col("party").replace_strict(
+                                {code: word for code, (_, word, *_) in PARTIES.items()}, default=None
+                            ),
+                        )
+                    ),
+                    ignore_nulls=True,
+                ),
+                day="day",
+                special=pl.lit(False),
+                state=pl.lit("CA"),
+                district=pl.col("code").cast(pl.Int64),
+                candidate="choice",
+                writein="writein",
+                votes="votes",
+                measure=pl.lit(1, pl.Int16),
+                code="fips",
+                kind=pl.lit("county"),
+                source=pl.lit("CA"),
+            ).filter(pl.col("chamber").str.contains(":") | (pl.col("year") >= 2012)),
+            house,
+        ]
+    ).write_parquet(PARSED / "congress.parquet")
     partisan = pl.col("day").dt.year() < 2012
     frames.append(
         ca.filter(~pl.col("office").is_in(["house", "us-senate"]))
@@ -1385,6 +1595,7 @@ def parse() -> None:
     )
     (
         pl.concat(frames, how="diagonal_relaxed")
+        .join(replaced, on=["state", *contest, "scheme"], how="anti", nulls_equal=True)
         .group_by("state", "day", "office", "code", "party", "fips", "scheme", "unit", "choice", "writein")
         .agg(
             pl.col("label").drop_nulls().first(),
@@ -1406,10 +1617,10 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="State legislative and statewide primaries and runoffs from state canvasses: "
-            "North Carolina 2002–2022, Minnesota 2016–2022, and Washington 2015–2022 by precinct, "
-            "California 2002–2022 by county, and Colorado, Connecticut, Idaho, Massachusetts, New York, "
-            "Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine 2000–2022 "
-            "by county from the Secretary of State's tabulations",
+            "North Carolina 2002–2022, Minnesota 2016–2022, Washington 2015–2022, and New York City 2014–2022 "
+            "by precinct, California 2002–2022 by county, Colorado, Connecticut, Idaho, Massachusetts, New Mexico, "
+            "New York, Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine "
+            "2000–2022 by county from the Secretary of State's tabulations",
             polity="US",
         )
 
@@ -1431,6 +1642,22 @@ def emit() -> Path:
                 )
         for stamp, path, *_ in ME_FILES:
             cs.artifact(raw.cached(SOURCE, ME_WAYBACK.format(stamp, path)), sources["ME"])
+        sources["NYC"] = cs.source(nyc_general.PUBLISHER, NYC_TITLE)
+        if sources["NYC"] in cs.minted:
+            cs.add(
+                "source",
+                id=sources["NYC"],
+                kind="official_body",
+                publisher=nyc_general.PUBLISHER,
+                title=NYC_TITLE,
+                url=NYC_SITE + "/page/election-results-summary",
+                license="Public record",
+            )
+        for year in NYC_YEARS:
+            cs.artifact(raw.cached(SOURCE, NYC_PAGE.format(year)), sources["NYC"])
+        for stem in nyc_files().values():
+            for suffix in ("EDLevel", "Recap"):
+                cs.artifact(raw.cached(SOURCE, f"{stem}%20{suffix}.csv"), sources["NYC"])
         for day in NC_DAYS:
             cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), sources["NC"])
         for day in MN_DAYS:
@@ -1472,6 +1699,11 @@ def emit() -> Path:
                    where x.scheme = %s""",
                 [f"{SOURCE}.result_set"],
             ).fetchall()
+        }
+        stale = {
+            match[1]: row
+            for value, row in published.items()
+            if (match := re.fullmatch(r"(.+):parts(?::\d+)?", value)) and row[8] == "active"
         }
         earlier: dict[UUID, list[tuple[UUID, str, int | None, str | None]]] = {}
         for result_set, option, kind, seats, notes in conn.execute(
@@ -1858,7 +2090,28 @@ def emit() -> Path:
             latest = f"{base}:{grain}" + (f":{revision}" if revision > 1 else "")
             current = published.get(latest)
             supersedes = old[0] if parted and old is not None else None
-            if current is not None and set(earlier.get(current[0], [])) == wanted:
+            replaced = None if parted else stale.get(base)
+            if replaced is not None:
+                latest = f"{base}:{grain}" if current is None else f"{base}:{grain}:{revision + 1}"
+                supersedes = replaced[0]
+                cs.add(
+                    "result_set",
+                    id=replaced[0],
+                    election_id=replaced[1],
+                    contest_id=replaced[2],
+                    stage=replaced[3],
+                    kind=replaced[4],
+                    status="superseded",
+                    source_id=replaced[5],
+                    is_default=False,
+                    completeness=replaced[6],
+                    supersedes_id=replaced[7],
+                )
+                for option, outcome, seats, notes in earlier.get(replaced[0], []):
+                    cs.add(
+                        "outcome", result_set_id=replaced[0], option_id=option, kind=outcome, seats=seats, notes=notes
+                    )
+            elif current is not None and set(earlier.get(current[0], [])) == wanted:
                 supersedes = current[7]
             elif current is not None:
                 latest = f"{base}:{grain}:{revision + 1}"
@@ -1881,6 +2134,7 @@ def emit() -> Path:
                         "outcome", result_set_id=current[0], option_id=option, kind=outcome, seats=seats, notes=notes
                     )
             result_set = sets[(state, day, office, code, party)] = cs.key(f"{SOURCE}.result_set", latest)
+            ed_level = state == "NY" and not parted
             cs.add(
                 "result_set",
                 id=result_set,
@@ -1889,7 +2143,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources[state],
+                source_id=sources["NYC" if ed_level else state],
                 is_default=True,
                 completeness=1,
                 supersedes_id=supersedes,
@@ -1900,7 +2154,9 @@ def emit() -> Path:
                 kind="methodology",
                 body_md=methods.get(result_set)
                 or (
-                    WA_METHOD
+                    NYC_METHOD
+                    if ed_level
+                    else WA_METHOD
                     if state == "WA"
                     else CA_METHOD.format(
                         rule="The top two candidates advance to the general election."
@@ -1928,6 +2184,12 @@ def emit() -> Path:
                 )
             for option, kind, _, notes in sorted(wanted):
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, notes=notes)
+        congress = pl.read_parquet(PARSED / "congress.parquet")
+        city = congress.filter(pl.col("state") == "NY")
+        bases |= {
+            f"{day}:NY:house:{district}:{chamber.removeprefix('house:')}"
+            for day, district, chamber in city.select("day", "district", "chamber").unique().iter_rows()
+        }
         for value, row in published.items():
             match = re.fullmatch(r"(.+):(?:precinct|parts)(?::\d+)?", value)
             if match is not None and match[1] not in bases and row[8] == "active":
@@ -2080,7 +2342,8 @@ def emit() -> Path:
                 [STATES["CA"][2]],
             ).fetchall()
         ]
-        congress = pl.read_parquet(PARSED / "congress.parquet").filter(
+        congress = congress.filter(
+            pl.col("state") == "CA",
             ~pl.concat_str(
                 pl.col("day").cast(pl.String),
                 pl.lit("CA"),
@@ -2094,7 +2357,28 @@ def emit() -> Path:
                 )
                 .otherwise("chamber"),
                 separator=":",
-            ).is_in(held)
+            ).is_in(held),
         )
         medsl.attach(cs, conn, congress, sources)
+        medsl.attach(cs, conn, city, sources, grain="precinct")
+        used = {value for frame in cs.frames.get("result_value", []) for value in frame["unit_id"].unique().to_list()}
+        for day, unit in city.select("day", "code").unique().sort("code").iter_rows():
+            precinct = cs.unit("us.precinct", unit)
+            if precinct not in cs.minted or str(precinct) not in used or unit in units:
+                continue
+            units[unit] = precinct
+            fips = unit.split(":")[2]
+            cs.add(
+                "reporting_unit",
+                id=precinct,
+                polity_id=polities["NY"],
+                scheme_code="us.precinct",
+                code=unit,
+                parent_id=counties[fips][0],
+                area_relation="within",
+                area_id=counties[fips][1],
+                kind="standard",
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
         return cs.write()
