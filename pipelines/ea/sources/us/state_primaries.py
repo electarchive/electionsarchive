@@ -11,6 +11,7 @@ from datetime import date, timedelta
 from pathlib import Path
 from urllib.parse import quote, urlencode
 from uuid import UUID
+from xml.etree import ElementTree
 
 import fastexcel
 import httpx
@@ -299,6 +300,13 @@ STATES = {
         "Election results extracts and detail reports: primaries by county, 2000–2022",
         "https://results.elections.myflorida.com/",
     ),
+    "SC": (
+        "45",
+        "South Carolina",
+        "South Carolina Election Commission",
+        "Election night reporting: primary detail results, 2010–2022",
+        "https://www.enr-scvotes.org/",
+    ),
     "KY": (
         "21",
         "Kentucky",
@@ -342,6 +350,8 @@ OFFICES = {
     "INSURANCE COMMISSIONER": ("insurance-commissioner", "Insurance Commissioner"),
     "CONTROLLER": ("controller", "Controller"),
     "COMPTROLLER": ("comptroller", "Comptroller"),
+    "COMPTROLLER GENERAL": ("comptroller-general", "Comptroller General"),
+    "SUPERINTENDENT OF EDUCATION": ("superintendent-of-education", "Superintendent of Education"),
     "SUPREME COURT ASSOCIATE JUSTICE": ("justice-of-the-supreme-court", "Supreme Court Associate Justice"),
     "SUPREME COURT CHIEF JUSTICE": ("chief-justice-of-the-supreme-court", "Supreme Court Chief Justice"),
     "COURT OF APPEALS JUDGE": ("judge-of-the-court-of-appeals", "Court of Appeals Judge"),
@@ -603,6 +613,51 @@ TX_METHOD = (
     "page does not mark winners, so the winner shown is the candidate with a majority, or the runoff's leader, and "
     "when a runoff followed, the top two are shown as advancing."
 )
+SC_DAYS = {
+    date(2010, 6, 8): None,
+    date(2010, 6, 22): date(2010, 6, 8),
+    date(2012, 6, 12): None,
+    date(2012, 6, 26): date(2012, 6, 12),
+    date(2014, 6, 10): None,
+    date(2014, 6, 24): date(2014, 6, 10),
+    date(2016, 6, 14): None,
+    date(2016, 6, 28): date(2016, 6, 14),
+    date(2018, 6, 12): None,
+    date(2018, 6, 26): date(2018, 6, 12),
+    date(2020, 6, 9): None,
+    date(2020, 6, 23): date(2020, 6, 9),
+    date(2022, 6, 14): None,
+    date(2022, 6, 28): date(2022, 6, 14),
+}
+SC_FILES = {
+    date(2010, 6, 8): ("16117",),
+    date(2010, 6, 22): ("16213",),
+    date(2012, 6, 12): ("39142", "40325"),
+    date(2012, 6, 26): ("40277", "40548"),
+    date(2014, 6, 10): ("51763", "52123"),
+    date(2014, 6, 24): ("52366",),
+    date(2016, 6, 14): ("62359", "62748"),
+    date(2016, 6, 28): ("62799",),
+    date(2018, 6, 12): ("75708", "76290"),
+    date(2018, 6, 26): ("76440",),
+    date(2020, 6, 9): ("103402", "104192"),
+    date(2020, 6, 23): ("104240", "104404"),
+    date(2022, 6, 14): ("114143", "115138"),
+    date(2022, 6, 28): ("115187", "115243"),
+}
+SC_SITE = "https://www.enr-scvotes.org/SC/{}/"
+SC_RACE = re.compile(
+    r"State (House of Representatives|Senate),? District (\d+) ?- ?(DEM|REP)"
+    r"|(Governor|Lieutenant Governor|Secretary of State|(?:State )?Treasurer|Attorney General|Comptroller General"
+    r"|(?:State )?Superintendent of Education|Commissioner of Agriculture) ?- ?(DEM|REP)"
+)
+SC_METHOD = (
+    "Totals are the county rows of the State Election Commission's detail results file, each candidate's rows "
+    "checked against its total, with the recount's file in place of the first count where the Commission "
+    "recounted the contest; a county the district splits holds only the district's part. The file does not mark "
+    "winners, so the winner shown is the candidate with a majority, or the runoff's leader, and when a runoff "
+    "followed, the top two are shown as advancing."
+)
 IL_DAYS = {
     2000: date(2000, 3, 21),
     2002: date(2002, 3, 19),
@@ -827,6 +882,18 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
+    for ids in SC_FILES.values():
+        for election in ids:
+            try:
+                version = raw.cached(SOURCE, SC_SITE.format(election) + "current_ver.txt")
+            except LookupError:
+                version = raw.fetch(SOURCE, SC_SITE.format(election) + "current_ver.txt", suffix=".txt")
+            url = SC_SITE.format(election) + version.path.read_text().strip() + "/reports/detailxml.zip"
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                raw.fetch(SOURCE, url, suffix=".zip")
+                time.sleep(1)
     for year in KY_DAYS:
         page = raw.fetch(SOURCE, KY_PAGE.format(year), suffix=".htm")
         for path in re.findall(
@@ -887,7 +954,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|21|33|35|36|48|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|21|33|35|36|45|48|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -2270,6 +2337,74 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    sc: list[tuple[date, str, str | None, str, str, str, int]] = []
+    for day, ids in SC_FILES.items():
+        tallied: dict[tuple[str, str | None, str], list[tuple[str, str, int]]] = {}
+        for election in ids:
+            site = SC_SITE.format(election)
+            version = raw.cached(SOURCE, site + "current_ver.txt").path.read_text().strip()
+            with zipfile.ZipFile(raw.cached(SOURCE, f"{site}{version}/reports/detailxml.zip").path) as archive:
+                root = ElementTree.fromstring(archive.read("detail.xml"))
+            seen: set[tuple[str, str | None, str]] = set()
+            for race in root.iter("Contest"):
+                title = re.sub(r"\s+", " ", race.get("text", "")).strip()
+                if (match := SC_RACE.fullmatch(title)) is None:
+                    continue
+                key = (
+                    ("house" if match[1].startswith("House") else "senate", str(int(match[2])), match[3])
+                    if match[1]
+                    else (OFFICES[match[4].upper().removeprefix("STATE ")][0], None, match[5])
+                )
+                if key in seen:
+                    raise ValueError(f"{election} {title}: the contest appears twice")
+                if election != ids[0] and key not in tallied:
+                    raise ValueError(f"{election} {title}: a recount of a contest the first count lacks")
+                seen.add(key)
+                rows: list[tuple[str, str, int]] = []
+                for choice in race.iter("Choice"):
+                    counts: dict[str, int] = {}
+                    for kind in choice.iter("VoteType"):
+                        parts = [
+                            (county.get("name", ""), int(county.get("votes", "0")))
+                            for county in kind
+                            if county.tag in ("County", "Precinct")
+                        ]
+                        if sum(value for _, value in parts) != int(kind.get("votes", "0")):
+                            raise ValueError(f"{election} {title}: the county rows do not match the vote type total")
+                        for county, value in parts:
+                            counts[county] = counts.get(county, 0) + value
+                    if sum(counts.values()) != int(choice.get("totalVotes", "0")):
+                        raise ValueError(f"{election} {title}: the county rows do not match the candidate's total")
+                    candidate = re.sub(r"\s*\(Withdrew\)$", "", re.sub(r"\s+", " ", choice.get("text", ""))).strip()
+                    rows.extend((county, candidate, value) for county, value in counts.items())
+                tallied[key] = rows
+        sc.extend(
+            (day, office, code, party, counties[("45", re.sub(r"[^a-z]", "", county.lower()))], candidate, value)
+            for (office, code, party), rows in tallied.items()
+            for county, candidate, value in rows
+        )
+    frames.append(
+        pl.DataFrame(
+            sc,
+            schema={
+                "day": pl.Date,
+                "office": pl.String,
+                "code": pl.String,
+                "party": pl.String,
+                "fips": pl.String,
+                "choice": pl.String,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        ).with_columns(
+            state=pl.lit("SC"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     partisan = pl.col("day").dt.year() < 2012
     frames.append(
         ca.filter(~pl.col("office").is_in(["house", "us-senate"]))
@@ -2319,8 +2454,9 @@ def emit() -> Path:
             "New York, Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine "
             "2000–2024 by county from the Secretary of State's tabulations, Illinois 2000–2022 by county from the "
             "State Board of Elections' vote totals, Texas 2000–2014 by county from the Secretary of State's "
-            "election history, Florida 2000–2022 by county from the Division of Elections' results extracts, and "
-            "Kentucky 2000–2008 by county from the State Board of Elections' county reports",
+            "election history, Florida 2000–2022 by county from the Division of Elections' results extracts, "
+            "Kentucky 2000–2008 by county from the State Board of Elections' county reports, and South Carolina "
+            "2010–2022 by county from the State Election Commission's detail results",
             polity="US",
         )
 
@@ -2404,6 +2540,17 @@ def emit() -> Path:
             for race, title in tx_elchist.races(election):
                 if TX_RACE.fullmatch(title):
                     cs.artifact(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm"), sources["TX"])
+        for ids in SC_FILES.values():
+            for election in ids:
+                version = raw.cached(SOURCE, SC_SITE.format(election) + "current_ver.txt")
+                cs.artifact(version, sources["SC"])
+                cs.artifact(
+                    raw.cached(
+                        SOURCE,
+                        SC_SITE.format(election) + version.path.read_text().strip() + "/reports/detailxml.zip",
+                    ),
+                    sources["SC"],
+                )
         for day in MN_DAYS:
             for file in ("allracesbyprecinct", "PrctTbl"):
                 cs.artifact(raw.cached(SOURCE, MN_FILES.format(day=day, name=file)), sources["MN"])
@@ -2557,6 +2704,7 @@ def emit() -> Path:
             *(("ME", day, None) for day in ME_DAYS.values()),
             *(("IL", day, None) for day in IL_DAYS.values()),
             *(("TX", day, first) for day, first in TX_DAYS.items()),
+            *(("SC", day, first) for day, first in SC_DAYS.items()),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(("KY", day, None) for day in KY_DAYS.values()),
             *(
@@ -2586,7 +2734,7 @@ def emit() -> Path:
                     f"{day:%B} {day.day}, {day.year} {STATES[state][1]} primary {'runoff ' if first else ''}election",
                 )
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=election)
-        rounds = {"NC": NC_DAYS, "TX": TX_DAYS, "FL": FL_DAYS}
+        rounds = {"NC": NC_DAYS, "TX": TX_DAYS, "FL": FL_DAYS, "SC": SC_DAYS}
         later = {(state, first, day) for state, days in rounds.items() for day, first in days.items() if first}
         contests = {
             group: rows.sort(["votes", "choice"], descending=[True, False])
@@ -2692,7 +2840,7 @@ def emit() -> Path:
                     else "fptp"
                     if state in ("MN", "CA", "ME", "IL", "KY", *ELSTATS)
                     else "two_round"
-                    if state == "TX" or (state == "FL" and day.year == 2000)
+                    if state in ("TX", "SC") or (state == "FL" and day.year == 2000)
                     else "fptp"
                     if state == "FL"
                     else "two_round_40"
@@ -2760,7 +2908,7 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=old[0], option_id=option, kind=outcome, seats=seats, notes=notes)
                 if empty:
                     cs.add("note", entity_id=old[0], kind="caveat", body_md=EMPTY)
-            threshold = 50 if state in ("TX", "FL") else 40 if day.year < 2018 else 30
+            threshold = 50 if state in ("TX", "FL", "SC") else 40 if day.year < 2018 else 30
             total = rows["votes"].sum()
             ranked = rows.filter(~pl.col("writein"))
             nominated: dict[str, bool] = {}
@@ -2985,6 +3133,8 @@ def emit() -> Path:
                     if state == "TX"
                     else KY_METHOD
                     if state == "KY"
+                    else SC_METHOD
+                    if state == "SC"
                     else FL_METHOD.format(
                         rule=", with more than half the votes, or the leader of the second primary; when a second "
                         "primary followed, the top two are shown as advancing"
