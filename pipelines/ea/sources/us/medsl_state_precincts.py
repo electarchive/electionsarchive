@@ -15,7 +15,7 @@ from ea.sources.us.medsl_precincts import METHOD
 from ea.store import DATA, connect
 
 SOURCE = "us.medsl_state_precincts"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 STATEWIDE = DATA / "parsed" / "us.medsl_statewide"
 STATES_2022 = {
@@ -96,6 +96,7 @@ SWAPPED = {
     ("04025", "RUBY SMITH"): "JAY RUBY",
     ("36031", "BILLY D JONES"): "D BILLY JONES",
 }
+MISFILED = {(2024, "OR")}
 VERMONT = {
     "ADD": "ADDISON",
     "BEN": "BENNINGTON",
@@ -316,6 +317,32 @@ def emit() -> Path:
         ],
         how="vertical_relaxed",
     )
+    misfiled = (
+        returns.filter(
+            (pl.col("measure") == 1)
+            & (pl.col("kind") == "precinct")
+            & pl.struct("year", "state").map_elements(
+                lambda row: (row["year"], row["state"]) in MISFILED, return_dtype=pl.Boolean
+            )
+        )
+        .group_by("year", "state", "office", "code")
+        .agg(
+            cast=pl.col("seat").filter(~pl.col("writein")).unique(),
+            written=pl.col("seat").filter(pl.col("writein")).unique(),
+        )
+        .filter(
+            (pl.col("cast").list.len() > 0)
+            & (pl.col("written").list.len() > 0)
+            & (pl.col("cast").list.set_intersection("written").list.len() == 0)
+        )
+        .select("year", "state", "office", "code", dropped=pl.lit(True))
+    )
+    print(f"{misfiled.height} precincts with candidate lines under another district than their write-ins, dropped")
+    returns = (
+        returns.join(misfiled, on=["year", "state", "office", "code"], how="left")
+        .filter(pl.col("dropped").is_null() | pl.col("writein") | (pl.col("measure") != 1))
+        .drop("dropped")
+    )
     days = sorted({str(day) for day in returns["day"].unique()})
     with connect() as conn:
         cs = Changeset(
@@ -374,14 +401,17 @@ def emit() -> Path:
                 )
             for origin, url in FILES[year]:
                 cs.artifact(raw.cached(origin, url), sources[year])
-        own: dict[str, tuple[UUID, UUID | None, int, set[str]]] = {
-            key: (result_set, supersedes, int(total), set(present))
-            for key, result_set, supersedes, total, present in conn.execute(
+        own: dict[str, tuple[UUID, UUID | None, int, set[str], set[str]]] = {
+            key: (result_set, supersedes, int(total), set(present), set(reached))
+            for key, result_set, supersedes, total, present, reached in conn.execute(
                 """select regexp_replace(x.value, ':r[0-9]+$', ''), r.id, r.supersedes_id,
                           (select coalesce(sum(v.value), 0) from result_value v
                            where v.result_set_k = r.k and v.measure = 1 and v.count_round = 0),
                           (select coalesce(array_agg(distinct case u.scheme_code when 'us.precinct'
                                   then split_part(u.code, ':', 3) else u.code end), '{}')
+                           from result_value v join reporting_unit u on u.k = v.unit_k
+                           where v.result_set_k = r.k and v.measure = 1 and v.value > 0),
+                          (select coalesce(array_agg(distinct u.code), '{}')
                            from result_value v join reporting_unit u on u.k = v.unit_k
                            where v.result_set_k = r.k and v.measure = 1 and v.value > 0)
                    from external_id x join result_set r on r.id = x.entity_id and r.status = 'active'
@@ -560,13 +590,23 @@ def emit() -> Path:
                 if (option := picked.get((candidate, party))) is not None:
                     tallies[option] += votes
             official = sum(votes for _, _, _, _, votes in known.values())
+            rolled = {
+                parent for parent in children if not any(votes for _, _, up, _, votes in known.values() if up == parent)
+            }
             drifted = [
-                (sorted(names)[:1], tallies.get(option, 0), votes)
-                for option, (_, _, _, names, votes) in known.items()
+                (sorted(names)[:1], tally, votes)
+                for option, (_, kind, parent, names, votes) in known.items()
+                for tally in [
+                    tallies.get(option, 0)
+                    + sum(
+                        tallies.get(child, 0) for child, line in known.items() if option in rolled and line[2] == option
+                    )
+                ]
                 if official
-                and option not in children
-                and not (known[option][1] == "write_in" and votes == 0)
-                and tallies.get(option, 0) - votes > max(10, votes * 0.01)
+                and (option not in children or option in rolled)
+                and parent not in rolled
+                and not (kind == "write_in" and votes == 0)
+                and tally - votes > max(10, votes * 0.01)
             ]
             if drifted:
                 print(f"{key}: precinct sums exceed the district totals {drifted[:3]}, skipped")
@@ -597,16 +637,17 @@ def emit() -> Path:
                 if (candidate, party) in picked
             )
             published = own.get(key)
+            voted = {
+                (code, code.split(":")[2] if kind == "precinct" else code)
+                for code, kind, votes in lines.filter(pl.col("measure") == 1)
+                .select("code", "kind", "votes")
+                .iter_rows()
+                if votes > 0
+            }
             if published is not None and (
                 published[2] == counted
-                or not {
-                    code.split(":")[2] if kind == "precinct" else code
-                    for code, kind, votes in lines.filter(pl.col("measure") == 1)
-                    .select("code", "kind", "votes")
-                    .iter_rows()
-                    if votes > 0
-                }
-                - published[3]
+                or not {county for _, county in voted} - published[3]
+                and not published[4] - {code for code, _ in voted}
             ):
                 continue
             result_set = cs.key(f"{SOURCE}.result_set", key if published is None else f"{key}:r{counted}")
