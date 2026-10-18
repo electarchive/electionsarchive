@@ -20,6 +20,7 @@ SOURCE = "us.elstats"
 VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
+PRIMARIES = 2022
 EARLY = {"CT": 1789, "VT": 1789}
 ORDINALS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
 SEARCH = "https://{tenant}.civera.com/api/download_search.csv?"
@@ -96,7 +97,7 @@ def fetch() -> None:
         for election, *_ in MA_ROW.findall(listing):
             raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
     for state, (tenant, _, _) in TENANTS.items():
-        for year in range(EARLY.get(state, FIRST), LAST + 1):
+        for year in range(EARLY.get(state, FIRST), PRIMARIES + 1):
             raw.fetch(SOURCE, url(tenant, year), suffix=".csv")
 
 
@@ -140,7 +141,7 @@ def parse() -> None:
         towns.setdefault(state, {})[name] = code
     frames = []
     for state, (tenant, _, _) in TENANTS.items():
-        for year in range(EARLY.get(state, FIRST), LAST + 1):
+        for year in range(EARLY.get(state, FIRST), PRIMARIES + 1):
             frame = pl.read_csv(raw.cached(SOURCE, url(tenant, year)).path, infer_schema=False)
             if "office_name" not in frame.columns or frame.height == 0:
                 continue
@@ -159,7 +160,7 @@ def parse() -> None:
                     pl.col("chamber").is_not_null()
                     & pl.col("division_type").is_in(list(DIVISIONS))
                     & (
-                        pl.col("election_type").str.contains("(?i)general")
+                        pl.col("election_type").str.contains("(?i)general") & (year <= LAST)
                         | (
                             pl.col("election_type").str.contains("(?i)primary")
                             & pl.col("chamber").is_in(["senate", "house"])

@@ -834,11 +834,28 @@ def attach(
         if undercounted and ":" in chamber:
             print(f"{key}: a primary candidate's county sum falls short of the FEC total, skipped")
             continue
+        pooled = tallies.with_columns(
+            pl.col("option").replace(
+                "pool",
+                next(
+                    (str(option) for option, kind, label, _, _ in known if kind == "write_in" and label in GENERIC),
+                    "pool",
+                ),
+            )
+        )
         if (
             max(known, key=lambda option: option[4] or 0)[0]
-            != max(known, key=lambda option: int(tallies.filter(pl.col("option") == str(option[0]))["votes"].sum()))[0]
+            != max(known, key=lambda option: int(pooled.filter(pl.col("option") == str(option[0]))["votes"].sum()))[0]
         ):
             print(f"{key}: the county sum puts another option first, skipped")
+            columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
+            for row in conn.execute(
+                f"""select {", ".join(f"r.{column}" for column in columns)} from external_id x
+                    join result_set r on r.id = x.entity_id and r.status = 'active'
+                    where x.scheme = %s and x.value = %s""",
+                [f"{tag}.result_set", f"{key}:{grain}"],
+            ).fetchall():
+                cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn")
             continue
         if any(votes > official * 0.01 for _, _, votes, official in missing):
             print(
