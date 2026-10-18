@@ -95,6 +95,25 @@ GEORGIA = {
         "https://results.enr.clarityelections.com//GA//105369/271927/reports/detailxml.zip",
     ),
 }
+MONTANA = {
+    date(2012, 11, 6): ("20201219202556", "https://sosmt.gov/wp-content/uploads/attachments/2012_General_Canvass.pdf"),
+    date(2014, 11, 4): (
+        "20211103045454",
+        "https://sosmt.gov/wp-content/uploads/attachments/2014-General-Official-Statewide-Canvass.pdf",
+    ),
+    date(2016, 11, 8): (
+        "20181113075535",
+        "https://sosmt.gov/wp-content/uploads/attachments/2016GeneralStatewideCanvass.pdf",
+    ),
+    date(2018, 11, 6): ("20190101181853", "https://sosmt.gov/wp-content/uploads/2018GeneralReportStateCanvass.pdf"),
+}
+MONTANA_KINDS = {
+    "LEGISLATIVE REFERENDUM": "LR",
+    "INITIATIVE REFERENDUM": "IR",
+    "CONSTITUTIONAL INITIATIVE": "CI",
+    "CONSTITUTIONAL AMENDMENT": "C",
+    "INITIATIVE": "I",
+}
 NORTH_CAROLINA = {
     date(2018, 11, 6): (
         "2018-11-27/Canvass/Supplement_11_30_2018/State%20Composite%20Abstract%20Report%20-%20County.pdf",
@@ -185,6 +204,12 @@ DOCUMENTS = {
         "https://voterportal.sos.la.gov/graphical",
         "the Louisiana Secretary of State's official results",
     ),
+    "MT": (
+        "Montana Secretary of State",
+        "Statewide general election canvass",
+        "https://sosmt.gov/elections/results/",
+        "the Montana Secretary of State's statewide canvass",
+    ),
     "MO": (
         mo_sos.PUBLISHER,
         mo_sos.TITLE,
@@ -214,6 +239,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WAYBACK.format(*GEORGIA[day]) if day in GEORGIA else ""
     if state == "AZ":
         return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
+    if state == "MT":
+        return SOURCE, WAYBACK.format(*MONTANA[day]) if day in MONTANA else ""
     if state == "LA":
         return SOURCE, la_sos.blob(day, "Votes_Multiparish.htm")
     if state == "NC":
@@ -342,6 +369,42 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "MT":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                found = re.search(r"(" + "|".join(MONTANA_KINDS) + r") NO\.\s*(\d+)", " ".join(page.split()))
+                if found is None:
+                    continue
+                answers = ("FOR", "AGAINST") if "AGAINST" in page else ("YES", "NO")
+                for line in page.splitlines():
+                    if (matched := re.fullmatch(r"([A-Z][A-Za-z &.]*?)\s+([\d,]+)\s+([\d,]+)\s*", line)) and (
+                        elstats.plain(matched[1]) in names["MT"] or matched[1] == "Total"
+                    ):
+                        for answer, votes in zip(answers, matched.group(2, 3), strict=True):
+                            records.append((matched[1], f"{found[1]} NO. {found[2]}", answer, votes, number))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
                 )
                 .filter(~total)
                 .drop("count")
@@ -805,6 +868,14 @@ def emit() -> Path:
             .with_columns(
                 tag=pl.when(pl.col("state") == "FL")
                 .then(pl.concat_str(pl.lit("amendment "), pl.col("office").str.extract(r"^A0*(\d+) ")))
+                .when(pl.col("state") == "MT")
+                .then(
+                    pl.concat_str(
+                        pl.col("office").str.extract(r"^(.*) NO\.").replace_strict(MONTANA_KINDS, default=None),
+                        pl.lit("-"),
+                        pl.col("office").str.extract(r"NO\. (\d+)$"),
+                    )
+                )
                 .when(pl.col("state") == "LA")
                 .then(pl.concat_str(pl.lit("amendment "), pl.col("office").str.extract(r"(?i)^CA No\. (\d+) ")))
                 .otherwise(
@@ -818,8 +889,14 @@ def emit() -> Path:
             )
         )
         wiki = wiki.with_columns(
-            wtag=pl.concat_str(
-                pl.col("name").str.extract(TAG, 1).str.to_lowercase(), pl.lit(" "), pl.col("name").str.extract(TAG, 2)
+            wtag=pl.when(pl.col("state") == "MT")
+            .then(pl.col("name").str.extract(r"\b((?:LR|IR|CI|C|I)-\d+)\b"))
+            .otherwise(
+                pl.concat_str(
+                    pl.col("name").str.extract(TAG, 1).str.to_lowercase(),
+                    pl.lit(" "),
+                    pl.col("name").str.extract(TAG, 2),
+                )
             ),
             wballot=pl.len().over("state", "day"),
         )
