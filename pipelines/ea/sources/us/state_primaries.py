@@ -356,6 +356,8 @@ METHOD = (
     "primary needs, or when no runoff followed; when a runoff followed, the top two are shown as advancing."
 )
 
+EMPTY = "The source lists this primary with zero votes for every candidate, so its returns are missing; the set is withdrawn."
+
 
 def search(state: str, office: int, year: int) -> str:
     if state == "MA":
@@ -564,7 +566,7 @@ def parse() -> None:
                     pl.col("candidate_name")
                     .str.to_lowercase()
                     .str.contains(
-                        r"^(total (votes|ballots)( cast)?|blanks?|blank/void|void|undervotes|overvotes|registered voters)$"
+                        r"^(total (votes|ballots)( cast)?|blanks?|blank/void|void|undervotes|overvotes|registered voters|# enrolled|number checked as having voted|unknown candidate)$"
                     )
                 )
                 pooled = (
@@ -887,8 +889,12 @@ def parse() -> None:
         lines = pl.concat(
             [
                 rows.join(exact, on=["office", "code", "fips"], nulls_equal=True).with_columns(
-                    scheme=pl.lit("us.precinct"),
-                    unit=pl.concat_str(pl.lit(f"{day}:WA"), "fips", pl.lit(""), "precinct", separator=":"),
+                    scheme=pl.when(pl.col("precinct") == "Countywide")
+                    .then(pl.lit("us.county"))
+                    .otherwise(pl.lit("us.precinct")),
+                    unit=pl.when(pl.col("precinct") == "Countywide")
+                    .then("fips")
+                    .otherwise(pl.concat_str(pl.lit(f"{day}:WA"), "fips", pl.lit(""), "precinct", separator=":")),
                 ),
                 totals.join(exact, on=["office", "code", "fips"], how="anti", nulls_equal=True)
                 .drop("preference")
@@ -1101,6 +1107,23 @@ def emit() -> Path:
             for file in names:
                 cs.artifact(raw.cached(SOURCE, CA_SOV.format(path=path.format(file))), sources["CA"])
         polities = {state: cs.polity(f"US-{state}") for state in STATES}
+        published = {
+            value: row
+            for value, *row in conn.execute(
+                """select x.value, r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness,
+                          r.supersedes_id, r.status
+                   from external_id x join result_set r on r.id = x.entity_id
+                   where x.scheme = %s""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        }
+        earlier: dict[UUID, list[tuple[UUID, str, int | None]]] = {}
+        for result_set, option, kind, seats in conn.execute(
+            """select o.result_set_id, o.option_id, o.kind, o.seats from outcome o
+               join external_id x on x.entity_id = o.result_set_id and x.scheme = %s""",
+            [f"{SOURCE}.result_set"],
+        ).fetchall():
+            earlier.setdefault(result_set, []).append((option, kind, seats))
         keys = {
             value
             for (value,) in conn.execute(
@@ -1214,7 +1237,7 @@ def emit() -> Path:
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=election)
         later = {(first, day) for day, first in NC_DAYS.items() if first}
         contests = {
-            group: rows.sort("votes", descending=True)
+            group: rows.sort(["votes", "choice"], descending=[True, False])
             for group, rows in lines.group_by("state", "day", "office", "code", "party", "choice", "writein")
             .agg(
                 pl.col("label").drop_nulls().first(),
@@ -1225,10 +1248,18 @@ def emit() -> Path:
             .group_by("state", "day", "office", "code", "party")
         }
         held = {(day, office, code, party) for state, day, office, code, party in contests if state == "NC"}
+        parts = {
+            tuple(row)
+            for row in lines.filter(pl.col("code").is_not_null(), pl.col("scheme").is_in(["us.county", "us.aggregate"]))
+            .select("state", "day", "office", "code", "party")
+            .unique()
+            .iter_rows()
+        }
         persons: dict[str, UUID] = {}
         options: dict[tuple[str, date, str, str | None, str, str], UUID] = {}
         sets: dict[tuple[str, date, str, str | None, str], UUID] = {}
         made: dict[tuple[str, date, str, str | None, str], UUID] = {}
+        bases: set[str] = set()
         skipped = 0
         for (state, day, office, code, party), rows in sorted(
             contests.items(), key=lambda item: (item[0][0], item[0][1])
@@ -1246,6 +1277,11 @@ def emit() -> Path:
                 taken = re.compile(re.escape(base))
             if any(taken.fullmatch(value) for value in keys):
                 skipped += 1
+                continue
+            bases.add(base)
+            empty = bool(rows.filter(~pl.col("writein")).height) and rows["votes"].sum() == 0
+            old = published.get(f"{base}:precinct")
+            if empty and old is None:
                 continue
             contest = made[(state, day, office, code, party)] = cs.key("us.contest", base)
             previous = None
@@ -1315,38 +1351,61 @@ def emit() -> Path:
             if slugs.setdefault(path, contest) != contest:
                 raise ValueError(f"slug {path} is taken")
             cs.add("slug", path=path, entity_id=contest)
-            result_set = sets[(state, day, office, code, party)] = cs.key(f"{SOURCE}.result_set", f"{base}:precinct")
-            threshold = 40 if day.year < 2018 else 30
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=elections[(state, day)],
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                status="active",
-                source_id=sources[state],
-                is_default=True,
-                completeness=1,
-            )
-            cs.add(
-                "note",
-                entity_id=result_set,
-                kind="methodology",
-                body_md=WA_METHOD
-                if state == "WA"
-                else CA_METHOD.format(
-                    rule="The top two candidates advance to the general election."
-                    if party == ""
-                    else "The file does not mark winners, so the winner shown is the candidate with the most votes."
+            parted = (state, day, office, code, party) in parts
+            if old is not None and (empty or parted):
+                cs.add(
+                    "result_set",
+                    id=old[0],
+                    election_id=old[1],
+                    contest_id=old[2],
+                    stage=old[3],
+                    kind=old[4],
+                    status="withdrawn" if empty else "superseded",
+                    source_id=old[5],
+                    is_default=False,
+                    completeness=old[6],
+                    supersedes_id=old[7],
                 )
-                if state == "CA"
-                else MN_METHOD
-                if state == "MN"
-                else ELSTATS_METHOD.format(publisher=STATES[state][2])
-                if state in ELSTATS
-                else METHOD.format(threshold=threshold),
-            )
+                for option, outcome, seats in earlier.get(old[0], []):
+                    cs.add("outcome", result_set_id=old[0], option_id=option, kind=outcome, seats=seats)
+                if empty:
+                    cs.add("note", entity_id=old[0], kind="caveat", body_md=EMPTY)
+            threshold = 40 if day.year < 2018 else 30
+            if not empty:
+                result_set = sets[(state, day, office, code, party)] = cs.key(
+                    f"{SOURCE}.result_set", f"{base}:parts" if parted else f"{base}:precinct"
+                )
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=elections[(state, day)],
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=sources[state],
+                    is_default=True,
+                    completeness=1,
+                    supersedes_id=old[0] if parted and old is not None else None,
+                )
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="methodology",
+                    body_md=WA_METHOD
+                    if state == "WA"
+                    else CA_METHOD.format(
+                        rule="The top two candidates advance to the general election."
+                        if party == ""
+                        else "The file does not mark winners, so the winner shown is the candidate with the most votes."
+                    )
+                    if state == "CA"
+                    else MN_METHOD
+                    if state == "MN"
+                    else ELSTATS_METHOD.format(publisher=STATES[state][2])
+                    if state in ELSTATS
+                    else METHOD.format(threshold=threshold),
+                )
             total = rows["votes"].sum()
             ranked = rows.filter(~pl.col("writein"))
             matched: list[bool] = []
@@ -1405,6 +1464,8 @@ def emit() -> Path:
                         is_independent=False,
                     )
                 options[(state, day, office, code, party, choice)] = option
+            if empty:
+                continue
             if state in ELSTATS:
                 tallies = ranked["votes"].to_list()
                 if len(tallies) > magnitude and tallies[magnitude - 1] == tallies[magnitude]:
@@ -1418,7 +1479,8 @@ def emit() -> Path:
                     )
                 continue
             if party == "":
-                for choice in ranked["choice"][:2]:
+                tallies = ranked["votes"].to_list()
+                for choice in ranked["choice"][: 1 if len(tallies) > 2 and tallies[1] == tallies[2] else 2]:
                     cs.add(
                         "outcome",
                         result_set_id=result_set,
@@ -1458,12 +1520,32 @@ def emit() -> Path:
                 or matched[0]
             ):
                 cs.add("outcome", result_set_id=result_set, option_id=leader, kind="won")
+        for value, row in published.items():
+            base, _, grain = value.rpartition(":")
+            if grain in ("precinct", "parts") and base not in bases and row[8] == "active":
+                cs.add(
+                    "result_set",
+                    id=row[0],
+                    election_id=row[1],
+                    contest_id=row[2],
+                    stage=row[3],
+                    kind=row[4],
+                    status="withdrawn",
+                    source_id=row[5],
+                    is_default=False,
+                    completeness=row[6],
+                    supersedes_id=row[7],
+                )
+                for option, outcome, seats in earlier.get(row[0], []):
+                    cs.add("outcome", result_set_id=row[0], option_id=option, kind=outcome, seats=seats)
+                cs.add("note", entity_id=row[0], kind="caveat", body_md=EMPTY)
         print(f"{len(made)} contests, {skipped} already held")
         frame = lines.join(
             pl.DataFrame(
                 [
                     (state, day, office, code, party, choice, str(option), str(sets[(state, day, office, code, party)]))
                     for (state, day, office, code, party, choice), option in options.items()
+                    if (state, day, office, code, party) in sets
                 ],
                 schema={
                     "state": pl.String,
@@ -1480,17 +1562,36 @@ def emit() -> Path:
             on=["state", "day", "office", "code", "party", "choice"],
             nulls_equal=True,
         ).filter(pl.col("result_set_id").is_in([str(value) for value in sets.values() if value in cs.minted]))
+        part = pl.col("code").is_not_null() & pl.col("scheme").is_in(["us.county", "us.aggregate"])
         frame = frame.with_columns(
-            flags=pl.when(pl.col("scheme") == "us.aggregate").then(UNALLOCATED).otherwise(0).cast(pl.Int16)
+            flags=pl.when(pl.col("scheme") == "us.aggregate").then(UNALLOCATED).otherwise(0).cast(pl.Int16),
+            unit=pl.when(part)
+            .then(pl.concat_str("unit", pl.col("day").cast(pl.String), "office", "code", separator=":"))
+            .otherwise("unit"),
+            scheme=pl.when(part & (pl.col("scheme") == "us.county")).then(pl.lit("us.county_part")).otherwise("scheme"),
+            part=part,
         )
         units: dict[str, UUID] = {}
         reused = 0
-        for state, day, fips, scheme, unit, flags in (
-            frame.select("state", "day", "fips", "scheme", "unit", "flags").unique().iter_rows()
+        for state, day, fips, scheme, unit, flags, office, code, parted in (
+            frame.select("state", "day", "fips", "scheme", "unit", "flags", "office", "code", "part")
+            .unique()
+            .iter_rows()
         ):
             if unit in units:
                 continue
             units[unit] = counties[fips][0] if scheme == "us.county" else cs.unit(scheme, unit)
+            if parted:
+                cs.add(
+                    "reporting_unit_area",
+                    unit_id=units[unit],
+                    area_id=cs.area(
+                        "us.sldl" if office in ("house", "assembly", "house-of-delegates") else "us.sldu",
+                        f"{state}:{code.partition(':')[0]}",
+                    ),
+                    valid_from=day,
+                    valid_to=day + timedelta(days=1),
+                )
             if units[unit] not in cs.minted:
                 reused += 1
                 continue
@@ -1504,10 +1605,51 @@ def emit() -> Path:
                 area_relation="within",
                 area_id=counties[fips][1],
                 kind="aggregate" if flags else "standard",
-                valid_from=None if flags else day,
-                valid_to=None if flags else day + timedelta(days=1),
+                valid_from=None if flags and not parted else day,
+                valid_to=None if flags and not parted else day + timedelta(days=1),
             )
         print(f"{len(units)} units, {reused} already held")
+        precincts = (
+            lines.filter(pl.col("scheme") == "us.precinct", pl.col("code").is_not_null())
+            .join(
+                pl.DataFrame(
+                    list(sets),
+                    schema={
+                        "state": pl.String,
+                        "day": pl.Date,
+                        "office": pl.String,
+                        "code": pl.String,
+                        "party": pl.String,
+                    },
+                    orient="row",
+                ),
+                on=["state", "day", "office", "code", "party"],
+                how="semi",
+            )
+            .select("state", "day", "office", "unit", district=pl.col("code").str.split(":").list.first())
+            .unique()
+        )
+        split = (
+            precincts.group_by("state", "day", "office", "unit")
+            .agg(pl.col("district").n_unique())
+            .filter(pl.col("district") > 1)
+            .join(precincts, on=["state", "day", "office", "unit"])
+            .select("state", "day", "office", district="district_right")
+            .unique()
+        )
+        member = precincts.join(split, on=["state", "day", "office", "district"], how="anti")
+        print(f"{member.height} precinct memberships, {split.height} districts with a split precinct left out")
+        for state, day, office, unit, district in member.iter_rows():
+            cs.add(
+                "reporting_unit_area",
+                unit_id=units.get(unit) or cs.unit("us.precinct", unit),
+                area_id=cs.area(
+                    "us.sldl" if office in ("house", "assembly", "house-of-delegates") else "us.sldu",
+                    f"{state}:{district}",
+                ),
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
         cs.frame(
             "result_value",
             frame.with_columns(unit_id=pl.col("unit").replace_strict({key: str(value) for key, value in units.items()}))
