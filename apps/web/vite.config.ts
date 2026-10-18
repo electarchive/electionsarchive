@@ -6,7 +6,7 @@ import tailwindcss from "@tailwindcss/vite";
 import { defineConfig } from "vite";
 import devtoolsJson from "vite-plugin-devtools-json";
 
-export default defineConfig({
+export default defineConfig(({ command }) => ({
   plugins: [
     tailwindcss(),
     sveltekit({
@@ -20,8 +20,9 @@ export default defineConfig({
     paraglideVitePlugin({
       project: "./project.inlang",
       outdir: "./src/lib/paraglide",
-      outputStructure: "message-modules",
+      outputStructure:
+        command === "build" ? "message-modules" : "locale-modules",
       strategy: ["cookie", "preferredLanguage", "globalVariable", "baseLocale"],
     }),
   ],
-});
+}));
