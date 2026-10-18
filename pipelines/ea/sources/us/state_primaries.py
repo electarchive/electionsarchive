@@ -191,6 +191,7 @@ ELSTATS = {
     "VT": {8: "house", 9: "senate"},
     "VA": {8: "house-of-delegates", 9: "senate"},
     "MA": {8: "house", 9: "senate"},
+    "NM": {23: "house", 95: "senate"},
 }
 ELSTATS = {state: offices for state, offices in ELSTATS.items() if state not in elstats.HELD}
 ELSTATS_YEARS = range(2000, 2023)
@@ -266,6 +267,7 @@ STATES = {
     "NY": ("36", "New York", elstats.TENANTS["NY"][1], elstats.TITLE, elstats.TENANTS["NY"][2]),
     "VT": ("50", "Vermont", elstats.TENANTS["VT"][1], elstats.TITLE, elstats.TENANTS["VT"][2]),
     "VA": ("51", "Virginia", elstats.TENANTS["VA"][1], elstats.TITLE, elstats.TENANTS["VA"][2]),
+    "NM": ("35", "New Mexico", elstats.TENANTS["NM"][1], elstats.TITLE, elstats.TENANTS["NM"][2]),
     "MA": ("25", "Massachusetts", elstats.MA_PUBLISHER, elstats.TITLE, "https://electionstats.state.ma.us"),
     "ME": (
         "23",
@@ -479,6 +481,11 @@ WON_THRESHOLD = (
 ADVANCED_TOP = "Derived: one of the top two of the certified contest totals."
 ADVANCED_RUNOFF = "Derived: one of the top two of the certified contest totals, and a second primary followed."
 
+WITHHELD = (
+    'The archive withholds some of this primary\'s county counts by voting method for voter privacy, shown as "*", '
+    "covering at most {ballots} ballots by its own ballot totals, so each candidate's total may be short by up to that "
+    "many votes; no winner is shown unless the leader's margin is larger."
+)
 EMPTY = "The source lists this primary with zero votes for every candidate, so its returns are missing; the set is withdrawn."
 
 
@@ -537,7 +544,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|16|33|36|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|16|33|35|36|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("51") and int(code[2:]) >= 500:
@@ -717,6 +724,35 @@ def parse() -> None:
                             (fips, re.sub(r"[^a-z]", "", re.sub(r"(?i)\b(county|locality)\b", "", bare).lower()))
                         )
                     )
+                withheld: dict[str, int | None] = {}
+                if frame["votes"].cast(pl.String).eq("*").any():
+                    ballots = {
+                        tuple(key): votes
+                        for *key, votes in frame.filter(
+                            pl.col("candidate_name").str.to_lowercase() == "total ballots cast"
+                        )
+                        .select("district_name", "primary_party", "division_name", "vote_channel", "votes")
+                        .iter_rows()
+                    }
+                    for key in (
+                        frame.filter(pl.col("votes") == "*")
+                        .select("district_name", "primary_party", "division_name", "vote_channel")
+                        .unique()
+                        .iter_rows()
+                    ):
+                        bound = ballots.get(key)
+                        so_far = withheld.get(key[0] + ":" + key[1], 0)
+                        withheld[key[0] + ":" + key[1]] = (
+                            None if bound in (None, "*") or so_far is None else so_far + int(bound)
+                        )
+                    for key, bound in withheld.items():
+                        if bound is None:
+                            print(f"{year} {state} {body} {key}: withheld counts with no ballot total, skipped")
+                    frame = frame.filter(
+                        ~(pl.col("district_name") + ":" + pl.col("primary_party")).is_in(
+                            [key for key, bound in withheld.items() if bound is None]
+                        )
+                    )
                 lines = frame.filter(~pseudo, pl.col("district_name").is_in(list(codes))).with_columns(
                     fips=pl.col("division_name").replace_strict(places, default=None, return_dtype=pl.String)
                 )
@@ -755,7 +791,10 @@ def parse() -> None:
                         .then(pl.lit("Write-ins"))
                         .otherwise(pl.col("candidate_name").str.strip_chars()),
                         writein=pooled,
-                        votes=pl.col("votes").cast(pl.Float64).cast(pl.Int64),
+                        votes=pl.col("votes").cast(pl.String).replace("*", None).cast(pl.Float64).cast(pl.Int64),
+                        withheld=(pl.col("district_name") + ":" + pl.col("primary_party")).replace_strict(
+                            withheld, default=0, return_dtype=pl.Int64
+                        ),
                         seats=pl.col("number_seats").cast(pl.Int16),
                         seat="district_name",
                     )
@@ -1352,6 +1391,7 @@ def parse() -> None:
             pl.col("votes").sum(),
             pl.col("seats").max(),
             pl.col("seat").first(),
+            pl.col("withheld").max(),
         )
         .sort("state", "day", "office", "code", "party", "fips", "unit", "choice")
         .write_parquet(PARSED / "lines.parquet")
@@ -1569,6 +1609,7 @@ def emit() -> Path:
                 pl.col("votes").sum(),
                 pl.col("seats").max(),
                 pl.col("seat").first(),
+                pl.col("withheld").max(),
             )
             .group_by("state", "day", "office", "code", "party")
         }
@@ -1774,7 +1815,9 @@ def emit() -> Path:
             elif state in ("MN", "CA", "ME", *ELSTATS):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
-                elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total:
+                elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
+                    magnitude
+                ] > (rows["withheld"].max() or 0):
                     wins = [(choice, "won", WON_LEAD) for choice in names[:magnitude]]
                 elif magnitude == 1 and tallies[0] > tallies[1] and nominated.get(names[0]):
                     wins = [(names[0], "won", WON_NOMINEE)]
@@ -1876,6 +1919,13 @@ def emit() -> Path:
                 + " "
                 + RECOUNT,
             )
+            if rows["withheld"].max():
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=WITHHELD.format(ballots=rows["withheld"].max()),
+                )
             for option, kind, _, notes in sorted(wanted):
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, notes=notes)
         for value, row in published.items():
