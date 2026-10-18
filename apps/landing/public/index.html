@@ -205,10 +205,6 @@
         .shots {
           grid-template-columns: repeat(2, minmax(0, 1fr));
         }
-
-        .shots figure:last-child {
-          grid-column: 1 / -1;
-        }
       }
 
       h1 {
@@ -398,6 +394,26 @@
               <figcaption>
                 The 2024 US presidential election, showing electoral votes by
                 state
+              </figcaption>
+            </figure>
+            <figure>
+              <picture>
+                <source
+                  srcset="/shots/precincts-dark.webp"
+                  media="(prefers-color-scheme: dark)"
+                />
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src="/shots/precincts-light.webp"
+                  width="1600"
+                  height="844"
+                  alt="A map of Fulton County, Georgia, showing 463 precincts shaded by winner in the 2024 presidential election, next to the county's results table"
+                />
+              </picture>
+              <figcaption>
+                Fulton County, Georgia, showing 2024 presidential election
+                results by precinct
               </figcaption>
             </figure>
             <figure>
