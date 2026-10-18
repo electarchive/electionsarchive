@@ -356,6 +356,22 @@ METHOD = (
     "primary needs, or when no runoff followed; when a runoff followed, the top two are shown as advancing."
 )
 
+RECOUNT = (
+    "No winner is shown where the leader's margin is within 1 percent of the contest's votes, close enough for a "
+    "recount, unless the leader is the party's nominee on the general election ballot."
+)
+WON_LEAD = "Derived: the plurality leader of the certified contest totals."
+WON_ALONE = "Derived: the only named candidate in the certified contest totals."
+WON_NOMINEE = (
+    "Derived: the leader of the certified contest totals and the party's nominee on the general election ballot."
+)
+WON_THRESHOLD = (
+    "Derived: the leader of the certified contest totals, with more than the {threshold} percent that avoids a second "
+    "primary."
+)
+ADVANCED_TOP = "Derived: one of the top two of the certified contest totals."
+ADVANCED_RUNOFF = "Derived: one of the top two of the certified contest totals, and a second primary followed."
+
 EMPTY = "The source lists this primary with zero votes for every candidate, so its returns are missing; the set is withdrawn."
 
 
@@ -1117,13 +1133,13 @@ def emit() -> Path:
                 [f"{SOURCE}.result_set"],
             ).fetchall()
         }
-        earlier: dict[UUID, list[tuple[UUID, str, int | None]]] = {}
-        for result_set, option, kind, seats in conn.execute(
-            """select o.result_set_id, o.option_id, o.kind, o.seats from outcome o
+        earlier: dict[UUID, list[tuple[UUID, str, int | None, str | None]]] = {}
+        for result_set, option, kind, seats, notes in conn.execute(
+            """select o.result_set_id, o.option_id, o.kind, o.seats, o.notes from outcome o
                join external_id x on x.entity_id = o.result_set_id and x.scheme = %s""",
             [f"{SOURCE}.result_set"],
         ).fetchall():
-            earlier.setdefault(result_set, []).append((option, kind, seats))
+            earlier.setdefault(result_set, []).append((option, kind, seats, notes))
         keys = {
             value
             for (value,) in conn.execute(
@@ -1366,49 +1382,14 @@ def emit() -> Path:
                     completeness=old[6],
                     supersedes_id=old[7],
                 )
-                for option, outcome, seats in earlier.get(old[0], []):
-                    cs.add("outcome", result_set_id=old[0], option_id=option, kind=outcome, seats=seats)
+                for option, outcome, seats, notes in earlier.get(old[0], []):
+                    cs.add("outcome", result_set_id=old[0], option_id=option, kind=outcome, seats=seats, notes=notes)
                 if empty:
                     cs.add("note", entity_id=old[0], kind="caveat", body_md=EMPTY)
             threshold = 40 if day.year < 2018 else 30
-            if not empty:
-                result_set = sets[(state, day, office, code, party)] = cs.key(
-                    f"{SOURCE}.result_set", f"{base}:parts" if parted else f"{base}:precinct"
-                )
-                cs.add(
-                    "result_set",
-                    id=result_set,
-                    election_id=elections[(state, day)],
-                    contest_id=contest,
-                    stage="certified",
-                    kind="counted",
-                    status="active",
-                    source_id=sources[state],
-                    is_default=True,
-                    completeness=1,
-                    supersedes_id=old[0] if parted and old is not None else None,
-                )
-                cs.add(
-                    "note",
-                    entity_id=result_set,
-                    kind="methodology",
-                    body_md=WA_METHOD
-                    if state == "WA"
-                    else CA_METHOD.format(
-                        rule="The top two candidates advance to the general election."
-                        if party == ""
-                        else "The file does not mark winners, so the winner shown is the candidate with the most votes."
-                    )
-                    if state == "CA"
-                    else MN_METHOD
-                    if state == "MN"
-                    else ELSTATS_METHOD.format(publisher=STATES[state][2])
-                    if state in ELSTATS
-                    else METHOD.format(threshold=threshold),
-                )
             total = rows["votes"].sum()
             ranked = rows.filter(~pl.col("writein"))
-            matched: list[bool] = []
+            nominated: dict[str, bool] = {}
             for choice, writein, preference in rows.select("choice", "writein", "label").iter_rows():
                 if writein:
                     option = cs.key("us.option", f"{base}:write-ins")
@@ -1442,7 +1423,7 @@ def emit() -> Path:
                             name(person, text)
                     persons[local] = person
                     if role == "head":
-                        matched.append(len(found) == 1)
+                        nominated[choice] = len(found) == 1
                     people.append((role, text, person))
                 option = cs.key("us.option", f"{base}:{people[0][2]}")
                 cs.add(
@@ -1466,63 +1447,120 @@ def emit() -> Path:
                 options[(state, day, office, code, party, choice)] = option
             if empty:
                 continue
-            if state in ELSTATS:
-                tallies = ranked["votes"].to_list()
-                if len(tallies) > magnitude and tallies[magnitude - 1] == tallies[magnitude]:
-                    continue
-                for choice in ranked["choice"][:magnitude]:
-                    cs.add(
-                        "outcome",
-                        result_set_id=result_set,
-                        option_id=options[(state, day, office, code, party, choice)],
-                        kind="won",
-                    )
-                continue
+            tallies = ranked["votes"].to_list()
+            names = ranked["choice"].to_list()
+            wins: list[tuple[str, str, str]] = []
             if party == "":
-                tallies = ranked["votes"].to_list()
-                for choice in ranked["choice"][: 1 if len(tallies) > 2 and tallies[1] == tallies[2] else 2]:
-                    cs.add(
-                        "outcome",
-                        result_set_id=result_set,
-                        option_id=options[(state, day, office, code, party, choice)],
-                        kind="advanced",
+                if len(tallies) <= 2 or (tallies[1] - tallies[2]) * 100 > total:
+                    wins = [(choice, "advanced", ADVANCED_TOP) for choice in names[:2]]
+                elif (tallies[0] - tallies[2]) * 100 > total:
+                    wins = [(names[0], "advanced", ADVANCED_TOP)]
+            elif state in ("MN", "CA", *ELSTATS):
+                if len(tallies) <= magnitude:
+                    wins = [(choice, "won", WON_ALONE) for choice in names]
+                elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total:
+                    wins = [(choice, "won", WON_LEAD) for choice in names[:magnitude]]
+                elif magnitude == 1 and tallies[0] > tallies[1] and nominated.get(names[0]):
+                    wins = [(names[0], "won", WON_NOMINEE)]
+            elif tallies:
+                runoff = state == "NC" and (
+                    any((day, later_day) in later and (later_day, office, code, party) in held for later_day in NC_DAYS)
+                    or any(
+                        re.fullmatch(
+                            rf"{later_day}:NC:{office}:" + (f"{code}:{etype}runoff" if code is not None else str(word)),
+                            value,
+                        )
+                        for later_day in NC_DAYS
+                        if (day, later_day) in later
+                        for value in keys
                     )
-                continue
-            votes = ranked["votes"].to_list()
-            if not votes or (len(votes) > 1 and votes[0] == votes[1]):
-                continue
-            leader = options[(state, day, office, code, party, ranked["choice"][0])]
-            runoff = state == "NC" and (
-                any((day, later_day) in later and (later_day, office, code, party) in held for later_day in NC_DAYS)
-                or any(
-                    re.fullmatch(
-                        rf"{later_day}:NC:{office}:" + (f"{code}:{etype}runoff" if code is not None else str(word)),
-                        value,
-                    )
-                    for later_day in NC_DAYS
-                    if (day, later_day) in later
-                    for value in keys
                 )
-            )
-            if first is None and runoff and len(votes) > 1:
-                for choice in ranked["choice"][:2]:
+                clear = len(tallies) == 1 or (tallies[0] - tallies[1]) * 100 > total
+                if first is None and runoff and len(tallies) > 1:
+                    if len(tallies) == 2 or (tallies[1] - tallies[2]) * 100 > total:
+                        wins = [(choice, "advanced", ADVANCED_RUNOFF) for choice in names[:2]]
+                    elif (tallies[0] - tallies[2]) * 100 > total:
+                        wins = [(names[0], "advanced", ADVANCED_RUNOFF)]
+                elif len(tallies) == 1:
+                    wins = [(names[0], "won", WON_ALONE)]
+                elif clear and first is not None:
+                    wins = [(names[0], "won", WON_LEAD)]
+                elif clear and tallies[0] * 100 > threshold * total:
+                    wins = [(names[0], "won", WON_THRESHOLD.format(threshold=threshold))]
+                elif tallies[0] > tallies[1] and nominated.get(names[0]):
+                    wins = [(names[0], "won", WON_NOMINEE)]
+            wanted = {
+                (options[(state, day, office, code, party, choice)], kind, None, notes) for choice, kind, notes in wins
+            }
+            grain = "parts" if parted else "precinct"
+            revision = 1
+            while f"{base}:{grain}:{revision + 1}" in published:
+                revision += 1
+            latest = f"{base}:{grain}" + (f":{revision}" if revision > 1 else "")
+            current = published.get(latest)
+            supersedes = old[0] if parted and old is not None else None
+            if current is not None and set(earlier.get(current[0], [])) == wanted:
+                supersedes = current[7]
+            elif current is not None:
+                latest = f"{base}:{grain}:{revision + 1}"
+                supersedes = current[0]
+                cs.add(
+                    "result_set",
+                    id=current[0],
+                    election_id=current[1],
+                    contest_id=current[2],
+                    stage=current[3],
+                    kind=current[4],
+                    status="superseded",
+                    source_id=current[5],
+                    is_default=False,
+                    completeness=current[6],
+                    supersedes_id=current[7],
+                )
+                for option, outcome, seats, notes in earlier.get(current[0], []):
                     cs.add(
-                        "outcome",
-                        result_set_id=result_set,
-                        option_id=options[(state, day, office, code, party, choice)],
-                        kind="advanced",
+                        "outcome", result_set_id=current[0], option_id=option, kind=outcome, seats=seats, notes=notes
                     )
-            elif (
-                state in ("MN", "CA")
-                or first is not None
-                or len(votes) == 1
-                or votes[0] * 100 > threshold * total
-                or matched[0]
-            ):
-                cs.add("outcome", result_set_id=result_set, option_id=leader, kind="won")
+            result_set = sets[(state, day, office, code, party)] = cs.key(f"{SOURCE}.result_set", latest)
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=elections[(state, day)],
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=sources[state],
+                is_default=True,
+                completeness=1,
+                supersedes_id=supersedes,
+            )
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=(
+                    WA_METHOD
+                    if state == "WA"
+                    else CA_METHOD.format(
+                        rule="The top two candidates advance to the general election."
+                        if party == ""
+                        else "The file does not mark winners, so the winner shown is the candidate with the most votes."
+                    )
+                    if state == "CA"
+                    else MN_METHOD
+                    if state == "MN"
+                    else ELSTATS_METHOD.format(publisher=STATES[state][2])
+                    if state in ELSTATS
+                    else METHOD.format(threshold=threshold)
+                )
+                + (" " + RECOUNT if result_set in cs.minted else ""),
+            )
+            for option, kind, _, notes in sorted(wanted):
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, notes=notes)
         for value, row in published.items():
-            base, _, grain = value.rpartition(":")
-            if grain in ("precinct", "parts") and base not in bases and row[8] == "active":
+            match = re.fullmatch(r"(.+):(?:precinct|parts)(?::\d+)?", value)
+            if match is not None and match[1] not in bases and row[8] == "active":
                 cs.add(
                     "result_set",
                     id=row[0],
@@ -1536,8 +1574,8 @@ def emit() -> Path:
                     completeness=row[6],
                     supersedes_id=row[7],
                 )
-                for option, outcome, seats in earlier.get(row[0], []):
-                    cs.add("outcome", result_set_id=row[0], option_id=option, kind=outcome, seats=seats)
+                for option, outcome, seats, notes in earlier.get(row[0], []):
+                    cs.add("outcome", result_set_id=row[0], option_id=option, kind=outcome, seats=seats, notes=notes)
                 cs.add("note", entity_id=row[0], kind="caveat", body_md=EMPTY)
         print(f"{len(made)} contests, {skipped} already held")
         frame = lines.join(
