@@ -285,6 +285,13 @@ STATES = {
         "Statement of Vote",
         "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
     ),
+    "IL": (
+        "17",
+        "Illinois",
+        "Illinois State Board of Elections",
+        "Election vote totals",
+        "https://www.elections.il.gov/ElectionOperations/DownloadVoteTotals.aspx",
+    ),
     "MN": (
         "27",
         "Minnesota",
@@ -311,6 +318,8 @@ OFFICES = {
     "COMMISSIONER OF PUBLIC LANDS": ("commissioner-of-public-lands", "Commissioner of Public Lands"),
     "INSURANCE COMMISSIONER": ("insurance-commissioner", "Insurance Commissioner"),
     "CONTROLLER": ("controller", "Controller"),
+    "COMPTROLLER": ("comptroller", "Comptroller"),
+    "GOVERNOR AND LIEUTENANT GOVERNOR": ("governor", "gubernatorial"),
 }
 LEGISLATIVE = re.compile(r"NC (?:STATE )?(HOUSE|SENATE)(?: OF REPRESENTATIVES)?(?: DISTRICT 0*(\d+)| \(0*(\d+)\))")
 MN_LEGISLATIVE = re.compile(r"STATE (REPRESENTATIVE|SENATOR) DISTRICT 0*(\d+)([AB]?)")
@@ -471,6 +480,76 @@ ME_METHOD = (
     "or more candidates, the candidate with a majority of first choices. Votes are first choices."
 )
 WON_MAJORITY = "Derived: a majority of first choices in the certified contest totals."
+IL_DAYS = {
+    2000: date(2000, 3, 21),
+    2002: date(2002, 3, 19),
+    2004: date(2004, 3, 16),
+    2006: date(2006, 3, 21),
+    2008: date(2008, 2, 5),
+    2010: date(2010, 2, 2),
+    2012: date(2012, 3, 20),
+    2014: date(2014, 3, 18),
+    2016: date(2016, 3, 15),
+    2018: date(2018, 3, 20),
+    2020: date(2020, 3, 17),
+    2022: date(2022, 6, 28),
+}
+IL_DOWNLOAD = "https://elections.il.gov/NewDocDisplay.aspx?{}"
+IL_FILES = {
+    2000: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZZw3h4ar3NE4CX%2bu5lLO94twHzufQ58vYlkMCNtiT%2bQdcHGqEYcC76CbrjgtiNCE9OdyRxnyYqKgQXnIZXgm9P0%3d",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZZw3h4ar3NE4CX%2bu5lLO94s5VwxtnxnL3VC0goT8Xc4%2bcpzhL9soUlXkd%2btIUPkyyv74AaIjCozFfujtZIZcqa993sfx8bQGXA%3d%3d",
+    ),
+    2002: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZeeBDZh5aFV%2f5Fj6mxlHEmXEac%2b7FDWzASHsRW%2fwdRIOZN%2bm5LhvUKX%2bpoElUyimQSE%2bVXPDSEKizg8ayVXVwzE%3d",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZeeBDZh5aFV%2f5Fj6mxlHEmUjDI54OVMzUYhwPAtDMfy78bBFapmbnQvhJNFxtOZcnKns%2fUBy2Pfu2hWxgBB%2fRa%2fKv7ESylauVw%3d%3d",
+    ),
+    2004: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZbBAaynJaYDeehzrVcUaY%2f6dQuJ6YjQnX%2b71Qjck0nD%2bHTkhSqy3seM4FQJRsPS50i8GGymPg3z4HmLxqaWPlew%3d",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZbBAaynJaYDeehzrVcUaY%2f5m4n1hiFA9SAh0DW2mSW4lKoOvvGdWaIh2ni5xUKVyrQNpHt6JHA41kJXR52dHgerH52n86VxSvw%3d%3d",
+    ),
+    2006: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZYCUKSb2ZB%2fCxykq03t7B1JOgGbXUywd8voRsbUZilaq7s8%2fEtlljJr0loIczjwBrXgglSkhu6EvAL%2fo3i4nuSg%3d",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZYCUKSb2ZB%2fCxykq03t7B1Kk%2bqKdEb0phCJOtRg6etlxRPCHc0xvEv47T0uWjr1tzGOyL3dcQpphwiS3WZdBFy1ND5DtxhXFYg%3d%3d",
+    ),
+    2008: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZVcE%2fKSRRVYPmEiR0E1M2978KTDoe9Wt%2b1W5aF%2bRXzu69bF8AGYhjosV0r3rabq5iug%2bdSlcSWf5",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZVcE%2fKSRRVYPmEiR0E1M294%2fG9VxI%2byEMFthnmNvGlJJcozgLlLtqW2zJpTGV8i%2bEdEPI4FrYhKBoufL0t0YW6s%3d",
+    ),
+    2010: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZchKLBtq0PZpEVaLjqq6OleE8DkYy3MmTp6H9k5sJxom1Y1PPZKwyR4dyASY9ZwI%2bDIGSET1QO%2fp",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZchKLBtq0PZpEVaLjqq6OlfG226W57pkA7fg3O957p7AE4vK23HfJEZ87y1N3BzH%2fNoXHu6HqyDwk89aCA5toVo%3d",
+    ),
+    2012: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1Zer3TqjMLZFBpyGuzFVLVTjMzwFBag7lME1L7hxIQQoc5HhRXX%2bWhi%2bgmy8ULWmB6YnC6IwQ9qo7",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1Zer3TqjMLZFBpyGuzFVLVTjvgR4qMJ4ABVTDfVQr7Rp1jEqtyHVsrZpEtiUUIcIs8722MEB3Xraswmia%2bRMCYB8%3d",
+    ),
+    2014: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZasjAerqxs3fRrf2XYrBXtEbKmVLSjufof2IpO8z4VfYshl93ka8t4VUe%2b%2bKCz2u1NwHX2KbNrDv",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZasjAerqxs3fRrf2XYrBXtGGnkcw1G96QzlBYJgOnLM7MW14dtZ3u%2b2v4AWTtX5CQ6CcIX51s8LWibLvk%2bAvXhs%3d",
+    ),
+    2016: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZcyCkMA7x3sXBKi6Ks4uZustlNRzKk7R7ljbA1VA2W573EZlHuKfVuEiC1xOdiy9jipiK%2fw54q6%2b",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZcyCkMA7x3sXBKi6Ks4uZuu%2fl7C4HQEu06X05BGg9mYwvQ5glmvqMKPEStc0j%2fcewAwSHyZhxz9CRsY%2bPfFUxuQ%3d",
+    ),
+    2018: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZQftp%2fSyhp5PFMq2OvjCNY5I2g1KvY54trRpa2jTf6%2fHHJtgkIMya6%2feEoiTEYKMdmjC14wEnY8G",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZQftp%2fSyhp5PFMq2OvjCNY6CJOHWnP0uhQfvR5RntaiWX3C%2bBte9YZp2ygdyNM2gyp1NAVhsPJ%2b%2feEUvv1w%2bYaI%3d",
+    ),
+    2020: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZeVciCixC%2bz1ZNJL5NtW4BzqozO%2bIMmNKOu4%2bAw5AhmApODsF8NFLz8KnZXanpC%2fx9w31mSz9l5v",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZeVciCixC%2bz1ZNJL5NtW4Bxejud%2fndV9iL%2bJYWPjg8O2CWwcntZg%2fS%2flS6liUFtBq%2bIRyPM63t2HkOOPnvLRDeE%3d",
+    ),
+    2022: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZSMw8T%2bTP0Bu5MYScFngpt5KKJsa1cQ0Ak2xTeElyH2R6HzvNMlMKxgJQMjsktjYGuSvEqhKQS1%2b",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZSMw8T%2bTP0Bu5MYScFngpt7DT1jIISrO8vbwEz2j1UaUFk4Ught6jyIEJO1%2flfBqWXHLZ4FGOg24NU92Hn1kynhR%2fg1AlG3%2fHg%3d%3d",
+    ),
+}
+IL_METHOD = (
+    "Totals are the State Board of Elections' official primary vote by county, each candidate's county rows checked "
+    "against the Board's statewide totals file. The files do not mark winners, so the winner shown is the candidate "
+    "with the most votes."
+)
 
 RECOUNT = (
     "No winner is shown where the leader's margin is within 1 percent of the contest's votes, close enough for a "
@@ -613,6 +692,9 @@ def fetch() -> None:
                 time.sleep(10 * 2**attempt)
         else:
             raw.fetch(SOURCE, ME_WAYBACK.format(stamp, path), suffix=Path(path).suffix)
+    for county, total in IL_FILES.values():
+        for token in (county, total):
+            raw.fetch(SOURCE, IL_DOWNLOAD.format(token), suffix=".txt")
     for day in NC_DAYS:
         raw.fetch(SOURCE, FILES.format(day=day), suffix=".zip")
     for day in MN_DAYS:
@@ -643,7 +725,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|16|33|35|36|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|16|17|33|35|36|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -1759,6 +1841,58 @@ def parse() -> None:
             ),
         ]
     ).write_parquet(PARSED / "congress.parquet")
+    illinois = re.compile(r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)|" + "|".join(OFFICES))
+    il: list[tuple[date, str, str | None, str, str, str, int]] = []
+    for year, (county, total) in IL_FILES.items():
+        books = []
+        for token in (county, total):
+            text = raw.cached(SOURCE, IL_DOWNLOAD.format(token)).path.read_text(encoding="latin-1")
+            rows = list(csv.reader(io.StringIO(text), delimiter="\t" if "\t" in text.split("\n", 1)[0] else ","))
+            heads = [cell.strip() for cell in rows[0]]
+            books.append(
+                [dict(zip(heads, [cell.strip() for cell in row], strict=True)) for row in rows[1:] if any(row)]
+            )
+        sums: dict[tuple[str, str], int] = {}
+        for row in books[0]:
+            if (found := illinois.fullmatch(row["OfficeName"])) is None:
+                continue
+            sums[(row["OfficeName"], row["CandidateID"])] = sums.get((row["OfficeName"], row["CandidateID"]), 0) + int(
+                row["Votes"]
+            )
+            name = re.sub(r"\s+", " ", f"{row['CanFirstName']} {row['CanLastName']}").strip().title()
+            il.append(
+                (
+                    IL_DAYS[year],
+                    ("house" if found[2] == "REPRESENTATIVE" else "senate") if found[1] else OFFICES[found[0]][0],
+                    str(int(found[1])) if found[1] else None,
+                    row["PartyAbbrev"],
+                    counties[("17", re.sub(r"[^a-z]", "", row["County"].lower()))],
+                    re.sub(
+                        r"\b(Ii|Iii|Iv)\b",
+                        lambda numeral: numeral[1].upper(),
+                        re.sub(r"\bMc([a-z])", lambda prefix: "Mc" + prefix[1].upper(), name),
+                    ),
+                    int(row["Votes"]),
+                )
+            )
+        if sums != {
+            (row["OfficeName"], row["CandidateID"]): int(row["Votes"])
+            for row in books[1]
+            if illinois.fullmatch(row["OfficeName"])
+        }:
+            raise ValueError(f"{year} Illinois: the county rows do not match the statewide totals")
+    frames.append(
+        pl.DataFrame(
+            il, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row"
+        ).with_columns(
+            state=pl.lit("IL"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     partisan = pl.col("day").dt.year() < 2012
     frames.append(
         ca.filter(~pl.col("office").is_in(["house", "us-senate"]))
@@ -1806,7 +1940,8 @@ def emit() -> Path:
             "North Carolina 2002–2022, Minnesota 2016–2022, Washington 2015–2022, and New York City 2014–2022 "
             "by precinct, California 2002–2022 by county, Colorado, Connecticut, Idaho, Massachusetts, New Mexico, "
             "New York, Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine "
-            "2000–2024 by county from the Secretary of State's tabulations",
+            "2000–2024 by county from the Secretary of State's tabulations, and Illinois 2000–2022 by county from the "
+            "State Board of Elections' vote totals",
             polity="US",
         )
 
@@ -1857,6 +1992,9 @@ def emit() -> Path:
             )
         for stamp, link in NY_FEDERAL.values():
             cs.artifact(raw.cached(SOURCE, f"https://web.archive.org/web/{stamp}id_/{link}"), sources["NYSBOE"])
+        for county, total in IL_FILES.values():
+            for token in (county, total):
+                cs.artifact(raw.cached(SOURCE, IL_DOWNLOAD.format(token)), sources["IL"])
         for day in NC_DAYS:
             cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), sources["NC"])
         for day in MN_DAYS:
@@ -1994,7 +2132,11 @@ def emit() -> Path:
             .unique()
             .iter_rows()
         }
-        if cs.minted & {*parties.values(), *systems.values(), *offices.values(), *bodies.values()}:
+        lieutenant = offices.get(("IL", "lieutenant-governor"))
+        if lieutenant is not None and lieutenant in cs.minted:
+            cs.add("office", id=lieutenant, polity_id=cs.polity("US-IL"), kind="other")
+            name(lieutenant, "Lieutenant Governor of Illinois")
+        if cs.minted & {*parties.values(), *systems.values(), *offices.values(), *bodies.values()} - {lieutenant}:
             raise ValueError("the parties, systems, offices, and bodies must already exist")
         titles = dict(OFFICES.values())
         elections: dict[tuple[str, date], UUID] = {}
@@ -2004,6 +2146,7 @@ def emit() -> Path:
             *(("WA", day, None) for day in WA_DAYS),
             *(("CA", day, None) for day in CA_DAYS),
             *(("ME", day, None) for day in ME_DAYS.values()),
+            *(("IL", day, None) for day in IL_DAYS.values()),
             *(
                 (state, day, None)
                 for state, day in lines.filter(pl.col("state").is_in(list(ELSTATS)))
@@ -2098,7 +2241,9 @@ def emit() -> Path:
             stage = f"{label} primary" + (" runoff" if first else "")
             magnitude: int = rows.select(pl.col("seats").fill_null(1).max()).item()
             district, _, post = (code or "").partition(":")
-            remainder = state == "WA" and day.year % 2 == 1
+            remainder = (state == "WA" and day.year % 2 == 1) or (
+                state == "IL" and office == "comptroller" and day.year == 2016
+            )
             cs.add(
                 "contest",
                 id=contest,
@@ -2124,7 +2269,7 @@ def emit() -> Path:
                     else "irv"
                     if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", "ME", *ELSTATS)
+                    if state in ("MN", "CA", "ME", "IL", *ELSTATS)
                     else "two_round_40"
                     if day.year < 2018
                     else "two_round_30"
@@ -2243,7 +2388,7 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_MAJORITY)]
                 elif tallies[0] > tallies[1] and nominated.get(names[0]) and day.year < 2024:
                     wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", *ELSTATS):
+            elif state in ("MN", "CA", "ME", "IL", *ELSTATS):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
@@ -2367,6 +2512,8 @@ def emit() -> Path:
                     if state == "MN"
                     else ME_METHOD
                     if state == "ME"
+                    else IL_METHOD
+                    if state == "IL"
                     else ELSTATS_METHOD.format(publisher=STATES[state][2])
                     if state in ELSTATS
                     else METHOD.format(threshold=threshold)
