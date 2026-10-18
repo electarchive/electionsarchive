@@ -21,12 +21,12 @@ const COUNTED = sql`${sql.param(MEASURES.keys().toArray())}::int2[]`;
 const FACTS = {
   area: (set: SQL, area: SQL) =>
     sql`
-      select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.exact
+      select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.complete
             from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area}
     `,
   unit: (set: SQL, unit: SQL) =>
     sql`
-      select v.result_set_k, v.unit_k as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as exact
+      select v.result_set_k, v.unit_k as area_k, v.option_k, v.measure, v.count_round, sum(v.value) as value, true as complete
             from result_value v where v.result_set_k = ${set} and v.unit_k = ${unit}
             group by 1, 2, 3, 4, 5
     `,
@@ -566,7 +566,7 @@ async function load(
       side: Side;
       measure: string;
       appointed: number | null;
-      exact: boolean;
+      complete: boolean;
       ks: Array<number>;
       sets: Array<v.InferOutput<typeof ResultSet>>;
     }
@@ -628,12 +628,12 @@ async function load(
     role: string;
     main: number;
     value: number;
-    exact: boolean;
+    complete: boolean;
     rank: number;
   }>(sql`
     with fetched as materialized (
       select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
-        r.value::float8 as value, r.exact,
+        r.value::float8 as value, r.complete,
         coalesce(${round}::int, min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)) as first,
         min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as opening
       from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[]) as p(set, area)
@@ -654,7 +654,7 @@ async function load(
         sum(f.value) filter (where f.count_round = f.opening and f.measure = m.main) over (partition by f.option) as rank
       from fetched f join mains m on m.area = f.area
     )
-    select r.set, r.area, r.option, x.role, r.main, r.value, r.exact, 0::float8 as rank
+    select r.set, r.area, r.option, x.role, r.main, r.value, r.complete, 0::float8 as rank
     from flagged r
     cross join lateral (
       select case
@@ -682,7 +682,7 @@ async function load(
       votes: Map<number, number>;
       sums: Map<string, number>;
       main: number;
-      exact: boolean;
+      complete: boolean;
     }
   >();
   for (const row of counts) {
@@ -690,10 +690,10 @@ async function load(
       votes: new Map<number, number>(),
       sums: new Map<string, number>(),
       main: row.main,
-      exact: true,
+      complete: true,
     };
     areas.set(row.area, area);
-    area.exact &&= row.exact;
+    area.complete &&= row.complete;
     const sum = `${row.role}:${row.set}`;
     area.sums.set(sum, (area.sums.get(sum) ?? 0) + row.value);
     if (row.role === "votes") {
@@ -929,7 +929,7 @@ async function load(
       },
       measure: MEASURES.get(area.main) ?? "votes",
       appointed: appointed > 0 ? appointed : null,
-      exact: area.exact,
+      complete: area.complete,
       ks: sets.map((set) => set.k),
       sets: sets.map((row) => ({
         stage: row.stage,
@@ -2309,7 +2309,7 @@ export const contests = {
           v.object({
             valid: v.number(),
             measure: v.string(),
-            exact: v.boolean(),
+            complete: v.boolean(),
             sets: v.array(ResultSet),
             isAllied: v.boolean(),
           }),
@@ -2371,7 +2371,7 @@ export const contests = {
             year: v.nullable(v.number()),
             status: v.string(),
             valid: v.number(),
-            exact: v.boolean(),
+            complete: v.boolean(),
             sets: v.array(ResultSet),
           }),
         ),
@@ -3190,7 +3190,7 @@ export const contests = {
               year: chosen.year,
               status: chosen.status,
               valid: earlier.side.valid,
-              exact: earlier.exact,
+              complete: earlier.complete,
               sets: earlier.sets,
             };
       const rows = compare(
@@ -3255,7 +3255,7 @@ export const contests = {
         current: {
           valid: current.side.valid,
           measure: current.measure,
-          exact: current.exact,
+          complete: current.complete,
           sets: current.sets,
           isAllied: current.side.options.some(
             (option) => option.alliance != null && option.votes > 0,
@@ -3280,7 +3280,7 @@ export const contests = {
           label:
             target == null
               ? null
-              : current.exact && target.exact
+              : current.complete && target.complete
                 ? "exact"
                 : "estimated",
           notes: notesOut,

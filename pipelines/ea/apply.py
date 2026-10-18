@@ -603,19 +603,19 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
               left join polity_territory pt on pt.polity_id = ru.polity_id and pt.valid @> rs.on_date
             ),
             ancestors as (
-              select result_set_k, unit_k, area_id, on_date, true as exact from units
+              select result_set_k, unit_k, area_id, on_date, true as complete from units
               union
               select u.result_set_k, u.unit_k, ua.area_id, u.on_date, not ua.partial
               from units u join reporting_unit_area ua on ua.unit_id = u.unit_id and ua.valid @> u.on_date and not ua.approximate
               union
-              select a.result_set_k, a.unit_k, p.parent_id, a.on_date, a.exact
+              select a.result_set_k, a.unit_k, p.parent_id, a.on_date, a.complete
               from ancestors a join area_parent p on p.area_id = a.area_id and p.valid @> a.on_date
             ),
             reached as (
-              select result_set_k, unit_k, area_id, bool_or(exact) as exact from ancestors group by result_set_k, unit_k, area_id
+              select result_set_k, unit_k, area_id, bool_or(complete) as complete from ancestors group by result_set_k, unit_k, area_id
             )
-            insert into result_rollup (result_set_k, area_k, option_k, channel, measure, count_round, exact, value)
-            select v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round, bool_and(a.exact), sum(v.value)
+            insert into result_rollup (result_set_k, area_k, option_k, channel, measure, count_round, complete, value)
+            select v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round, bool_and(a.complete), sum(v.value)
             from result_value v
             join reached a on a.result_set_k = v.result_set_k and a.unit_k = v.unit_k
             join area on area.id = a.area_id

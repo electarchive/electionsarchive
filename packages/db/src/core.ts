@@ -883,7 +883,7 @@ export const resultRollup = pgTable("result_rollup", {
 	channel: smallint().default(0).notNull(),
 	measure: smallint().notNull(),
 	countRound: smallint("count_round").default(0).notNull(),
-	exact: boolean().notNull(),
+	complete: boolean().notNull(),
 	value: numeric().notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.resultSetK, table.areaK, table.optionK, table.channel, table.measure, table.countRound], name: "result_rollup_pkey"}),
