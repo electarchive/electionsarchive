@@ -144,6 +144,12 @@ WYOMING = {
     date(2024, 11, 5): "2024/Results/General/2024_General_Statewide_Constitutional_Amendment_Summary.pdf",
 }
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
+KENTUCKY = {
+    date(2022, 11, 8): (
+        "https://elect.ky.gov/results/2020-2029/Documents/2022%20General%20Election%20Results.pdf",
+        {"sections 36, 42, and 55": "Constitutional Amendment 1", "Section 26A": "Constitutional Amendment 2"},
+    )
+}
 NORTH_CAROLINA = {
     date(2018, 11, 6): (
         "2018-11-27/Canvass/Supplement_11_30_2018/State%20Composite%20Abstract%20Report%20-%20County.pdf",
@@ -279,6 +285,12 @@ DOCUMENTS = {
         "https://sos.iowa.gov/elections/results/",
         "the Iowa State Board of Canvassers' canvass summary",
     ),
+    "KY": (
+        "Kentucky State Board of Elections",
+        "Official general election results",
+        "https://elect.ky.gov/results/",
+        "the Kentucky State Board of Elections' official general election results",
+    ),
     "MO": (
         mo_sos.PUBLISHER,
         mo_sos.TITLE,
@@ -312,6 +324,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WAYBACK.format(*MONTANA[day]) if day in MONTANA else ""
     if state == "IA":
         return SOURCE, f"https://sos.iowa.gov/elections/pdf/{IOWA[day]}/general/canvsummary.pdf" if day in IOWA else ""
+    if state == "KY":
+        return SOURCE, KENTUCKY[day][0] if day in KENTUCKY else ""
     if state == "WY":
         return SOURCE, "https://sos.wyo.gov/Elections/Docs/" + WYOMING[day] if day in WYOMING else ""
     if state == "LA":
@@ -497,6 +511,45 @@ def parse() -> None:
                     )
                     & (total.sum().over("office", "answer") == 1)
                     & (pl.len().over("office", "answer") == 100)
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "KY":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=False, capture_output=True, text=True)
+            office = None
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    if cue := next((name for words, name in KENTUCKY[day][1].items() if words in line), None):
+                        office = cue
+                    elif office and (matched := re.fullmatch(r"\s*([A-Z][A-Za-z ]*?)\s+([\d,]+)\s+([\d,]+)\s*", line)):
+                        county = "Total" if matched[1] == "Total Votes" else matched[1]
+                        if elstats.plain(county) in names["KY"] or county == "Total":
+                            for answer, votes in zip(("NO", "YES"), matched.group(2, 3), strict=True):
+                                records.append((county, office, answer, votes, number))
+                        if county == "Total":
+                            office = None
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.unique(["county", "office", "answer"], keep="first", maintain_order=True)
+                .filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 121)
                 )
                 .filter(~total)
                 .drop("count")
