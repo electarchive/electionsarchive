@@ -252,6 +252,20 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         ],
     ),
     (
+        "1924-11-04",
+        "president",
+        [(12627, 0.13, 0.95, 0, 1), (12628, 0.12, 0.54, 0, 1)],
+        [
+            ("REP", "Coolidge"),
+            ("DEM", "Davis"),
+            ("SOC", "La Follette"),
+            ("PRO", "Faris"),
+            ("SLP", "Johns"),
+            ("LIB", "La Follette"),
+            ("CWL", "Wallace"),
+        ],
+    ),
+    (
         "1928-11-06",
         "president",
         [(15353, 0.12, 0.94, 0, 1), (15354, 0.1, 0.5, 0, 1)],
@@ -472,6 +486,10 @@ MISORDERED: dict[tuple[str, str], list[tuple[str, str]]] = {
     ("1924-11-04", "president"): [("perry", "pettis")],
 }
 CHECKED: set[tuple[str, str, int]] = {
+    ("1924-11-04", "president", 6),
+    ("1924-11-04", "president", 5),
+    ("1924-11-04", "president", 4),
+    ("1924-11-04", "president", 1),
     ("1908-11-03", "president", 6),
     ("1908-11-03", "president", 5),
     ("1908-11-03", "president", 3),
@@ -520,6 +538,31 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1924-11-04", "president", "29183", 5): 603,
+    ("1924-11-04", "president", "29185", 5): 113,
+    ("1924-11-04", "president", "29209", 5): 230,
+    ("1924-11-04", "president", "29063", 4): 0,
+    ("1924-11-04", "president", "29049", 6): 3,
+    ("1924-11-04", "president", "29081", 6): 3,
+    ("1924-11-04", "president", "29189", 6): 16,
+    ("1924-11-04", "president", "29201", 6): 3,
+    ("1924-11-04", "president", "29207", 6): 3,
+    ("1924-11-04", "president", "29217", 6): 3,
+    ("1924-11-04", "president", "29157", 5): 213,
+    ("1924-11-04", "president", "29169", 5): 92,
+    ("1924-11-04", "president", "29179", 5): 0,
+    ("1924-11-04", "president", "29181", 5): 51,
+    ("1924-11-04", "president", "29186", 5): 58,
+    ("1924-11-04", "president", "29197", 5): 29,
+    ("1924-11-04", "president", "29001", 4): 15,
+    ("1924-11-04", "president", "TOTAL", 6): 258,
+    ("1924-11-04", "president", "TOTAL", 5): 27427,
+    ("1924-11-04", "president", "TOTAL", 4): 883,
+    ("1924-11-04", "president", "TOTAL", 3): 1418,
+    ("1924-11-04", "president", "TOTAL", 2): 56733,
+    ("1924-11-04", "president", "TOTAL", 1): 572753,
+    ("1924-11-04", "president", "TOTAL", 0): 648486,
+    ("1924-11-04", "president", "29155", 1): 5616,
     ("1916-11-07", "governor", "29175", 5): 0,
     ("1916-11-07", "governor", "29145", 5): 9,
     ("1916-11-07", "governor", "29149", 5): 0,
@@ -1029,7 +1072,6 @@ FIXES: dict[tuple[str, str, str, int], int] = {
     ("1924-11-04", "president", "29129", 4): 0,
     ("1924-11-04", "president", "29141", 4): 0,
     ("1924-11-04", "president", "29187", 4): 3,
-    ("1924-11-04", "president", "TOTAL", 4): 883,
     ("1928-11-06", "president", "29137", 1): 4957,
     ("1940-11-05", "president", "29023", 4): 23,
     ("1940-11-05", "president", "29039", 4): 16,
@@ -1967,6 +2009,27 @@ def emit() -> Path:
                     print(f"{key}: {label} has {votes}, {on_file[option]} on file")
                 picked[(label, party)] = option
                 totals[option] = totals.get(option, 0) + votes
+            lines_per_option = Counter(picked.values())
+            for (label, party), option in list(picked.items()):
+                if lines_per_option[option] > 1:
+                    code = party if office == "president" else f"MO:{party}" if f"MO:{party}" in parties else party
+                    ((text,),) = conn.execute(
+                        "select ballot_label from contest_option where id = %s", [option]
+                    ).fetchall()
+                    ((line,),) = conn.execute(
+                        "select text from name where entity_id = %s and is_preferred", [parties[code]]
+                    ).fetchall()
+                    child = cs.key("us.option", f"{key}:{option}:{party}")
+                    cs.add(
+                        "contest_option",
+                        id=child,
+                        contest_id=contest,
+                        parent_option_id=option,
+                        kind="ticket" if office == "president" else "candidate",
+                        party_id=parties[code],
+                        ballot_label=f"{re.sub(r' \(.*\)$', '', text)} ({line})",
+                    )
+                    picked[(label, party)] = child
             cs.add(
                 "result_set",
                 id=result_set,
