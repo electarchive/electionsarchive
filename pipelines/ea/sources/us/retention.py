@@ -62,6 +62,8 @@ ARIZONA_COLUMNS = {
     "Yuma": "04027",
     "TOTAL": "",
 }
+INDIANA = "https://www.in.gov/courts/news/2024/1119/"
+INDIANA_RETAINED = {"IN:loretta-rush", "IN:mark-massa", "IN:derek-molter", "IN:rudolph-pyle", "IN:peter-foley"}
 OKLAHOMA_DAYS = ["2016-11-08", "2018-11-06", "2020-11-03", "2022-11-08", "2024-11-05"]
 ANSWERS = {"YES": "yes", "NO": "no", "YES/SI": "yes", "NO/NO": "no", "RETAIN": "yes", "REJECT": "no"}
 COURTS = [
@@ -141,6 +143,15 @@ TAKEN_OVER = (
     "the question's Yes and No answers, told apart by matching their totals to the Kansas Secretary of State's, and "
     "the undervote and overvote lines stay as `others`."
 )
+INDIANA_METHOD = (
+    "Results are based on a November 19, 2024, press release from the Indiana Judicial Branch citing the Indiana "
+    "Secretary of State's Office. Each judge on the ballot was retained with approximately 70 percent Yes votes."
+)
+INDIANA_CAVEAT = (
+    "The release provides only rounded Yes shares and totals, and no official county breakdown was published. This "
+    "set records the outcome without vote counts. MEDSL's precinct returns for this question are kept as a separate "
+    "set."
+)
 SUPERSEDED = (
     "This set loaded the retention question as a race between four candidates named for the judge and the answers, "
     "and its Yes and No lines lost their options when the question was rebuilt. The `us.retention` copy that "
@@ -189,6 +200,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
     for url in ARIZONA_CANVASSES.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
+    raw.fetch(SOURCE, INDIANA, suffix=".html")
 
 
 def arizona() -> list[dict[str, object]]:
@@ -666,8 +678,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Judicial retention elections for state supreme and appellate courts: MEDSL's precinct returns "
-            "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024, and Arizona's "
-            "official canvasses of 2016, 2022, and 2024",
+            "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024, Arizona's "
+            "official canvasses of 2016, 2022, and 2024, and Indiana's 2024 outcomes from the Judicial Branch",
             polity="US",
         )
 
@@ -778,7 +790,18 @@ def emit() -> Path:
             url="https://azsos.gov/elections/results-data",
             license="Public record",
         )
-        official_sources = {"KS": kansas_source, "OK": oklahoma_source, "AZ": arizona_source}
+        indiana_source = cs.source("Indiana Judicial Branch", "Press release: Appellate judges retained")
+        cs.add(
+            "source",
+            id=indiana_source,
+            kind="official_body",
+            publisher="Indiana Judicial Branch",
+            title="Press release: Appellate judges retained",
+            url=INDIANA,
+            license="Public record",
+        )
+        cs.artifact(raw.cached(SOURCE, INDIANA), indiana_source)
+        official_sources = {"KS": kansas_source, "OK": oklahoma_source, "AZ": arizona_source, "IN": indiana_source}
         methods = {"KS": KANSAS_METHOD, "OK": OKLAHOMA_METHOD, "AZ": ARIZONA_METHOD}
         artifacts = {
             url: cs.artifact(raw.cached(SOURCE, url), official_sources[state])
@@ -1018,6 +1041,12 @@ def emit() -> Path:
                             y1=item["y1"] / height,
                         )
                 complete = True
+            declared = day == "2024-11-05" and person_key in INDIANA_RETAINED
+            if declared:
+                default = cs.key(f"{SOURCE}.result_set", f"{contest_key}:release")
+                note(default, "methodology", f"{METHOD} {INDIANA_METHOD}")
+                note(default, "caveat", INDIANA_CAVEAT)
+                complete = True
             for result_set, election, stage, kind, source, completeness in held.get(contest_key, []):
                 copy = cs.key(f"{SOURCE}.result_set", f"{contest_key}:{result_set}")
                 cs.add(
@@ -1095,7 +1124,7 @@ def emit() -> Path:
                     is_default=default is None,
                     completeness=None,
                 )
-                note(fine, "methodology", f"{METHOD} {MEDSL_METHOD}" if default is None else MEDSL_METHOD)
+                note(fine, "methodology", MEDSL_METHOD if totals.height else f"{METHOD} {MEDSL_METHOD}")
                 if missing > 0:
                     note(fine, "caveat", MISSING.format(counties=f"{missing} of the {expected} counties it covers"))
                 sums = dict(lines.group_by("answer").agg(pl.col("votes").sum()).iter_rows())
@@ -1103,7 +1132,7 @@ def emit() -> Path:
                     default = fine
                     tallies = sums
                     complete = missing <= 0
-                else:
+                elif totals.height:
                     compared.append(
                         (contest_key, sums.get("yes", 0) - tallies["yes"], sums.get("no", 0) - tallies["no"])
                     )
@@ -1127,7 +1156,7 @@ def emit() -> Path:
                         if unit in cs.minted:
                             raise ValueError(f"{contest_key}: no Alaska district {code}")
                     values.append((str(fine), str(unit), str(options[answer]), int(votes), 0))
-            if totals.height:
+            if totals.height or declared:
                 cs.add(
                     "result_set",
                     id=default,
@@ -1138,13 +1167,13 @@ def emit() -> Path:
                     status="active",
                     source_id=official_sources[state],
                     is_default=True,
-                    completeness=1,
+                    completeness=1 if totals.height else None,
                 )
             if default is None or not complete:
                 continue
             yes, no = tallies.get("yes", 0), tallies.get("no", 0)
             share = THRESHOLDS.get(state)
-            retained = yes >= share * (yes + no) if share is not None else yes > no
+            retained = declared or (yes >= share * (yes + no) if share is not None else yes > no)
             cs.add(
                 "outcome",
                 result_set_id=default,
