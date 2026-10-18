@@ -1,5 +1,7 @@
+import csv
 import gzip
 import html
+import io
 import json
 import re
 import subprocess
@@ -9,6 +11,7 @@ import xml.etree.ElementTree as ET
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
+from urllib.parse import urljoin
 from uuid import UUID
 
 import fastexcel
@@ -23,13 +26,14 @@ SOURCE = "us.sf_doe"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ORIGIN = "https://www.sfelections.org/results/"
-WAYBACK = "https://web.archive.org/web/{}id_/" + ORIGIN + "{}"
+WAYBACK = "https://web.archive.org/web/{}id_/{}"
+OLD = "http://www.sfgov.org/site/"
 PUBLISHER = "San Francisco Department of Elections"
 PLANS = {
     "2002": (
         "https://data.sf.gov/api/geospatial/2iky-e78c?method=export&format=GeoJSON",
         "precname",
-        date(2008, 11, 4),
+        date(2006, 11, 7),
         date(2011, 11, 9),
     ),
     "2012": (
@@ -51,6 +55,12 @@ RECORDS = {
     "2022-11-08": ("20230419065651", "20221108/data/20221201/CVR_Export_20221201120428.zip"),
 }
 IMAGES = {
+    "2006-11-07": (
+        ("20070614113250", OLD + "uploadedfiles/election/Elections_Pages/Results2006_11/BallotDetail.txt"),
+        ("20070614113249", OLD + "uploadedfiles/election/Elections_Pages/Results2006_11/Candidates.txt"),
+        ("20070614113249", OLD + "uploadedfiles/election/Elections_Pages/Results2006_11/PrecinctIndex.txt"),
+        ("20070614113248", OLD + "uploadedfiles/election/Elections_Pages/Results2006_11/Contests.txt"),
+    ),
     "2008-11-04:CA:san-francisco:supervisors:1": (("20260406113518", "20081104/D1_BallotImageFinal.zip"),),
     "2008-11-04:CA:san-francisco:supervisors:3": (("20260406123016", "20081104/D3_BallotImageFinal.zip"),),
     "2008-11-04:CA:san-francisco:supervisors:9": (("20260406113154", "20081104/D9_BallotImageFinal.zip"),),
@@ -82,6 +92,34 @@ IMAGES = {
     ),
 }
 CONTESTS: dict[str, tuple[str, tuple[str, str]]] = {
+    "2004-11-02:CA:san-francisco:supervisors:1": (
+        "alged:667000_2004_11_san francisco_CA_City Council_1_1",
+        ("20051125171835", OLD + "uploadedfiles/election/2004RCV1.htm"),
+    ),
+    "2004-11-02:CA:san-francisco:supervisors:5": (
+        "alged:667000_2004_11_san francisco_CA_City Council_5_1",
+        ("20051125173937", OLD + "uploadedfiles/election/2004RCV5.htm"),
+    ),
+    "2004-11-02:CA:san-francisco:supervisors:7": (
+        "alged:667000_2004_11_san francisco_CA_City Council_7_1",
+        ("20051125171726", OLD + "uploadedfiles/election/2004RCV7.htm"),
+    ),
+    "2004-11-02:CA:san-francisco:supervisors:11": (
+        "alged:667000_2004_11_san francisco_CA_City Council_11_1",
+        ("20051125174026", OLD + "uploadedfiles/election/2004RCV11.htm"),
+    ),
+    "2005-11-08:CA:san-francisco:assessor-recorder": (
+        "ceda:200500025",
+        ("20060804084835", OLD + "uploadedfiles/election/2005RCV1.htm"),
+    ),
+    "2006-11-07:CA:san-francisco:supervisors:4": (
+        "alged:667000_2006_11_san francisco_CA_City Council_4_1",
+        ("20070614113342", OLD + "election_index.asp?id=48099"),
+    ),
+    "2006-11-07:CA:san-francisco:supervisors:6": (
+        "alged:667000_2006_11_san francisco_CA_City Council_6_1",
+        ("20070614113342", OLD + "election_index.asp?id=48100"),
+    ),
     "2008-11-04:CA:san-francisco:supervisors:1": (
         "alged:667000_2008_11_san francisco_CA_City Council_1_1",
         ("20221124012746", "20081104/D1_Pass%20Report%20Final.xls"),
@@ -282,7 +320,7 @@ def fetch() -> None:
         *RECORDS.values(),
         *(file for files in IMAGES.values() for file in files),
     ]:
-        downloads.append((WAYBACK.format(stamp, path), "." + path.rsplit(".", 1)[1]))
+        downloads.append((WAYBACK.format(stamp, urljoin(ORIGIN, path)), "." + path.split("?")[0].rsplit(".", 1)[1]))
     for url, suffix in downloads:
         for attempt in range(5):
             try:
@@ -298,9 +336,32 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     official: dict[str, list[dict[str | None, int]]] = {}
     for key, (_, (stamp, path)) in CONTESTS.items():
-        file = raw.cached(SOURCE, WAYBACK.format(stamp, path)).path
+        file = raw.cached(SOURCE, WAYBACK.format(stamp, urljoin(ORIGIN, path))).path
         lines: list[tuple[str, list[int]]] = []
-        if path.endswith(".html") or key < "2015":
+        if path.startswith(OLD):
+            rows = [
+                [
+                    re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
+                    for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL | re.IGNORECASE)
+                ]
+                for row in re.findall(
+                    r"<tr[^>]*>(.*?)</tr>", file.read_text(encoding="latin-1"), re.DOTALL | re.IGNORECASE
+                )
+            ]
+            start = next(index for index, row in enumerate(rows) if "Pass 1" in row)
+            columns = [index for index, cell in enumerate(rows[start]) if re.fullmatch(r"Pass \d+", cell)]
+            for row in rows[start + 1 :]:
+                cells = [row[index] if index < len(row) else "" for index in columns]
+                if len(row) < 2 or not all(re.fullmatch(r"[\d,]*\*?", cell) for cell in cells):
+                    continue
+                label = re.sub(r"\s*\(Winner [^)]*\)", "", row[0] or row[1])
+                values = [int(re.sub(r"[,*]", "", cell) or 0) for cell in cells]
+                if label == "Exhausted Ballots":
+                    lines.append(("Non Transferable Total", values))
+                    break
+                if label != "Eligible Ballots" and (label != "WRITE-IN" or any(values)):
+                    lines.append((label, values))
+        elif path.endswith(".html") or key < "2015":
             table: list[tuple[str, list[int]]] = []
             if path.endswith(".html"):
                 for row in re.findall(
@@ -457,7 +518,9 @@ def parse() -> None:
     frames = []
     cast: dict[str, list[tuple[str, list[set[str]]]]] = {}
     for day, records in RECORDS.items():
-        with zipfile.ZipFile(raw.cached(SOURCE, WAYBACK.format(*records)).path) as archive:
+        with zipfile.ZipFile(
+            raw.cached(SOURCE, WAYBACK.format(records[0], urljoin(ORIGIN, records[1]))).path
+        ) as archive:
             manifest = {
                 name: json.loads(archive.read(f"{name}Manifest.json"))["List"]
                 for name in ("Contest", "Candidate", "PrecinctPortion")
@@ -501,11 +564,48 @@ def parse() -> None:
                                 )
                             )
     for scope, (image, *lookup) in IMAGES.items():
+        if image[1].startswith(OLD):
+            candidates, indexes, titles = (
+                list(csv.reader(io.StringIO(raw.cached(SOURCE, WAYBACK.format(*file)).path.read_text())))
+                for file in lookup
+            )
+            names: dict[int, list[str]] = {}
+            for code, *label in candidates:
+                names.setdefault(int(code.split("-")[0]), []).append(",".join(label).strip())
+            rooms = {index: "/".join(sorted(re.findall(r"\d{4}", description))) for index, description in indexes[1:]}
+            wanted = {
+                int(code): key
+                for key in CONTESTS
+                if key.startswith(scope)
+                for code, title in titles[1:]
+                if title == f"MEMBER, BOARD OF SUPERVISORS DIST. {key.rsplit(':', 1)[1]}"
+            }
+            for line in raw.cached(SOURCE, WAYBACK.format(*image)).path.read_text(encoding="latin-1").splitlines():
+                tokens = line.split()
+                if len(tokens) < 2 or not re.fullmatch(r"\d{4}", tokens[0]) or int(tokens[1][:4]) not in wanted:
+                    continue
+                ranking = []
+                for token in tokens[1:]:
+                    contest, choice = int(token[:4]), int(token[5:])
+                    listed = names[contest]
+                    ranking.append(
+                        {listed[choice - 1]}
+                        if choice <= len(listed)
+                        else {"over", "votes"}
+                        if choice == len(listed) + 1
+                        else set()
+                    )
+                cast.setdefault(wanted[int(tokens[1][:4])], []).append((rooms[tokens[0]], ranking))
+            continue
         if lookup:
-            text = raw.cached(SOURCE, WAYBACK.format(*lookup[0])).path.read_text(encoding="utf-8")
-            data = raw.cached(SOURCE, WAYBACK.format(*image)).path.read_bytes()
+            text = raw.cached(SOURCE, WAYBACK.format(lookup[0][0], urljoin(ORIGIN, lookup[0][1]))).path.read_text(
+                encoding="utf-8"
+            )
+            data = raw.cached(SOURCE, WAYBACK.format(image[0], urljoin(ORIGIN, image[1]))).path.read_bytes()
         else:
-            with zipfile.ZipFile(raw.cached(SOURCE, WAYBACK.format(*image)).path) as archive:
+            with zipfile.ZipFile(
+                raw.cached(SOURCE, WAYBACK.format(image[0], urljoin(ORIGIN, image[1]))).path
+            ) as archive:
                 members = [name for name in archive.namelist() if name.casefold().endswith(".txt")]
                 text = archive.read(next(name for name in members if "lookup" in name.casefold())).decode("utf-8")
                 data = archive.read(next(name for name in members if "image" in name.casefold()))
@@ -839,10 +939,10 @@ def emit() -> Path:
                 kind="official_body",
                 publisher=PUBLISHER,
                 title=title,
-                url=ORIGIN + path,
+                url=urljoin(ORIGIN, path),
                 license="Public record",
             )
-            cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, path)), source)
+            cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, urljoin(ORIGIN, path))), source)
 
             current = conn.execute(
                 """select o.id, o.ballot_label, h.pipeline = %s from contest_option o
@@ -886,7 +986,7 @@ def emit() -> Path:
                     continue
                 if found:
                     raise ValueError(f"{key}: {len(found)} options for {label}")
-                display = label.title().replace("''", '"')
+                display = re.sub(r"\bIi+\b", lambda found: found[0].upper(), label.title().replace("''", '"'))
                 known = people.get((words[0], words[-1]), set())
                 matches = {person for person, _, _ in known}
                 for preferred in (
