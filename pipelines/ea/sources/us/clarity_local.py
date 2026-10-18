@@ -20,7 +20,8 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 CLARITY = "https://results.enr.clarityelections.com/{state}/{county}/{election}/{version}/reports/detailxml.zip"
 TITLE = "Election night reporting results"
-STATES = {"17": "IL", "26": "MI", "39": "OH", "42": "PA"}
+STATES = {"17": "IL", "20": "KS", "26": "MI", "31": "NE", "39": "OH", "42": "PA"}
+STATE_NAMES = {"IL": "Illinois", "KS": "Kansas", "MI": "Michigan", "NE": "Nebraska", "OH": "Ohio", "PA": "Pennsylvania"}
 COUNTIES = {
     "17043": (
         "DuPage",
@@ -152,6 +153,70 @@ COUNTIES = {
     ),
     "42051": ("Fayette", "Fayette County Election Bureau", {125144: 367166, 122836: 355870}),
     "42133": ("York", "York County Office of Elections", {119017: 369102}),
+    "20079": (
+        "Harvey",
+        "Harvey County Clerk",
+        {
+            125935: 368735,
+            124688: 367253,
+            122758: 365748,
+            118958: 367104,
+            115750: 367119,
+            111055: 367116,
+            106041: 367115,
+            98749: 367121,
+            92669: 367249,
+            71590: 367122,
+            67626: 367285,
+            64160: 367286,
+        },
+    ),
+    "20121": (
+        "Miami",
+        "Miami County Clerk",
+        {
+            124189: 366480,
+            123552: 359181,
+            123538: 358379,
+            122433: 357589,
+            118629: 324767,
+            115742: 314015,
+            115407: 301566,
+            110768: 284790,
+            106205: 281487,
+            95989: 235896,
+            91800: 222046,
+            71302: 191263,
+            69895: 187892,
+            59146: 183367,
+            59144: 163982,
+            55468: 151970,
+            55189: 281437,
+            54886: 150788,
+            50886: 148837,
+            50884: 125463,
+            43029: 112464,
+            45272: 114401,
+            41794: 100464,
+        },
+    ),
+    "31153": (
+        "Sarpy",
+        "Sarpy County Election Commission",
+        {
+            125926: 368264,
+            123023: 356163,
+            122854: 355957,
+            117800: 318363,
+            116155: 314091,
+            115136: 300257,
+            107143: 271967,
+            92897: 237043,
+            64652: 237038,
+            54217: 237036,
+            43953: 237446,
+        },
+    ),
 }
 DATES = {
     105201: date(2020, 11, 3),
@@ -159,6 +224,15 @@ DATES = {
     49399: date(2013, 11, 5),
     104650: date(2020, 8, 4),
     96256: date(2019, 8, 6),
+    10445: date(2009, 4, 7),
+    8819: date(2008, 11, 4),
+}
+RENAMED = {
+    "2009-04-07:IL": "0001-01-01:IL",
+    **{
+        f"2008-11-04:IL:{code}:question": f"0001-01-01:IL:{code}:question"
+        for code in ("1782491", "1720168783", "1720133188")
+    },
 }
 SUBDIVISIONS = {st: f"https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{st}_cousub_500k.zip" for st in STATES}
 PLACES = {st: f"https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{st}_place_500k.zip" for st in STATES}
@@ -168,10 +242,20 @@ SKIPPED = re.compile(
     r"CONSTABLE|INSPECTOR|FOREST PRESERVE|CONSERVATION|AIRPORT|HOSPITAL|MOSQUITO|CEMETERY|DRAINAGE|RECLAMATION|"
     r"COLLEGE|UNIVERSITY|LIGHT AND POWER|CIRCUIT|MULTI|LOCAL OPTION|PRESIDENT AND|UNITED STATES|\bU S\b|\bESR\b|"
     r"REGIONAL|AMBULANCE|\bEMS\b|PENSION|MENTAL|HEALTH|AUTHORITY|TRANSIT|\bZOO\b|MUSEUM|\bSOIL\b|PRECINCT|"
-    r"ELECTION|\bWATER\b|SEWER|RESCUE|RECREATION|\bLIB\b|\bFPD\b|\bPK DIST"
+    r"ELECTION|\bWATER\b|SEWER|RESCUE|RECREATION|\bLIB\b|\bFPD\b|\bPK DIST|FIRE (?:\d+ )?PROP"
 )
-QUESTION = re.compile(r"PROPOSITION|PROPOSAL|REFERENDUM|QUESTION|LEVY|ISSUE|MILLAGE|ORDINANCE|ADVISORY|BOND|CHARTER")
-TOWNSHIP_KEYS = ("supervisor", "highway-commissioner", "assessor", "collector", "township-board", "fiscal-officer")
+QUESTION = re.compile(
+    r"PROPOSITION|PROPOSAL|REFERENDUM|QUESTION|LEVY|ISSUE|MILLAGE|ORDINANCE|ADVISORY|BOND|CHARTER|\bTAX\b(?! COLLECTOR)"
+)
+TOWNSHIP_KEYS = (
+    "trustee",
+    "supervisor",
+    "highway-commissioner",
+    "assessor",
+    "collector",
+    "township-board",
+    "fiscal-officer",
+)
 PLACE_KEYS = ("mayor", "president", "council", "council-president", "board-of-trustees", "law-director")
 BODIES = (
     "council",
@@ -186,6 +270,11 @@ PARTIES = {"DEM": "democratic-party", "REP": "republican-party"}
 METHOD = (
     "Votes are the {publisher}'s election night reporting results by precinct, summed across the ways of voting the "
     "county reports. Every candidate's precinct votes add up to the county's total."
+)
+WITHDRAWN = (
+    "Withdrawn: an earlier reading of the county's results put this race under the wrong contest, such as a term "
+    "length read as a seat or a fire district's question read as the town's; the corrected reading loads the race, "
+    "where it is the town's, under its own contest."
 )
 TOTALS = (
     "Votes are the {publisher}'s election night reporting results, counted as one total for the whole jurisdiction "
@@ -309,7 +398,7 @@ def parse() -> None:
                 elif re.search(r"\bALDER|COUNCIL|\bCOMMISSIONER\b", plain):
                     key = "council"
                 elif re.search(r"\bTRUSTEE|\bTRST\b", plain):
-                    key = "township-board" if township_word else "board-of-trustees"
+                    key = "trustee" if st == "KS" else "township-board" if township_word else "board-of-trustees"
                 elif "CLERK" in plain:
                     key = "clerk-treasurer" if "TREASURER" in plain else "clerk"
                 elif "TREASURER" in plain:
@@ -359,8 +448,12 @@ def parse() -> None:
                     elif district:
                         number = district[1] or district[2]
                         seat = f"District {int(number) if number.isdigit() else number}"
-                    elif re.search(r"\bAT ?LARGE\b", plain):
+                    elif re.search(r"\bAT ?L(?:ARGE|G)\b", plain):
                         seat = "At-Large"
+                    elif position := re.search(
+                        r"\bCOUNCIL (?:POSITION |POS )?(\d+)\b(?! ?(?:YEAR|YR))|\bPOS(?:ITION)? (\d+)\b", plain
+                    ):
+                        seat = f"Position {int(position[1] or position[2])}"
                 rows = []
                 for choice in choices:
                     label = re.sub(r"\s+", " ", choice.get("text") or "").strip()
@@ -395,6 +488,8 @@ def parse() -> None:
                             "votes": int(choice.get("totalVotes") or 0),
                         }
                     )
+                if not rows:
+                    continue
                 lines.extend(rows)
                 contests.append(
                     {
@@ -524,18 +619,21 @@ def emit() -> Path:
         parents: dict[str, tuple[str, str]] = {}
         for value, kind in conn.execute(
             """select x.value, e.kind from external_id x join election e on e.id = x.entity_id
-               where x.scheme = 'us.election' and x.value ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}:(IL|MI|OH|PA)(:[a-z_]+)?$'
+               where x.scheme = 'us.election' and x.value ~ '^[0-9]{4}-[0-9]{2}-[0-9]{2}:(IL|KS|MI|NE|OH|PA)(:[a-z_]+)?$'
                  and e.kind <> 'primary'
                order by length(x.value)"""
         ).fetchall():
             parents.setdefault(":".join(value.split(":")[:2]), (value, kind))
+        held = set(parents)
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="City, village, borough, and township elections and local questions from county election night reporting sites in Illinois, Michigan, Ohio, and Pennsylvania",
+            summary="City, village, borough, and township elections and local questions from county election night reporting sites in Illinois, Kansas, Michigan, Nebraska, Ohio, and Pennsylvania",
             polity="US",
         )
+
+        cs.renamed.update(RENAMED)
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -627,6 +725,7 @@ def emit() -> Path:
         minted: dict[str, tuple[str, date]] = {}
         memberships: set[tuple[UUID, UUID, date]] = set()
         values: list[tuple[str, str, str, int]] = []
+        emitted: list[UUID] = []
         for row in contests.iter_rows(named=True):
             scheme, code, key, seat, day = row["scheme"], row["code"], row["key"], row["seat"], row["day"]
             st = STATES[code[:2]]
@@ -642,7 +741,7 @@ def emit() -> Path:
                 )
             parent_key, kind = parents[f"{day}:{st}"]
             parent = cs.key("us.election", parent_key)
-            if parent in cs.minted and parent not in elections:
+            if f"{day}:{st}" not in held and parent not in elections:
                 elections.add(parent)
                 cs.add(
                     "election",
@@ -654,14 +753,14 @@ def emit() -> Path:
                     date_precision="day",
                     status="held",
                 )
-                state_name = {"IL": "Illinois", "MI": "Michigan", "OH": "Ohio", "PA": "Pennsylvania"}[st]
                 name(
                     parent,
-                    f"{day.year} {state_name} " + ("general election" if kind == "general" else f"{kind} elections"),
+                    f"{day.year} {STATE_NAMES[st]} "
+                    + ("general election" if kind == "general" else f"{kind} elections"),
                 )
                 cs.add("slug", path=f"us/{st.lower()}/{day}-{kind}", entity_id=parent)
             election = cs.key("us.election", f"{day}:{st}:{code}")
-            if election in cs.minted and election not in elections:
+            if election not in elections:
                 elections.add(election)
                 cs.add(
                     "election",
@@ -725,6 +824,7 @@ def emit() -> Path:
                     "auditors": f"{place} Auditors",
                     "auditor": f"{place} Auditor",
                     "supervisor": f"{place} Supervisor",
+                    "trustee": f"{place} Trustee",
                     "highway-commissioner": f"{place} Highway Commissioner",
                     "assessor": f"{place} Assessor",
                     "collector": f"{place} Tax Collector" if st == "PA" else f"{place} Collector",
@@ -787,6 +887,7 @@ def emit() -> Path:
                     + (f" ({row['variant']})" if row["variant"] else ""),
                 )
             cs.add("slug", path=contest_path, entity_id=contest)
+            emitted.append(contest)
             counted = grouped[(row["county"], row["election"], row["contest"])]
             jurisdiction = COUNTIES[row["county"]][0].replace("_", " ").upper()
             prefix = f"{day.year}:{st}:{row['county']}"
@@ -887,6 +988,15 @@ def emit() -> Path:
                     minted.setdefault(place_code, (row["county"], day))
                 memberships.add((target, area, day))
                 values.append((str(result_set), str(target), str(options[choice]), votes))
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
+        for row in conn.execute(
+            f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
+                join changeset g on g.id = r.changeset_id
+                where g.pipeline = %s and r.status = 'active' and r.contest_id <> all(%s)""",
+            [SOURCE, emitted],
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn")
+            cs.add("note", entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
         for place_code, (county, day) in minted.items():
             cs.add(
                 "reporting_unit",
