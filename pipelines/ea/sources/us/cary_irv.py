@@ -88,7 +88,8 @@ def parse() -> None:
     for label, values in columns.items():
         if sum(values) != second[label]:
             raise ValueError(f"irv: the precincts do not add up for {label}")
-    if sum(second.values()) != int(re.search(r"Total\s*</td>.*?=\s*</td>.*?>(\d+)<", sheet, re.DOTALL)[1]):
+    printed = re.search(r"Total\s*</td>.*?=\s*</td>.*?>(\d+)<", sheet, re.DOTALL)
+    if printed is None or sum(second.values()) != int(printed[1]):
         raise ValueError("irv: the finalists do not add up to the total")
     (PARSED / "contest.json").write_text(json.dumps({"first": first, "second": second, "columns": columns}))
 
