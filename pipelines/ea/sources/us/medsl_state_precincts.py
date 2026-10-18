@@ -96,7 +96,7 @@ SWAPPED = {
     ("04025", "RUBY SMITH"): "JAY RUBY",
     ("36031", "BILLY D JONES"): "D BILLY JONES",
 }
-MISFILED = {(2024, "OR")}
+MISFILED = {(2024, "OR"): "candidates", (2020, "NY"): "write-ins", (2022, "VT"): "write-ins"}
 VERMONT = {
     "ADD": "ADDISON",
     "BEN": "BENNINGTON",
@@ -319,29 +319,55 @@ def emit() -> Path:
     )
     misfiled = (
         returns.filter(
-            (pl.col("measure") == 1)
-            & (pl.col("kind") == "precinct")
+            (pl.col("kind") == "precinct")
             & pl.struct("year", "state").map_elements(
                 lambda row: (row["year"], row["state"]) in MISFILED, return_dtype=pl.Boolean
             )
         )
-        .group_by("year", "state", "office", "code")
+        .with_columns(
+            side=pl.struct("year", "state").map_elements(
+                lambda row: MISFILED[(row["year"], row["state"])], return_dtype=pl.String
+            )
+        )
+        .group_by("year", "state", "office", "code", "side")
         .agg(
-            cast=pl.col("seat").filter(~pl.col("writein")).unique(),
+            cast=pl.col("seat").filter(~pl.col("writein") & (pl.col("measure") == 1)).unique(),
             written=pl.col("seat").filter(pl.col("writein")).unique(),
+            accounted=pl.col("seat").filter(pl.col("measure") != 1).unique(),
+            tallied=pl.col("votes").filter(~pl.col("writein") & (pl.col("measure") == 1)).sum(),
         )
         .filter(
             (pl.col("cast").list.len() > 0)
-            & (pl.col("written").list.len() > 0)
-            & (pl.col("cast").list.set_intersection("written").list.len() == 0)
+            & (
+                (pl.col("written").list.len() > 0) & (pl.col("cast").list.set_intersection("written").list.len() == 0)
+                | (pl.col("side") == "write-ins")
+                & (pl.col("accounted").list.len() > 0)
+                & (pl.col("cast").list.set_intersection("accounted").list.len() == 0)
+            )
         )
-        .select("year", "state", "office", "code", dropped=pl.lit(True))
+        .select(
+            "year",
+            "state",
+            "office",
+            "code",
+            "side",
+            moved=pl.when((pl.col("cast").list.len() == 1) & (pl.col("tallied") > 0)).then(pl.col("cast").list.first()),
+        )
     )
-    print(f"{misfiled.height} precincts with candidate lines under another district than their write-ins, dropped")
+    print(f"{misfiled.height} precincts with candidate lines under another district than their write-ins")
     returns = (
         returns.join(misfiled, on=["year", "state", "office", "code"], how="left")
-        .filter(pl.col("dropped").is_null() | pl.col("writein") | (pl.col("measure") != 1))
-        .drop("dropped")
+        .filter(~((pl.col("side").fill_null("") == "candidates") & ~pl.col("writein") & (pl.col("measure") == 1)))
+        .with_columns(
+            seat=pl.when(
+                (pl.col("side").fill_null("") == "write-ins")
+                & (pl.col("writein") | (pl.col("measure") != 1))
+                & pl.col("moved").is_not_null()
+            )
+            .then("moved")
+            .otherwise("seat")
+        )
+        .drop("side", "moved")
     )
     days = sorted({str(day) for day in returns["day"].unique()})
     with connect() as conn:
@@ -401,10 +427,10 @@ def emit() -> Path:
                 )
             for origin, url in FILES[year]:
                 cs.artifact(raw.cached(origin, url), sources[year])
-        own: dict[str, tuple[UUID, UUID | None, int, set[str], set[str]]] = {
-            key: (result_set, supersedes, int(total), set(present), set(reached))
-            for key, result_set, supersedes, total, present, reached in conn.execute(
-                """select regexp_replace(x.value, ':r[0-9]+$', ''), r.id, r.supersedes_id,
+        own: dict[str, tuple[UUID, UUID | None, int, set[str], set[str], float | None, set[str]]] = {
+            key: (result_set, supersedes, int(total), set(present), set(reached), completeness, set(listed))
+            for key, result_set, supersedes, total, present, reached, completeness, listed in conn.execute(
+                """select regexp_replace(x.value, ':r[0-9]+(:u[0-9]+)?$', ''), r.id, r.supersedes_id,
                           (select coalesce(sum(v.value), 0) from result_value v
                            where v.result_set_k = r.k and v.measure = 1 and v.count_round = 0),
                           (select coalesce(array_agg(distinct case u.scheme_code when 'us.precinct'
@@ -413,7 +439,10 @@ def emit() -> Path:
                            where v.result_set_k = r.k and v.measure = 1 and v.value > 0),
                           (select coalesce(array_agg(distinct u.code), '{}')
                            from result_value v join reporting_unit u on u.k = v.unit_k
-                           where v.result_set_k = r.k and v.measure = 1 and v.value > 0)
+                           where v.result_set_k = r.k and v.measure = 1 and v.value > 0),
+                          r.completeness::float8,
+                          (select coalesce(array_agg(distinct u.id::text), '{}')
+                           from result_value v join reporting_unit u on u.k = v.unit_k where v.result_set_k = r.k)
                    from external_id x join result_set r on r.id = x.entity_id and r.status = 'active'
                    where x.scheme = %s""",
                 [f"{SOURCE}.result_set"],
@@ -644,13 +673,43 @@ def emit() -> Path:
                 .iter_rows()
                 if votes > 0
             }
+            completeness = round(sum(tallies.values()) / official, 4) if official else None
+            listed = {
+                members[code]
+                for code, candidate, party, measure in lines.select("code", "candidate", "party", "measure").iter_rows()
+                if code in members and (measure != 1 or (candidate, party) in picked)
+            }
             if published is not None and (
                 published[2] == counted
-                or not {county for _, county in voted} - published[3]
+                and ((year, state) not in MISFILED or published[6] == listed)
+                or (year, state) not in MISFILED
+                and not {county for _, county in voted} - published[3]
                 and not published[4] - {code for code, _ in voted}
             ):
+                if MISFILED.get((year, state)) == "candidates" and published[5] != completeness:
+                    print(f"{key}: completeness {published[5]} on file, {completeness} now")
+                    cs.add(
+                        "result_set",
+                        id=published[0],
+                        election_id=election,
+                        contest_id=contest,
+                        stage="certified",
+                        kind="counted",
+                        status="active",
+                        source_id=sources[year],
+                        is_default=False,
+                        supersedes_id=published[1],
+                        completeness=completeness,
+                    )
                 continue
-            result_set = cs.key(f"{SOURCE}.result_set", key if published is None else f"{key}:r{counted}")
+            result_set = cs.key(
+                f"{SOURCE}.result_set",
+                key
+                if published is None
+                else f"{key}:r{counted}"
+                if published[2] != counted
+                else f"{key}:r{counted}:u{len(listed)}",
+            )
             if result_set not in cs.minted:
                 continue
             result_sets.append(result_set)
@@ -683,7 +742,7 @@ def emit() -> Path:
                 source_id=sources[year],
                 is_default=False,
                 supersedes_id=None if published is None else published[0],
-                completeness=round(sum(tallies.values()) / official, 4) if official else None,
+                completeness=completeness,
             )
             values.append(
                 lines.join(
