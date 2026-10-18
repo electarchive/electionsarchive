@@ -143,6 +143,7 @@ PUBLISHERS = {
     "AR": "Arkansas Secretary of State",
     "TN:2023-03-14": "Shelby County Election Commission",
     "2026-02-03:NY:senate:61": "Erie County Board of Elections",
+    "2025-11-04:NY:assembly:115": "New York State Board of Elections",
     "TN:2023-09-14": "Davidson County Election Commission",
     "MA": "Massachusetts Secretary of the Commonwealth",
     "NH": "New Hampshire Secretary of State",
@@ -606,6 +607,7 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
         "https://vote.nyc/sites/default/files/pdf/election_results/2026/20260203Special%20Election/00102100047New%20York%20State%20Senator%2047th%20Senatorial%20District%20Recap.csv",
         None,
     ),
+    "2025-11-04:NY:assembly:115": ("transcribed", "https://results.elections.ny.gov/contest/5859", None),
     "2026-02-03:NY:senate:61": (
         "transcribed",
         "https://elections.erie.gov/Files/Election%20Results/2026/2026%20Special%20Canvass%20Book.pdf",
@@ -777,6 +779,13 @@ TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
         ("Erik Bottcher", "Working Families", 2249),
         ("Charlotte Friedman", "Republican", 1117),
         (None, None, 96),
+    ],
+    "2025-11-04:NY:assembly:115": [
+        ("Michael S. Cashman", "Democratic", 18164),
+        ("Michael S. Cashman", "Working Families", 1633),
+        ("Brent M. Davison", "Republican", 16230),
+        ("Brent M. Davison", "Conservative", 1813),
+        (None, None, 25),
     ],
     "2026-02-03:NY:senate:61": [
         ("Jeremy J. Zellner", "Democratic", 19341),
