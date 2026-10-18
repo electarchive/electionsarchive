@@ -3,7 +3,9 @@ import itertools
 import json
 import re
 import zipfile
+from datetime import date, timedelta
 from pathlib import Path
+from urllib.parse import urlencode
 from uuid import UUID
 
 import polars as pl
@@ -14,7 +16,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.ceda"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ACCESS = "https://scholars.csus.edu/view/fileRedirect?instCode=01CALS_USL&filePid={}&download=true"
 CODEBOOK = ACCESS.format("13306594360001671")
@@ -23,6 +25,22 @@ PLACES = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_06_place_500k.z
 SCHOOLS = [
     f"https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_06_{kind}_500k.zip" for kind in ("unsd", "elsd", "scsd")
 ]
+ARCHIVES = {
+    "06097": ("https://sonomaca.elstats3.civera.com", "Sonoma County Registrar of Voters", "SONOMA"),
+    "06013": ("https://pastresults.contracostavote.gov", "Contra Costa County Elections Division", "CONTRA COSTA"),
+}
+ARCHIVE_TITLE = "Election database"
+OFFICES = (
+    "County",
+    "Supervisor",
+    "Director",
+    "School",
+    "Board of Education",
+    "Governing Board",
+    "Trustee",
+    "District Attorney",
+    "Sheriff",
+)
 PUBLISHER = "California State University, Sacramento, Institute for Social Research"
 TITLE = "California Elections Data Archive"
 PARTS = (
@@ -50,6 +68,10 @@ METHOD = (
     "for a district that crosses county lines, the votes are its sums across the counties. Write-in votes are one "
     "total per contest."
 )
+PRECINCT = (
+    "Where the county's election database adds up to those totals for every candidate, the votes are the county's "
+    "own precinct results instead, summed across voting methods."
+)
 RCV = "This contest was decided by ranked-choice voting; the archive shows the votes as the data archive reports them."
 DISTRICT = (
     "Only part of the {whole} votes in this contest. The archive has no boundary for the district yet, so the "
@@ -57,8 +79,25 @@ DISTRICT = (
 )
 
 
+def database(county: str, year: int) -> str:
+    search = {
+        "global": {"years": {"from": year, "to": year}},
+        "ballotQuestions": {"text": "no ballot questions", "types": [], "number": "", "divisions": []},
+        "contests": {"candidates": [], "divisions": [], "offices": [{"free": office} for office in OFFICES]},
+        "specialElectionsOnly": False,
+        "voterStats": False,
+        "stages": [],
+    }
+    return f"{ARCHIVES[county][0]}/api/download_search.csv?" + urlencode(
+        {"search": json.dumps(search, separators=(",", ":"))}
+    )
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, CODEBOOK, suffix=".pdf")
+    for county in ARCHIVES:
+        for year in range(2000, 2026):
+            raw.fetch(SOURCE, database(county, year), suffix=".csv")
     for url in FILES.values():
         raw.fetch(SOURCE, url, suffix=".xlsx")
     for url in [PLACES, *SCHOOLS]:
@@ -153,13 +192,15 @@ def parse() -> None:
                      select code, name, lsad, st_multi(st_collectionextract(st_makevalid(st_transform(
                        st_setsrid(st_geomfromgeojson(geojson), 4269), 4326)), 3)) as geom
                      from unnest(%s::text[], %s::text[], %s::text[], %s::text[]) as f(code, name, lsad, geojson)
+                   ), counties as materialized (
+                     select c.code, g.geom from area a join area_code c on c.area_id = a.id
+                     join area_geometry g on g.area_id = a.id
+                     where a.scheme_code = 'us.county' and c.code like '06%%'
                    )
                    select s.code, s.name, s.lsad, encode(st_asewkb(s.geom), 'hex'),
                      encode(st_asewkb(st_pointonsurface(s.geom)), 'hex'),
-                     array(select c.code from area a join area_code c on c.area_id = a.id
-                           join area_geometry g on g.area_id = a.id
-                           where a.scheme_code = 'us.county' and c.code like '06%%' and g.geom && s.geom
-                             and st_area(st_intersection(g.geom, s.geom)) > 0.01 * st_area(s.geom))
+                     array(select k.code from counties k
+                           where k.geom && s.geom and st_area(st_intersection(k.geom, s.geom)) > 0.01 * st_area(s.geom))
                    from shapes s""",
                 [
                     [code for code, _, _, _ in shapes],
@@ -255,8 +296,101 @@ def parse() -> None:
         .with_columns(pl.col("race").min().over("code", "key", "day", "area", "remainder", "magnitude"))
     )
     print(f"kept {frame['race'].n_unique()} races; unmatched: {len(missing)} places")
+    parts = []
+    for county, (_, _, jurisdiction) in ARCHIVES.items():
+        for year in range(2000, 2026):
+            part = pl.read_csv(
+                raw.cached(SOURCE, database(county, year)).path, infer_schema=False, truncate_ragged_lines=True
+            )
+            if part.height == 0:
+                continue
+            parts.append(
+                part.filter(
+                    pl.col("division_type") == "Precinct",
+                    pl.col("candidate_name").is_not_null(),
+                    ~pl.col("vote_channel").fill_null("").str.ends_with("- Total"),
+                    ~pl.col("candidate_name").str.contains(
+                        r"(?i)^total |^registered voters$|^unknown candidate$|^blank"
+                        r"|^(?:over|under)[ /]*(?:votes?)?(?:[ /]*(?:over|under)[ /]*votes?)?$"
+                    ),
+                ).select(
+                    pl.lit(county).alias("fips"),
+                    pl.col("election_date").str.slice(0, 10).str.to_date().alias("day"),
+                    pl.col("contest_id").alias("contest"),
+                    pl.col("candidate_name").str.strip_chars().alias("ballot"),
+                    pl.concat_str(
+                        pl.lit(f"{year}:CA:{county}:{jurisdiction}:"),
+                        pl.col("division_name").str.strip_chars().str.to_uppercase(),
+                    ).alias("unit"),
+                    pl.col("votes").cast(pl.Int64, strict=False),
+                )
+            )
+    reported = (
+        pl.concat(parts)
+        .filter(~pl.col("votes").is_null().any().over("fips", "day", "contest"))
+        .with_columns(write=pl.col("ballot").str.contains(r"(?i)^write"))
+        .group_by("fips", "day", "contest", "ballot", "write", "unit")
+        .agg(pl.col("votes").sum())
+    )
+    sums = reported.group_by("fips", "day", "contest", "ballot", "write").agg(pl.col("votes").sum())
+    signature = pl.col("votes").cast(pl.String).sort().str.join("|")
+    names = {jurisdiction: county for county, (_, _, jurisdiction) in ARCHIVES.items()}
+    matched = (
+        frame.group_by("race")
+        .agg(
+            pl.col("county").n_unique().alias("counties"),
+            pl.first("county", "day", "writeins"),
+            signature.alias("signature"),
+        )
+        .filter(pl.col("counties") == 1, pl.col("county").is_in(list(names)))
+        .with_columns(pl.col("county").replace_strict(names).alias("fips"))
+        .filter(pl.len().over("fips", "day", "signature") == 1)
+        .join(
+            sums.group_by("fips", "day", "contest")
+            .agg(
+                pl.col("votes").filter(~pl.col("write")).cast(pl.String).sort().str.join("|").alias("signature"),
+                pl.col("votes").filter(pl.col("write")).sum().alias("writes"),
+            )
+            .filter(pl.len().over("fips", "day", "signature") == 1),
+            on=["fips", "day", "signature"],
+        )
+        .filter(pl.col("writes") == pl.col("writeins"))
+        .select("race", "contest")
+    )
+    options = pl.concat(
+        [
+            frame.select("race", "candidate", "votes")
+            .join(matched, on="race")
+            .filter(pl.len().over("race", "votes") == 1)
+            .join(
+                sums.filter(~pl.col("write")).filter(pl.len().over("contest", "votes") == 1),
+                on=["contest", "votes"],
+            )
+            .select("race", "contest", "candidate", "ballot"),
+            sums.filter(pl.col("write"))
+            .join(matched, on="contest")
+            .select("race", "contest", pl.lit("write-ins").alias("candidate"), "ballot"),
+        ]
+    )
+    complete = (
+        frame.group_by("race")
+        .agg(pl.len().alias("candidates"))
+        .join(
+            options.filter(pl.col("candidate") != "write-ins").group_by("race").agg(pl.len().alias("found")),
+            on="race",
+        )
+        .filter(pl.col("candidates") == pl.col("found"))
+        .select("race")
+    )
+    precincts = (
+        reported.join(options.join(complete, on="race"), on=["contest", "ballot"])
+        .group_by("race", "candidate", "fips", "unit")
+        .agg(pl.col("votes").sum())
+    )
+    print(f"{precincts['race'].n_unique()} races by precinct")
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "candidates.parquet")
+    precincts.write_parquet(PARSED / "precincts.parquet")
     places.filter(pl.col("code").is_in(frame["code"].implode())).write_parquet(PARSED / "places.parquet")
     (PARSED / "missing.txt").write_text("\n".join(sorted(missing)))
 
@@ -264,6 +398,7 @@ def parse() -> None:
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "candidates.parquet")
     places = pl.read_parquet(PARSED / "places.parquet")
+    grouped = {race: rows for (race,), rows in pl.read_parquet(PARSED / "precincts.parquet").group_by("race")}
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -290,6 +425,49 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, CODEBOOK), source)
         for url in FILES.values():
             cs.artifact(raw.cached(SOURCE, url), source)
+        counted: dict[str, UUID] = {}
+        stored: set[str] = set()
+        for county, (url, publisher, _) in ARCHIVES.items():
+            counted[county] = cs.source(publisher, ARCHIVE_TITLE)
+            cs.add(
+                "source",
+                id=counted[county],
+                kind="official_body",
+                publisher=publisher,
+                title=ARCHIVE_TITLE,
+                url=url,
+                license="Public record",
+            )
+            for year in range(2000, 2026):
+                if (artifact := raw.cached(SOURCE, database(county, year))).storage_key not in stored:
+                    stored.add(artifact.storage_key)
+                    cs.artifact(artifact, counted[county])
+        wards = {
+            entity
+            for (entity,) in conn.execute(
+                """select distinct r.contest_id from result_set r join changeset x on x.id = r.changeset_id
+                   where x.pipeline = 'us.city_precincts'"""
+            ).fetchall()
+        }
+        sets = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = %s", [f"{SOURCE}.result_set"]
+            ).fetchall()
+        }
+        precincts: dict[str, UUID] = dict(
+            conn.execute(
+                "select code, id from reporting_unit where scheme_code = 'us.precinct' and code like '20__:CA:06%%'"
+            ).fetchall()
+        )
+        counties: dict[str, tuple[UUID, UUID]] = {
+            code: (unit, area)
+            for code, unit, area in conn.execute(
+                "select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code like '06%%'"
+            ).fetchall()
+        }
+        minted: dict[str, date] = {}
+        memberships: set[tuple[UUID, UUID, date]] = set()
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         for url in [PLACES, *SCHOOLS]:
             cs.artifact(raw.cached(SOURCE, url), census)
@@ -329,6 +507,19 @@ def emit() -> Path:
                      and x.scheme in ('us.office', 'us.body')
                    where x.value like 'CA:%%' and s.title <> %s""",
                 [TITLE],
+            ).fetchall()
+        )
+        held |= {
+            ("CA:06075:board-of-supervisors", year, month)
+            for value, year, month in held
+            if value == "CA:0667000:council"
+        }
+        kept = dict(
+            conn.execute(
+                """select c.id, c.electoral_system_id from contest c join changeset x on x.id = c.changeset_id
+                   join result_set r on r.contest_id = c.id join changeset y on y.id = r.changeset_id
+                   where y.pipeline = %s and x.pipeline <> %s""",
+                [SOURCE, SOURCE],
             ).fetchall()
         )
         parents = dict(
@@ -523,7 +714,8 @@ def emit() -> Path:
                 magnitude=magnitude,
                 round_number=2 if race in previous else 1,
                 previous_round_id=cs.key("us.contest", f"ceda:{previous[race]}") if race in previous else None,
-                electoral_system_id=systems[
+                electoral_system_id=kept.get(contest)
+                or systems[
                     "irv"
                     if rcv and magnitude == 1
                     else "block"
@@ -557,7 +749,25 @@ def emit() -> Path:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DISTRICT.format(whole=word))
             if rcv:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=RCV)
+            reported = None if contest in wards else grouped.get(race)
+            superseded = None
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            if reported is not None:
+                if contest_key in sets:
+                    superseded = result_set
+                    cs.add(
+                        "result_set",
+                        id=superseded,
+                        election_id=election,
+                        contest_id=contest,
+                        stage="certified",
+                        kind="counted",
+                        status="superseded",
+                        source_id=source,
+                        is_default=False,
+                        completeness=1,
+                    )
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:precinct")
             cs.add(
                 "result_set",
                 id=result_set,
@@ -566,11 +776,19 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=source if reported is None else counted[reported["fips"][0]],
                 is_default=True,
+                supersedes_id=superseded,
                 completeness=1,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=METHOD if reported is None else f"{METHOD} {PRECINCT}",
+            )
+
+            entries: list[tuple[UUID, str, int]] = []
             for candidate_id, ballot, incumbent, votes, elected in rows.select(
                 "candidate", "name", "incumbent", "votes", "elected"
             ).iter_rows():
@@ -597,13 +815,46 @@ def emit() -> Path:
                         kind="elected" if elected == "1" else "advanced",
                         seats=None,
                     )
-                if result_set in cs.minted:
-                    values.append((str(result_set), str(unit), str(option), votes))
+                entries.append((option, candidate_id, votes))
             if writeins := first["writeins"]:
                 option = cs.key("us.option", f"{contest_key}:write-ins")
                 cs.add("contest_option", id=option, contest_id=contest, kind="write_in", ballot_label="Write-ins")
-                if result_set in cs.minted:
-                    values.append((str(result_set), str(unit), str(option), writeins))
+                entries.append((option, "write-ins", writeins))
+            for option, candidate_id, votes in entries if result_set in cs.minted else []:
+                if reported is None:
+                    values.append((str(result_set), str(unit), str(option), votes))
+                    continue
+                for place, value in (
+                    reported.filter(pl.col("candidate") == candidate_id).select("unit", "votes").iter_rows()
+                ):
+                    target = precincts.get(place) or cs.unit("us.precinct", place)
+                    if place not in precincts:
+                        minted.setdefault(place, day)
+                    if area != counties[place.split(":")[2]][1]:
+                        memberships.add((target, area, day))
+                    values.append((str(result_set), str(target), str(option), value))
+        for place, day in minted.items():
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.precinct", place),
+                polity_id=state,
+                scheme_code="us.precinct",
+                code=place,
+                parent_id=counties[place.split(":")[2]][0],
+                area_relation="within",
+                area_id=counties[place.split(":")[2]][1],
+                kind="standard",
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
+        for target, area, day in memberships:
+            cs.add(
+                "reporting_unit_area",
+                unit_id=target,
+                area_id=area,
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
         cs.frame(
             "result_value",
             pl.DataFrame(

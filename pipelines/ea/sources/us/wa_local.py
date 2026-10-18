@@ -234,13 +234,15 @@ def parse() -> None:
                      select code, name, lsad, st_multi(st_collectionextract(st_makevalid(st_transform(
                        st_setsrid(st_geomfromgeojson(geojson), 4269), 4326)), 3)) as geom
                      from unnest(%s::text[], %s::text[], %s::text[], %s::text[]) as f(code, name, lsad, geojson)
+                   ), counties as materialized (
+                     select c.code, g.geom from area a join area_code c on c.area_id = a.id
+                     join area_geometry g on g.area_id = a.id
+                     where a.scheme_code = 'us.county' and c.code like '53%%'
                    )
                    select s.code, s.name, s.lsad, encode(st_asewkb(s.geom), 'hex'),
                      encode(st_asewkb(st_pointonsurface(s.geom)), 'hex'),
-                     array(select c.code from area a join area_code c on c.area_id = a.id
-                           join area_geometry g on g.area_id = a.id
-                           where a.scheme_code = 'us.county' and c.code like '53%%' and g.geom && s.geom
-                             and st_area(st_intersection(g.geom, s.geom)) > 0.005 * st_area(s.geom))
+                     array(select k.code from counties k
+                           where k.geom && s.geom and st_area(st_intersection(k.geom, s.geom)) > 0.005 * st_area(s.geom))
                    from shapes s""",
                 [
                     [code for code, _, _, _ in shapes],
