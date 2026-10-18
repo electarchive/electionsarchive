@@ -374,6 +374,12 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("REP", "Baker"), ("DEM", "Nelson"), ("SOC", "Brandt"), ("SLP", "Cox")],
     ),
     (
+        "1928-11-06",
+        "governor",
+        [(15382, 0.455, 0.965, 0, 1), (15383, 0.12, 0.935, 0, 1)],
+        [("REP", "Caulfield"), ("DEM", "Wilson"), ("SOC", "Hodges"), ("SLP", "Middlecoff"), ("PRO", "Brandenburg")],
+    ),
+    (
         "1932-11-08",
         "governor",
         [(17056, 0.125, 0.96, 0, 1), (17057, 0.115, 0.505, 0, 1)],
@@ -467,6 +473,9 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1928-11-06", "governor", "29095", 0): 107579,
+    ("1928-11-06", "governor", "29510", 0): 175867,
+    ("1928-11-06", "governor", "TOTAL", 0): 784293,
     ("1896-11-03", "governor", "29199", 3): 0,
     ("1896-11-03", "governor", "29009", 3): 3,
     ("1896-11-03", "governor", "29041", 3): 3,
@@ -930,6 +939,7 @@ NAMES: dict[tuple[str, str, str], str] = {
     ("1924-11-04", "Cox", "SLP"): "William W. Cox",
     ("1928-11-06", "Hodges", "SOC"): "Joseph G. Hodges",
     ("1928-11-06", "Middlecoff", "SLP"): "Edward G. Middlecoff",
+    ("1928-11-06", "Brandenburg", "PRO"): "Brandenburg",
     ("1932-11-08", "Wolf", "SOC"): "Louis Martin Wolf",
     ("1932-11-08", "Cox", "SLP"): "William W. Cox",
     ("1932-11-08", "Penney", "COM"): "Owen W. Penney",
