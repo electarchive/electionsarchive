@@ -156,7 +156,12 @@ KENTUCKY = {
     date(2022, 11, 8): (
         "https://elect.ky.gov/results/2020-2029/Documents/2022%20General%20Election%20Results.pdf",
         {"sections 36, 42, and 55": "Constitutional Amendment 1", "Section 26A": "Constitutional Amendment 2"},
-    )
+    ),
+    date(2024, 11, 5): (
+        "https://elect.ky.gov/results/2020-2029/Documents/"
+        "2024%20General%20Election%20Certification%20as%20Amended%20on%20December%209th%202024.pdf",
+        {"Sections 145 and 155": "Constitutional Amendment 1", "To give parents choices": "Constitutional Amendment 2"},
+    ),
 }
 NORTH_CAROLINA = {
     date(2018, 11, 6): (
@@ -687,14 +692,17 @@ def parse() -> None:
             records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], check=False, capture_output=True, text=True)
             office = None
+            answers = ("NO", "YES")
             for number, page in enumerate(text.stdout.split("\f"), start=1):
                 for line in page.splitlines():
                     if cue := next((name for words, name in KENTUCKY[day][1].items() if words in line), None):
                         office = cue
+                    elif header := re.fullmatch(r"\s+(YES|NO)\s+(YES|NO)\s*", line):
+                        answers = (header[1], header[2])
                     elif office and (matched := re.fullmatch(r"\s*([A-Z][A-Za-z ]*?)\s+([\d,]+)\s+([\d,]+)\s*", line)):
                         county = "Total" if matched[1] == "Total Votes" else matched[1]
                         if elstats.plain(county) in names["KY"] or county == "Total":
-                            for answer, votes in zip(("NO", "YES"), matched.group(2, 3), strict=True):
+                            for answer, votes in zip(answers, matched.group(2, 3), strict=True):
                                 records.append((county, office, answer, votes, number))
                         if county == "Total":
                             office = None
