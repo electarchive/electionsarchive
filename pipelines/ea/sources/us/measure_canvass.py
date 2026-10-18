@@ -42,7 +42,7 @@ ANSWERS = {
     "AGAINST": ("NO", "FOR"),
 }
 TAG = (
-    r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure)"
+    r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure|issue)\b"
     r"(?:\s+measure)?(?:\s+to the legislature)?\s*(?:no\.?|#|number\s+\w+\s+\()?)\s*(\d+|[A-Za-z])\b"
 )
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
@@ -144,6 +144,7 @@ WYOMING = {
     date(2024, 11, 5): "2024/Results/General/2024_General_Statewide_Constitutional_Amendment_Summary.pdf",
 }
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
+ARKANSAS = {date(2024, 11, 5): "GE2024_report.pdf"}
 NEBRASKA = {
     date(2018, 11, 6): "2018/2018-general-election-official-results.pdf",
     date(2020, 11, 3): "2020/2020-General-Canvass-Book.pdf",
@@ -292,6 +293,12 @@ DOCUMENTS = {
         "https://sos.iowa.gov/elections/results/",
         "the Iowa State Board of Canvassers' canvass summary",
     ),
+    "AR": (
+        "Arkansas Secretary of State",
+        "Official general election results report",
+        "https://www.sos.arkansas.gov/elections/research/election-results",
+        "the Arkansas Secretary of State's official results report",
+    ),
     "NE": (
         "Nebraska Secretary of State",
         "Official report of the Board of State Canvassers",
@@ -349,6 +356,8 @@ def link(state: str, day: date) -> tuple[str, str]:
             if day in ILLINOIS
             else ""
         )
+    if state == "AR":
+        return SOURCE, "https://www.sos.arkansas.gov/uploads/elections/" + ARKANSAS[day] if day in ARKANSAS else ""
     if state == "NE":
         return SOURCE, (
             "https://sos.nebraska.gov/sites/default/files/doc/elections/" + NEBRASKA[day] if day in NEBRASKA else ""
@@ -500,6 +509,48 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "AR":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            office = None
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    if heading := re.match(r"(Issue No\. \d+):", line):
+                        office = heading[1]
+                    elif re.match(r"\S.*:", line):
+                        office = None
+                    elif office and (matched := re.fullmatch(r"([A-Z][A-Za-z ]*?)\s+(\d+)\s+(\d+)\s+(\d+)\s*", line)):
+                        if int(matched[2]) + int(matched[3]) != int(matched[4]):
+                            continue
+                        county = "Total" if matched[1] == "Totals" else matched[1]
+                        if county == "Total" or elstats.plain(county) in names["AR"]:
+                            for answer, votes in zip(("FOR", "AGAINST"), matched.group(2, 3), strict=True):
+                                records.append((county, office, answer, votes, number))
+                        if county == "Total":
+                            office = None
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 76)
                 )
                 .filter(~total)
                 .drop("count")
