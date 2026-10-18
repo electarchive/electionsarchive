@@ -17,7 +17,7 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
 EARLY = {"CT": 1789, "VT": 1789}
@@ -162,7 +162,7 @@ def parse() -> None:
                         pl.col("election_type").str.contains("(?i)general")
                         | (
                             pl.col("election_type").str.contains("(?i)primary")
-                            & (pl.col("chamber") == "senate")
+                            & pl.col("chamber").is_in(["senate", "house"])
                             & pl.col("primary_party").is_not_null()
                         )
                     )
@@ -171,7 +171,8 @@ def parse() -> None:
                     chamber=pl.when(pl.col("election_type").str.contains("(?i)primary"))
                     .then(
                         pl.concat_str(
-                            pl.lit("senate:"),
+                            "chamber",
+                            pl.lit(":"),
                             pl.col("primary_party").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", "-"),
                         )
                     )
@@ -195,7 +196,7 @@ def parse() -> None:
                         pl.col("election_type").fill_null(""), pl.col("office_modifier").fill_null("")
                     ).str.contains("(?i)special|unexpired"),
                     state=pl.lit(state),
-                    district=pl.when(pl.col("chamber") == "house").then(
+                    district=pl.when(pl.col("chamber").str.starts_with("house")).then(
                         pl.coalesce(
                             pl.col("district_name").str.extract(r"(\d+)").cast(pl.Int16, strict=False),
                             pl.col("district_name")
@@ -315,7 +316,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="House, Senate, and presidential general elections by county from state election archives",
+            summary="House, Senate, and presidential general elections and House and Senate primaries by county from state "
+            "election archives",
             polity="US",
         )
         sources: dict[str, UUID] = {}
