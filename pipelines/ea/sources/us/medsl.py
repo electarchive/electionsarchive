@@ -836,7 +836,7 @@ def attach(
             print(f"{key}: a primary candidate's county sum falls short of the FEC total, skipped")
             continue
         pooled = tallies.with_columns(
-            pl.col("option").replace(
+            pl.col("option").cast(pl.String).replace(
                 "pool",
                 next(
                     (str(option) for option, kind, label, _, _ in known if kind == "write_in" and label in GENERIC),

@@ -552,14 +552,17 @@ def emit() -> Path:
             ).fetchall()
         }
         existing = set(medsl_units)
-        shaped = {
-            unit: str(area)
-            for unit, area in pl.read_parquet(DATA / "parsed" / "us.cook_precincts" / "links.parquet")
-            .join(
+        links = pl.concat(
+            pl.read_parquet(DATA / "parsed" / source / "links.parquet")
+            for source in ("us.cook_precincts", "us.swdb_precincts")
+        )
+        shaped = dict(
+            links.join(
                 pl.DataFrame(
                     conn.execute(
                         """select c.code, c.area_id::text from area_code c join area a on a.id = c.area_id
-                           where a.scheme_code = 'us.precinct' and c.code like '%%:IL:17031:%%'"""
+                           where a.scheme_code = 'us.precinct' and c.code = any(%s)""",
+                        [links["area"].unique().to_list()],
                     ).fetchall(),
                     schema=["area", "id"],
                     orient="row",
@@ -568,7 +571,7 @@ def emit() -> Path:
             )
             .select("code", "id")
             .iter_rows()
-        }
+        )
         minted = (
             returns.filter(~pl.col("code").is_in(list(existing)))
             .group_by("code")

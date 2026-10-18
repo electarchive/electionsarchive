@@ -16,10 +16,13 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 CHICAGO = "https://data.cityofchicago.org/"
 COOK = "https://datacatalog.cookcountyil.gov/"
-LICENSE = "Unconfirmed: permission to redistribute requested on 2026-10-17, pending"
+LICENSE = (
+    "Pending: redistribution permission requested 2026-10-17; used on the archive owner's instruction until "
+    "granted or refused"
+)
 NOTES = (
-    "Held out of public releases and default views until permission arrives: the shapes sit on the "
-    "us.restricted_precinct scheme and link to units only as extra memberships."
+    "Released onto us.precinct on the archive owner's instruction while permission is outstanding; "
+    "pull them if it is refused."
 )
 LAYERS = {
     "chicago:2011": (
@@ -71,14 +74,8 @@ LAYERS = {
         None,
     ),
 }
-GENERALS = {
-    2014: date(2014, 11, 4),
-    2016: date(2016, 11, 8),
-    2018: date(2018, 11, 6),
-    2020: date(2020, 11, 3),
-    2022: date(2022, 11, 8),
-    2024: date(2024, 11, 5),
-}
+GENERALS = {2014: date(2014, 11, 4), 2022: date(2022, 11, 8), 2024: date(2024, 11, 5)}
+VEST = (date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3))
 TOLERANCE = 0.00001
 
 
@@ -188,11 +185,32 @@ def parse() -> None:
                 for layer, when in (("cook:2011", pl.col("year") < 2016), ("cook:current", pl.col("year") >= 2022))
             ]
         )
-        links.write_parquet(PARSED / "links.parquet")
         for year, total in units.group_by("year").len().sort("year").iter_rows():
             print(
                 f"{year} suburban Cook: {links.filter(pl.col('code').str.starts_with(str(year))).height} of {total} units"
             )
+        wards = {
+            layer: set(pl.read_parquet(PARSED / f"{layer.replace(':', '_')}.parquet")["key"])
+            for layer in ("chicago:2013", "chicago:2023")
+        }
+        chicago = []
+        for (code,) in conn.execute(
+            """select u.code from reporting_unit u join changeset c on c.id = u.changeset_id
+               where c.pipeline in ('us.medsl_precincts', 'us.oe_precincts')
+                 and u.code ~* '^(2014|2022|2024):IL:17031:.*ward'"""
+        ).fetchall():
+            day = GENERALS[int(code[:4])]
+            ward = re.fullmatch(r"(?i)ward\s*0*(\d+)\s*precinct\s*0*(\d+)", code.split(":")[-1].strip())
+            layer = "chicago:2013" if day < date(2022, 6, 29) else "chicago:2023"
+            key = f"{int(ward[1])}-{int(ward[2])}" if ward is not None else ""
+            if key in wards[layer] and not (
+                layer == "chicago:2023" and day < date(2023, 1, 10) and key in ("24-16", "24-20")
+            ):
+                chicago.append((code, f"{LAYERS[layer][4]}:IL:17031:{key}"))
+        print(f"Chicago: {len(chicago)} units linked")
+        pl.concat([links, pl.DataFrame(chicago, schema=["code", "area"], orient="row")]).write_parquet(
+            PARSED / "links.parquet"
+        )
 
 
 def emit() -> Path:
@@ -201,32 +219,21 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Chicago's ward precincts of 2011, 2013, and 2023, held out of releases until permission arrives "
-            "and linked to MEDSL's and OpenElections' precincts, and suburban Cook County's public-domain precincts "
-            "of 2009, 2011, and today",
+            summary="Chicago's ward precincts of 2011, 2013, and 2023, released on the archive owner's instruction "
+            "while permission is pending, and suburban Cook County's public-domain precincts of 2009, 2011, and "
+            "today",
             polity="US",
         )
-        if conn.execute("select from scheme where code = 'us.restricted_precinct'").fetchone() is None:
-            cs.add(
-                "scheme",
-                code="us.restricted_precinct",
-                polity_id=cs.polity("US"),
-                kind="precinct",
-                rank=3,
-                noun="precinct",
-            )
         (cook,) = conn.execute(
             """select a.id::text from area a join area_code c on c.area_id = a.id
                where a.scheme_code = 'us.county' and c.code = '17031'"""
         ).fetchone() or (None,)
         if cook is None:
             raise ValueError("Cook County must already be an area")
-        keys: dict[str, dict[str, str]] = {}
         for layer, (portal, view, publisher, title, start, end) in LAYERS.items():
             meta, data = urls(layer)
             retrieved = raw.cached(SOURCE, data).retrieved_at.date()
             public = layer.startswith("cook")
-            scheme = "us.precinct" if public else "us.restricted_precinct"
             if (
                 layer == "cook:current"
                 and not conn.execute(
@@ -257,12 +264,9 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, data), source)
             frame = pl.read_parquet(PARSED / f"{layer.replace(':', '_')}.parquet").with_columns(
                 code=pl.format("{}:IL:17031:{}", pl.lit(str(start)), "key")
-                if public
-                else pl.format("{}:{}", pl.lit(layer), "key")
             )
-            ids = [str(cs.area(scheme, code)) for code in frame["code"]]
-            keys[layer] = dict(zip(frame["key"], ids, strict=True))
-            cs.frame("area", pl.DataFrame({"id": ids, "scheme_code": scheme}))
+            ids = [str(cs.area("us.precinct", code)) for code in frame["code"]]
+            cs.frame("area", pl.DataFrame({"id": ids, "scheme_code": "us.precinct"}))
             cs.frame(
                 "area_code",
                 pl.DataFrame({"area_id": ids, "code": frame["code"]}).with_columns(valid_from=pl.lit(None, pl.Date)),
@@ -271,26 +275,33 @@ def emit() -> Path:
                 "area_parent",
                 pl.DataFrame({"area_id": ids, "parent_id": cook}).with_columns(valid_from=pl.lit(None, pl.Date)),
             )
-            cs.frame(
-                "area_geometry",
-                pl.DataFrame(
-                    {
-                        "area_id": ids,
-                        "geom": frame["geom"],
-                        "label_point": frame["point"],
-                        "valid_from": [
-                            date(2023, 1, 10) if layer == "chicago:2023" and key in ("24-16", "24-20") else start
-                            for key in frame["key"]
-                        ],
-                    }
-                ).with_columns(
-                    valid_from_precision=pl.lit("year" if start.month == start.day == 1 else "day"),
-                    valid_to=pl.lit(end or retrieved + timedelta(days=1)),
-                    valid_to_precision=pl.lit("year" if end is not None and end.month == end.day == 1 else "day"),
-                    quality=pl.lit("official"),
-                    source_id=pl.lit(str(source)),
-                ),
-            )
+            stop = end or retrieved + timedelta(days=1)
+            days = [day for day in VEST if start < day < stop]
+            for since, until in zip([start, *(day + timedelta(days=1) for day in days)], [*days, stop], strict=True):
+                cs.frame(
+                    "area_geometry",
+                    pl.DataFrame(
+                        {
+                            "area_id": ids,
+                            "geom": frame["geom"],
+                            "label_point": frame["point"],
+                            "valid_from": [
+                                date(2023, 1, 10) if layer == "chicago:2023" and key in ("24-16", "24-20") else since
+                                for key in frame["key"]
+                            ],
+                        }
+                    ).with_columns(
+                        valid_from_precision=pl.lit(
+                            "year" if since == start and start.month == start.day == 1 else "day"
+                        ),
+                        valid_to=pl.lit(until),
+                        valid_to_precision=pl.lit(
+                            "year" if until == end and end is not None and end.month == end.day == 1 else "day"
+                        ),
+                        quality=pl.lit("official"),
+                        source_id=pl.lit(str(source)),
+                    ),
+                )
             cs.frame(
                 "name",
                 pl.DataFrame(
@@ -306,35 +317,4 @@ def emit() -> Path:
                 ).with_columns(is_preferred=pl.lit(True), lang=pl.lit("en"), kind=pl.lit("official")),
             )
             print(f"{layer}: {frame.height} precincts, {start} to {end or retrieved}")
-        units = conn.execute(
-            """select u.id::text, u.code from reporting_unit u join changeset c on c.id = u.changeset_id
-               where c.pipeline in ('us.medsl_precincts', 'us.oe_precincts')
-                 and u.code ~* '^(2014|2016|2018|2020|2022|2024):IL:17031:.*ward'"""
-        ).fetchall()
-        links = []
-        tally: dict[tuple[int, str], list[int]] = {}
-        for unit, code in units:
-            year, name = int(code.split(":")[0]), code.split(":")[-1].strip()
-            day = GENERALS[year]
-            ward = re.fullmatch(r"(?i)ward\s*0*(\d+)\s*precinct\s*0*(\d+)", name)
-            if ward is not None:
-                part, key = "Chicago", f"{int(ward[1])}-{int(ward[2])}"
-                layer = "chicago:2013" if day < date(2022, 6, 29) else "chicago:2023"
-            else:
-                part, key, layer = "other", "", None
-            area = keys.get(layer or "", {}).get(key)
-            if layer == "chicago:2023" and day < date(2023, 1, 10) and key in ("24-16", "24-20"):
-                area = None
-            tally.setdefault((year, part), [0, 0])[1] += 1
-            if area is not None:
-                tally[(year, part)][0] += 1
-                links.append((unit, area, day))
-        for (year, part), (matched, total) in sorted(tally.items()):
-            print(f"{year} {part}: {matched} of {total} units linked ({matched / total:.1%})")
-        cs.frame(
-            "reporting_unit_area",
-            pl.DataFrame(links, schema=["unit_id", "area_id", "valid_from"], orient="row").with_columns(
-                valid_to=pl.col("valid_from") + timedelta(days=1)
-            ),
-        )
         return cs.write()
