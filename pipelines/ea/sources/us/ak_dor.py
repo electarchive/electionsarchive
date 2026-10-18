@@ -217,7 +217,7 @@ CONTESTS: dict[
     "2024-11-05:AK:house:0": (
         "RCV Detailed Report: U.S. Representative, November 5, 2024 General Election",
         ("20241204164835", "24GENR/RCV-USRep.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "U.S. Representative",
         [
             {
@@ -236,7 +236,7 @@ CONTESTS: dict[
     "2024-11-05:AK:house:6:g": (
         "RCV Detailed Report: House District 6, November 5, 2024 General Election",
         ("20250206032953", "24GENR/RCV-HD6.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "House District 6",
         [
             {"Johnson, Brent": 4965, "Slaughter, Dawson R.": 1078, "Vance, Sarah L.": 5363, None: 392},
@@ -260,7 +260,7 @@ CONTESTS: dict[
     "2024-11-05:AK:house:36:g": (
         "RCV Detailed Report: House District 36, November 5, 2024 General Election",
         ("20250206032958", "24GENR/RCV-HD36.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "House District 36",
         [
             {
@@ -279,7 +279,7 @@ CONTESTS: dict[
     "2024-11-05:AK:house:38:g": (
         "RCV Detailed Report: House District 38, November 5, 2024 General Election",
         ("20250206033002", "24GENR/RCV-HD38.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "House District 38",
         [
             {
@@ -298,7 +298,7 @@ CONTESTS: dict[
     "2024-11-05:AK:house:40:g": (
         "RCV Detailed Report: House District 40, November 5, 2024 General Election",
         ("20241204024735", "24GENR/RCV-HD40.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "House District 40",
         [
             {'Baker, Thomas C. "Ikaaq"': 743, 'Burke, Robyn "Niayuq"': 1425, 'Chase, Saima "Ikrik"': 874, None: 128},
@@ -310,7 +310,7 @@ CONTESTS: dict[
     "2024-11-05:AK:senate:d:g": (
         "RCV Detailed Report: Senate District D, November 5, 2024 General Election",
         ("20241213112547", "24GENR/RCV-SenD.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "Senate District D",
         [
             {"Bjorkman, Jesse J.": 9257, "Carpenter, Ben": 7865, "Wegener, Tina": 2196, None: 820},
@@ -322,7 +322,7 @@ CONTESTS: dict[
     "2024-11-05:AK:senate:f:g": (
         "RCV Detailed Report: Senate District F, November 5, 2024 General Election",
         ("20250206033010", "24GENR/RCV-SenF.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "Senate District F",
         [
             {"Borbridge, Harold": 1184, "Kaufman, James D.": 8180, "Park, Janice L.": 7657, None: 946},
@@ -334,7 +334,7 @@ CONTESTS: dict[
     "2024-11-05:AK:senate:l:g": (
         "RCV Detailed Report: Senate District L, November 5, 2024 General Election",
         ("20250206033015", "24GENR/RCV-SenL.pdf"),
-        None,
+        ("20250206032627", "24GENR/CVR_Export_20241130154411.zip"),
         "Senate District L",
         [
             {"Goecker, Jared D.": 7698, "Hammermeister, Lee E.": 2770, "Merrick, Kelly R.": 9092, None: 780},
@@ -350,15 +350,8 @@ OFFICIAL = (
     "ballot that ranks a write-in counts for its next choice. Each candidate's value at round n is their running "
     "total; an eliminated candidate has 0 at the round of their elimination."
 )
-UNMATCHED = (
-    " The cast vote records the Division published for this election hold 340,778 ballots for this race, 4,925 more "
-    "than the tabulation counted, most of them absentee and questioned ballots, so they are not used for a breakdown "
-    "by precinct."
-)
-UNMATCHED_DISTRICT = (
-    " The cast vote records the Division published for this election hold more ballots for this race than the "
-    "tabulation counted, so they are not used for a breakdown by precinct."
-)
+UNMATCHED = "The cast vote records published by the Division on November 30, 2024, fall between the first count and the recount; they are not used for the precinct breakdown."
+INVALID = "The 2024 records include ballots with invalid votes in this race; these are excluded from the Division's tabulation and this breakdown."
 RECOUNT = " These are the rounds after the recount."
 BLANKS = " The recount's report counts fewer blank ballots than the first count did, so its ballot total is lower."
 MEDSL = (
@@ -400,12 +393,20 @@ def parse() -> None:
         with zipfile.ZipFile(raw.cached(SOURCE, WAYBACK.format(*records)).path) as archive:
             manifest = {
                 name: json.loads(archive.read(f"{name}Manifest.json"))["List"]
-                for name in ("Contest", "Candidate", "Precinct", "PrecinctPortion")
+                for name in ("Contest", "Candidate", "Precinct", "PrecinctPortion", "OutstackCondition")
             }
+            invalid = {
+                condition["Id"]
+                for condition in manifest["OutstackCondition"]
+                if condition["Description"] == "InvalidContest"
+            }
+            named = records[1].startswith("24")
             precincts = {}
             for precinct in manifest["Precinct"]:
                 description = re.sub(r"\s+", " ", precinct["Description"]).strip()
-                if re.match(r"\d\d[- ]\d\d\d ", description):
+                if named:
+                    precincts[precinct["Id"]] = description
+                elif re.match(r"\d\d[- ]\d\d\d ", description):
                     if not re.fullmatch(r"\d\d-\d\d\d", precinct["ExternalId"]):
                         raise ValueError(f"{records}: precinct {description} has no district-precinct number")
                     precincts[precinct["Id"]] = precinct["ExternalId"]
@@ -430,7 +431,7 @@ def parse() -> None:
                     side = session.get("Modified") or session["Original"]
                     for card in side["Cards"]:
                         for contest in card["Contests"]:
-                            if contest["Id"] not in ballots:
+                            if contest["Id"] not in ballots or invalid & set(contest["OutstackConditionIds"]):
                                 continue
                             ranks: dict[int, set[str]] = {}
                             for mark in contest["Marks"]:
@@ -448,6 +449,7 @@ def parse() -> None:
             if len(ballots[contest]) != total:
                 raise ValueError(f"{key}: {len(ballots[contest])} records, the official count has {total} ballots")
             continuing = [{label for label in tally if label is not None} for tally in rounds]
+            alias = {re.sub(r' "[^"]*"', "", label): label for label in continuing[0]}
             counts: dict[tuple[str, int, str | None], int] = {}
             for unit, ranking in ballots[contest]:
                 for number, standing in enumerate(continuing, 1):
@@ -461,6 +463,7 @@ def parse() -> None:
                         if len(marks) > 1:
                             break
                         (choice,) = marks
+                        choice = alias.get(re.sub(r' "[^"]*"', "", choice), choice)
                         if choice in seen:
                             skips += 1
                             if skips == 2:
@@ -593,7 +596,8 @@ def emit() -> Path:
             as_of=first,
         )
         precinct_codes = set(precincts["code"])
-        for unit in sorted(set(tallies["unit"]) - precinct_codes):
+        early = set(tallies.filter(pl.col("key").str.starts_with("2022"))["unit"])
+        for unit in sorted(early - precinct_codes):
             cs.add(
                 "reporting_unit",
                 id=cs.unit("us.aggregate", f"AK:2022:{unit}"),
@@ -609,8 +613,12 @@ def emit() -> Path:
             unit: cs.unit("us.precinct", f"2022:AK:{unit}")
             if unit in precinct_codes
             else cs.unit("us.aggregate", f"AK:2022:{unit}")
-            for unit in set(tallies["unit"])
+            for unit in early
         }
+        for unit in set(tallies.filter(pl.col("key").str.starts_with("2024"))["unit"]):
+            units[unit] = cs.unit("us.precinct", f"2024:AK:02:STATEWIDE:{unit}")
+            if units[unit] in cs.minted:
+                raise ValueError(f"2024 precinct {unit} must already exist")
 
         for key, (title, report, records, _, rounds, total, before) in CONTESTS.items():
             day = date.fromisoformat(key[:10])
@@ -788,7 +796,7 @@ def emit() -> Path:
                     OFFICIAL
                     + (RECOUNT if "recount" in report[1].lower() else "")
                     + ("" if before is None else BLANKS)
-                    + ("" if records is not None else UNMATCHED if district is None else UNMATCHED_DISTRICT),
+                    + ("" if records is not None else " " + UNMATCHED),
                     pl.DataFrame(
                         [
                             (str(top), number, label, tally.get(label, 0))
@@ -827,15 +835,18 @@ def emit() -> Path:
                     (
                         cs.key(f"{SOURCE}.result_set", f"{key}:precincts"),
                         False,
-                        DERIVED
-                        if district is None
-                        else DERIVED.replace("over the state", "over the district")
-                        if before is None
-                        else DERIVED.replace(
-                            "Summed over the state, every round reproduces the official count exactly.",
-                            "Summed over the district, every round reproduces the Division's count before the "
-                            "recount exactly; the recount moved the candidates' totals by one or two votes.",
-                        ),
+                        (
+                            DERIVED
+                            if district is None
+                            else DERIVED.replace("over the state", "over the district")
+                            if before is None
+                            else DERIVED.replace(
+                                "Summed over the state, every round reproduces the official count exactly.",
+                                "Summed over the district, every round reproduces the Division's count before the "
+                                "recount exactly; the recount moved the candidates' totals by one or two votes.",
+                            )
+                        )
+                        + (" " + INVALID if day.year == 2024 else ""),
                         pl.concat(
                             [
                                 rows,
@@ -863,6 +874,11 @@ def emit() -> Path:
                     completeness=1,
                 )
                 if result_set not in cs.minted:
+                    for id, body in conn.execute(
+                        "select id, body_md from note where entity_id = %s and kind = 'methodology'", [result_set]
+                    ).fetchall():
+                        if body != note:
+                            cs.add("note", id=id, entity_id=result_set, kind="methodology", body_md=note)
                     continue
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
                 unknown = set(values["label"].drop_nulls()) - set(options) - {"ballots"}
