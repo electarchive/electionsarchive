@@ -322,6 +322,7 @@ OFFICES = {
     "SUPREME COURT ASSOCIATE JUSTICE": ("justice-of-the-supreme-court", "Supreme Court Associate Justice"),
     "SUPREME COURT CHIEF JUSTICE": ("chief-justice-of-the-supreme-court", "Supreme Court Chief Justice"),
     "COURT OF APPEALS JUDGE": ("judge-of-the-court-of-appeals", "Court of Appeals Judge"),
+    "APPELLATE COURT JUDGE": ("judge-of-the-appellate-court", "Appellate Court Judge"),
     "GOVERNOR AND LIEUTENANT GOVERNOR": ("governor", "gubernatorial"),
 }
 LEGISLATIVE = re.compile(r"NC (?:STATE )?(HOUSE|SENATE)(?: OF REPRESENTATIVES)?(?: DISTRICT 0*(\d+)| \(0*(\d+)\))")
@@ -1861,8 +1862,11 @@ def parse() -> None:
             ),
         ]
     ).write_parquet(PARSED / "congress.parquet")
-    illinois = re.compile(r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)|" + "|".join(OFFICES))
-    il: list[tuple[date, str, str | None, str, str, str, int]] = []
+    illinois = re.compile(
+        r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)|([1-5])(?:ST|ND|RD|TH) (SUPREME|APPELLATE) - (.+) VACANCY|"
+        + "|".join(OFFICES)
+    )
+    il: list[tuple[date, str, str | None, str, str, str, int, str | None]] = []
     for year, (county, total) in IL_FILES.items():
         books = []
         for token in (county, total):
@@ -1880,10 +1884,19 @@ def parse() -> None:
                 row["Votes"]
             )
             name = re.sub(r"\s+", " ", f"{row['CanFirstName']} {row['CanLastName']}").strip().title()
+            vacancy = re.sub(
+                r"\b(Ii|Iii|Iv)\b",
+                lambda numeral: numeral[1].upper(),
+                re.sub(r"\bMc([a-z])", lambda prefix: "Mc" + prefix[1].upper(), (found[5] or "").title()),
+            )
             il.append(
                 (
                     IL_DAYS[year],
-                    ("house" if found[2] == "REPRESENTATIVE" else "senate") if found[1] else OFFICES[found[0]][0],
+                    ("house" if found[2] == "REPRESENTATIVE" else "senate")
+                    if found[1]
+                    else f"{'justice-of-the-supreme-court' if found[4] == 'SUPREME' else 'judge-of-the-appellate-court'}:{found[3]}:{slug(vacancy)}"
+                    if found[3]
+                    else OFFICES[found[0]][0],
                     str(int(found[1])) if found[1] else None,
                     row["PartyAbbrev"],
                     counties[("17", re.sub(r"[^a-z]", "", row["County"].lower()))],
@@ -1893,6 +1906,7 @@ def parse() -> None:
                         re.sub(r"\bMc([a-z])", lambda prefix: "Mc" + prefix[1].upper(), name),
                     ),
                     int(row["Votes"]),
+                    vacancy or None,
                 )
             )
         if sums != {
@@ -1903,7 +1917,7 @@ def parse() -> None:
             raise ValueError(f"{year} Illinois: the county rows do not match the statewide totals")
     frames.append(
         pl.DataFrame(
-            il, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row"
+            il, schema=["day", "office", "code", "party", "fips", "choice", "votes", "seat"], orient="row"
         ).with_columns(
             state=pl.lit("IL"),
             label="party",
@@ -2275,7 +2289,9 @@ def emit() -> Path:
                 kind="office" if code is None else "body_seats",
                 office_id=offices[(state, office.split(":")[0])] if code is None else None,
                 body_id=bodies[(state, office)] if code is not None else None,
-                district_area_id=cs.area("us.state", fips)
+                district_area_id=cs.area("us.judicial_district", f"IL:judicial-{office.split(':')[1]}")
+                if state == "IL" and ":" in office
+                else cs.area("us.state", fips)
                 if code is None
                 else cs.area(
                     "us.sldl" if office in ("house", "assembly", "house-of-delegates") else "us.sldu",
@@ -2305,9 +2321,18 @@ def emit() -> Path:
                 seat = office.partition(":")[2]
                 name(
                     contest,
-                    f"{day.year} {place} {titles[office.split(':')[0]]}"
+                    f"{day.year} {place} "
                     + (
-                        f", Seat {seat.removeprefix('seat-')},"
+                        f"{'Supreme Court Justice' if office.startswith('justice') else 'Appellate Court Judge'}, "
+                        f"{('First', 'Second', 'Third', 'Fourth', 'Fifth')[int(seat[0]) - 1]} District "
+                        f"({rows['seat'][0]} vacancy),"
+                        if state == "IL" and seat
+                        else titles[office.split(":")[0]]
+                    )
+                    + (
+                        ""
+                        if state == "IL"
+                        else f", Seat {seat.removeprefix('seat-')},"
                         if seat.startswith("seat-")
                         else f" ({seat.title()} seat)"
                         if seat
