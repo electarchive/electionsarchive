@@ -51,6 +51,74 @@ RUNOFF = (
     "if no one wins a majority, the top two meet in a runoff."
 )
 
+REPORT = "https://archive.org/download/micro_IA40706905_0363/micro_IA40706905_0363.pdf"
+LAMBERT_TREEN_1979 = [
+    (9661, 9822),
+    (6496, 3267),
+    (17012, 3008),
+    (5675, 3497),
+    (9768, 7020),
+    (4473, 4848),
+    (3886, 2999),
+    (8018, 11731),
+    (28959, 41337),
+    (29361, 26678),
+    (2523, 2176),
+    (2061, 1979),
+    (3294, 2388),
+    (3232, 3093),
+    (4903, 4327),
+    (5406, 3758),
+    (54302, 57666),
+    (2118, 1675),
+    (5162, 2014),
+    (8913, 7021),
+    (5178, 4660),
+    (4183, 2964),
+    (6996, 13616),
+    (11247, 3573),
+    (4944, 3050),
+    (46047, 83099),
+    (5420, 6473),
+    (13448, 30008),
+    (11714, 17433),
+    (2982, 3286),
+    (4428, 6760),
+    (16344, 5674),
+    (3005, 2022),
+    (6092, 5847),
+    (6618, 5969),
+    (79057, 74676),
+    (18032, 23840),
+    (2150, 5443),
+    (6916, 2582),
+    (19517, 19472),
+    (3306, 2044),
+    (3786, 3856),
+    (4702, 3655),
+    (14708, 15215),
+    (8008, 6437),
+    (3929, 1404),
+    (7482, 2038),
+    (9693, 4331),
+    (17273, 13424),
+    (7353, 7665),
+    (8390, 11651),
+    (14363, 21527),
+    (19357, 12003),
+    (1982, 1457),
+    (9601, 18107),
+    (4509, 4625),
+    (9908, 11934),
+    (7192, 5268),
+    (12597, 7254),
+    (8405, 6951),
+    (5047, 1950),
+    (2828, 2604),
+    (2808, 1115),
+    (4366, 3425),
+]
+
 
 def blob(day: date, name: str) -> str:
     return f"{DATA_URL}{day:%Y%m%d}/{name}"
@@ -76,6 +144,7 @@ def statewide(day: date) -> list[dict[str, Any]]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, DATES, suffix=".json")
+    raw.fetch(SOURCE, REPORT, suffix=".pdf")
     lock = threading.Lock()
 
     def get(link: str) -> None:
@@ -368,4 +437,96 @@ def emit() -> Path:
                         kind="elected" if outcome == "Elected" else "advanced",
                         seats=1 if outcome == "Elected" else None,
                     )
+        report = cs.source(PUBLISHER, "Report of the Secretary of State, 1979–1980")
+        if report in cs.minted:
+            cs.add(
+                "source",
+                id=report,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title="Report of the Secretary of State, 1979–1980",
+                url="https://archive.org/details/micro_IA40706905_0363",
+                license="Public record",
+            )
+        cs.artifact(raw.cached(SOURCE, REPORT), report)
+        ((primary,),) = conn.execute(
+            "select entity_id from external_id where scheme = 'us.contest' and value = '1979-10-27:LA:governor'"
+        ).fetchall()
+        persons79 = dict(
+            conn.execute(
+                """select o.ballot_label, d.person_id from contest_option o join candidacy d on d.option_id = o.id
+                   where o.contest_id = %s""",
+                [primary],
+            ).fetchall()
+        )
+        counties = dict(
+            conn.execute("select code, id from reporting_unit where scheme_code = 'us.county' and code like '22%%'")
+        )
+        contest = cs.key("us.contest", "1979-12-08:LA:governor")
+        cs.add(
+            "contest",
+            id=contest,
+            election_id=cs.key("us.election", "1979-12-08:LA:runoff"),
+            kind="office",
+            office_id=cs.key("us.office", "governor:LA"),
+            district_area_id=area,
+            term="full",
+            magnitude=1,
+            round_number=2,
+            previous_round_id=primary,
+            electoral_system_id=two_round,
+            default_result_kind="counted",
+        )
+        name(contest, "1979 Louisiana Governor runoff")
+        cs.add("slug", path="us/la/1979-12-08-runoff/governor", entity_id=contest)
+        result_set = cs.key(f"{SOURCE}.result_set", "1979-12-08:LA:governor")
+        cs.add(
+            "result_set",
+            id=result_set,
+            election_id=cs.key("us.election", "1979-12-08:LA:runoff"),
+            contest_id=contest,
+            stage="certified",
+            kind="counted",
+            status="active",
+            source_id=report,
+            is_default=True,
+            completeness=1,
+        )
+        for column, (label, ballot, party) in enumerate(
+            [("Louis Lambert", "Louis Lambert", "DEM"), ("David Conner Treen", "David C. Treen", "REP")]
+        ):
+            option = cs.key("us.option", f"1979-12-08:LA:governor:{persons79[label]}")
+            cs.add(
+                "contest_option",
+                id=option,
+                contest_id=contest,
+                kind="candidate",
+                party_id=parties[party],
+                ballot_label=ballot,
+            )
+            cs.add(
+                "candidacy",
+                id=cs.key("us.candidacy", f"1979-12-08:LA:governor:{persons79[label]}:head"),
+                person_id=persons79[label],
+                option_id=option,
+                role="head",
+                ballot_name=ballot,
+                is_independent=False,
+            )
+            for index, votes in enumerate(LAMBERT_TREEN_1979) if result_set in cs.minted else ():
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=counties[f"22{index * 2 + 1:03}"],
+                    option_id=option,
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=votes[column],
+                )
+            if label == "David Conner Treen":
+                cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
+        if not conn.execute("select 1 from citation where entity_id = %s", [result_set]).fetchall():
+            cs.add("citation", entity_id=result_set, source_id=report, locator={"page": 42, "insert": "E"})
         return cs.write()

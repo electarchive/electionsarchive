@@ -224,14 +224,16 @@ def emit() -> Path:
             ).fetchall()
         )
         own: dict[tuple[str, int], str] = {}
-        for (value,) in conn.execute(
-            """select x.value from external_id x join contest c on c.id = x.entity_id
+        owned: dict[str, UUID] = {}
+        for value, owned_contest in conn.execute(
+            """select x.value, c.id from external_id x join contest c on c.id = x.entity_id
                join changeset s on s.id = c.changeset_id
                where x.scheme = 'us.contest' and s.pipeline = %s and x.value ~ '^[0-9-]+:[A-Z]{2}:governor$'""",
             [SOURCE],
         ):
             datekey, state, _ = value.split(":")
             own.setdefault((state, int(datekey[:4])), datekey)
+            owned[value] = owned_contest
         others: dict[tuple[str, int], list[tuple[str, UUID, list[tuple[UUID, set[str]]]]]] = {}
         runoffs: dict[tuple[str, int], tuple[str, str]] = {}
         decided: dict[tuple[str, int], tuple[str, UUID]] = {}
@@ -256,8 +258,10 @@ def emit() -> Path:
                 found[-1][2].append((option, set(slug(label or "").split("-"))))
         for (state, year), (key, first_round) in runoffs.items():
             entries = {entry[0]: entry for entry in others[(state, year)]}
-            if first_round in entries:
-                decided[(state, year)] = entries[first_round][:2]
+            if first_round in entries or first_round in owned:
+                decided[(state, year)] = (
+                    entries[first_round][:2] if first_round in entries else (first_round, owned[first_round])
+                )
                 others[(state, year)] = [entries[key]]
         fptp = cs.key("us.electoral_system", "fptp")
         two_round = cs.key("us.electoral_system", "two_round")
