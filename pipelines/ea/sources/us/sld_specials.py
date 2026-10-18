@@ -150,6 +150,7 @@ PUBLISHERS = {
     "MS": "Mississippi Secretary of State",
     "MI": "Michigan Bureau of Elections",
     "WI": "Wisconsin Elections Commission",
+    "TX": "Texas Secretary of State",
     "VA": "Virginia Department of Elections",
     "AL": "Alabama Secretary of State",
     "CA": "California Secretary of State",
@@ -169,6 +170,36 @@ PUBLISHERS = {
 }
 SYSTEMS = {"GA": "two_round", "LA": "two_round", "MS": "two_round", "TX": "two_round", "CA": "top_two", "WA": "top_two"}
 SPECIALS: dict[str, tuple[str, str, str | None]] = {
+    "2023-11-07:TX:house:2": (
+        "transcribed",
+        "https://results.texas-election.com/static/data/election/49379/117/Districted.json",
+        None,
+    ),
+    "2024-01-30:TX:house:2:runoff": (
+        "transcribed",
+        "https://results.texas-election.com/static/data/election/49681/667/Districted.json",
+        None,
+    ),
+    "2024-05-04:TX:senate:15": (
+        "transcribed",
+        "https://results.texas-election.com/static/data/election/49698/114/Districted.json",
+        None,
+    ),
+    "2025-11-04:TX:senate:9": (
+        "transcribed",
+        "https://goelect.txelections.civixapps.com/api-ivis-system/api/s3/enr/election/51830",
+        None,
+    ),
+    "2026-01-31:TX:senate:9:runoff": (
+        "transcribed",
+        "https://goelect.txelections.civixapps.com/api-ivis-system/api/s3/enr/election/54613",
+        None,
+    ),
+    "2026-05-02:TX:senate:4": (
+        "transcribed",
+        "https://goelect.txelections.civixapps.com/api-ivis-system/api/s3/enr/election/56181",
+        None,
+    ),
     "2025-01-28:IA:senate:35": ("clarity", IOWA.format("123074/356352"), "State Senate District 35"),
     "2025-03-11:IA:house:100": ("clarity", IOWA.format("123279/356897"), "State Representative District 100"),
     "2025-04-29:IA:house:78": (
@@ -629,6 +660,23 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2026-01-06:SC:house:98": ("clarity", SOUTH_CAROLINA.format("125869/367712"), "Representatives, District 98"),
 }
 TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
+    "2023-11-07:TX:house:2": [
+        ("Jill Dutton", "REP", 7156),
+        ("Heath Hyde", "REP", 6081),
+        ("Brent Money", "REP", 9011),
+        ("Doug Roszhart", "REP", 2221),
+        ("Krista Schild", "REP", 721),
+        ("Kristen Washington", "DEM", 3170),
+    ],
+    "2024-01-30:TX:house:2:runoff": [("Jill Dutton", "REP", 6836), ("Brent Money", "REP", 6726)],
+    "2024-05-04:TX:senate:15": [("Molly Cook", "DEM", 9370), ("Jarvis D. Johnson", "DEM", 7052)],
+    "2025-11-04:TX:senate:9": [
+        ("John Huffman", "REP", 19608),
+        ("Taylor Rehmet", "DEM", 56565),
+        ("Leigh Wambsganss", "REP", 42739),
+    ],
+    "2026-01-31:TX:senate:9:runoff": [("Taylor Rehmet", "DEM", 54473), ("Leigh Wambsganss", "REP", 40648)],
+    "2026-05-02:TX:senate:4": [("Ron C. Angeletti", "DEM", 8700), ("Brett W. Ligon", "REP", 26130)],
     "2025-06-24:AL:senate:5": [
         ("Matt Woods", "Republican", 7715),
         ("Ryan Cagle", "Democratic", 1240),
