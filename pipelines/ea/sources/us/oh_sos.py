@@ -20,6 +20,7 @@ SUMMARY = "Ohio's House results by county from the Secretary of State's official
 STATE = "OH"
 FIPS = "39"
 REVISION = 1
+RENAMED: str | None = None
 ERRATA = {(2000, 13)}
 TURNED: set[tuple[int, int]] = set()
 RESULTS = "https://www.ohiosos.gov/elections/election-results-and-data/"

@@ -591,7 +591,9 @@ def emit(source: ModuleType) -> Path:
                 f"{source.SOURCE}.result_set", f"{key}:county" + (f":{source.REVISION}" if source.REVISION > 1 else "")
             )
             previous = (
-                cs.key(
+                cs.key(f"{source.RENAMED}.result_set", f"{key}:county")
+                if source.RENAMED is not None
+                else cs.key(
                     f"{source.SOURCE}.result_set",
                     f"{key}:county" + (f":{source.REVISION - 1}" if source.REVISION > 2 else ""),
                 )

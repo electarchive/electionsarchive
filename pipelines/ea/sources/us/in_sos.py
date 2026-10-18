@@ -28,6 +28,7 @@ ERRATA = {(1986, 5)}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 1
+RENAMED: str | None = None
 TURNED: set[tuple[int, int]] = set()
 THRESHOLDS = (150, 170, 190, 210, 230)
 

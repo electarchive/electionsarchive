@@ -44,6 +44,7 @@ ERRATA = {(1972, 12), (1982, 6), (1986, 3)}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 2
+RENAMED: str | None = None
 TURNED: set[tuple[int, int]] = set()
 THRESHOLDS: tuple[int, ...] = ()
 
