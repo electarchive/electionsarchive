@@ -2,6 +2,7 @@ import json
 import re
 import subprocess
 from datetime import date
+from difflib import SequenceMatcher
 from pathlib import Path
 from uuid import UUID
 
@@ -11,7 +12,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import al_sos, elstats, fl_sos, mo_sos, wa_local
+from ea.sources.us import al_sos, elstats, fl_sos, me_canvass, measure_precincts, mo_sos, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_canvass"
@@ -85,6 +86,7 @@ KANSAS_CITY = (
     " Kansas City, its own election authority, is reported apart from the Jackson, Clay, Platte, and Cass county "
     "authorities and is credited to the city."
 )
+OVERSEAS = " Overseas and military (UOCAVA) ballots, which Maine tabulates statewide, are a unit of their own."
 ADVISORY = " As in the question's existing options, the export's Maintained is recorded as Yes and Repealed as No."
 DOCUMENTS = {
     "AL": (
@@ -117,6 +119,12 @@ DOCUMENTS = {
         "https://sos.oregon.gov/elections/Pages/electionhistory.aspx",
         "the Oregon Secretary of State's abstract of votes",
     ),
+    "ME": (
+        me_canvass.PUBLISHER,
+        "Referendum tabulations",
+        "https://www.maine.gov/sos/cec/elec/results/",
+        "the Maine Secretary of State's referendum tabulation",
+    ),
     "MO": (
         mo_sos.PUBLISHER,
         mo_sos.TITLE,
@@ -144,6 +152,12 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WAYBACK.format(*UTAH[day]) if day in UTAH else ""
     if state == "AL":
         return SOURCE, "https://www.sos.alabama.gov/sites/default/files/" + ALABAMA[day] if day in ALABAMA else ""
+    if state == "ME":
+        return measure_precincts.SOURCE, (
+            measure_precincts.ME_WAYBACK.format(*measure_precincts.ME_FILES[str(day)])
+            if str(day) in measure_precincts.ME_FILES
+            else ""
+        )
     if state == "MO":
         return SOURCE, mo_sos.SITE + MISSOURI[day] if day in MISSOURI else ""
     if state == "OR":
@@ -190,6 +204,7 @@ def parse() -> None:
             if int(code[2:]) >= 500:
                 names[iso.removeprefix("US-")][f"{plain}city"] = code
     names["MO"] |= {"kansascity": "2938000", "statewide": "29"}
+    names["ME"] |= {"uocava": "ME:uocava", "statewide": "23"}
     frames = []
     for state, day in dates:
         source, url = link(state, day)
@@ -241,6 +256,74 @@ def parse() -> None:
                 )
                 .filter(~total)
                 .drop("count")
+            )
+        elif state == "ME":
+            records = []
+            reader = fastexcel.read_excel(path.read_bytes())
+            sheet = next(
+                frame
+                for name in reader.sheet_names
+                if (frame := reader.load_sheet(name, header_row=None).to_polars()).height >= 100
+            )
+            cells = [
+                [str(cell).strip().upper() if cell is not None else "" for cell in row] for row in sheet.iter_rows()
+            ]
+            header = next(number for number, row in enumerate(cells) if "YES" in row)
+            labels = cells[header]
+            pairs = [
+                (column, next(other for other in range(column + 1, len(labels)) if labels[other] == "NO"))
+                for column, label in enumerate(labels)
+                if label == "YES"
+            ]
+            current = None
+            for row in cells[header + 1 :]:
+                current = next((name for name in measure_precincts.ME_NAMES if row[0] == name[:3]), current)
+                words = re.findall(r"[A-Z]+", " ".join(cell for cell in row[:3] if not re.fullmatch(r"[\d.]*", cell)))
+                if "UOCAVA" not in words and not any(word.startswith("TOTAL") for word in words):
+                    continue
+                named = next(
+                    (
+                        name
+                        for word in words
+                        for name in measure_precincts.ME_NAMES
+                        if word == name[:3] or SequenceMatcher(None, word, name).ratio() >= 0.85
+                    ),
+                    None,
+                )
+                if "UOCAVA" in words and "INCLUDES" not in words:
+                    county = "UOCAVA"
+                elif {"STATE", "STATEWIDE", "GRAND"} & set(words):
+                    county = "STATEWIDE"
+                else:
+                    county = named or (current if words[0].startswith("TOTAL") else None)
+                if county is None:
+                    continue
+                for number, (yes, no) in enumerate(pairs, start=1):
+                    records.append((county, f"Question {number}", "YES", row[yes]))
+                    records.append((county, f"Question {number}", "NO", row[no]))
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            ).with_columns(
+                votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64).cast(pl.String),
+                statewide=pl.col("county") == "STATEWIDE",
+            )
+            local = ~pl.col("statewide")
+            table = (
+                table.with_columns(
+                    complete=(
+                        (
+                            pl.col("votes").cast(pl.Int64).filter(local).sum()
+                            == pl.col("votes").cast(pl.Int64).filter(~local).sum()
+                        )
+                        & (pl.col("county").filter(local & (pl.col("county") != "UOCAVA")).n_unique() == 16)
+                        & (pl.col("county").filter(local).n_unique() == local.sum())
+                    ).over("office", "answer")
+                )
+                .filter(pl.col("statewide").sum().over("office", "answer") == 1)
+                .filter(pl.when(pl.col("complete").all().over("office")).then(local).otherwise(~local))
+                .drop("statewide", "complete")
             )
         elif state == "MO":
             records = []
@@ -389,16 +472,22 @@ def parse() -> None:
         answer=pl.col("label").replace_strict({label: answer for label, (answer, _) in ANSWERS.items()}),
         pair=pl.col("label").replace_strict({label: pair for label, (_, pair) in ANSWERS.items()}),
     )
-    counties = frame.drop_nulls("fips").group_by("state", "url").agg(pl.col("fips").n_unique().alias("counties"))
+    counties = (
+        frame.drop_nulls("fips")
+        .filter(pl.col("fips").str.len_chars() != 2)
+        .group_by("state", "url")
+        .agg(pl.col("fips").n_unique().alias("counties"))
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
-        frame.join(counties, on=["state", "url"])
+        frame.join(counties, on=["state", "url"], how="left")
         .with_columns(page=pl.col("page").min().over("state", "day", "url", "office"))
         .filter(
             pl.col("answer").n_unique().over("state", "day", "office") == 2,
             pl.col("pair").n_unique().over("state", "day", "office") == 1,
             pl.col("fips").is_null().sum().over("state", "day", "office") == 0,
-            pl.col("fips").n_unique().over("state", "day", "office") == pl.col("counties"),
+            (pl.col("fips").n_unique().over("state", "day", "office") == pl.col("counties"))
+            | (pl.col("fips").str.len_chars() == 2).all().over("state", "day", "office"),
         )
         .group_by("state", "day", "url", "page", "winner", "office", "pair", "fips", "answer")
         .agg(pl.col("votes").sum())
@@ -462,6 +551,7 @@ def emit() -> Path:
             .agg(
                 statewide=(pl.col("fips").str.len_chars() == 2).all(),
                 kansas=(pl.col("fips") == "2938000").any(),
+                overseas=(pl.col("fips") == "ME:uocava").any(),
                 yes=pl.col("votes").filter(pl.col("answer") == "YES").sum(),
                 no=pl.col("votes").filter(pl.col("answer") == "NO").sum(),
             )
@@ -562,7 +652,13 @@ def emit() -> Path:
                 body_md=METHOD.format(
                     level="Statewide" if row["statewide"] else "County",
                     document=DOCUMENTS[row["state"]][3],
-                    advisory=ADVISORY if row["pair"] == "MAINTAINED" else KANSAS_CITY if row["kansas"] else "",
+                    advisory=ADVISORY
+                    if row["pair"] == "MAINTAINED"
+                    else KANSAS_CITY
+                    if row["kansas"]
+                    else OVERSEAS
+                    if row["overseas"]
+                    else "",
                 ),
             )
             cs.add(
@@ -584,7 +680,10 @@ def emit() -> Path:
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
-                    unit_id=cs.unit({2: "us.state", 5: "us.county", 7: "us.place"}[len(fips)], fips),
+                    unit_id=cs.unit(
+                        "us.aggregate" if ":" in fips else {2: "us.state", 5: "us.county", 7: "us.place"}[len(fips)],
+                        fips,
+                    ),
                     option_id=options[answer],
                     channel=0,
                     measure=1,

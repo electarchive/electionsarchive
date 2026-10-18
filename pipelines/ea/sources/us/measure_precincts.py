@@ -737,7 +737,8 @@ def parse() -> None:
         for row, section in zip(cells[header + 1 :], sections[header + 1 :], strict=True):
             if county is not None and row[county]:
                 current = row[county][:3]
-            overseas = any("UOCAVA" in cell for cell in row[: town + 2])
+            overseas = any("UOCAVA" in cell and "INCLUDES" not in cell for cell in row[: town + 2])
+            emergency = "EMERGENCY" in row[town]
             if not overseas and (not row[town] or any("TOTAL" in cell for cell in row[: town + 2])):
                 continue
             if county is not None:
@@ -754,6 +755,8 @@ def parse() -> None:
                             "district": None,
                             "fips": "ME:uocava"
                             if overseas
+                            else "ME:emergency"
+                            if emergency
                             else f"23{2 * ME_COUNTIES.index(code) + 1:03}"
                             if code in ME_COUNTIES
                             else None,
@@ -864,7 +867,7 @@ def emit() -> Path:
         counties: dict[str, tuple[UUID, UUID]] = {
             code: (unit, area)
             for code, unit, area in conn.execute(
-                "select code, id, area_id from reporting_unit where scheme_code in ('us.county', 'us.place')"
+                "select code, id, area_id from reporting_unit where scheme_code in ('us.state', 'us.county', 'us.place')"
             ).fetchall()
         }
         aggregates: dict[str, UUID] = dict(
@@ -1009,7 +1012,7 @@ def emit() -> Path:
                     print(f"{key}: county sums differ in {differ['code'].n_unique()} counties, skipped")
                     skipped += 1
                     continue
-            if rows["fips"].is_in(list(counties)).not_().any():
+            if rows["fips"].is_in([*counties, *aggregates, "ME:emergency"]).not_().any():
                 print(f"{key}: precincts in counties not on file, skipped")
                 skipped += 1
                 continue
@@ -1032,6 +1035,19 @@ def emit() -> Path:
             )
             codes = {}
             for code, fips in rows.select("code", "fips").unique().iter_rows():
+                if fips == "ME:emergency" and fips not in aggregates:
+                    aggregates[fips] = cs.unit("us.aggregate", fips)
+                    cs.add(
+                        "reporting_unit",
+                        id=aggregates[fips],
+                        polity_id=states["ME"],
+                        scheme_code="us.aggregate",
+                        code=fips,
+                        parent_id=counties["23"][0],
+                        area_relation="within",
+                        area_id=counties["23"][1],
+                        kind="aggregate",
+                    )
                 if fips in aggregates and not fips.isdigit():
                     codes[code] = str(aggregates[fips])
                     continue
