@@ -32,6 +32,7 @@ CALIFORNIA = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/79-us-rep-co
 CA_PRESIDENT = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/25-presidential-formatted.xlsx"
 NORTH_CAROLINA = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/2024_03_05/results_pct_20240305.zip"
 MINNESOTA = "https://electionresultsfiles.sos.mn.gov/20240813/{}.txt"
+MN_PRESIDENT = "https://electionresultsfiles.sos.mn.gov/20240305/{}.txt"
 MARYLAND = "https://elections.maryland.gov/elections/archive/2024/election_data/PP24_{:02d}Precincts{}.csv"
 WASHINGTON = "https://results.vote.wa.gov/results/{0}/export/{0}_allcounties.csv"
 INDIANA = "https://enr.indianavoters.in.gov/archive/2024Primary/data/OffCatC_{}_B.json"
@@ -89,6 +90,7 @@ ARIZONA = tuple(
         ("20240817161358", "2024_Primary_Election_Official_Canvass_0815b"),
     )
 )
+VERMONT = "https://outside.vermont.gov/dept/sos/Elections_Division/election_info_resources/elections_results_data/2024_presidential_primary_official_report_canvassing_committee.pdf"
 CLARK = "https://clark.legistar1.com/clark/attachments/f2a5b366-4205-4df9-9335-68731b056c1f.pdf"
 OKLAHOMA = "https://web.archive.org/web/20240314213731id_/https://oklahoma.gov/content/dam/ok/en/elections/candidate-filing-archives/2024-candidate-filing-archives/2024-ppp-cd-results.pdf"
 MONTANA = "https://web.archive.org/web/20240905130237id_/https://sosmt.gov/wp-content/uploads/wpfd/preview_files/2024-Primary-State-Canvass.pdf"
@@ -171,6 +173,7 @@ CHECKED = {
     "2024-06-25:NY:house:10:democratic",
     "2024-06-25:NY:house:14:democratic",
     "2024-06-04:MT:governor:democratic",
+    "2024-03-05:VT:president:democratic",
 }
 PARTIES = {
     "d": "democratic",
@@ -269,6 +272,8 @@ def fetch() -> None:
             raw.fetch(SOURCE, MARYLAND.format(county, party), suffix=".csv")
     for name in ("ushousepct", "ussenatepct", "PrctTbl"):
         raw.fetch(SOURCE, MINNESOTA.format(name), suffix=".txt")
+    for name in ("PNPPrecinct", "PrctTbl"):
+        raw.fetch(SOURCE, MN_PRESIDENT.format(name), suffix=".txt")
     for day in ("20240312", "20240806"):
         raw.fetch(SOURCE, WASHINGTON.format(day), suffix=".csv")
     for category in IN_CATEGORIES:
@@ -311,6 +316,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, MONTANA, suffix=".pdf")
     raw.fetch(SOURCE, OKLAHOMA, suffix=".pdf")
     raw.fetch(SOURCE, CLARK, suffix=".pdf")
+    raw.fetch(SOURCE, VERMONT, suffix=".pdf")
     for url in ARIZONA:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
@@ -501,6 +507,7 @@ def parse() -> None:
         ("NC", "precinct", NORTH_CAROLINA),
         ("MN", "precinct", MINNESOTA.format("ushousepct")),
         ("MN", "precinct", MINNESOTA.format("ussenatepct")),
+        ("MN", "precinct", MN_PRESIDENT.format("PNPPrecinct")),
         ("WA", "county", WASHINGTON.format("20240312")),
         ("WA", "county", WASHINGTON.format("20240806")),
         *(("IN", "county", INDIANA.format(category)) for category in IN_CATEGORIES),
@@ -533,6 +540,7 @@ def parse() -> None:
         ("MT", "county", MONTANA),
         ("OK", "county", OKLAHOMA),
         ("NV", "county", CLARK),
+        ("VT", "county", VERMONT),
         *(("AZ", "county", url) for url in ARIZONA),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
@@ -1231,6 +1239,84 @@ def parse() -> None:
                     elif found := re.fullmatch(r"(.+?) \W*(?:REP|DEM) \W*([\d,]+) \W*[\d.]+%\W*", text):
                         box = next(box for word, box in words if re.fullmatch(r"\d{1,3}(,\d{3})*", word))
                         entries.append((re.sub(r"[|‘']+$", "", found[1]).strip(), int(found[2].replace(",", "")), box))
+            frame = pl.DataFrame(
+                cells,
+                schema={
+                    **dict.fromkeys(COLUMNS, pl.String),
+                    **dict.fromkeys(("page", "x0", "y0", "x1", "y1"), pl.Int64),
+                },
+            )
+        elif url == VERMONT:
+            pdf = raw.cached(SOURCE, url).path
+            info = subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True, check=True).stdout
+            candidates: dict[str, list[str]] = {}
+            stated: dict[str, list[int]] = {}
+            cells = []
+            for page in range(1, int(info.split("Pages:")[1].split()[0]) + 1):
+                lines = []
+                for word, box in sorted(scan.layer(pdf, page), key=lambda item: (item[1][1], item[1][0])):
+                    if lines and abs(lines[-1][0][1][1] - box[1]) < 12:
+                        lines[-1].append((html.unescape(word), box))
+                    else:
+                        lines.append([(html.unescape(word), box)])
+                texts = [" ".join(word for word, _ in sorted(line, key=lambda item: item[1][0])) for line in lines]
+                if page == 1:
+                    party = ""
+                    for text in texts:
+                        if found := re.fullmatch(r"\d (DEMOCRATIC|REPUBLICAN) Party", text):
+                            party = found[1].title()
+                            candidates[party] = []
+                        elif party and (found := re.fullmatch(r"(.+?)\*? ([\d,]+)(?: [\d.]+%)?", text)):
+                            if found[1] == "Total votes counted":
+                                stated[party] = [
+                                    int(re.fullmatch(r"(.+?)\*? ([\d,]+)(?: [\d.]+%)?", line)[2].replace(",", ""))
+                                    for line in texts[
+                                        texts.index(text) - len(candidates[party]) : texts.index(text) + 1
+                                    ]
+                                ]
+                                party = ""
+                            else:
+                                candidates[party].append(found[1])
+                    continue
+                heading = next((text for text in texts if "STATEWIDE TOTALS" in text), None)
+                if heading is None:
+                    continue
+                party = heading.split()[-1].title()
+                names = candidates[party]
+                rows = []
+                for line in lines:
+                    words = sorted(line, key=lambda item: item[1][0])
+                    numbers = [(word, box) for word, box in words if re.fullmatch(r"[\d,]+", word)]
+                    label = " ".join(word for word, _ in words if not re.fullmatch(r"[\d,]+", word))
+                    if len(numbers) == len(names) + 1 and label:
+                        counts = [int(word.replace(",", "")) for word, _ in numbers]
+                        if sum(counts[:-1]) != counts[-1]:
+                            raise ValueError(f"VT page {page}: {label} does not add up")
+                        rows.append((label, counts, [box for _, box in numbers]))
+                *counties, (label, total, _) = rows
+                if label != "Statewide Totals" or len(counties) != 14:
+                    raise ValueError(f"VT page {page}: expected 14 counties and the statewide totals")
+                if [sum(row[1][column] for row in counties) for column in range(len(total))] != total:
+                    raise ValueError(f"VT page {page}: {party} counties do not sum to the statewide totals")
+                if total != stated[party]:
+                    raise ValueError(f"VT page {page}: {party} totals differ from the summary on page 1")
+                cells += [
+                    {
+                        "county": county,
+                        "office": "President",
+                        "party": party,
+                        "candidate": name,
+                        "votes": str(count),
+                        "page": page,
+                        "x0": box[0],
+                        "y0": box[1],
+                        "x1": box[2],
+                        "y1": box[3],
+                    }
+                    for county, counts, boxes in counties
+                    for name, count, box in zip(names, counts, boxes, strict=False)
+                    if name not in ("Overvotes", "Blank votes")
+                ]
             frame = pl.DataFrame(
                 cells,
                 schema={
@@ -2459,7 +2545,7 @@ def parse() -> None:
                 "column_13": "votes",
             }
             precincts = pl.read_csv(
-                raw.cached(SOURCE, MINNESOTA.format("PrctTbl")).path,
+                raw.cached(SOURCE, url.rsplit("/", 1)[0] + "/PrctTbl.txt").path,
                 separator=";",
                 has_header=False,
                 infer_schema=False,
@@ -2563,7 +2649,7 @@ def parse() -> None:
             else SOUTH_CAROLINA[url]
             if url in SOUTH_CAROLINA
             else date(2024, 3, 5)
-            if state == "AR" or url == OKLAHOMA
+            if state == "AR" or url in (OKLAHOMA, VERMONT)
             else date(2024, 6, 11)
             if url == CLARK
             else date(2024, 4, 23)
@@ -2636,7 +2722,11 @@ def parse() -> None:
                 .str.to_lowercase()
                 .str.strip_chars()
                 .replace_strict(
-                    {**PARTIES, "dem": "north-dakota-democratic-nonpartisan-league"} if state == "ND" else PARTIES,
+                    {**PARTIES, "dem": "north-dakota-democratic-nonpartisan-league"}
+                    if state == "ND"
+                    else {**PARTIES, "dfl": "democratic"}
+                    if url == MN_PRESIDENT.format("PNPPrecinct")
+                    else PARTIES,
                     default=None,
                 ),
                 grain=pl.lit(grain),
@@ -2676,7 +2766,7 @@ def parse() -> None:
                 .when(office.str.contains(r"^governor\b"))
                 .then(pl.lit("governor"))
             )
-            .filter(pl.col("kind").is_not_null())
+            .filter(pl.col("kind").is_not_null(), (pl.lit(state) != "VT") | (pl.col("kind") != "president"))
             .select(
                 state=pl.lit(state),
                 day=pl.col("election_date").str.slice(0, 10).str.to_date(),
@@ -3066,6 +3156,14 @@ def emit() -> Path:
                     "Public record",
                 )
                 if used == OKLAHOMA
+                else (
+                    "Vermont Secretary of State",
+                    "Official Report of the Canvassing Committee, Presidential Primary, March 5, 2024",
+                    "https://sos.vermont.gov/elections/election-info-resources/elections-results-data/",
+                    "official_body",
+                    "Public record",
+                )
+                if used == VERMONT
                 else (
                     "Clark County Election Department",
                     "Results of Canvass, 2024 Primary Election, June 11, 2024",
