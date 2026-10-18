@@ -40,6 +40,12 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Reed"), ("REP", "Dickey"), ("SOC", "O'Hare"), ("SLP", "Scheidler")],
     ),
     (
+        "1918-11-05",
+        "senate:special",
+        [(11228, 0.16, 1, 0, 1), (11229, 0.13, 0.56, 0, 1)],
+        [("DEM", "Folk"), ("REP", "Spencer"), ("SOC", "Lipscomb"), ("SLP", "Cox")],
+    ),
+    (
         "1920-11-02",
         "senate",
         [(11842, 0.38, 1, 0, 1), (11843, 0.1, 0.79, 0, 1)],
@@ -489,6 +495,12 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
     ),
     (
         "1960-11-08",
+        "senate:special",
+        [(34787, 0.19, 0.88, 0, 0.5), (34787, 0.19, 0.88, 0.5, 1)],
+        [("DEM", "Long"), ("REP", "Hocker")],
+    ),
+    (
+        "1960-11-08",
         "governor",
         [(34788, 0.19, 0.88, 0, 0.5), (34788, 0.19, 0.88, 0.5, 1)],
         [("DEM", "Dalton"), ("REP", "Farmer")],
@@ -578,6 +590,91 @@ CHECKED: set[tuple[str, str, int]] = {
     ("1932-11-08", "president", 1),
     ("1944-11-07", "president", 4),
 }
+CREATED = {"1918-11-05:MO:senate:special": ("1920-11-02:MO:senate", "1918 U.S. Senate special election in Missouri")}
+HINTS: dict[tuple[str, str], dict[str, tuple[int, ...]]] = {
+    ("1918-11-05", "senate:special"): {
+        "29001": (1531, 2156),
+        "29007": (2576, 1406),
+        "29013": (2525, 2347),
+        "29019": (3802, 1540),
+        "29025": (1175, 1736),
+        "29031": (2098, 2994),
+        "29037": (2334, 1699),
+        "29043": (591, 1680),
+        "29049": (1541, 1212),
+        "29055": (1012, 1506),
+        "29061": (1925, 2073),
+        "29067": (378, 1354),
+        "29073": (277, 1961),
+        "29079": (1133, 2111),
+        "29085": (397, 1068),
+        "29091": (1367, 1805),
+        "29097": (5703, 6822),
+        "29103": (1229, 1336),
+        "29109": (2062, 2855),
+        "29115": (2530, 2412),
+        "29121": (2810, 2563),
+        "29127": (2823, 1965),
+        "29133": (1048, 694),
+        "29139": (1599, 1803),
+        "29145": (2306, 2492),
+        "29151": (891, 1808),
+        "29157": (954, 1758),
+        "29163": (2405, 1650),
+        "29169": (1118, 732),
+        "29175": (3696, 1508),
+        "29181": (995, 873),
+        "29187": (2945, 2709),
+        "29195": (3362, 2053),
+        "29201": (1788, 1596),
+        "29207": (2120, 1830),
+        "29213": (386, 873),
+        "29219": (282, 1612),
+        "29225": (1495, 1947),
+        "29510": (40276, 76066),
+    },
+    ("1960-11-08", "senate:special"): {
+        "29001": (3394, 5000),
+        "29007": (6575, 4654),
+        "29013": (4305, 4944),
+        "29019": (11990, 9283),
+        "29025": (1854, 2935),
+        "29031": (8610, 10452),
+        "29037": (6226, 5495),
+        "29043": (1782, 4261),
+        "29049": (3214, 2741),
+        "29055": (2477, 3853),
+        "29061": (2458, 2848),
+        "29067": (1089, 3294),
+        "29073": (1619, 4715),
+        "29079": (2560, 4079),
+        "29085": (697, 1752),
+        "29091": (3164, 6244),
+        "29097": (16117, 19441),
+        "29103": (1888, 1734),
+        "29109": (4951, 7669),
+        "29115": (4922, 4584),
+        "29121": (4454, 4516),
+        "29127": (7561, 5197),
+        "29133": (4109, 1815),
+        "29139": (2875, 3287),
+        "29145": (6461, 7791),
+        "29151": (2727, 2779),
+        "29157": (2795, 3838),
+        "29163": (4596, 3225),
+        "29169": (3443, 2733),
+        "29175": (6992, 3395),
+        "29181": (1995, 2252),
+        "29187": (8067, 9097),
+        "29195": (6349, 5474),
+        "29201": (7066, 4506),
+        "29207": (5854, 5215),
+        "29213": (1573, 3311),
+        "29219": (1421, 2832),
+        "29225": (2967, 4225),
+        "29510": (196146, 100256),
+    },
+}
 NOTES: list[tuple[str, str, str]] = [
     (
         "1972-11-07",
@@ -604,6 +701,16 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1918-11-05", "senate:special", "29099", 1): 2821,
+    ("1918-11-05", "senate:special", "29027", 3): 1,
+    ("1918-11-05", "senate:special", "29095", 3): 73,
+    ("1918-11-05", "senate:special", "29095", 2): 228,
+    ("1918-11-05", "senate:special", "29095", 1): 18927,
+    ("1918-11-05", "senate:special", "29095", 0): 30879,
+    ("1918-11-05", "senate:special", "TOTAL", 3): 904,
+    ("1918-11-05", "senate:special", "TOTAL", 2): 6725,
+    ("1918-11-05", "senate:special", "TOTAL", 1): 302680,
+    ("1918-11-05", "senate:special", "TOTAL", 0): 267397,
     ("1970-11-03", "senate", "29003", 3): 3,
     ("1970-11-03", "senate", "29021", 3): 3,
     ("1970-11-03", "senate", "29215", 3): 3,
@@ -1277,6 +1384,10 @@ NAMES: dict[tuple[str, str, str], str] = {
     ("1936-11-03", "Cox", "SLP"): "William W. Cox",
     ("1936-11-03", "Williams", "COM"): "Frank A. Williams",
     ("1936-11-03", "Botz", "NP"): "Botz",
+    ("1918-11-05", "Folk", "DEM"): "Joseph W. Folk",
+    ("1918-11-05", "Spencer", "REP"): "Selden P. Spencer",
+    ("1918-11-05", "Lipscomb", "SOC"): "Lipscomb",
+    ("1918-11-05", "Cox", "SLP"): "Cox",
     ("1970-11-03", "Chapman", "AIP"): "Gene Chapman",
     ("1970-11-03", "DiGirolamo", "NP"): "E. J. DiGirolamo",
     ("1972-11-07", "Leonard", "NP"): "Paul J. Leonard",
@@ -1783,6 +1894,9 @@ def parse() -> None:
                     )
                     if column is not None:
                         diagnostic[(county, column)] = diagnostic.get((county, column), 0) + votes
+            for county, values in HINTS.get((day, office), {}).items():
+                for column, value in enumerate(values):
+                    diagnostic[(county, column)] = value
             if office == "governor":
                 for column in range(len(candidates)):
                     if diagnostic.get(("29189", column), 0) > diagnostic.get(("29510", column), 0) > 0:
@@ -1998,9 +2112,40 @@ def emit() -> Path:
         )
         for (day, office), lines in frame.group_by("day", "office", maintain_order=True):
             key = f"{day}:MO:{office}"
-            contest = contests[key]
             result_set = cs.key(f"{SOURCE}.result_set", key)
-            ((election_id,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
+            if key in contests:
+                contest = contests[key]
+                ((election_id,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
+            else:
+                seated, title = CREATED[key]
+                ((election_id,),) = conn.execute(
+                    """select distinct c.election_id from contest c
+                       join external_id x on x.entity_id = c.id and x.scheme = 'us.contest' where x.value like %s""",
+                    [f"{day}:MO:house:%"],
+                ).fetchall()
+                fields = (
+                    "kind",
+                    "body_id",
+                    "district_area_id",
+                    "seat_id",
+                    "magnitude",
+                    "round_number",
+                    "electoral_system_id",
+                )
+                ((*values,),) = conn.execute(
+                    f"select {', '.join(fields)} from contest where id = %s", [contests[seated]]
+                ).fetchall()
+                contest = cs.key("us.contest", key)
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election_id,
+                    **dict(zip(fields, values, strict=True)),
+                    term="remainder",
+                    default_result_kind="counted",
+                )
+                cs.add("name", entity_id=contest, text=title, lang="en", kind="official", is_preferred=True)
+                cs.add("slug", path=f"us/mo/{day}-general/senate-special", entity_id=contest)
             options = conn.execute(
                 """select id, ballot_label, party_id from contest_option
                    where contest_id = %s and parent_option_id is null and kind in ('candidate', 'ticket')""",
