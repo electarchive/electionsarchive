@@ -147,6 +147,8 @@ PUBLISHERS = {
     "MA": "Massachusetts Secretary of the Commonwealth",
     "NH": "New Hampshire Secretary of State",
     "MS": "Mississippi Secretary of State",
+    "MI": "Michigan Bureau of Elections",
+    "WI": "Wisconsin Elections Commission",
     "VA": "Virginia Department of Elections",
     "AL": "Alabama Secretary of State",
     "CA": "California Secretary of State",
@@ -259,6 +261,36 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2025-02-15:DE:senate:5": (
         "transcribed",
         "https://elections.delaware.gov/elections/special/20250215_sd05/2025SpecialElection_SD05_OfficialResults.pdf",
+        None,
+    ),
+    "2023-04-04:WI:senate:8": (
+        "transcribed",
+        "https://elections.wi.gov/sites/default/files/documents/County%20by%20County%20Report_SD%208%20special%20election.pdf",
+        None,
+    ),
+    "2023-07-18:WI:assembly:24": (
+        "transcribed",
+        "https://elections.wi.gov/sites/default/files/documents/County%20by%20County%20Report_for%20canvass%20for%20AD%2024%20special.pdf",
+        None,
+    ),
+    "2024-07-30:WI:senate:4": (
+        "transcribed",
+        "https://elections.wi.gov/sites/default/files/documents/Ward%20by%20Ward%20Report_SD%204%20Special%20Election.xlsx",
+        None,
+    ),
+    "2024-04-16:MI:house:13": (
+        "transcribed",
+        "https://mvic.sos.state.mi.us/votehistory/Index?type=C&electionDate=4-16-2024",
+        None,
+    ),
+    "2024-04-16:MI:house:25": (
+        "transcribed",
+        "https://mvic.sos.state.mi.us/votehistory/Index?type=C&electionDate=4-16-2024",
+        None,
+    ),
+    "2026-05-05:MI:senate:35": (
+        "transcribed",
+        "https://mvic.sos.state.mi.us/votehistory/Index?type=C&electionDate=5-5-2026",
         None,
     ),
     "2023-12-21:DE:house:37": (
@@ -628,6 +660,28 @@ TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
         ("Brent Burdge", "Republican", 2015),
         (None, None, 12),
     ],
+    "2023-04-04:WI:senate:8": [
+        ("Jodi Habush Sinykin", "Democratic", 37200),
+        ("Dan Knodl", "Republican", 38492),
+        (None, None, 59),
+    ],
+    "2023-07-18:WI:assembly:24": [
+        ("Bob Tatterson", "Democratic", 5568),
+        ("Paul Melotik", "Republican", 6455),
+        (None, None, 3),
+    ],
+    "2024-07-30:WI:senate:4": [("Dora Drake", "Democratic", 4843), (None, None, 172)],
+    "2024-04-16:MI:house:13": [("Mai Xiong", "Democratic", 5741), ("Ronald Singer", "Republican", 3007)],
+    "2024-04-16:MI:house:25": [
+        ("Peter Herzberg", "Democratic", 6373),
+        ("Josh Powell", "Republican", 4096),
+        ("Robert Stano", "U.S. Taxpayers", 220),
+    ],
+    "2026-05-05:MI:senate:35": [
+        ("Chedrick Greene", "Democratic", 36583),
+        ("Jason Tunney", "Republican", 24491),
+        ("Ali K. Sledz", "Libertarian", 1058),
+    ],
     "2023-12-21:DE:house:37": [
         ("Jane Hovington", "Democratic", 1068),
         ("Valerie Jones Giltner", "Republican", 1805),
@@ -759,6 +813,7 @@ PARTIES = {
     "gop": "republican-party",
     "libertarian": "libertarian-party",
     "lbt": "libertarian-party",
+    "MI:u.s. taxpayers": "MI:u-s-taxpayers-party",
     "lib": "libertarian-party",
     "lpf": "libertarian-party",
     "green": "green-party",
