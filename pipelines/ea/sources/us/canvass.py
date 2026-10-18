@@ -4,7 +4,7 @@ import re
 import struct
 import subprocess
 from collections import defaultdict
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -60,8 +60,16 @@ OR_PUBLISHER = "Oregon Secretary of State"
 OR_TITLE = "{day:%B} {day.day}, {day.year}, General Election Abstract of Votes"
 OR_OFFICES = {
     date(2022, 11, 8): {"Commissioner of the Bureau of Labor and Industries"},
-    date(2024, 11, 5): {"Secretary of State", "State Treasurer", "Attorney General"},
+    date(2024, 11, 5): {
+        "Secretary of State",
+        "State Treasurer",
+        "Attorney General",
+        "State Senator",
+        "State Representative",
+    },
 }
+OR_DISTRICTS = {"State Senator": {1, 5, 27, 29, 30}, "State Representative": {1, 9, 15, 16, 31, 32, 57, 58, 59}}
+OR_CHAMBERS = {"State Senator": "senate", "State Representative": "house"}
 AZ_COUNTIES = [f"040{code:02d}" for code in (1, 3, 5, 7, 9, 11, 12, 13, 15, 17, 19, 21, 23, 25, 27)]
 SEATS = {
     "Corporation Commissioner": 2,
@@ -378,49 +386,65 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '41%'"""
             ).fetchall()
         }
-    office = None
-    for day, text in (
-        (day, line.strip())
+    office = district = None
+    oregon_header: list[str] = []
+    for day, printed in (
+        (day, printed)
         for day, url in OREGON.items()
-        for line in subprocess.run(
+        for printed in subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url).path), "-"],
             check=False,
             capture_output=True,
             text=True,
         ).stdout.splitlines()
     ):
-        if text in OR_OFFICES[day]:
-            office, header, tallied = text, [], []
+        text = printed.strip()
+        if text in OR_OFFICES[day] or text and len(printed) - len(printed.lstrip()) >= 50:
+            office, district, oregon_header, tallied = (text if text in OR_OFFICES[day] else None), None, [], []
             continue
         if office is None or not text:
             continue
+        numbered = re.fullmatch(r"(\d+)(?:st|nd|rd|th) District", text)
+        if numbered is not None and office in OR_DISTRICTS:
+            district, oregon_header, tallied = int(numbered[1]), [], []
+            continue
+        if office in OR_DISTRICTS and district is None:
+            continue
         found = re.fullmatch(r"([A-Z][A-Za-z ]*?)\s{2,}([\d,]+(?:\s+[\d,]+)*)", text)
         if found is None:
-            header.append(re.split(r"\s{2,}", text))
+            if not tallied:
+                oregon_header.append(text)
             continue
-        surnames, (_, *firsts) = header
+        if len(oregon_header) != 2:
+            raise ValueError(f"Oregon {office} {district}: cannot read the header {oregon_header}")
+        names, given = oregon_header[0], oregon_header[1].removeprefix("County").strip()
         votes = [int(figure.replace(",", "")) for figure in found[2].split()]
+        surnames = re.split(r"\s{2,}", names) if len(re.split(r"\s{2,}", names)) == len(votes) else names.split()
+        firsts = re.findall(r"(\S.*?) \(([A-Z]+)\)", given) or [(first, None) for first in re.split(r"\s{2,}", given)]
         if len(votes) != len(surnames) or len(firsts) != len(surnames) - 1:
-            raise ValueError(f"Oregon {office}: cannot read {found[1]} under {header}")
+            raise ValueError(f"Oregon {office} {district}: cannot read {found[1]} under {oregon_header}")
         if not tallied:
             tallied = [0] * (len(votes) + 1)
         if found[1].upper() == "TOTAL":
-            if tallied != [*votes, 36]:
-                raise ValueError(f"Oregon {office}: the counties do not add up to the printed totals")
-            office = None
+            if tallied[:-1] != votes or district is None and tallied[-1] != 36:
+                raise ValueError(f"Oregon {office} {district}: the counties do not add up to the printed totals")
+            office = None if district is None else office
             continue
         tallied[-1] += 1
         for index, (surname, count) in enumerate(zip(surnames, votes, strict=True)):
             tallied[index] += count
-            first = re.fullmatch(r"(.+?)(?: \((\w+)\))?", firsts[index]) if index < len(firsts) else None
+            if district is not None and district not in OR_DISTRICTS[office]:
+                continue
+            first, label = firsts[index] if index < len(firsts) else (None, None)
             rows.append(
                 {
                     "state": "OR",
                     "day": day,
                     "office": office,
-                    "candidate": "Write-ins" if first is None else f"{first[1]} {surname.lstrip('*')}",
+                    "district": district,
+                    "candidate": "Write-ins" if first is None else f"{first} {surname.lstrip('*')}",
                     "mate": None,
-                    "party": None if first is None else first[2],
+                    "party": label,
                     "fips": oregon_fips[slug(found[1]).replace("-", "")],
                     "votes": count,
                     "write_in": surname == "Misc.",
@@ -503,7 +527,8 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's, Arizona's, and Oregon's 2022, Kentucky's "
-                "2023, and Oregon's 2024 statewide general elections by county"
+                "2023, and Oregon's 2024 statewide general elections by county, and 14 of Oregon's 2024 legislative "
+                "contests by county"
             ),
             polity="US",
         )
@@ -629,12 +654,14 @@ def emit() -> Path:
                 [isos],
             ).fetchall()
         )
-        counties: dict[str, UUID] = dict(
-            conn.execute(
-                """select code, id from reporting_unit
+        county_areas: dict[str, tuple[UUID, UUID]] = {
+            code: (unit, area)
+            for code, unit, area in conn.execute(
+                """select code, id, area_id from reporting_unit
                    where scheme_code = 'us.county' and left(code, 2) in ('21', '44', '18', '26', '04', '41')"""
             ).fetchall()
-        )
+        }
+        counties = {code: unit for code, (unit, _) in county_areas.items()}
         cs.add(
             "reporting_unit",
             id=cs.unit("us.aggregate", "RI:statewide"),
@@ -652,9 +679,9 @@ def emit() -> Path:
         known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
-        existing: dict[str, tuple[list[tuple[UUID, set[str]]], list[tuple[object, ...]]]] = {}
-        for key, contest in conn.execute(
-            """select e.value, e.entity_id from external_id e
+        existing: dict[str, tuple[list[tuple[UUID, set[str]]], list[tuple[object, ...]], UUID]] = {}
+        for key, contest, district_area in conn.execute(
+            """select e.value, e.entity_id, c.district_area_id from external_id e join contest c on c.id = e.entity_id
                where e.scheme = 'us.contest' and e.value like any(%s)""",
             [[f"{day}:{state}:%" for state, day in frame.select("state", "day").unique().iter_rows()]],
         ).fetchall():
@@ -670,7 +697,7 @@ def emit() -> Path:
                    from result_set where contest_id = %s and is_default""",
                 [contest],
             ).fetchall()
-            existing[key] = (options, defaults)
+            existing[key] = (options, defaults, district_area)
         people: dict[tuple[str, str], dict[UUID, int]] = defaultdict(lambda: defaultdict(int))
         for state, person, ballot in conn.execute(
             """select substr(p.iso_code, 4), cd.person_id, cd.ballot_name from candidacy cd
@@ -721,12 +748,41 @@ def emit() -> Path:
                 name(found, NAMED[key])
             return found
 
-        for (state, day, office_text, seats), lines in frame.group_by(
-            "state", "day", "office", "seats", maintain_order=True
+        for (state, day, office_text, district, seats), lines in frame.group_by(
+            "state", "day", "office", "district", "seats", maintain_order=True
         ):
             state, office_text, seats = str(state), str(office_text), int(str(seats))
             assert isinstance(day, date)
-            office, office_slug = OFFICES[office_text]
+            units = counties
+            if district is not None:
+                contest_key = f"{day}:{state}:{OR_CHAMBERS[office_text]}:{district}:g"
+                if contest_key not in existing:
+                    raise ValueError(f"{contest_key}: no such contest")
+                units = {}
+                for fips in lines["fips"].unique().to_list():
+                    part = f"{fips}:{day}:{OR_CHAMBERS[office_text]}:{district}"
+                    units[fips] = cs.unit("us.county_part", part, on=day)
+                    cs.add(
+                        "reporting_unit",
+                        id=units[fips],
+                        polity_id=cs.polity(f"US-{state}"),
+                        scheme_code="us.county_part",
+                        code=part,
+                        parent_id=county_areas[fips][0],
+                        area_relation="within",
+                        area_id=county_areas[fips][1],
+                        kind="standard",
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
+                    cs.add(
+                        "reporting_unit_area",
+                        unit_id=units[fips],
+                        area_id=existing[contest_key][2],
+                        valid_from=day,
+                        valid_to=day + timedelta(days=1),
+                    )
+            office, office_slug = OFFICES.get(office_text, (office_text, ""))
             election_key = f"{day}:{state}"
             election = cs.key("us.election", election_key)
             if election_key not in known:
@@ -743,8 +799,8 @@ def emit() -> Path:
                 name(election, f"{day.year} {states[state]} general election")
                 cs.add("slug", path=f"us/{state.lower()}/{day}-general", entity_id=election)
             office_key = f"{office_slug}:{state}"
-            office_id = cs.key("us.office", office_key)
-            if office_key not in offices_known:
+            office_id = cs.key("us.office", office_key) if district is None else None
+            if office_id is not None and office_key not in offices_known:
                 offices_known.add(office_key)
                 cs.add(
                     "office",
@@ -753,9 +809,9 @@ def emit() -> Path:
                     kind="governor" if office_slug == "governor" else "other",
                 )
                 name(office_id, f"{office} of {states[state]}")
-            contest_key = f"{day}:{state}:{office_slug}"
+            contest_key = f"{day}:{state}:{office_slug}" if district is None else contest_key
             contest = cs.key("us.contest", contest_key)
-            options, defaults = existing.get(contest_key, ([], []))
+            options, defaults, _ = existing.get(contest_key, ([], [], None))
             if contest_key not in existing or state == "KY":
                 cs.add(
                     "contest",
@@ -875,7 +931,7 @@ def emit() -> Path:
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
-                        unit_id=counties[str(fips)],
+                        unit_id=units[str(fips)],
                         option_id=option,
                         channel=0,
                         measure=1,
@@ -888,7 +944,7 @@ def emit() -> Path:
                         cs.add(
                             "value_locator",
                             result_set_id=result_set,
-                            unit_id=counties[str(fips)],
+                            unit_id=units[str(fips)],
                             option_id=option,
                             channel=0,
                             measure=1,
