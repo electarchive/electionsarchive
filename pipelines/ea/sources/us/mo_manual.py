@@ -304,6 +304,12 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Stevenson"), ("REP", "Eisenhower")],
     ),
     (
+        "1892-11-08",
+        "governor",
+        [(2232, 0.14, 0.81, 0, 0.52), (2232, 0.14, 0.8, 0.52, 1)],
+        [("DEM", "Stone"), ("REP", "Warner"), ("PPL", "Leonard"), ("PRO", "Sobieski")],
+    ),
+    (
         "1920-11-02",
         "governor",
         [(11843, 0.8, 0.95, 0, 1), (11844, 0.105, 0.96, 0, 1), (11845, 0.105, 0.43, 0, 1)],
@@ -327,6 +333,12 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         "governor",
         [(17056, 0.125, 0.96, 0, 1), (17057, 0.115, 0.505, 0, 1)],
         [("DEM", "Park"), ("REP", "Winter"), ("SOC", "Wolf"), ("SLP", "Cox"), ("COM", "Penney")],
+    ),
+    (
+        "1936-11-03",
+        "governor",
+        [(18905, 0.59, 0.965, 0, 1), (18906, 0.105, 0.955, 0, 1)],
+        [("DEM", "Stark"), ("REP", "Barrett"), ("SOC", "Duemler"), ("SLP", "Cox"), ("COM", "Williams"), ("NP", "Botz")],
     ),
     (
         "1940-11-05",
@@ -409,6 +421,99 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1936-11-03", "governor", "29005", 3): 0,
+    ("1936-11-03", "governor", "29043", 3): 0,
+    ("1892-11-08", "governor", "TOTAL", 3): 3393,
+    ("1892-11-08", "governor", "TOTAL", 2): 37262,
+    ("1892-11-08", "governor", "29005", 3): 53,
+    ("1892-11-08", "governor", "29009", 3): 33,
+    ("1892-11-08", "governor", "29037", 3): 59,
+    ("1892-11-08", "governor", "29047", 3): 61,
+    ("1892-11-08", "governor", "29049", 3): 37,
+    ("1892-11-08", "governor", "29063", 3): 23,
+    ("1892-11-08", "governor", "29071", 3): 13,
+    ("1892-11-08", "governor", "29089", 3): 33,
+    ("1892-11-08", "governor", "29101", 3): 39,
+    ("1892-11-08", "governor", "29109", 3): 53,
+    ("1892-11-08", "governor", "29117", 3): 33,
+    ("1892-11-08", "governor", "29119", 3): 15,
+    ("1892-11-08", "governor", "29121", 3): 36,
+    ("1892-11-08", "governor", "29123", 3): 26,
+    ("1892-11-08", "governor", "29125", 3): 3,
+    ("1892-11-08", "governor", "29127", 3): 83,
+    ("1892-11-08", "governor", "29131", 3): 5,
+    ("1892-11-08", "governor", "29133", 3): 13,
+    ("1892-11-08", "governor", "29135", 3): 12,
+    ("1892-11-08", "governor", "29137", 3): 14,
+    ("1892-11-08", "governor", "29141", 3): 6,
+    ("1892-11-08", "governor", "29147", 3): 83,
+    ("1892-11-08", "governor", "29167", 3): 21,
+    ("1892-11-08", "governor", "29171", 3): 19,
+    ("1892-11-08", "governor", "29181", 3): 1,
+    ("1892-11-08", "governor", "29185", 3): 17,
+    ("1892-11-08", "governor", "29197", 3): 13,
+    ("1892-11-08", "governor", "29227", 3): 53,
+    ("1892-11-08", "governor", "29510", 3): 203,
+    ("1892-11-08", "governor", "29003", 2): 371,
+    ("1892-11-08", "governor", "29005", 2): 1083,
+    ("1892-11-08", "governor", "29017", 2): 43,
+    ("1892-11-08", "governor", "29019", 2): 203,
+    ("1892-11-08", "governor", "29029", 2): 283,
+    ("1892-11-08", "governor", "29045", 2): 13,
+    ("1892-11-08", "governor", "29055", 2): 35,
+    ("1892-11-08", "governor", "29065", 2): 23,
+    ("1892-11-08", "governor", "29083", 2): 349,
+    ("1892-11-08", "governor", "29103", 2): 544,
+    ("1892-11-08", "governor", "29109", 2): 753,
+    ("1892-11-08", "governor", "29119", 2): 302,
+    ("1892-11-08", "governor", "29121", 2): 655,
+    ("1892-11-08", "governor", "29123", 2): 64,
+    ("1892-11-08", "governor", "29131", 2): 286,
+    ("1892-11-08", "governor", "29133", 2): 58,
+    ("1892-11-08", "governor", "29135", 2): 603,
+    ("1892-11-08", "governor", "29139", 2): 150,
+    ("1892-11-08", "governor", "29141", 2): 275,
+    ("1892-11-08", "governor", "29153", 2): 253,
+    ("1892-11-08", "governor", "29155", 2): 9,
+    ("1892-11-08", "governor", "29161", 2): 198,
+    ("1892-11-08", "governor", "29165", 2): 135,
+    ("1892-11-08", "governor", "29183", 2): 25,
+    ("1892-11-08", "governor", "29185", 2): 520,
+    ("1892-11-08", "governor", "29195", 2): 582,
+    ("1892-11-08", "governor", "29199", 2): 458,
+    ("1892-11-08", "governor", "29201", 2): 50,
+    ("1892-11-08", "governor", "29205", 2): 93,
+    ("1892-11-08", "governor", "29211", 2): 63,
+    ("1892-11-08", "governor", "29213", 2): 76,
+    ("1892-11-08", "governor", "29215", 2): 329,
+    ("1892-11-08", "governor", "29221", 2): 9,
+    ("1892-11-08", "governor", "29223", 2): 43,
+    ("1892-11-08", "governor", "29225", 2): 362,
+    ("1892-11-08", "governor", "29229", 2): 606,
+    ("1892-11-08", "governor", "29035", 1): 377,
+    ("1892-11-08", "governor", "29047", 1): 783,
+    ("1892-11-08", "governor", "29073", 1): 1637,
+    ("1892-11-08", "governor", "29079", 1): 2535,
+    ("1892-11-08", "governor", "29113", 1): 1392,
+    ("1892-11-08", "governor", "29121", 1): 2844,
+    ("1892-11-08", "governor", "29179", 1): 282,
+    ("1892-11-08", "governor", "29195", 1): 2689,
+    ("1892-11-08", "governor", "29199", 1): 973,
+    ("1892-11-08", "governor", "29215", 1): 1319,
+    ("1892-11-08", "governor", "29510", 1): 37253,
+    ("1892-11-08", "governor", "29037", 0): 3028,
+    ("1892-11-08", "governor", "29073", 0): 593,
+    ("1892-11-08", "governor", "29101", 0): 3097,
+    ("1892-11-08", "governor", "29119", 0): 1033,
+    ("1892-11-08", "governor", "29121", 0): 3277,
+    ("1892-11-08", "governor", "29137", 0): 3854,
+    ("1892-11-08", "governor", "29141", 0): 1135,
+    ("1892-11-08", "governor", "29153", 0): 385,
+    ("1892-11-08", "governor", "29163", 0): 3654,
+    ("1892-11-08", "governor", "29175", 0): 3628,
+    ("1892-11-08", "governor", "29181", 0): 809,
+    ("1892-11-08", "governor", "29189", 0): 3079,
+    ("1892-11-08", "governor", "29510", 0): 32839,
     ("1944-11-07", "governor", "29045", 2): 2,
     ("1944-11-07", "governor", "29133", 2): 9,
     ("1944-11-07", "governor", "29135", 2): 3,
@@ -594,6 +699,7 @@ NAMES: dict[tuple[str, str, str], str] = {
     ("1936-11-03", "Duemler", "SOC"): "George K. Duemler",
     ("1936-11-03", "Cox", "SLP"): "William W. Cox",
     ("1936-11-03", "Williams", "COM"): "Frank A. Williams",
+    ("1936-11-03", "Botz", "NP"): "Botz",
     ("1940-11-05", "High", "SOC"): "Jed A. High",
     ("1940-11-05", "Cox", "SLP"): "William W. Cox",
     ("1944-11-07", "Rinck", "SOC"): "William F. Rinck",
@@ -718,7 +824,7 @@ def segment(
                 else [(piece[1], piece[2], piece[3].strip(",")) for piece in run]
             )
             for right_edge, middle, text in group:
-                if re.fullmatch(r"\d{1,3}(,\d{3})*", text):
+                if re.fullmatch(r"\d{1,3}(,\d{3})*|\d{4,6}", text):
                     tokens.append((right_edge, middle, int(text.replace(",", ""))))
     places: dict[int, list[tuple[float, float]]] = {}
     for x, y, value in tokens:
@@ -812,7 +918,7 @@ def segment(
     indexes = sorted((order.index(county), middle) for county, middle in lines.items() if county in order[:-1])
     pitch = statistics.median((b[1] - a[1]) / (b[0] - a[0]) for a, b in itertools.pairwise(indexes) if b[0] > a[0])
     for (low, low_y), (high, high_y) in itertools.pairwise(indexes):
-        if high - low > 1 and abs(high_y - low_y - (high - low) * pitch) < pitch * 0.4:
+        if high - low > 1 and abs(high_y - low_y - (high - low) * pitch) < pitch * 0.4 * (high - low - 1) ** 0.5:
             for index in range(low + 1, high):
                 lines[order[index]] = low_y + (index - low) * (high_y - low_y) / (high - low)
     for start, step in ((indexes[0], -1), (indexes[-1], 1)):
@@ -871,12 +977,16 @@ def segment(
             for x, y, _ in tokens
             if low <= x <= high and any(abs(y - slope * x - middle) <= 8 for middle in lines.values())
         )
-        clusters: list[list[float]] = []
-        for x in xs:
-            if clusters and x - clusters[-1][-1] <= 40:
-                clusters[-1].append(x)
-            else:
-                clusters.append([x])
+        for reach in (40, 12):
+            clusters: list[list[float]] = []
+            for x in xs:
+                if clusters and x - clusters[-1][-1] <= reach:
+                    clusters[-1].append(x)
+                else:
+                    clusters.append([x])
+            clusters = [cluster for cluster in clusters if len(cluster) >= 2]
+            if len(clusters) >= len(run):
+                break
         clusters = sorted(sorted(clusters, key=len)[-len(run) :], key=lambda cluster: cluster[0])
         if len(clusters) == len(run) and all(len(cluster) >= 2 for cluster in clusters):
             for column, cluster in zip(run, clusters, strict=True):
@@ -1381,7 +1491,7 @@ def emit() -> Path:
                     ]
                     if len(set(known)) > 1:
                         raise ValueError(f"{key}: {len(set(known))} people for {full}")
-                    if not known and " " in full:
+                    if not known and " " in full and office == "president":
                         known = [
                             person
                             for (person,) in conn.execute(
