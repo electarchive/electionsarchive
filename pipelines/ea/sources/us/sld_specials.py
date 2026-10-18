@@ -152,6 +152,7 @@ PUBLISHERS = {
     "WI": "Wisconsin Elections Commission",
     "TX": "Texas Secretary of State",
     "MN": "Minnesota Secretary of State",
+    "OK": "Oklahoma State Election Board",
     "VA": "Virginia Department of Elections",
     "AL": "Alabama Secretary of State",
     "CA": "California Secretary of State",
@@ -171,6 +172,12 @@ PUBLISHERS = {
 }
 SYSTEMS = {"GA": "two_round", "LA": "two_round", "MS": "two_round", "TX": "two_round", "CA": "top_two", "WA": "top_two"}
 SPECIALS: dict[str, tuple[str, str, str | None]] = {
+    "2023-12-12:OK:senate:32": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20231212", None),
+    "2024-02-13:OK:house:39": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20240213", None),
+    "2025-05-13:OK:senate:8": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20250513", None),
+    "2025-06-10:OK:house:71": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20250610", None),
+    "2025-06-10:OK:house:74": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20250610", None),
+    "2026-02-10:OK:house:35": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20260210", None),
     "2023-12-05:MN:house:52-b": (
         "transcribed",
         "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=159&scenario=StateRepresentative",
@@ -711,6 +718,20 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2026-01-06:SC:house:98": ("clarity", SOUTH_CAROLINA.format("125869/367712"), "Representatives, District 98"),
 }
 TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
+    "2023-12-12:OK:senate:32": [("Dusty Deevers", "REP", 3105), ("Larry Bush", "DEM", 2491)],
+    "2024-02-13:OK:house:39": [
+        ("Richard Prawdzienski", "LIB", 224),
+        ("Erick Harris", "REP", 2507),
+        ("Regan Raff", "DEM", 2246),
+    ],
+    "2025-05-13:OK:senate:8": [
+        ("Bryan Logan", "REP", 3083),
+        ("Nathan Brewer", "DEM", 1484),
+        ("Steve Sanford", "IND", 436),
+    ],
+    "2025-06-10:OK:house:71": [("Beverly A. Atteberry", "REP", 326), ("Amanda Clinton", "DEM", 1805)],
+    "2025-06-10:OK:house:74": [("Kevin Wayne Norwood", "REP", 1727), ("Amy Hossain", "DEM", 945)],
+    "2026-02-10:OK:house:35": [("Dillon Travis", "REP", 2907), ("Luke Kruse", "DEM", 1624)],
     "2023-12-05:MN:house:52-b": [
         ("Bianca Virnig", "DFL", 3853),
         ("Charles Kuchlenz", "LIB", 59),
