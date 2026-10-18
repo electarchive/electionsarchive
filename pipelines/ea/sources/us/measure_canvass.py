@@ -94,7 +94,10 @@ ALABAMA = {
     date(2022, 11, 8): "election-data/2022-11/Final%20Canvass%20of%20Results%20%28canvassed%20by%20state%20canvassing"
     "%20board%2011-28-2022%29.pdf",
 }
-ARIZONA = {date(2014, 11, 4): ("20141202160733", "http://www.azsos.gov/election/2014/General/Canvass2014GE.pdf")}
+ARIZONA = {
+    date(2014, 11, 4): ("20141202160733", "http://www.azsos.gov/election/2014/General/Canvass2014GE.pdf"),
+    date(2020, 11, 3): ("20231207175657", "https://azsos.gov/sites/default/files/2020_General_State_Canvass.pdf"),
+}
 GEORGIA = {
     date(2012, 11, 6): (
         "20190306082429",
@@ -121,6 +124,11 @@ MONTANA = {
     ),
     date(2018, 11, 6): ("20190101181853", "https://sosmt.gov/wp-content/uploads/2018GeneralReportStateCanvass.pdf"),
     date(2020, 11, 3): ("20201203074647", "https://sosmt.gov/wp-content/uploads/State_Canvass_Report.pdf"),
+    date(2022, 11, 8): ("20230104151335", "https://sosmt.gov/docs/769/results/49081/2022general-statecanvassreport"),
+    date(2024, 11, 5): (
+        "20241203210537",
+        "https://sosmt.gov/docs/31/post-election/66775/2024-general-election-report-state-canvass",
+    ),
 }
 MONTANA_KINDS = {
     "LEGISLATIVE REFERENDUM": "LR",
@@ -367,6 +375,7 @@ def parse() -> None:
                 names[iso.removeprefix("US-")][f"{plain}city"] = code
     names["MO"] |= {"kansascity": "2938000", "statewide": "29"}
     names["ME"] |= {"uocava": "ME:uocava", "statewide": "23"}
+    names["MT"] |= {"lewisand": "30049"}
     frames = []
     for state, day in dates:
         source, url = link(state, day)
@@ -433,18 +442,21 @@ def parse() -> None:
             records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             for number, page in enumerate(text.stdout.split("\f"), start=1):
-                found = re.search(
-                    r"(" + "|".join(MONTANA_KINDS) + r") (?:NO\.|C|CI)\s*-?\s*(\d+)", " ".join(page.split())
-                )
-                if found is None:
+                joined = " ".join(page.split())
+                if spelled := re.search(r"(" + "|".join(MONTANA_KINDS) + r") (?:NO\.|C|CI)\s*-?\s*(\d+)", joined):
+                    found = spelled[1], spelled[2]
+                elif coded := re.search(r"\b(LR|IR|CI|C|I)-(\d+) A ", joined):
+                    found = {code: kind for kind, code in MONTANA_KINDS.items()}[coded[1]], coded[2]
+                else:
                     continue
                 answers = ("FOR", "AGAINST") if "AGAINST" in page else ("YES", "NO")
                 for line in page.splitlines():
                     if (matched := re.fullmatch(r"([A-Z][A-Za-z &.]*?)\s+([\d,]+)\s+([\d,]+)\s*", line)) and (
-                        elstats.plain(matched[1]) in names["MT"] or matched[1] == "Total"
+                        elstats.plain(matched[1]) in names["MT"] or matched[1].upper() == "TOTAL"
                     ):
+                        county = "Total" if matched[1].upper() == "TOTAL" else matched[1]
                         for answer, votes in zip(answers, matched.group(2, 3), strict=True):
-                            records.append((matched[1], f"{found[1]} NO. {found[2]}", answer, votes, number))
+                            records.append((county, f"{found[0]} NO. {found[1]}", answer, votes, number))
             table = pl.DataFrame(
                 records,
                 schema={
@@ -973,7 +985,19 @@ def emit() -> Path:
         )
         wiki = wiki.with_columns(
             wtag=pl.when(pl.col("state") == "MT")
-            .then(pl.col("name").str.extract(r"\b((?:LR|IR|CI|C|I)-\d+)\b"))
+            .then(
+                pl.coalesce(
+                    pl.col("name").str.extract(r"\b((?:LR|IR|CI|C|I)-\d+)\b"),
+                    pl.concat_str(
+                        pl.col("name")
+                        .str.extract(r"(?i)^(" + "|".join(MONTANA_KINDS) + r") No\.")
+                        .str.to_uppercase()
+                        .replace_strict(MONTANA_KINDS, default=None),
+                        pl.lit("-"),
+                        pl.col("name").str.extract(r"(?i)No\. (\d+)"),
+                    ),
+                )
+            )
             .otherwise(
                 pl.concat_str(
                     pl.col("name").str.extract(TAG, 1).str.to_lowercase(),
