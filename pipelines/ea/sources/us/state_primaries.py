@@ -3,6 +3,7 @@ import html
 import io
 import json
 import re
+import subprocess
 import time
 import unicodedata
 import zipfile
@@ -520,6 +521,41 @@ NYC_TOTALS = [
     "Total Votes",
     "Unrecorded",
 ]
+NY_TITLE = "Certified primary election results"
+NY_FEDERAL = {
+    date(2014, 6, 24): (
+        "20140813073848",
+        "http://www.elections.ny.gov/NYSBOE/elections/2014/Primary/2014FederalPrimaryResults.pdf",
+    ),
+    date(2016, 6, 28): (
+        "20160822134930",
+        "http://www.elections.ny.gov/NYSBOE/elections/2016/Primary/FederalPrimaryResults.pdf",
+    ),
+    date(2018, 6, 26): (
+        "20181008172249",
+        "http://www.elections.ny.gov:80/NYSBOE/Elections/2018/FederalPrimary/2018CertifiedFederalPrimaryResult.pdf",
+    ),
+    date(2020, 6, 23): (
+        "20200816214138",
+        "https://www.elections.ny.gov/NYSBOE/Elections/2020/Primary/CertifiedJune232020StatePrimaryResults.pdf",
+    ),
+    date(2022, 8, 23): (
+        "20220916224340",
+        "https://www.elections.ny.gov/NYSBOE/Elections/2022/Primary/2022AugFedAndStatePrimaryResults.xlsx",
+    ),
+}
+NY_LINES = {
+    "DEM": "democratic",
+    "REP": "republican",
+    "CON": "conservative",
+    "WOR": "working-families",
+    "WEP": "women-s-equality",
+    "IND": "independence",
+    "GRE": "green",
+    "REF": "reform",
+    "LBT": "libertarian",
+    "LIB": "libertarian",
+}
 NYC_OFFICES = {"Representative in Congress": "house", "State Senator": "senate", "Member of the Assembly": "assembly"}
 
 
@@ -556,6 +592,8 @@ def search(state: str, office: int, year: int) -> str:
 
 
 def fetch() -> None:
+    for stamp, link in NY_FEDERAL.values():
+        raw.fetch(SOURCE, f"https://web.archive.org/web/{stamp}id_/{link}", suffix=Path(link).suffix)
     for year in NYC_YEARS:
         raw.fetch(SOURCE, NYC_PAGE.format(year), suffix=".html")
     for stem in nyc_files().values():
@@ -596,12 +634,15 @@ def fetch() -> None:
 def parse() -> None:
     with connect() as conn:
         counties: dict[tuple[str, str], str] = {}
+        titles: set[str] = set()
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
                where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|16|33|35|36|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
+            if code.startswith("36"):
+                titles.add(text)
             if code.startswith("51") and int(code[2:]) >= 500:
                 counties[(code[:2], f"{plain}city")] = code
             counties.setdefault((code[:2], plain), code)
@@ -1526,6 +1567,119 @@ def parse() -> None:
     replaced = overlap.filter("inside").select(*contest, state=pl.lit("NY"), scheme=pl.lit("us.county"))
     frames.append(city.filter(pl.col("office") != "house").drop("chamber"))
     federal = ca.filter(pl.col("office").is_in(["house", "us-senate"]))
+    ny_fips = {plain: fips for (state, plain), fips in counties.items() if state == "36"}
+    ny_county = rf"(?:Part of )?({'|'.join(re.escape(title) for title in sorted(titles, key=len, reverse=True))})"
+    certified = []
+    for day, (stamp, link) in NY_FEDERAL.items():
+        path = raw.cached(SOURCE, f"https://web.archive.org/web/{stamp}id_/{link}").path
+        if path.suffix == ".xlsx":
+            book = fastexcel.read_excel(path)
+            for sheet in book.sheet_names:
+                if not (found := re.fullmatch(r"CD (\d+) ([A-Z]{3})", sheet)):
+                    continue
+                table = book.load_sheet(sheet, header_row=None).to_polars().rows()
+                heads = [
+                    ny_fips[re.sub(r"[^a-z]", "", re.sub(r"^Part of |(?: County)?\s*Vote Results$", "", cell).lower())]
+                    for cell in table[1][1:-1]
+                ]
+                for choice, *cells in table[2:]:
+                    if choice in ("Blank", "Void", "Total Votes by County"):
+                        continue
+                    if int(cells[-1]) != sum(int(cell or 0) for cell in cells[:-1]):
+                        raise ValueError(f"{day} {sheet}: {choice}'s counties do not add up")
+                    certified.extend(
+                        (
+                            day,
+                            int(found[1]),
+                            NY_LINES[found[2]],
+                            re.sub(r"\s*\([A-Z]{3}\)$", "", choice).strip(),
+                            choice == "Scattering",
+                            fips,
+                            int(cell or 0),
+                        )
+                        for fips, cell in zip(heads, cells[:-1], strict=True)
+                    )
+            continue
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(path), "-"], check=True, capture_output=True, text=True
+        ).stdout.splitlines()
+        for index, line in enumerate(text):
+            if found := re.match(
+                r"(?:Representative in Congress District (\d+)|(\d+)\w\w Congressional District) - (\w[\w' ]*?) - ",
+                line,
+            ):
+                district = int(found[1] or found[2])
+                block = []
+                for following in text[index + 1 :]:
+                    if re.search(r"Primary \w+ \d{1,2}, \d{4}$", following):
+                        break
+                    block.append(following)
+                pattern = r"^(.+?)\s{2,}((?:[\d,]+\*?\s+)*[\d,]+\*?)$"
+                first = next(position for position, row in enumerate(block) if re.match(pattern, row))
+                ends = [number.end() for number in re.finditer(r"(?<!\S)[\d,]+\*?(?!\S)", block[first])]
+                columns: list[list[str]] = [[] for _ in ends]
+                for row in block[:first]:
+                    for word in re.finditer(r"\S+", row):
+                        columns[next(k for k, end in enumerate(ends) if word.start() < end)].append(word[0])
+                heads = []
+                for words in columns[:-1]:
+                    county = re.search(ny_county, " ".join(words).replace("Herkiner", "Herkimer"))
+                    if county is None:
+                        raise ValueError(f"{day} NY-{district}: no county in {words}")
+                    heads.append(ny_fips[re.sub(r"[^a-z]", "", county[1].lower())])
+                for row in block:
+                    candidate = re.match(pattern, row)
+                    if candidate is None or candidate[1].strip().startswith(("Blank", "Void", "Total Votes")):
+                        continue
+                    numbers = [int(number.replace(",", "").rstrip("*")) for number in candidate[2].split()]
+                    if len(numbers) != len(heads) + 1 or sum(numbers[:-1]) != numbers[-1]:
+                        raise ValueError(f"{day} NY-{district}: {row.strip()} does not fit {heads}")
+                    choice = re.sub(r"\s*\([A-Z]{3}\)$", "", candidate[1]).strip()
+                    certified.extend(
+                        (day, district, slug(found[3]), choice, choice == "Scattering", fips, votes)
+                        for fips, votes in zip(heads, numbers[:-1], strict=True)
+                    )
+            elif found := re.fullmatch(r"(\d+)\w\w Congressional District\s*", line):
+                block = []
+                for following in text[index + 1 :]:
+                    if re.fullmatch(r"\d+\w\w Congressional District\s*", following):
+                        break
+                    block.append(following)
+                    if re.match(r"\s*(?:RECAP|Total)\s", following):
+                        break
+                rows = [
+                    (row, match) for row in block if (match := re.match(rf"{ny_county}\s+((?:[\d,]+\s+)*[\d,]+)$", row))
+                ]
+                codes = next(row.split() for row in block if re.fullmatch(r"\s*(?:[A-Z]{3}\s+)*[A-Z]{3}\s*", row))
+                if len(set(codes)) != 1 or not rows:
+                    raise ValueError(f"{day} NY-{found[1]}: lines {codes}")
+                ends = [number.end() for number in re.finditer(r"(?<!\S)[\d,]+(?!\S)", rows[0][0])]
+                start = next(position for position, row in enumerate(block) if row.startswith("County"))
+                words: list[list[str]] = [[] for _ in ends]
+                for row in block[max(0, start - 2) : start + 1]:
+                    for piece in re.finditer(r"\S+(?: \S+)*", row.removeprefix("County").rjust(len(row))):
+                        nearest = min(range(len(ends)), key=lambda column: abs(ends[column] - piece.end()))
+                        if abs(ends[nearest] - piece.end()) <= 3:
+                            words[nearest].append(piece[0])
+                total = next((row for row in block if re.match(r"\s*(?:RECAP|Total)\s", row)), rows[0][0])
+                sums = [int(number.replace(",", "")) for number in re.findall(r"(?<!\S)[\d,]+(?!\S)", total)]
+                for column, label in enumerate(words):
+                    county = [int(match[2].split()[column].replace(",", "")) for _, match in rows]
+                    if len(sums) != len(ends) or sum(county) != sums[column] or not label:
+                        raise ValueError(f"{day} NY-{found[1]}: column {column} does not add up")
+                    certified.extend(
+                        (
+                            day,
+                            int(found[1]),
+                            NY_LINES[codes[0]],
+                            " ".join(label),
+                            "opportunity" in " ".join(label).lower(),
+                            ny_fips[re.sub(r"[^a-z]", "", match[1].lower())],
+                            votes,
+                        )
+                        for (_, match), votes in zip(rows, county, strict=True)
+                    )
+    print(f"{len({row[:3] for row in certified})} federal primaries in the State Board's certified files")
     house = city.filter(pl.col("office") == "house").select(
         year=pl.col("day").dt.year(),
         chamber="chamber",
@@ -1571,6 +1725,33 @@ def parse() -> None:
                 source=pl.lit("CA"),
             ).filter(pl.col("chamber").str.contains(":") | (pl.col("year") >= 2012)),
             house,
+            pl.DataFrame(
+                certified,
+                schema={
+                    "day": pl.Date,
+                    "district": pl.Int64,
+                    "party": pl.String,
+                    "candidate": pl.String,
+                    "writein": pl.Boolean,
+                    "code": pl.String,
+                    "votes": pl.Int64,
+                },
+                orient="row",
+            ).select(
+                year=pl.col("day").dt.year(),
+                chamber=pl.lit("house:") + pl.col("party"),
+                day="day",
+                special=pl.lit(False),
+                state=pl.lit("NY"),
+                district="district",
+                candidate="candidate",
+                writein="writein",
+                votes="votes",
+                measure=pl.lit(1, pl.Int16),
+                code="code",
+                kind=pl.lit("county"),
+                source=pl.lit("NYSBOE"),
+            ),
         ]
     ).write_parquet(PARSED / "congress.parquet")
     partisan = pl.col("day").dt.year() < 2012
@@ -1658,6 +1839,19 @@ def emit() -> Path:
         for stem in nyc_files().values():
             for suffix in ("EDLevel", "Recap"):
                 cs.artifact(raw.cached(SOURCE, f"{stem}%20{suffix}.csv"), sources["NYC"])
+        sources["NYSBOE"] = cs.source(STATES["NY"][2], NY_TITLE)
+        if sources["NYSBOE"] in cs.minted:
+            cs.add(
+                "source",
+                id=sources["NYSBOE"],
+                kind="official_body",
+                publisher=STATES["NY"][2],
+                title=NY_TITLE,
+                url="https://www.elections.ny.gov",
+                license="Public record",
+            )
+        for stamp, link in NY_FEDERAL.values():
+            cs.artifact(raw.cached(SOURCE, f"https://web.archive.org/web/{stamp}id_/{link}"), sources["NYSBOE"])
         for day in NC_DAYS:
             cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), sources["NC"])
         for day in MN_DAYS:
@@ -2185,7 +2379,7 @@ def emit() -> Path:
             for option, kind, _, notes in sorted(wanted):
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, notes=notes)
         congress = pl.read_parquet(PARSED / "congress.parquet")
-        city = congress.filter(pl.col("state") == "NY")
+        city = congress.filter(pl.col("source") == "NYC")
         bases |= {
             f"{day}:NY:house:{district}:{chamber.removeprefix('house:')}"
             for day, district, chamber in city.select("day", "district", "chamber").unique().iter_rows()
@@ -2342,25 +2536,55 @@ def emit() -> Path:
                 [STATES["CA"][2]],
             ).fetchall()
         ]
-        congress = congress.filter(
-            pl.col("state") == "CA",
-            ~pl.concat_str(
-                pl.col("day").cast(pl.String),
-                pl.lit("CA"),
-                pl.when(pl.col("district").is_not_null())
-                .then(
-                    pl.concat_str(
-                        pl.lit("house:"),
-                        pl.col("district").cast(pl.String),
-                        pl.col("chamber").str.strip_prefix("house"),
+        medsl.attach(
+            cs,
+            conn,
+            congress.filter(
+                pl.col("state") == "CA",
+                ~pl.concat_str(
+                    pl.col("day").cast(pl.String),
+                    pl.lit("CA"),
+                    pl.when(pl.col("district").is_not_null())
+                    .then(
+                        pl.concat_str(
+                            pl.lit("house:"),
+                            pl.col("district").cast(pl.String),
+                            pl.col("chamber").str.strip_prefix("house"),
+                        )
                     )
-                )
-                .otherwise("chamber"),
-                separator=":",
-            ).is_in(held),
+                    .otherwise("chamber"),
+                    separator=":",
+                ).is_in(held),
+            ),
+            sources,
         )
-        medsl.attach(cs, conn, congress, sources)
         medsl.attach(cs, conn, city, sources, grain="precinct")
+        held = [
+            value
+            for (value,) in conn.execute(
+                """select e.value from external_id e
+                   where e.scheme = 'us.contest' and e.value ~ '^20[0-2][0-9]-0[6-8]-[0-9]{2}:NY:house:'
+                     and exists (select 1 from result_set rs join source s on s.id = rs.source_id
+                                 where rs.contest_id = e.entity_id and rs.status = 'active'
+                                   and s.publisher <> 'Federal Election Commission' and s.id <> %s)""",
+                [sources["NYSBOE"]],
+            ).fetchall()
+        ]
+        medsl.attach(
+            cs,
+            conn,
+            congress.filter(
+                pl.col("source") == "NYSBOE",
+                ~pl.concat_str(
+                    pl.col("day").cast(pl.String),
+                    pl.lit("NY:house"),
+                    pl.col("district").cast(pl.String),
+                    pl.col("chamber").str.strip_prefix("house:"),
+                    separator=":",
+                ).is_in(held),
+            ),
+            sources,
+        )
         used = {value for frame in cs.frames.get("result_value", []) for value in frame["unit_id"].unique().to_list()}
         for day, unit in city.select("day", "code").unique().sort("code").iter_rows():
             precinct = cs.unit("us.precinct", unit)
