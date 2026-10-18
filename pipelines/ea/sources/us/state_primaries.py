@@ -18,7 +18,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import elstats, me_legislature, medsl, nyc_general, wa_local
+from ea.sources.us import elstats, fl_sos, me_legislature, medsl, nyc_general, tx_elchist, wa_local
 from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
@@ -292,6 +292,20 @@ STATES = {
         "Election vote totals",
         "https://www.elections.il.gov/ElectionOperations/DownloadVoteTotals.aspx",
     ),
+    "FL": (
+        "12",
+        "Florida",
+        fl_sos.PUBLISHER,
+        "Election results extracts and detail reports: primaries by county, 2000–2022",
+        "https://results.elections.myflorida.com/",
+    ),
+    "TX": (
+        "48",
+        "Texas",
+        "Texas Secretary of State",
+        "Texas election history: legislative primaries by county, 2000–2014",
+        "https://elections.sos.state.tx.us/",
+    ),
     "MN": (
         "27",
         "Minnesota",
@@ -313,6 +327,8 @@ OFFICES = {
         "Superintendent of Public Instruction",
     ),
     "COMMISSIONER OF AGRICULTURE": ("commissioner-of-agriculture", "Commissioner of Agriculture"),
+    "COMMISSIONER OF EDUCATION": ("commissioner-of-education", "Commissioner of Education"),
+    "CHIEF FINANCIAL OFFICER": ("chief-financial-officer", "Chief Financial Officer"),
     "COMMISSIONER OF INSURANCE": ("commissioner-of-insurance", "Commissioner of Insurance"),
     "COMMISSIONER OF LABOR": ("commissioner-of-labor", "Commissioner of Labor"),
     "COMMISSIONER OF PUBLIC LANDS": ("commissioner-of-public-lands", "Commissioner of Public Lands"),
@@ -338,6 +354,7 @@ PARTIES = {
     "DEM": ("democratic-party", "democratic", "dp", "Democratic"),
     "REP": ("republican-party", "republican", "rp", "Republican"),
     "LIB": ("libertarian-party", "libertarian", "liberp", "Libertarian"),
+    "LBT": ("libertarian-party", "libertarian", "liberp", "Libertarian"),
     "GRE": ("green-party", "green", "greenp", "Green"),
     "GIP": ("green-party", "green-independent", "greenp", "Green Independent"),
     "CST": ("constitution-party", "constitution", "constp", "Constitution"),
@@ -494,6 +511,67 @@ ME_METHOD = (
     "or more candidates, the candidate with a majority of first choices. Votes are first choices."
 )
 WON_MAJORITY = "Derived: a majority of first choices in the certified contest totals."
+FL_DAYS = {
+    date(2000, 9, 5): None,
+    date(2000, 10, 3): date(2000, 9, 5),
+    date(2002, 9, 10): None,
+    date(2004, 8, 31): None,
+    date(2006, 9, 5): None,
+    date(2008, 8, 26): None,
+    date(2010, 8, 24): None,
+    date(2012, 8, 14): None,
+    date(2014, 8, 26): None,
+    date(2016, 8, 30): None,
+    date(2018, 8, 28): None,
+    date(2020, 8, 18): None,
+    date(2022, 8, 23): None,
+}
+FL_RACES = {
+    "STR": "house",
+    "STS": "senate",
+    "GOV": "GOVERNOR",
+    "ATG": "ATTORNEY GENERAL",
+    "AGR": "COMMISSIONER OF AGRICULTURE",
+    "CFO": "CHIEF FINANCIAL OFFICER",
+    "EDU": "COMMISSIONER OF EDUCATION",
+    "CMP": "COMPTROLLER",
+    "TRE": "TREASURER",
+    "SEC": "SECRETARY OF STATE",
+}
+FL_DETAIL = (
+    "https://results.elections.myflorida.com/DetailRpt.Asp?ELECTIONDATE={day:%-m/%-d/%Y}&RACE={race}&PARTY={party}"
+    "&DIST={district}&GRP=&DATAMODE="
+)
+FL_METHOD = (
+    "Totals are the county rows of the Division of Elections' official results extract, each race checked county by "
+    "county against its detail report and that report's total; a county the district splits holds only the "
+    "district's part. The extract does not mark winners, so the winner shown is the leading candidate{rule}."
+)
+TX_DAYS = {
+    date(2000, 3, 14): None,
+    date(2000, 4, 11): date(2000, 3, 14),
+    date(2002, 3, 12): None,
+    date(2002, 4, 9): date(2002, 3, 12),
+    date(2004, 3, 9): None,
+    date(2004, 4, 13): date(2004, 3, 9),
+    date(2006, 3, 7): None,
+    date(2006, 4, 11): date(2006, 3, 7),
+    date(2008, 3, 4): None,
+    date(2008, 4, 8): date(2008, 3, 4),
+    date(2010, 3, 2): None,
+    date(2010, 4, 13): date(2010, 3, 2),
+    date(2012, 5, 29): None,
+    date(2012, 7, 31): date(2012, 5, 29),
+    date(2014, 3, 4): None,
+    date(2014, 5, 27): date(2014, 3, 4),
+}
+TX_RACE = re.compile(r"State Representative District (\d+)|State Senator, District (\d+)")
+TX_METHOD = (
+    "Totals are the county rows of the Secretary of State's election history page for the race, each candidate's "
+    "rows checked against its All Counties total; a county the district splits holds only the district's part. The "
+    "page does not mark winners, so the winner shown is the candidate with a majority, or the runoff's leader, and "
+    "when a runoff followed, the top two are shown as advancing."
+)
 IL_DAYS = {
     2000: date(2000, 3, 21),
     2002: date(2002, 3, 19),
@@ -709,6 +787,30 @@ def fetch() -> None:
     for county, total in IL_FILES.values():
         for token in (county, total):
             raw.fetch(SOURCE, IL_DOWNLOAD.format(token), suffix=".txt")
+    for election in tx_elchist.PRIMARIES:
+        for race, title in tx_elchist.races(election):
+            if TX_RACE.fullmatch(title):
+                url = f"{tx_elchist.SITE}elchist{election}_race{race}.htm"
+                try:
+                    raw.cached(SOURCE, url)
+                except LookupError:
+                    raw.fetch(SOURCE, url, suffix=".htm")
+                    time.sleep(1)
+    for day in FL_DAYS:
+        extract = raw.fetch(SOURCE, fl_sos.EXTRACT.format(day=day), suffix=".txt")
+        for race, party, district in sorted(
+            {
+                (row[3], row[1], row[7] if row[3] in ("STR", "STS") else "")
+                for row in csv.reader(io.StringIO(extract.path.read_bytes().decode("cp1252")), delimiter="\t")
+                if row and row[3] in FL_RACES
+            }
+        ):
+            url = FL_DETAIL.format(day=day, race=race, party=party, district=district)
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                raw.fetch(SOURCE, url, suffix=".htm")
+                time.sleep(1)
     for day in NC_DAYS:
         raw.fetch(SOURCE, FILES.format(day=day), suffix=".zip")
     for day in MN_DAYS:
@@ -739,7 +841,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|16|17|33|35|36|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|33|35|36|48|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -1927,6 +2029,140 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    fl: list[tuple[date, str, str | None, str, str, str, int]] = []
+    counties[("12", "dade")] = counties[("12", "miamidade")]
+    for day in FL_DAYS:
+        extract = (
+            pl.read_csv(
+                io.BytesIO(
+                    raw.cached(SOURCE, fl_sos.EXTRACT.format(day=day)).path.read_bytes().decode("cp1252").encode()
+                ),
+                separator="\t",
+                infer_schema_length=0,
+                quote_char=None,
+            )
+            .filter(pl.col("RaceCode").is_in(list(FL_RACES)))
+            .with_columns(
+                district=pl.when(pl.col("RaceCode").is_in(["STR", "STS"])).then("Juris1num").otherwise(pl.lit("")),
+                choice=pl.concat_str(
+                    [
+                        pl.col(column).fill_null("").str.replace_all(",", "").str.strip_chars()
+                        for column in ("CanNameFirst", "CanNameMiddle", "CanNameLast")
+                    ],
+                    separator=" ",
+                )
+                .str.replace_all(r"\s+", " ")
+                .str.strip_chars(),
+                votes=pl.col("CanVotes").cast(pl.Int64),
+            )
+        )
+        extract = extract.unique(["PartyCode", "RaceCode", "CountyName", "district", "choice", "votes"])
+        if extract.select(
+            pl.struct("PartyCode", "RaceCode", "CountyName", "district", "choice").is_duplicated().any()
+        ).item():
+            raise ValueError(f"{day} Florida: a candidate has two different county rows")
+        for (race, party, district), rows in extract.group_by("RaceCode", "PartyCode", "district"):
+            assert isinstance(race, str) and isinstance(party, str) and isinstance(district, str)
+            text = raw.cached(
+                SOURCE, FL_DETAIL.format(day=day, race=race, party=party, district=district)
+            ).path.read_text(encoding="latin-1")
+            report: dict[str, list[int]] = {}
+            for line in re.findall(r"<TR[^>]*>(.*?)</TR>", text, re.IGNORECASE | re.DOTALL):
+                found = [
+                    html.unescape(re.sub(r"<[^>]+>", "", cell)).strip()
+                    for cell in re.findall(r"<TD[^>]*>(.*?)</TD>", line, re.IGNORECASE | re.DOTALL)
+                ]
+                if len(found) > 1 and all(re.fullmatch(r"[\d,]+", cell) for cell in found[1:]):
+                    report[re.sub(r"[^a-z]", "", found[0].lower())] = sorted(
+                        int(cell.replace(",", "")) for cell in found[1:]
+                    )
+            mine = {
+                re.sub(r"[^a-z]", "", county.lower()): sorted(group["votes"].to_list())
+                for (county,), group in rows.group_by("CountyName")
+            }
+            mine["total"] = sorted(rows.group_by("choice").agg(pl.col("votes").sum())["votes"].to_list())
+            if mine != report:
+                raise ValueError(
+                    f"{day} Florida {race} {party} {district}: the extract does not match the detail report"
+                )
+            fl.extend(
+                (
+                    day,
+                    FL_RACES[race] if race in ("STR", "STS") else OFFICES[FL_RACES[race]][0],
+                    str(int(district)) if district else None,
+                    party,
+                    counties[("12", re.sub(r"[^a-z]", "", county.lower()))],
+                    choice,
+                    votes,
+                )
+                for county, choice, votes in rows.select("CountyName", "choice", "votes").iter_rows()
+            )
+    frames.append(
+        pl.DataFrame(
+            fl, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row"
+        ).with_columns(
+            state=pl.lit("FL"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
+    tx: list[tuple[date, str, str, str, str, str, int]] = []
+    for election in tx_elchist.PRIMARIES:
+        for race, title in tx_elchist.races(election):
+            if (found := TX_RACE.fullmatch(title)) is None:
+                continue
+            text = raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm").path.read_text(
+                errors="replace"
+            )
+            stamp = re.search(r"<H3[^>]*>(\d+)/(\d+)/(\d{4})</H3>", text, re.IGNORECASE)
+            if stamp is None:
+                raise ValueError(f"{election} {race}: no heading")
+            day = date(int(stamp[3]), int(stamp[1]), int(stamp[2]))
+            if day not in TX_DAYS:
+                raise ValueError(f"{election} {race}: {day} is not a Texas primary day")
+            lines = re.findall(r"<TR[^>]*>(.*?)</TR>", text, re.IGNORECASE | re.DOTALL)
+            headers = [tx_elchist.cells(line, "TH") for line in lines if re.search(r"<TH", line, re.IGNORECASE)]
+            data = [tx_elchist.cells(line, "TD") for line in lines if re.search(r"<TD", line, re.IGNORECASE)]
+            parties = headers[-1]
+            total = next((row for row in data if row[0] == "ALL COUNTIES"), data[0] if len(data) == 1 else None)
+            if total is None:
+                raise ValueError(f"{election} {race}: no All Counties row")
+            for column in range(1, parties.index("Votes")):
+                if parties[column] not in ("DEM", "REP"):
+                    raise ValueError(f"{election} {race}: party {parties[column]}")
+                choice = " ".join(
+                    row[column] for row in headers[:-1] if column < len(row) and row[column] not in ("...", "Total")
+                )
+                votes = [(row[0], int(row[column].replace(",", "") or 0)) for row in data if row[0] != "ALL COUNTIES"]
+                if sum(value for _, value in votes) != int(total[column].replace(",", "")):
+                    raise ValueError(f"{election} {race} {choice}: the county rows do not match All Counties")
+                tx.extend(
+                    (
+                        day,
+                        "house" if found[1] else "senate",
+                        str(int(found[1] or found[2])),
+                        parties[column],
+                        counties[("48", re.sub(r"[^a-z]", "", county.lower()))],
+                        re.sub(r"\s+", " ", choice).strip(),
+                        value,
+                    )
+                    for county, value in votes
+                )
+    frames.append(
+        pl.DataFrame(
+            tx, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row"
+        ).with_columns(
+            state=pl.lit("TX"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     partisan = pl.col("day").dt.year() < 2012
     frames.append(
         ca.filter(~pl.col("office").is_in(["house", "us-senate"]))
@@ -1974,8 +2210,9 @@ def emit() -> Path:
             "North Carolina 2002–2022, Minnesota 2016–2022, Washington 2015–2022, and New York City 2014–2022 "
             "by precinct, California 2002–2022 by county, Colorado, Connecticut, Idaho, Massachusetts, New Mexico, "
             "New York, Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine "
-            "2000–2024 by county from the Secretary of State's tabulations, and Illinois 2000–2022 by county from the "
-            "State Board of Elections' vote totals",
+            "2000–2024 by county from the Secretary of State's tabulations, Illinois 2000–2022 by county from the "
+            "State Board of Elections' vote totals, Texas 2000–2014 by county from the Secretary of State's "
+            "election history, and Florida 2000–2022 by county from the Division of Elections' results extracts",
             polity="US",
         )
 
@@ -2031,6 +2268,22 @@ def emit() -> Path:
                 cs.artifact(raw.cached(SOURCE, IL_DOWNLOAD.format(token)), sources["IL"])
         for day in NC_DAYS:
             cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), sources["NC"])
+        for day in FL_DAYS:
+            extract = raw.cached(SOURCE, fl_sos.EXTRACT.format(day=day))
+            cs.artifact(extract, sources["FL"])
+            for race, party, district in {
+                (row[3], row[1], row[7] if row[3] in ("STR", "STS") else "")
+                for row in csv.reader(io.StringIO(extract.path.read_bytes().decode("cp1252")), delimiter="\t")
+                if row and row[3] in FL_RACES
+            }:
+                cs.artifact(
+                    raw.cached(SOURCE, FL_DETAIL.format(day=day, race=race, party=party, district=district)),
+                    sources["FL"],
+                )
+        for election in tx_elchist.PRIMARIES:
+            for race, title in tx_elchist.races(election):
+                if TX_RACE.fullmatch(title):
+                    cs.artifact(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm"), sources["TX"])
         for day in MN_DAYS:
             for file in ("allracesbyprecinct", "PrctTbl"):
                 cs.artifact(raw.cached(SOURCE, MN_FILES.format(day=day, name=file)), sources["MN"])
@@ -2143,7 +2396,7 @@ def emit() -> Path:
         parties = {code: cs.key("us.party", key) for code, (key, *_) in PARTIES.items() if key}
         systems = {
             key: cs.key("us.electoral_system", key)
-            for key in ("fptp", "top_two", "two_round_40", "two_round_30", "block", "irv")
+            for key in ("fptp", "top_two", "two_round", "two_round_40", "two_round_30", "block", "irv")
         }
         offices = {
             (state, office): cs.key("us.office", f"{office}:{state}")
@@ -2183,6 +2436,8 @@ def emit() -> Path:
             *(("CA", day, None) for day in CA_DAYS),
             *(("ME", day, None) for day in ME_DAYS.values()),
             *(("IL", day, None) for day in IL_DAYS.values()),
+            *(("TX", day, first) for day, first in TX_DAYS.items()),
+            *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(
                 (state, day, None)
                 for state, day in lines.filter(pl.col("state").is_in(list(ELSTATS)))
@@ -2210,7 +2465,8 @@ def emit() -> Path:
                     f"{day:%B} {day.day}, {day.year} {STATES[state][1]} primary {'runoff ' if first else ''}election",
                 )
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=election)
-        later = {(first, day) for day, first in NC_DAYS.items() if first}
+        rounds = {"NC": NC_DAYS, "TX": TX_DAYS, "FL": FL_DAYS}
+        later = {(state, first, day) for state, days in rounds.items() for day, first in days.items() if first}
         contests = {
             group: rows.sort(["votes", "choice"], descending=[True, False])
             for group, rows in lines.group_by("state", "day", "office", "code", "party", "choice", "writein")
@@ -2223,7 +2479,7 @@ def emit() -> Path:
             )
             .group_by("state", "day", "office", "code", "party")
         }
-        held = {(day, office, code, party) for state, day, office, code, party in contests if state == "NC"}
+        held = {key for key in contests if key[0] in rounds}
         parts = {
             tuple(row)
             for row in lines.filter(pl.col("code").is_not_null(), pl.col("scheme").is_in(["us.county", "us.aggregate"]))
@@ -2242,7 +2498,7 @@ def emit() -> Path:
         ):
             assert isinstance(state, str) and isinstance(day, date) and isinstance(office, str)
             assert isinstance(party, str) and (code is None or isinstance(code, str))
-            first = NC_DAYS.get(day) if state == "NC" else None
+            first = rounds.get(state, {}).get(day)
             fips, place = STATES[state][0], STATES[state][1]
             _, word, etype, label = PARTIES[party]
             if code is not None:
@@ -2264,7 +2520,11 @@ def emit() -> Path:
             if first is not None:
                 previous = made.get((state, first, office, code, party))
                 if previous is None:
-                    prior = f"{first}:NC:{office}:{code}:{etype}" if code is not None else f"{first}:NC:{office}:{word}"
+                    prior = (
+                        f"{first}:{state}:{office}:{code}:{etype}"
+                        if code is not None
+                        else f"{first}:{state}:{office}:{word}"
+                    )
                     previous = next(
                         (
                             cs.key("us.contest", value)
@@ -2310,6 +2570,10 @@ def emit() -> Path:
                     if state == "ME" and day.year >= 2018
                     else "fptp"
                     if state in ("MN", "CA", "ME", "IL", *ELSTATS)
+                    else "two_round"
+                    if state == "TX" or (state == "FL" and day.year == 2000)
+                    else "fptp"
+                    if state == "FL"
                     else "two_round_40"
                     if day.year < 2018
                     else "two_round_30"
@@ -2375,10 +2639,25 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=old[0], option_id=option, kind=outcome, seats=seats, notes=notes)
                 if empty:
                     cs.add("note", entity_id=old[0], kind="caveat", body_md=EMPTY)
-            threshold = 40 if day.year < 2018 else 30
+            threshold = 50 if state in ("TX", "FL") else 40 if day.year < 2018 else 30
             total = rows["votes"].sum()
             ranked = rows.filter(~pl.col("writein"))
             nominated: dict[str, bool] = {}
+            shared = [
+                (words[0][0], slug(words[-1]))
+                for words in (
+                    [
+                        word
+                        for word in re.sub(r"\(.*?\)|\".*?\"|,", " ", text).lower().split()
+                        if word.strip(".") not in ("jr", "sr", "ii", "iii", "iv")
+                    ]
+                    for text in (
+                        re.sub(r" and .+", "", choice) if state == "MN" and office == "governor" else choice
+                        for choice in rows["choice"]
+                    )
+                )
+                if words
+            ]
             for choice, writein, preference in rows.select("choice", "writein", "label").iter_rows():
                 if writein:
                     option = cs.key("us.option", f"{base}:write-ins")
@@ -2399,7 +2678,9 @@ def emit() -> Path:
                             (state, day.year, office, code, parties.get(preference), words[0][0], slug(words[-1])),
                             set(),
                         )
-                        if role == "head" and preference in parties
+                        if role == "head"
+                        and preference in parties
+                        and shared.count((words[0][0], slug(words[-1]))) == 1
                         else set()
                     )
                     local = f"{state}:{office if role == 'head' else 'lieutenant-governor'}:{code or ''}:{party}:{slug(text)}"
@@ -2449,7 +2730,7 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_MAJORITY)]
                 elif tallies[0] > tallies[1] and nominated.get(names[0]) and day.year < 2024:
                     wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", "IL", *ELSTATS):
+            elif state in ("MN", "CA", "ME", "IL", *ELSTATS) or (state == "FL" and day.year > 2000):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
@@ -2459,15 +2740,19 @@ def emit() -> Path:
                 elif magnitude == 1 and tallies[0] > tallies[1] and nominated.get(names[0]):
                     wins = [(names[0], "won", WON_NOMINEE)]
             elif tallies:
-                runoff = state == "NC" and (
-                    any((day, later_day) in later and (later_day, office, code, party) in held for later_day in NC_DAYS)
+                runoff = state in rounds and (
+                    any(
+                        (state, day, later_day) in later and (state, later_day, office, code, party) in held
+                        for later_day in rounds[state]
+                    )
                     or any(
                         re.fullmatch(
-                            rf"{later_day}:NC:{office}:" + (f"{code}:{etype}runoff" if code is not None else str(word)),
+                            rf"{later_day}:{state}:{office}:"
+                            + (f"{code}:{etype}runoff" if code is not None else str(word)),
                             value,
                         )
-                        for later_day in NC_DAYS
-                        if (day, later_day) in later
+                        for later_day in rounds[state]
+                        if (state, day, later_day) in later
                         for value in keys
                     )
                 )
@@ -2575,6 +2860,15 @@ def emit() -> Path:
                     if state == "ME"
                     else IL_METHOD
                     if state == "IL"
+                    else TX_METHOD
+                    if state == "TX"
+                    else FL_METHOD.format(
+                        rule=", with more than half the votes, or the leader of the second primary; when a second "
+                        "primary followed, the top two are shown as advancing"
+                        if day.year == 2000
+                        else ""
+                    )
+                    if state == "FL"
                     else ELSTATS_METHOD.format(publisher=STATES[state][2])
                     if state in ELSTATS
                     else JUDICIAL_METHOD
