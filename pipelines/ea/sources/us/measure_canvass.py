@@ -144,6 +144,7 @@ WYOMING = {
     date(2024, 11, 5): "2024/Results/General/2024_General_Statewide_Constitutional_Amendment_Summary.pdf",
 }
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
+ILLINOIS = {date(2016, 11, 8): 2016, date(2020, 11, 3): 2020, date(2022, 11, 8): 2022}
 KENTUCKY = {
     date(2022, 11, 8): (
         "https://elect.ky.gov/results/2020-2029/Documents/2022%20General%20Election%20Results.pdf",
@@ -285,6 +286,12 @@ DOCUMENTS = {
         "https://sos.iowa.gov/elections/results/",
         "the Iowa State Board of Canvassers' canvass summary",
     ),
+    "IL": (
+        "Illinois State Board of Elections",
+        "Official vote cast at the general election",
+        "https://www.elections.il.gov/electionoperations/VoteTotalSearch.aspx",
+        "the Illinois State Board of Elections' official vote",
+    ),
     "KY": (
         "Kentucky State Board of Elections",
         "Official general election results",
@@ -324,6 +331,12 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WAYBACK.format(*MONTANA[day]) if day in MONTANA else ""
     if state == "IA":
         return SOURCE, f"https://sos.iowa.gov/elections/pdf/{IOWA[day]}/general/canvsummary.pdf" if day in IOWA else ""
+    if state == "IL":
+        return SOURCE, (
+            f"https://elections.il.gov/Downloads/ElectionOperations/VoteTotals/{ILLINOIS[day]}GEOfficialVote.pdf"
+            if day in ILLINOIS
+            else ""
+        )
     if state == "KY":
         return SOURCE, KENTUCKY[day][0] if day in KENTUCKY else ""
     if state == "WY":
@@ -511,6 +524,54 @@ def parse() -> None:
                     )
                     & (total.sum().over("office", "answer") == 1)
                     & (pl.len().over("office", "answer") == 100)
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "IL":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            reading = False
+            wrapped = None
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    counts = re.findall(r"(?<![\d.,])\d[\d,]*(?![\d.,]*\s*%)", line)
+                    if "CONSTITUTIONAL AMENDMENT PROPOSAL" in line:
+                        reading = True
+                    elif reading and wrapped and len(counts) == 3:
+                        records.append((wrapped, "Constitutional Amendment", "YES", counts[1], number))
+                        records.append((wrapped, "Constitutional Amendment", "NO", counts[2], number))
+                        wrapped = None
+                    elif reading and (matched := re.match(r"\s*\d?\s+([A-Za-z][A-Za-z. ]*?)\s{2,}\d", line)):
+                        county = "Total" if matched[1] == "TOTALS" else matched[1]
+                        counts = re.findall(r"(?<![\d.,])\d[\d,]*(?![\d.,]*\s*%)", line[matched.end(1) :])
+                        if elstats.plain(county) in names["IL"] or county == "Total":
+                            if len(counts) == 1:
+                                wrapped = county
+                            elif len(counts) == 4:
+                                records.append((county, "Constitutional Amendment", "YES", counts[2], number))
+                                records.append((county, "Constitutional Amendment", "NO", counts[3], number))
+                        if county == "Total":
+                            reading = False
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 103)
                 )
                 .filter(~total)
                 .drop("count")
