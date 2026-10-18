@@ -4,7 +4,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "us.kc_board"
-VERSION = "3"
+VERSION = "4"
 CAVEAT = (
     "MEDSL's Kansas City jurisdiction is the Kansas City Board of Election Commissioners, which runs elections only "
     "in the Jackson County part of the city; Clay, Platte, and Cass counties count their parts of Kansas City "
@@ -27,8 +27,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Kansas City, Missouri's election board units, filed within Missouri, move within Jackson "
-            "County with a membership in Kansas City, and the units under them within Jackson County, since the "
-            "board covers only the Jackson County part of the city",
+            "County with a partial membership in Kansas City, so their rollups to the city are marked not exact, "
+            "and the units under them move within Jackson County, since the board covers only the Jackson County "
+            "part of the city",
             polity="US",
             kind="correction",
         )
@@ -67,7 +68,9 @@ def emit() -> Path:
                 valid_to=valid_to,
                 valid_to_precision=to_precision,
             )
-            cs.add("reporting_unit_area", unit_id=id, area_id=city, valid_from=valid_from, valid_to=valid_to)
+            cs.add(
+                "reporting_unit_area", unit_id=id, area_id=city, valid_from=valid_from, valid_to=valid_to, partial=True
+            )
             if not noted:
                 cs.add("note", entity_id=id, kind="caveat", body_md=CAVEAT)
             moved += 1

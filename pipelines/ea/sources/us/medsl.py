@@ -480,6 +480,7 @@ def emit() -> Path:
                     area_id=cs.area("us.place", code),
                     valid_from=None,
                     valid_to=None,
+                    partial=True,
                 )
 
         result_sets: dict[tuple[int, str], UUID] = {}
