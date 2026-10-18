@@ -151,6 +151,7 @@ PUBLISHERS = {
     "MI": "Michigan Bureau of Elections",
     "WI": "Wisconsin Elections Commission",
     "TX": "Texas Secretary of State",
+    "MN": "Minnesota Secretary of State",
     "VA": "Virginia Department of Elections",
     "AL": "Alabama Secretary of State",
     "CA": "California Secretary of State",
@@ -170,6 +171,56 @@ PUBLISHERS = {
 }
 SYSTEMS = {"GA": "two_round", "LA": "two_round", "MS": "two_round", "TX": "two_round", "CA": "top_two", "WA": "top_two"}
 SPECIALS: dict[str, tuple[str, str, str | None]] = {
+    "2023-12-05:MN:house:52-b": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=159&scenario=StateRepresentative",
+        None,
+    ),
+    "2024-03-19:MN:house:27-b": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=165&scenario=StateRepresentative",
+        None,
+    ),
+    "2025-01-28:MN:senate:60": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=178&scenario=StateSenate",
+        None,
+    ),
+    "2025-03-11:MN:house:40-b": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=181&scenario=StateRepresentative",
+        None,
+    ),
+    "2025-04-29:MN:senate:6": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=184&scenario=StateSenate",
+        None,
+    ),
+    "2025-09-16:MN:house:34-b": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=189&scenario=StateRepresentative",
+        None,
+    ),
+    "2025-11-04:MN:senate:29": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=187&scenario=StateSenate",
+        None,
+    ),
+    "2025-11-04:MN:senate:47": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=187&scenario=StateSenate",
+        None,
+    ),
+    "2026-01-27:MN:house:47-a": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=194&scenario=StateRepresentative",
+        None,
+    ),
+    "2026-01-27:MN:house:64-a": (
+        "transcribed",
+        "https://electionresults.sos.mn.gov/Results/Index?ersElectionId=194&scenario=StateRepresentative",
+        None,
+    ),
     "2023-11-07:TX:house:2": (
         "transcribed",
         "https://results.texas-election.com/static/data/election/49379/117/Districted.json",
@@ -660,6 +711,25 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2026-01-06:SC:house:98": ("clarity", SOUTH_CAROLINA.format("125869/367712"), "Representatives, District 98"),
 }
 TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
+    "2023-12-05:MN:house:52-b": [
+        ("Bianca Virnig", "DFL", 3853),
+        ("Charles Kuchlenz", "LIB", 59),
+        ("Cynthia Lonnquist", "R", 2705),
+        (None, None, 1),
+    ],
+    "2024-03-19:MN:house:27-b": [("Bryan Lawrence", "R", 1752), ("Brad Brown", "DFL", 319), (None, None, 2)],
+    "2025-01-28:MN:senate:60": [("Doron Clark", "DFL", 7783), ("Abigail Wolters", "R", 746), (None, None, 32)],
+    "2025-03-11:MN:house:40-b": [("Paul Wikstrom", "R", 3966), ("David Gottfried", "DFL", 9352), (None, None, 13)],
+    "2025-04-29:MN:senate:6": [("Denise Slipy", "DFL", 8376), ("Keri Heintzeman", "R", 12752), (None, None, 30)],
+    "2025-09-16:MN:house:34-b": [("Xp Lee", "DFL", 4331), ("Ruth Bittner", "R", 2785), (None, None, 5)],
+    "2025-11-04:MN:senate:29": [("Louis McNutt", "DFL", 7459), ("Michael Holmstrom Jr", "R", 12328), (None, None, 22)],
+    "2025-11-04:MN:senate:47": [
+        ("Dwight Dorau", "R", 8383),
+        ("Amanda Hemmingsen-Jaeger", "DFL", 13527),
+        (None, None, 18),
+    ],
+    "2026-01-27:MN:house:47-a": [("Shelley Buck", "DFL", 1913), (None, None, 48)],
+    "2026-01-27:MN:house:64-a": [("Meg Luger-Nikolai", "DFL", 5557), ("Dan Walsh", "R", 254), (None, None, 21)],
     "2023-11-07:TX:house:2": [
         ("Jill Dutton", "REP", 7156),
         ("Heath Hyde", "REP", 6081),
@@ -867,6 +937,7 @@ PARTIES = {
     "democratic-farmer-labor": "democratic-party",
     "republican": "republican-party",
     "rep": "republican-party",
+    "r": "republican-party",
     "gop": "republican-party",
     "libertarian": "libertarian-party",
     "lbt": "libertarian-party",
