@@ -1,3 +1,8 @@
+<script lang="ts" module>
+  let handoff: { path: string; image: string } | null = null;
+  const warmed: Record<string, boolean> = {};
+</script>
+
 <script lang="ts">
   import type * as Maplibre from "maplibre-gl";
   import { goto, preloadData } from "$app/navigation";
@@ -10,7 +15,7 @@
   import { mode } from "mode-watcher";
   import { untrack } from "svelte";
   import { on } from "svelte/events";
-  import { fly } from "svelte/transition";
+  import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
   import { count, percent, points } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -80,6 +85,17 @@
   const uid = $props.id();
   let maps = $state<Array<Maplibre.Map>>([]);
   let isLoaded = $state(false);
+  let opening = $state<number | null>(null);
+  let still = $state(
+    untrack(() =>
+      handoff != null &&
+      decodeURI(handoff.path) === decodeURI(page.url.pathname)
+        ? handoff.image
+        : null,
+    ),
+  );
+  handoff = null;
+  let dwell: ReturnType<typeof setTimeout> | undefined;
   let credits = $state<Array<string>>([]);
   const credited = $derived(sources ?? credits);
   let pinned = $state<number | null>(null);
@@ -308,11 +324,32 @@
       return;
     }
     const loading = preloadData(href);
+    opening = k;
+    pinned = k;
+    focus = k;
     let isGone = false;
     const leave = () => {
       if (!isGone) {
         isGone = true;
-        void loading.finally(() => void goto(href));
+        void loading.then(
+          () => {
+            try {
+              handoff = {
+                path: href,
+                image: map.getCanvas().toDataURL("image/webp", 0.85),
+              };
+            } catch {
+              handoff = null;
+            }
+            void goto(href).finally(() => {
+              opening = null;
+            });
+          },
+          () => {
+            opening = null;
+            void goto(href);
+          },
+        );
       }
     };
     map.once("moveend", leave);
@@ -874,13 +911,24 @@
           const id = map.queryRenderedFeatures(event.point, { layers: hit })[0]
             ?.id;
           const k = typeof id === "number" && rows.has(id) ? id : null;
-          map.getCanvas().style.cursor =
-            k != null && rows.get(k)?.path != null ? "pointer" : "";
-          if (pinned == null) {
+          const path = k == null ? null : rows.get(k)?.path;
+          map.getCanvas().style.cursor = path != null ? "pointer" : "";
+          if (pinned == null && focus !== k) {
             focus = k;
+            clearTimeout(dwell);
+            if (path != null) {
+              dwell = setTimeout(() => {
+                const href = resolve("/[...path]", { path });
+                if (focus === k && warmed[href] !== true) {
+                  warmed[href] = true;
+                  void preloadData(href);
+                }
+              }, 350);
+            }
           }
         });
         map.on("mouseleave", "fill", () => {
+          clearTimeout(dwell);
           map.getCanvas().style.cursor = "";
           if (pinned == null) {
             focus = null;
@@ -904,6 +952,11 @@
             focus = k;
           } else {
             open(k);
+          }
+        });
+        map.once("idle", () => {
+          if (index === 0) {
+            still = null;
           }
         });
         map.on("load", () => {
@@ -934,6 +987,7 @@
     })();
     return () => {
       stop.abort();
+      clearTimeout(dwell);
       for (const map of built) {
         map.remove();
       }
@@ -1213,11 +1267,31 @@
       )}
       data-map-surface
     ></div>
-    {#if !isLoaded}
+    {#if still != null}
+      <img
+        class="pointer-events-none absolute inset-0 object-cover block-full inline-full"
+        src={still}
+        alt=""
+        out:fade={{ duration: calm ? 0 : 180 }}
+      />
+    {:else if !isLoaded}
       <p
         class="absolute inset-0 grid place-items-center text-[0.8125rem] text-muted-foreground"
       >
         {m.map_loading()}
+      </p>
+    {/if}
+    {#if opening != null}
+      <p
+        class="pointer-events-none absolute inset-x-0 inset-be-3 mx-auto flex items-center gap-2 rounded-sm bg-card/95 px-3 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 inline-fit"
+        role="status"
+        transition:fade={{ duration: calm ? 0 : 120 }}
+      >
+        <span
+          class="animate-spin rounded-full border-2 border-border border-bs-foreground block-3.5 inline-3.5 motion-reduce:animate-none"
+          aria-hidden="true"
+        ></span>
+        {m.map_opening({ place: rows.get(opening)?.name ?? "" })}
       </p>
     {/if}
     {#if frames.length > 1}

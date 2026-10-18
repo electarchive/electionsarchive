@@ -4,7 +4,7 @@
   import type { Snippet } from "svelte";
   import { onNavigate } from "$app/navigation";
   import { resolve } from "$app/paths";
-  import { page } from "$app/state";
+  import { navigating, page } from "$app/state";
   import { ProgressBar } from "@prgm/sveltekit-progress-bar";
   import { QueryClientProvider } from "@tanstack/svelte-query";
   import { SvelteQueryDevtools } from "@tanstack/svelte-query-devtools";
@@ -23,6 +23,7 @@
     ConfirmationStore,
     setConfirmationContext,
   } from "#lib/stores/confirmation.svelte.js";
+  import { cn } from "#lib/utils.js";
 
   const { children }: { children: Snippet } = $props();
 
@@ -30,6 +31,10 @@
 
   setConfirmationContext(new ConfirmationStore());
   setContext("figures", new Set<string>());
+
+  const isPending = $derived(
+    navigating.to != null && navigating.to.url.pathname !== page.url.pathname,
+  );
 
   const embed = $derived(
     /^[a-z]+(?:-\d+)?$/.exec(page.url.searchParams.get("embed") ?? "")?.[0] ??
@@ -158,7 +163,13 @@
     {#if embed == null}
       <div class="grid grid-rows-[auto_1fr] min-block-dvh">
         <Header />
-        <div class="mx-auto inline-full max-inline-7xl">
+        <div
+          class={cn(
+            "mx-auto transition-opacity duration-200 inline-full max-inline-7xl motion-reduce:transition-none",
+            { "opacity-55 delay-150": isPending },
+          )}
+          aria-busy={isPending}
+        >
           {@render children()}
         </div>
       </div>

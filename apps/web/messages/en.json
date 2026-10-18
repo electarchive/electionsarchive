@@ -625,6 +625,7 @@
   "map_margin_over": "{points} or more",
   "map_open": "Open {place}",
   "map_loading": "Loading map",
+  "map_opening": "Loading {place}…",
   "map_gesture_windows": "Hold Ctrl and scroll to zoom",
   "map_gesture_mac": "Hold ⌘ and scroll to zoom",
   "map_gesture_mobile": "Use two fingers to move the map",
