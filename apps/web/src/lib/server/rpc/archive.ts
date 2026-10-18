@@ -2,9 +2,10 @@ import type { Grouping, Match, Option, Relation, Side } from "@ea/analytics";
 import type { SQL } from "drizzle-orm";
 import { ancestry, compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
-import { ORPCError, os } from "@orpc/server";
+import { ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
 import * as v from "valibot";
+import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
 
 const STAGES = sql.raw(
@@ -70,7 +71,9 @@ const sisters = (roots: Array<string>, day: string) => sql`
     select t.id as contest, o.id as option,
       coalesce(bm.into_id, b.parent_party_id, pm.into_id, o.party_id) as party
     from tree t
-    join contest_option o on o.contest_id = t.id and o.party_id is not null
+    cross join lateral (
+      select o.id, o.party_id from contest_option o where o.contest_id = t.id and o.party_id is not null offset 0
+    ) o
     left join entity_merge pm on pm.entity_id = o.party_id
     left join party_affiliation b on b.party_id = coalesce(pm.into_id, o.party_id)
       and b.kind = 'regional_branch' and b.valid @> ${day}::date
@@ -80,11 +83,13 @@ const sisters = (roots: Array<string>, day: string) => sql`
   reach as (
     select l.party, array_agg(distinct l.contest) as contests, count(distinct l.contest) as n
     from lines l
-    where exists (
-      select from lines w
-      join outcome x on x.option_id = w.option and x.kind in ('elected', 'won')
-      join result_set rs on rs.id = x.result_set_id and rs.is_default
-      where w.party = l.party
+    where l.party in (
+      select w.party from lines w
+      cross join lateral (
+        select from outcome x join result_set rs on rs.id = x.result_set_id and rs.is_default
+        where x.option_id = w.option and x.kind in ('elected', 'won')
+        limit 1
+      ) won
     )
     group by l.party
   )
@@ -329,7 +334,7 @@ async function children(
       union all
       select c.id from contest c join grp on c.allocation_parent_id = grp.id
     )
-    select rs.k from result_set rs join grp on grp.id = rs.contest_id
+    select rs.k from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
   `);
   const ks = sets.rows.map((row) => row.k);
   if (ks.length === 0) {
@@ -597,7 +602,7 @@ async function load(
     ),
     sets as materialized (
       select rs.k, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
-      from result_set rs join grp on grp.id = rs.contest_id
+      from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
     ),
     picked as (
       select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.contest_id as contest, rs.root, rs.stage, rs.status,
@@ -1458,7 +1463,7 @@ async function places(
         union all
         select c.id from contest c join grp on c.allocation_parent_id = grp.id
       )
-      select rs.k, rs.is_default as "isDefault" from result_set rs join grp on grp.id = rs.contest_id
+      select rs.k, rs.is_default as "isDefault" from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
       where rs.status = 'active'
     `);
     const defaults = sets.rows
@@ -2112,7 +2117,7 @@ export const contests = {
           select a.k from head join contest c on c.id = head.id join area a on a.id = c.district_area_id
         ),
         sets as (
-          select rs.k, rs.source_id from result_set rs join tree on tree.id = rs.contest_id where rs.is_default
+          select rs.k, rs.source_id from tree cross join lateral (select * from result_set x where x.contest_id = tree.id offset 0) rs where rs.is_default
         ),
         options as (
           select o.k from contest_option o join tree on tree.id = o.contest_id
@@ -2749,9 +2754,13 @@ export const contests = {
         ),
         tallied as materialized (
           select distinct grp.root from grp
-          join result_set rs on rs.contest_id = grp.id
           cross join lateral (
-            select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
+            select from result_set rs
+            cross join lateral (
+              select from result_rollup x where x.result_set_k = rs.k and x.area_k = ${area.k} and x.measure = any(${COUNTED}) limit 1
+            ) probe
+            where rs.contest_id = grp.id
+            limit 1
           ) hit
         ),
         decided as materialized (
@@ -2825,7 +2834,7 @@ export const contests = {
            ),
            sets as materialized (
              select grp.root, rs.k, rs.contest_id, rs.is_default, rs.stage, rs.completeness
-             from result_set rs join grp on grp.id = rs.contest_id
+             from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
            ),
            picked as (
              select distinct on (rs.contest_id) rs.root, rs.k
@@ -3681,7 +3690,7 @@ export const contests = {
         ),
         hits as (
           select distinct grp.top from grp
-          join result_set rs on rs.contest_id = grp.id
+          cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
           where exists (
             select 1 from result_rollup r
             where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
@@ -4041,7 +4050,7 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     isFilled: boolean;
   }>(sql`
     with parts as (
-      select (ST_Dump(ST_SimplifyPreserveTopology(g.geom, 0.02))).geom as geom
+      select (ST_Dump(g.geom)).geom as geom
       from area_geometry g
       where g.area_id = ${area}::uuid and g.valid @> ${day}::date
     ),
@@ -4056,8 +4065,9 @@ async function framing(area: string, day: string, ks: Array<number> = []) {
     select ST_XMin(box) as west, ST_YMin(box) as south, ST_XMax(box) as east, ST_YMax(box) as north,
       size / nullif(sum(size) over (), 0) as share,
       cardinality(${sql.param(ks)}::int[]) = 0 or exists (
-        select from area x join area_geometry g on g.area_id = x.id
-        where x.k = any(${sql.param(ks)}::int[]) and g.valid @> ${day}::date and g.geom && ST_SetSRID(box::geometry, 4326)
+        select from area x
+        cross join lateral (select g.geom from area_geometry g where g.area_id = x.id and g.valid @> ${day}::date offset 0) g
+        where x.k = any(${sql.param(ks)}::int[]) and g.geom && ST_SetSRID(box::geometry, 4326)
       ) as "isFilled"
     from grouped order by size desc
   `);
@@ -4103,8 +4113,9 @@ async function sketch(
           where x.scheme_code = bs.scheme_code and x.k = any(${sql.param([...ks, area.k])}::int[]) and c.credit is not null
         ) as credits,
         exists (
-          select from area_geometry g join area x on x.id = g.area_id
-          where x.scheme_code = bs.scheme_code and g.quality = 'synthetic' and g.valid @> coalesce(bs.as_of, ${day}::date)
+          select from (select area_id, valid from area_geometry where quality = 'synthetic' offset 0) g
+          join area x on x.id = g.area_id
+          where x.scheme_code = bs.scheme_code and g.valid @> coalesce(bs.as_of, ${day}::date)
           limit 1
         ) as synthetic
       from boundary_set bs
@@ -4230,24 +4241,35 @@ async function races(
         union
         select p.parent_id from polity_parent p join anc on p.polity_id = anc.id
       ),
-      runs as (
-        select n.previous_round_id as id, array_agg(n.id) as ids
-        from contest n join election ne on ne.id = n.election_id
-        where ne.kind = 'runoff' and n.previous_round_id is not null
-        group by n.previous_round_id
-      )
-      select c.id, c.kind::text as kind,
-        coalesce(
+      base as materialized (
+        select c.id, tree.stage, coalesce(
           (select b.polity_id from body b where b.id = c.body_id),
           (select o.polity_id from office o where o.id = c.office_id),
           e.polity_id
-        ) in (select id from anc) as "isOwn",
+        ) in (select id from anc) as own
+        from contest c
+        join election e on e.id = c.election_id
+        join tree on tree.id = c.election_id
+        where c.allocation_parent_id is null or not exists (
+          select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
+        )
+      ),
+      kept as materialized (
+        select id, stage, own from base where own or not exists (select from base where own)
+      ),
+      runs as (
+        select n.previous_round_id as id, array_agg(n.id) as ids
+        from contest n join election ne on ne.id = n.election_id
+        where ne.kind = 'runoff' and n.previous_round_id in (select id from kept)
+        group by n.previous_round_id
+      )
+      select c.id, c.kind::text as kind, k.own as "isOwn",
         case when c.kind = 'ballot_question' then c.id::text
-          else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, c.party_scope_id, tree.stage) end as series,
+          else concat_ws(':', c.office_id, c.body_id, c.kind, case when e.kind <> 'general' then e.date_from end, c.party_scope_id, k.stage) end as series,
         coalesce(c.body_id, c.office_id) as owner, c.office_id as office, c.election_id as election,
         case when c.kind = 'office' then null else c.body_id end as body,
         e.date_from::text as day, c.round_number as round,
-        c.kind = 'office' as "isOffice", tree.stage as "isStage", z.seats as size,
+        c.kind = 'office' as "isOffice", k.stage as "isStage", z.seats as size,
         (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
           select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
         ))) and coalesce(st.voting, true) as "isCounted",
@@ -4258,7 +4280,8 @@ async function races(
         case when exists (
           select from contest_option o where o.contest_id = c.id and o.party_id is null and o.alliance_id is not null
         ) then 'alliance' else 'party' end as grouping
-      from contest c
+      from kept k
+      join contest c on c.id = k.id
       join election e on e.id = c.election_id
       left join seat st on st.id = c.seat_id
       left join area a on a.id = c.district_area_id
@@ -4268,11 +4291,7 @@ async function races(
         where z.body_id = c.body_id and (z.valid @> e.date_from or z.valid_from between e.date_from and e.date_from + 150)
         order by z.valid_from desc nulls last limit 1
       ) z on true
-      join tree on tree.id = c.election_id
       left join runs on runs.id = c.id
-      where c.allocation_parent_id is null or not exists (
-        select from contest p join tree pt on pt.id = p.election_id where p.id = c.allocation_parent_id
-      )
     `),
     db.execute<{ id: string; k: number }>(sql`
       select a.id, a.k from polity_territory pt join area a on a.id = pt.area_id
@@ -4298,13 +4317,13 @@ async function races(
   }
   const [labels, slugs, lineage] = await Promise.all([
     names(
-      found.rows.flatMap((row) => [
+      owned.flatMap((row) => [
         row.id,
         ...[row.owner, row.area].filter((id) => id != null),
       ]),
       date,
     ),
-    paths(found.rows.map((row) => row.id)),
+    paths(owned.map((row) => row.id)),
     branches(day),
   ]);
   const parentOf = new Map(lineage.map((row) => [row.from, row.to]));
@@ -7964,7 +7983,7 @@ export const people = {
         ),
         picked as (
           select distinct on (rs.contest_id) grp.root, rs.k, p.area
-          from grp join result_set rs on rs.contest_id = grp.id join placed p on p.root = grp.root
+          from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs join placed p on p.root = grp.root
           join lateral (
             select 1 from result_rollup r where r.result_set_k = rs.k and r.area_k = p.area and r.measure = any(${COUNTED}) limit 1
           ) hit on true
@@ -8316,7 +8335,7 @@ export const parties = {
         ),
         picked as materialized (
           select distinct on (rs.contest_id) t.root, rs.k, t.area
-          from tree t join result_set rs on rs.contest_id = t.id
+          from tree t cross join lateral (select * from result_set x where x.contest_id = t.id offset 0) rs
           cross join lateral (
             select from result_rollup x where x.result_set_k = rs.k and x.area_k = t.area and x.measure = any(${COUNTED}) limit 1
           ) hit
