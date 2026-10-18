@@ -81,7 +81,7 @@ export async function home() {
   const drawn = atlas.get("world") ?? draw();
   atlas.set("world", drawn);
   const [polities, shapes, dated, held] = await Promise.all([
-    call(router.polities.list, undefined),
+    call(router.polities.list, { kinds: ["sovereign_state", "supranational"] }),
     drawn,
     db.execute<{
       id: string;
@@ -89,7 +89,7 @@ export async function home() {
       path: string;
       date: string;
       kind: string;
-      polity: string;
+      polity: string | null;
       when: string;
     }>(sql`
       with picked as (
@@ -97,9 +97,11 @@ export async function home() {
           from election e join polity y on y.id = e.polity_id
           where e.parent_id is null and y.kind in ('sovereign_state', 'supranational')
             and e.kind in ('general', 'referendum') and e.date_from <= current_date
-            and exists (
-              select from contest c join election x on x.id = c.election_id
-              where x.id = e.id or (x.parent_id = e.id and y.kind = 'sovereign_state')
+            and (
+              exists (select from contest c where c.election_id = e.id)
+              or (y.kind = 'sovereign_state' and exists (
+                select from election x join contest c on c.election_id = x.id where x.parent_id = e.id
+              ))
             )
           order by e.date_from desc limit 6)
         union all
@@ -114,9 +116,11 @@ export async function home() {
             and abs(extract(doy from e.date_from) - extract(doy from current_date)) <= 3
           order by (e.kind = 'general') desc, e.date_from desc limit 8)
       )
-      select p.id, p.date_from::text as date, p.kind::text as kind, p.polity_id as polity, p.when, s.path,
+      select p.id, p.date_from::text as date, p.kind::text as kind, p.when, s.path,
         (select n.text from name n where n.entity_id = p.id and n.kind in ('official', 'english')
-          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as name
+          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as name,
+        (select n.text from name n where n.entity_id = p.polity_id and n.kind in ('official', 'english')
+          order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1) as polity
       from picked p join slug s on s.entity_id = p.id and s.is_current
     `),
     db.execute<{ id: string; years: Array<number> }>(sql`
@@ -135,14 +139,13 @@ export async function home() {
         polity.kind === "sovereign_state" || polity.kind === "supranational",
     )
     .map((polity) => ({ ...polity, years: years.get(polity.id) ?? [] }));
-  const names = new Map(polities.map((polity) => [polity.id, polity.name]));
   const elections = dated.rows.map((row) => ({
     id: row.id,
     name: row.name ?? "",
     path: row.path,
     date: row.date,
     kind: row.kind,
-    polity: names.get(row.polity) ?? null,
+    polity: row.polity,
     when: row.when,
   }));
   return {

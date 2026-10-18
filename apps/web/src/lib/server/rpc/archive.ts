@@ -1352,9 +1352,11 @@ async function tally(
     ),
     db.execute<{ round: number; value: number }>(sql`
       select r.count_round as round, sum(r.value)::float8 as value
-      from result_set rs join result_rollup r on r.result_set_k = rs.k
-      where rs.contest_id = ${contest.id}::uuid and rs.is_default and r.area_k = ${areaK}
-        and r.option_k = 0 and r.measure = 21
+      from result_set rs cross join lateral (
+        select x.count_round, x.value from result_rollup x
+        where x.result_set_k = rs.k and x.area_k = ${areaK} and x.option_k = 0 and x.measure = 21 offset 0
+      ) r
+      where rs.contest_id = ${contest.id}::uuid and rs.is_default
       group by r.count_round
     `),
   ]);
@@ -2478,9 +2480,12 @@ export const contests = {
           select * from (
             select nullif(max(r.value) filter (where r.measure = 2), 0)::float8 as registered,
               coalesce(max(r.value) filter (where r.measure = 14), max(r.value) filter (where r.measure = 3))::float8 as voters
-            from result_set rs join result_rollup r on r.result_set_k = rs.k
-            where rs.contest_id = ${contest.id}::uuid and rs.is_default and r.area_k = ${area?.k ?? null}::int
-              and r.option_k = 0 and r.measure in (2, 3, 14) and r.count_round = 0
+            from result_set rs cross join lateral (
+              select x.measure, x.value from result_rollup x
+              where x.result_set_k = rs.k and x.area_k = ${area?.k ?? null}::int and x.option_k = 0
+                and x.measure in (2, 3, 14) and x.count_round = 0 offset 0
+            ) r
+            where rs.contest_id = ${contest.id}::uuid and rs.is_default
           ) t where registered is not null and voters is not null
         `),
         db.execute<{
@@ -2495,9 +2500,11 @@ export const contests = {
               where rs.contest_id = ${contest.id}::uuid and not rs.is_default
             ) as derived
           from (
-            select max(r.count_round)::int as last from result_set rs join result_rollup r on r.result_set_k = rs.k
-            where rs.contest_id = ${contest.id}::uuid and rs.is_default and r.area_k = ${contest.place?.k ?? null}::int
-              and r.measure = any(${COUNTED})
+            select max(r.count_round)::int as last from result_set rs cross join lateral (
+              select x.count_round from result_rollup x
+              where x.result_set_k = rs.k and x.area_k = ${contest.place?.k ?? null}::int and x.measure = any(${COUNTED}) offset 0
+            ) r
+            where rs.contest_id = ${contest.id}::uuid and rs.is_default
           ) t
         `),
       ]);
@@ -2520,9 +2527,12 @@ export const contests = {
         breadcrumbs(contest.polity),
         db.execute<{ kind: string; body: string }>(sql`
           select kind::text, body_md as body from note
-          where entity_id in (${contest.id}::uuid, ${contest.election}::uuid)
-            or entity_id in (
-              select rs.id from result_set rs
+          where entity_id in (
+            select ${contest.id}::uuid
+            union all
+            select ${contest.election}::uuid
+            union all
+            select rs.id from result_set rs
               where rs.contest_id = ${contest.id}::uuid and (rs.is_default or exists (
                 select from result_rollup r
                 where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
@@ -2530,11 +2540,10 @@ export const contests = {
                   where d.contest_id = ${contest.id}::uuid and d.is_default and q.area_k = r.area_k
                 )
               ))
-            )
-            or entity_id in (
-              select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
-              where o.contest_id = ${contest.id}::uuid
-            )
+            union all
+            select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
+            where o.contest_id = ${contest.id}::uuid
+          )
           order by array_position(array['caveat','context','methodology','editorial']::note_kind[], kind)
         `),
         db.execute<{
@@ -2742,10 +2751,16 @@ export const contests = {
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
             e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
             c.term is not distinct from 'remainder' as "isRemainder"
-          from contest c
+          from (
+            select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
+            union
+            select x.id from polity_territory pt
+            join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
+            join contest x on x.election_id = y.id
+            where pt.area_id in (select id from anc) and x.district_area_id is null and x.allocation_parent_id is null
+          ) hit
+          join contest c on c.id = hit.id
           join election e on e.id = c.election_id
-          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-          where c.allocation_parent_id is null and coalesce(c.district_area_id, pt.area_id) in (select id from anc)
         ),
         grp(root, id) as materialized (
           select id, id from roots
@@ -2765,9 +2780,13 @@ export const contests = {
         ),
         decided as materialized (
           select distinct grp.root from grp
-          join contest_option o on o.contest_id = grp.id
-          join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
-          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          cross join lateral (
+            select from contest_option o
+            join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
+            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            where o.contest_id = grp.id
+            limit 1
+          ) hit
         )
         select * from (
           select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
@@ -2887,9 +2906,9 @@ export const contests = {
                head.person, coalesce(pm.into_id, o.party_id) as party, o.kind::text as kind, o.ballot_label as label,
                0::float8 as votes, 0::float8 as total
              from grp
-             join contest_option o on o.contest_id = grp.id
+             cross join lateral (select * from contest_option y where y.contest_id = grp.id offset 0) o
              join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
-             join result_set rs on rs.id = x.result_set_id and rs.is_default
+             cross join lateral (select from result_set z where z.id = x.result_set_id and z.is_default offset 0) rs
              left join entity_merge pm on pm.entity_id = o.party_id
              left join lateral (
                select coalesce(em.into_id, cy.person_id) as person
@@ -6195,6 +6214,7 @@ export const polities = {
     .meta(
       openapi({ method: "GET", path: "/polities", summary: "List polities" }),
     )
+    .input(v.optional(v.object({ kinds: v.optional(v.array(v.string())) })))
     .output(
       v.array(
         v.object({
@@ -6211,7 +6231,8 @@ export const polities = {
         }),
       ),
     )
-    .handler(async () => {
+    .handler(async ({ input }) => {
+      const kinds = input?.kinds == null ? null : sql.param(input.kinds);
       const result = await db.execute<{
         id: string;
         kind: string;
@@ -6245,6 +6266,7 @@ export const polities = {
         from polity p
         left join own o on o.polity_id = p.id
         left join nested i on i.top = p.id
+        where ${kinds}::text[] is null or p.kind::text = any(${kinds}::text[])
       `);
       const ids = result.rows.flatMap((row) =>
         row.latest == null ? [row.id] : [row.id, row.latest],
