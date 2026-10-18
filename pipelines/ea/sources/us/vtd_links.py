@@ -52,13 +52,13 @@ def emit() -> Path:
         )
         units = pl.DataFrame(
             conn.execute(
-                """select u.id::text, u.code, u.valid_from, u.valid_to, c.code from reporting_unit u
+                """select u.id::text, u.code, u.valid_from, u.valid_to, c.code, ch.pipeline from reporting_unit u
                    join area a on a.id = u.area_id and a.scheme_code = 'us.county'
-                   join area_code c on c.area_id = a.id
+                   join area_code c on c.area_id = a.id join changeset ch on ch.id = u.changeset_id
                    where u.scheme_code = 'us.precinct' and u.area_relation = 'within'
                      and u.valid_from >= '2000-01-01' and u.valid_from < '2015-01-01'"""
             ).fetchall(),
-            schema=["unit", "code", "valid_from", "valid_to", "county"],
+            schema=["unit", "code", "valid_from", "valid_to", "county", "pipeline"],
             orient="row",
         ).with_columns(
             vintage=pl.when(pl.col("valid_from") < date(2010, 4, 1)).then(2000).otherwise(2010),
@@ -103,7 +103,9 @@ def emit() -> Path:
             left = units.join(links, on="unit", how="anti").rename({f"{side}_key": "key"}).filter(pl.col("key") != "")
             right = vtds.join(links.select("area").unique(), on="area", how="anti").filter(pl.col(side) != "")
             once = ["vintage", "county", "key"]
-            left = left.filter(pl.col("code").str.split(":").list.last().n_unique().over([*once, "valid_from"]) == 1)
+            left = left.filter(
+                pl.col("code").str.split(":").list.last().n_unique().over([*once, "valid_from", "pipeline"]) == 1
+            )
             right = right.rename({side: "key"}).filter(pl.len().over(once) == 1)
             links = pl.concat([links, left.join(right, on=once).select("unit", "area", **{"pass": pl.lit(side)})])
         counts = Counter(links["area"].to_list())
