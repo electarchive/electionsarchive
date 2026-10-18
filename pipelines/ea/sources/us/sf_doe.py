@@ -36,7 +36,7 @@ PLANS = {
         "https://data.sf.gov/api/geospatial/bsfq-aeyw?method=export&format=GeoJSON",
         "prec_2012",
         date(2012, 11, 6),
-        date(2018, 11, 7),
+        date(2019, 11, 6),
     ),
     "2022": (
         "https://data.sf.gov/api/geospatial/d6x4-hefw?method=export&format=GeoJSON",
@@ -46,6 +46,7 @@ PLANS = {
     ),
 }
 RECORDS = {
+    "2019-11-05": ("20191127231913", "20191105/data/20191125/CVR_Export_20191125163446.zip"),
     "2020-11-03": ("20210628011559", "20201103/data/20201201/CVR_Export_20201201091840.zip"),
     "2022-11-08": ("20230419065651", "20221108/data/20221201/CVR_Export_20221201120428.zip"),
 }
@@ -462,7 +463,9 @@ def parse() -> None:
                 for name in ("Contest", "Candidate", "PrecinctPortion")
             }
             portions = {
-                portion["Id"]: re.findall(r"\d{4}", portion["Description"])[0]
+                portion["Id"]: "/".join(sorted(re.findall(r"\d{4}", portion["Description"])))
+                if day == "2019-11-05"
+                else re.findall(r"\d{4}", portion["Description"])[0]
                 for portion in manifest["PrecinctPortion"]
             }
             wanted = {}
@@ -483,7 +486,7 @@ def parse() -> None:
                     continue
                 for session in json.loads(archive.read(member))["Sessions"]:
                     side = session.get("Modified") or session["Original"]
-                    for card in side["Cards"]:
+                    for card in side.get("Cards", [side]):
                         for contest in card["Contests"]:
                             if contest["Id"] not in wanted:
                                 continue
@@ -701,9 +704,9 @@ def emit() -> Path:
         )
         if polity is None:
             raise ValueError("San Francisco County must already be a polity")
-        older = tallies.filter(~pl.col("key").str.slice(0, 10).is_in(["2016-11-08", *RECORDS])).with_columns(
-            plan=pl.when(pl.col("key") < "2012").then(pl.lit("2002")).otherwise(pl.lit("2012"))
-        )
+        older = tallies.filter(
+            ~pl.col("key").str.slice(0, 10).is_in(["2016-11-08", "2020-11-03", "2022-11-08"])
+        ).with_columns(plan=pl.when(pl.col("key") < "2012").then(pl.lit("2002")).otherwise(pl.lit("2012")))
         for vintage, number in sorted(set(older.select("plan", "unit").iter_rows())):
             members = number.split("/")
             area = cs.area("us.precinct", f"{vintage}:CA:06075:" + "-".join(members))
@@ -751,7 +754,7 @@ def emit() -> Path:
                     valid_from=date.fromisoformat(day),
                     valid_to=date.fromisoformat(day) + timedelta(days=1),
                 )
-        for day in ("2011-11-08", "2015-11-03", "2018-06-05"):
+        for day in ("2011-11-08", "2015-11-03", "2018-06-05", "2019-11-05"):
             cs.add(
                 "boundary_set",
                 scheme_code="us.precinct",
