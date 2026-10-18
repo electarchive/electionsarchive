@@ -79,7 +79,22 @@ def contests() -> pl.DataFrame:
     return pl.concat(frames).sort("state", "contest")
 
 
+JOURNAL = "https://legislature.vermont.gov/Documents/2018/Docs/JOURNAL/hj170104.pdf"
+RECOUNTS = {
+    "2016-11-08:VT:house:windsororange-1:g": (
+        {"page": 10},
+        (
+            "Town canvass totals show Sarah Buxton leading David Ainsworth 1,003 to 1,000. Following a recount requested by "
+            "Ainsworth, Superior Court Judge Robert Gerety ruled in December 2016 that Ainsworth received 1,005 votes and "
+            "Buxton received 1,003. The House seated Ainsworth for Windsor-Orange-1 on January 4, 2017. Because the "
+            "court's recount order is not published online, these totals are not stored as a separate result set."
+        ),
+    )
+}
+
+
 def fetch() -> None:
+    raw.fetch(SOURCE, JOURNAL, suffix=".pdf")
     for state in GRAPHQL:
         for year in YEARS:
             raw.fetch(SOURCE, search(state, year), suffix=".csv")
@@ -202,6 +217,22 @@ def emit() -> Path:
                 [f"{SOURCE}.result_set", WINNERS],
             ).fetchall()
         )
+        journal = cs.source("Vermont House of Representatives", "Journal of the House, January 4, 2017")
+        if journal in cs.minted:
+            cs.add(
+                "source",
+                id=journal,
+                kind="official_body",
+                publisher="Vermont House of Representatives",
+                title="Journal of the House, January 4, 2017",
+                url=JOURNAL,
+                license="Public record",
+            )
+        cs.artifact(raw.cached(SOURCE, JOURNAL), journal)
+        cited = {
+            (str(entity), str(source))
+            for entity, source in conn.execute("select entity_id, source_id from citation").fetchall()
+        }
         memberships: set[tuple[str, str, date]] = set()
         minted: dict[str, tuple[str, str, date]] = {}
         skipped: dict[str, list[str]] = {}
@@ -321,6 +352,12 @@ def emit() -> Path:
                         kind="methodology",
                         body_md=WINNERS,
                     )
+                if key in RECOUNTS:
+                    locator, caveat = RECOUNTS[key]
+                    cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
+                    for entity in (result_set, default):
+                        if (str(entity), str(journal)) not in cited:
+                            cs.add("citation", entity_id=entity, source_id=journal, locator=locator)
                 if f"{key}:precinct" in published:
                     continue
                 values.append(
