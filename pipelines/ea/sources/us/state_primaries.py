@@ -9,6 +9,7 @@ import unicodedata
 import zipfile
 from datetime import date, timedelta
 from pathlib import Path
+from typing import Any
 from urllib.parse import quote, urlencode
 from uuid import UUID
 from xml.etree import ElementTree
@@ -299,6 +300,13 @@ STATES = {
         fl_sos.PUBLISHER,
         "Election results extracts and detail reports: primaries by county, 2000–2022",
         "https://results.elections.myflorida.com/",
+    ),
+    "IN": (
+        "18",
+        "Indiana",
+        "Indiana Election Division",
+        "Election night reporting results archive",
+        "https://enr.indianavoters.in.gov/",
     ),
     "PA": (
         "42",
@@ -621,6 +629,14 @@ TX_METHOD = (
     "page does not mark winners, so the winner shown is the candidate with a majority, or the runoff's leader, and "
     "when a runoff followed, the top two are shown as advancing."
 )
+IN_DAY = date(2020, 6, 2)
+IN_ARCHIVE = "https://enr.indianavoters.in.gov/archive/2020Primary/data/OffCatC_{}_B.json"
+IN_CATEGORIES = {1009: "GOVERNOR", 1018: "senate", 1039: "house"}
+IN_METHOD = (
+    "Totals are the county rows of the Election Division's election night results archive, each candidate's rows "
+    "checked against the archive's statewide summary; a county the district splits holds only the district's part. "
+    "The winner shown is derived, not the archive's flag: the candidate with the most votes."
+)
 PA_ELECTIONS = {
     date(2000, 4, 4): 9,
     date(2002, 5, 21): 11,
@@ -924,6 +940,8 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
+    for category in IN_CATEGORIES:
+        raw.fetch(SOURCE, IN_ARCHIVE.format(category), suffix=".json")
     for election in PA_ELECTIONS.values():
         for office in PA_OFFICES:
             listing = json.loads(raw.fetch(SOURCE, PA_OFFICE.format(office, election), suffix=".json").path.read_text())
@@ -1001,6 +1019,10 @@ def fetch() -> None:
                         raw.fetch(SOURCE, MA_DOWNLOAD.format(election), suffix=".csv")
 
 
+def listed(value: dict[str, Any] | list[dict[str, Any]]) -> list[dict[str, Any]]:
+    return value if isinstance(value, list) else [value]
+
+
 def parse() -> None:
     with connect() as conn:
         counties: dict[tuple[str, str], str] = {}
@@ -1008,7 +1030,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|21|33|35|36|42|45|48|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|18|21|33|35|36|42|45|48|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -2391,6 +2413,59 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    hoosier: list[tuple[date, str, str | None, str, str, str, int]] = []
+    for category, label in IN_CATEGORIES.items():
+        root = json.loads(raw.cached(SOURCE, IN_ARCHIVE.format(category)).path.read_bytes().decode("utf-8-sig"))["Root"]
+        totals = {
+            (race["OFFICE_TITLE"], entry["PARTY"], entry["NAME_ON_BALLOT"]): int(entry["TOTAL"])
+            for race in listed(root["StatewideSummary"]["Race"])
+            for entry in listed(race["Candidates"]["Candidate"])
+        }
+        sums: dict[tuple[str, str, str], int] = {}
+        for region in listed(root["OfficeCategory"]["Regions"]["Region"]):
+            for race in listed(region["Races"]["Race"]):
+                for entry in listed(race["Candidates"]["Candidate"]):
+                    key = (race["OFFICE_TITLE"], entry["PARTY_ABBREV"], entry["NAME_ON_BALLOT"])
+                    sums[key] = sums.get(key, 0) + int(entry["TOTAL_VOTES"])
+                    hoosier.append(
+                        (
+                            IN_DAY,
+                            label if label in ("house", "senate") else OFFICES[label][0],
+                            str(int(re.findall(r"\d+", race["OFFICE_TITLE"])[-1]))
+                            if label in ("house", "senate")
+                            else None,
+                            {"D": "DEM", "R": "REP"}[entry["PARTY_ABBREV"]],
+                            race["Jurisdiction"]["FIPS"]
+                            if label in ("house", "senate")
+                            else counties[("18", re.sub(r"[^a-z]", "", region["MAP_JURISDICTION_NAME"].lower()))],
+                            re.sub(r"\s+", " ", entry["NAME_ON_BALLOT"]).strip(),
+                            int(entry["TOTAL_VOTES"]),
+                        )
+                    )
+        if sums != totals:
+            raise ValueError(f"Indiana {label}: the county rows do not match the statewide summary")
+    frames.append(
+        pl.DataFrame(
+            hoosier,
+            schema={
+                "day": pl.Date,
+                "office": pl.String,
+                "code": pl.String,
+                "party": pl.String,
+                "fips": pl.String,
+                "choice": pl.String,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        ).with_columns(
+            state=pl.lit("IN"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     pa: list[tuple[date, str, str | None, str, str, str, int]] = []
     for day, election in PA_ELECTIONS.items():
         for office, label in PA_OFFICES.items():
@@ -2624,8 +2699,9 @@ def emit() -> Path:
             "State Board of Elections' vote totals, Texas 2000–2014 by county from the Secretary of State's "
             "election history, Florida 2000–2022 by county from the Division of Elections' results extracts, "
             "Kentucky 2000–2008 by county from the State Board of Elections' county reports, South Carolina 2010–2022 by "
-            "county from the State Election Commission's detail results, and Pennsylvania 2000–2022 by county from "
-            "the Department of State's election returns",
+            "county from the State Election Commission's detail results, Pennsylvania 2000–2022 by county from the "
+            "Department of State's election returns, and Indiana 2020 by county from the Election Division's results "
+            "archive",
             polity="US",
         )
 
@@ -2709,6 +2785,8 @@ def emit() -> Path:
             for race, title in tx_elchist.races(election):
                 if TX_RACE.fullmatch(title):
                     cs.artifact(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm"), sources["TX"])
+        for category in IN_CATEGORIES:
+            cs.artifact(raw.cached(SOURCE, IN_ARCHIVE.format(category)), sources["IN"])
         for election in PA_ELECTIONS.values():
             for office in PA_OFFICES:
                 listing = raw.cached(SOURCE, PA_OFFICE.format(office, election))
@@ -2891,6 +2969,7 @@ def emit() -> Path:
             *(("TX", day, first) for day, first in TX_DAYS.items()),
             *(("SC", day, first) for day, first in SC_DAYS.items()),
             *(("PA", day, None) for day in PA_ELECTIONS),
+            ("IN", IN_DAY, None),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(("KY", day, None) for day in KY_DAYS.values()),
             *(
@@ -3024,7 +3103,7 @@ def emit() -> Path:
                     else "irv"
                     if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", *ELSTATS)
+                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", *ELSTATS)
                     else "two_round"
                     if state in ("TX", "SC") or (state == "FL" and day.year == 2000)
                     else "fptp"
@@ -3185,7 +3264,7 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_MAJORITY)]
                 elif tallies[0] > tallies[1] and nominated.get(names[0]) and day.year < 2024:
                     wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", *ELSTATS) or (state == "FL" and day.year > 2000):
+            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", *ELSTATS) or (state == "FL" and day.year > 2000):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
@@ -3323,6 +3402,8 @@ def emit() -> Path:
                     if state == "SC"
                     else PA_METHOD
                     if state == "PA"
+                    else IN_METHOD
+                    if state == "IN"
                     else FL_METHOD.format(
                         rule=", with more than half the votes, or the leader of the second primary; when a second "
                         "primary followed, the top two are shown as advancing"
