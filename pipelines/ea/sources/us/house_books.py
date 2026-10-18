@@ -82,6 +82,9 @@ def parse(source: ModuleType) -> None:
     labels: dict[tuple[int, object], list[str]] = {}
     for year, (_, _, _, pages) in source.VOLUMES.items():
         book = _artifact(source, year)
+        learned: list[tuple[float, float, float, float]] = []
+        steps: list[float] = []
+        spans: list[float] = []
         firsts = _tables(parsed / "model" / f"{year}.txt")
         seconds = _tables(parsed / "model" / f"{year}.v2.txt")
         if [(t["page"], t["district"], t["columns"], [r[0] for r in t["rows"]]) for t in firsts] != [
@@ -150,9 +153,11 @@ def parse(source: ModuleType) -> None:
                         tokens.append((digits, box))
             reach: list[tuple[float, float, float]] = []
             pitch: list[float] = []
-            for table, second in zip(firsts, seconds, strict=True):
-                if table["page"] != page:
-                    continue
+            grid: dict[int, list[float]] = {}
+            for table, second in sorted(
+                ((table, second) for table, second in zip(firsts, seconds, strict=True) if table["page"] == page),
+                key=lambda pair: sum(county != "Totals" for county, _ in pair[0]["rows"]) == 1,
+            ):
                 columns = table["columns"]
                 known = labels.setdefault((year, table["district"]), [])
                 known.extend(label for label in columns if label not in known)
@@ -292,12 +297,64 @@ def parse(source: ModuleType) -> None:
                         )
                         if near:
                             k = near[0][1]
-                            width = statistics.median(r_[2] for r_ in reach) * len(str(settled[(r, c)]))
+                            width = statistics.median(r_[2] for r_ in reach) * len(
+                                f"{settled[(r, c)]:,}" if source.COMMAS else str(settled[(r, c)])
+                            )
                             middle, half = (k[1] + k[3]) / 2, statistics.median(r_[1] for r_ in reach) / 2
                             anchors[(r, c)] = (
                                 round(k[0] + offset - width),
                                 round(middle - half),
                                 round(k[0] + offset),
+                                round(middle + half),
+                            )
+                            guessed.add((r, c))
+                if not anchors and reach:
+                    for r, c, county, *_ in cells:
+                        if r == total or (r, c) not in settled or c not in grid or c not in heads:
+                            continue
+                        below = [k for name, k in words if name == _plain(county) and 0 < k[1] - heads[c][3] < 1200]
+                        if below:
+                            k = min(below, key=lambda k: k[1])
+                            right = statistics.median(grid[c])
+                            width = statistics.median(r_[2] for r_ in reach) * len(
+                                f"{settled[(r, c)]:,}" if source.COMMAS else str(settled[(r, c)])
+                            )
+                            middle, half = (k[1] + k[3]) / 2, statistics.median(r_[1] for r_ in reach) / 2
+                            anchors[(r, c)] = (
+                                round(right - width),
+                                round(middle - half),
+                                round(right),
+                                round(middle + half),
+                            )
+                            guessed.add((r, c))
+                if not anchors and learned and steps:
+                    for c, column in enumerate(columns):
+                        spots: list[tuple[int, int, int, int]] = []
+                        for name, h in words:
+                            if name == _plain(column) and not any(
+                                abs(h[0] - spot[0]) < 15 and abs(h[1] - spot[1]) < 15 for spot in spots
+                            ):
+                                spots.append(h)
+                        if len(spots) != 1:
+                            continue
+                        for i, r in enumerate(lines):
+                            if (r, c) not in settled:
+                                continue
+                            right = spots[0][0] + statistics.median(item[0] for item in learned)
+                            middle = (
+                                spots[0][3]
+                                + statistics.median(item[1] for item in learned)
+                                + i * statistics.median(steps)
+                            )
+                            half = statistics.median(item[2] for item in learned) / 2
+                            anchors[(r, c)] = (
+                                round(
+                                    right
+                                    - statistics.median(item[3] for item in learned)
+                                    * len(f"{settled[(r, c)]:,}" if source.COMMAS else str(settled[(r, c)]))
+                                ),
+                                round(middle - half),
+                                round(right),
                                 round(middle + half),
                             )
                             guessed.add((r, c))
@@ -313,7 +370,13 @@ def parse(source: ModuleType) -> None:
                     ]
                     if lefts and (r, c) not in guessed:
                         k = max(lefts, key=lambda k: k[2])
-                        reach.append((b[2] - k[0], b[3] - b[1], (b[2] - b[0]) / len(str(settled[(r, c)]))))
+                        reach.append(
+                            (
+                                b[2] - k[0],
+                                b[3] - b[1],
+                                (b[2] - b[0]) / len(f"{settled[(r, c)]:,}" if source.COMMAS else str(settled[(r, c)])),
+                            )
+                        )
                 ys = {
                     r: statistics.median((b[1] + b[3]) / 2 for (rr, _), b in anchors.items() if rr == r)
                     for r in {r for r, _ in anchors}
@@ -338,8 +401,13 @@ def parse(source: ModuleType) -> None:
                             anchors[(r, c)] = near[0]
                     if any(k == c for _, k in anchors):
                         xs[c] = statistics.median(b[2] for (_, k), b in anchors.items() if k == c)
+                for c, x in xs.items():
+                    grid.setdefault(c, []).append(x)
                 height = statistics.median(b[3] - b[1] for b in anchors.values())
-                digit = statistics.median((b[2] - b[0]) / len(str(settled[key])) for key, b in anchors.items())
+                digit = statistics.median(
+                    (b[2] - b[0]) / len(f"{settled[key]:,}" if source.COMMAS else str(settled[key]))
+                    for key, b in anchors.items()
+                )
                 pitch.extend((ys[b] - ys[a]) / (b - a) for a, b in zip(sorted(ys), sorted(ys)[1:]))
                 for r in set(lines) - set(ys):
                     below, above = [k for k in ys if k < r], [k for k in ys if k > r]
@@ -369,6 +437,14 @@ def parse(source: ModuleType) -> None:
                             if right
                             else xs[max(left)] + step * (c - max(left))
                         )
+                if not guessed:
+                    steps.extend((ys[b] - ys[a]) / (b - a) for a, b in zip(sorted(ys), sorted(ys)[1:]))
+                    spans.extend((xs[b] - xs[a]) / (b - a) for a, b in zip(sorted(xs), sorted(xs)[1:]))
+                    learned.extend(
+                        (xs[k] - heads[k][0], ys[lines[0]] - heads[k][3], height, digit)
+                        for k in heads
+                        if k in xs and lines and lines[0] in ys
+                    )
                 for r, c, county, value, again in cells:
                     if r == total or columns[c] == "Plurality" or (r, c) not in settled:
                         continue
@@ -407,7 +483,7 @@ def parse(source: ModuleType) -> None:
                         if near:
                             box, how = near[0], "aligned"
                         else:
-                            width = digit * len(str(votes))
+                            width = digit * len(f"{votes:,}" if source.COMMAS else str(votes))
                             box = (
                                 round(right - width),
                                 round(down - height / 2),
@@ -424,7 +500,7 @@ def parse(source: ModuleType) -> None:
                         if near:
                             box, how = near[0], "aligned"
                         else:
-                            width = digit * len(str(votes))
+                            width = digit * len(f"{votes:,}" if source.COMMAS else str(votes))
                             box = (
                                 round(xs[c] - width),
                                 round(ys[r] - height / 2),
@@ -432,10 +508,37 @@ def parse(source: ModuleType) -> None:
                                 round(ys[r] + height / 2),
                             )
                             how = "placed"
+                    if box is None and (c in xs or c in grid or (xs and spans)) and (r in ys or (ys and steps)):
+                        known_ = min(ys, key=lambda k: abs(k - r))
+                        down = ys[r] if r in ys else ys[known_] + statistics.median(steps) * (r - known_)
+                        right = (
+                            xs[c]
+                            if c in xs
+                            else statistics.median(grid[c])
+                            if c in grid
+                            else xs[nearest := min(xs, key=lambda k: abs(k - c))]
+                            + statistics.median(spans) * (c - nearest)
+                        )
+                        box = (
+                            round(right - digit * len(f"{votes:,}" if source.COMMAS else str(votes))),
+                            round(down - height / 2),
+                            round(right),
+                            round(down + height / 2),
+                        )
+                        how = "placed"
                     if box is not None and box[3] - box[1] > 1.6 * height and r in ys:
                         box = (box[0], round(ys[r] - height / 2), box[2], round(ys[r] + height / 2))
-                    if box is not None and box[2] - box[0] > 1.6 * digit * len(str(votes)) + 10 and c in xs:
-                        box = (round(xs[c] - digit * len(str(votes))), box[1], round(xs[c]), box[3])
+                    if (
+                        box is not None
+                        and box[2] - box[0] > 1.6 * digit * len(f"{votes:,}" if source.COMMAS else str(votes)) + 10
+                        and c in xs
+                    ):
+                        box = (
+                            round(xs[c] - digit * len(f"{votes:,}" if source.COMMAS else str(votes))),
+                            box[1],
+                            round(xs[c]),
+                            box[3],
+                        )
                     rows.append(
                         {
                             "year": year,

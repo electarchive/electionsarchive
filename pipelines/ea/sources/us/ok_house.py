@@ -33,6 +33,7 @@ ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 1
 RENAMED = "us.ok_seb"
+COMMAS = False
 TURNED: set[tuple[int, int]] = set()
 THRESHOLDS = (150, 170, 190, 210, 230)
 

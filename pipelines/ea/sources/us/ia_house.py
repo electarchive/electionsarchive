@@ -38,6 +38,7 @@ ALIASES = {"Write-Ins": ("sc", "scat", "scattering", "scattered")}
 BESIDE = ("counties",)
 REVISION = 1
 RENAMED: str | None = None
+COMMAS = False
 TURNED = {(1984, 8), (1984, 9)}
 THRESHOLDS: tuple[int, ...] = ()
 

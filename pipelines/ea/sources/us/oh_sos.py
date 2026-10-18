@@ -21,6 +21,7 @@ STATE = "OH"
 FIPS = "39"
 REVISION = 1
 RENAMED: str | None = None
+COMMAS = False
 ERRATA = {(2000, 13)}
 TURNED: set[tuple[int, int]] = set()
 RESULTS = "https://www.ohiosos.gov/elections/election-results-and-data/"
