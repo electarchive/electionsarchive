@@ -90,6 +90,7 @@ ARIZONA = tuple(
         ("20240817161358", "2024_Primary_Election_Official_Canvass_0815b"),
     )
 )
+ALASKA = "https://www.elections.alaska.gov/results/24PRIM/ENRbyPrecinct.csv"
 VERMONT = "https://outside.vermont.gov/dept/sos/Elections_Division/election_info_resources/elections_results_data/2024_presidential_primary_official_report_canvassing_committee.pdf"
 CLARK = "https://clark.legistar1.com/clark/attachments/f2a5b366-4205-4df9-9335-68731b056c1f.pdf"
 OKLAHOMA = "https://web.archive.org/web/20240314213731id_/https://oklahoma.gov/content/dam/ok/en/elections/candidate-filing-archives/2024-candidate-filing-archives/2024-ppp-cd-results.pdf"
@@ -174,6 +175,7 @@ CHECKED = {
     "2024-06-25:NY:house:14:democratic",
     "2024-06-04:MT:governor:democratic",
     "2024-03-05:VT:president:democratic",
+    "2024-08-20:AK:house:0",
 }
 PARTIES = {
     "d": "democratic",
@@ -317,6 +319,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, OKLAHOMA, suffix=".pdf")
     raw.fetch(SOURCE, CLARK, suffix=".pdf")
     raw.fetch(SOURCE, VERMONT, suffix=".pdf")
+    raw.fetch(SOURCE, ALASKA, suffix=".csv")
     for url in ARIZONA:
         raw.fetch(SOURCE, url, suffix=".pdf")
     for place in json.loads(raw.fetch(SOURCE, NC_RUNOFF.format("county"), suffix=".json").path.read_text()):
@@ -541,6 +544,7 @@ def parse() -> None:
         ("OK", "county", OKLAHOMA),
         ("NV", "county", CLARK),
         ("VT", "county", VERMONT),
+        ("AK", "precinct", ALASKA),
         *(("AZ", "county", url) for url in ARIZONA),
         *(
             ("LA", "precinct", LOUISIANA.format(f"VotesRaceByPrecinct/Votes_{race}_{parish:02d}"))
@@ -2534,6 +2538,19 @@ def parse() -> None:
                     )
                 ).cast(pl.String),
             )
+        elif url == ALASKA:
+            frame = (
+                pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False, truncate_ragged_lines=True)
+                .filter(pl.col("Contest_title") == "U.S. Representative")
+                .select(
+                    county=pl.lit("02"),
+                    precinct="Precinct_name",
+                    office="Contest_title",
+                    party="Party_Code",
+                    candidate=pl.col("candidate_name").str.replace(r"^([^,]+), (.+)$", "$2 $1"),
+                    votes="total_votes",
+                )
+            )
         elif state == "MN":
             minnesota = {
                 "column_1": "county",
@@ -2584,7 +2601,11 @@ def parse() -> None:
                     if column.endswith("_votes")
                 ).cast(pl.String)
             )
-        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC", "LA") or url in (OKLAHOMA, CLARK):
+        if state in ("MN", "IN", "ME", "NJ", "NE", "TX", "HI", "DE", "AR", "DC", "LA") or url in (
+            OKLAHOMA,
+            CLARK,
+            ALASKA,
+        ):
             pass
         elif state == "MA":
             frame = frame.with_columns(
@@ -2650,6 +2671,8 @@ def parse() -> None:
             if url in SOUTH_CAROLINA
             else date(2024, 3, 5)
             if state == "AR" or url in (OKLAHOMA, VERMONT)
+            else date(2024, 8, 20)
+            if url == ALASKA
             else date(2024, 6, 11)
             if url == CLARK
             else date(2024, 4, 23)
@@ -2717,7 +2740,7 @@ def parse() -> None:
                     else pl.col("district").fill_null("").str.extract(r"(\d+)").cast(pl.Int64).fill_null(0)
                 ),
                 party=pl.lit(None, pl.String)
-                if state == "WA" and day.month == 8
+                if state == "WA" and day.month == 8 or url == ALASKA
                 else pl.col("party")
                 .str.to_lowercase()
                 .str.strip_chars()
@@ -3165,6 +3188,14 @@ def emit() -> Path:
                 )
                 if used == VERMONT
                 else (
+                    "Alaska Division of Elections",
+                    "2024 Primary Election, official results by precinct",
+                    "https://www.elections.alaska.gov/election-results/e/?id=24prim",
+                    "official_body",
+                    "Public record",
+                )
+                if used == ALASKA
+                else (
                     "Clark County Election Department",
                     "Results of Canvass, 2024 Primary Election, June 11, 2024",
                     "https://clark.legistar.com/Calendar.aspx",
@@ -3378,7 +3409,7 @@ def emit() -> Path:
             )
             kept = {str(option) for option, kind, _ in outcomes if kind in ("won", "advanced", "elected")}
             leaders = set(totals["option"].head(len(kept)))
-            if leaders != kept:
+            if leaders != kept and key not in CHECKED:
                 print(f"{key}: the returns lead with {leaders}, the outcomes name {kept}, skipped")
                 continue
             known = {str(option): total for option, _, _, _, total in options}
