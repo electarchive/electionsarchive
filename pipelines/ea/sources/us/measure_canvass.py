@@ -1,10 +1,12 @@
 import json
 import re
 import subprocess
+import zipfile
 from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
 from uuid import UUID
+from xml.etree import ElementTree
 
 import fastexcel
 import httpx
@@ -78,6 +80,21 @@ ALABAMA = {
     date(2018, 11, 6): "voter-pdfs/2018/2018-Official-General-Election-Results-Certified-2018-11-27.pdf",
     date(2020, 11, 3): "election-2020/Final%20Canvass%20of%20Results-Merged.pdf",
 }
+ARIZONA = {date(2014, 11, 4): ("20141202160733", "http://www.azsos.gov/election/2014/General/Canvass2014GE.pdf")}
+GEORGIA = {
+    date(2012, 11, 6): (
+        "20190306082429",
+        "http://results.enr.clarityelections.com/GA/42277/113204/reports/detailxml.zip",
+    ),
+    date(2018, 11, 6): (
+        "20210105145724",
+        "https://results.enr.clarityelections.com/GA/91639/222278/reports/detailxml.zip",
+    ),
+    date(2020, 11, 3): (
+        "20210107083007",
+        "https://results.enr.clarityelections.com//GA//105369/271927/reports/detailxml.zip",
+    ),
+}
 METHOD = (
     "{level} totals from {document}, the state's certified results. They replace the totals transcribed from the "
     "English Wikipedia as this question's default.{advisory}"
@@ -101,6 +118,12 @@ DOCUMENTS = {
         "https://results.vote.wa.gov/results/",
         "the Washington Secretary of State's county results export",
     ),
+    "AZ": (
+        "Arizona Secretary of State",
+        "State of Arizona official canvass",
+        "https://azsos.gov/elections/results-data",
+        "the Arizona Secretary of State's official canvass",
+    ),
     "FL": (
         fl_sos.PUBLISHER,
         fl_sos.TITLE,
@@ -118,6 +141,12 @@ DOCUMENTS = {
         "Official results, abstract of votes",
         "https://sos.oregon.gov/elections/Pages/electionhistory.aspx",
         "the Oregon Secretary of State's abstract of votes",
+    ),
+    "GA": (
+        "Georgia Secretary of State",
+        "Official election results",
+        "https://results.enr.clarityelections.com/GA/",
+        "the Georgia Secretary of State's certified results by county",
     ),
     "ME": (
         me_canvass.PUBLISHER,
@@ -150,6 +179,10 @@ def wikipedia(conn) -> list[tuple[str, date]]:
 def link(state: str, day: date) -> tuple[str, str]:
     if state == "UT":
         return SOURCE, WAYBACK.format(*UTAH[day]) if day in UTAH else ""
+    if state == "GA":
+        return SOURCE, WAYBACK.format(*GEORGIA[day]) if day in GEORGIA else ""
+    if state == "AZ":
+        return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
     if state == "AL":
         return SOURCE, "https://www.sos.alabama.gov/sites/default/files/" + ALABAMA[day] if day in ALABAMA else ""
     if state == "ME":
@@ -182,7 +215,9 @@ def fetch() -> None:
         source, url = link(state, day)
         if source == SOURCE and url:
             try:
-                raw.fetch(SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx"}.get(state, ".pdf"))
+                raw.fetch(
+                    SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "GA": ".zip"}.get(state, ".pdf")
+                )
             except httpx.HTTPStatusError as error:
                 print(f"{state} {day}: {error}")
 
@@ -253,6 +288,77 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "GA":
+            records = []
+            with zipfile.ZipFile(path) as archive:
+                root = ElementTree.fromstring(archive.read("detail.xml"))
+            for contest in root.iter("Contest"):
+                office = (contest.get("text") or "").split("<br>")[0]
+                if not re.search(r"(?i)amendment|referendum", office):
+                    continue
+                for choice in contest.iter("Choice"):
+                    counties: dict[str, int] = {}
+                    for county in choice.iter("County"):
+                        counties[county.get("name") or ""] = counties.get(county.get("name") or "", 0) + int(
+                            county.get("votes") or 0
+                        )
+                    if sum(counties.values()) != int(choice.get("totalVotes") or -1):
+                        print(f"GA {day} {office} {choice.get('text')}: counties do not add up to the total, skipped")
+                        continue
+                    for county, votes in counties.items():
+                        records.append((county, office, choice.get("text"), str(votes)))
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            )
+        elif state == "AZ":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                counties: list[str] = []
+                title = None
+                for line in page.splitlines():
+                    if re.match(r"\s+Apache\s+Cochise", line):
+                        counties = re.split(r"\s{2,}", line.strip())
+                    elif matched := re.match(r"PROPOSITION (\d+)\s", line):
+                        title = f"Proposition {matched[1]}"
+                    elif (
+                        title and counties and (matched := re.fullmatch(r"\s*(YES|NO)\s*(\*?)\s+([\d,\s]+?)\s*", line))
+                    ):
+                        numbers = matched[3].split()
+                        if len(numbers) != len(counties):
+                            continue
+                        for county, votes in zip(counties, numbers, strict=True):
+                            records.append(
+                                (county, title, matched[1], votes, number, matched[1] if matched[2] else None)
+                            )
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                    "winner": pl.String,
+                },
+                orient="row",
+            ).with_columns(
+                winner=pl.col("winner").drop_nulls().first().over("office"),
+                count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
+            )
+            total = pl.col("county").str.to_uppercase() == "TOTAL"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & total.any().over("office", "answer")
                 )
                 .filter(~total)
                 .drop("count")

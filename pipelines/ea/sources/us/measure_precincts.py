@@ -960,7 +960,11 @@ def emit() -> Path:
         )
         for origin, key in matched.filter(pl.len().over("origin", "key") > 1).select("origin", "key").unique().rows():
             print(f"{key}: several {origin} questions share its totals, skipped")
-        matched = matched.filter(pl.len().over("origin", "key") == 1).sort("origin")
+        matched = (
+            matched.filter(pl.len().over("origin", "key") == 1)
+            .sort("origin")
+            .unique("key", keep="first", maintain_order=True)
+        )
         print(f"{matched.group_by('origin').len().rows()} questions match a statewide question's totals exactly")
         picked = returns.join(matched.select(*question, "key"), on=question, nulls_equal=True)
         del returns
