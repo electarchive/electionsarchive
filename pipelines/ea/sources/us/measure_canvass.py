@@ -14,7 +14,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import al_sos, elstats, fl_sos, me_canvass, measure_precincts, mo_sos, wa_local
+from ea.sources.us import al_sos, elstats, fl_sos, la_sos, me_canvass, measure_precincts, mo_sos, ncsbe, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.measure_canvass"
@@ -95,6 +95,25 @@ GEORGIA = {
         "https://results.enr.clarityelections.com//GA//105369/271927/reports/detailxml.zip",
     ),
 }
+NORTH_CAROLINA = {
+    date(2018, 11, 6): (
+        "2018-11-27/Canvass/Supplement_11_30_2018/State%20Composite%20Abstract%20Report%20-%20County.pdf",
+        "2018-11-27/Canvass/Supplement_11_30_2018/State%20Composite%20Abstract%20Report%20-%20Contest.pdf",
+    ),
+    date(2024, 11, 5): (
+        "2024-11-26/Canvass/Composite_Statewide_Abstract_Report.pdf",
+        "2024-11-26/Canvass/State_Composite_Abstract_Report-Contest.pdf",
+    ),
+}
+NORTH_CAROLINA_QUESTIONS = {
+    "PROTECT RIGHT TO HUNT AND FISH": "North Carolina Right to Hunt and Fish Amendment",
+    "STRENGTHENING VICTIMS RIGHTS": "North Carolina Marsy's Law Crime Victims Rights Amendment",
+    "MAXIMUM INCOME TAX RATE OF 7.0%": "North Carolina Income Tax Cap Amendment",
+    "REQUIRE PHOTO ID TO VOTE": "North Carolina Voter ID Amendment",
+    "NONPARTISAN JUDICIAL MERIT COMMISSION": "North Carolina Judicial Selection for Midterm Vacancies Amendment",
+    "BIPARTISAN BOARD OF ETHICS AND ELECTIONS": "North Carolina Legislative Appointments to Elections Board Amendment",
+}
+NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
 METHOD = (
     "{level} totals from {document}, the state's certified results. They replace the totals transcribed from the "
     "English Wikipedia as this question's default.{advisory}"
@@ -154,6 +173,18 @@ DOCUMENTS = {
         "https://www.maine.gov/sos/cec/elec/results/",
         "the Maine Secretary of State's referendum tabulation",
     ),
+    "NC": (
+        ncsbe.PUBLISHER,
+        "State composite abstract report",
+        "https://www.ncsbe.gov/results-data",
+        "the North Carolina State Board of Elections' state composite abstract",
+    ),
+    "LA": (
+        la_sos.PUBLISHER,
+        la_sos.TITLE,
+        "https://voterportal.sos.la.gov/graphical",
+        "the Louisiana Secretary of State's official results",
+    ),
     "MO": (
         mo_sos.PUBLISHER,
         mo_sos.TITLE,
@@ -183,6 +214,10 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WAYBACK.format(*GEORGIA[day]) if day in GEORGIA else ""
     if state == "AZ":
         return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
+    if state == "LA":
+        return SOURCE, la_sos.blob(day, "Votes_Multiparish.htm")
+    if state == "NC":
+        return SOURCE, NCSBE + NORTH_CAROLINA[day][0] if day in NORTH_CAROLINA else ""
     if state == "AL":
         return SOURCE, "https://www.sos.alabama.gov/sites/default/files/" + ALABAMA[day] if day in ALABAMA else ""
     if state == "ME":
@@ -211,15 +246,34 @@ def link(state: str, day: date) -> tuple[str, str]:
 def fetch() -> None:
     with connect() as conn:
         dates = wikipedia(conn)
+    official = {
+        entry["ElectionDate"]
+        for entry in json.loads(raw.fetch(SOURCE, la_sos.DATES, suffix=".json").path.read_text())["Dates"]["Date"]
+        if entry["ResultsOfficial"] == "1"
+    }
     for state, day in dates:
+        if state == "LA":
+            if f"{day:%m/%d/%Y}" not in official:
+                continue
+            races = json.loads(
+                raw.fetch(SOURCE, la_sos.blob(day, "RacesCandidates_Multiparish.htm"), suffix=".json").path.read_text()
+            )
+            for race in la_sos.many((races.get("Races") or {}).get("Race")):
+                if race["GeneralTitle"] == "Constitutional Amendment" and race.get("IsMultiParish") == "1":
+                    raw.fetch(SOURCE, la_sos.blob(day, f"VotesRaceByParish/Votes_{race['ID']}.htm"), suffix=".json")
+            raw.fetch(SOURCE, la_sos.blob(day, "Votes_Multiparish.htm"), suffix=".json")
+            continue
         source, url = link(state, day)
         if source == SOURCE and url:
-            try:
-                raw.fetch(
-                    SOURCE, url, suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "GA": ".zip"}.get(state, ".pdf")
-                )
-            except httpx.HTTPStatusError as error:
-                print(f"{state} {day}: {error}")
+            for each in [url, NCSBE + NORTH_CAROLINA[day][1]] if state == "NC" else [url]:
+                try:
+                    raw.fetch(
+                        SOURCE,
+                        each,
+                        suffix={"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "GA": ".zip"}.get(state, ".pdf"),
+                    )
+                except httpx.HTTPStatusError as error:
+                    print(f"{state} {day}: {error}")
 
 
 def parse() -> None:
@@ -292,6 +346,90 @@ def parse() -> None:
                 .filter(~total)
                 .drop("count")
             )
+        elif state == "LA":
+            records = []
+            races = json.loads(raw.cached(SOURCE, la_sos.blob(day, "RacesCandidates_Multiparish.htm")).path.read_text())
+            statewide = {
+                race["ID"]: {choice["ID"]: int(choice["VoteTotal"]) for choice in la_sos.many(race["Choice"])}
+                for race in la_sos.many(json.loads(path.read_text())["Races"]["Race"])
+            }
+            for race in la_sos.many(races["Races"]["Race"]):
+                if race["GeneralTitle"] != "Constitutional Amendment" or race.get("IsMultiParish") != "1":
+                    continue
+                each = la_sos.blob(day, f"VotesRaceByParish/Votes_{race['ID']}.htm")
+                answers = {choice["ID"]: choice["Desc"] for choice in la_sos.many(race["Choice"])}
+                parishes = la_sos.many(json.loads(raw.cached(SOURCE, each).path.read_text())["Parishes"]["Parish"])
+                sums = {choice: 0 for choice in answers}
+                for parish in parishes:
+                    for choice in la_sos.many(parish["Choice"]):
+                        sums[choice["ID"]] += int(choice["VoteTotal"])
+                if sums != statewide.get(race["ID"]):
+                    print(f"LA {day} {race['SpecificTitle']}: parishes do not add up to the statewide total, skipped")
+                    continue
+                for parish in parishes:
+                    for choice in la_sos.many(parish["Choice"]):
+                        records.append(
+                            (
+                                f"22{2 * int(parish['ParishValue']) - 1:03}",
+                                race["SpecificTitle"],
+                                answers[choice["ID"]],
+                                choice["VoteTotal"],
+                                each,
+                            )
+                        )
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "fips": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "url": pl.String,
+                },
+                orient="row",
+            )
+        elif state == "NC":
+            totals: dict[tuple[str, str], int] = {}
+            office = ""
+            contest = raw.cached(SOURCE, NCSBE + NORTH_CAROLINA[day][1]).path
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(contest), "-"], capture_output=True, text=True, check=True
+            )
+            for line in text.stdout.splitlines():
+                if matched := re.fullmatch(r"(?:(\S.*?)\s{2,})?\s*(For|Against)\s+([\d,]+)(?:\s+[\d,]+){4}\s*", line):
+                    office = matched[1] or office
+                    totals[office, matched[2]] = int(matched[3].replace(",", ""))
+            records = []
+            county = ""
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    if re.fullmatch(r"[A-Z][A-Z .]*", line[:14].strip()):
+                        county = line[:14].strip()
+                    if matched := re.fullmatch(
+                        r"\s*(?:(\S.*?)\s{2,})?(For|Against)\s+([\d,]+)(?:\s+[\d,]+){4}\s*", line[14:]
+                    ):
+                        office = matched[1] or office
+                        if (office, matched[2]) in totals:
+                            records.append((county, office, matched[2], matched[3], number))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            )
+            sums = table.group_by("office", "answer").agg(pl.col("votes").str.replace_all(",", "").cast(pl.Int64).sum())
+            for office, answer, votes in sums.iter_rows():
+                if votes != totals[office, answer]:
+                    print(
+                        f"NC {day} {office} {answer}: counties add up to {votes}, not {totals[office, answer]}, skipped"
+                    )
+                    table = table.filter(pl.col("office") != office)
         elif state == "GA":
             records = []
             with zipfile.ZipFile(path) as archive:
@@ -559,9 +697,11 @@ def parse() -> None:
             table.select(
                 state=pl.lit(state),
                 day=pl.lit(day),
-                url=pl.lit(url),
+                url=pl.col("url") if "url" in table.columns else pl.lit(url),
                 office=pl.col("office").str.replace_all(r"\s+", " ").str.strip_chars(),
-                fips=pl.col("county")
+                fips=pl.col("fips")
+                if "fips" in table.columns
+                else pl.col("county")
                 .map_elements(elstats.plain, return_dtype=pl.String)
                 .replace_strict(names[state], default=None),
                 label=pl.col("answer").str.strip_chars().str.extract(r"(?i)^(\w+)").str.to_uppercase(),
@@ -578,7 +718,7 @@ def parse() -> None:
         answer=pl.col("label").replace_strict({label: answer for label, (answer, _) in ANSWERS.items()}),
         pair=pl.col("label").replace_strict({label: pair for label, (_, pair) in ANSWERS.items()}),
     )
-    counties = (
+    spread = (
         frame.drop_nulls("fips")
         .filter(pl.col("fips").str.len_chars() != 2)
         .group_by("state", "url")
@@ -586,7 +726,7 @@ def parse() -> None:
     )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
-        frame.join(counties, on=["state", "url"], how="left")
+        frame.join(spread, on=["state", "url"], how="left")
         .with_columns(page=pl.col("page").min().over("state", "day", "url", "office"))
         .filter(
             pl.col("answer").n_unique().over("state", "day", "office") == 2,
@@ -630,6 +770,7 @@ def emit() -> Path:
                    join result_value v on v.result_set_k = rs.k and v.measure = 1
                    join contest_option o on o.k = v.option_k
                    where c.kind = 'ballot_question' and substr(p.iso_code, 4) = any(%s)
+                     and split_part(x.value, ':', 2) = substr(p.iso_code, 4)
                    group by c.id, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10""",
                 [list(DOCUMENTS)],
             ).fetchall(),
@@ -664,6 +805,8 @@ def emit() -> Path:
             .with_columns(
                 tag=pl.when(pl.col("state") == "FL")
                 .then(pl.concat_str(pl.lit("amendment "), pl.col("office").str.extract(r"^A0*(\d+) ")))
+                .when(pl.col("state") == "LA")
+                .then(pl.concat_str(pl.lit("amendment "), pl.col("office").str.extract(r"(?i)^CA No\. (\d+) ")))
                 .otherwise(
                     pl.concat_str(
                         pl.col("office").str.extract(TAG, 1).str.to_lowercase(),
@@ -684,6 +827,7 @@ def emit() -> Path:
             questions.join(wiki, on=["state", "day"])
             .filter(
                 (pl.col("tag") == pl.col("wtag"))
+                | (pl.col("office").replace_strict(NORTH_CAROLINA_QUESTIONS, default=None) == pl.col("name"))
                 | (pl.col("wtag").is_null() & (pl.col("ballot") == 1) & (pl.col("wballot") == 1))
             )
             .filter(pl.len().over("key") == 1, pl.len().over("state", "day", "office") == 1)
