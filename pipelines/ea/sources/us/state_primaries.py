@@ -301,6 +301,13 @@ STATES = {
         "Election results extracts and detail reports: primaries by county, 2000–2022",
         "https://results.elections.myflorida.com/",
     ),
+    "AL": (
+        "01",
+        "Alabama",
+        "Alabama Secretary of State",
+        "Election data: 2022 primary and primary runoff precinct results",
+        "https://www.sos.alabama.gov/alabama-votes/voter/election-data",
+    ),
     "IN": (
         "18",
         "Indiana",
@@ -358,6 +365,10 @@ OFFICES = {
         "Superintendent of Public Instruction",
     ),
     "COMMISSIONER OF AGRICULTURE": ("commissioner-of-agriculture", "Commissioner of Agriculture"),
+    "COMMISSIONER OF AGRICULTURE AND INDUSTRIES": (
+        "commissioner-of-agriculture-and-industries",
+        "Commissioner of Agriculture and Industries",
+    ),
     "COMMISSIONER OF EDUCATION": ("commissioner-of-education", "Commissioner of Education"),
     "CHIEF FINANCIAL OFFICER": ("chief-financial-officer", "Chief Financial Officer"),
     "COMMISSIONER OF INSURANCE": ("commissioner-of-insurance", "Commissioner of Insurance"),
@@ -628,6 +639,23 @@ TX_METHOD = (
     "rows checked against its All Counties total; a county the district splits holds only the district's part. The "
     "page does not mark winners, so the winner shown is the candidate with a majority, or the runoff's leader, and "
     "when a runoff followed, the top two are shown as advancing."
+)
+AL_DAYS = {date(2022, 5, 24): None, date(2022, 6, 21): date(2022, 5, 24)}
+AL_FILES = {
+    date(2022, 5, 24): "https://www.sos.alabama.gov/sites/default/files/election-data/2022-06/"
+    "2022%20Primary%20Precinct%20Results.zip",
+    date(2022, 6, 21): "https://www.sos.alabama.gov/sites/default/files/election-data/2022-07/"
+    "2022%20Primary%20Runoff%20Precinct%20Results.zip",
+}
+AL_RACE = re.compile(
+    r"STATE (REPRESENTATIVE|SENATOR), DISTRICT (\d+)|(GOVERNOR|LIEUTENANT GOVERNOR|ATTORNEY GENERAL|SECRETARY OF STATE"
+    r"|STATE TREASURER|STATE AUDITOR|COMMISSIONER OF AGRICULTURE AND INDUSTRIES)"
+)
+AL_METHOD = (
+    "Totals are the sums of the precinct, absentee, and provisional columns of the Secretary of State's county "
+    "precinct results files; the files print no contest totals to check them against, and a county the district "
+    "splits holds only the district's part. The files do not mark winners, so the winner shown is the candidate "
+    "with a majority, or the runoff's leader, and when a runoff followed, the top two are shown as advancing."
 )
 IN_DAY = date(2020, 6, 2)
 IN_ARCHIVE = "https://enr.indianavoters.in.gov/archive/2020Primary/data/OffCatC_{}_B.json"
@@ -942,6 +970,8 @@ def fetch() -> None:
                     time.sleep(1)
     for category in IN_CATEGORIES:
         raw.fetch(SOURCE, IN_ARCHIVE.format(category), suffix=".json")
+    for url in AL_FILES.values():
+        raw.fetch(SOURCE, url, suffix=".zip")
     for election in PA_ELECTIONS.values():
         for office in PA_OFFICES:
             listing = json.loads(raw.fetch(SOURCE, PA_OFFICE.format(office, election), suffix=".json").path.read_text())
@@ -1030,7 +1060,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|18|21|33|35|36|42|45|48|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(01|37|53|06|08|09|12|16|17|18|21|33|35|36|42|45|48|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -2413,6 +2443,53 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    alabama: dict[tuple[date, str, str | None, str, str, str], int] = {}
+    for day, url in AL_FILES.items():
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+            for member in archive.namelist():
+                county = counties[
+                    ("01", re.sub(r"[^a-z]", "", re.sub(r".*Primary-(?:Runoff-)?|\.xls$", "", member).lower()))
+                ]
+                sheet = fastexcel.read_excel(archive.read(member)).load_sheet(0, header_row=None).to_polars()
+                for title, party, candidate, *cells in sheet.iter_rows():
+                    found = AL_RACE.fullmatch(re.sub(r"\s+", " ", title or "").strip())
+                    if found is None or candidate.strip() in ("Over Votes", "Under Votes"):
+                        continue
+                    key = (
+                        day,
+                        ("house" if found[1] == "REPRESENTATIVE" else "senate")
+                        if found[1]
+                        else OFFICES[found[3].removeprefix("STATE ")][0],
+                        str(int(found[2])) if found[1] else None,
+                        party.strip(),
+                        county,
+                        re.sub(r"\s+", " ", candidate).strip(),
+                    )
+                    if key in alabama:
+                        raise ValueError(f"{member} {title}: {candidate} appears twice")
+                    alabama[key] = sum(int(cell) for cell in cells if cell is not None and cell.strip())
+    frames.append(
+        pl.DataFrame(
+            [(*key, votes) for key, votes in alabama.items()],
+            schema={
+                "day": pl.Date,
+                "office": pl.String,
+                "code": pl.String,
+                "party": pl.String,
+                "fips": pl.String,
+                "choice": pl.String,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        ).with_columns(
+            state=pl.lit("AL"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     hoosier: list[tuple[date, str, str | None, str, str, str, int]] = []
     for category, label in IN_CATEGORIES.items():
         root = json.loads(raw.cached(SOURCE, IN_ARCHIVE.format(category)).path.read_bytes().decode("utf-8-sig"))["Root"]
@@ -2700,8 +2777,8 @@ def emit() -> Path:
             "election history, Florida 2000–2022 by county from the Division of Elections' results extracts, "
             "Kentucky 2000–2008 by county from the State Board of Elections' county reports, South Carolina 2010–2022 by "
             "county from the State Election Commission's detail results, Pennsylvania 2000–2022 by county from the "
-            "Department of State's election returns, and Indiana 2020 by county from the Election Division's results "
-            "archive",
+            "Department of State's election returns, Indiana 2020 by county from the Election Division's results "
+            "archive, and Alabama 2022 by county from the Secretary of State's precinct results",
             polity="US",
         )
 
@@ -2787,6 +2864,8 @@ def emit() -> Path:
                     cs.artifact(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm"), sources["TX"])
         for category in IN_CATEGORIES:
             cs.artifact(raw.cached(SOURCE, IN_ARCHIVE.format(category)), sources["IN"])
+        for url in AL_FILES.values():
+            cs.artifact(raw.cached(SOURCE, url), sources["AL"])
         for election in PA_ELECTIONS.values():
             for office in PA_OFFICES:
                 listing = raw.cached(SOURCE, PA_OFFICE.format(office, election))
@@ -2970,6 +3049,7 @@ def emit() -> Path:
             *(("SC", day, first) for day, first in SC_DAYS.items()),
             *(("PA", day, None) for day in PA_ELECTIONS),
             ("IN", IN_DAY, None),
+            *(("AL", day, first) for day, first in AL_DAYS.items()),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(("KY", day, None) for day in KY_DAYS.values()),
             *(
@@ -2999,7 +3079,7 @@ def emit() -> Path:
                     f"{day:%B} {day.day}, {day.year} {STATES[state][1]} primary {'runoff ' if first else ''}election",
                 )
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{kind}", entity_id=election)
-        rounds = {"NC": NC_DAYS, "TX": TX_DAYS, "FL": FL_DAYS, "SC": SC_DAYS}
+        rounds = {"NC": NC_DAYS, "TX": TX_DAYS, "FL": FL_DAYS, "SC": SC_DAYS, "AL": AL_DAYS}
         later = {(state, first, day) for state, days in rounds.items() for day, first in days.items() if first}
         contests = {
             group: rows.sort(["votes", "choice"], descending=[True, False])
@@ -3105,7 +3185,7 @@ def emit() -> Path:
                     else "fptp"
                     if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", *ELSTATS)
                     else "two_round"
-                    if state in ("TX", "SC") or (state == "FL" and day.year == 2000)
+                    if state in ("TX", "SC", "AL") or (state == "FL" and day.year == 2000)
                     else "fptp"
                     if state == "FL"
                     else "two_round_40"
@@ -3173,7 +3253,7 @@ def emit() -> Path:
                     cs.add("outcome", result_set_id=old[0], option_id=option, kind=outcome, seats=seats, notes=notes)
                 if empty:
                     cs.add("note", entity_id=old[0], kind="caveat", body_md=EMPTY)
-            threshold = 50 if state in ("TX", "FL", "SC") else 40 if day.year < 2018 else 30
+            threshold = 50 if state in ("TX", "FL", "SC", "AL") else 40 if day.year < 2018 else 30
             total = rows["votes"].sum()
             ranked = rows.filter(~pl.col("writein"))
             nominated: dict[str, bool] = {}
@@ -3404,6 +3484,8 @@ def emit() -> Path:
                     if state == "PA"
                     else IN_METHOD
                     if state == "IN"
+                    else AL_METHOD
+                    if state == "AL"
                     else FL_METHOD.format(
                         rule=", with more than half the votes, or the leader of the second primary; when a second "
                         "primary followed, the top two are shown as advancing"
