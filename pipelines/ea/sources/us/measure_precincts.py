@@ -1,16 +1,18 @@
+import html
 import io
 import json
 import re
 import subprocess
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
-from datetime import date, timedelta
+from datetime import UTC, date, datetime, timedelta
 from pathlib import Path
 from uuid import UUID
 
 import fastexcel
 import httpx
 import polars as pl
+from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset
@@ -193,6 +195,28 @@ HARNEY_NOTE = (
     "Clerk's official abstract of votes filed with the Secretary of State (record EPD/24/216), a scan read by hand; "
     "they add up to the abstract's totals and to Harney's certified county totals."
 )
+OR_RECORDS = {date(2020, 11, 3): 7879432}
+OR_DETAIL = "https://records.sos.state.or.us/ORSOSCMSearch/Search/SearchDetail.aspx?uri={}"
+OR_PUBLISHER = "Oregon Secretary of State"
+OR_TITLE = "County precinct results filed with the Secretary of State"
+OR_LICENSE = (
+    "Pending: redistribution terms for the counties' precinct reports not yet confirmed; used on the archive owner's "
+    "instruction until confirmed"
+)
+OR_TURNED = ("Clackamas", "Union")
+OREGON = (
+    "Precinct rows of the counties' official precinct results, filed with the Oregon Secretary of State, one report "
+    "per county. Reports with a text layer and spreadsheets are read directly; scanned reports are digitized in two "
+    "passes, a transcription and a machine read of each value's cell, which must agree, and each value keeps its page "
+    "and position. Each answer's precinct rows add up to the totals of this question's default results{counties}. "
+    "The terms for redistributing the counties' reports are not yet confirmed, so this set is held under a pending "
+    "license."
+)
+OR_2020_NOTE = " Harney County's report labels the state measures Question 13-107 to 13-110, after its county number."
+OR_2020_110_NOTE = (
+    " Hood River County's report also lists a county measure numbered Question 14-110; it is not Measure 110 and is "
+    "left out."
+)
 CA_ELECTIONS = ("P12", "G12", "P14", "P16", "G16", "P18", "P20", "G20", "P24")
 CA_SOV = swdb_precincts.SWDB + "{0}/state/state_{1}_sov_data_by_{1}_svprec.zip"
 CA_TITLE = "Statement of Vote data by SOV precinct"
@@ -222,6 +246,42 @@ def fetch() -> None:
     raw.fetch(SOURCE, MONO_2016, suffix=".pdf")
     measures.fetch()
     raw.fetch(SOURCE, HARNEY, suffix=".pdf")
+    for uri in OR_RECORDS.values():
+        url = OR_DETAIL.format(uri)
+        try:
+            record = raw.cached(SOURCE, url)
+        except LookupError:
+            with httpx.Client(headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=900) as client:
+                page = client.get(url).text
+                fields = {
+                    name: html.unescape(value)
+                    for name, value in re.findall(
+                        r'<input type="hidden" name="([^"]+)" id="[^"]*" value="([^"]*)"', page
+                    )
+                }
+                response = client.post(url, data=fields | {"ctl00$ContentPlaceHolder1$lnkDownload": "Download"})
+                response.raise_for_status()
+            record = raw.store(
+                SOURCE,
+                url,
+                response.content,
+                suffix=".zip",
+                retrieved_at=datetime.now(UTC),
+                media_type=response.headers.get("content-type", "application/zip"),
+            )
+        with zipfile.ZipFile(record.path) as archive:
+            for member in archive.namelist():
+                try:
+                    raw.cached(SOURCE, f"{url}#{member}")
+                except LookupError:
+                    raw.store(
+                        SOURCE,
+                        f"{url}#{member}",
+                        archive.read(member),
+                        suffix=Path(member).suffix.lower(),
+                        retrieved_at=record.retrieved_at,
+                        media_type="application/pdf" if member.lower().endswith(".pdf") else "text/csv",
+                    )
     with connect() as conn:
         dates = conn.execute(
             """select distinct substr(p.iso_code, 4), e.date_from from contest c
@@ -922,6 +982,41 @@ def parse() -> None:
         ]
     ).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "california.parquet")
 
+    pl.DataFrame(
+        [
+            (day.year, day, "OR", f"MEASURE {measure}", *counties["OR"][elstats.plain(county)], precinct, answer, votes)
+            + (
+                (f"{OR_DETAIL.format(uri)}#{day:%m.%d.%y}/{county}.pdf", page, *box, 8 if digitized else 0)
+                if page is not None
+                else (f"{OR_DETAIL.format(uri)}#{day:%m.%d.%y}/{county}.csv", None, None, None, None, None, 0)
+            )
+            for day, uri in OR_RECORDS.items()
+            for county, measure, precinct, yes, no, *cells, digitized in json.loads(
+                (PARSED / "model" / f"or-{day.year}.json").read_text()
+            )
+            for answer, votes, page, box in (("YES", yes, cells[0], cells[1]), ("NO", no, cells[2], cells[3]))
+        ],
+        schema={
+            "year": pl.Int32,
+            "day": pl.Date,
+            "state": pl.String,
+            "office": pl.String,
+            "fips": pl.String,
+            "jurisdiction": pl.String,
+            "precinct": pl.String,
+            "answer": pl.String,
+            "votes": pl.Int64,
+            "file": pl.String,
+            "page": pl.Int32,
+            "x0": pl.Float64,
+            "y0": pl.Float64,
+            "x1": pl.Float64,
+            "y1": pl.Float64,
+            "flags": pl.Int16,
+        },
+        orient="row",
+    ).with_columns(district=pl.lit(None, pl.String)).write_parquet(PARSED / "oregon.parquet")
+
 
 def emit() -> Path:
     archives = pl.read_parquet(PARSED / "archives.parquet").with_columns(
@@ -938,40 +1033,11 @@ def emit() -> Path:
             pl.read_parquet(PARSED / "massachusetts.parquet").with_columns(origin=pl.lit("massachusetts")),
             pl.read_parquet(PARSED / "alabama.parquet").with_columns(origin=pl.lit("alabama")),
             pl.read_parquet(PARSED / "california.parquet").with_columns(origin=pl.lit("california")),
+            pl.read_parquet(PARSED / "oregon.parquet").with_columns(origin=pl.lit("oregon")),
         ],
         how="diagonal_relaxed",
     )
-    oregon = returns.filter(pl.col("origin") == "medsl", pl.col("state") == "OR", pl.col("year") == 2024)
-    if "41025" not in oregon["fips"].to_list():
-        returns = pl.concat(
-            [
-                returns,
-                pl.DataFrame(
-                    [
-                        (2024, date(2024, 11, 5), "OR", office, district, "41025", "HARNEY", precinct, answer, votes)
-                        for office, district in oregon.select("office", "district").unique().iter_rows()
-                        for answer, counts in zip(
-                            ("YES", "NO"), HARNEY_2024[int(re.findall(r"MEASURE (\d+)", office)[0])][1:], strict=True
-                        )
-                        for precinct, votes in zip(("21", "25", "26"), counts, strict=True)
-                    ],
-                    schema=[
-                        "year",
-                        "day",
-                        "state",
-                        "office",
-                        "district",
-                        "fips",
-                        "jurisdiction",
-                        "precinct",
-                        "answer",
-                        "votes",
-                    ],
-                    orient="row",
-                ).with_columns(origin=pl.lit("medsl")),
-            ],
-            how="diagonal_relaxed",
-        )
+    returns = returns.filter(~((pl.col("origin") == "medsl") & (pl.col("state") == "OR") & (pl.col("year") == 2024)))
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -1071,8 +1137,22 @@ def emit() -> Path:
                     ALABAMA,
                 ),
                 ("california", "CA"): (cs.source(swdb_precincts.PUBLISHER, CA_TITLE), CALIFORNIA),
+                ("oregon", "OR"): (cs.source(OR_PUBLISHER, OR_TITLE), OREGON),
             }
         )
+        if sources[("oregon", "OR")][0] in cs.minted:
+            cs.add(
+                "source",
+                id=sources[("oregon", "OR")][0],
+                kind="official_body",
+                publisher=OR_PUBLISHER,
+                title=OR_TITLE,
+                url="https://records.sos.state.or.us/ORSOSCMSearch/",
+                license=OR_LICENSE,
+            )
+        pages: dict[tuple[str, int], UUID] = {}
+        artifacts: dict[str, UUID] = {}
+        locators: list[pl.DataFrame] = []
         if sources[("california", "CA")][0] in cs.minted:
             cs.add(
                 "source",
@@ -1209,14 +1289,17 @@ def emit() -> Path:
                     minted.setdefault((code, day), (state, fips))
             complete = (
                 rows.group_by("code", "answer")
-                .agg(pl.col("votes").sum())
+                .agg(
+                    pl.col("votes").sum(),
+                    pl.col("flags").max().fill_null(0) if "flags" in rows.columns else pl.lit(0).alias("flags"),
+                )
                 .select(
                     unit_id=pl.col("code").replace_strict(codes),
                     option_id=pl.col("answer").replace_strict(options),
                     channel=pl.lit(0, pl.Int16),
                     measure=pl.lit(1, pl.Int16),
                     count_round=pl.lit(0, pl.Int16),
-                    flags=pl.lit(0, pl.Int16),
+                    flags=pl.col("flags").cast(pl.Int16),
                     value=pl.col("votes"),
                 )
             )
@@ -1259,8 +1342,68 @@ def emit() -> Path:
                 kind="methodology",
                 body_md=method.format(counties=" and to each county's" if by_county else "")
                 + (HARNEY_NOTE if harney else "")
-                + (MONO_NOTE if mono else ""),
+                + (MONO_NOTE if mono else "")
+                + (OR_2020_NOTE if method == OREGON and day == date(2020, 11, 3) else "")
+                + (OR_2020_110_NOTE if method == OREGON and day == date(2020, 11, 3) and "measure-110" in key else ""),
             )
+            if method == OREGON:
+                source = sources[("oregon", "OR")][0]
+                record = OR_DETAIL.format(OR_RECORDS[day])
+                if record not in artifacts:
+                    artifacts[record] = cs.artifact(raw.cached(SOURCE, record), source)
+                cs.add(
+                    "citation",
+                    entity_id=staged,
+                    source_id=source,
+                    locator={"url": record, "artifact": str(artifacts[record])},
+                )
+                located = rows.filter(pl.col("page").is_not_null())
+                for file, number in located.select("file", "page").unique().iter_rows():
+                    if (file, number) in pages:
+                        continue
+                    pdf = raw.cached(SOURCE, file)
+                    image = DATA / "pages" / SOURCE / f"{pdf.sha256}-{number}.png"
+                    if not image.exists():
+                        image.parent.mkdir(parents=True, exist_ok=True)
+                        subprocess.run(
+                            ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                            + [str(pdf.path), str(image.with_suffix(""))],
+                            check=True,
+                        )
+                        if Path(file).stem in OR_TURNED:
+                            with Image.open(image) as rendered:
+                                rendered.rotate(-90, expand=True).save(image)
+                    if file not in artifacts:
+                        artifacts[file] = cs.artifact(pdf, source)
+                    pages[(file, number)] = cs.page(artifacts[file], number)
+                    with Image.open(image) as opened:
+                        cs.add(
+                            "source_page",
+                            id=pages[(file, number)],
+                            artifact_id=artifacts[file],
+                            page_number=number,
+                            image_key=f"pages/{SOURCE}/{image.name}",
+                            width=opened.width,
+                            height=opened.height,
+                        )
+                locators.append(
+                    located.select(
+                        result_set_id=pl.lit(str(staged)),
+                        unit_id=pl.col("code").replace_strict(codes),
+                        option_id=pl.col("answer").replace_strict(options),
+                        channel=pl.lit(0, pl.Int16),
+                        measure=pl.lit(1, pl.Int16),
+                        count_round=pl.lit(0, pl.Int16),
+                        page_id=pl.concat_str("file", "page", separator="\x1f").replace_strict(
+                            {f"{file}\x1f{number}": str(page) for (file, number), page in pages.items()}
+                        ),
+                        source_id=pl.lit(None, pl.String),
+                        x0="x0",
+                        y0="y0",
+                        x1="x1",
+                        y1="y1",
+                    )
+                )
             if mono:
                 clerk = cs.source("Mono County Elections", "Statement of Vote, June 7, 2016")
                 if clerk in cs.minted:
@@ -1325,6 +1468,8 @@ def emit() -> Path:
             )
         if values:
             cs.frame("result_value", pl.concat(values))
+        if locators:
+            cs.frame("value_locator", pl.concat(locators))
         print(
             f"{sum(landed.values())} precinct sets {sorted(landed.items())}, {skipped} skipped, {len(minted)} new units"
         )
