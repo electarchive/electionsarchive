@@ -137,6 +137,12 @@ MONTANA_KINDS = {
     "CONSTITUTIONAL AMENDMENT": "C",
     "INITIATIVE": "I",
 }
+WYOMING = {
+    date(2016, 11, 8): "2016/Results/General/2016_Wyoming_General_Election_Results.pdf",
+    date(2020, 11, 3): "2020/Results/General/2020_General_Statewide_Constitutional_Amendment_Summary.pdf",
+    date(2022, 11, 8): "2022/Results/General/2022_General_Statewide_Constitutional_Amendment_Summary.pdf",
+    date(2024, 11, 5): "2024/Results/General/2024_General_Statewide_Constitutional_Amendment_Summary.pdf",
+}
 NORTH_CAROLINA = {
     date(2018, 11, 6): (
         "2018-11-27/Canvass/Supplement_11_30_2018/State%20Composite%20Abstract%20Report%20-%20County.pdf",
@@ -260,6 +266,12 @@ DOCUMENTS = {
         "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
         "the California Secretary of State's Statement of Vote",
     ),
+    "WY": (
+        "Wyoming Secretary of State",
+        "Statewide constitutional amendments official summary",
+        "https://sos.wyo.gov/Elections/State/ElectionResults.aspx",
+        "the Wyoming Secretary of State's official summary of the constitutional amendments",
+    ),
     "MO": (
         mo_sos.PUBLISHER,
         mo_sos.TITLE,
@@ -291,6 +303,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
     if state == "MT":
         return SOURCE, WAYBACK.format(*MONTANA[day]) if day in MONTANA else ""
+    if state == "WY":
+        return SOURCE, "https://sos.wyo.gov/Elections/Docs/" + WYOMING[day] if day in WYOMING else ""
     if state == "LA":
         return SOURCE, la_sos.blob(day, "Votes_Multiparish.htm")
     if state == "NC":
@@ -434,6 +448,46 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "WY":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            office = None
+            seen = set()
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    if heading := re.fullmatch(r"\s*(Constitutional Amendment [A-Z])\s*", line):
+                        office = None if heading[1] in seen else heading[1]
+                    elif office and (
+                        matched := re.fullmatch(r"([A-Z][A-Za-z ]*?)\s+([\d,]+)\s+([\d,]+)\s+[\d,]+\s+[\d,]+\s*", line)
+                    ):
+                        if elstats.plain(matched[1]) in names["WY"] or matched[1] == "Total":
+                            for answer, votes in zip(("FOR", "AGAINST"), matched.group(2, 3), strict=True):
+                                records.append((matched[1], office, answer, votes, number))
+                        if matched[1] == "Total":
+                            seen.add(office)
+                            office = None
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
                 )
                 .filter(~total)
                 .drop("count")
@@ -914,10 +968,10 @@ def emit() -> Path:
             conn.execute(
                 """select x.value, substr(p.iso_code, 4), e.date_from, rs.id::text, rs.election_id::text,
                           rs.contest_id::text, rs.stage, rs.kind, rs.source_id::text, rs.completeness::float8,
-                          max(o.id::text) filter (where upper(o.ballot_label) = 'YES'),
-                          max(o.id::text) filter (where upper(o.ballot_label) = 'NO'),
-                          sum(v.value) filter (where upper(o.ballot_label) = 'YES')::bigint,
-                          sum(v.value) filter (where upper(o.ballot_label) = 'NO')::bigint,
+                          max(o.id::text) filter (where upper(o.ballot_label) in ('YES', 'FOR')),
+                          max(o.id::text) filter (where upper(o.ballot_label) in ('NO', 'AGAINST')),
+                          sum(v.value) filter (where upper(o.ballot_label) in ('YES', 'FOR'))::bigint,
+                          sum(v.value) filter (where upper(o.ballot_label) in ('NO', 'AGAINST'))::bigint,
                           (select min(n.text) from name n where n.entity_id = c.id), s.publisher
                    from contest c
                    join election e on e.id = c.election_id join polity p on p.id = e.polity_id
