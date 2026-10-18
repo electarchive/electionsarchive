@@ -2,6 +2,7 @@ import html
 import io
 import json
 import re
+import time
 import unicodedata
 import zipfile
 from datetime import date, timedelta
@@ -10,11 +11,12 @@ from urllib.parse import urlencode
 from uuid import UUID
 
 import fastexcel
+import httpx
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import elstats, medsl, wa_local
+from ea.sources.us import elstats, me_legislature, medsl, wa_local
 from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
@@ -265,6 +267,13 @@ STATES = {
     "VT": ("50", "Vermont", elstats.TENANTS["VT"][1], elstats.TITLE, elstats.TENANTS["VT"][2]),
     "VA": ("51", "Virginia", elstats.TENANTS["VA"][1], elstats.TITLE, elstats.TENANTS["VA"][2]),
     "MA": ("25", "Massachusetts", elstats.MA_PUBLISHER, elstats.TITLE, "https://electionstats.state.ma.us"),
+    "ME": (
+        "23",
+        "Maine",
+        me_legislature.PUBLISHER,
+        "Primary Election Tabulations",
+        "https://www.maine.gov/sos/cec/elec/results/",
+    ),
     "CA": (
         "06",
         "California",
@@ -309,6 +318,7 @@ PARTIES = {
     "REP": ("republican-party", "republican", "rp", "Republican"),
     "LIB": ("libertarian-party", "libertarian", "liberp", "Libertarian"),
     "GRE": ("green-party", "green", "greenp", "Green"),
+    "GIP": ("green-party", "green-independent", "greenp", "Green Independent"),
     "CST": ("constitution-party", "constitution", "constp", "Constitution"),
     "DFL": ("democratic-party", "democratic-farmer-labor", "dp", "Democratic-Farmer-Labor"),
     "R": ("republican-party", "republican", "rp", "Republican"),
@@ -356,6 +366,103 @@ METHOD = (
     "primary needs, or when no runoff followed; when a runoff followed, the top two are shown as advancing."
 )
 
+ME_DAYS = {
+    2000: date(2000, 6, 13),
+    2002: date(2002, 6, 11),
+    2004: date(2004, 6, 8),
+    2006: date(2006, 6, 13),
+    2008: date(2008, 6, 10),
+    2010: date(2010, 6, 8),
+    2012: date(2012, 6, 12),
+    2016: date(2016, 6, 14),
+    2018: date(2018, 6, 12),
+    2020: date(2020, 7, 14),
+    2022: date(2022, 6, 14),
+}
+ME_WAYBACK = "https://web.archive.org/web/{}id_/https://www.maine.gov/sos/cec/elec/{}"
+ME_FILES = [
+    ("20121018003921", "2000g/2000p-dem-sr.txt", "house", "DEM"),
+    ("20121018002956", "2000g/2000p-gre-sr.txt", "house", "GIP"),
+    ("20121018003803", "2000g/2000p-rep-sr.txt", "house", "REP"),
+    ("20121018003129", "2000g/2000p-dem-ss.txt", "senate", "DEM"),
+    ("20121018004143", "2000g/2000p-gre-ss.txt", "senate", "GIP"),
+    ("20121018003620", "2000g/2000p-rep-ss.txt", "senate", "REP"),
+    ("20121017225740", "2002p/pri02srd.txt", "house", "DEM"),
+    ("20121017230617", "2002p/pri02srg.txt", "house", "GIP"),
+    ("20121017225629", "2002p/pri02srr.txt", "house", "REP"),
+    ("20121017230334", "2002p/pri02ssd.txt", "senate", "DEM"),
+    ("20121017224021", "2002p/pri02ssg.txt", "senate", "GIP"),
+    ("20121017230241", "2002p/pri02ssr.txt", "senate", "REP"),
+    ("20141017110346", "2004/pri04srd.txt", "house", "DEM"),
+    ("20141006205259", "2004/pri04srg.txt", "house", "GIP"),
+    ("20141015143259", "2004/pri04srr.txt", "house", "REP"),
+    ("20141006211453", "2004/pri04ssd.txt", "senate", "DEM"),
+    ("20141006211457", "2004/pri04ssg.txt", "senate", "GIP"),
+    ("20141006213056", "2004/pri04ssr.txt", "senate", "REP"),
+    ("20141021002949", "2006p/pri06srd.txt", "house", "DEM"),
+    ("20141021010515", "2006p/pri06srg.txt", "house", "GIP"),
+    ("20141021002135", "2006p/pri06srr.txt", "house", "REP"),
+    ("20141021001825", "2006p/pri06ssd.txt", "senate", "DEM"),
+    ("20141021010520", "2006p/pri06ssg.txt", "senate", "GIP"),
+    ("20141021005409", "2006p/pri06ssr.txt", "senate", "REP"),
+    ("20121104160750", "2008/tabs-can-sr-dem-6-08.txt", "house", "DEM"),
+    ("20121104160759", "2008/tabs-can-sr-gre-6-08.txt", "house", "GIP"),
+    ("20121104160810", "2008/tabs-can-sr-rep-6-08.txt", "house", "REP"),
+    ("20121104160830", "2008/tabs-can-ss-dem-6-08.txt", "senate", "DEM"),
+    ("20121104160840", "2008/tabs-can-ss-gre-6-08.txt", "senate", "GIP"),
+    ("20121104160851", "2008/tabs-can-ss-rep-6-08.txt", "senate", "REP"),
+    ("20150405014036", "2010/tabssrdem0610.html", "house", "DEM"),
+    ("20150405085926", "2010/tabssrgrn0610.html", "house", "GIP"),
+    ("20150405012144", "2010/tabssrrep0610.html", "house", "REP"),
+    ("20150405023225", "2010/tabsssdem0610.html", "senate", "DEM"),
+    ("20150405084705", "2010/tabsssgrn.html", "senate", "GIP"),
+    ("20150405020342", "2010/tabsssrep0610.html", "senate", "REP"),
+    ("20140310133220", "2012/d-repleg.txt", "house", "DEM"),
+    ("20140310123911", "2012/g-repleg.txt", "house", "GIP"),
+    ("20140310131157", "2012/r-repleg.txt", "house", "REP"),
+    ("20140310131146", "2012/d-statesen.txt", "senate", "DEM"),
+    ("20140310131616", "2012/g-statesen.txt", "senate", "GIP"),
+    ("20140310124133", "2012/r-statesen.txt", "senate", "REP"),
+    ("20250321194028", "results/2016/State%20Rep%20DEM.xlsx", "house", "DEM"),
+    ("20250320045127", "results/2016/State%20Rep%20GRE.xlsx", "house", "GIP"),
+    ("20250319192354", "results/2016/State%20Rep%20REP.xlsx", "house", "REP"),
+    ("20250324173048", "results/2016/State%20Senate%20DEM.xlsx", "senate", "DEM"),
+    ("20250324135524", "results/2016/State%20Senate%20GRE.xlsx", "senate", "GIP"),
+    ("20250320232455", "results/2016/State%20Senate%20REP.xlsx", "senate", "REP"),
+    ("20250404031332", "results/2018/staterepd.xlsx", "house", "DEM"),
+    ("20250405041042", "results/2018/staterepgi.xlsx", "house", "GIP"),
+    ("20250404053939", "results/2018/staterepl.xlsx", "house", "LIB"),
+    ("20250404024739", "results/2018/staterepr.xlsx", "house", "REP"),
+    ("20250404050530", "results/2018/statesend.xlsx", "senate", "DEM"),
+    ("20250404023524", "results/2018/statesenr.xlsx", "senate", "REP"),
+    ("20250324023325", "results/2020/srdemnr.xlsx", "house", "DEM"),
+    ("20250325035436", "results/2020/srgreennr.xlsx", "house", "GIP"),
+    ("20250328232007", "results/2020/srrepnr.xlsx", "house", "REP"),
+    ("20250324023315", "results/2020/ssdemnr.xlsx", "senate", "DEM"),
+    ("20250328232003", "results/2020/ssrepnr.xlsx", "senate", "REP"),
+    ("20250324070338", "results/2022/dem/replegd622.xlsx", "house", "DEM"),
+    ("20250318204713", "results/2022/green/greenreptoleg622.xlsx", "house", "GIP"),
+    ("20250321080350", "results/2022/rep/replegr622.xlsx", "house", "REP"),
+    ("20250321080350", "results/2022/dem/ssd622.xlsx", "senate", "DEM"),
+    ("20250324070337", "results/2022/rep/ssr622.xlsx", "senate", "REP"),
+]
+ME_NAME = (
+    pl.when(pl.col("name").str.to_uppercase() == pl.col("name"))
+    .then(pl.col("name").str.to_titlecase())
+    .otherwise(pl.col("name"))
+    .str.strip_chars()
+    .str.replace(r"(?i)^([^,]+?)\s*,\s*(.+?)(?:,?\s+(jr\.?|sr\.?|ii|iii|iv))?$", "${2} ${1} ${3}")
+    .str.replace_all(r"\s+", " ")
+    .str.strip_chars(" ,")
+)
+ME_METHOD = (
+    "Totals are the town rows of the Secretary of State's primary tabulations, summed by county within the district; "
+    "overseas and military ballots the state counts centrally stay on the district. The files do not mark winners, so "
+    "the winner shown is the candidate with the most votes, or, from 2018, where ranked-choice voting applies to three "
+    "or more candidates, the candidate with a majority of first choices. Votes are first choices."
+)
+WON_MAJORITY = "Derived: a majority of first choices in the certified contest totals."
+
 RECOUNT = (
     "No winner is shown where the leader's margin is within 1 percent of the contest's votes, close enough for a "
     "recount, unless the leader is the party's nominee on the general election ballot."
@@ -392,6 +499,15 @@ def search(state: str, office: int, year: int) -> str:
 
 
 def fetch() -> None:
+    for stamp, path, *_ in ME_FILES:
+        for attempt in range(5):
+            try:
+                raw.fetch(SOURCE, ME_WAYBACK.format(stamp, path), suffix=Path(path).suffix)
+                break
+            except httpx.HTTPError:
+                time.sleep(10 * 2**attempt)
+        else:
+            raw.fetch(SOURCE, ME_WAYBACK.format(stamp, path), suffix=Path(path).suffix)
     for day in NC_DAYS:
         raw.fetch(SOURCE, FILES.format(day=day), suffix=".zip")
     for day in MN_DAYS:
@@ -651,6 +767,187 @@ def parse() -> None:
                         )
                     )
                 )
+    me: list[tuple[int, str, str, str, str | None, str, str, int]] = []
+    for stamp, path, office, party in ME_FILES:
+        year = int(re.findall(r"20\d\d", path)[0])
+        data = raw.cached(SOURCE, ME_WAYBACK.format(stamp, path)).path
+        if year <= 2006:
+            frame = pl.read_csv(data, infer_schema=False, encoding="latin1")
+            frame.columns = [column.strip().lower() for column in frame.columns]
+            for number in [
+                column.removeprefix("fullname") for column in frame.columns if column.startswith("fullname")
+            ]:
+                for district, county, town, name, votes in frame.select(
+                    "district",
+                    pl.col("county") if "county" in frame.columns else pl.lit(None, pl.String),
+                    "town",
+                    f"fullname{number}",
+                    f"votes{number}",
+                ).iter_rows():
+                    if name:
+                        me.append((year, office, party, district, county, town, name, int(votes or 0)))
+        elif year == 2008:
+            for district, county, town, name, votes in (
+                pl.read_csv(data, infer_schema=False, encoding="latin1", truncate_ragged_lines=True)
+                .select(pl.nth(1), pl.nth(2), pl.nth(4), pl.nth(6), pl.nth(7))
+                .iter_rows()
+            ):
+                me.append((year, office, party, district, county, town, name, int(votes)))
+        elif year == 2010:
+            district, heads = None, []
+            for row in re.findall(r"(?is)<tr.*?</tr>", data.read_text(encoding="latin-1")):
+                cells = [
+                    [line.strip() for line in html.unescape(re.sub(r"(?s)<[^>]+>", "\n", cell)).splitlines()]
+                    for cell in re.findall(r"(?is)<t[dh][^>]*>(.*?)</t[dh]>", row)
+                ]
+                cells = [[line for line in cell if line] for cell in cells]
+                flat = [" ".join(" ".join(cell).split()) for cell in cells]
+                if found := re.fullmatch(r"DISTRICT (\d+)", flat[-1] if flat else ""):
+                    district, heads = found[1], []
+                elif district is None or not flat or flat[0] == "Municipality" or flat[0].lower().startswith("total"):
+                    continue
+                elif flat[0] == "":
+                    heads = [" ".join(" ".join(cell[:-1]).split()) for cell in cells[1:]]
+                elif len(flat) == len(heads) + 1 and all(re.fullmatch(r"[\d,]+", votes) for votes in flat[1:]):
+                    for name, votes in zip(heads, flat[1:], strict=True):
+                        me.append((year, office, party, district, None, flat[0], name, int(votes.replace(",", ""))))
+        else:
+            rows = (
+                [line.split("|") for line in data.read_text(encoding="latin-1").splitlines()]
+                if year == 2012
+                else [
+                    ["" if cell is None else cell for cell in row]
+                    for row in fastexcel.read_excel(data)
+                    .load_sheet(0, header_row=None, dtypes="string")
+                    .to_polars()
+                    .iter_rows()
+                ]
+            )
+            heading: dict[int, str] = {}
+            expect = True
+            for row in rows:
+                cells = [cell.strip() for cell in row]
+                if len(cells) > 3 and re.fullmatch(r"\d+(?:\.0)?", cells[0]):
+                    for column, name in heading.items():
+                        if column < len(cells) and cells[column]:
+                            me.append(
+                                (
+                                    year,
+                                    office,
+                                    party,
+                                    cells[0],
+                                    cells[1] or None,
+                                    cells[2],
+                                    name,
+                                    int(float(cells[column].replace(",", ""))),
+                                )
+                            )
+                    expect = True
+                    continue
+                texts = {
+                    column: cell
+                    for column, cell in enumerate(cells)
+                    if column >= 3 and cell and not re.fullmatch(r"[\d,.%]+", cell)
+                }
+                if expect and texts:
+                    heading = {
+                        column: re.sub(r"(?i)\s*\(declared write-in\)$", "", cell)
+                        for column, cell in texts.items()
+                        if not re.fullmatch(r"(?i)blank|total ballots cast|tbc|total votes cast", cell)
+                    }
+                    expect = False
+    me_frame = pl.DataFrame(
+        me,
+        schema={
+            "year": pl.Int64,
+            "office": pl.String,
+            "party": pl.String,
+            "district": pl.String,
+            "county": pl.String,
+            "town": pl.String,
+            "name": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    ).with_columns(
+        district=pl.col("district").cast(pl.Float64).cast(pl.Int64).cast(pl.String),
+        fips=pl.col("county").str.strip_chars().replace_strict(me_legislature.COUNTIES, default=None),
+        place=pl.col("town")
+        .str.to_uppercase()
+        .str.replace_all(r"\bST\b\.?", "SAINT")
+        .str.replace_all(r"\bPLANTATION\b", "PLT")
+        .str.replace(r"^NO\.?\s*(\d)", "T${1}")
+        .str.replace_all(r"\b(?:TOWNSHIPS?|TWPS?)\b", "")
+        .str.replace_all(r"[^A-Z0-9]", ""),
+        uocava=pl.col("town").str.to_uppercase().str.contains("UOCAVA"),
+        choice=ME_NAME,
+    )
+    known: dict[str, set[str]] = {}
+    for place, fips in me_frame.filter(pl.col("fips").is_not_null()).select("place", "fips").unique().iter_rows():
+        known.setdefault(place, set()).add(fips)
+    resolved = {}
+    for year, office, district, place in (
+        me_frame.filter(pl.col("fips").is_null(), ~pl.col("uocava"))
+        .select("year", "office", "district", "place")
+        .unique()
+        .iter_rows()
+    ):
+        homes = known.get(place, set())
+        neighbors = me_frame.filter(pl.col("year") == year, pl.col("office") == office, pl.col("district") == district)[
+            "place"
+        ].to_list()
+        if len(homes) > 1:
+            homes = {max(homes, key=lambda fips: sum(known.get(other, set()) == {fips} for other in neighbors))}
+        elif not homes:
+            homes = {fips for other in neighbors if len(known.get(other, set())) == 1 for fips in known[other]}
+            if len(homes) > 1:
+                homes = set()
+        if homes:
+            resolved[(year, office, district, place)] = next(iter(homes))
+        else:
+            print(f"{year} ME {office} {district}: no county for {place}")
+    me_frame = me_frame.with_columns(
+        fips=pl.coalesce(
+            "fips",
+            pl.struct("year", "office", "district", "place").map_elements(
+                lambda row: resolved.get((row["year"], row["office"], row["district"], row["place"])),
+                return_dtype=pl.String,
+            ),
+        )
+    )
+    lost = me_frame.filter(pl.col("fips").is_null(), ~pl.col("uocava"))
+    if lost.height:
+        print(f"{lost.select('year', 'office', 'district').n_unique()} Maine districts with an unplaced town skipped")
+    frames.append(
+        me_frame.join(lost.select("year", "office", "district").unique(), on=["year", "office", "district"], how="anti")
+        .with_columns(
+            pl.col("choice")
+            .max()
+            .over(
+                "year",
+                "office",
+                "district",
+                "party",
+                pl.col("choice").str.to_lowercase().str.replace_all("[^a-z0-9]", ""),
+            )
+        )
+        .select(
+            state=pl.lit("ME"),
+            day=pl.col("year").replace_strict(ME_DAYS, return_dtype=pl.Date),
+            office="office",
+            code="district",
+            party="party",
+            label="party",
+            fips="fips",
+            scheme=pl.when("uocava").then(pl.lit("us.aggregate")).otherwise(pl.lit("us.county")),
+            unit=pl.when("uocava").then(pl.lit("ME:uocava")).otherwise("fips"),
+            choice="choice",
+            writein=pl.lit(False),
+            votes="votes",
+            seats=pl.lit(1, pl.Int16),
+            seat=pl.lit(None, pl.String),
+        )
+    )
     for day in NC_DAYS:
         with zipfile.ZipFile(raw.cached(SOURCE, FILES.format(day=day)).path) as archive:
             text = archive.read(archive.namelist()[0]).replace(b"\x00", b"")
@@ -1071,7 +1368,8 @@ def emit() -> Path:
             summary="State legislative and statewide primaries and runoffs from state canvasses: "
             "North Carolina 2002–2022, Minnesota 2016–2022, and Washington 2015–2022 by precinct, "
             "California 2002–2022 by county, and Colorado, Connecticut, Idaho, Massachusetts, New York, "
-            "Vermont, and Virginia 2000–2022 by county from their ElectionStats archives",
+            "Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine 2000–2022 "
+            "by county from the Secretary of State's tabulations",
             polity="US",
         )
 
@@ -1091,6 +1389,8 @@ def emit() -> Path:
                     url=url,
                     license="Public record",
                 )
+        for stamp, path, *_ in ME_FILES:
+            cs.artifact(raw.cached(SOURCE, ME_WAYBACK.format(stamp, path)), sources["ME"])
         for day in NC_DAYS:
             cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), sources["NC"])
         for day in MN_DAYS:
@@ -1140,6 +1440,14 @@ def emit() -> Path:
             [f"{SOURCE}.result_set"],
         ).fetchall():
             earlier.setdefault(result_set, []).append((option, kind, seats, notes))
+        methods: dict[UUID, str] = dict(
+            conn.execute(
+                """select n.entity_id, n.body_md from note n
+                   join external_id x on x.entity_id = n.entity_id and x.scheme = %s
+                   where n.kind = 'methodology'""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        )
         keys = {
             value
             for (value,) in conn.execute(
@@ -1192,7 +1500,7 @@ def emit() -> Path:
         parties = {code: cs.key("us.party", key) for code, (key, *_) in PARTIES.items() if key}
         systems = {
             key: cs.key("us.electoral_system", key)
-            for key in ("fptp", "top_two", "two_round_40", "two_round_30", "block")
+            for key in ("fptp", "top_two", "two_round_40", "two_round_30", "block", "irv")
         }
         offices = {
             (state, office): cs.key("us.office", f"{office}:{state}")
@@ -1224,6 +1532,7 @@ def emit() -> Path:
             *(("MN", day, None) for day in MN_DAYS),
             *(("WA", day, None) for day in WA_DAYS),
             *(("CA", day, None) for day in CA_DAYS),
+            *(("ME", day, None) for day in ME_DAYS.values()),
             *(
                 (state, day, None)
                 for state, day in lines.filter(pl.col("state").is_in(list(ELSTATS)))
@@ -1340,8 +1649,10 @@ def emit() -> Path:
                     if party == ""
                     else "block"
                     if magnitude > 1
+                    else "irv"
+                    if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", *ELSTATS)
+                    if state in ("MN", "CA", "ME", *ELSTATS)
                     else "two_round_40"
                     if day.year < 2018
                     else "two_round_30"
@@ -1455,7 +1766,12 @@ def emit() -> Path:
                     wins = [(choice, "advanced", ADVANCED_TOP) for choice in names[:2]]
                 elif (tallies[0] - tallies[2]) * 100 > total:
                     wins = [(names[0], "advanced", ADVANCED_TOP)]
-            elif state in ("MN", "CA", *ELSTATS):
+            elif state == "ME" and day.year >= 2018 and len(tallies) > 2:
+                if tallies[0] * 2 > sum(tallies) and (tallies[0] - tallies[1]) * 100 > total:
+                    wins = [(names[0], "won", WON_MAJORITY)]
+                elif tallies[0] > tallies[1] and nominated.get(names[0]):
+                    wins = [(names[0], "won", WON_NOMINEE)]
+            elif state in ("MN", "CA", "ME", *ELSTATS):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total:
@@ -1539,7 +1855,8 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=(
+                body_md=methods.get(result_set)
+                or (
                     WA_METHOD
                     if state == "WA"
                     else CA_METHOD.format(
@@ -1550,11 +1867,14 @@ def emit() -> Path:
                     if state == "CA"
                     else MN_METHOD
                     if state == "MN"
+                    else ME_METHOD
+                    if state == "ME"
                     else ELSTATS_METHOD.format(publisher=STATES[state][2])
                     if state in ELSTATS
                     else METHOD.format(threshold=threshold)
                 )
-                + (" " + RECOUNT if result_set in cs.minted else ""),
+                + " "
+                + RECOUNT,
             )
             for option, kind, _, notes in sorted(wanted):
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, notes=notes)
@@ -1639,9 +1959,9 @@ def emit() -> Path:
                 polity_id=polities[state],
                 scheme_code=scheme,
                 code=unit,
-                parent_id=counties[fips][0],
-                area_relation="within",
-                area_id=counties[fips][1],
+                parent_id=counties[fips][0] if fips else None,
+                area_relation="within" if fips else "unlocated",
+                area_id=counties[fips][1] if fips else None,
                 kind="aggregate" if flags else "standard",
                 valid_from=None if flags and not parted else day,
                 valid_to=None if flags and not parted else day + timedelta(days=1),
