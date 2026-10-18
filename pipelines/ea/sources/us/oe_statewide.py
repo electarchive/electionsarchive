@@ -87,6 +87,7 @@ ILLINOIS = "https://www.elections.il.gov/Downloads/ElectionOperations/VoteTotals
 MICHIGAN = (
     "https://web.archive.org/web/20160614235202id_/http://miboecfr.nictusa.com/election/results.old/02GEN/02GENall.html"
 )
+WISCONSIN = "https://docs.legis.wisconsin.gov/misc/lrb/blue_book/2007_2008/960_elections.pdf"
 MONTANA = "https://sosmt.gov/wp-content/uploads/attachments/2012_General_Canvass.pdf"
 ARKANSAS = "https://web.archive.org/web/20180216174010id_/http://results.enr.clarityelections.com/AR/53237/149792/json/sum.json"
 CANVASSES = {
@@ -123,6 +124,11 @@ CANVASSES = {
         "https://mielections.us/election/results/",
     ),
     "MT": ("Montana Secretary of State", "2012 Statewide General Election Canvass", MONTANA),
+    "WI": (
+        "Wisconsin Legislative Reference Bureau",
+        "Wisconsin Blue Book 2007-2008",
+        "https://docs.legis.wisconsin.gov/misc/lrb/blue_book/2007_2008",
+    ),
 }
 DECLARATIONS = {
     "2000-11-07:MO:lieutenant-governor": (MISSOURI.format(stamp=2024, year=2000), {"page": 1}),
@@ -148,6 +154,8 @@ DECLARATIONS = {
     "2014-11-04:IL:treasurer": (ILLINOIS, {"page": 54}),
     "2002-11-05:MI:attorney-general": (MICHIGAN, {"section": "Attorney General 4 Year Term (1) Position"}),
     "2012-11-06:MT:superintendent-of-public-instruction": (MONTANA, {"page": 9}),
+    "2006-11-07:WI:treasurer": (WISCONSIN, {"page": 9, "printed_page": 932}),
+    "2006-11-07:WI:attorney-general": (WISCONSIN, {"page": 7, "printed_page": 930}),
 }
 CLOSE_WINNER = (
     "The race was within 0.5% in these sums. {winner} was declared the winner in the state's official canvass and "

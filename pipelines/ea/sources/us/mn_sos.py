@@ -126,6 +126,11 @@ CLAY_NOTE = (
     "vote for that candidate."
 )
 
+DERIVED = (
+    "The 2006 precinct spreadsheet does not include a column for {name}. These precinct votes are omitted from this "
+    "set and appear only in the county totals."
+)
+
 
 def fetch() -> None:
     for path in FILES.values():
@@ -324,7 +329,13 @@ def emit() -> Path:
                     {} if year == 2002 else {"document": int(url.rpartition("/")[2])}
                 )
                 cs.add("citation", entity_id=default, source_id=source, locator=locator)
-            if f"{key}:precinct" in keys:
+            derived = [
+                name
+                for field, name, _, _ in CANDIDATES[(int(year), str(office))]
+                if field.endswith("TOT") and name is not None
+            ]
+            label = f"{key}:precinct" + (":2" if derived else "")
+            if label in keys:
                 continue
             options = {
                 ("WRITE-INS" if kind == "write_in" else label.upper()): option
@@ -336,7 +347,28 @@ def emit() -> Path:
             missing = set(rows["candidate"]) - set(options)
             if missing:
                 raise ValueError(f"{key}: no option for {missing}")
-            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
+            replaced = None
+            if derived and f"{key}:precinct" in keys:
+                replaced = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
+                cs.add(
+                    "result_set",
+                    id=replaced,
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=found["results"],
+                    is_default=False,
+                    supersedes_id=None,
+                    completeness=1,
+                )
+                for option, kind, seats in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [replaced]
+                ).fetchall():
+                    cs.add("outcome", result_set_id=replaced, option_id=option, kind=kind, seats=seats)
+            counted = rows.filter(~pl.col("candidate").is_in(derived))
+            result_set = cs.key(f"{SOURCE}.result_set", label)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -347,15 +379,19 @@ def emit() -> Path:
                 status="active",
                 source_id=found["results"],
                 is_default=False,
-                completeness=1,
+                supersedes_id=replaced,
+                completeness=round(int(counted["votes"].sum()) / int(rows["votes"].sum()), 4),
             )
             for option, kind, seats in conn.execute(
                 "select option_id, kind, seats from outcome where result_set_id = %s", [default]
             ).fetchall():
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
+            if not derived:
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD)
             if year == 2006:
                 cs.add("note", entity_id=result_set, kind="caveat", body_md=CLAY_NOTE)
+            for name in derived:
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=DERIVED.format(name=name.title()))
             for county, precinct in rows.select("county", "precinct").unique().iter_rows():
                 code = f"{year}:MN:{county}::{precinct}"
                 if code in units:
@@ -375,7 +411,7 @@ def emit() -> Path:
                     valid_to=day + timedelta(days=1),
                 )
             values.append(
-                rows.filter(pl.col("votes") > 0).select(
+                counted.filter(pl.col("votes") > 0).select(
                     result_set_id=pl.lit(str(result_set)),
                     unit_id=pl.concat_str(
                         pl.col("year").cast(pl.String), pl.lit(":MN:"), "county", pl.lit("::"), "precinct"
