@@ -319,11 +319,18 @@ OFFICES = {
     "INSURANCE COMMISSIONER": ("insurance-commissioner", "Insurance Commissioner"),
     "CONTROLLER": ("controller", "Controller"),
     "COMPTROLLER": ("comptroller", "Comptroller"),
+    "SUPREME COURT ASSOCIATE JUSTICE": ("justice-of-the-supreme-court", "Supreme Court Associate Justice"),
+    "SUPREME COURT CHIEF JUSTICE": ("chief-justice-of-the-supreme-court", "Supreme Court Chief Justice"),
+    "COURT OF APPEALS JUDGE": ("judge-of-the-court-of-appeals", "Court of Appeals Judge"),
     "GOVERNOR AND LIEUTENANT GOVERNOR": ("governor", "gubernatorial"),
 }
 LEGISLATIVE = re.compile(r"NC (?:STATE )?(HOUSE|SENATE)(?: OF REPRESENTATIVES)?(?: DISTRICT 0*(\d+)| \(0*(\d+)\))")
 MN_LEGISLATIVE = re.compile(r"STATE (REPRESENTATIVE|SENATOR) DISTRICT 0*(\d+)([AB]?)")
 STATEWIDE = re.compile(rf"(?:NC )?(?:STATE )?({'|'.join(OFFICES)})")
+JUDICIAL = re.compile(
+    r"(?:NC )?(SUPREME COURT(?: ASSOCIATE JUSTICE| CHIEF JUSTICE)?|COURT OF APPEALS JUDGE)"
+    r"(?: \((\w+)\)| - (\w+) SEAT| SEAT 0*(\d+))?"
+)
 SUFFIX = re.compile(r"\s*(?:- |\()(DEM|REP|LIB|GRE|CST)\)?$")
 PSEUDO = re.compile(r"ABSENTEE.*|PROV.*|TRANSFERS?|CURBSIDE|ONE ?STOP.*|ONESTOP.*|OS|OS[ _-].*")
 PARTIES = {
@@ -371,6 +378,12 @@ ELSTATS_METHOD = (
 MN_METHOD = (
     "Totals are the sums of the precinct rows in the Secretary of State's all-races file. The file does not mark "
     "winners, so the winner shown is the candidate with the most votes."
+)
+JUDICIAL_METHOD = (
+    "Totals are the sums of the precinct, early voting, absentee, and provisional rows in the State Board's "
+    "precinct file; votes the file reports only county-wide are kept at the county level. The primary is "
+    "nonpartisan and the file does not mark winners, so the two shown as advancing are the top two, who go on to "
+    "the general election."
 )
 METHOD = (
     "Totals are the sums of the precinct, early voting, absentee, and provisional rows in the State Board's "
@@ -1222,6 +1235,13 @@ def parse() -> None:
             bare = SUFFIX.sub("", contest)
             if found := LEGISLATIVE.fullmatch(bare):
                 office, code = found[1].lower(), str(int(found[2] or found[3]))
+            elif found := JUDICIAL.fullmatch(bare):
+                seat = f"seat-{int(found[4])}" if found[4] else (found[2] or found[3] or "").lower()
+                office = OFFICES[found[1] if found[1] != "SUPREME COURT" else "SUPREME COURT ASSOCIATE JUSTICE"][0]
+                office, code = f"{office}:{seat}" if seat else office, None
+                if suffix is None and 2004 <= day.year <= 2016:
+                    labels.append({"contest": contest, "office": office, "code": code, "named": ""})
+                    continue
             elif found := STATEWIDE.fullmatch(bare):
                 office, code = OFFICES[found[1]][0], None
             else:
@@ -2115,7 +2135,9 @@ def emit() -> Path:
             (state, office): cs.key("us.office", f"{office}:{state}")
             for state in STATES
             for office in {office for office, _ in OFFICES.values()}
-            if not lines.filter(pl.col("state") == state, pl.col("office") == office).is_empty()
+            if not lines.filter(
+                pl.col("state") == state, pl.col("office").str.split(":").list.first() == office
+            ).is_empty()
         }
         chambers: dict[str, str] = dict(
             conn.execute(
@@ -2238,7 +2260,9 @@ def emit() -> Path:
                         None,
                     )
             kind = "runoff" if first else "primary"
-            stage = f"{label} primary" + (" runoff" if first else "")
+            stage = f"{'nonpartisan' if state == 'NC' and party == '' else label} primary" + (
+                " runoff" if first else ""
+            )
             magnitude: int = rows.select(pl.col("seats").fill_null(1).max()).item()
             district, _, post = (code or "").partition(":")
             remainder = (state == "WA" and day.year % 2 == 1) or (
@@ -2249,7 +2273,7 @@ def emit() -> Path:
                 id=contest,
                 election_id=elections[(state, day)],
                 kind="office" if code is None else "body_seats",
-                office_id=offices[(state, office)] if code is None else None,
+                office_id=offices[(state, office.split(":")[0])] if code is None else None,
                 body_id=bodies[(state, office)] if code is not None else None,
                 district_area_id=cs.area("us.state", fips)
                 if code is None
@@ -2278,8 +2302,20 @@ def emit() -> Path:
                 party_scope_id=parties.get(party),
             )
             if code is None:
-                name(contest, f"{day.year} {place} {titles[office]} {stage}")
-                path = f"us/{state.lower()}/{day}-{kind}/{office}" + (f"-{word}" if word else "")
+                seat = office.partition(":")[2]
+                name(
+                    contest,
+                    f"{day.year} {place} {titles[office.split(':')[0]]}"
+                    + (
+                        f", Seat {seat.removeprefix('seat-')},"
+                        if seat.startswith("seat-")
+                        else f" ({seat.title()} seat)"
+                        if seat
+                        else ""
+                    )
+                    + f" {stage}",
+                )
+                path = f"us/{state.lower()}/{day}-{kind}/{office.replace(':', '-')}" + (f"-{word}" if word else "")
             else:
                 name(
                     contest,
@@ -2516,6 +2552,8 @@ def emit() -> Path:
                     if state == "IL"
                     else ELSTATS_METHOD.format(publisher=STATES[state][2])
                     if state in ELSTATS
+                    else JUDICIAL_METHOD
+                    if party == ""
                     else METHOD.format(threshold=threshold)
                 )
                 + " "
