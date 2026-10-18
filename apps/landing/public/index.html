@@ -14,12 +14,12 @@
     <meta
       name="theme-color"
       media="(prefers-color-scheme: light)"
-      content="#f1efea"
+      content="#ffffff"
     />
     <meta
       name="theme-color"
       media="(prefers-color-scheme: dark)"
-      content="#1a1917"
+      content="#111315"
     />
     <link rel="canonical" href="https://www.electionsarchive.com/" />
     <link rel="icon" href="/favicon.svg" type="image/svg+xml" />
@@ -77,26 +77,12 @@
     </script>
     <link
       rel="preload"
-      href="/fonts/piazzolla.woff2"
-      as="font"
-      type="font/woff2"
-      crossorigin
-    />
-    <link
-      rel="preload"
       href="/fonts/sofia-sans-semi-condensed.woff2"
       as="font"
       type="font/woff2"
       crossorigin
     />
     <style>
-      @font-face {
-        font-family: "Piazzolla Variable";
-        font-style: normal;
-        font-display: swap;
-        font-weight: 100 900;
-        src: url("/fonts/piazzolla.woff2") format("woff2-variations");
-      }
       @font-face {
         font-family: "Sofia Sans Semi Condensed Variable";
         font-style: normal;
@@ -107,35 +93,24 @@
       }
 
       :root {
-        --background: #f1efea;
-        --foreground: #191816;
-        --card: #fbfaf7;
-        --primary: #ffe03a;
-        --muted-foreground: #67635b;
-        --accent: color-mix(in oklab, #ffe03a 72%, transparent);
-        --border: #cfcac0;
-        --radius: 5px;
+        --background: #ffffff;
+        --foreground: #15171a;
+        --muted-foreground: #5b616a;
+        --border: #dadde2;
+        --marker: #ffe03a;
+        --radius: 3px;
         --sans:
           "Sofia Sans Semi Condensed Variable", "Noto Sans", system-ui,
           sans-serif;
-        --serif: "Piazzolla Variable", "Noto Serif", Georgia, serif;
       }
 
       @media (prefers-color-scheme: dark) {
         :root {
-          --background: #1a1917;
-          --foreground: #ece9e2;
-          --card: #22211e;
-          --primary: #e8c547;
-          --muted-foreground: #a09b91;
-          --accent: color-mix(in oklab, #e8c547 28%, transparent);
-          --border: #3b3934;
-        }
-      }
-
-      @supports (corner-shape: squircle) {
-        :root {
-          --radius: 9px;
+          --background: #111315;
+          --foreground: #e8eaed;
+          --muted-foreground: #9aa0a9;
+          --border: #2b2f34;
+          --marker: #e8c547;
         }
       }
 
@@ -154,9 +129,8 @@
 
       body {
         min-block-size: 100dvh;
-        display: grid;
-        place-items: center;
-        padding: clamp(0.875rem, 4vw, 3rem);
+        display: flex;
+        flex-direction: column;
         background: var(--background);
         color: var(--foreground);
         font-family: var(--sans);
@@ -166,33 +140,27 @@
       }
 
       ::selection {
-        background: var(--accent);
-        color: var(--foreground);
+        background: var(--marker);
+        color: #15171a;
       }
 
-      .sheet {
+      .wrap {
         inline-size: 100%;
-        max-inline-size: 60rem;
-        display: grid;
-        gap: 1px;
-        overflow: hidden;
-        border: 1px solid var(--border);
-        border-radius: var(--radius);
-        corner-shape: squircle;
-        background: var(--border);
-      }
-
-      .cell {
-        background: var(--card);
-        padding: 0.75rem 1rem;
+        max-inline-size: 80rem;
+        margin-inline: auto;
+        padding-inline: 1rem;
       }
 
       .brand {
+        border-block-end: 1px solid var(--border);
+      }
+
+      .brand .wrap {
         display: flex;
         align-items: center;
         justify-content: space-between;
         gap: 1rem;
-        min-block-size: 3rem;
+        block-size: 3rem;
       }
 
       .lockup {
@@ -208,68 +176,100 @@
       }
 
       .status {
-        padding-inline: 0.3em;
-        background-image: linear-gradient(
-          178deg,
-          transparent 12%,
-          var(--accent) 12% 88%,
-          transparent 88%
-        );
+        color: var(--muted-foreground);
         font-size: 0.875rem;
-        font-weight: 600;
       }
 
-      .monogram .box {
-        fill: var(--card);
-        stroke: var(--foreground);
+      .monogram rect {
+        fill: var(--marker);
       }
 
-      .monogram .marker,
-      .tally .marker {
-        fill: var(--primary);
-      }
-
-      .monogram .bars,
-      .tally path:not(.marker) {
+      .monogram path {
         fill: none;
-        stroke: var(--foreground);
-        stroke-linecap: round;
+        stroke: #15171a;
+        stroke-linecap: square;
       }
 
       .hero {
         display: grid;
-        grid-template-columns: minmax(0, 1fr) auto;
-        align-items: end;
-        gap: 1.5rem 3rem;
-        padding: clamp(1.5rem, 5vw, 3rem) clamp(1rem, 4vw, 2.5rem);
+        gap: 1.5rem 4rem;
+        padding-block: clamp(2.5rem, 6vw, 4.5rem) clamp(2rem, 5vw, 3.5rem);
+      }
+
+      @media (width >= 64rem) {
+        .hero {
+          grid-template-columns: minmax(0, 1fr) minmax(0, 32rem);
+          align-items: end;
+        }
+
+        .shots {
+          grid-template-columns: repeat(2, minmax(0, 1fr));
+        }
+
+        .shots figure:last-child {
+          grid-column: 1 / -1;
+        }
       }
 
       h1 {
-        max-inline-size: 17ch;
-        font-family: var(--serif);
-        font-optical-sizing: auto;
-        font-size: clamp(2.125rem, 5.4vw, 3.5rem);
-        font-weight: 640;
-        line-height: 1.02;
-        letter-spacing: -0.01em;
+        max-inline-size: 18ch;
+        font-size: clamp(2.25rem, 1.4rem + 3.4vw, 4.25rem);
+        font-weight: 780;
+        line-height: 0.98;
+        letter-spacing: -0.022em;
         text-wrap: balance;
       }
 
       .lede {
-        max-inline-size: 58ch;
-        margin-block-start: 1.25rem;
-        font-size: 1.0625rem;
-        line-height: 1.55;
+        max-inline-size: 60ch;
+        font-size: 1.125rem;
+        line-height: 1.5;
         text-wrap: pretty;
       }
 
-      .tally {
-        inline-size: clamp(7rem, 15vw, 10.5rem);
+      .preview {
+        border-block-start: 1px solid var(--border);
+        padding-block: 1.75rem 3rem;
+      }
+
+      h2 {
+        font-size: 1.375rem;
+        font-weight: 740;
+        line-height: 1.15;
+        letter-spacing: -0.012em;
+      }
+
+      .intro {
+        margin-block-start: 0.375rem;
+        color: var(--muted-foreground);
+      }
+
+      .shots {
+        display: grid;
+        align-items: start;
+        gap: 1.5rem;
+        margin-block-start: 1.5rem;
+      }
+
+      figure img {
+        display: block;
+        inline-size: 100%;
         block-size: auto;
-        overflow: visible;
+        border: 1px solid var(--border);
+        border-radius: var(--radius);
+      }
+
+      figcaption {
+        margin-block-start: 0.5rem;
+        color: var(--muted-foreground);
+        font-size: 0.875rem;
+        text-wrap: pretty;
       }
 
       .foot {
+        margin-block-start: auto;
+        border-block-start: 1px solid var(--border);
+        padding-block: 1rem;
         color: var(--muted-foreground);
         font-size: 0.875rem;
       }
@@ -285,43 +285,10 @@
         text-decoration-color: currentColor;
       }
 
-      @media (width < 40rem) {
-        body {
-          place-items: start stretch;
-          padding: 0;
-        }
-
-        .sheet {
-          border-inline: 0;
-          border-block-start: 0;
-          border-radius: 0;
-        }
-
-        .hero {
-          grid-template-columns: minmax(0, 1fr);
-        }
-
-        .tally {
-          order: -1;
-          inline-size: 5.5rem;
-        }
-      }
-
       @media (prefers-reduced-motion: no-preference) {
-        .tally .bar,
-        .tally .gate {
+        .monogram path {
           animation: draw 200ms cubic-bezier(0.3, 0.7, 0.3, 1) both;
-          animation-delay: calc(var(--i) * 140ms + 300ms);
-        }
-
-        .tally .gate {
-          animation-duration: 280ms;
-        }
-
-        .tally .marker {
-          transform-box: fill-box;
-          transform-origin: left center;
-          animation: swipe 380ms cubic-bezier(0.2, 0.8, 0.2, 1) 1220ms both;
+          animation-delay: calc(var(--i) * 120ms + 250ms);
         }
       }
 
@@ -338,17 +305,11 @@
           opacity: 1;
         }
       }
-
-      @keyframes swipe {
-        from {
-          transform: scaleX(0);
-        }
-      }
     </style>
   </head>
   <body>
-    <main class="sheet">
-      <header class="cell brand">
+    <header class="brand">
+      <div class="wrap">
         <span class="lockup">
           <svg
             class="monogram"
@@ -357,86 +318,134 @@
             viewBox="0 0 32 32"
             aria-hidden="true"
           >
-            <rect
-              class="box"
-              x="1"
-              y="1"
-              width="30"
-              height="30"
-              rx="4"
-              stroke-width="1.5"
-            />
-            <path class="marker" d="M5 12.6 L27 11.4 L27 19.4 L5 20.6 Z" />
+            <rect width="32" height="32" rx="3" />
             <path
-              class="bars"
-              d="M9 8 V24 M13 8 V24 M17 8 V24 M21 8 V24 M6 21.5 L26 12"
-              stroke-width="2.2"
+              style="--i: 0"
+              d="M9.5 7 V25"
+              pathLength="1"
+              stroke-dasharray="1"
+              stroke-width="2.4"
+            />
+            <path
+              style="--i: 1"
+              d="M13.75 7 V25"
+              pathLength="1"
+              stroke-dasharray="1"
+              stroke-width="2.4"
+            />
+            <path
+              style="--i: 2"
+              d="M18 7 V25"
+              pathLength="1"
+              stroke-dasharray="1"
+              stroke-width="2.4"
+            />
+            <path
+              style="--i: 3"
+              d="M22.25 7 V25"
+              pathLength="1"
+              stroke-dasharray="1"
+              stroke-width="2.4"
+            />
+            <path
+              style="--i: 4"
+              d="M5.5 21 L26.5 11"
+              pathLength="1"
+              stroke-dasharray="1"
+              stroke-width="2.4"
             />
           </svg>
           <span class="wordmark">Elections Archive</span>
         </span>
         <span class="status">In preparation</span>
-      </header>
+      </div>
+    </header>
 
-      <section class="cell hero">
-        <div>
-          <h1>Every election in the world, down to the ballot box.</h1>
-          <p class="lede">
-            Elections Archive provides a free, open record of election results,
-            from nationwide totals to individual polling stations, going back to
-            the first election each place held. At launch, you can browse the
-            data on the web or access it via an API, an MCP server, or bulk
-            downloads.
-          </p>
-        </div>
-        <svg class="tally" viewBox="3.5 6.5 25 19" aria-hidden="true">
-          <path class="marker" d="M5 12.6 L27 11.4 L27 19.4 L5 20.6 Z" />
-          <path
-            class="bar"
-            style="--i: 0"
-            d="M9 8 V24"
-            pathLength="1"
-            stroke-dasharray="1"
-            stroke-width="2.2"
-          />
-          <path
-            class="bar"
-            style="--i: 1"
-            d="M13 8 V24"
-            pathLength="1"
-            stroke-dasharray="1"
-            stroke-width="2.2"
-          />
-          <path
-            class="bar"
-            style="--i: 2"
-            d="M17 8 V24"
-            pathLength="1"
-            stroke-dasharray="1"
-            stroke-width="2.2"
-          />
-          <path
-            class="bar"
-            style="--i: 3"
-            d="M21 8 V24"
-            pathLength="1"
-            stroke-dasharray="1"
-            stroke-width="2.2"
-          />
-          <path
-            class="gate"
-            style="--i: 4"
-            d="M6 21.5 L26 12"
-            pathLength="1"
-            stroke-dasharray="1"
-            stroke-width="2.2"
-          />
-        </svg>
+    <main>
+      <section class="wrap hero">
+        <h1>Every election in the world, down to the ballot box.</h1>
+        <p class="lede">
+          Elections Archive provides a free, open record of election results,
+          from nationwide totals to individual polling stations, going back to
+          the first election each place held. At launch, you can browse the data
+          on the web or access it via an API, an MCP server, or bulk downloads.
+        </p>
       </section>
 
-      <footer class="cell foot">
-        <p>Built by <a href="https://firatciftci.com">Firat Ciftci</a></p>
-      </footer>
+      <section class="preview">
+        <div class="wrap">
+          <h2>Preview</h2>
+          <p class="intro">
+            Screenshots of the archive in development. Pages may change before
+            launch.
+          </p>
+          <div class="shots">
+            <figure>
+              <picture>
+                <source
+                  srcset="/shots/president-dark.webp"
+                  media="(prefers-color-scheme: dark)"
+                />
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src="/shots/president-light.webp"
+                  width="1600"
+                  height="888"
+                  alt="The 2024 US presidential election page: a sentence stating the result, the electoral vote as a bar of states, a map shaded by winner, and a results table"
+                />
+              </picture>
+              <figcaption>
+                The 2024 US presidential election, showing electoral votes by
+                state
+              </figcaption>
+            </figure>
+            <figure>
+              <picture>
+                <source
+                  srcset="/shots/bundestag-dark.webp"
+                  media="(prefers-color-scheme: dark)"
+                />
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src="/shots/bundestag-light.webp"
+                  width="1600"
+                  height="838"
+                  alt="A map of Germany's states shaded by winning party beside a hemicycle of the Bundestag's 630 seats and a breakdown of seats by party"
+                />
+              </picture>
+              <figcaption>
+                The 2025 Bundestag election, showing the winner in each state
+                and total seats in the chamber
+              </figcaption>
+            </figure>
+            <figure>
+              <picture>
+                <source
+                  srcset="/shots/results-dark.webp"
+                  media="(prefers-color-scheme: dark)"
+                />
+                <img
+                  loading="lazy"
+                  decoding="async"
+                  src="/shots/results-light.webp"
+                  width="1600"
+                  height="400"
+                  alt="Grid showing four recent national elections. Each election displays the seats or shares of the two leading parties above a bar representing the full result"
+                />
+              </picture>
+              <figcaption>Latest national results on the home page</figcaption>
+            </figure>
+          </div>
+        </div>
+      </section>
     </main>
+
+    <footer class="foot">
+      <p class="wrap">
+        Built by <a href="https://firatciftci.com">Firat Ciftci</a>
+      </p>
+    </footer>
   </body>
 </html>
