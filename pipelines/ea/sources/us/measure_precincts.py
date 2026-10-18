@@ -1,6 +1,7 @@
 import io
 import json
 import re
+import subprocess
 import zipfile
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date, timedelta
@@ -201,6 +202,14 @@ CALIFORNIA = (
     "default results{counties}. The Database's permission to redistribute its files is pending, so this set is held "
     "under that pending license."
 )
+MONO_2016 = (
+    "https://web.archive.org/web/20170124201915id_/http://www.monocounty.ca.gov/sites/default/files/fileattachments/"
+    "elections/page/227/official-statement_of_vote_book.pdf"
+)
+MONO_NOTE = (
+    " The Database's Mono County rows trail the county's certified totals, so Mono's precincts come from the county's "
+    "own statement of vote (page 16), its vote-by-mail rows coded with the Database's `A` suffix."
+)
 COMMITS = openelections.COMMITS | county_measures.COMMITS
 FILE = re.compile(
     r"(?:.*/)?(\d{8})__([a-z]{2})__((?:general|primary|special|runoff)(?:__(?:general|primary|runoff))?)(__[a-z_]+)?__(precinct|town)\.csv"
@@ -210,6 +219,7 @@ FILE = re.compile(
 def fetch() -> None:
     for election in CA_ELECTIONS:
         raw.fetch(SOURCE, CA_SOV.format(election, election.lower()), suffix=".zip")
+    raw.fetch(SOURCE, MONO_2016, suffix=".pdf")
     measures.fetch()
     raw.fetch(SOURCE, HARNEY, suffix=".pdf")
     with connect() as conn:
@@ -879,7 +889,38 @@ def parse() -> None:
             )
             .filter(pl.col("votes").is_not_null().all().over("office"))
         )
-    pl.concat(frames).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "california.parquet")
+    text = subprocess.run(
+        ["pdftotext", "-f", "16", "-l", "16", "-layout", str(raw.cached(SOURCE, MONO_2016).path), "-"],
+        capture_output=True,
+        text=True,
+        check=True,
+    ).stdout
+    mono = [
+        (number + ("A" if "- Vot" in line else ""), answer, int(votes))
+        for line in text.splitlines()
+        if (found := re.match(r"^(\d\d) .*?\s+\d+\s+\d+\s+[\d.]+\s+(\d+)\s+(\d+)$", line))
+        for number, yes, no in [found.groups()]
+        for answer, votes in (("YES", yes), ("NO", no))
+    ]
+    day = swdb_precincts.DAYS["P16"]
+    replaced = (pl.col("day") == day) & (pl.col("fips") == "06051") & (pl.col("office") == "PROPOSITION 50")
+    pl.concat(
+        [
+            pl.concat(frames).filter(~replaced),
+            pl.DataFrame(mono, schema=["precinct", "answer", "votes"], orient="row").select(
+                year=pl.lit(day.year, pl.Int32),
+                day=pl.lit(day),
+                state=pl.lit("CA"),
+                office=pl.lit("PROPOSITION 50"),
+                district=pl.lit(None, pl.String),
+                fips=pl.lit("06051"),
+                jurisdiction=pl.lit(""),
+                precinct="precinct",
+                answer="answer",
+                votes=pl.col("votes").cast(pl.Int64),
+            ),
+        ]
+    ).sort("day", "office", "fips", "precinct", "answer").write_parquet(PARSED / "california.parquet")
 
 
 def emit() -> Path:
@@ -1211,13 +1252,37 @@ def emit() -> Path:
                     completeness=1,
                 )
             harney = state == "OR" and day == date(2024, 11, 5) and method == MEDSL
+            mono = method == CALIFORNIA and day == swdb_precincts.DAYS["P16"]
             cs.add(
                 "note",
                 entity_id=staged,
                 kind="methodology",
                 body_md=method.format(counties=" and to each county's" if by_county else "")
-                + (HARNEY_NOTE if harney else ""),
+                + (HARNEY_NOTE if harney else "")
+                + (MONO_NOTE if mono else ""),
             )
+            if mono:
+                clerk = cs.source("Mono County Elections", "Statement of Vote, June 7, 2016")
+                if clerk in cs.minted:
+                    cs.add(
+                        "source",
+                        id=clerk,
+                        kind="official_body",
+                        publisher="Mono County Elections",
+                        title="Statement of Vote, June 7, 2016",
+                        url="https://monocounty.ca.gov/1910/Elections",
+                        license="Public record",
+                    )
+                cs.add(
+                    "citation",
+                    entity_id=staged,
+                    source_id=clerk,
+                    locator={
+                        "url": MONO_2016,
+                        "artifact": str(cs.artifact(raw.cached(SOURCE, MONO_2016), clerk)),
+                        "page": 16,
+                    },
+                )
             if harney:
                 if records is None:
                     secretary = cs.source("Oregon Secretary of State", "County precinct-level results")
