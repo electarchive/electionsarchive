@@ -3,6 +3,7 @@ import io
 import json
 import re
 import subprocess
+import tempfile
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -65,8 +66,36 @@ GENERALS = (
     | {
         "2023-10-14:LA": LOUISIANA.format(date(2023, 10, 14)),
         "2023-11-18:LA:runoff": LOUISIANA.format(date(2023, 11, 18)),
+        "2023-11-07:MS:single": "https://www.sos.ms.gov/elections/electionresults/2023General/State%20Certified%20Results/"
+        "Legislative%20Office%20Composed%20of%20a%20Single%20County.pdf",
+        "2023-11-07:MS:multi": "https://www.sos.ms.gov/elections/electionresults/2023General/State%20Certified%20Results/"
+        "State%20District%20Offices%20and%20Multi-County%20Legislative%20District%20Offices.pdf",
     }
 )
+MISSISSIPPI_QUALIFYING = (
+    "https://www.sos.ms.gov/Content/documents/Elections/candidate%20qualifying/2023%20Qualifying%20List%202023.6.3.pdf"
+)
+MISSISSIPPI_READINGS = {
+    "Dianne BD. Black": "Dianne D. Black",
+    "Layd B. 'Rob' Roberson II": "Loyd B. 'Rob' Roberson II",
+    "John ©. Read": "John O. Read",
+    "Robert L. Johnson IIE": "Robert L. Johnson III",
+    "Lestey Smith": "Lesley Smith",
+    "Jeffery S$. Hale": "Jeffery S. Hale",
+    "W. I. 'Doc! Harris Jr.": "W. I. 'Doc' Harris Jr.",
+    "Josh Harkins 414,672": "Josh Harkins 14,672",
+    "Scott Delano 7,615": "Scott DeLano 7,615",
+    "Total for District 50 7,645": "Total for District 50 7,615",
+}
+MISSISSIPPI_PARTIES = {
+    "house:6:Michael Chandler": "Democrat",
+    "house:41:Kabir Karriem": "Democrat",
+    "house:58:Jonathan McMillan": "Republican",
+    "house:74:Lee Yancey": "Republican",
+    "house:97:Ben Thompson": "Democrat",
+    "house:114:Jeffrey S. 'Jeff' Guice": "Republican",
+    "senate:23:Briggs Hopson": "Republican",
+}
 NJ_ORDINALS = [
     "first",
     "second",
@@ -100,6 +129,7 @@ PUBLISHERS = {
     "TN:2023-09-14": "Davidson County Election Commission",
     "MA": "Massachusetts Secretary of the Commonwealth",
     "NH": "New Hampshire Secretary of State",
+    "MS": "Mississippi Secretary of State",
     "VA": "Virginia Department of Elections",
     "AL": "Alabama Secretary of State",
     "CA": "California Secretary of State",
@@ -713,6 +743,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=SUFFIXES[system] or Path(url.split("?")[0]).suffix)
         if system == "louisiana":
             raw.fetch(SOURCE, url.replace("Votes_", "RacesCandidates_"), suffix=".json")
+    raw.fetch(SOURCE, MISSISSIPPI_QUALIFYING, suffix=".pdf")
     for election, url in GENERALS.items():
         if ":LA" in election:
             raw.fetch(SOURCE, url, suffix=".json")
@@ -850,6 +881,71 @@ def parse() -> None:
             rows.append({"key": key, "url": url, "candidate": label, "party": _party(state, party), "votes": votes})
     for election, url in GENERALS.items():
         day, state = election.split(":")[:2]
+        if state == "MS":
+            qualified: dict[str, list[tuple[str, str]]] = defaultdict(list)
+            chamber = None
+            for line in subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, MISSISSIPPI_QUALIFYING).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.splitlines():
+                if line.startswith("Candidates for"):
+                    chamber = "senate" if "State Senator" in line else "house" if "House of Rep" in line else None
+                elif chamber and (
+                    match := re.match(
+                        r"^\s*.+?\s{2,}(\S.*?)\s+(\d+)\s+(Repu?blican|Democrat|Independent|Libertarian|Green)\b", line
+                    )
+                ):
+                    party = "Republican" if match[3].startswith("Rep") else match[3]
+                    qualified[f"{chamber}:{match[2]}"].append((match[1].split(",")[0], party))
+            with tempfile.TemporaryDirectory() as folder:
+                subprocess.run(
+                    ["pdftoppm", "-r", "300", "-gray", str(raw.cached(SOURCE, url).path), f"{folder}/page"], check=True
+                )
+                text = "\n".join(
+                    subprocess.run(
+                        ["tesseract", str(page), "-", "--psm", "6"], capture_output=True, text=True, check=True
+                    ).stdout
+                    for page in sorted(Path(folder).glob("page-*.pgm"))
+                )
+            chamber = None
+            candidates: list[tuple[str, int]] = []
+            for line in text.splitlines():
+                line = re.sub(r"[‘’]", "'", line.strip().strip("|!‘' ").strip())
+                for wrong, right in MISSISSIPPI_READINGS.items():
+                    line = line.replace(wrong, right)
+                if match := re.match(r"^State (Senate|House)(?: Of Rep)? \S+, District", line):
+                    chamber, candidates = match[1].lower(), []
+                elif re.match(r"^(District Attorney|Public Service|Transportation)", line):
+                    chamber = None
+                elif chamber and (match := re.match(r"^Total for District (\S+)\s+([\d,.]+)", line)):
+                    district = int(re.sub(r"\D", "", match[1].translate(str.maketrans("Oi$S", "0155"))))
+                    if sum(votes for _, votes in candidates) != int(re.sub(r"\D", "", match[2])):
+                        raise ValueError(f"MS {chamber} {district}: candidates do not sum to the total")
+                    for candidate, votes in candidates:
+                        tokens = {token.lower().strip(".,'\"") for token in re.split(r"[\s-]+", candidate)}
+                        parties = {
+                            party
+                            for last, party in qualified[f"{chamber}:{district}"]
+                            if all(token.lower().strip(".,'\"") in tokens for token in re.split(r"[\s-]+", last))
+                        }
+                        party = MISSISSIPPI_PARTIES.get(f"{chamber}:{district}:{candidate}")
+                        if party is None and len(parties) != 1:
+                            raise ValueError(f"MS {chamber} {district}: no single party for {candidate}")
+                        rows.append(
+                            {
+                                "key": f"{day}:MS:{chamber}:{district}:general",
+                                "url": url,
+                                "candidate": candidate,
+                                "party": _party(state, party or parties.pop()),
+                                "votes": votes,
+                            }
+                        )
+                    chamber = None
+                elif chamber and (match := re.match(r"^(.+?)\s+([\d,.]+)\s+[\d.,]+\s*%", line)):
+                    candidates.append((match[1].strip(), int(re.sub(r"\D", "", match[2]))))
+            continue
         if state == "LA":
             races = json.loads(raw.cached(SOURCE, url.replace("Votes_", "RacesCandidates_")).path.read_text())
             counted = {
@@ -1038,9 +1134,10 @@ def emit() -> Path:
                     license="Public record",
                 )
             source = sources[(publisher, day)]
-            if url not in cited:
-                cited.add(url)
-                cs.artifact(raw.cached(SOURCE, url), source)
+            for cite in (url, MISSISSIPPI_QUALIFYING) if regular and state == "MS" else (url,):
+                if cite not in cited:
+                    cited.add(cite)
+                    cs.artifact(raw.cached(SOURCE, cite), source)
             if chamber == "senate":
                 body_name, body_key, scheme = UPPER.get(state, "Senate"), f"{state}:senate", "us.sldu"
             else:
@@ -1112,7 +1209,9 @@ def emit() -> Path:
                 )
                 previous = contests[first] if first else None
             seats = 2 if state == "NJ" and body_slug == "general-assembly" and regular else 1
-            electoral_system = "block" if seats > 1 else SYSTEMS.get(state, "fptp")
+            electoral_system = (
+                "block" if seats > 1 else "fptp" if regular and state == "MS" else SYSTEMS.get(state, "fptp")
+            )
             cs.add(
                 "contest",
                 id=contest,
