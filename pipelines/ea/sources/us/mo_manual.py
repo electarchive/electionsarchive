@@ -323,6 +323,19 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         ],
     ),
     (
+        "1912-11-05",
+        "governor",
+        [(8998, 0.15, 0.95, 0, 0.565), (8999, 0.12, 0.68, 0, 0.63)],
+        [
+            ("DEM", "Major"),
+            ("REP", "McKinley"),
+            ("PRO", "Stokes"),
+            ("SOC", "Ward"),
+            ("SLP", "Rogers"),
+            ("PRG", "Nortoni"),
+        ],
+    ),
+    (
         "1920-11-02",
         "governor",
         [(11843, 0.8, 0.95, 0, 1), (11844, 0.105, 0.96, 0, 1), (11845, 0.105, 0.43, 0, 1)],
@@ -395,6 +408,7 @@ MISORDERED: dict[tuple[str, str], list[tuple[str, str]]] = {
     ("1924-11-04", "president"): [("perry", "pettis")],
 }
 CHECKED: set[tuple[str, str, int]] = {
+    ("1912-11-05", "governor", 3),
     ("1944-11-07", "governor", 2),
     ("1932-11-08", "governor", 2),
     ("1920-11-02", "governor", 5),
@@ -434,6 +448,10 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1912-11-05", "governor", "29135", 4): 0,
+    ("1912-11-05", "governor", "29173", 4): 0,
+    ("1912-11-05", "governor", "TOTAL", 4): 1861,
+    ("1912-11-05", "governor", "29173", 3): 8,
     ("1904-11-08", "governor", "29001", 5): 65,
     ("1904-11-08", "governor", "29003", 5): 10,
     ("1904-11-08", "governor", "29005", 5): 12,
@@ -846,6 +864,7 @@ NAMES: dict[tuple[str, str, str], str] = {
     ("1904-11-08", "White", "SLP"): "J. Edward White",
     ("1904-11-08", "Alldredge", "PPL"): "William C. Alldredge",
     ("1912-11-05", "Stokes", "PRO"): "Charles E. Stokes",
+    ("1912-11-05", "Ward", "SOC"): "Ward",
     ("1912-11-05", "Rogers", "SLP"): "Charles Rogers",
     ("1912-11-05", "Nortoni", "PRG"): "Albert D. Nortoni",
     ("1920-11-02", "Aldrich", "SOC"): "Marvin M. Aldrich",
