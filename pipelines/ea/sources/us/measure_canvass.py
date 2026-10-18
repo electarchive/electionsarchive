@@ -143,6 +143,7 @@ WYOMING = {
     date(2022, 11, 8): "2022/Results/General/2022_General_Statewide_Constitutional_Amendment_Summary.pdf",
     date(2024, 11, 5): "2024/Results/General/2024_General_Statewide_Constitutional_Amendment_Summary.pdf",
 }
+IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
 NORTH_CAROLINA = {
     date(2018, 11, 6): (
         "2018-11-27/Canvass/Supplement_11_30_2018/State%20Composite%20Abstract%20Report%20-%20County.pdf",
@@ -272,6 +273,12 @@ DOCUMENTS = {
         "https://sos.wyo.gov/Elections/State/ElectionResults.aspx",
         "the Wyoming Secretary of State's official summary of the constitutional amendments",
     ),
+    "IA": (
+        "Iowa Secretary of State",
+        "Official canvass summary",
+        "https://sos.iowa.gov/elections/results/",
+        "the Iowa State Board of Canvassers' canvass summary",
+    ),
     "MO": (
         mo_sos.PUBLISHER,
         mo_sos.TITLE,
@@ -303,6 +310,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
     if state == "MT":
         return SOURCE, WAYBACK.format(*MONTANA[day]) if day in MONTANA else ""
+    if state == "IA":
+        return SOURCE, f"https://sos.iowa.gov/elections/pdf/{IOWA[day]}/general/canvsummary.pdf" if day in IOWA else ""
     if state == "WY":
         return SOURCE, "https://sos.wyo.gov/Elections/Docs/" + WYOMING[day] if day in WYOMING else ""
     if state == "LA":
@@ -448,6 +457,46 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "IA":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            office = county = None
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    if heading := re.match(r"\s*(Constitutional Amendment \d+|Question \d+)\b", line):
+                        office, county = heading[1], None
+                    elif office and (start := re.match(r"([A-Z][A-Za-z' .]*?)\s+Election Day", line)):
+                        county = start[1]
+                    elif office and (matched := re.match(r"\s+Total\s+([\d,]+)\s+([\d,]+)\s", line)):
+                        name = "Total" if county in (None, "TOTAL") else county
+                        for answer, votes in zip(("YES", "NO"), matched.group(1, 2), strict=True):
+                            records.append((name, office, answer, votes, number))
+                        if name == "Total":
+                            office = None
+                        county = None
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 100)
                 )
                 .filter(~total)
                 .drop("count")
