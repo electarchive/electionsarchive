@@ -382,6 +382,7 @@ ME_DAYS = {
     2018: date(2018, 6, 12),
     2020: date(2020, 7, 14),
     2022: date(2022, 6, 14),
+    2024: date(2024, 6, 11),
 }
 ME_WAYBACK = "https://web.archive.org/web/{}id_/https://www.maine.gov/sos/cec/elec/{}"
 ME_FILES = [
@@ -449,6 +450,10 @@ ME_FILES = [
     ("20250321080350", "results/2022/rep/replegr622.xlsx", "house", "REP"),
     ("20250321080350", "results/2022/dem/ssd622.xlsx", "senate", "DEM"),
     ("20250324070337", "results/2022/rep/ssr622.xlsx", "senate", "REP"),
+    ("20241103073940", "results/2024/5%20Rep%20to%20the%20Legislature%20Dem-%20FINAL.xlsx", "house", "DEM"),
+    ("20241103073943", "results/2024/5%20Rep%20to%20the%20Legislature%20Rep%20-%20FINAL.xlsx", "house", "REP"),
+    ("20241103073927", "results/2024/4%20State%20Senate%20Dem%20-%20FINAL.xlsx", "senate", "DEM"),
+    ("20241103073934", "results/2024/4%20State%20Senate%20Rep%20-%20FINAL.xlsx", "senate", "REP"),
 ]
 ME_NAME = (
     pl.when(pl.col("name").str.to_uppercase() == pl.col("name"))
@@ -1801,7 +1806,7 @@ def emit() -> Path:
             "North Carolina 2002–2022, Minnesota 2016–2022, Washington 2015–2022, and New York City 2014–2022 "
             "by precinct, California 2002–2022 by county, Colorado, Connecticut, Idaho, Massachusetts, New Mexico, "
             "New York, Vermont, and Virginia 2000–2022 by county from their ElectionStats archives, and Maine "
-            "2000–2022 by county from the Secretary of State's tabulations",
+            "2000–2024 by county from the Secretary of State's tabulations",
             polity="US",
         )
 
@@ -2236,7 +2241,7 @@ def emit() -> Path:
             elif state == "ME" and day.year >= 2018 and len(tallies) > 2:
                 if tallies[0] * 2 > sum(tallies) and (tallies[0] - tallies[1]) * 100 > total:
                     wins = [(names[0], "won", WON_MAJORITY)]
-                elif tallies[0] > tallies[1] and nominated.get(names[0]):
+                elif tallies[0] > tallies[1] and nominated.get(names[0]) and day.year < 2024:
                     wins = [(names[0], "won", WON_NOMINEE)]
             elif state in ("MN", "CA", "ME", *ELSTATS):
                 if len(tallies) <= magnitude:
