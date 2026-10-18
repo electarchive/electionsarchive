@@ -153,6 +153,7 @@ PUBLISHERS = {
     "TX": "Texas Secretary of State",
     "MN": "Minnesota Secretary of State",
     "OK": "Oklahoma State Election Board",
+    "KY": "Kentucky State Board of Elections",
     "VA": "Virginia Department of Elections",
     "AL": "Alabama Secretary of State",
     "CA": "California Secretary of State",
@@ -172,6 +173,26 @@ PUBLISHERS = {
 }
 SYSTEMS = {"GA": "two_round", "LA": "two_round", "MS": "two_round", "TX": "two_round", "CA": "top_two", "WA": "top_two"}
 SPECIALS: dict[str, tuple[str, str, str | None]] = {
+    "2023-05-16:KY:senate:28": (
+        "transcribed",
+        "https://elect.ky.gov/results/2020-2029/Documents/5-16-23%20Certification%20of%20Election%20Results%20for%2028th%20Senatorial%20District%20State%20Senate%20Special%20Election.pdf",
+        None,
+    ),
+    "2023-11-07:KY:house:93": (
+        "transcribed",
+        "https://elect.ky.gov/results/2020-2029/2023ElectionReports/State%20Representative%2093rd%20Representative%20Distict%20Vote%20Totals.pdf",
+        None,
+    ),
+    "2024-03-19:KY:house:24": (
+        "transcribed",
+        "https://elect.ky.gov/Documents/Certification%20of%20Election%20Results%20for%202024%20Special%20Election%2024th%20Representative%20District.pdf",
+        None,
+    ),
+    "2024-03-19:KY:house:26": (
+        "transcribed",
+        "https://elect.ky.gov/Documents/Certification%20of%20Election%20Results%20for%202024%20Special%20Election%2026th%20Representative%20District.pdf",
+        None,
+    ),
     "2023-12-12:OK:senate:32": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20231212", None),
     "2024-02-13:OK:house:39": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20240213", None),
     "2025-05-13:OK:senate:8": ("transcribed", "https://results.okelections.gov/OKER/?elecDate=20250513", None),
@@ -718,6 +739,18 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2026-01-06:SC:house:98": ("clarity", SOUTH_CAROLINA.format("125869/367712"), "Representatives, District 98"),
 }
 TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
+    "2023-05-16:KY:senate:28": [
+        ("Greg Elkins", "Republican", 7899),
+        ("Robert Sainte", "Democratic", 4968),
+        ("Richard Henderson", None, 3001),
+    ],
+    "2023-11-07:KY:house:93": [("Adrielle Camuel", "Democratic", 7924), ("Kyle Whalen", "Republican", 5841)],
+    "2024-03-19:KY:house:24": [
+        ("Courtney Gilbert", "Republican", 1025),
+        ("John Pennington", "Democratic", 372),
+        ("Craig Astor", None, 244),
+    ],
+    "2024-03-19:KY:house:26": [("Peyton Griffee", "Republican", 75)],
     "2023-12-12:OK:senate:32": [("Dusty Deevers", "REP", 3105), ("Larry Bush", "DEM", 2491)],
     "2024-02-13:OK:house:39": [
         ("Richard Prawdzienski", "LIB", 224),
