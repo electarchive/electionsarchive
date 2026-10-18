@@ -300,6 +300,13 @@ STATES = {
         "Election results extracts and detail reports: primaries by county, 2000–2022",
         "https://results.elections.myflorida.com/",
     ),
+    "PA": (
+        "42",
+        "Pennsylvania",
+        "Pennsylvania Department of State",
+        "Election returns: primaries by county, 2000–2022",
+        "https://www.electionreturns.pa.gov/",
+    ),
     "SC": (
         "45",
         "South Carolina",
@@ -336,6 +343,7 @@ OFFICES = {
     "ATTORNEY GENERAL": ("attorney-general", "Attorney General"),
     "SECRETARY OF STATE": ("secretary-of-state", "Secretary of State"),
     "AUDITOR": ("auditor", "State Auditor"),
+    "AUDITOR GENERAL": ("auditor-general", "Auditor General"),
     "TREASURER": ("treasurer", "State Treasurer"),
     "SUPERINTENDENT OF PUBLIC INSTRUCTION": (
         "superintendent-of-public-instruction",
@@ -613,6 +621,40 @@ TX_METHOD = (
     "page does not mark winners, so the winner shown is the candidate with a majority, or the runoff's leader, and "
     "when a runoff followed, the top two are shown as advancing."
 )
+PA_ELECTIONS = {
+    date(2000, 4, 4): 9,
+    date(2002, 5, 21): 11,
+    date(2004, 4, 27): 13,
+    date(2006, 5, 16): 15,
+    date(2008, 4, 22): 17,
+    date(2010, 5, 18): 19,
+    date(2012, 4, 24): 27,
+    date(2014, 5, 20): 41,
+    date(2016, 4, 26): 54,
+    date(2018, 5, 15): 63,
+    date(2020, 6, 2): 83,
+    date(2022, 5, 17): 94,
+}
+PA_OFFICES = {
+    3: "GOVERNOR",
+    4: "LIEUTENANT GOVERNOR",
+    5: "ATTORNEY GENERAL",
+    6: "AUDITOR GENERAL",
+    7: "TREASURER",
+    12: "senate",
+    13: "house",
+}
+PA_API = "https://www.electionreturns.pa.gov/api/ElectionReturn/"
+PA_OFFICE = PA_API + "GetOfficeData?officeId={}&methodName=GetOfficeData&electionid={}&electiontype=P&isactive=0"
+PA_COUNTY = (
+    PA_API
+    + "GetCountyBreak?officeId={}&districtId={}&methodName=GetCountyBreak&electionid={}&electiontype=P&isactive=0"
+)
+PA_METHOD = (
+    "Totals are the county rows of the Department of State's election returns for the district, each candidate's "
+    "rows checked against the returns' district total; a county the district splits holds only the district's part. "
+    "The returns do not mark winners, so the winner shown is the candidate with the most votes."
+)
 SC_DAYS = {
     date(2010, 6, 8): None,
     date(2010, 6, 22): date(2010, 6, 8),
@@ -882,6 +924,18 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
+    for election in PA_ELECTIONS.values():
+        for office in PA_OFFICES:
+            listing = json.loads(raw.fetch(SOURCE, PA_OFFICE.format(office, election), suffix=".json").path.read_text())
+            for blocks in json.loads(listing)["Election"].values() if listing else ():
+                for block in blocks:
+                    for heading in block:
+                        url = PA_COUNTY.format(office, heading.split("$$")[1], election)
+                        try:
+                            raw.cached(SOURCE, url)
+                        except LookupError:
+                            raw.fetch(SOURCE, url, suffix=".json")
+                            time.sleep(0.3)
     for ids in SC_FILES.values():
         for election in ids:
             try:
@@ -954,7 +1008,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|21|33|35|36|45|48|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(37|53|06|08|09|12|16|17|21|33|35|36|42|45|48|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -2337,6 +2391,120 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    pa: list[tuple[date, str, str | None, str, str, str, int]] = []
+    for day, election in PA_ELECTIONS.items():
+        for office, label in PA_OFFICES.items():
+            listing = json.loads(raw.cached(SOURCE, PA_OFFICE.format(office, election)).path.read_text())
+            for blocks in (
+                json.loads(
+                    re.sub(
+                        r'(?<="CandidateName":")(.*?)(?=","(?:Votes|Percentage)":)',
+                        lambda found: found[0].replace('"', '\\"'),
+                        listing,
+                    )
+                )["Election"].values()
+                if listing
+                else ()
+            ):
+                for block in blocks:
+                    for heading, items in block.items():
+                        totals: dict[tuple[str, str], int] = {}
+                        for item in items:
+                            for side in item["Candidates"]:
+                                for party, entries in side.items():
+                                    for entry in entries:
+                                        key = (
+                                            party,
+                                            re.sub(r"\s+", " ", entry["CandidateName"].replace('"', "")).strip(),
+                                        )
+                                        if key in totals:
+                                            raise ValueError(f"{day} PA {label} {heading}: {key[1]} appears twice")
+                                        totals[key] = int(entry["Votes"])
+                        district = heading.split("$$")[1]
+                        sums: dict[tuple[str, str], int] = {}
+                        breaks = json.loads(
+                            re.sub(
+                                r'(?<="CandidateName":")(.*?)(?=","(?:Votes|Percentage)":)',
+                                lambda found: found[0].replace('"', '\\"'),
+                                json.loads(
+                                    raw.cached(SOURCE, PA_COUNTY.format(office, district, election)).path.read_text()
+                                ),
+                            )
+                        )
+                        for chunks in breaks["Election"].values():
+                            for chunk in chunks:
+                                for county, bands in chunk.items():
+                                    for band in bands:
+                                        for party, entries in band.items():
+                                            for entry in entries:
+                                                person = re.sub(
+                                                    r"\s*\((?:DEM|REP)\)$",
+                                                    "",
+                                                    re.sub(
+                                                        r"\s+", " ", entry["CandidateName"].replace('"', "")
+                                                    ).strip(),
+                                                )
+                                                sums[(party, person)] = sums.get((party, person), 0) + int(
+                                                    entry["Votes"]
+                                                )
+                                                parts = [part.strip() for part in person.split(",")]
+                                                tail = [
+                                                    word
+                                                    for word in " ".join(parts[1:]).replace(".", "").split()
+                                                    if word in ("JR", "SR", "II", "III", "IV")
+                                                ]
+                                                given = [
+                                                    word
+                                                    for word in parts[-1].split()
+                                                    if word.rstrip(".") not in ("JR", "SR", "II", "III", "IV")
+                                                ]
+                                                pa.append(
+                                                    (
+                                                        day,
+                                                        label if label in ("house", "senate") else OFFICES[label][0],
+                                                        str(int(re.findall(r"\d+", items[0]["District"])[0]))
+                                                        if label in ("house", "senate")
+                                                        else None,
+                                                        {"Democratic": "DEM", "Republican": "REP"}[party],
+                                                        counties[("42", re.sub(r"[^a-z]", "", county.lower()))],
+                                                        " ".join(
+                                                            [
+                                                                " ".join([*given, parts[0]]).title(),
+                                                                *(
+                                                                    word.title() if word in ("JR", "SR") else word
+                                                                    for word in tail
+                                                                ),
+                                                            ]
+                                                        ),
+                                                        int(entry["Votes"]),
+                                                    )
+                                                )
+                        if sums != totals:
+                            raise ValueError(
+                                f"{day} PA {label} {heading}: the county rows do not match the district total"
+                            )
+    frames.append(
+        pl.DataFrame(
+            pa,
+            schema={
+                "day": pl.Date,
+                "office": pl.String,
+                "code": pl.String,
+                "party": pl.String,
+                "fips": pl.String,
+                "choice": pl.String,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        ).with_columns(
+            state=pl.lit("PA"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     sc: list[tuple[date, str, str | None, str, str, str, int]] = []
     for day, ids in SC_FILES.items():
         tallied: dict[tuple[str, str | None, str], list[tuple[str, str, int]]] = {}
@@ -2455,8 +2623,9 @@ def emit() -> Path:
             "2000–2024 by county from the Secretary of State's tabulations, Illinois 2000–2022 by county from the "
             "State Board of Elections' vote totals, Texas 2000–2014 by county from the Secretary of State's "
             "election history, Florida 2000–2022 by county from the Division of Elections' results extracts, "
-            "Kentucky 2000–2008 by county from the State Board of Elections' county reports, and South Carolina "
-            "2010–2022 by county from the State Election Commission's detail results",
+            "Kentucky 2000–2008 by county from the State Board of Elections' county reports, South Carolina 2010–2022 by "
+            "county from the State Election Commission's detail results, and Pennsylvania 2000–2022 by county from "
+            "the Department of State's election returns",
             polity="US",
         )
 
@@ -2540,6 +2709,19 @@ def emit() -> Path:
             for race, title in tx_elchist.races(election):
                 if TX_RACE.fullmatch(title):
                     cs.artifact(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm"), sources["TX"])
+        for election in PA_ELECTIONS.values():
+            for office in PA_OFFICES:
+                listing = raw.cached(SOURCE, PA_OFFICE.format(office, election))
+                text = json.loads(listing.path.read_text())
+                if text:
+                    cs.artifact(listing, sources["PA"])
+                for blocks in json.loads(text)["Election"].values() if text else ():
+                    for block in blocks:
+                        for heading in block:
+                            cs.artifact(
+                                raw.cached(SOURCE, PA_COUNTY.format(office, heading.split("$$")[1], election)),
+                                sources["PA"],
+                            )
         for ids in SC_FILES.values():
             for election in ids:
                 version = raw.cached(SOURCE, SC_SITE.format(election) + "current_ver.txt")
@@ -2688,11 +2870,14 @@ def emit() -> Path:
             .unique()
             .iter_rows()
         }
-        lieutenant = offices.get(("IL", "lieutenant-governor"))
-        if lieutenant is not None and lieutenant in cs.minted:
-            cs.add("office", id=lieutenant, polity_id=cs.polity("US-IL"), kind="other")
-            name(lieutenant, "Lieutenant Governor of Illinois")
-        if cs.minted & {*parties.values(), *systems.values(), *offices.values(), *bodies.values()} - {lieutenant}:
+        lieutenants = {state: offices.get((state, "lieutenant-governor")) for state in ("IL", "PA")}
+        for state, lieutenant in lieutenants.items():
+            if lieutenant is not None and lieutenant in cs.minted:
+                cs.add("office", id=lieutenant, polity_id=cs.polity(f"US-{state}"), kind="other")
+                name(lieutenant, f"Lieutenant Governor of {STATES[state][1]}")
+        if cs.minted & {*parties.values(), *systems.values(), *offices.values(), *bodies.values()} - {
+            *lieutenants.values()
+        }:
             raise ValueError("the parties, systems, offices, and bodies must already exist")
         titles = dict(OFFICES.values())
         elections: dict[tuple[str, date], UUID] = {}
@@ -2705,6 +2890,7 @@ def emit() -> Path:
             *(("IL", day, None) for day in IL_DAYS.values()),
             *(("TX", day, first) for day, first in TX_DAYS.items()),
             *(("SC", day, first) for day, first in SC_DAYS.items()),
+            *(("PA", day, None) for day in PA_ELECTIONS),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(("KY", day, None) for day in KY_DAYS.values()),
             *(
@@ -2838,7 +3024,7 @@ def emit() -> Path:
                     else "irv"
                     if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", "ME", "IL", "KY", *ELSTATS)
+                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", *ELSTATS)
                     else "two_round"
                     if state in ("TX", "SC") or (state == "FL" and day.year == 2000)
                     else "fptp"
@@ -2999,7 +3185,7 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_MAJORITY)]
                 elif tallies[0] > tallies[1] and nominated.get(names[0]) and day.year < 2024:
                     wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", "IL", "KY", *ELSTATS) or (state == "FL" and day.year > 2000):
+            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", *ELSTATS) or (state == "FL" and day.year > 2000):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
@@ -3135,6 +3321,8 @@ def emit() -> Path:
                     if state == "KY"
                     else SC_METHOD
                     if state == "SC"
+                    else PA_METHOD
+                    if state == "PA"
                     else FL_METHOD.format(
                         rule=", with more than half the votes, or the leader of the second primary; when a second "
                         "primary followed, the top two are shown as advancing"
