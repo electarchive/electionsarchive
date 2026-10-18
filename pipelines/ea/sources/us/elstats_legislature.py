@@ -89,7 +89,23 @@ RECOUNTS = {
             "Buxton received 1,003. The House seated Ainsworth for Windsor-Orange-1 on January 4, 2017. Because the "
             "court's recount order is not published online, these totals are not stored as a separate result set."
         ),
-    )
+    ),
+    "2016-11-08:NH:house:hillsborough-12:g": (
+        None,
+        (
+            "Town canvass totals show Lisa M. Freeman leading Andrew Gregoire for the second seat by 6 votes, 1,128 to "
+            "1,122. The winners shown are those declared in Klarner's state legislative election returns, which list "
+            "Gregoire as elected. No recount record for this race could be found online."
+        ),
+    ),
+    "2016-11-08:NH:house:hillsborough-28:g": (
+        None,
+        (
+            "Town canvass totals show Elizabeth Ferreira leading Sylvia E. Gale for the third seat by 6 votes, 2,420 to "
+            "2,414. The winners shown are those declared in Klarner's state legislative election returns, which list "
+            "Gale as elected. No recount record for this race could be found online."
+        ),
+    ),
 }
 
 
@@ -233,6 +249,10 @@ def emit() -> Path:
             (str(entity), str(source))
             for entity, source in conn.execute("select entity_id, source_id from citation").fetchall()
         }
+        caveats = {
+            (str(entity), body)
+            for entity, body in conn.execute("select entity_id, body_md from note where kind = 'caveat'").fetchall()
+        }
         memberships: set[tuple[str, str, date]] = set()
         minted: dict[str, tuple[str, str, date]] = {}
         skipped: dict[str, list[str]] = {}
@@ -354,9 +374,10 @@ def emit() -> Path:
                     )
                 if key in RECOUNTS:
                     locator, caveat = RECOUNTS[key]
-                    cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
+                    if (str(result_set), caveat) not in caveats:
+                        cs.add("note", entity_id=result_set, kind="caveat", body_md=caveat)
                     for entity in (result_set, default):
-                        if (str(entity), str(journal)) not in cited:
+                        if locator is not None and (str(entity), str(journal)) not in cited:
                             cs.add("citation", entity_id=entity, source_id=journal, locator=locator)
                 if f"{key}:precinct" in published:
                     continue
