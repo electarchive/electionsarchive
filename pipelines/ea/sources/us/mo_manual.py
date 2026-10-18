@@ -518,6 +518,24 @@ TABLES: list[tuple[str, str, list[tuple[int, float, float, float, float]], list[
         [("DEM", "Hearnes"), ("REP", "Shepley")],
     ),
     (
+        "1968-11-05",
+        "president",
+        [(41027, 0.26, 0.97, 0, 1), (41028, 0.15, 0.64, 0, 1)],
+        [("DEM", "Humphrey"), ("REP", "Nixon"), ("AIP", "Wallace")],
+    ),
+    (
+        "1968-11-05",
+        "senate",
+        [(41029, 0.17, 0.79, 0, 0.52), (41029, 0.17, 0.79, 0.52, 1)],
+        [("DEM", "Eagleton"), ("REP", "Curtis")],
+    ),
+    (
+        "1968-11-05",
+        "governor",
+        [(41030, 0.17, 0.78, 0, 0.49), (41030, 0.17, 0.78, 0.49, 1)],
+        [("DEM", "Hearnes"), ("REP", "Roos")],
+    ),
+    (
         "1970-11-03",
         "senate",
         [(42578, 0.2, 0.96, 0, 1), (42579, 0.08, 0.8, 0, 1)],
@@ -604,6 +622,10 @@ NOTES: list[tuple[str, str, str]] = [
     ),
 ]
 FIXES: dict[tuple[str, str, str, int], int] = {
+    ("1968-11-05", "governor", "TOTAL", 1): 691797,
+    ("1968-11-05", "governor", "TOTAL", 0): 1072805,
+    ("1968-11-05", "senate", "TOTAL", 1): 850544,
+    ("1968-11-05", "senate", "TOTAL", 0): 887414,
     ("1970-11-03", "senate", "29003", 3): 3,
     ("1970-11-03", "senate", "29021", 3): 3,
     ("1970-11-03", "senate", "29215", 3): 3,
