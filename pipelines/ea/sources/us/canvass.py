@@ -34,10 +34,10 @@ KY_METHODOLOGY = (
     "election for all 120 counties. Write-in candidates appear as the certification lists them."
 )
 OE_PUBLISHER = "OpenElections"
-INDIANA = "https://enr.indianavoters.in.gov/archive/2022General/data/OffCatC_{category}_A.json"
-IN_CATEGORIES = (1040, 1046, 1036)
+INDIANA = "https://enr.indianavoters.in.gov/archive/{year}General/data/OffCatC_{category}_A.json"
+IN_CATEGORIES = {date(2018, 11, 6): (2202, 2198, 2208), date(2022, 11, 8): (1040, 1046, 1036)}
 IN_PUBLISHER = "Indiana Election Division"
-IN_TITLE = "2022 General Election results"
+IN_TITLE = "{year} General Election results"
 MICHIGAN = (
     "https://raw.githubusercontent.com/openelections/openelections-data-mi/"
     "2103114f669c2bb25f19792bf5ca290300381396/2022/20221108__mi__general__county.csv"
@@ -170,8 +170,9 @@ def fetch() -> None:
     for town in _towns():
         raw.fetch(SOURCE, RHODE_ISLAND.format(town=town), suffix=".json")
     raw.fetch(SOURCE, KENTUCKY, suffix=".pdf")
-    for category in IN_CATEGORIES:
-        raw.fetch(SOURCE, INDIANA.format(category=category), suffix=".json")
+    for day, categories in IN_CATEGORIES.items():
+        for category in categories:
+            raw.fetch(SOURCE, INDIANA.format(year=day.year, category=category), suffix=".json")
     raw.fetch(SOURCE, MICHIGAN, suffix=".csv")
     raw.fetch(SOURCE, ARIZONA, suffix=".pdf")
 
@@ -291,8 +292,10 @@ def parse() -> None:
                     "write_in": label == "Write-In",
                 }
             )
-    for category in IN_CATEGORIES:
-        data = json.loads(raw.cached(SOURCE, INDIANA.format(category=category)).path.read_text(encoding="utf-8-sig"))
+    for day, category in [(day, category) for day, categories in IN_CATEGORIES.items() for category in categories]:
+        data = json.loads(
+            raw.cached(SOURCE, INDIANA.format(year=day.year, category=category)).path.read_text(encoding="utf-8-sig")
+        )
         summary = data["Root"]["StatewideSummary"]["Race"]
         counted: dict[str, int] = defaultdict(int)
         for region in data["Root"]["OfficeCategory"]["Regions"]["Region"]:
@@ -301,7 +304,7 @@ def parse() -> None:
                 rows.append(
                     {
                         "state": "IN",
-                        "day": date(2022, 11, 8),
+                        "day": day,
                         "office": summary["OFFICE_TITLE"],
                         "candidate": candidate["NAME_ON_BALLOT"].removesuffix(" (W/I)"),
                         "mate": None,
@@ -424,8 +427,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Rhode Island's 2010, Indiana's, Michigan's, and Arizona's 2022, and Kentucky's 2023 statewide general "
-                "elections by county"
+                "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's and Arizona's 2022, and Kentucky's 2023 "
+                "statewide general elections by county"
             ),
             polity="US",
         )
@@ -461,18 +464,20 @@ def emit() -> Path:
             license="Public record",
         )
         cs.artifact(raw.cached(SOURCE, KENTUCKY), kentucky)
-        division = cs.source(IN_PUBLISHER, IN_TITLE)
-        cs.add(
-            "source",
-            id=division,
-            kind="official_body",
-            publisher=IN_PUBLISHER,
-            title=IN_TITLE,
-            url="https://enr.indianavoters.in.gov/archive/2022General/",
-            license="Public record",
-        )
-        for category in IN_CATEGORIES:
-            cs.artifact(raw.cached(SOURCE, INDIANA.format(category=category)), division)
+        divisions: dict[int, UUID] = {}
+        for day, categories in IN_CATEGORIES.items():
+            divisions[day.year] = cs.source(IN_PUBLISHER, IN_TITLE.format(year=day.year))
+            cs.add(
+                "source",
+                id=divisions[day.year],
+                kind="official_body",
+                publisher=IN_PUBLISHER,
+                title=IN_TITLE.format(year=day.year),
+                url=f"https://enr.indianavoters.in.gov/archive/{day.year}General/",
+                license="Public record",
+            )
+            for category in categories:
+                cs.artifact(raw.cached(SOURCE, INDIANA.format(year=day.year, category=category)), divisions[day.year])
         michigan = cs.source(OE_PUBLISHER, MI_TITLE)
         cs.add(
             "source",
@@ -517,8 +522,8 @@ def emit() -> Path:
                 width=width,
                 height=height,
             )
-        sources = {"RI": board, "KY": kentucky, "IN": division, "MI": michigan, "AZ": secretary}
-        isos = [f"US-{state}" for state in sources]
+        sources = {"RI": board, "KY": kentucky, "MI": michigan, "AZ": secretary}
+        isos = [f"US-{state}" for state in (*sources, "IN")]
         states = dict(
             conn.execute(
                 """select substr(p.iso_code, 4), n.text from polity p
@@ -720,7 +725,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources[state],
+                source_id=divisions[day.year] if state == "IN" else sources[state],
                 is_default=True,
                 supersedes_id=None if result_set == first else first,
                 completeness=1,
