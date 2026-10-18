@@ -598,7 +598,7 @@ def emit() -> Path:
                 publisher="OpenElections",
                 title=title,
                 url=f"https://github.com/openelections/openelections-data-{state.lower()}",
-                license=None,
+                license="No license stated: facts published with attribution, raw files not redistributed",
             )
         stored: set[tuple[str, str]] = set()
         for (state, _), grains in picks().items():
@@ -652,4 +652,42 @@ def emit() -> Path:
             ),
         )
         print(f"{minted.height} new precincts")
+        areas = dict(
+            conn.execute(
+                """select c.code, c.area_id::text from area_code c join area a on a.id = c.area_id
+                   where a.scheme_code = 'us.precinct' and c.code ~ '^20[0-9]{2}-[0-9]{2}-[0-9]{2}:CA:'"""
+            ).fetchall()
+        )
+        rows = []
+        tally: dict[str, list[int]] = {}
+        for row in conn.execute(
+            """select u.id::text, u.polity_id::text, u.code, u.parent_id::text, u.kind::text, u.valid_from, u.valid_to
+               from reporting_unit u join changeset c on c.id = u.changeset_id
+               where c.pipeline = %s and u.scheme_code = 'us.precinct' and u.code ~ '^20[0-9-]+:CA:'""",
+            [SOURCE],
+        ).fetchall():
+            day, _, county, _, name = row[2].split(":", 4)
+            name = name.strip()
+            area = next(
+                (
+                    areas[f"{day}:CA:{county}:{bare}"]
+                    for bare in dict.fromkeys([name, re.sub(r"\.0$", "", name), re.sub(r"A$", "", name)])
+                    if f"{day}:CA:{county}:{bare}" in areas
+                ),
+                None,
+            )
+            tally.setdefault(day, [0, 0])[1] += 1
+            if area is not None:
+                tally[day][0] += 1
+                rows.append((*row, area))
+        for day, (linked, total) in sorted(tally.items()):
+            print(f"{day} California: {linked} of {total} precincts on the Statewide Database's shapes")
+        cs.frame(
+            "reporting_unit",
+            pl.DataFrame(
+                rows,
+                schema=["id", "polity_id", "code", "parent_id", "kind", "valid_from", "valid_to", "area_id"],
+                orient="row",
+            ).with_columns(scheme_code=pl.lit("us.precinct"), area_relation=pl.lit("equals")),
+        )
         return cs.write()
