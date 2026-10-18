@@ -43,7 +43,7 @@ ANSWERS = {
 }
 TAG = (
     r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure)"
-    r"(?:\s+measure)?(?:\s+to the legislature)?\s*(?:no\.|#)?)\s*(\d+|[A-Z])\b"
+    r"(?:\s+measure)?(?:\s+to the legislature)?\s*(?:no\.?|#)?)\s*(\d+|[A-Z])\b"
 )
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
 UTAH = {
@@ -158,9 +158,14 @@ CALIFORNIA = {
 }
 NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
 METHOD = (
-    "{level} totals from {document}, the state's certified results. They replace the totals transcribed from the "
-    "English Wikipedia as this question's default.{advisory}"
+    "{level} totals from {document}, the state's certified results. They replace {replaced} as this question's "
+    "default.{advisory}"
 )
+REPLACED = {
+    "Wikipedia": "the totals transcribed from the English Wikipedia",
+    "MIT Election Data and Science Lab": "MEDSL's totals summed from its precinct returns",
+    "OpenElections": "OpenElections' totals summed from its precinct returns",
+}
 KANSAS_CITY = (
     " Kansas City, its own election authority, is reported apart from the Jackson, Clay, Platte, and Cass county "
     "authorities and is credited to the city."
@@ -249,16 +254,16 @@ DOCUMENTS = {
 }
 
 
-def wikipedia(conn) -> list[tuple[str, date]]:
+def replaceable(conn) -> list[tuple[str, date]]:
     return conn.execute(
         """select distinct substr(p.iso_code, 4), e.date_from from contest c
            join election e on e.id = c.election_id join polity p on p.id = e.polity_id
            join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
            join result_set rs on rs.contest_id = c.id and rs.is_default join source s on s.id = rs.source_id
-           where c.kind = 'ballot_question' and s.publisher = 'Wikipedia' and substr(p.iso_code, 4) = any(%s)
+           where c.kind = 'ballot_question' and s.publisher = any(%s) and substr(p.iso_code, 4) = any(%s)
              and e.date_from between '2000-01-01' and '2025-12-31'
            order by 1, 2""",
-        [list(DOCUMENTS)],
+        [list(REPLACED), list(DOCUMENTS)],
     ).fetchall()
 
 
@@ -304,7 +309,7 @@ def link(state: str, day: date) -> tuple[str, str]:
 
 def fetch() -> None:
     with connect() as conn:
-        dates = wikipedia(conn)
+        dates = replaceable(conn)
     official = {
         entry["ElectionDate"]
         for entry in json.loads(raw.fetch(SOURCE, la_sos.DATES, suffix=".json").path.read_text())["Dates"]["Date"]
@@ -339,7 +344,7 @@ def fetch() -> None:
 
 def parse() -> None:
     with connect() as conn:
-        dates = wikipedia(conn)
+        dates = replaceable(conn)
         names: dict[str, dict[str, str]] = {}
         for code, text, iso in conn.execute(
             """select u.code, n.text, p.iso_code from reporting_unit u
@@ -871,7 +876,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Statewide ballot questions' certified county totals from the states' canvasses, replacing "
-            "Wikipedia's totals as the default",
+            "Wikipedia's, MEDSL's, and OpenElections' totals as the default",
             polity="US",
         )
         wiki = pl.DataFrame(
@@ -882,18 +887,18 @@ def emit() -> Path:
                           max(o.id::text) filter (where upper(o.ballot_label) = 'NO'),
                           sum(v.value) filter (where upper(o.ballot_label) = 'YES')::bigint,
                           sum(v.value) filter (where upper(o.ballot_label) = 'NO')::bigint,
-                          (select min(n.text) from name n where n.entity_id = c.id)
+                          (select min(n.text) from name n where n.entity_id = c.id), s.publisher
                    from contest c
                    join election e on e.id = c.election_id join polity p on p.id = e.polity_id
                    join external_id x on x.entity_id = c.id and x.scheme = 'us.contest'
                    join result_set rs on rs.contest_id = c.id and rs.is_default
-                   join source s on s.id = rs.source_id and s.publisher = 'Wikipedia'
+                   join source s on s.id = rs.source_id and s.publisher = any(%s)
                    join result_value v on v.result_set_k = rs.k and v.measure = 1
                    join contest_option o on o.k = v.option_k
                    where c.kind = 'ballot_question' and substr(p.iso_code, 4) = any(%s)
                      and split_part(x.value, ':', 2) = substr(p.iso_code, 4)
-                   group by c.id, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10""",
-                [list(DOCUMENTS)],
+                   group by c.id, s.publisher, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10""",
+                [list(REPLACED), list(DOCUMENTS)],
             ).fetchall(),
             schema=[
                 "key",
@@ -911,6 +916,7 @@ def emit() -> Path:
                 "wyes",
                 "wno",
                 "name",
+                "publisher",
             ],
             orient="row",
         )
@@ -1037,6 +1043,7 @@ def emit() -> Path:
                 body_md=METHOD.format(
                     level="Statewide" if row["statewide"] else "County",
                     document=DOCUMENTS[row["state"]][3],
+                    replaced=REPLACED[row["publisher"]],
                     advisory=ADVISORY
                     if row["pair"] == "MAINTAINED"
                     else KANSAS_CITY

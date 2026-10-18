@@ -45,6 +45,10 @@ TOWN_ARCHIVE = (
     "City and town rows of the state's election statistics archive, which add up to its county totals for each "
     "answer. The state reports by municipality, so the units are whole towns rather than precincts."
 )
+WITHDRAWN = (
+    "Withdrawn: this question's default totals were replaced by the state's certified results, and these precinct "
+    "rows no longer add up to them."
+)
 MEDSL = (
     "Precinct rows of MEDSL's precinct returns, which compile each state's certified canvass. Each answer's precinct "
     "rows add up to the totals of this question's default results{counties}."
@@ -1235,6 +1239,7 @@ def emit() -> Path:
             candidates.append((str(key), str(state), source, method, rows))
 
         landed: dict[str, int] = {}
+        kept: set[UUID | None] = set()
         skipped = 0
         minted: dict[tuple[str, date], tuple[str, str]] = {}
         values = []
@@ -1356,6 +1361,7 @@ def emit() -> Path:
                     if moved
                     else f"{key}: {present.height} of its values on file, superseded by a complete set"
                 )
+            kept.update({staged, supersedes})
             for id, status in [(supersedes, "superseded"), (staged, "active")] if supersedes else [(staged, "active")]:
                 cs.add(
                     "result_set",
@@ -1479,6 +1485,53 @@ def emit() -> Path:
                 )
             values.append(complete.select(pl.lit(str(staged)).alias("result_set_id"), pl.all()))
             landed[state] = landed.get(state, 0) + 1
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
+        active = pl.DataFrame(
+            conn.execute(
+                """select rs.id::text, rs.election_id::text, rs.contest_id::text, rs.stage, rs.kind, rs.source_id::text,
+                          rs.is_default, rs.completeness::float8,
+                          case when u.scheme_code = 'us.precinct' then pu.code else u.code end,
+                           upper(o.ballot_label), sum(v.value)::bigint
+                    from result_set rs join changeset g on g.id = rs.changeset_id
+                    join result_value v on v.result_set_k = rs.k and v.measure = 1
+                    join reporting_unit u on u.k = v.unit_k
+                    left join reporting_unit pu on pu.id = u.parent_id
+                    join contest_option o on o.k = v.option_k
+                    where g.pipeline = %s and rs.status = 'active'
+                    group by rs.id, 9, 10""",
+                [SOURCE],
+            ).fetchall(),
+            schema=[*columns, "code", "answer", "votes"],
+            orient="row",
+        ).with_columns(answer=pl.col("answer").replace_strict(ANSWERS, default=None))
+        expected = defaults.group_by("contest", "scheme", "code", "answer").agg(pl.col("total").sum())
+        whole = expected.group_by("contest", "answer").agg(pl.col("total").sum())
+        county_level = expected.group_by("contest").agg(by_county=(pl.col("scheme") == "us.county").all())
+        broken = set(
+            active.group_by("id", "contest_id", "answer")
+            .agg(pl.col("votes").sum())
+            .join(whole, left_on=["contest_id", "answer"], right_on=["contest", "answer"], how="left", nulls_equal=True)
+            .filter(pl.col("votes") != pl.col("total").fill_null(0))["id"]
+            .to_list()
+        )
+        for (id,), rows in active.join(
+            county_level.filter("by_county"), left_on="contest_id", right_on="contest"
+        ).group_by("id"):
+            mine = rows.group_by("code", "answer").agg(pl.col("votes").sum())
+            theirs = expected.filter(pl.col("contest") == rows["contest_id"][0]).select("code", "answer", "total")
+            joined = mine.join(theirs, on=["code", "answer"], how="full", coalesce=True, nulls_equal=True)
+            if (joined["votes"].fill_null(0) != joined["total"].fill_null(0)).any():
+                broken.add(id)
+        for row in active.filter(pl.col("id").is_in(list(broken))).unique("id").iter_rows(named=True):
+            if UUID(row["id"]) in kept:
+                continue
+            print(f"{row['id']}: no longer adds up to its question's default, withdrawn")
+            cs.add(
+                "result_set",
+                **{column: UUID(str(row[column])) if column.endswith("id") else row[column] for column in columns},
+                status="withdrawn",
+            )
+            cs.add("note", entity_id=UUID(row["id"]), kind="caveat", body_md=WITHDRAWN)
         for (code, day), (state, fips) in minted.items():
             cs.add(
                 "reporting_unit",
