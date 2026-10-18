@@ -43,7 +43,7 @@ ANSWERS = {
 }
 TAG = (
     r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure)"
-    r"(?:\s+measure)?(?:\s+to the legislature)?\s*(?:no\.?|#)?)\s*(\d+|[A-Z])\b"
+    r"(?:\s+measure)?(?:\s+to the legislature)?\s*(?:no\.?|#|number\s+\w+\s+\()?)\s*(\d+|[A-Za-z])\b"
 )
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
 UTAH = {
@@ -83,6 +83,7 @@ MISSOURI = {
     date(2020, 8, 4): "ActualResults-August42020.pdf",
     date(2020, 11, 3): "ActualResults-November32020.pdf",
     date(2024, 8, 6): "ActualResults-August62024.pdf",
+    date(2024, 11, 5): "ActualResults-November52024.pdf",
 }
 ALABAMA = {
     date(2012, 9, 18): "voter-pdfs/2012/scae-results-certified-2012-10-09.pdf",
@@ -90,6 +91,8 @@ ALABAMA = {
     date(2016, 11, 8): "voter-pdfs/2016/2016-Official-General-Election-Results-Certified-2016-11-29.pdf",
     date(2018, 11, 6): "voter-pdfs/2018/2018-Official-General-Election-Results-Certified-2018-11-27.pdf",
     date(2020, 11, 3): "election-2020/Final%20Canvass%20of%20Results-Merged.pdf",
+    date(2022, 11, 8): "election-data/2022-11/Final%20Canvass%20of%20Results%20%28canvassed%20by%20state%20canvassing"
+    "%20board%2011-28-2022%29.pdf",
 }
 ARIZONA = {date(2014, 11, 4): ("20141202160733", "http://www.azsos.gov/election/2014/General/Canvass2014GE.pdf")}
 GEORGIA = {
@@ -117,6 +120,7 @@ MONTANA = {
         "https://sosmt.gov/wp-content/uploads/attachments/2016GeneralStatewideCanvass.pdf",
     ),
     date(2018, 11, 6): ("20190101181853", "https://sosmt.gov/wp-content/uploads/2018GeneralReportStateCanvass.pdf"),
+    date(2020, 11, 3): ("20201203074647", "https://sosmt.gov/wp-content/uploads/State_Canvass_Report.pdf"),
 }
 MONTANA_KINDS = {
     "LEGISLATIVE REFERENDUM": "LR",
@@ -135,13 +139,14 @@ NORTH_CAROLINA = {
         "2024-11-26/Canvass/State_Composite_Abstract_Report-Contest.pdf",
     ),
 }
-NORTH_CAROLINA_QUESTIONS = {
+NAMED_QUESTIONS = {
     "PROTECT RIGHT TO HUNT AND FISH": "North Carolina Right to Hunt and Fish Amendment",
     "STRENGTHENING VICTIMS RIGHTS": "North Carolina Marsy's Law Crime Victims Rights Amendment",
     "MAXIMUM INCOME TAX RATE OF 7.0%": "North Carolina Income Tax Cap Amendment",
     "REQUIRE PHOTO ID TO VOTE": "North Carolina Voter ID Amendment",
     "NONPARTISAN JUDICIAL MERIT COMMISSION": "North Carolina Judicial Selection for Midterm Vacancies Amendment",
     "BIPARTISAN BOARD OF ETHICS AND ELECTIONS": "North Carolina Legislative Appointments to Elections Board Amendment",
+    "Constitution Of Alabama Of 2022": "Constitution of Alabama of 2022",
 }
 CALIFORNIA = {
     date(2012, 6, 5): "2012-primary/123-ballot-measures-formatted.xls",
@@ -155,6 +160,8 @@ CALIFORNIA = {
     date(2020, 3, 3): "2020-primary/sov/170-state-ballot-measures-formatted.xls",
     date(2020, 11, 3): "2020-general/sov/58-ballot-measures.xlsx",
     date(2024, 3, 5): "2024-primary/sov/csv-ballot-measures.xlsx",
+    date(2022, 11, 8): "2022-general/sov/csv-ballotmeasures.xlsx",
+    date(2024, 11, 5): "2024-general/sov/csv-ballot-measures.xlsx",
 }
 NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
 METHOD = (
@@ -372,23 +379,33 @@ def parse() -> None:
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             columns: list[tuple[str, str]] = []
             for number, page in enumerate(text.stdout.split("\f"), start=1):
+                alone = None
                 for line in page.splitlines():
                     if re.search(r"(?i)amendment|#", line):
-                        columns = re.findall(
-                            r"(?i)(\w+)\s+(?:#|amendment\s+number\s+\w+\s+\(|amendment\s+no\.\s*)(\d+)", line
-                        )
+                        alone = None
+                        columns = [
+                            ("Statewide", "Constitution Of Alabama Of 2022") if constitution else (kind, measure)
+                            for constitution, kind, measure in re.findall(
+                                r"(?i)(constitution of alabama of 2022)|(\w+)\s+(?:#|amendment\s+number\s+\w+\s+\(|"
+                                r"amendment\s+no\.\s*)(\d+)",
+                                line,
+                            )
+                        ]
+                    elif not re.search(r"\d", line) and elstats.plain(line) in names["AL"]:
+                        alone = line.strip()
                     elif (
                         columns
                         and (matched := re.fullmatch(r"\W*([A-Za-z][\w .']*?)\s{2,}(\d.*)", line))
                         and (elstats.plain(matched[1]) in names["AL"] or matched[1].upper() in ("TOTAL", "TOTALS"))
                     ):
+                        county = alone if alone is not None and matched[1].upper() == "TOTAL" else matched[1]
+                        alone = None
                         numbers = re.findall(r"\d[\d,]*", matched[2])
                         for index, (kind, measure) in enumerate(columns):
+                            office = measure if measure.startswith("Constitution") else f"Amendment {measure}"
                             if "statewide" in kind.lower() and len(numbers) >= 2 * index + 2:
-                                records.append((matched[1], f"Amendment {measure}", "YES", numbers[2 * index], number))
-                                records.append(
-                                    (matched[1], f"Amendment {measure}", "NO", numbers[2 * index + 1], number)
-                                )
+                                records.append((county, office, "YES", numbers[2 * index], number))
+                                records.append((county, office, "NO", numbers[2 * index + 1], number))
             table = pl.DataFrame(
                 records,
                 schema={
@@ -416,7 +433,9 @@ def parse() -> None:
             records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             for number, page in enumerate(text.stdout.split("\f"), start=1):
-                found = re.search(r"(" + "|".join(MONTANA_KINDS) + r") NO\.\s*(\d+)", " ".join(page.split()))
+                found = re.search(
+                    r"(" + "|".join(MONTANA_KINDS) + r") (?:NO\.|C|CI)\s*-?\s*(\d+)", " ".join(page.split())
+                )
                 if found is None:
                     continue
                 answers = ("FOR", "AGAINST") if "AGAINST" in page else ("YES", "NO")
@@ -946,7 +965,7 @@ def emit() -> Path:
                     pl.concat_str(
                         pl.col("office").str.extract(TAG, 1).str.to_lowercase(),
                         pl.lit(" "),
-                        pl.col("office").str.extract(TAG, 2),
+                        pl.col("office").str.extract(TAG, 2).str.to_lowercase(),
                     )
                 ),
                 ballot=pl.len().over("state", "day"),
@@ -959,7 +978,7 @@ def emit() -> Path:
                 pl.concat_str(
                     pl.col("name").str.extract(TAG, 1).str.to_lowercase(),
                     pl.lit(" "),
-                    pl.col("name").str.extract(TAG, 2),
+                    pl.col("name").str.extract(TAG, 2).str.to_lowercase(),
                 )
             ),
             wballot=pl.len().over("state", "day"),
@@ -968,7 +987,7 @@ def emit() -> Path:
             questions.join(wiki, on=["state", "day"])
             .filter(
                 (pl.col("tag") == pl.col("wtag"))
-                | (pl.col("office").replace_strict(NORTH_CAROLINA_QUESTIONS, default=None) == pl.col("name"))
+                | (pl.col("office").replace_strict(NAMED_QUESTIONS, default=None) == pl.col("name"))
                 | (pl.col("wtag").is_null() & (pl.col("ballot") == 1) & (pl.col("wballot") == 1))
             )
             .filter(pl.len().over("key") == 1, pl.len().over("state", "day", "office") == 1)
