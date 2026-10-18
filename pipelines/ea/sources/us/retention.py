@@ -35,6 +35,33 @@ KANSAS_FILES = {
     "2024-11-05": "24elec/2024-General-Election-Official-Vote-Totals.pdf",
 }
 OKLAHOMA = "https://results.okelections.gov/OKER/?elecDate="
+ARIZONA_CANVASSES = {
+    "2016-11-08": "https://web.archive.org/web/20161220192915id_/"
+    "http://apps.azsos.gov/election/2016/General/Official%20Signed%20State%20Canvass.pdf",
+    "2022-11-08": "https://web.archive.org/web/20221205195258id_/"
+    "https://azsos.gov/sites/default/files/2022Dec05_General_Election_Canvass_Web.pdf",
+    "2024-11-05": "https://web.archive.org/web/20241201183644id_/"
+    "https://apps.azsos.gov/election/2024/ge/canvass/20241105_GeneralCanvass_Signed.pdf",
+}
+ARIZONA_COLUMNS = {
+    "Apache": "04001",
+    "Cochise": "04003",
+    "Coconino": "04005",
+    "Gila": "04007",
+    "Graham": "04009",
+    "Greenlee": "04011",
+    "Paz": "04012",
+    "LaPaz": "04012",
+    "Maricopa": "04013",
+    "Mohave": "04015",
+    "Navajo": "04017",
+    "Pima": "04019",
+    "Pinal": "04021",
+    "Cruz": "04023",
+    "Yavapai": "04025",
+    "Yuma": "04027",
+    "TOTAL": "",
+}
 OKLAHOMA_DAYS = ["2016-11-08", "2018-11-06", "2020-11-03", "2022-11-08", "2024-11-05"]
 ANSWERS = {"YES": "yes", "NO": "no", "YES/SI": "yes", "NO/NO": "no", "RETAIN": "yes", "REJECT": "no"}
 COURTS = [
@@ -100,6 +127,10 @@ MISSING = (
     "total and no outcome is recorded."
 )
 KANSAS_METHOD = "Statewide Yes and No votes from the Kansas Secretary of State's official vote totals."
+ARIZONA_METHOD = (
+    "Yes and No votes by county from the Arizona Secretary of State's official canvass, with each row checked "
+    "against its printed total."
+)
 OKLAHOMA_METHOD = (
     "Statewide Yes and No votes from the Oklahoma State Election Board's official results site, captured from the "
     "page for the election day."
@@ -156,6 +187,105 @@ def display(text: str) -> str:
 def fetch() -> None:
     for path in KANSAS_FILES.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
+    for url in ARIZONA_CANVASSES.values():
+        raw.fetch(SOURCE, url, suffix=".pdf")
+
+
+def arizona() -> list[dict[str, object]]:
+    rows: list[dict[str, object]] = []
+    (PARSED / "ocr").mkdir(parents=True, exist_ok=True)
+    for day, url in ARIZONA_CANVASSES.items():
+        pdf = raw.cached(SOURCE, url)
+        info = subprocess.run(["pdfinfo", str(pdf.path)], capture_output=True, text=True, check=True).stdout
+        for page in range(1, int(info.split("Pages:")[1].split()[0]) + 1):
+            lines: list[list[tuple[str, scan.Box]]] = []
+            layer = scan.layer(pdf.path, page)
+            if layer:
+                for word, box in sorted(layer, key=lambda item: (item[1][1], item[1][0])):
+                    if lines and abs(lines[-1][0][1][1] - box[1]) < 15:
+                        lines[-1].append((word, box))
+                    else:
+                        lines.append([(word, box)])
+            else:
+                grouped: dict[tuple[int, int, int], list[tuple[str, scan.Box]]] = {}
+                for word, box, line, _ in scan.words(pdf.path, page, PARSED / "ocr" / f"{pdf.sha256}-{page}.tsv"):
+                    grouped.setdefault(line, []).append((word, box))
+                lines = list(grouped.values())
+            columns: list[tuple[float, str]] = []
+            court: tuple[str, int | None] | None = None
+            name = ""
+            for words in lines:
+                words.sort(key=lambda item: item[1][0])
+                text = " ".join(word for word, _ in words)
+                if "Apache" in text and "TOTAL" in text:
+                    columns = [
+                        ((box[0] + box[2]) / 2, ARIZONA_COLUMNS[word]) for word, box in words if word in ARIZONA_COLUMNS
+                    ]
+                    continue
+                if heading := re.match(
+                    r"(Justice of the Arizona Supreme Court|Judge of the Court of Appeals Division (I+))", text
+                ):
+                    court = ("supreme-court", None) if heading[2] is None else ("court-of-appeals", len(heading[2]))
+                    continue
+                said = re.match(r"Be retained (YES|NO)\b", text, re.IGNORECASE)
+                if court is None or said is None:
+                    if court is not None and not re.search(r"\d", text):
+                        name = text.rstrip(" :")
+                    continue
+                cells: list[tuple[str, int, scan.Box, bool]] = []
+                merged: list[tuple[str, scan.Box]] = []
+                for word, box in words[3:]:
+                    if word == "*":
+                        continue
+                    if (
+                        merged
+                        and (word.startswith(",") or merged[-1][0].endswith(","))
+                        and box[0] - merged[-1][1][2] < 40
+                    ):
+                        last, at = merged[-1]
+                        merged[-1] = (last + word, (at[0], min(at[1], box[1]), box[2], max(at[3], box[3])))
+                    else:
+                        merged.append((word, box))
+                for word, box in merged:
+                    if not re.search(r"\d", word):
+                        continue
+                    center = (box[0] + box[2]) / 2
+                    column = min(columns, key=lambda item: abs(item[0] - center))[1]
+                    cells.append((column, int(re.sub(r"\D", "", word)), box, bool(re.search(r"[^\d,]", word))))
+                if not any(column == "" for column, _, _, _ in cells):
+                    raise ValueError(f"Arizona {day} page {page} {name}: no total in {text}")
+                total = next(votes for column, votes, _, _ in cells if column == "")
+                garbled = [cell for cell in cells if cell[0] != "" and cell[3]]
+                counted = [(column, votes, box, False) for column, votes, box, _ in cells if column != ""]
+                gap = total - sum(votes for _, votes, _, _ in counted)
+                if gap:
+                    if len(garbled) != 1:
+                        raise ValueError(f"Arizona {day} {name} {said[1]}: counties miss the total by {gap}")
+                    column, votes, box, _ = garbled[0]
+                    print(f"Arizona {day} {name} {said[1]}: read {votes} in {column} as {votes + gap}")
+                    counted[[cell[0] for cell in counted].index(column)] = (column, votes + gap, box, True)
+                for column, votes, box, repaired in counted:
+                    rows.append(
+                        {
+                            "day": day,
+                            "state": "AZ",
+                            "court": court[0],
+                            "number": court[1],
+                            "post": None,
+                            "name": name,
+                            "answer": said[1].lower(),
+                            "votes": votes,
+                            "page": page,
+                            "x0": box[0],
+                            "y0": box[1],
+                            "x1": box[2],
+                            "y1": box[3],
+                            "origin": url,
+                            "county": column,
+                            "flags": (0 if layer else 8) | (1 if repaired else 0),
+                        }
+                    )
+    return rows
 
 
 def kansas() -> list[dict[str, object]]:
@@ -221,6 +351,8 @@ def kansas() -> list[dict[str, object]]:
                                 "x1": at[2],
                                 "y1": at[3],
                                 "origin": KANSAS + path,
+                                "county": None,
+                                "flags": 0,
                             }
                         )
                     race = None
@@ -263,6 +395,8 @@ def oklahoma() -> list[dict[str, object]]:
                         "x1": None,
                         "y1": None,
                         "origin": url,
+                        "county": None,
+                        "flags": 0,
                     }
                 )
     return rows
@@ -355,7 +489,7 @@ def parse() -> None:
         )
     )
     official = pl.DataFrame(
-        kansas() + oklahoma(),
+        kansas() + oklahoma() + arizona(),
         schema={
             "day": pl.String,
             "state": pl.String,
@@ -371,6 +505,8 @@ def parse() -> None:
             "x1": pl.Int32,
             "y1": pl.Int32,
             "origin": pl.String,
+            "county": pl.String,
+            "flags": pl.Int16,
         },
     )
     variants: dict[tuple[str, str, str], list[str]] = defaultdict(list)
@@ -415,6 +551,7 @@ def parse() -> None:
             pl.col("day").str.slice(0, 4).cast(pl.Int32).alias("year"), "state", "court", "number", "post", "person"
         )
         .unique()
+        .filter(pl.len().over("year", "state", "court", "number", "post") == 1)
         .rename({"person": "official"})
     )
     frame = frame.join(filled, on=["year", "state", "court", "number", "post"], how="left", nulls_equal=True)
@@ -509,7 +646,7 @@ def emit() -> Path:
                     pl.lit(False).alias("at_large"),
                     pl.col("post").first(),
                     pl.lit(False).alias("chief"),
-                    pl.lit([], pl.List(pl.String)).alias("counties"),
+                    pl.col("county").drop_nulls().unique().alias("counties"),
                 ),
             ]
         )
@@ -529,7 +666,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Judicial retention elections for state supreme and appellate courts: MEDSL's precinct returns "
-            "2016–2024, Kansas's official totals 2004–2024, and Oklahoma's official totals 2016–2024",
+            "2016–2024, Kansas's official totals 2004–2024, Oklahoma's official totals 2016–2024, and Arizona's "
+            "official canvasses of 2016, 2022, and 2024",
             polity="US",
         )
 
@@ -630,9 +768,21 @@ def emit() -> Path:
             url="https://results.okelections.gov/OKER/",
             license="Public record",
         )
+        arizona_source = cs.source("Arizona Secretary of State", "State of Arizona Official Canvass")
+        cs.add(
+            "source",
+            id=arizona_source,
+            kind="official_body",
+            publisher="Arizona Secretary of State",
+            title="State of Arizona Official Canvass",
+            url="https://azsos.gov/elections/results-data",
+            license="Public record",
+        )
+        official_sources = {"KS": kansas_source, "OK": oklahoma_source, "AZ": arizona_source}
+        methods = {"KS": KANSAS_METHOD, "OK": OKLAHOMA_METHOD, "AZ": ARIZONA_METHOD}
         artifacts = {
-            url: cs.artifact(raw.cached(SOURCE, url), kansas_source if url.startswith(KANSAS) else oklahoma_source)
-            for url in official["origin"].unique().sort()
+            url: cs.artifact(raw.cached(SOURCE, url), official_sources[state])
+            for url, state in official.select("origin", "state").unique().sort("origin").iter_rows()
         }
         medsl_sources: dict[int, UUID] = {}
         for year, (text, _) in TITLES.items():
@@ -833,32 +983,21 @@ def emit() -> Path:
             if totals.height:
                 url = totals["origin"][0]
                 default = cs.key(f"{SOURCE}.result_set", f"{contest_key}:official")
-                cs.add(
-                    "result_set",
-                    id=default,
-                    election_id=cs.key("us.election", election_key),
-                    contest_id=contest,
-                    stage="certified",
-                    kind="counted",
-                    status="active",
-                    source_id=kansas_source if state == "KS" else oklahoma_source,
-                    is_default=True,
-                    completeness=1,
-                )
-                note(default, "methodology", f"{METHOD} {KANSAS_METHOD if state == 'KS' else OKLAHOMA_METHOD}")
+                note(default, "methodology", f"{METHOD} {methods[state]}")
                 for item in totals.iter_rows(named=True):
-                    tallies[item["answer"]] = item["votes"]
+                    tallies[item["answer"]] = tallies.get(item["answer"], 0) + item["votes"]
+                    unit = state_units[state][0] if item["county"] is None else counties[item["county"]][0]
                     if default not in cs.minted:
                         continue
                     cs.add(
                         "result_value",
                         result_set_id=default,
-                        unit_id=state_units[state][0],
+                        unit_id=unit,
                         option_id=options[item["answer"]],
                         channel=0,
                         measure=1,
                         count_round=0,
-                        flags=0,
+                        flags=item["flags"],
                         value=item["votes"],
                     )
                     if item["page"] is not None:
@@ -866,7 +1005,7 @@ def emit() -> Path:
                         cs.add(
                             "value_locator",
                             result_set_id=default,
-                            unit_id=state_units[state][0],
+                            unit_id=unit,
                             option_id=options[item["answer"]],
                             channel=0,
                             measure=1,
@@ -895,6 +1034,14 @@ def emit() -> Path:
                     completeness=completeness,
                 )
                 note(copy, "methodology", TAKEN_OVER)
+                if area in districts.values():
+                    for (unit,) in conn.execute(
+                        """select distinct u.id from result_value v join result_set r on r.k = v.result_set_k
+                           join reporting_unit u on u.k = v.unit_k
+                           where r.id = %s and u.scheme_code = 'us.precinct'""",
+                        [result_set],
+                    ).fetchall():
+                        memberships.add((unit, area, day))
                 if copy not in cs.minted:
                     continue
                 facts = conn.execute(
@@ -964,7 +1111,7 @@ def emit() -> Path:
                     lines.group_by("unit", "code", "county", "answer").agg(pl.col("votes").sum()).iter_rows()
                 ):
                     if unit_kind == "precinct":
-                        unit = cs.unit("us.precinct", code)
+                        unit = cs.unit("us.precinct", code, date.fromisoformat(day))
                         if area in districts.values():
                             memberships.add((unit, area, day))
                         if fine not in cs.minted:
@@ -980,6 +1127,19 @@ def emit() -> Path:
                         if unit in cs.minted:
                             raise ValueError(f"{contest_key}: no Alaska district {code}")
                     values.append((str(fine), str(unit), str(options[answer]), int(votes), 0))
+            if totals.height:
+                cs.add(
+                    "result_set",
+                    id=default,
+                    election_id=cs.key("us.election", election_key),
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="active",
+                    source_id=official_sources[state],
+                    is_default=True,
+                    completeness=1,
+                )
             if default is None or not complete:
                 continue
             yes, no = tallies.get("yes", 0), tallies.get("no", 0)
@@ -1015,7 +1175,7 @@ def emit() -> Path:
             pl.DataFrame(
                 [
                     {
-                        "id": str(cs.unit("us.precinct", code)),
+                        "id": str(cs.unit("us.precinct", code, date.fromisoformat(day))),
                         "polity_id": str(cs.polity(f"US-{state}")),
                         "scheme_code": "us.precinct",
                         "code": code,
