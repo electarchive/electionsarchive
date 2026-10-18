@@ -554,7 +554,7 @@ def emit() -> Path:
         existing = set(medsl_units)
         links = pl.concat(
             pl.read_parquet(DATA / "parsed" / source / "links.parquet")
-            for source in ("us.cook_precincts", "us.swdb_precincts")
+            for source in ("us.cook_precincts", "us.swdb_precincts", "us.held_precincts")
         )
         shaped = dict(
             links.join(
