@@ -12,7 +12,7 @@ from ea.sources.us import fl_sos, medsl, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.leg_canvass"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 IL_DOWNLOAD = "https://elections.il.gov/NewDocDisplay.aspx?{}"
 IL_PUBLISHER = "Illinois State Board of Elections"
@@ -50,10 +50,27 @@ IL_FILES = {
         "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZasjAerqxs3fRrf2XYrBXtEbKmVLSjufoQA9F%2b6gOYWYukAdACVpfqNvXS55dDoOw6hcmTvo2Kjo",
         "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZasjAerqxs3fRrf2XYrBXtGGnkcw1G96QzlBYJgOnLM7Ga8QRu3XuaFCd9MPCmYxKdHbwXUX35VkrGYmOkqck6M%3d",
     ),
+    2016: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZcyCkMA7x3sXBKi6Ks4uZustlNRzKk7R7o%2fUN%2fUv1sMbaVKf25KY3N3OWQWoH4blCnfzDDDR5%2b%2fg",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZcyCkMA7x3sXBKi6Ks4uZuu%2fl7C4HQEu06X05BGg9mYw7wDdwyO07Bm7Yy2r3sylr8er9iFcCoHLeV2%2fc8%2bATxc%3d",
+    ),
+    2018: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZQftp%2fSyhp5PFMq2OvjCNY5I2g1KvY54tj%2fYiCsJFXfU3G5I4YhttIgztwDX6Njr6ZVU8vmK28oZ",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZQftp%2fSyhp5PFMq2OvjCNY6CJOHWnP0uhQfvR5RntaiW0kjQAjlpkFYK509VRn553jQrI8GTqJvhJGz51YMUHCM%3d",
+    ),
+    2020: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZeVciCixC%2bz1ZNJL5NtW4BzqozO%2bIMmNKJ4X79NjbJKzdNUQuBLhZjPAWD9hH%2fRxos2PhS1bcx2H",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZeVciCixC%2bz1ZNJL5NtW4Bxejud%2fndV9iL%2bJYWPjg8O2BTMp%2bf8NHZ96RLwL01lpPfbLA4sutAwo1bgllFNkdd8%3d",
+    ),
+    2022: (
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZSMw8T%2bTP0Bu5MYScFngpt5KKJsa1cQ0Ak2xTeElyH2Rf2dTv5xVv%2bzcqC31P7B96%2ftQl5sPSN5M",
+        "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZSMw8T%2bTP0Bu5MYScFngpt7DT1jIISrO8vbwEz2j1UaUFk4Ught6jyKPD0J6ZjQaef6%2fy5lLn0i%2brhqAS%2fOCDIRvrRtL96BN5g%3d%3d",
+    ),
 }
 FL_RACES = {"STS": "senate", "STR": "house"}
 IL_OFFICE = re.compile(r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)")
 IL_CITIES = {"cityofchicago": "cook"}
+FL_DAYS = [date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in range(2000, 2023, 2)]
 
 
 def day(year: int) -> date:
@@ -61,6 +78,9 @@ def day(year: int) -> date:
 
 
 def fetch() -> None:
+    for held in FL_DAYS:
+        if held.year > 2014:
+            raw.fetch(SOURCE, fl_sos.EXTRACT.format(day=held), suffix=".txt")
     for files in IL_FILES.values():
         for token in files:
             raw.fetch(SOURCE, IL_DOWNLOAD.format(token), suffix=".txt")
@@ -70,12 +90,13 @@ def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)
     frames = []
-    for held in fl_sos.DAYS:
-        if held.year < 2000:
-            continue
+    for held in FL_DAYS:
         frame = pl.read_csv(
             io.BytesIO(
-                raw.cached(fl_sos.SOURCE, fl_sos.EXTRACT.format(day=held)).path.read_bytes().decode("cp1252").encode()
+                raw.cached(fl_sos.SOURCE if held.year < 2015 else SOURCE, fl_sos.EXTRACT.format(day=held))
+                .path.read_bytes()
+                .decode("cp1252")
+                .encode()
             ),
             separator="\t",
             infer_schema_length=0,
@@ -182,7 +203,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Florida's and Illinois's state legislative general elections by county, 2000–2014, from the "
+            summary="Florida's and Illinois's state legislative general elections by county, 2000–2022, from the "
             "Division of Elections' results extracts and the State Board of Elections' vote totals",
             polity="US",
         )
@@ -191,12 +212,10 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from result_set r
                    join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
-                   join changeset c on c.id = r.changeset_id
-                   where r.status = 'active' and c.pipeline <> %s and x.value ~ '^20..-11-..:(FL|IL):'
+                   where r.status = 'active' and x.value ~ '^20..-11-..:(FL|IL):'
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
                                    and u.scheme_code in ('us.county', 'us.county_part', 'us.town', 'us.precinct'))""",
-                [SOURCE],
             ).fetchall()
         }
         frame = frame.filter(
@@ -220,9 +239,11 @@ def emit() -> Path:
                     url=url,
                     license="Public record",
                 )
-        for held in fl_sos.DAYS:
-            if held.year >= 2000:
-                cs.artifact(raw.cached(fl_sos.SOURCE, fl_sos.EXTRACT.format(day=held)), sources["FL"])
+        for held in FL_DAYS:
+            cs.artifact(
+                raw.cached(fl_sos.SOURCE if held.year < 2015 else SOURCE, fl_sos.EXTRACT.format(day=held)),
+                sources["FL"],
+            )
         for files in IL_FILES.values():
             for token in files:
                 cs.artifact(raw.cached(SOURCE, IL_DOWNLOAD.format(token)), sources["IL"])

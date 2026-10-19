@@ -14,10 +14,10 @@ from ea.sources.us import elstats, medsl, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_leg_counties"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
-YEARS = {"CT": range(2000, 2015, 2), "NY": range(2000, 2015, 2), "VA": range(2001, 2016, 2)}
-YEARS |= {"ID": range(2000, 2015, 2), "NM": range(2000, 2013, 2), "CO": range(2000, 2003, 2)}
+YEARS = {"CT": range(2000, 2025, 2), "NY": range(2000, 2025, 2), "VA": range(2001, 2026, 2)}
+YEARS |= {"ID": range(2000, 2025, 2), "NM": range(2000, 2025, 2), "CO": range(2000, 2003, 2)}
 TERMS = ["State Senat", "State Representative", "Assembly", "Delegate"]
 CHAMBERS = {"NY": "assembly", "VA": "house-of-delegates"}
 OFFICE = r"(?i)^(state senat\w*|state representative( [ab])?|member of assembly|member,? house of delegates)$"
@@ -135,7 +135,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="State legislative general elections by county from the ElectionStats archives of Connecticut "
-            "(by town, summed to county), New York, Virginia, Idaho, New Mexico, and Colorado, 2000–2015",
+            "(by town, summed to county), New York, Virginia, Idaho, New Mexico, and Colorado, 2000–2025",
             polity="US",
         )
         covered = {
@@ -143,12 +143,10 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from result_set r
                    join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
-                   join changeset c on c.id = r.changeset_id
-                   where r.status = 'active' and c.pipeline <> %s
+                   where r.status = 'active'
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
                                    and u.scheme_code in ('us.county', 'us.county_part', 'us.town', 'us.precinct'))""",
-                [SOURCE],
             ).fetchall()
         }
         frame = frame.filter(
