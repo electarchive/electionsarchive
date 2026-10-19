@@ -116,31 +116,38 @@
       </span>
     {:else if total == null || total <= 1}
       <span
-        class="rounded-[2px] border border-destructive block-4.5 inline-4.5"
+        class="rounded-[2px] border border-done-low block-4.5 inline-4.5"
         title={m.coverage_missing()}
       >
         <span class="sr-only">{m.coverage_missing()}</span>
       </span>
     {:else}
       {const done = $derived(Math.max(0, total - gap))}
+      {const share = $derived(Math.min(99, Math.floor((done / total) * 100)))}
       {const title = $derived(
         view === "left"
           ? m.coverage_gap({ count: count(gap) })
           : view === "percent"
-            ? m.coverage_percent_title({
-                percent: `${Math.min(99, Math.floor((done / total) * 100))}%`,
-              })
+            ? m.coverage_percent_title({ percent: `${share}%` })
             : m.coverage_done_title({ done: count(done), total: count(total) }),
       )}
       <span
-        class="rounded-[2px] border border-destructive px-1 font-figures text-xs/4 whitespace-nowrap text-destructive"
+        class={cn(
+          "rounded-[2px] border px-1 font-figures text-xs/4 whitespace-nowrap",
+          {
+            "border-done-low text-done-low": share < 25,
+            "border-done-some text-done-some": share >= 25 && share < 50,
+            "border-done-half text-done-half": share >= 50 && share < 75,
+            "border-done-most text-done-most": share >= 75,
+          },
+        )}
         {title}
       >
         <span aria-hidden="true">
           {#if view === "left"}
             {count(gap)}
           {:else if view === "percent"}
-            {Math.min(99, Math.floor((done / total) * 100))}%
+            {share}%
           {:else}
             <span class="max-sm:grid max-sm:leading-3.5"
               >{compact.format(done)}<span class="max-sm:hidden">/</span><span

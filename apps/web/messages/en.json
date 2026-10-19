@@ -980,5 +980,8 @@
   "coverage_percent_title": "{percent} done",
   "coverage_done_title": "{done} of {total} done",
   "coverage_hide_done": "Hide completed rows",
-  "coverage_all_done": "All rows are completed"
+  "coverage_all_done": "All rows are completed",
+  "coverage_legend": "Done",
+  "coverage_band_under": "Less than {value}",
+  "coverage_band": "{from} to {to}"
 }

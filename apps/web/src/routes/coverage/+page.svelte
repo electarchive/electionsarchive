@@ -53,7 +53,36 @@
         {m.coverage_denominator()}
       </p>
       <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
-        <p class="text-xs text-muted-foreground">{built}</p>
+        <div class="grid gap-1.5">
+          <p class="text-xs text-muted-foreground">{built}</p>
+          <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
+            <span class="text-muted-foreground">{m.coverage_legend()}</span>
+            <span class="flex items-center gap-1"
+              ><span
+                class="rounded-[2px] border border-done-low block-3 inline-3"
+              ></span>{m.coverage_band_under({ value: "25%" })}</span
+            >
+            <span class="flex items-center gap-1"
+              ><span
+                class="rounded-[2px] border border-done-some block-3 inline-3"
+              ></span>{m.coverage_band({ from: "25%", to: "49%" })}</span
+            >
+            <span class="flex items-center gap-1"
+              ><span
+                class="rounded-[2px] border border-done-half block-3 inline-3"
+              ></span>{m.coverage_band({ from: "50%", to: "74%" })}</span
+            >
+            <span class="flex items-center gap-1"
+              ><span
+                class="rounded-[2px] border border-done-most block-3 inline-3"
+              ></span>{m.coverage_band({ from: "75%", to: "99%" })}</span
+            >
+            <span class="flex items-center gap-1"
+              ><span class="rounded-[2px] bg-(--yes) block-3 inline-3"
+              ></span>{m.coverage_ok()}</span
+            >
+          </p>
+        </div>
         <div
           role="group"
           aria-label={m.coverage_view()}

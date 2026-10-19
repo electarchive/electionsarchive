@@ -38,6 +38,10 @@
   --destructive: #b3261e;
   --yes: #2e7d4f;
   --no: #c2410c;
+  --done-low: #b3261e;
+  --done-some: #c2410c;
+  --done-half: #a16207;
+  --done-most: #4d7c0f;
   --border: #dadde2;
   --input: #b9bec6;
   --ring: #15171a;
@@ -65,6 +69,10 @@
   --destructive: #f2675e;
   --yes: #5bb57e;
   --no: #f07a45;
+  --done-low: #f2675e;
+  --done-some: #f07a45;
+  --done-half: #e0b23a;
+  --done-most: #9ccc65;
   --border: #2b2f34;
   --input: #474d55;
   --ring: #e8eaed;
@@ -87,6 +95,10 @@
   --color-input: var(--input);
   --color-border: var(--border);
   --color-destructive: var(--destructive);
+  --color-done-low: var(--done-low);
+  --color-done-some: var(--done-some);
+  --color-done-half: var(--done-half);
+  --color-done-most: var(--done-most);
   --color-accent-foreground: var(--accent-foreground);
   --color-accent: var(--accent);
   --color-muted-foreground: var(--muted-foreground);
