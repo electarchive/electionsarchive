@@ -80,10 +80,12 @@ def parse(source: ModuleType) -> None:
     columns_by: dict[tuple[int, object, int], list[int]] = {}
     printed: dict[tuple[int, object, int], int] = {}
     labels: dict[tuple[int, object], list[str]] = {}
+    steps: list[float] = []
+    carried: list[float] = []
     for year, (_, _, _, pages) in source.VOLUMES.items():
         book = _artifact(source, year)
         learned: list[tuple[float, float, float, float]] = []
-        steps: list[float] = []
+        carried, steps = steps or carried, []
         spans: list[float] = []
         firsts = _tables(parsed / "model" / f"{year}.txt")
         seconds = _tables(parsed / "model" / f"{year}.v2.txt")
@@ -508,9 +510,13 @@ def parse(source: ModuleType) -> None:
                                 round(ys[r] + height / 2),
                             )
                             how = "placed"
-                    if box is None and (c in xs or c in grid or (xs and spans)) and (r in ys or (ys and steps)):
+                    if (
+                        box is None
+                        and (c in xs or c in grid or (xs and spans))
+                        and (r in ys or (ys and (steps or carried)))
+                    ):
                         known_ = min(ys, key=lambda k: abs(k - r))
-                        down = ys[r] if r in ys else ys[known_] + statistics.median(steps) * (r - known_)
+                        down = ys[r] if r in ys else ys[known_] + statistics.median(steps or carried) * (r - known_)
                         right = (
                             xs[c]
                             if c in xs
