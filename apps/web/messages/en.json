@@ -983,5 +983,6 @@
   "coverage_all_done": "All rows are completed",
   "coverage_legend": "Done",
   "coverage_band_under": "Less than {value}",
-  "coverage_band": "{from} to {to}"
+  "coverage_band": "{from} to {to}",
+  "coverage_all_years": "All years coverage"
 }

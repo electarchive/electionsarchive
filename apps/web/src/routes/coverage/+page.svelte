@@ -24,6 +24,52 @@
     } catch {}
   });
 
+  const summary = $derived.by(() => {
+    const sums: Record<
+      | "expected"
+      | "missing"
+      | "county"
+      | "countyTotal"
+      | "precinct"
+      | "precinctTotal"
+      | "shapes"
+      | "shapesTotal",
+      number | null
+    > = {
+      expected: null,
+      missing: null,
+      county: null,
+      countyTotal: null,
+      precinct: null,
+      precinctTotal: null,
+      shapes: null,
+      shapesTotal: null,
+    };
+    let held = 0;
+    for (const row of data.rows) {
+      held += row.held;
+      for (const key of Object.keys(sums) as Array<keyof typeof sums>) {
+        const value = row[key];
+        if (value != null) {
+          sums[key] = (sums[key] ?? 0) + Math.max(0, value);
+        }
+      }
+    }
+    return {
+      ...sums,
+      path: "all",
+      label: m.coverage_all_years(),
+      kind: "total",
+      held,
+      governments: null,
+      precincts: 0,
+      shaped: 0,
+      hasChildren: false,
+      href: null,
+      detail: null,
+    };
+  });
+
   const built = $derived(
     data.builtAt == null
       ? m.coverage_building()
@@ -163,7 +209,7 @@
           >
         {/each}
       </div>
-      <Rows rows={data.rows} {view} {hideDone} />
+      <Rows rows={[summary, ...data.rows]} {view} {hideDone} />
     </div>
   </article>
 </main>

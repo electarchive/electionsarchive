@@ -238,7 +238,10 @@
       {:else}
         <span class="shrink-0 inline-4"></span>
         {#if row.href == null}
-          <span class="truncate">{label}</span>
+          <span
+            class={cn("truncate", { "font-semibold": row.kind === "total" })}
+            >{label}</span
+          >
         {:else}
           <a
             href={resolve("/[...path]", { path: row.href })}
