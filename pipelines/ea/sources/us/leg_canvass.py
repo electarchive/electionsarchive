@@ -1,5 +1,6 @@
 import csv
 import io
+import json
 import re
 import subprocess
 from datetime import date
@@ -9,11 +10,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import fl_sos, medsl, nj_sos, openelections, wa_local
+from ea.sources.us import fl_sos, la_sos, medsl, nj_sos, openelections, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.leg_canvass"
-VERSION = "4"
+VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
 IL_DOWNLOAD = "https://elections.il.gov/NewDocDisplay.aspx?{}"
 IL_PUBLISHER = "Illinois State Board of Elections"
@@ -100,6 +101,10 @@ NJ_UNITS = [
     "nineteenth",
 ]
 NJ_TENS = {"twentieth": 20, "thirtieth": 30, "fortieth": 40, "twenty": 20, "thirty": 30, "forty": 40}
+LA_DAYS = [date(2019, 10, 12), date(2019, 11, 16), date(2023, 10, 14), date(2023, 11, 18)]
+LA_FILES = ["Votes_Multiparish.htm", "RacesCandidates_Multiparish.htm"] + [
+    f"VotesParish/Votes_{parish}.htm" for parish in la_sos.PARISHES
+]
 FL_RACES = {"STS": "senate", "STR": "house"}
 IL_OFFICE = re.compile(r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)")
 IL_CITIES = {"cityofchicago": "cook"}
@@ -120,6 +125,9 @@ def fetch() -> None:
     for paths in NJ_FILES.values():
         for path in paths:
             raw.fetch(SOURCE, nj_sos.RESULTS + path, suffix=".pdf")
+    for held in LA_DAYS:
+        for name in LA_FILES:
+            raw.fetch(SOURCE, la_sos.blob(held, name), suffix=".json")
 
 
 def parse() -> None:
@@ -275,6 +283,78 @@ def parse() -> None:
             orient="row",
         )
     )
+    with connect() as conn:
+        parishes = [
+            code
+            for (code,) in conn.execute(
+                """select u.code from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '22%' order by n.text"""
+            ).fetchall()
+        ]
+        keys = {
+            key
+            for (key,) in conn.execute(
+                "select value from external_id where scheme = 'us.contest' and value ~ '^20(19|23)-1[01]-..:LA:(house|senate):'"
+            ).fetchall()
+        }
+    rows = []
+    for held in LA_DAYS:
+        listed = [json.loads(raw.cached(SOURCE, la_sos.blob(held, name)).path.read_text()) for name in LA_FILES]
+        races = {
+            race["ID"]: race
+            for race in la_sos.many((listed[1].get("Races") or {}).get("Race"))
+            if race["GeneralTitle"] in ("State Representative", "State Senator")
+        }
+        totals = {
+            (race["ID"], choice["ID"]): int(choice["VoteTotal"])
+            for race in la_sos.many((listed[0].get("Races") or {}).get("Race"))
+            for choice in la_sos.many(race["Choice"])
+        }
+        counted: dict[tuple[str, str], int] = {}
+        for parish, votes in zip(parishes, listed[2:], strict=True):
+            for race in la_sos.many((votes.get("Races") or {}).get("Race")):
+                if race["ID"] not in races:
+                    continue
+                meta = races[race["ID"]]
+                district = re.search(
+                    r"(\d+)(?:st|nd|rd|th) (Representative|Senatorial) District", meta["SpecificTitle"]
+                )
+                body = "house" if meta["GeneralTitle"] == "State Representative" else "senate"
+                if held.month == 11:
+                    chamber = f"{body}:{int(district[1])}:larunoff"
+                else:
+                    chamber = next(
+                        (
+                            f"{body}:{int(district[1])}:{suffix}"
+                            for suffix in ("lafsettled", "lafunsettled")
+                            if f"{held}:LA:{body}:{int(district[1])}:{suffix}" in keys
+                        ),
+                        f"{body}:{int(district[1])}:lafsettled",
+                    )
+                names = {choice["ID"]: choice["Desc"] for choice in la_sos.many(meta["Choice"])}
+                for choice in la_sos.many(race["Choice"]):
+                    counted[(race["ID"], choice["ID"])] = counted.get((race["ID"], choice["ID"]), 0) + int(
+                        choice["VoteTotal"]
+                    )
+                    rows.append(
+                        (
+                            held,
+                            chamber,
+                            parish,
+                            re.sub(r"\s*\([A-Z]+\)$", "", names[choice["ID"]].strip()).upper(),
+                            int(choice["VoteTotal"]),
+                        )
+                    )
+        for key, total in totals.items():
+            if key[0] in races and counted.get(key) != total:
+                raise ValueError(f"{held} {races[key[0]]['SpecificTitle']}: the parishes don't add up to {total}")
+    frames.append(
+        pl.DataFrame(
+            rows,
+            schema={"day": pl.Date, "chamber": pl.String, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).with_columns(year=pl.col("day").dt.year().cast(pl.Int32), state=pl.lit("LA"))
+    )
     for held in WA_DAYS:
         race = pl.col("Race").str.strip_chars()
         found = race.str.extract_groups(r"(?i)^legislative district (\d+) state (senator|representative pos\. (\d))$")
@@ -302,9 +382,9 @@ def parse() -> None:
         )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
-        pl.concat(frames, how="vertical_relaxed")
+        pl.concat(frames, how="diagonal_relaxed")
         .with_columns(
-            day=pl.col("year").map_elements(day, return_dtype=pl.Date),
+            day=pl.coalesce("day", pl.col("year").map_elements(day, return_dtype=pl.Date)),
             special=pl.lit(False),
             district=pl.lit(None, pl.Int16),
             measure=pl.lit(1, pl.Int16),
@@ -349,6 +429,7 @@ def emit() -> Path:
             "IL": cs.source(IL_PUBLISHER, IL_TITLE),
             "WA": cs.source(wa_local.PUBLISHER, wa_local.TITLE),
             "NJ": cs.source(nj_sos.PUBLISHER, nj_sos.TITLE),
+            "LA": cs.source(la_sos.PUBLISHER, la_sos.TITLE),
         }
         for state, publisher, title, url in (
             ("FL", fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
@@ -360,6 +441,7 @@ def emit() -> Path:
                 nj_sos.TITLE,
                 "https://www.nj.gov/state/elections/election-information-results.shtml",
             ),
+            ("LA", la_sos.PUBLISHER, la_sos.TITLE, "https://voterportal.sos.la.gov/static/"),
         ):
             if sources[state] in cs.minted:
                 cs.add(
@@ -376,6 +458,9 @@ def emit() -> Path:
                 raw.cached(fl_sos.SOURCE if held.year < 2015 else SOURCE, fl_sos.EXTRACT.format(day=held)),
                 sources["FL"],
             )
+        for held in LA_DAYS:
+            for name in LA_FILES:
+                cs.artifact(raw.cached(SOURCE, la_sos.blob(held, name)), sources["LA"])
         for paths in NJ_FILES.values():
             for path in paths:
                 cs.artifact(raw.cached(SOURCE, nj_sos.RESULTS + path), sources["NJ"])
