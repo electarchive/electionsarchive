@@ -10,7 +10,7 @@ import zipfile
 from datetime import date, timedelta
 from pathlib import Path
 from typing import Any
-from urllib.parse import quote, urlencode
+from urllib.parse import quote, unquote, urlencode
 from uuid import UUID
 from xml.etree import ElementTree
 
@@ -308,6 +308,13 @@ STATES = {
         "Election data: 2022 primary and primary runoff precinct results",
         "https://www.sos.alabama.gov/alabama-votes/voter/election-data",
     ),
+    "IA": (
+        "19",
+        "Iowa",
+        "Iowa Secretary of State",
+        "Election results: primary precinct vote totals by county, 2010–2016",
+        "https://sos.iowa.gov/archived-election-results-and-statistics",
+    ),
     "IN": (
         "18",
         "Indiana",
@@ -365,6 +372,9 @@ OFFICES = {
         "Superintendent of Public Instruction",
     ),
     "COMMISSIONER OF AGRICULTURE": ("commissioner-of-agriculture", "Commissioner of Agriculture"),
+    "AUDITOR OF STATE": ("auditor", "State Auditor"),
+    "TREASURER OF STATE": ("treasurer", "State Treasurer"),
+    "SECRETARY OF AGRICULTURE": ("secretary-of-agriculture", "Secretary of Agriculture"),
     "COMMISSIONER OF AGRICULTURE AND INDUSTRIES": (
         "commissioner-of-agriculture-and-industries",
         "Commissioner of Agriculture and Industries",
@@ -656,6 +666,27 @@ AL_METHOD = (
     "precinct results files; the files print no contest totals to check them against, and a county the district "
     "splits holds only the district's part. The files do not mark winners, so the winner shown is the candidate "
     "with a majority, or the runoff's leader, and when a runoff followed, the top two are shown as advancing."
+)
+IA_DAYS = {2010: date(2010, 6, 8), 2012: date(2012, 6, 5), 2014: date(2014, 6, 3), 2016: date(2016, 6, 7)}
+IA_CDX = (
+    "https://web.archive.org/cdx/search/cdx?url=sos.iowa.gov/elections/results/xls/{}/primary/&matchType=prefix"
+    "&fl=timestamp,original,statuscode,mimetype&limit=100000"
+)
+IA_RACE = re.compile(
+    r"(?:STATE (REPRESENTATIVE|REP\.|SENATOR) (?:DISTRICT|DIST\.) (\d+)|(GOVERNOR|SECRETARY OF STATE|AUDITOR OF STATE"
+    r"|TREASURER OF STATE|SECRETARY OF AGRICULTURE|ATTORNEY GENERAL)) - (DEM|REP|D|R|DEMOCRATIC PARTY|REPUBLICAN PARTY)"
+)
+IA_METHOD = (
+    "Totals are the county totals of the Secretary of State's county precinct results files, read from the Wayback "
+    "Machine's captures, each county's precinct rows checked against its printed total, except in nine county files "
+    "whose rows for some races skip the precincts outside the district and no longer line up with the header, where "
+    "the printed county total is taken as is; a county the district splits holds only the district's part. The files do not mark winners, so the winner shown is derived: the candidate "
+    "with the most votes, when that candidate has at least the 35 percent of the votes Iowa requires. Below that, a "
+    "party convention chooses the nominee, and no winner is shown."
+)
+WON_CONVENTION = (
+    "Derived: the leader of the certified contest totals, with at least the 35 percent that avoids a nominating "
+    "convention."
 )
 IN_DAY = date(2020, 6, 2)
 IN_ARCHIVE = "https://enr.indianavoters.in.gov/archive/2020Primary/data/OffCatC_{}_B.json"
@@ -972,6 +1003,20 @@ def fetch() -> None:
         raw.fetch(SOURCE, IN_ARCHIVE.format(category), suffix=".json")
     for url in AL_FILES.values():
         raw.fetch(SOURCE, url, suffix=".zip")
+    for year in IA_DAYS:
+        raw.fetch(SOURCE, IA_CDX.format(year), suffix=".txt")
+    for url in iowa().values():
+        try:
+            raw.cached(SOURCE, url)
+        except LookupError:
+            for attempt in range(6):
+                time.sleep(2 + 30 * attempt)
+                try:
+                    raw.fetch(SOURCE, url, suffix=Path(url).suffix)
+                    break
+                except httpx.HTTPError:
+                    if attempt == 5:
+                        raise
     for election in PA_ELECTIONS.values():
         for office in PA_OFFICES:
             listing = json.loads(raw.fetch(SOURCE, PA_OFFICE.format(office, election), suffix=".json").path.read_text())
@@ -1049,6 +1094,18 @@ def fetch() -> None:
                         raw.fetch(SOURCE, MA_DOWNLOAD.format(election), suffix=".csv")
 
 
+def iowa() -> dict[tuple[int, str], str]:
+    found: dict[tuple[int, str], tuple[str, str]] = {}
+    for year in IA_DAYS:
+        for line in raw.cached(SOURCE, IA_CDX.format(year)).path.read_text().splitlines():
+            parts = line.split()
+            matched = len(parts) == 4 and re.search(r"/primary/([^/]+)\.xlsx?$", parts[1])
+            if matched and parts[2] == "200":
+                county = re.sub(r"[^a-z]", "", unquote(matched[1]).lower())
+                found[(year, county)] = max(found.get((year, county), ("", "")), (parts[0], parts[1]))
+    return {key: f"https://web.archive.org/web/{stamp}id_/{url}" for key, (stamp, url) in sorted(found.items())}
+
+
 def listed(value: dict[str, Any] | list[dict[str, Any]]) -> list[dict[str, Any]]:
     return value if isinstance(value, list) else [value]
 
@@ -1060,7 +1117,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(01|37|53|06|08|09|12|16|17|18|21|33|35|36|42|45|48|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(01|37|53|06|08|09|12|16|17|18|19|21|33|35|36|42|45|48|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -2443,6 +2500,189 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    hawkeye: dict[tuple[date, str, str | None, str, str, str, bool], int] = {}
+    ia_unread: set[str] = set()
+    ia_compact: set[tuple[int, str, str]] = set()
+    for (ia_year, ia_plain), ia_url in iowa().items():
+        ia_county = counties[("19", ia_plain)]
+        ia_book = fastexcel.read_excel(raw.cached(SOURCE, ia_url).path)
+        ia_sheet = next(
+            ia_rows
+            for ia_rows in (
+                ia_book.load_sheet(ia_at, header_row=None).to_polars() for ia_at in range(len(ia_book.sheet_names))
+            )
+            if len(ia_rows)
+        )
+        ia_grid = [
+            ["" if ia_cell is None else re.sub(r"\s+", " ", str(ia_cell)).strip() for ia_cell in ia_row]
+            for ia_row in ia_sheet.iter_rows()
+        ]
+        ia_entries: list[tuple[str, str, int]] = []
+        if ia_grid[0][0] == "Race":
+            ia_header: list[str] = []
+            ia_sums: list[int] = []
+            ia_race = ""
+            ia_headless = False
+            ia_kept = [ia_row for ia_row in ia_grid if ia_row[0]]
+            for ia_last, ia_row in zip([[""], *ia_kept], ia_kept, strict=False):
+                if ia_row[0] == ia_last[0] == "Grand Totals":
+                    continue
+                if ia_row[0] == "Race":
+                    if any(ia_sums):
+                        raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_race} has no grand totals")
+                    ia_header = ia_row[: ia_row.index("Precinct Totals") + 1]
+                    ia_sums = [0] * (len(ia_header) - 3)
+                elif ia_last[0] == "Grand Totals":
+                    ia_race, ia_headless = ia_row[0], True
+                    if IA_RACE.fullmatch(ia_race.upper()):
+                        raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_race} has no header")
+                elif ia_headless:
+                    ia_headless = ia_row[0] != "Grand Totals"
+                elif ia_row[0] == "Grand Totals":
+                    if [int(float(ia_cell or 0)) for ia_cell in ia_row[3 : len(ia_header)]] != ia_sums:
+                        raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_race} does not add up to its grand totals")
+                    ia_entries.extend(
+                        (ia_race, ia_name, ia_total)
+                        for ia_name, ia_total in zip(ia_header[3:-1], ia_sums[:-1], strict=True)
+                    )
+                    ia_sums = [0] * len(ia_sums)
+                else:
+                    ia_race = ia_row[0]
+                    ia_values = [int(float(ia_cell or 0)) for ia_cell in ia_row[3 : len(ia_header)]]
+                    if sum(ia_values[:-1]) != ia_values[-1]:
+                        raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_race} {ia_row[2]} does not add up")
+                    ia_sums = [ia_total + ia_value for ia_total, ia_value in zip(ia_sums, ia_values, strict=True)]
+            if any(ia_sums):
+                raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_race} has no grand totals")
+        elif ia_grid[0][0] == "RaceTitle":
+            ia_header = ia_grid[0]
+            ia_totals = [
+                ia_at
+                for ia_at, ia_label in enumerate(ia_header)
+                if ia_label == f"{next(ia_name for ia_name in ia_header[3:] if '-' in ia_name).split('-')[0]} Total"
+            ]
+            if len(ia_totals) != 1 or any(
+                ia_label and not re.search(r"[ -](Absentee|Polling|Total)$", ia_label) for ia_label in ia_header[3:]
+            ):
+                raise ValueError(f"Iowa {ia_year} {ia_plain}: unexpected columns")
+            ia_split = {
+                ia_label.rsplit(" ", 1)[0] for ia_label in ia_header if re.search(r" (Absentee|Polling)$", ia_label)
+            }
+            ia_parts = [
+                ia_at
+                for ia_at, ia_label in enumerate(ia_header[3:], 3)
+                if ia_label
+                and ia_at != ia_totals[0]
+                and ia_label.rsplit(" ", 1)[0] not in ia_split
+                or re.search(r" (Absentee|Polling)$", ia_label)
+            ]
+            for ia_row in ia_grid[1:]:
+                if not ia_row[0]:
+                    continue
+                ia_total = int(float(ia_row[ia_totals[0]] or 0))
+                if sum(int(float(ia_row[ia_at] or 0)) for ia_at in ia_parts) != ia_total:
+                    ia_total = int(float(ia_row[ia_totals[0]] or [ia_cell for ia_cell in ia_row if ia_cell][-1]))
+                    ia_compact.add((ia_year, ia_plain, ia_row[0]))
+                ia_entries.append((ia_row[0], ia_row[1], ia_total))
+        else:
+            ia_blocks: dict[str, tuple[list[str], list[int]]] = {}
+            ia_done: set[str] = set()
+            ia_open: str | None = None
+            ia_names: list[str] | None = None
+            for ia_row in ia_grid:
+                ia_cells = [ia_cell for ia_cell in ia_row if ia_cell]
+                if len(ia_cells) == 2 and ia_cells[1] == "Total" and " - " in ia_cells[0]:
+                    ia_open, ia_names = ia_cells[0], None
+                elif ia_open is not None and ia_names is None:
+                    ia_names = ia_cells
+                    if ia_blocks.setdefault(ia_open, (ia_names, [0] * (len(ia_names) + 1)))[0] != ia_names:
+                        raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_open} changes its columns")
+                elif ia_open is not None and ia_names is not None and ia_cells and ia_cells[0] == "Total":
+                    if [int(float(ia_cell)) for ia_cell in ia_cells[1:]] != ia_blocks[ia_open][1]:
+                        raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_open} does not add up to its total")
+                    ia_entries.extend(
+                        (ia_open, ia_name, ia_total)
+                        for ia_name, ia_total in zip(ia_names, ia_blocks[ia_open][1][:-1], strict=True)
+                    )
+                    ia_done.add(ia_open)
+                    ia_open = None
+                elif ia_open is not None and ia_names is not None and len(ia_cells) == len(ia_names) + 2:
+                    ia_values = [int(float(ia_cell)) for ia_cell in ia_cells[1:]]
+                    if sum(ia_values[:-1]) != ia_values[-1]:
+                        raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_open} {ia_cells[0]} does not add up")
+                    ia_blocks[ia_open] = (
+                        ia_names,
+                        [
+                            ia_total + ia_value
+                            for ia_total, ia_value in zip(ia_blocks[ia_open][1], ia_values, strict=True)
+                        ],
+                    )
+            if set(ia_blocks) != ia_done:
+                raise ValueError(f"Iowa {ia_year} {ia_plain}: {sorted(set(ia_blocks) - ia_done)} have no totals")
+        for ia_title, ia_candidate, ia_votes in ia_entries:
+            ia_found = IA_RACE.fullmatch(ia_title.upper())
+            if ia_found is None:
+                ia_unread.add(ia_title)
+                continue
+            if ia_candidate.upper() in ("OVER VOTES", "UNDER VOTES"):
+                continue
+            ia_writein = re.fullmatch(r"(?i)write-?in", ia_candidate) is not None
+            ia_choice = re.sub(r"\s+", " ", ia_candidate).strip()
+            if ia_choice.isupper():
+                ia_choice = re.sub(
+                    r"\b(Ii|Iii|Iv)\b",
+                    lambda numeral: numeral[1].upper(),
+                    re.sub(r"\bMc([a-z])", lambda prefix: "Mc" + prefix[1].upper(), ia_choice.title()),
+                )
+            ia_key = (
+                IA_DAYS[ia_year],
+                ("senate" if ia_found[1] == "SENATOR" else "house") if ia_found[1] else OFFICES[ia_found[3]][0],
+                str(int(ia_found[2])) if ia_found[1] else None,
+                "DEM" if ia_found[4].startswith("D") else "REP",
+                ia_county,
+                "Write-ins" if ia_writein else ia_choice,
+                ia_writein,
+            )
+            if ia_key in hawkeye:
+                raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_title} {ia_candidate} appears twice")
+            hawkeye[ia_key] = ia_votes
+    ia_missing = {(ia_year, ia_plain) for ia_year in IA_DAYS for _, ia_plain in iowa()} - set(iowa())
+    if ia_missing != {(2016, "obrien")}:
+        raise ValueError(f"Iowa county files missing: {sorted(ia_missing)}")
+    print("Iowa titles not read:", sorted(ia_unread))
+    print("Iowa rows whose precincts do not line up with the header:", sorted(ia_compact))
+    ia_obrien = {
+        (ia_office, ia_code)
+        for ia_day, ia_office, ia_code, _, ia_fips, _, _ in hawkeye
+        if ia_day == IA_DAYS[2014] and ia_fips == counties[("19", "obrien")]
+    }
+    iowa_frame = pl.DataFrame(
+        [
+            (*ia_key, ia_votes)
+            for ia_key, ia_votes in hawkeye.items()
+            if not (ia_key[0] == IA_DAYS[2016] and (ia_key[2] is None or (ia_key[1], ia_key[2]) in ia_obrien))
+        ],
+        schema={
+            "day": pl.Date,
+            "office": pl.String,
+            "code": pl.String,
+            "party": pl.String,
+            "fips": pl.String,
+            "choice": pl.String,
+            "writein": pl.Boolean,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    )
+    frames.append(
+        iowa_frame.filter((~pl.col("writein")).any().over("day", "office", "code", "party")).with_columns(
+            state=pl.lit("IA"),
+            label=pl.when(~pl.col("writein")).then("party"),
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     alabama: dict[tuple[date, str, str | None, str, str, str], int] = {}
     for day, url in AL_FILES.items():
         with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
@@ -2778,7 +3018,8 @@ def emit() -> Path:
             "Kentucky 2000–2008 by county from the State Board of Elections' county reports, South Carolina 2010–2022 by "
             "county from the State Election Commission's detail results, Pennsylvania 2000–2022 by county from the "
             "Department of State's election returns, Indiana 2020 by county from the Election Division's results "
-            "archive, and Alabama 2022 by county from the Secretary of State's precinct results",
+            "archive, Alabama 2022 by county from the Secretary of State's precinct results, and Iowa 2010–2016 by county "
+            "from the Secretary of State's county precinct results",
             polity="US",
         )
 
@@ -2866,6 +3107,8 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, IN_ARCHIVE.format(category)), sources["IN"])
         for url in AL_FILES.values():
             cs.artifact(raw.cached(SOURCE, url), sources["AL"])
+        for url in iowa().values():
+            cs.artifact(raw.cached(SOURCE, url), sources["IA"])
         for election in PA_ELECTIONS.values():
             for office in PA_OFFICES:
                 listing = raw.cached(SOURCE, PA_OFFICE.format(office, election))
@@ -3050,6 +3293,7 @@ def emit() -> Path:
             *(("PA", day, None) for day in PA_ELECTIONS),
             ("IN", IN_DAY, None),
             *(("AL", day, first) for day, first in AL_DAYS.items()),
+            *(("IA", day, None) for day in IA_DAYS.values()),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(("KY", day, None) for day in KY_DAYS.values()),
             *(
@@ -3183,7 +3427,7 @@ def emit() -> Path:
                     else "irv"
                     if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", *ELSTATS)
+                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "IA", *ELSTATS)
                     else "two_round"
                     if state in ("TX", "SC", "AL") or (state == "FL" and day.year == 2000)
                     else "fptp"
@@ -3344,6 +3588,14 @@ def emit() -> Path:
                     wins = [(names[0], "won", WON_MAJORITY)]
                 elif tallies[0] > tallies[1] and nominated.get(names[0]) and day.year < 2024:
                     wins = [(names[0], "won", WON_NOMINEE)]
+            elif state == "IA":
+                if len(tallies) == 1 and tallies[0] * 100 >= 35 * total:
+                    wins = [(names[0], "won", WON_ALONE)]
+                elif len(tallies) > 1 and tallies[0] * 100 >= 35 * total:
+                    if (tallies[0] - tallies[1]) * 100 > total:
+                        wins = [(names[0], "won", WON_CONVENTION)]
+                    elif tallies[0] > tallies[1] and nominated.get(names[0]):
+                        wins = [(names[0], "won", WON_NOMINEE)]
             elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", *ELSTATS) or (state == "FL" and day.year > 2000):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
@@ -3486,6 +3738,8 @@ def emit() -> Path:
                     if state == "IN"
                     else AL_METHOD
                     if state == "AL"
+                    else IA_METHOD
+                    if state == "IA"
                     else FL_METHOD.format(
                         rule=", with more than half the votes, or the leader of the second primary; when a second "
                         "primary followed, the top two are shown as advancing"
