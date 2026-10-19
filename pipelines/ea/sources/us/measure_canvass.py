@@ -118,6 +118,14 @@ GEORGIA = {
         "https://results.enr.clarityelections.com//GA//105369/271927/reports/detailxml.zip",
     ),
 }
+WEST_VIRGINIA = {
+    date(2024, 11, 5): (
+        "20241230051024",
+        "https://results.enr.clarityelections.com//WV//122766/356048/reports/detailxml.zip",
+    ),
+}
+WV_JSON = {date(2022, 11, 8): ("115844/316316", "20240515032146", "20260319205226")}
+CLARITY_JSON = "https://results.enr.clarityelections.com/WV/{}/json/{}.json"
 MONTANA = {
     date(2012, 11, 6): ("20201219202556", "https://sosmt.gov/wp-content/uploads/attachments/2012_General_Canvass.pdf"),
     date(2014, 11, 4): (
@@ -295,6 +303,12 @@ DOCUMENTS = {
         "https://results.enr.clarityelections.com/GA/",
         "the Georgia Secretary of State's certified results by county",
     ),
+    "WV": (
+        "West Virginia Secretary of State",
+        "Official election results",
+        "https://results.enr.clarityelections.com/WV/",
+        "the West Virginia Secretary of State's certified results by county",
+    ),
     "ME": (
         me_canvass.PUBLISHER,
         "Referendum tabulations",
@@ -423,8 +437,11 @@ def link(state: str, day: date) -> tuple[str, str]:
     if state == "UT":
         entry = UTAH.get(day, "")
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
-    if state == "GA":
-        return SOURCE, WAYBACK.format(*GEORGIA[day]) if day in GEORGIA else ""
+    if state == "WV" and day in WV_JSON:
+        return SOURCE, WAYBACK.format(WV_JSON[day][1], CLARITY_JSON.format(WV_JSON[day][0], "details"))
+    if state in ("GA", "WV"):
+        reports = GEORGIA if state == "GA" else WEST_VIRGINIA
+        return SOURCE, WAYBACK.format(*reports[day]) if day in reports else ""
     if state == "AZ":
         return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
     if state == "MT":
@@ -573,6 +590,8 @@ def fetch() -> None:
                 if state == "NC"
                 else [url, *(HAWAII_REPORTS.format(day.year, county) for county in ("cch", "coh", "cok", "com"))]
                 if state == "HI"
+                else [url, WAYBACK.format(WV_JSON[day][2], CLARITY_JSON.format(WV_JSON[day][0], "sum"))]
+                if state == "WV" and day in WV_JSON
                 else [url]
             ):
                 try:
@@ -580,7 +599,7 @@ def fetch() -> None:
                         SOURCE,
                         each,
                         suffix="." + each.rsplit(".", 1)[1]
-                        if state in ("CA", "UT")
+                        if state in ("CA", "UT", "WV")
                         else {
                             "WA": ".csv",
                             "FL": ".tsv",
@@ -1295,7 +1314,34 @@ def parse() -> None:
                         f"NC {day} {office} {answer}: counties add up to {votes}, not {totals[office, answer]}, skipped"
                     )
                     table = table.filter(pl.col("office") != office)
-        elif state == "GA":
+        elif state == "WV" and day in WV_JSON:
+            records = []
+            summary = {
+                contest["K"]: contest
+                for contest in json.loads(
+                    raw.cached(
+                        SOURCE, WAYBACK.format(WV_JSON[day][2], CLARITY_JSON.format(WV_JSON[day][0], "sum"))
+                    ).path.read_text()
+                )["Contests"]
+            }
+            for contest in json.loads(path.read_text())["Contests"]:
+                office = summary[contest["K"]]["C"]
+                if not re.search(r"(?i)amendment", office):
+                    continue
+                for index, (answer, total) in enumerate(
+                    zip(summary[contest["K"]]["CH"], summary[contest["K"]]["V"], strict=True)
+                ):
+                    if sum(votes[index] for votes in contest["V"]) != total:
+                        print(f"WV {day} {office} {answer}: counties do not add up to the total, skipped")
+                        continue
+                    for county, votes in zip(contest["P"], contest["V"], strict=True):
+                        records.append((county, office, answer, str(votes[index])))
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            )
+        elif state in ("GA", "WV"):
             records = []
             with zipfile.ZipFile(path) as archive:
                 root = ElementTree.fromstring(archive.read("detail.xml"))
@@ -1310,7 +1356,9 @@ def parse() -> None:
                             county.get("votes") or 0
                         )
                     if sum(counties.values()) != int(choice.get("totalVotes") or -1):
-                        print(f"GA {day} {office} {choice.get('text')}: counties do not add up to the total, skipped")
+                        print(
+                            f"{state} {day} {office} {choice.get('text')}: counties do not add up to the total, skipped"
+                        )
                         continue
                     for county, votes in counties.items():
                         records.append((county, office, choice.get("text"), str(votes)))
