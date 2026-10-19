@@ -160,6 +160,7 @@ HAWAII = {
     },
     date(2018, 11, 6): {"Constitutional Convention": "Hawaii Constitutional Convention Question"},
 }
+TENNESSEE = {date(2022, 11, 8): ("20240213031752", "20221108AllbyPrecinct.xlsx")}
 OHIO = {
     date(2022, 11, 8): ("20241007174602", "2022/gen/issues-summary.xlsx"),
     date(2023, 8, 8): ("20250314030933", "2023/spec/issues_summary.xlsx"),
@@ -341,6 +342,12 @@ DOCUMENTS = {
         "https://www.sos.arkansas.gov/elections/research/election-results",
         "the Arkansas Secretary of State's official results report",
     ),
+    "TN": (
+        "Tennessee Secretary of State",
+        "Election results by precinct",
+        "https://sos.tn.gov/elections/results",
+        "the Tennessee Secretary of State's official results by precinct, summed by county",
+    ),
     "OH": (
         "Ohio Secretary of State",
         "Official statewide issues summary by county",
@@ -421,6 +428,14 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, (
             f"https://elections.il.gov/Downloads/ElectionOperations/VoteTotals/{ILLINOIS[day]}GEOfficialVote.pdf"
             if day in ILLINOIS
+            else ""
+        )
+    if state == "TN":
+        return SOURCE, (
+            WAYBACK.format(
+                TENNESSEE[day][0], "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/" + TENNESSEE[day][1]
+            )
+            if day in TENNESSEE
             else ""
         )
     if state == "OH":
@@ -553,7 +568,9 @@ def fetch() -> None:
                         each,
                         suffix="." + each.rsplit(".", 1)[1]
                         if state in ("CA", "UT")
-                        else {"WA": ".csv", "FL": ".tsv", "OH": ".xlsx", "GA": ".zip"}.get(state, ".pdf"),
+                        else {"WA": ".csv", "FL": ".tsv", "OH": ".xlsx", "TN": ".xlsx", "GA": ".zip"}.get(
+                            state, ".pdf"
+                        ),
                     )
                 except httpx.HTTPStatusError as error:
                     print(f"{state} {day}: {error}")
@@ -653,6 +670,17 @@ def parse() -> None:
                 )
                 .filter(~total)
                 .drop("count")
+            )
+        elif state == "TN":
+            sheet = fastexcel.read_excel(path).load_sheet(0).to_polars()
+            table = pl.concat(
+                sheet.filter(pl.col("OFFICENAME").str.contains("(?i)amendment")).select(
+                    county="COUNTY",
+                    office="OFFICENAME",
+                    answer=f"RNAME{column}",
+                    votes=pl.col(f"PVTALLY{column}").cast(pl.Int64).cast(pl.String),
+                )
+                for column in (1, 2)
             )
         elif state == "OH":
             records = []
