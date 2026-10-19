@@ -1,8 +1,9 @@
+import html
 import json
 import re
 import subprocess
 import zipfile
-from datetime import date
+from datetime import UTC, date, datetime
 from difflib import SequenceMatcher
 from pathlib import Path
 from uuid import UUID
@@ -145,6 +146,7 @@ WYOMING = {
 }
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
 ARKANSAS = {date(2024, 11, 5): "GE2024_report.pdf"}
+NORTH_DAKOTA = {date(2022, 11, 8): "&eid=326", date(2024, 11, 5): ""}
 NEBRASKA = {
     date(2018, 11, 6): "2018/2018-general-election-official-results.pdf",
     date(2020, 11, 3): "2020/2020-General-Canvass-Book.pdf",
@@ -158,8 +160,10 @@ KENTUCKY = {
         {"sections 36, 42, and 55": "Constitutional Amendment 1", "Section 26A": "Constitutional Amendment 2"},
     ),
     date(2024, 11, 5): (
-        "https://elect.ky.gov/results/2020-2029/Documents/"
-        "2024%20General%20Election%20Certification%20as%20Amended%20on%20December%209th%202024.pdf",
+        (
+            "https://elect.ky.gov/results/2020-2029/Documents/"
+            "2024%20General%20Election%20Certification%20as%20Amended%20on%20December%209th%202024.pdf"
+        ),
         {"Sections 145 and 155": "Constitutional Amendment 1", "To give parents choices": "Constitutional Amendment 2"},
     ),
 }
@@ -304,6 +308,12 @@ DOCUMENTS = {
         "https://www.sos.arkansas.gov/elections/research/election-results",
         "the Arkansas Secretary of State's official results report",
     ),
+    "ND": (
+        "North Dakota Secretary of State",
+        "Official election results, statewide measures by county",
+        "https://results.sos.nd.gov/",
+        "the North Dakota Secretary of State's official results by county",
+    ),
     "NE": (
         "Nebraska Secretary of State",
         "Official report of the Board of State Canvassers",
@@ -359,6 +369,12 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, (
             f"https://elections.il.gov/Downloads/ElectionOperations/VoteTotals/{ILLINOIS[day]}GEOfficialVote.pdf"
             if day in ILLINOIS
+            else ""
+        )
+    if state == "ND":
+        return SOURCE, (
+            "https://results.sos.nd.gov/resultsSW.aspx?text=BQ&type=SW&map=CTY" + NORTH_DAKOTA[day]
+            if day in NORTH_DAKOTA
             else ""
         )
     if state == "AR":
@@ -423,6 +439,42 @@ def fetch() -> None:
             raw.fetch(SOURCE, la_sos.blob(day, "Votes_Multiparish.htm"), suffix=".json")
             continue
         source, url = link(state, day)
+        if state == "ND" and url:
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                with httpx.Client(headers={"User-Agent": raw.USER_AGENT}, follow_redirects=True, timeout=300) as client:
+                    page = client.get(url).text
+                    fields = {
+                        name: html.unescape(value)
+                        for name, value in re.findall(
+                            r'<input type="hidden" name="([^"]+)" id="[^"]*" value="([^"]*)"', page
+                        )
+                    }
+                    for target, race in re.findall(
+                        r"__doPostBack\('([^']+)',''\)\" name=\"[^\"]+\" type=\"button\" class=\"export-button\" "
+                        r'value="County" raceid="(\d+)"',
+                        page,
+                    ):
+                        response = client.post(url, data=fields | {"__EVENTTARGET": target, "__EVENTARGUMENT": ""})
+                        response.raise_for_status()
+                        raw.store(
+                            SOURCE,
+                            f"{url}#{race}",
+                            response.content,
+                            suffix=".xlsx",
+                            retrieved_at=datetime.now(UTC),
+                            media_type=response.headers["content-type"].split(";")[0],
+                        )
+                    raw.store(
+                        SOURCE,
+                        url,
+                        page.encode(),
+                        suffix=".html",
+                        retrieved_at=datetime.now(UTC),
+                        media_type="text/html",
+                    )
+            continue
         if source == SOURCE and url:
             for each in [url, NCSBE + NORTH_CAROLINA[day][1]] if state == "NC" else [url]:
                 try:
@@ -514,6 +566,52 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "ND":
+            records = []
+            page = path.read_text()
+            for race in (
+                re.findall(r'value="County" raceid="(\d+)"', page)
+                if re.search(rf"Official\s+{day.year}\s+General", re.sub(r"<[^>]+>", " ", page))
+                else []
+            ):
+                sheet = (
+                    fastexcel.read_excel(raw.cached(SOURCE, f"{url}#{race}").path)
+                    .load_sheet(0, header_row=None)
+                    .to_polars()
+                )
+                cells = sheet.rows()
+                start = next(index for index, row in enumerate(cells) if row[1] == "County")
+                office, answers = cells[start][0].strip(), cells[start][3:]
+                for row in cells[start + 1 :]:
+                    if row[1] is None:
+                        continue
+                    county = "Total" if row[1] == "TOTALS" else row[1]
+                    if county == "Total" or elstats.plain(county) in names["ND"]:
+                        for answer, votes in zip(answers, row[3:], strict=True):
+                            records.append((county, office, str(answer).upper(), votes, None))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 54)
                 )
                 .filter(~total)
                 .drop("count")
@@ -1344,6 +1442,10 @@ def emit() -> Path:
             .filter(
                 (pl.col("tag") == pl.col("wtag"))
                 | (pl.col("office").replace_strict(NAMED_QUESTIONS, default=None) == pl.col("name"))
+                | (
+                    ("proposition " + pl.col("office").str.to_lowercase().str.strip_chars_end("."))
+                    == pl.col("name").str.to_lowercase().str.strip_chars_end(".")
+                )
                 | (pl.col("wtag").is_null() & (pl.col("ballot") == 1) & (pl.col("wballot") == 1))
             )
             .filter(pl.len().over("key") == 1, pl.len().over("state", "day", "office") == 1)
