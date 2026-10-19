@@ -8,11 +8,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import fl_sos, medsl, openelections
+from ea.sources.us import fl_sos, medsl, openelections, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.leg_canvass"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 IL_DOWNLOAD = "https://elections.il.gov/NewDocDisplay.aspx?{}"
 IL_PUBLISHER = "Illinois State Board of Elections"
@@ -67,6 +67,7 @@ IL_FILES = {
         "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZSMw8T%2bTP0Bu5MYScFngpt7DT1jIISrO8vbwEz2j1UaUFk4Ught6jyKPD0J6ZjQaef6%2fy5lLn0i%2brhqAS%2fOCDIRvrRtL96BN5g%3d%3d",
     ),
 }
+WA_DAYS = [held for held in wa_local.DAYS if held.month == 11 and held.year >= 2016]
 FL_RACES = {"STS": "senate", "STR": "house"}
 IL_OFFICE = re.compile(r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)")
 IL_CITIES = {"cityofchicago": "cook"}
@@ -178,6 +179,31 @@ def parse() -> None:
             orient="row",
         )
     )
+    for held in WA_DAYS:
+        race = pl.col("Race").str.strip_chars()
+        found = race.str.extract_groups(r"(?i)^legislative district (\d+) state (senator|representative pos\. (\d))$")
+        frames.append(
+            pl.read_csv(raw.cached(wa_local.SOURCE, wa_local.FILES[held]).path, infer_schema_length=0)
+            .with_columns(found=found)
+            .filter(pl.col("found").struct.field("1").is_not_null())
+            .select(
+                year=pl.lit(held.year),
+                chamber=pl.concat_str(
+                    pl.when(pl.col("found").struct.field("2").str.to_lowercase() == "senator")
+                    .then(pl.lit("senate"))
+                    .otherwise(pl.lit("house")),
+                    pl.col("found").struct.field("1").cast(pl.Int16).cast(pl.String),
+                    pl.col("found").struct.field("3"),
+                    pl.lit("gs" if held.year % 2 else "g"),
+                    separator=":",
+                    ignore_nulls=True,
+                ),
+                state=pl.lit("WA"),
+                code=pl.col("County").str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips["WA"]),
+                candidate=pl.col("Candidate").str.strip_chars().str.to_uppercase(),
+                votes=pl.col("Votes").cast(pl.Int64),
+            )
+        )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.concat(frames, how="vertical_relaxed")
@@ -203,8 +229,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Florida's and Illinois's state legislative general elections by county, 2000–2022, from the "
-            "Division of Elections' results extracts and the State Board of Elections' vote totals",
+            summary="Florida's, Illinois's, and Washington's state legislative general elections by county, 2000–2025, "
+            "from the Division of Elections' results extracts, the State Board of Elections' vote totals, and the "
+            "Secretary of State's county results exports",
             polity="US",
         )
         covered = {
@@ -224,10 +251,12 @@ def emit() -> Path:
         sources = {
             "FL": cs.source(fl_sos.PUBLISHER, fl_sos.TITLE),
             "IL": cs.source(IL_PUBLISHER, IL_TITLE),
+            "WA": cs.source(wa_local.PUBLISHER, wa_local.TITLE),
         }
         for state, publisher, title, url in (
             ("FL", fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
             ("IL", IL_PUBLISHER, IL_TITLE, "https://www.elections.il.gov/ElectionOperations/DownloadVoteTotals.aspx"),
+            ("WA", wa_local.PUBLISHER, wa_local.TITLE, "https://results.vote.wa.gov/results/"),
         ):
             if sources[state] in cs.minted:
                 cs.add(
@@ -244,6 +273,8 @@ def emit() -> Path:
                 raw.cached(fl_sos.SOURCE if held.year < 2015 else SOURCE, fl_sos.EXTRACT.format(day=held)),
                 sources["FL"],
             )
+        for held in WA_DAYS:
+            cs.artifact(raw.cached(wa_local.SOURCE, wa_local.FILES[held]), sources["WA"])
         for files in IL_FILES.values():
             for token in files:
                 cs.artifact(raw.cached(SOURCE, IL_DOWNLOAD.format(token)), sources["IL"])
