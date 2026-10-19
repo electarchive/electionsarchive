@@ -10,11 +10,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import fl_sos, la_sos, medsl, nj_sos, openelections, wa_local
+from ea.sources.us import fl_sos, in_local, la_sos, medsl, nj_sos, openelections, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.leg_canvass"
-VERSION = "5"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 IL_DOWNLOAD = "https://elections.il.gov/NewDocDisplay.aspx?{}"
 IL_PUBLISHER = "Illinois State Board of Elections"
@@ -101,6 +101,10 @@ NJ_UNITS = [
     "nineteenth",
 ]
 NJ_TENS = {"twentieth": 20, "thirtieth": 30, "fortieth": 40, "twenty": 20, "thirty": 30, "forty": 40}
+KS_HOUSE = (
+    "https://sos.ks.gov/elections/22elec/2022-General-Election-Kansas-House-of-Representatives-Results-By-Precinct.xlsx"
+)
+IN_YEARS = [2018, 2020, 2022, 2024]
 LA_DAYS = [date(2019, 10, 12), date(2019, 11, 16), date(2023, 10, 14), date(2023, 11, 18)]
 LA_FILES = ["Votes_Multiparish.htm", "RacesCandidates_Multiparish.htm"] + [
     f"VotesParish/Votes_{parish}.htm" for parish in la_sos.PARISHES
@@ -125,6 +129,7 @@ def fetch() -> None:
     for paths in NJ_FILES.values():
         for path in paths:
             raw.fetch(SOURCE, nj_sos.RESULTS + path, suffix=".pdf")
+    raw.fetch(SOURCE, KS_HOUSE, suffix=".xlsx")
     for held in LA_DAYS:
         for name in LA_FILES:
             raw.fetch(SOURCE, la_sos.blob(held, name), suffix=".json")
@@ -355,6 +360,77 @@ def parse() -> None:
             orient="row",
         ).with_columns(year=pl.col("day").dt.year().cast(pl.Int32), state=pl.lit("LA"))
     )
+    for year in IN_YEARS:
+        frame = pl.read_csv(
+            raw.cached(in_local.SOURCE, in_local.FILES.format(year=year)).path,
+            infer_schema=False,
+            encoding="utf8-lossy",
+        )
+        frame.columns = [column.replace(" ", "").lstrip("\ufeff") for column in frame.columns]
+        frames.append(
+            frame.filter(
+                pl.col("OfficeCategory").is_in(["State Representative", "State Senator"]),
+                ~pl.col("Office").str.contains("(?i)unexpired|special"),
+            ).select(
+                year=pl.lit(year),
+                chamber=pl.concat_str(
+                    pl.when(pl.col("OfficeCategory") == "State Senator")
+                    .then(pl.lit("senate"))
+                    .otherwise(pl.lit("house")),
+                    pl.col("Office").str.extract(r"District 0*(\d+)"),
+                    pl.lit("g"),
+                    separator=":",
+                ),
+                state=pl.lit("IN"),
+                code=pl.col("ReportingCountyName")
+                .str.to_lowercase()
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict(fips["IN"]),
+                candidate=pl.col("NameonBallot").str.strip_chars().str.to_uppercase(),
+                votes=pl.col("TotalVotes").cast(pl.Int64),
+            )
+        )
+    sheets = pl.read_excel(raw.cached(SOURCE, KS_HOUSE).path, sheet_id=0, infer_schema_length=0)
+    rows = [
+        (
+            int(re.search(r"(\d+)$", race)[1]),
+            county,
+            re.sub(r"^(.*?),\s*(.*)$", r"\2 \1", candidate),
+            int(votes),
+        )
+        for county, race, candidate, votes in sheets.pop("KSHouse")
+        .select("County", "Race", "Candidate", "Votes")
+        .iter_rows()
+        if votes is not None and race is not None
+    ]
+    for county, sheet in sheets.items():
+        names = sheet.row(0)
+        for column, name in zip(sheet.columns, names, strict=True):
+            if found := re.search(r"(\d+)(?:st|nd|rd|th) District", column):
+                rows.extend(
+                    (
+                        int(found[1]),
+                        county,
+                        re.sub(r"^(REP|DEM|LIB|IND)\s+", "", name),
+                        int(votes),
+                    )
+                    for code, votes in sheet.select("PRECINCT CODE", column).slice(1).iter_rows()
+                    if code is not None and code.isdigit() and votes is not None
+                )
+    frames.append(
+        pl.DataFrame(
+            rows,
+            schema={"district": pl.Int16, "county": pl.String, "candidate": pl.String, "votes": pl.Int64},
+            orient="row",
+        ).select(
+            year=pl.lit(2022),
+            chamber=pl.concat_str(pl.lit("house:"), pl.col("district").cast(pl.String), pl.lit(":g")),
+            state=pl.lit("KS"),
+            code=pl.col("county").str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips["KS"]),
+            candidate=pl.col("candidate").str.strip_chars().str.to_uppercase(),
+            votes="votes",
+        )
+    )
     for held in WA_DAYS:
         race = pl.col("Race").str.strip_chars()
         found = race.str.extract_groups(r"(?i)^legislative district (\d+) state (senator|representative pos\. (\d))$")
@@ -430,6 +506,8 @@ def emit() -> Path:
             "WA": cs.source(wa_local.PUBLISHER, wa_local.TITLE),
             "NJ": cs.source(nj_sos.PUBLISHER, nj_sos.TITLE),
             "LA": cs.source(la_sos.PUBLISHER, la_sos.TITLE),
+            "IN": cs.source(in_local.PUBLISHER, in_local.TITLE),
+            "KS": cs.source("Kansas Secretary of State", "Election results"),
         }
         for state, publisher, title, url in (
             ("FL", fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
@@ -442,6 +520,13 @@ def emit() -> Path:
                 "https://www.nj.gov/state/elections/election-information-results.shtml",
             ),
             ("LA", la_sos.PUBLISHER, la_sos.TITLE, "https://voterportal.sos.la.gov/static/"),
+            ("IN", in_local.PUBLISHER, in_local.TITLE, "https://enr.indianavoters.in.gov/"),
+            (
+                "KS",
+                "Kansas Secretary of State",
+                "Election results",
+                "https://sos.ks.gov/elections/election-results.html",
+            ),
         ):
             if sources[state] in cs.minted:
                 cs.add(
@@ -458,6 +543,9 @@ def emit() -> Path:
                 raw.cached(fl_sos.SOURCE if held.year < 2015 else SOURCE, fl_sos.EXTRACT.format(day=held)),
                 sources["FL"],
             )
+        cs.artifact(raw.cached(SOURCE, KS_HOUSE), sources["KS"])
+        for year in IN_YEARS:
+            cs.artifact(raw.cached(in_local.SOURCE, in_local.FILES.format(year=year)), sources["IN"])
         for held in LA_DAYS:
             for name in LA_FILES:
                 cs.artifact(raw.cached(SOURCE, la_sos.blob(held, name)), sources["LA"])
