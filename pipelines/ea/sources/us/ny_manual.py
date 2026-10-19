@@ -18,7 +18,7 @@ from ea.changeset import Changeset
 from ea.store import DATA, connect
 
 SOURCE = "us.ny_manual"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 PUBLISHER = "New York Secretary of State"
@@ -26,12 +26,23 @@ ITEM = "https://archive.org/details/{item}"
 FILE = "https://archive.org/download/{item}/{item}.pdf"
 DIGITIZED = 8
 DERIVED = 1
+MANUAL = "Manual for the Use of the Legislature of the State of New York, {}"
 VOLUMES = {
-    1904: ("manualforuseofle00newy_12", 1905, date(1904, 11, 8), range(826, 847), True),
-    1906: ("manualforuseofle00newy_14", 1908, date(1906, 11, 6), range(858, 885), True),
-    1912: ("manualforuseofle1913newy", 1913, date(1912, 11, 5), range(722, 744), True),
-    1926: ("manualforuseofle0000robe", 1927, date(1926, 11, 2), range(897, 909), False),
+    1904: ("manualforuseofle00newy_12", MANUAL.format(1905), PUBLISHER, date(1904, 11, 8), range(826, 847), True),
+    1906: ("manualforuseofle00newy_14", MANUAL.format(1908), PUBLISHER, date(1906, 11, 6), range(858, 885), True),
+    1912: ("manualforuseofle1913newy", MANUAL.format(1913), PUBLISHER, date(1912, 11, 5), range(722, 744), True),
+    1918: (
+        "newyorkredbook1919unse",
+        "The New York Red Book, 1919",
+        "J. B. Lyon Company",
+        date(1918, 11, 5),
+        range(581, 589),
+        False,
+    ),
+    1926: ("manualforuseofle0000robe", MANUAL.format(1927), PUBLISHER, date(1926, 11, 2), range(897, 909), False),
 }
+
+MISPRINTED = {(1918, 16), (1918, 17), (1918, 18)}
 
 
 def _artifact(year: int) -> raw.Artifact:
@@ -87,7 +98,7 @@ def _tables(path: Path) -> list[dict[str, object]]:
 def parse() -> None:
     rows: list[dict[str, object]] = []
     failed: list[str] = []
-    for year, (_, _, _, pages, turned) in VOLUMES.items():
+    for year, (*_, pages, turned) in VOLUMES.items():
         book = _artifact(year)
         firsts = _tables(PARSED / "model" / f"{year}.txt")
         seconds = _tables(PARSED / "model" / f"{year}.v2.txt")
@@ -179,7 +190,9 @@ def parse() -> None:
                             (None if c == whole else totals[0], f"{columns[c]}: the column does not add up")
                         )
                 for _, problem in unbalanced:
-                    if all(r == totals[0] for r, _ in unbalanced):
+                    if (year, table["district"]) in MISPRINTED:
+                        print(f"{year} district {table['district']} {problem} (misprinted blank or whole, not emitted)")
+                    elif all(r == totals[0] for r, _ in unbalanced):
                         print(f"{year} district {table['district']} {problem} (misprinted total, not emitted)")
                     else:
                         failed.append(f"{year} district {table['district']} {problem}")
@@ -337,14 +350,13 @@ def emit() -> Path:
         PAGES.mkdir(parents=True, exist_ok=True)
         sources: dict[int, UUID] = {}
         pages: dict[tuple[int, int], tuple[UUID, int, int]] = {}
-        for year, (item, volume, _, numbers, turned) in VOLUMES.items():
-            title = f"Manual for the Use of the Legislature of the State of New York, {volume}"
-            sources[year] = cs.source(PUBLISHER, title)
+        for year, (item, title, publisher, _, numbers, turned) in VOLUMES.items():
+            sources[year] = cs.source(publisher, title)
             cs.add(
                 "source",
                 id=sources[year],
-                kind="official_body",
-                publisher=PUBLISHER,
+                kind="official_body" if publisher == PUBLISHER else "compendium",
+                publisher=publisher,
                 title=title,
                 url=ITEM.format(item=item),
                 license="Public domain",
@@ -369,7 +381,7 @@ def emit() -> Path:
                     height=height,
                 )
         for (year, district), lines in frame.group_by("year", "district", maintain_order=True):
-            day = VOLUMES[int(year)][2]
+            day = VOLUMES[int(year)][3]
             key = next(
                 (k for k in (f"{day}:NY:house:{district}", f"{day:%Y-%m}:NY:house:{district}") if k in contests), None
             )
