@@ -942,6 +942,15 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 [changeset_id, changeset_id],
             )
         conn.execute("update entity set retired_by = null where retired_by = %s", [changeset_id])
+        conn.execute(
+            """update area_geometry_history h set geom = coalesce(
+                 (select g.geom from area_geometry g
+                  where g.area_id = h.area_id and md5(st_asbinary(g.geom))::uuid = h.geom_md5 limit 1),
+                 (select o.geom from area_geometry_history o
+                  where o.area_id = h.area_id and o.geom_md5 = h.geom_md5 and o.geom is not null limit 1))
+               where h.superseded_by = %s and h.geom is null""",
+            [changeset_id],
+        )
         conn.execute("set local session_replication_role = replica")
         for table in histories:
             history = sql.Identifier(f"{table}_history")
