@@ -93,6 +93,7 @@ ALABAMA = {
     date(2016, 11, 8): "voter-pdfs/2016/2016-Official-General-Election-Results-Certified-2016-11-29.pdf",
     date(2018, 11, 6): "voter-pdfs/2018/2018-Official-General-Election-Results-Certified-2018-11-27.pdf",
     date(2020, 11, 3): "election-2020/Final%20Canvass%20of%20Results-Merged.pdf",
+    date(2024, 11, 5): "election-data/2024-12/2024-General%20Precinct%20Level%20Results.zip",
     date(2022, 11, 8): "election-data/2022-11/Final%20Canvass%20of%20Results%20%28canvassed%20by%20state%20canvassing"
     "%20board%2011-28-2022%29.pdf",
 }
@@ -117,6 +118,22 @@ GEORGIA = {
         "20210107083007",
         "https://results.enr.clarityelections.com//GA//105369/271927/reports/detailxml.zip",
     ),
+    date(2022, 11, 8): "https://results.sos.ga.gov/cdn/results/09378a07-e6cf-4f66-be7c-ca4aa534f99a/"
+    "Total%20Votes%20Results_7ceee513-d4c4-4b68-9397-68a73d22dc4f.xlsx",
+    date(2024, 11, 5): "https://results.sos.ga.gov/cdn/results/09378a07-e6cf-4f66-be7c-ca4aa534f99a/"
+    "Total%20Votes%20Results_3675bf50-5eeb-4407-b538-c04b909ccd08.xlsx",
+}
+SOUTH_CAROLINA = {date(2024, 11, 5): "https://www.enr-scvotes.org/SC/122436/359624/reports/detailxml.zip"}
+DISTRICT = {
+    date(2024, 11, 5): "https://electionresults.dcboe.org/Downloads/Reports/"
+    "November_5_2024_General_Election_Certified_Results.csv"
+}
+OKLAHOMA = [date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3), date(2024, 11, 5)]
+NEVADA = [date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3), date(2024, 11, 5)]
+MAINE = {
+    date(
+        2024, 11, 5
+    ): "https://www.maine.gov/sos/sites/maine.gov.sos/files/content/assets/State-20Referendum-20FINAL.xlsx"
 }
 WEST_VIRGINIA = {
     date(2024, 11, 5): (
@@ -158,7 +175,12 @@ WYOMING = {
     date(2024, 11, 5): "2024/Results/General/2024_General_Statewide_Constitutional_Amendment_Summary.pdf",
 }
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
-ARKANSAS = {date(2024, 11, 5): "GE2024_report.pdf"}
+ARKANSAS = {
+    date(2016, 11, 8): 1836,
+    date(2018, 11, 6): 1838,
+    date(2020, 11, 3): 1841,
+    date(2024, 11, 5): "GE2024_report.pdf",
+}
 HAWAII = {
     date(2016, 11, 8): {
         "Jury Trials in Civil Cases": "Hawaii Threshold of Financial Damage Required to Establish the Right to a Trial by "
@@ -368,6 +390,30 @@ DOCUMENTS = {
         "https://elections.ri.gov/elections/results/",
         "the Rhode Island Board of Elections' official results by precinct, summed by county",
     ),
+    "SC": (
+        "South Carolina Election Commission",
+        "Official election results",
+        "https://scvotes.gov/elections-statistics/election-results/",
+        "the South Carolina Election Commission's certified results by county",
+    ),
+    "DC": (
+        "District of Columbia Board of Elections",
+        "Certified election results",
+        "https://electionresults.dcboe.org/",
+        "the District of Columbia Board of Elections' certified results",
+    ),
+    "OK": (
+        "Oklahoma State Election Board",
+        "Official results, county level",
+        "https://results.okelections.gov/OKER/",
+        "the Oklahoma State Election Board's official county-level results",
+    ),
+    "NV": (
+        "Nevada Secretary of State",
+        "Official statewide general election results",
+        "https://www.nvsos.gov/sos/elections",
+        "the Nevada Secretary of State's official results by county",
+    ),
     "TN": (
         "Tennessee Secretary of State",
         "Election results by precinct",
@@ -444,9 +490,22 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
     if state == "WV" and day in WV_JSON:
         return SOURCE, WAYBACK.format(WV_JSON[day][1], CLARITY_JSON.format(WV_JSON[day][0], "details"))
-    if state in ("GA", "WV"):
-        reports = GEORGIA if state == "GA" else WEST_VIRGINIA
-        return SOURCE, WAYBACK.format(*reports[day]) if day in reports else ""
+    if state in ("GA", "WV", "SC", "DC"):
+        entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT}[state].get(day, "")
+        return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
+    if state == "OK":
+        return (
+            SOURCE,
+            f"https://results.okelections.gov/OKERS/enrapi/GetExtract/CLCSV/{day:%Y%m%d}" if day in OKLAHOMA else "",
+        )
+    if state == "NV":
+        return SOURCE, (
+            f"https://www.nvsos.gov/SOSelectionPages/results/{day.year}StateWideGeneral/ElectionSummary.aspx"
+            if day in NEVADA
+            else ""
+        )
+    if state == "ME" and day in MAINE:
+        return SOURCE, MAINE[day]
     if state == "AZ":
         return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
     if state == "MT":
@@ -495,7 +554,14 @@ def link(state: str, day: date) -> tuple[str, str]:
             else ""
         )
     if state == "AR":
-        return SOURCE, "https://www.sos.arkansas.gov/uploads/elections/" + ARKANSAS[day] if day in ARKANSAS else ""
+        entry = ARKANSAS.get(day, "")
+        return SOURCE, (
+            f"https://results.tally-enr.com/results/arkansas/{entry}/FullDataFile.json"
+            if isinstance(entry, int)
+            else "https://www.sos.arkansas.gov/uploads/elections/" + entry
+            if entry
+            else ""
+        )
     if state == "NE":
         return SOURCE, (
             "https://sos.nebraska.gov/sites/default/files/doc/elections/" + NEBRASKA[day] if day in NEBRASKA else ""
@@ -607,7 +673,7 @@ def fetch() -> None:
                         SOURCE,
                         each,
                         suffix="." + each.rsplit(".", 1)[1]
-                        if state in ("CA", "UT", "WV")
+                        if state in ("AL", "AR", "CA", "DC", "GA", "SC", "UT", "WV")
                         else {
                             "WA": ".csv",
                             "FL": ".tsv",
@@ -661,7 +727,7 @@ def parse() -> None:
                 .filter(~total)
                 .drop("count")
             )
-        elif state == "AL":
+        elif state == "AL" and path.suffix == ".pdf":
             records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             columns: list[tuple[str, str]] = []
@@ -940,6 +1006,47 @@ def parse() -> None:
                     )
                     & (total.sum().over("office", "answer") == 1)
                     & (pl.len().over("office", "answer") == 54)
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "AR" and path.suffix == ".json":
+            records = []
+            for contest in json.loads(path.read_text())["ContestData"]:
+                if not (heading := re.match(r"(?i)(Issue No\. \d+):", contest["ContestName"])):
+                    continue
+                office = heading[1].title()
+                for candidate in contest["Candidates"]:
+                    records.append(("Total", office, candidate["Name"], str(candidate["TotalVotes"]), None))
+                for county in contest["Counties"]:
+                    if elstats.plain(county["CountyName"]) in names["AR"]:
+                        for candidate in county["Candidates"]:
+                            records.append(
+                                (county["CountyName"], office, candidate["Name"], str(candidate["TotalVotes"]), None)
+                            )
+            table = (
+                pl.DataFrame(
+                    records,
+                    schema={
+                        "county": pl.String,
+                        "office": pl.String,
+                        "answer": pl.String,
+                        "votes": pl.String,
+                        "page": pl.Int64,
+                    },
+                    orient="row",
+                )
+                .group_by("county", "office", "answer", "page", maintain_order=True)
+                .agg(pl.col("votes").cast(pl.Int64).sum())
+                .with_columns(count=pl.col("votes"), votes=pl.col("votes").cast(pl.String))
+            )
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (pl.len().over("office", "answer") == 76)
                 )
                 .filter(~total)
                 .drop("count")
@@ -1348,7 +1455,112 @@ def parse() -> None:
                 schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
                 orient="row",
             )
-        elif state in ("GA", "WV"):
+        elif state == "GA" and path.suffix == ".xlsx":
+            workbook = fastexcel.read_excel(path)
+            sheet = workbook.load_sheet(
+                "County Results" if "County Results" in workbook.sheet_names else "Precinct Results"
+            ).to_polars()
+            table = (
+                sheet.rename({sheet.columns[0]: "County"})
+                .filter(pl.col("Office Name").str.contains("(?i)amendment|referendum"))
+                .select(
+                    county=pl.col("County").str.replace(r"(?i)\s+county$", ""),
+                    office="Office Name",
+                    answer="Ballot Name",
+                    votes=pl.col("Total").cast(pl.Int64).cast(pl.String),
+                )
+            )
+        elif state == "AL" and path.suffix == ".zip":
+            records = []
+            with zipfile.ZipFile(path) as archive:
+                for name in archive.namelist():
+                    county = re.sub(
+                        r"(?<=[a-z])(?=[A-Z])", " ", name.removeprefix("2024-General-").removesuffix(".xls")
+                    )
+                    sheet = fastexcel.read_excel(archive.read(name)).load_sheet(0, header_row=None).to_polars()
+                    for row in sheet.iter_rows():
+                        if re.search(r"(?i)statewide amendment", row[0] or "") and str(row[2]).strip() in ("Yes", "No"):
+                            office = re.sub(
+                                r"(?i)^.*?(amendment number \w+ \(\d+\)).*$", r"\1", str(row[0]).replace("\n", " ")
+                            ).title()
+                            records.append(
+                                (
+                                    county,
+                                    office,
+                                    str(row[2]).strip(),
+                                    str(sum(int(float(cell)) for cell in row[3:] if cell)),
+                                )
+                            )
+            table = (
+                pl.DataFrame(
+                    records,
+                    schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                    orient="row",
+                )
+                .group_by("county", "office", "answer")
+                .agg(pl.col("votes").cast(pl.Int64).sum().cast(pl.String))
+            )
+        elif state == "DC":
+            table = (
+                pl.read_csv(path, infer_schema=False)
+                .filter(pl.col("ContestName").str.contains("(?i)^initiative|^referendum"))
+                .group_by("ContestName", "Candidate")
+                .agg(pl.col("Votes").cast(pl.Int64).sum())
+                .select(
+                    fips=pl.lit("11001"),
+                    office=pl.col("ContestName").str.to_titlecase(),
+                    answer="Candidate",
+                    votes=pl.col("Votes").cast(pl.String),
+                )
+            )
+        elif state == "OK":
+            with zipfile.ZipFile(path) as archive:
+                table = (
+                    pl.read_csv(archive.read(archive.namelist()[0]), infer_schema=False, truncate_ragged_lines=True)
+                    .filter(pl.col("race_description").str.contains("^STATE QUESTION"))
+                    .select(
+                        county="county",
+                        office=pl.col("race_description").str.extract(r"^(STATE QUESTION NO\. \d+)").str.to_titlecase(),
+                        answer=pl.col("cand_name").str.extract(r"- (YES|NO)$"),
+                        votes="cand_tot_votes",
+                    )
+                )
+        elif state == "NV":
+            records = []
+            page = path.read_text(encoding="utf-8", errors="replace")
+            for number, body in re.findall(
+                r"(?is)<strong>\s*(?:state\s+)?(?:ballot\s+)?question\s+no\.\s*(\d+).*?<table[^>]*>(.*?)</table>", page
+            ):
+                headers = [
+                    re.sub(r"<[^>]+>|&nbsp;", "", cell).strip()
+                    for cell in re.findall(r"(?is)<th[^>]*>(.*?)</th>", body)
+                ]
+                for row in re.findall(r"(?is)<tr[^>]*>(.*?)</tr>", body):
+                    cells = [
+                        re.sub(r"<[^>]+>", "", cell).strip() for cell in re.findall(r"(?is)<td[^>]*>(.*?)</td>", row)
+                    ]
+                    if len(cells) != len(headers) or cells[0] not in ("YES", "NO"):
+                        continue
+                    for header, cell in zip(headers[2:], cells[2:], strict=True):
+                        county = "Total" if header == "Total Votes" else header
+                        records.append((county, f"Question {number}", cells[0], cell.replace(",", "")))
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            ).with_columns(count=pl.col("votes").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (pl.len().over("office", "answer") == 18)
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state in ("GA", "WV", "SC"):
             records = []
             with zipfile.ZipFile(path) as archive:
                 root = ElementTree.fromstring(archive.read("detail.xml"))
