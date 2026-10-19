@@ -146,6 +146,16 @@ WYOMING = {
 }
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
 ARKANSAS = {date(2024, 11, 5): "GE2024_report.pdf"}
+HAWAII = {
+    date(2016, 11, 8): {
+        "Jury Trials in Civil Cases": "Hawaii Threshold of Financial Damage Required to Establish the Right to a Trial by "
+        "Jury, Amendment 1",
+        "Disposition of Excess": "Hawaii General Fund Revenues Spent On Pension Liabilities and Bond Repayments, "
+        "Amendment 2",
+    },
+    date(2018, 11, 6): {"Constitutional Convention": "Hawaii Constitutional Convention Question"},
+}
+HAWAII_REPORTS = "https://files.hawaii.gov/elections/files/results/{}/general/{}.pdf"
 NORTH_DAKOTA = {date(2022, 11, 8): "&eid=326", date(2024, 11, 5): ""}
 NEBRASKA = {
     date(2018, 11, 6): "2018/2018-general-election-official-results.pdf",
@@ -185,6 +195,7 @@ NAMED_QUESTIONS = {
     "NONPARTISAN JUDICIAL MERIT COMMISSION": "North Carolina Judicial Selection for Midterm Vacancies Amendment",
     "BIPARTISAN BOARD OF ETHICS AND ELECTIONS": "North Carolina Legislative Appointments to Elections Board Amendment",
     "Constitution Of Alabama Of 2022": "Constitution of Alabama of 2022",
+    **{office: office for offices in HAWAII.values() for office in offices.values()},
 }
 CALIFORNIA = {
     date(2012, 6, 5): "2012-primary/123-ballot-measures-formatted.xls",
@@ -308,6 +319,12 @@ DOCUMENTS = {
         "https://www.sos.arkansas.gov/elections/research/election-results",
         "the Arkansas Secretary of State's official results report",
     ),
+    "HI": (
+        "Hawaii Office of Elections",
+        "Final summary reports, statewide and by county",
+        "https://elections.hawaii.gov/election-results/",
+        "the Hawaii Office of Elections' final summary reports",
+    ),
     "ND": (
         "North Dakota Secretary of State",
         "Official election results, statewide measures by county",
@@ -371,6 +388,8 @@ def link(state: str, day: date) -> tuple[str, str]:
             if day in ILLINOIS
             else ""
         )
+    if state == "HI":
+        return SOURCE, HAWAII_REPORTS.format(day.year, "histatewide") if day in HAWAII else ""
     if state == "ND":
         return SOURCE, (
             "https://results.sos.nd.gov/resultsSW.aspx?text=BQ&type=SW&map=CTY" + NORTH_DAKOTA[day]
@@ -476,7 +495,13 @@ def fetch() -> None:
                     )
             continue
         if source == SOURCE and url:
-            for each in [url, NCSBE + NORTH_CAROLINA[day][1]] if state == "NC" else [url]:
+            for each in (
+                [url, NCSBE + NORTH_CAROLINA[day][1]]
+                if state == "NC"
+                else [url, *(HAWAII_REPORTS.format(day.year, county) for county in ("cch", "coh", "cok", "com"))]
+                if state == "HI"
+                else [url]
+            ):
                 try:
                     raw.fetch(
                         SOURCE,
@@ -566,6 +591,62 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "HI":
+            records = []
+            for county, report in [
+                ("Total", path),
+                *(
+                    (name, raw.cached(SOURCE, HAWAII_REPORTS.format(day.year, code)).path)
+                    for name, code in (("Honolulu", "cch"), ("Hawaii", "coh"), ("Kauai", "cok"), ("Maui", "com"))
+                ),
+            ]:
+                text = subprocess.run(
+                    ["pdftotext", "-raw", str(report), "-"], capture_output=True, text=True, check=True
+                )
+                for number, page in enumerate(text.stdout.split("\f"), start=1):
+                    lines = page.splitlines()
+                    for index, line in enumerate(lines):
+                        office = next((office for phrase, office in HAWAII[day].items() if phrase in line), None)
+                        if office is None:
+                            continue
+                        for answer in ("YES", "NO"):
+                            votes = next(
+                                (
+                                    matched[1] or matched[2]
+                                    for following in lines[index + 1 : index + 6]
+                                    if (
+                                        matched := re.fullmatch(
+                                            rf"{answer} ([\d,]+) [\d.]+%|([\d,]+) [\d.]+% {answer}", following.strip()
+                                        )
+                                    )
+                                ),
+                                None,
+                            )
+                            if votes is not None:
+                                records.append((county, office, answer, votes, number))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 5)
                 )
                 .filter(~total)
                 .drop("count")
