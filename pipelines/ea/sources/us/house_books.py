@@ -644,9 +644,10 @@ def emit(source: ModuleType) -> Path:
             for (year, county), districts in frame.group_by("year", "county")
             if districts["district"].n_unique() > 1 or _plain(str(county)) == "cook"
         }
+        parts: set[str] = set()
         for (year, district), lines in frame.group_by("year", "district", maintain_order=True):
             day = source.VOLUMES[int(year)][2]
-            key = f"{day}:{source.STATE}:house:{district}"
+            key = getattr(source, "KEYS", {}).get((int(year), int(district)), f"{day}:{source.STATE}:house:{district}")
             if key not in contests:
                 print(f"{year} district {district}: no contest")
                 continue
@@ -757,8 +758,11 @@ def emit(source: ModuleType) -> Path:
             for county in lines["county"].unique(maintain_order=True):
                 code, parent, area = counties[_plain(county)]
                 if (int(year), county) in split:
-                    part = f"{year}:{code}:{district}"
+                    part = f"{year}:{code}:{key.split(':')[3]}"
                     units[county] = cs.unit("us.county_part", part)
+                    if part in parts:
+                        continue
+                    parts.add(part)
                     cs.add(
                         "reporting_unit",
                         id=units[county],
