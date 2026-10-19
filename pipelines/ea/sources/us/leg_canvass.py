@@ -1,6 +1,7 @@
 import csv
 import io
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -8,11 +9,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import fl_sos, medsl, openelections, wa_local
+from ea.sources.us import fl_sos, medsl, nj_sos, openelections, wa_local
 from ea.store import DATA, connect
 
 SOURCE = "us.leg_canvass"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 IL_DOWNLOAD = "https://elections.il.gov/NewDocDisplay.aspx?{}"
 IL_PUBLISHER = "Illinois State Board of Elections"
@@ -68,6 +69,37 @@ IL_FILES = {
     ),
 }
 WA_DAYS = [held for held in wa_local.DAYS if held.month == 11 and held.year >= 2016]
+NJ_FILES = {
+    year: [f"{year}/{year}-official-general-results-{body}.pdf" for body in bodies]
+    for year, bodies in (
+        (2019, ["general-assembly"]),
+        (2021, ["general-assembly", "state-senate"]),
+        (2023, ["general-assembly", "state-senate"]),
+        (2025, ["general-assembly"]),
+    )
+}
+NJ_UNITS = [
+    "first",
+    "second",
+    "third",
+    "fourth",
+    "fifth",
+    "sixth",
+    "seventh",
+    "eighth",
+    "ninth",
+    "tenth",
+    "eleventh",
+    "twelfth",
+    "thirteenth",
+    "fourteenth",
+    "fifteenth",
+    "sixteenth",
+    "seventeenth",
+    "eighteenth",
+    "nineteenth",
+]
+NJ_TENS = {"twentieth": 20, "thirtieth": 30, "fortieth": 40, "twenty": 20, "thirty": 30, "forty": 40}
 FL_RACES = {"STS": "senate", "STR": "house"}
 IL_OFFICE = re.compile(r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)")
 IL_CITIES = {"cityofchicago": "cook"}
@@ -85,6 +117,9 @@ def fetch() -> None:
     for files in IL_FILES.values():
         for token in files:
             raw.fetch(SOURCE, IL_DOWNLOAD.format(token), suffix=".txt")
+    for paths in NJ_FILES.values():
+        for path in paths:
+            raw.fetch(SOURCE, nj_sos.RESULTS + path, suffix=".pdf")
 
 
 def parse() -> None:
@@ -179,6 +214,67 @@ def parse() -> None:
             orient="row",
         )
     )
+    counties = sorted((county.upper() for county in nj_sos.COUNTIES), key=len, reverse=True)
+    rows = []
+    for year, paths in NJ_FILES.items():
+        for path in paths:
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, nj_sos.RESULTS + path).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout
+            district, name, votes = None, None, {}
+            for line in text.splitlines():
+                if found := re.match(r"\s*([A-Za-z-]+) Legislative District", line):
+                    parts = found[1].lower().split("-")
+                    district = (
+                        NJ_TENS[parts[0]] + (NJ_UNITS.index(parts[1]) + 1 if len(parts) > 1 else 0)
+                        if parts[0] in NJ_TENS
+                        else NJ_UNITS.index(parts[0]) + 1
+                    )
+                    name = None
+                elif found := re.match(r"\s+Total\s+([\d,]+)\s*$", line):
+                    if name is not None and votes:
+                        if sum(votes.values()) != int(found[1].replace(",", "")):
+                            raise ValueError(f"{path}: {name}'s counties don't add up to the total")
+                        rows.extend(
+                            (
+                                year,
+                                f"{'senate' if 'senate' in path else 'general-assembly'}:{district}:g",
+                                "NJ",
+                                fips["NJ"][re.sub(r"[^a-z]", "", county.lower())],
+                                name,
+                                count,
+                            )
+                            for county, count in votes.items()
+                        )
+                    name, votes = None, {}
+                elif re.match(r"\S", line) and district and not re.match(r"(Name|Counties|\d\d/\d\d/\d{4})\b", line):
+                    name = (
+                        name
+                        or re.sub(
+                            r"\s*(\(w\)|\*|\s\d+[A-Z]?\s|\sP\.?\s?O\.?\s).*$", "", re.split(r"\s{2,}", line)[0]
+                        ).upper()
+                    )
+                elif len(line) - len(line.lstrip()) >= 50:
+                    county = next((county for county in counties if line.strip().startswith(county + " ")), None)
+                    if county and (found := re.search(r"([\d,]+)$", line.strip())):
+                        votes[county] = votes.get(county, 0) + int(found[1].replace(",", ""))
+    frames.append(
+        pl.DataFrame(
+            rows,
+            schema={
+                "year": pl.Int32,
+                "chamber": pl.String,
+                "state": pl.String,
+                "code": pl.String,
+                "candidate": pl.String,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        )
+    )
     for held in WA_DAYS:
         race = pl.col("Race").str.strip_chars()
         found = race.str.extract_groups(r"(?i)^legislative district (\d+) state (senator|representative pos\. (\d))$")
@@ -229,9 +325,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Florida's, Illinois's, and Washington's state legislative general elections by county, 2000–2025, "
-            "from the Division of Elections' results extracts, the State Board of Elections' vote totals, and the "
-            "Secretary of State's county results exports",
+            summary="Florida's, Illinois's, Washington's, and New Jersey's state legislative general elections by county, "
+            "2000–2025, from the Division of Elections' results extracts, the State Board of Elections' vote totals, "
+            "the Secretary of State's county results exports, and the Division of Elections' official results",
             polity="US",
         )
         covered = {
@@ -252,11 +348,18 @@ def emit() -> Path:
             "FL": cs.source(fl_sos.PUBLISHER, fl_sos.TITLE),
             "IL": cs.source(IL_PUBLISHER, IL_TITLE),
             "WA": cs.source(wa_local.PUBLISHER, wa_local.TITLE),
+            "NJ": cs.source(nj_sos.PUBLISHER, nj_sos.TITLE),
         }
         for state, publisher, title, url in (
             ("FL", fl_sos.PUBLISHER, fl_sos.TITLE, "https://results.elections.myflorida.com/"),
             ("IL", IL_PUBLISHER, IL_TITLE, "https://www.elections.il.gov/ElectionOperations/DownloadVoteTotals.aspx"),
             ("WA", wa_local.PUBLISHER, wa_local.TITLE, "https://results.vote.wa.gov/results/"),
+            (
+                "NJ",
+                nj_sos.PUBLISHER,
+                nj_sos.TITLE,
+                "https://www.nj.gov/state/elections/election-information-results.shtml",
+            ),
         ):
             if sources[state] in cs.minted:
                 cs.add(
@@ -273,6 +376,9 @@ def emit() -> Path:
                 raw.cached(fl_sos.SOURCE if held.year < 2015 else SOURCE, fl_sos.EXTRACT.format(day=held)),
                 sources["FL"],
             )
+        for paths in NJ_FILES.values():
+            for path in paths:
+                cs.artifact(raw.cached(SOURCE, nj_sos.RESULTS + path), sources["NJ"])
         for held in WA_DAYS:
             cs.artifact(raw.cached(wa_local.SOURCE, wa_local.FILES[held]), sources["WA"])
         for files in IL_FILES.values():
