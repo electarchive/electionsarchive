@@ -168,7 +168,12 @@ HAWAII = {
     },
     date(2018, 11, 6): {"Constitutional Convention": "Hawaii Constitutional Convention Question"},
 }
-RHODE_ISLAND = {date(2020, 11, 3): ("20201207151320", "2020/RIGEN20.xlsx")}
+RHODE_ISLAND = {
+    date(2018, 11, 6): "2022-02/rigen18-11.28.xlsx",
+    date(2020, 11, 3): ("20201207151320", "2020/RIGEN20.xlsx"),
+    date(2022, 11, 8): "2023-06/RIGEN22%20%282%29.xlsx",
+    date(2024, 11, 5): "2025-01/Gen24EX%20%281%29.xlsx",
+}
 TENNESSEE = {date(2022, 11, 8): ("20240213031752", "20221108AllbyPrecinct.xlsx")}
 OHIO = {
     date(2022, 11, 8): ("20241007174602", "2022/gen/issues-summary.xlsx"),
@@ -455,9 +460,12 @@ def link(state: str, day: date) -> tuple[str, str]:
             else ""
         )
     if state == "RI":
+        entry = RHODE_ISLAND.get(day, "")
         return SOURCE, (
-            WAYBACK.format(RHODE_ISLAND[day][0], "https://elections.ri.gov/elections/results/" + RHODE_ISLAND[day][1])
-            if day in RHODE_ISLAND
+            "https://elections.ri.gov/sites/g/files/xkgbur756/files/" + entry
+            if isinstance(entry, str) and entry
+            else WAYBACK.format(entry[0], "https://elections.ri.gov/elections/results/" + entry[1])
+            if entry
             else ""
         )
     if state == "TN":
@@ -716,19 +724,18 @@ def parse() -> None:
             towns: dict[str, str] = {}
             for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
                 towns.setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
-            table = (
-                fastexcel.read_excel(path)
-                .load_sheet(0)
-                .to_polars()
-                .select(
-                    fips=pl.col("City/Town")
-                    .str.replace(r"(\s+Limited)?(\s*\d+)?$", "")
-                    .map_elements(elstats.plain, return_dtype=pl.String)
-                    .replace_strict(towns, default=None),
-                    office=pl.col("Contest"),
-                    answer=pl.col("Candidate").replace({"Approve": "Approved", "Reject": "Rejected"}),
-                    votes=pl.col("Total").cast(pl.Int64).cast(pl.String),
-                )
+            workbook = fastexcel.read_excel(path)
+            sheet = workbook.load_sheet(
+                "Candidate_Breakout" if "Candidate_Breakout" in workbook.sheet_names else 0
+            ).to_polars()
+            table = sheet.rename({sheet.columns[0]: "City/Town", "Total Votes": "Total"}, strict=False).select(
+                fips=pl.col("City/Town")
+                .str.replace(r"(\s+Limited)?(\s*\d+)?$", "")
+                .map_elements(elstats.plain, return_dtype=pl.String)
+                .replace_strict(towns, default=None),
+                office=pl.col("Contest"),
+                answer=pl.col("Candidate").replace({"Approve": "Approved", "Reject": "Rejected"}),
+                votes=pl.col("Total").cast(pl.Int64).cast(pl.String),
             )
         elif state == "TN":
             sheet = fastexcel.read_excel(path).load_sheet(0).to_polars()
@@ -1695,10 +1702,10 @@ def emit() -> Path:
             conn.execute(
                 """select x.value, substr(p.iso_code, 4), e.date_from, rs.id::text, rs.election_id::text,
                           rs.contest_id::text, rs.stage, rs.kind, rs.source_id::text, rs.completeness::float8,
-                          max(o.id::text) filter (where upper(o.ballot_label) in ('YES', 'FOR')),
-                          max(o.id::text) filter (where upper(o.ballot_label) in ('NO', 'AGAINST')),
-                          sum(v.value) filter (where upper(o.ballot_label) in ('YES', 'FOR'))::bigint,
-                          sum(v.value) filter (where upper(o.ballot_label) in ('NO', 'AGAINST'))::bigint,
+                          max(o.id::text) filter (where upper(o.ballot_label) in ('YES', 'FOR', 'APPROVE', 'APPROVED')),
+                          max(o.id::text) filter (where upper(o.ballot_label) in ('NO', 'AGAINST', 'REJECT', 'REJECTED')),
+                          sum(v.value) filter (where upper(o.ballot_label) in ('YES', 'FOR', 'APPROVE', 'APPROVED'))::bigint,
+                          sum(v.value) filter (where upper(o.ballot_label) in ('NO', 'AGAINST', 'REJECT', 'REJECTED'))::bigint,
                           (select min(n.text) from name n where n.entity_id = c.id), s.publisher
                    from contest c
                    join election e on e.id = c.election_id join polity p on p.id = e.polity_id
@@ -1796,6 +1803,7 @@ def emit() -> Path:
             .filter(
                 (pl.col("tag") == pl.col("wtag"))
                 | (pl.col("office").replace_strict(NAMED_QUESTIONS, default=None) == pl.col("name"))
+                | (pl.col("office").str.to_lowercase() == pl.col("name").str.to_lowercase())
                 | (
                     ("proposition " + pl.col("office").str.to_lowercase().str.strip_chars_end("."))
                     == pl.col("name").str.to_lowercase().str.strip_chars_end(".")
