@@ -186,7 +186,14 @@ MASSACHUSETTS = (
     "Precinct rows of the Secretary of the Commonwealth's election statistics archive for this question. Each "
     "answer's precinct rows add up to the totals of this question's default results{counties}."
 )
-OR_RECORDS = {date(2020, 11, 3): 7879432}
+OR_RECORDS = {
+    date(2012, 11, 6): 5993047,
+    date(2014, 11, 4): 5993052,
+    date(2016, 11, 8): 6570960,
+    date(2018, 1, 23): 7132821,
+    date(2018, 11, 6): 7132820,
+    date(2020, 11, 3): 7879432,
+}
 OR_2024 = {
     "Baker": 10575038,
     "Benton": 10575039,
