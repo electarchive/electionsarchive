@@ -64,6 +64,7 @@ UTAH = {
         "2025",
         "https://vote.utah.gov/wp-content/uploads/2021/02/2020-General-Election-Statewide-Canvass.xlsx",
     ),
+    date(2024, 11, 5): "https://vote.utah.gov/wp-content/uploads/2025/02/2024-General-Election-Statewide-Canvass-2.pdf",
 }
 OREGON = {
     date(2012, 11, 6): ("20150430200315", "results-11-2012.pdf"),
@@ -406,7 +407,8 @@ def replaceable(conn) -> list[tuple[str, date]]:
 
 def link(state: str, day: date) -> tuple[str, str]:
     if state == "UT":
-        return SOURCE, WAYBACK.format(*UTAH[day]) if day in UTAH else ""
+        entry = UTAH.get(day, "")
+        return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
     if state == "GA":
         return SOURCE, WAYBACK.format(*GEORGIA[day]) if day in GEORGIA else ""
     if state == "AZ":
@@ -550,10 +552,8 @@ def fetch() -> None:
                         SOURCE,
                         each,
                         suffix="." + each.rsplit(".", 1)[1]
-                        if state == "CA"
-                        else {"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "OH": ".xlsx", "GA": ".zip"}.get(
-                            state, ".pdf"
-                        ),
+                        if state in ("CA", "UT")
+                        else {"WA": ".csv", "FL": ".tsv", "OH": ".xlsx", "GA": ".zip"}.get(state, ".pdf"),
                     )
                 except httpx.HTTPStatusError as error:
                     print(f"{state} {day}: {error}")
@@ -585,7 +585,21 @@ def parse() -> None:
             path = raw.cached(source, url).path
         except LookupError:
             continue
-        if state == "AL":
+        if (model := PARSED / "model" / f"{state.lower()}-{day.year}.json").exists():
+            total = pl.col("county").str.to_uppercase() == "TOTAL"
+            table = (
+                pl.DataFrame(json.loads(model.read_text()))
+                .with_columns(count=pl.col("votes").cast(pl.Int64), digitized=pl.lit(True))
+                .filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & total.any().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "AL":
             records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             columns: list[tuple[str, str]] = []
@@ -1238,8 +1252,7 @@ def parse() -> None:
                 orient="row",
             )
         elif state == "AZ":
-            model = PARSED / "model" / f"az-{day.year}.json"
-            records = [tuple(row.values()) for row in json.loads(model.read_text())] if model.exists() else []
+            records = []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             for number, page in enumerate(text.stdout.split("\f"), start=1):
                 counties: list[str] = []
@@ -1273,7 +1286,6 @@ def parse() -> None:
             ).with_columns(
                 winner=pl.col("winner").drop_nulls().first().over("office"),
                 count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
-                digitized=pl.lit(model.exists()),
             )
             total = pl.col("county").str.to_uppercase() == "TOTAL"
             table = (
