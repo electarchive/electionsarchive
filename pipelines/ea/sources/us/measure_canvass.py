@@ -155,6 +155,13 @@ HAWAII = {
     },
     date(2018, 11, 6): {"Constitutional Convention": "Hawaii Constitutional Convention Question"},
 }
+OHIO = {
+    date(2022, 11, 8): ("20241007174602", "2022/gen/issues-summary.xlsx"),
+    date(2023, 8, 8): ("20250314030933", "2023/spec/issues_summary.xlsx"),
+    date(2023, 11, 7): ("20240401063409", "2023/gen/issues-summary.xlsx"),
+    date(2024, 11, 5): ("20250306194809", "2024/gen/official/issue-summary.xlsx"),
+    date(2025, 5, 6): ("20250621212835", "2025/pri/issues-final-summary.xlsx"),
+}
 SOUTH_DAKOTA = {
     date(2020, 11, 3): "2020%20Assests/2020GeneralStateCanvassFinal%26Certificate.pdf",
     date(2022, 11, 8): "2022%20Assets/2022Generalcanvassreport.pdf",
@@ -324,6 +331,12 @@ DOCUMENTS = {
         "https://www.sos.arkansas.gov/elections/research/election-results",
         "the Arkansas Secretary of State's official results report",
     ),
+    "OH": (
+        "Ohio Secretary of State",
+        "Official statewide issues summary by county",
+        "https://www.ohiosos.gov/elections/election-results-and-data/",
+        "the Ohio Secretary of State's official statewide issues summary",
+    ),
     "SD": (
         "South Dakota Secretary of State",
         "Official state canvass report",
@@ -397,6 +410,12 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, (
             f"https://elections.il.gov/Downloads/ElectionOperations/VoteTotals/{ILLINOIS[day]}GEOfficialVote.pdf"
             if day in ILLINOIS
+            else ""
+        )
+    if state == "OH":
+        return SOURCE, (
+            WAYBACK.format(OHIO[day][0], "https://www.ohiosos.gov/globalassets/elections/" + OHIO[day][1])
+            if day in OHIO
             else ""
         )
     if state == "SD":
@@ -523,7 +542,9 @@ def fetch() -> None:
                         each,
                         suffix="." + each.rsplit(".", 1)[1]
                         if state == "CA"
-                        else {"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "GA": ".zip"}.get(state, ".pdf"),
+                        else {"WA": ".csv", "FL": ".tsv", "UT": ".xlsx", "OH": ".xlsx", "GA": ".zip"}.get(
+                            state, ".pdf"
+                        ),
                     )
                 except httpx.HTTPStatusError as error:
                     print(f"{state} {day}: {error}")
@@ -606,6 +627,42 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "OH":
+            records = []
+            cells = fastexcel.read_excel(path).load_sheet(0, header_row=None).to_polars().rows()
+            start = next(index for index, row in enumerate(cells) if row[0] == "County Name")
+            for column in range(6, len(cells[start]), 2):
+                office = (cells[start - 1][column] or "").strip()
+                for row in cells[start + 1 :]:
+                    if row[0] in (None, "Percentage") or (
+                        row[0] != "Total" and elstats.plain(row[0]) not in names["OH"]
+                    ):
+                        continue
+                    for answer, votes in zip(cells[start][column : column + 2], row[column : column + 2], strict=True):
+                        records.append((row[0], office, str(answer).upper(), votes, None))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 89)
                 )
                 .filter(~total)
                 .drop("count")
