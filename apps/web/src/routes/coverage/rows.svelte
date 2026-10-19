@@ -37,11 +37,13 @@
     parent = null,
     depth = 0,
     view,
+    hideDone,
   }: {
     rows?: Array<Row> | null;
     parent?: string | null;
     depth?: number;
     view: "percent" | "left" | "done";
+    hideDone: boolean;
   } = $props();
 
   const LABELS: Record<string, () => string> = {
@@ -72,7 +74,16 @@
     enabled: rows == null && parent != null,
   }));
 
-  const list = $derived(rows ?? children.data?.rows ?? []);
+  const all = $derived(rows ?? children.data?.rows ?? []);
+  const list = $derived(
+    hideDone
+      ? all.filter((row) =>
+          [row.missing, row.county, row.precinct, row.shapes].some(
+            (gap) => gap != null && gap > 0,
+          ),
+        )
+      : all,
+  );
   const opened = new SvelteSet<string>();
   const current = new Date().getUTCFullYear();
   const compact = new Intl.NumberFormat(getLocale(), {
@@ -158,7 +169,7 @@
     class="bg-card py-1.5 text-sm text-muted-foreground"
     style:padding-inline-start="{0.875 + depth * 1.125}rem"
   >
-    {m.coverage_empty()}
+    {all.length === 0 ? m.coverage_empty() : m.coverage_all_done()}
   </div>
 {/if}
 {#each list as row (row.path)}
@@ -263,6 +274,6 @@
     {@render marker(row.shapes, row.shapesTotal)}
   </div>
   {#if isOpen}
-    <Self parent={row.path} depth={depth + 1} {view} />
+    <Self parent={row.path} depth={depth + 1} {view} {hideDone} />
   {/if}
 {/each}

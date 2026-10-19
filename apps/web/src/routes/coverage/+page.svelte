@@ -11,6 +11,7 @@
 
   const VIEWS = ["percent", "left", "done"] as const;
   let view = $state<(typeof VIEWS)[number]>("percent");
+  let hideDone = $state(false);
 
   onMount(() => {
     try {
@@ -19,6 +20,7 @@
       if (found != null) {
         view = found;
       }
+      hideDone = localStorage.getItem("coverage-hide-done") === "true";
     } catch {}
   });
 
@@ -55,7 +57,7 @@
         <div
           role="group"
           aria-label={m.coverage_view()}
-          class="flex items-center gap-2 text-sm"
+          class="flex flex-wrap items-center gap-2 text-sm"
         >
           <span class="text-muted-foreground">{m.coverage_view()}</span>
           <span class="flex rounded-sm border border-border p-0.5">
@@ -86,6 +88,25 @@
               </button>
             {/each}
           </span>
+          <button
+            type="button"
+            aria-pressed={hideDone}
+            class={cn(
+              "rounded-sm border border-border px-2 block-8 focus-visible:outline-2 focus-visible:outline-ring",
+              {
+                "bg-foreground text-background": hideDone,
+                "text-muted-foreground hover:text-foreground": !hideDone,
+              },
+            )}
+            onclick={() => {
+              hideDone = !hideDone;
+              try {
+                localStorage.setItem("coverage-hide-done", String(hideDone));
+              } catch {}
+            }}
+          >
+            {m.coverage_hide_done()}
+          </button>
         </div>
       </div>
     </header>
@@ -113,7 +134,7 @@
           >
         {/each}
       </div>
-      <Rows rows={data.rows} {view} />
+      <Rows rows={data.rows} {view} {hideDone} />
     </div>
   </article>
 </main>
