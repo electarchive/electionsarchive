@@ -695,6 +695,15 @@ export const relations = defineRelations(schema, (r) => ({
 		}),
 		tenures: r.many.tenure(),
 	},
+	coverageGovernmentYear: {
+		coverageGovernment: r.one.coverageGovernment({
+			from: r.coverageGovernmentYear.governmentId,
+			to: r.coverageGovernment.id
+		}),
+	},
+	coverageGovernment: {
+		coverageGovernmentYears: r.many.coverageGovernmentYear(),
+	},
 	crosswalk: {
 		changeset: r.one.changeset({
 			from: r.crosswalk.changesetId,

@@ -2,7 +2,7 @@ import argparse
 import importlib
 from pathlib import Path
 
-from ea import cache, checks, coverage, fixtures, raw, search, tiles
+from ea import cache, checks, coverage, coverage_tables, fixtures, raw, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import connect
 
@@ -26,8 +26,10 @@ def main() -> None:
     commands.add_parser("search", help="rebuild the search index from names and slugs")
     commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
     commands.add_parser(
-        "coverage", help="measure a polity's coverage against its v1 goal and write .agents/spec/{polity}-coverage.md"
-    ).add_argument("polity", choices=("us",))
+        "coverage",
+        help="measure a polity's coverage against its v1 goal and write .agents/spec/{polity}-coverage.md, "
+        "or refresh the coverage tables the app's coverage page reads",
+    ).add_argument("polity", choices=("us", "refresh"))
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -47,6 +49,8 @@ def main() -> None:
             print(tiles.build(args.scheme))
         case "search":
             print(search.build())
+        case "coverage" if args.polity == "refresh":
+            print(coverage_tables.refresh())
         case "coverage":
             print(getattr(coverage, args.polity)())
         case "raw" if args.action in ("push", "pull"):

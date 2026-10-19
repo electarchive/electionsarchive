@@ -1,0 +1,232 @@
+<script lang="ts">
+  import { resolve } from "$app/paths";
+  import CheckIcon from "@lucide/svelte/icons/check";
+  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
+  import { createQuery } from "@tanstack/svelte-query";
+  import { SvelteSet } from "svelte/reactivity";
+  import { count } from "#lib/format.js";
+  import { m } from "#lib/paraglide/messages.js";
+  import { orpc } from "#lib/rpc.js";
+  import { cn } from "#lib/utils.js";
+  import Self from "./rows.svelte";
+
+  type Row = {
+    path: string;
+    label: string;
+    kind: string;
+    expected: number | null;
+    held: number;
+    governments: number | null;
+    missing: number | null;
+    county: number | null;
+    precinct: number | null;
+    shapes: number | null;
+    precincts: number;
+    shaped: number;
+    hasChildren: boolean;
+    href: string | null;
+    detail: string | null;
+  };
+
+  const {
+    rows = null,
+    parent = null,
+    depth = 0,
+  }: {
+    rows?: Array<Row> | null;
+    parent?: string | null;
+    depth?: number;
+  } = $props();
+
+  const LABELS: Record<string, () => string> = {
+    federal: m.coverage_federal,
+    national: m.coverage_national,
+    president: m.coverage_level_president,
+    us_senate: m.coverage_level_us_senate,
+    us_house: m.coverage_level_us_house,
+    governor: m.coverage_level_governor,
+    statewide_exec: m.coverage_level_statewide_exec,
+    judicial: m.coverage_level_judicial,
+    state_upper: m.coverage_level_state_upper,
+    state_lower: m.coverage_level_state_lower,
+    statewide_measure: m.coverage_level_statewide_measure,
+    general: m.coverage_stage_general,
+    primary: m.coverage_stage_primary,
+    runoff: m.coverage_stage_runoff,
+    special: m.coverage_stage_special,
+    county: m.coverage_group_county,
+    municipality: m.coverage_group_municipality,
+    township: m.coverage_group_township,
+    school: m.coverage_group_school,
+    other: m.coverage_group_other,
+  };
+
+  const children = createQuery(() => ({
+    ...orpc.coverage.rows.queryOptions({ input: { parent: parent ?? "" } }),
+    enabled: rows == null && parent != null,
+  }));
+
+  const list = $derived(rows ?? children.data?.rows ?? []);
+  const opened = new SvelteSet<string>();
+  const current = new Date().getUTCFullYear();
+
+  const name = (row: Row) =>
+    row.kind === "governments" && row.label === "special"
+      ? m.coverage_group_special()
+      : row.kind === "state" && row.label !== "national"
+        ? row.label
+        : (LABELS[row.label]?.() ?? row.label);
+</script>
+
+{#snippet marker(gap: number | null, isLeaf: boolean)}
+  <span role="gridcell" class="grid place-items-center">
+    {#if gap == null}
+      <span class="text-muted-foreground" title={m.coverage_na()}>
+        <span aria-hidden="true">–</span>
+        <span class="sr-only">{m.coverage_na()}</span>
+      </span>
+    {:else if gap <= 0}
+      <span
+        class="grid place-items-center rounded-[2px] bg-(--yes) text-background block-4.5 inline-4.5"
+        title={m.coverage_ok()}
+      >
+        <CheckIcon class="block-3.5 inline-3.5" strokeWidth={3} />
+        <span class="sr-only">{m.coverage_ok()}</span>
+      </span>
+    {:else if isLeaf}
+      <span
+        class="rounded-[2px] border border-destructive block-4.5 inline-4.5"
+        title={m.coverage_missing()}
+      >
+        <span class="sr-only">{m.coverage_missing()}</span>
+      </span>
+    {:else}
+      <span
+        class="rounded-[2px] border border-destructive px-1 font-figures text-xs/4  text-destructive"
+        title={m.coverage_gap({ count: count(gap) })}
+      >
+        {count(gap)}
+        <span class="sr-only">{m.coverage_gap({ count: count(gap) })}</span>
+      </span>
+    {/if}
+  </span>
+{/snippet}
+
+{#if rows == null && children.isPending}
+  <div
+    role="row"
+    class="bg-card py-1.5 text-sm text-muted-foreground"
+    style:padding-inline-start="{0.875 + depth * 1.125}rem"
+  >
+    {m.coverage_loading()}
+  </div>
+{:else if list.length === 0}
+  <div
+    role="row"
+    class="bg-card py-1.5 text-sm text-muted-foreground"
+    style:padding-inline-start="{0.875 + depth * 1.125}rem"
+  >
+    {m.coverage_empty()}
+  </div>
+{/if}
+{#each list as row (row.path)}
+  {const isOpen = $derived(opened.has(row.path))}
+  {const label = $derived(name(row))}
+  {const isYear = $derived(row.kind === "year")}
+  <div
+    role="row"
+    aria-level={depth + 1}
+    aria-expanded={row.hasChildren ? isOpen : undefined}
+    class={cn(
+      "grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(4,4.75rem)] items-center gap-x-1 bg-card pe-2 max-sm:grid-cols-[minmax(0,1fr)_repeat(4,2.25rem)]",
+      { "block-10": isYear, "block-8": !isYear },
+      { "hover:bg-secondary": row.hasChildren },
+    )}
+  >
+    <span
+      role="gridcell"
+      class="flex items-center gap-1.5 min-inline-0"
+      style:padding-inline-start="{0.5 + depth * 1.125}rem"
+    >
+      {#if row.hasChildren}
+        <button
+          type="button"
+          class="flex items-center gap-1.5 rounded-sm text-start min-inline-0 focus-visible:outline-2 focus-visible:outline-ring"
+          aria-label={isOpen
+            ? m.coverage_collapse({ name: label })
+            : m.coverage_expand({ name: label })}
+          onclick={() => {
+            if (isOpen) {
+              opened.delete(row.path);
+            } else {
+              opened.add(row.path);
+            }
+          }}
+        >
+          <ChevronRightIcon
+            class={cn(
+              "shrink-0 text-muted-foreground transition-transform block-4 inline-4 motion-reduce:transition-none",
+              { "rotate-90": isOpen },
+            )}
+          />
+          <span
+            class={cn("truncate", {
+              "font-figures text-lg font-[720]": isYear,
+              "font-semibold": row.kind === "state" || row.kind === "federal",
+            })}>{label}</span
+          >
+        </button>
+        {#if isYear && Number(row.label) === current}
+          <span class="text-xs text-muted-foreground"
+            >{m.coverage_in_progress()}</span
+          >
+        {/if}
+      {:else}
+        <span class="shrink-0 inline-4"></span>
+        {#if row.href == null}
+          <span class="truncate">{label}</span>
+        {:else}
+          <a
+            href={resolve("/[...path]", { path: row.href })}
+            class="truncate underline-offset-2 hover:underline focus-visible:outline-2 focus-visible:outline-ring"
+            >{label}</a
+          >
+        {/if}
+        {#if row.detail != null}
+          <span class="truncate text-xs text-muted-foreground"
+            >{row.detail}</span
+          >
+        {/if}
+      {/if}
+    </span>
+    <span
+      role="gridcell"
+      class="text-end font-figures text-sm text-muted-foreground max-sm:hidden"
+    >
+      {#if row.kind === "government"}
+        {row.expected === 0 && row.held === 0
+          ? m.coverage_not_due()
+          : count(row.held)}
+      {:else if row.kind === "governments" && row.expected != null}
+        {m.coverage_held_contests({
+          held: count(row.expected - (row.missing ?? 0)),
+          expected: count(row.expected),
+        })}
+      {:else if row.expected != null && (row.kind === "level" || row.kind === "stage" || (row.kind === "state" && row.path.includes("/federal/")))}
+        {m.coverage_held_contests({
+          held: count(row.held),
+          expected: count(Math.max(row.expected, row.held)),
+        })}
+      {:else}
+        {count(row.held)}
+      {/if}
+    </span>
+    {@render marker(row.missing, row.kind === "government")}
+    {@render marker(row.county, row.kind === "government")}
+    {@render marker(row.precinct, row.kind === "government")}
+    {@render marker(row.shapes, row.kind === "government")}
+  </div>
+  {#if isOpen}
+    <Self parent={row.path} depth={depth + 1} />
+  {/if}
+{/each}

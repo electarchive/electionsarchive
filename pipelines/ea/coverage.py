@@ -3,7 +3,7 @@ import time
 from collections import defaultdict
 from datetime import date
 
-from ea.store import ROOT, connect
+from ea.store import ROOT, Connection, connect
 
 LEVELS = (
     "president",
@@ -251,33 +251,31 @@ def governor_years(st: str) -> set[int]:
     return set()
 
 
-def us() -> str:
-    started = time.monotonic()
-    with connect() as conn:
-        conn.execute("set statement_timeout = 0")
-        for statement in CONTESTS_SQL.split(";\n\n"):
-            conn.execute(statement)
-        held = {
-            (st, year, level, stage): {
-                "held": n,
-                "results": results,
-                "county": county,
-                "precinct": precinct,
-                "icpsr_only": icpsr,
-            }
-            for st, year, level, stage, n, results, county, precinct, icpsr in conn.execute(COUNT_SQL)
+def matrix(conn: Connection, last: int = LAST) -> list[dict]:
+    conn.execute("set statement_timeout = 0")
+    for statement in CONTESTS_SQL.split(";\n\n"):
+        conn.execute(statement)
+    held = {
+        (st, year, level, stage): {
+            "held": n,
+            "results": results,
+            "county": county,
+            "precinct": precinct,
+            "icpsr_only": icpsr,
         }
-        shapes = {
-            (st, year, level, stage): (n, shaped) for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL)
-        }
-        pipelines: dict[tuple, set[str]] = defaultdict(set)
-        for st, year, level, stage, pipeline in conn.execute(PIPELINES_SQL):
-            pipelines[(st, year, level, stage)].add(pipeline)
-        states = {fips: (st, name) for st, fips, name in conn.execute(STATES_SQL)}
-        electors = list(conn.execute(ELECTORS_SQL))
-        districts = list(conn.execute(DISTRICTS_SQL))
-        at_large = {(st, year): n for st, year, n in conn.execute(AT_LARGE_SQL)}
-        seats = [label for (label,) in conn.execute(SENATE_SQL)]
+        for st, year, level, stage, n, results, county, precinct, icpsr in conn.execute(COUNT_SQL)
+    }
+    shapes = {
+        (st, year, level, stage): (n, shaped) for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL)
+    }
+    pipelines: dict[tuple, set[str]] = defaultdict(set)
+    for st, year, level, stage, pipeline in conn.execute(PIPELINES_SQL):
+        pipelines[(st, year, level, stage)].add(pipeline)
+    states = {fips: (st, name) for st, fips, name in conn.execute(STATES_SQL)}
+    electors = list(conn.execute(ELECTORS_SQL))
+    districts = list(conn.execute(DISTRICTS_SQL))
+    at_large = {(st, year): n for st, year, n in conn.execute(AT_LARGE_SQL)}
+    seats = [label for (label,) in conn.execute(SENATE_SQL)]
 
     expected: dict[tuple, int] = defaultdict(int)
     for year, st in electors:
@@ -351,7 +349,7 @@ def us() -> str:
     rows: list[dict] = []
     for key in sorted(set(held) | set(expected)):
         st, year, level, stage = key
-        if year > LAST:
+        if year > last:
             continue
         cell = held.get(key, {"held": 0, "results": 0, "county": 0, "precinct": 0, "icpsr_only": 0})
         exp = expected.get(key)
@@ -390,6 +388,13 @@ def us() -> str:
             }
         )
 
+    return rows
+
+
+def us() -> str:
+    started = time.monotonic()
+    with connect() as conn:
+        rows = matrix(conn)
     spec = ROOT / ".agents" / "spec"
     with (spec / "us-coverage.csv").open("w", newline="") as handle:
         writer = csv.DictWriter(handle, fieldnames=list(rows[0]))

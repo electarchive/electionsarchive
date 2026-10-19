@@ -18,7 +18,7 @@ async function refresh() {
   try {
     const result = await db.execute<{ version: string }>(sql`
       select concat_ws(':', current_date, count(*) filter (where status = 'published'), max(published_at),
-        count(*) filter (where status = 'rejected')) as version
+        count(*) filter (where status = 'rejected'), (select built_at from coverage_build)) as version
       from changeset
     `);
     const version = result.rows[0]?.version ?? "";

@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, text, smallint, integer, date, boolean, numeric, timestamp, jsonb, customType, real, char, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, integer, text, boolean, smallint, date, timestamp, numeric, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -144,6 +144,7 @@ export const areaGeometry = pgTable("area_geometry", {
 }, (table) => [
 	primaryKey({ columns: [table.areaId, table.valid], name: "area_geometry_pkey"}),
 	index("area_geometry_geom_idx").using("gist", table.geom.asc().nullsLast()),
+	index("area_geometry_synthetic_idx").using("btree", table.areaId.asc().nullsLast()).where(sql`(quality = 'synthetic'::geometry_quality)`),
 ]);
 
 export const areaParent = pgTable("area_parent", {
@@ -345,6 +346,66 @@ export const contestOption = pgTable("contest_option", {
 	index("contest_option_contest_idx").using("btree", table.contestId.asc().nullsLast()),
 	index("contest_option_parent_option_idx").using("btree", table.parentOptionId.asc().nullsLast()),
 	unique("contest_option_k_key").on(table.k),]);
+
+export const coverageBuild = pgTable("coverage_build", {
+	id: boolean().default(true).primaryKey(),
+	requestedAt: timestamp("requested_at", { withTimezone: true }),
+	startedAt: timestamp("started_at", { withTimezone: true }),
+	builtAt: timestamp("built_at", { withTimezone: true }),
+}, (table) => [
+check("coverage_build_id_check", sql`id`),]);
+
+export const coverageGovernment = pgTable("coverage_government", {
+	id: text().primaryKey(),
+	state: text().notNull(),
+	county: text(),
+	kind: text().notNull(),
+	name: text().notNull(),
+	function: text(),
+	population: integer(),
+	active: boolean().notNull(),
+	polityId: uuid("polity_id"),
+	period: integer(),
+	phase: integer(),
+	month: integer(),
+	basis: text().notNull(),
+}, (table) => [
+	index("coverage_government_polity_idx").using("btree", table.polityId.asc().nullsLast()),
+	index("coverage_government_state_idx").using("btree", table.state.asc().nullsLast(), table.kind.asc().nullsLast()),
+]);
+
+export const coverageGovernmentYear = pgTable("coverage_government_year", {
+	governmentId: text("government_id").notNull().references(() => coverageGovernment.id, { onDelete: "cascade" } ),
+	year: integer().notNull(),
+	expected: boolean().notNull(),
+	held: integer().notNull(),
+	precinct: integer().notNull(),
+	precincts: integer().notNull(),
+	shaped: integer().notNull(),
+	missing: boolean().notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.year, table.governmentId], name: "coverage_government_year_pkey"}),
+]);
+
+export const coverageRow = pgTable("coverage_row", {
+	path: text().primaryKey(),
+	parent: text(),
+	year: integer().notNull(),
+	sort: integer().notNull(),
+	label: text().notNull(),
+	kind: text().notNull(),
+	expected: integer(),
+	held: integer().notNull(),
+	governments: integer(),
+	missing: integer(),
+	county: integer(),
+	precinct: integer(),
+	shapes: integer(),
+	precincts: integer().default(0).notNull(),
+	shaped: integer().default(0).notNull(),
+}, (table) => [
+	index("coverage_row_parent_idx").using("btree", table.parent.asc().nullsLast(), table.sort.asc().nullsLast()),
+]);
 
 export const crosswalk = pgTable("crosswalk", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),

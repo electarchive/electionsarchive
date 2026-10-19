@@ -8,7 +8,7 @@ import polars as pl
 from psycopg import sql
 from psycopg.types.json import Jsonb
 
-from ea import checks
+from ea import checks, coverage_tables
 from ea.checks import FACTS, KEYS, Stage
 from ea.store import DATA, Connection, connect
 
@@ -753,6 +753,11 @@ def publish(conn: Connection, changeset_id: str) -> None:
                     )
         conn.execute("update changeset set status = 'published', published_at = now() where id = %s", [changeset_id])
         conn.execute(sql.SQL("drop schema {} cascade").format(sql.Identifier(stage.schema)))
+    us = conn.execute(
+        "select pipeline like 'us.%%' or scope->>'polity' = 'US' from changeset where id = %s", [changeset_id]
+    ).fetchone()
+    if us is not None and us[0]:
+        coverage_tables.request()
 
 
 def revert(conn: Connection, changeset_id: str, reason: str) -> None:
