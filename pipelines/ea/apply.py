@@ -574,7 +574,8 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
             [moved, repointed],
         ).fetchall()
     ]
-    conn.execute("delete from result_rollup where result_set_k = any(%s)", [stale])
+    conn.execute("delete from result_rollup_sum where result_set_k = any(%s)", [stale])
+    conn.execute("delete from result_rollup_unit where result_set_k = any(%s)", [stale])
     facts = (
         sql.SQL("select distinct result_set_id from {}").format(stage.staged("result_value"))
         if "result_value" in stage.tables
@@ -623,14 +624,24 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
             ),
             reached as (
               select result_set_k, unit_k, area_id, bool_or(complete) as complete from ancestors group by result_set_k, unit_k, area_id
+            ),
+            counted as (
+              select r.result_set_k, r.area_id, min(r.unit_k) as unit_k, count(*) > 1 or not bool_and(r.complete) as summed
+              from reached r
+              where not exists (select from ceiling x where x.result_set_k = r.result_set_k and x.area_id = r.area_id)
+              group by r.result_set_k, r.area_id
+            ),
+            single as (
+              insert into result_rollup_unit (result_set_k, area_k, unit_k)
+              select c.result_set_k, area.k, c.unit_k from counted c join area on area.id = c.area_id where not c.summed
             )
-            insert into result_rollup (result_set_k, area_k, option_k, channel, measure, count_round, complete, value)
+            insert into result_rollup_sum (result_set_k, area_k, option_k, channel, measure, count_round, complete, value)
             select v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round, bool_and(a.complete), sum(v.value)
             from result_value v
             join reached a on a.result_set_k = v.result_set_k and a.unit_k = v.unit_k
+            join counted c on c.result_set_k = a.result_set_k and c.area_id = a.area_id and c.summed
             join area on area.id = a.area_id
             where v.result_set_k in (select k from rs)
-              and not exists (select from ceiling x where x.result_set_k = v.result_set_k and x.area_id = a.area_id)
             group by v.result_set_k, area.k, v.option_k, v.channel, v.measure, v.count_round"""
         ).format(facts=facts, stale=sql.Literal(stale))
     )
@@ -933,7 +944,7 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                or polity_id in (select id from polity where changeset_id = %(id)s)""",
             {"id": changeset_id},
         )
-        for table in (*FACTS, "result_rollup"):
+        for table in (*FACTS, "result_rollup_sum", "result_rollup_unit"):
             conn.execute(
                 sql.SQL(
                     "delete from {} where result_set_k in (select k from result_set rs where rs.changeset_id = %s"

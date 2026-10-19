@@ -508,8 +508,11 @@ export async function comparison(ids: Array<string>) {
                 select o.contest_id, coalesce(o.parent_option_id, o.id) as top, sum(r.value) as value
                 from places pl
                 join contest_option o on o.contest_id = pl.contest_id
-                join result_rollup r on r.result_set_k = pl.set and r.area_k = pl.area and r.option_k = o.k
-                  and r.measure = 1 and r.channel = 0
+                cross join lateral (
+                  select r.value, r.count_round from result_rollup r
+                  where r.result_set_k = pl.set and r.area_k = pl.area and r.option_k = o.k
+                    and r.measure = 1 and r.channel = 0 offset 0
+                ) r
                 group by o.contest_id, top, r.count_round
               ) rounds
               group by contest_id, top

@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, smallint, text, integer, boolean, timestamp, date, numeric, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, integer, smallint, boolean, text, date, timestamp, numeric, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -940,7 +940,7 @@ export const resultFlow = pgTable("result_flow", {
 	primaryKey({ columns: [table.resultSetK, table.unitK, table.fromOptionK, table.optionK, table.channel, table.measure, table.countRound], name: "result_flow_pkey"}),
 ]);
 
-export const resultRollup = pgTable("result_rollup", {
+export const resultRollupSum = pgTable("result_rollup_sum", {
 	resultSetK: integer("result_set_k").notNull(),
 	areaK: integer("area_k").notNull(),
 	optionK: integer("option_k").default(0).notNull(),
@@ -950,7 +950,15 @@ export const resultRollup = pgTable("result_rollup", {
 	complete: boolean().notNull(),
 	value: numeric().notNull(),
 }, (table) => [
-	primaryKey({ columns: [table.resultSetK, table.areaK, table.optionK, table.channel, table.measure, table.countRound], name: "result_rollup_pkey"}),
+	primaryKey({ columns: [table.resultSetK, table.areaK, table.optionK, table.channel, table.measure, table.countRound], name: "result_rollup_sum_pkey"}),
+]);
+
+export const resultRollupUnit = pgTable("result_rollup_unit", {
+	resultSetK: integer("result_set_k").notNull(),
+	areaK: integer("area_k").notNull(),
+	unitK: integer("unit_k").notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.resultSetK, table.areaK], name: "result_rollup_unit_pkey"}),
 ]);
 
 export const resultSet = pgTable("result_set", {
@@ -1158,3 +1166,12 @@ export const valueLocator = pgTable("value_locator", {
 }, (table) => [
 	primaryKey({ columns: [table.resultSetK, table.unitK, table.optionK, table.channel, table.measure, table.countRound], name: "value_locator_pkey"}),
 check("value_locator_check", sql`(num_nonnulls(page_id, source_id) >= 1)`),check("value_locator_check1", sql`((page_id IS NULL) = (x0 IS NULL))`),]);
+export const resultRollup = pgView("result_rollup", {	resultSetK: integer("result_set_k"),
+	areaK: integer("area_k"),
+	optionK: integer("option_k"),
+	channel: smallint(),
+	measure: smallint(),
+	countRound: smallint("count_round"),
+	complete: boolean(),
+	value: numeric(),
+}).as(sql`SELECT result_rollup_sum.result_set_k, result_rollup_sum.area_k, result_rollup_sum.option_k, result_rollup_sum.channel, result_rollup_sum.measure, result_rollup_sum.count_round, result_rollup_sum.complete, result_rollup_sum.value FROM result_rollup_sum UNION ALL SELECT u.result_set_k, u.area_k, v.option_k, v.channel, v.measure, v.count_round, true AS complete, v.value FROM result_rollup_unit u JOIN result_value v ON v.result_set_k = u.result_set_k AND v.unit_k = u.unit_k`);

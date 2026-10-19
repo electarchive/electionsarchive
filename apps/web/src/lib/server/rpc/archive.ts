@@ -23,7 +23,7 @@ const FACTS = {
   area: (set: SQL, area: SQL) =>
     sql`
       select r.result_set_k, r.area_k, r.option_k, r.measure, r.count_round, r.value, r.complete
-            from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area}
+            from result_rollup r where r.result_set_k = ${set} and r.area_k = ${area} offset 0
     `,
   unit: (set: SQL, unit: SQL) =>
     sql`
@@ -44,7 +44,7 @@ const fused = (option: SQL, contest: SQL) => sql`
   (
     select ch.party_id from contest_option ch
     join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
-    join result_rollup x on x.result_set_k = rs.k and x.option_k = ch.k
+    cross join lateral (select x.value from result_rollup x where x.result_set_k = rs.k and x.option_k = ch.k offset 0) x
     where ch.contest_id = ${contest} and ch.parent_option_id = ${option} and ch.party_id is not null
     group by ch.id, ch.party_id order by max(x.value) desc, ch.id limit 1
   )
@@ -344,8 +344,9 @@ async function children(
     select a.id, a.k, a.scheme_code as scheme
     from area_parent p join area a on a.id = p.area_id
     where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date and exists (
-      select 1 from result_rollup r
-      where r.result_set_k = any(${sql.param(ks)}::int[]) and r.area_k = a.k and r.measure = any(${COUNTED})
+      select 1 from unnest(${sql.param(ks)}::int[]) as s(k) cross join lateral (
+        select from result_rollup r where r.result_set_k = s.k and r.area_k = a.k and r.measure = any(${COUNTED}) limit 1
+      ) r
     )
   `);
   if (isRoot && found.rows.length < 2) {
@@ -357,8 +358,9 @@ async function children(
       )
       select a.id, a.k, a.scheme_code as scheme
       from (
-        select distinct area_k from result_rollup
-        where result_set_k = any(${sql.param(ks)}::int[]) and measure = any(${COUNTED})
+        select distinct r.area_k from unnest(${sql.param(ks)}::int[]) as s(k) cross join lateral (
+          select x.area_k from result_rollup x where x.result_set_k = s.k and x.measure = any(${COUNTED}) offset 0
+        ) r
       ) r
       join area a on a.k = r.area_k
       where a.id not in (select id from anc)
@@ -650,9 +652,12 @@ async function load(
       select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
     ),
     gone as materialized (
-      select r.result_set_k as set, r.option_k as option from result_rollup r
-      where ${round}::int is not null and r.result_set_k = any(${sql.param([...new Set(picked.rows.map((row) => row.k))])}::int[])
-        and r.measure = any(${COUNTED}) and r.count_round = ${round}::int
+      select r.result_set_k as set, r.option_k as option
+      from unnest(${sql.param([...new Set(picked.rows.map((row) => row.k))])}::int[]) as s(k) cross join lateral (
+        select x.result_set_k, x.option_k, x.value from result_rollup x
+        where ${round}::int is not null and x.result_set_k = s.k and x.measure = any(${COUNTED}) and x.count_round = ${round}::int
+        offset 0
+      ) r
       group by 1, 2 having max(r.value) = 0
     ),
     flagged as (
@@ -1005,9 +1010,12 @@ async function units(
     seats: number;
   }>(sql`
     select r.area_k as area, r.option_k as option, sum(r.value)::int as seats
-    from result_rollup r join result_set rs on rs.k = r.result_set_k
-    where rs.contest_id = ${contest}::uuid and rs.is_default and r.measure = 16 and r.count_round = 0
-      and r.area_k = any(${sql.param(kids.map((kid) => kid.k))}::int[])
+    from result_set rs cross join lateral (
+      select r.area_k, r.option_k, r.value from result_rollup r
+      where r.result_set_k = rs.k and r.measure = 16 and r.count_round = 0
+        and r.area_k = any(${sql.param(kids.map((kid) => kid.k))}::int[]) offset 0
+    ) r
+    where rs.contest_id = ${contest}::uuid and rs.is_default
     group by r.area_k, r.option_k
     having sum(r.value) > 0
   `);
@@ -2558,9 +2566,12 @@ export const contests = {
               where rs.contest_id = ${contest.id}::uuid and (rs.is_default or exists (
                 select from result_rollup r
                 where r.result_set_k = rs.k and r.measure = any(${COUNTED}) and not exists (
-                  select from result_set d join result_rollup q on q.result_set_k = d.k
-                  where d.contest_id = ${contest.id}::uuid and d.is_default and q.area_k = r.area_k
+                  select from result_set d
+                  where d.contest_id = ${contest.id}::uuid and d.is_default and exists (
+                    select from result_rollup q where q.result_set_k = d.k and q.area_k = r.area_k offset 0
+                  )
                 )
+                offset 0
               ))
             union all
             select cy.id from candidacy cy join contest_option o on o.id = cy.option_id
@@ -2605,7 +2616,7 @@ export const contests = {
            join contest_option o on o.id = x.option_id
            left join entity_merge pm on pm.entity_id = o.party_id
            where ${isRoot}::boolean and rs.contest_id = ${contest.id}::uuid and rs.is_default
-             and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k))
+             and (rs.kind <> 'counted' or not exists (select from result_rollup r where r.result_set_k = rs.k offset 0))
            order by o.k
         `),
       ]);
@@ -4183,7 +4194,7 @@ export const contests = {
           cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
           where exists (
             select 1 from result_rollup r
-            where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED})
+            where r.result_set_k = rs.k and r.area_k = ${area.k} and r.measure = any(${COUNTED}) offset 0
           )
         )
         select c.id, c.parent, s.path
@@ -4364,7 +4375,7 @@ export const contests = {
           with chosen as (
             select rs.k from result_set rs
             where rs.contest_id = ${contest.id}::uuid and rs.is_default and exists (
-              select from result_rollup r where r.result_set_k = rs.k and r.area_k = ${contest.place?.k ?? 0} and r.measure = any(${COUNTED})
+              select from result_rollup r where r.result_set_k = rs.k and r.area_k = ${contest.place?.k ?? 0} and r.measure = any(${COUNTED}) offset 0
             )
             order by array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
             limit 1
@@ -4372,8 +4383,10 @@ export const contests = {
           picked as (
             select r.option_k, r.measure, r.count_round, r.value
             from chosen
-            join result_rollup r on r.result_set_k = chosen.k and r.area_k = ${contest.place?.k ?? 0}
-            where r.measure = any(${COUNTED})
+            cross join lateral (
+              select r.option_k, r.measure, r.count_round, r.value from result_rollup r
+              where r.result_set_k = chosen.k and r.area_k = ${contest.place?.k ?? 0} and r.measure = any(${COUNTED}) offset 0
+            ) r
           ),
           main as (
             select (${COUNTED})[min(array_position(${COUNTED}, measure))] as measure, min(count_round) as round from picked
@@ -6928,8 +6941,10 @@ export const polities = {
             join contest c on c.election_id = e.id
             join slug s on s.entity_id = c.id and s.is_current
             where e.polity_id in (select id from up) and e.date_from is not null and exists (
-              select 1 from result_set rs join result_rollup r on r.result_set_k = rs.k
-              where rs.contest_id = c.id and rs.status = 'active' and r.area_k = place.k and r.measure = any(${COUNTED})
+              select 1 from result_set rs
+              where rs.contest_id = c.id and rs.status = 'active' and exists (
+                select from result_rollup r where r.result_set_k = rs.k and r.area_k = place.k and r.measure = any(${COUNTED}) offset 0
+              )
             )
           `),
         ]);
@@ -8928,7 +8943,10 @@ export const parties = {
           select r.id, sum(x.value) filter (where o.party_id in (select id from ids))::float8 as votes,
             sum(x.value)::float8 as total
           from roots r join result_set rs on rs.contest_id = r.id and rs.is_default
-          join result_rollup x on x.result_set_k = rs.k and x.area_k = r.area and x.measure = 1 and x.option_k <> 0
+          cross join lateral (
+            select x.option_k, x.value from result_rollup x
+            where x.result_set_k = rs.k and x.area_k = r.area and x.measure = 1 and x.option_k <> 0 offset 0
+          ) x
           join contest_option o on o.k = x.option_k
           group by r.id
         ),
