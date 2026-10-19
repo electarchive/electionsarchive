@@ -160,6 +160,7 @@ HAWAII = {
     },
     date(2018, 11, 6): {"Constitutional Convention": "Hawaii Constitutional Convention Question"},
 }
+RHODE_ISLAND = {date(2020, 11, 3): ("20201207151320", "2020/RIGEN20.xlsx")}
 TENNESSEE = {date(2022, 11, 8): ("20240213031752", "20221108AllbyPrecinct.xlsx")}
 OHIO = {
     date(2022, 11, 8): ("20241007174602", "2022/gen/issues-summary.xlsx"),
@@ -342,6 +343,12 @@ DOCUMENTS = {
         "https://www.sos.arkansas.gov/elections/research/election-results",
         "the Arkansas Secretary of State's official results report",
     ),
+    "RI": (
+        "Rhode Island Board of Elections",
+        "Election results by precinct",
+        "https://elections.ri.gov/elections/results/",
+        "the Rhode Island Board of Elections' official results by precinct, summed by county",
+    ),
     "TN": (
         "Tennessee Secretary of State",
         "Election results by precinct",
@@ -428,6 +435,12 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, (
             f"https://elections.il.gov/Downloads/ElectionOperations/VoteTotals/{ILLINOIS[day]}GEOfficialVote.pdf"
             if day in ILLINOIS
+            else ""
+        )
+    if state == "RI":
+        return SOURCE, (
+            WAYBACK.format(RHODE_ISLAND[day][0], "https://elections.ri.gov/elections/results/" + RHODE_ISLAND[day][1])
+            if day in RHODE_ISLAND
             else ""
         )
     if state == "TN":
@@ -568,9 +581,14 @@ def fetch() -> None:
                         each,
                         suffix="." + each.rsplit(".", 1)[1]
                         if state in ("CA", "UT")
-                        else {"WA": ".csv", "FL": ".tsv", "OH": ".xlsx", "TN": ".xlsx", "GA": ".zip"}.get(
-                            state, ".pdf"
-                        ),
+                        else {
+                            "WA": ".csv",
+                            "FL": ".tsv",
+                            "OH": ".xlsx",
+                            "TN": ".xlsx",
+                            "RI": ".xlsx",
+                            "GA": ".zip",
+                        }.get(state, ".pdf"),
                     )
                 except httpx.HTTPStatusError as error:
                     print(f"{state} {day}: {error}")
@@ -670,6 +688,28 @@ def parse() -> None:
                 )
                 .filter(~total)
                 .drop("count")
+            )
+        elif state == "RI":
+            with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+                gazetteer = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).filter(
+                    pl.col("USPS") == "RI"
+                )
+            towns: dict[str, str] = {}
+            for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
+                towns.setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+            table = (
+                fastexcel.read_excel(path)
+                .load_sheet(0)
+                .to_polars()
+                .select(
+                    fips=pl.col("City/Town")
+                    .str.replace(r"(\s+Limited)?(\s*\d+)?$", "")
+                    .map_elements(elstats.plain, return_dtype=pl.String)
+                    .replace_strict(towns, default=None),
+                    office=pl.col("Contest"),
+                    answer=pl.col("Candidate").replace({"Approve": "Approved", "Reject": "Rejected"}),
+                    votes=pl.col("Total").cast(pl.Int64).cast(pl.String),
+                )
             )
         elif state == "TN":
             sheet = fastexcel.read_excel(path).load_sheet(0).to_polars()
@@ -1667,6 +1707,8 @@ def emit() -> Path:
                 )
                 .when(pl.col("state") == "LA")
                 .then(pl.concat_str(pl.lit("amendment "), pl.col("office").str.extract(r"(?i)^CA No\. (\d+) ")))
+                .when(pl.col("state") == "RI")
+                .then(pl.concat_str(pl.lit("question "), pl.col("office").str.extract(r"^(\d+)\. ")))
                 .otherwise(
                     pl.concat_str(
                         pl.col("office").str.extract(TAG, 1).str.to_lowercase(),
