@@ -972,5 +972,11 @@
   "coverage_collapse": "Collapse {name}",
   "coverage_loading": "Loading",
   "coverage_empty": "No data under this row",
-  "coverage_missing": "Missing"
+  "coverage_missing": "Missing",
+  "coverage_view": "Show",
+  "coverage_view_percent": "Percentage",
+  "coverage_view_left": "Items left",
+  "coverage_view_done": "Done of total",
+  "coverage_percent_title": "{percent} done",
+  "coverage_done_title": "{done} of {total} done"
 }

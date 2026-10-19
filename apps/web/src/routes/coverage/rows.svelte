@@ -6,6 +6,7 @@
   import { SvelteSet } from "svelte/reactivity";
   import { count } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import Self from "./rows.svelte";
@@ -23,6 +24,9 @@
     shapes: number | null;
     precincts: number;
     shaped: number;
+    countyTotal: number | null;
+    precinctTotal: number | null;
+    shapesTotal: number | null;
     hasChildren: boolean;
     href: string | null;
     detail: string | null;
@@ -32,10 +36,12 @@
     rows = null,
     parent = null,
     depth = 0,
+    view,
   }: {
     rows?: Array<Row> | null;
     parent?: string | null;
     depth?: number;
+    view: "percent" | "left" | "done";
   } = $props();
 
   const LABELS: Record<string, () => string> = {
@@ -69,6 +75,10 @@
   const list = $derived(rows ?? children.data?.rows ?? []);
   const opened = new SvelteSet<string>();
   const current = new Date().getUTCFullYear();
+  const compact = new Intl.NumberFormat(getLocale(), {
+    notation: "compact",
+    maximumFractionDigits: 1,
+  });
 
   const name = (row: Row) =>
     row.kind === "governments" && row.label === "special"
@@ -78,7 +88,7 @@
         : (LABELS[row.label]?.() ?? row.label);
 </script>
 
-{#snippet marker(gap: number | null, isLeaf: boolean)}
+{#snippet marker(gap: number | null, total: number | null)}
   <span role="gridcell" class="grid place-items-center">
     {#if gap == null}
       <span class="text-muted-foreground" title={m.coverage_na()}>
@@ -93,7 +103,7 @@
         <CheckIcon class="block-3.5 inline-3.5" strokeWidth={3} />
         <span class="sr-only">{m.coverage_ok()}</span>
       </span>
-    {:else if isLeaf}
+    {:else if total == null || total <= 1}
       <span
         class="rounded-[2px] border border-destructive block-4.5 inline-4.5"
         title={m.coverage_missing()}
@@ -101,12 +111,34 @@
         <span class="sr-only">{m.coverage_missing()}</span>
       </span>
     {:else}
+      {const done = $derived(Math.max(0, total - gap))}
+      {const title = $derived(
+        view === "left"
+          ? m.coverage_gap({ count: count(gap) })
+          : view === "percent"
+            ? m.coverage_percent_title({
+                percent: `${Math.min(99, Math.floor((done / total) * 100))}%`,
+              })
+            : m.coverage_done_title({ done: count(done), total: count(total) }),
+      )}
       <span
-        class="rounded-[2px] border border-destructive px-1 font-figures text-xs/4  text-destructive"
-        title={m.coverage_gap({ count: count(gap) })}
+        class="rounded-[2px] border border-destructive px-1 font-figures text-xs/4 whitespace-nowrap text-destructive"
+        {title}
       >
-        {count(gap)}
-        <span class="sr-only">{m.coverage_gap({ count: count(gap) })}</span>
+        <span aria-hidden="true">
+          {#if view === "left"}
+            {count(gap)}
+          {:else if view === "percent"}
+            {Math.min(99, Math.floor((done / total) * 100))}%
+          {:else}
+            <span class="max-sm:grid max-sm:leading-3.5"
+              >{compact.format(done)}<span class="max-sm:hidden">/</span><span
+                >{compact.format(total)}</span
+              ></span
+            >
+          {/if}
+        </span>
+        <span class="sr-only">{title}</span>
       </span>
     {/if}
   </span>
@@ -138,7 +170,11 @@
     aria-level={depth + 1}
     aria-expanded={row.hasChildren ? isOpen : undefined}
     class={cn(
-      "grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(4,4.75rem)] items-center gap-x-1 bg-card pe-2 max-sm:grid-cols-[minmax(0,1fr)_repeat(4,2.25rem)]",
+      "grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(4,4.75rem)] items-center gap-x-1 bg-card pe-2",
+      {
+        "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,2.25rem)]": view !== "done",
+        "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,3rem)]": view === "done",
+      },
       { "block-10": isYear, "block-8": !isYear },
       { "hover:bg-secondary": row.hasChildren },
     )}
@@ -221,12 +257,12 @@
         {count(row.held)}
       {/if}
     </span>
-    {@render marker(row.missing, row.kind === "government")}
-    {@render marker(row.county, row.kind === "government")}
-    {@render marker(row.precinct, row.kind === "government")}
-    {@render marker(row.shapes, row.kind === "government")}
+    {@render marker(row.missing, row.expected)}
+    {@render marker(row.county, row.countyTotal)}
+    {@render marker(row.precinct, row.precinctTotal)}
+    {@render marker(row.shapes, row.shapesTotal)}
   </div>
   {#if isOpen}
-    <Self parent={row.path} depth={depth + 1} />
+    <Self parent={row.path} depth={depth + 1} {view} />
   {/if}
 {/each}

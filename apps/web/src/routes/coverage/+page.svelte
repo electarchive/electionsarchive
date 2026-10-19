@@ -1,11 +1,26 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { onMount } from "svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
+  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Rows from "./rows.svelte";
 
   const { data }: { data: PageData } = $props();
+
+  const VIEWS = ["percent", "left", "done"] as const;
+  let view = $state<(typeof VIEWS)[number]>("percent");
+
+  onMount(() => {
+    try {
+      const saved = localStorage.getItem("coverage-view");
+      const found = VIEWS.find((option) => option === saved);
+      if (found != null) {
+        view = found;
+      }
+    } catch {}
+  });
 
   const built = $derived(
     data.builtAt == null
@@ -35,12 +50,56 @@
       <p class="text-sm text-muted-foreground max-inline-[72ch]">
         {m.coverage_denominator()}
       </p>
-      <p class="text-xs text-muted-foreground">{built}</p>
+      <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
+        <p class="text-xs text-muted-foreground">{built}</p>
+        <div
+          role="group"
+          aria-label={m.coverage_view()}
+          class="flex items-center gap-2 text-sm"
+        >
+          <span class="text-muted-foreground">{m.coverage_view()}</span>
+          <span class="flex rounded-sm border border-border p-0.5">
+            {#each VIEWS as option (option)}
+              <button
+                type="button"
+                aria-pressed={view === option}
+                class={cn(
+                  "rounded-[3px] px-2 block-7 focus-visible:outline-2 focus-visible:outline-ring",
+                  {
+                    "bg-foreground text-background": view === option,
+                    "text-muted-foreground hover:text-foreground":
+                      view !== option,
+                  },
+                )}
+                onclick={() => {
+                  view = option;
+                  try {
+                    localStorage.setItem("coverage-view", option);
+                  } catch {}
+                }}
+              >
+                {option === "percent"
+                  ? m.coverage_view_percent()
+                  : option === "left"
+                    ? m.coverage_view_left()
+                    : m.coverage_view_done()}
+              </button>
+            {/each}
+          </span>
+        </div>
+      </div>
     </header>
     <div role="treegrid" aria-label={m.coverage_title()} class="grid gap-px">
       <div
         role="row"
-        class="sticky inset-bs-0 z-10 grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(4,4.75rem)] items-end gap-x-1 bg-card px-2  pbs-2 pbe-1.5 text-xs/tight  font-bold max-sm:grid-cols-[minmax(0,1fr)_repeat(4,2.25rem)]"
+        class={cn(
+          "sticky inset-bs-0 z-10 grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(4,4.75rem)] items-end gap-x-1 bg-card px-2 pbs-2 pbe-1.5 text-xs/tight font-bold max-sm:pbs-16",
+          {
+            "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,2.25rem)]":
+              view !== "done",
+            "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,3rem)]": view === "done",
+          },
+        )}
       >
         <span role="columnheader">{m.coverage_column_name()}</span>
         <span role="columnheader" class="text-end max-sm:hidden"
@@ -54,7 +113,7 @@
           >
         {/each}
       </div>
-      <Rows rows={data.rows} />
+      <Rows rows={data.rows} {view} />
     </div>
   </article>
 </main>

@@ -18,6 +18,9 @@ const row = v.object({
   shapes: gap,
   precincts: v.number(),
   shaped: v.number(),
+  countyTotal: gap,
+  precinctTotal: gap,
+  shapesTotal: gap,
   hasChildren: v.boolean(),
   href: v.nullable(v.string()),
   detail: v.nullable(v.string()),
@@ -53,9 +56,12 @@ export const coverage = {
           select 'g:' || g.id as path, g.name as label, 'government' as kind,
             y.expected::int as expected, y.held, null::int as governments,
             y.missing::int as missing, null::int as county,
-            case when y.year >= 2000 then (y.held = 0 or y.precinct < y.held)::int end as precinct,
-            case when y.year >= 2000 and y.precincts > 0 then (y.shaped < y.precincts)::int end as shapes,
-            y.precincts, y.shaped, false as "hasChildren", s.path as href,
+            case when y.year >= 2000 then y.held - y.precinct + (y.expected and y.held = 0)::int end as precinct,
+            case when y.year >= 2000 and y.precincts > 0 then y.precincts - y.shaped end as shapes,
+            y.precincts, y.shaped, null::int as "countyTotal",
+            case when y.year >= 2000 then y.held + (y.expected and y.held = 0)::int end as "precinctTotal",
+            case when y.year >= 2000 and y.precincts > 0 then y.precincts end as "shapesTotal",
+            false as "hasChildren", s.path as href,
             nullif(concat_ws(', ', g.function, case when g.kind <> 'county' then (
               select n.text from external_id c join name n on n.entity_id = c.entity_id and n.is_preferred
               where c.scheme = 'us.polity' and c.value = 'county:' || g.county
@@ -71,7 +77,8 @@ export const coverage = {
       }
       const found = await db.execute<v.InferOutput<typeof row>>(sql`
         select r.path, r.label, r.kind, r.expected, r.held, r.governments, r.missing, r.county,
-          r.precinct, r.shapes, r.precincts, r.shaped,
+          r.precinct, r.shapes, r.precincts, r.shaped, r.county_total as "countyTotal",
+          r.precinct_total as "precinctTotal", r.shapes_total as "shapesTotal",
           r.kind = 'governments' or exists (select from coverage_row c where c.parent = r.path) as "hasChildren",
           null as href, null as detail
         from coverage_row r

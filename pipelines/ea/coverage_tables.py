@@ -479,7 +479,7 @@ def build() -> str:
                         shaped,
                     )
                 )
-    leaves: dict[tuple[int, str, str], list[int]] = defaultdict(lambda: [0, 0, 0, 0, 0, 0, 0, 0])
+    leaves: dict[tuple[int, str, str], list[int]] = defaultdict(lambda: [0, 0, 0, 0, 0, 0, 0, 0, 0])
     kinds = {g["id"]: (g["state"], g["kind"]) for g in governments}
     for gid, year, expected, n, missing, precinct, precincts, shaped in years_out:
         st, kind = kinds[gid]
@@ -488,10 +488,11 @@ def build() -> str:
         cell[1] += expected
         cell[2] += n
         cell[3] += missing
-        cell[4] += year >= 2000 and (n == 0 or precinct < n)
-        cell[5] += year >= 2000 and shaped < precincts
+        cell[4] += n - precinct + (expected and n == 0)
+        cell[5] += precincts - shaped
         cell[6] += precincts
         cell[7] += shaped
+        cell[8] += n + (expected and n == 0)
 
     def node(path: str, parent: str | None, year: int, sort: int, label: str, kind: str) -> dict:
         return {
@@ -510,6 +511,9 @@ def build() -> str:
             "shapes": None,
             "precincts": 0,
             "shaped": 0,
+            "county_total": None,
+            "precinct_total": None,
+            "shapes_total": None,
         }
 
     nodes: dict[str, dict] = {}
@@ -537,15 +541,19 @@ def build() -> str:
             else None
         )
         precinct = base - c["precinct"] if c["target"] == "precinct" else None
+        shapes = c["target"] == "precinct" and c["precincts"] > 0
         values = {
             "expected": expected,
             "held": c["held"],
             "missing": max(0, (expected or 0) - c["held"]),
             "county": county,
             "precinct": precinct,
-            "shapes": c["precincts"] - c["shaped_precincts"] if c["target"] == "precinct" and c["precincts"] else None,
+            "shapes": c["precincts"] - c["shaped_precincts"] if shapes else None,
             "precincts": c["precincts"],
             "shaped": c["shaped_precincts"],
+            "county_total": None if county is None else base,
+            "precinct_total": None if precinct is None else base,
+            "shapes_total": c["precincts"] if shapes else None,
         }
         if str(year) not in nodes:
             nodes[str(year)] = node(str(year), None, year, -year, str(year), "year")
@@ -580,7 +588,7 @@ def build() -> str:
             year,
             values,
         )
-    for (year, st, kind), (count, expected, n, missing, precinct, shapes, precincts, shaped) in leaves.items():
+    for (year, st, kind), (count, expected, n, missing, precinct, shapes, precincts, shaped, total) in leaves.items():
         if st not in names:
             continue
         add(
@@ -601,6 +609,8 @@ def build() -> str:
                 "shapes": shapes if year >= 2000 and precincts else None,
                 "precincts": precincts,
                 "shaped": shaped,
+                "precinct_total": total if year >= 2000 else None,
+                "shapes_total": precincts if year >= 2000 and precincts else None,
             },
         )
     rows = list(nodes.values())
@@ -640,7 +650,7 @@ def build() -> str:
                 copy.write_row(row)
         with conn.cursor().copy(
             "copy coverage_row (path, parent, year, sort, label, kind, expected, held, governments, missing, county,"
-            " precinct, shapes, precincts, shaped) from stdin"
+            " precinct, shapes, precincts, shaped, county_total, precinct_total, shapes_total) from stdin"
         ) as copy:
             for row in rows:
                 copy.write_row(list(row.values()))
