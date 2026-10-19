@@ -38,12 +38,14 @@
     depth = 0,
     view,
     hideDone,
+    local,
   }: {
     rows?: Array<Row> | null;
     parent?: string | null;
     depth?: number;
     view: "percent" | "left" | "done";
     hideDone: boolean;
+    local: boolean;
   } = $props();
 
   const LABELS: Record<string, () => string> = {
@@ -70,7 +72,9 @@
   };
 
   const children = createQuery(() => ({
-    ...orpc.coverage.rows.queryOptions({ input: { parent: parent ?? "" } }),
+    ...orpc.coverage.rows.queryOptions({
+      input: { parent: parent ?? "", scope: local ? "all" : "nonlocal" },
+    }),
     enabled: rows == null && parent != null,
   }));
 
@@ -284,6 +288,6 @@
     {@render marker(row.shapes, row.shapesTotal)}
   </div>
   {#if isOpen}
-    <Self parent={row.path} depth={depth + 1} {view} {hideDone} />
+    <Self parent={row.path} depth={depth + 1} {view} {hideDone} {local} />
   {/if}
 {/each}

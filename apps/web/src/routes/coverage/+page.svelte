@@ -1,8 +1,10 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { createQuery } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Rows from "./rows.svelte";
@@ -12,6 +14,13 @@
   const VIEWS = ["percent", "left", "done"] as const;
   let view = $state<(typeof VIEWS)[number]>("percent");
   let hideDone = $state(false);
+  let local = $state(true);
+
+  const nonlocal = createQuery(() => ({
+    ...orpc.coverage.rows.queryOptions({ input: { scope: "nonlocal" } }),
+    enabled: !local,
+  }));
+  const years = $derived(local ? data.rows : (nonlocal.data?.rows ?? []));
 
   onMount(() => {
     try {
@@ -21,6 +30,7 @@
         view = found;
       }
       hideDone = localStorage.getItem("coverage-hide-done") === "true";
+      local = localStorage.getItem("coverage-local") !== "false";
     } catch {}
   });
 
@@ -46,7 +56,7 @@
       shapesTotal: null,
     };
     let held = 0;
-    for (const row of data.rows) {
+    for (const row of years) {
       held += row.held;
       for (const key of Object.keys(sums) as Array<keyof typeof sums>) {
         const value = row[key];
@@ -134,6 +144,34 @@
           aria-label={m.coverage_view()}
           class="flex flex-wrap items-center gap-2 text-sm"
         >
+          <span
+            role="group"
+            aria-label={m.coverage_scope()}
+            class="flex rounded-sm border border-border p-0.5"
+          >
+            {#each [true, false] as option (option)}
+              <button
+                type="button"
+                aria-pressed={local === option}
+                class={cn(
+                  "rounded-[3px] px-2 block-7 focus-visible:outline-2 focus-visible:outline-ring",
+                  {
+                    "bg-foreground text-background": local === option,
+                    "text-muted-foreground hover:text-foreground":
+                      local !== option,
+                  },
+                )}
+                onclick={() => {
+                  local = option;
+                  try {
+                    localStorage.setItem("coverage-local", String(option));
+                  } catch {}
+                }}
+              >
+                {option ? m.coverage_scope_all() : m.coverage_scope_nonlocal()}
+              </button>
+            {/each}
+          </span>
           <span class="text-muted-foreground">{m.coverage_view()}</span>
           <span class="flex rounded-sm border border-border p-0.5">
             {#each VIEWS as option (option)}
@@ -209,7 +247,16 @@
           >
         {/each}
       </div>
-      <Rows rows={[summary, ...data.rows]} {view} {hideDone} />
+      {#if local || nonlocal.data != null}
+        <Rows rows={[summary, ...years]} {view} {hideDone} {local} />
+      {:else}
+        <div
+          role="row"
+          class="bg-card px-3.5 py-1.5 text-sm text-muted-foreground"
+        >
+          {m.coverage_loading()}
+        </div>
+      {/if}
     </div>
   </article>
 </main>
