@@ -15,7 +15,9 @@ with docs as (
         case e.type
             when 'polity' then 4 + ln(1 + (select count(*) from election el where el.polity_id = e.id)) / 10
             when 'election' then 2 + (select (kind = 'general')::int from election where id = e.id)
-            when 'contest' then (select 1 + 2 * (c.allocation_parent_id is null)::int + 0.5 * (el.kind = 'general')::int from contest c join election el on el.id = c.election_id where c.id = e.id)
+            when 'contest' then (select 1 + 2 * (c.allocation_parent_id is null)::int + 0.5 * (el.kind = 'general')::int
+                + (exists (select from contest ch where ch.allocation_parent_id = c.id))::int
+                from contest c join election el on el.id = c.election_id where c.id = e.id)
             when 'party' then 1 + ln(1 + (select count(*) from contest_option o where o.party_id = e.id)) / 3
             when 'person' then ln(1 + (select count(*) from candidacy cy where cy.person_id = e.id)) / 2
                 + (select count(*) from external_id x where x.entity_id = e.id and x.scheme = 'wikidata')
@@ -32,7 +34,14 @@ insert into search_document (entity_id, type, polity_id, text, tsv, rank_boost)
 select entity_id, type, polity_id, text, to_tsvector('simple', text), rank_boost
 from (
     select entity_id, type, polity_id, rank_boost,
-        lower(unaccent(text)) || case when text ~* '\\mu\\.s\\.' then ' united states' else '' end as text
+        lower(unaccent(text))
+            || case when text ~* '\\mu\\.s\\.' then ' united states' else '' end
+            || case when text ~* '\\mpresidential\\M' then ' president' else '' end
+            || case when text ~* '\\mgubernatorial\\M' then ' governor' else '' end
+            || case when text ~* '\\msenatorial\\M' then ' senator' else '' end
+            || case when text ~* '\\mcongressional\\M' then ' congress' else '' end
+            || case when text ~* '\\mmayoral\\M' then ' mayor' else '' end
+            || case when text ~* '\\mparliamentary\\M' then ' parliament' else '' end as text
     from docs
 ) d
 """
