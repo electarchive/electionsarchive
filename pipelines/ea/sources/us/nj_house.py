@@ -17,7 +17,7 @@ from ea.store import DATA
 
 SOURCE = "us.nj_house"
 RAW = "us.sri"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "New Jersey Division of Elections"
 TITLE = "State of New Jersey Results of the General Election, {day:%B %-d, %Y}"
 LICENSE = "Public record"
@@ -32,10 +32,20 @@ ITEMS = {
     1990: ("micro_IA40706939_0170", date(1990, 11, 6), (3, 4, 5, 6, 7, 8, 9, 10)),
     1992: ("micro_IA40706946_0066", date(1992, 11, 3), tuple(range(6, 19))),
 }
+NJ96 = "https://www.nj.gov/state/elections/assets/pdf/election-results/1996/1996-general-election-results-house.pdf"
+NJ98 = "https://www.nj.gov/state/elections/assets/pdf/election-results/1998/1998-gen-elect-results-us--house.pdf"
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, day, pages) in ITEMS.items()
+} | {
+    1996: (NJ96, NJ96, date(1996, 11, 5), tuple(range(1, 14))),
+    1998: (NJ98, NJ98, date(1998, 11, 3), tuple(range(1, 15))),
 }
+TITLES = {
+    1996: "Official List: General Election Returns for the Office of House of Representatives, November 5, 1996",
+    1998: "Official List: Candidate Returns for House of Representatives, November 1998 General Election",
+}
+VERTICAL = {1998}
 KEYS = {
     (1988, 103): "1988-11-08:NJ:house:3:special",
     (1990, 101): "1990-11-06:NJ:house:1:special",
@@ -150,8 +160,74 @@ def parse() -> None:
             digit_: list[float] = []
             for table in [t for t in first if t["page"] == page]:
                 counties = [*table["counties"], "Total"]
+                offset = sum(len(t["rows"]) for t in first[: first.index(table)] if t["district"] == table["district"])
                 cells = [(i, k, v) for i, (_, votes) in enumerate(table["rows"]) for k, v in enumerate(votes)]
                 anchors = {(i, k): boxes[str(v)][0] for i, k, v in cells if len(boxes.get(str(v), [])) == 1}
+                if year in VERTICAL:
+                    if not anchors:
+                        raise ValueError(f"{year} page {page} district {table['district']}: no cell found on the page")
+                    right = statistics.median(b[2] for b in anchors.values())
+                    kept = sorted((c, b) for c, b in anchors.items() if abs(b[2] - right) < 40)
+                    kept = [
+                        (c, b)
+                        for n, (c, b) in enumerate(kept)
+                        if all(p[1] < b[1] for _, p in kept[:n]) and all(b[1] < q[1] for _, q in kept[n + 1 :])
+                    ]
+                    order = {(i, k): n for n, (i, k, _) in enumerate(cells)}
+                    height_.extend(b[3] - b[1] for _, b in kept)
+                    digit_.extend((b[2] - b[0]) / len(f"{table['rows'][i][1][k]:,}") for (i, k), b in kept)
+                    height, digit = statistics.median(height_), statistics.median(digit_)
+                    for i, k, v in cells:
+                        if k == len(counties) - 1:
+                            continue
+                        before = [(c, b) for c, b in kept if c < (i, k)]
+                        after = [(c, b) for c, b in kept if c > (i, k)]
+                        near = [
+                            b
+                            for b in boxes.get(str(v), [])
+                            if abs(b[2] - right) < 40
+                            and (not before or before[-1][1][3] <= b[1])
+                            and (not after or b[3] <= after[0][1][1])
+                        ]
+                        if dict(kept).get((i, k)) is not None:
+                            box, how = dict(kept)[(i, k)], "unique"
+                        elif len(near) == 1:
+                            box, how = near[0], "aligned"
+                        elif before and after:
+                            (low, top_), (high, bottom) = before[-1], after[0]
+                            middle = (top_[1] + top_[3]) / 2 + ((bottom[1] + bottom[3]) - (top_[1] + top_[3])) / 2 * (
+                                order[(i, k)] - order[low]
+                            ) / (order[high] - order[low])
+                            box, how = (
+                                (
+                                    round(right - digit * len(f"{v:,}")),
+                                    round(middle - height / 2),
+                                    round(right),
+                                    round(middle + height / 2),
+                                ),
+                                "placed",
+                            )
+                        else:
+                            failed.append(
+                                f"{year} page {page} district {table['district']} {table['rows'][i][0]} {counties[k]}: no box"
+                            )
+                            continue
+                        rows.append(
+                            {
+                                "year": year,
+                                "page": page,
+                                "district": table["district"],
+                                "county": counties[k],
+                                "column": i + offset,
+                                "label": re.sub(
+                                    r",? (jr|sr|iii|ii)\.?$", "", table["rows"][i][0], flags=re.IGNORECASE
+                                ).split()[-1],
+                                "votes": v,
+                                "box": list(box),
+                                "located": how,
+                            }
+                        )
+                    continue
                 for i, (_, votes) in enumerate(table["rows"]):
                     for v in {v for v in votes if votes.count(v) > 1}:
                         found = boxes.get(str(v), [])
@@ -269,7 +345,7 @@ def parse() -> None:
                             "page": page,
                             "district": table["district"],
                             "county": counties[k],
-                            "column": i,
+                            "column": i + offset,
                             "label": re.sub(
                                 r",? (jr|sr|iii|ii)\.?$", "", table["rows"][i][0], flags=re.IGNORECASE
                             ).split()[-1],
