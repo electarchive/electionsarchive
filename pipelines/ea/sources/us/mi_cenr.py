@@ -12,18 +12,15 @@ from ea.store import DATA, connect
 SOURCE = "us.mi_cenr"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-FILES = {
-    date(
-        1998, 11, 3
-    ): "http://web.archive.org/web/2020id_/http://miboecfr.nictusa.com/election/results/DATA/1998GEN_MI_CENR_BY_COUNTY.xls",
-}
+FILE = "http://web.archive.org/web/2020id_/http://miboecfr.nictusa.com/election/results/DATA/{}_MI_CENR_BY_COUNTY.xls"
+FILES = ["1998GEN", *(f"{year}PRI" for year in range(2000, 2020, 2))]
 PUBLISHER = "Michigan Department of State"
 TITLE = "Official general election results by county"
 
 
 def fetch() -> None:
-    for url in FILES.values():
-        raw.fetch(SOURCE, url, suffix=".txt")
+    for name in FILES:
+        raw.fetch(SOURCE, FILE.format(name), suffix=".txt")
 
 
 def parse() -> None:
@@ -37,27 +34,32 @@ def parse() -> None:
             ).fetchall()
         }
     frames = []
-    for day, url in FILES.items():
-        frame = pl.read_csv(raw.cached(SOURCE, url).path, separator="\t", infer_schema=False, quote_char=None)
+    for name in FILES:
+        frame = pl.read_csv(raw.cached(SOURCE, FILE.format(name)).path, separator="\t", infer_schema=False, quote_char=None)
+        primary = name.endswith("PRI")
         office = pl.col("OfficeDescription")
         district = office.str.extract(r"^(\d+)\w\w District Representative in Congress")
         frames.append(
             frame.filter(
                 district.is_not_null()
-                | (pl.col("OfficeCode(Text)") == "02")
+                | ((pl.col("OfficeCode(Text)") == "02") & (not primary))
                 | office.str.starts_with("United States Senator")
                 | office.str.starts_with("President")
             ).select(
-                year=pl.lit(day.year, pl.Int32),
-                chamber=pl.when(district.is_not_null())
-                .then(pl.lit("house"))
-                .when((pl.col("OfficeCode(Text)") == "02"))
-                .then(pl.lit("governor"))
-                .when(office.str.starts_with("President"))
-                .then(pl.lit("president"))
-                .otherwise(pl.lit("senate")),
-                day=pl.lit(day),
-                special=pl.lit(False),
+                year=pl.col("ElectionDate").str.slice(0, 4).cast(pl.Int32),
+                chamber=pl.concat_str(
+                    pl.when(district.is_not_null())
+                    .then(pl.lit("house"))
+                    .when((pl.col("OfficeCode(Text)") == "02"))
+                    .then(pl.lit("governor"))
+                    .when(office.str.starts_with("President"))
+                    .then(pl.lit("president"))
+                    .otherwise(pl.lit("senate")),
+                    pl.when(primary).then(pl.lit(":") + pl.col("PartyDescription").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", "-")),
+                    ignore_nulls=True,
+                ),
+                day=pl.col("ElectionDate").str.to_date(),
+                special=office.str.contains("Partial Term"),
                 state=pl.lit("MI"),
                 district=district.cast(pl.Int16),
                 code=pl.col("CountyName")
@@ -96,7 +98,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Michigan's 1998 governor and House general elections by county",
+            summary="Michigan's 1998 governor and House general elections and its 2000–2018 House and Senate primaries by county",
             polity="US-MI",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -106,10 +108,38 @@ def emit() -> Path:
             kind="official_body",
             publisher=PUBLISHER,
             title=TITLE,
-            url="https://miboecfr.nictusa.com/election/results/98GEN/",
+            url="https://miboecfr.nictusa.com/election/results/",
             license="Public record",
         )
-        for url in FILES.values():
-            cs.artifact(raw.cached(SOURCE, url), source)
-        medsl.attach(cs, conn, frame, {"MI": source}, strict=True)
+        for name in FILES:
+            cs.artifact(raw.cached(SOURCE, FILE.format(name)), source)
+        held = {
+            value
+            for (value,) in conn.execute(
+                """select e.value from external_id e
+                   where e.scheme = 'us.contest' and e.value ~ '^20[0-2][0-9]-0[5-9]-[0-9]{2}:MI:(house:[0-9]+|senate):[a-z-]+$'
+                     and exists (select 1 from result_set rs join source s on s.id = rs.source_id
+                                 where rs.contest_id = e.entity_id and rs.status = 'active'
+                                   and s.publisher <> 'Federal Election Commission' and s.id <> %s)""",
+                [source],
+            ).fetchall()
+        }
+        medsl.attach(
+            cs,
+            conn,
+            frame.filter(
+                ~pl.concat_str(
+                    pl.col("day").cast(pl.String),
+                    pl.lit("MI"),
+                    pl.when(pl.col("district").is_not_null()).then(
+                        pl.concat_str(pl.lit("house:"), pl.col("district").cast(pl.String))
+                    ),
+                    pl.col("chamber").str.strip_prefix("house:").str.strip_prefix("house"),
+                    separator=":",
+                    ignore_nulls=True,
+                ).is_in(held)
+            ),
+            {"MI": source},
+            strict=True,
+        )
         return cs.write()
