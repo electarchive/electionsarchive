@@ -14,7 +14,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, Connection, connect
 
 SOURCE = "us.openelections"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 GEORGIA = "https://raw.githubusercontent.com/openelections/openelections-data-ga/"
 FILES = {
@@ -93,6 +93,8 @@ MISSPELLED = {
     ("MS", "launderdale"): "lauderdale",
 }
 LEVELS = {"__county": 0, "": 1, "__precinct": 2, "__ward": 3}
+MISFILED = {"2010/20101102__ri__general__town.csv"}
+ALIASES = {"officename": "office", "ballotname": "candidate", "total_votes": "votes"}
 SENATE = re.compile(r"\b(u\.?\s?s\.?|united states)\s*senat")
 HOUSE = re.compile(r"\b(u\.?\s?s\.?|united states)\s*(house|rep)|congress")
 NOT_COUNTED = (
@@ -131,16 +133,17 @@ def picks() -> list[tuple[str, int, str]]:
         best: dict[int, tuple[int, list[str]]] = {}
         for entry in tree["tree"]:
             found = re.fullmatch(
-                rf"(?:.*/)?(\d{{4}})11\d{{2}}__{state.lower()}__general(__county|__precinct|__ward|__[a-z_]+__precinct)?\.csv",
+                rf"(?:.*/)?(\d{{4}})11\d{{2}}__{state.lower()}__general(__county|__precinct|__ward|__[a-z_]+__precinct|__[a-z_]+)?\.csv",
                 entry["path"],
             )
-            if entry["type"] != "blob" or found is None:
+            if entry["type"] != "blob" or found is None or entry["path"] in MISFILED:
                 continue
-            year, level = int(found[1]), LEVELS.get(found[2] or "", 4)
+            year = int(found[1])
+            level = LEVELS.get(found[2] or "", 4 if (found[2] or "").endswith("__precinct") else 5)
             if 2000 <= year <= 2014 and year % 2 == 0:
                 if year not in best or level < best[year][0]:
                     best[year] = (level, [entry["path"]])
-                elif level == best[year][0] == 4:
+                elif level == best[year][0] >= 4:
                     best[year][1].append(entry["path"])
         chosen.extend((state, year, path) for year, (_, paths) in sorted(best.items()) for path in paths)
     return chosen
@@ -192,12 +195,24 @@ def parse() -> None:
             if column.strip().lower() not in renamed.values():
                 renamed[column] = column.strip().lower()
         frame = frame.rename(renamed)
+        frame = frame.rename({a: b for a, b in ALIASES.items() if a in frame.columns and b not in frame.columns})
+        if "votes" not in frame.columns and {"election_day_votes", "absentee_by_mail_votes"} <= set(frame.columns):
+            frame = frame.with_columns(
+                votes=pl.sum_horizontal(
+                    pl.col(column).str.replace_all(r"[,\s]", "").cast(pl.Int64, strict=False)
+                    for column in CHANNELS
+                    if column in frame.columns
+                ).cast(pl.String)
+            )
+        named = re.search(r"__general__([a-z_]+)\.csv$", path)
+        if "county" not in frame.columns and named and named[1].replace("_", "") in fips.get(state, {}):
+            frame = frame.with_columns(county=pl.lit(named[1].replace("_", " ")))
         if "county" not in frame.columns and {"jurisdiction", "reporting_level"} <= set(frame.columns):
             frame = frame.filter(pl.col("reporting_level") == "county").rename({"jurisdiction": "county"})
         if not {"county", "office", "candidate", "votes"} <= set(frame.columns):
             print(f"{path}: no county, office, candidate, or votes column, skipped")
             continue
-        office = pl.col("office").fill_null("").str.to_lowercase()
+        office = pl.col("office").fill_null("").str.to_lowercase().str.strip_chars()
         if state == "WI":
             office = office.replace({"house": "u.s. house", "senate": "u.s. senate"})
         chamber = (
@@ -205,6 +220,8 @@ def parse() -> None:
             .then(pl.lit("senate"))
             .when(office.str.contains(HOUSE.pattern) & ~office.str.contains(r"\bstate\b"))
             .then(pl.lit("house"))
+            .when(office.str.contains(r"^governor\b") & ~office.str.contains("council"))
+            .then(pl.lit("governor"))
         )
         district = (pl.col("district") if "district" in frame.columns else pl.lit(None, pl.String)).fill_null("")
         frames.append(
@@ -384,7 +401,37 @@ def emit() -> Path:
                 value="value",
             ),
         )
-        counties_frame = pl.read_parquet(PARSED / "counties.parquet")
+        covered = {
+            key
+            for (key,) in conn.execute(
+                """select distinct x.value from result_set r
+                   join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
+                   join changeset c on c.id = r.changeset_id
+                   left join source s on s.id = r.source_id
+                   where r.status = 'active' and c.pipeline <> %s
+                     and coalesce(s.publisher, '') not in
+                         ('Inter-university Consortium for Political and Social Research', 'Algara and Amlani')
+                     and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
+                                 where v.result_set_k = r.k
+                                   and u.scheme_code in ('us.county', 'us.county_part', 'us.town', 'us.precinct'))""",
+                [SOURCE],
+            ).fetchall()
+        }
+        base = pl.concat_str(
+            pl.col("day").cast(pl.String),
+            pl.lit(":"),
+            "state",
+            pl.lit(":"),
+            "chamber",
+            pl.when(pl.col("district").is_not_null()).then(pl.lit(":") + pl.col("district").cast(pl.String)),
+            ignore_nulls=True,
+        )
+        counties_frame = pl.read_parquet(PARSED / "counties.parquet").filter(
+            ~base.is_in(list(covered)),
+            ~(base + ":special").is_in(list(covered)),
+            ~pl.concat_str(pl.col("day").cast(pl.String), pl.lit(":"), "state", pl.lit(":house:0")).is_in(list(covered))
+            | (pl.col("chamber") != "house"),
+        )
         sources: dict[str, UUID] = {}
         for state in counties_frame["state"].unique().sort():
             title = f"{state} county-level results"
@@ -404,5 +451,5 @@ def emit() -> Path:
                     raw.cached(SOURCE, REPOSITORY.format(state=state.lower(), commit=COMMITS[state], path=path)),
                     sources[state],
                 )
-        medsl.attach(cs, conn, counties_frame, sources)
+        medsl.attach(cs, conn, counties_frame, sources, strict=True)
         return cs.write()

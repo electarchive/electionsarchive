@@ -683,6 +683,7 @@ def attach(
     sources: dict[str, UUID],
     redone: frozenset[str] = frozenset(),
     grain: str = "county",
+    strict: bool = False,
 ) -> None:
     tag = str(cs.manifest["pipeline"])
     states: dict[str, UUID] = {
@@ -832,11 +833,13 @@ def attach(
         if overcounted:
             print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
             continue
-        if undercounted and ":" in chamber:
-            print(f"{key}: a primary candidate's county sum falls short of the FEC total, skipped")
+        if undercounted and (strict or ":" in chamber):
+            print(f"{key}: a candidate's county sum falls short of the FEC total, skipped")
             continue
         pooled = tallies.with_columns(
-            pl.col("option").cast(pl.String).replace(
+            pl.col("option")
+            .cast(pl.String)
+            .replace(
                 "pool",
                 next(
                     (str(option) for option, kind, label, _, _ in known if kind == "write_in" and label in GENERIC),
