@@ -8,10 +8,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.ca_sov"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://elections.cdn.sos.ca.gov/sov/"
 PUBLISHER = "California Secretary of State"
@@ -25,6 +26,7 @@ FILES = {
     (date(1998, 11, 3), "attorney-general"): "1998-general/sov16-18.pdf",
     (date(1998, 11, 3), "insurance-commissioner"): "1998-general/sov19-21.pdf",
     (date(1998, 11, 3), "senate"): "1998-general/sov25-27.pdf",
+    (date(1998, 11, 3), "house"): "1998-general/sov28-34.pdf",
 }
 NAMES = {
     "Harold H Bloomfield La": "Harold H Bloomfield",
@@ -83,69 +85,87 @@ def parse() -> None:
             text=True,
             check=True,
         ).stdout
-        seen: dict[str, list[int]] = {}
-        header: list[tuple[str, str]] = []
-        shape: list[tuple[str, str]] = []
-        printed: list[int] = []
+        tables: dict[
+            int | None, tuple[dict[str, list[int]], list[tuple[str, str]], list[tuple[str, str]], list[int]]
+        ] = {}
+        district: int | None = None
         for page in text.split("\f"):
-            lines = page.splitlines()
-            first = next((i for i, line in enumerate(lines) if re.match(r"[A-Z][a-z]+.*\s\d[\d,]*\s*$", line)), None)
-            if first is None:
-                continue
-            edges = [found.end() for found in re.finditer(r"\d[\d,]*", lines[first])]
-            words = [line for line in lines[:first] if line.strip()][-3:]
-            columns: list[list[list[str]]] = [[[], [], []] for _ in edges]
-            for row, line in enumerate(words):
-                for found in re.finditer(r"\S+", line):
-                    end = found.end()
-                    column = (
-                        next((i for i, edge in enumerate(edges) if edge >= end - 1), len(edges) - 1)
-                        if row == 0
-                        else min(range(len(edges)), key=lambda i: abs(edges[i] - end))
-                    )
-                    columns[column][row].append(found[0])
-            names = [(" ".join([*first_names, *last]), " ".join(party)) for first_names, last, party in columns]
-            check = [(" ".join(last), " ".join(party)) for _, last, party in columns]
-            if not header:
-                header, shape = names, check
-            elif check != shape:
-                raise ValueError(f"{path}: the header changes from {shape} to {check}")
-            for line in lines[first:]:
-                found = re.fullmatch(r"(\S.*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*", line)
-                if found is None:
-                    continue
-                values = [int(value.replace(",", "")) for value in found[2].split()]
-                if len(values) != len(edges):
-                    raise ValueError(f"{path}: {line}")
-                if found[1] == "State Totals":
-                    printed = values
-                elif plain(found[1]) in codes:
-                    seen[codes[plain(found[1])]] = values
+            segments: list[tuple[int | None, list[str]]] = [(district, [])]
+            for line in page.splitlines():
+                title = re.fullmatch(r"\s*(\d+)(?:st|nd|rd|th) Congressional District\s*", line)
+                if title:
+                    district = int(title[1])
+                    segments.append((district, []))
                 else:
-                    raise ValueError(f"{path}: unknown county {found[1]}")
-        if len(seen) != 58:
-            raise ValueError(f"{path}: {len(seen)} counties")
-        for column, (name, party) in enumerate(header):
-            if name.startswith("Votes not"):
-                continue
-            total = sum(values[column] for values in seen.values())
-            if total != printed[column]:
-                raise ValueError(f"{path} {name}: {total}, printed {printed[column]}")
-            if not total:
-                continue
-            rows.extend(
-                {
-                    "day": day,
-                    "office": office,
-                    "candidate": NAMES.get(name, name),
-                    "party": party,
-                    "county": county,
-                    "votes": values[column],
-                }
-                for county, values in seen.items()
-            )
+                    segments[-1][1].append(line)
+            for number, lines in segments:
+                first = next(
+                    (i for i, line in enumerate(lines) if re.match(r"[A-Z][a-z]+.*\s\d[\d,]*\s*$", line)), None
+                )
+                if first is None:
+                    continue
+                seen, header, shape, printed = tables.setdefault(number, ({}, [], [], []))
+                edges = [found.end() for found in re.finditer(r"\d[\d,]*", lines[first])]
+                words = [line for line in lines[:first] if line.strip()][-3:]
+                columns: list[list[list[str]]] = [[[], [], []] for _ in edges]
+                for row, line in enumerate(words):
+                    for found in re.finditer(r"\S+", line):
+                        end = found.end()
+                        column = (
+                            next((i for i, edge in enumerate(edges) if edge >= end - 1), len(edges) - 1)
+                            if row == 0 and number is None
+                            else min(range(len(edges)), key=lambda i: abs(edges[i] - end))
+                        )
+                        columns[column][row].append(found[0])
+                names = [(" ".join([*first_names, *last]), " ".join(party)) for first_names, last, party in columns]
+                check = [(" ".join(last), " ".join(party)) for _, last, party in columns]
+                if not header:
+                    header.extend(names)
+                    shape.extend(check)
+                elif check != shape:
+                    raise ValueError(f"{path}: the header changes from {shape} to {check}")
+                for line in lines[first:]:
+                    found = re.fullmatch(r"(\S.*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*", line)
+                    if found is None:
+                        continue
+                    values = [int(value.replace(",", "")) for value in found[2].split()]
+                    if len(values) != len(edges):
+                        raise ValueError(f"{path}: {line}")
+                    if found[1] in ("State Totals", "District Totals"):
+                        printed.extend(values)
+                    elif plain(found[1]) in codes:
+                        seen[codes[plain(found[1])]] = values
+                    else:
+                        raise ValueError(f"{path}: unknown county {found[1]}")
+        for number, (seen, header, _, printed) in tables.items():
+            if number is None and len(seen) != 58:
+                raise ValueError(f"{path}: {len(seen)} counties")
+            if not printed and len(seen) == 1:
+                printed = next(iter(seen.values()))
+            for column, (name, party) in enumerate(header):
+                if name.startswith("Votes not"):
+                    continue
+                total = sum(values[column] for values in seen.values())
+                if total != printed[column]:
+                    raise ValueError(f"{path} {number} {name}: {total}, printed {printed[column]}")
+                if not total:
+                    continue
+                rows.extend(
+                    {
+                        "day": day,
+                        "office": office,
+                        "district": number,
+                        "candidate": NAMES.get(name, name),
+                        "party": party,
+                        "county": county,
+                        "votes": values[column],
+                    }
+                    for county, values in seen.items()
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(rows).write_parquet(PARSED / "lines.parquet")
+    frame = pl.DataFrame(rows, infer_schema_length=None)
+    frame.filter(pl.col("office") != "house").drop("district").write_parquet(PARSED / "lines.parquet")
+    frame.filter(pl.col("office") == "house").write_parquet(PARSED / "house.parquet")
 
 
 def emit() -> Path:
@@ -155,7 +175,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="California's 1998 governor, U.S. Senate, and other statewide offices by county "
+            summary="California's 1998 governor, U.S. Senate, other statewide offices, and House by county "
             "from the Secretary of State's Statement of Vote",
             polity="US",
         )
@@ -374,4 +394,25 @@ def emit() -> Path:
             if not kept:
                 winner = max(totals, key=totals.__getitem__)
                 cs.add("outcome", result_set_id=result_set, option_id=winner, kind="elected", seats=1)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "house.parquet").select(
+                year=pl.col("day").dt.year(),
+                chamber=pl.lit("house"),
+                day="day",
+                special=pl.lit(False),
+                state=pl.lit("CA"),
+                district=pl.col("district").cast(pl.Int16),
+                code=pl.col("county"),
+                candidate=pl.col("candidate").str.replace_all(",", ""),
+                measure=pl.lit(1, pl.Int16),
+                writein=pl.col("party") == "Write-in",
+                votes="votes",
+                kind=pl.lit("county"),
+                source=pl.lit("CA"),
+            ),
+            {"CA": source},
+            strict=True,
+        )
         return cs.write()

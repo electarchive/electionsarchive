@@ -9,10 +9,11 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_elchist"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://elections.sos.state.tx.us/"
 STATEWIDE = re.compile(
@@ -21,6 +22,8 @@ STATEWIDE = re.compile(
     r"|Chief Justice, Supreme Court|Justice, Supreme Court, Place \d|Presiding Judge, Court of Criminal Appeals"
     r"|Judge, Court of Criminal Appeals Place \d)( - Unexpired Term)?$"
 )
+HOUSE = re.compile(r"^U\. ?S\. Representative District (\d+)$")
+HOUSES = (56, 57, 72)
 PUBLISHER = "Texas Secretary of State"
 TITLE = "Texas election history: statewide returns by county, 1992–1998"
 LATER = "Texas election history: statewide returns by county, 2000–2014"
@@ -116,6 +119,15 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
+    for election in HOUSES:
+        for race, title in races(election):
+            if HOUSE.match(title):
+                url = f"{SITE}elchist{election}_race{race}.htm"
+                try:
+                    raw.cached(SOURCE, url)
+                except LookupError:
+                    raw.fetch(SOURCE, url, suffix=".htm")
+                    time.sleep(1)
 
 
 def cells(row: str, tag: str) -> list[str]:
@@ -179,7 +191,47 @@ def parse() -> None:
                     }
                     for row, value in zip(counties, votes, strict=True)
                 )
+    house: list[dict[str, object]] = []
+    for election in HOUSES:
+        for race, title in races(election):
+            district = HOUSE.match(title)
+            if district is None:
+                continue
+            text = raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm").path.read_text(errors="replace")
+            stamp = re.search(r"<H3[^>]*>(\d+)/(\d+)/(\d{4})</H3>", text, re.IGNORECASE)
+            if stamp is None:
+                raise ValueError(f"{election} {race}: no date")
+            lines = re.findall(r"<TR[^>]*>(.*?)</TR>", text, re.IGNORECASE | re.DOTALL)
+            headers = [cells(line, "TH") for line in lines if re.search(r"<TH", line, re.IGNORECASE)]
+            data = [cells(line, "TD") for line in lines if re.search(r"<TD", line, re.IGNORECASE)]
+            width = headers[-1].index("Votes")
+            counties = [row for row in data if row[0] != "ALL COUNTIES"]
+            total = next((row for row in data if row[0] == "ALL COUNTIES"), counties[0] if len(counties) == 1 else None)
+            if total is None:
+                raise ValueError(f"{election} {race}: no total")
+            for column in range(1, width):
+                candidate = " ".join(
+                    row[column] for row in headers[:-1] if column < len(row) and row[column] not in ("...", "Total")
+                )
+                votes = [int(row[column].replace(",", "") or 0) for row in counties]
+                if sum(votes) != int(total[column].replace(",", "")):
+                    raise ValueError(
+                        f"{election} {race} {candidate}: counties sum to {sum(votes)}, not {total[column]}"
+                    )
+                house.extend(
+                    {
+                        "election": election,
+                        "day": date(int(stamp[3]), int(stamp[1]), int(stamp[2])),
+                        "district": int(district[1]),
+                        "candidate": candidate,
+                        "party": headers[-1][column],
+                        "county": row[0],
+                        "votes": value,
+                    }
+                    for row, value in zip(counties, votes, strict=True)
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
+    pl.DataFrame(house).write_parquet(PARSED / "house.parquet")
     frame = pl.DataFrame(rows, infer_schema_length=None)
     frame.write_parquet(PARSED / "lines.parquet")
     print(frame.group_by("election", "name", "day", "race").agg(pl.col("candidate").n_unique()).sort("day", "race"))
@@ -192,8 +244,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas statewide elections of 1992 to 1998 and primaries, runoffs, and generals of 2000 to 2014 by "
-            "county from the Secretary of State's election history",
+            summary="Texas statewide elections of 1992 to 1998, House generals of 1996 and 1998, and primaries, "
+            "runoffs, and generals of 2000 to 2014 by county from the Secretary of State's election history",
             polity="US",
         )
 
@@ -577,4 +629,37 @@ def emit() -> Path:
                         cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced", seats=None)
             filled += 1
         print(filled, "contests filled")
+        house = pl.read_parquet(PARSED / "house.parquet")
+        for election in HOUSES:
+            for race, title in races(election):
+                if HOUSE.match(title):
+                    cs.artifact(raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm"), source)
+        codes: dict[str, str] = {
+            plain(text): code
+            for text, code in conn.execute(
+                """select n.text, u.code from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '48%%'"""
+            ).fetchall()
+        }
+        medsl.attach(
+            cs,
+            conn,
+            house.select(
+                year=pl.col("day").dt.year(),
+                chamber=pl.lit("house"),
+                day="day",
+                special=pl.lit(False),
+                state=pl.lit("TX"),
+                district=pl.col("district").cast(pl.Int16),
+                code=pl.col("county").map_elements(lambda county: codes[plain(county)], return_dtype=pl.String),
+                candidate="candidate",
+                measure=pl.lit(1, pl.Int16),
+                writein=pl.col("party").str.contains("(?i)^(w-i|write)"),
+                votes="votes",
+                kind=pl.lit("county"),
+                source=pl.lit("TX"),
+            ),
+            {"TX": source},
+            strict=True,
+        )
         return cs.write()
