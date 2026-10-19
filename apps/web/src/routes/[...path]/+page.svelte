@@ -161,6 +161,7 @@
         lists={data.lists}
         rounds={data.rounds}
         ballot={data.ballot}
+        cycle={data.cycle}
         boundaries={data.boundaries}
         match={data.match}
       />
@@ -169,6 +170,7 @@
         <Election
           id={data.id}
           election={data.election}
+          cycle={data.cycle}
           sections={data.sections}
         />
       {/key}

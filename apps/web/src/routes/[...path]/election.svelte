@@ -13,6 +13,7 @@
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Cycle from "./cycle.svelte";
   import Electors from "./electors.svelte";
   import Governments from "./governments.svelte";
   import PlaceMap from "./map.svelte";
@@ -27,12 +28,20 @@
   const {
     id,
     election,
+    cycle,
     sections,
   }: {
     id: string;
     election: Extract<PageData, { kind: "election" }>["election"];
+    cycle: Extract<PageData, { kind: "election" }>["cycle"];
     sections: Extract<PageData, { kind: "election" }>["sections"];
   } = $props();
+
+  const monthDay = new Intl.DateTimeFormat(getLocale(), {
+    month: "short",
+    day: "numeric",
+    timeZone: "UTC",
+  });
 
   const client = useQueryClient();
   untrack(() => {
@@ -682,6 +691,42 @@
   </p>
 </header>
 
+<Cycle
+  primaries={cycle.primaries.map((primary) => ({
+    ...primary,
+    key: primary.id,
+    label:
+      primary.party == null
+        ? primary.name
+        : primary.until == null
+          ? m.cycle_primary({ party: primary.party.label })
+          : m.cycle_primaries({ party: primary.party.label }),
+    color: primary.party?.color ?? null,
+    runoff: null,
+    local: null,
+  }))}
+  general={cycle.general == null
+    ? null
+    : { ...cycle.general, winners: [], local: null }}
+  others={cycle.parts.map((part) => ({
+    key: part.place,
+    label: part.place,
+    color: null,
+    races: part.races.map((race) => ({
+      ...race,
+      label: [
+        race.date == null
+          ? null
+          : monthDay.format(new Date(`${race.date}T00:00:00Z`)),
+        race.party?.short ?? race.party?.label ?? null,
+      ]
+        .filter((part) => part != null)
+        .join(", "),
+    })),
+  }))}
+  othersTitle={m.cycle_parts()}
+/>
+
 {#if races.length === 0 && election.contests.length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_contests()}</h2>
@@ -728,7 +773,7 @@
               >
                 <a
                   class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                  href="#race-{index}">{race.name}</a
+                  href="#race-{race.anchor}">{race.name}</a
                 >
               </h3>
               {#if race.lede != null}
@@ -807,7 +852,7 @@
 
 {#each races as race, index (index)}
   <section
-    id="race-{index}"
+    id="race-{race.anchor}"
     class="col-span-12 grid scroll-mbs-4 gap-1.5 bg-card px-3.5 pbs-4 pbe-1"
   >
     <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">

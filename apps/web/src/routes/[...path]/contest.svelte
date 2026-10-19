@@ -16,6 +16,7 @@
   import Ballot from "./ballot.svelte";
   import Changes from "./changes.svelte";
   import Count from "./count.svelte";
+  import Cycle from "./cycle.svelte";
   import ElectionRow from "./election-row.svelte";
   import Electors from "./electors.svelte";
   import Lists from "./lists.svelte";
@@ -36,6 +37,7 @@
     lists,
     rounds,
     ballot,
+    cycle,
     boundaries,
     match,
   }: {
@@ -43,10 +45,21 @@
     lists: Extract<PageData, { kind: "contest" }>["lists"];
     rounds: Extract<PageData, { kind: "contest" }>["rounds"];
     ballot: Extract<PageData, { kind: "contest" }>["ballot"];
+    cycle: Extract<PageData, { kind: "contest" }>["cycle"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
     match: string;
   } = $props();
 
+  const DAY: Record<string, () => string> = {
+    owner: () => "",
+    governor: m.cycle_governor,
+    legislature: m.cycle_legislature,
+    regional_office: m.cycle_regional_office,
+    national_measure: m.cycle_national_measure,
+    regional_measure: m.cycle_regional_measure,
+    local: m.cycle_local,
+    local_measure: m.cycle_local_measure,
+  };
   const STAGES: Record<string, () => string> = {
     live: m.stage_live,
     preliminary: m.stage_preliminary,
@@ -802,6 +815,43 @@
 {#if rounds.length > 1}
   <Rounds {rounds} />
 {/if}
+
+<Cycle
+  primaries={cycle.primaries.map((step) => ({
+    ...step,
+    key: step.id,
+    label:
+      step.party == null
+        ? ""
+        : step.until == null
+          ? m.cycle_primary({ party: step.party.label })
+          : m.cycle_primaries({ party: step.party.label }),
+    color: step.party?.color ?? null,
+  }))}
+  general={cycle.general}
+  others={cycle.others.map((entry) => ({
+    key: entry.party.id,
+    label: entry.party.label,
+    color: entry.party.color,
+    races: entry.races.map((race) => ({ ...race, label: race.place })),
+  }))}
+  othersTitle={m.cycle_others()}
+  day={{
+    ...cycle.day,
+    groups: cycle.day.groups.flatMap((group, index) =>
+      group.path == null
+        ? []
+        : [
+            {
+              ...group,
+              path: group.path,
+              key: `${group.kind}:${index}`,
+              label: group.label ?? DAY[group.kind]?.() ?? "",
+            },
+          ],
+    ),
+  }}
+/>
 
 {#if contest.current == null && contest.declared != null}
   <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">

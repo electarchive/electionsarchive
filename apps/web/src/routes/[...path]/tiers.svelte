@@ -290,7 +290,8 @@
 
 {#if places.length > 0}
   <section
-    class="col-span-12 grid grid-cols-[minmax(0,1fr)] gap-4 bg-card px-3.5 pbs-3.5 pbe-4"
+    id="down-the-ballot"
+    class="col-span-12 grid scroll-mbs-4 grid-cols-[minmax(0,1fr)] gap-4 bg-card px-3.5 pbs-3.5 pbe-4"
     aria-labelledby="{uid}-title"
   >
     <div class="grid gap-0.5">

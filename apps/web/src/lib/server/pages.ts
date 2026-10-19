@@ -352,7 +352,7 @@ export async function archive(path: string, search: URLSearchParams) {
   const match =
     requested === "person" || requested === "family" ? requested : "party";
   if (slug.type === "contest") {
-    const [contest, lists, rounds, ballot] = await found(
+    const [contest, lists, rounds, ballot, cycle] = await found(
       Promise.all([
         call(router.contests.get, {
           id: slug.entity_id,
@@ -366,6 +366,7 @@ export async function archive(path: string, search: URLSearchParams) {
         call(router.contests.lists, { id: slug.entity_id }),
         call(router.contests.rounds, { id: slug.entity_id, unit }),
         call(router.contests.ballot, { id: slug.entity_id, unit }),
+        call(router.contests.cycle, { id: slug.entity_id, unit }),
       ]),
     );
     const boundaries = await call(router.contests.boundaries, {
@@ -379,22 +380,25 @@ export async function archive(path: string, search: URLSearchParams) {
       lists,
       rounds,
       ballot,
+      cycle,
       boundaries,
       match,
     };
   }
   if (slug.type === "election") {
     const input = { id: slug.entity_id };
-    const [election, governments, regions, tiers] = await Promise.all([
+    const [election, governments, regions, tiers, cycle] = await Promise.all([
       call(router.elections.get, input),
       call(router.elections.governments, input),
       call(router.elections.regions, input),
       call(router.elections.tiers, input),
+      call(router.elections.cycle, input),
     ]);
     return {
       kind: "election" as const,
       id: slug.entity_id,
       election,
+      cycle,
       sections: { governments, regions, tiers },
     };
   }
