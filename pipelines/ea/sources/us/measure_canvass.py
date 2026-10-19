@@ -97,6 +97,10 @@ ALABAMA = {
 }
 ARIZONA = {
     date(2014, 11, 4): ("20141202160733", "http://www.azsos.gov/election/2014/General/Canvass2014GE.pdf"),
+    date(2018, 11, 6): (
+        "20181207054635",
+        "https://azsos.gov/sites/default/files/2018%201203%20Signed%20Official%20Statewide%20Canvass.pdf",
+    ),
     date(2020, 11, 3): ("20231207175657", "https://azsos.gov/sites/default/files/2020_General_State_Canvass.pdf"),
 }
 GEORGIA = {
@@ -234,6 +238,11 @@ REPLACED = {
     "MIT Election Data and Science Lab": "MEDSL's totals summed from its precinct returns",
     "OpenElections": "OpenElections' totals summed from its precinct returns",
 }
+DIGITIZED = (
+    " The canvass is a scanned image, so its county figures were digitized in two passes: a hand transcription, "
+    "each value then matched to Apple Vision's or tesseract's read of its cell, and each answer's counties checked "
+    "against the canvass's printed total."
+)
 KANSAS_CITY = (
     " Kansas City, its own election authority, is reported apart from the Jackson, Clay, Platte, and Cass county "
     "authorities and is credited to the city."
@@ -1229,7 +1238,8 @@ def parse() -> None:
                 orient="row",
             )
         elif state == "AZ":
-            records = []
+            model = PARSED / "model" / f"az-{day.year}.json"
+            records = [tuple(row.values()) for row in json.loads(model.read_text())] if model.exists() else []
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             for number, page in enumerate(text.stdout.split("\f"), start=1):
                 counties: list[str] = []
@@ -1263,6 +1273,7 @@ def parse() -> None:
             ).with_columns(
                 winner=pl.col("winner").drop_nulls().first().over("office"),
                 count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64),
+                digitized=pl.lit(model.exists()),
             )
             total = pl.col("county").str.to_uppercase() == "TOTAL"
             table = (
@@ -1505,6 +1516,7 @@ def parse() -> None:
                 label=pl.col("answer").str.strip_chars().str.extract(r"(?i)^(\w+)").str.to_uppercase(),
                 votes=pl.col("votes").str.replace_all(",", "").cast(pl.Int64, strict=False),
                 page=pl.col("page").cast(pl.Int64) if "page" in table.columns else pl.lit(None, pl.Int64),
+                digitized=pl.col("digitized") if "digitized" in table.columns else pl.lit(False),
                 winner=pl.col("winner")
                 .str.to_uppercase()
                 .replace_strict({label: answer for label, (answer, _) in ANSWERS.items()}, default=None)
@@ -1533,7 +1545,7 @@ def parse() -> None:
             (pl.col("fips").n_unique().over("state", "day", "office") == pl.col("counties"))
             | (pl.col("fips").str.len_chars() == 2).all().over("state", "day", "office"),
         )
-        .group_by("state", "day", "url", "page", "winner", "office", "pair", "fips", "answer")
+        .group_by("state", "day", "url", "page", "winner", "office", "pair", "fips", "answer", "digitized")
         .agg(pl.col("votes").sum())
         .sort("state", "day", "office", "fips", "answer")
         .write_parquet(PARSED / "canvass.parquet")
@@ -1595,6 +1607,7 @@ def emit() -> Path:
         questions = (
             frame.group_by("state", "day", "url", "page", "winner", "office", "pair")
             .agg(
+                digitized=pl.col("digitized").any(),
                 statewide=(pl.col("fips").str.len_chars() == 2).all(),
                 kansas=(pl.col("fips") == "2938000").any(),
                 overseas=(pl.col("fips") == "ME:uocava").any(),
@@ -1739,7 +1752,8 @@ def emit() -> Path:
                     else OVERSEAS
                     if row["overseas"]
                     else "",
-                ),
+                )
+                + (DIGITIZED if row["digitized"] else ""),
             )
             cs.add(
                 "citation",
@@ -1768,7 +1782,7 @@ def emit() -> Path:
                     channel=0,
                     measure=1,
                     count_round=0,
-                    flags=0,
+                    flags=8 if row["digitized"] else 0,
                     value=votes,
                 )
             landed[row["state"]] = landed.get(row["state"], 0) + 1
