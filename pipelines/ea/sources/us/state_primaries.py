@@ -711,6 +711,9 @@ PA_ELECTIONS = {
     date(2022, 5, 17): 94,
 }
 PA_OFFICES = {
+    1: "president",
+    2: "us-senate",
+    11: "congress",
     3: "GOVERNOR",
     4: "LIEUTENANT GOVERNOR",
     5: "ATTORNEY GENERAL",
@@ -2182,7 +2185,7 @@ def parse() -> None:
         source=pl.lit("NYC"),
     )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.concat(
+    congress = pl.concat(
         [
             federal.select(
                 year=pl.col("day").dt.year(),
@@ -2239,7 +2242,7 @@ def parse() -> None:
                 source=pl.lit("NYSBOE"),
             ),
         ]
-    ).write_parquet(PARSED / "congress.parquet")
+    )
     illinois = re.compile(
         r"(\d+)(?:ST|ND|RD|TH) (REPRESENTATIVE|SENATE)|([1-5])(?:ST|ND|RD|TH) (SUPREME|APPELLATE) - (.+) VACANCY|"
         + "|".join(OFFICES)
@@ -2853,9 +2856,12 @@ def parse() -> None:
                                                 pa.append(
                                                     (
                                                         day,
-                                                        label if label in ("house", "senate") else OFFICES[label][0],
+                                                        label
+                                                        if label
+                                                        in ("house", "senate", "congress", "president", "us-senate")
+                                                        else OFFICES[label][0],
                                                         str(int(re.findall(r"\d+", items[0]["District"])[0]))
-                                                        if label in ("house", "senate")
+                                                        if label in ("house", "senate", "congress")
                                                         else None,
                                                         {"Democratic": "DEM", "Republican": "REP"}[party],
                                                         counties[("42", re.sub(r"[^a-z]", "", county.lower()))],
@@ -2875,20 +2881,45 @@ def parse() -> None:
                             raise ValueError(
                                 f"{day} PA {label} {heading}: the county rows do not match the district total"
                             )
+    pa_frame = pl.DataFrame(
+        pa,
+        schema={
+            "day": pl.Date,
+            "office": pl.String,
+            "code": pl.String,
+            "party": pl.String,
+            "fips": pl.String,
+            "choice": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    )
+    pa_federal = pa_frame.filter(pl.col("office").is_in(["congress", "president", "us-senate"]))
+    congress = pl.concat(
+        [
+            congress,
+            pa_federal.select(
+                year=pl.col("day").dt.year(),
+                chamber=pl.col("office").replace({"congress": "house", "us-senate": "senate"})
+                + pl.lit(":")
+                + pl.col("party").replace_strict({"DEM": "democratic", "REP": "republican"}),
+                day="day",
+                special=pl.lit(False),
+                state=pl.lit("PA"),
+                district=pl.col("code").cast(pl.Int64),
+                candidate="choice",
+                writein=pl.lit(False),
+                votes="votes",
+                measure=pl.lit(1, pl.Int16),
+                code="fips",
+                kind=pl.lit("county"),
+                source=pl.lit("PA"),
+            ),
+        ]
+    )
+    congress.write_parquet(PARSED / "congress.parquet")
     frames.append(
-        pl.DataFrame(
-            pa,
-            schema={
-                "day": pl.Date,
-                "office": pl.String,
-                "code": pl.String,
-                "party": pl.String,
-                "fips": pl.String,
-                "choice": pl.String,
-                "votes": pl.Int64,
-            },
-            orient="row",
-        ).with_columns(
+        pa_frame.filter(~pl.col("office").is_in(["congress", "president", "us-senate"])).with_columns(
             state=pl.lit("PA"),
             label="party",
             scheme=pl.lit("us.county"),
@@ -3946,6 +3977,36 @@ def emit() -> Path:
             sources,
         )
         medsl.attach(cs, conn, city, sources, grain="precinct")
+        held = [
+            value
+            for (value,) in conn.execute(
+                """select e.value from external_id e
+                   where e.scheme = 'us.contest' and e.value ~ '^20[0-2][0-9]-0[4-6]-[0-9]{2}:PA:(house:[0-9]+|senate|president):(democratic|republican)$'
+                     and exists (select 1 from result_set rs join source s on s.id = rs.source_id
+                                 where rs.contest_id = e.entity_id and rs.status = 'active'
+                                   and s.publisher <> 'Federal Election Commission' and s.id <> %s)""",
+                [sources["PA"]],
+            ).fetchall()
+        ]
+        medsl.attach(
+            cs,
+            conn,
+            congress.filter(
+                pl.col("source") == "PA",
+                ~pl.concat_str(
+                    pl.col("day").cast(pl.String),
+                    pl.lit("PA"),
+                    pl.when(pl.col("district").is_not_null())
+                    .then(pl.concat_str(pl.lit("house:"), pl.col("district").cast(pl.String), pl.lit(":")))
+                    .otherwise(pl.lit("")),
+                    pl.col("chamber").str.strip_prefix("house:"),
+                    separator=":",
+                )
+                .str.replace("::", ":")
+                .is_in(held),
+            ),
+            sources,
+        )
         held = [
             value
             for (value,) in conn.execute(
