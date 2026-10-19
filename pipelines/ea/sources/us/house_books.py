@@ -53,6 +53,7 @@ def _render(book: raw.Artifact, page: int, dpi: int, image: Path, turned: bool) 
 def _tables(path: Path) -> list[dict[str, object]]:
     tables: list[dict[str, object]] = []
     page = 0
+    state = None
     for line in path.read_text().splitlines():
         line = line.strip()
         if not line:
@@ -60,10 +61,19 @@ def _tables(path: Path) -> list[dict[str, object]]:
         if line.startswith("@"):
             page = int(line[1:])
             continue
+        if line.startswith("#"):
+            state = line[1:].strip()
+            continue
         head, rest = (part.strip() for part in line.split("|", 1))
         if head.isdigit():
             tables.append(
-                {"page": page, "district": int(head), "columns": [c.strip() for c in rest.split(",")], "rows": []}
+                {
+                    "page": page,
+                    "state": state,
+                    "district": int(head),
+                    "columns": [c.strip() for c in rest.split(",")],
+                    "rows": [],
+                }
             )
             continue
         votes = [int(cell) for cell in rest.split()]
@@ -89,8 +99,8 @@ def parse(source: ModuleType) -> None:
         spans: list[float] = []
         firsts = _tables(parsed / "model" / f"{year}.txt")
         seconds = _tables(parsed / "model" / f"{year}.v2.txt")
-        if [(t["page"], t["district"], t["columns"], [r[0] for r in t["rows"]]) for t in firsts] != [
-            (t["page"], t["district"], t["columns"], [r[0] for r in t["rows"]]) for t in seconds
+        if [(t["page"], t["state"], t["district"], t["columns"], [r[0] for r in t["rows"]]) for t in firsts] != [
+            (t["page"], t["state"], t["district"], t["columns"], [r[0] for r in t["rows"]]) for t in seconds
         ]:
             raise ValueError(f"{year}: the two reads lay out different tables")
         for page in pages:
@@ -161,7 +171,8 @@ def parse(source: ModuleType) -> None:
                 key=lambda pair: sum(county != "Totals" for county, _ in pair[0]["rows"]) == 1,
             ):
                 columns = table["columns"]
-                known = labels.setdefault((year, table["district"]), [])
+                where = table["district"] if table["state"] is None else (table["state"], table["district"])
+                known = labels.setdefault((year, where), [])
                 known.extend(label for label in columns if label not in known)
                 cells = [
                     (r, c, county, value, again[c])
@@ -173,22 +184,22 @@ def parse(source: ModuleType) -> None:
                 settled: dict[tuple[int, int], int] = {(r, c): v for r, c, _, v, w in cells if v == w}
                 for r, c, _, value, again in cells:
                     if (r, c) not in settled:
-                        failed.append(f"{year} district {table['district']} row {r} column {c}: {value} or {again}")
+                        failed.append(f"{year} district {where} row {r} column {c}: {value} or {again}")
                 for r in range(len(table["rows"])):
                     top = sorted((settled[(r, k)] for k in range(1, len(columns)) if (r, k) in settled), reverse=True)
                     if (
-                        (year, table["district"]) not in source.ERRATA
+                        (year, where) not in source.ERRATA
                         and columns[0] == "Plurality"
                         and (r, 0) in settled
                         and len(top) == len(columns) - 1
                         and settled[(r, 0)] not in (top[0], top[0] - (top[1] if len(top) > 1 else 0))
                     ):
-                        failed.append(f"{year} district {table['district']} row {r}: the plurality does not fit")
+                        failed.append(f"{year} district {where} row {r}: the plurality does not fit")
                 for c in range(int(columns[0] == "Plurality"), len(columns)):
-                    column = columns_by.setdefault((year, table["district"], known.index(columns[c])), [])
+                    column = columns_by.setdefault((year, where, known.index(columns[c])), [])
                     column.extend(settled.get((k, c), -(10**9)) for k in lines)
                     if total is not None:
-                        printed[(year, table["district"], known.index(columns[c]))] = settled.get((total, c), -1)
+                        printed[(year, where, known.index(columns[c]))] = settled.get((total, c), -1)
                 found = {
                     (r, c): list(
                         dict.fromkeys(
@@ -361,7 +372,7 @@ def parse(source: ModuleType) -> None:
                             )
                             guessed.add((r, c))
                 if not anchors:
-                    raise ValueError(f"{year} page {page} district {table['district']}: no cell found on the page")
+                    raise ValueError(f"{year} page {page} district {where}: no cell found on the page")
                 for (r, c), b in anchors.items():
                     lefts = [
                         k
@@ -549,6 +560,7 @@ def parse(source: ModuleType) -> None:
                         {
                             "year": year,
                             "page": page,
+                            "state": table["state"] or source.STATE,
                             "district": table["district"],
                             "county": county,
                             "column": known.index(columns[c]),
@@ -579,6 +591,14 @@ def parse(source: ModuleType) -> None:
 
 def emit(source: ModuleType) -> Path:
     frame = pl.read_parquet(DATA / "parsed" / source.SOURCE / "values.parquet")
+    if "state" not in frame.columns:
+        frame = frame.with_columns(state=pl.lit(source.STATE))
+    names = getattr(source, "NAMES", {})
+    frame = frame.with_columns(
+        county=pl.struct("state", "county").map_elements(
+            lambda row: names.get((row["state"], row["county"]), row["county"]), return_dtype=pl.String
+        )
+    )
     folder = DATA / "pages" / source.SOURCE
     with connect() as conn:
         cs = Changeset(
@@ -588,32 +608,64 @@ def emit(source: ModuleType) -> Path:
             summary=source.SUMMARY,
             polity="US",
         )
-        counties: dict[str, tuple[str, UUID, UUID]] = {
-            _plain(text): (code, unit, area)
+        fips: dict[str, str] = dict(
+            conn.execute(
+                """select substr(p.iso_code, 4), u.code from reporting_unit u join polity p on p.id = u.polity_id
+                   where u.scheme_code = 'us.state'"""
+            ).fetchall()
+        )
+        counties: dict[tuple[str, str], tuple[str, UUID, UUID]] = {
+            (code[:2], _plain(text)): (code, unit, area)
             for code, unit, area, text in conn.execute(
                 """select u.code, u.id, u.area_id, n.text from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'short'
                    where u.scheme_code = 'us.county' and u.code like %s""",
-                [f"{source.FIPS}%"],
+                [f"{source.FIPS or ''}%"],
             ).fetchall()
         }
-        state = cs.polity(f"US-{source.STATE}")
+        for code, unit, area in conn.execute(
+            """select code, id, area_id from reporting_unit
+               where scheme_code in ('us.county', 'us.former_county') and code like %s""",
+            [f"{source.FIPS or source.STATE or ''}%"],
+        ).fetchall():
+            counties[(code, code)] = (code, unit, area)
+        for (postal, plain), (label, successor, ended) in getattr(source, "FORMER", {}).items():
+            code = f"{postal}:{plain}"
+            if (code, code) in counties:
+                continue
+            unit = cs.unit("us.former_county", code)
+            area = counties[(successor, successor)][2]
+            counties[(code, code)] = (code, unit, area)
+            cs.add(
+                "reporting_unit",
+                id=unit,
+                polity_id=cs.polity(f"US-{postal}"),
+                scheme_code="us.former_county",
+                code=code,
+                parent_id=cs.unit("us.state", successor[:2]),
+                area_relation="within",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+                valid_to=ended,
+            )
+            cs.add("name", entity_id=unit, text=label, lang="en", kind="official", is_preferred=True)
         contests: dict[str, UUID] = dict(
             conn.execute(
                 "select value, entity_id from external_id where scheme = 'us.contest' and value like %s",
-                [f"%:{source.STATE}:house:%"],
+                [f"%:{source.STATE or ''}%:house:%"],
             ).fetchall()
         )
         folder.mkdir(parents=True, exist_ok=True)
         sources: dict[int, UUID] = {}
         pages: dict[tuple[int, int], tuple[UUID, int, int]] = {}
         for year, (_, landing, day, numbers) in source.VOLUMES.items():
-            title = source.TITLE.format(day=day)
+            title = getattr(source, "TITLES", {}).get(year) or source.TITLE.format(day=day)
             if (made := cs.source(source.PUBLISHER, title)) not in sources.values():
                 cs.add(
                     "source",
                     id=made,
-                    kind="official_body",
+                    kind=getattr(source, "KIND", "official_body"),
                     publisher=source.PUBLISHER,
                     title=title,
                     url=landing,
@@ -630,6 +682,12 @@ def emit(source: ModuleType) -> Path:
                     width, height = rendered.size
                 page = cs.page(artifact, number)
                 pages[(year, number)] = (page, width, height)
+                if conn.execute(
+                    """select 1 from source_page p join changeset c on c.id = p.changeset_id
+                       where p.id = %s and c.pipeline <> %s""",
+                    [page, source.SOURCE],
+                ).fetchone():
+                    continue
                 cs.add(
                     "source_page",
                     id=page,
@@ -640,27 +698,36 @@ def emit(source: ModuleType) -> Path:
                     height=height,
                 )
         split = {
-            (int(year), str(county))
-            for (year, county), districts in frame.group_by("year", "county")
+            (int(year), str(where), str(county))
+            for (year, where, county), districts in frame.group_by("year", "state", "county")
             if districts["district"].n_unique() > 1 or _plain(str(county)) == "cook"
         }
         parts: set[str] = set()
-        for (year, district), lines in frame.group_by("year", "district", maintain_order=True):
+        for (year, where, district), lines in frame.group_by("year", "state", "district", maintain_order=True):
             day = source.VOLUMES[int(year)][2]
-            key = getattr(source, "KEYS", {}).get((int(year), int(district)), f"{day}:{source.STATE}:house:{district}")
+            state = cs.polity(f"US-{where}")
+            key = getattr(source, "KEYS", {}).get(
+                (int(year), int(district)) if source.STATE else (int(year), str(where), int(district)),
+                f"{day}:{where}:house:{district}",
+            )
             if key not in contests:
-                print(f"{year} district {district}: no contest")
-                continue
+                dated = [k for k in contests if re.fullmatch(rf"{year}-[0-9-]+:{where}:house:{district}", k)]
+                if len(dated) != 1:
+                    print(f"{year} {where} district {district}: no contest")
+                    continue
+                key = dated[0]
             contest = contests[key]
-            election, district_area, first, official = conn.execute(
+            election, district_area, first, official, held = conn.execute(
                 """select c.election_id, c.district_area_id, coalesce(min(v.count_round), 0),
                           coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
-                                   sum(v.value) filter (where v.measure = 1))::bigint
-                   from contest c join result_set rs on rs.contest_id = c.id and rs.is_default
+                                   sum(v.value) filter (where v.measure = 1))::bigint, e.date_from
+                   from contest c join election e on e.id = c.election_id
+                   join result_set rs on rs.contest_id = c.id and rs.is_default
                    left join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
-                   where c.id = %s group by 1, 2""",
+                   where c.id = %s group by 1, 2, 5""",
                 [contest],
             ).fetchone()
+            day = held or day
             known = conn.execute(
                 """select o.id, o.kind, coalesce(o.ballot_label, ''),
                           (select sum(v.value)::bigint from result_value v
@@ -670,6 +737,7 @@ def emit(source: ModuleType) -> Path:
                 [contest],
             ).fetchall()
             picked: dict[int, UUID] = {}
+            unmatched: list[tuple[int, str, int]] = []
             for (column, label), cells in lines.group_by("column", "label", maintain_order=True):
                 summed = int(cells["votes"].sum())
                 surname = _plain(str(label))
@@ -677,6 +745,7 @@ def emit(source: ModuleType) -> Path:
                     (option, total)
                     for option, kind, name, total in known
                     if kind in ("candidate", "write_in")
+                    and surname not in getattr(source, "PARTIES", ())
                     and (words := [w for w in re.sub(r"\(.*\)", "", name).split() if _plain(w) not in ("jr", "sr")])
                     and (
                         surname in _plain(" ".join(words))
@@ -696,7 +765,24 @@ def emit(source: ModuleType) -> Path:
                 elif summed == 0:
                     lines = lines.filter(pl.col("column") != column)
                 else:
-                    print(f"{key}: no option for {label} ({summed})")
+                    unmatched.append((int(column), str(label), summed))
+            if getattr(source, "PARTIES", ()):
+                free = [(o, t) for o, k, _, t in known if k == "candidate" and t and o not in picked.values()]
+                if len(unmatched) == 1 and len(free) == 1:
+                    picked[unmatched[0][0]] = free[0][0]
+                    unmatched = []
+                for column, label, summed in list(unmatched):
+                    near = sorted(free, key=lambda pair: abs(pair[1] - summed))
+                    if (
+                        near
+                        and abs(near[0][1] - summed) <= 0.05 * summed
+                        and (len(near) == 1 or abs(near[1][1] - summed) > 0.1 * summed)
+                        and near[0][0] not in picked.values()
+                    ):
+                        picked[column] = near[0][0]
+                        unmatched.remove((column, label, summed))
+            for column, label, summed in unmatched:
+                print(f"{key}: no option for {label} ({summed})")
             result_set = cs.key(
                 f"{source.SOURCE}.result_set", f"{key}:county" + (f":{source.REVISION}" if source.REVISION > 1 else "")
             )
@@ -756,8 +842,8 @@ def emit(source: ModuleType) -> Path:
                     )
             units: dict[str, UUID] = {}
             for county in lines["county"].unique(maintain_order=True):
-                code, parent, area = counties[_plain(county)]
-                if (int(year), county) in split:
+                code, parent, area = counties.get((county, county)) or counties[(fips[where], _plain(county))]
+                if (int(year), where, county) in split:
                     part = f"{year}:{code}:{key.split(':')[3]}"
                     units[county] = cs.unit("us.county_part", part)
                     if part in parts:
