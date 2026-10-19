@@ -227,18 +227,13 @@ OR_2024 = {
 OR_DETAIL = "https://records.sos.state.or.us/ORSOSCMSearch/Search/SearchDetail.aspx?uri={}"
 OR_PUBLISHER = "Oregon Secretary of State"
 OR_TITLE = "County precinct results filed with the Secretary of State"
-OR_LICENSE = (
-    "Pending: redistribution terms for the counties' precinct reports not yet confirmed; used on the archive owner's "
-    "instruction until confirmed"
-)
+OR_LICENSE = "Public record"
 OR_TURNED = ("Clackamas", "Union")
 OREGON = (
     "Precinct rows of the counties' official precinct results, filed with the Oregon Secretary of State, one report "
     "per county. Reports with a text layer and spreadsheets are read directly; scanned reports are digitized in two "
     "passes, a transcription and a machine read of each value's cell, which must agree, and each value keeps its page "
-    "and position. Each answer's precinct rows add up to the totals of this question's default results{counties}. "
-    "The terms for redistributing the counties' reports are not yet confirmed, so this set is held under a pending "
-    "license."
+    "and position. Each answer's precinct rows add up to the totals of this question's default results{counties}."
 )
 OR_2020_NOTE = " Harney County's report labels the state measures Question 13-107 to 13-110, after its county number."
 OR_2020_110_NOTE = (
