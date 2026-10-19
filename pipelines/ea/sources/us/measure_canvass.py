@@ -43,7 +43,7 @@ ANSWERS = {
     "AGAINST": ("NO", "FOR"),
 }
 TAG = (
-    r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure|issue)\b"
+    r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure|issue|referred law)\b"
     r"(?:\s+measure)?(?:\s+to the legislature)?\s*(?:no\.?|#|number\s+\w+\s+\()?)\s*(\d+|[A-Za-z])\b"
 )
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
@@ -154,6 +154,11 @@ HAWAII = {
         "Amendment 2",
     },
     date(2018, 11, 6): {"Constitutional Convention": "Hawaii Constitutional Convention Question"},
+}
+SOUTH_DAKOTA = {
+    date(2020, 11, 3): "2020%20Assests/2020GeneralStateCanvassFinal%26Certificate.pdf",
+    date(2022, 11, 8): "2022%20Assets/2022Generalcanvassreport.pdf",
+    date(2024, 11, 5): "2024%20Assets/Recount-Canvass-and-Canvass-Docs-General/2024GeneralElectionCanvassWithCert.pdf",
 }
 HAWAII_REPORTS = "https://files.hawaii.gov/elections/files/results/{}/general/{}.pdf"
 NORTH_DAKOTA = {date(2022, 11, 8): "&eid=326", date(2024, 11, 5): ""}
@@ -319,6 +324,12 @@ DOCUMENTS = {
         "https://www.sos.arkansas.gov/elections/research/election-results",
         "the Arkansas Secretary of State's official results report",
     ),
+    "SD": (
+        "South Dakota Secretary of State",
+        "Official state canvass report",
+        "https://www.sdsos.gov/elections-voting/election-resources/election-history/",
+        "the South Dakota State Canvassing Board's official canvass report",
+    ),
     "HI": (
         "Hawaii Office of Elections",
         "Final summary reports, statewide and by county",
@@ -387,6 +398,10 @@ def link(state: str, day: date) -> tuple[str, str]:
             f"https://elections.il.gov/Downloads/ElectionOperations/VoteTotals/{ILLINOIS[day]}GEOfficialVote.pdf"
             if day in ILLINOIS
             else ""
+        )
+    if state == "SD":
+        return SOURCE, (
+            "https://www.sdsos.gov/elections-voting/assets/Archive/" + SOUTH_DAKOTA[day] if day in SOUTH_DAKOTA else ""
         )
     if state == "HI":
         return SOURCE, HAWAII_REPORTS.format(day.year, "histatewide") if day in HAWAII else ""
@@ -591,6 +606,64 @@ def parse() -> None:
                     )
                     & total.any().over("office", "answer")
                     & pl.col("count").is_not_null().all().over("office", "answer")
+                )
+                .filter(~total)
+                .drop("count")
+            )
+        elif state == "SD":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            pending: dict[int, str] = {}
+            offices: list[str] = []
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    for heading in re.finditer(
+                        r"(Constitutional Amendment [A-Z]|Initiated Measure \d+|Referred Law \d+):", line
+                    ):
+                        pending[heading.start()] = heading[1]
+                    if line.startswith("County"):
+                        pairs = re.fullmatch(r"County((?:\s+Yes\s+No)+)\s*", line)
+                        named = [pending[column] for column in sorted(pending)]
+                        offices = (
+                            []
+                            if pairs is None
+                            else named
+                            if len(named) == pairs[1].count("Yes")
+                            else offices
+                            if not named and len(offices) == pairs[1].count("Yes")
+                            else []
+                        )
+                        pending = {}
+                    elif offices and (
+                        matched := re.fullmatch(r"([A-Z][A-Za-z ]*?)\s{2,}((?:[\d,]+\s+)*[\d,]+)\s*", line)
+                    ):
+                        counts = matched[2].split()
+                        if len(counts) == 2 * len(offices) and (
+                            matched[1] == "Total" or elstats.plain(matched[1]) in names["SD"]
+                        ):
+                            for index, office in enumerate(offices):
+                                for answer, votes in zip(("YES", "NO"), counts[2 * index : 2 * index + 2], strict=True):
+                                    records.append((matched[1], office, answer, votes, number))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.unique(["county", "office", "answer"], keep="first", maintain_order=True)
+                .filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 67)
                 )
                 .filter(~total)
                 .drop("count")
