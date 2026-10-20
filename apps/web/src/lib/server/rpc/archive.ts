@@ -496,6 +496,7 @@ const VARIANTS = [
 function separate(
   colors: Map<string, string>,
   votes: Array<readonly [string | null, number]>,
+  branch: Map<string, string> = new Map(),
 ) {
   const weight = new Map<string, number>();
   for (const [party, count] of votes) {
@@ -598,6 +599,9 @@ function separate(
           .join("")}`,
       );
     }
+  }
+  for (const [party, parent] of branch) {
+    colors.set(party, colors.get(parent) ?? "");
   }
 }
 
@@ -886,9 +890,18 @@ async function load(
   ];
   const [labels, colors, positions] = await Promise.all([
     names(entities, date),
-    db.execute<{ party_id: string; color: string }>(sql`
-      select p.id as party_id, c.color from unnest(${sql.param(parties)}::uuid[]) p(id),
-        lateral (select ${paint(sql`p.id`, sql`select election_id from contest where id = any(${sql.param(roots)}::uuid[])`, sql`${date}::date`)} as color) c
+    db.execute<{ party_id: string; color: string; parent: string | null }>(sql`
+      select p.id as party_id, c.color, b.parent from unnest(${sql.param(parties)}::uuid[]) p(id)
+        left join lateral (
+          select coalesce(m.into_id, a.parent_party_id) as parent from party_affiliation a
+          left join entity_merge m on m.entity_id = a.parent_party_id
+          where a.party_id = p.id and a.kind = 'regional_branch' and a.valid @> ${date}::date
+          limit 1
+        ) b on true,
+        lateral (select coalesce(
+          ${paint(sql`b.parent`, sql`select election_id from contest where id = any(${sql.param(roots)}::uuid[])`, sql`${date}::date`)},
+          ${paint(sql`p.id`, sql`select election_id from contest where id = any(${sql.param(roots)}::uuid[])`, sql`${date}::date`)}
+        ) as color) c
       where c.color is not null
     `),
     db.execute<{ party_id: string; lean: number }>(sql`
@@ -896,7 +909,15 @@ async function load(
       where party_id = any(${sql.param(parties)}::uuid[]) and valid @> ${date}::date
     `),
   ]);
-  const color = new Map(colors.rows.map((row) => [row.party_id, row.color]));
+  const branch = new Map(
+    colors.rows.map((row) => [row.party_id, row.parent ?? row.party_id]),
+  );
+  const color = new Map(
+    colors.rows.flatMap((row) => [
+      [row.party_id, row.color],
+      [row.parent ?? row.party_id, row.color],
+    ]),
+  );
   const lean = new Map(positions.rows.map((row) => [row.party_id, row.lean]));
   const top = Math.max(0, ...tallies.values());
   const independents = options.rows
@@ -917,8 +938,13 @@ async function load(
   separate(
     color,
     options.rows.map(
-      (row) => [stand(row) ?? row.person, tallies.get(row.k) ?? 0] as const,
+      (row) =>
+        [
+          branch.get(stand(row) ?? "") ?? stand(row) ?? row.person,
+          tallies.get(row.k) ?? 0,
+        ] as const,
     ),
+    branch,
   );
   const rootOf = new Map(picked.rows.map((row) => [row.contest, row.root]));
   const sharing = Map.groupBy(
@@ -7849,6 +7875,53 @@ export const polities = {
                 }),
               },
       };
+    }),
+  neighbors: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/polities/{id}/neighbors",
+        summary:
+          "List a polity's sibling polities that share its boundary scheme",
+      }),
+    )
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        on: v.optional(v.pipe(v.string(), v.isoDate())),
+      }),
+    )
+    .output(
+      v.array(v.object({ k: v.number(), name: v.string(), path: v.string() })),
+    )
+    .handler(async ({ input }) => {
+      const day = input.on ?? new Date().toISOString().slice(0, 10);
+      const found = await db.execute<{ id: string; k: number }>(sql`
+        with me as (
+          select a.scheme_code from polity_territory t join area a on a.id = t.area_id
+          where t.polity_id = ${input.id}::uuid
+          order by t.valid @> ${day}::date desc, upper(t.valid) desc nulls first limit 1
+        ),
+        up as (
+          select parent_id from polity_parent where polity_id = ${input.id}::uuid
+          order by valid @> ${day}::date desc, upper_inf(valid) desc, upper(valid) desc limit 1
+        )
+        select distinct on (p.polity_id) p.polity_id as id, a.k
+        from polity_parent p
+        join polity_territory t on t.polity_id = p.polity_id
+        join area a on a.id = t.area_id and a.scheme_code = (select scheme_code from me)
+        where p.parent_id = (select parent_id from up) and p.polity_id <> ${input.id}::uuid
+          and p.valid @> ${day}::date
+        order by p.polity_id, t.valid @> ${day}::date desc, upper(t.valid) desc nulls first
+      `);
+      const ids = found.rows.map((row) => row.id);
+      const [labels, slugs] = await Promise.all([names(ids, day), paths(ids)]);
+      return found.rows.flatMap((row) => {
+        const path = slugs.get(row.id);
+        return path == null
+          ? []
+          : [{ k: row.k, name: labels.full.get(row.id) ?? "", path }];
+      });
     }),
   record: os
     .meta(

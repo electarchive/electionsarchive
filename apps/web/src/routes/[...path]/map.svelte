@@ -8,6 +8,7 @@
   import { goto, preloadData } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import ArrowUpLeftIcon from "@lucide/svelte/icons/arrow-up-left";
   import MinusIcon from "@lucide/svelte/icons/minus";
   import PlusIcon from "@lucide/svelte/icons/plus";
   import ScanIcon from "@lucide/svelte/icons/scan";
@@ -48,6 +49,8 @@
     pick,
     sources = null,
     explore = null,
+    neighbors = null,
+    up = null,
   }: {
     places: Places;
     colors: Array<string>;
@@ -75,6 +78,10 @@
     pick?: (code: string) => void;
     sources?: Array<string> | null;
     explore?: string | null;
+    neighbors?:
+      | (() => Promise<Array<{ k: number; name: string; path: string }>>)
+      | null;
+    up?: { name: string; path: string } | null;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -101,6 +108,28 @@
   let credits = $state<Array<string>>([]);
   const credited = $derived(sources ?? credits);
   let pinned = $state<number | null>(null);
+  let pointer = $state<{ x: number; y: number } | null>(null);
+  let near = $state<number | null>(null);
+  let nearPinned = $state(false);
+  let nearby = $state<Array<{ k: number; name: string; path: string }>>([]);
+  let seen = $state<Array<number>>([]);
+  let isMoved = false;
+  let boxWidth = $state(0);
+  let boxHeight = $state(0);
+  let cardWidth = $state(0);
+  let cardHeight = $state(0);
+  const besides = $derived(new Map(nearby.map((entry) => [entry.k, entry])));
+  const beside = $derived(near == null ? null : (besides.get(near) ?? null));
+  const adjoining = $derived(
+    seen
+      .flatMap((k) => {
+        const entry = besides.get(k);
+        return entry == null || k === own?.k ? [] : [entry];
+      })
+      .toSorted((a, b) =>
+        a.name.localeCompare(b.name, undefined, { numeric: true }),
+      ),
+  );
   let grab = $state<number | null>(null);
   let drag = $state(0);
   const calm =
@@ -313,6 +342,38 @@
           .toSorted((a, b) => b.share - a.share)
           .slice(0, 3),
   );
+
+  const spot = $derived.by(() => {
+    let anchor = pointer;
+    if (anchor == null && current?.at != null && maps[0] != null) {
+      const projected = maps[0].project(current.at);
+      anchor =
+        projected.x >= 0 &&
+        projected.y >= 0 &&
+        projected.x <= boxWidth &&
+        projected.y <= boxHeight
+          ? { x: projected.x, y: projected.y }
+          : null;
+    }
+    if (anchor == null) {
+      return { x: 8, y: up == null ? 8 : 48 };
+    }
+    const gap = 16;
+    const right = boxWidth - cardWidth - 8;
+    const bottom = boxHeight - cardHeight - 8;
+    const x =
+      anchor.x + gap + cardWidth > boxWidth - 8
+        ? anchor.x - gap - cardWidth
+        : anchor.x + gap;
+    const y =
+      anchor.y + gap + cardHeight > boxHeight - 8
+        ? anchor.y - gap - cardHeight
+        : anchor.y + gap;
+    return {
+      x: Math.max(8, Math.min(right, x)),
+      y: Math.max(8, Math.min(bottom, y)),
+    };
+  });
 
   function bin(margin: number | null) {
     const value = margin ?? 0;
@@ -650,11 +711,15 @@
       const surfaces = [
         ...host.querySelectorAll<HTMLElement>("[data-map-surface]"),
       ];
+      const edge = Math.max(
+        24,
+        Math.round(Math.min(host.clientWidth, host.clientHeight) * 0.06),
+      );
       const room = {
-        top: 20,
-        right: 52,
-        bottom: (surfaces[1]?.clientHeight ?? 0) + 20,
-        left: 20,
+        top: edge + (up == null ? 0 : 20),
+        right: edge + 36,
+        bottom: (surfaces[1]?.clientHeight ?? 0) + edge,
+        left: edge,
       };
       fit = room;
       for (const [index, surface] of surfaces.entries()) {
@@ -756,7 +821,12 @@
                       ] as Maplibre.FilterSpecification,
                       paint: {
                         "fill-color": colorsNow.paper,
-                        "fill-opacity": 0.6,
+                        "fill-opacity": [
+                          "case",
+                          ["boolean", ["feature-state", "near"], false],
+                          0.35,
+                          0.6,
+                        ] as Maplibre.ExpressionSpecification,
                       },
                     },
                   ]),
@@ -834,6 +904,28 @@
                       paint: {
                         "line-color": colorsNow.ink,
                         "line-width": 1.75,
+                      },
+                    },
+                    {
+                      id: "near",
+                      type: "line" as const,
+                      source: "own",
+                      "source-layer": "areas",
+                      filter: [
+                        "!=",
+                        ["id"],
+                        own.k,
+                      ] as Maplibre.FilterSpecification,
+                      paint: {
+                        "line-color": colorsNow.ink,
+                        "line-width": 1.5,
+                        "line-dasharray": [3, 2],
+                        "line-opacity": [
+                          "case",
+                          ["boolean", ["feature-state", "near"], false],
+                          1,
+                          0,
+                        ] as Maplibre.ExpressionSpecification,
                       },
                     },
                   ]),
@@ -917,8 +1009,32 @@
               padding: index === 0 ? room : 6,
               animate: false,
             });
+            if (index === 0) {
+              map.setMinZoom(Math.max(0, map.getZoom() - 1.25));
+            }
           }
         });
+        if (index === 0) {
+          map.on("movestart", (event) => {
+            if (event.originalEvent != null) {
+              isMoved = true;
+            }
+          });
+          const watcher = new ResizeObserver(() => {
+            if (frame == null || isMoved || opening != null) {
+              return;
+            }
+            map.resize();
+            map.setMinZoom(0);
+            map.fitBounds([frame.west, frame.south, frame.east, frame.north], {
+              padding: room,
+              animate: false,
+            });
+            map.setMinZoom(Math.max(0, map.getZoom() - 1.25));
+          });
+          watcher.observe(host);
+          cleanup.push(() => watcher.disconnect());
+        }
         map.touchZoomRotate.disableRotation();
         map.keyboard.disable();
         map.getCanvas().removeAttribute("role");
@@ -969,6 +1085,42 @@
             focus = null;
           }
         });
+        map.on("mousemove", (event) => {
+          const bounds = host.getBoundingClientRect();
+          pointer = {
+            x: event.originalEvent.clientX - bounds.left,
+            y: event.originalEvent.clientY - bounds.top,
+          };
+          if (own == null || nearPinned) {
+            return;
+          }
+          const place = map
+            .queryRenderedFeatures(event.point, { layers: hit })
+            .find(
+              (feature) =>
+                typeof feature.id === "number" && rows.has(feature.id),
+            )?.id;
+          const id =
+            place == null
+              ? map.queryRenderedFeatures(event.point, { layers: ["veil"] })[0]
+                  ?.id
+              : null;
+          const k = typeof id === "number" && besides.has(id) ? id : null;
+          if (k !== near) {
+            near = k;
+          }
+          map.getCanvas().style.cursor =
+            k != null ||
+            (typeof place === "number" && rows.get(place)?.path != null)
+              ? "pointer"
+              : "";
+        });
+        map.on("mouseout", () => {
+          pointer = null;
+          if (!nearPinned) {
+            near = null;
+          }
+        });
         map.on("click", (event) => {
           const [feature] = map.queryRenderedFeatures(event.point, {
             layers: hit,
@@ -982,7 +1134,25 @@
           if (k == null) {
             pinned = null;
             focus = null;
+            const id =
+              own == null
+                ? null
+                : map.queryRenderedFeatures(event.point, {
+                    layers: ["veil"],
+                  })[0]?.id;
+            const next = typeof id === "number" ? besides.get(id) : undefined;
+            if (next == null) {
+              nearPinned = false;
+              near = null;
+            } else if (isTouch && !(nearPinned && near === next.k)) {
+              near = next.k;
+              nearPinned = true;
+            } else {
+              void goto(resolve("/[...path]", { path: next.path }));
+            }
           } else if (isTouch && pinned !== k) {
+            nearPinned = false;
+            near = null;
             pinned = k;
             focus = k;
           } else {
@@ -998,6 +1168,31 @@
           ready.add(map);
           if (index === 0) {
             isLoaded = true;
+            if (own != null && neighbors != null) {
+              const look = () => {
+                seen = [
+                  ...new Set(
+                    map
+                      .queryRenderedFeatures({ layers: ["veil"] })
+                      .flatMap((feature) =>
+                        typeof feature.id === "number" ? [feature.id] : [],
+                      ),
+                  ),
+                ];
+              };
+              map.once("idle", look);
+              map.on("moveend", look);
+              neighbors().then(
+                (list) => {
+                  if (!stop.signal.aborted) {
+                    nearby = list;
+                  }
+                },
+                () => {
+                  nearby = [];
+                },
+              );
+            }
           }
           const box = map.getCanvas();
           const side = Math.sqrt(
@@ -1108,6 +1303,7 @@
         if (map.getLayer("outline") != null) {
           map.setPaintProperty("outline", "line-color", colorsNow.ink);
           map.setPaintProperty("veil", "fill-color", colorsNow.paper);
+          map.setPaintProperty("near", "line-color", colorsNow.ink);
         }
         map.setPaintProperty("bubble", "circle-stroke-color", colorsNow.seam);
         map.setPaintProperty("arrow", "icon-halo-color", colorsNow.seam);
@@ -1172,6 +1368,36 @@
         map.once("load", apply);
       }
     }
+  });
+
+  let lit: number | null = null;
+  $effect(() => {
+    const k = near;
+    for (const map of maps) {
+      const apply = () => {
+        if (map.getSource("own") == null) {
+          return;
+        }
+        if (lit != null) {
+          map.setFeatureState(
+            { source: "own", sourceLayer: "areas", id: lit },
+            { near: false },
+          );
+        }
+        if (k != null) {
+          map.setFeatureState(
+            { source: "own", sourceLayer: "areas", id: k },
+            { near: true },
+          );
+        }
+      };
+      if (ready.has(map)) {
+        apply();
+      } else {
+        map.once("load", apply);
+      }
+    }
+    lit = k;
   });
 
   let shown: number | null = null;
@@ -1329,6 +1555,8 @@
   <div
     class="relative overflow-hidden rounded-sm bg-card ring-1 ring-border inline-full max-block-[min(38rem,70svh)]"
     style:aspect-ratio={ratio}
+    bind:clientWidth={boxWidth}
+    bind:clientHeight={boxHeight}
     {@attach mount}
   >
     <div
@@ -1385,7 +1613,10 @@
         class="grid place-items-center block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_in()}
         title={m.map_zoom_in()}
-        onclick={() => maps[0]?.zoomIn()}
+        onclick={() => {
+          isMoved = true;
+          maps[0]?.zoomIn();
+        }}
       >
         <PlusIcon class="block-4 inline-4" />
       </button>
@@ -1394,7 +1625,10 @@
         class="grid place-items-center border-bs border-border block-8 inline-8 hover:bg-secondary pointer-coarse:block-10 pointer-coarse:inline-10"
         aria-label={m.map_zoom_out()}
         title={m.map_zoom_out()}
-        onclick={() => maps[0]?.zoomOut()}
+        onclick={() => {
+          isMoved = true;
+          maps[0]?.zoomOut();
+        }}
       >
         <MinusIcon class="block-4 inline-4" />
       </button>
@@ -1406,6 +1640,7 @@
         onclick={() => {
           const frame = frames[0];
           if (frame != null) {
+            isMoved = false;
             maps[0]?.fitBounds(
               [frame.west, frame.south, frame.east, frame.north],
               { padding: fit },
@@ -1416,12 +1651,40 @@
         <ScanIcon class="block-4 inline-4" />
       </button>
     </div>
-    {#if current != null}
+    {#if up != null}
+      <a
+        class="absolute inset-s-2 inset-bs-2 flex items-center gap-1.5 rounded-sm bg-card ps-2 pe-2.5 text-[0.8125rem] font-semibold shadow-menu ring-1 ring-border block-8 max-inline-[calc(100%-4.5rem)] hover:bg-secondary pointer-coarse:block-10"
+        href={resolve("/[...path]", { path: up.path })}
+        data-export-skip
+        ><ArrowUpLeftIcon
+          class="shrink-0 block-4 inline-4"
+          aria-hidden="true"
+        /><span class="sr-only">{m.map_up()}</span><span class="truncate"
+          >{up.name}</span
+        ></a
+      >
+    {/if}
+    {#if current != null || (beside != null && pointer != null)}
       <div
-        class="pointer-events-none absolute inset-s-2 inset-bs-2 grid gap-1.5 rounded-sm bg-card/95 px-3 py-2.5 shadow-menu ring-1 ring-border inline-[min(17rem,calc(100%-4.5rem))] max-sm:hidden"
+        class={cn(
+          "pointer-events-none absolute inset-s-0 inset-bs-0 grid gap-1.5 rounded-sm bg-card/95 px-3 py-2.5 shadow-menu ring-1 ring-border max-sm:hidden",
+          {
+            "inline-[min(17rem,calc(100%-1rem))]": current != null,
+            "gap-0.5 inline-fit": current == null,
+          },
+        )}
+        style:translate="{spot.x}px {spot.y}px"
+        bind:clientWidth={cardWidth}
+        bind:clientHeight={cardHeight}
         aria-live="polite"
       >
-        {@render readout()}
+        {#if current != null}
+          {@render readout()}
+        {:else if beside != null}
+          <span class="font-semibold text-pretty">{beside.name}</span>
+          <span class="text-xs text-muted-foreground">{m.map_click_open()}</span
+          >
+        {/if}
       </div>
     {/if}
   </div>
@@ -1642,9 +1905,59 @@
     </div>
   {/if}
 
+  {#if adjoining.length > 0}
+    <nav
+      class="flex flex-wrap items-baseline gap-x-3 gap-y-1 px-1 text-[0.8125rem]"
+      aria-label={m.map_nearby()}
+    >
+      <span class="text-muted-foreground">{m.map_nearby()}</span>
+      {#each adjoining as entry (entry.k)}
+        <a
+          class="font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+          href={resolve("/[...path]", { path: entry.path })}
+          onpointerenter={() => (near = entry.k)}
+          onpointerleave={() => {
+            if (!nearPinned) {
+              near = null;
+            }
+          }}>{entry.name}</a
+        >
+      {/each}
+    </nav>
+  {/if}
   <p class="px-1 text-[0.8125rem] text-muted-foreground sm:hidden">
     {m.map_pick_touch()}
   </p>
+  {#if nearPinned && beside != null && pinned == null}
+    {const place = $derived(beside)}
+    <div
+      class="fixed inset-x-0 inset-be-0 z-40 grid gap-2 rounded-t-lg bg-card px-4 pbs-3 pbe-[max(1rem,env(safe-area-inset-bottom))] shadow-menu ring-1 ring-border sm:hidden"
+      role="region"
+      aria-label={place.name}
+      data-export-skip
+      transition:fly={{ y: 48, duration: calm ? 0 : 220 }}
+    >
+      <div class="flex items-center justify-between gap-3">
+        <span class="font-semibold">{place.name}</span>
+        <button
+          type="button"
+          class="-me-2 grid place-items-center rounded-sm text-muted-foreground block-10 inline-10 hover:bg-secondary"
+          aria-label={m.map_sheet_close()}
+          onclick={() => {
+            nearPinned = false;
+            near = null;
+          }}
+        >
+          <XIcon class="block-4 inline-4" />
+        </button>
+      </div>
+      <a
+        class="flex items-center justify-center rounded-sm border border-foreground bg-marker text-sm font-semibold text-[#15171a] block-11"
+        href={resolve("/[...path]", { path: place.path })}
+        >{m.map_open({ place: place.name })}</a
+      >
+    </div>
+  {/if}
   {#if pinned != null && current != null}
     <div
       class="fixed inset-x-0 inset-be-0 z-40 grid touch-none gap-2 rounded-t-lg bg-card px-4 pbs-1.5 pbe-[max(1rem,env(safe-area-inset-bottom))] shadow-menu ring-1 ring-border sm:hidden"
@@ -1781,12 +2094,8 @@
           <span class="font-figures tabular-nums">{count(current.valid)}</span
           >{/if}</span
       >
-      {#if current.path != null && !isSheet}
-        <a
-          class="pointer-events-auto font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
-          href={resolve("/[...path]", { path: current.path })}
-          >{m.map_open({ place: current.name })}</a
-        >
+      {#if current.path != null && !isSheet && pinned == null}
+        <span class="text-muted-foreground">{m.map_click_open()}</span>
       {/if}
     </span>
   {/if}

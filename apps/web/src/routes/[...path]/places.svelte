@@ -14,6 +14,7 @@
   import { provenance } from "#lib/provenance.svelte.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
+  import Preview from "./preview.svelte";
 
   let {
     places,
@@ -115,6 +116,7 @@
     }),
   );
   const tether = TooltipPrimitive.createTether<number>();
+  const strip = TooltipPrimitive.createTether<number>();
   const flips = $derived(moves.filter((move) => move.flip != null).length);
   const widest = $derived.by(() => {
     const sizes = moves
@@ -249,6 +251,62 @@
       provenance.isOpen = true;
     }}>{text}</button
   >
+{/snippet}
+
+{#snippet breakdown(row: (typeof visible)[number] | undefined)}
+  {#if row != null}
+    {const ranked = $derived(
+      row.shares
+        .map((share, index) => ({ share, index }))
+        .filter(
+          (entry) => entry.share > 0 && places.legend[entry.index] != null,
+        )
+        .toSorted((a, b) => b.share - a.share),
+    )}
+    <Tooltip.Content
+      collisionPadding={8}
+      class="grid gap-1.5 leading-snug inline-[min(19rem,calc(100vw-2rem))]"
+    >
+      <span class="font-semibold">{row.name}</span>
+      <span
+        class="grid grid-cols-[minmax(0,1fr)_auto_auto] items-baseline gap-x-3 gap-y-0.5 text-xs"
+      >
+        {#each ranked.slice(0, 8) as entry (entry.index)}
+          <span class="flex items-baseline gap-1.5 min-inline-0">
+            <span
+              class="shrink-0 self-center rounded-xs block-2 inline-2"
+              style:background-color={colors[entry.index]}
+            ></span>
+            <span
+              class={cn("truncate", {
+                "font-semibold": entry.index === row.leader,
+              })}>{titles[entry.index]}</span
+            >
+          </span>
+          <span class="text-end font-figures tabular-nums opacity-70"
+            >{row.valid > 0
+              ? count(Math.round(entry.share * row.valid))
+              : ""}</span
+          >
+          <span class="text-end font-figures tabular-nums"
+            >{percent(entry.share)}</span
+          >
+        {/each}
+      </span>
+      {#if ranked.length > 8}
+        <span class="text-xs opacity-70"
+          >{m.card_more({ count: count(ranked.length - 8) })}</span
+        >
+      {/if}
+      {#if row.margin != null}
+        <span class="text-xs opacity-80"
+          >{m.col_margin()}
+          <span class="font-figures tabular-nums">{points(row.margin)}</span
+          ></span
+        >
+      {/if}
+    </Tooltip.Content>
+  {/if}
 {/snippet}
 
 {#snippet about(row: (typeof visible)[number] | undefined)}
@@ -569,12 +627,19 @@
               {#if row.path == null}
                 <span class="font-semibold">{row.label}</span>
               {:else}
+                {const target = $derived(row.path)}
                 <a
+                  class="absolute inset-0"
+                  href={resolve("/[...path]", { path: target })}
+                  tabindex={-1}
+                  aria-hidden="true"
+                ></a>
+                <Preview
                   class={cn(
-                    "font-semibold group-hover:underline group-hover:decoration-border group-hover:underline-offset-4 before:absolute before:inset-0",
+                    "relative z-1 font-semibold group-hover:underline group-hover:decoration-border group-hover:underline-offset-4",
                     { "font-medium": row.isNested },
                   )}
-                  href={resolve("/[...path]", { path: row.path })}
+                  path={target}
                   onclick={(event) => {
                     if (
                       !event.metaKey &&
@@ -584,7 +649,7 @@
                     ) {
                       event.currentTarget.dataset.scopeSource = "";
                     }
-                  }}>{row.label}</a
+                  }}>{row.label}</Preview
                 >
               {/if}
               {#if row.isRemainder}<span
@@ -605,24 +670,34 @@
               </span>
             </th>
             <td class="px-2 py-1.5 max-sm:hidden">
-              <span
-                class="flex overflow-hidden rounded-xs bg-muted block-3"
-                aria-hidden="true"
-              >
-                {#each row.shares as share, index (index)}
-                  <span
-                    class={cn(
-                      "shrink-0 bg-(--party) not-last:border-e not-last:border-card",
-                      {
-                        "opacity-35":
-                          only != null && only !== "flip" && only !== index,
-                      },
-                    )}
-                    style:--party={colors[index]}
-                    style:inline-size="{share * 100}%"
-                  ></span>
-                {/each}
-              </span>
+              <Tooltip.Trigger tether={strip} payload={index} tabindex={-1}>
+                {#snippet child({ props })}
+                  <svelte:element
+                    this={row.path == null ? "span" : "a"}
+                    {...props}
+                    type={undefined}
+                    class="relative z-1 flex overflow-hidden rounded-xs bg-muted block-3"
+                    href={row.path == null
+                      ? undefined
+                      : resolve("/[...path]", { path: row.path })}
+                    aria-hidden="true"
+                  >
+                    {#each row.shares as share, index (index)}
+                      <span
+                        class={cn(
+                          "shrink-0 bg-(--party) not-last:border-e not-last:border-card",
+                          {
+                            "opacity-35":
+                              only != null && only !== "flip" && only !== index,
+                          },
+                        )}
+                        style:--party={colors[index]}
+                        style:inline-size="{share * 100}%"
+                      ></span>
+                    {/each}
+                  </svelte:element>
+                {/snippet}
+              </Tooltip.Trigger>
             </td>
             <td class="px-2 py-1.5 whitespace-nowrap">
               {#if row.leader != null}
@@ -774,6 +849,13 @@
   <Tooltip.Root {tether} delayDuration={250}>
     {#snippet children({ payload })}
       {@render about(payload == null ? undefined : visible.at(Number(payload)))}
+    {/snippet}
+  </Tooltip.Root>
+  <Tooltip.Root tether={strip} delayDuration={150}>
+    {#snippet children({ payload })}
+      {@render breakdown(
+        payload == null ? undefined : visible.at(Number(payload)),
+      )}
     {/snippet}
   </Tooltip.Root>
 

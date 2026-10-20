@@ -12,8 +12,16 @@
   const {
     path,
     class: className,
+    onclick,
     children,
-  }: { path: string; class?: string; children: Snippet } = $props();
+  }: {
+    path: string;
+    class?: string;
+    onclick?: (
+      event: MouseEvent & { currentTarget: HTMLAnchorElement },
+    ) => void;
+    children: Snippet;
+  } = $props();
 
   const href = $derived(resolve("/[...path]", { path }));
 
@@ -83,6 +91,9 @@
         {...props}
         class={className}
         {href}
+        onclick={(event) => {
+          onclick?.(event);
+        }}
         role={undefined}
         aria-haspopup={undefined}
         aria-expanded={undefined}>{@render children()}</a

@@ -11,6 +11,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
+  import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Ballot from "./ballot.svelte";
@@ -108,6 +109,31 @@
   let focus = $state<number | null>(null);
 
   const here = $derived(page.url.pathname.slice(1));
+  const around = $derived.by(() => {
+    const siblings = contest.scope.trail.at(-1)?.siblings;
+    if (siblings == null) {
+      return null;
+    }
+    return async () => {
+      const found = await orpc.contests.places.call({
+        id: siblings.contest,
+        unit: siblings.unit ?? undefined,
+        by: siblings.level,
+      });
+      return (found?.rows ?? []).flatMap((row) =>
+        row.path == null ? [] : [{ k: row.k, name: row.name, path: row.path }],
+      );
+    };
+  });
+  const upward = $derived.by(() => {
+    const parent = contest.scope.trail.at(-2);
+    if (parent?.path != null) {
+      return { name: parent.name, path: parent.path };
+    }
+    return contest.election.path == null
+      ? null
+      : { name: contest.election.name, path: contest.election.path };
+  });
   const drawn = $derived.by(() => {
     const places = contest.places;
     const level = boundaries.find((entry) => entry.scheme === places?.level);
@@ -929,6 +955,8 @@
           noun={drawn.noun}
           sources={drawn.sources}
           explore={here}
+          neighbors={around}
+          up={upward}
           votes={counted ?? m.col_votes()}
           names={titles}
           {levels}

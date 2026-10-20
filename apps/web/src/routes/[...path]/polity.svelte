@@ -237,6 +237,12 @@
           ),
         };
   });
+  const upward = $derived.by(() => {
+    const parent = polity.breadcrumbs.at(-1);
+    return parent?.path == null
+      ? null
+      : { name: parent.name, path: parent.path };
+  });
   const isMapped = $derived(
     headline?.contest != null &&
       (loaded?.id !== headline.contest || drawn != null),
@@ -322,6 +328,12 @@
         names={drawn.names}
         levels={[]}
         span={null}
+        neighbors={async () =>
+          orpc.polities.neighbors.call({
+            id,
+            on: loaded?.contest.election.date ?? undefined,
+          })}
+        up={upward}
       />
     {/if}
   </div>
