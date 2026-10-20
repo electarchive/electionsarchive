@@ -34,6 +34,7 @@ TITLES = {
 }
 NOT_VOTES = {"Total", "Blank", "Void", "Scattering"}
 ITEMS = {
+    1882: (date(1882, 11, 7), (3, 4, 6, 7, 8, 9, 10, 11, 12)),
     1886: (date(1886, 11, 2), range(11, 20)),
 }
 VOLUMES = {
@@ -41,6 +42,13 @@ VOLUMES = {
     for year, (day, pages) in ITEMS.items()
 }
 PARTIES = {
+    (1882, "governor", "M. M. Estee"): "republican-party",
+    (1882, "governor", "Geo. Stoneman"): "democratic-party",
+    (1882, "lieutenant-governor", "John Daggett"): "republican-party",
+    (1882, "lieutenant-governor", "A. R. Conklin"): "democratic-party",
+    (1882, "secretary-of-state", "Thos. L. Thompson"): "democratic-party",
+    (1882, "controller", "John P. Dunn"): "democratic-party",
+    (1882, "attorney-general", "A. L. Hart"): "democratic-party",
     (1886, "governor", "John F. Swift"): "republican-party",
     (1886, "governor", "Washington Bartlett"): "democratic-party",
     (1886, "governor", "Joel Russell"): "prohibition-party",
@@ -66,6 +74,11 @@ PARTIES = {
 }
 NAMES: dict[str, str] = {}
 ERRATA = {
+    (1882, ("secretary-of-state", 0)),
+    (1882, ("treasurer", 0)),
+    (1882, ("surveyor-general", 0)),
+    (1882, ("clerk-of-the-supreme-court", 0)),
+    (1882, ("superintendent-of-public-instruction", 0)),
     (1886, ("governor", 0)),
     (1886, ("lieutenant-governor", 0)),
     (1886, ("secretary-of-state", 0)),
@@ -75,7 +88,7 @@ ERRATA = {
     (1886, ("clerk-of-the-supreme-court", 0)),
     (1886, ("superintendent-of-public-instruction", 0)),
 }
-PUBLISHED = {(1886, "lieutenant-governor")}
+PUBLISHED = {1882, 1886}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
@@ -94,8 +107,8 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "values.parquet").filter(
-        ~pl.struct("year", "state").map_elements(
-            lambda row: (row["year"], row["state"]) in PUBLISHED, return_dtype=pl.Boolean
+        ~pl.col("year").map_elements(
+            lambda year: year in PUBLISHED, return_dtype=pl.Boolean
         )
     )
     plain = house_books._plain
