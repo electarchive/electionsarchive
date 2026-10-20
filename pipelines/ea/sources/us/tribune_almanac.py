@@ -23,6 +23,7 @@ ITEMS = {
     1864: ("tribunealmanacpo00otta", 1865, date(1864, 11, 8), (53,)),
     1866: ("bub_gb_53IwAAAAIAAJ", 1867, date(1866, 11, 6), (51,)),
     1868: ("tribunealmanacpo1869newy", 1869, date(1868, 11, 3), (62,)),
+    1874: ("tribunealmanacpo18751879newy", 1875, date(1874, 11, 3), (76, 77, 78)),
 }
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
