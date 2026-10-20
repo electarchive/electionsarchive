@@ -84,7 +84,15 @@ def parse() -> None:
                     totals[key] = totals.get(key, 0) + votes
                     rows.append((day.year, key[0], day, False, "RI", district, TOWNS[town], key[2], 1, False, votes))
         if totals != statewide:
-            print(folder, "towns differ from the statewide file:", {k: (totals.get(k), statewide.get(k)) for k in set(totals) | set(statewide) if totals.get(k) != statewide.get(k)})
+            print(
+                folder,
+                "towns differ from the statewide file:",
+                {
+                    k: (totals.get(k), statewide.get(k))
+                    for k in set(totals) | set(statewide)
+                    if totals.get(k) != statewide.get(k)
+                },
+            )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
