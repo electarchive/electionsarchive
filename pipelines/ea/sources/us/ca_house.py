@@ -14,6 +14,7 @@ SUMMARY = "California's House results by county from the Secretary of State's St
 STATE = "CA"
 FIPS = "06"
 ITEMS = {
+    1976: ("statementofvote1976cali", date(1976, 11, 2), range(80, 85)),
     1978: ("statementofvote197879cali", date(1978, 11, 7), range(259, 266)),
     1980: ("statementofvote41980cali", date(1980, 11, 4), range(23, 29)),
     1982: ("statementofvote21982cali", date(1982, 11, 2), range(32, 39)),
@@ -40,7 +41,7 @@ BESIDE: tuple[str, ...] = ()
 REVISION = 1
 RENAMED: str | None = None
 COMMAS = True
-TURNED: set[tuple[int, int]] = set()
+TURNED: set[tuple[int, int]] = {(1976, page) for page in range(80, 85)}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
