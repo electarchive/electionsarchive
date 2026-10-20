@@ -18,9 +18,16 @@ BASE = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/2010-201
 FILES = {
     2012: (f"{BASE}2012/2012offpriresults.pdf", date(2012, 5, 22)),
     2014: (f"{BASE}2014/2014%20Primary%20Election%20Results.pdf", date(2014, 5, 20)),
+    2020: ("https://elect.ky.gov/results/2020-2029/Documents/2020%20Primary%20Election%20Results.pdf", date(2020, 6, 23)),
+    2022: ("https://elect.ky.gov/results/2020-2029/Documents/2022%20Primary%20Election%20results.pdf", date(2022, 5, 17)),
+    2024: ("https://elect.ky.gov/results/2020-2029/Documents/2024%20Primary%20Results.pdf", date(2024, 5, 21)),
 }
 PUBLISHER = "Kentucky Secretary of State"
 TITLE = "Official primary election results"
+SENATE_2020 = {
+    "Republican": ["Mitch McConnell", "C. Wesley Morgan", "Louis Grider", "Paul John Frangedakis", "Naren James", "Kenneth Lowndes", "Nicholas Alsager"],
+    "Democratic": ["Amy McGrath", "Charles Booker", "Mike Broihier", "Mary Ann Tobin", "Maggie Jo Hilliard", "Andrew J. Maynard", "Bennie J. Smith", "Jimmy C. Ausbrooks", "Eric Rothmuller", "John R. Sharpensteen"],
+}
 PARTY = re.compile(r"(Republican|Democratic) Party")
 DISTRICT = re.compile(r"(\d+)(?:st|nd|rd|th) Congressional District")
 CELL = re.compile(r"\S+(?: \S+)*")
@@ -64,6 +71,8 @@ def parse() -> None:
                 if office.startswith("United States Representative")
                 else None
             )
+            if year == 2020 and kind == "senate" and party in SENATE_2020 and len(columns) == len(SENATE_2020[party]):
+                columns[:] = SENATE_2020[party]
             if kind is not None and columns and counties:
                 for index, candidate in enumerate(columns):
                     for name, values in counties.items():
@@ -140,7 +149,17 @@ def parse() -> None:
                                     else f"{columns[near]}{'' if columns[near].endswith('-') else ' '}{m[0]}"
                                 )
                     else:
-                        print(f"{year} {office} {district} {party}: no header row of {len(numbers)} cells")
+                        edges = [m.end() for m in NUMBER.finditer(line)]
+                        words: list[list[str]] = [[] for _ in numbers]
+                        for text in lines:
+                            for m in re.finditer(r"\S+", text):
+                                center = (m.start() + m.end()) / 2
+                                near = next((c for c, edge in enumerate(edges) if center <= edge + 1), len(edges) - 1)
+                                words[near].append(m[0])
+                        columns = [" ".join(w) for w in words]
+                        if not all(columns):
+                            columns = []
+                            print(f"{year} {office} {district} {party}: no header row of {len(numbers)} cells")
                 if columns:
                     counties[name] = [int(value.replace(",", "")) for value in numbers]
                 continue
@@ -180,7 +199,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kentucky's 2012 and 2014 House, Senate, and presidential primaries by county",
+            summary="Kentucky's 2012, 2014, 2020, 2022, and 2024 House, Senate, and presidential primaries by county",
             polity="US-KY",
         )
         source = cs.source(PUBLISHER, TITLE)
