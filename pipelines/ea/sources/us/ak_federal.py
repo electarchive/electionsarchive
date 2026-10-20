@@ -19,9 +19,10 @@ FILES = {
     date(2014, 8, 19): "14PRIM/data/results-precinct.txt",
     date(2016, 8, 16): "16PRIM/data/resultsbyprct.txt",
     date(2018, 8, 21): "18PRIM/data/resultsbyprecinct.txt",
+    date(2020, 8, 18): "20PRIM/data/sovc/resultsbyprecinct20.txt",
 }
-PARTIES = {"DEM": "democratic", "REP": "republican", "LIB": "libertarian"}
-STATS = {"Number of Precincts for Race", "Number of Precincts Reporting", "Registered Voters", "Times Counted"}
+PARTIES = {"DEM": "democratic", "REP": "republican", "LIB": "libertarian", "AD": "democratic"}
+STATS = {"Number of Precincts", "Number of Precincts for Race", "Number of Precincts Reporting", "Registered Voters", "Times Counted"}
 PUBLISHER = "Alaska Division of Elections"
 TITLE = "Primary election results by precinct"
 
@@ -32,7 +33,7 @@ def fetch() -> None:
             raw.cached(SOURCE, BASE + path)
         except LookupError:
             body = subprocess.run(
-                ["curl", "-sfk", "--compressed", "-A", raw.USER_AGENT, BASE + path], capture_output=True, check=True
+                ["curl", "-sfkL", "--compressed", "-A", raw.USER_AGENT, BASE + path], capture_output=True, check=True
             ).stdout
             raw.store(SOURCE, BASE + path, body, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/plain")
 
@@ -44,9 +45,12 @@ def parse() -> None:
         printed: dict[tuple[str, str], int] = {}
         lines = raw.cached(SOURCE, BASE + path).path.read_text(encoding="latin-1").splitlines()
         for row in csv.reader(lines):
-            if len(row) < 8 or not row[1].strip().startswith(("US SENATOR", "US REPRESENTATIVE")):
+            if len(row) < 8 or not row[1].strip().upper().replace(".", "").startswith(("US SENATOR", "US REPRESENTATIVE")):
                 continue
-            place, race, _, _, name, party, column, votes = (cell.strip() for cell in row[:8])
+            place, race, ballot, _, name, party, column, votes = (cell.strip() for cell in row[:8])
+            race = race.upper().replace(".", "")
+            if day.year >= 2020:
+                party = ballot
             if name in STATS or column != "Total" or party not in PARTIES:
                 continue
             office = "senate" if race.startswith("US SENATOR") else "house"
@@ -54,7 +58,7 @@ def parse() -> None:
             key = (chamber, name.upper())
             if place == "Election Total":
                 printed[key] = int(votes)
-            elif found := re.match(r"(\d\d)-", place) or re.match(r"District (\d+) - ", place):
+            elif found := re.match(r"(\d\d)-", place) or re.match(r"District (\d+)\s*- ", place):
                 totals[key] = totals.get(key, 0) + int(votes)
                 rows.append(
                     (
@@ -119,7 +123,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska's 2014, 2016, and 2018 U.S. Senate and House primaries by House district",
+            summary="Alaska's 2014, 2016, 2018, and 2020 U.S. Senate and House primaries by House district",
             polity="US-AK",
         )
         source = cs.source(PUBLISHER, TITLE)
