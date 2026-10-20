@@ -12,13 +12,26 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://elections.sos.state.tx.us/"
 HOUSE = re.compile(r"^U\. ?S\. Representative District (\d+)$")
-ELECTIONS = {7: "democratic", 8: "republican", 53: "democratic", 55: "republican", 62: "democratic", 63: "republican"}
+ELECTIONS = {
+    7: "democratic",
+    8: "republican",
+    53: "democratic",
+    55: "republican",
+    62: "democratic",
+    63: "republican",
+    9: "democratic",
+    10: "republican",
+    52: "democratic",
+    54: "republican",
+    69: "democratic",
+    70: "republican",
+}
 PUBLISHER = "Texas Secretary of State"
-TITLE = "Texas election history: House primaries by county, 1994–1998"
+TITLE = "Texas election history: House primaries and runoffs by county, 1994–1998"
 
 
 def races(election: int) -> list[tuple[int, int]]:
@@ -69,7 +82,9 @@ def parse() -> None:
                 data = [cells(line, "TD") for line in lines if re.search(r"<TD", line, re.IGNORECASE)]
                 width = headers[-1].index("Votes")
                 counties = [row for row in data if row[0] != "ALL COUNTIES"]
-                total = next((row for row in data if row[0] == "ALL COUNTIES"), counties[0] if len(counties) == 1 else None)
+                total = next(
+                    (row for row in data if row[0] == "ALL COUNTIES"), counties[0] if len(counties) == 1 else None
+                )
                 if total is None:
                     raise ValueError(f"{election} {race}: no total")
                 key = f"{day}:TX:house:{district}:{chamber}"
@@ -100,7 +115,9 @@ def parse() -> None:
                     for column, name in names.items():
                         votes = [int(row[column].replace(",", "") or 0) for row in counties]
                         if sum(votes) != int(total[column].replace(",", "")):
-                            raise ValueError(f"{election} {race} {name}: counties sum to {sum(votes)}, not {total[column]}")
+                            raise ValueError(
+                                f"{election} {race} {name}: counties sum to {sum(votes)}, not {total[column]}"
+                            )
                         rows.extend(
                             {
                                 "year": day.year,
@@ -135,7 +152,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas's House primaries of 1994, 1996, and 1998 by county from the Secretary of State's election history",
+            summary="Texas's House primaries and runoffs of 1994, 1996, and 1998 by county from the Secretary of State's election history",
             polity="US-TX",
         )
         source = cs.source(PUBLISHER, TITLE)
