@@ -13,7 +13,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FILES = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{day:%Y_%m_%d}/results_pct_{day:%Y%m%d}.zip"
 DAYS = [
@@ -28,6 +28,13 @@ DAYS = [
     date(2012, 7, 17),
     date(2014, 5, 6),
     date(2014, 7, 15),
+    date(2016, 3, 15),
+    date(2016, 6, 7),
+    date(2018, 5, 8),
+    date(2020, 3, 3),
+    date(2020, 6, 23),
+    date(2022, 5, 17),
+    date(2022, 7, 26),
 ]
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Election results by precinct: primaries"
@@ -157,7 +164,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Carolina's House, Senate, and presidential primaries and second primaries by county, 2002–2014",
+            summary="North Carolina's House, Senate, and presidential primaries and second primaries by county, 2002–2022",
             polity="US-NC",
         )
         source = cs.source(PUBLISHER, TITLE)
