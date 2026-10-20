@@ -12,7 +12,7 @@ from ea.sources.us.nj_sos import COUNTIES
 from ea.store import DATA, connect
 
 SOURCE = "us.nj_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://www.nj.gov/state/elections/assets/pdf/election-results/"
 FILES = {
@@ -27,6 +27,10 @@ FILES = {
     (date(2008, 6, 3), "senate"): "2008/2008-official-pri-elect-senate-candidate-tallies-071108.pdf",
     (date(2008, 6, 3), "house"): "2008/2008-official-pri-elect-house-candidate-tallies-071108.pdf",
     (date(2008, 2, 5), "president"): "2008/2008-presidential-official-primary-results-032808.pdf",
+    (date(2020, 7, 7), "president"): "2020/2020-official-primary-results-us-president-amended-0826.pdf",
+    (date(2020, 7, 7), "senate"): "2020/2020-official-primary-results-us-senate-amended-0826.pdf",
+    (date(2020, 7, 7), "house"): "2020/2020-official-primary-results-us-house-amended-0826.pdf",
+    (date(2022, 6, 7), "house"): "2022/2022-official-primary-results-us-house.pdf",
 }
 ORDINALS = [
     "first",
@@ -71,7 +75,7 @@ def parse() -> None:
             text=True,
             check=True,
         ).stdout
-        columns: tuple[int, int] | None = None
+        columns: tuple[int, int, int] | None = None
         district: int | None = None
         candidate = party = ""
         votes: dict[str, int] = {}
@@ -80,14 +84,12 @@ def parse() -> None:
             if found:
                 district = ORDINALS.index(found[1].lower()) + 1
             if re.match(r"\s*Name\b", line) and "County" in line:
-                columns = (
-                    line.find("Designation") if "Designation" in line else line.find("Party"),
-                    line.find("County"),
-                )
+                party_at = line.find("Designation") if "Designation" in line else line.find("Party")
+                columns = (party_at, line.find("County"), line.find("Address") if "Address" in line and day.year >= 2020 else party_at)
                 continue
             if columns is None:
                 continue
-            party_column, county_column = columns
+            party_column, county_column, name_column = columns
             total = re.match(r"\s*Total\s+([\d,]+)\s*$", line)
             if total:
                 if candidate and sum(votes.values()) != int(total[1].replace(",", "")):
@@ -106,8 +108,11 @@ def parse() -> None:
                     )
                 candidate, votes = "", {}
                 continue
-            name = line[:party_column].strip()
+            name = line[:name_column].strip()
             label = line[party_column:county_column].strip()
+            if name_column != party_column:
+                tail = re.search(r"\b(Democratic|Republican)\s*$", line)
+                label = tail[1] if tail else ""
             if name and line[:1] != " " and label in ("Democratic", "Republican"):
                 candidate = re.sub(r"\s*\((?:w|W)\)|\s*\*", "", name).strip().upper()
                 party = label
@@ -150,7 +155,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Jersey's 2000–2008 House, Senate, and presidential primaries by county",
+            summary="New Jersey's 2000–2008 and 2020–2022 House, Senate, and presidential primaries by county",
             polity="US-NJ",
         )
         source = cs.source(PUBLISHER, TITLE)
