@@ -687,6 +687,10 @@ IA_RACE = re.compile(
     r"(?:STATE (REPRESENTATIVE|REP\.|SENATOR) (?:DISTRICT|DIST\.) (\d+)|(GOVERNOR|SECRETARY OF STATE|AUDITOR OF STATE"
     r"|TREASURER OF STATE|SECRETARY OF AGRICULTURE|ATTORNEY GENERAL)) - (DEM|REP|D|R|DEMOCRATIC PARTY|REPUBLICAN PARTY)"
 )
+IA_FEDERAL = re.compile(
+    r"(?:U\.S\.|UNITED STATES) (?:(SENATOR)|(?:REPRESENTATIVE|HOUSE OF REPRESENTATIVES|REP\.) (?:DISTRICT|DIST\.) (\d+))"
+    r" - (DEM|REP|D|R|DEMOCRATIC PARTY|REPUBLICAN PARTY)"
+)
 IA_METHOD = (
     "Totals are the county totals of the Secretary of State's county precinct results files, read from the Wayback "
     "Machine's captures, each county's precinct rows checked against its printed total, except in nine county files "
@@ -2522,6 +2526,7 @@ def parse() -> None:
         )
     )
     hawkeye: dict[tuple[date, str, str | None, str, str, str, bool], int] = {}
+    ia_federal: dict[tuple[date, str, str | None, str, str, str, bool], int] = {}
     ia_unread: set[str] = set()
     ia_compact: set[tuple[int, str, str]] = set()
     for (ia_year, ia_plain), ia_url in iowa().items():
@@ -2641,11 +2646,27 @@ def parse() -> None:
             if set(ia_blocks) != ia_done:
                 raise ValueError(f"Iowa {ia_year} {ia_plain}: {sorted(set(ia_blocks) - ia_done)} have no totals")
         for ia_title, ia_candidate, ia_votes in ia_entries:
+            if ia_candidate.upper() in ("OVER VOTES", "UNDER VOTES"):
+                continue
+            ia_upper = IA_FEDERAL.fullmatch(ia_title.upper())
+            if ia_upper is not None:
+                ia_writein = re.fullmatch(r"(?i)write-?in", ia_candidate) is not None
+                ia_key = (
+                    IA_DAYS[ia_year],
+                    "us-senate" if ia_upper[1] else "congress",
+                    None if ia_upper[1] else str(int(ia_upper[2])),
+                    "DEM" if ia_upper[3].startswith("D") else "REP",
+                    ia_county,
+                    "WRITE-INS" if ia_writein else re.sub(r"\s+", " ", ia_candidate).strip().upper(),
+                    ia_writein,
+                )
+                if ia_key in ia_federal:
+                    raise ValueError(f"Iowa {ia_year} {ia_plain}: {ia_title} {ia_candidate} appears twice")
+                ia_federal[ia_key] = ia_votes
+                continue
             ia_found = IA_RACE.fullmatch(ia_title.upper())
             if ia_found is None:
                 ia_unread.add(ia_title)
-                continue
-            if ia_candidate.upper() in ("OVER VOTES", "UNDER VOTES"):
                 continue
             ia_writein = re.fullmatch(r"(?i)write-?in", ia_candidate) is not None
             ia_choice = re.sub(r"\s+", " ", ia_candidate).strip()
@@ -2691,6 +2712,28 @@ def parse() -> None:
             "fips": pl.String,
             "choice": pl.String,
             "writein": pl.Boolean,
+            "votes": pl.Int64,
+        },
+        orient="row",
+    )
+    ia_fourth = {
+        ia_code
+        for ia_day, ia_office, ia_code, _, ia_fips, _, _ in ia_federal
+        if ia_day == IA_DAYS[2014] and ia_office == "congress" and ia_fips == counties[("19", "obrien")]
+    }
+    ia_upper_frame = pl.DataFrame(
+        [
+            (*ia_key[:6], ia_votes)
+            for ia_key, ia_votes in ia_federal.items()
+            if not (ia_key[0] == IA_DAYS[2016] and (ia_key[2] is None or ia_key[2] in ia_fourth))
+        ],
+        schema={
+            "day": pl.Date,
+            "office": pl.String,
+            "code": pl.String,
+            "party": pl.String,
+            "fips": pl.String,
+            "choice": pl.String,
             "votes": pl.Int64,
         },
         orient="row",
@@ -2937,7 +2980,7 @@ def parse() -> None:
                     kind=pl.lit("county"),
                     source=pl.lit(state),
                 )
-                for state, federal in (("PA", pa_federal), ("FL", fl_federal))
+                for state, federal in (("PA", pa_federal), ("FL", fl_federal), ("IA", ia_upper_frame))
             ),
         ]
     )
@@ -4042,7 +4085,7 @@ def emit() -> Path:
             sources,
         )
         medsl.attach(cs, conn, city, sources, grain="precinct")
-        for state in ("PA", "MA", "FL"):
+        for state in ("PA", "MA", "FL", "IA"):
             held = [
                 value
                 for (value,) in conn.execute(
