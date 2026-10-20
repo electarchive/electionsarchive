@@ -28,6 +28,7 @@ DIGITIZED = 8
 DERIVED = 1
 MANUAL = "Manual of the Legislature of New Jersey, {}"
 VOLUMES = {
+    1892: ("manualoflegislat1893mull", MANUAL.format(1893), PUBLISHER, date(1892, 11, 8), range(362, 366), False),
     1894: ("manualoflegislat1895mull", MANUAL.format(1895), PUBLISHER, date(1894, 11, 6), range(391, 394), False),
     1896: ("manualoflegislat1897mull", MANUAL.format(1897), PUBLISHER, date(1896, 11, 3), range(424, 427), False),
     1898: ("manualoflegislat1899mull", MANUAL.format(1899), PUBLISHER, date(1898, 11, 8), range(442, 445), False),
@@ -35,12 +36,16 @@ VOLUMES = {
     1902: ("manualoflegislat1903mull", MANUAL.format(1903), PUBLISHER, date(1902, 11, 4), range(522, 525), False),
     1904: ("manualoflegislat1905mull", MANUAL.format(1905), PUBLISHER, date(1904, 11, 8), range(532, 535), False),
     1906: ("manualoflegislat1907mull", MANUAL.format(1907), PUBLISHER, date(1906, 11, 6), range(509, 512), False),
+    1908: ("manualoflegislat1909mull", MANUAL.format(1909), PUBLISHER, date(1908, 11, 3), range(563, 565), True),
     1910: ("manualoflegislat1911mull", MANUAL.format(1911), PUBLISHER, date(1910, 11, 8), range(542, 544), False),
     1912: ("manualoflegislat1913mull", MANUAL.format(1913), PUBLISHER, date(1912, 11, 5), range(654, 657), False),
     1914: ("manualoflegislat1915mull", MANUAL.format(1915), PUBLISHER, date(1914, 11, 3), range(625, 628), False),
+    1916: ("manualoflegislat1917mull", MANUAL.format(1917), PUBLISHER, date(1916, 11, 7), range(619, 621), False),
+    1920: ("manualoflegislat1921mull", MANUAL.format(1921), PUBLISHER, date(1920, 11, 2), range(537, 540), False),
 }
 
 MISPRINTED: set[tuple[int, int]] = set()
+TRANSPOSED = {1916}
 
 
 def _artifact(year: int) -> raw.Artifact:
@@ -136,6 +141,10 @@ def parse() -> None:
                         re.sub(r"\D", "", row["text"].translate(scan.CONFUSABLE)),
                     }:
                         tokens.append((digits, box))
+            flip = year in TRANSPOSED
+            if flip:
+                tokens = [(digits, (box[1], box[0], box[3], box[2])) for digits, box in tokens]
+            tolerance = 60 if flip else 20
             for table, second in zip(firsts, seconds, strict=True):
                 if table["page"] != page:
                     continue
@@ -217,7 +226,7 @@ def parse() -> None:
                     anchors = {
                         (r, c): b
                         for (r, c), b in anchors.items()
-                        if abs((b[1] + b[3]) / 2 - ys[r]) < 20 and abs(b[2] - xs[c]) < 60
+                        if abs((b[1] + b[3]) / 2 - ys[r]) < tolerance and abs(b[2] - xs[c]) < 60
                     }
                 if not anchors:
                     raise ValueError(f"{year} page {page} district {table['district']}: no cell found on the page")
@@ -270,7 +279,7 @@ def parse() -> None:
                         near = [
                             b
                             for b in boxes.get((r, c), [])
-                            if abs((b[1] + b[3]) / 2 - ys[r]) < 20 and abs(b[2] - xs[c]) < 60
+                            if abs((b[1] + b[3]) / 2 - ys[r]) < tolerance and abs(b[2] - xs[c]) < 60
                         ]
                         if near:
                             box, how = near[0], "aligned"
@@ -284,9 +293,11 @@ def parse() -> None:
                             )
                             how = "placed"
                     elif r in ys and (
-                        near := [b for b in boxes.get((r, c), []) if abs((b[1] + b[3]) / 2 - ys[r]) < 20]
+                        near := [b for b in boxes.get((r, c), []) if abs((b[1] + b[3]) / 2 - ys[r]) < tolerance]
                     ):
                         box, how = near[0], "aligned"
+                    if flip and box is not None:
+                        box = (box[1], box[0], box[3], box[2])
                     rows.append(
                         {
                             "year": year,
