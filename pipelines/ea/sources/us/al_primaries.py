@@ -40,9 +40,7 @@ def parse() -> None:
             fips.setdefault(re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower()), code)
     rows: list[tuple[str, str, int | None, str, int]] = []
     for party, (url, sheet) in FILES.items():
-        table = (
-            fastexcel.read_excel(raw.cached(SOURCE, url).path).load_sheet(sheet, header_row=None).to_polars().rows()
-        )
+        table = fastexcel.read_excel(raw.cached(SOURCE, url).path).load_sheet(sheet, header_row=None).to_polars().rows()
         office_row, name_row = (0, 1) if party == "democratic" else (1, 2)
         start = 3 if party == "democratic" else 3
         stop = next(index for index, row in enumerate(table) if (row[0] or "").strip() == "Totals")
