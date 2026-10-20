@@ -121,13 +121,13 @@ def emit() -> Path:
                 url="https://apps.elections.virginia.gov/SBE_CSV/ELECTIONS/ELECTIONTURNOUT/",
                 license="Public record",
             )
+        for name in FILES:
+            cs.artifact(raw.cached(SOURCE, url(name)), source)
         for (day,), rows in frame.group_by("date", maintain_order=True):
             if day not in elections:
                 print(f"{day}: no election")
                 continue
             value_key, election_id = elections[day]
-            for name in FILES:
-                cs.artifact(raw.cached(SOURCE, url(name)), source)
             result_set = cs.key(f"{SOURCE}.result_set", f"{value_key}:county")
             cs.add(
                 "result_set",
