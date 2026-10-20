@@ -529,8 +529,9 @@
           ...row,
           seats: row.seats ?? 0,
           here: 0,
-          members: [],
+          members: race.holders?.seats[row.key] ?? [],
         })),
+        holders: race.holders?.places ?? [],
         isLone: seated.length === 0,
         rows: race.results.map((row) => ({
           key: row.key,
@@ -933,6 +934,7 @@
             own={shape.own}
             nested={shape.nested}
             frames={shape.frames}
+            blank={shape.blank ?? null}
             isApproximate={shape.isApproximate}
             sources={shape.credits}
             noun={places.levels[0]?.noun ?? ""}
@@ -991,6 +993,7 @@
   {#if isSeated}
     <Seated
       parties={race.seated}
+      places={race.holders}
       body={race.body}
       size={race.size}
       date={election.date}

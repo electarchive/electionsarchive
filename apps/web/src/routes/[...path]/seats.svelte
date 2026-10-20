@@ -35,6 +35,7 @@
     governing: governed = [],
     chamber = null,
     isLinked = false,
+    isUp = false,
   }: {
     parties: Array<{
       key: string;
@@ -57,6 +58,7 @@
     governing?: Array<string>;
     chamber?: string | null;
     isLinked?: boolean;
+    isUp?: boolean;
   } = $props();
 
   const uid = $props.id();
@@ -163,30 +165,33 @@
   const majority = $derived(Math.floor(totals.all / 2) + 1);
 
   const layout = $derived.by(() => {
-    const capacity = (rows: number) => {
-      const thick = 1 / (4 * rows - 2);
-      return Array.from({ length: rows }, (_, row) =>
-        Math.floor((Math.PI * (0.5 + 2 * row * thick)) / (2 * thick)),
-      );
+    const total = Math.max(1, totals.all);
+    const fit = (rows: number) => {
+      const thick =
+        rows === 1
+          ? Math.min(0.2, Math.PI / (2 * total))
+          : (Math.PI * rows) / (2 * total + Math.PI * rows * (rows - 1));
+      return { rows, thick, inner: 1 - 2 * (rows - 1) * thick };
     };
-    let rows = 1;
-    for (;;) {
-      let room = 0;
-      for (const seats of capacity(rows)) {
-        room += seats;
-      }
-      if (room >= totals.all || rows >= 40) {
+    let chosen = fit(1);
+    for (let rows = 2; rows <= 40; rows++) {
+      const next = fit(rows);
+      if (next.inner <= 0.62) {
+        chosen = next.inner >= 0.4 ? next : chosen;
         break;
       }
-      rows += 1;
+      chosen = next;
     }
-    const thick = 1 / (4 * rows - 2);
-    const caps = capacity(rows);
+    const { rows, thick, inner } = chosen;
+    const radii = Array.from(
+      { length: rows },
+      (_, row) => inner + 2 * row * thick,
+    );
     let room = 0;
-    for (const seats of caps) {
-      room += seats;
+    for (const radius of radii) {
+      room += radius;
     }
-    const raw = caps.map((seats) => (totals.all * seats) / room);
+    const raw = radii.map((radius) => (totals.all * radius) / room);
     const counts = raw.map((value) => Math.floor(value));
     let left = totals.all;
     for (const value of counts) {
@@ -198,12 +203,7 @@
       .slice(0, left)) {
       counts[row] = (counts[row] ?? 0) + 1;
     }
-    return {
-      rows,
-      thick,
-      radii: caps.map((_, row) => 0.5 + 2 * row * thick),
-      counts,
-    };
+    return { rows, thick, radii, counts };
   });
   const dot = $derived(0.84 * layout.thick * S);
   const ring = $derived(Math.max(0.6, 0.22 * dot));
@@ -243,7 +243,9 @@
       for (const seat of block) {
         seat.party = party.key;
         seat.member = queue.shift() ?? null;
-        seat.local = link != null && seat.member?.place === here;
+        seat.local =
+          link != null &&
+          (isUp ? seat.member != null : seat.member?.place === here);
       }
       if (link == null) {
         continue;
@@ -273,7 +275,8 @@
     new Map(folded.map((party) => [party.key, party.label])),
   );
   const whole = $derived(
-    link == null && (size === totals.all || (size == null && isComplete)),
+    isUp ||
+      (link == null && (size === totals.all || (size == null && isComplete))),
   );
   const majorityAngle = $derived.by(() => {
     const before = seats[majority - 2];
@@ -307,6 +310,12 @@
     );
   });
   const caption = $derived.by(() => {
+    if (isUp) {
+      return m.seats_up({
+        count: count(totals.local),
+        total: count(totals.all),
+      });
+    }
     if (link != null) {
       return m.seats_focus({
         count: count(totals.local),

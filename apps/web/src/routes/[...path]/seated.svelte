@@ -6,6 +6,7 @@
 
   const {
     parties,
+    places,
     body,
     size,
     date,
@@ -28,8 +29,12 @@
         place: number;
         name: string | null;
         position: number | null;
+        person?: string | null;
+        party?: string | null;
+        affiliation?: string | null;
       }>;
     }>;
+    places: Array<{ name: string; path: string | null }>;
     body: string | null;
     size: number | null;
     date: string | null;
@@ -48,9 +53,7 @@
     }
     return total;
   });
-  const isPart = $derived(
-    body != null && size != null && filled < size && region != null,
-  );
+  const isPart = $derived(body != null && size != null && filled < size);
 
   const chamber = createQuery(() => ({
     ...orpc.bodies.get.queryOptions({ input: { id: body ?? "" } }),
@@ -81,6 +84,7 @@
     }
     const info = new Map(data.parties.map((party) => [party.id, party]));
     const local = new Map<string, number>();
+    const held = new Map<string, (typeof parties)[number]["members"]>();
     for (const party of parties) {
       const id = /^party:(.+)$/.exec(party.key)?.[1] ?? null;
       const key =
@@ -88,6 +92,7 @@
           ? id
           : "none";
       local.set(key, (local.get(key) ?? 0) + party.seats);
+      held.set(key, [...(held.get(key) ?? []), ...party.members]);
     }
     return term.parties.map((entry) => {
       const key = entry.party ?? "none";
@@ -100,7 +105,7 @@
         lean: party?.lean ?? null,
         seats: entry.seats,
         here: Math.min(entry.seats, local.get(key) ?? 0),
-        members: [],
+        members: region == null ? (held.get(key) ?? []) : [],
       };
     });
   });
@@ -109,17 +114,18 @@
 {#if whole != null}
   <Seats
     parties={whole}
-    places={[]}
+    places={region == null ? places : []}
     here={null}
     place={region ?? place}
     link={{ name: chamber.data?.name ?? place, path: null }}
     {size}
     chamber={body}
+    isUp={region == null}
   />
 {:else if !isPart || chamber.isError || chamber.data != null}
   <Seats
     {parties}
-    places={[]}
+    {places}
     here={null}
     {place}
     link={null}

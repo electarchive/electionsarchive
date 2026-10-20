@@ -115,6 +115,10 @@
             color={swatch(person.party.color, `party:${person.party.id}`)}
             party={person.party.id}
           />
+        {:else if person.isIndependent}
+          <span class="font-semibold text-foreground"
+            >{m.person_parties_none()}</span
+          >
         {/if}
         {#if person.born != null}
           <span

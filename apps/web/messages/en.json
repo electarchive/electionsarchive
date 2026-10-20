@@ -1029,5 +1029,10 @@
   "coverage_all_years": "All years coverage",
   "coverage_scope": "Race scope",
   "coverage_scope_all": "All races",
-  "coverage_scope_nonlocal": "Without local"
+  "coverage_scope_nonlocal": "Without local",
+  "map_no_results": "No results available for this contest",
+  "map_blank_key": "No results",
+  "places_others_with": "{name} and others",
+  "places_others_note": "The county source groups {name} with minor candidates; they appear as one group on this map.",
+  "seats_up": "{count} of {total} seats were up for election. Faded dots represent seats not up."
 }

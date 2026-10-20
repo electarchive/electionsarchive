@@ -134,8 +134,49 @@
       ? null
       : { name: contest.election.name, path: contest.election.path };
   });
+  const grouped = $derived.by(() => {
+    const legend = contest.places?.legend ?? [];
+    if (!legend.some((item) => item.key.startsWith("kind:others"))) {
+      return null;
+    }
+    const keys = new Set(legend.map((item) => item.key));
+    const people = new Set(legend.map((item) => item.person));
+    const absent = contest.rows.filter(
+      (row) =>
+        row.current != null &&
+        !row.key.startsWith("kind:") &&
+        !keys.has(row.key) &&
+        !people.has(row.current.person),
+    );
+    let total = 0;
+    for (const row of absent) {
+      total += row.current?.votes ?? 0;
+    }
+    const top = absent.toSorted(
+      (a, b) => (b.current?.votes ?? 0) - (a.current?.votes ?? 0),
+    )[0];
+    return top?.current == null || top.current.votes < total * 0.9 ? null : top;
+  });
+  const placed = $derived(
+    contest.places == null || grouped == null
+      ? contest.places
+      : {
+          ...contest.places,
+          legend: contest.places.legend.map((item) =>
+            item.key.startsWith("kind:others")
+              ? {
+                  ...item,
+                  label: m.places_others_with({ name: grouped.label }),
+                  color: grouped.color,
+                  person: grouped.current?.person ?? null,
+                  party: grouped.current?.party ?? null,
+                }
+              : item,
+          ),
+        },
+  );
   const drawn = $derived.by(() => {
-    const places = contest.places;
+    const places = placed;
     const level = boundaries.find((entry) => entry.scheme === places?.level);
     const own = boundaries.find(
       (entry) => entry.k != null && entry.scheme !== places?.level,
@@ -163,6 +204,7 @@
               ? null
               : { tiles: inner.tiles, ks: districts.map((row) => row.k) },
           frames: own.frames,
+          blank: level.blank,
           isApproximate: level.isApproximate,
           noun: noun ?? level.noun,
           sources: [
@@ -179,21 +221,21 @@
   const unmapped = $derived.by(() => {
     const total = contest.current?.valid ?? 0;
     let mapped = 0;
-    for (const row of contest.places?.rows ?? []) {
+    for (const row of placed?.rows ?? []) {
       mapped += row.valid;
     }
     return total > 0 ? (total - mapped) / total : 0;
   });
   const titles = $derived(
-    contest.places?.legend.map((item) =>
+    placed?.legend.map((item) =>
       item.person == null ? (item.short ?? item.label) : item.label,
     ) ?? [],
   );
   const tones = $derived(
-    contest.places?.legend.map((item) => swatch(item.color, item.key)) ?? [],
+    placed?.legend.map((item) => swatch(item.color, item.key)) ?? [],
   );
   const ladder = $derived.by(() => {
-    const places = contest.places;
+    const places = placed;
     const ranked = contest.electors?.rows ?? [];
     const rows = [...(places?.rows ?? []), ...(places?.districts ?? [])];
     const sides = ranked
@@ -241,7 +283,7 @@
         ];
   });
   const levels = $derived(
-    contest.places?.levels.map((level) => {
+    placed?.levels.map((level) => {
       const query = new URLSearchParams({
         ...Object.fromEntries(page.url.searchParams),
         by: level.code,
@@ -254,12 +296,12 @@
         count: level.count,
         path: here,
         query,
-        isCurrent: level.code === contest.places?.level,
+        isCurrent: level.code === placed?.level,
       };
     }) ?? [],
   );
   const keyed = $derived.by(() => {
-    const rows = (contest.places?.rows ?? []).filter(
+    const rows = (placed?.rows ?? []).filter(
       (row) => row.leader != null && row.valid > 0,
     );
     if (rows.length < 6) {
@@ -652,7 +694,7 @@
     }),
   );
   const below = $derived.by(() => {
-    const places = contest.places;
+    const places = placed;
     const level = places?.levels.find((entry) => entry.code === places.level);
     return places == null ||
       level == null ||
@@ -936,7 +978,7 @@
   {#if contest.electors != null}
     <Electors electors={contest.electors} {ladder} bind:focus />
   {/if}
-  {#if drawn != null && contest.places != null}
+  {#if drawn != null && placed != null}
     <div
       class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
         "lg:col-span-8": contest.chamber != null,
@@ -945,12 +987,13 @@
     >
       {#key `${here}:${drawn.tiles}`}
         <PlaceMap
-          places={contest.places}
+          places={placed}
           colors={tones}
           tiles={drawn.tiles}
           own={drawn.own}
           nested={drawn.nested}
           frames={drawn.frames}
+          blank={drawn.blank}
           isApproximate={drawn.isApproximate}
           noun={drawn.noun}
           sources={drawn.sources}
@@ -970,6 +1013,11 @@
           bind:focus
         />
       {/key}
+      {#if grouped != null && placed?.rows.some( (row) => placed.legend[row.leader ?? -1]?.key.startsWith("kind:others") )}
+        <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
+          {m.places_others_note({ name: grouped.label })}
+        </p>
+      {/if}
       {#if unmapped >= 0.01}
         <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
           {m.map_unmapped({ percent: percent(unmapped) })}
@@ -1269,7 +1317,7 @@
         ? { before: contest.current.valid, after: contest.target.valid }
         : { before: contest.target.valid, after: contest.current.valid }}
       counted={counted ?? m.stat_valid()}
-      places={contest.places}
+      places={placed}
       picked={only}
       onpick={(value) => {
         filter = { at: page.url.href, value };
@@ -1278,15 +1326,14 @@
         }
       }}
     />
-    {#if contest.places != null}
+    {#if placed != null}
       <Shift
-        places={contest.places}
+        places={placed}
         {span}
         colors={tones}
         names={titles}
-        noun={contest.places.levels.find(
-          (level) => level.code === contest.places?.level,
-        )?.noun ?? ""}
+        noun={placed.levels.find((level) => level.code === placed?.level)
+          ?.noun ?? ""}
         bind:focus
       />
     {/if}
@@ -1328,10 +1375,10 @@
   <Members parties={contest.chamber.parties} places={contest.chamber.places} />
 {/if}
 
-{#if contest.places != null}
+{#if placed != null}
   {#key here}
     <Places
-      places={contest.places}
+      places={placed}
       trace={page.url.pathname.slice(1)}
       {span}
       {publishers}

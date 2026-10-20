@@ -36,6 +36,7 @@
     own,
     nested = null,
     frames,
+    blank = null,
     isApproximate,
     noun,
     votes,
@@ -58,6 +59,7 @@
     own: { tiles: string; k: number } | null;
     nested?: { tiles: string; ks: Array<number> } | null;
     frames: Array<{ west: number; south: number; east: number; north: number }>;
+    blank?: Array<{ k: number; name: string }> | null;
     isApproximate: boolean;
     noun: string;
     votes: string;
@@ -108,6 +110,7 @@
   let credits = $state<Array<string>>([]);
   const credited = $derived(sources ?? credits);
   let pinned = $state<number | null>(null);
+  let empty = $state<number | null>(null);
   let pointer = $state<{ x: number; y: number } | null>(null);
   let near = $state<number | null>(null);
   let nearPinned = $state(false);
@@ -168,6 +171,9 @@
     ),
   );
   const inner = $derived(new Set(nested?.ks ?? []));
+  const blanks = $derived(
+    new Map((blank ?? []).map((entry) => [entry.k, entry.name])),
+  );
   const scopes = $derived(
     frames.map((frame): Maplibre.FilterSpecification | null => {
       if (frames.length < 2) {
@@ -178,24 +184,28 @@
       const west = frame.west - padX;
       const east = frame.east + padX;
       return [
-        "in",
-        ["id"],
+        "any",
+        ["!", ["in", ["id"], ["literal", [...rows.keys()]]]],
         [
-          "literal",
-          [...places.rows, ...(places.districts ?? [])].flatMap((row) => {
-            const at = row.at;
-            if (at == null) {
-              return [];
-            }
-            const [x, y] = at;
-            const isAcross =
-              west <= east ? x >= west && x <= east : x >= west || x <= east;
-            return isAcross &&
-              y >= frame.south - padY &&
-              y <= frame.north + padY
-              ? [row.k]
-              : [];
-          }),
+          "in",
+          ["id"],
+          [
+            "literal",
+            [...places.rows, ...(places.districts ?? [])].flatMap((row) => {
+              const at = row.at;
+              if (at == null) {
+                return [row.k];
+              }
+              const [x, y] = at;
+              const isAcross =
+                west <= east ? x >= west && x <= east : x >= west || x <= east;
+              return isAcross &&
+                y >= frame.south - padY &&
+                y <= frame.north + padY
+                ? [row.k]
+                : [];
+            }),
+          ],
         ],
       ];
     }),
@@ -775,6 +785,22 @@
                   ],
                 },
               },
+              ...(blanks.size === 0
+                ? []
+                : [
+                    {
+                      id: "blank",
+                      type: "fill" as const,
+                      source: "places",
+                      "source-layer": "areas",
+                      filter: [
+                        "in",
+                        ["id"],
+                        ["literal", [...blanks.keys()]],
+                      ] as Maplibre.FilterSpecification,
+                      paint: { "fill-pattern": "hatch" },
+                    },
+                  ]),
               ...(isApproximate
                 ? [
                     {
@@ -1063,6 +1089,8 @@
             ?.id;
           const k = typeof id === "number" && rows.has(id) ? id : null;
           const path = k == null ? null : rows.get(k)?.path;
+          empty =
+            k == null && typeof id === "number" && blanks.has(id) ? id : null;
           map.getCanvas().style.cursor = path != null ? "pointer" : "";
           if (pinned == null && focus !== k) {
             focus = k;
@@ -1080,6 +1108,7 @@
         });
         map.on("mouseleave", "fill", () => {
           clearTimeout(dwell);
+          empty = null;
           map.getCanvas().style.cursor = "";
           if (pinned == null) {
             focus = null;
@@ -1664,7 +1693,7 @@
         ></a
       >
     {/if}
-    {#if current != null || (beside != null && pointer != null)}
+    {#if current != null || (pointer != null && (empty != null || beside != null))}
       <div
         class={cn(
           "pointer-events-none absolute inset-s-0 inset-bs-0 grid gap-1.5 rounded-sm bg-card/95 px-3 py-2.5 shadow-menu ring-1 ring-border max-sm:hidden",
@@ -1680,6 +1709,10 @@
       >
         {#if current != null}
           {@render readout()}
+        {:else if empty != null}
+          <span class="font-semibold text-pretty">{blanks.get(empty)}</span>
+          <span class="text-xs text-muted-foreground">{m.map_no_results()}</span
+          >
         {:else if beside != null}
           <span class="font-semibold text-pretty">{beside.name}</span>
           <span class="text-xs text-muted-foreground">{m.map_click_open()}</span
@@ -1833,6 +1866,18 @@
             {/if}
           </button>
         {/each}
+        {#if blanks.size > 0}
+          <span
+            class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+            title={[...blanks.values()].join(", ")}
+          >
+            <span
+              class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_3px)] ring-1 ring-border block-2.5 inline-2.5"
+            ></span>
+            <span>{m.map_blank_key()}</span>
+            <span class="font-figures text-xs tabular-nums">{blanks.size}</span>
+          </span>
+        {/if}
       </div>
       {#if isDeclared}{:else if view === "bubbles"}
         <span class="text-muted-foreground"

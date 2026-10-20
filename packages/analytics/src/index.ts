@@ -189,16 +189,28 @@ export function compare(
   const anchors = alliances(options);
   const lines = new Map<string, Option>();
   const totals = new Map<string, number>();
+  const owned = new Map<string, string>(
+    options.flatMap((option) =>
+      option.person == null || option.party == null || option.line != null
+        ? []
+        : [[`${option.contest}:${option.person}`, option.party] as const],
+    ),
+  );
   for (const option of options) {
     const seat = `${option.contest}:${option.person}`;
     totals.set(
       option.contest,
       (totals.get(option.contest) ?? 0) + option.votes,
     );
+    const held = lines.get(seat);
+    const own = owned.get(seat);
     if (
       option.person != null &&
       option.party != null &&
-      (lines.get(seat)?.votes ?? -1) < option.votes
+      (held == null ||
+        (own != null && held.party !== own && option.party === own) ||
+        ((own == null || (held.party === own) === (option.party === own)) &&
+          held.votes < option.votes))
     ) {
       lines.set(seat, option);
     }
