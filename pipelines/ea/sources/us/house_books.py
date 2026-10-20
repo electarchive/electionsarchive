@@ -710,7 +710,7 @@ def emit(source: ModuleType) -> Path:
         contests: dict[str, UUID] = dict(
             conn.execute(
                 "select value, entity_id from external_id where scheme = 'us.contest' and value like %s",
-                [f"%:{source.STATE or ''}%:house:%"],
+                [f"%:{source.STATE or ''}%:{getattr(source, 'CHAMBER', 'house')}:%"],
             ).fetchall()
         )
         folder.mkdir(parents=True, exist_ok=True)
@@ -757,7 +757,7 @@ def emit(source: ModuleType) -> Path:
         split = {
             (int(year), str(where), str(county))
             for (year, where, county), districts in frame.group_by("year", "state", "county")
-            if districts["district"].n_unique() > 1 or _plain(str(county)) == "cook"
+            if districts["district"].n_unique() > 1 or _plain(str(county)) == "cook" or hasattr(source, "CHAMBER")
         }
         parts: set[str] = set()
         for (year, where, district), lines in frame.group_by("year", "state", "district", maintain_order=True):
@@ -901,7 +901,11 @@ def emit(source: ModuleType) -> Path:
             for county in lines["county"].unique(maintain_order=True):
                 code, parent, area = counties.get((county, county)) or counties[(fips[where], _plain(county))]
                 if (int(year), where, county) in split:
-                    part = f"{year}:{code}:{key.split(':')[3]}"
+                    part = (
+                        f"{year}:{code}:{source.CHAMBER}:{key.split(':', 3)[3]}"
+                        if hasattr(source, "CHAMBER")
+                        else f"{year}:{code}:{key.split(':')[3]}"
+                    )
                     units[county] = cs.unit("us.county_part", part)
                     if part in parts:
                         continue
