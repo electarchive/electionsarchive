@@ -17,7 +17,7 @@ from ea.store import DATA, connect
 SOURCE = "us.oe_primary"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
-NAME = re.compile(r"(?:.*/)?(\d{8})__([a-z]{2})__(.+)\.csv")
+NAME = re.compile(r"(?:.*/)?(\d{8})__([a-zA-Z]{2})__(.+)\.csv")
 KINDS = {
     "primary",
     "special",
