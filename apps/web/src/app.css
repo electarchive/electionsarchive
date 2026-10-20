@@ -25,6 +25,7 @@
   --foreground: #15171a;
   --card: #ffffff;
   --card-foreground: #15171a;
+  --map-low: #ffffff;
   --popover: #ffffff;
   --popover-foreground: #15171a;
   --primary: #15171a;
@@ -56,6 +57,7 @@
   --foreground: #e8eaed;
   --card: #111315;
   --card-foreground: #e8eaed;
+  --map-low: #c4c8ce;
   --popover: #1a1d20;
   --popover-foreground: #e8eaed;
   --primary: #e8eaed;

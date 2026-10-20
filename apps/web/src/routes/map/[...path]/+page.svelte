@@ -170,7 +170,7 @@
   }
 
   function mix(tone: string, strength: number) {
-    return `color-mix(in oklab, ${tone} ${strength}%, var(--card))`;
+    return `color-mix(in oklab, ${tone} ${strength}%, var(--map-low))`;
   }
 
   function step(value: number, edges: Array<number>) {
@@ -1272,8 +1272,28 @@
     }
   });
 
+  let shade = $state(0);
+  $effect(() => {
+    const bump = () => requestAnimationFrame(() => (shade += 1));
+    const observer = new MutationObserver(bump);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style", "data-theme"],
+    });
+    const offScheme = on(
+      matchMedia("(prefers-color-scheme: dark)"),
+      "change",
+      bump,
+    );
+    return () => {
+      observer.disconnect();
+      offScheme();
+    };
+  });
+
   $effect(() => {
     const theme = mode.current;
+    void shade;
     const gl = map;
     if (gl == null || theme == null) {
       return;
@@ -1339,6 +1359,7 @@
       only,
       isFlippedOnly,
       mode.current,
+      shade,
       first?.key,
       $state.snapshot(palette),
     ]);

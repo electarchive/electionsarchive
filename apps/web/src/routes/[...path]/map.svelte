@@ -139,6 +139,38 @@
     ),
   );
   const inner = $derived(new Set(nested?.ks ?? []));
+  const scopes = $derived(
+    frames.map((frame): Maplibre.FilterSpecification | null => {
+      if (frames.length < 2) {
+        return null;
+      }
+      const padX = ((frame.east - frame.west + 360) % 360 || 360) * 0.06;
+      const padY = (frame.north - frame.south) * 0.06;
+      const west = frame.west - padX;
+      const east = frame.east + padX;
+      return [
+        "in",
+        ["id"],
+        [
+          "literal",
+          [...places.rows, ...(places.districts ?? [])].flatMap((row) => {
+            const at = row.at;
+            if (at == null) {
+              return [];
+            }
+            const [x, y] = at;
+            const isAcross =
+              west <= east ? x >= west && x <= east : x >= west || x <= east;
+            return isAcross &&
+              y >= frame.south - padY &&
+              y <= frame.north + padY
+              ? [row.k]
+              : [];
+          }),
+        ],
+      ];
+    }),
+  );
   const hit = $derived(nested == null ? ["fill"] : ["nested-fill", "fill"]);
   const isCompared = $derived(
     span != null && places.rows.some((row) => row.earlier != null),
@@ -267,6 +299,7 @@
   });
   const biggest = $derived(Math.max(1, ...places.rows.map((row) => row.valid)));
   const isDeclared = $derived(places.rows.every((row) => row.valid === 0));
+  let isShaded = $state(false);
   const current = $derived(focus == null ? null : (rows.get(focus) ?? null));
   const moved = $derived(
     focus == null || !isCompared ? null : (changes.get(focus) ?? null),
@@ -420,7 +453,7 @@
         only != null && typeof only === "number" && only !== row.leader;
       let strength = dimmed
         ? 10
-        : isDeclared || row.valid === 0
+        : isDeclared || row.valid === 0 || !isShaded
           ? 100
           : (STRENGTHS[bin(row.margin)] ?? 100);
       let tone = colors[row.leader] ?? "var(--muted-foreground)";
@@ -486,7 +519,7 @@
       }
       result.push([
         row.k,
-        read(`color-mix(in oklab, ${tone} ${strength}%, var(--card))`),
+        read(`color-mix(in oklab, ${tone} ${strength}%, var(--map-low))`),
       ]);
     }
     return result;
@@ -962,6 +995,7 @@
           }
         });
         map.on("load", () => {
+          ready.add(map);
           if (index === 0) {
             isLoaded = true;
           }
@@ -1001,8 +1035,29 @@
     };
   };
 
+  const ready = new WeakSet<Maplibre.Map>();
+  let repaint = $state(0);
+  $effect(() => {
+    const bump = () => requestAnimationFrame(() => (repaint += 1));
+    const observer = new MutationObserver(bump);
+    observer.observe(document.documentElement, {
+      attributes: true,
+      attributeFilter: ["class", "style", "data-theme"],
+    });
+    const offScheme = on(
+      matchMedia("(prefers-color-scheme: dark)"),
+      "change",
+      bump,
+    );
+    return () => {
+      observer.disconnect();
+      offScheme();
+    };
+  });
+
   $effect(() => {
     const theme = mode.current;
+    void repaint;
     const host = maps[0]?.getContainer().closest<HTMLElement>("[data-map]");
     if (host == null || theme == null) {
       return;
@@ -1037,6 +1092,11 @@
     tones.done();
     for (const [index, map] of maps.entries()) {
       const apply = () => {
+        for (const layer of ["fill", "hatch", "seam"]) {
+          if (map.getLayer(layer) != null) {
+            map.setFilter(layer, scopes[index] ?? null);
+          }
+        }
         map.setPaintProperty("paper", "background-color", colorsNow.paper);
         map.setPaintProperty("fill", "fill-color", [
           "coalesce",
@@ -1106,7 +1166,7 @@
           );
         }
       };
-      if (map.isStyleLoaded()) {
+      if (ready.has(map)) {
         apply();
       } else {
         map.once("load", apply);
@@ -1140,7 +1200,7 @@
           );
         }
       };
-      if (map.isStyleLoaded()) {
+      if (ready.has(map)) {
         apply();
       } else {
         map.once("load", apply);
@@ -1383,7 +1443,7 @@
                   class="block-3 inline-5 first:rounded-s-xs"
                   style:background-color="color-mix(in oklab, {colors[1] ??
                     'var(--muted-foreground)'}
-                  {strength}%, var(--card))"
+                  {strength}%, var(--map-low))"
                 ></span>
               {/each}
               {#each STRENGTHS as strength, at (`a${at}`)}
@@ -1391,7 +1451,7 @@
                   class="block-3 inline-5 last:rounded-e-xs"
                   style:background-color="color-mix(in oklab, {colors[0] ??
                     'var(--muted-foreground)'}
-                  {strength}%, var(--card))"
+                  {strength}%, var(--map-low))"
                 ></span>
               {/each}
             </span>
@@ -1474,7 +1534,7 @@
                 class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
                 style:background-color="color-mix(in oklab, {colors[index] ??
                   'var(--muted-foreground)'}
-                {strength}%, var(--card))"
+                {strength}%, var(--map-low))"
               ></span>
             {/each}
           </span>
@@ -1516,23 +1576,35 @@
           >{m.map_bubbles_key({ votes: votes.toLowerCase() })}</span
         >
       {:else}
-        <div class="flex items-center gap-2.5" aria-hidden="true">
-          <span class="text-muted-foreground">{m.map_margin()}</span>
+        <div class="flex items-center gap-2.5">
           <span
-            class="flex items-center gap-1.5 font-figures text-xs tabular-nums"
+            class={cn(
+              "flex items-center gap-1.5 font-figures text-xs tabular-nums",
+              { hidden: !isShaded },
+            )}
+            aria-hidden="true"
           >
             <span>{m.map_margin_under({ points: "5" })}</span>
             <span class="flex">
               {#each STRENGTHS as strength (strength)}
                 <span
                   class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
-                  style:background-color="color-mix(in oklab, var(--foreground) {strength *
-                    0.85}%, var(--card))"
+                  style:background-color="color-mix(in oklab, #3d434b {strength}%,
+                  var(--map-low))"
                 ></span>
               {/each}
             </span>
             <span>{m.map_margin_over({ points: "20" })}</span>
           </span>
+          <button
+            type="button"
+            class={cn(
+              "flex items-center gap-1.5 rounded-xs px-1.5 py-0.5 font-semibold ring-1 ring-border hover:bg-secondary",
+              { "bg-foreground text-background hover:bg-foreground": isShaded },
+            )}
+            aria-pressed={isShaded}
+            onclick={() => (isShaded = !isShaded)}>{m.map_margin()}</button
+          >
         </div>
       {/if}
     {/if}
