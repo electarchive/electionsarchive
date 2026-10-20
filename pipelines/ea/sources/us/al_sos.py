@@ -105,14 +105,19 @@ def parse() -> None:
         sheets = books[workbook]
         for sheet, cells in sheets.items():
             year = re.search(r"(\d{2}|\d{4})\s*$", sheet.strip())
-            if "gen" not in sheet.lower() or year is None or not 2002 <= 2000 + int(year[1][-2:]) <= 2012:
+            if (workbook, sheet) == ("easecretaryofstate1986-2010_0.xls", "Gen.98") or (workbook.startswith("eapsc") and re.search(r"9\d\s*$", sheet)) or "gen" not in sheet.lower() or year is None or not 1990 <= (1900 if int(year[1][-2:]) >= 50 else 2000) + int(year[1][-2:]) <= 2012:
                 continue
             text = " ".join([sheet, *(cell for row in cells[:3] for cell in row if cell)]).upper()
             header = next(
-                index
-                for index, row in enumerate(cells)
-                if sum(CANDIDATE.fullmatch(cell or "") is not None for cell in row) >= 2
+                (
+                    index
+                    for index, row in enumerate(cells)
+                    if sum(CANDIDATE.fullmatch(cell or "") is not None for cell in row) >= 2
+                ),
+                None,
             )
+            if header is None:
+                continue
             blocks: list[list[int]] = []
             closed = True
             for column, cell in enumerate(cells[header]):
@@ -129,7 +134,7 @@ def parse() -> None:
                     if any(re.sub(r"[^a-z]", "", (row[column] or "").lower()) == "autauga" for row in cells)
                 )
                 counties = [
-                    fips[plain] for row in cells if (plain := re.sub(r"[^a-z]", "", (row[label] or "").lower())) in fips
+                    fips[plain] for row in cells if (plain := re.sub(r"[^a-z]", "", (row[label] or "").lower()).replace("conucuh", "conecuh")) in fips
                 ]
                 numeric = [
                     [int(row[column] or 0) for column in block]
@@ -166,7 +171,7 @@ def parse() -> None:
                     for county, values in zip(counties, data, strict=True):
                         rows.append(
                             (
-                                2000 + int(year[1][-2:]),
+                                (1900 if int(year[1][-2:]) >= 50 else 2000) + int(year[1][-2:]),
                                 title,
                                 post,
                                 candidate.upper(),
@@ -246,7 +251,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="Alabama's statewide executive offices and public service commissioners 2002–2012 by county from the "
+        summary="Alabama's statewide executive offices and public service commissioners 1990–2012 by county from the "
         "Secretary of State's election history workbooks",
         cite=cite,
         method=METHOD,
