@@ -43,7 +43,9 @@
       | "precinct"
       | "precinctTotal"
       | "shapes"
-      | "shapesTotal",
+      | "shapesTotal"
+      | "turnout"
+      | "turnoutTotal",
       number | null
     > = {
       expected: null,
@@ -54,6 +56,8 @@
       precinctTotal: null,
       shapes: null,
       shapesTotal: null,
+      turnout: null,
+      turnoutTotal: null,
     };
     let held = 0;
     for (const row of years) {
@@ -227,11 +231,11 @@
       <div
         role="row"
         class={cn(
-          "sticky inset-bs-0 z-10 grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(4,4.75rem)] items-end gap-x-1 bg-card px-2 pbs-2 pbe-1.5 text-xs/tight font-bold max-sm:pbs-16",
+          "sticky inset-bs-0 z-10 grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(5,4.75rem)] items-end gap-x-1 bg-card px-2 pbs-2 pbe-1.5 text-xs/tight font-bold max-sm:pbs-16",
           {
-            "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,2.25rem)]":
+            "max-sm:grid-cols-[minmax(0,1fr)_repeat(5,2.25rem)]":
               view !== "done",
-            "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,3rem)]": view === "done",
+            "max-sm:grid-cols-[minmax(0,1fr)_repeat(5,3rem)]": view === "done",
           },
         )}
       >
@@ -239,7 +243,7 @@
         <span role="columnheader" class="text-end max-sm:hidden"
           >{m.coverage_column_held()}</span
         >
-        {#each [m.coverage_column_all(), m.coverage_column_county(), m.coverage_column_precinct(), m.coverage_column_shapes()] as heading (heading)}
+        {#each [m.coverage_column_all(), m.coverage_column_county(), m.coverage_column_precinct(), m.coverage_column_shapes(), m.coverage_column_turnout()] as heading (heading)}
           <span
             role="columnheader"
             class="text-center max-sm:origin-bottom-left max-sm:translate-x-3 max-sm:-rotate-45 max-sm:text-start max-sm:whitespace-nowrap"

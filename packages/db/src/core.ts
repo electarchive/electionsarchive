@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, integer, smallint, boolean, text, date, timestamp, numeric, jsonb, customType, char, real, bigint, geometry, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, text, integer, smallint, boolean, timestamp, date, numeric, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -406,6 +406,8 @@ export const coverageRow = pgTable("coverage_row", {
 	countyTotal: integer("county_total"),
 	precinctTotal: integer("precinct_total"),
 	shapesTotal: integer("shapes_total"),
+	turnout: integer(),
+	turnoutTotal: integer("turnout_total"),
 }, (table) => [
 	index("coverage_row_parent_idx").using("btree", table.parent.asc().nullsLast(), table.sort.asc().nullsLast()),
 ]);

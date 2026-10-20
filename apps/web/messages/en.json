@@ -960,6 +960,7 @@
   "coverage_column_county": "County results",
   "coverage_column_precinct": "Precinct results",
   "coverage_column_shapes": "Map shapes",
+  "coverage_column_turnout": "Turnout",
   "coverage_ok": "Complete",
   "coverage_gap": "{count} short",
   "coverage_na": "Not measured",

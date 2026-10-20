@@ -103,6 +103,17 @@ from result_set r join cc on cc.id = r.contest_id join changeset cs on cs.id = r
 left join source s on s.id = r.source_id
 where r.status <> 'withdrawn';
 
+create temp table rsm as
+select distinct rv.result_set_k, rv.measure from result_value rv
+where rv.measure in (2, 3, 14) and rv.result_set_k in (select k from result_set where status <> 'withdrawn');
+
+create temp table tn as
+select cc.id from cc join contest c on c.id = cc.id
+where exists (select from result_set r join rsm on rsm.result_set_k = r.k and rsm.measure = 2
+        where r.election_id = c.election_id and (r.contest_id is null or r.contest_id = c.id))
+    and exists (select from result_set r join rsm on rsm.result_set_k = r.k and rsm.measure in (3, 14)
+        where r.election_id = c.election_id and (r.contest_id is null or r.contest_id = c.id));
+
 create temp table rsu as
 select distinct rv.result_set_k, rv.unit_k from result_value rv where rv.result_set_k in (select k from rs);
 
@@ -127,13 +138,15 @@ group by rs.contest_id;
 COUNT_SQL = """
 with c as (
     select cc.*, cg.precinct, cg.county, cg.county_free, exists (select from rs where rs.contest_id = cc.id) as results,
+        exists (select from tn where tn.id = cc.id) as turnout,
         tacit and stage in ('primary', 'runoff') and st in ('AL', 'AR', 'CO', 'CT', 'DE', 'FL', 'KY', 'LA', 'MS', 'NC',
             'NY', 'OK', 'SC', 'SD', 'UT', 'VA') as cancelled
     from cc left join cg on cg.contest_id = cc.id
 )
 select st, year, level, stage, count(*), count(*) filter (where results),
     count(*) filter (where county or precinct or cancelled), count(*) filter (where precinct or cancelled),
-    count(*) filter (where county and not county_free and not coalesce(precinct, false))
+    count(*) filter (where county and not county_free and not coalesce(precinct, false)),
+    count(*) filter (where turnout)
 from c group by 1, 2, 3, 4
 """
 
@@ -262,8 +275,9 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
             "county": county,
             "precinct": precinct,
             "icpsr_only": icpsr,
+            "turnout": turnout,
         }
-        for st, year, level, stage, n, results, county, precinct, icpsr in conn.execute(COUNT_SQL)
+        for st, year, level, stage, n, results, county, precinct, icpsr, turnout in conn.execute(COUNT_SQL)
     }
     shapes = {
         (st, year, level, stage): (n, shaped) for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL)
@@ -351,7 +365,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         st, year, level, stage = key
         if year > last:
             continue
-        cell = held.get(key, {"held": 0, "results": 0, "county": 0, "precinct": 0, "icpsr_only": 0})
+        cell = held.get(key, {"held": 0, "results": 0, "county": 0, "precinct": 0, "icpsr_only": 0, "turnout": 0})
         exp = expected.get(key)
         base = max(exp or 0, cell["held"])
         goal = target(st, level, year)
@@ -369,6 +383,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "with_results": cell["results"],
                 "county_or_finer": cell["county"],
                 "precinct": cell["precinct"],
+                "with_turnout": cell["turnout"],
                 "precinct_share": round(cell["precinct"] / cell["held"], 3) if cell["held"] else 0,
                 "grain": "precinct"
                 if cell["precinct"]

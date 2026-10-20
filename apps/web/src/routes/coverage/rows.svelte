@@ -27,6 +27,8 @@
     countyTotal: number | null;
     precinctTotal: number | null;
     shapesTotal: number | null;
+    turnout: number | null;
+    turnoutTotal: number | null;
     hasChildren: boolean;
     href: string | null;
     detail: string | null;
@@ -82,7 +84,7 @@
   const list = $derived(
     hideDone
       ? all.filter((row) =>
-          [row.missing, row.county, row.precinct, row.shapes].some(
+          [row.missing, row.county, row.precinct, row.shapes, row.turnout].some(
             (gap) => gap != null && gap > 0,
           ),
         )
@@ -192,10 +194,10 @@
     aria-level={depth + 1}
     aria-expanded={row.hasChildren ? isOpen : undefined}
     class={cn(
-      "grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(4,4.75rem)] items-center gap-x-1 bg-card pe-2",
+      "grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(5,4.75rem)] items-center gap-x-1 bg-card pe-2",
       {
-        "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,2.25rem)]": view !== "done",
-        "max-sm:grid-cols-[minmax(0,1fr)_repeat(4,3rem)]": view === "done",
+        "max-sm:grid-cols-[minmax(0,1fr)_repeat(5,2.25rem)]": view !== "done",
+        "max-sm:grid-cols-[minmax(0,1fr)_repeat(5,3rem)]": view === "done",
       },
       { "block-10": isYear, "block-8": !isYear },
       { "hover:bg-secondary": row.hasChildren },
@@ -286,6 +288,7 @@
     {@render marker(row.county, row.countyTotal)}
     {@render marker(row.precinct, row.precinctTotal)}
     {@render marker(row.shapes, row.shapesTotal)}
+    {@render marker(row.turnout, row.turnoutTotal)}
   </div>
   {#if isOpen}
     <Self parent={row.path} depth={depth + 1} {view} {hideDone} {local} />

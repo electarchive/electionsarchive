@@ -21,6 +21,8 @@ const row = v.object({
   countyTotal: gap,
   precinctTotal: gap,
   shapesTotal: gap,
+  turnout: gap,
+  turnoutTotal: gap,
   hasChildren: v.boolean(),
   href: v.nullable(v.string()),
   detail: v.nullable(v.string()),
@@ -65,6 +67,7 @@ export const coverage = {
             y.precincts, y.shaped, null::int as "countyTotal",
             case when y.year >= 2000 then y.held + (y.expected and y.held = 0)::int end as "precinctTotal",
             case when y.year >= 2000 and y.precincts > 0 then y.precincts end as "shapesTotal",
+            null::int as turnout, null::int as "turnoutTotal",
             false as "hasChildren", s.path as href,
             nullif(concat_ws(', ', g.function, case when g.kind <> 'county' then (
               select n.text from external_id c join name n on n.entity_id = c.entity_id and n.is_preferred
@@ -85,6 +88,7 @@ export const coverage = {
           case when ${isLocal} or r.shapes_total > g.shapes_total then r.shapes - g.shapes end as shapes, r.precincts - g.precincts as precincts, r.shaped - g.shaped as shaped,
           r.county_total as "countyTotal", r.precinct_total - g.precinct_total as "precinctTotal",
           r.shapes_total - g.shapes_total as "shapesTotal",
+          r.turnout, r.turnout_total as "turnoutTotal",
           r.kind = 'governments' or exists (select from coverage_row c where c.parent = r.path) as "hasChildren",
           null as href, null as detail
         from coverage_row r

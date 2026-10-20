@@ -514,6 +514,8 @@ def build() -> str:
             "county_total": None,
             "precinct_total": None,
             "shapes_total": None,
+            "turnout": None,
+            "turnout_total": None,
         }
 
     nodes: dict[str, dict] = {}
@@ -554,6 +556,8 @@ def build() -> str:
             "county_total": None if county is None else base,
             "precinct_total": None if precinct is None else base,
             "shapes_total": c["precincts"] if shapes else None,
+            "turnout": c["held"] - c.get("with_turnout", 0),
+            "turnout_total": c["held"],
         }
         if str(year) not in nodes:
             nodes[str(year)] = node(str(year), None, year, -year, str(year), "year")
@@ -650,7 +654,8 @@ def build() -> str:
                 copy.write_row(row)
         with conn.cursor().copy(
             "copy coverage_row (path, parent, year, sort, label, kind, expected, held, governments, missing, county,"
-            " precinct, shapes, precincts, shaped, county_total, precinct_total, shapes_total) from stdin"
+            " precinct, shapes, precincts, shaped, county_total, precinct_total, shapes_total, turnout,"
+            " turnout_total) from stdin"
         ) as copy:
             for row in rows:
                 copy.write_row(list(row.values()))
