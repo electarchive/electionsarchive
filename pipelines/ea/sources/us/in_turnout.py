@@ -92,7 +92,7 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "counties.parquet")
-    addresses = {v: k for k, v in listing().items()}
+    addresses = listing()
     with connect() as conn:
         cs = Changeset(
             conn,
