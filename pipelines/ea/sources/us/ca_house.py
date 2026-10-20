@@ -14,6 +14,12 @@ SUMMARY = "California's House results by county from the Secretary of State's St
 STATE = "CA"
 FIPS = "06"
 ITEMS = {
+    1912: ("statementofvo19081922cali", date(1912, 11, 5), range(46, 50)),
+    1914: ("statementofvo19081922cali", date(1914, 11, 3), range(86, 90)),
+    1916: ("statementofvo19081922cali", date(1916, 11, 7), range(187, 191)),
+    1918: ("statementofvo19081922cali", date(1918, 11, 5), range(277, 281)),
+    1920: ("statementofvo19081922cali", date(1920, 11, 2), range(323, 327)),
+    1922: ("statementofvo19081922cali", date(1922, 11, 7), range(427, 430)),
     1932: ("statementofvo19321939cali", date(1932, 11, 8), range(147, 150)),
     1934: ("statementofvo19321939cali", date(1934, 11, 6), range(264, 270)),
     1936: ("statementofvo19321939cali", date(1936, 11, 3), range(419, 422)),
@@ -57,14 +63,14 @@ for year, day in ((1994, date(1994, 11, 8)), (1996, date(1996, 11, 5))):
         day,
         range(1, 9),
     )
-ERRATA: set[tuple[int, int]] = {(1988, 4), (1952, 1)}
+ERRATA: set[tuple[int, int]] = {(1988, 4), (1952, 1), (1918, 8)}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 1
 RENAMED: str | None = None
 COMMAS = True
 TURNED: set[tuple[int, int]] = {(1976, page) for page in range(80, 85)}
-TRANSPOSED = {1932, 1934, 1936, 1938, 1940, 1942, 1944, 1946, 1948, 1950, 1960, 1958, 1956, 1954, 1952}
+TRANSPOSED = {1912, 1914, 1916, 1918, 1920, 1922, 1932, 1934, 1936, 1938, 1940, 1942, 1944, 1946, 1948, 1950, 1960, 1958, 1956, 1954, 1952}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
