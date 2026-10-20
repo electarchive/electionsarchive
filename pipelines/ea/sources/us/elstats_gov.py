@@ -11,6 +11,7 @@ import polars as pl
 
 from ea import names, raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.elstats import FORMER, GAZETTEER, HELD, SEARCH, SUFFIXES, TENANTS, TITLE, plain
 from ea.store import DATA, connect
 
@@ -122,6 +123,7 @@ def parse() -> None:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
         ).filter(pl.col("USPS").is_in(list(OFFICES)))
+    regions = ct_regions()
     towns: dict[str, dict[str, str]] = {}
     for state, geoid, text in (
         gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
@@ -158,7 +160,11 @@ def parse() -> None:
                 candidate=pl.col("candidate_name").fill_null("").str.strip_chars(),
                 party=pl.col("candidate_party_name"),
                 winner=pl.col("is_winner") == "true",
-                code=pl.when(pl.col("division_type").replace_strict(DIVISIONS) == "county")
+                code=pl.when(
+                    (pl.lit(state) == "CT") & (pl.col("election_date").str.slice(0, 4).cast(pl.Int32) >= 2022)
+                )
+                .then(division.map_elements(plain, return_dtype=pl.String).replace_strict(regions, default=None))
+                .when(pl.col("division_type").replace_strict(DIVISIONS) == "county")
                 .then(
                     division.str.to_lowercase()
                     .str.replace_all(r"saint ", "st ")
@@ -441,7 +447,8 @@ def emit() -> Path:
             )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             previous = None
-            if folded and result_set not in cs.minted:
+            regioned = state == "CT" and day.year >= 2022
+            if (folded or regioned) and result_set not in cs.minted:
                 previous = result_set
                 cs.add(
                     "result_set",
@@ -455,11 +462,13 @@ def emit() -> Path:
                     is_default=False,
                     completeness=1,
                 )
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:{'regions' if regioned else 'folded'}")
                 for option, kind_, seats in conn.execute(
                     "select option_id, kind, seats from outcome where result_set_id = %s", [previous]
                 ).fetchall():
                     cs.add("outcome", result_set_id=previous, option_id=option, kind=kind_, seats=seats)
-                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:folded")
+                    if regioned:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind_, seats=seats)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -469,7 +478,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[state],
-                is_default=not reused and (previous or result_set) not in demoted,
+                is_default=regioned or (not reused and (previous or result_set) not in demoted),
                 supersedes_id=previous,
                 completeness=1,
             )
