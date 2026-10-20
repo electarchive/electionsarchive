@@ -783,7 +783,34 @@ async function load(
     alliance: string | null;
     is_line: boolean;
   }>(sql`
-    select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
+    select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id, (
+        select coalesce(mm.into_id, cy.member_of_party_id, nm.party_id, ta.party_id, nb.party)
+        from candidacy cy
+        left join lateral (
+          select n.party_id from candidacy_nomination n where n.candidacy_id = cy.id and n.kind = 'nominated' order by n.party_id limit 1
+        ) nm on true
+        left join lateral (
+          select a.party_id from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
+          where t.person_id = cy.person_id and t.contest_id = o.contest_id order by lower(a.valid) nulls first limit 1
+        ) ta on true
+        left join lateral (
+          select coalesce(xm.into_id, xo.party_id) as party
+          from candidacy xc
+          join contest_option xo on xo.id = xc.option_id and xo.party_id is not null
+          join contest xk on xk.id = xo.contest_id and xk.party_scope_id is null
+          join election xe on xe.id = xk.election_id
+          left join entity_merge xm on xm.entity_id = xo.party_id
+          where xc.person_id = cy.person_id and xc.id <> cy.id and not xc.is_independent
+            and xe.date_from between (select e.date_from - 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
+              and (select e.date_from + 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
+          order by abs(xe.date_from - (select e.date_from from contest k join election e on e.id = k.election_id where k.id = o.contest_id)), xe.date_from desc
+          limit 1
+        ) nb on cy.member_of_party_id is null and nm.party_id is null and ta.party_id is null
+        left join entity_merge mm on mm.entity_id = coalesce(cy.member_of_party_id, nm.party_id, ta.party_id)
+        where o.parent_option_id is null and o.kind in ('candidate', 'ticket') and cy.option_id = o.id and cy.role = 'head' and not cy.is_independent
+          and not exists (select from candidacy cz where cz.option_id = o.id and cz.role = 'head' and cz.id <> cy.id)
+        limit 1
+      )) as party, o.ballot_label as label,
       o.alliance_id as alliance, o.parent_option_id is not null as is_line,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
