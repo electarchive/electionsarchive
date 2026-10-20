@@ -13,7 +13,7 @@ SOURCE = "us.mi_cenr_statewide"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 FILE = "http://web.archive.org/web/2020id_/http://miboecfr.nictusa.com/election/results/DATA/{}GEN_MI_CENR_BY_COUNTY.xls"
-YEARS = [1998, 2000, 2004, 2008, 2012]
+YEARS = [1998, 2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014]
 PUBLISHER = "Michigan Department of State"
 TITLE = "Official general election results by county"
 OFFICES = {
@@ -147,7 +147,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="Michigan's 1998 secretary of state and attorney general and the 1998, 2000, 2004, 2008, and 2012 "
+        summary="Michigan's 1998 secretary of state and attorney general and the 1998 to 2014 "
         "State Board of Education, University of Michigan regents, Michigan State trustees, and Wayne State governors "
         "by county from the Department of State's official results",
         cite=cite,
