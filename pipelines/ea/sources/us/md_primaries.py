@@ -14,7 +14,7 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.md_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://elections.maryland.gov/elections/archive/"
 DAYS = {
@@ -24,13 +24,18 @@ DAYS = {
     2010: date(2010, 9, 14),
     2012: date(2012, 4, 3),
     2014: date(2014, 6, 24),
+    2016: date(2016, 4, 26),
+    2018: date(2018, 6, 26),
+    2020: date(2020, 6, 2),
+    2022: date(2022, 7, 19),
 }
 FILES = {
     2004: r"([A-Za-z_.']+)_(Democratic|Republican)_Primary_2004\.csv",
     **{
         year: rf"([A-Za-z_.']+?)(?:_County)?_(Democratic|Republican)_{year}_Primary\.csv"
-        for year in (2006, 2008, 2010, 2012, 2014)
+        for year in (2006, 2008, 2010, 2012, 2014, 2016, 2018, 2020)
     },
+    2022: r"GP22_(\d\d)(Democratic|Republican)Results\.csv",
 }
 PUBLISHER = "Maryland State Board of Elections"
 TITLE = "Election results archive: primaries"
@@ -66,14 +71,17 @@ def parse() -> None:
             if int(code[2:]) >= 500:
                 fips[f"{plain}city"] = code
             fips.setdefault(plain, code)
+    ordinals = sorted(set(fips.values()))
     rows: list[tuple[int, str, str, int | None, str, str, int]] = []
     for year, pattern in FILES.items():
         for name in files(year):
             found = re.fullmatch(pattern, name)
+            if year == 2022 and found[1] == "00":
+                continue
             plain = re.sub(
                 r"[^a-z]", "", found[1].lower().replace("_", " ").replace("saint ", "st ").replace("st.", "st")
             )
-            code = fips[plain]
+            code = ordinals[int(found[1]) - 1] if year == 2022 else fips[plain]
             entries = [
                 {key.strip(): value for key, value in entry.items() if key is not None}
                 for entry in csv.DictReader(
@@ -149,7 +157,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maryland's House, Senate, and presidential primaries by county, 2004–2014",
+            summary="Maryland's House, Senate, and presidential primaries by county, 2004–2022",
             polity="US-MD",
         )
         source = cs.source(PUBLISHER, TITLE)
