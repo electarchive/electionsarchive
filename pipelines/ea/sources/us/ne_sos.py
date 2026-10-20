@@ -4,11 +4,13 @@ import json
 import re
 import statistics
 import subprocess
+import tempfile
 from datetime import date
 from difflib import SequenceMatcher
 from pathlib import Path
 from uuid import UUID
 
+import numpy
 import polars as pl
 from PIL import Image
 
@@ -43,7 +45,8 @@ PARTIES = {
     "Libertarian": "libertarian-party",
     "Nebraska": "NE:nebraska-party",
 }
-LEFT_ROWS = 47
+BLOCKS = {2006: [(0, 47), (47, 94)], 2002: [(0, 51), (51, 94)]}
+SIDES: dict[int, list[bool | None]] = {2006: [True, False], 2002: [None, None]}
 
 
 def fetch() -> None:
@@ -58,65 +61,99 @@ def parse() -> None:
         year = int(path.stem)
         book = raw.cached(SOURCE, BOOKS[year][1])
         for office, table in json.loads(path.read_text())[str(year)].items():
-            page = table["page"]
             keys = list(table["rows"])
-            image = PAGES / f"{book.sha256}-{page}.png"
-            if not image.exists():
-                subprocess.run(
-                    ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
-                    + [str(book.path), str(image.with_suffix(""))],
-                    check=True,
-                )
-            tsv = subprocess.run(
-                ["tesseract", str(image), "stdout", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
-            ).stdout
-            tokens = [
-                (int(r["left"]), int(r["top"]), int(r["left"]) + int(r["width"]), int(r["top"]) + int(r["height"]), r["text"])
-                for r in csv.DictReader(io.StringIO(tsv), delimiter="\t", quoting=csv.QUOTE_NONE)
-                if r["level"] == "5" and r["text"].strip().isdigit() and int(r["top"]) > 340
-            ]
-            with Image.open(image) as rendered:
-                middle = rendered.size[0] / 2
             columns = len(table["candidates"])
+            layout = [
+                (page, side, block)
+                for page, side, block in zip(
+                    table["pages"] * len(BLOCKS[year]) if len(table["pages"]) == 1 else table["pages"],
+                    SIDES[year],
+                    [keys[start:stop] for start, stop in BLOCKS[year]],
+                    strict=True,
+                )
+            ]
             boxes: dict[tuple[str, int], tuple[int, int, int, int]] = {}
+            at_page: dict[str, int] = {}
             matched = 0
-            for left in (True, False):
-                block = [t for t in tokens if ((t[0] + t[2]) / 2 < middle) == left]
-                block_keys = keys[:LEFT_ROWS] if left else keys[LEFT_ROWS:]
-                centers = sorted((t[0] + t[2]) / 2 for t in block)
-                groups: list[list[float]] = [[centers[0]]]
-                for value in centers[1:]:
-                    if value - groups[-1][-1] > 60:
-                        groups.append([])
-                    groups[-1].append(value)
-                groups = [g for g in groups if len(g) > len(block_keys) / 3]
-                if len(groups) != columns:
-                    raise ValueError(f"{year} {office}: {len(groups)} column groups for {columns} columns")
-                height = statistics.median(t[3] - t[1] for t in block)
+            for page, side, block_keys in layout:
+                image = PAGES / f"{book.sha256}-{page}.png"
+                if not image.exists():
+                    subprocess.run(
+                        ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile"]
+                        + [str(book.path), str(image.with_suffix(""))],
+                        check=True,
+                    )
+                    with Image.open(image) as rendered:
+                        small = rendered.convert("L").resize((rendered.width // 4, rendered.height // 4))
+                        ink = Image.fromarray((numpy.asarray(small) < 128).astype("uint8") * 255)
+                        angle = max(
+                            numpy.arange(-4, 4.01, 0.1), key=lambda a: numpy.var(numpy.asarray(ink.rotate(a)).sum(axis=1))
+                        )
+                        rendered.convert("L").rotate(angle, resample=Image.Resampling.BICUBIC, fillcolor=255).save(image)
+                with Image.open(image) as rendered:
+                    clean = Path(tempfile.mkdtemp()) / "clean.png"
+                    rendered.convert("L").point(lambda v: 0 if v < 110 else 255).save(clean)
+                tsv = subprocess.run(
+                    ["tesseract", str(clean), "stdout", "--psm", "6", "tsv"], capture_output=True, text=True, check=True
+                ).stdout
+                tokens = [
+                    (int(r["left"]), int(r["top"]), int(r["left"]) + int(r["width"]), int(r["top"]) + int(r["height"]), r["text"])
+                    for r in csv.DictReader(io.StringIO(tsv), delimiter="\t", quoting=csv.QUOTE_NONE)
+                    if r["level"] == "5" and r["text"].strip().isdigit() and int(r["top"]) > 340 and int(r["left"]) < 1580
+                ]
+                with Image.open(image) as rendered:
+                    middle = rendered.size[0] / 2
+                block = [t for t in tokens if side is None or (((t[0] + t[2]) / 2 < middle) == side)]
                 char = statistics.median((t[2] - t[0]) / len(t[4]) for t in block)
-                fitted: list[tuple[int, int]] = []
                 found: dict[tuple[int, int], tuple[int, int, int, int]] = {}
-                for column, group in enumerate(groups):
-                    low, high = min(group) - 40, max(group) + 40
-                    mine = sorted((t for t in block if low <= (t[0] + t[2]) / 2 <= high), key=lambda t: t[1])
+                edges: list[float] = []
+                for column in range(columns):
                     expected = [str(table["rows"][k][column]) for k in block_keys]
+                    rights = [t[2] for t in block if t[4] in expected and len(t[4]) > 1]
+                    common = statistics.mode(round(r / 8) for r in rights)
+                    edge = statistics.median(r for r in rights if round(r / 8) == common)
+                    edges.append(edge)
+                    mine = sorted((t for t in block if abs(t[2] - edge) < 14), key=lambda t: t[1])
                     match = SequenceMatcher(None, expected, [t[4] for t in mine], autojunk=False)
                     for a, b, size in match.get_matching_blocks():
                         for offset in range(size):
                             found[(a + offset, column)] = mine[b + offset][:4]
-                            fitted.append((a + offset, (mine[b + offset][1] + mine[b + offset][3]) // 2))
-                slope, intercept = statistics.linear_regression([i for i, _ in fitted], [y for _, y in fitted])
-                for column, group in enumerate(groups):
-                    x = statistics.median(group)
+                pairs = [(i, (box[1] + box[3]) / 2) for (i, _), box in found.items() if block_keys[i] != "TOTAL"]
+                if len(found) > 0.6 * columns * (len(block_keys) - 1):
+                    pitch = statistics.median(
+                        (yj - yi) / (j - i) for n, (i, yi) in enumerate(pairs[::3]) for j, yj in pairs[::3][n + 1 :] if j != i
+                    )
+                    top = statistics.median(y - pitch * i for i, y in pairs)
+                else:
+                    with Image.open(image) as rendered:
+                        ink = numpy.asarray(rendered.convert("L")) < 140
+                    span = ink[:, round(min(edges) - 300) : round(max(edges))]
+                    dark = span.mean(axis=1) > 0.5
+                    rules = [y for y in range(1, len(dark)) if dark[y] and not dark[y - 1]]
+                    if len(rules) < 5:
+                        raise ValueError(f"{year} {office} page {page}: {len(rules)} rules")
+                    pitch = statistics.median(b - a for a, b in zip(rules, rules[1:], strict=False)) / 2
+                    guess = statistics.median(y - i * pitch for i, y in pairs)
+                    near = min(range(-3, 4), key=lambda k: abs(rules[0] - pitch / 2 + k * pitch - guess))
+                    top = rules[0] - pitch / 2 + near * pitch
+                found = {
+                    cell: box
+                    for cell, box in found.items()
+                    if block_keys[cell[0]] != "TOTAL" and abs((box[1] + box[3]) / 2 - (top + cell[0] * pitch)) < pitch / 3
+                }
+                for column in range(columns):
                     for i, key in enumerate(block_keys):
+                        if key == "TOTAL":
+                            continue
                         box = found.get((i, column))
                         if box is None:
-                            y = slope * i + intercept
-                            half = char * len(str(table["rows"][key][column])) / 2
-                            box = (round(x - half), round(y - height / 2), round(x + half), round(y + height / 2))
+                            y = top + i * pitch
+                            width = char * len(str(table["rows"][key][column]))
+                            box = (round(edges[column] - width), round(y - pitch * 0.3), round(edges[column]), round(y + pitch * 0.3))
                         else:
                             matched += 1
                         boxes[(key, column)] = box
+                        at_page[key] = page
             print(year, office, f"{matched}/{len(keys) * columns} cells matched to OCR tokens")
             printed = table["rows"]["TOTAL"]
             for column, candidate in enumerate(table["candidates"]):
@@ -133,7 +170,7 @@ def parse() -> None:
                             "county": key,
                             "votes": table["rows"][key][column],
                             "printed": printed[column],
-                            "page": page,
+                            "page": at_page[key],
                             "box": list(boxes[(key, column)]),
                         }
                     )
