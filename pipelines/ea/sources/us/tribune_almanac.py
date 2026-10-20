@@ -16,7 +16,7 @@ STATE = None
 FIPS = None
 ITEMS = {
     1854: ("tribunealmanacpo1855newy", 1855, date(1854, 11, 7), (51,)),
-    1856: ("vol1857tribuneal00unse", 1857, date(1856, 11, 4), (47, 56, 57, 58, 59, 60, 61, 63)),
+    1856: ("vol1857tribuneal00unse", 1857, date(1856, 11, 4), (47, 48, 49, 56, 57, 58, 59, 60, 61, 63)),
     1858: ("vol1859tribuneal00unse", 1859, date(1858, 11, 2), (46, 55, 57, 58, 59, 60, 61)),
     1860: ("vol1861tribuneal00unse", 1861, date(1860, 11, 6), (42, 47, 48, 49, 56, 57, 58, 59, 60, 62, 63)),
     1862: ("tribunealmanacpo1863newy", 1863, date(1862, 11, 4), (57, 58)),
