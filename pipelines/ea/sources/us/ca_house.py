@@ -26,7 +26,7 @@ VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, day, pages) in ITEMS.items()
 }
-for year, day in ((1994, date(1994, 11, 8)),):
+for year, day in ((1994, date(1994, 11, 8)), (1996, date(1996, 11, 5))):
     VOLUMES[year] = (
         f"https://elections.cdn.sos.ca.gov/sov/{year}-general/us-representative.pdf",
         f"https://elections.cdn.sos.ca.gov/sov/{year}-general/",
