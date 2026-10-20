@@ -14,6 +14,8 @@ SUMMARY = "California's House results by county from the Secretary of State's St
 STATE = "CA"
 FIPS = "06"
 ITEMS = {
+    1908: ("statementofvo19081922cali", date(1908, 11, 3), range(13, 15)),
+    1910: ("statementofvoteo1886cali", date(1910, 11, 8), range(234, 237)),
     1912: ("statementofvo19081922cali", date(1912, 11, 5), range(46, 50)),
     1914: ("statementofvo19081922cali", date(1914, 11, 3), range(86, 90)),
     1916: ("statementofvo19081922cali", date(1916, 11, 7), range(187, 191)),
@@ -70,7 +72,7 @@ REVISION = 1
 RENAMED: str | None = None
 COMMAS = True
 TURNED: set[tuple[int, int]] = {(1976, page) for page in range(80, 85)}
-TRANSPOSED = {1912, 1914, 1916, 1918, 1920, 1922, 1932, 1934, 1936, 1938, 1940, 1942, 1944, 1946, 1948, 1950, 1960, 1958, 1956, 1954, 1952}
+TRANSPOSED = {1908, 1910, 1912, 1914, 1916, 1918, 1920, 1922, 1932, 1934, 1936, 1938, 1940, 1942, 1944, 1946, 1948, 1950, 1960, 1958, 1956, 1954, 1952}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
