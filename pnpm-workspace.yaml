@@ -19,18 +19,18 @@ catalog:
   "@better-auth/api-key": 1.7.7
   "@better-auth/drizzle-adapter": ^1.7.7
   "@better-auth/i18n": ^1.7.7
-  "@fontsource/piazzolla": ^5.3.0
-  "@fontsource/sofia-sans-semi-condensed": ^5.3.0
   "@fontsource-variable/noto-naskh-arabic": ^5.3.0
   "@fontsource-variable/piazzolla": ^5.3.0
   "@fontsource-variable/sofia-sans-semi-condensed": ^5.3.0
+  "@fontsource/piazzolla": ^5.3.0
+  "@fontsource/sofia-sans-semi-condensed": ^5.3.0
   "@inlang/paraglide-js": ^2.27.0
   "@lucide/svelte": ^1.55.0
-  "@orpc/client": 2.0.0-beta.43
-  "@orpc/openapi": 2.0.0-beta.43
-  "@orpc/server": 2.0.0-beta.43
-  "@orpc/tanstack-query": 2.0.0-beta.43
-  "@orpc/valibot": 2.0.0-beta.43
+  "@orpc/client": 2.0.0-beta.44
+  "@orpc/openapi": 2.0.0-beta.44
+  "@orpc/server": 2.0.0-beta.44
+  "@orpc/tanstack-query": 2.0.0-beta.44
+  "@orpc/valibot": 2.0.0-beta.44
   "@prgm/sveltekit-progress-bar": ^3.0.2
   "@redis/client": ^6.3.0
   "@resvg/resvg-js": ^2.6.2

@@ -198,20 +198,20 @@ catalogs:
       specifier: ^1.55.0
       version: 1.55.0
     '@orpc/client':
-      specifier: 2.0.0-beta.43
-      version: 2.0.0-beta.43
+      specifier: 2.0.0-beta.44
+      version: 2.0.0-beta.44
     '@orpc/openapi':
-      specifier: 2.0.0-beta.43
-      version: 2.0.0-beta.43
+      specifier: 2.0.0-beta.44
+      version: 2.0.0-beta.44
     '@orpc/server':
-      specifier: 2.0.0-beta.43
-      version: 2.0.0-beta.43
+      specifier: 2.0.0-beta.44
+      version: 2.0.0-beta.44
     '@orpc/tanstack-query':
-      specifier: 2.0.0-beta.43
-      version: 2.0.0-beta.43
+      specifier: 2.0.0-beta.44
+      version: 2.0.0-beta.44
     '@orpc/valibot':
-      specifier: 2.0.0-beta.43
-      version: 2.0.0-beta.43
+      specifier: 2.0.0-beta.44
+      version: 2.0.0-beta.44
     '@prgm/sveltekit-progress-bar':
       specifier: ^3.0.2
       version: 3.0.2
@@ -447,19 +447,19 @@ importers:
         version: 5.3.0
       '@orpc/client':
         specifier: 'catalog:'
-        version: 2.0.0-beta.43
+        version: 2.0.0-beta.44
       '@orpc/openapi':
         specifier: 'catalog:'
-        version: 2.0.0-beta.43
+        version: 2.0.0-beta.44
       '@orpc/server':
         specifier: 'catalog:'
-        version: 2.0.0-beta.43
+        version: 2.0.0-beta.44
       '@orpc/tanstack-query':
         specifier: 'catalog:'
-        version: 2.0.0-beta.43(@tanstack/query-core@5.104.2)
+        version: 2.0.0-beta.44(@tanstack/query-core@5.104.2)
       '@orpc/valibot':
         specifier: 'catalog:'
-        version: 2.0.0-beta.43(valibot@1.5.0(typescript@6.0.3))
+        version: 2.0.0-beta.44(valibot@1.5.0(typescript@6.0.3))
       '@redis/client':
         specifier: 'catalog:'
         version: 6.3.0
@@ -1507,17 +1507,17 @@ packages:
     resolution: {integrity: sha512-eSYWTm620tTk45EKSedaUL8MFYI8hW164hIXsgIHyxu3VobUB3fFCu5t0hQby6OoWRPsG1KkKUG2M5UadiLiVg==}
     engines: {node: '>=14'}
 
-  '@orpc/client@2.0.0-beta.43':
-    resolution: {integrity: sha512-176u4pmmoXGyjHRTuJFSQVN4Ucuau5mfn3LkxBs+kyTcNHOZD9XmDW8DAr0NJwhfUBDT/E62q1y9aEgiKUcJsA==}
+  '@orpc/client@2.0.0-beta.44':
+    resolution: {integrity: sha512-x78eWZACv7Xzc6qGyrG6BvbH9/p6zoG+urnmOo8Vr6U63fnk9yLN4AA0B5n3/Ndb2lA6kmW8fNCyYbqj2DzH7A==}
 
-  '@orpc/contract@2.0.0-beta.43':
-    resolution: {integrity: sha512-8IyzPrpdvGhi51G6QHEkoPOvs4AyV0YjhV6OP57W9rUAS9YnPyc/ScKwpsTZsm6dOjPcNBk8R2n+iN2s7m4t4w==}
+  '@orpc/contract@2.0.0-beta.44':
+    resolution: {integrity: sha512-8yRa8eY7b6ltf9EjswD+h6HlqLhyjzxn4YOmj48u39K2VGjRhFwXw/EpAGJGmochOuQZuWzrj9VcsyVg6uV7kQ==}
 
-  '@orpc/json-schema@2.0.0-beta.43':
-    resolution: {integrity: sha512-h0wq0pMfxTjFEy7RaFTKwwq2GviS7lz+uh16sUMbdUMTNYP4y1t8SLLfa979EbhfG9RJ3/vXPdaToiMh8HQz8g==}
+  '@orpc/json-schema@2.0.0-beta.44':
+    resolution: {integrity: sha512-V8FriE7bd+WEZgjYGuCYg1cAGEaM/+nSDIJLSGyp1Zco2lMaXZ7whwqWyh9KJm36d4VkraIePDA4Tntza9+w7A==}
 
-  '@orpc/openapi@2.0.0-beta.43':
-    resolution: {integrity: sha512-sT/a4M/rfyemqAv07VRdbBA/NsepWTLlggrqnpRUhqYSUobGKJ+I08uaKRzjPumXUz8ip9oDeSaR3Xgu3q5JXw==}
+  '@orpc/openapi@2.0.0-beta.44':
+    resolution: {integrity: sha512-FZ37L4iRZ1wFXtFBEla6Y2oZTgY9PVqQobzVnu+XqYA5tKOaWTWyeQ1j+OdeSv9tTbT8VLy3gcFtq3yfEGhkfQ==}
     peerDependencies:
       '@scalar/api-reference': '>=1.57.2'
       '@types/swagger-ui': '>=5.32.0'
@@ -1530,8 +1530,8 @@ packages:
       swagger-ui:
         optional: true
 
-  '@orpc/server@2.0.0-beta.43':
-    resolution: {integrity: sha512-4G6xYiPQtu5iefsnEZzxa9rcl+P0IJCPkzQu+Mv45QJd/S3Qp6MQwDJAV90WBAjQay6dd0662awGrh4JXfIXhQ==}
+  '@orpc/server@2.0.0-beta.44':
+    resolution: {integrity: sha512-XUyWiMyTqm+hoIU9XMG+C5dlh63Ay3hrwWqgoHG7eDfU+KjwJvnxQtR7HUVT7EeJknXioMaKDihf8Z7Qu01Uew==}
     peerDependencies:
       crossws: '>=0.3.4'
       fastify: '>=5.6.1'
@@ -1541,16 +1541,16 @@ packages:
       fastify:
         optional: true
 
-  '@orpc/shared@2.0.0-beta.43':
-    resolution: {integrity: sha512-2DP1wex6Aja6dcmudQAiMdZlXcuJXN7/k0dtFAj2Sy0TwQ6Jcr+t7aJk5lmZrosPpEAQTbY/f9kJJW+Cxr35Cw==}
+  '@orpc/shared@2.0.0-beta.44':
+    resolution: {integrity: sha512-3R+et5pRqGXJ0GKeU/Xzm+Ia0pgfN7C2Ur01RxvDQmkPnFCfU5XxPWmHq0AmiTbOwt5dV3xpSeP7JTgy8P8A9Q==}
 
-  '@orpc/tanstack-query@2.0.0-beta.43':
-    resolution: {integrity: sha512-ezTglhKxmhaMf/l74TPpHW5W16ONiKzDdDSFmVKH+dhAwbm9UafJfncSJXNhNo5h1i5wX2U+22VSM5y2riNzmg==}
+  '@orpc/tanstack-query@2.0.0-beta.44':
+    resolution: {integrity: sha512-9UEnHifpU2kAo84LNMmCabBb9PRfBkKskN69Tzol85Fu7oqWD9aUCH8PaIdOQQgv5EKUZRJFcU9mbihRX08Yzg==}
     peerDependencies:
       '@tanstack/query-core': '>=5.89.0'
 
-  '@orpc/valibot@2.0.0-beta.43':
-    resolution: {integrity: sha512-N/AqEexRiHiw0TrGFrOaDDNl7VlJvRXSJpAoa5O58x4kbwW/um+iHYT/FgbmQo/zQMwfTRCEsEaTqcG5SPY6Gw==}
+  '@orpc/valibot@2.0.0-beta.44':
+    resolution: {integrity: sha512-ROHug6xCWWFO1INisSFEetw94N+mNtzOIDbrRlg5HW8WspOLQt8m+utjytq5NQYKAymXM75Z+q7YhliFzCirRA==}
     peerDependencies:
       valibot: '>=1.5.0'
 
@@ -6005,40 +6005,40 @@ snapshots:
 
   '@opentelemetry/semantic-conventions@1.43.0': {}
 
-  '@orpc/client@2.0.0-beta.43':
+  '@orpc/client@2.0.0-beta.44':
     dependencies:
-      '@orpc/shared': 2.0.0-beta.43
+      '@orpc/shared': 2.0.0-beta.44
       '@standard-server/core': 0.10.3
       '@standard-server/fetch': 0.10.3
       '@standard-server/peer': 0.10.3
 
-  '@orpc/contract@2.0.0-beta.43':
+  '@orpc/contract@2.0.0-beta.44':
     dependencies:
-      '@orpc/client': 2.0.0-beta.43
-      '@orpc/shared': 2.0.0-beta.43
+      '@orpc/client': 2.0.0-beta.44
+      '@orpc/shared': 2.0.0-beta.44
       '@standard-schema/spec': 1.1.0
 
-  '@orpc/json-schema@2.0.0-beta.43':
+  '@orpc/json-schema@2.0.0-beta.44':
     dependencies:
       '@openapi-spec/types': 0.3.0
-      '@orpc/client': 2.0.0-beta.43
-      '@orpc/contract': 2.0.0-beta.43
-      '@orpc/server': 2.0.0-beta.43
-      '@orpc/shared': 2.0.0-beta.43
+      '@orpc/client': 2.0.0-beta.44
+      '@orpc/contract': 2.0.0-beta.44
+      '@orpc/server': 2.0.0-beta.44
+      '@orpc/shared': 2.0.0-beta.44
       '@standard-schema/spec': 1.1.0
     transitivePeerDependencies:
       - crossws
       - fastify
 
-  '@orpc/openapi@2.0.0-beta.43':
+  '@orpc/openapi@2.0.0-beta.44':
     dependencies:
       '@openapi-spec/downgrader': 0.3.0
       '@openapi-spec/types': 0.3.0
-      '@orpc/client': 2.0.0-beta.43
-      '@orpc/contract': 2.0.0-beta.43
-      '@orpc/json-schema': 2.0.0-beta.43
-      '@orpc/server': 2.0.0-beta.43
-      '@orpc/shared': 2.0.0-beta.43
+      '@orpc/client': 2.0.0-beta.44
+      '@orpc/contract': 2.0.0-beta.44
+      '@orpc/json-schema': 2.0.0-beta.44
+      '@orpc/server': 2.0.0-beta.44
+      '@orpc/shared': 2.0.0-beta.44
       '@standard-server/core': 0.10.3
       '@standard-server/fetch': 0.10.3
       rou3: 1.0.0
@@ -6046,11 +6046,11 @@ snapshots:
       - crossws
       - fastify
 
-  '@orpc/server@2.0.0-beta.43':
+  '@orpc/server@2.0.0-beta.44':
     dependencies:
-      '@orpc/client': 2.0.0-beta.43
-      '@orpc/contract': 2.0.0-beta.43
-      '@orpc/shared': 2.0.0-beta.43
+      '@orpc/client': 2.0.0-beta.44
+      '@orpc/contract': 2.0.0-beta.44
+      '@orpc/shared': 2.0.0-beta.44
       '@standard-server/aws-lambda': 0.10.3
       '@standard-server/core': 0.10.3
       '@standard-server/fastify': 0.10.3
@@ -6059,18 +6059,18 @@ snapshots:
       '@standard-server/peer': 0.10.3
       cookie: 2.0.1
 
-  '@orpc/shared@2.0.0-beta.43':
+  '@orpc/shared@2.0.0-beta.44':
     dependencies:
       '@standard-server/shared': 0.10.3
       radash: 12.1.1
       type-fest: 5.10.0
 
-  '@orpc/tanstack-query@2.0.0-beta.43(@tanstack/query-core@5.104.2)':
+  '@orpc/tanstack-query@2.0.0-beta.44(@tanstack/query-core@5.104.2)':
     dependencies:
-      '@orpc/client': 2.0.0-beta.43
-      '@orpc/contract': 2.0.0-beta.43
-      '@orpc/openapi': 2.0.0-beta.43
-      '@orpc/shared': 2.0.0-beta.43
+      '@orpc/client': 2.0.0-beta.44
+      '@orpc/contract': 2.0.0-beta.44
+      '@orpc/openapi': 2.0.0-beta.44
+      '@orpc/shared': 2.0.0-beta.44
       '@tanstack/query-core': 5.104.2
     transitivePeerDependencies:
       - '@scalar/api-reference'
@@ -6079,9 +6079,9 @@ snapshots:
       - fastify
       - swagger-ui
 
-  '@orpc/valibot@2.0.0-beta.43(valibot@1.5.0(typescript@6.0.3))':
+  '@orpc/valibot@2.0.0-beta.44(valibot@1.5.0(typescript@6.0.3))':
     dependencies:
-      '@orpc/json-schema': 2.0.0-beta.43
+      '@orpc/json-schema': 2.0.0-beta.44
       '@valibot/to-json-schema': 1.8.0(valibot@1.5.0(typescript@6.0.3))
       valibot: 1.5.0(typescript@6.0.3)
     transitivePeerDependencies:
