@@ -1,6 +1,7 @@
 import difflib
 import re
 import subprocess
+import tempfile
 import time
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -16,6 +17,7 @@ SOURCE = "us.tn_turnout"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Tennessee Secretary of State"
+WAYBACK = "https://web.archive.org/web/20251231205750id_/"
 BASE = "https://web.archive.org/web/20241212142335id_/http://sharetngov.tnsosfiles.com/sos/election/data/turnout/"
 FILES = {
     date(1994, 8, 4): "1994-08.pdf",
@@ -43,8 +45,16 @@ FILES = {
     date(2012, 11, 6): "2012_11%20Turnout.pdf",
     date(2014, 8, 7): "20140807.pdf",
     date(2014, 11, 4): "20141104_Turnout.pdf",
+    date(1996, 3, 12): WAYBACK + "http://sharetngov.tnsosfiles.com/sos/election/data/turnout/1996-03.pdf",
+    date(2000, 3, 14): WAYBACK + "http://sharetngov.tnsosfiles.com/sos/election/data/turnout/2000-03.pdf",
+    date(2016, 3, 1): WAYBACK + "https://sos-tn-gov-files.s3.amazonaws.com/2016%20March%20PPP%20Turnout.pdf",
+    date(2016, 8, 4): WAYBACK + "https://sos-tn-gov-files.s3.amazonaws.com/2016_August_PPP_Turnout.pdf",
+    date(2016, 11, 8): WAYBACK + "https://sos-tn-gov-files.s3.amazonaws.com/2016_November_PPP_Turnout.pdf",
+    date(2022, 8, 4): WAYBACK + "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/2022_August_Turnout.pdf",
+    date(2024, 11, 5): WAYBACK + "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/2024%20November%20Turnout%20Report.pdf",
 }
-ROW = re.compile(r"^\s*([A-Za-z][A-Za-z .'-]*?):?\s+([\d,]+)\s+([\d,]+)\s")
+FILES = {day: name if name.startswith("http") else BASE + name for day, name in FILES.items()}
+ROW = re.compile(r"^\s*([A-Za-z][A-Za-z .'-]*?):?\s+([\d,]+)\s+([\d,]+)\s+([\d.]+)%")
 
 
 def plain(name: str) -> str:
@@ -53,7 +63,7 @@ def plain(name: str) -> str:
 
 def fetch() -> None:
     for name in FILES.values():
-        address = BASE + name
+        address = name
         try:
             raw.cached(SOURCE, address)
             continue
@@ -86,10 +96,18 @@ def parse() -> None:
     rows = []
     for day, name in FILES.items():
         try:
-            path = raw.cached(SOURCE, BASE + name).path
+            path = raw.cached(SOURCE, name).path
         except LookupError:
             continue
         text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
+        scanned = not text.strip()
+        if scanned:
+            with tempfile.TemporaryDirectory() as tmp:
+                subprocess.run(["pdftoppm", "-r", "300", "-gray", str(path), f"{tmp}/p"], check=True)
+                text = "\n".join(
+                    subprocess.run(["tesseract", str(image), "-", "--psm", "6"], capture_output=True, text=True, check=True).stdout
+                    for image in sorted(Path(tmp).glob("p-*.pgm"))
+                )
         found = {}
         total = None
         for line in text.replace("\x0c", "\n").splitlines():
@@ -102,6 +120,8 @@ def parse() -> None:
                 total = values
                 continue
             close = [key] if key in codes else difflib.get_close_matches(key, list(codes), n=1, cutoff=0.85)
+            if scanned and abs(round(values[1] / values[0] * 10000) - round(float(match[4]) * 100)) > 1:
+                continue
             if close and codes[close[0]] not in found and values[1] <= values[0]:
                 found[codes[close[0]]] = values
         got = (sum(v[0] for v in found.values()), sum(v[1] for v in found.values()))
@@ -140,6 +160,12 @@ def emit() -> Path:
         }
         title = "Statistical Analysis of Voter Turnout"
         source = cs.source(PUBLISHER, title)
+        published = {
+            election_id
+            for (election_id,) in conn.execute(
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+            )
+        }
         if source in cs.minted:
             cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url="https://sos.tn.gov/elections/statistics", license="Public record")
         for (day,), rows in frame.group_by("date", maintain_order=True):
@@ -147,7 +173,9 @@ def emit() -> Path:
                 print(f"{day}: no election")
                 continue
             value_key, election_id = elections[day]
-            cs.artifact(raw.cached(SOURCE, BASE + FILES[day]), source)
+            if election_id in published:
+                continue
+            cs.artifact(raw.cached(SOURCE, FILES[day]), source)
             result_set = cs.key(f"{SOURCE}.result_set", f"{value_key}:county")
             cs.add(
                 "result_set",
