@@ -55,7 +55,9 @@ STOP = {
     "constitution",
     "concerning",
 }
-TITLE_START = re.compile(r"Shall (?:there be|state|the|a |an |any |[a-z]+ )[^?]{20,1800}\?")
+TITLE_START = re.compile(
+    r"(?:Shall (?:there be|state|the|a |an |any |[a-z]+ )|SHALL STATE |Without (?:raising|increasing|imposing|new)[^?]{0,200}, (?:shall|may) )[^?]{20,4500}\?"
+)
 
 
 def fetch() -> None:
@@ -129,14 +131,16 @@ def emit() -> Path:
             candidates = titles.filter(pl.col("year") == year).to_dicts()
             scored: list[tuple[float, str, int]] = []
             for key, label, _ in contests.get(year, []):
-                short = label.split(":", 1)[-1]
+                short = re.sub(r"^(?:Amendment|Proposition|Referendum) (?:[A-Z]{1,2}|\d+)\s*(?:\((?:STATUTORY|CONSTITUTIONAL)\))?", "", label.split(":", 1)[-1])
                 mine = words(short)
                 for index, candidate in enumerate(candidates):
                     theirs = words(candidate["title"])
+                    named = re.match(r"(Amendment|Proposition|Referendum) ([A-Z]{1,2}|\d+)", label)
+                    boost = 0.3 if named is not None and named[0] in candidate["labels"] else 0
                     if mine:
-                        named = re.match(r"(Amendment|Proposition|Referendum) ([A-Z]{1,2}|\d+)", label)
-                        boost = 0.3 if named is not None and named[0] in candidate["labels"] else 0
                         scored.append((len(mine & theirs) / len(mine) + boost, key, index))
+                    elif boost > 0:
+                        scored.append((0.5, key, index))
             taken_keys: set[str] = set()
             taken_titles: set[int] = set()
             for score, key, index in sorted(scored, reverse=True):
