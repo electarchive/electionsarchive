@@ -8,7 +8,7 @@ from datetime import date
 
 import polars as pl
 
-from ea import coverage
+from ea import coverage, statewide_table
 from ea.store import DATA, ROOT, connect
 
 LOCK = 7_302_019
@@ -235,6 +235,7 @@ def build() -> str:
     started = time.monotonic()
     today = date.today()
     with connect() as conn:
+        statewide_table.rebuild(conn)
         cells = coverage.matrix(conn, last=today.year)
         states = {fips: (st, name) for st, fips, name in conn.execute(coverage.STATES_SQL)}
         conn.execute(LOCAL_SQL)

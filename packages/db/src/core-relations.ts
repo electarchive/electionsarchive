@@ -673,6 +673,7 @@ export const relations = defineRelations(schema, (r) => ({
 			from: r.office.polityId,
 			to: r.polity.id
 		}),
+		statewideOfficeYears: r.many.statewideOfficeYear(),
 		tenures: r.many.tenure(),
 	},
 	seat: {
@@ -1138,6 +1139,12 @@ export const relations = defineRelations(schema, (r) => ({
 		changesets: r.many.changeset({
 			from: r.sourceArtifact.id.through(r.sourcePage.artifactId),
 			to: r.changeset.id.through(r.sourcePage.changesetId)
+		}),
+	},
+	statewideOfficeYear: {
+		office: r.one.office({
+			from: r.statewideOfficeYear.officeId,
+			to: r.office.id
 		}),
 	},
 	tenure: {

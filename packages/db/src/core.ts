@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, text, integer, smallint, boolean, timestamp, date, numeric, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, text, integer, boolean, smallint, timestamp, date, numeric, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -1090,6 +1090,18 @@ export const sourcePage = pgTable("source_page", {
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
 	unique("source_page_artifact_id_page_number_key").on(table.artifactId, table.pageNumber),]);
+
+export const statewideOfficeYear = pgTable("statewide_office_year", {
+	state: text().notNull(),
+	officeId: uuid("office_id").notNull().references(() => office.id),
+	class: text().notNull(),
+	year: integer().notNull(),
+	jointTicket: boolean("joint_ticket").notNull(),
+	basis: text().notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.officeId, table.year], name: "statewide_office_year_pkey"}),
+	index("statewide_office_year_state_idx").using("btree", table.state.asc().nullsLast(), table.year.asc().nullsLast()),
+]);
 
 export const tenure = pgTable("tenure", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
