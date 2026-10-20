@@ -218,6 +218,15 @@ MA_DAYS = {
     2020: date(2020, 9, 1),
     2022: date(2022, 9, 6),
 }
+MA_FEDERAL = {5: "congress", 6: "us-senate", 1: "president"}
+MA_PRESIDENT = {
+    2000: date(2000, 3, 7),
+    2004: date(2004, 3, 2),
+    2008: date(2008, 2, 5),
+    2012: date(2012, 3, 6),
+    2016: date(2016, 3, 1),
+    2020: date(2020, 3, 3),
+}
 MA_DOWNLOAD = elstats.MASSACHUSETTS + "download/{}/precincts_include:0/"
 MA_EMPTY = re.compile(r'id="election-id-(\d+)"(?:(?!id="election-id-).)*?class="no_candidates"', re.DOTALL)
 ELSTATS_PARTIES = {"Democratic": "DEM", "Republican": "REP", "Libertarian": "LIB", "Green": "GRE"}
@@ -605,6 +614,8 @@ FL_DAYS = {
     date(2022, 8, 23): None,
 }
 FL_RACES = {
+    "USR": "congress",
+    "USS": "us-senate",
     "STR": "house",
     "STS": "senate",
     "GOV": "GOVERNOR",
@@ -1063,7 +1074,7 @@ def fetch() -> None:
         extract = raw.fetch(SOURCE, fl_sos.EXTRACT.format(day=day), suffix=".txt")
         for race, party, district in sorted(
             {
-                (row[3], row[1], row[7] if row[3] in ("STR", "STS") else "")
+                (row[3], row[1], row[7] if row[3] in ("STR", "STS", "USR") else "")
                 for row in csv.reader(io.StringIO(extract.path.read_bytes().decode("cp1252")), delimiter="\t")
                 if row and row[3] in FL_RACES
             }
@@ -1083,12 +1094,12 @@ def fetch() -> None:
         for name in names:
             raw.fetch(SOURCE, CA_SOV.format(path=path.format(name)), suffix=Path(path).suffix)
     for state, offices in ELSTATS.items():
-        for office in offices:
+        for office in offices | (MA_FEDERAL if state == "MA" else {}):
             for year in ELSTATS_YEARS:
                 if state != "MA":
                     raw.fetch(SOURCE, search(state, office, year), suffix=".csv")
                     continue
-                if year not in MA_DAYS:
+                if year not in (MA_PRESIDENT if office == 1 else MA_DAYS):
                     continue
                 listing = raw.fetch(SOURCE, search(state, office, year), suffix=".html").path.read_text()
                 empty = set(MA_EMPTY.findall(listing))
@@ -1158,12 +1169,14 @@ def parse() -> None:
         towns.setdefault((state, name), code)
     towns[("VT", "essexjunction")] = towns[("VT", "essex")]
     frames = []
+    ma_federal = []
     for state, offices in ELSTATS.items():
         fips = STATES[state][0]
-        for office, body in offices.items():
+        for office, body in (offices | (MA_FEDERAL if state == "MA" else {})).items():
             for year in ELSTATS_YEARS:
                 if state == "MA":
-                    if year not in MA_DAYS:
+                    days = MA_PRESIDENT if office == 1 else MA_DAYS
+                    if year not in days:
                         continue
                     listing = raw.cached(SOURCE, search(state, office, year)).path.read_text()
                     empty = set(MA_EMPTY.findall(listing))
@@ -1209,7 +1222,7 @@ def parse() -> None:
                             continue
                         tables.append(
                             long.filter(pl.col("division_name") != "TOTALS").with_columns(
-                                election_date=pl.lit(MA_DAYS[year].isoformat()),
+                                election_date=pl.lit(days[year].isoformat()),
                                 election_type=pl.lit("State Primary"),
                                 primary_party=pl.lit(
                                     stage.removesuffix(" Primary").replace("Green-rainbow", "Green-Rainbow")
@@ -1222,6 +1235,9 @@ def parse() -> None:
                             )
                         )
                     frame = pl.concat(tables) if tables else pl.DataFrame()
+                    if office in MA_FEDERAL:
+                        ma_federal.extend(tables)
+                        continue
                 else:
                     frame = pl.read_csv(raw.cached(SOURCE, search(state, office, year)).path, infer_schema=False)
                 if "office_id" not in frame.columns:
@@ -2383,7 +2399,9 @@ def parse() -> None:
             )
             .filter(pl.col("RaceCode").is_in(list(FL_RACES)))
             .with_columns(
-                district=pl.when(pl.col("RaceCode").is_in(["STR", "STS"])).then("Juris1num").otherwise(pl.lit("")),
+                district=pl.when(pl.col("RaceCode").is_in(["STR", "STS", "USR"]))
+                .then("Juris1num")
+                .otherwise(pl.lit("")),
                 choice=pl.concat_str(
                     [
                         pl.col(column).fill_null("").str.replace_all(",", "").str.strip_chars()
@@ -2428,7 +2446,7 @@ def parse() -> None:
             fl.extend(
                 (
                     day,
-                    FL_RACES[race] if race in ("STR", "STS") else OFFICES[FL_RACES[race]][0],
+                    FL_RACES[race] if race in ("STR", "STS", "USR", "USS") else OFFICES[FL_RACES[race]][0],
                     str(int(district)) if district else None,
                     party,
                     counties[("12", re.sub(r"[^a-z]", "", county.lower()))],
@@ -2437,10 +2455,10 @@ def parse() -> None:
                 )
                 for county, choice, votes in rows.select("CountyName", "choice", "votes").iter_rows()
             )
+    fl_frame = pl.DataFrame(fl, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row")
+    fl_federal = fl_frame.filter(pl.col("office").is_in(["congress", "us-senate"]))
     frames.append(
-        pl.DataFrame(
-            fl, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row"
-        ).with_columns(
+        fl_frame.filter(~pl.col("office").is_in(["congress", "us-senate"])).with_columns(
             state=pl.lit("FL"),
             label="party",
             scheme=pl.lit("us.county"),
@@ -2898,24 +2916,71 @@ def parse() -> None:
     congress = pl.concat(
         [
             congress,
-            pa_federal.select(
-                year=pl.col("day").dt.year(),
-                chamber=pl.col("office").replace({"congress": "house", "us-senate": "senate"})
-                + pl.lit(":")
-                + pl.col("party").replace_strict({"DEM": "democratic", "REP": "republican"}),
-                day="day",
-                special=pl.lit(False),
-                state=pl.lit("PA"),
-                district=pl.col("code").cast(pl.Int64),
-                candidate="choice",
-                writein=pl.lit(False),
-                votes="votes",
-                measure=pl.lit(1, pl.Int16),
-                code="fips",
-                kind=pl.lit("county"),
-                source=pl.lit("PA"),
+            *(
+                federal.select(
+                    year=pl.col("day").dt.year(),
+                    chamber=pl.col("office").replace({"congress": "house", "us-senate": "senate"})
+                    + pl.lit(":")
+                    + pl.col("party").replace_strict(
+                        {code: word for code, (_, word, *_) in PARTIES.items()},
+                        default=pl.col("party").str.to_lowercase(),
+                    ),
+                    day="day",
+                    special=pl.lit(False),
+                    state=pl.lit(state),
+                    district=pl.col("code").cast(pl.Int64),
+                    candidate="choice",
+                    writein=pl.lit(False),
+                    votes="votes",
+                    measure=pl.lit(1, pl.Int16),
+                    code="fips",
+                    kind=pl.lit("county"),
+                    source=pl.lit(state),
+                )
+                for state, federal in (("PA", pa_federal), ("FL", fl_federal))
             ),
         ]
+    )
+    ma_frame = pl.concat(ma_federal).with_columns(
+        code=pl.col("division_name").map_elements(
+            lambda name: (
+                towns.get(("MA", elstats.plain(name)))
+                or towns.get(("MA", elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower()))))
+            ),
+            return_dtype=pl.String,
+        )
+    )
+    if ma_frame["code"].is_null().any():
+        raise ValueError(
+            f"MA towns with no county: {ma_frame.filter(pl.col('code').is_null())['division_name'].unique().to_list()}"
+        )
+    congress = pl.concat(
+        [
+            congress,
+            ma_frame.filter(~pl.col("candidate_name").is_in(["Blanks", "Total Votes Cast"]))
+            .group_by("election_date", "office_id", "district_name", "primary_party", "candidate_name", "code")
+            .agg(pl.col("votes").sum())
+            .select(
+                year=pl.col("election_date").str.slice(0, 4).cast(pl.Int32),
+                chamber=pl.col("office_id")
+                .replace_strict({str(key): value for key, value in MA_FEDERAL.items()})
+                .replace({"congress": "house", "us-senate": "senate"})
+                + pl.lit(":")
+                + pl.col("primary_party").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", "-"),
+                day=pl.col("election_date").str.to_date(),
+                special=pl.lit(False),
+                state=pl.lit("MA"),
+                district=pl.col("district_name").str.extract(r"^(\d+)").cast(pl.Int64),
+                candidate=pl.col("candidate_name").str.to_uppercase(),
+                writein=pl.col("candidate_name") == "All Others",
+                votes="votes",
+                measure=pl.lit(1, pl.Int16),
+                code="code",
+                kind=pl.lit("county"),
+                source=pl.lit("MA"),
+            ),
+        ],
+        how="vertical_relaxed",
     )
     congress.write_parquet(PARSED / "congress.parquet")
     frames.append(
@@ -3122,7 +3187,7 @@ def emit() -> Path:
             extract = raw.cached(SOURCE, fl_sos.EXTRACT.format(day=day))
             cs.artifact(extract, sources["FL"])
             for race, party, district in {
-                (row[3], row[1], row[7] if row[3] in ("STR", "STS") else "")
+                (row[3], row[1], row[7] if row[3] in ("STR", "STS", "USR") else "")
                 for row in csv.reader(io.StringIO(extract.path.read_bytes().decode("cp1252")), delimiter="\t")
                 if row and row[3] in FL_RACES
             }:
@@ -3172,9 +3237,9 @@ def emit() -> Path:
                 cs.artifact(raw.cached(wa_local.SOURCE, url), sources["WA"])
         held = set()
         for state, offices in ELSTATS.items():
-            for office in offices:
+            for office in offices | (MA_FEDERAL if state == "MA" else {}):
                 for year in ELSTATS_YEARS:
-                    if state == "MA" and year not in MA_DAYS:
+                    if state == "MA" and year not in (MA_PRESIDENT if office == 1 else MA_DAYS):
                         continue
                     artifact = raw.cached(SOURCE, search(state, office, year))
                     if artifact.storage_key not in held:
@@ -3977,36 +4042,40 @@ def emit() -> Path:
             sources,
         )
         medsl.attach(cs, conn, city, sources, grain="precinct")
-        held = [
-            value
-            for (value,) in conn.execute(
-                """select e.value from external_id e
-                   where e.scheme = 'us.contest' and e.value ~ '^20[0-2][0-9]-0[4-6]-[0-9]{2}:PA:(house:[0-9]+|senate|president):(democratic|republican)$'
-                     and exists (select 1 from result_set rs join source s on s.id = rs.source_id
-                                 where rs.contest_id = e.entity_id and rs.status = 'active'
-                                   and s.publisher <> 'Federal Election Commission' and s.id <> %s)""",
-                [sources["PA"]],
-            ).fetchall()
-        ]
-        medsl.attach(
-            cs,
-            conn,
-            congress.filter(
-                pl.col("source") == "PA",
-                ~pl.concat_str(
-                    pl.col("day").cast(pl.String),
-                    pl.lit("PA"),
-                    pl.when(pl.col("district").is_not_null())
-                    .then(pl.concat_str(pl.lit("house:"), pl.col("district").cast(pl.String), pl.lit(":")))
-                    .otherwise(pl.lit("")),
-                    pl.col("chamber").str.strip_prefix("house:"),
-                    separator=":",
-                )
-                .str.replace("::", ":")
-                .is_in(held),
-            ),
-            sources,
-        )
+        for state in ("PA", "MA", "FL"):
+            held = [
+                value
+                for (value,) in conn.execute(
+                    """select e.value from external_id e
+                       where e.scheme = 'us.contest' and e.value ~ %s
+                         and exists (select 1 from result_set rs join source s on s.id = rs.source_id
+                                     where rs.contest_id = e.entity_id and rs.status = 'active'
+                                       and s.publisher <> 'Federal Election Commission' and s.id <> %s)""",
+                    [
+                        f"^20[0-2][0-9]-0[2-9]-[0-9]{{2}}:{state}:(house:[0-9]+|senate|president):[a-z-]+$",
+                        sources[state],
+                    ],
+                ).fetchall()
+            ]
+            medsl.attach(
+                cs,
+                conn,
+                congress.filter(
+                    pl.col("source") == state,
+                    ~pl.concat_str(
+                        pl.col("day").cast(pl.String),
+                        pl.lit(state),
+                        pl.when(pl.col("district").is_not_null())
+                        .then(pl.concat_str(pl.lit("house:"), pl.col("district").cast(pl.String), pl.lit(":")))
+                        .otherwise(pl.lit("")),
+                        pl.col("chamber").str.strip_prefix("house:"),
+                        separator=":",
+                    )
+                    .str.replace("::", ":")
+                    .is_in(held),
+                ),
+                sources,
+            )
         held = [
             value
             for (value,) in conn.execute(

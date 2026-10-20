@@ -1,5 +1,4 @@
 import re
-from datetime import date
 from pathlib import Path
 
 import polars as pl
@@ -35,7 +34,9 @@ def parse() -> None:
         }
     frames = []
     for name in FILES:
-        frame = pl.read_csv(raw.cached(SOURCE, FILE.format(name)).path, separator="\t", infer_schema=False, quote_char=None)
+        frame = pl.read_csv(
+            raw.cached(SOURCE, FILE.format(name)).path, separator="\t", infer_schema=False, quote_char=None
+        )
         primary = name.endswith("PRI")
         office = pl.col("OfficeDescription")
         district = office.str.extract(r"^(\d+)\w\w District Representative in Congress")
@@ -50,12 +51,14 @@ def parse() -> None:
                 chamber=pl.concat_str(
                     pl.when(district.is_not_null())
                     .then(pl.lit("house"))
-                    .when((pl.col("OfficeCode(Text)") == "02"))
+                    .when(pl.col("OfficeCode(Text)") == "02")
                     .then(pl.lit("governor"))
                     .when(office.str.starts_with("President"))
                     .then(pl.lit("president"))
                     .otherwise(pl.lit("senate")),
-                    pl.when(primary).then(pl.lit(":") + pl.col("PartyDescription").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", "-")),
+                    pl.when(primary).then(
+                        pl.lit(":") + pl.col("PartyDescription").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", "-")
+                    ),
                     ignore_nulls=True,
                 ),
                 day=pl.col("ElectionDate").str.to_date(),
