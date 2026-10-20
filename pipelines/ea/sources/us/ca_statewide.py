@@ -34,18 +34,48 @@ TITLES = {
 }
 NOT_VOTES = {"Total", "Blank", "Void", "Scattering"}
 ITEMS = {
-    1886: (date(1886, 11, 2), range(12, 13)),
+    1886: (date(1886, 11, 2), range(11, 20)),
 }
 VOLUMES = {
     year: (f"https://v3.californiatargetbook.com/docs/SoV/g{year}.pdf", "https://www.californiatargetbook.com/", day, pages)
     for year, (day, pages) in ITEMS.items()
 }
 PARTIES = {
+    (1886, "governor", "John F. Swift"): "republican-party",
+    (1886, "governor", "Washington Bartlett"): "democratic-party",
+    (1886, "governor", "Joel Russell"): "prohibition-party",
     (1886, "lieutenant-governor", "R. H. Waterman"): "republican-party",
     (1886, "lieutenant-governor", "Michael F. Tarpey"): "democratic-party",
+    (1886, "lieutenant-governor", "A. D. Boren"): "prohibition-party",
+    (1886, "secretary-of-state", "Walter S. Moore"): "republican-party",
+    (1886, "secretary-of-state", "William C. Hendricks"): "democratic-party",
+    (1886, "secretary-of-state", "Frank E. Kellogg"): "prohibition-party",
+    (1886, "controller", "J. E. Denny"): "republican-party",
+    (1886, "controller", "John P. Dunn"): "democratic-party",
+    (1886, "controller", "J. A. Fairbanks"): "prohibition-party",
+    (1886, "treasurer", "J. H. Neff"): "republican-party",
+    (1886, "treasurer", "Adam Herold"): "democratic-party",
+    (1886, "treasurer", "H. S. Graves"): "prohibition-party",
+    (1886, "attorney-general", "W. H. H. Hart"): "republican-party",
+    (1886, "attorney-general", "George A. Johnson"): "democratic-party",
+    (1886, "attorney-general", "George Babcock"): "prohibition-party",
+    (1886, "surveyor-general", "Theodore Reichert"): "republican-party",
+    (1886, "surveyor-general", "George B. Tolman"): "prohibition-party",
+    (1886, "clerk-of-the-supreme-court", "Julius Lyons"): "prohibition-party",
+    (1886, "superintendent-of-public-instruction", "D. A. Mobley"): "prohibition-party",
 }
 NAMES: dict[str, str] = {}
-ERRATA = {(1886, ("lieutenant-governor", 0))}
+ERRATA = {
+    (1886, ("governor", 0)),
+    (1886, ("lieutenant-governor", 0)),
+    (1886, ("secretary-of-state", 0)),
+    (1886, ("controller", 0)),
+    (1886, ("attorney-general", 0)),
+    (1886, ("surveyor-general", 0)),
+    (1886, ("clerk-of-the-supreme-court", 0)),
+    (1886, ("superintendent-of-public-instruction", 0)),
+}
+PUBLISHED = {(1886, "lieutenant-governor")}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
@@ -63,7 +93,11 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "values.parquet")
+    frame = pl.read_parquet(PARSED / "values.parquet").filter(
+        ~pl.struct("year", "state").map_elements(
+            lambda row: (row["year"], row["state"]) in PUBLISHED, return_dtype=pl.Boolean
+        )
+    )
     plain = house_books._plain
     with connect() as conn:
         cs = Changeset(
@@ -207,7 +241,7 @@ def emit() -> Path:
                     cs.add("contest_option", id=root, contest_id=contest, kind="others", ballot_label="Scattering")
                     targets[label] = root
                     continue
-                found = [option for option, name in roots if plain(name).endswith(plain(label.split()[-1]))]
+                found = [option for option, name in roots if plain(name) == plain(text)]
                 if len(found) > 1:
                     raise ValueError(f"{key}: {len(found)} options for {label}")
                 if found:
