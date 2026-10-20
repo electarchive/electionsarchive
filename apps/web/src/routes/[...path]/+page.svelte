@@ -1,7 +1,9 @@
 <script lang="ts">
   import { page } from "$app/state";
+  import { setContext } from "svelte";
   import { date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { WITHIN } from "#lib/party.js";
   import type { PageData } from "./$types";
   import Contest from "./contest.svelte";
   import Election from "./election.svelte";
@@ -9,6 +11,8 @@
   import Preview from "./preview.svelte";
 
   const { data }: { data: PageData } = $props();
+
+  setContext(WITHIN, () => data.within);
 
   const crumbs = $derived(
     data.kind === "contest"

@@ -3,7 +3,7 @@ import { error, redirect } from "@sveltejs/kit";
 import { router } from "#lib/server/rpc/router.js";
 import type { PageServerLoad } from "./$types";
 
-export const load: PageServerLoad = async ({ params }) => {
+export const load: PageServerLoad = async ({ params, url }) => {
   let path: string | null = null;
   try {
     ({ path } = await call(router.entities.path, { id: params.id }));
@@ -18,5 +18,5 @@ export const load: PageServerLoad = async ({ params }) => {
   if (path == null) {
     error(404);
   }
-  redirect(307, `/${path}`);
+  redirect(307, `/${path}${url.search}`);
 };

@@ -1,7 +1,9 @@
 <script lang="ts">
+  import { getContext } from "svelte";
   import PartyCard from "#lib/components/party-card.svelte";
   import PersonCard from "#lib/components/person-card.svelte";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
+  import { WITHIN } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
 
   const {
@@ -19,6 +21,8 @@
     party?: string | null;
     class?: string;
   } = $props();
+
+  const scope = getContext<(() => string | null) | undefined>(WITHIN);
 
   let open = $state(false);
 </script>
@@ -63,7 +67,7 @@
       class="p-0 text-start font-sans text-sm font-normal tracking-normal text-foreground normal-case inline-[min(21rem,calc(100vw-2rem))]"
     >
       {#if person == null}
-        <PartyCard id={party ?? ""} {color} />
+        <PartyCard id={party ?? ""} {color} within={scope?.() ?? null} />
       {:else}
         <PersonCard id={person} />
       {/if}

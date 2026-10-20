@@ -7,7 +7,11 @@
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
 
-  const { id, color = null }: { id: string; color?: string | null } = $props();
+  const {
+    id,
+    color = null,
+    within = null,
+  }: { id: string; color?: string | null; within?: string | null } = $props();
 
   const KINDS: Record<string, () => string> = {
     party: m.party_kind_party,
@@ -37,9 +41,26 @@
   };
 
   const query = createQuery(() => ({
-    ...orpc.parties.get.queryOptions({ input: { id } }),
+    ...orpc.parties.get.queryOptions({
+      input: { id, within: within ?? undefined },
+    }),
     meta: { quiet: true },
   }));
+
+  const local = $derived(
+    query.data?.scope?.span == null ||
+      query.data.scope.polity.path == null ||
+      query.data.scope.polity.path === query.data.polity?.path
+      ? null
+      : {
+          ...query.data.scope,
+          span: query.data.scope.span,
+          target:
+            query.data.parents.find(
+              (parent) => parent.kind === "regional_branch",
+            )?.party.id ?? id,
+        },
+  );
 
   const links = $derived(
     query.data == null
@@ -122,6 +143,40 @@
         </dd>
       </div>
     </dl>
+  {/if}
+  {#if local != null}
+    <div class="grid gap-1.5 border-bs px-3 py-2 text-[0.8125rem]/snug">
+      <p class="flex items-baseline justify-between gap-3">
+        <span class="font-semibold"
+          >{m.party_card_in({ place: local.polity.name })}</span
+        >
+        <span class="font-figures text-xs text-muted-foreground tabular-nums"
+          >{local.span.from.slice(0, 4) === local.span.to.slice(0, 4)
+            ? local.span.from.slice(0, 4)
+            : `${local.span.from.slice(0, 4)}–${local.span.to.slice(0, 4)}`}
+          · {m.race_contests({ count: count(local.span.contests) })}</span
+        >
+      </p>
+      {#if local.branches.length > 0}
+        <p class="text-muted-foreground">
+          {m.party_scope_branch({ place: local.polity.name })}
+          {#each local.branches as branch, index (branch.id)}
+            {index > 0 ? ", " : ""}<span
+              class="me-1 inline-block rounded-xs block-2 inline-2"
+              style:background-color={swatch(
+                branch.color,
+                `party:${branch.id}`,
+              )}
+            ></span><span class="text-foreground">{branch.label}</span>
+          {/each}
+        </p>
+      {/if}
+      <a
+        class="justify-self-start font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+        href="{resolve('/id/[id]', { id: local.target })}?in={local.polity
+          .path}">{m.party_card_open_in({ place: local.polity.name })}</a
+      >
+    </div>
   {/if}
   {#if links.length > 0}
     <ul class="grid gap-1 border-bs px-3 py-2 text-[0.8125rem]/snug">

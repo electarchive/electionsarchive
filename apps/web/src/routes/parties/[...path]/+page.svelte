@@ -78,8 +78,20 @@
 </script>
 
 <svelte:head>
-  <title>{party.name} | {m.wordmark()}</title>
-  <link rel="canonical" href="{page.url.origin}{page.url.pathname}" />
+  <title
+    >{party.scope == null
+      ? party.name
+      : m.party_scope_title({
+          party: party.name,
+          place: party.scope.polity.name,
+        })} | {m.wordmark()}</title
+  >
+  <link
+    rel="canonical"
+    href="{page.url.origin}{page.url.pathname}{party.scope == null
+      ? ''
+      : page.url.search}"
+  />
   <meta property="og:type" content="profile" />
   <meta property="og:title" content={party.name} />
   <meta
@@ -97,8 +109,13 @@
     <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
       <div class="flex items-start justify-between gap-3">
         <h1 class="title">
-          {party.name}
-          {#if party.short != null && party.short !== party.name}
+          {party.scope == null
+            ? party.name
+            : m.party_scope_title({
+                party: party.name,
+                place: party.scope.polity.name,
+              })}
+          {#if party.scope == null && party.short != null && party.short !== party.name}
             <span
               class="ms-1 font-sans text-[0.5em] font-semibold tracking-normal text-muted-foreground"
               >{party.short}</span
@@ -113,67 +130,106 @@
           />{m.versus_action()}</a
         >
       </div>
-      <p
-        class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
-      >
-        {#if party.polity != null}
-          <span>
-            {#if party.polity.path == null}
-              {m.party_in({
-                kind: KINDS[party.kind]?.() ?? party.kind,
-                polity: party.polity.name,
-              })}
-            {:else}
-              <a
-                class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                href={resolve("/[...path]", { path: party.polity.path })}
-                >{m.party_in({
+      {#if party.scope != null}
+        {const scope = $derived(party.scope)}
+        <p
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
+        >
+          <span
+            >{m.party_scope_national()}
+            <a
+              class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href={resolve("/parties/[...path]", {
+                path: page.params.path ?? "",
+              })}>{party.name}</a
+            ></span
+          >
+          {#if scope.branches.length > 0}
+            <span
+              >{m.party_scope_branch({ place: scope.polity.name })}
+              {#each scope.branches as branch, index (branch.id)}{#if index > 0},
+                {/if}<a
+                  class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  href={resolve("/id/[id]", { id: branch.id })}
+                  >{branch.label}</a
+                >{/each}</span
+            >
+          {/if}
+          {#if scope.polity.path != null}
+            <a
+              class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href={resolve("/[...path]", { path: scope.polity.path })}
+              >{scope.polity.name}</a
+            >
+          {/if}
+        </p>
+      {/if}
+      {#if party.scope == null}
+        <p
+          class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem] text-muted-foreground"
+        >
+          {#if party.polity != null}
+            <span>
+              {#if party.polity.path == null}
+                {m.party_in({
                   kind: KINDS[party.kind]?.() ?? party.kind,
                   polity: party.polity.name,
-                })}</a
+                })}
+              {:else}
+                <a
+                  class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                  href={resolve("/[...path]", { path: party.polity.path })}
+                  >{m.party_in({
+                    kind: KINDS[party.kind]?.() ?? party.kind,
+                    polity: party.polity.name,
+                  })}</a
+                >
+              {/if}
+            </span>
+          {/if}
+          {#if party.wikidata != null}
+            <a
+              class="inline-flex items-center gap-1 underline decoration-border underline-offset-4 hover:decoration-foreground"
+              href="https://www.wikidata.org/wiki/{party.wikidata}"
+              rel="external noopener"
+              >{m.card_wikidata()}<ArrowUpRightIcon
+                class="block-3 inline-3"
+              /></a
+            >
+          {/if}
+          <span
+            class="inline-flex items-center gap-2"
+            title={m.party_color_note()}
+          >
+            <label class="inline-flex items-center gap-1.5">
+              <input
+                class="cursor-pointer rounded-xs border border-input bg-card p-0 block-5 inline-7"
+                type="color"
+                value={palette.overrides[data.id] ?? party.color ?? "#888888"}
+                oninput={(event) =>
+                  (palette.overrides[data.id] = event.currentTarget.value)}
+              />
+              {m.party_color_pick({ name: party.short ?? party.name })}
+            </label>
+            {#if palette.overrides[data.id] != null}
+              <button
+                type="button"
+                class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+                onclick={() =>
+                  (palette.overrides = Object.fromEntries(
+                    Object.entries(palette.overrides).filter(
+                      ([key]) => key !== data.id,
+                    ),
+                  ))}>{m.party_color_reset()}</button
               >
             {/if}
           </span>
-        {/if}
-        {#if party.wikidata != null}
-          <a
-            class="inline-flex items-center gap-1 underline decoration-border underline-offset-4 hover:decoration-foreground"
-            href="https://www.wikidata.org/wiki/{party.wikidata}"
-            rel="external noopener"
-            >{m.card_wikidata()}<ArrowUpRightIcon class="block-3 inline-3" /></a
-          >
-        {/if}
-        <span
-          class="inline-flex items-center gap-2"
-          title={m.party_color_note()}
-        >
-          <label class="inline-flex items-center gap-1.5">
-            <input
-              class="cursor-pointer rounded-xs border border-input bg-card p-0 block-5 inline-7"
-              type="color"
-              value={palette.overrides[data.id] ?? party.color ?? "#888888"}
-              oninput={(event) =>
-                (palette.overrides[data.id] = event.currentTarget.value)}
-            />
-            {m.party_color_pick({ name: party.short ?? party.name })}
-          </label>
-          {#if palette.overrides[data.id] != null}
-            <button
-              type="button"
-              class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-              onclick={() =>
-                (palette.overrides = Object.fromEntries(
-                  Object.entries(palette.overrides).filter(
-                    ([key]) => key !== data.id,
-                  ),
-                ))}>{m.party_color_reset()}</button
-            >
-          {/if}
-        </span>
-      </p>
+        </p>
+      {/if}
     </header>
 
-    {#if party.span != null}
+    {const span = $derived(party.scope == null ? party.span : party.scope.span)}
+    {#if span != null}
       <dl
         class="col-span-12 flex flex-wrap items-baseline gap-x-7 gap-y-1.5 bg-card px-3.5 py-3"
       >
@@ -182,11 +238,11 @@
             {m.party_ballot()}
           </dt>
           <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            {party.span.from.slice(0, 4) === party.span.to.slice(0, 4)
-              ? party.span.from.slice(0, 4)
+            {span.from.slice(0, 4) === span.to.slice(0, 4)
+              ? span.from.slice(0, 4)
               : m.polity_span({
-                  first: party.span.from.slice(0, 4),
-                  last: party.span.to.slice(0, 4),
+                  first: span.from.slice(0, 4),
+                  last: span.to.slice(0, 4),
                 })}
           </dd>
         </div>
@@ -203,7 +259,7 @@
             {m.party_contests()}
           </dt>
           <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            {count(party.span.contests)}
+            {count(span.contests)}
           </dd>
         </div>
       </dl>
@@ -215,9 +271,11 @@
       <Strength election={data.election} party={data.id} name={party.name} />
     {/if}
 
-    <Lineage {party} {color} />
+    {#if party.scope == null}
+      <Lineage {party} {color} />
+    {/if}
 
-    {#if links.length > 0}
+    {#if links.length > 0 && party.scope == null}
       <section class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5">
         <h2 class="text-[0.8125rem] font-bold">{m.party_relations()}</h2>
         <ul class="grid gap-1 text-sm">

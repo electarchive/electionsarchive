@@ -169,27 +169,44 @@ export async function person(slug: string) {
   };
 }
 
-export async function party(path: string) {
+export async function party(path: string, place: string | null = null) {
   const segments = path.split("/");
-  const { id } = await found(
-    call(router.parties.locate, {
-      polity: segments.length > 1 ? segments.slice(0, -1).join("/") : undefined,
-      slug: segments.at(-1) ?? "",
-    }),
-  );
+  const [{ id }, scope] = await Promise.all([
+    found(
+      call(router.parties.locate, {
+        polity:
+          segments.length > 1 ? segments.slice(0, -1).join("/") : undefined,
+        slug: segments.at(-1) ?? "",
+      }),
+    ),
+    place == null
+      ? null
+      : db.execute<{ id: string }>(sql`
+        select s.entity_id as id from slug s join polity p on p.id = s.entity_id
+        where s.path = ${place} and s.is_current
+      `),
+  ]);
+  const within = scope?.rows[0]?.id;
+  if (scope != null && within == null) {
+    error(404);
+  }
   const [party, record, history, latest] = await Promise.all([
-    call(router.parties.get, { id }),
-    call(router.parties.elections, { id }),
-    call(router.parties.history, { id }),
+    call(router.parties.get, { id, within }),
+    call(router.parties.elections, { id, within }),
+    call(router.parties.history, { id, within }),
     db.execute<{ id: string }>(sql`
       with ids as (
         select ${id}::uuid as id
         union
         select entity_id from entity_merge where into_id = ${id}::uuid
+        union
+        select party_id from party_affiliation where kind = 'regional_branch' and parent_party_id = ${id}::uuid
       )
       select e.id from election e
-      where e.kind = 'general' and e.parent_id is null and e.date_from <= current_date
-        and e.polity_id = (select polity_id from party where id = ${id}::uuid)
+      where e.kind = 'general' and e.date_from <= current_date
+        and case when ${within ?? null}::uuid is null
+          then e.parent_id is null and e.polity_id = (select polity_id from party where id = ${id}::uuid)
+          else e.polity_id = ${within ?? null}::uuid end
         and exists (
           select from contest c join contest_option o on o.contest_id = c.id
           where c.election_id = e.id and o.party_id in (select id from ids)
@@ -351,6 +368,22 @@ export async function archive(path: string, search: URLSearchParams) {
   const requested = search.get("match");
   const match =
     requested === "person" || requested === "family" ? requested : "party";
+  const region = await db.execute<{ id: string }>(sql`
+    with recursive up(id) as (
+      select coalesce(
+        (select e.polity_id from contest c join election e on e.id = c.election_id where c.id = ${slug.entity_id}::uuid),
+        (select polity_id from election where id = ${slug.entity_id}::uuid),
+        (select id from polity where id = ${slug.entity_id}::uuid)
+      )
+      union
+      select pp.parent_id from polity_parent pp join up on pp.polity_id = up.id where upper_inf(pp.valid)
+    )
+    select up.id from up
+    join polity_parent pp on pp.polity_id = up.id and upper_inf(pp.valid)
+    join polity n on n.id = pp.parent_id and n.kind = 'sovereign_state'
+    limit 1
+  `);
+  const within = region.rows[0]?.id ?? null;
   if (slug.type === "contest") {
     const [contest, lists, rounds, ballot, cycle] = await found(
       Promise.all([
@@ -383,6 +416,7 @@ export async function archive(path: string, search: URLSearchParams) {
       cycle,
       boundaries,
       match,
+      within,
     };
   }
   if (slug.type === "election") {
@@ -400,6 +434,7 @@ export async function archive(path: string, search: URLSearchParams) {
       election,
       cycle,
       sections: { governments, regions, tiers },
+      within,
     };
   }
   if (slug.type === "polity") {
@@ -407,6 +442,7 @@ export async function archive(path: string, search: URLSearchParams) {
       kind: "polity" as const,
       id: slug.entity_id,
       polity: await call(router.polities.get, { id: slug.entity_id }),
+      within,
     };
   }
   error(404);

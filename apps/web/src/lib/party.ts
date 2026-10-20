@@ -45,6 +45,8 @@ const SAFE = [
   "#cc79a7",
 ].map((hex) => oklch(hex));
 
+export const WITHIN = Symbol("within");
+
 export function swatch(color: string | null | undefined, key: string) {
   const chosen =
     (key.startsWith("party:") ? palette.overrides[key.slice(6)] : undefined) ??

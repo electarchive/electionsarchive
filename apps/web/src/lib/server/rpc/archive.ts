@@ -9506,7 +9506,12 @@ export const parties = {
           "List the elections a party ran in, newest first, each with how many races it entered and the seats or offices it won",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        within: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
     .output(
       v.object({
         count: v.number(),
@@ -9536,8 +9541,27 @@ export const parties = {
           union
           select em.entity_id from entity_merge em join ids on em.into_id = ids.id
         ),
+        branches as (
+          select pa.party_id as id from party_affiliation pa
+          where pa.kind = 'regional_branch' and pa.parent_party_id in (select id from ids)
+        ),
+        family as (
+          select id from ids union select id from branches
+          union select em.entity_id from entity_merge em where em.into_id in (select id from branches)
+        ),
+        below(id) as (
+          select ${input.within ?? null}::uuid where ${input.within ?? null}::uuid is not null
+          union
+          select pp.polity_id from polity_parent pp join below on pp.parent_id = below.id
+        ),
         mine as materialized (
-          select o.id as option, o.contest_id from contest_option o where o.party_id in (select id from ids)
+          select o.id as option, o.contest_id from contest_option o
+          where o.party_id in (select id from family) and (
+            ${input.within ?? null}::uuid is null or exists (
+              select from contest c join election e on e.id = c.election_id
+              where c.id = o.contest_id and e.polity_id in (select id from below)
+            )
+          )
         ),
         up(id, parent) as (
           select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
@@ -9548,16 +9572,25 @@ export const parties = {
           select distinct m.contest_id from mine m
           join outcome x on x.option_id = m.option and x.candidacy_id is null and x.kind in ('elected', 'won')
           join result_set rs on rs.id = x.result_set_id and rs.is_default
+        ),
+        tops as (
+          select up.id, case when ${input.within ?? null}::uuid is null then coalesce(e.parent_id, e.id) else e.id end as election,
+            e.date_from, ${CYCLE} as year
+          from up join contest c on c.id = up.id join election e on e.id = c.election_id
+          where case when ${input.within ?? null}::uuid is null then up.parent is null
+            else e.polity_id in (select id from below) and not exists (
+              select from contest p join election pe on pe.id = p.election_id
+              where p.id = up.parent and pe.polity_id in (select id from below)
+            ) end
         )
-        select coalesce(e.parent_id, e.id) as election, min(e.date_from)::text as date, min(${CYCLE}) as year,
-          count(distinct up.id)::int as races,
+        select t.election, min(t.date_from)::text as date, min(t.year) as year,
+          count(distinct t.id)::int as races,
           count(distinct w.contest_id)::int as won,
           count(*) over ()::int as total
-        from up join contest c on c.id = up.id join election e on e.id = c.election_id
-        left join won w on w.contest_id = up.id
-        where up.parent is null
-        group by coalesce(e.parent_id, e.id)
-        order by min(e.date_from) desc nulls last, count(distinct up.id) desc
+        from tops t
+        left join won w on w.contest_id = t.id
+        group by t.election
+        order by min(t.date_from) desc nulls last, count(distinct t.id) desc
         limit 200
       `);
       const ids = found.rows.map((row) => row.election);
@@ -9583,7 +9616,12 @@ export const parties = {
           "List a party's vote share and seats in each general election for its polity's chambers and offices, one series per chamber or office",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        within: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
     .output(
       v.array(
         v.object({
@@ -9626,7 +9664,7 @@ export const parties = {
           select em.entity_id from entity_merge em join ids on em.into_id = ids.id
         ),
         home as (
-          select polity_id as polity from party where id = (select id from ids limit 1)
+          select coalesce(${input.within ?? null}::uuid, polity_id) as polity from party where id = (select id from ids limit 1)
         ),
         branches as (
           select pa.party_id as id from party_affiliation pa
@@ -9774,7 +9812,7 @@ export const parties = {
           join slug s on s.entity_id = c.id and s.is_current
           join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           join area a on a.id = pt.area_id
-          where e.polity_id = (select polity_id from party where id = (select id from ids limit 1))
+          where e.polity_id = coalesce(${input.within ?? null}::uuid, (select polity_id from party where id = (select id from ids limit 1)))
             and e.kind = 'local' and c.kind = 'body_seats'
             and c.body_id is null and c.office_id is null and c.allocation_parent_id is null
         ),
@@ -9914,7 +9952,12 @@ export const parties = {
         summary: "Get a party, its lineage, and its years on the ballot",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        within: v.optional(v.pipe(v.string(), v.uuid())),
+      }),
+    )
     .output(
       v.object({
         name: v.string(),
@@ -9936,6 +9979,23 @@ export const parties = {
           }),
         ),
         parents: v.array(v.object({ kind: v.string(), party: PartyRef })),
+        scope: v.nullable(
+          v.object({
+            polity: v.object({
+              id: v.string(),
+              name: v.string(),
+              path: v.nullable(v.string()),
+            }),
+            branches: v.array(PartyRef),
+            span: v.nullable(
+              v.object({
+                from: v.string(),
+                to: v.string(),
+                contests: v.number(),
+              }),
+            ),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -9987,7 +10047,42 @@ export const parties = {
           order by parent_party_id, upper(valid) desc nulls first
         `),
       ]);
-      const polity = party.polity == null ? [] : [party.polity];
+      const scoped =
+        input.within == null
+          ? null
+          : await db.execute<{
+              from: string | null;
+              to: string | null;
+              contests: number;
+              branches: Array<string>;
+            }>(sql`
+              with recursive below(id) as (
+                select ${input.within}::uuid
+                union
+                select pp.polity_id from polity_parent pp join below on pp.parent_id = below.id
+              ),
+              branches as (
+                select pa.party_id as id from party_affiliation pa join party bp on bp.id = pa.party_id
+                where pa.kind = 'regional_branch' and pa.parent_party_id = ${party.id}::uuid
+                  and bp.polity_id in (select id from below)
+              ),
+              family as (
+                select ${party.id}::uuid as id
+                union select entity_id from entity_merge where into_id = ${party.id}::uuid
+                union select id from branches
+                union select em.entity_id from entity_merge em where em.into_id in (select id from branches)
+              )
+              select min(e.date_from)::text as from, max(e.date_from)::text as to,
+                count(distinct o.contest_id)::int as contests,
+                array(select id::text from branches) as branches
+              from contest_option o join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+              where o.party_id in (select id from family) and e.polity_id in (select id from below)
+            `);
+      const branched = scoped?.rows[0]?.branches ?? [];
+      const polity = [
+        ...(party.polity == null ? [] : [party.polity]),
+        ...(input.within == null ? [] : [input.within]),
+      ];
       const others = relations.rows.map((row) => row.other);
       const [entities, slugs, spans] = await Promise.all([
         refs([
@@ -9995,6 +10090,7 @@ export const parties = {
           ...polity,
           ...relations.rows.map((row) => row.other),
           ...parents.rows.map((row) => row.parent),
+          ...branched,
         ]),
         paths(polity),
         db.execute<{ party: string; from: string; to: string }>(sql`
@@ -10045,6 +10141,25 @@ export const parties = {
           const other = entities.get(row.parent);
           return other == null ? [] : [{ kind: row.kind, party: other }];
         }),
+        scope:
+          input.within == null
+            ? null
+            : {
+                polity: {
+                  id: input.within,
+                  name: entities.get(input.within)?.label ?? "",
+                  path: slugs.get(input.within) ?? null,
+                },
+                branches: branched.flatMap((id) => entities.get(id) ?? []),
+                span:
+                  scoped?.rows[0]?.from == null || scoped.rows[0].to == null
+                    ? null
+                    : {
+                        from: scoped.rows[0].from,
+                        to: scoped.rows[0].to,
+                        contests: scoped.rows[0].contests,
+                      },
+              },
       };
     }),
 };
