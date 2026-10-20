@@ -1,5 +1,7 @@
+import csv
 import io
 import json
+import re
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -15,6 +17,7 @@ SOURCE = "us.county_changes"
 VERSION = "1"
 REGIONS = "https://www2.census.gov/geo/tiger/GENZ2022/shp/cb_2022_us_county_500k.zip"
 NOTICE = "https://www2.census.gov/geo/pdfs/reference/ct_county_equiv_change.pdf"
+CROSSWALK = "https://www2.census.gov/geo/docs/reference/ct_change/ct_cou_to_cousub_crosswalk.txt"
 HISTORY = "https://www.census.gov/programs-surveys/geography/technical-documentation/county-changes.html"
 REGIONS_FROM = date(2022, 1, 1)
 STARTS = {
@@ -43,6 +46,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, REGIONS, suffix=".zip")
     raw.fetch(SOURCE, NOTICE, suffix=".pdf")
     raw.fetch(SOURCE, HISTORY, suffix=".html")
+    raw.fetch(SOURCE, CROSSWALK, suffix=".txt")
 
 
 def emit() -> Path:
@@ -75,7 +79,7 @@ def emit() -> Path:
             url=HISTORY,
             license="Public domain",
         )
-        for url in (REGIONS, NOTICE, HISTORY):
+        for url in (REGIONS, NOTICE, HISTORY, CROSSWALK):
             cs.artifact(raw.cached(SOURCE, url), census)
 
         ct_state_area = cs.area("us.state", "09")
@@ -123,7 +127,7 @@ def emit() -> Path:
 
         dissolved: list[tuple[UUID, str]] = []
         for code in sorted(existing):
-            if code.startswith("09"):
+            if code.startswith("090"):
                 restage(code, None, REGIONS_FROM)
                 dissolved.append((existing[code][5], "from"))
             elif code in STARTS:
@@ -186,6 +190,32 @@ def emit() -> Path:
                 valid_to=ended,
             )
             cs.add("name", entity_id=unit, text=label, lang="en", kind="official", is_preferred=True)
+
+
+        text = raw.cached(SOURCE, CROSSWALK).path.read_text(encoding="utf-8-sig")
+        region_of: dict[str, str] = {}
+        for row in csv.reader(io.StringIO(text), delimiter="|"):
+            if len(row) > 8 and row[3].isdigit():
+                region_of[re.sub(r"[^a-z]", "", re.sub(r" town$", "", row[8].lower()))] = f"09{row[3]}"
+        unmatched: list[str] = []
+        for code, unit in conn.execute(
+            """select u.code, u.id from reporting_unit u join polity p on p.id = u.polity_id
+               where p.iso_code = 'US-CT' and u.scheme_code = 'us.return_unit' and u.code like 'CT:%:town:%'"""
+        ).fetchall():
+            region = region_of.get(code.rsplit(":", 1)[1])
+            if region is None:
+                unmatched.append(code)
+                continue
+            cs.add(
+                "reporting_unit_area",
+                unit_id=unit,
+                area_id=cs.area("us.county", region),
+                valid_from=REGIONS_FROM,
+                approximate=False,
+                partial=False,
+            )
+        if unmatched:
+            print(f"unmatched towns: {unmatched}")
 
         for kind, day, members in events:
             event = uuid7()

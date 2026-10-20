@@ -615,6 +615,12 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
             ),
             ancestors as (
               select result_set_k, unit_k, area_id, on_date, true as complete from units
+              where not exists (
+                select from reporting_unit_area ua
+                join area own on own.id = units.area_id join area dated on dated.id = ua.area_id
+                where ua.unit_id = units.unit_id and ua.valid @> units.on_date and not ua.approximate
+                  and not ua.partial and dated.scheme_code = own.scheme_code and dated.id <> own.id
+              )
               union
               select u.result_set_k, u.unit_k, ua.area_id, u.on_date, not ua.partial
               from units u join reporting_unit_area ua on ua.unit_id = u.unit_id and ua.valid @> u.on_date and not ua.approximate
