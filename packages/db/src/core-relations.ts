@@ -48,6 +48,7 @@ export const relations = defineRelations(schema, (r) => ({
 			to: r.contest.id.through(r.ballotQuestion.contestId),
 			alias: "changeset_id_contest_id_via_ballotQuestion"
 		}),
+		ballotQuestionTexts: r.many.ballotQuestionText(),
 		bodiesChangesetId: r.many.body({
 			alias: "body_changesetId_changeset_id"
 		}),
@@ -337,6 +338,7 @@ export const relations = defineRelations(schema, (r) => ({
 			alias: "changeset_id_source_id_via_areaEvent"
 		}),
 		areaGeometries: r.many.areaGeometry(),
+		ballotQuestionTexts: r.many.ballotQuestionText(),
 		bodyEvents: r.many.bodyEvent(),
 		citations: r.many.citation(),
 		financeSummaries: r.many.financeSummary(),
@@ -470,6 +472,23 @@ export const relations = defineRelations(schema, (r) => ({
 		contestOptions: r.many.contestOption(),
 		resultSets: r.many.resultSet(),
 		tenures: r.many.tenure(),
+	},
+	ballotQuestionText: {
+		changeset: r.one.changeset({
+			from: r.ballotQuestionText.changesetId,
+			to: r.changeset.id
+		}),
+		ballotQuestion: r.one.ballotQuestion({
+			from: r.ballotQuestionText.contestId,
+			to: r.ballotQuestion.contestId
+		}),
+		source: r.one.source({
+			from: r.ballotQuestionText.sourceId,
+			to: r.source.id
+		}),
+	},
+	ballotQuestion: {
+		ballotQuestionTexts: r.many.ballotQuestionText(),
 	},
 	body: {
 		changeset: r.one.changeset({

@@ -1,6 +1,6 @@
 import { daterange } from "./range.ts";
 import { users } from "./schema.ts";
-import { pgEnum, pgTable, uuid, text, integer, boolean, smallint, timestamp, date, numeric, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
+import { pgEnum, pgTable, uuid, text, integer, smallint, boolean, date, timestamp, numeric, jsonb, customType, char, real, geometry, bigint, index, uniqueIndex, foreignKey, primaryKey, unique, check, pgView } from "drizzle-orm/pg-core"
 import { sql } from "drizzle-orm"
 
 export const datePrecision = pgEnum("date_precision", ["day", "month", "year", "unknown"])
@@ -51,6 +51,7 @@ export const flagSeverity = pgEnum("flag_severity", ["info", "warning", "error"]
 export const flagStatus = pgEnum("flag_status", ["open", "accepted", "resolved"])
 export const contestTerm = pgEnum("contest_term", ["full", "remainder"])
 export const governmentPartyRole = pgEnum("government_party_role", ["head", "member", "support"])
+export const ballotQuestionTextKind = pgEnum("ballot_question_text_kind", ["text", "summary", "link"])
 
 
 export const alliance = pgTable("alliance", {
@@ -168,6 +169,22 @@ export const ballotQuestion = pgTable("ballot_question", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 });
+
+export const ballotQuestionText = pgTable("ballot_question_text", {
+	id: uuid().default(sql`uuidv7()`).primaryKey(),
+	contestId: uuid("contest_id").notNull().references(() => ballotQuestion.contestId, { onDelete: "cascade" } ),
+	kind: ballotQuestionTextKind().notNull(),
+	lang: text().default("en").notNull(),
+	body: text(),
+	url: text(),
+	sourceId: uuid("source_id").notNull().references(() => source.id),
+	locator: jsonb(),
+	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
+	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+}, (table) => [
+	index("ballot_question_text_source_idx").using("btree", table.sourceId.asc().nullsLast()),
+	uniqueIndex("ballot_question_text_value_idx").using("btree", table.contestId.asc().nullsLast(), table.kind.asc().nullsLast(), table.lang.asc().nullsLast(), table.sourceId.asc().nullsLast(), table.url.asc().nullsLast()),
+check("ballot_question_text_check", sql`((body IS NOT NULL) OR (url IS NOT NULL))`),check("ballot_question_text_check1", sql`((kind = 'link'::ballot_question_text_kind) = (body IS NULL))`),]);
 
 export const body = pgTable("body", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
