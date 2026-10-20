@@ -14,6 +14,12 @@ SUMMARY = "California's House results by county from the Secretary of State's St
 STATE = "CA"
 FIPS = "06"
 ITEMS = {
+    1940: ("stateofcaliforn194050cali", date(1940, 11, 5), range(114, 117)),
+    1942: ("stateofcaliforn194050cali", date(1942, 11, 3), range(202, 205)),
+    1944: ("stateofcaliforn194050cali", date(1944, 11, 7), range(270, 273)),
+    1946: ("stateofcaliforn194050cali", date(1946, 11, 5), range(348, 351)),
+    1948: ("stateofcaliforn194050cali", date(1948, 11, 2), range(413, 416)),
+    1950: ("stateofcaliforn194050cali", date(1950, 11, 7), range(506, 508)),
     1952: ("stateofcaliforn195262cali", date(1952, 11, 4), range(56, 59)),
     1954: ("stateofcaliforn195262cali", date(1954, 11, 2), range(131, 134)),
     1956: ("stateofcaliforn195262cali", date(1956, 11, 6), range(199, 202)),
@@ -54,7 +60,7 @@ REVISION = 1
 RENAMED: str | None = None
 COMMAS = True
 TURNED: set[tuple[int, int]] = {(1976, page) for page in range(80, 85)}
-TRANSPOSED = {1960, 1958, 1956, 1954, 1952}
+TRANSPOSED = {1940, 1942, 1944, 1946, 1948, 1950, 1960, 1958, 1956, 1954, 1952}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
