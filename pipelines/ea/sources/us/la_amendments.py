@@ -26,15 +26,33 @@ FILES = {
     date(2020, 12, 5): "ProposedConstitutionalAmendments2020Dec",
     date(2021, 11, 13): "ProposedConstitutionalAmendments2021",
     date(2022, 11, 8): "ProposedConstitutionalAmendments_November_8_2022",
+    date(2014, 11, 4): "ProposedConstitutionalAmendments20132014",
+    date(2023, 10, 14): "ProposedConstitutionalAmendments_Oct_14_2023",
+    date(2023, 11, 18): "ProposedConstitutionalAmendments_Nov_18_2023",
+    date(2024, 11, 5): "Proposed_Constitutional_Amendment_11_05_2024",
+}
+STAMPS = {
+    date(2023, 10, 14): 20260430032232,
+    date(2023, 11, 18): 20250306070402,
+    date(2024, 11, 5): 20250301053325,
 }
 HEADER = re.compile(r"Proposed Amendment No\. (\d+)")
 WORDING = re.compile(r"(?:Do you support|Shall)[^?]*\?")
-NUMBER = re.compile(r"(?i)\bamendment\s*(?:no\.?\s*)?(\d+)\b")
+ACT = re.compile(r"Act (\d+)[^\n]{0,60}\n.*?(Do you support[^?]*\?)", re.S)
+BALLOT = re.compile(r"Ballot Language: .(Do you support[^?]*\?).")
+NUMBER = re.compile(r"(?i)\b(?:amendment|ca)\s*(?:no\.?\s*)?(\d+)\b")
+
+
+STOP = {"the", "of", "and", "to", "a", "an", "for", "in", "louisiana", "amendment", "fund"}
+
+
+def words(text: str) -> set[str]:
+    return {word.rstrip("s") for word in re.findall(r"[a-z]+", text.lower()) if word not in STOP and len(word) > 2}
 
 
 def url(day: date) -> str:
     return (
-        f"https://web.archive.org/web/2023id_/https://www.sos.la.gov/ElectionsAndVoting/PublishedDocuments/{FILES[day]}.pdf"
+        f"https://web.archive.org/web/{STAMPS.get(day, 2023)}id_/https://www.sos.la.gov/ElectionsAndVoting/PublishedDocuments/{FILES[day]}.pdf"
     )
 
 
@@ -52,9 +70,11 @@ def parse() -> None:
             text=True,
             check=True,
         ).stdout
-        for found in HEADER.finditer(text):
-            wording = WORDING.search(text, found.end())
-            if wording is None or wording.start() - found.end() > 900:
+        headers = list(HEADER.finditer(text))
+        for index, found in enumerate(headers):
+            end = headers[index + 1].start() if index + 1 < len(headers) else len(text)
+            wording = WORDING.search(text, found.end(), end)
+            if wording is None:
                 continue
             rows.append(
                 {
@@ -64,6 +84,19 @@ def parse() -> None:
                     "text": re.sub(r"\s+", " ", wording[0]).strip(),
                 }
             )
+        if day == date(2014, 11, 4):
+            for found in ACT.finditer(text):
+                rows.append(
+                    {
+                        "day": day,
+                        "amendment": -int(found[1]),
+                        "page": text.count("\f", 0, found.start()) + 1,
+                        "text": re.sub(r"\s+", " ", found[2]).strip(),
+                    }
+                )
+        if day == date(2020, 12, 5):
+            found = BALLOT.search(text)
+            rows.append({"day": day, "amendment": 1, "page": 1, "text": re.sub(r"\s+", " ", found[1]).strip()})
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(rows)
     frame.write_parquet(PARSED / "wording.parquet")
@@ -93,6 +126,7 @@ def emit() -> Path:
         for day in FILES:
             cs.artifact(raw.cached(SOURCE, url(day)), source)
         contests: dict[tuple[date, int], list[object]] = {}
+        numbers: dict[tuple[date, int], str] = {}
         for key, name, entity in conn.execute(
             """select x.value, n.text, x.entity_id from external_id x join ballot_question q on q.contest_id = x.entity_id
                join name n on n.entity_id = x.entity_id and n.is_preferred
@@ -100,8 +134,25 @@ def emit() -> Path:
         ):
             if (found := NUMBER.search(name)) is not None:
                 contests.setdefault((date.fromisoformat(key[:10]), int(found[1])), []).append(entity)
+                numbers[(date.fromisoformat(key[:10]), int(found[1]))] = name
+        rows = wording.rows()
+        acts = [row for row in rows if row[1] < 0]
+        scored = sorted(
+            (
+                (len(words(act[3]) & words(name)) / len(words(name)), act[1], number)
+                for act in acts
+                for (when, number), name in numbers.items()
+                if when == act[0]
+            ),
+            reverse=True,
+        )
+        mapped: dict[int, int] = {}
+        for _, act, number in scored:
+            if act not in mapped and number not in mapped.values():
+                mapped[act] = number
+        rows = [(day, mapped.get(amendment, amendment), page, text) for day, amendment, page, text in rows if amendment >= 0 or amendment in mapped]
         placed = 0
-        for day, amendment, page, text in wording.iter_rows():
+        for day, amendment, page, text in rows:
             entities = contests.get((day, amendment), [])
             if len(entities) != 1:
                 print(f"{day} Amendment {amendment}: {len(entities)} contests")
