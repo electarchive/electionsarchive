@@ -53,7 +53,7 @@ ITEMS = {
     1958: (date(1958, 11, 4), range(4, 9)),
     1990: (date(1990, 11, 6), range(24, 30)),
     1994: (date(1994, 11, 8), (33, 36, 39, 42, 45, 48)),
-    1962: (date(1962, 11, 6), (7, 8, 9, 10)),
+    1962: (date(1962, 11, 6), (6, 7, 8, 9, 10, 25)),
     1966: (date(1966, 11, 8), (10, 11)),
     1970: (date(1970, 11, 3), (13, 14, 15, 16, 17, 33)),
     1974: (date(1974, 11, 5), range(10, 15)),
@@ -260,6 +260,11 @@ PARTIES = {
     (1990, "insurance-commissioner", "Ted Brown"): "libertarian-party",
     (1990, "insurance-commissioner", "Tom Condit"): "CA:peace-and-freedom-party",
     (1962, "lieutenant-governor", "Glenn M. Anderson"): "democratic-party",
+    (1962, "governor", "Edmund G. (Pat) Brown"): "democratic-party",
+    (1962, "governor", "Richard M. Nixon"): "republican-party",
+    (1962, "governor", "Robert L. Wyckoff"): "prohibition-party",
+    (1966, "governor", "Edmund G. (Pat) Brown"): "democratic-party",
+    (1966, "governor", "Ronald Reagan"): "republican-party",
     (1962, "lieutenant-governor", "George Christopher"): "republican-party",
     (1962, "secretary-of-state", "Frank M. Jordan"): "republican-party",
     (1962, "secretary-of-state", "Don Rose"): "democratic-party",
@@ -450,6 +455,7 @@ ERRATA = {
     (1994, ("attorney-general", 0)),
     (1994, ("insurance-commissioner", 0)),
 }
+ADDED: set[tuple[int, str]] = set()
 PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930, 1934, 1938, 1942, 1946, 1950, 1954, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
@@ -469,8 +475,9 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "values.parquet").filter(
-        ~pl.col("year").map_elements(
-            lambda year: year in PUBLISHED, return_dtype=pl.Boolean
+        pl.struct("year", "state").map_elements(
+            lambda row: row["year"] not in PUBLISHED or (row["year"], row["state"]) in ADDED,
+            return_dtype=pl.Boolean,
         )
     )
     plain = house_books._plain
