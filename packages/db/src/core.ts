@@ -816,7 +816,8 @@ export const personPartyMembership = pgTable("person_party_membership", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-	primaryKey({ columns: [table.personId, table.valid], name: "person_party_membership_pkey"}),
+	index("person_party_membership_party_idx").using("btree", table.partyId.asc().nullsLast().op("uuid_ops")),
+	primaryKey({ columns: [table.personId, table.partyId, table.valid], name: "person_party_membership_pkey"}),
 ]);
 
 export const polity = pgTable("polity", {
@@ -1165,7 +1166,7 @@ export const tenureAffiliation = pgTable("tenure_affiliation", {
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
 }, (table) => [
-	primaryKey({ columns: [table.tenureId, table.kind, table.valid], name: "tenure_affiliation_pkey"}),
+	unique("tenure_affiliation_key").on(table.tenureId, table.kind, table.partyId, table.valid),
 ]);
 
 export const tenureEvent = pgTable("tenure_event", {

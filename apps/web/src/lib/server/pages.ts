@@ -162,11 +162,11 @@ export async function home() {
 
 export async function person(slug: string) {
   const { id } = await found(call(router.people.locate, { slug }));
-  return {
-    kind: "person" as const,
-    id,
-    person: await call(router.people.get, { id }),
-  };
+  const [record, parties] = await Promise.all([
+    call(router.people.get, { id }),
+    call(router.people.parties, { id }),
+  ]);
+  return { kind: "person" as const, id, person: record, parties };
 }
 
 export async function party(path: string, place: string | null = null) {

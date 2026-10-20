@@ -10,6 +10,7 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
   import Career from "./career.svelte";
+  import Parties from "./parties.svelte";
 
   const { data }: { data: PageData } = $props();
 
@@ -210,6 +211,8 @@
         {/if}
       </section>
     {/if}
+
+    <Parties lanes={data.parties} />
 
     <Career record={person.record} />
 

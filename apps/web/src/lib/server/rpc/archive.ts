@@ -9414,7 +9414,7 @@ export const people = {
           last?.owner === row.owner &&
           last.to != null &&
           row.from != null &&
-          Date.parse(row.from) - Date.parse(last.to) < 90 * 864e5
+          Date.parse(row.from) - Date.parse(last.to) < 365 * 864e5
         ) {
           last.to = row.to;
         } else {
@@ -9493,6 +9493,207 @@ export const people = {
           ),
         record,
       };
+    }),
+  parties: os
+    .meta(
+      openapi({
+        method: "GET",
+        path: "/people/{id}/parties",
+        summary:
+          "List a person's parties over time: memberships, the party they sat for in each office, and every party that nominated, endorsed, or carried them on a ballot line",
+      }),
+    )
+    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .output(
+      v.array(
+        v.object({
+          party: v.nullable(PartyRef),
+          spans: v.array(
+            v.object({
+              kind: v.picklist(["member", "office", "group"]),
+              from: v.nullable(v.string()),
+              to: v.nullable(v.string()),
+            }),
+          ),
+          ballots: v.array(
+            v.object({
+              date: v.string(),
+              how: v.picklist([
+                "nominated",
+                "line",
+                "endorsed",
+                "supported",
+                "member",
+                "independent",
+              ]),
+              name: v.string(),
+              path: v.nullable(v.string()),
+            }),
+          ),
+        }),
+      ),
+    )
+    .handler(async ({ input }) => {
+      const [spans, ballots] = await Promise.all([
+        db.execute<{
+          party: string | null;
+          kind: "member" | "office" | "group";
+          from: string | null;
+          to: string | null;
+        }>(sql`
+          with recursive ids(id) as (
+            select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+            union
+            select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+          )
+          select coalesce(pm.into_id, x.party) as party, x.kind, x.from, x.to from (
+            select m.party_id as party, 'member' as kind, m.valid_from::text as from, m.valid_to::text as to
+            from person_party_membership m where m.person_id in (select id from ids)
+            union all
+            select a.party_id, case when a.kind = 'party' then 'office' else 'group' end,
+              coalesce(lower(a.valid), t.from_date)::text, coalesce(upper(a.valid), t.to_date)::text
+            from tenure t join tenure_affiliation a on a.tenure_id = t.id
+            where t.person_id in (select id from ids)
+          ) x
+          left join entity_merge pm on pm.entity_id = x.party
+          order by 1, 2, x.from nulls first
+        `),
+        db.execute<{
+          party: string | null;
+          how:
+            | "nominated"
+            | "line"
+            | "endorsed"
+            | "supported"
+            | "member"
+            | "independent";
+          date: string;
+          contest: string;
+        }>(sql`
+          with recursive ids(id) as (
+            select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+            union
+            select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+          ),
+          mine as materialized (
+            select cd.id, cd.member_of_party_id as member, cd.is_independent as independent, o.id as option,
+              coalesce(o.party_id, ${fused(sql`o.id`, sql`o.contest_id`)}) as line,
+              coalesce(case when c.kind = 'list_allocation' then null else c.allocation_parent_id end, c.id) as contest,
+              e.date_from
+            from candidacy cd join contest_option o on o.id = cd.option_id
+            join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+            where cd.person_id in (select id from ids) and cd.role in ('head', 'running_mate', 'list_member')
+              and o.kind <> 'write_in'
+          ),
+          claims as (
+            select m.contest, m.date_from, n.party_id as party, n.kind::text as how
+            from mine m join candidacy_nomination n on n.candidacy_id = m.id
+            union all
+            select m.contest, m.date_from, m.line, case when m.independent then 'independent' else 'line' end
+            from mine m where m.line is not null or m.independent
+            union all
+            select m.contest, m.date_from, ch.party_id, 'line'
+            from mine m join contest_option ch on ch.parent_option_id = m.option and ch.party_id is not null
+            union all
+            select m.contest, m.date_from, m.member, 'member'
+            from mine m where m.member is not null
+          )
+          select distinct on (coalesce(pm.into_id, x.party), x.contest)
+            coalesce(pm.into_id, x.party) as party, x.how, x.date_from::text as date, x.contest
+          from claims x left join entity_merge pm on pm.entity_id = x.party
+          order by coalesce(pm.into_id, x.party), x.contest,
+            array_position(array['nominated', 'line', 'member', 'independent', 'endorsed', 'supported'], x.how)
+        `),
+      ]);
+      const parties = [
+        ...new Set(
+          [...spans.rows, ...ballots.rows].flatMap((row) => row.party ?? []),
+        ),
+      ];
+      const contests = [...new Set(ballots.rows.map((row) => row.contest))];
+      const [entities, labels, slugs] = await Promise.all([
+        refs(parties),
+        names(contests),
+        paths(contests),
+      ]);
+      const lanes = new Map<
+        string,
+        {
+          party: {
+            id: string;
+            label: string;
+            short: string | null;
+            color: string | null;
+          } | null;
+          spans: Array<{
+            kind: "member" | "office" | "group";
+            from: string | null;
+            to: string | null;
+          }>;
+          ballots: Array<{
+            date: string;
+            how:
+              | "nominated"
+              | "line"
+              | "endorsed"
+              | "supported"
+              | "member"
+              | "independent";
+            name: string;
+            path: string | null;
+          }>;
+        }
+      >();
+      const lane = (party: string | null) => {
+        const key = party ?? "";
+        const found = lanes.get(key) ?? {
+          party: party == null ? null : (entities.get(party) ?? null),
+          spans: [],
+          ballots: [],
+        };
+        lanes.set(key, found);
+        return found;
+      };
+      for (const row of spans.rows) {
+        const into = lane(row.party).spans;
+        const last = into.at(-1);
+        if (
+          last?.kind === row.kind &&
+          last.to != null &&
+          row.from != null &&
+          Date.parse(row.from) - Date.parse(last.to) < 365 * 864e5
+        ) {
+          last.to = row.to;
+        } else {
+          into.push({ kind: row.kind, from: row.from, to: row.to });
+        }
+      }
+      for (const row of ballots.rows) {
+        lane(row.party).ballots.push({
+          date: row.date,
+          how: row.how,
+          name: labels.full.get(row.contest) ?? "",
+          path: slugs.get(row.contest) ?? null,
+        });
+      }
+      return lanes
+        .values()
+        .map((entry) => ({
+          entry: {
+            ...entry,
+            ballots: entry.ballots.toSorted((a, b) =>
+              a.date.localeCompare(b.date),
+            ),
+          },
+          start:
+            [
+              ...entry.spans.map((span) => span.from ?? ""),
+              ...entry.ballots.map((ballot) => ballot.date),
+            ].toSorted((a, b) => a.localeCompare(b))[0] ?? "",
+        }))
+        .toArray()
+        .toSorted((a, b) => a.start.localeCompare(b.start))
+        .map(({ entry }) => entry);
     }),
 };
 
