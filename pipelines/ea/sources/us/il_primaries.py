@@ -17,7 +17,7 @@ from ea.sources.us import house_books
 from ea.store import DATA, connect
 
 SOURCE = "us.il_primaries"
-VERSION = "1"
+VERSION = "2"
 PUBLISHER = "Illinois State Board of Elections"
 LICENSE = "Public domain"
 PARSED = DATA / "parsed" / SOURCE
@@ -57,7 +57,10 @@ ORDINALS = {
         1,
     )
 }
-CHECKED: set[tuple[str, str]] = set()
+CHECKED = {
+    ("1996-03-19:IL:house:7:democratic", "powell"),
+    ("1996-03-19:IL:house:7:democratic", "mendenhall"),
+}
 
 Word = tuple[str, float, float, float, float]
 
@@ -94,6 +97,69 @@ def surname(text: str) -> str:
 
 def number(text: str) -> int | None:
     return int(text.replace(",", "")) if re.fullmatch(r"\d{1,3}(,\d{3})+|\d+", text) else None
+
+
+def reads(path: Path) -> dict[tuple[int, str, int], dict[str, list]]:
+    found: dict[tuple[int, str, int], dict[str, list]] = {}
+    year = 0
+    page = 0
+    block: dict[str, list] | None = None
+    current: tuple[list[str], list[tuple[int, str, list[int]]]] | None = None
+    for line in path.read_text().splitlines():
+        line = line.strip()
+        if not line:
+            continue
+        if line.startswith("$"):
+            year = int(line[1:])
+        elif line.startswith("@"):
+            page = int(line[1:])
+            block = None
+            current = None
+        elif line.startswith("#"):
+            office, district = line[1:].strip().rsplit("-", 1)
+            block = found.setdefault((year, office, int(district)), {"cands": [], "groups": [], "pages": []})
+            block["pages"].append(page)
+            current = None
+        elif block is not None:
+            head, _, rest = (part.strip() for part in line.partition("|"))
+            if head == "C":
+                name, party, total = (part.strip() for part in rest.split("|"))
+                if not any(c[0] == name for c in block["cands"]):
+                    block["cands"].append((name, party, int(re.sub(r"\D", "", total) or 0)))
+            elif head == "H":
+                heads: list[str] = []
+                for part in (part.strip() for part in rest.split(",")):
+                    if heads and part.upper() in {"JR.", "SR.", "II", "III", "IV", "JR", "SR"}:
+                        heads[-1] += f" {part}"
+                    else:
+                        heads.append(part)
+                group = next((g for g in block["groups"] if g[0] == heads), None)
+                if group is None:
+                    group = (heads, [])
+                    block["groups"].append(group)
+                current = group
+            elif head != "T" and current is not None:
+                current[1].append((page, head, [int(re.sub(r"\D", "", cell) or 0) for cell in rest.split()]))
+    for block in found.values():
+        block["heads"] = [head for heads, _ in block["groups"] for head in heads]
+        names = list(dict.fromkeys(county for _, group_rows in block["groups"] for _, county, _ in group_rows))
+        block["rows"] = [
+            (
+                [
+                    page_
+                    for heads, group_rows in block["groups"]
+                    for page_ in next(([p_] * len(heads) for p_, c, _ in group_rows if c == county), [0] * len(heads))
+                ],
+                county,
+                [
+                    value
+                    for heads, group_rows in block["groups"]
+                    for value in next((v for _, c, v in group_rows if c == county), [0] * len(heads))
+                ],
+            )
+            for county in names
+        ]
+    return found
 
 
 def pages(year: int) -> list[tuple[float, float, list[tuple[str, float, float, float, float]]]]:
@@ -189,10 +255,14 @@ def parse() -> None:
             )
         }
         options = conn.execute(
-            """select x.value, o.id::text, o.ballot_label, coalesce(sum(v.value), 0)::bigint
+            """select x.value, o.id::text, o.ballot_label,
+                      coalesce(array_agg(distinct s.total) filter (where s.total is not null), '{}')
                from external_id x join contest_option o on o.contest_id = x.entity_id
-               left join result_set rs on rs.contest_id = x.entity_id and rs.is_default
-               left join result_value v on v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
+               left join (
+                   select rs.contest_id, v.option_k, rs.k, sum(v.value)::bigint as total
+                   from result_set rs join result_value v on v.result_set_k = rs.k and v.measure = 1
+                   group by 1, 2, 3
+               ) s on s.contest_id = x.entity_id and s.option_k = o.k
                where x.scheme = 'us.contest' and x.value ~ '^(1994-03-15|1996-03-19|1998-03-17):IL:(house|senate):'
                  and o.kind in ('candidate', 'write_in')
                group by 1, 2, 3"""
@@ -296,8 +366,8 @@ def parse() -> None:
                 if summed != total:
                     failed.append(f"{contest}: {label} sums to {summed:,}, printed {total:,}")
                     continue
-                if summed != filed and (contest, surname(label)) not in CHECKED:
-                    failed.append(f"{contest}: {label} sums to {summed:,}, the FEC has {filed:,}")
+                if summed not in filed and (contest, surname(label)) not in CHECKED:
+                    failed.append(f"{contest}: {label} sums to {summed:,}, the FEC has {sorted(filed)}")
                     continue
                 done.add(contest)
                 for county, votes, page, box, size in column:
@@ -312,6 +382,140 @@ def parse() -> None:
                             "box": [box[0] / size[0], box[1] / size[1], box[2] / size[0], box[3] / size[1]],
                         }
                     )
+    first, second = (reads(PARSED / "model" / f"read{n}.txt") for n in (1, 2))
+    for key in sorted(set(first) & set(second)):
+        year, office, district = key
+        day = ITEMS[year][1]
+        one, two = first[key], second[key]
+        heads = one["heads"]
+        if two["heads"] != heads and len(two["heads"]) != len(heads):
+            failed.append(f"{year} {office} {district}: reads disagree on headings")
+            continue
+        a = {(plain(county)): (page, votes) for page, county, votes in one["rows"]}
+        b = {(plain(county)): (page, votes) for page, county, votes in two["rows"]}
+        if len(a) != len(one["rows"]) or set(a) != set(b):
+            failed.append(f"{year} {office} {district}: reads list different counties {sorted(set(a) ^ set(b))}")
+            continue
+        differ = [k for k in a if a[k][1] != b[k][1]]
+        lookup: dict[str, str] = {}
+        for county in a:
+            close = max(counties, key=lambda c, k=county: difflib.SequenceMatcher(None, k, c).ratio())
+            if county in counties:
+                lookup[county] = county
+            elif difflib.SequenceMatcher(None, county, close).ratio() >= 0.85:
+                lookup[county] = close
+        if len(set(lookup.values())) != len(a) or len(lookup) != len(a):
+            failed.append(f"{year} {office} {district}: counties not resolved {sorted(set(a) - set(lookup))}")
+            continue
+        titled: list[tuple[str, str, int, str, str, int]] = []
+        for name, code, total in one["cands"]:
+            party = PARTIES.get(code) or {"LIB": "libertarian", "REF": "reform"}.get(code, code.lower())
+            pool = [
+                (contest, option, label, filed)
+                for contest, option, label, filed in options
+                if contest.startswith(f"{day}:IL:{office}:")
+                and contest.endswith(f":{party}")
+                and (office == "senate" or contest.split(":")[3] == str(district))
+            ]
+            scored = sorted(
+                (
+                    (difflib.SequenceMatcher(None, surname(name), surname(lb)).ratio(), c, o, lb, f)
+                    for c, o, lb, f in pool
+                ),
+                reverse=True,
+            )
+            if not scored or scored[0][0] < 0.8 or len(scored) > 1 and scored[1][0] == scored[0][0]:
+                failed.append(f"{year} {office} {district}: no option for {name}")
+                continue
+            _, contest, option, label, filed = scored[0]
+            column = (
+                one["cands"].index((name, code, total))
+                if len(one["cands"]) == len(heads)
+                else next(
+                    (
+                        i
+                        for i, head in enumerate(heads)
+                        if difflib.SequenceMatcher(None, plain(head), surname(name)).ratio() >= 0.8
+                        or surname(name) in plain(head)
+                    ),
+                    None,
+                )
+            )
+            if column is None:
+                failed.append(f"{contest}: no column for {name}")
+                continue
+            titled.append((contest, option, label, column, total, filed))
+        if not titled:
+            continue
+        for pick in range(2 ** len(differ) if len(differ) <= 6 else 0):
+            votes_by = {k: b[k][1] if k in differ and pick >> differ.index(k) & 1 else a[k][1] for k in a}
+            if titled and all(sum(v[column] for v in votes_by.values()) == total for _, _, _, column, total, _ in titled):
+                break
+        else:
+            failed.append(f"{year} {office} {district}: reads disagree on {differ} and no choice adds up")
+            continue
+        placed: dict[int, list[tuple[str, float, float, float, float]]] = {}
+        for page in sorted({p_ for k in a for p_ in a[k][0] if p_}):
+            width, height, words = pages(year)[page - 1]
+            lines = rows(words)
+            heads_at = [
+                (n, " ".join(w[0] for w in line))
+                for n, line in enumerate(lines)
+                if re.match(r"(REPRESENTATIVE IN CONGRESS|UNITED STATES SENATOR)", " ".join(w[0] for w in line))
+            ]
+            mine = next(
+                (
+                    n
+                    for n, text in heads_at
+                    if office == "senate"
+                    and text.startswith("UNITED")
+                    or office == "house"
+                    and n + 1 < len(lines)
+                    and re.split(r"[\s-]+", " ".join(w[0] for w in lines[n + 1]))[0] == next(
+                        word for word, number_ in ORDINALS.items() if number_ == district
+                    )
+                ),
+                None,
+            )
+            top = lines[mine][0][2] if mine is not None else 0.0
+            after = next((lines[n][0][2] for n, _ in heads_at if n > (mine if mine is not None else -1)), height)
+            placed[page] = [w for w in words if top <= w[2] < after]
+        used: set[tuple[str, float, float, float, float]] = set()
+        for contest, option, label, column, total, filed in titled:
+            summed = sum(v[column] for v in votes_by.values())
+            if summed not in filed and (contest, surname(label)) not in CHECKED:
+                failed.append(f"{contest}: {label} sums to {summed:,}, the FEC has {sorted(filed)}")
+                continue
+            done.add(contest)
+            out[:] = [row for row in out if (row["contest"], row["option"]) != (contest, option)]
+            for county, votes in votes_by.items():
+                page = a[county][0][column]
+                if page == 0:
+                    continue
+                width, height, _ = pages(year)[page - 1]
+                region = placed[page]
+                text = f"{votes[column]:,}"
+                near = [w for w in region if w[0] == text and w not in used]
+                order = [k for k in a if a[k][0][column] == page]
+                spread = [w[2] for w in region if number(w[0]) is not None]
+                expected = min(spread) + (order.index(county) + 0.5) / len(order) * (max(spread) - min(spread))
+                box = (
+                    min(near, key=lambda w: abs((w[2] + w[4]) / 2 - expected))
+                    if near
+                    else ("", 0.0, expected - 4, float(width), expected + 4)
+                )
+                used.add(box)
+                out.append(
+                    {
+                        "year": year,
+                        "contest": contest,
+                        "option": option,
+                        "county": counties[lookup[county]],
+                        "votes": votes[column],
+                        "page": page,
+                        "box": [box[1] / width, box[2] / height, box[3] / width, box[4] / height],
+                    }
+                )
     for line in failed:
         print(line)
     left = {contest for contest, *_ in options} - done
@@ -392,7 +596,7 @@ def emit() -> Path:
             "supersedes_id",
         )
         for (key, year), lines in frame.group_by("contest", "year", maintain_order=True):
-            result_set = cs.key(f"{SOURCE}.result_set", str(key))
+            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:2")
             if result_set not in cs.minted:
                 continue
             contest = contests[str(key)]
