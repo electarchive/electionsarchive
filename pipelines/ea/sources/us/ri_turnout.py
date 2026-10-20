@@ -1,3 +1,4 @@
+import difflib
 import re
 import subprocess
 from datetime import UTC, date, datetime
@@ -30,6 +31,15 @@ BOOKS = {
     2018: "2018 Count Book",
 }
 HISTORY_YEARS = list(range(1996, 2020, 2))
+OLD_PRIMARIES = {
+    1998: (date(1998, 9, 15), 622880, 86159),
+    2000: (date(2000, 9, 12), 634300, 97689),
+    2002: (date(2002, 9, 10), 665012, 149359),
+}
+OLD_FIXES = {
+    1998: {"littlecompton": (2675, 180), "middletown": (9993, 423), "narragansett": (11198, 1743), "scituate": (4133, 336)},
+}
+ABBREVIATIONS = {"e": "east", "n": "north", "s": "south", "w": "west"}
 COUNTIES = {
     "44001": "barrington bristol warren",
     "44003": "coventry eastgreenwich warwick westgreenwich westwarwick",
@@ -121,6 +131,34 @@ def blocks(lines: list[str]) -> list[dict]:
     return found
 
 
+def old_primary(year: int) -> dict[str, tuple[int, int]]:
+    lines = text_of(year)
+    start = next(
+        i
+        for i, line in enumerate(lines)
+        if re.search(r"R(HODE ISLAND|[lI]) STATEWIDE PRIMARY", line)
+        and "September" in "\n".join(lines[i : i + 3])
+        and "TURNOUT" in "\n".join(lines[i : i + 7]).upper()
+    )
+    rows = dict(OLD_FIXES.get(year, {}))
+    for line in lines[start : start + 80]:
+        match = re.match(r"^\W*(?:\d\s+|split\s+)?([A-Za-z][A-Za-z. ]+?)\s+([\d,.]+)\s+([\d,.]+)\s", line)
+        if not match:
+            continue
+        words = match[1].split()
+        if len(words[0].rstrip(".")) == 1:
+            words[0] = ABBREVIATIONS.get(words[0].rstrip(".").lower(), "")
+        name = plain(" ".join(words))
+        if name in TOWN_COUNTY:
+            rows.setdefault(name, (int(re.sub(r"[.,]", "", match[2])), int(re.sub(r"[.,]", "", match[3]))))
+    _, eligible, cast = OLD_PRIMARIES[year]
+    got = (sum(v[0] for v in rows.values()), sum(v[1] for v in rows.values()))
+    if len(rows) != len(TOWN_COUNTY) or abs(got[0] - eligible) > eligible // 100 or abs(got[1] - cast) > cast // 100:
+        raise ValueError(f"{year} primary: {len(rows)} towns {got} vs printed {(eligible, cast)}")
+    print(f"{year} primary: {got} vs printed {(eligible, cast)}")
+    return rows
+
+
 def parse() -> None:
     elections: dict[date, dict[str, tuple[int, int]]] = {}
     with connect() as conn:
@@ -152,38 +190,45 @@ def parse() -> None:
                 continue
             taken.add(day)
             elections[day] = block["rows"]
-    lines = text_of(2018)
-    start = next(i for i, line in enumerate(lines) if line.startswith("STATEWIDE ELIGIBILITY & VOTER TURNOUT"))
-    statewide: dict[str, list[int]] = {}
-    municipal: dict[str, dict[str, list[list[int]]]] = {}
-    town = None
-    for line in lines[start:]:
-        stripped = line.strip()
-        values = re.findall(r"[\d,]{3,}", stripped)
-        kind = re.match(r"(?i)(eligible|turnout)\b", stripped)
-        if kind and len(values) == len(HISTORY_YEARS):
-            target = statewide if town is None else municipal.setdefault(town, {})
-            target[kind[1].lower()] = [number(v) for v in values]
-        elif re.fullmatch(r"MUNICIPAL ELIGIBILITY & VOTER TURNOUT", stripped):
-            town = ""
-        elif re.fullmatch(r"[A-Z][A-Za-z .]+", stripped) and plain(stripped) in TOWN_COUNTY:
-            town = plain(stripped)
-            municipal.setdefault(town, {})
-    if len(municipal) != len(TOWN_COUNTY):
-        raise ValueError(f"history table has {len(municipal)} towns")
+    for year, (day, _, _) in OLD_PRIMARIES.items():
+        elections[day] = old_primary(year)
     state_rows = []
-    for index, year in enumerate(HISTORY_YEARS):
-        day = next((d for d, kind in days.items() if d.year == year and kind == "general"), None)
-        if day is None:
-            continue
-        eligible = sum(municipal[t]["eligible"][index] for t in municipal)
-        cast = sum(municipal[t]["turnout"][index] for t in municipal)
-        state = (statewide["eligible"][index], statewide["turnout"][index])
-        state_rows.append({"date": day, "registered": state[0], "voters": state[1]})
-        ok = eligible == state[0] and abs(cast - state[1]) <= max(60, state[1] // 200)
-        print(f"history {year}: towns {eligible}/{cast} state {state} {'ok' if ok else 'mismatch'}")
-        if ok and day not in elections:
-            elections[day] = {t: (municipal[t]["eligible"][index], municipal[t]["turnout"][index]) for t in municipal}
+    for book, years in ((2018, HISTORY_YEARS), (2002, list(range(1986, 2004, 2)))):
+        lines = text_of(book)
+        start = next(i for i, line in enumerate(lines) if re.match(r"(?i)\s*STATEWIDE ELIGIBILITY & VOTER TURNOUT", line))
+        statewide: dict[str, list[int]] = {}
+        municipal: dict[str, dict[str, list[int]]] = {}
+        town = None
+        for line in lines[start:]:
+            stripped = re.sub(r"^\d+\s+(?=[A-Za-z])", "", line.strip())
+            values = re.findall(r"[\d,]{3,}", stripped)
+            kind = re.match(r"(?i)(eligible|turnout)\b", stripped)
+            if kind and len(values) == len(years):
+                target = statewide if town is None else municipal.setdefault(town, {})
+                target[kind[1].lower()] = [number(v) for v in values]
+            elif re.fullmatch(r"MUNICIPAL ELIGIBILITY & VOTER TURNOUT", stripped):
+                town = ""
+            elif re.fullmatch(r"[A-Za-z][A-Za-z .]+", stripped):
+                close = difflib.get_close_matches(plain(stripped), list(TOWN_COUNTY), n=1, cutoff=0.85)
+                if close:
+                    town = close[0]
+                    municipal.setdefault(town, {})
+        if len(municipal) != len(TOWN_COUNTY) or any(len(v) != 2 for v in municipal.values()):
+            raise ValueError(f"{book} history table has {len(municipal)} towns")
+        for index, year in enumerate(years):
+            if book == 2002 and year >= 1996:
+                continue
+            day = next((d for d, kind in days.items() if d.year == year and kind == "general"), None)
+            if day is None:
+                continue
+            eligible = sum(municipal[t]["eligible"][index] for t in municipal)
+            cast = sum(municipal[t]["turnout"][index] for t in municipal)
+            state = (statewide["eligible"][index], statewide["turnout"][index])
+            state_rows.append({"date": day, "registered": state[0], "voters": state[1]})
+            ok = eligible == state[0] and abs(cast - state[1]) <= max(60, state[1] // 200)
+            print(f"history {year}: towns {eligible}/{cast} state {state} {'ok' if ok else 'mismatch'}")
+            if ok and day not in elections:
+                elections[day] = {t: (municipal[t]["eligible"][index], municipal[t]["turnout"][index]) for t in municipal}
     rows = []
     for day, towns in elections.items():
         for code in COUNTIES:
@@ -204,7 +249,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Rhode Island's registered voters and ballots cast by county for its primaries and generals of 1996–2018, "
+            summary="Rhode Island's registered voters and ballots cast by county for its primaries and generals of 1982–2018 (primaries from 1998), "
             "summed from the Board of Elections' municipal turnout tables in the count books, and statewide where the municipal tables do not add up",
             polity="US",
         )
@@ -235,6 +280,12 @@ def emit() -> Path:
             )
         for year in BOOKS:
             cs.artifact(raw.cached(SOURCE, url(year)), source)
+        published = {
+            election_id
+            for (election_id,) in conn.execute(
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+            )
+        }
         covered = set()
         for (day,), rows in counties.group_by("date", maintain_order=True):
             if day not in elections:
@@ -242,6 +293,8 @@ def emit() -> Path:
                 continue
             covered.add(day)
             value_key, election_id = elections[day]
+            if election_id in published:
+                continue
             result_set = cs.key(f"{SOURCE}.result_set", f"{value_key}:county")
             cs.add(
                 "result_set",
@@ -272,6 +325,8 @@ def emit() -> Path:
             if day in covered or day not in elections:
                 continue
             value_key, election_id = elections[day]
+            if election_id in published:
+                continue
             result_set = cs.key(f"{SOURCE}.result_set", f"{value_key}:state")
             cs.add(
                 "result_set",
