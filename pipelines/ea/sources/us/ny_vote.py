@@ -17,6 +17,8 @@ ITEMS = {
     1986: ("micro_IA40706926_0008", date(1986, 11, 4), range(7, 13)),
     1988: ("micro_IA40706932_0313", date(1988, 11, 8), range(9, 16)),
     1990: ("micro_IA40706939_0195", date(1990, 11, 6), range(10, 18)),
+    1992: ("micro_IA40706946_0089", date(1992, 11, 3), range(21, 29)),
+    1994: ("micro_IA40706953_0122", date(1994, 11, 8), range(26, 34)),
 }
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
@@ -29,6 +31,7 @@ REVISION = 1
 RENAMED: str | None = None
 COMMAS = False
 TURNED: set[tuple[int, int]] = set()
+TRANSPOSED = {1992, 1994}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
