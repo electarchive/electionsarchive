@@ -15,6 +15,7 @@ SUMMARY = "House results by county from the Tribune Almanac"
 STATE = None
 FIPS = None
 ITEMS = {
+    1860: ("vol1861tribuneal00unse", 1861, date(1860, 11, 6), (42,)),
     1862: ("tribunealmanacpo1863newy", 1863, date(1862, 11, 4), (57, 58)),
     1864: ("tribunealmanacpo00otta", 1865, date(1864, 11, 8), (53,)),
     1866: ("bub_gb_53IwAAAAIAAJ", 1867, date(1866, 11, 6), (51,)),
