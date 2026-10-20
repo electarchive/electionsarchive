@@ -8,16 +8,25 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import medsl, openelections
+from ea.sources.us import fec_totals, medsl, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.mo_primaries"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://web.archive.org/web/2025id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
 FILES = {
     date(1998, 8, 4): [SITE + "CountyPrimary1998.pdf"],
     date(2004, 8, 3): [SITE + "CountyPrimary2004.pdf", SITE + "CountyPrimary2004Part2.pdf"],
+}
+STATS = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
+MATRICES = {
+    date(2016, 3, 15): "ActualResults-April122016.pdf",
+    date(2016, 8, 2): "ActualResults-August22016.pdf",
+    date(2018, 8, 7): "ActualResults-August72018.pdf",
+    date(2020, 3, 10): "ACTUALRESULTS-March102020.pdf",
+    date(2020, 8, 4): "ActualResults-August42020.pdf",
+    date(2022, 8, 2): "ActualResults-August22022.pdf",
 }
 SHEETS = {
     date(2012, 8, 7): "2012/20120807__mo__primary.csv",
@@ -44,6 +53,8 @@ def fetch() -> None:
     for urls in FILES.values():
         for url in urls:
             raw.fetch(SOURCE, url, suffix=".pdf")
+    for name in MATRICES.values():
+        raw.fetch(SOURCE, STATS + name, suffix=".pdf")
     for path in SHEETS.values():
         raw.fetch(
             SOURCE,
@@ -104,6 +115,93 @@ def parse() -> None:
                         raise ValueError(f"{day} {county} {office}: rows do not sum to {total[1]}")
                     rows.extend(lines)
                     office = None
+    party_label = re.compile(r"Republican|Democrat(?:ic)?|Libertarian|Green|Constitution")
+    entry = re.compile(r"(\S.*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*")
+    known = connect()
+    for day, name in MATRICES.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, STATS + name).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout
+        tables: list[dict[str, object]] = []
+        head: list[str] = []
+        table: dict[str, object] | None = None
+        for line in text.splitlines():
+            if not line.strip() or re.search(
+                r"Missouri Office of Secretary|OFFICIAL RESULTS|(Primary|General) Election -|Preference Primary -", line
+            ):
+                continue
+            if (found := entry.fullmatch(line.strip())) and head:
+                if table is None:
+                    title = " ".join(head)
+                    previous = tables[-1] if tables else None
+                    if previous is not None and previous["title"] == title and not previous["closed"]:
+                        table = previous
+                    else:
+                        office: tuple[str, int | None] | None = None
+                        if re.search(r"State (Senator|Representative)", title):
+                            office = None
+                        elif re.search(r"President", title):
+                            office = ("president", None)
+                        elif re.search(r"(United States|U\.? ?S\.?) Senator", title):
+                            office = ("senate", None)
+                        elif (seat := re.search(r"Representative.*?District (\d+)", title)) and re.search(
+                            r"U\.? ?S\.? Representative|United States Representative|Representative in Congress", title
+                        ):
+                            office = ("house", int(seat[1]))
+                        table = {
+                            "office": office,
+                            "title": title,
+                            "labels": party_label.findall(head[0]),
+                            "rows": {},
+                            "closed": False,
+                        }
+                        tables.append(table)
+                rows_here = table["rows"]
+                assert isinstance(rows_here, dict)
+                rows_here[found[1]] = [int(value.replace(",", "")) for value in found[2].split()]
+                table["closed"] = found[1].upper() == "TOTAL"
+                continue
+            if table is not None:
+                head, table = [], None
+            head.append(re.sub(r"\s+", " ", line.strip()))
+        grouped: dict[tuple[str, int | None], list[dict[str, object]]] = {}
+        for table in tables:
+            if table["office"] is not None:
+                grouped.setdefault(table["office"], []).append(table)
+        for (kind, district), groups in grouped.items():
+            columns: list[tuple[str, dict[str, int], int]] = []
+            for group in groups:
+                body = {county: values for county, values in group["rows"].items()}
+                total_row = next(body.pop(county) for county in list(body) if county.upper() == "TOTAL")
+                for at, label in enumerate(group["labels"]):
+                    votes = {county: values[at] for county, values in body.items()}
+                    if sum(votes.values()) != total_row[at]:
+                        raise ValueError(f"{day} {kind} {district}: column {at} of {group['labels']} does not add up")
+                    columns.append((label, votes, total_row[at]))
+            for label, votes, total in columns:
+                party = PARTIES[label.upper()[:3]]
+                key = f"{day}:MO:" + (f"house:{district}" if district is not None else kind) + f":{party}"
+                names = fec_totals.labels(known, key).get(total, [])
+                if len(names) != 1:
+                    print(f"{key}: {len(names)} candidates with {total}, skipped")
+                    continue
+                rows.extend(
+                    {
+                        "day": day,
+                        "chamber": f"{kind}:{party}",
+                        "district": district,
+                        "code": codes[re.sub(r"[^a-z]", "", county.lower())],
+                        "candidate": names[0].upper(),
+                        "writein": False,
+                        "votes": value,
+                        "source": "MO",
+                    }
+                    for county, value in votes.items()
+                )
+    known.close()
     for day, path in SHEETS.items():
         url = openelections.REPOSITORY.format(state="mo", commit=openelections.COMMITS["MO"], path=path)
         with raw.cached(SOURCE, url).path.open(newline="") as handle:
@@ -147,7 +245,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Missouri's 1998, 2004, 2012, and 2014 House and Senate primaries by county",
+            summary="Missouri's 1998, 2004, 2012, 2014, and 2016–2022 House, Senate, and presidential primaries by county",
             polity="US-MO",
         )
         sources = {"MO": cs.source(PUBLISHER, TITLE), "OE": cs.source("OpenElections", OE_TITLE)}
