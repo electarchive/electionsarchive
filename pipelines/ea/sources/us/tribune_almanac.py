@@ -23,6 +23,8 @@ ITEMS = {
     1864: ("tribunealmanacpo00otta", 1865, date(1864, 11, 8), (53,)),
     1866: ("bub_gb_53IwAAAAIAAJ", 1867, date(1866, 11, 6), (51,)),
     1868: ("tribunealmanacpo1869newy", 1869, date(1868, 11, 3), (62,)),
+    1878: ("vol1881tribuneal00unse", 1881, date(1878, 11, 5), (81, 82)),
+    1880: ("vol1881tribuneal00unse", 1881, date(1880, 11, 2), (81, 82)),
     1874: ("tribunealmanacpo18751879newy", 1875, date(1874, 11, 3), (76, 77, 78)),
 }
 VOLUMES = {
