@@ -22,6 +22,8 @@ STATE = "OH"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 ITEMS = {
+    1986: ("micro_IA40706926_0051", date(1986, 11, 4), (116, 117, 118, 122, 123, 124)),
+    1990: ("micro_IA40706942_0388", date(1990, 11, 6), (93, 94)),
     1988: ("micro_IA40706932_0362", date(1988, 11, 8), (111, 112, 113, 114, 115)),
     1992: ("micro_IA40706946_0141", date(1992, 11, 3), (115, 118, 119, 120, 121)),
     1994: ("micro_IA40706953_0173", date(1994, 11, 8), (124, 129, 130, 139, 140)),
@@ -31,8 +33,8 @@ VOLUMES = {
     for year, (item, day, pages) in ITEMS.items()
 }
 OFFICES = {"president": "president", "senate": "senate", "governor": "governor"}
-ERRATA = {(1988, ("turnout", 0)), (1992, ("turnout", 0)), (1994, ("turnout", 0))}
-DERIVED = {(1994, "Guernsey", "Registered Voters"): 14166, (1992, "Henry", "Electors Voting"): 13538}
+ERRATA = {(1986, ("governor", 0)), (1990, ("governor", 0)), (1988, ("turnout", 0)), (1992, ("turnout", 0)), (1994, ("turnout", 0))}
+DERIVED = {(1986, "Clermont", "Celeste"): 14246, (1994, "Guernsey", "Registered Voters"): 14166, (1992, "Henry", "Electors Voting"): 13538}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
