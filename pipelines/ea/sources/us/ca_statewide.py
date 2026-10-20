@@ -43,6 +43,8 @@ ITEMS = {
     1922: (date(1922, 11, 7), range(13, 20)),
     1926: (date(1926, 11, 2), range(5, 12)),
     1930: (date(1930, 11, 4), range(5, 10)),
+    1934: (date(1934, 11, 6), range(6, 11)),
+    1938: (date(1938, 11, 8), range(5, 10)),
 }
 VOLUMES = {
     year: (f"https://v3.californiatargetbook.com/docs/SoV/g{year}.pdf", "https://www.californiatargetbook.com/", day, pages)
@@ -167,6 +169,15 @@ PARTIES = {
     (1930, "treasurer", "Charles G. Johnson"): "republican-party",
     (1930, "treasurer", "William B. Shearer"): "democratic-party",
     (1930, "treasurer", "Sylvanus H. Kellogg"): "prohibition-party",
+    (1934, "lieutenant-governor", "Sheridan Downey"): "democratic-party",
+    (1934, "lieutenant-governor", "George J. Hatfield"): "republican-party",
+    (1934, "lieutenant-governor", "Jesse W. Southwick"): "socialist-party-of-america",
+    (1934, "treasurer", "Charles G. Johnson"): "republican-party",
+    (1934, "treasurer", "Wm. A. Ward"): "democratic-party",
+    (1938, "lieutenant-governor", "Walter Scott Franklin"): "republican-party",
+    (1938, "secretary-of-state", "Nellie S. Harriss"): "prohibition-party",
+    (1938, "controller", "Ellen G. Pritchard"): "prohibition-party",
+    (1938, "attorney-general", "Claude A. Watson"): "prohibition-party",
 }
 NAMES: dict[str, str] = {}
 ERRATA = {
@@ -192,8 +203,9 @@ ERRATA = {
     (1918, ("treasurer", 0)),
     (1926, ("surveyor-general", 0)),
     (1930, ("controller", 0)),
+    (1938, ("secretary-of-state", 0)),
 }
-PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930}
+PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930, 1934, 1938}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
