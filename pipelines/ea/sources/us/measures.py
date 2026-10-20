@@ -12,6 +12,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us import elstats
+from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.measures"
@@ -149,6 +150,7 @@ def parse() -> None:
         counties.setdefault(state, {})[name] = code
         towns.setdefault(state, {})[name] = code
 
+    regions = ct_regions()
     frames = []
     for state, district in STATEWIDE.items():
         frame = (
@@ -172,7 +174,11 @@ def parse() -> None:
                 type=pl.col("question_type").fill_null(""),
                 winner=pl.lit(None, pl.String),
                 division=pl.concat_str(pl.lit(f"{state}:"), division),
-                code=pl.when(pl.col("division_type") == "City/Town")
+                code=pl.when(
+                    (pl.lit(state) == "CT") & (pl.col("election_date").str.slice(0, 4).cast(pl.Int32) >= 2022)
+                )
+                .then(division.map_elements(elstats.plain, return_dtype=pl.String).replace_strict(regions, default=None))
+                .when(pl.col("division_type") == "City/Town")
                 .then(
                     pl.coalesce(
                         division.map_elements(elstats.plain, return_dtype=pl.String).replace_strict(
@@ -431,6 +437,32 @@ def emit() -> Path:
                     ballot_label=label,
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            if state == "CT" and day.year >= 2022 and result_set not in cs.minted:
+                previous = result_set
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:regions")
+                (replaced,) = conn.execute(
+                    "select election_id, contest_id, stage, kind, source_id, completeness, supersedes_id from result_set where id = %s",
+                    [previous],
+                ).fetchall()
+                cs.add(
+                    "result_set",
+                    id=previous,
+                    election_id=replaced[0],
+                    contest_id=replaced[1],
+                    stage=replaced[2],
+                    kind=replaced[3],
+                    status="superseded",
+                    source_id=replaced[4],
+                    is_default=False,
+                    completeness=replaced[5],
+                    supersedes_id=replaced[6],
+                )
+                for option, outcome, seats in conn.execute(
+                    "select option_id, kind, seats from outcome where result_set_id = %s", [previous]
+                ).fetchall():
+                    cs.add("outcome", result_set_id=previous, option_id=option, kind=outcome, seats=seats)
+            else:
+                previous = None
             cs.add(
                 "result_set",
                 id=result_set,
@@ -442,6 +474,7 @@ def emit() -> Path:
                 source_id=sources[state],
                 is_default=True,
                 completeness=round(matched / valid, 4),
+                supersedes_id=previous,
             )
             for code, answer, votes in rows.filter(pl.col("matched")).select("code", "answer", "votes").iter_rows():
                 cs.add(
