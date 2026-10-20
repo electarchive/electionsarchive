@@ -18,6 +18,7 @@ BASE = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Statistics/turno
 FILES = {
     (2011, "gen"): BASE + "/2011/TRNSUMMARYGEX11.txt",
     (2012, "pri"): BASE + "/2012/PRI12trnsumm.txt",
+    (2015, "gen"): "https://elect.ky.gov/statistics/Documents/voterturnoutcounty-2015G-20160126-031529.pdf",
     (2019, "gen"): "https://elect.ky.gov/Resources/Documents/voterturnoutcounty-2019G-20200323-080539.pdf",
     (2023, "gen"): "https://elect.ky.gov/Resources/Documents/2023G%20Turnout%20by%20County.pdf",
     (2024, "gen"): "https://elect.ky.gov/Resources/Documents/2024G%20Voter%20Turnout%20by%20County.pdf",
@@ -88,7 +89,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kentucky's registered voters and ballots cast by county for its 2011 general, 2012 primary, and 2019, 2023, and 2024 generals, "
+            summary="Kentucky's registered voters and ballots cast by county for its 2011 general, 2012 primary, and 2015, 2019, 2023, and 2024 generals, "
             "from the State Board of Elections' voter turnout reports",
             polity="US",
         )
@@ -117,12 +118,20 @@ def emit() -> Path:
                 url="https://elect.ky.gov/Resources/Pages/Turnout.aspx",
                 license="Public record",
             )
+        published = {
+            election_id
+            for (election_id,) in conn.execute(
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+            )
+        }
         for (year, stage), rows in frame.group_by("year", "stage", maintain_order=True):
             found = elections.get((year, stage), [])
             if len(found) != 1:
                 print(f"{year} {stage}: {len(found)} elections")
                 continue
             value_key, election_id = found[0]
+            if election_id in published:
+                continue
             cs.artifact(raw.cached(SOURCE, FILES[(year, stage)]), source)
             result_set = cs.key(f"{SOURCE}.result_set", f"{value_key}:county")
             cs.add(
