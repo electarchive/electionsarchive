@@ -14,6 +14,7 @@ SUMMARY = "California's House results by county from the Secretary of State's St
 STATE = "CA"
 FIPS = "06"
 ITEMS = {
+    1952: ("stateofcaliforn195262cali", date(1952, 11, 4), range(56, 59)),
     1954: ("stateofcaliforn195262cali", date(1954, 11, 2), range(131, 134)),
     1956: ("stateofcaliforn195262cali", date(1956, 11, 6), range(199, 202)),
     1958: ("stateofcaliforn195262cali", date(1958, 11, 4), range(267, 270)),
@@ -46,7 +47,7 @@ for year, day in ((1994, date(1994, 11, 8)), (1996, date(1996, 11, 5))):
         day,
         range(1, 9),
     )
-ERRATA: set[tuple[int, int]] = {(1988, 4)}
+ERRATA: set[tuple[int, int]] = {(1988, 4), (1952, 1)}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 1
