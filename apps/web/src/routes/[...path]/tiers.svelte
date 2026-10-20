@@ -108,22 +108,33 @@
     ),
   );
   const places = $derived(
-    parts.flatMap((part) => {
-      const code = part.path?.split("/")[1] ?? "";
-      const at = TILES[code];
-      return at == null
-        ? []
-        : [
-            {
-              code,
-              at,
-              place: part.place ?? part.name,
-              path: part.path,
-              id: known.get(part.path ?? "")?.id ?? null,
-              top: known.get(part.path ?? "")?.top ?? null,
-            },
-          ];
-    }),
+    Map.groupBy(
+      parts.flatMap((part) => {
+        const code = part.path?.split("/")[1] ?? "";
+        const at = TILES[code];
+        return at == null
+          ? []
+          : [
+              {
+                code,
+                at,
+                place: part.place ?? part.name,
+                path: part.path,
+                id: known.get(part.path ?? "")?.id ?? null,
+                top: known.get(part.path ?? "")?.top ?? null,
+              },
+            ];
+      }),
+      (place) => place.code,
+    )
+      .values()
+      .map(
+        (group) =>
+          group.find((place) => place.top != null) ??
+          group.find((place) => place.id != null) ??
+          group[0],
+      )
+      .toArray(),
   );
   const isTopped = $derived(places.some((place) => place.top != null));
 
