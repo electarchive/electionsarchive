@@ -29,3 +29,6 @@ vite.config.ts.timestamp-*
 .venv
 __pycache__
 .ruff_cache
+
+# Agent scratch
+.agents/scratch/
