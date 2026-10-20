@@ -17,7 +17,7 @@ PARSED = DATA / "parsed" / SOURCE
 MANUAL = Path.home() / "Downloads"
 BASE = "https://sos.iowa.gov/elections/pdf/{year}/primary/canvsummary.pdf"
 FILES = {2020: (date(2020, 6, 2), "ia_2020_pri_canvsummary.pdf"), 2022: (date(2022, 6, 7), "ia_2022_pri_canvsummary.pdf")}
-PARTIES = {"Rep.": "republican", "Dem.": "democratic", "Lib.": "libertarian", "Grn.": "green"}
+PARTIES = {"Rep.": "republican", "Dem.": "democratic", "Republican": "republican", "Democratic": "democratic"}
 PUBLISHER = "Iowa Secretary of State"
 TITLE = "Primary election canvass summary"
 TITLE_LINE = re.compile(r"^\s+(United States Senator|United States Representative District (\d+)) - (\S+)\s*$")
@@ -64,7 +64,7 @@ def parse() -> None:
         names: list[str] = []
         county = None
         for i, line in enumerate(lines):
-            if "CANVASS SUMMARY" in line:
+            if line.strip().startswith(("2022 Primary", "Primary Election")):
                 contest = None
                 continue
             found = TITLE_LINE.match(line)
@@ -86,7 +86,7 @@ def parse() -> None:
                 continue
             if contest is None:
                 continue
-            found_county = re.match(r"^\s?(\S.*?)\s+Election Day", line)
+            found_county = re.match(r"^\s?(\S.*?)\s+(?:Election Day|Absentee)", line)
             if found_county:
                 county = found_county[1]
                 continue
@@ -95,6 +95,7 @@ def parse() -> None:
                 continue
             values = [int(v.replace(",", "")) for v in row[2].split()]
             key = re.sub(r"[^a-z]", "", county.lower())
+            county = None
             if len(values) != len(names) + 4 or key not in fips:
                 continue
             for candidate, votes in zip([*names, "WRITE-INS"], values[: len(names) + 1], strict=True):
