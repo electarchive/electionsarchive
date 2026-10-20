@@ -16,6 +16,7 @@ STATE = None
 FIPS = None
 ITEMS = {
     1864: ("tribunealmanacpo00otta", 1865, date(1864, 11, 8), (53,)),
+    1866: ("bub_gb_53IwAAAAIAAJ", 1867, date(1866, 11, 6), (51,)),
     1868: ("tribunealmanacpo1869newy", 1869, date(1868, 11, 3), (62,)),
 }
 VOLUMES = {
