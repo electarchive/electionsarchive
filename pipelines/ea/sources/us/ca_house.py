@@ -6,7 +6,7 @@ from ea.sources.us import house_books
 
 SOURCE = "us.ca_house"
 RAW = "us.ca_sov"
-VERSION = "2"
+VERSION = "3"
 PUBLISHER = "California Secretary of State"
 TITLE = "Statement of Vote, General Election, {day:%B %-d, %Y}"
 LICENSE = "Public record"
@@ -26,6 +26,13 @@ VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
     for year, (item, day, pages) in ITEMS.items()
 }
+for year, day in ((1994, date(1994, 11, 8)),):
+    VOLUMES[year] = (
+        f"https://elections.cdn.sos.ca.gov/sov/{year}-general/us-representative.pdf",
+        f"https://elections.cdn.sos.ca.gov/sov/{year}-general/",
+        day,
+        range(1, 9),
+    )
 ERRATA: set[tuple[int, int]] = {(1988, 4)}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
