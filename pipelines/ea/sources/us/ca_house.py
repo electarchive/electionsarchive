@@ -14,6 +14,8 @@ SUMMARY = "California's House results by county from the Secretary of State's St
 STATE = "CA"
 FIPS = "06"
 ITEMS = {
+    1970: ("statementofvote197072cali", date(1970, 11, 3), range(68, 72)),
+    1974: ("statementofvote197374cali", date(1974, 11, 5), range(113, 117)),
     1976: ("statementofvote1976cali", date(1976, 11, 2), range(80, 85)),
     1978: ("statementofvote197879cali", date(1978, 11, 7), range(259, 266)),
     1980: ("statementofvote41980cali", date(1980, 11, 4), range(23, 29)),
