@@ -2272,6 +2272,8 @@ def parse() -> None:
         + "|".join(OFFICES)
     )
     il: list[tuple[date, str, str | None, str, str, str, int, str | None]] = []
+    il_federal_title = re.compile(r"(\d+)(?:ST|ND|RD|TH) CONGRESS|UNITED STATES SENATOR|PRESIDENT")
+    il_federal: list[tuple[date, str, int | None, str, str, str, int]] = []
     for year, (county, total) in IL_FILES.items():
         books = []
         for token in (county, total):
@@ -2283,6 +2285,30 @@ def parse() -> None:
             )
         sums: dict[tuple[str, str], int] = {}
         for row in books[0]:
+            if (federal := il_federal_title.fullmatch(row["OfficeName"])) is not None:
+                sums[(row["OfficeName"], row["CandidateID"])] = sums.get(
+                    (row["OfficeName"], row["CandidateID"]), 0
+                ) + int(row["Votes"])
+                il_federal.append(
+                    (
+                        IL_DAYS[year],
+                        "congress" if federal[1] else "us-senate" if "SENATOR" in row["OfficeName"] else "president",
+                        int(federal[1]) if federal[1] else None,
+                        row["PartyAbbrev"],
+                        counties[("17", re.sub(r"[^a-z]", "", row["County"].lower()))],
+                        re.sub(
+                            r"\b(Ii|Iii|Iv)\b",
+                            lambda numeral: numeral[1].upper(),
+                            re.sub(
+                                r"\bMc([a-z])",
+                                lambda prefix: "Mc" + prefix[1].upper(),
+                                re.sub(r"\s+", " ", f"{row['CanFirstName']} {row['CanLastName']}").strip().title(),
+                            ),
+                        ),
+                        int(row["Votes"]),
+                    )
+                )
+                continue
             if (found := illinois.fullmatch(row["OfficeName"])) is None:
                 continue
             sums[(row["OfficeName"], row["CandidateID"])] = sums.get((row["OfficeName"], row["CandidateID"]), 0) + int(
@@ -2317,7 +2343,7 @@ def parse() -> None:
         if sums != {
             (row["OfficeName"], row["CandidateID"]): int(row["Votes"])
             for row in books[1]
-            if illinois.fullmatch(row["OfficeName"])
+            if illinois.fullmatch(row["OfficeName"]) or il_federal_title.fullmatch(row["OfficeName"])
         }:
             raise ValueError(f"{year} Illinois: the county rows do not match the statewide totals")
     frames.append(
@@ -2984,7 +3010,19 @@ def parse() -> None:
                     kind=pl.lit("county"),
                     source=pl.lit(state),
                 )
-                for state, federal in (("PA", pa_federal), ("FL", fl_federal), ("IA", ia_upper_frame))
+                for state, federal in (
+                    ("PA", pa_federal),
+                    ("FL", fl_federal),
+                    ("IA", ia_upper_frame),
+                    (
+                        "IL",
+                        pl.DataFrame(
+                            il_federal,
+                            schema=["day", "office", "code", "party", "fips", "choice", "votes"],
+                            orient="row",
+                        ),
+                    ),
+                )
             ),
         ]
     )
@@ -4096,7 +4134,7 @@ def emit() -> Path:
             sources,
         )
         medsl.attach(cs, conn, city, sources, grain="precinct")
-        for state in ("PA", "MA", "FL", "IA"):
+        for state in ("PA", "MA", "FL", "IA", "IL"):
             held = [
                 value
                 for (value,) in conn.execute(
