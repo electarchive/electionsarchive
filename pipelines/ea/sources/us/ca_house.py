@@ -22,6 +22,10 @@ ITEMS = {
     1918: ("statementofvo19081922cali", date(1918, 11, 5), range(277, 281)),
     1920: ("statementofvo19081922cali", date(1920, 11, 2), range(323, 327)),
     1922: ("statementofvo19081922cali", date(1922, 11, 7), range(427, 430)),
+    1924: ("statementofvote192430cali", date(1924, 11, 4), range(108, 110)),
+    1926: ("statementofvote192430cali", date(1926, 11, 2), range(217, 221)),
+    1928: ("statementofvote192430cali", date(1928, 11, 6), range(381, 383)),
+    1930: ("statementofvote192430cali", date(1930, 11, 4), range(458, 461)),
     1932: ("statementofvo19321939cali", date(1932, 11, 8), range(147, 150)),
     1934: ("statementofvo19321939cali", date(1934, 11, 6), range(264, 270)),
     1936: ("statementofvo19321939cali", date(1936, 11, 3), range(419, 422)),
@@ -65,14 +69,14 @@ for year, day in ((1994, date(1994, 11, 8)), (1996, date(1996, 11, 5))):
         day,
         range(1, 9),
     )
-ERRATA: set[tuple[int, int]] = {(1988, 4), (1952, 1), (1918, 8)}
+ERRATA: set[tuple[int, int]] = {(1988, 4), (1952, 1), (1918, 8), (1928, 7)}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 REVISION = 1
 RENAMED: str | None = None
 COMMAS = True
 TURNED: set[tuple[int, int]] = {(1976, page) for page in range(80, 85)}
-TRANSPOSED = {1908, 1910, 1912, 1914, 1916, 1918, 1920, 1922, 1932, 1934, 1936, 1938, 1940, 1942, 1944, 1946, 1948, 1950, 1960, 1958, 1956, 1954, 1952}
+TRANSPOSED = {1908, 1910, 1924, 1926, 1928, 1930, 1912, 1914, 1916, 1918, 1920, 1922, 1932, 1934, 1936, 1938, 1940, 1942, 1944, 1946, 1948, 1950, 1960, 1958, 1956, 1954, 1952}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
