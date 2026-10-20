@@ -12,19 +12,20 @@ from ea.sources.us import medsl, tx_elchist
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_house"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = tx_elchist.PUBLISHER
 TITLE = "Texas election history: U.S. House primaries and runoffs by county, 2000–2014"
+PAGE = re.compile(r"^(?:U\. ?S\. Representative District (\d+)|(President/Vice-President))$")
 PARTIES = {"DEM": "democratic", "REP": "republican"}
 
 
-def pages() -> list[tuple[int, int, int]]:
+def pages() -> list[tuple[int, int, int | None]]:
     return [
-        (election, race, int(found[1]))
+        (election, race, int(found[1]) if found[1] else None)
         for election in tx_elchist.PRIMARIES
         for race, title in tx_elchist.races(election)
-        if (found := tx_elchist.HOUSE.match(title))
+        if (found := PAGE.match(title))
     ]
 
 
@@ -48,7 +49,7 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '48%%'"""
             ).fetchall()
         }
-    rows: list[tuple[date, str, int, str, str, int]] = []
+    rows: list[tuple[date, str, int | None, str, str, int]] = []
     for election, race, district in pages():
         text = raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm").path.read_text(errors="replace")
         stamp = re.search(r"<H3[^>]*>(\d+)/(\d+)/(\d{4})</H3>", text, re.IGNORECASE)
@@ -60,7 +61,7 @@ def parse() -> None:
         day = date(int(stamp[3]), int(stamp[1]), int(stamp[2]))
         width = headers[-1].index("Votes")
         counties = [row for row in data if row[0] != "ALL COUNTIES"]
-        total = next((row for row in data if row[0] == "ALL COUNTIES"), None)
+        total = next((row for row in data if row[0] == "ALL COUNTIES"), counties[0] if len(counties) == 1 else None)
         if total is None:
             continue
         for column in range(1, width):
@@ -74,7 +75,14 @@ def parse() -> None:
             if sum(votes) != int(total[column].replace(",", "")):
                 raise ValueError(f"{election} {race} {candidate}: counties sum to {sum(votes)}, not {total[column]}")
             rows.extend(
-                (day, f"house:{party}", district, candidate.upper(), fips[re.sub(r"[^a-z]", "", row[0].lower())], value)
+                (
+                    day,
+                    f"{'house' if district else 'president'}:{party}",
+                    district,
+                    candidate.upper(),
+                    fips[re.sub(r"[^a-z]", "", row[0].lower())],
+                    value,
+                )
                 for row, value in zip(counties, votes, strict=True)
             )
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -110,7 +118,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas's 2000–2014 U.S. House primaries and runoffs by county",
+            summary="Texas's 2000–2014 U.S. House and presidential primaries and runoffs by county",
             polity="US-TX",
         )
         source = cs.source(PUBLISHER, TITLE)
