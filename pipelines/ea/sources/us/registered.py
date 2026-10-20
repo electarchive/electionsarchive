@@ -71,31 +71,32 @@ def parse() -> None:
         .drop("total", "largest")
     )
     colorado = []
-    for year in elstats_leg_counties.YEARS["CO"]:
+    for year in range(1980, 2003, 2):
         url = elstats_leg_counties.search("CO", year)
-        table = pl.read_csv(raw.cached(elstats_leg_counties.SOURCE, url).path, infer_schema=False)
+        table = pl.read_csv(raw.fetch(elstats_leg_counties.SOURCE, url, suffix=".csv").path, infer_schema=False)
         if "candidate_name" not in table.columns:
             continue
+        counties = table.filter(
+            pl.col("division_type") == "County", pl.col("office_name").str.contains(elstats_leg_counties.OFFICE)
+        ).select(
+            state=pl.lit("CO"),
+            day=pl.col("election_date").str.slice(0, 10).str.to_date(),
+            kind=pl.col("election_type").str.to_lowercase(),
+            county=pl.col("division_name"),
+            chamber=pl.col("office_name").str.to_lowercase().str.contains("senat"),
+            name=pl.col("candidate_name").str.to_lowercase(),
+            value=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
+            url=pl.lit(url),
+            source=pl.lit(elstats_leg_counties.SOURCE),
+        )
         colorado.append(
-            table.filter(
-                pl.col("candidate_name").str.to_lowercase() == "registered voters",
-                pl.col("division_type") == "County",
-                pl.col("office_name").str.contains(elstats_leg_counties.OFFICE),
+            counties.group_by("state", "day", "kind", "county", "chamber", "url", "source")
+            .agg(
+                pl.col("value").filter(pl.col("name") == "registered voters").sum().alias("registered"),
+                pl.col("value").filter(pl.col("name") == "total ballots cast").sum().alias("ballots"),
             )
-            .select(
-                state=pl.lit("CO"),
-                day=pl.col("election_date").str.slice(0, 10).str.to_date(),
-                kind=pl.col("election_type").str.to_lowercase(),
-                county=pl.col("division_name"),
-                office=pl.col("office_name").str.to_lowercase().str.contains("senat"),
-                registered=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64),
-                url=pl.lit(url),
-                source=pl.lit(elstats_leg_counties.SOURCE),
-            )
-            .group_by("state", "day", "kind", "county", "office", "url", "source")
-            .agg(pl.col("registered").sum())
             .group_by("state", "day", "kind", "county", "url", "source")
-            .agg(pl.col("registered").max())
+            .agg(pl.col("registered").max(), pl.col("ballots").max())
             .filter(pl.col("registered") > 0)
             .with_columns(precincts=pl.lit(None, pl.UInt32))
         )
@@ -132,6 +133,7 @@ def emit() -> Path:
         ).fetchall():
             counties.setdefault(iso.removeprefix("US-"), {}).setdefault(elstats.plain(text), code)
         sources = {}
+        artifacts = set()
         for (state, day, kind), rows in frame.group_by("state", "day", "kind", maintain_order=True):
             key = f"{day}:{state}" if kind == "general" else f"{day}:{state}:{kind}"
             if key not in elections:
@@ -141,12 +143,15 @@ def emit() -> Path:
                 continue
             names = counties.get(state, {})
             values = {}
-            for county, registered in rows.select("county", "registered").iter_rows():
+            ballots = {}
+            for county, registered, cast in rows.select("county", "registered", "ballots" if "ballots" in rows.columns else pl.lit(None).alias("ballots")).iter_rows():
                 code = names.get(re.sub(r"(county|parish)$", "", elstats.plain(county)))
                 if code is None:
                     print(f"{key}: {county!r} has no county unit")
                     continue
                 values[code] = max(values.get(code, 0), registered)
+                if kind == "general" and cast:
+                    ballots[code] = max(ballots.get(code, 0), cast)
             if kind == "general":
                 survey = {
                     code: registered
@@ -178,7 +183,9 @@ def emit() -> Path:
                 if sources[state] in cs.minted:
                     cs.add("source", id=sources[state], kind=kind, publisher=publisher, title=title, url=link, license=license)
             for source, url in rows.select("source", "url").unique().iter_rows():
-                cs.artifact(raw.cached(source, url), sources[state])
+                if (state, url) not in artifacts:
+                    artifacts.add((state, url))
+                    cs.artifact(raw.cached(source, url), sources[state])
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
             cs.add(
                 "result_set",
@@ -193,15 +200,17 @@ def emit() -> Path:
                 completeness=round(len(values) / len(set(names.values())), 4),
             )
             for code, registered in values.items():
-                cs.add(
-                    "result_value",
-                    result_set_id=result_set,
-                    unit_id=cs.unit("us.county", code),
-                    option_id=None,
-                    channel=0,
-                    measure=2,
-                    count_round=0,
-                    flags=0,
-                    value=registered,
-                )
+                for measure, value in ((2, registered), (3, ballots.get(code))):
+                    if value and not (measure == 3 and value > registered):
+                        cs.add(
+                            "result_value",
+                            result_set_id=result_set,
+                            unit_id=cs.unit("us.county", code),
+                            option_id=None,
+                            channel=0,
+                            measure=measure,
+                            count_round=0,
+                            flags=0,
+                            value=value,
+                        )
         return cs.write()
