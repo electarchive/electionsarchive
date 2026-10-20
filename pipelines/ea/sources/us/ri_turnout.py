@@ -229,6 +229,17 @@ def parse() -> None:
             print(f"history {year}: towns {eligible}/{cast} state {state} {'ok' if ok else 'mismatch'}")
             if ok and day not in elections:
                 elections[day] = {t: (municipal[t]["eligible"][index], municipal[t]["turnout"][index]) for t in municipal}
+    lines = text_of(2000)
+    start = next(i for i, line in enumerate(lines) if re.match(r"(?i)\s*STATEWIDE ELIGIBILITY & VOTER TURNOUT", line))
+    history = {}
+    for line in lines[start : start + 12]:
+        match = re.match(r"\s*(ELIGIBLE|TURNOUT)\s+((?:[\d,]{6,}\s+){9}[\d,]{6,})\s*$", line)
+        if match:
+            history[match[1]] = [number(v) for v in match[2].split()]
+    for index, year in enumerate((1982, 1984)):
+        day = next((d for d, kind in days.items() if d.year == year and kind == "general"), None)
+        if day is not None:
+            state_rows.append({"date": day, "registered": history["ELIGIBLE"][index], "voters": history["TURNOUT"][index]})
     rows = []
     for day, towns in elections.items():
         for code in COUNTIES:

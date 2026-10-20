@@ -45,6 +45,7 @@ ELECTIONS = {
     (2022, "general"): 62,
     (2024, "primary"): 65,
     (2024, "general"): 66,
+    (2026, "primary"): 69,
 }
 HEADERS = {"User-Agent": "Mozilla/5.0"}
 
@@ -119,7 +120,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Illinois's registered voters and ballots cast by county for the general primaries and general elections of 1998–2024, "
+            summary="Illinois's registered voters and ballots cast by county for the general primaries and general elections of 1998–2026, "
             "from the State Board of Elections' voter turnout tables",
             polity="US",
         )
@@ -138,6 +139,12 @@ def emit() -> Path:
         }
         title = "Voter Turnout"
         source = cs.source(PUBLISHER, title)
+        published = {
+            election_id
+            for (election_id,) in conn.execute(
+                "select election_id from result_set where contest_id is null and source_id = %s and status <> 'withdrawn'", (source,)
+            )
+        }
         if source in cs.minted:
             cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=PAGE, license="Public record")
         for (year, stage), rows in frame.group_by("year", "stage", maintain_order=True):
@@ -146,6 +153,8 @@ def emit() -> Path:
                 print(f"{year} {stage}: {len(found)} elections")
                 continue
             value_key, election_id = found[0]
+            if election_id in published:
+                continue
             cs.artifact(raw.cached(SOURCE, key(ELECTIONS[(year, stage)])), source)
             result_set = cs.key(f"{SOURCE}.result_set", f"{value_key}:county")
             cs.add(
