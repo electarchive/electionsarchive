@@ -51,6 +51,15 @@ def ct_regions() -> dict[str, str]:
     }
 
 
+def ct_cousub_regions() -> dict[str, str]:
+    text = raw.cached(SOURCE, CROSSWALK).path.read_text(encoding="utf-8-sig")
+    return {
+        row[6]: f"09{row[3]}"
+        for row in csv.reader(io.StringIO(text), delimiter="|")
+        if len(row) > 6 and row[3].isdigit()
+    }
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, REGIONS, suffix=".zip")
     raw.fetch(SOURCE, NOTICE, suffix=".pdf")
@@ -199,7 +208,6 @@ def emit() -> Path:
                 valid_to=ended,
             )
             cs.add("name", entity_id=unit, text=label, lang="en", kind="official", is_preferred=True)
-
 
         region_of = ct_regions()
         unmatched: list[str] = []

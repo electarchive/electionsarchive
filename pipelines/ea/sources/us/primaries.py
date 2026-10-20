@@ -22,6 +22,7 @@ from PIL import Image
 from ea import raw, scan
 from ea.changeset import Changeset, slug
 from ea.sources.us import elstats, ncsbe, openelections, wa_local
+from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.primaries"
@@ -2626,7 +2627,11 @@ def parse() -> None:
                 .str.replace(r"limited$", "")
                 .replace_strict(
                     {
-                        **{town: county for (known, town), county in towns.items() if known == state},
+                        **(
+                            ct_regions()
+                            if state == "CT"
+                            else {town: county for (known, town), county in towns.items() if known == state}
+                        ),
                         **dict.fromkeys(("federalprecinct", "federalprecincts", "congressionaldistrict"), "44"),
                     },
                     default=None,
@@ -2767,6 +2772,8 @@ def parse() -> None:
         )
     for state in ELECTIONSTATS:
         places[state].update(TYPOS.get(state, {}))
+        if state == "CT":
+            places[state] = ct_regions()
         url = search(state)
         frame = pl.read_csv(raw.cached(SOURCE, url).path, infer_schema=False, truncate_ragged_lines=True)
         office = pl.col("office_name").str.to_lowercase().str.strip_chars()

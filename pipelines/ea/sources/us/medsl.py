@@ -9,6 +9,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, Connection, connect
 
 SOURCE = "us.medsl"
@@ -202,19 +203,32 @@ def parse() -> None:
 
     frame = precincts({key: raw.cached(SOURCE, DATAVERSE + file).path for key, (file, _) in PRECINCTS.items()})
     frame.write_parquet(PARSED / "precincts.parquet")
-    frame = frame.group_by(
-        "year",
-        "chamber",
-        "day",
-        "special",
-        "state",
-        "district",
-        "kind",
-        "code",
-        "candidate",
-        "measure",
-        maintain_order=True,
-    ).agg(pl.col("writein").any(), pl.col("votes").sum())
+    frame = (
+        frame.with_columns(
+            code=pl.when((pl.col("state") == "CT") & (pl.col("year") >= 2022) & (pl.col("kind") == "county"))
+            .then(
+                pl.col("jurisdiction")
+                .str.to_lowercase()
+                .str.replace_all(r"[^a-z]", "")
+                .replace_strict(ct_regions(), default=None)
+            )
+            .otherwise("code")
+        )
+        .group_by(
+            "year",
+            "chamber",
+            "day",
+            "special",
+            "state",
+            "district",
+            "kind",
+            "code",
+            "candidate",
+            "measure",
+            maintain_order=True,
+        )
+        .agg(pl.col("writein").any(), pl.col("votes").sum())
+    )
     print(frame.filter(pl.col("kind") == "aggregate").group_by("code").agg(pl.col("votes").sum()).sort("code"))
     if frame["code"].null_count():
         raise ValueError(f"{frame['code'].null_count()} rows have no unit")
@@ -875,7 +889,13 @@ def attach(
         unmatched.extend(missing)
         result_set = cs.key(f"{tag}.result_set", f"{key}:{grain}")
         previous = None
-        if key in redone:
+        if key in redone or (
+            state == "CT"
+            and year >= 2022
+            and conn.execute(
+                "select 1 from external_id where scheme = %s and value = %s", [f"{tag}.result_set", f"{key}:{grain}"]
+            ).fetchone()
+        ):
             previous, result_set = result_set, cs.key(f"{tag}.result_set", f"{key}:{grain}:2")
         if result_set not in cs.minted:
             continue

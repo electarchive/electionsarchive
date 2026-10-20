@@ -7,6 +7,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.us.county_changes import ct_cousub_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.eavs"
@@ -69,7 +70,9 @@ def early_files(year: int) -> dict[str, bytes]:
         path = raw.cached(SOURCE, url).path
         if url.endswith(".zip"):
             with zipfile.ZipFile(path) as archive:
-                files |= {name: archive.read(name) for name in archive.namelist() if name.lower().endswith((".xls", ".xlsx"))}
+                files |= {
+                    name: archive.read(name) for name in archive.namelist() if name.lower().endswith((".xls", ".xlsx"))
+                }
         else:
             files[url] = path.read_bytes()
     return files
@@ -88,9 +91,13 @@ def read_early(year: int) -> pl.DataFrame:
     if year == 2004:
         parts = []
         for data in files.values():
-            registered = sheet(data, sheet_name="Registration", has_header=False).slice(6).filter(
-                pl.col("column_2").str.strip_chars().str.starts_with(pl.col("column_0").str.strip_chars())
-                & pl.col("column_2").str.strip_chars().str.contains(r"^\d{5}(\d{5})?$")
+            registered = (
+                sheet(data, sheet_name="Registration", has_header=False)
+                .slice(6)
+                .filter(
+                    pl.col("column_2").str.strip_chars().str.starts_with(pl.col("column_0").str.strip_chars())
+                    & pl.col("column_2").str.strip_chars().str.contains(r"^\d{5}(\d{5})?$")
+                )
             )
             ballots = sheet(data, sheet_name="Ballots Counted", has_header=False).slice(6)
             parts.append(
@@ -119,15 +126,28 @@ def read_early(year: int) -> pl.DataFrame:
             .join(voters.select(code=pl.col("JurisID"), voters=number("F1a")), on="code", how="left")
             .filter(pl.col("code").str.len_chars() == 10)
         )
-    registered = sheet(next(data for name, data in files.items() if name.startswith("https") or name.endswith("Section_A.xlsx")))
-    voters = sheet(next(data for name, data in files.items() if name.endswith(("Section F.xlsx", "Section F.xls", "Section_F.xlsx"))))
-    return registered.select(
-        state=pl.col("State"), code=pl.col("FIPSCode"), jurisdiction=pl.col("Jurisdiction"), registered=number("QA1a")
-    ).join(
-        voters.select(code=pl.col("FIPSCode"), jurisdiction=pl.col("Jurisdiction"), voters=number("QF1a")),
-        on=["code", "jurisdiction"],
-        how="left",
-    ).drop("jurisdiction")
+    registered = sheet(
+        next(data for name, data in files.items() if name.startswith("https") or name.endswith("Section_A.xlsx"))
+    )
+    voters = sheet(
+        next(
+            data for name, data in files.items() if name.endswith(("Section F.xlsx", "Section F.xls", "Section_F.xlsx"))
+        )
+    )
+    return (
+        registered.select(
+            state=pl.col("State"),
+            code=pl.col("FIPSCode"),
+            jurisdiction=pl.col("Jurisdiction"),
+            registered=number("QA1a"),
+        )
+        .join(
+            voters.select(code=pl.col("FIPSCode"), jurisdiction=pl.col("Jurisdiction"), voters=number("QF1a")),
+            on=["code", "jurisdiction"],
+            how="left",
+        )
+        .drop("jurisdiction")
+    )
 
 
 def fetch() -> None:
@@ -139,6 +159,7 @@ def fetch() -> None:
 
 
 def parse() -> None:
+    regions = ct_cousub_regions()
     frames = []
     for year in FILES:
         frame = read(year)
@@ -147,7 +168,9 @@ def parse() -> None:
             frame.select(
                 year=pl.lit(year),
                 state=pl.col(state),
-                code=pl.col("FIPSCode").str.zfill(10).str.slice(0, 5),
+                code=pl.when((pl.col(state) == "CT") & (year >= 2022))
+                .then(pl.col("FIPSCode").str.zfill(10).replace_strict(regions, default=None))
+                .otherwise(pl.col("FIPSCode").str.zfill(10).str.slice(0, 5)),
                 registered=pl.col("A1a").str.extract(r"^(-?\d+)").cast(pl.Int64, strict=False),
                 voters=pl.col("F1a").str.extract(r"^(-?\d+)").cast(pl.Int64, strict=False),
             )
@@ -208,10 +231,19 @@ def emit() -> Path:
             "from the Election Assistance Commission's Election Administration and Voting Survey",
             polity="US",
         )
-        elections = {key: id for key, id in conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()}
-        counties = {code for (code,) in conn.execute("select code from reporting_unit where scheme_code = 'us.county'").fetchall()}
+        elections = {
+            key: id
+            for key, id in conn.execute(
+                "select value, entity_id from external_id where scheme = 'us.election'"
+            ).fetchall()
+        }
+        counties = {
+            code
+            for (code,) in conn.execute("select code from reporting_unit where scheme_code = 'us.county'").fetchall()
+        }
         sources = {}
-        for year, (_, urls) in EARLY.items():
+        emitted = EARLY | {2022: (FILES[2022][1], [FILES[2022][0]])}
+        for year, (_, urls) in emitted.items():
             sources[year] = cs.source(PUBLISHER, title(year))
             if sources[year] in cs.minted:
                 cs.add(
@@ -225,8 +257,10 @@ def emit() -> Path:
                 )
             for url in urls:
                 cs.artifact(raw.cached(SOURCE, url), sources[year])
-        for (year, state), rows in frame.filter(pl.col("year") < 2016).group_by("year", "state", maintain_order=True):
-            day = EARLY[year][0]
+        for (year, state), rows in frame.filter(
+            (pl.col("year") < 2016) | ((pl.col("year") == 2022) & (pl.col("state") == "CT"))
+        ).group_by("year", "state", maintain_order=True):
+            day = emitted[year][0]
             key = f"{day}:{state}"
             if key not in elections:
                 print(f"{key}: no election")
@@ -241,10 +275,27 @@ def emit() -> Path:
             ]
             lost = rows.height - len(values)
             if lost:
-                print(f"{key}: {lost} jurisdictions without a county unit, numbers, or with more voters than registered")
+                print(
+                    f"{key}: {lost} jurisdictions without a county unit, numbers, or with more voters than registered"
+                )
             if not values:
                 continue
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
+            previous = None
+            if year == 2022:
+                previous, result_set = result_set, cs.key(f"{SOURCE}.result_set", f"{key}:regions")
+                cs.add(
+                    "result_set",
+                    id=previous,
+                    election_id=elections[key],
+                    contest_id=None,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=sources[year],
+                    is_default=False,
+                    completeness=1,
+                )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -256,6 +307,7 @@ def emit() -> Path:
                 source_id=sources[year],
                 is_default=True,
                 completeness=round(len(values) / rows.height, 4),
+                supersedes_id=previous,
             )
             for code, registered, voters in values:
                 for measure, value in ((2, registered), (14, voters)):

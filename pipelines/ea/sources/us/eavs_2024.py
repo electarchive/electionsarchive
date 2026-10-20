@@ -7,6 +7,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
+from ea.sources.us.county_changes import ct_cousub_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.eavs_2024"
@@ -26,10 +27,13 @@ def parse() -> None:
     with zipfile.ZipFile(raw.cached(SOURCE, URL).path) as archive:
         data = archive.read(next(name for name in archive.namelist() if name.lower().endswith(".csv")))
     frame = pl.read_csv(io.BytesIO(data), infer_schema=False, encoding="utf8-lossy")
+    regions = ct_cousub_regions()
     parsed = (
         frame.select(
             state=pl.col("State_Abbr"),
-            code=pl.col("FIPSCode").str.zfill(10).str.slice(0, 5),
+            code=pl.when(pl.col("State_Abbr") == "CT")
+            .then(pl.col("FIPSCode").str.zfill(10).replace_strict(regions, default=None))
+            .otherwise(pl.col("FIPSCode").str.zfill(10).str.slice(0, 5)),
             registered=pl.col("A1a").str.extract(r"^(-?\d+)").cast(pl.Int64, strict=False),
             voters=pl.col("F1a").str.extract(r"^(-?\d+)").cast(pl.Int64, strict=False),
         )
@@ -66,8 +70,13 @@ def emit() -> Path:
             "from the Election Assistance Commission's Election Administration and Voting Survey",
             polity="US",
         )
-        elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
-        counties = {code for (code,) in conn.execute("select code from reporting_unit where scheme_code = 'us.county'").fetchall()}
+        elections = dict(
+            conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
+        )
+        counties = {
+            code
+            for (code,) in conn.execute("select code from reporting_unit where scheme_code = 'us.county'").fetchall()
+        }
         held = {
             election_id
             for (election_id,) in conn.execute(
@@ -104,6 +113,21 @@ def emit() -> Path:
             if not values:
                 continue
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
+            previous = None
+            if state == "CT":
+                previous, result_set = result_set, cs.key(f"{SOURCE}.result_set", f"{key}:regions")
+                cs.add(
+                    "result_set",
+                    id=previous,
+                    election_id=elections[key],
+                    contest_id=None,
+                    stage="certified",
+                    kind="counted",
+                    status="superseded",
+                    source_id=source,
+                    is_default=False,
+                    completeness=1,
+                )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -113,8 +137,9 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=source,
-                is_default=elections[key] not in held,
+                is_default=elections[key] not in held or state == "CT",
                 completeness=round(len(values) / rows.height, 4),
+                supersedes_id=previous,
             )
             for code, registered, voters in values:
                 for measure, value in ((2, registered), (14, voters)):

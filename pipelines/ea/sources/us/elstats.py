@@ -13,6 +13,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us import medsl
+from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
@@ -139,6 +140,7 @@ def parse() -> None:
     for (state, name), code in FORMER.items():
         counties.setdefault(state, {})[name] = code
         towns.setdefault(state, {})[name] = code
+    regions = ct_regions()
     frames = []
     for state, (tenant, _, _) in TENANTS.items():
         for year in range(EARLY.get(state, FIRST), PRIMARIES + 1):
@@ -207,7 +209,11 @@ def parse() -> None:
                             ),
                         )
                     ),
-                    code=pl.when(pl.col("division_type").replace_strict(DIVISIONS) == "county")
+                    code=pl.when(
+                        (pl.lit(state) == "CT") & (pl.col("election_date").str.slice(0, 4).cast(pl.Int32) >= 2022)
+                    )
+                    .then(division.map_elements(plain, return_dtype=pl.String).replace_strict(regions, default=None))
+                    .when(pl.col("division_type").replace_strict(DIVISIONS) == "county")
                     .then(
                         division.str.to_lowercase()
                         .str.replace_all(r"saint ", "st ")
