@@ -230,6 +230,18 @@ def parse(source: ModuleType) -> None:
                         if box is None and names:
                             box = tuple(names[0])
                             how = "placed"
+                        if box is None and heads_:
+                            box = tuple(heads_[0])
+                            how = "placed"
+                        if box is None and tokens:
+                            box = tuple(min(tokens, key=lambda token: token[1][1])[1])
+                            how = "placed"
+                        if box is None and heads_:
+                            box = tuple(heads_[0])
+                            how = "placed"
+                        if box is None and tokens:
+                            box = tuple(min(tokens, key=lambda token: token[1][1])[1])
+                            how = "placed"
                         rows.append(
                             {
                                 "year": year,
