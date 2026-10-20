@@ -27,6 +27,7 @@ from ea.sources.us.elstats import (
     TITLE,
     plain,
 )
+from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.statewide"
@@ -327,6 +328,12 @@ def parse() -> None:
         pl.concat(frames)
         .filter(pl.col("votes").is_not_null())
         .filter(pl.col("votes").filter(pl.col("candidate") != "Unknown Candidate").sum().over("contest") > 0)
+    )
+    regions = ct_regions()
+    frame = frame.with_columns(
+        code=pl.when((pl.col("state") == "CT") & (pl.col("year") >= 2022))
+        .then(pl.col("division").str.slice(3).map_elements(plain, return_dtype=pl.String).replace_strict(regions, default=None))
+        .otherwise("code")
     )
     lost = frame.filter(pl.col("code").is_null())
     if lost.height:
@@ -764,7 +771,8 @@ def emit() -> Path:
             )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             previous = None
-            if folded and result_set not in cs.minted:
+            regioned = state == "CT" and year >= 2022
+            if (folded or regioned) and result_set not in cs.minted:
                 previous = result_set
                 cs.add(
                     "result_set",
@@ -778,11 +786,13 @@ def emit() -> Path:
                     is_default=False,
                     completeness=None,
                 )
+                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:{'regions' if regioned else 'folded'}")
                 for option, outcome, count in conn.execute(
                     "select option_id, kind, seats from outcome where result_set_id = %s", [previous]
                 ).fetchall():
                     cs.add("outcome", result_set_id=previous, option_id=option, kind=outcome, seats=count)
-                result_set = cs.key(f"{SOURCE}.result_set", f"{contest_key}:folded")
+                    if regioned:
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome, seats=count)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -792,7 +802,7 @@ def emit() -> Path:
                 kind="counted",
                 status="active",
                 source_id=sources[state],
-                is_default=kept.get(previous or result_set, not reused),
+                is_default=True if regioned else kept.get(previous or result_set, not reused),
                 supersedes_id=previous,
                 completeness=None,
             )

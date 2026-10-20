@@ -42,6 +42,15 @@ FORMER = {
 }
 
 
+def ct_regions() -> dict[str, str]:
+    text = raw.cached(SOURCE, CROSSWALK).path.read_text(encoding="utf-8-sig")
+    return {
+        re.sub(r"[^a-z]", "", re.sub(r" town$", "", row[8].lower())): f"09{row[3]}"
+        for row in csv.reader(io.StringIO(text), delimiter="|")
+        if len(row) > 8 and row[3].isdigit()
+    }
+
+
 def fetch() -> None:
     raw.fetch(SOURCE, REGIONS, suffix=".zip")
     raw.fetch(SOURCE, NOTICE, suffix=".pdf")
@@ -192,11 +201,7 @@ def emit() -> Path:
             cs.add("name", entity_id=unit, text=label, lang="en", kind="official", is_preferred=True)
 
 
-        text = raw.cached(SOURCE, CROSSWALK).path.read_text(encoding="utf-8-sig")
-        region_of: dict[str, str] = {}
-        for row in csv.reader(io.StringIO(text), delimiter="|"):
-            if len(row) > 8 and row[3].isdigit():
-                region_of[re.sub(r"[^a-z]", "", re.sub(r" town$", "", row[8].lower()))] = f"09{row[3]}"
+        region_of = ct_regions()
         unmatched: list[str] = []
         for code, unit in conn.execute(
             """select u.code, u.id from reporting_unit u join polity p on p.id = u.polity_id
