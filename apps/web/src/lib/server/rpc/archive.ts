@@ -2976,7 +2976,8 @@ export const contests = {
              select p.root, r.*
              from picked p cross join lateral (
                select r.option_k as option, r.measure, r.value::float8 as value, r.count_round,
-                 min(r.count_round) over (partition by r.measure) as first
+                 min(r.count_round) over (partition by r.measure) as first,
+                 max(r.count_round) over (partition by r.measure) as last
                from result_rollup r
                where r.result_set_k = p.k and r.area_k = ${area.k}
                  and (r.measure = any(${COUNTED}) and r.option_k <> 0 or r.measure = 2 and r.option_k = 0)
@@ -3002,7 +3003,7 @@ export const contests = {
           and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
                order by cy.option_id = o.id desc, cy.id limit 1
              ) head on true
-             where f.count_round = f.first
+             where f.count_round = f.last
            ),
            grouped as (
              select root, key, min(main) as measure, min(appointed) as appointed, (array_agg(person))[1] as person,
@@ -5317,6 +5318,18 @@ async function races(
       const single =
         head != null && group.length === 1 ? await find(head.id) : null;
       const place = single?.place ?? nation;
+      const final =
+        single == null
+          ? null
+          : ((
+              await db.execute<{ last: number | null }>(sql`
+                select max(r.count_round)::int as last from result_set rs cross join lateral (
+                  select x.count_round from result_rollup x
+                  where x.result_set_k = rs.k and x.area_k = ${place.k}::int and x.measure = any(${COUNTED}) offset 0
+                ) r
+                where rs.contest_id = ${single.id}::uuid and rs.is_default
+              `)
+            ).rows[0]?.last ?? null);
       const districts = group.filter((row) => row.k != null);
       const first = districts[0];
       const grouping =
@@ -5339,7 +5352,14 @@ async function races(
           .map((row) => row.id),
       ];
       const [totals, grid, table, spread] = await Promise.all([
-        load(roots, [place.k], day, counted.length > 0 ? counted : roots),
+        load(
+          roots,
+          [place.k],
+          day,
+          counted.length > 0 ? counted : roots,
+          [],
+          final != null && final > 1 ? final : null,
+        ),
         single == null || isBrief
           ? null
           : places(
@@ -5430,7 +5450,15 @@ async function races(
       ]);
       const here = totals.get(place.k);
       const rows = (
-        here == null ? [] : compare(here.side, null, lineage, "party", grouping)
+        here == null
+          ? []
+          : compare(
+              here.side,
+              null,
+              lineage,
+              "party",
+              single == null || grouping === "alliance" ? grouping : "option",
+            )
       ).flatMap((row) =>
         row.current == null ? [] : [{ ...row, cell: row.current }],
       );
@@ -9204,11 +9232,17 @@ export const people = {
         fetched as (
           select p.root, r.* from picked p cross join lateral (
             select r.option_k as option, r.measure, r.value::float8 as value, r.count_round,
-              min(r.count_round) over (partition by r.measure) as first
+              min(r.count_round) over (partition by r.measure) as first,
+              max(r.count_round) over (partition by r.measure) as last
             from result_rollup r
             where r.result_set_k = p.k and r.area_k = p.area
               and (r.measure = any(${COUNTED}) and r.option_k <> 0 or r.measure = 2 and r.option_k = 0)
           ) r
+        ),
+        rounds as (
+          select f.root, f.measure,
+            case when bool_or(f.count_round = f.last and f.value > 0 and f.option in (select k from lines)) then max(f.last) else min(f.first) end as round
+          from fetched f group by f.root, f.measure
         ),
         mains as (
           select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main,
@@ -9219,7 +9253,8 @@ export const people = {
           select f.root, m.main, m.appointed, sum(f.value) as total,
             coalesce(sum(f.value) filter (where f.option in (select k from lines)), 0) as votes
           from fetched f join mains m on m.root = f.root and m.main = f.measure
-          where f.count_round = f.first and f.option <> 0
+            join rounds d on d.root = f.root and d.measure = f.measure
+          where f.count_round = d.round and f.option <> 0
           group by f.root, m.main, m.appointed
         )
         select p.root, p.date::text as date, p.year, p.kind, t.main::int as measure, t.votes,
