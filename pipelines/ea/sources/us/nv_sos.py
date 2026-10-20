@@ -1,5 +1,6 @@
 import html
 import re
+import subprocess
 import time
 from concurrent.futures import ThreadPoolExecutor
 from datetime import date
@@ -48,6 +49,12 @@ OFFICES = {
     "attorney general": "Attorney General",
 }
 PARTIES = {
+    "D": "DEMOCRATIC",
+    "R": "REPUBLICAN",
+    "L": "LIBERTARIAN",
+    "IA": "INDEPENDENT AMERICAN",
+    "NL": "NATURAL LAW",
+
     "DEM": "DEMOCRATIC",
     "REP": "REPUBLICAN",
     "LIB": "LIBERTARIAN",
@@ -56,6 +63,14 @@ PARTIES = {
     "NAT": "NATURAL LAW",
     "CON": "CONSTITUTION",
     "CST": "CONSTITUTION",
+}
+PDF = "https://web.archive.org/web/2016id_/http://www.nvsos.gov/SOSelectionPages/results/1998General/1998GeneralElectionResults.pdf"
+HEADINGS = {
+    "lieutenant governor": "Lieutenant Governor",
+    "secretary of state": "Secretary of State",
+    "state treasurer": "Treasurer",
+    "state controller": "Controller",
+    "state attorney general": "Attorney General",
 }
 METHOD = (
     "County totals come from the Nevada Secretary of State's official county results pages. Each candidate's county "
@@ -82,6 +97,7 @@ def fetch() -> None:
                 time.sleep(10 * (attempt + 1))
         raise RuntimeError(url)
 
+    raw.fetch(SOURCE, PDF, suffix=".pdf")
     with ThreadPoolExecutor(3) as pool:
         list(pool.map(get, [address(year, page) for year in FOLDERS for page in [*COUNTIES, "ElectionSummary"]]))
 
@@ -127,6 +143,34 @@ def parse() -> None:
                         continue
                     held.append(word)
                     index += 1
+    title = None
+    pending: list[str] = []
+    for line in subprocess.run(
+        ["pdftotext", "-layout", str(raw.cached(SOURCE, PDF).path), "-"], capture_output=True, text=True, check=True
+    ).stdout.splitlines():
+        found = re.fullmatch(r"(.*?)((?:\s+\d[\d,]*){18})\s*", line)
+        if found is None:
+            text = line.strip()
+            if text.lower() in HEADINGS or re.match(r"State (Senate|Assembly)|Regent|Justice|District", text):
+                title, pending = HEADINGS.get(text.lower()), []
+            elif text and title and not re.match(r"State of Nevada|Carson|City Churchill|\d+$", text):
+                pending.append(text)
+            continue
+        if title is None:
+            pending = []
+            continue
+        label = re.sub(r"\bA(?=None)|\bA\S*@", "", " ".join([*pending, found[1].strip()]))
+        pending = []
+        figures = [int(value.replace(",", "")) for value in found[2].split()]
+        if sum(figures[:-1]) != figures[-1]:
+            raise ValueError(f"1998 {title} {label}: the counties do not add up to the printed total")
+        label = re.sub(r"\s+", " ", re.sub(r"-\s+", "-", label.replace("@", ""))).strip()
+        party = re.search(r"\((\w+)\)$", label)
+        name = re.sub(r"\s*\(\w+\)$", "", label)
+        if name.lower().startswith("none of these"):
+            name = "None of these Candidates"
+        for county, votes in zip(COUNTIES, figures, strict=False):
+            rows.append((1998, title, name, PARTIES.get(party[1], None) if party else None, votes, fips[county.lower()]))
     for year in FOLDERS:
         words = tokens(raw.cached(SOURCE, address(year, "ElectionSummary")).path)
         for index, word in enumerate(words):
@@ -223,8 +267,8 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="Nevada's lieutenant governor, secretary of state, treasurer, controller, and attorney general of 2002, "
-        "2006, 2010, and 2014 by county from the Secretary of State's official results pages",
+        summary="Nevada's lieutenant governor, secretary of state, treasurer, controller, and attorney general of 1998, 2002, "
+        "2006, 2010, and 2014 by county from the Secretary of State's official results",
         cite=cite,
         method=METHOD,
         absent=MISSING,
