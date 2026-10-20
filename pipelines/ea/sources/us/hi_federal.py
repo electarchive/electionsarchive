@@ -15,6 +15,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://files.hawaii.gov/elections/files/results/"
 DAYS = {
+    date(2020, 8, 8): "2020/primary",
     date(2022, 8, 13): "2022/primary",
     date(2024, 8, 10): "2024/Primary",
 }
@@ -37,14 +38,20 @@ def parse() -> None:
     for day, folder in DAYS.items():
         for county, code in COUNTIES.items():
             text = subprocess.run(
-                ["pdftotext", "-raw", str(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf").path), "-"],
+                ["pdftotext", "-layout" if day.year == 2020 else "-raw", str(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf").path), "-"],
                 capture_output=True,
                 text=True,
                 check=True,
             ).stdout
-            current = None
+            states: dict[int, tuple[str | None, int | None] | None] = {}
+            cells = []
             for line in text.splitlines():
-                line = line.strip()
+                if day.year == 2020:
+                    cells.extend((i, line[i * 65 : (i + 1) * 65].strip()) for i in range(3))
+                else:
+                    cells.append((0, line.strip()))
+            for index, line in cells:
+                current = states.get(index)
                 if found := HEADER.match(line):
                     office = "senate" if "Senator" in found[1] else "house" if "Representative" in found[1] else "president"
                     current = (
@@ -54,7 +61,7 @@ def parse() -> None:
                 elif re.match(r"^[A-Z].* - [A-Z]+$", line) or line.startswith(("Page ", "Printed")):
                     current = None
                 elif current and current[0] and not line.startswith(("Blank Votes", "Over Votes")):
-                    if match := re.fullmatch(r"(.+?) ([\d,]+) [\d.]+%", line):
+                    if match := re.fullmatch(r"(.+?)\s+([\d,]+)\s+[\d.]+%", line):
                         rows.append(
                             (
                                 day.year,
@@ -70,6 +77,7 @@ def parse() -> None:
                                 int(match[2].replace(",", "")),
                             )
                         )
+                states[index] = current
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
@@ -97,7 +105,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Hawaii's 2022 and 2024 president, U.S. Senate, and House primaries by county",
+            summary="Hawaii's 2020, 2022, and 2024 president, U.S. Senate, and House primaries by county",
             polity="US-HI",
         )
         source = cs.source(PUBLISHER, TITLE)
