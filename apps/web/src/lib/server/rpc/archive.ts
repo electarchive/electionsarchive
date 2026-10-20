@@ -104,6 +104,11 @@ const paint = (party: SQL, elections: SQL, date: SQL) => sql`
       left join entity_merge tm on tm.entity_id = r.to_party_id
       join party_color pc on pc.party_id = coalesce(tm.into_id, r.to_party_id) and pc.valid @> ${date}
       where r.kind = 'list_vehicle_for' and coalesce(fm.into_id, r.from_party_id) = ${party} and r.election_id in (${elections})
+      limit 1),
+    (select pc.color from party_affiliation a
+      left join entity_merge bm on bm.entity_id = a.parent_party_id
+      join party_color pc on pc.party_id = coalesce(bm.into_id, a.parent_party_id) and pc.valid @> ${date}
+      where a.party_id = ${party} and a.kind = 'regional_branch' and a.valid @> ${date}
       limit 1)
   )
 `;
@@ -8736,6 +8741,12 @@ async function refs(ids: Array<string>) {
         left join election e on e.id = r.election_id
         join party_color pc on pc.party_id = coalesce(tm.into_id, r.to_party_id) and (e.id is null or pc.valid @> e.date_from)
         where r.kind = 'list_vehicle_for' and coalesce(fm.into_id, r.from_party_id) = any(${sql.param(unique)}::uuid[])
+        union all
+        select a.party_id, pc.color, true, upper(pc.valid)
+        from party_affiliation a
+        left join entity_merge bm on bm.entity_id = a.parent_party_id
+        join party_color pc on pc.party_id = coalesce(bm.into_id, a.parent_party_id)
+        where a.kind = 'regional_branch' and a.party_id = any(${sql.param(unique)}::uuid[])
       ) x
       order by party, lent, until desc nulls first
     `),

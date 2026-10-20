@@ -20,7 +20,7 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, percent, points, precision } from "#lib/format.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { provenance } from "#lib/provenance.svelte.js";
@@ -72,6 +72,13 @@
       (line) => line.change != null && !line.row.key.startsWith("kind:"),
     ),
   );
+  const digits = $derived.by(() => {
+    const [first = 0, second = 0] = rows
+      .filter((row) => !row.key.startsWith("kind:"))
+      .map((row) => row.current?.share ?? 0)
+      .toSorted((a, b) => b - a);
+    return second === 0 ? 1 : precision(first - second);
+  });
   const topShare = $derived(
     Math.max(0.0001, ...rows.map((row) => row.current?.share ?? 0)),
   );
@@ -478,7 +485,7 @@
               class="relative px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
             >
               {#if page != null}
-                {@render cite(percent(page.share), "share", row)}
+                {@render cite(percent(page.share, digits), "share", row)}
               {/if}
               <span
                 class="absolute inset-e-2 inset-be-0.5 bg-(--party) block-0.5"
@@ -498,7 +505,7 @@
                   },
                 )}
               >
-                {cell == null ? "–" : percent(cell.share)}
+                {cell == null ? "–" : percent(cell.share, digits)}
               </td>
             {/each}
           {/if}

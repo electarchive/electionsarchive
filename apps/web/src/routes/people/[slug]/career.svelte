@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
   import { percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -189,16 +190,37 @@
                 stroke-width="2"
               />
             {/if}
-            <rect
-              x={x - 9}
-              y={y - 9}
-              width="18"
-              height="18"
-              fill="transparent"
-              role="presentation"
-              onpointerenter={() => (hovered = index)}
-              onpointerleave={() => (hovered = null)}
-            />
+            {#if mark.path == null}
+              <rect
+                x={x - 9}
+                y={y - 9}
+                width="18"
+                height="18"
+                fill="transparent"
+                role="presentation"
+                onpointerenter={() => (hovered = index)}
+                onpointerleave={() => (hovered = null)}
+              />
+            {:else}
+              <a
+                href={resolve("/[...path]", { path: mark.path })}
+                aria-label={mark.name}
+                onfocus={() => (hovered = index)}
+                onblur={() => (hovered = null)}
+              >
+                <rect
+                  class="cursor-pointer"
+                  x={x - 9}
+                  y={y - 9}
+                  width="18"
+                  height="18"
+                  fill="transparent"
+                  role="presentation"
+                  onpointerenter={() => (hovered = index)}
+                  onpointerleave={() => (hovered = null)}
+                />
+              </a>
+            {/if}
           {/if}
         {/each}
       </svg>

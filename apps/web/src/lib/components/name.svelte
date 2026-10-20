@@ -1,4 +1,6 @@
 <script lang="ts">
+  import { goto } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { getContext } from "svelte";
   import PartyCard from "#lib/components/party-card.svelte";
   import PersonCard from "#lib/components/person-card.svelte";
@@ -47,7 +49,7 @@
           {...props}
           type="button"
           class={cn(
-            "cursor-default text-start underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] hover:decoration-current focus-visible:decoration-current",
+            "cursor-pointer text-start underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] hover:decoration-current focus-visible:decoration-current",
             className,
           )}
           onclick={(event) => {
@@ -56,6 +58,15 @@
               event.pointerType !== "mouse"
             ) {
               open = !open;
+              return;
+            }
+            event.preventDefault();
+            event.stopPropagation();
+            const href = resolve("/id/[id]", { id: person ?? party ?? "" });
+            if (event.metaKey || event.ctrlKey) {
+              window.open(href, "_blank", "noopener");
+            } else {
+              void goto(href);
             }
           }}>{@render face()}</button
         >

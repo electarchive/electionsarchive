@@ -7,7 +7,7 @@
   import Term from "#lib/components/term.svelte";
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, date, percent, points } from "#lib/format.js";
+  import { count, date, percent, points, precision } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -499,7 +499,20 @@
               party: elector.label,
               seats: count(elector.votes),
               total: count(total),
-              share: percent(popular.current.share),
+              share: percent(
+                popular.current.share,
+                precision(
+                  popular.current.share -
+                    Math.max(
+                      0,
+                      ...contest.rows.flatMap((row) =>
+                        row === popular || row.key.startsWith("kind:")
+                          ? []
+                          : [row.current?.share ?? 0],
+                      ),
+                    ),
+                ),
+              ),
             });
     }
     if (seated) {
@@ -577,7 +590,10 @@
     const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
     return (isWon ? m.race_lede_won : m.race_lede_votes)({
       party: named(top),
-      share: percent(top.current.share),
+      share: percent(
+        top.current.share,
+        precision(top.current.share - next.current.share),
+      ),
       margin: points(top.current.share - next.current.share).replace(
         /^\+/u,
         "",

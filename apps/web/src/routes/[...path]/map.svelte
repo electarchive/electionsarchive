@@ -18,7 +18,7 @@
   import { on } from "svelte/events";
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, percent, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -2108,7 +2108,7 @@
                 )}</span
               >
             {/if}
-            {percent(entry.share)}</span
+            {percent(entry.share, precision(current.margin))}</span
           >
           <span class="col-span-2 rounded-xs bg-muted block-1.5">
             <span
