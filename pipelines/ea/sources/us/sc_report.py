@@ -22,8 +22,10 @@ TITLE = "{year} Election Report"
 LANDING = "https://scvotes.gov/election-results/"
 LICENSE = "Public record"
 DPI = 200
-DAY = date(2002, 11, 5)
-URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_2002.pdf"
+URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
+BOOKS = {2002: "2002", 1998: "1997-1998"}
+DAYS = {2002: date(2002, 11, 5), 1998: date(1998, 11, 3)}
+FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 COUNTIES = [
     "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
     "Charleston", "Cherokee", "Chester", "Chesterfield", "Clarendon", "Colleton", "Darlington", "Dillon",
@@ -41,32 +43,48 @@ OFFICES = {
     "commissioner-of-agriculture": "Commissioner of Agriculture",
 }
 PARTIES = {"D": "democratic-party", "R": "republican-party"}
+UNREADABLE = {(1998, 37, 7, 3): 18170}
 TABLES = [
-    (41, "lieutenant-governor", [(3, "Phil Leventis", "D"), (4, "André Bauer", "R"), (5, "Kenneth E. Curtis", "L")]),
-    (42, "secretary-of-state", [(0, "Rick C. Wade", "D"), (1, "Mark Hammond", "R")]),
-    (42, "treasurer", [(3, "Grady L. Patterson Jr.", "D"), (4, "Greg Ryberg", "R")]),
-    (43, "attorney-general", [(0, "Steve Benjamin", "D"), (1, "Henry McMaster", "R")]),
-    (43, "comptroller-general", [(3, "Jim Lander", "D"), (4, "Richard A. Eckstrom", "R")]),
+    (2002, 41, "lieutenant-governor", [(3, "Phil Leventis", "D"), (4, "André Bauer", "R"), (5, "Kenneth E. Curtis", "L")]),
+    (2002, 42, "secretary-of-state", [(0, "Rick C. Wade", "D"), (1, "Mark Hammond", "R")]),
+    (2002, 42, "treasurer", [(3, "Grady L. Patterson Jr.", "D"), (4, "Greg Ryberg", "R")]),
+    (2002, 43, "attorney-general", [(0, "Steve Benjamin", "D"), (1, "Henry McMaster", "R")]),
+    (2002, 43, "comptroller-general", [(3, "Jim Lander", "D"), (4, "Richard A. Eckstrom", "R")]),
     (
+        2002,
         44,
         "superintendent-of-education",
         [(0, "Inez Tenenbaum", "D"), (1, "Al Hafer", "C"), (2, "Dan Hiltgen", "R"), (3, "Marva Y. Manigault", "")],
     ),
-    (45, "commissioner-of-agriculture", [(0, "John Long", "D"), (1, "Charles Sharpe", "R")]),
+    (2002, 45, "commissioner-of-agriculture", [(0, "John Long", "D"), (1, "Charles Sharpe", "R")]),
+    (
+        1998,
+        34,
+        "lieutenant-governor",
+        [(0, "Daniel L. O'Neal", "L"), (1, "Nick L. Theodore", "D"), (2, "Bob Peeler", "R")],
+    ),
+    (1998, 34, "secretary-of-state", [(4, "Roy B. Fairchild", "D"), (5, "Jim Miles", "R")]),
+    (1998, 35, "treasurer", [(0, "Grady L. Patterson Jr.", "D"), (1, "Richard Eckstrom", "R")]),
+    (1998, 35, "attorney-general", [(3, "Tom Turnipseed", "D"), (4, "Charlie Condon", "R")]),
+    (1998, 36, "comptroller-general", [(0, "Jim Lander", "D"), (1, "John Courson", "R")]),
+    (1998, 36, "superintendent-of-education", [(3, "Inez Tenenbaum", "D"), (4, "David Eckstrom", "R")]),
+    (1998, 37, "commissioner-of-agriculture", [(3, "Les Tindal", "R")]),
 ]
 
 
 def fetch() -> None:
-    raw.fetch(SOURCE, URL, suffix=".pdf")
+    for book in BOOKS.values():
+        raw.fetch(SOURCE, URL.format(book), suffix=".pdf")
 
 
 def parse() -> None:
-    path = raw.cached(SOURCE, URL).path
     PAGES.mkdir(parents=True, exist_ok=True)
     PARSED.mkdir(parents=True, exist_ok=True)
     rows: list[dict[str, object]] = []
-    for page in sorted({t[0] for t in TABLES}):
-        image = PAGES / f"{raw.cached(SOURCE, URL).sha256}-{page}.png"
+    for year, page in sorted({(t[0], t[1]) for t in TABLES}):
+        book = raw.cached(SOURCE, URL.format(BOOKS[year]))
+        path = book.path
+        image = PAGES / f"{book.sha256}-{page}.png"
         if not image.exists():
             subprocess.run(
                 ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(path), str(image.with_suffix(""))],
@@ -87,10 +105,16 @@ def parse() -> None:
                 lines[-1].append(word)
             else:
                 lines.append([word])
-        lines = [sorted(line) for line in lines]
+        merged_lines: list[list[tuple[float, float, float, float, str]]] = []
+        for line in lines:
+            if merged_lines and all(w[0] < 130 for w in merged_lines[-1]) and line[0][1] - merged_lines[-1][0][1] <= 8:
+                merged_lines[-1] = [*merged_lines[-1], *line]
+            else:
+                merged_lines.append(line)
+        lines = [sorted(line) for line in merged_lines]
         total = next(i for i, line in enumerate(lines) if any(w[4] == "TOTAL" for w in line))
         edges = [w[2] for w in lines[total] if w[4] not in ("STATE", "TOTAL")]
-        printed = [int(re.sub(r"\D", "", w[4])) for w in lines[total] if w[4] not in ("STATE", "TOTAL")]
+        printed = [int(re.sub(r"\D", "", w[4].translate(FIXES))) for w in lines[total] if w[4] not in ("STATE", "TOTAL")]
         cells: list[dict[int, tuple[int, list[float]]]] = []
         for line in lines[total - 46 : total]:
             merged: list[list[object]] = []
@@ -105,23 +129,27 @@ def parse() -> None:
             row: dict[int, tuple[int, list[float]]] = {}
             for x0, y0, x1, y1, text in merged:
                 column = min(range(len(edges)), key=lambda i: abs(edges[i] - float(x1)))
-                if abs(edges[column] - float(x1)) > 14 or not re.search(r"\d", str(text)):
+                if abs(edges[column] - float(x1)) > 14 or not re.search(r"\d", str(text).translate(FIXES)):
                     continue
-                row[column] = (int(re.sub(r"\D", "", str(text))), [float(x0), float(y0), float(x1), float(y1)])
+                row[column] = (int(re.sub(r"\D", "", str(text).translate(FIXES))), [float(x0), float(y0), float(x1), float(y1)])
             cells.append(row)
-        for table_page, office, candidates in TABLES:
-            if table_page != page:
+        for (fixed_year, fixed_page, county_index, column), value in UNREADABLE.items():
+            if (fixed_year, fixed_page) == (year, page):
+                cells[county_index][column] = (value, cells[county_index][column][1])
+        for table_year, table_page, office, candidates in TABLES:
+            if (table_year, table_page) != (year, page):
                 continue
             for column, name, party in candidates:
                 summed = sum(row[column][0] for row in cells if column in row)
                 if summed != printed[column]:
-                    raise ValueError(f"{office} {name}: counties sum to {summed}, printed {printed[column]}")
+                    raise ValueError(f"{year} {office} {name}: counties sum to {summed}, printed {printed[column]}")
                 for county, row in zip(COUNTIES, cells, strict=True):
                     if column not in row:
                         continue
                     votes, box = row[column]
                     rows.append(
                         {
+                            "year": year,
                             "office": office,
                             "name": name,
                             "party": party,
@@ -145,7 +173,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="South Carolina's lieutenant governor, secretary of state, treasurer, attorney general, comptroller general, "
-            "superintendent of education, and commissioner of agriculture elections of 2002 by county from the "
+            "superintendent of education, and commissioner of agriculture elections of 1998 and 2002 by county from the "
             "State Election Commission's election report",
             polity="US",
         )
@@ -160,22 +188,34 @@ def emit() -> Path:
             words = [word for word in text.replace(",", " ").split() if plain(word) not in {"jr", "sr", "ii", "iii"}]
             return plain(words[-1])
 
-        title = TITLE.format(year=DAY.year)
-        source = cs.source(PUBLISHER, title)
-        cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=LANDING, license=LICENSE)
-        book = raw.cached(SOURCE, URL)
-        artifact = cs.artifact(book, source)
-        pages: dict[int, tuple[UUID, int, int]] = {}
-        for number in sorted(set(frame["page"])):
+        sources: dict[int, UUID] = {}
+        artifacts: dict[int, UUID] = {}
+        pages: dict[tuple[int, int], tuple[UUID, int, int]] = {}
+        for year, number in sorted(set(zip(frame["year"], frame["page"], strict=True))):
+            if year not in sources:
+                title = TITLE.format(year=year)
+                sources[year] = cs.source(PUBLISHER, title)
+                cs.add(
+                    "source",
+                    id=sources[year],
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=LANDING,
+                    license=LICENSE,
+                )
+            book = raw.cached(SOURCE, URL.format(BOOKS[year]))
+            if year not in artifacts:
+                artifacts[year] = cs.artifact(book, sources[year])
             image = PAGES / f"{book.sha256}-{number}.png"
             with Image.open(image) as rendered:
                 width, height = rendered.size
-            page = cs.page(artifact, number)
-            pages[number] = (page, width, height)
+            page = cs.page(artifacts[year], number)
+            pages[(year, number)] = (page, width, height)
             cs.add(
                 "source_page",
                 id=page,
-                artifact_id=artifact,
+                artifact_id=artifacts[year],
                 page_number=number,
                 image_key=f"pages/{SOURCE}/{image.name}",
                 width=width,
@@ -200,7 +240,7 @@ def emit() -> Path:
         contests = {
             value
             for (value,) in conn.execute(
-                "select value from external_id where scheme = 'us.contest' and value ~ '^2002-11.*:SC:'"
+                "select value from external_id where scheme = 'us.contest' and value ~ '^(2002|1998)-11.*:SC:'"
             )
         }
         people: dict[str, set[UUID]] = {}
@@ -217,8 +257,8 @@ def emit() -> Path:
         if cs.minted & {fptp, *parties.values()}:
             raise ValueError("the electoral system and parties must already exist")
         made: set[UUID] = set()
-        for (office,), lines in frame.sort("office").group_by("office", maintain_order=True):
-            day = DAY
+        for (year, office), lines in frame.sort("year", "office").group_by("year", "office", maintain_order=True):
+            day = DAYS[year]
             key = f"{day}:SC:{office}"
             if key in contests:
                 print(key, "is already in the archive")
@@ -249,7 +289,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=sources[year],
                 is_default=True,
                 completeness=1,
             )
@@ -292,7 +332,7 @@ def emit() -> Path:
                         "count_round": 0,
                     }
                     cs.add("result_value", **fact, flags=house_books.DIGITIZED, value=votes)
-                    page, width, height = pages[number]
+                    page, width, height = pages[(year, number)]
                     cs.add(
                         "value_locator",
                         **fact,
