@@ -22,7 +22,7 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 ITEM = "micro_IA40706952_0290"
 VOLUMES = {
-    1994: (f"https://archive.org/download/{ITEM}/{ITEM}.pdf", f"https://archive.org/details/{ITEM}", date(1994, 11, 8), range(12, 62)),
+    1994: (f"https://archive.org/download/{ITEM}/{ITEM}.pdf", f"https://archive.org/details/{ITEM}", date(1994, 11, 8), range(2, 62)),
 }
 OFFICES = {
     "governor": ("governor", None, "Governor"),
@@ -114,6 +114,8 @@ def emit() -> Path:
         ).fetchall()
         for office, rows in frame.group_by("state", maintain_order=True):
             office = str(office[0])
+            if office != "governor":
+                continue
             base, seat, label = OFFICES[office]
             key = f"{day}:GA:{base}" + ("" if seat is None else f":{seat}")
             result_set = cs.key(f"{SOURCE}.result_set", key)
@@ -143,9 +145,33 @@ def emit() -> Path:
                     [contest],
                 ).fetchall()
             ]
-            if conn.execute("select 1 from result_set where contest_id = %s and is_default", [contest]).fetchone():
-                print(f"{key}: already has a default set, held until the ICPSR replacement is cleared")
-                continue
+            for row in conn.execute(
+                """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness, supersedes_id
+                   from result_set where contest_id = %s and is_default""",
+                [contest],
+            ).fetchall():
+                cs.add(
+                    "result_set",
+                    **dict(
+                        zip(
+                            (
+                                "id",
+                                "election_id",
+                                "contest_id",
+                                "stage",
+                                "kind",
+                                "status",
+                                "source_id",
+                                "as_of",
+                                "completeness",
+                                "supersedes_id",
+                            ),
+                            row,
+                            strict=True,
+                        )
+                    ),
+                    is_default=False,
+                )
             outcomes = conn.execute(
                 """select o.option_id, o.kind, o.seats from outcome o
                    join result_set rs on rs.id = o.result_set_id and rs.is_default where rs.contest_id = %s""",
