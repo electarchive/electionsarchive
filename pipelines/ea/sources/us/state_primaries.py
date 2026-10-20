@@ -20,6 +20,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.county_changes import ct_regions
 from ea.sources.us import elstats, fl_sos, me_legislature, medsl, nyc_general, tx_elchist, wa_local
 from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
@@ -1169,6 +1170,7 @@ def parse() -> None:
     ):
         towns.setdefault((state, elstats.plain(name)), geoid[:5])
         towns.setdefault((state, elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower()))), geoid[:5])
+    regions = ct_regions()
     for (state, name), code in elstats.FORMER.items():
         towns.setdefault((state, name), code)
     towns[("VT", "essexjunction")] = towns[("VT", "essex")]
@@ -1315,7 +1317,9 @@ def parse() -> None:
                 for kind, name in frame.select("division_type", "division_name").unique().iter_rows():
                     bare = re.sub(r"\s*\(.*\)$", "", name)
                     places[name] = (
-                        towns.get((state, elstats.plain(bare)))
+                        regions.get(elstats.plain(bare))
+                        if state == "CT" and year >= 2022 and kind == "City/Town"
+                        else towns.get((state, elstats.plain(bare)))
                         or towns.get((state, elstats.plain(re.sub(elstats.SUFFIXES, "", bare.lower()))))
                         if kind == "City/Town"
                         else counties.get(
@@ -3784,6 +3788,13 @@ def emit() -> Path:
                 revision += 1
             latest = f"{base}:{grain}" + (f":{revision}" if revision > 1 else "")
             current = published.get(latest)
+            forced = None
+            if state == "CT" and day.year >= 2022:
+                if f"{base}:regions" in published:
+                    latest = f"{base}:regions"
+                    current = published[latest]
+                else:
+                    forced = f"{base}:regions"
             supersedes = old[0] if parted and old is not None else None
             replaced = None if parted else stale.get(base)
             if replaced is not None:
@@ -3806,10 +3817,10 @@ def emit() -> Path:
                     cs.add(
                         "outcome", result_set_id=replaced[0], option_id=option, kind=outcome, seats=seats, notes=notes
                     )
-            elif current is not None and set(earlier.get(current[0], [])) == wanted:
+            elif current is not None and forced is None and set(earlier.get(current[0], [])) == wanted:
                 supersedes = current[7]
             elif current is not None:
-                latest = f"{base}:{grain}:{revision + 1}"
+                latest = forced or f"{base}:{grain}:{revision + 1}"
                 supersedes = current[0]
                 cs.add(
                     "result_set",
