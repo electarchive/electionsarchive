@@ -1,8 +1,11 @@
 import csv
+import json
 import time
 from collections import defaultdict
 from datetime import date
 
+from ea import raw
+from ea.sources.us.clerk import LEGISLATORS
 from ea.store import ROOT, Connection, connect
 
 LEVELS = (
@@ -25,6 +28,21 @@ STAGES = ("general", "primary", "runoff", "special")
 LOCAL = {"county", "municipal", "school", "special_district", "local_measure"}
 ERAS = ((1789, 1823), (1824, 1899), (1900, 1966), (1967, 1999), (2000, 2015), (2016, 2025))
 LAST = 2025
+ALL_LEVELS = ("us_house", "us_senate", "governor", "statewide_exec", "state_upper", "state_lower")
+CONGRESS = ("us_house", "us_senate")
+STATEWIDE = ("governor", "statewide_exec", "state_upper", "state_lower")
+RUNOFFS = (
+    ("AL AR GA MS OK SC TX", "primary", ALL_LEVELS, 1900, LAST, 0.5),
+    ("FL", "primary", ALL_LEVELS, 1900, 2000, 0.5),
+    ("NC", "primary", ALL_LEVELS, 1900, 2016, 0.4),
+    ("NC", "primary", ALL_LEVELS, 2018, LAST, 0.3),
+    ("SD", "primary", ("us_house", "us_senate", "governor"), 1900, LAST, 0.35),
+    ("GA", "general", ALL_LEVELS, 1964, LAST, 0.5),
+    ("LA", "general", STATEWIDE, 1975, LAST, 0.5),
+    ("LA", "general", CONGRESS, 1978, 2006, 0.5),
+    ("LA", "general", CONGRESS, 2012, LAST, 0.5),
+    ("GA LA MS TX", "special", ALL_LEVELS, 1980, LAST, 0.5),
+)
 
 CONTESTS_SQL = """
 create temp table uspol as
@@ -227,6 +245,55 @@ where cc.level = 'us_house' and cc.stage = 'general'
 group by 1, 2
 """
 
+RUNOFF_SQL = """
+create temp table rr(st text, stage text, level text, y0 int, y1 int, thr numeric);
+
+insert into rr values {rules};
+
+create temp table fr as
+select cc.id, cc.st, cc.year, cc.level, rr.thr, e.date_from as d,
+    c.office_id, c.body_id, c.district_area_id, c.party_scope_id
+from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
+join rr on rr.st = cc.st and rr.stage = cc.stage and rr.level = cc.level and cc.year between rr.y0 and rr.y1
+where c.previous_round_id is null and not cc.tacit;
+
+create temp table fs as
+with u as (
+    select r.contest_id, r.k, rv.unit_k, rv.option_k,
+        coalesce(sum(rv.value) filter (where rv.channel = 0), sum(rv.value)) as v
+    from fr join result_set r on r.contest_id = fr.id and r.is_default and r.status <> 'withdrawn'
+    join result_value rv on rv.result_set_k = r.k and rv.measure = 1 and rv.option_k <> 0
+    group by 1, 2, 3, 4
+),
+o as (select contest_id, k, option_k, sum(v) as v from u group by 1, 2, 3),
+t as (select contest_id, k, max(v) / nullif(sum(v), 0) as top, sum(v) as total, count(*) as n from o group by 1, 2)
+select distinct on (contest_id) contest_id, top from t where n >= 2 order by contest_id, total desc;
+
+select fr.st, fr.year, fr.level, fr.thr, fs.top, nx.year, nx.stage, un.year
+from fr
+left join fs on fs.contest_id = fr.id
+left join lateral (
+    select ccx.year, ccx.stage from contest n join cc ccx on ccx.id = n.id where n.previous_round_id = fr.id limit 1
+) nx on true
+left join lateral (
+    select ccx.year from contest rc join cc ccx on ccx.id = rc.id join election re on re.id = rc.election_id
+    where ccx.stage = 'runoff' and ccx.st = fr.st and ccx.level = fr.level and rc.previous_round_id is null
+        and nx.year is null
+        and rc.office_id is not distinct from fr.office_id and rc.body_id is not distinct from fr.body_id
+        and rc.district_area_id is not distinct from fr.district_area_id
+        and rc.party_scope_id is not distinct from fr.party_scope_id
+        and re.date_from between fr.d + 3 and fr.d + 130
+    limit 1
+) un on true
+where fs.top <= fr.thr or nx.year is not null
+"""
+
+SPECIALS_SQL = """
+select cc.st, cc.level, cc.year, e.date_from
+from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
+where cc.stage = 'special' and cc.level in ('us_house', 'us_senate')
+"""
+
 SENATE_SQL = """
 select s.label from seat s join external_id e on e.entity_id = s.body_id and e.scheme = 'us.body' and e.value = 'senate'
 """
@@ -300,9 +367,7 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         }
         for st, year, level, stage, n, results, county, precinct, icpsr, turnout in conn.execute(COUNT_SQL)
     }
-    shapes = {
-        (st, year, level, stage): (n, shaped) for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL)
-    }
+    shapes = {(st, year, level, stage): (n, shaped) for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL)}
     pipelines: dict[tuple, set[str]] = defaultdict(set)
     for st, year, level, stage, pipeline in conn.execute(PIPELINES_SQL):
         pipelines[(st, year, level, stage)].add(pipeline)
@@ -375,6 +440,86 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         if level in ("president", "us_house", "us_senate") and stage == "primary" and year in (2020, 2022):
             key = (st, year + 4 if level == "president" else year + 2, level, stage)
             expected[key] = max(expected[key], cell["held"])
+
+    rules = ", ".join(
+        f"('{st}', '{stage}', '{level}', {first}, {end}, {share})"
+        for states, stage, levels, first, end, share in RUNOFFS
+        for st in states.split()
+        for level in levels
+    )
+    statements = RUNOFF_SQL.replace("{rules}", rules).split(";\n\n")
+    for statement in statements[:-1]:
+        conn.execute(statement)
+    for st, year, level, share, top, next_year, next_stage, loose_year in conn.execute(statements[-1]):
+        if next_year is not None and next_stage != "runoff":
+            continue
+        expected[(st, next_year or loose_year or year, level, "runoff")] += 1
+
+    members = [
+        person
+        for kind in ("historical", "current")
+        for person in json.loads(raw.cached("us.clerk", LEGISLATORS.format(kind=kind)).path.read_text())
+    ]
+    abbreviations = {st for st, _ in states.values()}
+    seated = defaultdict(list)
+    for member in members:
+        terms = sorted(member["terms"], key=lambda term: term["start"])
+        for index, term in enumerate(terms):
+            start = date.fromisoformat(term["start"])
+            level = "us_senate" if term["type"] == "sen" else "us_house"
+            if start.year < (1935 if level == "us_senate" else 1990) or term["state"] not in abbreviations:
+                continue
+            convened = date(start.year if start.year % 2 else start.year - 1, 1, 3)
+            if start < convened:
+                convened = date(convened.year - 2, 1, 3)
+            continuing = any(
+                before["type"] == term["type"] and -1000 <= (start - date.fromisoformat(before["end"])).days <= 30
+                for before in terms[:index]
+            )
+            if (start - convened).days > 45 and not continuing:
+                seated[(term["state"], level, term.get("class"))].append((start, term.get("how") == "appointment"))
+
+    specials = defaultdict(list)
+    for st, level, year, day in conn.execute(SPECIALS_SQL):
+        specials[(st, level)].append([day, year, False])
+
+    implied: list[tuple[str, str, date, int]] = []
+    for (st, level, seat_class), events in seated.items():
+        events.sort()
+        groups: list[list[tuple[date, bool]]] = []
+        for event in events:
+            if level == "us_senate" and groups and (event[0] - groups[-1][-1][0]).days <= 900:
+                groups[-1].append(event)
+            else:
+                groups.append([event])
+        for group in groups:
+            elected = [day for day, appointed in group if not appointed]
+            if level == "us_house" or elected:
+                for day in elected:
+                    implied.append((st, level, day, day.year))
+                continue
+            year = group[0][0].year + (1 if group[0][0].year % 2 else 0)
+            if group[0][0] >= date(year, 11, 8):
+                year += 2
+            if year % 6 != {1: 2, 2: 4, 3: 0}[seat_class]:
+                implied.append((st, level, date(year, 11, 1), year))
+
+    for st, level, day, year in implied:
+        near = [
+            hold
+            for hold in specials[(st, level)]
+            if not hold[2]
+            and (
+                abs((hold[0] - day).days) <= 200
+                if (day.month, day.day) == (11, 1)
+                else -450 <= (hold[0] - day).days <= 60
+            )
+        ]
+        if near:
+            hold = min(near, key=lambda hold: abs((hold[0] - day).days))
+            hold[2] = True
+            year = hold[1]
+        expected[(st, year, level, "special")] += 1
 
     rows: list[dict] = []
     for key in sorted(set(held) | set(expected)):
@@ -570,7 +715,9 @@ Generated by `ea coverage us` on {today} from the database, measured against the
 - Stage: `runoff` for runoff elections (general and primary), `primary` for party-scoped contests and primary, top-two, and caucus elections, `special` for special elections and remainder terms on a regular day, and `general` otherwise.
 - Grain: a contest is `precinct` when any of its result sets has a precinct unit (`us.precinct`, `us.nyc_ed`, Iowa caucus precincts), `county` when any has a county, town, county part, Alaska house district, or place unit, `total` when it has any result set, and `none` otherwise. A precinct has a shape when its unit equals an area with geometry. `icpsr_only` counts contests whose only county-level results come from ICPSR or from Algara and Amlani's returns, which are compiled from ICPSR and CQ (`us.icpsr`, `us.algara`, `us.algara_federal`; the ICPSR replacement lane's work). A result set is matched by its source's publisher, not by the changeset that last wrote it, since another pipeline that makes a set non-default restages it.
 - Target: precinct from 2000, county from 1824 to 1999 (total for local offices, local measures, and state legislative districts, whose county breakdowns before 2000 are not measured), and the contest total before 1824. `gap` is the larger of contests expected and held, less those reaching the target. A primary or runoff listed as unopposed with no vote (the FEC's `Unopposed`, held as a tacit result) needs no breakdown in the states whose law cancels an uncontested primary and declares the lone candidate nominated: Alabama, Arkansas, Colorado (when the whole primary is canceled), Connecticut, Delaware, Florida, Kentucky, Louisiana, Mississippi, New York, North Carolina, Oklahoma, South Carolina, South Dakota, Utah, and Virginia.
-- Expected contests: presidential slates for each state casting electoral votes from 1824 (less the states whose legislatures chose electors, and Maine's and Nebraska's districts), House seats from `us.cd` districts in force at each Congress's start, with a state's at-large seat counted only when it has no numbered districts or a source holds an at-large race that cycle (each race filed under the even year before the Congress its winner was seated in, or, with no seated winner, the Congress its date falls in), regular Senate elections from each state's seat classes since 1914 (1960 in Alaska and Hawaii), governors from 1974 by each state's cycle and before 1974 wherever any source holds one, state legislative generals as Klarner holds them 1967–2022 (Vermont 1968–1984 and North Carolina 1968, which Klarner lacks, at their next counts) and 2023–2025 at the count four years earlier, other statewide offices from the `statewide_office_year` table (one contest for each office a state has elected in at least two general elections since 1990, in every year of its cycle from the first year its holders are known, or from the state's first governor election, and before 1990 in the years the state elected its governor when the office's modern cycle matches the governor's; lieutenant governors on the governor's ticket have no contest of their own and are not counted), and 2024 congressional and presidential primaries at their 2022 and 2020 counts. Specials, runoffs, judicial races, ballot measures, local races, and anything before these windows have no calendar, so they count only what is held.
+- Expected contests: presidential slates for each state casting electoral votes from 1824 (less the states whose legislatures chose electors, and Maine's and Nebraska's districts), House seats from `us.cd` districts in force at each Congress's start, with a state's at-large seat counted only when it has no numbered districts or a source holds an at-large race that cycle (each race filed under the even year before the Congress its winner was seated in, or, with no seated winner, the Congress its date falls in), regular Senate elections from each state's seat classes since 1914 (1960 in Alaska and Hawaii), governors from 1974 by each state's cycle and before 1974 wherever any source holds one, state legislative generals as Klarner holds them 1967–2022 (Vermont 1968–1984 and North Carolina 1968, which Klarner lacks, at their next counts) and 2023–2025 at the count four years earlier, other statewide offices from the `statewide_office_year` table (one contest for each office a state has elected in at least two general elections since 1990, in every year of its cycle from the first year its holders are known, or from the state's first governor election, and before 1990 in the years the state elected its governor when the office's modern cycle matches the governor's; lieutenant governors on the governor's ticket have no contest of their own and are not counted), and 2024 congressional and presidential primaries at their 2022 and 2020 counts. Runoffs are expected where a first round we hold leaves no candidate above its state's threshold (see below), and House and Senate specials where a member's term begins mid-term. Judicial races, ballot measures, local races, other specials, and anything before these windows have no calendar, so they count only what is held.
+- Runoffs: the rule table in `coverage.RUNOFFS` gives each state's first-round stage, offices, years, and threshold: a majority in Alabama, Arkansas, Georgia, Mississippi, Oklahoma, South Carolina, and Texas primaries, Florida's primaries through 2000, North Carolina's 40 percent through 2016 and 30 percent from 2018, South Dakota's 35 percent for Congress and governor, Georgia's general elections from 1964, Louisiana's majority elections (statewide and legislative from 1975, Congress 1978–2006 and from 2012), and the jungle specials of Georgia, Louisiana, Mississippi, and Texas. Each first round (a contest with no earlier round) whose default result set has a top vote share at or below the threshold, or which already has a runoff chained to it, expects one runoff, filed under the year of the runoff held (chained, or found by office and district within 130 days) and otherwise the first round's year. A first round chained to a contest that is not stage `runoff` (Louisiana's November generals) adds nothing. Caveat: a runoff can be waived when the runner-up withdraws, so some missing North Carolina runoffs never happened.
+- Specials: from congress-legislators' terms. A House term from 1990 or a Senate term from 1935 that starts more than 45 days after the Congress convened, with no term of the same chamber ending within 30 days before it, implies one special, held in the cell of the matching special we hold (election within 450 days before the swearing-in) or else the swearing-in year. A Senate appointment implies a special in the first even year after it unless that year is the seat class's regular election; an appointee and the later winner are one special. Earlier terms start on irregular dates in the source, so older specials have no calendar. Governors' and statewide officers' tenures show every elected successor on cycle (two exceptions), so they imply none.
 
 ## Coverage by level
 
