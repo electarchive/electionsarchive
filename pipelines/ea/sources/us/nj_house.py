@@ -31,6 +31,7 @@ ITEMS = {
     1988: ("micro_IA40706932_0272", date(1988, 11, 8), tuple(range(8, 16))),
     1990: ("micro_IA40706939_0170", date(1990, 11, 6), (3, 4, 5, 6, 7, 8, 9, 10)),
     1992: ("micro_IA40706946_0066", date(1992, 11, 3), tuple(range(6, 19))),
+    1994: ("micro_IA40706953_0096", date(1994, 11, 8), tuple(range(2, 23))),
 }
 NJ96 = "https://www.nj.gov/state/elections/assets/pdf/election-results/1996/1996-general-election-results-house.pdf"
 NJ98 = "https://www.nj.gov/state/elections/assets/pdf/election-results/1998/1998-gen-elect-results-us--house.pdf"
@@ -42,10 +43,13 @@ VOLUMES = {
     1998: (NJ98, NJ98, date(1998, 11, 3), tuple(range(1, 15))),
 }
 TITLES = {
+    1994: "State of New Jersey Results of the General Election by County and Municipality, November 8, 1994",
     1996: "Official List: General Election Returns for the Office of House of Representatives, November 5, 1996",
     1998: "Official List: Candidate Returns for House of Representatives, November 1998 General Election",
 }
 VERTICAL = {1998}
+BYROW = {1994}
+DERIVED = {(1994, 18, "Morris")}
 KEYS = {
     (1988, 103): "1988-11-08:NJ:house:3:special",
     (1990, 101): "1990-11-06:NJ:house:1:special",
@@ -88,6 +92,7 @@ def parse() -> None:
     parsed = DATA / "parsed" / SOURCE
     rows: list[dict[str, object]] = []
     failed: list[str] = []
+    columns: dict[int, list[float]] = {}
     for year, (_, _, _, pages) in VOLUMES.items():
         first = _tables(parsed / "model" / f"{year}.txt")
         second = _tables(parsed / "model" / f"{year}.v2.txt")
@@ -105,8 +110,15 @@ def parse() -> None:
                 for k, (v, w) in enumerate(zip(votes, other, strict=True)):
                     if v != w:
                         failed.append(f"{year} district {table['district']} {name} cell {k}: {v} or {w}")
-                if (year, table["district"]) not in ERRATA and sum(votes[:-1]) != votes[-1]:
+                if year not in BYROW and (year, table["district"]) not in ERRATA and sum(votes[:-1]) != votes[-1]:
                     failed.append(f"{year} district {table['district']} {name}: {sum(votes[:-1])} against {votes[-1]}")
+        for district in {t["district"] for t in first if year in BYROW}:
+            parts = [t for t in first if t["district"] == district]
+            printed = next(t for t in parts if any(votes[-1] for _, votes in t["rows"]))
+            for i, (name, votes) in enumerate(printed["rows"]):
+                summed = sum(sum(t["rows"][i][1][:-1]) for t in parts)
+                if summed != votes[-1]:
+                    failed.append(f"{year} district {district} {name}: {summed} against {votes[-1]}")
         if failed:
             continue
         book = house_books._artifact(sys.modules[__name__], year)
@@ -160,9 +172,98 @@ def parse() -> None:
             digit_: list[float] = []
             for table in [t for t in first if t["page"] == page]:
                 counties = [*table["counties"], "Total"]
-                offset = sum(len(t["rows"]) for t in first[: first.index(table)] if t["district"] == table["district"])
+                offset = (
+                    0
+                    if year in BYROW
+                    else sum(len(t["rows"]) for t in first[: first.index(table)] if t["district"] == table["district"])
+                )
                 cells = [(i, k, v) for i, (_, votes) in enumerate(table["rows"]) for k, v in enumerate(votes)]
                 anchors = {(i, k): boxes[str(v)][0] for i, k, v in cells if len(boxes.get(str(v), [])) == 1}
+                if year in BYROW:
+                    cells = [(i, k, v) for i, (_, votes) in enumerate(table["rows"]) for k, v in enumerate(votes[:-1])]
+                    anchors = {
+                        (i, k): min(boxes[str(v)], key=lambda b: b[3] - b[1])
+                        for i, k, v in cells
+                        if boxes.get(str(v))
+                        and (year, page, counties[k]) not in DERIVED
+                        and max(b[1] for b in boxes[str(v)]) - min(b[1] for b in boxes[str(v)]) < 40
+                        and max(b[0] for b in boxes[str(v)]) - min(b[0] for b in boxes[str(v)]) < 40
+                    }
+                    for _ in range(2):
+                        if not anchors:
+                            raise ValueError(
+                                f"{year} page {page} district {table['district']}: no cell found on the page"
+                            )
+                        ys = {
+                            k: statistics.median((b[1] + b[3]) / 2 for (_, kk), b in anchors.items() if kk == k)
+                            for k in {k for _, k in anchors}
+                        }
+                        xs = {
+                            i: statistics.median(b[2] for (ii, _), b in anchors.items() if ii == i)
+                            for i in {i for i, _ in anchors}
+                        }
+                        anchors = {
+                            (i, k): b
+                            for (i, k), b in anchors.items()
+                            if abs((b[1] + b[3]) / 2 - ys[k]) < 15 and abs(b[2] - xs[i]) < 40
+                        }
+                    for i, x in xs.items():
+                        columns.setdefault(i, []).append(x)
+                    xs = {i: xs.get(i) or statistics.median(columns[i]) for i in columns if i < len(table["rows"])}
+                    height_.extend(b[3] - b[1] for b in anchors.values())
+                    digit_.extend((b[2] - b[0]) / len(f"{table['rows'][i][1][k]:,}") for (i, k), b in anchors.items())
+                    height, digit = statistics.median(height_), statistics.median(digit_)
+                    for i, k, v in cells:
+                        if (year, page, counties[k]) in DERIVED:
+                            above = max(ys[kk] for kk in ys if counties[kk] != counties[k])
+                            heading = min(w[1] for plain, w in words if plain == "morris" and w[1] > above)
+                            overseas = max(w[3] for plain, w in words if plain == "overseas")
+                            box, how = (
+                                (round(xs[i] - digit * len(f"{v:,}")), heading, round(xs[i]), overseas),
+                                "derived",
+                            )
+                        elif (i, k) in anchors:
+                            box, how = anchors[(i, k)], "unique"
+                        elif i in xs and k in ys:
+                            near = [
+                                b
+                                for b in boxes.get(str(v), [])
+                                if abs((b[1] + b[3]) / 2 - ys[k]) < 15 and abs(b[2] - xs[i]) < 40
+                            ]
+                            box, how = (
+                                (near[0], "aligned")
+                                if near
+                                else (
+                                    (
+                                        round(xs[i] - digit * len(f"{v:,}")),
+                                        round(ys[k] - height / 2),
+                                        round(xs[i]),
+                                        round(ys[k] + height / 2),
+                                    ),
+                                    "placed",
+                                )
+                            )
+                        elif i in xs and (low := [b for b in boxes.get(str(v), []) if abs(b[2] - xs[i]) < 40]):
+                            box, how = max(low, key=lambda b: b[1]), "lowest"
+                        else:
+                            failed.append(
+                                f"{year} page {page} district {table['district']} {table['rows'][i][0]} {counties[k]}: no box"
+                            )
+                            continue
+                        rows.append(
+                            {
+                                "year": year,
+                                "page": page,
+                                "district": table["district"],
+                                "county": counties[k],
+                                "column": i,
+                                "label": table["rows"][i][0].split()[-1],
+                                "votes": v,
+                                "box": list(box),
+                                "located": how,
+                            }
+                        )
+                    continue
                 if year in VERTICAL:
                     if not anchors:
                         raise ValueError(f"{year} page {page} district {table['district']}: no cell found on the page")

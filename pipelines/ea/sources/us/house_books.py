@@ -207,16 +207,26 @@ def parse(source: ModuleType) -> None:
                         votes = settled[(r, c)]
                         text = str(votes)
                         names = [
-                            k for name, k in words if name == _plain(columns[c]) or _plain(columns[c]).startswith(name) and len(name) >= 5
+                            k
+                            for name, k in words
+                            if name == _plain(columns[c]) or _plain(columns[c]).startswith(name) and len(name) >= 5
                         ]
-                        heads_ = [k for name, k in words if name == _plain(county) or (len(name) >= 3 and _plain(county).startswith(name))]
+                        heads_ = [
+                            k
+                            for name, k in words
+                            if name == _plain(county) or (len(name) >= 3 and _plain(county).startswith(name))
+                        ]
                         hits = []
                         for digits, b in tokens:
                             if digits != text:
                                 continue
                             if not any(abs((b[1] + b[3]) / 2 - (k[1] + k[3]) / 2) < 14 for k in names):
                                 continue
-                            head = [k for k in heads_ if 0 < b[1] - k[3] < 700 and abs((b[0] + b[2]) / 2 - (k[0] + k[2]) / 2) < 140]
+                            head = [
+                                k
+                                for k in heads_
+                                if 0 < b[1] - k[3] < 700 and abs((b[0] + b[2]) / 2 - (k[0] + k[2]) / 2) < 140
+                            ]
                             if head:
                                 hits.append((min(b[1] - k[3] for k in head), b))
                         boxes_ = list(dict.fromkeys(b for _, b in sorted(hits)))
@@ -899,6 +909,13 @@ def emit(source: ModuleType) -> Path:
                         supersedes_id=previous if id == result_set else None,
                         completeness=round(min(counted / official, 1), 4) if official else None,
                     )
+            held = {
+                code
+                for (code,) in conn.execute(
+                    "select code from reporting_unit where scheme_code = 'us.county_part' and code like %s and valid_from <> %s",
+                    [f"{year}:%", day],
+                ).fetchall()
+            }
             units: dict[str, UUID] = {}
             for county in lines["county"].unique(maintain_order=True):
                 code, parent, area = counties.get((county, county)) or counties[(fips[where], _plain(county))]
@@ -908,6 +925,8 @@ def emit(source: ModuleType) -> Path:
                         if hasattr(source, "CHAMBER")
                         else f"{year}:{code}:{key.split(':')[3]}"
                     )
+                    if part in held:
+                        part = f"{day}:{part.split(':', 1)[1]}"
                     units[county] = cs.unit("us.county_part", part)
                     if part in parts:
                         continue
