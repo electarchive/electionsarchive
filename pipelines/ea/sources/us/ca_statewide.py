@@ -45,6 +45,11 @@ ITEMS = {
     1930: (date(1930, 11, 4), range(5, 10)),
     1934: (date(1934, 11, 6), range(6, 11)),
     1938: (date(1938, 11, 8), range(5, 10)),
+    1942: (date(1942, 11, 3), range(5, 10)),
+    1946: (date(1946, 11, 5), range(5, 10)),
+    1950: (date(1950, 11, 7), range(5, 10)),
+    1954: (date(1954, 11, 2), range(4, 9)),
+    1958: (date(1958, 11, 4), range(4, 9)),
 }
 VOLUMES = {
     year: (f"https://v3.californiatargetbook.com/docs/SoV/g{year}.pdf", "https://www.californiatargetbook.com/", day, pages)
@@ -178,6 +183,45 @@ PARTIES = {
     (1938, "secretary-of-state", "Nellie S. Harriss"): "prohibition-party",
     (1938, "controller", "Ellen G. Pritchard"): "prohibition-party",
     (1938, "attorney-general", "Claude A. Watson"): "prohibition-party",
+    (1942, "lieutenant-governor", "Ellis E. Patterson"): "democratic-party",
+    (1942, "lieutenant-governor", "Frederick F. Houser"): "republican-party",
+    (1942, "secretary-of-state", "Paul Peek"): "democratic-party",
+    (1942, "secretary-of-state", "Frank M. Jordan"): "republican-party",
+    (1942, "attorney-general", "Robert W. Kenny"): "democratic-party",
+    (1942, "attorney-general", "Wallace L. Ware"): "republican-party",
+    (1942, "attorney-general", "Claude A. Watson"): "prohibition-party",
+    (1946, "lieutenant-governor", "Goodwin J. Knight"): "republican-party",
+    (1946, "lieutenant-governor", "John F. Shelley"): "democratic-party",
+    (1946, "controller", "Virgil G. Hinshaw"): "prohibition-party",
+    (1946, "attorney-general", "Edmund G. Brown"): "democratic-party",
+    (1946, "attorney-general", "Fred N. Houser"): "republican-party",
+    (1946, "attorney-general", "Claude A. Watson"): "prohibition-party",
+    (1950, "controller", "Virgil G. Hinshaw"): "prohibition-party",
+    (1950, "attorney-general", "Edmund G. (Pat) Brown"): "democratic-party",
+    (1950, "attorney-general", "Claude A. Watson"): "prohibition-party",
+    (1950, "attorney-general", "Edward S. Shattuck"): "republican-party",
+    (1954, "lieutenant-governor", "Harold J. Powers"): "republican-party",
+    (1954, "lieutenant-governor", "Edward R. Roybal"): "democratic-party",
+    (1954, "secretary-of-state", "Frank M. Jordan"): "republican-party",
+    (1954, "secretary-of-state", "Daniel Raeburn"): "democratic-party",
+    (1954, "secretary-of-state", "Frank G. H. Stevens"): "prohibition-party",
+    (1954, "controller", "Robert C. Kirkwood"): "republican-party",
+    (1954, "controller", "George D. Collins Jr."): "democratic-party",
+    (1954, "controller", "Fred H. Ross"): "prohibition-party",
+    (1954, "treasurer", "Charles G. Johnson"): "republican-party",
+    (1954, "treasurer", "George E. Johnson"): "democratic-party",
+    (1954, "attorney-general", "Edwin M. Copper"): "prohibition-party",
+    (1958, "lieutenant-governor", "Harold J. Powers"): "republican-party",
+    (1958, "lieutenant-governor", "Glenn M. Anderson"): "democratic-party",
+    (1958, "secretary-of-state", "Frank M. Jordan"): "republican-party",
+    (1958, "secretary-of-state", "Henry P. Lopez"): "democratic-party",
+    (1958, "secretary-of-state", "Mel J. Miller"): "prohibition-party",
+    (1958, "controller", "Robert C. Kirkwood"): "republican-party",
+    (1958, "controller", "Alan Cranston"): "democratic-party",
+    (1958, "treasurer", "A. Ronald Button"): "republican-party",
+    (1958, "treasurer", "Bert A. Betts"): "democratic-party",
+    (1958, "attorney-general", "Patrick J. Hillings"): "republican-party",
+    (1958, "attorney-general", "Stanley Mosk"): "democratic-party",
 }
 NAMES: dict[str, str] = {}
 ERRATA = {
@@ -204,8 +248,13 @@ ERRATA = {
     (1926, ("surveyor-general", 0)),
     (1930, ("controller", 0)),
     (1938, ("secretary-of-state", 0)),
+    (1942, ("lieutenant-governor", 0)),
+    (1946, ("secretary-of-state", 0)),
+    (1946, ("controller", 0)),
+    (1946, ("treasurer", 0)),
+    (1958, ("treasurer", 0)),
 }
-PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930, 1934, 1938}
+PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930, 1934, 1938, 1942, 1946, 1950, 1954, 1958}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
