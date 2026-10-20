@@ -105,13 +105,13 @@ where r.status <> 'withdrawn';
 
 create temp table rsm as
 select distinct rv.result_set_k, rv.measure from result_value rv
-where rv.measure in (2, 3, 14) and rv.result_set_k in (select k from result_set where status <> 'withdrawn');
+where rv.measure in (2, 3, 14, 24, 25) and rv.result_set_k in (select k from result_set where status <> 'withdrawn');
 
 create temp table tn as
 select cc.id from cc join contest c on c.id = cc.id
-where exists (select from result_set r join rsm on rsm.result_set_k = r.k and rsm.measure = 2
+where exists (select from result_set r join rsm on rsm.result_set_k = r.k and rsm.measure in (2, 24)
         where r.election_id = c.election_id and (r.contest_id is null or r.contest_id = c.id))
-    and exists (select from result_set r join rsm on rsm.result_set_k = r.k and rsm.measure in (3, 14)
+    and exists (select from result_set r join rsm on rsm.result_set_k = r.k and rsm.measure in (3, 14, 25)
         where r.election_id = c.election_id and (r.contest_id is null or r.contest_id = c.id));
 
 create temp table rsu as
