@@ -552,6 +552,11 @@ PEOPLE = {
         ("us.mpls_evs.person", "robin-wonsley"),
         ("us.alged.person", "24125"),
     ),
+    "Jeff Jackson, North Carolina senator 2014-2022, representative 2023-2024, and attorney general": (
+        ("wikidata", "Q17183308"),
+        ("us.klarner.person", "331143"),
+        ("us.medsl_statewide.person", "NC:jeff-jackson"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
