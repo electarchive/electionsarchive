@@ -30,8 +30,12 @@ FILES = {
     date(2023, 10, 14): "ProposedConstitutionalAmendments_Oct_14_2023",
     date(2023, 11, 18): "ProposedConstitutionalAmendments_Nov_18_2023",
     date(2024, 11, 5): "Proposed_Constitutional_Amendment_11_05_2024",
+    date(2024, 12, 7): "ProposedConstitutionalAmendments2024DecSummaries",
+    date(2025, 3, 29): "ProposedConstitutionalAmendments2025MarSummaries",
 }
 STAMPS = {
+    date(2024, 12, 7): 20250701031819,
+    date(2025, 3, 29): 20260627114258,
     date(2023, 10, 14): 20260430032232,
     date(2023, 11, 18): 20250306070402,
     date(2024, 11, 5): 20250301053325,
@@ -40,6 +44,7 @@ HEADER = re.compile(r"Proposed Amendment No\. (\d+)")
 WORDING = re.compile(r"(?:Do you support|Shall)[^?]*\?")
 ACT = re.compile(r"Act (\d+)[^\n]{0,60}\n.*?(Do you support[^?]*\?)", re.S)
 BALLOT = re.compile(r"Ballot Language: .(Do you support[^?]*\?).")
+NUMBERED = re.compile(r"([1-4])\. (Do you support[^?]*\?)")
 NUMBER = re.compile(r"(?i)\b(?:amendment|ca)\s*(?:no\.?\s*)?(\d+)\b")
 
 
@@ -70,6 +75,18 @@ def parse() -> None:
             text=True,
             check=True,
         ).stdout
+        if day in (date(2024, 12, 7), date(2025, 3, 29)):
+            path = str(raw.cached(SOURCE, url(day)).path)
+            columns = [["pdftotext", "-q", path, "-"]]
+            if day == date(2025, 3, 29):
+                columns = [
+                    ["pdftotext", "-q", "-x", str(x), "-y", "0", "-W", "669", "-H", "1770", path, "-"] for x in (0, 669)
+                ]
+            for command in columns:
+                flat = re.sub(r"\s+", " ", subprocess.run(command, capture_output=True, text=True, check=True).stdout)
+                for found in NUMBERED.finditer(flat):
+                    rows.append({"day": day, "amendment": int(found[1]), "page": 1, "text": found[2]})
+            continue
         headers = list(HEADER.finditer(text))
         for index, found in enumerate(headers):
             end = headers[index + 1].start() if index + 1 < len(headers) else len(text)
