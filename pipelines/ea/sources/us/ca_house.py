@@ -14,6 +14,8 @@ SUMMARY = "California's House results by county from the Secretary of State's St
 STATE = "CA"
 FIPS = "06"
 ITEMS = {
+    1958: ("stateofcaliforn195262cali", date(1958, 11, 4), range(267, 270)),
+    1960: ("stateofcaliforn195262cali", date(1960, 11, 8), range(333, 336)),
     1962: ("castatem196264cali", date(1962, 11, 6), range(19, 23)),
     1964: ("castatem196264cali", date(1964, 11, 3), range(158, 161)),
     1966: ("californiastate196668cali", date(1966, 11, 8), range(55, 59)),
@@ -49,6 +51,7 @@ REVISION = 1
 RENAMED: str | None = None
 COMMAS = True
 TURNED: set[tuple[int, int]] = {(1976, page) for page in range(80, 85)}
+TRANSPOSED = {1960, 1958}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
