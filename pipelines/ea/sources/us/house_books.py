@@ -200,6 +200,51 @@ def parse(source: ModuleType) -> None:
                     column.extend(settled.get((k, c), -(10**9)) for k in lines)
                     if total is not None:
                         printed[(year, where, known.index(columns[c]))] = settled.get((total, c), -1)
+                if year in getattr(source, "TRANSPOSED", ()):
+                    for r, c, county, value, again in cells:
+                        if r == total or (r, c) not in settled:
+                            continue
+                        votes = settled[(r, c)]
+                        text = str(votes)
+                        names = [
+                            k for name, k in words if name == _plain(columns[c]) or _plain(columns[c]).startswith(name) and len(name) >= 5
+                        ]
+                        heads_ = [k for name, k in words if name == _plain(county) or (len(name) >= 3 and _plain(county).startswith(name))]
+                        hits = []
+                        for digits, b in tokens:
+                            if digits != text:
+                                continue
+                            if not any(abs((b[1] + b[3]) / 2 - (k[1] + k[3]) / 2) < 14 for k in names):
+                                continue
+                            head = [k for k in heads_ if 0 < b[1] - k[3] < 700 and abs((b[0] + b[2]) / 2 - (k[0] + k[2]) / 2) < 140]
+                            if head:
+                                hits.append((min(b[1] - k[3] for k in head), b))
+                        boxes_ = list(dict.fromkeys(b for _, b in sorted(hits)))
+                        box = boxes_[0] if boxes_ else None
+                        how = "unique" if len(boxes_) == 1 else "aligned"
+                        if box is None and names and heads_:
+                            head = min(heads_, key=lambda k: abs((k[1] + k[3]) / 2 - (names[0][1] + names[0][3]) / 2))
+                            line = min(names, key=lambda k: abs(k[1] - head[3]) if k[1] > head[3] else 10**6)
+                            box = (head[0], line[1], head[2], line[3])
+                            how = "placed"
+                        if box is None and names:
+                            box = tuple(names[0])
+                            how = "placed"
+                        rows.append(
+                            {
+                                "year": year,
+                                "page": page,
+                                "state": table["state"] or source.STATE,
+                                "district": table["district"],
+                                "county": county,
+                                "column": known.index(columns[c]),
+                                "label": columns[c],
+                                "votes": votes,
+                                "box": None if box is None else list(box),
+                                "located": how,
+                            }
+                        )
+                    continue
                 found = {
                     (r, c): list(
                         dict.fromkeys(
@@ -733,14 +778,14 @@ def emit(source: ModuleType) -> Path:
                           (select sum(v.value)::bigint from result_value v
                            where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1)
                    from contest_option o join result_set rs on rs.contest_id = o.contest_id and rs.is_default
-                   where o.contest_id = %s""",
+                   where o.contest_id = %s and o.parent_option_id is null""",
                 [contest],
             ).fetchall()
             picked: dict[int, UUID] = {}
             unmatched: list[tuple[int, str, int]] = []
             for (column, label), cells in lines.group_by("column", "label", maintain_order=True):
                 summed = int(cells["votes"].sum())
-                surname = _plain(str(label))
+                surname = _plain(str(label).split("/")[0])
                 named = [
                     (option, total)
                     for option, kind, name, total in known
