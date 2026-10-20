@@ -194,7 +194,7 @@
     aria-level={depth + 1}
     aria-expanded={row.hasChildren ? isOpen : undefined}
     class={cn(
-      "grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(5,4.75rem)] items-center gap-x-1 bg-card pe-2",
+      "grid grid-cols-[minmax(0,1fr)_8rem_4.5rem_repeat(5,4.75rem)] items-center gap-x-1 bg-card pe-2",
       {
         "max-sm:grid-cols-[minmax(0,1fr)_repeat(5,2.25rem)]": view !== "done",
         "max-sm:grid-cols-[minmax(0,1fr)_repeat(5,3rem)]": view === "done",
@@ -264,24 +264,34 @@
     </span>
     <span
       role="gridcell"
-      class="text-end font-figures text-sm text-muted-foreground max-sm:hidden"
+      class="text-end font-figures text-sm whitespace-nowrap text-muted-foreground max-sm:hidden"
     >
       {#if row.kind === "government"}
         {row.expected === 0 && row.held === 0
           ? m.coverage_not_due()
           : count(row.held)}
-      {:else if row.kind === "governments" && row.expected != null}
+      {:else if row.expected != null}
         {m.coverage_held_contests({
           held: count(row.expected - (row.missing ?? 0)),
           expected: count(row.expected),
         })}
-      {:else if row.expected != null && (row.kind === "level" || row.kind === "stage" || (row.kind === "state" && row.path.includes("/federal/")))}
-        {m.coverage_held_contests({
-          held: count(row.held),
-          expected: count(Math.max(row.expected, row.held)),
-        })}
       {:else}
-        {count(row.held)}
+        –
+      {/if}
+    </span>
+    <span
+      role="gridcell"
+      class="text-end font-figures text-sm whitespace-nowrap text-muted-foreground max-sm:hidden"
+      title={m.coverage_extra_title()}
+    >
+      {#if row.kind === "government"}
+        {count(Math.max(0, row.held - (row.expected ?? 0)))}
+      {:else}
+        {count(
+          row.expected == null
+            ? row.held
+            : row.held - row.expected + (row.missing ?? 0),
+        )}
       {/if}
     </span>
     {@render marker(row.missing, row.expected)}

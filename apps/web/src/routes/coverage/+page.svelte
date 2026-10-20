@@ -231,7 +231,7 @@
       <div
         role="row"
         class={cn(
-          "sticky inset-bs-0 z-10 grid grid-cols-[minmax(0,1fr)_5.5rem_repeat(5,4.75rem)] items-end gap-x-1 bg-card px-2 pbs-2 pbe-1.5 text-xs/tight font-bold max-sm:pbs-16",
+          "sticky inset-bs-0 z-10 grid grid-cols-[minmax(0,1fr)_8rem_4.5rem_repeat(5,4.75rem)] items-end gap-x-1 bg-card px-2 pbs-2 pbe-1.5 text-xs/tight font-bold max-sm:pbs-16",
           {
             "max-sm:grid-cols-[minmax(0,1fr)_repeat(5,2.25rem)]":
               view !== "done",
@@ -242,6 +242,9 @@
         <span role="columnheader">{m.coverage_column_name()}</span>
         <span role="columnheader" class="text-end max-sm:hidden"
           >{m.coverage_column_held()}</span
+        >
+        <span role="columnheader" class="text-end max-sm:hidden"
+          >{m.coverage_column_extra()}</span
         >
         {#each [m.coverage_column_all(), m.coverage_column_county(), m.coverage_column_precinct(), m.coverage_column_shapes(), m.coverage_column_turnout()] as heading (heading)}
           <span
