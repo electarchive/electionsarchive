@@ -73,17 +73,38 @@
                 (member.to == null || member.to > (members.data.start ?? "")))),
         ),
   );
-  const places = $derived([
-    ...new Map(
-      sitting.flatMap((member) =>
-        member.place == null
-          ? []
-          : [[member.place, { name: member.place, path: member.path }]],
+  const own = $derived(
+    new Map((members.data?.parties ?? []).map((party) => [party.id, party])),
+  );
+  const places = $derived(
+    [
+      ...new Map(
+        sitting.flatMap((member) =>
+          member.place == null
+            ? []
+            : [[member.place, { name: member.place, path: member.path }]],
+        ),
+      ).values(),
+    ].toSorted((a, b) =>
+      a.name.localeCompare(b.name, undefined, { numeric: true }),
+    ),
+  );
+  const hemicycle = $derived.by(() => {
+    const keys = new Set((term?.parties ?? []).map((entry) => entry.party));
+    const home = (party: string | null) =>
+      party == null || keys.has(party)
+        ? party
+        : (own.get(party)?.parent ?? party);
+    const seated = Map.groupBy(
+      sitting.toSorted(
+        (a, b) =>
+          (a.place ?? "").localeCompare(b.place ?? "", undefined, {
+            numeric: true,
+          }) || a.name.localeCompare(b.name),
       ),
-    ).values(),
-  ]);
-  const hemicycle = $derived(
-    (term?.parties ?? []).map((entry) => {
+      (member) => home(member.party),
+    );
+    return (term?.parties ?? []).map((entry) => {
       const party = entry.party == null ? null : info.get(entry.party);
       return {
         key: entry.party ?? "none",
@@ -93,16 +114,20 @@
         lean: party?.lean ?? null,
         seats: entry.seats,
         here: 0,
-        members: sitting
-          .filter((member) => member.party === entry.party)
-          .map((member) => ({
-            place: places.findIndex((place) => place.name === member.place),
-            name: member.name,
-            position: null,
-          })),
+        members: (seated.get(entry.party) ?? []).map((member) => ({
+          place: places.findIndex((place) => place.name === member.place),
+          name: member.name,
+          position: null,
+          person: member.person,
+          party: member.party,
+          affiliation:
+            member.party == null || member.party === entry.party
+              ? null
+              : (own.get(member.party)?.label ?? null),
+        })),
       };
-    }),
-  );
+    });
+  });
   const change = $derived.by(() => {
     if (previous == null) {
       return null;

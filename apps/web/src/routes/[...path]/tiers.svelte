@@ -128,11 +128,14 @@
       (place) => place.code,
     )
       .values()
-      .map(
-        (group) =>
-          group.find((place) => place.top != null) ??
-          group.find((place) => place.id != null) ??
-          group[0],
+      .flatMap((group) =>
+        group
+          .toSorted(
+            (a, b) =>
+              Number(b.top != null) - Number(a.top != null) ||
+              Number(b.id != null) - Number(a.id != null),
+          )
+          .slice(0, 1),
       )
       .toArray(),
   );

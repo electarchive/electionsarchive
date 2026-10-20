@@ -1107,10 +1107,22 @@ function slots(
     name: labels.full.get(option.area ?? option.contest) ?? "",
     path: option.path,
   };
-  const result = chosen.map((entry) => ({
+  const party = option.party;
+  const affiliation = party == null ? null : (labels.full.get(party) ?? null);
+  const result: Array<{
+    place: { id: string; name: string; path: string | null };
+    name: string | null;
+    position: number | null;
+    person: string | null;
+    party: string | null;
+    affiliation: string | null;
+  }> = chosen.map((entry) => ({
     place: own,
     name: labels.full.get(entry.person) ?? null,
     position: entry.position,
+    person: entry.person,
+    party,
+    affiliation,
   }));
   const units = chosen.length === 0 ? (split?.get(option.k) ?? []) : [];
   for (const unit of units) {
@@ -1121,11 +1133,25 @@ function slots(
     };
     const end = Math.min(option.seats, result.length + unit.seats);
     while (result.length < end) {
-      result.push({ place, name: null, position: null });
+      result.push({
+        place,
+        name: null,
+        position: null,
+        person: null,
+        party,
+        affiliation,
+      });
     }
   }
   while (result.length < option.seats) {
-    result.push({ place: own, name: null, position: null });
+    result.push({
+      place: own,
+      name: null,
+      position: null,
+      person: null,
+      party,
+      affiliation,
+    });
   }
   return result;
 }
@@ -1182,6 +1208,9 @@ function assign(
               place: at.get(slot.place.id) ?? 0,
               name: slot.name,
               position: slot.position,
+              person: slot.person,
+              party: slot.party,
+              affiliation: slot.affiliation,
             })),
         ]),
     ),
@@ -1267,6 +1296,7 @@ async function holders(
           .values()
           .flatMap((option) => [
             option.area ?? option.contest,
+            ...(option.party == null ? [] : [option.party]),
             ...option.people.map((entry) => entry.person),
           ]),
       ),
@@ -2436,6 +2466,9 @@ export const contests = {
                     place: v.number(),
                     name: v.nullable(v.string()),
                     position: v.nullable(v.number()),
+                    person: v.nullable(v.string()),
+                    party: v.nullable(v.string()),
+                    affiliation: v.nullable(v.string()),
                   }),
                 ),
               }),
@@ -8759,6 +8792,7 @@ export const bodies = {
             short: v.nullable(v.string()),
             color: v.nullable(v.string()),
             lean: v.nullable(v.number()),
+            parent: v.nullable(v.string()),
           }),
         ),
       }),
@@ -8878,7 +8912,7 @@ export const bodies = {
             .filter((id) => id != null),
         ),
       ];
-      const [labels, slugs, colors, positions] = await Promise.all([
+      const [labels, slugs, colors, positions, branches] = await Promise.all([
         names([
           ...new Set([
             ...rows.map((row) => row.person),
@@ -8892,9 +8926,19 @@ export const bodies = {
           where party_id = any(${sql.param(parties)}::uuid[])
           order by party_id, valid_from desc nulls last
         `),
+        db.execute<{ party: string; parent: string }>(sql`
+          select distinct on (a.party_id) a.party_id as party, coalesce(pm.into_id, a.parent_party_id) as parent
+          from party_affiliation a left join entity_merge pm on pm.entity_id = a.parent_party_id
+          where a.party_id = any(${sql.param(parties)}::uuid[]) and a.kind = 'regional_branch'
+            and (a.valid @> ${start ?? input.from}::date or upper(a.valid) is null)
+          order by a.party_id, lower(a.valid) desc nulls last
+        `),
       ]);
       const lean = new Map(
         positions.rows.map((row) => [row.party_id, row.lean]),
+      );
+      const parent = new Map(
+        branches.rows.map((row) => [row.party, row.parent]),
       );
       return {
         start,
@@ -8918,6 +8962,7 @@ export const bodies = {
         parties: parties.map((id) => ({
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,
+          parent: parent.get(id) ?? null,
         })),
       };
     }),
