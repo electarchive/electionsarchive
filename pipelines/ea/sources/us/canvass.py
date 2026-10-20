@@ -19,10 +19,11 @@ SOURCE = "us.canvass"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
-RHODE_ISLAND = "https://s3.amazonaws.com/rigov/election/results/2010/general_election/{town}.json"
-RI_STATEWIDE = "https://s3.amazonaws.com/rigov/election/results/2010/general_election/statewide.json"
+RHODE_ISLAND = "https://s3.amazonaws.com/rigov/election/results/{year}/general_election/{town}.json"
+RI_STATEWIDE = "https://s3.amazonaws.com/rigov/election/results/{year}/general_election/statewide.json"
+RI_DAYS = {2010: date(2010, 11, 2), 2014: date(2014, 11, 4)}
 RI_PUBLISHER = "Rhode Island Board of Elections"
-RI_TITLE = "2010 General Election results"
+RI_TITLE = "{year} General Election results"
 KENTUCKY = (
     "https://elect.ky.gov/results/2020-2029/Documents/"
     "Certification%20of%20Election%20Results%20for%202023%20General%20Election%20Final.pdf"
@@ -192,9 +193,10 @@ def _towns() -> list[str]:
 
 
 def fetch() -> None:
-    raw.fetch(SOURCE, RI_STATEWIDE, suffix=".json")
-    for town in _towns():
-        raw.fetch(SOURCE, RHODE_ISLAND.format(town=town), suffix=".json")
+    for year in RI_DAYS:
+        raw.fetch(SOURCE, RI_STATEWIDE.format(year=year), suffix=".json")
+        for town in _towns():
+            raw.fetch(SOURCE, RHODE_ISLAND.format(year=year, town=town), suffix=".json")
     raw.fetch(SOURCE, KENTUCKY, suffix=".pdf")
     for day, categories in IN_CATEGORIES.items():
         for category in categories:
@@ -207,52 +209,57 @@ def fetch() -> None:
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
-    for fips, towns in TOWNS.items():
-        for town in towns:
-            data = json.loads(
-                raw.cached(SOURCE, RHODE_ISLAND.format(town=slug(town).replace("-", "_"))).path.read_text()
+    for year, day in RI_DAYS.items():
+        found: list[dict[str, object]] = []
+        for fips, towns in TOWNS.items():
+            for town in towns:
+                data = json.loads(
+                    raw.cached(
+                        SOURCE, RHODE_ISLAND.format(year=year, town=slug(town).replace("-", "_"))
+                    ).path.read_text()
+                )
+                for contest in data["contests"]:
+                    if contest["name"] not in OFFICES:
+                        continue
+                    for candidate in contest["candidates"]:
+                        found.append(
+                            {
+                                "state": "RI",
+                                "day": day,
+                                "office": contest["name"],
+                                "candidate": candidate["name"],
+                                "mate": None,
+                                "party": candidate["party_code"],
+                                "fips": fips,
+                                "votes": int(candidate["votes"]),
+                            }
+                        )
+        statewide = {
+            (contest["name"], candidate["name"]): int(candidate["votes"])
+            for contest in json.loads(raw.cached(SOURCE, RI_STATEWIDE.format(year=year)).path.read_text())["contests"]
+            if contest["name"] in OFFICES
+            for candidate in contest["candidates"]
+        }
+        summed: dict[tuple[str, str], int] = defaultdict(int)
+        for row in found:
+            summed[(str(row["office"]), str(row["candidate"]))] += int(str(row["votes"]))
+        if set(summed) != set(statewide) or any(statewide[key] < votes for key, votes in summed.items()):
+            raise ValueError("Rhode Island's towns add up to more than its statewide totals")
+        rows.extend(found)
+        for (office, candidate), votes in statewide.items():
+            party = next(row["party"] for row in found if row["office"] == office and row["candidate"] == candidate)
+            rows.append(
+                {
+                    "state": "RI",
+                    "day": day,
+                    "office": office,
+                    "candidate": candidate,
+                    "mate": None,
+                    "party": party,
+                    "fips": "RI:statewide",
+                    "votes": votes - summed[(office, candidate)],
+                }
             )
-            for contest in data["contests"]:
-                if contest["name"] not in OFFICES:
-                    continue
-                for candidate in contest["candidates"]:
-                    rows.append(
-                        {
-                            "state": "RI",
-                            "day": date(2010, 11, 2),
-                            "office": contest["name"],
-                            "candidate": candidate["name"],
-                            "mate": None,
-                            "party": candidate["party_code"],
-                            "fips": fips,
-                            "votes": int(candidate["votes"]),
-                        }
-                    )
-    statewide = {
-        (contest["name"], candidate["name"]): int(candidate["votes"])
-        for contest in json.loads(raw.cached(SOURCE, RI_STATEWIDE).path.read_text())["contests"]
-        if contest["name"] in OFFICES
-        for candidate in contest["candidates"]
-    }
-    summed: dict[tuple[str, str], int] = defaultdict(int)
-    for row in rows:
-        summed[(str(row["office"]), str(row["candidate"]))] += int(str(row["votes"]))
-    if set(summed) != set(statewide) or any(statewide[key] < votes for key, votes in summed.items()):
-        raise ValueError("Rhode Island's towns add up to more than its statewide totals")
-    for (office, candidate), votes in statewide.items():
-        party = next(row["party"] for row in rows if row["office"] == office and row["candidate"] == candidate)
-        rows.append(
-            {
-                "state": "RI",
-                "day": date(2010, 11, 2),
-                "office": office,
-                "candidate": candidate,
-                "mate": None,
-                "party": party,
-                "fips": "RI:statewide",
-                "votes": votes - summed[(office, candidate)],
-            }
-        )
     with connect() as conn:
         fips = {
             slug(text).replace("-", ""): code
@@ -534,7 +541,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Rhode Island's 2010, Indiana's 2018 and 2022, Michigan's, Arizona's, and Oregon's 2022, Kentucky's "
+                "Rhode Island's 2010 and 2014, Indiana's 2018 and 2022, Michigan's, Arizona's, and Oregon's 2022, Kentucky's "
                 "2023, and Oregon's 2024 statewide general elections and measures by county, and 14 of Oregon's 2024 "
                 "legislative contests by county"
             ),
@@ -548,19 +555,21 @@ def emit() -> Path:
             text = re.sub(r"\b([A-Z][A-Z'.-]+)\b", lambda match: match[1].title(), text)
             return re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), text)
 
-        board = cs.source(RI_PUBLISHER, RI_TITLE)
-        cs.add(
-            "source",
-            id=board,
-            kind="official_body",
-            publisher=RI_PUBLISHER,
-            title=RI_TITLE,
-            url="https://www.ri.gov/election/results/2010/general_election/",
-            license="Public record",
-        )
-        cs.artifact(raw.cached(SOURCE, RI_STATEWIDE), board)
-        for town in _towns():
-            cs.artifact(raw.cached(SOURCE, RHODE_ISLAND.format(town=town)), board)
+        boards = {}
+        for year in RI_DAYS:
+            boards[year] = cs.source(RI_PUBLISHER, RI_TITLE.format(year=year))
+            cs.add(
+                "source",
+                id=boards[year],
+                kind="official_body",
+                publisher=RI_PUBLISHER,
+                title=RI_TITLE.format(year=year),
+                url=f"https://www.ri.gov/election/results/{year}/general_election/",
+                license="Public record",
+            )
+            cs.artifact(raw.cached(SOURCE, RI_STATEWIDE.format(year=year)), boards[year])
+            for town in _towns():
+                cs.artifact(raw.cached(SOURCE, RHODE_ISLAND.format(year=year, town=town)), boards[year])
         kentucky = cs.source(KY_PUBLISHER, KY_TITLE)
         cs.add(
             "source",
@@ -643,7 +652,7 @@ def emit() -> Path:
                 license="Public record",
             )
             cs.artifact(raw.cached(SOURCE, url), oregon[day.year])
-        sources = {"RI": board, "KY": kentucky, "MI": michigan, "AZ": secretary}
+        sources = {"RI": boards[2010], "KY": kentucky, "MI": michigan, "AZ": secretary}
         isos = [f"US-{state}" for state in (*sources, "IN", "OR")]
         states = dict(
             conn.execute(
@@ -890,6 +899,8 @@ def emit() -> Path:
                 if state == "IN"
                 else oregon[day.year]
                 if state == "OR"
+                else boards[day.year]
+                if state == "RI"
                 else sources[state],
                 is_default=True,
                 supersedes_id=None if result_set == first else first,
