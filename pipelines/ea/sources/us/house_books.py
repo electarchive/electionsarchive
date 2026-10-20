@@ -298,7 +298,7 @@ def parse(source: ModuleType) -> None:
                 heads = {
                     c: min(pairs)[1]
                     for c in range(len(columns))
-                    if len(columns) > 1
+                    if (len(columns) > 1 or getattr(source, "SINGLE_HEADS", False))
                     and (
                         pairs := [
                             (k[1] - h[3], h)
@@ -405,6 +405,8 @@ def parse(source: ModuleType) -> None:
                                 abs(h[0] - spot[0]) < 15 and abs(h[1] - spot[1]) < 15 for spot in spots
                             ):
                                 spots.append(h)
+                        if len(spots) != 1 and c in heads:
+                            spots = [heads[c]]
                         if len(spots) != 1:
                             continue
                         for i, r in enumerate(lines):
