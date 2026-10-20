@@ -18,7 +18,9 @@ FILES = {
     1996: date(1996, 11, 5),
     1998: date(1998, 11, 3),
     2000: date(2000, 11, 7),
+    2002: date(2002, 11, 5),
 }
+EMIT_YEARS = (2002,)
 NUMBER = re.compile(r"\d{1,3}(?:,\d{3})+")
 STATES_SQL = """
 select substr(p.iso_code, 4), ac.code, n.text
@@ -32,6 +34,8 @@ where p.iso_code like 'US-%'
 
 
 def url(year: int) -> str:
+    if year == 2002:
+        return f"{BASE}2002%20Voter%20Registration%20and%20Turnout%20Overview.pdf"
     return f"{BASE}{year}%20Voter%20Registration%20and%20Turnout%20by%20State.pdf"
 
 
@@ -92,8 +96,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Registered voters and turnout (the vote for the highest office) by state for the 1996, 1998, "
-            "and 2000 general elections from the Election Assistance Commission's published tables",
+            summary="Registered voters and turnout (the vote for the highest office) by state for the 2002 general election from the Election Assistance Commission's published tables",
             polity="US",
         )
         elections = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall())
@@ -103,7 +106,7 @@ def emit() -> Path:
                 "select election_id from result_set where contest_id is null and is_default and status <> 'withdrawn'"
             )
         }
-        for year, day in FILES.items():
+        for year, day in ((y, d) for y, d in FILES.items() if y in EMIT_YEARS):
             source = cs.source(PUBLISHER, title(year))
             if source in cs.minted:
                 cs.add(
