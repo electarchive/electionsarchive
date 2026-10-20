@@ -22,6 +22,8 @@ STATE = "OH"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 ITEMS = {
+    1982: ("micro_IA40706919_0320", date(1982, 11, 2), (137, 138, 139, 152, 153)),
+    1984: ("micro_IA40706919_0320", date(1984, 11, 6), (523, 524, 525, 526, 527, 528)),
     1986: ("micro_IA40706926_0051", date(1986, 11, 4), (116, 117, 118, 122, 123, 124)),
     1990: ("micro_IA40706942_0388", date(1990, 11, 6), (93, 94)),
     1988: ("micro_IA40706932_0362", date(1988, 11, 8), (111, 112, 113, 114, 115)),
@@ -33,12 +35,12 @@ VOLUMES = {
     for year, (item, day, pages) in ITEMS.items()
 }
 OFFICES = {"president": "president", "senate": "senate", "governor": "governor"}
-ERRATA = {(1986, ("governor", 0)), (1990, ("governor", 0)), (1988, ("turnout", 0)), (1992, ("turnout", 0)), (1994, ("turnout", 0))}
+ERRATA = {(1982, ("governor", 0)), (1984, ("president", 0)), (1986, ("governor", 0)), (1990, ("governor", 0)), (1988, ("turnout", 0)), (1992, ("turnout", 0)), (1994, ("turnout", 0))}
 DERIVED = {(1986, "Clermont", "Celeste"): 14246, (1994, "Guernsey", "Registered Voters"): 14166, (1992, "Henry", "Electors Voting"): 13538}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
-TURNED: set[tuple[int, int]] = set()
+TURNED = {(1982, page) for page in (137, 138, 139)} | {(1984, page) for page in range(523, 529)}
 THRESHOLDS = (150, 170, 190, 210, 230)
 
 
