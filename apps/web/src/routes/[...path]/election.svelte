@@ -21,7 +21,7 @@
   import Preview from "./preview.svelte";
   import Regions from "./regions.svelte";
   import Results, { MEASURES } from "./results.svelte";
-  import Seats from "./seats.svelte";
+  import Seated from "./seated.svelte";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
 
@@ -519,12 +519,19 @@
               : race.name,
         votes: MEASURES[race.measure]?.() ?? m.col_votes(),
         isSlate: race.kind === "elector_slate",
-        seated: seated.map((row) => ({
+        seated: (seated.length === 0 &&
+        race.kind === "body_seats" &&
+        race.body != null &&
+        (race.size ?? 0) > 1
+          ? grouped
+          : seated
+        ).map((row) => ({
           ...row,
           seats: row.seats ?? 0,
           here: 0,
           members: [],
         })),
+        isLone: seated.length === 0,
         rows: race.results.map((row) => ({
           key: row.key,
           label: row.label,
@@ -894,6 +901,7 @@
   {/if}
   {const isSeated = $derived(
     race.seated.length > 0 &&
+      (!race.isLone || election.parent != null) &&
       race.electors == null &&
       !race.isOffice &&
       !race.isSlate &&
@@ -981,18 +989,21 @@
     </div>
   {/if}
   {#if isSeated}
-    <Seats
+    <Seated
       parties={race.seated}
-      places={[]}
-      here={null}
-      place={race.name}
-      link={null}
+      body={race.body}
       size={race.size}
+      date={election.date}
+      place={race.name}
+      region={election.parent == null
+        ? null
+        : (election.breadcrumbs
+            .filter((crumb) => crumb.path !== election.parent?.path)
+            .at(-1)?.name ?? null)}
       change={race.change}
       isComplete={race.size != null || race.count === 1}
       partners={race.partners}
       governing={race.size === chamber?.size ? governing : []}
-      chamber={race.body}
     />
   {/if}
   <div
@@ -1009,8 +1020,7 @@
       trace={race.count === 1 ? race.path : null}
       span={null}
       votes={race.votes}
-      seats={race.seated.length === 0 ||
-      (race.isOffice && race.electors == null)
+      seats={race.isLone || (race.isOffice && race.electors == null)
         ? null
         : race.electors == null && !race.isSlate
           ? m.col_seats()
