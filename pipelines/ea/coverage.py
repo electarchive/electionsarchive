@@ -119,6 +119,7 @@ select distinct rv.result_set_k, rv.unit_k from result_value rv where rv.result_
 
 create temp table ug as
 select u.k,
+    u.scheme_code,
     case when u.scheme_code in ('us.precinct', 'us.nyc_ed', 'us-ia.caucus_precinct') then 'precinct'
         when u.scheme_code in ('us.county', 'us.town', 'us.county_part', 'us.former_county', 'us.ak_house_district',
             'us.place') then 'county'
@@ -126,12 +127,33 @@ select u.k,
     u.area_relation = 'equals' and exists (select from area_geometry g where g.area_id = u.area_id) as shaped
 from reporting_unit u where u.k in (select unit_k from rsu);
 
+create temp table cd as
+select cc.id as contest_id, cc.st, e.date_from as d
+from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
+where cc.year >= 2000 and cc.level in ('president', 'us_senate', 'governor', 'statewide_exec', 'judicial', 'statewide_measure');
+
+create temp table cx as
+select s.st, s.d, count(u.k) as n
+from (select distinct st, d from cd) s
+left join (reporting_unit u join pstate ps on ps.id = u.polity_id) on u.scheme_code = 'us.county' and ps.st = s.st and u.valid @> s.d
+group by 1, 2;
+
+create temp table cu as
+select cd.contest_id, cx.n as expected, count(distinct u.k) as present
+from cd join cx on cx.st = cd.st and cx.d = cd.d
+left join (rs join rsu on rsu.result_set_k = rs.k join reporting_unit u on u.k = rsu.unit_k and u.scheme_code = 'us.county')
+    on rs.contest_id = cd.contest_id and u.valid @> cd.d
+group by cd.contest_id, cx.n;
+
 create temp table cg as
 select rs.contest_id,
     bool_or(ug.grain = 'precinct') as precinct,
-    bool_or(ug.grain = 'county') as county,
-    bool_or(ug.grain = 'county' and not coalesce(rs.derived, false)) as county_free
+    bool_or(ug.grain = 'county' and (ug.scheme_code <> 'us.county' or cu.contest_id is null
+        or cu.expected = 0 or cu.present >= 0.9 * cu.expected)) as county,
+    bool_or(ug.grain = 'county' and (ug.scheme_code <> 'us.county' or cu.contest_id is null
+        or cu.expected = 0 or cu.present >= 0.9 * cu.expected) and not coalesce(rs.derived, false)) as county_free
 from rs join rsu on rsu.result_set_k = rs.k join ug on ug.k = rsu.unit_k
+left join cu on cu.contest_id = rs.contest_id
 group by rs.contest_id;
 """
 
