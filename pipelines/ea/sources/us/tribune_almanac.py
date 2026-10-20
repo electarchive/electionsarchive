@@ -15,6 +15,7 @@ SUMMARY = "House results by county from the Tribune Almanac"
 STATE = None
 FIPS = None
 ITEMS = {
+    1858: ("vol1859tribuneal00unse", 1859, date(1858, 11, 2), (46,)),
     1860: ("vol1861tribuneal00unse", 1861, date(1860, 11, 6), (42,)),
     1862: ("tribunealmanacpo1863newy", 1863, date(1862, 11, 4), (57, 58)),
     1864: ("tribunealmanacpo00otta", 1865, date(1864, 11, 8), (53,)),
@@ -27,7 +28,7 @@ VOLUMES = {
 }
 TITLES = {year: f"The Tribune Almanac and Political Register for {volume}" for year, (_, volume, _, _) in ITEMS.items()}
 PARTIES = ("rep", "dem", "lib", "ind", "scat", "cons", "rad", "opp", "gbk", "pro", "lab", "ref", "peo", "tem")
-ERRATA: set[tuple[int, tuple[str, int]]] = {(1862, ("NY", 27)), (1864, ("NY", 11)), (1868, ("NY", 12)), (1868, ("NY", 14))}
+ERRATA: set[tuple[int, tuple[str, int]]] = {(1858, ("NY", 31)), (1862, ("NY", 27)), (1864, ("NY", 11)), (1868, ("NY", 12)), (1868, ("NY", 14))}
 NAMES: dict[tuple[str, str], str] = {}
 KEYS: dict[tuple[int, str, int], str] = {}
 FORMER: dict[tuple[str, str], tuple[str, str, date]] = {}
