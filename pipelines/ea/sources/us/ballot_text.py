@@ -4,7 +4,7 @@ from uuid import UUID, uuid5
 import polars as pl
 
 from ea.changeset import NAMESPACE, Changeset, slug
-from ea.sources.us import elstats, measures, wikipedia_measures
+from ea.sources.us import ceda, ceda_measures, elstats, elstats_local_measures, measures, wikipedia_measures
 from ea.store import connect
 
 SOURCE = "us.ballot_text"
@@ -54,7 +54,9 @@ def emit() -> Path:
                 missed += 1
         print(f"wikipedia: {len(rows)} summaries, {missed} measures not in the archive under that source")
 
-        sources = {state: cs.source(elstats.TENANTS[state][1], elstats.TITLE) for state in ("CO", "CT", "ID", "NY", "VA")}
+        sources = {
+            state: cs.source(elstats.TENANTS[state][1], elstats.TITLE) for state in ("CO", "CT", "ID", "NM", "NY", "VA")
+        }
         assert not (set(sources.values()) & cs.minted)
         wording = (
             pl.read_parquet(measures.PARSED / "measures.parquet")
@@ -70,6 +72,36 @@ def emit() -> Path:
                 f"{day}:{state}:question:{question}", "text", title, sources[state], f"{base}/elections/view/{question}"
             )
         print(f"elstats: {found} of {wording.height} wordings placed")
+
+        local = (
+            pl.read_parquet(elstats_local_measures.PARSED / "questions.parquet")
+            .select("state", "contest", "title")
+            .unique()
+            .filter(pl.col("title").str.contains(WORDING) | (pl.col("title").str.len_chars() > 120))
+        )
+        found = 0
+        for state, contest, title in local.iter_rows():
+            if state in sources:
+                found += put(
+                    f"{state}:local:question:{contest}",
+                    "text",
+                    title,
+                    sources[state],
+                    f"{elstats.TENANTS[state][2]}/elections/view/{contest}",
+                )
+        print(f"elstats local: {found} of {local.height} wordings placed")
+
+        california = cs.source(ceda.PUBLISHER, ceda.TITLE)
+        assert california not in cs.minted
+        found = 0
+        for measure, question in (
+            pl.read_parquet(ceda_measures.PARSED / "measures.parquet")
+            .filter(pl.col("question").is_not_null())
+            .select("measure", "question")
+            .iter_rows()
+        ):
+            found += put(f"ceda:measure:{measure}", "text", question, california, None)
+        print(f"ceda: {found} wordings placed")
 
         for (contest, kind, lang, source, url), body in rows.items():
             cs.add(
