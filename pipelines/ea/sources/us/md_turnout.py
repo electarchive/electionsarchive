@@ -1,7 +1,9 @@
-import html
 import re
+from datetime import UTC, datetime
+from html import unescape
 from pathlib import Path
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -12,50 +14,55 @@ SOURCE = "us.md_turnout"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Maryland State Board of Elections"
-BASE = "https://elections.maryland.gov/elections/archive/"
-PAGES = {1992: "1992/turnout/general_statewide.html", 1996: "1996/turnout/general_statewide.html", 2000: "2000/turnout/general_statewide.html", 2002: "2002/turnout/g_statewide.html"}
+YEARS = range(1996, 2010, 2)
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
 join name n on n.entity_id = u.area_id and n.kind = 'short'
-where u.scheme_code = 'us.county' and u.code like '24%' and u.code <> '24510'
+where u.scheme_code = 'us.county' and u.code like '24%'
 """
+ROW = re.compile(r"([A-Z][A-Za-z.' ]+?)\s*\|\s*((?:[\d,]+\s*\|\s*)+)[\d.]+%")
+
+
+def url(year: int) -> str:
+    return f"https://2020mdmanual.msa.maryland.gov/msa/mdmanual/41electp/html/{year}p/regis.html"
 
 
 def plain(name: str) -> str:
-    return re.sub(r"[^a-z]", "", re.sub(r"(?i) co\.?$", "", name).lower())
+    return re.sub(r"[^a-z]", "", re.sub(r"(?i)( county| co\.)$", "", name.strip()).lower())
 
 
 def fetch() -> None:
-    for page in PAGES.values():
-        raw.fetch(SOURCE, BASE + page, suffix=".html")
+    for year in YEARS:
+        try:
+            raw.cached(SOURCE, url(year))
+            continue
+        except LookupError:
+            pass
+        response = httpx.get(url(year), headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=60)
+        response.raise_for_status()
+        raw.store(SOURCE, url(year), response.content, suffix=".html", retrieved_at=datetime.now(UTC), media_type="text/html")
 
 
 def parse() -> None:
     with connect() as conn:
         codes = {plain(name): code for code, name in conn.execute(COUNTIES_SQL)}
+    codes["baltimore"] = "24005"
     codes["baltimorecity"] = "24510"
     rows = []
-    for year, page in PAGES.items():
-        text = raw.cached(SOURCE, BASE + page).path.read_text(encoding="utf8", errors="replace")
-        text = re.sub(r"(?is)<script.*?</script>|<style.*?</style>", "", text)
-        text = html.unescape(re.sub(r"<[^>]+>", " ", re.sub(r"(?i)</tr>", "§", re.sub(r"(?i)</t[dh]>", "|", text))))
-        for line in text.split("§"):
-            cells = [c.strip() for c in line.split("|")]
-            if cells[0].strip().lower().startswith("total") and rows and rows[-1]["year"] == year:
-                break
-            start = next((i for i, c in enumerate(cells) if plain(c) in codes), None)
-            if start is None or len(cells) < start + 6:
+    for year in YEARS:
+        html = raw.cached(SOURCE, url(year)).path.read_text(errors="replace")
+        text = unescape(re.sub(r"<[^>]*>", "|", html))
+        text = re.sub(r"\s*\|\s*(?:\|\s*)*", " | ", re.sub(r"\s+", " ", text))
+        for match in ROW.finditer(text):
+            name = plain(match[1])
+            if name not in codes:
                 continue
-            cells = cells[start:]
-            numbers = [int(c.replace(",", "")) for c in cells[1:5] if re.fullmatch(r"[\d,]+", c)]
-            if len(numbers) != 4:
-                continue
-            registered, voted = (numbers[3], numbers[2]) if year == 2002 else (numbers[0], numbers[3])
-            rows.append({"year": year, "code": codes[plain(cells[0])], "registered": registered, "voted": voted})
+            numbers = [int(t.replace(",", "")) for t in match[2].split("|") if t.strip()]
+            rows.append({"year": year, "code": codes[name], "registered": numbers[0], "voters": numbers[-1]})
     frame = pl.DataFrame(rows).unique(["year", "code"])
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year").agg(pl.len(), pl.col("registered").sum(), pl.col("voted").sum()).sort("year"))
+    print(frame.group_by("year").agg(pl.len(), pl.col("registered").sum(), pl.col("voters").sum()).sort("year"))
 
 
 def emit() -> Path:
@@ -65,32 +72,41 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maryland's registered voters and ballots cast by county for the generals of 1992, 1996, 2000, and 2002, "
-            "from the State Board of Elections' archive",
+            summary="Maryland's registered voters and ballots cast by county for its primaries of 1996–2008, "
+            "from the Maryland Manual's voter participation tables",
             polity="US",
         )
-        elections = {}
-        for value, entity_id in conn.execute(
-            """select x.value, x.entity_id from external_id x join election e on e.id = x.entity_id
-               where x.scheme = 'us.election' and x.value ~ '^\\d{4}-\\d\\d-\\d\\d:MD$' and e.kind = 'general'"""
-        ):
-            elections[int(value[:4])] = (value, entity_id)
+        elections = {
+            start.year: (value, entity_id)
+            for value, entity_id, start in conn.execute(
+                """select x.value, x.entity_id, e.date_from from external_id x join election e on e.id = x.entity_id
+                   where x.scheme = 'us.election' and x.value ~ ':MD(:[a-z]+)?$' and e.kind = 'primary'"""
+            )
+        }
         held = {
             election_id
             for (election_id,) in conn.execute(
                 "select election_id from result_set where contest_id is null and is_default and status <> 'withdrawn'"
             )
         }
-        title = "Voter Turnout, General Elections Archive"
+        title = "Voter Participation by County"
         source = cs.source(PUBLISHER, title)
         if source in cs.minted:
-            cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=title, url=BASE, license="Public record")
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url="https://msa.maryland.gov/msa/mdmanual/41electp/html/elepr.html",
+                license="Public record",
+            )
         for (year,), rows in frame.group_by("year", maintain_order=True):
             if year not in elections:
                 print(f"{year}: no election")
                 continue
             value_key, election_id = elections[year]
-            cs.artifact(raw.cached(SOURCE, BASE + PAGES[year]), source)
+            cs.artifact(raw.cached(SOURCE, url(year)), source)
             result_set = cs.key(f"{SOURCE}.result_set", f"{value_key}:county")
             cs.add(
                 "result_set",
@@ -104,8 +120,8 @@ def emit() -> Path:
                 is_default=election_id not in held,
                 completeness=round(rows.height / 24, 4),
             )
-            for code, registered, voted in rows.select("code", "registered", "voted").iter_rows():
-                for measure, value in ((2, registered), (3, voted)):
+            for code, registered, voters in rows.select("code", "registered", "voters").iter_rows():
+                for measure, value in ((2, registered), (3, voters)):
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
