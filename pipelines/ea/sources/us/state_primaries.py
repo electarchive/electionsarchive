@@ -8,6 +8,7 @@ import time
 import unicodedata
 import zipfile
 from datetime import date, timedelta
+from itertools import product
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, unquote, urlencode
@@ -704,8 +705,8 @@ WON_CONVENTION = (
     "Derived: the leader of the certified contest totals, with at least the 35 percent that avoids a nominating "
     "convention."
 )
-IN_DAY = date(2020, 6, 2)
-IN_ARCHIVE = "https://enr.indianavoters.in.gov/archive/2020Primary/data/OffCatC_{}_B.json"
+IN_DAYS = {2020: date(2020, 6, 2), 2022: date(2022, 5, 3)}
+IN_ARCHIVE = "https://enr.indianavoters.in.gov/archive/{}Primary/data/OffCatC_{}_B.json"
 IN_CATEGORIES = {1009: "GOVERNOR", 1018: "senate", 1039: "house"}
 IN_METHOD = (
     "Totals are the county rows of the Election Division's election night results archive, each candidate's rows "
@@ -1018,8 +1019,9 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
-    for category in IN_CATEGORIES:
-        raw.fetch(SOURCE, IN_ARCHIVE.format(category), suffix=".json")
+    for year in IN_DAYS:
+        for category in IN_CATEGORIES:
+            raw.fetch(SOURCE, IN_ARCHIVE.format(year, category), suffix=".json")
     for url in AL_FILES.values():
         raw.fetch(SOURCE, url, suffix=".zip")
     for year in IA_DAYS:
@@ -2825,8 +2827,10 @@ def parse() -> None:
         )
     )
     hoosier: list[tuple[date, str, str | None, str, str, str, int]] = []
-    for category, label in IN_CATEGORIES.items():
-        root = json.loads(raw.cached(SOURCE, IN_ARCHIVE.format(category)).path.read_bytes().decode("utf-8-sig"))["Root"]
+    for (year, in_day), (category, label) in product(IN_DAYS.items(), IN_CATEGORIES.items()):
+        root = json.loads(raw.cached(SOURCE, IN_ARCHIVE.format(year, category)).path.read_bytes().decode("utf-8-sig"))[
+            "Root"
+        ]
         totals = {
             (race["OFFICE_TITLE"], entry["PARTY"], entry["NAME_ON_BALLOT"]): int(entry["TOTAL"])
             for race in listed(root["StatewideSummary"]["Race"])
@@ -2840,7 +2844,7 @@ def parse() -> None:
                     sums[key] = sums.get(key, 0) + int(entry["TOTAL_VOTES"])
                     hoosier.append(
                         (
-                            IN_DAY,
+                            in_day,
                             label if label in ("house", "senate") else OFFICES[label][0],
                             str(int(re.findall(r"\d+", race["OFFICE_TITLE"])[-1]))
                             if label in ("house", "senate")
@@ -3284,8 +3288,8 @@ def emit() -> Path:
             for race, title in tx_elchist.races(election):
                 if TX_RACE.fullmatch(title):
                     cs.artifact(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm"), sources["TX"])
-        for category in IN_CATEGORIES:
-            cs.artifact(raw.cached(SOURCE, IN_ARCHIVE.format(category)), sources["IN"])
+        for year, category in product(IN_DAYS, IN_CATEGORIES):
+            cs.artifact(raw.cached(SOURCE, IN_ARCHIVE.format(year, category)), sources["IN"])
         for url in AL_FILES.values():
             cs.artifact(raw.cached(SOURCE, url), sources["AL"])
         for url in iowa().values():
@@ -3472,7 +3476,7 @@ def emit() -> Path:
             *(("TX", day, first) for day, first in TX_DAYS.items()),
             *(("SC", day, first) for day, first in SC_DAYS.items()),
             *(("PA", day, None) for day in PA_ELECTIONS),
-            ("IN", IN_DAY, None),
+            *(("IN", day, None) for day in IN_DAYS.values()),
             *(("AL", day, first) for day, first in AL_DAYS.items()),
             *(("IA", day, None) for day in IA_DAYS.values()),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
