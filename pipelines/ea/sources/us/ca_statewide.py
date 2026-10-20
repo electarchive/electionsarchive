@@ -52,6 +52,7 @@ ITEMS = {
     1954: (date(1954, 11, 2), range(4, 9)),
     1958: (date(1958, 11, 4), range(4, 9)),
     1990: (date(1990, 11, 6), range(24, 30)),
+    1994: (date(1994, 11, 8), (33, 36, 39, 42, 45, 48)),
     1962: (date(1962, 11, 6), (7, 8, 9, 10)),
     1966: (date(1966, 11, 8), (10, 11)),
     1970: (date(1970, 11, 3), (13, 14, 15, 16, 17, 33)),
@@ -382,6 +383,37 @@ PARTIES = {
     (1986, "attorney-general", "Carol L. Newman"): "libertarian-party",
     (1986, "attorney-general", "Robert J. Evans"): "CA:peace-and-freedom-party",
     (1986, "attorney-general", "Gary R. Odom"): "american-independent-party",
+    (1994, "lieutenant-governor", "Gray Davis"): "democratic-party",
+    (1994, "lieutenant-governor", "Cathie Wright"): "republican-party",
+    (1994, "lieutenant-governor", "Robert W. Lewis"): "american-independent-party",
+    (1994, "lieutenant-governor", "Bob New"): "libertarian-party",
+    (1994, "lieutenant-governor", "J. Luis Gomez"): "CA:peace-and-freedom-party",
+    (1994, "lieutenant-governor", "Daniel Moses"): "green-party",
+    (1994, "secretary-of-state", "Tony Miller"): "democratic-party",
+    (1994, "secretary-of-state", "Bill Jones"): "republican-party",
+    (1994, "secretary-of-state", "Dorothy Kreiss Robbins"): "american-independent-party",
+    (1994, "secretary-of-state", "Peggy Christensen"): "libertarian-party",
+    (1994, "secretary-of-state", "Israel Feuer"): "CA:peace-and-freedom-party",
+    (1994, "secretary-of-state", "Margaret Garcia"): "green-party",
+    (1994, "controller", "Kathleen Connell"): "democratic-party",
+    (1994, "controller", "Tom McClintock"): "republican-party",
+    (1994, "controller", "Nathan E. Johnson"): "american-independent-party",
+    (1994, "controller", "Cullene Marie Lang"): "libertarian-party",
+    (1994, "controller", "Elizabeth Nakano"): "CA:peace-and-freedom-party",
+    (1994, "treasurer", "Phil Angelides"): "democratic-party",
+    (1994, "treasurer", "Matt Fong"): "republican-party",
+    (1994, "treasurer", "George M. McCoy"): "american-independent-party",
+    (1994, "treasurer", "Jon Petersen"): "libertarian-party",
+    (1994, "treasurer", "Jan B. Tucker"): "CA:peace-and-freedom-party",
+    (1994, "attorney-general", "Tom Umberg"): "democratic-party",
+    (1994, "attorney-general", "Dan Lungren"): "republican-party",
+    (1994, "attorney-general", "Richard N. Burns"): "libertarian-party",
+    (1994, "attorney-general", "Robert J. Evans"): "CA:peace-and-freedom-party",
+    (1994, "insurance-commissioner", "Art Torres"): "democratic-party",
+    (1994, "insurance-commissioner", "Chuck Quackenbush"): "republican-party",
+    (1994, "insurance-commissioner", "A. Jacques"): "american-independent-party",
+    (1994, "insurance-commissioner", "Ted Brown"): "libertarian-party",
+    (1994, "insurance-commissioner", "Tom Condit"): "CA:peace-and-freedom-party",
 }
 NAMES: dict[str, str] = {}
 ERRATA = {
@@ -415,8 +447,10 @@ ERRATA = {
     (1958, ("treasurer", 0)),
     (1970, ("treasurer", 0)),
     (1970, ("superintendent-of-public-instruction", 0)),
+    (1994, ("attorney-general", 0)),
+    (1994, ("insurance-commissioner", 0)),
 }
-PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930, 1934, 1938, 1942, 1946, 1950, 1954, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990}
+PUBLISHED = {1882, 1886, 1910, 1914, 1918, 1922, 1926, 1930, 1934, 1938, 1942, 1946, 1950, 1954, 1958, 1962, 1966, 1970, 1974, 1978, 1982, 1986, 1990, 1994}
 ALIASES: dict[str, tuple[str, ...]] = {}
 BESIDE: tuple[str, ...] = ()
 COMMAS = True
