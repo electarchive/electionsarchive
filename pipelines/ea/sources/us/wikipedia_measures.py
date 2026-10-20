@@ -96,7 +96,7 @@ def parse() -> None:
                     del cells[5]
                 if len(cells) < 7:
                     continue
-                origin, status, measure, _, when, yes, no = cells[:7]
+                origin, status, measure, summary, when, yes, no = cells[:7]
                 found = re.match(r"([A-Z][a-z]{2})[a-z]*\.?\s+(\d{1,2})", when)
                 votes = [re.search(r"\d[\d,]*", cell.replace("'", "")) for cell in (yes, no)]
                 if found is None or None in votes:
@@ -117,6 +117,9 @@ def parse() -> None:
                         "measure": measure,
                         "yes": int(votes[0][0].replace(",", "")),
                         "no": int(votes[1][0].replace(",", "")),
+                        "summary": re.sub(
+                            r"\s+", " ", re.sub(r"\{\{[^}]*\}\}|<br\s*/?>|<[^>]+>|'{2,}", " ", summary)
+                        ).strip(),
                     }
                 )
     frame = pl.DataFrame(rows)
@@ -124,8 +127,10 @@ def parse() -> None:
     if unknown.height:
         raise ValueError(f"unknown statuses: {unknown.select('state', 'measure', 'status').rows()}")
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame.unique(["state", "day", "measure"], keep="first", maintain_order=True).write_parquet(
-        PARSED / "measures.parquet"
+    unique = frame.unique(["state", "day", "measure"], keep="first", maintain_order=True)
+    unique.drop("summary").write_parquet(PARSED / "measures.parquet")
+    unique.filter(pl.col("summary") != "").select("state", "day", "measure", "summary").write_parquet(
+        PARSED / "summaries.parquet"
     )
 
 
