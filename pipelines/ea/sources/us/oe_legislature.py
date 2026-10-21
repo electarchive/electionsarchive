@@ -18,7 +18,7 @@ COMMITS = {
     "AL": ("ba3999b3a63736d5a09d9b90db2774639bede8aa", (2018,)),
     "AR": ("834ccef3cdcf64c8a381811e4d3ad02ec72ba336", (2022,)),
     "AZ": ("bf14331521f62f74cb17848ab11ca3dfd27f4f82", (2016, 2018, 2022)),
-    "CA": ("84c2cbb08a268c683800b513726a1ac7dbf08dac", (2022,)),
+    "CA": ("84c2cbb08a268c683800b513726a1ac7dbf08dac", (2002, 2004, 2006, 2008, 2010, 2012, 2014, 2022)),
     "CT": ("f948d0a1ce36871de4a1d696612ab2a268fd0758", (2000, 2002, 2006, 2008, 2018)),
     "DE": ("a2f49b3c57253914c75d1306ab452d354174bd1f", (2016,)),
     "GA": ("36b7453793848c02d8f41601d9304a66ad828dd0", (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014)),
@@ -83,6 +83,8 @@ def picks() -> list[tuple[str, int, str]]:
                     if suffix in TIERS
                     else 4
                     if suffix.endswith("__precinct")
+                    else 3
+                    if suffix in ("__state_assembly", "__state_senate")
                     else 0
                     if suffix.endswith("__county")
                     else None
