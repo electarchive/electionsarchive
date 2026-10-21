@@ -313,6 +313,7 @@ def emit(
     absent: str = MISSING,
     close: str = CLOSE,
     declared: dict[str, tuple[str, str]] | None = None,
+    pages: Callable[[Changeset], dict[int, tuple[UUID, int, int]]] | None = None,
 ) -> Path:
     returns = pl.read_parquet(parsed / "returns.parquet").filter(pl.col("measure") == 1)
     races = pl.read_parquet(parsed / "races.parquet")
@@ -408,6 +409,8 @@ def emit(
             return re.sub(r"[^a-z]", "", slug(words[-1])) if words else ""
 
         sources: dict[int | str, UUID] = {} if cite is None else dict(cite(cs))
+        page_ids = {} if pages is None else pages(cs)
+        places: list[tuple[str, str, str, int, float, float, float, float]] = []
         for year, (text, doi) in TITLES.items() if cite is None else ():
             sources[year] = cs.source(medsl_state.PUBLISHER, text)
             if sources[year] in cs.minted:
@@ -695,18 +698,35 @@ def emit(
                     cells = lines.filter(
                         pl.col("candidate") == text, pl.col("writein") == pooled, pl.col("party").eq_missing(label)
                     )
-                    for county, votes in (
+                    for county, votes, *place in (
                         ()
                         if result_set not in cs.minted
                         else cells.with_columns(
                             unit=pl.when(pl.col("county").is_in(list(counties))).then("county").otherwise(pl.lit(state))
                         )
                         .group_by("unit")
-                        .agg(pl.col("votes").sum())
+                        .agg(
+                            pl.col("votes").sum(),
+                            *(pl.col(column).first() for column in ("page", "x0", "y0", "x1", "y1") if page_ids),
+                        )
                         .iter_rows()
                     ):
                         unit = counties[county] if county in counties else state_units[state][0]
                         values.append((str(result_set), str(unit), str(target), int(votes)))
+                        if place:
+                            page, width, height = page_ids[place[0]]
+                            places.append(
+                                (
+                                    str(result_set),
+                                    str(unit),
+                                    str(target),
+                                    str(page),
+                                    place[1] / width,
+                                    place[2] / height,
+                                    place[3] / width,
+                                    place[4] / height,
+                                )
+                            )
                 if not (pooled or nota):
                     totals.append((int(rows["votes"].sum()), root))
                 for member in indices if revised is not None else ():
@@ -778,9 +798,32 @@ def emit(
                 channel=pl.lit(0, pl.Int16),
                 measure=pl.lit(1, pl.Int16),
                 count_round=pl.lit(0, pl.Int16),
-                flags=pl.lit(0, pl.Int16),
+                flags=pl.lit(8 if page_ids else 0, pl.Int16),
             ),
         )
+        if places:
+            cs.frame(
+                "value_locator",
+                pl.DataFrame(
+                    places,
+                    schema={
+                        "result_set_id": pl.String,
+                        "unit_id": pl.String,
+                        "option_id": pl.String,
+                        "page_id": pl.String,
+                        "x0": pl.Float64,
+                        "y0": pl.Float64,
+                        "x1": pl.Float64,
+                        "y1": pl.Float64,
+                    },
+                    orient="row",
+                ).with_columns(
+                    channel=pl.lit(0, pl.Int16),
+                    measure=pl.lit(1, pl.Int16),
+                    count_round=pl.lit(0, pl.Int16),
+                    source_id=pl.lit(None, pl.String),
+                ),
+            )
         pl.DataFrame(
             mapping,
             schema={
