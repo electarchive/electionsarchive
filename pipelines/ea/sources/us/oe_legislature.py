@@ -34,6 +34,7 @@ COMMITS = {
     "ND": ("c25145fbab08f849e6eeec319f516d7916533ea1", (2018,)),
     "NJ": ("81ce9f0b7f554e0bd1655a4083b34a633967f840", (2017,)),
     "NV": ("109e5c7d6be95f15c6bad5194b415ebcdf75d7fc", (2016,)),
+    "NY": ("49a61af92f2784874b1d7b405be8beaecdb4c02f", (2000, 2002, 2004, 2006, 2014)),
     "OH": ("c98f2f7f32c8f1b35bff344ed9b784d0eff31c8d", (2020,)),
     "OR": ("76c478184965392b18afeaf8ab0746e5f401a2e9", (2020,)),
     "RI": ("977565f9d7cf7a32d3a2a454282b5fd291cef291", (2022,)),
@@ -50,6 +51,7 @@ ALIASES = {
     ("MS", "jeffdavis"): "jeffersondavis",
     ("TX", "hildalgo"): "hidalgo",
     ("IN", "clar"): "clark",
+    ("NY", "chautaugua"): "chautauqua",
 }
 TIERS = ["__county", "__county-level", "__town", "", "__precinct"]
 OTHER = r"\b(u\.?\s?s\.?|united states|congress\w*|county|city|party|levy|referendum|measure|amendment|board|commission\w*|court|judge|regents?|school|recorder|clerk)\b"
