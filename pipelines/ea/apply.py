@@ -987,12 +987,14 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
             [changeset_id],
         )
         conn.execute("set local session_replication_role = replica")
+        restored: list[str] = []
         for table in histories:
             history = sql.Identifier(f"{table}_history")
             if conn.execute(
                 sql.SQL("select exists (select from {} where superseded_by = %s)").format(history), [changeset_id]
             ).fetchone() != (True,):
                 continue
+            restored.append(table)
             columns = conn.execute(
                 """select attname, attidentity <> '' from pg_attribute
                    where attrelid = %s::regclass and attnum > 0 and not attisdropped and attgenerated = ''
@@ -1062,6 +1064,35 @@ def revert(conn: Connection, changeset_id: str, reason: str) -> None:
                 )
             remaining = [table for table in remaining if table not in leaves]
         conn.execute("delete from entity where changeset_id = %s", [changeset_id])
+        stranded = [
+            f"{child}.{column} {value} ({parent} missing)"
+            for child, column, parent, key in conn.execute(
+                """select c.conrelid::regclass::text, a.attname, c.confrelid::regclass::text, p.attname
+                   from pg_constraint c
+                   join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
+                   join pg_attribute p on p.attrelid = c.confrelid and p.attnum = c.confkey[1]
+                   where c.contype = 'f' and c.connamespace = 'public'::regnamespace
+                     and c.conrelid::regclass::text = any(%s)""",
+                [restored],
+            ).fetchall()
+            for (value,) in conn.execute(
+                sql.SQL(
+                    """select distinct h.{column}::text from {history} h
+                       where h.superseded_by = %s and h.{column} is not null
+                         and not exists (select from {parent} p where p.{key} = h.{column})
+                         and exists (select from {child} t where t.{column} = h.{column})"""
+                ).format(
+                    column=sql.Identifier(column),
+                    history=sql.Identifier(f"{child}_history"),
+                    parent=sql.Identifier(parent),
+                    key=sql.Identifier(key),
+                    child=sql.Identifier(child),
+                ),
+                [changeset_id],
+            ).fetchall()
+        ]
+        if stranded:
+            raise ValueError(f"reverting {changeset_id} would strand restored rows: " + "; ".join(stranded[:10]))
         for table in histories:
             conn.execute(
                 sql.SQL("delete from {} where superseded_by = %s").format(sql.Identifier(f"{table}_history")),

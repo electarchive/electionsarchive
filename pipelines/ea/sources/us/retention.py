@@ -759,6 +759,17 @@ def emit() -> Path:
             [list(held)],
         ).fetchall():
             junk[key].append((option, label))
+        stranded = defaultdict(list)
+        for option, value in conn.execute(
+            """select x.entity_id, x.value from external_id x join entity e on e.id = x.entity_id
+               where x.scheme = 'us.option' and e.type = 'contest_option' and e.retired_by is null
+                 and not exists (select from contest_option o where o.id = e.id)
+                 and not exists (select from entity_merge m where m.entity_id = e.id)
+                 and substring(x.value from '^(.*):[^:]*$') = any(%s)""",
+            [list(held)],
+        ).fetchall():
+            key, line = value.rsplit(":", 1)
+            stranded[key].append((option, line.rsplit("-", 1)[1]))
 
         kansas_source = cs.source("Kansas Secretary of State", "Official vote totals, general elections")
         cs.add(
@@ -984,6 +995,8 @@ def emit() -> Path:
                     cs.add("contest_option", id=option, contest_id=contest, kind="others", ballot_label=spoiled[1])
                 elif label not in ("Yes", "No"):
                     raise ValueError(f"{contest_key}: unexpected option {label}")
+            for option, answer in stranded.get(contest_key, []):
+                cs.merge(option, options[answer])
             for result_set, election, stage, kind, source, completeness in held.get(contest_key, []):
                 cs.add(
                     "result_set",
