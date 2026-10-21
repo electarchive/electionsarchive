@@ -17,6 +17,11 @@ PUBLISHER = "Washington Secretary of State"
 TITLE = "Voters' Pamphlet"
 HOST = "https://www.sos.wa.gov"
 PAMPHLETS = {
+    date(2013, 11, 5): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202013.pdf",
+    date(2014, 11, 4): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202014.pdf",
+    date(2015, 11, 3): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202015.pdf",
+    date(2017, 11, 7): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202017.pdf",
+    date(2018, 11, 6): "https://web.archive.org/web/2019/https://www.sos.wa.gov/_assets/elections/Voters%20Pamphlet%202018.pdf",
     date(2016, 11, 8): "https://web.archive.org/web/2017/https://www.sos.wa.gov/_assets/elections/voters%20pamphlet%202016.pdf",
     date(2019, 11, 5): f"{HOST}/sites/default/files/2022-05/-ED02-%2520Chelan%2520FINAL%2520low%2520res.pdf",
     date(2020, 11, 3): f"{HOST}/sites/default/files/2022-05/--ed02chelan%252cdouglas%252cgrant%252ckittitas.pdf",
@@ -81,7 +86,7 @@ def parse() -> None:
                     statement = f"The legislature has proposed a constitutional amendment {statement}"
                 rows.append({"day": day, "kind": kind, "number": measure, "page": number, "text": statement, "url": link})
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame = pl.DataFrame(rows)
+    frame = pl.DataFrame(rows).unique(subset=["day", "kind", "text"], keep="first", maintain_order=True)
     frame.write_parquet(PARSED / "wording.parquet")
     print(frame.select("day", "kind", "number", "page").sort("day", "kind", "number"))
 
@@ -109,23 +114,34 @@ def emit() -> Path:
         for link in PAMPHLETS.values():
             cs.artifact(raw.cached(SOURCE, link), source)
         contests: dict[tuple[date, str, int], list[object]] = {}
+        titles: dict[object, str] = {}
         for key, name, entity in conn.execute(
             """select x.value, n.text, x.entity_id from external_id x join ballot_question q on q.contest_id = x.entity_id
                join name n on n.entity_id = x.entity_id and n.is_preferred
                where x.scheme = 'us.contest' and x.value like '%%:WA:question:%%'"""
         ):
+            titles[entity] = name
             for kind, pattern in KINDS.items():
                 if (found := pattern.search(name)) is not None:
                     contests.setdefault((date.fromisoformat(key[:10]), kind, int(found[1])), []).append(entity)
                     break
         placed = 0
         rows = list(wording.iter_rows())
-        for day in {row[0] for row in rows}:
-            numbers = sorted(number for when, kind, number in contests if when == day and kind == "advisory")
-            advisory = [index for index, row in enumerate(rows) if row[0] == day and row[1] == "advisory"]
-            if len(numbers) == len(advisory):
-                for index, number in zip(advisory, numbers):
-                    rows[index] = (*rows[index][:2], number, *rows[index][3:])
+        for index, (day, kind, number, page, statement, link) in enumerate(rows):
+            if kind != "advisory":
+                continue
+            words = {word[:5] for word in re.findall(r"[a-z]{5,}", statement.lower())} - {"legis", "witho", "the", "peopl", "costi", "first", "years", "gover", "spend", "this", "tax"}
+            scored = sorted(
+                (
+                    (len(words & {word[:5] for word in re.findall(r"[a-z]{5,}", titles[entity].lower())}), n)
+                    for (when, k, n), entities in contests.items()
+                    if when == day and k == "advisory"
+                    for entity in entities
+                ),
+                reverse=True,
+            )
+            if scored and scored[0][0] >= 1 and (len(scored) == 1 or scored[0][0] > scored[1][0]):
+                rows[index] = (day, kind, scored[0][1], page, statement, link)
         for day, kind, number, page, statement, link in rows:
             entities = contests.get((day, kind, number), [])
             if len(entities) != 1:
