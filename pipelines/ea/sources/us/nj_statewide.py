@@ -15,10 +15,18 @@ PARSED = DATA / "parsed" / SOURCE
 DIGITIZED = 8
 DERIVED = 1
 BOOKS = nj_manual.VOLUMES | {
+    1880: ("manualoflegislat1881mull", nj_manual.MANUAL.format(1881), nj_manual.PUBLISHER, date(1880, 11, 2), (), False),
+    1883: ("manualoflegislat1885mull", nj_manual.MANUAL.format(1885), nj_manual.PUBLISHER, date(1883, 11, 6), (), False),
+    1886: ("manualoflegislat1887mull", nj_manual.MANUAL.format(1887), nj_manual.PUBLISHER, date(1886, 11, 2), (), False),
+    1889: ("manualoflegislat1890mull", nj_manual.MANUAL.format(1890), nj_manual.PUBLISHER, date(1889, 11, 5), (), False),
     1918: ("manualoflegislat1919mull", nj_manual.MANUAL.format(1919), nj_manual.PUBLISHER, date(1918, 11, 5), (), False),
     1919: ("manualoflegislat1920mull", nj_manual.MANUAL.format(1920), nj_manual.PUBLISHER, date(1919, 11, 4), (), False),
 }
 VOLUMES = {
+    1880: (219, 220),
+    1883: (258,),
+    1886: (313, 316),
+    1889: (331, 332),
     1892: range(361, 363),
     1896: range(430, 432),
     1900: range(444, 445),
@@ -36,6 +44,13 @@ VOLUMES = {
 TURNED = {1919}
 DEM = r"(?<!Social )(?<!National )Democrat"
 TABLES = [
+    (1880, 219, slice(0, 4), ("1880-11-02:NJ:president",), "president", [DEM, "Republican", "Greenback", "Prohibition"]),
+    (1880, 220, slice(0, 4), ("1880:NJ:governor", "1880-11-02:NJ:governor"), "governor", [DEM, "Republican", None, None]),
+    (1883, 258, slice(0, 4), ("1883:NJ:governor",), "governor", [DEM, "Republican", None, None]),
+    (1886, 313, slice(2, 6), ("1886:NJ:governor", "1886-11-02:NJ:governor"), "governor", [DEM, "Republican", None, None]),
+    (1886, 316, slice(0, 4), ("1884-11-04:NJ:president",), "president", [DEM, "Republican", "Prohibition", "Greenback"]),
+    (1889, 331, slice(2, 6), ("1889:NJ:governor",), "governor", [DEM, "Republican", None, None]),
+    (1889, 332, slice(0, 3), ("1888-11-06:NJ:president",), "president", [DEM, "Republican", "Prohibition"]),
     (
         1892,
         361,
