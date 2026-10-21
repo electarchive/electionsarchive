@@ -18,7 +18,7 @@ from ea.raw import Artifact
 from ea.store import DATA, connect
 
 SOURCE = "wikidata_photos"
-VERSION = "1"
+VERSION = "2"
 TITLE = "Photos of people"
 PHOTOS = DATA / "photos"
 ITEMS = DATA / "parsed" / SOURCE / "items.json"
@@ -242,7 +242,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "Portraits from Wikimedia Commons for every person with a Wikidata image, limited to public domain, CC0, "
-                "CC BY, and CC BY-SA files, as 256-pixel-wide thumbnails with their license and author"
+                "CC BY, and CC BY-SA files, as 256-pixel-wide WebP thumbnails with their license and author"
             ),
             polity=None,
         )
@@ -288,9 +288,9 @@ def emit() -> Path:
             if image.width > WIDTH:
                 image = image.resize((WIDTH, round(image.height * WIDTH / image.width)), Image.Resampling.LANCZOS)
             buffer = io.BytesIO()
-            image.save(buffer, "JPEG", quality=85, optimize=True, progressive=True)
+            image.save(buffer, "WEBP", quality=80, method=6)
             content = buffer.getvalue()
-            name = f"{hashlib.sha256(content).hexdigest()}.jpg"
+            name = f"{hashlib.sha256(content).hexdigest()}.webp"
             (PHOTOS / name).write_bytes(content)
             person = people[item]
             cs.add(
