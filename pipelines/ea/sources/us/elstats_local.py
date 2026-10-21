@@ -642,9 +642,15 @@ def emit() -> Path:
             ).fetchall()
         }
         statewide = {
-            value: entity
-            for value, entity in conn.execute(
-                "select value, entity_id from external_id where scheme = 'us.statewide.person'"
+            value: (entity, last)
+            for value, entity, last in conn.execute(
+                """select x.value, x.entity_id, max(e.date_from)
+                   from external_id x join candidacy cy on cy.person_id = x.entity_id
+                   join contest_option o on o.id = cy.option_id join contest c on c.id = o.contest_id
+                   join election e on e.id = c.election_id join changeset h on h.id = cy.changeset_id
+                   where x.scheme = 'us.statewide.person' and h.pipeline <> %s
+                   group by x.value, x.entity_id""",
+                [SOURCE],
             ).fetchall()
         }
 
@@ -896,8 +902,11 @@ def emit() -> Path:
                     )
                 else:
                     rank += 1
-                    person = statewide.get(f"{state}:{candidate_id}") or cs.key(
-                        f"{SOURCE}.person", f"{state}:{candidate_id}"
+                    held_by, last = statewide.get(f"{state}:{candidate_id}", (None, None))
+                    person = (
+                        held_by
+                        if last is not None and day.year - last.year < 40
+                        else cs.key(f"{SOURCE}.person", f"{state}:{candidate_id}")
                     )
                     if person in cs.minted and person not in persons:
                         cs.add("person", id=person)
