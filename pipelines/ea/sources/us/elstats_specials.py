@@ -2,6 +2,7 @@ import csv
 import io
 import json
 import re
+import zipfile
 from datetime import date
 from pathlib import Path
 from uuid import UUID
@@ -12,12 +13,15 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.elstats import SOURCE as ARCHIVE
-from ea.sources.us.elstats import TENANTS, plain, url
+from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "3"
+VERSION = "5"
 SEARCHES = [
+    ("NY", 2009),
+    ("NY", 2011),
+    ("NY", 2015),
     ("NY", 2020),
     ("NY", 2022),
     ("NY", 2024),
@@ -35,7 +39,9 @@ CALIFORNIA_FILES = [
     ("2022-cd22", "primary", "xlsx", date(2022, 4, 5)),
     ("2022-cd22", "general", "xlsx", date(2022, 6, 7)),
 ]
+MASSACHUSETTS_SPECIALS = {106102: (date(2001, 10, 16), 9), 103450: (date(2007, 10, 16), 5), 124836: (date(2013, 12, 10), 5)}
 STATES = {
+    "MA": "Massachusetts",
     "NY": "New York",
     "NM": "New Mexico",
     "VA": "Virginia",
@@ -70,6 +76,8 @@ def fetch() -> None:
         for name in ["RacesCandidates_Multiparish.htm", "Votes_Multiparish.htm"]
         + [f"VotesParish/Votes_{parish:02}.htm" for parish in range(1, 65)]
     ]
+    for election in MASSACHUSETTS_SPECIALS:
+        raw.fetch(ARCHIVE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
     for special, stage, extension, _ in CALIFORNIA_FILES:
         raw.fetch(SOURCE, CALIFORNIA.format(special, stage, extension), suffix=f".{extension}")
     for link in links:
@@ -177,6 +185,53 @@ def emit() -> Path:
                 if counted.get((race["ID"], choice_id), 0) != totals[(race["ID"], choice_id)][0]:
                     raise ValueError(f"{day} {desc}: the parishes do not sum to the statewide total")
     frames.append(pl.DataFrame(louisiana, infer_schema_length=None))
+    with zipfile.ZipFile(raw.cached(ARCHIVE, GAZETTEER).path) as archive:
+        gazetteer = pl.read_csv(
+            io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+        ).filter(pl.col("USPS") == "MA")
+    massachusetts_towns: dict[str, str] = {}
+    for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
+        massachusetts_towns.setdefault(plain(name), geoid[:5])
+        massachusetts_towns.setdefault(plain(re.sub(SUFFIXES, "", name.lower())), geoid[:5])
+    massachusetts: list[dict[str, object]] = []
+    for election, (day, district) in MASSACHUSETTS_SPECIALS.items():
+        table = pl.read_csv(
+            raw.cached(ARCHIVE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/").path,
+            infer_schema=False,
+            has_header=False,
+        ).rows()
+        names, parties = table[0], table[1]
+        tallies: dict[tuple[str, str | None, str], int] = {}
+        for row in table[2:]:
+            if row[0] in (None, "TOTALS"):
+                continue
+            code = massachusetts_towns.get(
+                plain(re.sub(r"^([NSEW])\. ", lambda hit: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[hit[1]], row[0]))
+            )
+            if code is None:
+                raise ValueError(f"{election}: no town for {row[0]}")
+            for column in range(3, len(row)):
+                if names[column] in (None, "Blanks", "Total Votes Cast") or row[column] is None:
+                    continue
+                key = (
+                    "Write-ins" if names[column] == "All Others" else names[column],
+                    parties[column],
+                    code,
+                )
+                tallies[key] = tallies.get(key, 0) + int(row[column].replace(",", ""))
+        massachusetts.extend(
+            {
+                "state": "MA",
+                "election_date": str(day),
+                "district_name": str(district),
+                "candidate_name": name,
+                "candidate_party_name": party,
+                "division_name": f"code:{code}",
+                "votes": str(votes),
+            }
+            for (name, party, code), votes in tallies.items()
+        )
+    frames.append(pl.DataFrame(massachusetts, infer_schema_length=None))
     california: list[dict[str, object]] = []
     for special, stage, extension, day in CALIFORNIA_FILES:
         sheet = pl.read_excel(
@@ -256,6 +311,15 @@ def emit() -> Path:
         top_two = cs.key("us.electoral_system", "top_two")
         sources: dict[str, UUID] = {}
         for state in STATES:
+            if state == "MA":
+                sources[state] = cs.source("Massachusetts Secretary of the Commonwealth", "Election statistics archive")
+                if sources[state] in cs.minted:
+                    raise ValueError("MA: the archive's source must already exist")
+                for election in MASSACHUSETTS_SPECIALS:
+                    cs.artifact(
+                        raw.cached(ARCHIVE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/"), sources[state]
+                    )
+                continue
             if state == "CA":
                 publisher, title = "California Secretary of State", "Special election official canvasses"
                 sources[state] = cs.source(publisher, title)
@@ -522,8 +586,11 @@ def emit() -> Path:
                     simple = plain(
                         re.sub(r"\s*\(.*\)$", "", division).lower().replace("saint ", "st ").replace("&", "and")
                     )
-                    code = counties[state].get(re.sub(r"(county|parish|borough)$", "", simple)) or counties[state].get(
-                        simple
+                    code = (
+                        division.removeprefix("code:")
+                        if division.startswith("code:")
+                        else counties[state].get(re.sub(r"(county|parish|borough)$", "", simple))
+                        or counties[state].get(simple)
                     )
                     if code is None:
                         raise ValueError(f"{key}: no county for {division}")
