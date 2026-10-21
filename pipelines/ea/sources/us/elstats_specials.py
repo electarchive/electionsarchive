@@ -28,7 +28,21 @@ FLORIDA = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDa
 LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob={:%Y%m%d}/{}"
 LOUISIANA_DAYS = [date(2013, 10, 19), date(2013, 11, 16), date(2021, 3, 20), date(2021, 4, 24)]
 LOUISIANA_RUNOFFS = {date(2013, 11, 16), date(2021, 4, 24)}
-STATES = {"NY": "New York", "NM": "New Mexico", "VA": "Virginia", "FL": "Florida", "LA": "Louisiana"}
+CALIFORNIA = "https://elections.cdn.sos.ca.gov/special-elections/{}/{}-official-canvass.{}"
+CALIFORNIA_FILES = [
+    ("2020-cd25", "primary", "xls", date(2020, 3, 3)),
+    ("2020-cd25", "general", "xls", date(2020, 5, 12)),
+    ("2022-cd22", "primary", "xlsx", date(2022, 4, 5)),
+    ("2022-cd22", "general", "xlsx", date(2022, 6, 7)),
+]
+STATES = {
+    "NY": "New York",
+    "NM": "New Mexico",
+    "VA": "Virginia",
+    "FL": "Florida",
+    "LA": "Louisiana",
+    "CA": "California",
+}
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
@@ -56,6 +70,8 @@ def fetch() -> None:
         for name in ["RacesCandidates_Multiparish.htm", "Votes_Multiparish.htm"]
         + [f"VotesParish/Votes_{parish:02}.htm" for parish in range(1, 65)]
     ]
+    for special, stage, extension, _ in CALIFORNIA_FILES:
+        raw.fetch(SOURCE, CALIFORNIA.format(special, stage, extension), suffix=f".{extension}")
     for link in links:
         try:
             raw.fetch(SOURCE, link, suffix=".json")
@@ -161,6 +177,52 @@ def emit() -> Path:
                 if counted.get((race["ID"], choice_id), 0) != totals[(race["ID"], choice_id)][0]:
                     raise ValueError(f"{day} {desc}: the parishes do not sum to the statewide total")
     frames.append(pl.DataFrame(louisiana, infer_schema_length=None))
+    california: list[dict[str, object]] = []
+    for special, stage, extension, day in CALIFORNIA_FILES:
+        sheet = pl.read_excel(
+            raw.cached(SOURCE, CALIFORNIA.format(special, stage, extension)).path,
+            has_header=False,
+            engine="calamine",
+            infer_schema_length=0,
+        ).rows()
+        district = int(re.match(r"^(\d+)", next(row[0] for row in sheet if row[0] and "District" in row[0]))[1])
+        cells: list[dict[str, object]] = []
+        for index, row in enumerate(sheet):
+            if row[0] == "County**":
+                break
+            if row[0] is None and row[1] is None and row[2] is not None and (sheet[index - 1][2] is None or (sheet[index - 1][0] or "").startswith("Percentage")) and sheet[index + 3][0] not in (None, "Total Votes Cast"):
+                block = []
+                for line in sheet[index + 3 :]:
+                    if line[0] is None or line[0].startswith(("Total", "Votes", "Percentage")):
+                        break
+                    block.append(line)
+                for column in range(2, len(row), 2):
+                    if row[column] is None:
+                        continue
+                    name = f"{row[column]} {sheet[index + 1][column]}"
+                    party = sheet[index + 2][column].upper()
+                    total = sum(int(line[column]) for line in block)
+                    cells.extend(
+                        {"name": name, "party": party, "county": line[0], "votes": int(line[column]), "total": total}
+                        for line in block
+                    )
+        ranked = sorted({cell["name"]: cell["total"] for cell in cells}.items(), key=lambda item: -item[1])
+        leaders = {name for name, _ in ranked[: 1 if stage == "general" else 2]}
+        for cell in cells:
+            california.append(
+                {
+                    "state": "CA",
+                    "election_date": str(day),
+                    "district_name": str(district),
+                    "candidate_name": cell["name"],
+                    "candidate_party_name": cell["party"],
+                    "division_name": cell["county"],
+                    "votes": str(cell["votes"]),
+                    "outcome": ("Elected" if stage == "general" else "Runoff") if cell["name"] in leaders else "Defeated",
+                    "runoff": stage == "general",
+                }
+            )
+    frames.append(pl.DataFrame(california, infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
@@ -191,8 +253,25 @@ def emit() -> Path:
         house = cs.key("us.body", "house")
         fptp = cs.key("us.electoral_system", "fptp")
         two_round = cs.key("us.electoral_system", "two_round")
+        top_two = cs.key("us.electoral_system", "top_two")
         sources: dict[str, UUID] = {}
         for state in STATES:
+            if state == "CA":
+                publisher, title = "California Secretary of State", "Special election official canvasses"
+                sources[state] = cs.source(publisher, title)
+                if sources[state] in cs.minted:
+                    cs.add(
+                        "source",
+                        id=sources[state],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url="https://www.sos.ca.gov/elections/prior-elections/special-elections",
+                        license="Public record",
+                    )
+                for special, stage, extension, _ in CALIFORNIA_FILES:
+                    cs.artifact(raw.cached(SOURCE, CALIFORNIA.format(special, stage, extension)), sources[state])
+                continue
             if state == "LA":
                 publisher, title = "Louisiana Secretary of State", "Official election results"
                 sources[state] = cs.source(publisher, title)
@@ -294,7 +373,7 @@ def emit() -> Path:
                 )
                 if runoff
                 else None,
-                electoral_system_id=two_round if state == "LA" else fptp,
+                electoral_system_id={"LA": two_round, "CA": top_two}.get(state, fptp),
                 default_result_kind="counted",
             )
             cs.add(
@@ -334,7 +413,7 @@ def emit() -> Path:
                         previous[1] + votes,
                     )
             outcomes = dict(lines.group_by("candidate_name").agg(pl.col("outcome").first()).iter_rows())
-            if state == "LA":
+            if state in ("LA", "CA"):
                 winners = {name for name, outcome in outcomes.items() if outcome == "Elected"}
             else:
                 winners = {max(candidates, key=lambda candidate: candidates[candidate][1])}
