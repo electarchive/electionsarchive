@@ -27,6 +27,8 @@ CONTESTS = [
     (date(1941, 9, 23), "MS", 2, 1941, "Mississippi", "1941 U.S. Senate special election in Mississippi", False),
     (date(1941, 11, 5), "SC", 3, 1941, "South Carolina", "1941 U.S. Senate special election in South Carolina", False),
     (date(1949, 11, 8), "NY", 3, 1949, "New York", "1949 U.S. Senate special election in New York", False),
+    (date(1946, 6, 25), "ND", 3, 1946, "North Dakota", "1946 United States Senate special election in North Dakota", False),
+    (date(1936, 11, 3), "MN", 2, 1936, "Minnesota", "Special election results", False),
     (date(1957, 4, 2), "TX", 2, 1957, "Texas", "1957 U.S. Senate special election", False),
     (date(1957, 8, 27), "WI", 1, 1957, "Wisconsin", "1957 United States Senate special election in Wisconsin", False),
     (date(1960, 6, 28), "ND", 1, 1960, "North Dakota", "1960 United States Senate special election, North Dakota", False),
@@ -176,13 +178,10 @@ def emit() -> Path:
         }
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.election'")}
-        held = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.contest'")}
         persons: dict[str, UUID] = {}
         first_rounds: dict[int, UUID] = {}
         for day, state, seat_class, year, place, _, runoff in CONTESTS:
             contest_key = f"{day}:{state}:senate:special"
-            if contest_key in held:
-                continue
             unit, area, label = states[state]
             polity = cs.polity(f"US-{state}")
             two_round = year == 1961
