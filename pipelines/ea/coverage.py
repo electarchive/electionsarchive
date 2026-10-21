@@ -114,6 +114,8 @@ update cc set year = coalesce(
          from contest c join election e on e.id = c.election_id where c.id = cc.id))
 where level = 'us_house' and stage = 'general';
 
+create index on cc (id);
+
 create temp table rs as
 select r.k, r.contest_id, cs.pipeline,
     s.publisher in ('Inter-university Consortium for Political and Social Research', 'Algara and Amlani') as derived
@@ -126,6 +128,8 @@ create table if not exists coverage_cache_unit (result_set_k integer not null, u
 
 create table if not exists coverage_cache_measure (result_set_k integer not null, measure smallint not null,
     primary key (result_set_k, measure));
+
+create table if not exists coverage_cache_unit_k (unit_k integer primary key);
 
 create table if not exists coverage_cache_done (result_set_k integer primary key);
 
@@ -141,11 +145,22 @@ select distinct rv.result_set_k, rv.measure from result_value rv
 where rv.measure in (2, 3, 14, 24, 25) and rv.result_set_k in (select k from fresh)
 on conflict do nothing;
 
+insert into coverage_cache_unit_k
+select distinct unit_k from coverage_cache_unit
+where not exists (select from coverage_cache_unit_k)
+on conflict do nothing;
+
+insert into coverage_cache_unit_k
+select distinct unit_k from coverage_cache_unit where result_set_k in (select k from fresh)
+on conflict do nothing;
+
 insert into coverage_cache_done select k from fresh on conflict do nothing;
 
 analyze coverage_cache_unit;
 
 analyze coverage_cache_measure;
+
+analyze coverage_cache_unit_k;
 
 create temp view rsm as
 select cm.result_set_k, cm.measure from coverage_cache_measure cm
@@ -167,8 +182,10 @@ select u.k,
         when u.scheme_code in ('us.county', 'us.town', 'us.county_part', 'us.former_county', 'us.ak_house_district',
             'us.place') then 'county'
         else 'total' end as grain,
-    u.area_relation = 'equals' and exists (select from area_geometry g where g.area_id = u.area_id) as shaped
-from reporting_unit u where u.k in (select unit_k from rsu);
+    u.area_relation = 'equals' and g.area_id is not null as shaped
+from reporting_unit u
+left join (select distinct area_id from area_geometry) g on g.area_id = u.area_id
+where u.k in (select unit_k from coverage_cache_unit_k);
 
 create temp table cd as
 select cc.id as contest_id, cc.st, e.date_from as d
@@ -215,9 +232,15 @@ select st, year, level, stage, count(*), count(*) filter (where results),
 from c group by 1, 2, 3, 4
 """
 
+SHAPES_SIGNATURE_SQL = """
+select cc.st, cc.year, cc.level, cc.stage, concat_ws(':', count(*), sum(rs.k), sum(hashtext(cc.id::text)))
+from cc join rs on rs.contest_id = cc.id group by 1, 2, 3, 4
+"""
+
 SHAPES_SQL = """
 select cc.st, cc.year, cc.level, cc.stage, count(distinct ug.k), count(distinct ug.k) filter (where ug.shaped)
-from cc join rs on rs.contest_id = cc.id join rsu on rsu.result_set_k = rs.k join ug on ug.k = rsu.unit_k
+from cc join dirty d on d.key = concat_ws('|', cc.st, cc.year, cc.level, cc.stage)
+join rs on rs.contest_id = cc.id join rsu on rsu.result_set_k = rs.k join ug on ug.k = rsu.unit_k
 where ug.grain = 'precinct'
 group by 1, 2, 3, 4
 """
@@ -282,6 +305,23 @@ from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
 join rr on rr.st = cc.st and rr.stage = cc.stage and rr.level = cc.level and cc.year between rr.y0 and rr.y1
 where c.previous_round_id is null and not cc.tacit;
 
+create temp table nxt as
+select n.previous_round_id, ccx.year, ccx.stage from contest n join cc ccx on ccx.id = n.id
+where n.previous_round_id is not null;
+
+create index on nxt (previous_round_id);
+
+analyze nxt;
+
+create temp table ro as
+select ccx.st, ccx.level, ccx.year, rc.office_id, rc.body_id, rc.district_area_id, rc.party_scope_id, re.date_from as d
+from cc ccx join contest rc on rc.id = ccx.id join election re on re.id = rc.election_id
+where ccx.stage = 'runoff' and rc.previous_round_id is null;
+
+create index on ro (st, level);
+
+analyze ro;
+
 create temp table fs as
 with u as (
     select r.contest_id, r.k, rv.unit_k, rv.option_k,
@@ -298,16 +338,15 @@ select fr.st, fr.year, fr.level, fr.thr, fs.top, nx.year, nx.stage, un.year
 from fr
 left join fs on fs.contest_id = fr.id
 left join lateral (
-    select ccx.year, ccx.stage from contest n join cc ccx on ccx.id = n.id where n.previous_round_id = fr.id limit 1
+    select nxt.year, nxt.stage from nxt where nxt.previous_round_id = fr.id limit 1
 ) nx on true
 left join lateral (
-    select ccx.year from contest rc join cc ccx on ccx.id = rc.id join election re on re.id = rc.election_id
-    where ccx.stage = 'runoff' and ccx.st = fr.st and ccx.level = fr.level and rc.previous_round_id is null
-        and nx.year is null
-        and rc.office_id is not distinct from fr.office_id and rc.body_id is not distinct from fr.body_id
-        and rc.district_area_id is not distinct from fr.district_area_id
-        and rc.party_scope_id is not distinct from fr.party_scope_id
-        and re.date_from between fr.d + 3 and fr.d + 130
+    select ro.year from ro
+    where ro.st = fr.st and ro.level = fr.level and nx.year is null
+        and ro.office_id is not distinct from fr.office_id and ro.body_id is not distinct from fr.body_id
+        and ro.district_area_id is not distinct from fr.district_area_id
+        and ro.party_scope_id is not distinct from fr.party_scope_id
+        and ro.d between fr.d + 3 and fr.d + 130
     limit 1
 ) un on true
 where fs.top <= fr.thr or nx.year is not null
@@ -392,7 +431,42 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         }
         for st, year, level, stage, n, results, county, precinct, icpsr, turnout in conn.execute(COUNT_SQL)
     }
-    shapes = {(st, year, level, stage): (n, shaped) for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL)}
+    conn.execute(
+        "create table if not exists coverage_cache_shapes (key text primary key, signature text not null, "
+        "units integer not null, shaped integer not null)"
+    )
+    shaped_signature = conn.execute(
+        "select concat_ws(':', count(*), sum(k::bigint), sum(k::bigint * k)) from ug where grain = 'precinct' and shaped"
+    ).fetchone()[0]
+    cached = {
+        key: (signature, units, shaped)
+        for key, signature, units, shaped in conn.execute(
+            "select key, signature, units, shaped from coverage_cache_shapes"
+        )
+    }
+    signatures = {
+        "|".join(str(part) for part in (st, year, level, stage)): f"{shaped_signature}/{signature}"
+        for st, year, level, stage, signature in conn.execute(SHAPES_SIGNATURE_SQL)
+    }
+    dirty = [key for key, signature in signatures.items() if cached.get(key, ("",))[0] != signature]
+    conn.execute("create temp table dirty (key text primary key)")
+    conn.cursor().executemany("insert into dirty values (%s)", [(key,) for key in dirty])
+    conn.execute("analyze dirty")
+    for key in dirty:
+        cached[key] = (signatures[key], 0, 0)
+    for st, year, level, stage, n, shaped in conn.execute(SHAPES_SQL):
+        key = "|".join(str(part) for part in (st, year, level, stage))
+        cached[key] = (signatures[key], n, shaped)
+    conn.execute("delete from coverage_cache_shapes")
+    conn.cursor().executemany(
+        "insert into coverage_cache_shapes values (%s, %s, %s, %s)",
+        [(key, signature, n, shaped) for key, (signature, n, shaped) in cached.items() if key in signatures],
+    )
+    shapes = {}
+    for key, (_, n, shaped) in cached.items():
+        if key in signatures and n > 0:
+            st, year, level, stage = key.split("|")
+            shapes[(st, int(year), level, stage)] = (n, shaped)
     pipelines: dict[tuple, set[str]] = defaultdict(set)
     for st, year, level, stage, pipeline in conn.execute(PIPELINES_SQL):
         pipelines[(st, year, level, stage)].add(pipeline)
