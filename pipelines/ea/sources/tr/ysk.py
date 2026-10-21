@@ -4229,7 +4229,7 @@ def parse() -> None:
     doc = [
         line.strip()
         for line in subprocess.run(
-            ["textutil", "-format", "doc", "-convert", "txt", "-stdout", str(raw.cached(SOURCE, PARLIAMENT_2007).path)],
+            ["antiword", "-w", "0", str(raw.cached(SOURCE, PARLIAMENT_2007).path)],
             capture_output=True,
             text=True,
             check=True,
@@ -5671,11 +5671,13 @@ def parse() -> None:
         [
             line.strip()
             for line in subprocess.run(
-                ["textutil", "-format", "rtf", "-convert", "txt", "-stdout", str(raw.cached(SOURCE, url).path)],
+                ["pandoc", "-f", "rtf", "-t", "plain", "--wrap=none"],
+                input=re.sub(rb"\\u(-?\d+)\?", rb"{\\uc0\\u\1}", raw.cached(SOURCE, url).path.read_bytes()),
                 capture_output=True,
-                text=True,
                 check=True,
-            ).stdout.splitlines()
+            )
+            .stdout.decode()
+            .splitlines()
             if line.strip()
         ]
         for url in (REFERENDUM_2007, REFERENDUM_2007_CUSTOMS)
