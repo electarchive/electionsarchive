@@ -17,7 +17,7 @@ from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, p
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "5"
+VERSION = "6"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -39,6 +39,8 @@ CALIFORNIA_FILES = [
     ("2022-cd22", "primary", "xlsx", date(2022, 4, 5)),
     ("2022-cd22", "general", "xlsx", date(2022, 6, 7)),
 ]
+TEXAS = "https://elections.sos.state.tx.us/elchist{}_race{}.htm"
+TEXAS_PAGES = [(61, 90, date(1997, 3, 15), 28, False), (64, 90, date(1997, 4, 12), 28, True), (329, 89, date(2018, 6, 30), 27, False)]
 MASSACHUSETTS_SPECIALS = {106102: (date(2001, 10, 16), 9), 103450: (date(2007, 10, 16), 5), 124836: (date(2013, 12, 10), 5)}
 STATES = {
     "MA": "Massachusetts",
@@ -48,6 +50,7 @@ STATES = {
     "FL": "Florida",
     "LA": "Louisiana",
     "CA": "California",
+    "TX": "Texas",
 }
 PARTIES = {
     "Democratic": "democratic-party",
@@ -56,6 +59,7 @@ PARTIES = {
     "DEM": "democratic-party",
     "REP": "republican-party",
     "LPF": "libertarian-party",
+    "LIB": "libertarian-party",
     "LBT": "libertarian-party",
     "Green": "green-party",
     "Conservative": "NY:conservative-party",
@@ -80,6 +84,8 @@ def fetch() -> None:
         raw.fetch(ARCHIVE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
     for special, stage, extension, _ in CALIFORNIA_FILES:
         raw.fetch(SOURCE, CALIFORNIA.format(special, stage, extension), suffix=f".{extension}")
+    for election, race, _, _, _ in TEXAS_PAGES:
+        raw.fetch(SOURCE, TEXAS.format(election, race), suffix=".htm")
     for link in links:
         try:
             raw.fetch(SOURCE, link, suffix=".json")
@@ -278,6 +284,40 @@ def emit() -> Path:
                 }
             )
     frames.append(pl.DataFrame(california, infer_schema_length=None))
+    texas: list[dict[str, object]] = []
+    for election, race, day, district, runoff in TEXAS_PAGES:
+        rows = [
+            [re.sub(r"\s+", " ", re.sub(r"<[^>]*>", "", cell)).strip() for cell in re.findall(r"<T[HD][^>]*>(.*?)</T[HD]>", row, re.S | re.I)]
+            for row in re.findall(r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, TEXAS.format(election, race)).path.read_text(errors="replace"), re.S | re.I)
+        ]
+        firsts, lasts, parties = rows[0], rows[1], rows[2]
+        stop = parties.index("Votes")
+        cells = []
+        for row in rows[4:]:
+            for column in range(1, stop):
+                name = re.sub(r",? (III|Jr\.|Sr\.)$", "", f"{firsts[column]} {lasts[column]}") if parties[column] != "W-I" else "Write-ins"
+                cells.append({"name": name, "party": parties[column], "county": row[0].title(), "votes": int(row[column].replace(",", ""))})
+        by_name: dict[str, int] = {}
+        for cell in cells:
+            by_name[cell["name"]] = by_name.get(cell["name"], 0) + cell["votes"]
+        ranked = sorted(((name, count) for name, count in by_name.items() if name != "Write-ins"), key=lambda item: -item[1])
+        majority = ranked[0][1] * 2 > sum(by_name.values())
+        leaders = {name for name, _ in ranked[: 1 if runoff or majority else 2]}
+        for cell in cells:
+            texas.append(
+                {
+                    "state": "TX",
+                    "election_date": str(day),
+                    "district_name": str(district),
+                    "candidate_name": cell["name"],
+                    "candidate_party_name": None if cell["party"] in ("W-I", "IND") else cell["party"],
+                    "division_name": cell["county"],
+                    "votes": str(cell["votes"]),
+                    "outcome": ("Elected" if runoff or majority else "Runoff") if cell["name"] in leaders else "Defeated",
+                    "runoff": runoff,
+                }
+            )
+    frames.append(pl.DataFrame(texas, infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
@@ -335,6 +375,22 @@ def emit() -> Path:
                     )
                 for special, stage, extension, _ in CALIFORNIA_FILES:
                     cs.artifact(raw.cached(SOURCE, CALIFORNIA.format(special, stage, extension)), sources[state])
+                continue
+            if state == "TX":
+                publisher, title = "Texas Secretary of State", "Election history: official results"
+                sources[state] = cs.source(publisher, title)
+                if sources[state] in cs.minted:
+                    cs.add(
+                        "source",
+                        id=sources[state],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url="https://elections.sos.state.tx.us/index.htm",
+                        license="Public record",
+                    )
+                for election, race, _, _, _ in TEXAS_PAGES:
+                    cs.artifact(raw.cached(SOURCE, TEXAS.format(election, race)), sources[state])
                 continue
             if state == "LA":
                 publisher, title = "Louisiana Secretary of State", "Official election results"
@@ -437,7 +493,7 @@ def emit() -> Path:
                 )
                 if runoff
                 else None,
-                electoral_system_id={"LA": two_round, "CA": top_two}.get(state, fptp),
+                electoral_system_id={"LA": two_round, "TX": two_round, "CA": top_two}.get(state, fptp),
                 default_result_kind="counted",
             )
             cs.add(
@@ -477,7 +533,7 @@ def emit() -> Path:
                         previous[1] + votes,
                     )
             outcomes = dict(lines.group_by("candidate_name").agg(pl.col("outcome").first()).iter_rows())
-            if state in ("LA", "CA"):
+            if state in ("LA", "CA", "TX"):
                 winners = {name for name, outcome in outcomes.items() if outcome == "Elected"}
             else:
                 winners = {max(candidates, key=lambda candidate: candidates[candidate][1])}
