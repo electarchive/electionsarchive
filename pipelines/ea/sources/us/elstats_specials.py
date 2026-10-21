@@ -2,6 +2,8 @@ import csv
 import io
 import json
 import re
+import struct
+import subprocess
 import zipfile
 from datetime import date
 from pathlib import Path
@@ -12,10 +14,10 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import special_counties, special_files, special_md, special_nc, special_pdfs
+from ea.sources.us import special_counties, special_files, special_md, special_nc, special_nm_1997, special_pdfs
 from ea.sources.us.elstats import SOURCE as ARCHIVE
 from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "us.elstats_specials"
 VERSION = "13"
@@ -114,6 +116,7 @@ PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
     "Libertarian": "libertarian-party",
+    "Reform": "reform-party",
     "DEM": "democratic-party",
     "REP": "republican-party",
     "LPF": "libertarian-party",
@@ -147,6 +150,7 @@ def fetch() -> None:
     special_md.fetch()
     special_pdfs.fetch()
     special_counties.fetch()
+    special_nm_1997.fetch()
     for election, race, _, _, _ in TEXAS_PAGES:
         raw.fetch(SOURCE, TEXAS.format(election, race), suffix=".htm")
     for link in links:
@@ -387,6 +391,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_md.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_nm_1997.rows(), infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
@@ -534,6 +539,41 @@ def emit() -> Path:
             for year in frame.filter(pl.col("state") == state)["election_date"].str.slice(0, 4).unique():
                 cs.artifact(raw.cached(ARCHIVE, url(TENANTS[state][0], int(year))), sources[state])
 
+        canvass = raw.cached(SOURCE, special_nm_1997.CANVASS)
+        official = cs.source("New Mexico Secretary of State", "1997 special election canvass")
+        if official in cs.minted:
+            cs.add(
+                "source",
+                id=official,
+                kind="official_body",
+                publisher="New Mexico Secretary of State",
+                title="1997 special election canvass",
+                url="https://sos.nm.gov/sos-archive/election-results-archive/1997-election-results/",
+                license="Public record",
+            )
+        canvass_artifact = cs.artifact(canvass, official)
+        canvass_pages: dict[int, UUID] = {}
+        for number in sorted({row["page"] for row in special_nm_1997.rows()}):
+            image = DATA / "pages" / SOURCE / f"{canvass.sha256}-{number}.png"
+            if not image.exists():
+                image.parent.mkdir(parents=True, exist_ok=True)
+                subprocess.run(
+                    ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                    + [str(canvass.path), str(image.with_suffix(""))],
+                    check=True,
+                )
+            width, height = struct.unpack(">II", image.read_bytes()[16:24])
+            canvass_pages[number] = cs.page(canvass_artifact, number)
+            cs.add(
+                "source_page",
+                id=canvass_pages[number],
+                artifact_id=canvass_artifact,
+                page_number=number,
+                image_key=f"pages/{SOURCE}/{image.name}",
+                width=width,
+                height=height,
+            )
+
         created: set[UUID] = set()
         elections: set[UUID] = set()
         contests: dict[str, UUID] = {}
@@ -660,7 +700,7 @@ def emit() -> Path:
                 ).fetchall()
             }
             result_set = cs.key(f"{SOURCE}.result_set", key)
-            options: list[tuple[UUID, dict[str, int]]] = []
+            options: list[tuple[UUID, dict[str, int], dict[str, tuple[int, list[float]]]]] = []
             for name, (party, _) in candidates.items():
                 if name in winners or outcomes.get(name) == "Runoff":
                     row = conn.execute(
@@ -718,7 +758,15 @@ def emit() -> Path:
                     .agg(pl.col("votes").sum())
                     .iter_rows()
                 }
-                options.append((option, by_unit))
+                located = {
+                    str(division): (int(page), list(box))
+                    for division, page, box in lines.filter(
+                        (pl.col("candidate_name") == name) & pl.col("page").is_not_null()
+                    )
+                    .select("division_name", "page", "box")
+                    .iter_rows()
+                } if "page" in lines.columns else {}
+                options.append((option, by_unit, located))
             write_in = cs.key("us.option", f"{key}:write_in")
             cs.add("contest_option", id=write_in, contest_id=contest, kind="write_in", ballot_label="Write-ins")
             options.append(
@@ -733,6 +781,7 @@ def emit() -> Path:
                         .agg(pl.col("votes").sum())
                         .iter_rows()
                     },
+                    {},
                 )
             )
             cs.add(
@@ -743,12 +792,12 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=sources[state],
+                source_id=official if state == "NM" and day == date(1997, 5, 13) else sources[state],
                 is_default=True,
                 completeness=1,
             )
             totals: dict[str, int] = {}
-            for option, by_unit in options:
+            for option, by_unit, located in options:
                 for division, count in by_unit.items():
                     simple = plain(
                         re.sub(r"\s*\(.*\)$", "", division).lower().replace("saint ", "st ").replace("&", "and")
@@ -777,6 +826,23 @@ def emit() -> Path:
                         flags=0,
                         value=count,
                     )
+                    if division in located:
+                        page, box = located[division]
+                        cs.add(
+                            "value_locator",
+                            result_set_id=result_set,
+                            unit_id=unit,
+                            option_id=option,
+                            channel=0,
+                            measure=1,
+                            count_round=1,
+                            page_id=canvass_pages[page],
+                            source_id=None,
+                            x0=box[0],
+                            y0=box[1],
+                            x1=box[2],
+                            y1=box[3],
+                        )
             for unit, total in totals.items():
                 cs.add(
                     "result_value",
