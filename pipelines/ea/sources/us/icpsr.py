@@ -160,7 +160,11 @@ def parse() -> None:
                 separator="\t",
                 infer_schema_length=0,
             )
-            state = next(n for n, label in labels.items() if re.fullmatch(r"(ICPR |ICPSR )?(STATE|COUNTY)( CODE)?", label) and label != "ICPSR COUNTY CODE")
+            state = next(
+                n
+                for n, label in labels.items()
+                if re.fullmatch(r"(ICPR |ICPSR )?(STATE|COUNTY)( CODE)?", label) and label != "ICPSR COUNTY CODE"
+            )
             county = next(n for n, label in labels.items() if label == "COUNTY NAME")
             districts = {
                 int(found[1] or found[2] or 0): n
