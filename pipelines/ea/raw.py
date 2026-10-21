@@ -131,8 +131,12 @@ def _artifact(source: str, url: str, entry: dict[str, str | int | None]) -> Arti
     if HOST and not path.exists():
         path.parent.mkdir(parents=True, exist_ok=True)
         partial = path.parent / f".{uuid4()}.part"
-        with partial.open("wb") as file:
-            ssh(f"cat {shlex.quote(f'{ROOT}/raw/{source}/{path.name}')}", stdout=file)
+        try:
+            with partial.open("wb") as file:
+                ssh(f"cat {shlex.quote(f'{ROOT}/raw/{source}/{path.name}')}", stdout=file)
+        except BaseException:
+            partial.unlink(missing_ok=True)
+            raise
         with partial.open("rb") as file:
             if hashlib.file_digest(file, "sha256").hexdigest() != entry["sha256"]:
                 partial.unlink()
@@ -191,23 +195,27 @@ def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None 
     partial = folder / f".{uuid4()}.part"
     digest = hashlib.sha256()
     size = 0
-    with (
-        httpx.stream(
-            "GET" if body is None else "POST",
-            url,
-            json=body,
-            headers={"User-Agent": USER_AGENT},
-            follow_redirects=True,
-            timeout=600,
-        ) as response,
-        partial.open("wb") as file,
-    ):
-        response.raise_for_status()
-        media_type = response.headers.get("content-type")
-        for chunk in response.iter_bytes():
-            digest.update(chunk)
-            size += len(chunk)
-            file.write(chunk)
+    try:
+        with (
+            httpx.stream(
+                "GET" if body is None else "POST",
+                url,
+                json=body,
+                headers={"User-Agent": USER_AGENT},
+                follow_redirects=True,
+                timeout=600,
+            ) as response,
+            partial.open("wb") as file,
+        ):
+            response.raise_for_status()
+            media_type = response.headers.get("content-type")
+            for chunk in response.iter_bytes():
+                digest.update(chunk)
+                size += len(chunk)
+                file.write(chunk)
+    except BaseException:
+        partial.unlink(missing_ok=True)
+        raise
     name = f"{digest.hexdigest()}{suffix}"
     partial.rename(folder / name)
     retrieved_at = datetime.now(UTC)
