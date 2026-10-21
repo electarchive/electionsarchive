@@ -199,6 +199,24 @@ PARTIES = {
     ),
 }
 PEOPLE = {
+    "Pat Brown, attorney general and governor of California": (
+        ("wikidata", "Q724121"),
+        ("us.ca_statewide.person", "CA:edmund-g-pat-brown"),
+    ),
+    "Jerry Brown, governor of California 1975-1983 and 2011-2019": (
+        ("wikidata", "Q152451"),
+        ("us.algara.person", "CA:edmund-g-brown-jr"),
+        ("fec.candidate", "S2CA00088"),
+        ("us.ca_sov_xls.person", "CA:jerry-brown"),
+    ),
+    "Adlai Stevenson I, vice president and 1908 nominee for governor of Illinois": (
+        ("bioguide", "S000889"),
+        ("us.algara.person", "IL:adlai-e-stevenson"),
+    ),
+    "Adlai Stevenson III, senator and 1982 nominee for governor of Illinois": (
+        ("bioguide", "S000890"),
+        ("us.algara.person", "IL:adlai-e-iii-stevenson"),
+    ),
     "Mark Dayton, senator and governor of Minnesota": (
         ("bioguide", "D000596"),
         ("fec.candidate", "S2MN00027"),

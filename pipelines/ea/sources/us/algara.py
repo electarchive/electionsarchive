@@ -3,12 +3,12 @@ import re
 import struct
 from datetime import date
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
 from ea import raw
-from ea.changeset import Changeset, slug
+from ea.changeset import NAMESPACE, Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.algara"
@@ -27,6 +27,18 @@ COLUMNS = [
     "rep_nominee",
     "raw_county_vote_totals",
 ]
+NAMESAKES = {
+    ("CA:edmund-g-brown", 1974): "CA:edmund-g-brown-jr",
+    ("CA:edmund-g-brown", 1978): "CA:edmund-g-brown-jr",
+    ("CA:edmund-g-brown", 2010): "CA:edmund-g-brown-jr",
+    ("CA:edmund-g-brown", 2014): "CA:edmund-g-brown-jr",
+    ("IL:adlai-e-ii-stevenson", 1908): "IL:adlai-e-stevenson",
+    ("IL:adlai-e-ii-stevenson", 1982): "IL:adlai-e-iii-stevenson",
+    ("NC:thomas-settle", 1912): "NC:thomas-settle-iii",
+    ("RI:olney-arnold", 1872): "RI:olney-arnold:1872",
+    ("TN:john-e-mccall", 1932): "TN:john-e-mccall:1932",
+    ("VT:redfield-proctor", 1922): "VT:redfield-proctor-jr",
+}
 RENAMED = {"12025": "12086", "46113": "46102", "51515": "51019", "51560": "51005", "51780": "51083"}
 MAJORITY = {"VT": 9999, "GA": 9999, "MS": 2019, "ME": 1880, "NH": 1912, "CT": 1901, "RI": 1893, "MA": 1855}
 TWO_PARTY = (
@@ -445,8 +457,14 @@ def emit() -> Path:
                         )
                     elif option is None:
                         key = f"{state}:{slug(candidate)}"
+                        split = NAMESAKES.get((key, year))
+                        if split is not None:
+                            original = uuid5(NAMESPACE, f"external_id:{SOURCE}.person\x1f{key}")
+                            key = split
                         if key not in persons:
                             persons[key] = cs.key(f"{SOURCE}.person", key)
+                            if split is not None:
+                                cs.renamed[str(persons[key])] = str(original)
                             if persons[key] in cs.minted:
                                 cs.add("person", id=persons[key])
                                 name(persons[key], candidate)
