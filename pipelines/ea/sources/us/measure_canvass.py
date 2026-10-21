@@ -210,7 +210,14 @@ SOUTH_DAKOTA = {
     date(2024, 11, 5): "2024%20Assets/Recount-Canvass-and-Canvass-Docs-General/2024GeneralElectionCanvassWithCert.pdf",
 }
 HAWAII_REPORTS = "https://files.hawaii.gov/elections/files/results/{}/general/{}.pdf"
-NORTH_DAKOTA = {date(2022, 11, 8): "&eid=326", date(2024, 11, 5): ""}
+NORTH_DAKOTA = {
+    date(2016, 6, 14): "&eid=291",
+    date(2016, 11, 8): "&eid=292",
+    date(2018, 6, 12): "&eid=302",
+    date(2018, 11, 6): "&eid=303",
+    date(2022, 11, 8): "&eid=326",
+    date(2024, 11, 5): "",
+}
 NEBRASKA = {
     date(2018, 11, 6): "2018/2018-general-election-official-results.pdf",
     date(2020, 11, 3): "2020/2020-General-Canvass-Book.pdf",
