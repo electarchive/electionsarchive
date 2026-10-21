@@ -1,3 +1,4 @@
+import html
 import re
 import unicodedata
 from datetime import date
@@ -14,18 +15,21 @@ SOURCE = "us.ks_sos_primaries"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://web.archive.org/web/{stamp}id_/http://www.kssos.org/elections/"
+LIVE = "https://sos.ks.gov/elections/"
+WYANDOTTE = {date(2018, 8, 7): "https://wycovoteskck.gov/2018-primary-election-results"}
 FILES = {
     (date(2000, 8, 1), "house"): ("20140113113855", "00elec/2000_primary_uscongress_official_results.xls"),
     (date(2002, 8, 6), "house"): ("20041011130211", "02elec/ELUSHSE02P.xls"),
     (date(2002, 8, 6), "senate"): ("20041011130211", "02elec/ELUSSEN02P.xls"),
     (date(2004, 8, 3), "house"): ("20041217021415", "04elec/ELUSHOU04P.xls"),
-    (date(2004, 8, 3), "senate"): ("20041217002506", "04elec/ELUSSEN04P.xls"),
+    (date(2004, 8, 3), "senate"): ("2016", "04elec/ELUSSEN04P.xls"),
     (date(2006, 8, 1), "house"): ("20060906191042", "06elec/ELUSHOU06P.xls"),
     (date(2008, 8, 5), "house"): ("20100713114754", "08elec/2008_primary_us_house_official_results.xls"),
     (date(2008, 8, 5), "senate"): ("20100613050750", "08elec/2008_primary_us_senate_official_results.xls"),
     (date(2010, 8, 3), "house"): ("20101202033458", "10elec/2010_primary_us_house_official_results.xls"),
     (date(2010, 8, 3), "senate"): ("20101011005454", "10elec/2010_primary_us_senate_official_results.xls"),
     (date(2014, 8, 5), "senate"): ("20141014113038", "14elec/2014_primary_us_senate_official_results.xls"),
+    (date(2018, 8, 7), "house"): (None, "18elec/2018_Primary_Election_US_House_of_Representatives_Precinct_Level_Results.xlsx"),
 }
 PUBLISHER = "Kansas Secretary of State"
 TITLE = "Primary election official results by precinct"
@@ -34,12 +38,14 @@ LANDING = "https://sos.ks.gov/elections/election-results.html"
 
 def url(key: tuple[date, str]) -> str:
     stamp, name = FILES[key]
-    return BASE.format(stamp=stamp) + name
+    return LIVE + name if stamp is None else BASE.format(stamp=stamp) + name
 
 
 def fetch() -> None:
     for key in FILES:
-        raw.fetch(SOURCE, url(key), suffix=".xls")
+        raw.fetch(SOURCE, url(key), suffix=".xlsx" if url(key).endswith("x") else ".xls")
+    for page in WYANDOTTE.values():
+        raw.fetch(SOURCE, page, suffix=".html")
 
 
 def long_rows(path: Path) -> pl.DataFrame:
@@ -55,6 +61,51 @@ def long_rows(path: Path) -> pl.DataFrame:
         .str.strip_chars(),
         votes=pl.col("VOTES"),
     )
+
+
+def swapped(name: str) -> str:
+    last, _, first = name.partition(",")
+    return " ".join((f"{first.strip()} {last}" if first else last).replace("Rep. ", "").split())
+
+
+def rows_2018(path: Path, day: date) -> pl.DataFrame:
+    frame = pl.read_excel(path, sheet_name="PRECINCT", infer_schema_length=0)
+    out = [
+        (county, party, district, swapped(candidate), votes)
+        for county, district, candidate, party, votes in frame.select(
+            "County", "District", "Candidate", "Party", "Votes"
+        ).rows()
+    ]
+    cell = lambda text: (text or "").replace(" ", "").replace(",", "")  # noqa: E731
+    grid = pl.read_excel(path, sheet_name="JOHNSON", has_header=False, infer_schema_length=0).rows()
+    total = next(row for row in grid if row[2] == "COUNTY TOTALS")
+    for i in range(3, len(total)):
+        out.append(("Johnson", {"DEM": "Democratic", "REP": "Republican"}[grid[1][i]], "3", grid[2][i], cell(total[i])))
+    grid = pl.read_excel(path, sheet_name="SEDGWICK", has_header=False, infer_schema_length=0).rows()
+    for row in grid[2 : next(r for r, row in enumerate(grid) if row[0] == "Votes by Precinct")]:
+        for at, party in ((0, "Democratic"), (4, "Republican")):
+            if row[at] is not None and row[at + 1] is not None:
+                out.append(("Sedgwick", party, "4", row[at].removeprefix("Rep. "), row[at + 1]))
+    grid = pl.read_excel(path, sheet_name="SHAWNEE", has_header=False, infer_schema_length=0).rows()
+    total = next(row for row in grid if row[0] == "COUNTY TOTALS")
+    for i in range(1, len(total)):
+        out.append(
+            (
+                "Shawnee",
+                "Democratic" if grid[1][i] == "DEM" else "Republican",
+                "2",
+                " ".join(grid[2][i].split()),
+                cell(total[i]),
+            )
+        )
+    page = raw.cached(SOURCE, WYANDOTTE[day]).path.read_text()
+    text = html.unescape(re.sub(r"<[^>]+>", "\n", page))
+    for party, block in re.findall(
+        r"\((Democratic|Republican) Party\) \*+\s*United States Representative3rd District\s*\(VOTE FOR\)\s*\d+\s*(.*?)\s*Governor", text, re.S
+    ):
+        for name, votes in re.findall(r"^(.*?)\s*(?:\.\s*)+\s*([\d,]+)\s+[\d.]+\s*$", block, re.M):
+            out.append(("Wyandotte", party, "3", name.strip(), cell(votes)))
+    return pl.DataFrame(out, schema=["county", "party", "district", "candidate", "votes"], orient="row")
 
 
 def wide_rows(path: Path) -> pl.DataFrame:
@@ -86,7 +137,7 @@ def parse() -> None:
     for key in FILES:
         day, chamber = key
         path = raw.cached(SOURCE, url(key)).path
-        rows = wide_rows(path) if day.year == 2000 else long_rows(path)
+        rows = wide_rows(path) if day.year == 2000 else rows_2018(path, day) if day.year == 2018 else long_rows(path)
         frames.append(
             rows.select(
                 year=pl.lit(day.year, pl.Int32),
