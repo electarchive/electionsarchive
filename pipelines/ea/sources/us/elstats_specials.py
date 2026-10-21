@@ -20,7 +20,7 @@ from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, p
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "13"
+VERSION = "14"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -66,6 +66,8 @@ STATES = {
     "MS": "Mississippi",
     "RI": "Rhode Island",
     "OK": "Oklahoma",
+    "MT": "Montana",
+    "WI": "Wisconsin",
 }
 OFFICIAL = {
     "NC": (
@@ -620,7 +622,7 @@ def emit() -> Path:
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{stage}", entity_id=election)
             contest = cs.key("us.contest", key)
             contests[key] = contest
-            ordinal = f"{district}{'th' if district % 100 in (11, 12, 13) else {1: 'st', 2: 'nd', 3: 'rd'}.get(district % 10, 'th')}"
+            ordinal = "at-large" if district == 0 else f"{district}{'th' if district % 100 in (11, 12, 13) else {1: 'st', 2: 'nd', 3: 'rd'}.get(district % 10, 'th')}"
             cs.add(
                 "contest",
                 id=contest,
@@ -657,7 +659,7 @@ def emit() -> Path:
             )
             cs.add(
                 "slug",
-                path=f"us/{state.lower()}/{day}-{stage}/house-{district}-{primary.lower() or 'special'}",
+                path=f"us/{state.lower()}/{day}-{stage}/house-{'at-large' if district == 0 else district}-{primary.lower() or 'special'}",
                 entity_id=contest,
             )
 
@@ -784,6 +786,24 @@ def emit() -> Path:
                     {},
                 )
             )
+            prior = conn.execute(
+                """select id, election_id, contest_id, stage, kind, source_id, as_of, completeness
+                   from result_set where contest_id = %s and is_default and id <> %s""",
+                [contest, result_set],
+            ).fetchone()
+            if prior is not None:
+                cs.add(
+                    "result_set",
+                    **dict(
+                        zip(
+                            ("id", "election_id", "contest_id", "stage", "kind", "source_id", "as_of", "completeness"),
+                            prior,
+                            strict=True,
+                        )
+                    ),
+                    status="superseded",
+                    is_default=False,
+                )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -795,6 +815,7 @@ def emit() -> Path:
                 source_id=official if state == "NM" and day == date(1997, 5, 13) else sources[state],
                 is_default=True,
                 completeness=1,
+                supersedes_id=prior[0] if prior is not None else None,
             )
             totals: dict[str, int] = {}
             for option, by_unit, located in options:

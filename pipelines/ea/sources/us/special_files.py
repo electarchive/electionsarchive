@@ -18,6 +18,7 @@ RETRIEVED = datetime(2026, 10, 21, tzinfo=UTC)
 PARTY_LETTERS = {"D": "Democratic", "R": "Republican", "G": "Green", "L": "Libertarian", "LIB": "Libertarian"}
 PARTY_WORDS = {
     "democratic": "Democratic",
+    "democrat": "Democratic",
     "dem": "Democratic",
     "republican": "Republican",
     "rep": "Republican",
@@ -39,9 +40,13 @@ SITES = {
     "GA": ("Georgia Secretary of State", "Special election results", "https://results.sos.ga.gov/"),
     "UT": ("Utah Lieutenant Governor's Office", "Special election canvasses and results", "https://electionresults.utah.gov/"),
     "IL": ("Illinois State Board of Elections", "Election vote totals", ILLINOIS),
+    "MT": ("Montana Secretary of State", "2017 special election results", "https://electionresults.mt.gov/ResultsList.aspx?eid=15"),
+    "WI": ("Wisconsin Elections Commission", "Election results archive", "https://elections.wi.gov/elections/election-results/results-all"),
     "PA": ("Pennsylvania Department of State", "Election returns, special elections", "https://www.electionreturns.pa.gov/"),
 }
 LOADED = (
+    ("MF-015", "MT", 0, date(2017, 5, 25), "Statewide Results.xlsx"),
+    ("MF-017", "WI", 7, date(2020, 5, 12), "Cong 7 Special-County by County Results.xlsx"),
     ("MF-001", "OH", 8, date(2016, 6, 7), "2016-06-07-oh08-special-general/results_county.xlsx"),
     ("MF-001", "OH", 12, date(2018, 8, 7), "2018-08-07-oh12-special-general/resultsbycounty.xlsx"),
     (
@@ -188,6 +193,51 @@ def rows() -> list[dict[str, object]]:
                     if inside and hit is not None:
                         label = hit[2].strip("()")
                         lines.append((district, "", party(label), person(hit[1]), int(hit[4].replace(",", ""))))
+            elif file.suffix == ".xlsx" and state == "MT":
+                grid = sheet(file, fastexcel.read_excel(file).sheet_names[0])
+                start = next(index for index, row in enumerate(grid) if row[0] and "UNITED STATES REPRESENTATIVE" in row[0])
+                columns = [
+                    (index, *cell.split("\n")) for index, cell in enumerate(grid[start]) if cell is not None and "\n" in cell
+                ]
+                sums = dict.fromkeys((entry[1] for entry in columns), 0)
+                for row in grid[start + 1 :]:
+                    if row[1] is None:
+                        continue
+                    if row[1] == "TOTALS":
+                        if sums != {name: int(row[index]) for index, name, _ in columns}:
+                            raise ValueError(f"{day}: the county rows do not sum to the printed totals")
+                        break
+                    for index, name, label in columns:
+                        sums[name] += int(row[index])
+                        lines.append((district, row[1], party(label), person(name), int(row[index])))
+            elif file.suffix == ".xlsx" and state == "WI":
+                grid = sheet(file, "County by County Report")
+                start = next(index for index, row in enumerate(grid) if row[0] == "County")
+                labels = [cell for cell in grid[start][2:] if cell is not None]
+                names = [re.sub(r" \(Write-in\)$", "", cell) for cell in grid[start + 1] if cell is not None]
+                sums = [0] * len(names)
+                for row in grid[start + 2 :]:
+                    if row[0] is None:
+                        continue
+                    cells = [cell for cell in row[1:] if cell is not None]
+                    if row[0].startswith("Office Totals"):
+                        if sums != [int(cell) for cell in cells[1:]]:
+                            raise ValueError(f"{day}: the county rows do not sum to the printed totals")
+                        break
+                    if int(cells[0]) != sum(int(cell) for cell in cells[1:]):
+                        raise ValueError(f"{day} {row[0]}: the candidates do not sum to the county total")
+                    for index, cell in enumerate(cells[1:]):
+                        sums[index] += int(cell)
+                        scattering = names[index] == "SCATTERING"
+                        lines.append(
+                            (
+                                district,
+                                row[0].strip(),
+                                party(labels[index]) if index < 2 else None,
+                                "Write-ins" if scattering else person(names[index]),
+                                int(cell),
+                            )
+                        )
             elif file.suffix == ".xlsx" and state == "UT" and day.year == 2017:
                 grid = sheet(file, "Votes")
                 header = grid[1]
