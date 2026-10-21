@@ -119,6 +119,7 @@ POOLED = {
 }
 MISNAMED = {"WENDY ROSS": "WENDY LONG", "ROBIN TURNER": "ROBIN WILSON", "ROBIN TAYLOR": "ROBIN WILSON"}
 GENERIC = {"Scattered", "All Others", "Miscellaneous", "Other"}
+LOCATOR = ("page_id", "x0", "y0", "x1", "y1")
 RECODED = {"46113": "46102", "36000": "2938000", "29380": "2938000", "36122": "36123"}
 AGGREGATES = {
     "STATEWIDE WRITEIN": "write-in",
@@ -700,6 +701,7 @@ def attach(
     strict: bool = False,
 ) -> None:
     tag = str(cs.manifest["pipeline"])
+    located = "page_id" in congress.columns
     states: dict[str, UUID] = {
         iso.removeprefix("US-"): polity
         for iso, polity in conn.execute("select iso_code, id from polity where iso_code like 'US-%%'").fetchall()
@@ -979,15 +981,53 @@ def attach(
                 channel=pl.lit(0, pl.Int16),
                 measure=pl.col("measure"),
                 count_round=pl.lit(first, pl.Int16),
-                flags=pl.when(pl.col("kind") == "aggregate").then(pl.lit(32, pl.Int16)).otherwise(pl.lit(0, pl.Int16)),
+                flags=pl.when(pl.col("kind") == "aggregate")
+                .then(pl.lit(32, pl.Int16))
+                .when(pl.lit(located) & pl.col("measure").eq(1))
+                .then(pl.lit(8, pl.Int16))
+                .otherwise(pl.lit(0, pl.Int16)),
                 value="votes",
+                **({name: pl.col(name) for name in LOCATOR} if located else {}),
             )
             .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
-            .agg(pl.col("value").sum())
+            .agg(
+                pl.col("value").sum(),
+                *(
+                    [
+                        pl.col("page_id").first(),
+                        pl.col("page_id").n_unique().alias("pages"),
+                        pl.col("x0").min(),
+                        pl.col("y0").min(),
+                        pl.col("x1").max(),
+                        pl.col("y1").max(),
+                    ]
+                    if located
+                    else []
+                ),
+            )
         )
     for key, label, medsl, fec in drifted:
         print(f"{key}: {label} {medsl} by county against {fec} from the FEC")
     for key, candidate, votes, official in unmatched:
         print(f"{key}: {candidate} ({votes} of {official}) matches no option, dropped")
     if values:
-        cs.frame("result_value", pl.concat(values))
+        everything = pl.concat(values)
+        cs.frame("result_value", everything.select(pl.exclude("page_id", "pages", "x0", "y0", "x1", "y1")))
+        if located:
+            cs.frame(
+                "value_locator",
+                everything.filter((pl.col("pages") == 1) & (pl.col("measure") == 1)).select(
+                    "result_set_id",
+                    "unit_id",
+                    "option_id",
+                    "channel",
+                    "measure",
+                    "count_round",
+                    "page_id",
+                    source_id=pl.lit(None, pl.String),
+                    x0=pl.col("x0"),
+                    y0=pl.col("y0"),
+                    x1=pl.col("x1"),
+                    y1=pl.col("y1"),
+                ),
+            )
