@@ -26,7 +26,7 @@ COMMITS = {
     "IA": ("9ec8f4e142b5159f67b6aa447a583b63e249fd12", (2022,)),
     "IL": ("1fa096f60367a0fe22dc380cc9799abd5228b89c", (2008, 2010, 2012, 2014)),
     "IN": ("b130b78cd7b55e57e766623772424f60c0e640bd", (2016, 2018, 2020, 2022)),
-    "KS": ("11acd83f630a1404cfa507671e3ccf579b2887d8", (2014, 2016, 2022)),
+    "KS": ("11acd83f630a1404cfa507671e3ccf579b2887d8", (2012, 2014, 2016, 2022)),
     "KY": ("025799258505414d62830ea75fd34b58cb2ee59b", (2016,)),
     "MD": ("c0683efed91d246d2d3d86d6ef599624cd21f58d", (2018,)),
     "ME": ("55ee677d8f0a36564e1a234399d5136441bdafe6", (2016, 2018, 2022)),
@@ -55,6 +55,7 @@ ALIASES = {
     ("IN", "clar"): "clark",
     ("NY", "chautaugua"): "chautauqua",
 }
+FORCED = {("KS", 2012): 4}
 DEPTH = {("KS", 2014): max, ("NY", 2012): min}
 SKIPPED = {"2004/20041102__ok__general__state_house__county.csv"}
 TIERS = ["__county", "__county-level", "__town", "", "__precinct", "__ward"]
@@ -89,7 +90,7 @@ def picks() -> list[tuple[str, int, str]]:
                 if tier is not None and entry["path"] not in SKIPPED:
                     found.setdefault(tier, []).append(entry["path"])
             if found:
-                lowest = found[min(found)]
+                lowest = found[FORCED.get((state, year), min(found))]
                 if (state, year) in DEPTH:
                     chosen_depth = DEPTH[(state, year)](path.count("/") for path in lowest)
                     lowest = [path for path in lowest if path.count("/") == chosen_depth]
