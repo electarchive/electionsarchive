@@ -12,12 +12,13 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import special_files
 from ea.sources.us.elstats import SOURCE as ARCHIVE
 from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "6"
+VERSION = "7"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -51,7 +52,12 @@ STATES = {
     "LA": "Louisiana",
     "CA": "California",
     "TX": "Texas",
+    "OH": "Ohio",
+    "GA": "Georgia",
+    "UT": "Utah",
+    "PA": "Pennsylvania",
 }
+FIPS = {"GA": "13"}
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
@@ -318,6 +324,7 @@ def emit() -> Path:
                 }
             )
     frames.append(pl.DataFrame(texas, infer_schema_length=None))
+    frames.append(pl.DataFrame(special_files.rows(), infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
@@ -375,6 +382,23 @@ def emit() -> Path:
                     )
                 for special, stage, extension, _ in CALIFORNIA_FILES:
                     cs.artifact(raw.cached(SOURCE, CALIFORNIA.format(special, stage, extension)), sources[state])
+                continue
+            if state in special_files.SITES:
+                publisher, title, site = special_files.SITES[state]
+                sources[state] = cs.source(publisher, title)
+                if sources[state] in cs.minted:
+                    cs.add(
+                        "source",
+                        id=sources[state],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url=site,
+                        license="Public record",
+                    )
+                for owner, link in special_files.STORED:
+                    if owner == state:
+                        cs.artifact(raw.cached(SOURCE, link), sources[state])
                 continue
             if state == "TX":
                 publisher, title = "Texas Secretary of State", "Election history: official results"
@@ -487,13 +511,16 @@ def emit() -> Path:
                 magnitude=1,
                 round_number=2 if runoff else 1,
                 previous_round_id=next(
-                    previous
-                    for earlier, previous in reversed(contests.items())
-                    if earlier.endswith(f":{state}:house:{district}:special")
+                    (
+                        previous
+                        for earlier, previous in reversed(contests.items())
+                        if earlier.endswith(f":{state}:house:{district}:special")
+                    ),
+                    None,
                 )
                 if runoff
                 else None,
-                electoral_system_id={"LA": two_round, "TX": two_round, "CA": top_two}.get(state, fptp),
+                electoral_system_id={"LA": two_round, "TX": two_round, "GA": two_round, "CA": top_two}.get(state, fptp),
                 default_result_kind="counted",
             )
             cs.add(
@@ -533,7 +560,7 @@ def emit() -> Path:
                         previous[1] + votes,
                     )
             outcomes = dict(lines.group_by("candidate_name").agg(pl.col("outcome").first()).iter_rows())
-            if state in ("LA", "CA", "TX"):
+            if state in ("LA", "CA", "TX", "GA"):
                 winners = {name for name, outcome in outcomes.items() if outcome == "Elected"}
             else:
                 winners = {max(candidates, key=lambda candidate: candidates[candidate][1])}
@@ -559,7 +586,7 @@ def emit() -> Path:
                         [house, day, day, f"%{name.split()[-1].removesuffix(' Jr.').removesuffix(' Sr.')}%"],
                     ).fetchone()
                     if row is None:
-                        if name in winners:
+                        if name in winners and day.year < 2026:
                             raise ValueError(f"{key}: no House tenure for {name}")
                         person = known.get(slug(name)) or cs.key(f"{SOURCE}.person", f"{state}:{slug(name)}")
                         if person in cs.minted and person not in created:
@@ -642,16 +669,19 @@ def emit() -> Path:
                     simple = plain(
                         re.sub(r"\s*\(.*\)$", "", division).lower().replace("saint ", "st ").replace("&", "and")
                     )
+                    district_total = division.startswith("cd:")
                     code = (
-                        division.removeprefix("code:")
+                        f"{FIPS[state]}{district:02d}"
+                        if district_total
+                        else division.removeprefix("code:")
                         if division.startswith("code:")
                         else counties[state].get(re.sub(r"(county|parish|borough)$", "", simple))
                         or counties[state].get(simple)
                     )
                     if code is None:
                         raise ValueError(f"{key}: no county for {division}")
-                    unit = cs.unit("us.county", code, day)
-                    totals[code] = totals.get(code, 0) + count
+                    unit = cs.unit("us.cd" if district_total else "us.county", code, day)
+                    totals[unit] = totals.get(unit, 0) + count
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
@@ -663,11 +693,11 @@ def emit() -> Path:
                         flags=0,
                         value=count,
                     )
-            for code, total in totals.items():
+            for unit, total in totals.items():
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
-                    unit_id=cs.unit("us.county", code, day),
+                    unit_id=unit,
                     option_id=None,
                     channel=0,
                     measure=4,

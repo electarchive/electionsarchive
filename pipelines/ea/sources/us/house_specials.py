@@ -13,7 +13,7 @@ import polars as pl
 from ea import raw
 from ea.changeset import Changeset, slug
 from ea.sources.us.elstats import url as elstats
-from ea.store import connect
+from ea.store import DATA, connect
 
 SOURCE = "us.house_specials"
 VERSION = "1"
@@ -63,10 +63,12 @@ SOURCES = {
         "https://goelect.txelections.civixapps.com/ivis-enr-ui/races",
     ),
 }
+ARIZONA_FILE = DATA / "inbox" / "manual" / "MF-004" / ARIZONA.rsplit("/", 1)[1]
 ARIZONA_NOTE = (
     "Transcribed from the Arizona Secretary of State's official canvass, certified on October 14, 2025. The canvass "
-    "is a scanned PDF behind a browser check, so no copy is archived. Thirteen write-in candidates' 29 votes are "
-    "combined into one write-in line."
+    "is a scanned PDF with no text layer; a person saved it from a browser because the site blocks scripts, and the "
+    "archived copy was checked against these numbers. Nine write-in candidates' 29 votes are combined into one "
+    "write-in line."
 )
 ARIZONA_VOTES: list[tuple[str | None, str | None, int]] = [
     ("Daniel Francis Butierez Sr.", "REP", 29944),
@@ -102,6 +104,17 @@ def fetch() -> None:
             suffix=".xlsx",
             retrieved_at=datetime.fromtimestamp(TENNESSEE_FILE.stat().st_mtime, UTC),
             media_type="application/vnd.openxmlformats-officedocument.spreadsheetml.sheet",
+        )
+    try:
+        raw.cached(SOURCE, ARIZONA)
+    except LookupError:
+        raw.store(
+            SOURCE,
+            ARIZONA,
+            ARIZONA_FILE.read_bytes(),
+            suffix=".pdf",
+            retrieved_at=datetime.fromtimestamp(ARIZONA_FILE.stat().st_mtime, UTC),
+            media_type="application/pdf",
         )
 
 
@@ -194,6 +207,7 @@ def emit() -> Path:
         cs.artifact(raw.cached(SOURCE, FLORIDA), sources["FL"])
         cs.artifact(raw.cached(SOURCE, VIRGINIA), sources["VA"])
         cs.artifact(raw.cached(SOURCE, TENNESSEE), sources["TN"])
+        cs.artifact(raw.cached(SOURCE, ARIZONA), sources["AZ"])
         for _, election in CONTESTS.values():
             if election is not None:
                 cs.artifact(raw.cached(SOURCE, TEXAS.format(election)), sources["TX"])
