@@ -60,13 +60,17 @@ def rebuild(conn: Connection) -> int:
         begun = tenures.get((office, key, st))
         start = begun - 1 if begun is not None and begun - 1 <= first + 15 else first
         start = min(max(start, 1850), min(recent))
+        if begun is None and min(recent) >= 2000:
+            start = min(recent)
         together = any(year % period == phase for year in governors[st] if year >= 2000)
         old = (
-            {year for year in governors[st] if year >= start}
+            {year for year in governors[st] if start <= year < MODERN}
             if together
             else {year for year in range(start, MODERN) if year % period == phase}
         )
         years = {year for year in range(max(start, MODERN), LAST + 1) if year % period == phase} | old | modern
+        if max(recent) < 2016:
+            years = {year for year in years if year <= max(recent)}
         kind = next((name for pattern, name in CLASSES if re.search(pattern, key)), "other")
         for year in sorted(years):
             if year > LAST:
