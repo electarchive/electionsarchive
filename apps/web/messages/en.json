@@ -974,7 +974,7 @@
   "coverage_denominator": "Local government data is based on the 2022 Census of Governments. A government is due in a year based on its election history, or by the usual cycle for its type in that state if the archive has none of its elections.",
   "coverage_built": "Updated {time}",
   "coverage_refresh": "Refresh coverage",
-  "coverage_refresh_requested": "Refresh in progress. Reload in about 13 minutes.",
+  "coverage_refresh_requested": "Refresh in progress. Reload in about 5 minutes.",
   "coverage_building": "Not built",
   "coverage_column_name": "Year and place",
   "coverage_column_held": "Held of expected",
