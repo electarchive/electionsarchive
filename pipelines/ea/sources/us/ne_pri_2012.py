@@ -16,8 +16,10 @@ from ea.store import DATA, connect
 SOURCE = "us.ne_pri_2012"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-URL = "https://sos.nebraska.gov/sites/default/files/doc/elections/2012/canvass-report-2012-primary.pdf"
-DAY = date(2012, 5, 15)
+BASE = "https://sos.nebraska.gov/sites/default/files/doc/elections/"
+FILES = {
+    date(2012, 5, 15): "2012/canvass-report-2012-primary.pdf",
+}
 PUBLISHER = "Nebraska Secretary of State"
 TITLE = "Primary election canvass"
 CELL = re.compile(
@@ -29,7 +31,8 @@ DISTRICTS = {"One": 1, "Two": 2, "Three": 3}
 
 
 def fetch() -> None:
-    raw.fetch(SOURCE, URL, suffix=".pdf")
+    for path in FILES.values():
+        raw.fetch(SOURCE, BASE + path, suffix=".pdf")
 
 
 def parse() -> None:
@@ -42,41 +45,46 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '31%%'"""
             ).fetchall()
         }
-    lines = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, URL).path), "-"], capture_output=True, text=True, check=True
-    ).stdout.splitlines()
-    start = next(i for i, line in enumerate(lines) if i > 150 and re.match(r"\s+President of the United States\s*$", line))
-    end = next(i for i in range(start, len(lines)) if re.match(r"\s+Member of the U\.S\. House of Representatives Totals", lines[i]))
-    chamber, party, district = "", "", None
-    names: list[str] = []
-    tallies: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
-    for line in lines[start:end]:
-        if re.match(r"\s+President of the United States\s*$", line):
-            chamber, district = "president", None
-        elif re.match(r"\s+Member of the United States Senate", line):
-            chamber, district = "senate", None
-        elif re.match(r"\s+Member of the U\.S\. House of Representatives\s*$", line):
-            chamber, district = "house", None
-        elif found := re.match(r"\s+(Republican|Democratic|Libertarian) Party Nomination", line):
-            party, names = found[1].lower(), []
-            if chamber == "house":
-                district = None
-        elif found := re.search(r"\bDistrict (One|Two|Three)\s*$", line):
-            district, names = DISTRICTS[found[1]], []
-        elif line.lstrip().startswith("County"):
-            cells = list(CELL.finditer(line))
-            head = line[: cells[0].start()] if cells else line
-            names = [n for n in re.split(r"\s{2,}", head.strip()[len("County") :].strip()) if n]
-            for cell in cells:
-                tallies_row(tallies, chamber, district, party, names, cell, codes)
-        elif names:
-            for cell in CELL.finditer(line):
-                tallies_row(tallies, chamber, district, party, names, cell, codes)
     rows = []
-    for (chamber_, district_, party_), by_name in tallies.items():
-        for name, by_county in by_name.items():
-            for code, votes in by_county.items():
-                rows.append((2012, f"{chamber_}:{party_}", DAY, False, "NE", district_, code, name.upper(), 1, False, votes))
+    for day, path in FILES.items():
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"], capture_output=True, text=True, check=True
+        ).stdout.splitlines()
+        start = next(i for i, line in enumerate(lines) if i > 150 and re.match(r"\s+President of the United States\s*$", line))
+        end = next(i for i in range(start, len(lines)) if re.match(r"\s+(Member of the U\.S\. House of Representatives Totals|Representative in Congress . Totals)", lines[i]))
+        chamber, party, district = "", "", None
+        names: list[str] = []
+        tallies: dict[tuple, dict[str, dict[str, int]]] = defaultdict(lambda: defaultdict(lambda: defaultdict(int)))
+        for line in lines[start:end]:
+            if re.search(r"Totals?\s*$", line) and not CELL.search(line):
+                chamber = ""
+            elif re.match(r"\s+President of the United States\s*$", line):
+                chamber, district = "president", None
+            elif re.match(r"\s+Member of the United States Senate", line):
+                chamber, district = "senate", None
+            elif re.match(r"\s+Member of the U\.S\. House of Representatives\s*$", line):
+                chamber, district = "house", None
+            elif found := re.match(r"\s+(Republican|Democratic|Libertarian) Party Nomination", line):
+                party, names = found[1].lower(), []
+                if chamber == "house":
+                    district = None
+            elif found := re.search(r"(?:^\s*|\s)District (One|Two|Three)(?:\s{2,}|\s*$)", line):
+                district, names = DISTRICTS[found[1]], []
+            elif line.lstrip().startswith("County"):
+                cells = list(CELL.finditer(line))
+                head = line[: cells[0].start()] if cells else line
+                names = [n for n in re.split(r"\s{2,}", head.strip()[len("County") :].strip()) if n]
+                for cell in cells:
+                    tallies_row(tallies, chamber, district, party, names, cell, codes)
+            elif names:
+                for cell in CELL.finditer(line):
+                    tallies_row(tallies, chamber, district, party, names, cell, codes)
+        for (chamber_, district_, party_), by_name in tallies.items():
+            for name, by_county in by_name.items():
+                for code, votes in by_county.items():
+                    rows.append(
+                        (day.year, f"{chamber_}:{party_}", day, False, "NE", district_, code, name.upper(), 1, False, votes)
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.DataFrame(
@@ -103,7 +111,7 @@ def parse() -> None:
 
 
 def tallies_row(tallies: defaultdict, chamber, district, party, names, cell, codes) -> None:
-    if cell[1] == "TOTAL":
+    if cell[1] == "TOTAL" or not chamber:
         return
     numbers = [int(v.replace(",", "")) for v in cell[2].split()]
     if len(numbers) != len(names):
@@ -133,6 +141,7 @@ def emit() -> Path:
             url="https://sos.nebraska.gov/elections/election-results",
             license="Public record",
         )
-        cs.artifact(raw.cached(SOURCE, URL), source)
+        for path in FILES.values():
+            cs.artifact(raw.cached(SOURCE, BASE + path), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NE": source}, strict=True)
         return cs.write()
