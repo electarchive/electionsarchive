@@ -308,7 +308,7 @@ def emit() -> Path:
                 ]
                 for index, affiliation in enumerate(affiliations):
                     label = LABELS.get(affiliation["party"], affiliation["party"])
-                    if label is None or label in UNAFFILIATED:
+                    if label is None or label in UNAFFILIATED - {"Independent"}:
                         continue
                     since = date.fromisoformat(affiliation["start"])
                     if label == "Republican":
@@ -323,8 +323,8 @@ def emit() -> Path:
                         )
                     else:
                         key = NATIONAL.get(label, f"{term['state']}:{slug(label)}")
-                    party = cs.key("us.party", key)
-                    if party in cs.minted and party not in created:
+                    party = None if label == "Independent" else cs.key("us.party", key)
+                    if party is not None and party in cs.minted and party not in created:
                         created.add(party)
                         state = key.partition(":")[0] if ":" in key else None
                         cs.add("party", id=party, kind="party", polity_id=cs.polity(f"US-{state}") if state else us)

@@ -9923,7 +9923,10 @@ export const people = {
                   },
           };
         });
-      const held = await db.execute<{ party: string; stop: string | null }>(sql`
+      const held = await db.execute<{
+        party: string | null;
+        stop: string | null;
+      }>(sql`
         with recursive ids(id) as (
           select ${person.id}::uuid
           union
@@ -9934,7 +9937,7 @@ export const people = {
           from person_party_membership m where m.person_id in (select id from ids)
           union all
           select a.party_id, coalesce(lower(a.valid), t.from_date), coalesce(upper(a.valid), t.to_date), 1
-          from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
+          from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
           where t.person_id in (select id from ids)
         ) x
         left join entity_merge pm on pm.entity_id = x.party
@@ -9947,7 +9950,10 @@ export const people = {
       const current = held.rows.find(
         (row) => row.stop == null || general == null || row.stop > general.date,
       );
-      const isIndependent = current == null && general?.independent === true;
+      const isIndependent =
+        current == null
+          ? general?.independent === true
+          : current.party == null;
       const own = isIndependent
         ? null
         : (current?.party ??
