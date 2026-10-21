@@ -1,4 +1,5 @@
 <script lang="ts">
+  import { enhance } from "$app/forms";
   import { page } from "$app/state";
   import { createQuery } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
@@ -6,10 +7,10 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
-  import type { PageData } from "./$types";
+  import type { ActionData, PageData } from "./$types";
   import Rows from "./rows.svelte";
 
-  const { data }: { data: PageData } = $props();
+  const { data, form }: { data: PageData; form: ActionData } = $props();
 
   const VIEWS = ["percent", "left", "done"] as const;
   let view = $state<(typeof VIEWS)[number]>("percent");
@@ -114,7 +115,22 @@
       </p>
       <div class="flex flex-wrap items-center justify-between gap-x-4 gap-y-2">
         <div class="grid gap-1.5">
-          <p class="text-xs text-muted-foreground">{built}</p>
+          <div class="flex items-center gap-2 text-xs text-muted-foreground">
+            {built}
+            {#if data.dev}
+              {#if form?.requested}
+                <span>{m.coverage_refresh_requested()}</span>
+              {:else}
+                <form method="POST" action="?/refresh" use:enhance>
+                  <button
+                    type="submit"
+                    class="rounded-sm border border-border px-2 block-6 text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
+                    >{m.coverage_refresh()}</button
+                  >
+                </form>
+              {/if}
+            {/if}
+          </div>
           <p class="flex flex-wrap items-center gap-x-3 gap-y-1 text-xs">
             <span class="text-muted-foreground">{m.coverage_legend()}</span>
             <span class="flex items-center gap-1"
