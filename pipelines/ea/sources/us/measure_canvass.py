@@ -299,6 +299,8 @@ NEW_JERSEY = {
     date(2021, 11, 2): [f"2021/2021-official-general-results-public-question-{n}" for n in (1, 2)],
 }
 NEW_JERSEY_SITE = "https://www.nj.gov/state/elections/assets/pdf/election-results/{}.pdf"
+WISCONSIN = DATA / "inbox" / "manual" / "MF-021"
+WISCONSIN_SITE = "https://elections.wi.gov/elections-voting/results#{}/{}"
 TEXAS = {date(2013, 11, 5): 167, date(2015, 11, 3): 190, date(2017, 11, 7): 320}
 TEXAS_SITE = "https://elections.sos.state.tx.us/elchist{}_{}.htm"
 NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
@@ -340,6 +342,12 @@ DOCUMENTS = {
         "Public question results by county",
         "https://www.nj.gov/state/elections/election-information-results.shtml",
         "the New Jersey Division of Elections' public question results",
+    ),
+    "WI": (
+        "Wisconsin Elections Commission",
+        "County by County Report",
+        "https://elections.wi.gov/elections-voting/results",
+        "the Wisconsin Elections Commission's county-by-county canvass report",
     ),
     "TX": (
         "Texas Secretary of State",
@@ -540,6 +548,9 @@ def link(state: str, day: date) -> tuple[str, str]:
     if state in ("GA", "WV", "SC", "DC"):
         entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT}[state].get(day, "")
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
+    if state == "WI":
+        names = sorted(path.name for path in (WISCONSIN / f"{day}").glob("*")) if (WISCONSIN / f"{day}").exists() else []
+        return SOURCE, WISCONSIN_SITE.format(day, names[0]) if names else ""
     if state == "NJ":
         return SOURCE, NEW_JERSEY_SITE.format(NEW_JERSEY[day][0]) if day in NEW_JERSEY else ""
     if state == "TX":
@@ -690,6 +701,20 @@ def fetch() -> None:
                         suffix=".zip",
                         retrieved_at=datetime.now(UTC),
                         media_type="application/zip",
+                    )
+            continue
+        if state == "WI":
+            for path in sorted((WISCONSIN / f"{day}").glob("*")) if url else []:
+                try:
+                    raw.cached(SOURCE, WISCONSIN_SITE.format(day, path.name))
+                except LookupError:
+                    raw.store(
+                        SOURCE,
+                        WISCONSIN_SITE.format(day, path.name),
+                        path.read_bytes(),
+                        suffix=path.suffix,
+                        retrieved_at=datetime.now(UTC),
+                        media_type="application/octet-stream",
                     )
             continue
         if state == "NJ":
@@ -1605,6 +1630,66 @@ def parse() -> None:
                     answer="Candidate",
                     votes=pl.col("Votes").cast(pl.String),
                 )
+            )
+        elif state == "WI":
+            records = []
+            for each in sorted((WISCONSIN / f"{day}").glob("*")):
+                wi_url = WISCONSIN_SITE.format(day, each.name)
+                cached = raw.cached(SOURCE, wi_url).path
+                sections: list[tuple[str, list[list[str]]]] = []
+                if each.suffix == ".pdf":
+                    heading = "Referendum"
+                    section: list[list[str]] = []
+                    sections.append((heading, section))
+                    text = subprocess.run(
+                        ["pdftotext", "-layout", str(cached), "-"], capture_output=True, text=True, check=True
+                    ).stdout.replace("Question\n1\n", "Question 1\n")
+                    for line in text.splitlines():
+                        if titled := re.search(r"(?i)Referendum\s*-\s*Question (\d+)", line):
+                            section = []
+                            sections.append((f"Question {titled[1]}", section))
+                        elif row := re.fullmatch(
+                            r"\s*([A-Z][A-Z .'\-]+?)\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line
+                        ):
+                            section.append(list(row.groups()))
+                        elif matched := re.fullmatch(r"\s*Office Totals:\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line):
+                            section.append(["Total", *matched.groups()])
+                else:
+                    reader = fastexcel.read_excel(str(cached))
+                    for sheet in reader.sheet_names:
+                        rows = reader.load_sheet_by_name(sheet, header_row=None, dtypes="string").to_polars().rows()
+                        if not any(re.search(r"(?i)referendum", " ".join(c for c in row if c)) for row in rows[:6]):
+                            continue
+                        section = []
+                        for row in rows:
+                            cells = [c.strip() for c in row if c is not None and c.strip()]
+                            if len(cells) == 4 and re.fullmatch(r"[\d.]+", cells[1]):
+                                section.append(["Total" if cells[0] == "Office Totals:" else cells[0], *cells[1:]])
+                        sections.append(("Question 1", section))
+                for office, section in sections:
+                    total = [row for row in section if row[0] == "Total"]
+                    counties = [row for row in section if row[0] != "Total"]
+                    if len(total) != 1 or not counties:
+                        continue
+                    figures = [[int(float(cell.replace(",", ""))) for cell in row[2:4]] for row in counties]
+                    if [sum(column) for column in zip(*figures, strict=True)] != [
+                        int(float(cell.replace(",", ""))) for cell in total[0][2:4]
+                    ]:
+                        print(f"WI {day} {office}: counties do not add up, skipped")
+                        continue
+                    for row in counties:
+                        for answer, count in zip(("YES", "NO"), row[2:4], strict=True):
+                            records.append((row[0], office, answer, str(int(float(count.replace(",", "")))), wi_url))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "url": pl.String,
+                },
+                orient="row",
             )
         elif state == "NJ":
             records = []
