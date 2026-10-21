@@ -124,7 +124,7 @@ def emit() -> Path:
         shaped = {code: areas[code] for code in units["code"] if code in areas} | {
             unit: areas[area]
             for links in ("us.precinct_shapes", "us.cook_precincts", "us.swdb_precincts", "us.held_precincts")
-            for unit, area in pl.read_parquet(DATA / "parsed" / links / "links.parquet").iter_rows()
+            for unit, area in pl.read_parquet(raw.parsed(links) / "links.parquet").iter_rows()
             if area in areas
         }
         missing = set(units["county"]) - set(counties)

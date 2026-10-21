@@ -106,7 +106,7 @@ def parse() -> None:
 
 def emit() -> Path:
     frame = pl.read_parquet(PARSED / "oe.parquet")
-    eavs = pl.read_parquet(DATA / "parsed" / "us.eavs" / "counties.parquet").filter(pl.col("registered").is_not_null())
+    eavs = pl.read_parquet(raw.parsed("us.eavs") / "counties.parquet").filter(pl.col("registered").is_not_null())
     with connect() as conn:
         cs = Changeset(
             conn,

@@ -17,7 +17,7 @@ from ea.store import DATA, connect
 SOURCE = "us.medsl_state_precincts"
 VERSION = "5"
 PARSED = DATA / "parsed" / SOURCE
-STATEWIDE = DATA / "parsed" / "us.medsl_statewide"
+STATEWIDE = raw.parsed("us.medsl_statewide")
 STATES_2022 = {
     "AK": "10855159",
     "AL": "10855153",

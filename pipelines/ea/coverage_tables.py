@@ -9,8 +9,8 @@ from pathlib import Path
 
 import polars as pl
 
-from ea import coverage, statewide_table
-from ea.store import DATA, ROOT, connect
+from ea import coverage, raw, statewide_table
+from ea.store import ROOT, connect
 
 LOCK = 7_302_019
 FEDERAL = ("president", "us_senate", "us_house")
@@ -220,7 +220,7 @@ from changeset
 def fingerprint(conn) -> str:
     row = conn.execute(FINGERPRINT_SQL).fetchone()
     files = [Path(__file__).parent / name for name in ("coverage.py", "coverage_tables.py", "statewide_table.py")]
-    files += sorted((DATA / "parsed" / "us.cog").glob("*.parquet"))
+    files += sorted(raw.parsed("us.cog").glob("*.parquet"))
     return ":".join([row[0] if row else "", *(f"{f.name}{f.stat().st_mtime_ns}" for f in files)])
 
 
@@ -331,7 +331,7 @@ def build() -> str:
             )
             current["expected"] = max(current["expected"] or 0, due, current["held"])
 
-    cog = pl.read_parquet(DATA / "parsed" / "us.cog" / "governments.parquet")
+    cog = pl.read_parquet(raw.parsed("us.cog") / "governments.parquet")
     codes = {code: pid for pid, (_, code, _, _) in polities.items() if code is not None}
     link: dict[str, str] = {}
     for gid, kind, st, county, place in cog.select("id", "kind", "state_fips", "county_fips", "place_fips").iter_rows():

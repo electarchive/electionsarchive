@@ -1,10 +1,12 @@
 import argparse
 import importlib
+import subprocess
+import sys
 from pathlib import Path
 
 from ea import cache, checks, coverage, coverage_tables, fixtures, raw, search, tiles
 from ea.apply import apply, publish, revert
-from ea.store import connect
+from ea.store import DATA, connect
 
 
 def main() -> None:
@@ -68,6 +70,15 @@ def main() -> None:
             with connect() as conn:
                 revert(conn, args.changeset_id, args.reason)
         case step:
-            result = getattr(importlib.import_module(f"ea.sources.{args.source}"), step)()
+            module = importlib.import_module(f"ea.sources.{args.source}")
+            for loaded in [loaded for name, loaded in sys.modules.items() if name.startswith("ea.sources.")]:
+                if isinstance(source := getattr(loaded, "SOURCE", None), str):
+                    raw.parsed(source)
+            result = getattr(module, step)()
             if result is not None:
                 print(result)
+            if raw.HOST and (DATA / "parsed" / args.source).is_dir():
+                try:
+                    raw.push(args.source)
+                except subprocess.SubprocessError:
+                    print(f"{args.source} is not on {raw.HOST} yet; run `ea raw push {args.source}`", file=sys.stderr)

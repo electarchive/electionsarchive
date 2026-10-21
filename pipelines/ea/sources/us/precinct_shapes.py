@@ -1052,7 +1052,7 @@ def parse() -> None:
                     wards.setdefault((county, canon(match[1]), match[2], key.split(" ", 1)[1]), set()).add(key)
             groups: dict[str, list[str]] = {}
             for county, precinct in (
-                pl.read_parquet(DATA / "parsed" / "us.medsl_precincts" / "units.parquet")
+                pl.read_parquet(raw.parsed("us.medsl_precincts") / "units.parquet")
                 .filter(pl.col("code").str.starts_with("2024:WI:"))
                 .select("county", precinct=pl.col("code").str.split(":").list.get(4))
                 .iter_rows()
@@ -1093,9 +1093,9 @@ def parse() -> None:
         print(f"{vintage}: {len(rows)} features, {shapes.height} precincts", flush=True)
         shapes.write_parquet(PARSED / f"{vintage.replace(':', '_')}.parquet")
 
-    vest = pl.read_parquet(DATA / "parsed" / "us.vest" / "precincts_2020.parquet").filter(pl.col("state") == "IA")
+    vest = pl.read_parquet(raw.parsed("us.vest") / "precincts_2020.parquet").filter(pl.col("state") == "IA")
     caucuses = (
-        pl.read_parquet(DATA / "parsed" / "us.idp" / "precincts.parquet")
+        pl.read_parquet(raw.parsed("us.idp") / "precincts.parquet")
         .select("county", "precinct")
         .unique()
         .with_columns(
@@ -1125,7 +1125,7 @@ def parse() -> None:
     print(f"IA:caucus: {caucus.height} of {caucuses.height} caucus precincts matched to {vest.height} VEST precincts")
     caucus.write_parquet(PARSED / "IA_caucus.parquet")
 
-    units = pl.read_parquet(DATA / "parsed" / "us.medsl_precincts" / "units.parquet").with_columns(
+    units = pl.read_parquet(raw.parsed("us.medsl_precincts") / "units.parquet").with_columns(
         jurisdiction=pl.col("code").str.split(":").list.get(3),
         precinct=pl.col("code").str.split(":").list.slice(4).list.join(":"),
     )
@@ -1197,7 +1197,7 @@ def parse() -> None:
     units = (
         pl.concat(
             [
-                pl.read_parquet(DATA / "parsed" / pipeline / "units.parquet").select("code", "state", "county")
+                pl.read_parquet(raw.parsed(pipeline) / "units.parquet").select("code", "state", "county")
                 for pipeline in ("us.medsl_precincts", "us.medsl_state_precincts")
             ]
         )
@@ -1228,7 +1228,7 @@ def parse() -> None:
     mcds = {key: next(iter(codes)) for key, codes in jurisdictions.items() if len(codes) == 1}
     links = []
     for year in ("2016", "2018", "2020"):
-        vest = pl.read_parquet(DATA / "parsed" / "us.vest" / f"precincts_{year}.parquet").select(
+        vest = pl.read_parquet(raw.parsed("us.vest") / f"precincts_{year}.parquet").select(
             area=pl.format("{}:{}:{}", pl.lit(year), "state", "n"),
             county="county",
             name=pl.col("name").str.replace(r"\s+\d{3}-\d{2}$", ""),
@@ -1293,7 +1293,7 @@ def parse() -> None:
         )
         wards: dict[tuple[str, str, str, str], list[str]] = {}
         for county, name, geom in (
-            pl.read_parquet(DATA / "parsed" / "us.vest" / f"precincts_{year}.parquet")
+            pl.read_parquet(raw.parsed("us.vest") / f"precincts_{year}.parquet")
             .filter(pl.col("state") == "WI")
             .select("county", "name", "geom")
             .iter_rows()

@@ -84,7 +84,7 @@ def _tables(path: Path) -> list[dict[str, object]]:
 
 
 def parse(source: ModuleType) -> None:
-    parsed = DATA / "parsed" / source.SOURCE
+    parsed = raw.parsed(source.SOURCE)
     rows: list[dict[str, object]] = []
     failed: list[str] = []
     columns_by: dict[tuple[int, object, int], list[int]] = {}
@@ -687,7 +687,7 @@ def parse(source: ModuleType) -> None:
 
 
 def emit(source: ModuleType) -> Path:
-    frame = pl.read_parquet(DATA / "parsed" / source.SOURCE / "values.parquet")
+    frame = pl.read_parquet(raw.parsed(source.SOURCE) / "values.parquet")
     if "state" not in frame.columns:
         frame = frame.with_columns(state=pl.lit(source.STATE))
     names = getattr(source, "NAMES", {})

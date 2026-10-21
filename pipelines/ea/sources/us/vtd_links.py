@@ -5,6 +5,7 @@ from pathlib import Path
 
 import polars as pl
 
+from ea import raw
 from ea.changeset import Changeset
 from ea.store import DATA, connect
 
@@ -77,7 +78,7 @@ def emit() -> Path:
         ).with_columns(code_key=pl.col("keys").list.get(0), name_key=pl.col("keys").list.get(1))
         vtds = pl.concat(
             [
-                pl.read_parquet(DATA / "parsed" / "us.vtd" / f"vtd_{vintage}.parquet")
+                pl.read_parquet(raw.parsed("us.vtd") / f"vtd_{vintage}.parquet")
                 .select(
                     vintage=pl.lit(vintage),
                     area=pl.lit(f"{vintage}:") + pl.col("geoid"),

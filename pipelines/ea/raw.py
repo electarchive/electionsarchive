@@ -122,7 +122,7 @@ def _push(source: str, key: str, entry: dict[str, str | int | None]) -> None:
                 stdin=file,
             )
         merge_remote({source: {key: entry}})
-    except (subprocess.SubprocessError, OSError):
+    except subprocess.SubprocessError, OSError:
         print(f"{source}: {key} is not on {HOST} yet; run `ea raw push {source}`", file=sys.stderr)
 
 
@@ -226,17 +226,35 @@ def fetch(source: str, url: str, *, suffix: str, body: dict[str, object] | None 
     return _artifact(source, key, entry)
 
 
+def parsed(source: str) -> Path:
+    """Return the source's parse output folder, copying it down from the remote store when the cache lacks it."""
+    folder = DATA / "parsed" / source
+    if HOST and not folder.exists():
+        remote = shlex.quote(f"{ROOT}/parsed/{source}")
+        try:
+            if subprocess.run([*SSH, HOST, f"test -d {remote}"], check=False, timeout=60).returncode == 0:
+                subprocess.run(
+                    ["rsync", "-a", "--exclude", ".*", "-e", " ".join(SSH)]
+                    + [f"{HOST}:{ROOT}/parsed/{source}/", f"{folder}/"],
+                    check=True,
+                )
+        except subprocess.SubprocessError:
+            print(f"parsed/{source} could not be copied from {HOST}", file=sys.stderr)
+    return folder
+
+
 def push(source: str | None = None) -> str:
-    """Copy the raw files and page renders the remote store lacks, then merge the local indexes into its own."""
+    """Copy the raw files, page renders, and newer parse outputs the remote store lacks, then merge the local
+    indexes into its own."""
     if not HOST:
         raise SystemExit("set EA_REMOTE in .env, such as host:electionsarchive/data")
-    for tree in ("raw", "pages"):
+    for tree in ("raw", "pages", "parsed"):
         path = f"{tree}/{source}/" if source else f"{tree}/"
         if (DATA / path).is_dir():
             ssh(f"mkdir -p {shlex.quote(f'{ROOT}/{path}')}")
             subprocess.run(
-                ["rsync", "-a", "--ignore-existing", "--exclude", ".*", "--exclude", "index.json"]
-                + ["-e", " ".join(SSH), f"{DATA}/{path}", f"{HOST}:{ROOT}/{path}"],
+                ["rsync", "-a", "--update" if tree == "parsed" else "--ignore-existing", "--exclude", ".*"]
+                + ["--exclude", "index.json", "-e", " ".join(SSH), f"{DATA}/{path}", f"{HOST}:{ROOT}/{path}"],
                 check=True,
             )
     folders = [DATA / "raw" / source] if source else sorted((DATA / "raw").iterdir())
@@ -246,7 +264,8 @@ def push(source: str | None = None) -> str:
 
 
 def pull(source: str | None = None) -> str:
-    """Merge the remote indexes into the local ones, then copy the raw files and page renders the cache lacks."""
+    """Merge the remote indexes into the local ones, then copy the raw files, page renders, and newer parse outputs
+    the cache lacks."""
     if not HOST:
         raise SystemExit("set EA_REMOTE in .env, such as host:electionsarchive/data")
     script = (
@@ -262,13 +281,13 @@ def pull(source: str | None = None) -> str:
         with locked(name) as index:
             for key, entry in entries.items():
                 index[key] = _merged(index.get(key), entry)
-    for tree in ("raw", "pages"):
+    for tree in ("raw", "pages", "parsed"):
         path = f"{tree}/{source}/" if source else f"{tree}/"
         (DATA / path).mkdir(parents=True, exist_ok=True)
         ssh(f"mkdir -p {shlex.quote(f'{ROOT}/{path}')}")
         subprocess.run(
-            ["rsync", "-a", "--ignore-existing", "--exclude", ".*", "--exclude", "index.json"]
-            + ["-e", " ".join(SSH), f"{HOST}:{ROOT}/{path}", f"{DATA}/{path}"],
+            ["rsync", "-a", "--update" if tree == "parsed" else "--ignore-existing", "--exclude", ".*"]
+            + ["--exclude", "index.json", "-e", " ".join(SSH), f"{HOST}:{ROOT}/{path}", f"{DATA}/{path}"],
             check=True,
         )
     return f"pulled {sum(len(index) for index in indexes.values())} entries in {len(indexes)} sources from {HOST}"

@@ -12,9 +12,8 @@ import numpy as np
 import polars as pl
 from PIL import Image
 
-from ea import scan
+from ea import raw, scan
 from ea.sources.us import house_books
-from ea.store import DATA
 
 SOURCE = "us.mt_house"
 RAW = "us.sri"
@@ -43,7 +42,7 @@ def fetch() -> None:
 
 
 def locate(source: ModuleType) -> None:
-    parsed = DATA / "parsed" / source.SOURCE
+    parsed = raw.parsed(source.SOURCE)
     rows: list[dict[str, object]] = []
     for year, (_, _, _, (page,)) in source.VOLUMES.items():
         first = house_books._tables(parsed / "model" / f"{year}.txt")

@@ -106,7 +106,7 @@ def parse() -> None:
             choice=pl.col("value").replace({**labels, WRITE_IN: WRITE_INS}),
         ).drop("precinct", "value").write_parquet(PARSED / f"ballots_{day}.parquet")
 
-    official = pl.read_parquet(DATA / "parsed" / "us.nyc_boe" / "rounds.parquet")
+    official = pl.read_parquet(raw.parsed("us.nyc_boe") / "rounds.parquet")
     tallies = []
     for day in CVRS:
         ballots = pl.read_parquet(PARSED / f"ballots_{day}.parquet")
@@ -193,7 +193,7 @@ def parse() -> None:
 
 def emit() -> Path:
     tally = pl.read_parquet(PARSED / "rounds.parquet").join(
-        pl.read_parquet(DATA / "parsed" / "us.nyc_boe" / "rounds.parquet")
+        pl.read_parquet(raw.parsed("us.nyc_boe") / "rounds.parquet")
         .select("date", "page", "key", "office", "district")
         .unique(),
         on=["date", "page"],
