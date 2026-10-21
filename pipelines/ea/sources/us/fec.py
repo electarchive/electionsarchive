@@ -1073,6 +1073,7 @@ PRIMARY_RUNOFFS = {
 SUMMARIZED: dict[object, str] = {"LIB": "LBT", "DFL": "D", (2012, "PA", "D"): "R", (2020, "LA", "D"): "R"}
 SURNAMES = {"Bloomberg": "P00014530", "Romney": "P80003353"}
 NAMESAKES = {"H8CA52052", "P00014613"}
+FIGURES = {"george-pataki": "P60007572"}
 MOVED_IDS = {"H2IL06090": "IL:niki-conforti"}
 MISATTRIBUTED = {"2020:Democratic:P60016342": "P00014613"}
 REUSED_IDS = {
@@ -1080,6 +1081,7 @@ REUSED_IDS = {
     "2022:H2NY22139:Carolyn B. Maloney": "H2NY14037",
     "2022:H2IL06090:Kina Collins": "H0IL07167",
     '2022:H0IL07167:Jacqueline "Jacqui" Collins': "H2IL01315",
+    "2008:P80003395:D. R. Hunter": None,
 }
 TWINS = {
     "P00003343": "S2NC00174",
@@ -4687,6 +4689,9 @@ def emit() -> Path:
     nominations = (
         pl.read_parquet(PARSED / "nominations.parquet")
         .with_columns(
+            fec_id=pl.concat_str(pl.col("year").cast(pl.String), "fec_id", "name", separator=":").replace_strict(
+                REUSED_IDS, default=pl.col("fec_id"), return_dtype=pl.String
+            ),
             kind=pl.when(
                 pl.col("name").str.contains(r'(?i)^"?(uncommitted|no preference|uninstructed|to be uncommitted)')
             )
@@ -4850,7 +4855,9 @@ def emit() -> Path:
         for fec_id, handle in MOVED_IDS.items():
             fec_persons[fec_id] = cs.key(f"{SOURCE}.person", handle)
             cs.add("external_id", entity_id=fec_persons[fec_id], scheme="fec.candidate", value=fec_id)
-        figures = {text: cs.survivors.get(person, person) for text, person in figures.items()}
+        figures = {text: cs.survivors.get(person, person) for text, person in figures.items()} | {
+            text: fec_persons[fec_id] for text, fec_id in FIGURES.items()
+        }
 
         elections: dict[str, UUID] = {}
 
