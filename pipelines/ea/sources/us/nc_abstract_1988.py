@@ -18,6 +18,7 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "North Carolina State Board of Elections"
 TITLE = "Abstract of votes cast for Council of State at the general election held on November 8, 1988"
 RECORD = "https://digital.ncdcr.gov/Documents/Detail/4199398"
+RECORD_GOVERNOR = "https://digital.ncdcr.gov/Documents/Detail/4199437"
 DAY = date(1988, 11, 8)
 HELD = {"Commissioner of Agriculture"}
 SHEETS = {
@@ -27,6 +28,7 @@ SHEETS = {
         ("Commissioner of Labor", [("John C. Brooks", "DEMOCRATIC"), ("Richard D. (Dick) Levy", "REPUBLICAN")]),
         ("Treasurer", [("Harlan E. Boyles", "DEMOCRATIC"), ("Nancy Lake Coward", "REPUBLICAN")]),
     ],
+    (5, 6): [("Lieutenant Governor", [("Tony Rand", "DEMOCRATIC"), ("Jim Gardner", "REPUBLICAN")])],
     (3, 4): [
         ("Auditor", [("Edward Renfrow", "DEMOCRATIC"), ("Edward Garner, Jr.", "REPUBLICAN")]),
         ("Commissioner of Agriculture", [("James A. (Jim) Graham", "DEMOCRATIC"), ("Leo Tew", "REPUBLICAN")]),
@@ -42,7 +44,7 @@ METHOD = (
 
 
 def url(page: int) -> str:
-    return f"{RECORD}#page-{page:02d}"
+    return f"{RECORD_GOVERNOR if page > 4 else RECORD}#page-{page - 4 if page > 4 else page:02d}"
 
 
 def addresses() -> list[str]:
@@ -50,18 +52,19 @@ def addresses() -> list[str]:
 
 
 def fetch() -> None:
-    detail = subprocess.run(
-        ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", RECORD], capture_output=True, text=True, check=True
-    ).stdout
-    items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.S)[1])
-    for item in items:
-        number = int(item["path"].rsplit("-", 1)[1])
-        pdf = subprocess.run(
-            ["curl", "-sL", "-m", "120", "-A", "Mozilla/5.0", item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"])],
-            capture_output=True,
-            check=True,
+    for record, offset in ((RECORD, 0), (RECORD_GOVERNOR, 4)):
+        detail = subprocess.run(
+            ["curl", "-sL", "-m", "60", "-A", "Mozilla/5.0", record], capture_output=True, text=True, check=True
         ).stdout
-        raw.store(SOURCE, url(number), pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+        items = json.loads(re.search(r"var viewerItems = (\[.*?\]);\n", detail, re.S)[1])
+        for item in items:
+            number = int(item["path"].rsplit("-", 1)[1]) + offset
+            pdf = subprocess.run(
+                ["curl", "-sL", "-m", "120", "-A", "Mozilla/5.0", item["pdfUrl"].replace("[IMAGETOKEN]", item["imageToken"])],
+                capture_output=True,
+                check=True,
+            ).stdout
+            raw.store(SOURCE, url(number), pdf, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
 
 
 def parse() -> None:
@@ -140,7 +143,7 @@ def emit() -> Path:
         pipeline=SOURCE,
         version=VERSION,
         parsed=PARSED,
-        summary="North Carolina's 1988 secretary of state, auditor, treasurer, superintendent of public instruction, "
+        summary="North Carolina's 1988 lieutenant governor, secretary of state, auditor, treasurer, superintendent of public instruction, "
         "attorney general, and commissioners of insurance and labor by county from the State Board of "
         "Elections' abstract of votes cast",
         cite=cite,
