@@ -15,6 +15,9 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://files.hawaii.gov/elections/files/results/"
 DAYS = {
+    date(2000, 9, 23): "2000/primary",
+    date(2004, 9, 18): "2004/primary",
+    date(2006, 9, 23): "2006/primary",
     date(2008, 9, 20): "2008/primary",
     date(2010, 9, 18): "2010/primary",
     date(2012, 8, 11): "2012/primary",
@@ -32,6 +35,9 @@ TITLE = "Primary election summary reports by county"
 HEADER = re.compile(r"^(U\.?S\.? Senator|U\.?S\.? Representative, Dist (I+)|President[^-]*) - ([A-Z]+)$")
 GUTTER = re.compile(r" {3,}")
 ROMAN = {"I": 1, "II": 2}
+OLD_HEADER = re.compile(r"^\((\w+)\) (U\.S\. Senator|U\.S\. Representative(?:, \[D (\d)\])?)$")
+OLD_ROW = re.compile(r"^([\d,]+) (.+?) [\d.]+%$")
+OLD_PARTIES = {"R": "R", "RE": "R", "D": "D", "DE": "D", "L": "L", "LI": "L", "G": "G", "GR": "G"}
 
 
 def fetch() -> None:
@@ -57,7 +63,28 @@ def parse() -> None:
                     cells.extend((i, line[i * 65 : (i + 1) * 65].strip()) for i in range(3))
                 elif day.year > 2020:
                     cells.append((0, line.strip()))
-            if day.year < 2020:
+            if day.year in (2000, 2004):
+                text = subprocess.run(
+                    ["pdftotext", "-raw", str(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf").path), "-"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout
+                for line in text.splitlines():
+                    if header := OLD_HEADER.match(line.strip()):
+                        letter = OLD_PARTIES.get(header[1], "X")
+                        district = "I" * int(header[3]) if header[3] else ""
+                        line = (
+                            f"U.S. Senator - {letter}"
+                            if header[2].endswith("Senator")
+                            else f"U.S. Representative, Dist {district} - {letter}"
+                        )
+                    elif re.match(r"^\(\w+\) ", line.strip()) or line.strip().startswith(("Councilmember", "Mayor")):
+                        line = "Other - X"
+                    elif row := OLD_ROW.match(line.strip()):
+                        line = "Blank Votes" if re.fullmatch(r"(BLANK|OVER) VOTES", row[2]) else f"{row[2]} {row[1]} 0.0%"
+                    cells.append((0, line))
+            elif day.year < 2020:
                 cells = []
                 for page in text.split("\f"):
                     lines = page.splitlines()
@@ -134,7 +161,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Hawaii's 2008–2024 president, U.S. Senate, and House primaries by county",
+            summary="Hawaii's 2000, 2004, and 2006–2024 president, U.S. Senate, and House primaries by county",
             polity="US-HI",
         )
         source = cs.source(PUBLISHER, TITLE)
