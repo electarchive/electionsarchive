@@ -6246,6 +6246,11 @@ def emit() -> Path:
                 seen: set[UUID] = set()
                 totals: dict[str, int] = {}
                 roots: dict[str, UUID] = {}
+                unlabeled = (
+                    {"Nonpartisan"}
+                    if all(set(labels) <= {"Nonpartisan", "Write-In"} for labels in rows["parties"].to_list())
+                    else set()
+                )
                 for (person,), group in rows.filter(pl.col("person").is_not_null()).group_by(
                     "person", maintain_order=True
                 ):
@@ -6275,7 +6280,7 @@ def emit() -> Path:
                         role="head",
                         ballot_name=ballot,
                         is_independent=not nominated
-                        and any(label in INDEPENDENT or (state, label) in slogans for label in labels),
+                        and any(label in INDEPENDENT - unlabeled or (state, label) in slogans for label in labels),
                         is_incumbent=None
                         if all(row["is_incumbent"] is None for row in lines_of)
                         else any(row["is_incumbent"] for row in lines_of),

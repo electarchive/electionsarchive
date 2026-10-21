@@ -11,7 +11,7 @@ from ea.store import connect
 
 SOURCE = "us.wikidata_links"
 VERSION = "1"
-TITLE = "Positions held (P39) of American politicians"
+TITLE = "Positions held (P39) and candidacies in elections (P3602) of American politicians"
 CHUNK = 150
 SLACK = 1
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
@@ -63,9 +63,16 @@ NICKNAMES = {
     "cynthia": "cindy",
 }
 POSITIONS = """SELECT ?item ?posLabel ?start ?end WHERE {{ VALUES ?item {{ {items} }}
-?item p:P39 ?s . ?s ps:P39 ?pos .
-OPTIONAL {{ ?s pq:P580 ?start }} OPTIONAL {{ ?s pq:P582 ?end }}
+{{ ?item p:P39 ?s . ?s ps:P39 ?pos . OPTIONAL {{ ?s pq:P580 ?start }} OPTIONAL {{ ?s pq:P582 ?end }} }}
+UNION {{ ?item wdt:P3602 ?pos . OPTIONAL {{ ?pos wdt:P585 ?start }} OPTIONAL {{ ?pos wdt:P585 ?end }} }}
 SERVICE wikibase:label {{ bd:serviceParam wikibase:language "en". }} }}"""
+FEC = "https://query.wikidata.org/sparql?" + urlencode(
+    {
+        "query": """SELECT ?item ?fec ?label WHERE { ?item wdt:P1839 ?fec .
+OPTIONAL { ?item rdfs:label ?label FILTER(lang(?label) = "en") } }""",
+        "format": "json",
+    }
+)
 STATES = {
     "AL": "Alabama",
     "AK": "Alaska",
@@ -124,7 +131,7 @@ LEVELS = {
     "president": re.compile(r"president of the united states"),
     "state_upper": re.compile(r"senate"),
     "state_lower": re.compile(r"(house|assembly|delegates|general court)"),
-    "governor": re.compile(r"governor"),
+    "governor": re.compile(r"(governor|gubernatorial)"),
     "judicial": re.compile(r"(justice|judge|court)"),
     "statewide_exec": re.compile(
         r"(attorney general|secretary of state|treasurer|auditor|comptroller|controller|superintendent"
@@ -214,7 +221,7 @@ where length(a.l) > 3 and (wa.value is null) <> (wb.value is null)
   and coalesce(na.canon, a.f) = coalesce(nb.canon, b.f) and (length(a.f) > 1 or lower(a.nm) = lower(b.nm))
   and not exists (select 1 from pc x join pc y on x.contest_id = y.contest_id
                   where x.person_id = a.person_id and y.person_id = b.person_id)
-  and greatest(a.y0, b.y0) <= least(a.y1, b.y1) + 4
+  and greatest(a.y0, b.y0) <= least(a.y1, b.y1) + 12
   and not exists (select 1 from person p join person q on q.birth_date <> p.birth_date
                   where p.id = a.person_id and q.id = b.person_id)
 """
@@ -261,6 +268,7 @@ def fetch() -> None:
     with connect() as conn:
         for url in _urls(_pairs(conn)):
             raw.fetch(SOURCE, url, suffix=".json")
+    raw.fetch(SOURCE, FEC, suffix=".json")
 
 
 def emit() -> Path:
@@ -313,7 +321,7 @@ def emit() -> Path:
             version=VERSION,
             summary=(
                 "People recorded once per office joined to the Wikidata person who held that office in that state "
-                "during the years they ran, where the names match and Wikidata's positions held cover both records"
+                "during the years they ran, where the names match and Wikidata's positions held or candidacies cover both records"
             ),
             polity="US",
             kind="match",
@@ -329,7 +337,7 @@ def emit() -> Path:
             license="CC0 1.0",
             license_url="https://creativecommons.org/publicdomain/zero/1.0/",
         )
-        for url in urls:
+        for url in [*urls, FEC]:
             cs.artifact(raw.cached(SOURCE, url), source)
         merged = ambiguous = 0
         for other, known in confirmed:
@@ -340,5 +348,65 @@ def emit() -> Path:
             merged += 1
         print(
             f"{len(pairs)} candidate pairs, {len(confirmed)} confirmed by Wikidata, {merged} merged, {ambiguous} ambiguous left apart"
+        )
+        live = "not exists (select from entity_merge m where m.entity_id = x.entity_id)"
+        items: dict[str, set[UUID]] = defaultdict(set)
+        held_items: dict[UUID, set[str]] = defaultdict(set)
+        for person, item in conn.execute(
+            f"select x.entity_id, x.value from external_id x where x.scheme = 'wikidata' and {live}"
+        ).fetchall():
+            items[item].add(person)
+            held_items[person].add(item)
+        filed: dict[str, set[UUID]] = defaultdict(set)
+        for person, value in conn.execute(
+            f"select x.entity_id, x.value from external_id x where x.scheme = 'fec.candidate' and {live}"
+        ).fetchall():
+            filed[value].add(person)
+        words: dict[UUID, set[str]] = defaultdict(set)
+        for person, text in conn.execute(
+            f"""select x.entity_id, n.text from external_id x join name n on n.entity_id = x.entity_id
+                where x.scheme = 'fec.candidate' and {live}"""
+        ).fetchall():
+            words[person] |= set(re.findall(r"[a-z]{2,}", text.lower()))
+        candidacies: dict[UUID, int] = dict(
+            conn.execute(
+                """select cy.person_id, count(*) from candidacy cy
+                   where cy.person_id in (select entity_id from external_id where scheme = 'fec.candidate')
+                   group by 1"""
+            ).fetchall()
+        )
+        claims: dict[str, set[UUID]] = defaultdict(set)
+        labels: dict[str, str] = {}
+        for binding in json.loads(raw.cached(SOURCE, FEC).path.read_text(encoding="utf-8"))["results"]["bindings"]:
+            item = binding["item"]["value"].rsplit("/", 1)[1]
+            labels[item] = binding.get("label", {}).get("value", "")
+            claims[item] |= filed.get(binding["fec"]["value"], set())
+        claimed: dict[UUID, set[str]] = defaultdict(set)
+        for item, people in claims.items():
+            for person in people:
+                claimed[person].add(item)
+        joined = linked = conflicts = 0
+        for item, people in sorted(claims.items()):
+            surname = [word for word in re.findall(r"[a-z]{2,}", labels[item].lower()) if word not in SUFFIXES]
+            people = {person for person in people if surname and surname[-1] in words[person]}
+            if not people or any(len(claimed[person]) > 1 or held_items[person] - {item} for person in people):
+                conflicts += bool(people)
+                continue
+            if len(items[item]) > 1:
+                conflicts += 1
+                continue
+            survivor = next(iter(items[item]), None) or max(
+                people, key=lambda person: (candidacies.get(person, 0), -person.int)
+            )
+            if any(person in cs.survivors for person in people | {survivor}):
+                continue
+            if not items[item]:
+                cs.add("external_id", entity_id=survivor, scheme="wikidata", value=item)
+                linked += 1
+            for person in people - {survivor}:
+                cs.merge(person, survivor)
+                joined += 1
+        print(
+            f"FEC IDs on Wikidata: {joined} people joined, {linked} given their Wikidata item, {conflicts} left apart"
         )
         return cs.write()
