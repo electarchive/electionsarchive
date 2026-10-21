@@ -36,6 +36,7 @@ COMMITS = {
     "NJ": ("81ce9f0b7f554e0bd1655a4083b34a633967f840", (2017,)),
     "NV": ("109e5c7d6be95f15c6bad5194b415ebcdf75d7fc", (2016,)),
     "NY": ("49a61af92f2784874b1d7b405be8beaecdb4c02f", (2000, 2002, 2004, 2006, 2014)),
+    "OK": ("fe1098a34027523c53562c40c65353da8a1dcad2", (2004, 2008, 2010, 2012, 2014)),
     "OH": ("c98f2f7f32c8f1b35bff344ed9b784d0eff31c8d", (2020,)),
     "OR": ("76c478184965392b18afeaf8ab0746e5f401a2e9", (2020,)),
     "RI": ("977565f9d7cf7a32d3a2a454282b5fd291cef291", (2008, 2012, 2014, 2022)),
@@ -54,6 +55,7 @@ ALIASES = {
     ("IN", "clar"): "clark",
     ("NY", "chautaugua"): "chautauqua",
 }
+SKIPPED = {"2004/20041102__ok__general__state_house__county.csv"}
 TIERS = ["__county", "__county-level", "__town", "", "__precinct"]
 OTHER = r"\b(u\.?\s?s\.?|united states|congress\w*|county|city|party|levy|referendum|measure|amendment|board|commission\w*|court|judge|regents?|school|recorder|clerk)\b"
 
@@ -74,8 +76,16 @@ def picks() -> list[tuple[str, int, str]]:
                 if entry["type"] != "blob" or matched is None:
                     continue
                 suffix = (matched[1] or "") + ("__precinct" if matched[2] else "")
-                tier = TIERS.index(suffix) if suffix in TIERS else 4 if suffix.endswith("__precinct") else None
-                if tier is not None:
+                tier = (
+                    TIERS.index(suffix)
+                    if suffix in TIERS
+                    else 4
+                    if suffix.endswith("__precinct")
+                    else 0
+                    if suffix.endswith("__county")
+                    else None
+                )
+                if tier is not None and entry["path"] not in SKIPPED:
                     found.setdefault(tier, []).append(entry["path"])
             if found:
                 chosen.extend((state, year, path) for path in sorted(found[min(found)]))
