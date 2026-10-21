@@ -652,6 +652,34 @@ def parse(source: ModuleType) -> None:
         for line in failed:
             print(line)
         raise ValueError(f"{len(failed)} cells or sums do not reconcile")
+    for row in rows:
+        if row["box"] is not None:
+            continue
+        same_column = [
+            r["box"]
+            for r in rows
+            if r["box"] is not None
+            and (r["year"], r["district"], r["column"]) == (row["year"], row["district"], row["column"])
+        ]
+        same_row = [
+            r["box"]
+            for r in rows
+            if r["box"] is not None
+            and (r["year"], r["district"], r["county"]) == (row["year"], row["district"], row["county"])
+        ]
+        if not same_column or not same_row:
+            continue
+        digit = statistics.median(
+            (r["box"][2] - r["box"][0]) / len(str(r["votes"]))
+            for r in rows
+            if r["box"] is not None and r["year"] == row["year"]
+        )
+        right = round(statistics.median(b[2] for b in same_column))
+        middle = statistics.median((b[1] + b[3]) / 2 for b in same_row)
+        half = statistics.median(b[3] - b[1] for b in same_column) / 2
+        row["box"] = [round(right - digit * len(str(row["votes"]))), round(middle - half), right, round(middle + half)]
+        row["located"] = "placed"
+    frame = pl.DataFrame(rows, infer_schema_length=None)
     missing = frame.filter(pl.col("box").is_null())
     if missing.height:
         raise ValueError(f"no box for {missing.select('year', 'district', 'county', 'column').rows()}")
