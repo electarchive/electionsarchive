@@ -17,6 +17,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://sos.nebraska.gov/sites/default/files/doc/elections/"
 FILES = {
+    date(2016, 5, 10): "2016/Primary16CanvassBook.pdf",
     date(2020, 5, 12): "2020/2020%20Primary%20Canvass%20Book.pdf",
     date(2022, 5, 10): "2022/2022%20Primary%20Canvass%20Book.pdf",
 }
@@ -63,7 +64,7 @@ def parse() -> None:
             and re.match(r"\s+(President of the United States|Member of the (United States Senate|U\.S\. House))", line)
         )
         end = next(
-            i for i in range(start, len(lines)) if re.match(r"\s+(State Offices|Statewide Constitutional Offices)\s*$", lines[i])
+            i for i in range(start, len(lines)) if re.match(r"\s+(State Offices|Statewide Constitutional Offices|Public Service Commissioner)\s*$", lines[i])
         )
         chamber, district = "", None
         tables: list[dict] = []
@@ -87,9 +88,9 @@ def parse() -> None:
             elif re.match(r"\s+Member of the U\.S\. House", line):
                 close()
                 chamber, district = "house", None
-            elif found := re.match(r"\s+Congressional District (\d)", line):
+            elif found := re.match(r"\s+Congressional District (\d|One|Two|Three)", line):
                 close()
-                district = int(found[1])
+                district = int(found[1]) if found[1].isdigit() else ["One", "Two", "Three"].index(found[1]) + 1
             elif PARTY.search(line) and not CELL.search(line):
                 close()
                 for match in PARTY.finditer(line):
@@ -232,7 +233,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Nebraska's 2020 and 2022 federal primaries by county",
+            summary="Nebraska's 2016, 2020, and 2022 federal primaries by county",
             polity="US-NE",
         )
         source = cs.source(PUBLISHER, TITLE)
