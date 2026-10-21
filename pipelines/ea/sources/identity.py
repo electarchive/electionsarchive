@@ -227,6 +227,10 @@ PEOPLE = {
         ("wikidata", "Q4647998"),
         ("us.klarner.person", "255863"),
     ),
+    "Bill Walker, governor of Alaska 2014-2018": (
+        ("wikidata", "Q18159074"),
+        ("us.cage.person", "AK:william-m-bill-walker"),
+    ),
     "Mark Dayton, senator and governor of Minnesota": (
         ("bioguide", "D000596"),
         ("fec.candidate", "S2MN00027"),
