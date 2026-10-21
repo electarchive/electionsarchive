@@ -26,7 +26,7 @@ from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.primaries"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 CALIFORNIA = "https://elections.cdn.sos.ca.gov/sov/2024-primary/sov/79-us-rep-congress.xlsx"
@@ -2295,7 +2295,7 @@ def parse() -> None:
                         if "President of the United States" in text
                         else ("U.S. Senate", None)
                         if "Six Year Term" in text
-                        else (None, None)
+                        else ("U.S. Senate special", None)
                         if "Two Year Term" in text and "Senate" in text
                         else ("U.S. House", int(found[1]))
                         if (found := re.search(r"Congressional District (\d+)", text))
@@ -2716,6 +2716,8 @@ def parse() -> None:
                     & ~office.str.contains("council|board|commission|delegate")
                 )
                 .then(pl.lit("president"))
+                .when(office.str.contains(openelections.SENATE.pattern) & office.str.contains("special"))
+                .then(pl.lit("senate:special"))
                 .when(office.str.contains(openelections.SENATE.pattern))
                 .then(pl.lit("senate"))
                 .when(

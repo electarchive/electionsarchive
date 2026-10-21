@@ -14,7 +14,7 @@ from ea.sources.us import fec
 from ea.store import DATA, connect
 
 SOURCE = "us.wikipedia_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 API = "https://en.wikipedia.org/w/api.php?"
 STATES = {
@@ -193,6 +193,7 @@ def titles() -> list[tuple[str, str, str]]:
             found.append((state, "senate", f"2024 United States Senate election in {name}"))
         if state in GOVERNOR:
             found.append((state, "governor", f"2024 {name} gubernatorial election"))
+    found.append(("NE", "senate:special", "2024 United States Senate special election in Nebraska"))
     return found
 
 
@@ -545,7 +546,7 @@ def emit() -> Path:
                       (select array_agg(cy.person_id) from contest_option o
                        join candidacy cy on cy.option_id = o.id and cy.role = 'head' where o.contest_id = c.id)
                from external_id x join contest c on c.id = x.entity_id
-               where x.scheme = 'us.contest' and x.value ~ '^2024-11-05:[A-Z]{2}:(house:[0-9]+|senate|governor)$'"""
+               where x.scheme = 'us.contest' and x.value ~ '^2024-11-05:[A-Z]{2}:(house:[0-9]+|senate(:special)?|governor)$'"""
         ).fetchall():
             generals[row[0]] = dict(
                 zip(
@@ -707,11 +708,11 @@ def emit() -> Path:
                 contest,
                 f"2024 {STATES[state]} gubernatorial {stage}"
                 if office == "governor"
-                else f"2024 U.S. {'House' if office == 'house' else 'Senate'} {stage} in {where}",
+                else f"2024 U.S. {'House' if office == 'house' else 'Senate special' if office == 'senate:special' else 'Senate'} {stage} in {where}",
             )
             path = (
                 f"us/{state.lower()}/{day}-{kind}/"
-                + ("house-at-large" if district == 0 else f"house-{district}" if office == "house" else office)
+                + ("house-at-large" if district == 0 else f"house-{district}" if office == "house" else office.replace(":", "-"))
                 + (f"-{party}" if party else "")
             )
             if slugs.setdefault(path, contest) != contest:
