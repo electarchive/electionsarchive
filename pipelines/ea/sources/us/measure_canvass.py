@@ -205,6 +205,8 @@ OHIO = {
     date(2025, 5, 6): ("20250621212835", "2025/pri/issues-final-summary.xlsx"),
 }
 SOUTH_DAKOTA = {
+    date(2016, 11, 8): "2016%20Assets/2016GeneralElectionOfficialResultsStateCanvass.pdf",
+    date(2018, 11, 6): "2018%20Assets/2018GeneralElectionCanvassPDF.pdf",
     date(2020, 11, 3): "2020%20Assests/2020GeneralStateCanvassFinal%26Certificate.pdf",
     date(2022, 11, 8): "2022%20Assets/2022Generalcanvassreport.pdf",
     date(2024, 11, 5): "2024%20Assets/Recount-Canvass-and-Canvass-Docs-General/2024GeneralElectionCanvassWithCert.pdf",
