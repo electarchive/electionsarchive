@@ -12,13 +12,13 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import special_files, special_md, special_nc, special_pdfs
+from ea.sources.us import special_counties, special_files, special_md, special_nc, special_pdfs
 from ea.sources.us.elstats import SOURCE as ARCHIVE
 from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "12"
+VERSION = "13"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -61,6 +61,9 @@ STATES = {
     "MD": "Maryland",
     "NE": "Nebraska",
     "KS": "Kansas",
+    "MS": "Mississippi",
+    "RI": "Rhode Island",
+    "OK": "Oklahoma",
 }
 OFFICIAL = {
     "NC": (
@@ -86,6 +89,24 @@ OFFICIAL = {
         "Official election results",
         "https://www.sos.ks.gov/elections/election-results.html",
         [special_pdfs.KANSAS],
+    ),
+    "MS": (
+        "Mississippi Secretary of State",
+        "Certified special election results",
+        "https://www.sos.ms.gov/elections-voting/election-results",
+        special_counties.links()["MS"],
+    ),
+    "RI": (
+        "Rhode Island Board of Elections",
+        "Summary results reports",
+        "https://elections.ri.gov/elections/results",
+        special_counties.links()["RI"],
+    ),
+    "OK": (
+        "Oklahoma State Election Board",
+        "2002 election results",
+        "https://oklahoma.gov/elections/elections-results/election-results/2002-election-results.html",
+        special_counties.links()["OK"],
     ),
 }
 FIPS = {"GA": "13", "IL": "17", "KS": "20"}
@@ -125,6 +146,7 @@ def fetch() -> None:
     special_nc.fetch()
     special_md.fetch()
     special_pdfs.fetch()
+    special_counties.fetch()
     for election, race, _, _, _ in TEXAS_PAGES:
         raw.fetch(SOURCE, TEXAS.format(election, race), suffix=".htm")
     for link in links:
@@ -364,6 +386,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_nc.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_md.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
@@ -581,7 +604,7 @@ def emit() -> Path:
                 )
                 if runoff
                 else None,
-                electoral_system_id={"LA": two_round, "TX": two_round, "GA": two_round, "CA": top_two}.get(state, fptp),
+                electoral_system_id={"LA": two_round, "TX": two_round, "GA": two_round, "MS": two_round, "CA": top_two}.get(state, fptp),
                 default_result_kind="counted",
             )
             cs.add(
@@ -621,7 +644,7 @@ def emit() -> Path:
                         previous[1] + votes,
                     )
             outcomes = dict(lines.group_by("candidate_name").agg(pl.col("outcome").first()).iter_rows())
-            if state in ("LA", "CA", "TX", "GA"):
+            if state in ("LA", "CA", "TX", "GA", "MS"):
                 winners = {name for name, outcome in outcomes.items() if outcome == "Elected"}
             else:
                 winners = {max(candidates, key=lambda candidate: candidates[candidate][1])}
