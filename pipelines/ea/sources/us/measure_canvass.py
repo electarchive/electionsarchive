@@ -128,7 +128,17 @@ DISTRICT = {
     date(2024, 11, 5): "https://electionresults.dcboe.org/Downloads/Reports/"
     "November_5_2024_General_Election_Certified_Results.csv"
 }
-OKLAHOMA = [date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3), date(2024, 11, 5)]
+OKLAHOMA = [
+    date(2012, 11, 6),
+    date(2014, 11, 4),
+    date(2016, 11, 8),
+    date(2018, 6, 26),
+    date(2018, 11, 6),
+    date(2020, 6, 30),
+    date(2020, 11, 3),
+    date(2023, 3, 7),
+    date(2024, 11, 5),
+]
 NEVADA = [date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3), date(2024, 11, 5)]
 MAINE = {
     date(
@@ -661,6 +671,21 @@ def fetch() -> None:
             raw.fetch(SOURCE, la_sos.blob(day, "Votes_Multiparish.htm"), suffix=".json")
             continue
         source, url = link(state, day)
+        if state == "OK" and url:
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                name = f"{day:%Y%m%d}_CountyResults_csv.zip"
+                if (DATA / "inbox" / "manual" / "MF-019" / name).exists():
+                    raw.store(
+                        SOURCE,
+                        url,
+                        (DATA / "inbox" / "manual" / "MF-019" / name).read_bytes(),
+                        suffix=".zip",
+                        retrieved_at=datetime.now(UTC),
+                        media_type="application/zip",
+                    )
+            continue
         if state == "NJ":
             for name in NEW_JERSEY.get(day, []):
                 try:
