@@ -1,9 +1,12 @@
 import csv
 import io
+import json
 import re
+from datetime import date
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -13,7 +16,7 @@ from ea.sources.us.elstats import TENANTS, plain, url
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "2"
+VERSION = "3"
 SEARCHES = [
     ("NY", 2020),
     ("NY", 2022),
@@ -22,7 +25,10 @@ SEARCHES = [
     ("VA", 2023),
 ]
 FLORIDA = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=1/11/2022&OfficialResults=Y"
-STATES = {"NY": "New York", "NM": "New Mexico", "VA": "Virginia", "FL": "Florida"}
+LOUISIANA = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob={:%Y%m%d}/{}"
+LOUISIANA_DAYS = [date(2013, 10, 19), date(2013, 11, 16), date(2021, 3, 20), date(2021, 4, 24)]
+LOUISIANA_RUNOFFS = {date(2013, 11, 16), date(2021, 4, 24)}
+STATES = {"NY": "New York", "NM": "New Mexico", "VA": "Virginia", "FL": "Florida", "LA": "Louisiana"}
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
@@ -30,18 +36,32 @@ PARTIES = {
     "DEM": "democratic-party",
     "REP": "republican-party",
     "LPF": "libertarian-party",
+    "LBT": "libertarian-party",
     "Green": "green-party",
     "Conservative": "NY:conservative-party",
     "Working Families": "NY:working-families-party",
     "Independence": "NY:independence-party",
 }
 MAIN = {"Democratic", "Republican", "DEM", "REP"}
+INDEPENDENT = {"IND", "NOPTY", "NPTY", "NOP"}
 
 
 def fetch() -> None:
     for state, year in SEARCHES:
         raw.fetch(ARCHIVE, url(TENANTS[state][0], year), suffix=".csv")
     raw.fetch(SOURCE, FLORIDA, suffix=".txt")
+    links = [
+        LOUISIANA.format(day, name)
+        for day in LOUISIANA_DAYS
+        for name in ["RacesCandidates_Multiparish.htm", "Votes_Multiparish.htm"]
+        + [f"VotesParish/Votes_{parish:02}.htm" for parish in range(1, 65)]
+    ]
+    for link in links:
+        try:
+            raw.fetch(SOURCE, link, suffix=".json")
+        except httpx.HTTPStatusError as error:
+            if error.response.status_code != 404:
+                raise
 
 
 def emit() -> Path:
@@ -82,8 +102,68 @@ def emit() -> Path:
             }
         )
     )
+    louisiana: list[dict[str, object]] = []
+    with connect() as conn:
+        parishes = [
+            text
+            for (text,) in conn.execute(
+                """select n.text from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '22%' order by n.text"""
+            ).fetchall()
+        ]
+    for day in LOUISIANA_DAYS:
+        races = json.loads(raw.cached(SOURCE, LOUISIANA.format(day, "RacesCandidates_Multiparish.htm")).path.read_text())[
+            "Races"
+        ]["Race"]
+        totals = {}
+        for race in json.loads(raw.cached(SOURCE, LOUISIANA.format(day, "Votes_Multiparish.htm")).path.read_text())[
+            "Races"
+        ]["Race"]:
+            for choice in race["Choice"]:
+                totals[(race["ID"], choice["ID"])] = (int(choice["VoteTotal"]), choice["Outcome"])
+        counted: dict[tuple[str, str], int] = {}
+        for race in races if isinstance(races, list) else [races]:
+            found = re.match(r"^U\. S\. Representative -- (\d+)\w\w Congressional District$", race["SpecificTitle"])
+            if found is None:
+                continue
+            choices = {choice["ID"]: choice["Desc"] for choice in race["Choice"]}
+            for index, parish in enumerate(parishes):
+                try:
+                    listed = json.loads(
+                        raw.cached(
+                            SOURCE, LOUISIANA.format(day, f"VotesParish/Votes_{index + 1:02}.htm")
+                        ).path.read_text()
+                    )["Races"]
+                except LookupError:
+                    continue
+                for cell in listed["Race"] if isinstance(listed["Race"], list) else [listed["Race"]]:
+                    if cell["ID"] != race["ID"]:
+                        continue
+                    for choice in cell["Choice"]:
+                        match = re.match(r"^(.*?)\s*\(([A-Z]+)\)$", choices[choice["ID"]].strip())
+                        counted[(race["ID"], choice["ID"])] = counted.get((race["ID"], choice["ID"]), 0) + int(
+                            choice["VoteTotal"]
+                        )
+                        louisiana.append(
+                            {
+                                "state": "LA",
+                                "election_date": str(day),
+                                "district_name": found[1],
+                                "candidate_name": (match[1] if match else choices[choice["ID"]]).strip(),
+                                "candidate_party_name": None if match is None or match[2] in INDEPENDENT else match[2],
+                                "division_name": parish,
+                                "votes": str(choice["VoteTotal"]),
+                                "outcome": totals[(race["ID"], choice["ID"])][1],
+                                "runoff": day in LOUISIANA_RUNOFFS,
+                            }
+                        )
+            for choice_id, desc in choices.items():
+                if counted.get((race["ID"], choice_id), 0) != totals[(race["ID"], choice_id)][0]:
+                    raise ValueError(f"{day} {desc}: the parishes do not sum to the statewide total")
+    frames.append(pl.DataFrame(louisiana, infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
+        runoff=pl.col("runoff").fill_null(False),
         district=pl.col("district_name").cast(pl.Int32),
         votes=pl.col("votes").cast(pl.Int64),
     )
@@ -110,8 +190,23 @@ def emit() -> Path:
         )
         house = cs.key("us.body", "house")
         fptp = cs.key("us.electoral_system", "fptp")
+        two_round = cs.key("us.electoral_system", "two_round")
         sources: dict[str, UUID] = {}
         for state in STATES:
+            if state == "LA":
+                publisher, title = "Louisiana Secretary of State", "Official election results"
+                sources[state] = cs.source(publisher, title)
+                if sources[state] in cs.minted:
+                    raise ValueError("LA: the Secretary of State's source must already exist")
+                for day in LOUISIANA_DAYS:
+                    for name in ["RacesCandidates_Multiparish.htm", "Votes_Multiparish.htm"] + [
+                        f"VotesParish/Votes_{parish:02}.htm" for parish in range(1, 65)
+                    ]:
+                        try:
+                            cs.artifact(raw.cached(SOURCE, LOUISIANA.format(day, name)), sources[state])
+                        except LookupError:
+                            pass
+                continue
             if state == "FL":
                 publisher, title = (
                     "Florida Division of Elections",
@@ -139,9 +234,12 @@ def emit() -> Path:
 
         created: set[UUID] = set()
         elections: set[UUID] = set()
-        for (state, day, district), lines in frame.group_by("state", "day", "district", maintain_order=True):
+        contests: dict[str, UUID] = {}
+        for (state, day, district, runoff), lines in frame.sort("day").group_by(
+            "state", "day", "district", "runoff", maintain_order=True
+        ):
             label = STATES[state]
-            key = f"{day}:{state}:house:{district}:special"
+            key = f"{day}:{state}:house:{district}:special" + (":runoff" if runoff else "")
             general = conn.execute(
                 """select ct.id, ct.district_area_id, ct.boundary_set_id from external_id e
                    join contest ct on ct.id = e.entity_id
@@ -151,7 +249,7 @@ def emit() -> Path:
             ).fetchone()
             if general is None:
                 raise ValueError(f"{key}: no earlier general for the district")
-            election = cs.key("us.election", f"{day}:{state}:special")
+            election = cs.key("us.election", f"{day}:{state}:{'runoff' if runoff else 'special'}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
                 cs.add(
@@ -159,7 +257,7 @@ def emit() -> Path:
                     id=election,
                     polity_id=cs.polity(f"US-{state}"),
                     parent_id=None,
-                    kind="special",
+                    kind="runoff" if runoff else "special",
                     date_from=day,
                     date_to=day,
                     status="held",
@@ -167,13 +265,14 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=election,
-                    text=f"{day:%B} {day.day}, {day.year} {label} special election",
+                    text=f"{day:%B} {day.day}, {day.year} {label} special {'runoff' if runoff else 'election'}",
                     lang="en",
                     kind="official",
                     is_preferred=True,
                 )
-                cs.add("slug", path=f"us/{state.lower()}/{day}-special", entity_id=election)
+                cs.add("slug", path=f"us/{state.lower()}/{day}-{'runoff' if runoff else 'special'}", entity_id=election)
             contest = cs.key("us.contest", key)
+            contests[key] = contest
             ordinal = f"{district}{'th' if district % 100 in (11, 12, 13) else {1: 'st', 2: 'nd', 3: 'rd'}.get(district % 10, 'th')}"
             cs.add(
                 "contest",
@@ -187,24 +286,34 @@ def emit() -> Path:
                 boundary_set_id=general[2],
                 party_scope_id=None,
                 magnitude=1,
-                round_number=1,
-                previous_round_id=None,
-                electoral_system_id=fptp,
+                round_number=2 if runoff else 1,
+                previous_round_id=next(
+                    previous
+                    for earlier, previous in reversed(contests.items())
+                    if earlier.endswith(f":{state}:house:{district}:special")
+                )
+                if runoff
+                else None,
+                electoral_system_id=two_round if state == "LA" else fptp,
                 default_result_kind="counted",
             )
             cs.add(
                 "name",
                 entity_id=contest,
-                text=f"{day.year} U.S. House special election in {label}'s {ordinal} congressional district",
+                text=f"{day.year} U.S. House special {'runoff' if runoff else 'election'} in {label}'s {ordinal} congressional district",
                 lang="en",
                 kind="official",
                 is_preferred=True,
             )
-            cs.add("slug", path=f"us/{state.lower()}/{day}-special/house-{district}-special", entity_id=contest)
+            cs.add(
+                "slug",
+                path=f"us/{state.lower()}/{day}-{'runoff' if runoff else 'special'}/house-{district}-special",
+                entity_id=contest,
+            )
 
             candidates: dict[str, tuple[str | None, int]] = {}
             writein = 0
-            pseudo = re.compile(r"(?i)^(blank|void|total votes( cast)?|undervotes|overvotes)$")
+            pseudo = re.compile(r"(?i)^(blank|void|total (votes|ballots)( cast)?|undervotes|overvotes)$")
             for name, party, votes in (
                 lines.group_by("candidate_name", "candidate_party_name")
                 .agg(pl.col("votes").sum())
@@ -224,7 +333,11 @@ def emit() -> Path:
                         previous[0] if previous[0] in MAIN else party if party in MAIN else previous[0],
                         previous[1] + votes,
                     )
-            winner = max(candidates, key=lambda candidate: candidates[candidate][1])
+            outcomes = dict(lines.group_by("candidate_name").agg(pl.col("outcome").first()).iter_rows())
+            if state == "LA":
+                winners = {name for name, outcome in outcomes.items() if outcome == "Elected"}
+            else:
+                winners = {max(candidates, key=lambda candidate: candidates[candidate][1])}
 
             known = {
                 slug(text): person
@@ -239,15 +352,23 @@ def emit() -> Path:
             result_set = cs.key(f"{SOURCE}.result_set", key)
             options: list[tuple[UUID, dict[str, int]]] = []
             for name, (party, _) in candidates.items():
-                if name == winner:
+                if name in winners or outcomes.get(name) == "Runoff":
                     row = conn.execute(
                         """select t.person_id from tenure t join name n on n.entity_id = t.person_id and n.is_preferred
-                           where t.body_id = %s and t.from_date > %s and n.text ilike %s order by t.from_date limit 1""",
-                        [house, day, f"%{name.split()[-1].removesuffix(' Jr.').removesuffix(' Sr.')}%"],
+                           where t.body_id = %s and t.from_date >= %s and t.from_date < %s::date + 200
+                           and n.text ilike %s order by t.from_date limit 1""",
+                        [house, day, day, f"%{name.split()[-1].removesuffix(' Jr.').removesuffix(' Sr.')}%"],
                     ).fetchone()
                     if row is None:
-                        raise ValueError(f"{key}: no House tenure for {name}")
-                    person = row[0]
+                        if name in winners:
+                            raise ValueError(f"{key}: no House tenure for {name}")
+                        person = known.get(slug(name)) or cs.key(f"{SOURCE}.person", f"{state}:{slug(name)}")
+                        if person in cs.minted and person not in created:
+                            created.add(person)
+                            cs.add("person", id=person)
+                            cs.add("name", entity_id=person, text=name, lang="en", kind="official", is_preferred=True)
+                    else:
+                        person = row[0]
                 else:
                     person = known.get(slug(name)) or cs.key(f"{SOURCE}.person", f"{state}:{slug(name)}")
                     if person in cs.minted and person not in created:
@@ -275,7 +396,10 @@ def emit() -> Path:
                     is_incumbent=False,
                 )
                 cs.add(
-                    "outcome", result_set_id=result_set, option_id=option, kind="elected" if name == winner else "lost"
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind="elected" if name in winners else "advanced" if outcomes.get(name) == "Runoff" else "lost",
                 )
                 by_unit = {
                     str(division): int(count)
