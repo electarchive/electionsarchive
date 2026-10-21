@@ -125,7 +125,7 @@ VERMONT = (
     "the winner from the top three candidates."
 )
 MA_ROW = re.compile(
-    r'id="election-id-(\d+)".*?<td[^>]*>(\d{4})</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>(.*?)</table>',
+    r'id="election-id-(\d+)"(?:(?!id="election-id-).)*?<td[^>]*>(\d{4})</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>((?:(?!id="election-id-).)*?)(?:</table>|(?=<tr id="election-id-)|\Z)',
     re.DOTALL,
 )
 
