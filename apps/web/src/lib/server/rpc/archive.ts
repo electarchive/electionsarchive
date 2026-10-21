@@ -242,6 +242,8 @@ const Cell = v.nullable(
 
 const PlaceRow = v.object({
   k: v.number(),
+  turnout: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+  turnedBefore: v.optional(v.nullable(v.number())),
   at: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
   name: v.string(),
   path: v.nullable(v.string()),
@@ -1868,7 +1870,38 @@ async function places(
       contest.date ?? "infinity",
     ),
   ]);
+  const [turned, prior] = await Promise.all([
+    turnout(
+      contest.root,
+      listed.map((row) => row.k),
+    ),
+    turnout(
+      chosen?.id ?? null,
+      listed.map((row) => row.k),
+    ),
+  ]);
   const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
+  const share = (
+    entry: { registered: number; voters: number } | undefined,
+    valid: number,
+  ) =>
+    entry == null || valid === 0 || entry.voters < valid * 0.98
+      ? null
+      : entry.voters / entry.registered;
+  const turnouts = (row: (typeof tabulated.rows)[number]) => {
+    const entry = turned.get(row.k);
+    const now = share(entry, row.valid);
+    return {
+      turnout:
+        now == null || entry == null
+          ? null
+          : ([entry.voters, entry.registered] as [number, number]),
+      turnedBefore:
+        now == null || row.earlier == null
+          ? null
+          : share(prior.get(row.k), prior.get(row.k)?.voters ?? 0),
+    };
+  };
   return {
     levels: levels.map((entry) => ({
       code: entry.code,
@@ -1881,6 +1914,7 @@ async function places(
       .slice(0, rows.length)
       .map((row) => ({
         ...row,
+        ...turnouts(row),
         at: at.get(row.k) ?? null,
         seats: seats.get(row.k) ?? null,
       })),
@@ -1888,6 +1922,7 @@ async function places(
       .slice(rows.length)
       .map((row, index) => ({
         ...row,
+        ...turnouts(row),
         at: at.get(row.k) ?? null,
         seats: seats.get(row.k) ?? null,
         within: parents.get(nested[index]?.parent ?? ""),
@@ -2504,7 +2539,15 @@ export const contests = {
           }),
         ),
         turnout: v.nullable(
-          v.object({ registered: v.number(), voters: v.number() }),
+          v.object({
+            registered: v.number(),
+            voters: v.number(),
+            earlier: v.optional(
+              v.nullable(
+                v.object({ registered: v.number(), voters: v.number() }),
+              ),
+            ),
+          }),
         ),
         count: v.nullable(
           v.object({
@@ -3491,11 +3534,33 @@ export const contests = {
           votes: row.votes,
         }))
         .toSorted((a, b) => b.votes - a.votes);
-      const faces = await portraits(
-        rows.flatMap((row) => row.current?.person ?? row.earlier?.person ?? []),
+      const [faces, pooled, prior] = await Promise.all([
+        portraits(
+          rows.flatMap(
+            (row) => row.current?.person ?? row.earlier?.person ?? [],
+          ),
+        ),
+        page.turnout == null ? turnout(contest.id, [area.k]) : null,
+        chosen == null || earlier == null ? null : turnout(chosen.id, [area.k]),
+      ]);
+      const sane = (
+        entry: { registered: number; voters: number } | null | undefined,
+        valid: number,
+      ) => (entry == null || entry.voters < valid * 0.98 ? null : entry);
+      const turned = sane(
+        page.turnout ?? pooled?.get(area.k),
+        current.side.valid,
       );
       return {
         ...page,
+        turnout:
+          turned == null
+            ? null
+            : {
+                registered: turned.registered,
+                voters: turned.voters,
+                earlier: sane(prior?.get(area.k), earlier?.side.valid ?? 0),
+              },
         series,
         places: grid,
         checks,
@@ -5142,6 +5207,77 @@ export const contests = {
       };
     }),
 };
+
+async function turnout(contest: string | null, ks: Array<number>) {
+  if (contest == null || ks.length === 0) {
+    return new Map<number, { registered: number; voters: number }>();
+  }
+  const found = await db.execute<{
+    k: number;
+    registered: number | null;
+    voters: number | null;
+  }>(sql`
+    with recursive day as (
+      select e.date_from, e.kind from contest c join election e on e.id = c.election_id where c.id = ${contest}::uuid
+    ),
+    sets as materialized (
+      select rs.k, rs.election_id from result_set rs
+      join election e on e.id = rs.election_id
+      cross join day d
+      where rs.contest_id is null and rs.is_default and e.date_from = d.date_from and e.kind = d.kind
+    ),
+    facts as materialized (
+      select s.k as set, s.election_id as election, ua.area_id as area, v.measure, sum(v.value)::float8 as value
+      from sets s
+      join result_value v on v.result_set_k = s.k and v.option_k = 0 and v.measure in (2, 3, 14) and v.count_round = 0
+      join reporting_unit ru on ru.k = v.unit_k
+      cross join lateral (
+        select coalesce(ru.area_id, (
+          select x.area_id from reporting_unit_area x where x.unit_id = ru.id
+          order by x.valid @> (select date_from from day) desc limit 1
+        )) as area_id
+      ) ua
+      where ua.area_id is not null
+      group by 1, 2, 3, 4
+    ),
+    targets as (
+      select a.k, a.id from area a where a.k = any(${sql.param(ks)}::int[])
+    ),
+    up(origin, id, depth) as (
+      select distinct f.area, f.area, 0 from facts f
+      union all
+      select up.origin, p.parent_id, up.depth + 1 from up
+      join area_parent p on p.area_id = up.id and p.valid @> (select date_from from day)
+      where up.depth < 5
+    ),
+    tallied as (
+      select t.k, f.election, f.set, f.measure, sum(f.value) as value
+      from targets t
+      join up on up.id = t.id
+      join facts f on f.area = up.origin
+      group by 1, 2, 3, 4
+    ),
+    best as (
+      select k, election, measure, max(value) as value from tallied group by 1, 2, 3
+    ),
+    totals as (
+      select k, measure, sum(value) as value from best group by 1, 2
+    )
+    select k, max(value) filter (where measure = 2) as registered,
+      coalesce(max(value) filter (where measure = 14), max(value) filter (where measure = 3)) as voters
+    from totals group by k
+  `);
+  return new Map(
+    found.rows.flatMap((row) =>
+      row.registered == null ||
+      row.voters == null ||
+      row.registered <= 0 ||
+      row.voters > row.registered
+        ? []
+        : [[row.k, { registered: row.registered, voters: row.voters }]],
+    ),
+  );
+}
 
 async function anchors(ks: Array<number>, day: string) {
   const points = await db.execute<{ k: number; x: number; y: number }>(sql`

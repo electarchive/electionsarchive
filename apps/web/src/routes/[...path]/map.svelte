@@ -91,7 +91,14 @@
   const STEPS = [16, 36, 56, 78, 100];
   const SWINGS = [0.02, 0.05, 0.1];
   const COMPARED = new Set(["swing", "arrows", "flips"]);
-  const MODES = ["winner", "bubbles", "swing", "arrows", "flips"] as const;
+  const MODES = [
+    "winner",
+    "bubbles",
+    "turnout",
+    "swing",
+    "arrows",
+    "flips",
+  ] as const;
 
   const uid = $props.id();
   let maps = $state<Array<Maplibre.Map>>([]);
@@ -138,9 +145,7 @@
   const calm =
     typeof matchMedia !== "undefined" &&
     matchMedia("(prefers-reduced-motion: reduce)").matches;
-  let shading = $state<
-    "winner" | "bubbles" | "swing" | "arrows" | "flips" | number
-  >(
+  let shading = $state<(typeof MODES)[number] | number>(
     untrack(() => {
       const asked = isLinked ? page.url.searchParams.get("shade") : null;
       if (asked == null) {
@@ -241,8 +246,16 @@
       }),
     ),
   );
+  const turnouts = $derived(
+    new Map(
+      [...places.rows, ...(places.districts ?? [])].flatMap((row) =>
+        row.turnout == null ? [] : [[row.k, row.turnout[0] / row.turnout[1]]],
+      ),
+    ),
+  );
   const view = $derived(
-    !isCompared && typeof shading === "string" && COMPARED.has(shading)
+    (!isCompared && typeof shading === "string" && COMPARED.has(shading)) ||
+      (shading === "turnout" && turnouts.size === 0)
       ? "winner"
       : shading,
   );
@@ -309,13 +322,15 @@
       ),
   );
   const edges = $derived.by(() => {
-    if (typeof view !== "number") {
+    if (typeof view !== "number" && view !== "turnout") {
       return [];
     }
     const index = view;
-    const sorted = places.rows
-      .map((row) => row.shares[index] ?? 0)
-      .toSorted((a, b) => a - b);
+    const sorted = (
+      typeof index === "number"
+        ? places.rows.map((row) => row.shares[index] ?? 0)
+        : [...turnouts.values()]
+    ).toSorted((a, b) => a - b);
     const cuts = [0.2, 0.4, 0.6, 0.8].map(
       (at) => sorted[Math.floor(at * (sorted.length - 1))] ?? 0,
     );
@@ -517,6 +532,24 @@
   function fills(read: (css: string) => string) {
     const result: Array<[number, string]> = [];
     for (const row of [...places.rows, ...(places.districts ?? [])]) {
+      if (view === "turnout") {
+        const share = turnouts.get(row.k);
+        if (share != null) {
+          let step = 0;
+          for (const edge of edges) {
+            if (share > edge) {
+              step += 1;
+            }
+          }
+          result.push([
+            row.k,
+            read(
+              `color-mix(in oklab, var(--foreground) ${STEPS[step] ?? 100}%, var(--map-low))`,
+            ),
+          ]);
+        }
+        continue;
+      }
       if (row.leader == null) {
         continue;
       }
@@ -1505,6 +1538,9 @@
             <option value={String(option.index)}>{option.name}</option>
           {/each}
           <option value="bubbles">{m.map_mode_bubbles()}</option>
+          {#if turnouts.size > 0}
+            <option value="turnout">{m.map_mode_turnout()}</option>
+          {/if}
           {#if isCompared}
             <option value="swing">{m.map_mode_swing()}</option>
             <option value="arrows">{m.map_mode_arrows()}</option>
@@ -1512,7 +1548,7 @@
           {/if}
         </select>
         <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
-          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
+          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
             {#if group.length > 0}
               <div class="flex shrink-0">
                 {#each group as choice (choice.value)}
@@ -1813,6 +1849,34 @@
             >
           </button>
         {/each}
+      </div>
+    {:else if view === "turnout"}
+      <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">
+        <span class="text-muted-foreground">{m.map_turnout_key()}</span>
+        <span
+          class="flex items-center gap-1.5 font-figures text-xs tabular-nums"
+        >
+          <span>{percent(edges[0] ?? 0)}</span>
+          <span class="flex">
+            {#each STEPS.slice(0, edges.length + 1) as strength (strength)}
+              <span
+                class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
+                style:background-color="color-mix(in oklab, var(--foreground) {strength}%,
+                var(--map-low))"
+              ></span>
+            {/each}
+          </span>
+          <span>{percent(edges.at(-1) ?? 0)}</span>
+        </span>
+        {#if turnouts.size < places.rows.length}
+          <span
+            class="flex items-baseline gap-1.5 text-xs text-muted-foreground"
+            ><span>{m.map_turnout_none()}</span><span
+              class="font-figures tabular-nums"
+              >{count(places.rows.length - turnouts.size)}</span
+            ></span
+          >
+        {/if}
       </div>
     {:else if typeof view === "number"}
       {const index = $derived(typeof view === "number" ? view : 0)}
@@ -2131,6 +2195,25 @@
         {#if !isDeclared}
           <span class="text-muted-foreground">{m.map_unopposed()}</span>
         {/if}
+      </span>
+    {/if}
+    {#if current.turnout != null}
+      <span class="flex items-baseline justify-between gap-3 text-xs">
+        <span class="font-semibold"
+          >{m.map_turnout_line({
+            share: percent(current.turnout[0] / current.turnout[1]),
+          })}</span
+        >
+        <span class="font-figures text-muted-foreground tabular-nums"
+          >{#if current.turnedBefore != null}{m.map_turnout_change({
+              points: points(
+                current.turnout[0] / current.turnout[1] - current.turnedBefore,
+              ),
+            })}{:else}{m.stat_turnout_count({
+              voters: count(current.turnout[0]),
+              registered: count(current.turnout[1]),
+            })}{/if}</span
+        >
       </span>
     {/if}
     <span class="flex items-baseline justify-between gap-3 text-xs">

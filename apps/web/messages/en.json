@@ -1034,5 +1034,12 @@
   "map_blank_key": "No results",
   "places_others_with": "{name} and others",
   "places_others_note": "The county source groups {name} with minor candidates; they appear as one group on this map.",
-  "seats_up": "{count} of {total} seats were up for election. Faded dots represent seats not up."
+  "seats_up": "{count} of {total} seats were up for election. Faded dots represent seats not up.",
+  "stat_turnout_count": "{voters} of {registered} registered",
+  "turnout_since": "{points} points since {year}",
+  "map_mode_turnout": "Turnout",
+  "map_turnout_key": "Share of registered voters who cast a ballot",
+  "map_turnout_none": "No turnout data",
+  "map_turnout_line": "Turnout {share}",
+  "map_turnout_change": "{points} points"
 }

@@ -136,7 +136,11 @@
   });
   const grouped = $derived.by(() => {
     const legend = contest.places?.legend ?? [];
-    if (!legend.some((item) => item.key.startsWith("kind:others"))) {
+    if (
+      !(contest.places?.rows ?? []).some((row) =>
+        legend[row.leader ?? -1]?.key.startsWith("kind:others"),
+      )
+    ) {
       return null;
     }
     const keys = new Set(legend.map((item) => item.key));
@@ -1713,8 +1717,33 @@
           <dt class="text-[0.8125rem] text-muted-foreground">
             <Term label={m.stat_turnout()} definition={m.term_turnout()} />
           </dt>
-          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
-            {percent(contest.turnout.voters / contest.turnout.registered)}
+          <dd class="flex flex-wrap items-baseline gap-x-2">
+            <span class="font-figures text-xl font-[760] tracking-[-0.015em]"
+              >{percent(
+                contest.turnout.voters / contest.turnout.registered,
+              )}</span
+            >
+            {#if contest.current != null}
+              <span
+                class="font-figures text-xs text-muted-foreground tabular-nums"
+                >{m.stat_turnout_count({
+                  voters: count(contest.turnout.voters),
+                  registered: count(contest.turnout.registered),
+                })}</span
+              >
+            {/if}
+            {#if contest.turnout.earlier != null && contest.target?.year != null}
+              <span class="font-figures text-xs font-semibold tabular-nums"
+                >{m.turnout_since({
+                  points: points(
+                    contest.turnout.voters / contest.turnout.registered -
+                      contest.turnout.earlier.voters /
+                        contest.turnout.earlier.registered,
+                  ),
+                  year: String(contest.target.year),
+                })}</span
+              >
+            {/if}
           </dd>
         </div>
       {/if}
