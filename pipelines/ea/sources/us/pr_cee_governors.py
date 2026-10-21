@@ -20,6 +20,12 @@ PUBLISHER = "Puerto Rico State Elections Commission"
 TITLE = "Informe Estadístico, Elecciones Generales: votes for governor by municipio"
 BASE = "https://ww2.ceepur.org/sites/ComisionEE/es-pr/Documents/"
 ELECTIONS = {
+    "2016-11-08": {
+        "url": BASE + "Informe%20Estadistico%20EG2016%20-%20Parte1.pdf",
+        "pages": (82, 83),
+        "dpi": 150,
+        "surnames": ("bernier", "rossello", "santiago", "bernabe", "cidre", "lugaro"),
+    },
     "2020-11-03": {
         "url": BASE + "Informe-estadistico-EG2020.pdf",
         "pages": (109, 110),
@@ -83,7 +89,7 @@ def parse() -> None:
         with tempfile.TemporaryDirectory() as folder:
             for page in election["pages"]:
                 subprocess.run(
-                    ["pdftoppm", "-r", "300", "-f", str(page), "-l", str(page), "-png", str(raw.cached(SOURCE, election["url"]).path), f"{folder}/p"],
+                    ["pdftoppm", "-r", str(election.get("dpi", 300)), "-f", str(page), "-l", str(page), "-png", str(raw.cached(SOURCE, election["url"]).path), f"{folder}/p"],
                     check=True,
                 )
                 image = next(Path(folder).glob("p-*.png"))
@@ -216,7 +222,7 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=f"Votes by municipio read from pages {election['pages'][0]}–{election['pages'][1]} of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election, a table of page images. Each row's candidate votes sum to its printed total and match its printed percentages. Write-in and blank votes are not in the table.",
+                body_md=f"Votes by municipio read from pages {election['pages'][0]}–{election['pages'][1]} of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election, a table of page images. Each row's candidate votes sum to its printed total and match its printed percentages. Write-in and blank votes are not in the table. The municipio rows sum to within five votes per candidate of the island totals printed on the report's last row.",
             )
             published = conn.execute("select from result_set where id = %s", [result_set]).fetchone() is not None
             if not published:
