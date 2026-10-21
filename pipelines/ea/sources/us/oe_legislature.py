@@ -26,7 +26,7 @@ COMMITS = {
     "IA": ("9ec8f4e142b5159f67b6aa447a583b63e249fd12", (2022,)),
     "IL": ("1fa096f60367a0fe22dc380cc9799abd5228b89c", (2008, 2010, 2012, 2014)),
     "IN": ("b130b78cd7b55e57e766623772424f60c0e640bd", (2016, 2018, 2020, 2022)),
-    "KS": ("11acd83f630a1404cfa507671e3ccf579b2887d8", (2016, 2022)),
+    "KS": ("11acd83f630a1404cfa507671e3ccf579b2887d8", (2014, 2016, 2022)),
     "KY": ("025799258505414d62830ea75fd34b58cb2ee59b", (2016,)),
     "MD": ("c0683efed91d246d2d3d86d6ef599624cd21f58d", (2018,)),
     "ME": ("55ee677d8f0a36564e1a234399d5136441bdafe6", (2016, 2018, 2022)),
@@ -35,7 +35,7 @@ COMMITS = {
     "ND": ("c25145fbab08f849e6eeec319f516d7916533ea1", (2018,)),
     "NJ": ("81ce9f0b7f554e0bd1655a4083b34a633967f840", (2017,)),
     "NV": ("109e5c7d6be95f15c6bad5194b415ebcdf75d7fc", (2016,)),
-    "NY": ("49a61af92f2784874b1d7b405be8beaecdb4c02f", (2000, 2002, 2004, 2006, 2014)),
+    "NY": ("49a61af92f2784874b1d7b405be8beaecdb4c02f", (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014)),
     "OK": ("fe1098a34027523c53562c40c65353da8a1dcad2", (2004, 2008, 2010, 2012, 2014)),
     "OH": ("c98f2f7f32c8f1b35bff344ed9b784d0eff31c8d", (2020,)),
     "OR": ("76c478184965392b18afeaf8ab0746e5f401a2e9", (2020,)),
@@ -45,7 +45,7 @@ COMMITS = {
     "TX": ("c7185327aa987ecc23fefdde0ee53f5238f5da70", (2016, 2020, 2022)),
     "UT": ("a023ab4d87c4a93f0913f505c6fcbad1a585db57", (2016, 2018, 2022)),
     "WA": ("5ad56d3900dfe3678b827a6125e9c446fd32628b", (2016,)),
-    "WI": ("f344a0ee7effcea4cf835750a3584a7fbb754b6d", (2016, 2022)),
+    "WI": ("f344a0ee7effcea4cf835750a3584a7fbb754b6d", (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2022)),
     "WV": ("49d32c279d0e02d740c8af4fcb5b5eee380fbed4", (2022,)),
 }
 ALIASES = {
@@ -55,8 +55,9 @@ ALIASES = {
     ("IN", "clar"): "clark",
     ("NY", "chautaugua"): "chautauqua",
 }
+DEPTH = {("KS", 2014): max, ("NY", 2012): min}
 SKIPPED = {"2004/20041102__ok__general__state_house__county.csv"}
-TIERS = ["__county", "__county-level", "__town", "", "__precinct"]
+TIERS = ["__county", "__county-level", "__town", "", "__precinct", "__ward"]
 OTHER = r"\b(u\.?\s?s\.?|united states|congress\w*|county|city|party|levy|referendum|measure|amendment|board|commission\w*|court|judge|regents?|school|recorder|clerk)\b"
 
 
@@ -88,7 +89,11 @@ def picks() -> list[tuple[str, int, str]]:
                 if tier is not None and entry["path"] not in SKIPPED:
                     found.setdefault(tier, []).append(entry["path"])
             if found:
-                chosen.extend((state, year, path) for path in sorted(found[min(found)]))
+                lowest = found[min(found)]
+                if (state, year) in DEPTH:
+                    chosen_depth = DEPTH[(state, year)](path.count("/") for path in lowest)
+                    lowest = [path for path in lowest if path.count("/") == chosen_depth]
+                chosen.extend((state, year, path) for path in sorted(lowest))
     return chosen
 
 
