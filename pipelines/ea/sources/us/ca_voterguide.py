@@ -47,6 +47,26 @@ def parse() -> None:
     rows: list[dict[str, object]] = []
     for day in GUIDES:
         path = raw.cached(SOURCE, url(day)).path
+        if day == date(2014, 11, 4):
+            layout = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            for number, page in enumerate(layout.stdout.split("\f"), 1):
+                head = re.search(r"(?m)^\s*Official Title and Summary\s+Prepared by the Attorney General\s*\n\s*\n\s*(.+)\n", page)
+                numbered = re.search(r"(?m)^\s*(\d{1,2})(?:\s{2,}\S.*)?$", page[:500])
+                if head is None or numbered is None:
+                    continue
+                body = page[head.end() :]
+                body = re.split(r"(?i)\n\s*Summary of Legislative Analyst", body)[0]
+                body = re.sub(r"(?m)^\s*\d{1,2}(?:\s+|$)", "", body)
+                rows.append(
+                    {
+                        "day": day,
+                        "proposition": int(numbered[1]),
+                        "title": head[1].strip(),
+                        "summary": re.sub(r"\s+", " ", body.replace("•", " ")).strip(),
+                        "page": number,
+                    }
+                )
+            continue
         pages = subprocess.run(
             ["pdftotext", "-bbox-layout", str(path), "-"], capture_output=True, text=True, check=True
         ).stdout.split("<page ")[1:]
