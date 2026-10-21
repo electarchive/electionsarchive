@@ -14,6 +14,54 @@ VERSION = "1"
 TITLE = "Positions held (P39) of American politicians"
 CHUNK = 150
 SLACK = 1
+SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
+NICKNAMES = {
+    "william": "bill billy will willie willy",
+    "robert": "bob bobby rob robbie bert",
+    "richard": "dick rick ricky rich richie",
+    "james": "jim jimmy jimmie",
+    "joseph": "joe joey",
+    "michael": "mike mickey",
+    "thomas": "tom tommy",
+    "edward": "ed eddie ned",
+    "charles": "chuck charlie chas",
+    "david": "dave davey",
+    "daniel": "dan danny",
+    "donald": "don donnie",
+    "ronald": "ron ronnie",
+    "anthony": "tony",
+    "andrew": "andy",
+    "john": "jack johnny jon",
+    "bernard": "bernie",
+    "lawrence": "larry laurence",
+    "jeffrey": "jeff geoffrey",
+    "gregory": "greg",
+    "stephen": "steve steven",
+    "kenneth": "ken kenny",
+    "peter": "pete",
+    "philip": "phil phillip",
+    "frederick": "fred freddie",
+    "henry": "hank",
+    "benjamin": "ben",
+    "nicholas": "nick",
+    "matthew": "matt",
+    "christopher": "chris",
+    "timothy": "tim",
+    "alexander": "alex",
+    "douglas": "doug",
+    "raymond": "ray",
+    "gerald": "gerry",
+    "eugene": "gene",
+    "leonard": "len lenny",
+    "elizabeth": "liz beth betsy betty",
+    "katherine": "kathy kate katie catherine kathleen",
+    "susan": "sue susie",
+    "margaret": "peggy maggie",
+    "deborah": "debbie debra deb",
+    "jennifer": "jenny jen",
+    "rebecca": "becky",
+    "cynthia": "cindy",
+}
 POSITIONS = """SELECT ?item ?posLabel ?start ?end WHERE {{ VALUES ?item {{ {items} }}
 ?item p:P39 ?s . ?s ps:P39 ?pos .
 OPTIONAL {{ ?s pq:P580 ?start }} OPTIONAL {{ ?s pq:P582 ?end }}
@@ -77,6 +125,7 @@ LEVELS = {
     "state_upper": re.compile(r"senate"),
     "state_lower": re.compile(r"(house|assembly|delegates|general court)"),
     "governor": re.compile(r"governor"),
+    "judicial": re.compile(r"(justice|judge|court)"),
     "statewide_exec": re.compile(
         r"(attorney general|secretary of state|treasurer|auditor|comptroller|controller|superintendent"
         r"|commissioner|lieutenant|agriculture|insurance|labor)"
@@ -154,13 +203,15 @@ from pn where nm !~ ','""",
     """create index on pk(st,l)""",
 )
 PAIRS = """
-select a.person_id, b.person_id, a.st, a.levels, b.levels, a.y0, a.y1, b.y0, b.y1, wa.value, wb.value
-from pk a join pk b on a.st = b.st and a.l = b.l and a.person_id < b.person_id and left(a.f, 3) = left(b.f, 3)
+select a.person_id, b.person_id, a.st, a.levels, b.levels, a.y0, a.y1, b.y0, b.y1, a.nm, b.nm, wa.value, wb.value
+from pk a join pk b on a.st = b.st and a.l = b.l and a.person_id < b.person_id
   and not (a.levels && b.levels)
+left join nick na on na.f = a.f
+left join nick nb on nb.f = b.f
 left join external_id wa on wa.entity_id = a.person_id and wa.scheme = 'wikidata'
 left join external_id wb on wb.entity_id = b.person_id and wb.scheme = 'wikidata'
 where length(a.l) > 3 and (wa.value is null) <> (wb.value is null)
-  and (a.nm = b.nm or lower(regexp_replace(a.nm, '[^a-zA-Z ]', '', 'g')) = lower(regexp_replace(b.nm, '[^a-zA-Z ]', '', 'g')))
+  and coalesce(na.canon, a.f) = coalesce(nb.canon, b.f) and (length(a.f) > 1 or lower(a.nm) = lower(b.nm))
   and not exists (select 1 from pc x join pc y on x.contest_id = y.contest_id
                   where x.person_id = a.person_id and y.person_id = b.person_id)
   and greatest(a.y0, b.y0) <= least(a.y1, b.y1) + 4
@@ -172,7 +223,24 @@ where length(a.l) > 3 and (wa.value is null) <> (wb.value is null)
 def _pairs(conn) -> list[tuple]:
     for statement in STATEMENTS:
         conn.execute(statement)
-    return conn.execute(PAIRS).fetchall()
+    conn.execute("create temp table nick (f text primary key, canon text)")
+    with conn.cursor().copy("copy nick (f, canon) from stdin") as copy:
+        for canon, nicknames in NICKNAMES.items():
+            for nickname in (canon, *nicknames.split()):
+                copy.write_row((nickname, canon))
+    pairs = []
+    for row in conn.execute(PAIRS).fetchall():
+        a_words, b_words = (
+            [word for word in re.sub(r"[^a-z ]", "", text.lower()).split() if word not in SUFFIXES]
+            for text in row[9:11]
+        )
+        a_suffix, b_suffix = (set(re.findall(r"\b(jr|sr|ii|iii|iv)\b", text.lower())) for text in row[9:11])
+        if a_suffix and b_suffix and a_suffix != b_suffix:
+            continue
+        if a_words[1:-1] and b_words[1:-1] and a_words[1][0] != b_words[1][0]:
+            continue
+        pairs.append(row)
+    return pairs
 
 
 def _urls(pairs: list[tuple]) -> list[str]:
@@ -214,7 +282,7 @@ def emit() -> Path:
                     )
                 )
         confirmed: list[tuple[UUID, UUID]] = []
-        for a, b, state, a_levels, b_levels, a_from, a_to, b_from, b_to, a_item, b_item in pairs:
+        for a, b, state, a_levels, b_levels, a_from, a_to, b_from, b_to, _, _, a_item, b_item in pairs:
             known, other, levels, first, last = (
                 (a, b, b_levels, b_from, b_to) if a_item else (b, a, a_levels, a_from, a_to)
             )

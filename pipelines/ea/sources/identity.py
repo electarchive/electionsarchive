@@ -557,6 +557,15 @@ PEOPLE = {
         ("us.klarner.person", "331143"),
         ("us.medsl_statewide.person", "NC:jeff-jackson"),
     ),
+    "Nikki Haley, South Carolina representative 2005-2011, governor, and UN ambassador": (
+        ("wikidata", "Q11668"),
+        ("us.klarner.person", "268153"),
+    ),
+    "Bernie Sanders, Liberty Union candidate for senator in 1974 and governor in 1976, independent in 1986": (
+        ("wikidata", "Q359442"),
+        ("us.clerk.person", "VT:bernard-sanders"),
+        ("us.elstats_gov.person", "VT:bernard-sanders"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"

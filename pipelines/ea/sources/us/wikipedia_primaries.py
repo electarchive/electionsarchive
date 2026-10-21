@@ -491,6 +491,16 @@ def parse() -> None:
                     counted += int(str(row["votes"]))
             if total is not None and total != counted:
                 print(f"{template}: rows add up to {counted:,}, the total line says {total:,}")
+    sides: dict[str, dict[str, int]] = {}
+    for row in presidential:
+        if row["kind"] == "candidate":
+            counts = sides.setdefault(str(row["candidate"]), {})
+            counts[str(row["party"])] = counts.get(str(row["party"]), 0) + 1
+    for row in presidential:
+        counts = sides.get(str(row["candidate"]), {})
+        if row["kind"] == "candidate" and len(counts) > 1 and counts[str(row["party"])] < max(counts.values()):
+            print(f"{row['template']}: {row['candidate']} runs in the other party's primaries, a write-in")
+            row["kind"] = "write_in"
     pl.DataFrame(presidential).write_parquet(PARSED / "presidential.parquet")
     frame = pl.DataFrame(rows, infer_schema_length=None)
     race = ["state", "office", "district", "party"]
@@ -952,6 +962,19 @@ def emit() -> Path:
             contest_key = f"{day}:{state}:president:{lower}"
             if contest_key in keys:
                 print(f"{contest_key}: already held, skipped")
+                for candidate in lines.filter(pl.col("kind") == "write_in", pl.col("named"))["candidate"].unique():
+                    option_key = f"{contest_key}:{slug(candidate)}"
+                    if conn.execute(
+                        "select 1 from external_id where scheme = 'us.option' and value = %s", (option_key,)
+                    ).fetchone():
+                        cs.add(
+                            "contest_option",
+                            id=cs.key("us.option", option_key),
+                            contest_id=cs.key("us.contest", contest_key),
+                            kind="write_in",
+                            party_id=None,
+                            ballot_label=candidate,
+                        )
                 continue
             keys.add(contest_key)
             election_key = f"{day}:{state}:{lower}-caucuses" if caucus else f"{day}:{state}:primary"

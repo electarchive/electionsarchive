@@ -5730,7 +5730,9 @@ def emit() -> Path:
                         id=roots[person],
                         contest_id=contest,
                         kind="write_in" if all(row["write_in"] for row in lines_of) else "candidate",
-                        party_id=parties[(state, lines_of[0]["party"])],
+                        party_id=None
+                        if not blanket and all(row["write_in"] for row in lines_of)
+                        else parties[(state, lines_of[0]["party"])],
                         ballot_label=lines_of[0]["name"],
                     )
                     cs.add(
@@ -6001,7 +6003,7 @@ def emit() -> Path:
                     id=option,
                     contest_id=contest,
                     kind="write_in" if group["write_in"].all() else "candidate",
-                    party_id=parties[(state, label)],
+                    party_id=None if group["write_in"].all() else parties[(state, label)],
                     ballot_label=group["name"][0],
                 )
                 cs.add(
