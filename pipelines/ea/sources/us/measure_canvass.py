@@ -215,6 +215,7 @@ OHIO = {
     date(2025, 5, 6): ("20250621212835", "2025/pri/issues-final-summary.xlsx"),
 }
 SOUTH_DAKOTA = {
+    date(2014, 11, 4): "https://www.sdsos.gov/docs/2014ElectionReturn.pdf",
     date(2018, 6, 5): "Prior%20to%202026/OfficialStateCanvass2018PrimaryElection.pdf",
     date(2016, 11, 8): "2016%20Assets/2016GeneralElectionOfficialResultsStateCanvass.pdf",
     date(2018, 11, 6): "2018%20Assets/2018GeneralElectionCanvassPDF.pdf",
@@ -593,7 +594,11 @@ def link(state: str, day: date) -> tuple[str, str]:
         )
     if state == "SD":
         return SOURCE, (
-            "https://www.sdsos.gov/elections-voting/assets/Archive/" + SOUTH_DAKOTA[day] if day in SOUTH_DAKOTA else ""
+            SOUTH_DAKOTA[day]
+            if SOUTH_DAKOTA.get(day, "").startswith("https")
+            else "https://www.sdsos.gov/elections-voting/assets/Archive/" + SOUTH_DAKOTA[day]
+            if day in SOUTH_DAKOTA
+            else ""
         )
     if state == "HI":
         return SOURCE, HAWAII_REPORTS.format(day.year, "histatewide") if day in HAWAII else ""
@@ -783,6 +788,7 @@ def parse() -> None:
     names["MO"] |= {"kansascity": "2938000", "statewide": "29"}
     names["ME"] |= {"uocava": "ME:uocava", "statewide": "23"}
     names["MT"] |= {"lewisand": "30049"}
+    names["SD"] |= {"shannon": names["SD"]["oglalalakota"]}
     frames = []
     for state, day in dates:
         source, url = link(state, day)
