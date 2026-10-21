@@ -37,7 +37,7 @@ COMMITS = {
     "NV": ("109e5c7d6be95f15c6bad5194b415ebcdf75d7fc", (2016,)),
     "NY": ("49a61af92f2784874b1d7b405be8beaecdb4c02f", (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014)),
     "OK": ("fe1098a34027523c53562c40c65353da8a1dcad2", (2004, 2008, 2010, 2012, 2014)),
-    "OH": ("c98f2f7f32c8f1b35bff344ed9b784d0eff31c8d", (2020,)),
+    "OH": ("c98f2f7f32c8f1b35bff344ed9b784d0eff31c8d", (2002, 2006, 2008, 2010, 2012, 2014, 2020)),
     "OR": ("76c478184965392b18afeaf8ab0746e5f401a2e9", (2020,)),
     "RI": ("977565f9d7cf7a32d3a2a454282b5fd291cef291", (2008, 2012, 2014, 2022)),
     "SC": ("5e05b67e15f3614a20d31144df83248235cba6f2", (2022,)),
@@ -74,6 +74,7 @@ def picks() -> list[tuple[str, int, str]]:
                 matched = re.fullmatch(
                     rf"(?:[^/]+/)*{year}1[01]\d\d__{state.lower()}__general(__[a-z_'-]+?)?(_precinct)?\.csv",
                     entry["path"],
+                    re.IGNORECASE,
                 )
                 if entry["type"] != "blob" or matched is None:
                     continue
@@ -84,7 +85,7 @@ def picks() -> list[tuple[str, int, str]]:
                     else 4
                     if suffix.endswith("__precinct")
                     else 3
-                    if suffix in ("__state_assembly", "__state_senate")
+                    if suffix in ("__state_assembly", "__state_house", "__state_senate")
                     else 0
                     if suffix.endswith("__county")
                     else None
