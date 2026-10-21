@@ -26,6 +26,7 @@ ITEMS = {
     1878: ("vol1881tribuneal00unse", 1881, date(1878, 11, 5), (81, 82)),
     1880: ("vol1881tribuneal00unse", 1881, date(1880, 11, 2), (81, 82)),
     1874: ("tribunealmanacpo18751879newy", 1875, date(1874, 11, 3), (76, 77, 78)),
+    1876: ("tribunealmanacpo18751879newy", 1877, date(1876, 11, 7), (376, 377)),
 }
 VOLUMES = {
     year: (f"https://archive.org/download/{item}/{item}.pdf", f"https://archive.org/details/{item}", day, pages)
@@ -34,7 +35,7 @@ VOLUMES = {
 TITLES = {year: f"The Tribune Almanac and Political Register for {volume}" for year, (_, volume, _, _) in ITEMS.items()}
 TITLES[1854] = "The Whig Almanac and United States Register for 1855"
 PARTIES = ("rep", "dem", "lib", "ind", "scat", "cons", "rad", "opp", "gbk", "pro", "lab", "ref", "peo", "tem")
-ERRATA: set[tuple[int, tuple[str, int]]] = {(1854, ("IA", 2)), (1860, ("PA", 17)), (1856, ("NY", 26)), (1856, ("NY", 27)), (1858, ("NY", 31)), (1858, ("OH", 16)), (1858, ("OH", 18)), (1862, ("NY", 27)), (1864, ("NY", 11)), (1868, ("NY", 12)), (1868, ("NY", 14))}
+ERRATA: set[tuple[int, tuple[str, int]]] = {(1854, ("IA", 2)), (1876, ("NY", 14)), (1860, ("PA", 17)), (1856, ("NY", 26)), (1856, ("NY", 27)), (1858, ("NY", 31)), (1858, ("OH", 16)), (1858, ("OH", 18)), (1862, ("NY", 27)), (1864, ("NY", 11)), (1868, ("NY", 12)), (1868, ("NY", 14))}
 NAMES: dict[tuple[str, str], str] = {}
 KEYS: dict[tuple[int, str, int], str] = {}
 FORMER: dict[tuple[str, str], tuple[str, str, date]] = {("MI", "manitou"): ("Manitou", "26029", date(1895, 1, 1))}
