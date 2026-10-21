@@ -412,7 +412,7 @@ def parse(source: ModuleType) -> None:
                         spots: list[tuple[int, int, int, int]] = []
                         for name, h in words:
                             if name == _plain(column) and not any(
-                                abs(h[0] - spot[0]) < 15 and abs(h[1] - spot[1]) < 15 for spot in spots
+                                abs(h[0] - spot[0]) < 40 and abs(h[1] - spot[1]) < 40 for spot in spots
                             ):
                                 spots.append(h)
                         if len(spots) != 1 and c in heads:
