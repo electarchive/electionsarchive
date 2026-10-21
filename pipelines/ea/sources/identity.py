@@ -217,6 +217,16 @@ PEOPLE = {
         ("bioguide", "S000890"),
         ("us.algara.person", "IL:adlai-e-iii-stevenson"),
     ),
+    "Joe Manchin, West Virginia legislator 1982-1996, secretary of state, governor, and senator": (
+        ("bioguide", "M001183"),
+        ("us.klarner.person", "249698"),
+        ("us.algara.person", "WV:joe-iii-manchin"),
+        ("us.wv_hist.person", "WV:joe-manchin-iii"),
+    ),
+    "A. James Manchin, West Virginia treasurer and delegate 1998-2002": (
+        ("wikidata", "Q4647998"),
+        ("us.klarner.person", "255863"),
+    ),
     "Mark Dayton, senator and governor of Minnesota": (
         ("bioguide", "D000596"),
         ("fec.candidate", "S2MN00027"),
