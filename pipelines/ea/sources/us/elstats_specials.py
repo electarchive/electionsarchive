@@ -1,3 +1,5 @@
+import csv
+import io
 import re
 from pathlib import Path
 from uuid import UUID
@@ -11,7 +13,7 @@ from ea.sources.us.elstats import TENANTS, plain, url
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "1"
+VERSION = "2"
 SEARCHES = [
     ("NY", 2020),
     ("NY", 2022),
@@ -19,22 +21,27 @@ SEARCHES = [
     ("NM", 2021),
     ("VA", 2023),
 ]
-STATES = {"NY": "New York", "NM": "New Mexico", "VA": "Virginia"}
+FLORIDA = "https://results.elections.myflorida.com/ResultsExtract.Asp?ElectionDate=1/11/2022&OfficialResults=Y"
+STATES = {"NY": "New York", "NM": "New Mexico", "VA": "Virginia", "FL": "Florida"}
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
     "Libertarian": "libertarian-party",
+    "DEM": "democratic-party",
+    "REP": "republican-party",
+    "LPF": "libertarian-party",
     "Green": "green-party",
     "Conservative": "NY:conservative-party",
     "Working Families": "NY:working-families-party",
     "Independence": "NY:independence-party",
 }
-MAIN = {"Democratic", "Republican"}
+MAIN = {"Democratic", "Republican", "DEM", "REP"}
 
 
 def fetch() -> None:
     for state, year in SEARCHES:
         raw.fetch(ARCHIVE, url(TENANTS[state][0], year), suffix=".csv")
+    raw.fetch(SOURCE, FLORIDA, suffix=".txt")
 
 
 def emit() -> Path:
@@ -50,7 +57,32 @@ def emit() -> Path:
                 & pl.col("division_type").is_in(["County", "Locality"])
             ).with_columns(state=pl.lit(state))
         )
-    frame = pl.concat(frames).with_columns(
+    florida = [
+        row
+        for row in csv.DictReader(io.StringIO(raw.cached(SOURCE, FLORIDA).path.read_text()), delimiter="\t")
+        if row["RaceCode"] == "USR"
+    ]
+    frames.append(
+        pl.DataFrame(
+            {
+                "state": ["FL"] * len(florida),
+                "election_date": ["2022-01-11"] * len(florida),
+                "district_name": [str(int(row["Juris1num"])) for row in florida],
+                "candidate_name": [
+                    "Write-ins"
+                    if row["PartyCode"] == "WRI"
+                    else " ".join(f"{row['CanNameFirst']} {row['CanNameMiddle']} {row['CanNameLast']}".split())
+                    for row in florida
+                ],
+                "candidate_party_name": [
+                    None if row["PartyCode"] in ("NPA", "WRI") else row["PartyCode"] for row in florida
+                ],
+                "division_name": [row["CountyName"] for row in florida],
+                "votes": [row["CanVotes"] for row in florida],
+            }
+        )
+    )
+    frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         district=pl.col("district_name").cast(pl.Int32),
         votes=pl.col("votes").cast(pl.Int64),
@@ -72,7 +104,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="U.S. House special elections in New York, New Mexico, and Virginia by county from the state "
+            summary="U.S. House special elections in Florida, New York, New Mexico, and Virginia by county from the state "
             "election archives",
             polity="US",
         )
@@ -80,6 +112,24 @@ def emit() -> Path:
         fptp = cs.key("us.electoral_system", "fptp")
         sources: dict[str, UUID] = {}
         for state in STATES:
+            if state == "FL":
+                publisher, title = (
+                    "Florida Division of Elections",
+                    "Official results extract, January 11, 2022 special general election",
+                )
+                sources[state] = cs.source(publisher, title)
+                if sources[state] in cs.minted:
+                    cs.add(
+                        "source",
+                        id=sources[state],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url=FLORIDA,
+                        license="Public record",
+                    )
+                cs.artifact(raw.cached(SOURCE, FLORIDA), sources[state])
+                continue
             _, publisher, _ = TENANTS[state]
             sources[state] = cs.source(publisher, "Election statistics archive")
             if sources[state] in cs.minted:
