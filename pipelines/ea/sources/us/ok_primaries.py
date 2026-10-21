@@ -17,6 +17,14 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://results.okelections.gov/OKER/?elecDate="
 DAYS = [
+    date(2012, 6, 26),
+    date(2012, 8, 28),
+    date(2014, 6, 24),
+    date(2014, 8, 26),
+    date(2016, 6, 28),
+    date(2016, 8, 23),
+    date(2018, 6, 26),
+    date(2018, 8, 28),
     date(2020, 3, 3),
     date(2020, 6, 30),
     date(2020, 8, 25),
@@ -28,7 +36,8 @@ DAYS = [
 ]
 PUBLISHER = "Oklahoma State Election Board"
 TITLE = "Election results: county level results"
-DOWNLOADS = Path.home() / "Downloads"
+DOWNLOADS = DATA / "inbox" / "manual" / "MF-011"
+SAVED = Path.home() / "Downloads"
 
 
 def url(day: date) -> str:
@@ -40,10 +49,11 @@ def fetch() -> None:
         try:
             raw.cached(SOURCE, url(day))
         except LookupError:
+            name = f"{day:%Y%m%d}_CountyResults_csv.zip"
             raw.store(
                 SOURCE,
                 url(day),
-                (DOWNLOADS / f"{day:%Y%m%d}_CountyResults_csv.zip").read_bytes(),
+                (DOWNLOADS / name if (DOWNLOADS / name).exists() else SAVED / name).read_bytes(),
                 suffix=".zip",
                 retrieved_at=datetime.now(UTC),
                 media_type="application/zip",
@@ -119,7 +129,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oklahoma's 2020, 2022, and 2024 president, U.S. Senate, and House primaries and runoffs by county",
+            summary="Oklahoma's 2012 through 2024 president, U.S. Senate, and House primaries and runoffs by county; the 2012-2018 files were saved from the results site by a person in a browser",
             polity="US-OK",
         )
         source = cs.source(PUBLISHER, TITLE)
