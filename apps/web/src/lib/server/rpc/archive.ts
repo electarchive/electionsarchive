@@ -9923,13 +9923,13 @@ export const people = {
                   },
           };
         });
-      const held = await db.execute<{ party: string }>(sql`
+      const held = await db.execute<{ party: string; stop: string | null }>(sql`
         with recursive ids(id) as (
           select ${person.id}::uuid
           union
           select em.entity_id from entity_merge em join ids on em.into_id = ids.id
         )
-        select coalesce(pm.into_id, x.party) as party from (
+        select coalesce(pm.into_id, x.party) as party, x.stop::text as stop from (
           select m.party_id as party, m.valid_from as start, m.valid_to as stop, 0 as rank
           from person_party_membership m where m.person_id in (select id from ids)
           union all
@@ -9944,11 +9944,13 @@ export const people = {
       const general = rows.rows.find(
         (row) => !row.scoped && (row.party != null || row.independent),
       );
-      const isIndependent =
-        held.rows.length === 0 && general?.independent === true;
+      const current = held.rows.find(
+        (row) => row.stop == null || general == null || row.stop > general.date,
+      );
+      const isIndependent = current == null && general?.independent === true;
       const own = isIndependent
         ? null
-        : (held.rows[0]?.party ??
+        : (current?.party ??
           general?.party ??
           rows.rows.find((row) => row.party != null)?.party ??
           null);
