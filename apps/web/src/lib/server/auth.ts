@@ -7,6 +7,7 @@ import {
   GOOGLE_CLIENT_SECRET,
   RESEND_API_KEY,
 } from "$app/env/private";
+import { dev } from "$app/env";
 import { getRequestEvent } from "$app/server";
 import { apiKey } from "@better-auth/api-key";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";
@@ -101,7 +102,12 @@ export const auth = betterAuth({
   }),
   secret: BETTER_AUTH_SECRET,
   baseURL: BETTER_AUTH_URL,
-  trustedOrigins: [BETTER_AUTH_URL],
+  trustedOrigins: dev
+    ? (request) => [
+        BETTER_AUTH_URL,
+        request == null ? null : new URL(request.url).origin,
+      ]
+    : [BETTER_AUTH_URL],
   telemetry: { enabled: false },
   advanced: {
     database: {
