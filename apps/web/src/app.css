@@ -26,6 +26,8 @@
   --card: #ffffff;
   --card-foreground: #15171a;
   --map-low: #ffffff;
+  --map-rise: #4a2a87;
+  --map-fall: #b35806;
   --popover: #ffffff;
   --popover-foreground: #15171a;
   --primary: #15171a;
@@ -58,6 +60,8 @@
   --card: #111315;
   --card-foreground: #e8eaed;
   --map-low: #c4c8ce;
+  --map-rise: #3d1f78;
+  --map-fall: #9c4a04;
   --popover: #1a1d20;
   --popover-foreground: #e8eaed;
   --primary: #e8eaed;

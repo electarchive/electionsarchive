@@ -90,11 +90,12 @@
   const STRENGTHS = [34, 54, 76, 100];
   const STEPS = [16, 36, 56, 78, 100];
   const SWINGS = [0.02, 0.05, 0.1];
-  const COMPARED = new Set(["swing", "arrows", "flips"]);
+  const COMPARED = new Set(["swing", "arrows", "flips", "turnout_change"]);
   const MODES = [
     "winner",
     "bubbles",
     "turnout",
+    "turnout_change",
     "swing",
     "arrows",
     "flips",
@@ -253,9 +254,19 @@
       ),
     ),
   );
+  const surges = $derived(
+    new Map(
+      [...places.rows, ...(places.districts ?? [])].flatMap((row) =>
+        row.turnout == null || row.turnedBefore == null
+          ? []
+          : [[row.k, row.turnout[0] / row.turnout[1] - row.turnedBefore]],
+      ),
+    ),
+  );
   const view = $derived(
     (!isCompared && typeof shading === "string" && COMPARED.has(shading)) ||
-      (shading === "turnout" && turnouts.size === 0)
+      (shading === "turnout" && turnouts.size === 0) ||
+      (shading === "turnout_change" && surges.size === 0)
       ? "winner"
       : shading,
   );
@@ -532,6 +543,24 @@
   function fills(read: (css: string) => string) {
     const result: Array<[number, string]> = [];
     for (const row of [...places.rows, ...(places.districts ?? [])]) {
+      if (view === "turnout_change") {
+        const change = surges.get(row.k);
+        if (change != null) {
+          let step = 0;
+          for (const edge of SWINGS) {
+            if (Math.abs(change) >= edge) {
+              step += 1;
+            }
+          }
+          result.push([
+            row.k,
+            read(
+              `color-mix(in oklab, var(${change < 0 ? "--map-fall" : "--map-rise"}) ${STEPS[step + 1] ?? 100}%, var(--map-low))`,
+            ),
+          ]);
+        }
+        continue;
+      }
       if (view === "turnout") {
         const share = turnouts.get(row.k);
         if (share != null) {
@@ -1545,10 +1574,15 @@
             <option value="swing">{m.map_mode_swing()}</option>
             <option value="arrows">{m.map_mode_arrows()}</option>
             <option value="flips">{m.map_mode_flips()}</option>
+            {#if surges.size > 0}
+              <option value="turnout_change"
+                >{m.map_mode_turnout_change()}</option
+              >
+            {/if}
           {/if}
         </select>
         <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
-          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }] : []] as group, at (at)}
+          {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
             {#if group.length > 0}
               <div class="flex shrink-0">
                 {#each group as choice (choice.value)}
@@ -1849,6 +1883,32 @@
             >
           </button>
         {/each}
+      </div>
+    {:else if view === "turnout_change"}
+      <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">
+        <span class="text-muted-foreground">{m.map_turnout_change_key()}</span>
+        <span
+          class="flex items-center gap-1.5 font-figures text-xs tabular-nums"
+        >
+          <span>{m.map_turnout_fell()}</span>
+          <span class="flex">
+            {#each [...[3, 2, 1, 0].map((step) => ["--map-fall", STEPS[step + 1] ?? 100, -step - 1] as const), ...[0, 1, 2, 3].map((step) => ["--map-rise", STEPS[step + 1] ?? 100, step + 1] as const)] as [token, strength, key] (key)}
+              <span
+                class="block-3 inline-5 first:rounded-s-xs last:rounded-e-xs"
+                style:background-color="color-mix(in oklab, var({token}) {strength}%,
+                var(--map-low))"
+              ></span>
+            {/each}
+          </span>
+          <span>{m.map_turnout_rose()}</span>
+        </span>
+        <span class="font-figures text-xs text-muted-foreground tabular-nums"
+          >{m.map_turnout_bins({
+            low: String((SWINGS[0] ?? 0) * 100),
+            mid: String((SWINGS[1] ?? 0) * 100),
+            high: String((SWINGS[2] ?? 0) * 100),
+          })}</span
+        >
       </div>
     {:else if view === "turnout"}
       <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">

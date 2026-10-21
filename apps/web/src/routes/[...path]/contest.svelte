@@ -1744,6 +1744,14 @@
                 })}</span
               >
             {/if}
+            {#if contest.turnout.reporting != null && contest.turnout.of != null && contest.turnout.reporting < contest.turnout.of}
+              <span class="text-xs text-muted-foreground"
+                >{m.turnout_partial({
+                  reporting: String(contest.turnout.reporting),
+                  of: String(contest.turnout.of),
+                })}</span
+              >
+            {/if}
           </dd>
         </div>
       {/if}

@@ -1041,5 +1041,12 @@
   "map_turnout_key": "Share of registered voters who cast a ballot",
   "map_turnout_none": "No turnout data",
   "map_turnout_line": "Turnout {share}",
-  "map_turnout_change": "{points} points"
+  "map_turnout_change": "{points} points",
+  "election_turnout": "Turnout: {voters} of {registered} registered voters ({share}).",
+  "turnout_partial": "Based on {reporting} of {of} jurisdictions reporting both registered voters and ballots cast.",
+  "map_mode_turnout_change": "Turnout change",
+  "map_turnout_change_key": "Turnout change since the compared election",
+  "map_turnout_fell": "Decrease",
+  "map_turnout_rose": "Increase",
+  "map_turnout_bins": "Steps at {low}, {mid}, and {high} points"
 }

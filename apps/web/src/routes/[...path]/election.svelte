@@ -697,6 +697,39 @@
       >
     {/if}
   </p>
+  {#if election.turnout != null}
+    {const turnout = $derived(election.turnout)}
+    {const share = $derived(turnout.voters / turnout.registered)}
+    <p
+      class="flex flex-wrap items-baseline gap-x-2.5 gap-y-0.5 text-[0.9375rem]"
+    >
+      <span class="font-figures tabular-nums"
+        >{m.election_turnout({
+          voters: count(turnout.voters),
+          registered: count(turnout.registered),
+          share: percent(share),
+        })}</span
+      >
+      {#if turnout.earlier != null}
+        <span class="font-figures font-semibold tabular-nums"
+          >{m.turnout_since({
+            points: points(
+              share - turnout.earlier.voters / turnout.earlier.registered,
+            ),
+            year: String(turnout.earlier.year),
+          })}</span
+        >
+      {/if}
+      {#if turnout.reporting < turnout.of}
+        <span class="text-[0.8125rem] text-muted-foreground"
+          >{m.turnout_partial({
+            reporting: String(turnout.reporting),
+            of: String(turnout.of),
+          })}</span
+        >
+      {/if}
+    </p>
+  {/if}
 </header>
 
 <Cycle

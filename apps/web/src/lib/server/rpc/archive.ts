@@ -1882,10 +1882,14 @@ async function places(
   ]);
   const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
   const share = (
-    entry: { registered: number; voters: number } | undefined,
+    entry:
+      | { registered: number; voters: number; reporting: number; of: number }
+      | undefined,
     valid: number,
   ) =>
-    entry == null || valid === 0 || entry.voters < valid * 0.98
+    entry == null ||
+    valid === 0 ||
+    entry.voters < valid * (entry.reporting === entry.of ? 0.98 : 0.9)
       ? null
       : entry.voters / entry.registered;
   const turnouts = (row: (typeof tabulated.rows)[number]) => {
@@ -2542,6 +2546,8 @@ export const contests = {
           v.object({
             registered: v.number(),
             voters: v.number(),
+            reporting: v.optional(v.number()),
+            of: v.optional(v.number()),
             earlier: v.optional(
               v.nullable(
                 v.object({ registered: v.number(), voters: v.number() }),
@@ -3544,9 +3550,22 @@ export const contests = {
         chosen == null || earlier == null ? null : turnout(chosen.id, [area.k]),
       ]);
       const sane = (
-        entry: { registered: number; voters: number } | null | undefined,
+        entry:
+          | {
+              registered: number;
+              voters: number;
+              reporting?: number;
+              of?: number;
+            }
+          | null
+          | undefined,
         valid: number,
-      ) => (entry == null || entry.voters < valid * 0.98 ? null : entry);
+      ) =>
+        entry == null ||
+        entry.voters <
+          valid * ((entry.reporting ?? 0) === (entry.of ?? 0) ? 0.98 : 0.9)
+          ? null
+          : entry;
       const turned = sane(
         page.turnout ?? pooled?.get(area.k),
         current.side.valid,
@@ -3559,6 +3578,8 @@ export const contests = {
             : {
                 registered: turned.registered,
                 voters: turned.voters,
+                reporting: turned.reporting,
+                of: turned.of,
                 earlier: sane(prior?.get(area.k), earlier?.side.valid ?? 0),
               },
         series,
@@ -5210,12 +5231,17 @@ export const contests = {
 
 async function turnout(contest: string | null, ks: Array<number>) {
   if (contest == null || ks.length === 0) {
-    return new Map<number, { registered: number; voters: number }>();
+    return new Map<
+      number,
+      { registered: number; voters: number; reporting: number; of: number }
+    >();
   }
   const found = await db.execute<{
     k: number;
     registered: number | null;
     voters: number | null;
+    reporting: number;
+    of: number;
   }>(sql`
     with recursive day as (
       select e.date_from, e.kind from contest c join election e on e.id = c.election_id where c.id = ${contest}::uuid
@@ -5243,8 +5269,17 @@ async function turnout(contest: string | null, ks: Array<number>) {
     targets as (
       select a.k, a.id from area a where a.k = any(${sql.param(ks)}::int[])
     ),
+    expected as materialized (
+      select e.id as election, pt.area_id as area
+      from election e
+      join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+      join polity p on p.id = e.polity_id
+      cross join day d
+      where e.date_from = d.date_from and e.kind = d.kind
+        and p.kind in (select q.kind from sets s join election y on y.id = s.election_id join polity q on q.id = y.polity_id)
+    ),
     up(origin, id, depth) as (
-      select distinct f.area, f.area, 0 from facts f
+      select distinct x.area, x.area, 0 from (select area from facts union select area from expected) x
       union all
       select up.origin, p.parent_id, up.depth + 1 from up
       join area_parent p on p.area_id = up.id and p.valid @> (select date_from from day)
@@ -5258,23 +5293,36 @@ async function turnout(contest: string | null, ks: Array<number>) {
       group by 1, 2, 3, 4
     ),
     best as (
-      select k, election, measure, max(value) as value from tallied group by 1, 2, 3
-    ),
-    totals as (
-      select k, measure, sum(value) as value from best group by 1, 2
+      select k, election, max(value) filter (where measure = 2) as registered,
+        coalesce(max(value) filter (where measure = 14), max(value) filter (where measure = 3)) as voters
+      from tallied group by 1, 2
     )
-    select k, max(value) filter (where measure = 2) as registered,
-      coalesce(max(value) filter (where measure = 14), max(value) filter (where measure = 3)) as voters
-    from totals group by k
+    select k,
+      sum(registered) filter (where registered > 0 and voters <= registered) as registered,
+      sum(voters) filter (where registered > 0 and voters <= registered) as voters,
+      count(*) filter (where registered > 0 and voters <= registered)::int as reporting,
+      greatest(count(*), (
+        select count(distinct x.election) from targets t join up on up.id = t.id
+        join expected x on x.area = up.origin
+        where t.k = best.k and x.area <> t.id
+      ))::int as of
+    from best group by k
   `);
   return new Map(
     found.rows.flatMap((row) =>
-      row.registered == null ||
-      row.voters == null ||
-      row.registered <= 0 ||
-      row.voters > row.registered
+      row.registered == null || row.voters == null
         ? []
-        : [[row.k, { registered: row.registered, voters: row.voters }]],
+        : [
+            [
+              row.k,
+              {
+                registered: row.registered,
+                voters: row.voters,
+                reporting: row.reporting,
+                of: row.of,
+              },
+            ],
+          ],
     ),
   );
 }
@@ -6315,6 +6363,21 @@ export const elections = {
             map: v.nullable(Sketch),
           }),
         ),
+        turnout: v.nullable(
+          v.object({
+            registered: v.number(),
+            voters: v.number(),
+            reporting: v.number(),
+            of: v.number(),
+            earlier: v.nullable(
+              v.object({
+                year: v.number(),
+                registered: v.number(),
+                voters: v.number(),
+              }),
+            ),
+          }),
+        ),
         contests: v.array(
           v.object({
             name: v.string(),
@@ -6348,7 +6411,7 @@ export const elections = {
       if (election == null) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [contestRows, electionRows, notes, crumbs, raced] =
+      const [contestRows, electionRows, notes, crumbs, raced, anchor] =
         await Promise.all([
           db.execute<{ id: string; children: number }>(sql`
             select c.id, (select count(*)::int from contest x where x.allocation_parent_id = c.id) as children
@@ -6375,7 +6438,61 @@ export const elections = {
           `),
           breadcrumbs(election.polity),
           races(input.id, election.polity, election.date),
+          db.execute<{
+            k: number;
+            now: string | null;
+            before: string | null;
+            year: number | null;
+          }>(sql`
+            select a.k,
+              coalesce(
+                (select c.id from contest c where c.election_id = e.id limit 1),
+                (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = e.id and ch.kind = e.kind and ch.date_from = e.date_from limit 1)
+              ) as now,
+              prior.contest as before, prior.year
+            from election e
+            join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            join area a on a.id = pt.area_id
+            left join lateral (
+              select coalesce(
+                  (select c.id from contest c where c.election_id = x.id limit 1),
+                  (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = x.id and ch.kind = x.kind and ch.date_from = x.date_from limit 1)
+                ) as contest,
+                extract(year from x.date_from)::int as year
+              from election x
+              where x.polity_id = e.polity_id and x.kind = e.kind and x.date_from < e.date_from
+                and exists (select from contest t where t.election_id = e.id and t.office_id is not null)
+                  = exists (select from contest u where u.election_id = x.id and u.office_id is not null)
+                and (
+                  not exists (select from contest t where t.election_id = e.id and t.office_id is not null)
+                  or exists (
+                    select from contest t join contest u on u.office_id = t.office_id
+                    where t.election_id = e.id and u.election_id = x.id
+                  )
+                )
+                and exists (
+                  select from result_set rs join election y on y.id = rs.election_id
+                  where rs.contest_id is null and rs.is_default and y.date_from = x.date_from and y.kind = x.kind
+                )
+              order by x.date_from desc limit 1
+            ) prior on true
+            where e.id = ${input.id}::uuid
+            limit 1
+          `),
         ]);
+      const anchored = anchor.rows[0];
+      const [turned, prior] = await Promise.all([
+        turnout(anchored?.now ?? null, anchored == null ? [] : [anchored.k]),
+        turnout(anchored?.before ?? null, anchored == null ? [] : [anchored.k]),
+      ]);
+      const valid = Math.max(0, ...raced.map((race) => race.valid));
+      const totaled = anchored == null ? undefined : turned.get(anchored.k);
+      const earlier = anchored == null ? undefined : prior.get(anchored.k);
+      const isCovered = (
+        entry: { voters: number; reporting: number; of: number } | undefined,
+      ) =>
+        entry != null &&
+        (entry.reporting === entry.of || entry.voters >= valid * 0.9);
       const ids = [
         input.id,
         ...contestRows.rows.map((row) => row.id),
@@ -6406,6 +6523,22 @@ export const elections = {
                 path: slugs.get(election.parent) ?? null,
               },
         notes: notes.rows,
+        turnout:
+          totaled == null || !isCovered(totaled)
+            ? null
+            : {
+                ...totaled,
+                earlier:
+                  earlier == null ||
+                  anchored?.year == null ||
+                  !isCovered(earlier)
+                    ? null
+                    : {
+                        year: anchored.year,
+                        registered: earlier.registered,
+                        voters: earlier.voters,
+                      },
+              },
         races: raced.map((race, index) => ({
           ...race,
           anchor: raced
