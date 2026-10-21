@@ -6,12 +6,14 @@ from datetime import UTC, date, datetime
 from pathlib import Path
 
 import fastexcel
+import httpx
 import polars as pl
 
 from ea import raw
 from ea.store import DATA
 
 ROOT = DATA / "inbox" / "manual"
+ILLINOIS = "https://www.elections.il.gov/ElectionOperations/ElectionVoteTotals.aspx"
 RETRIEVED = datetime(2026, 10, 21, tzinfo=UTC)
 PARTY_LETTERS = {"D": "Democratic", "R": "Republican", "G": "Green", "L": "Libertarian", "LIB": "Libertarian"}
 PARTY_WORDS = {
@@ -36,6 +38,7 @@ SITES = {
     "OH": ("Ohio Secretary of State", "Special election official canvasses", "https://data.ohiosos.gov/portal/past-election-results"),
     "GA": ("Georgia Secretary of State", "Special election results", "https://results.sos.ga.gov/"),
     "UT": ("Utah Lieutenant Governor's Office", "Special election canvasses and results", "https://electionresults.utah.gov/"),
+    "IL": ("Illinois State Board of Elections", "Election vote totals", ILLINOIS),
     "PA": ("Pennsylvania Department of State", "Election returns, special elections", "https://www.electionreturns.pa.gov/"),
 }
 LOADED = (
@@ -72,6 +75,13 @@ NOTE = "A person saved this file from the state's results site in a web browser 
 
 
 STORED: list[tuple[str, str]] = []
+ILLINOIS_CSV = "https://www.elections.il.gov/Downloads/ElectionOperations/ElectionResults/ByOffice/49/49-420-18TH%20CONGRESS-2015SE.csv"
+ILLINOIS_PAGES = {
+    24: (date(2008, 3, 8), 14),
+    27: (date(2009, 4, 7), 5),
+    40: (date(2013, 4, 9), 2),
+    49: (date(2015, 9, 10), 18),
+}
 
 
 def party(text: str | None) -> str | None:
@@ -81,10 +91,13 @@ def party(text: str | None) -> str | None:
 
 
 def person(text: str) -> str:
-    cleaned = re.sub(r"\s+", " ", text).strip()
-    if cleaned.isupper():
-        cleaned = re.sub(r"\bMc([a-z])", lambda hit: "Mc" + hit[1].upper(), cleaned.title())
-    return cleaned
+    tokens = []
+    for token in re.sub(r"\s+", " ", text).strip().split(" "):
+        if token.isupper() and len(token) > 1 and not token.startswith('"') and token not in ("II", "III", "IV"):
+            token = token.title()
+        token = re.sub(r"^(Mc|La|Le)([A-Z]{2,})$", lambda hit: hit[1] + hit[2].title(), token)
+        tokens.append(re.sub(r"\bMc([a-z])", lambda hit: "Mc" + hit[1].upper(), token))
+    return " ".join(tokens)
 
 
 def sheet(path: Path, name: str) -> list[tuple[str | None, ...]]:
@@ -238,4 +251,88 @@ def rows() -> list[dict[str, object]]:
                         "manual": mf,
                     }
                 )
+    return found
+
+
+def fetch_illinois() -> None:
+    client = httpx.Client(headers={"User-Agent": "Mozilla/5.0"}, follow_redirects=True, timeout=60)
+    page = client.get(ILLINOIS).text
+    hidden = {
+        hit[0]: hit[1].replace("&amp;", "&")
+        for hit in re.findall(r'name="(__[A-Z]+)" id="[^"]*" value="([^"]*)"', page)
+    }
+    for election in ILLINOIS_PAGES:
+        url = f"{ILLINOIS}#election-{election}"
+        try:
+            raw.cached("us.elstats_specials", url)
+        except LookupError:
+            response = client.post(
+                ILLINOIS,
+                data={
+                    **hidden,
+                    "__EVENTTARGET": "ctl00$ContentPlaceHolder1$ddlElections",
+                    "ctl00$ContentPlaceHolder1$ddlElections": str(election),
+                },
+            )
+            response.raise_for_status()
+            raw.store(
+                "us.elstats_specials",
+                url,
+                response.content,
+                suffix=".html",
+                retrieved_at=datetime.now(UTC),
+                media_type="text/html",
+            )
+    raw.fetch("us.elstats_specials", ILLINOIS_CSV, suffix=".csv")
+
+
+def illinois_rows() -> list[dict[str, object]]:
+    found: list[dict[str, object]] = []
+    for election, (day, district) in ILLINOIS_PAGES.items():
+        url = f"{ILLINOIS}#election-{election}"
+        STORED.append(("IL", url))
+        text = raw.cached("us.elstats_specials", url).path.read_text(errors="replace")
+        start = text.index("CONGRESS")
+        body = text[start : text.index("</table>", start)]
+        candidates: list[tuple[str, str | None, int]] = []
+        printed = 0
+        for row in re.findall(r"<tr[^>]*>(.*?)</tr>", body, re.S):
+            cells = [re.sub(r"\s+", " ", re.sub(r"<[^>]*>|&nbsp;", "", cell)).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.S)]
+            if len(cells) < 3:
+                continue
+            if cells[0] == "Vote Totals":
+                printed = int(cells[2].replace(",", ""))
+            else:
+                candidates.append((cells[0], party(cells[1]), int(cells[2].replace(",", ""))))
+        if sum(count for _, _, count in candidates) != printed:
+            raise ValueError(f"{day}: the candidates do not sum to the printed total")
+        names = {name: (person(name) if label is not None or count > 100 else "Write-ins", label) for name, label, count in candidates}
+        winner = max(candidates, key=lambda entry: entry[2])[0]
+        lines: list[tuple[str, str | None, str, int]] = []
+        if election == 49:
+            STORED.append(("IL", ILLINOIS_CSV))
+            counts: dict[tuple[str, str], int] = {}
+            for record in csv.DictReader(io.StringIO(raw.cached("us.elstats_specials", ILLINOIS_CSV).path.read_text(encoding="utf-8-sig"))):
+                key = (record["CandidateName"], record["JurisName"].replace("CITY OF BLOOMINGTON", "McLEAN"))
+                counts[key] = counts.get(key, 0) + int(record["VoteCount"])
+            for (name, county), count in counts.items():
+                if not name.lower().startswith("write-in"):
+                    lines.append((person(name), names[name][1], county.title(), count))
+        else:
+            lines = [(names[name][0], names[name][1], f"cd:{district}", count) for name, _, count in candidates]
+        for name, label, division, count in lines:
+            found.append(
+                {
+                    "state": "IL",
+                    "election_date": str(day),
+                    "district_name": str(district),
+                    "candidate_name": name,
+                    "candidate_party_name": label,
+                    "division_name": division,
+                    "votes": str(count),
+                    "outcome": "Elected" if name == person(winner) else "Defeated",
+                    "runoff": False,
+                    "manual": None,
+                }
+            )
     return found

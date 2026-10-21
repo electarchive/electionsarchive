@@ -18,7 +18,7 @@ from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, p
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "7"
+VERSION = "8"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -56,8 +56,9 @@ STATES = {
     "GA": "Georgia",
     "UT": "Utah",
     "PA": "Pennsylvania",
+    "IL": "Illinois",
 }
-FIPS = {"GA": "13"}
+FIPS = {"GA": "13", "IL": "17"}
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
@@ -90,6 +91,7 @@ def fetch() -> None:
         raw.fetch(ARCHIVE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
     for special, stage, extension, _ in CALIFORNIA_FILES:
         raw.fetch(SOURCE, CALIFORNIA.format(special, stage, extension), suffix=f".{extension}")
+    special_files.fetch_illinois()
     for election, race, _, _, _ in TEXAS_PAGES:
         raw.fetch(SOURCE, TEXAS.format(election, race), suffix=".htm")
     for link in links:
@@ -325,6 +327,7 @@ def emit() -> Path:
             )
     frames.append(pl.DataFrame(texas, infer_schema_length=None))
     frames.append(pl.DataFrame(special_files.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_files.illinois_rows(), infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
