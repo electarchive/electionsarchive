@@ -17,9 +17,12 @@ VOLUMES = {
     1892: range(361, 363),
     1896: range(430, 432),
     1900: range(444, 445),
+    1902: range(526, 527),
     1904: range(529, 532),
-    1908: range(562, 563),
+    1908: (562, 565),
+    1910: range(543, 544),
     1912: range(653, 654),
+    1914: range(628, 629),
     1916: range(618, 619),
     1920: range(540, 541),
 }
@@ -90,6 +93,10 @@ TABLES = [
         "president",
         [DEM, "Progressive", "Republican", "Prohibition", r"Socialist(?! Labor)", "Socialist Labor"],
     ),
+    (1902, 526, slice(2, 7), ("1901:NJ:governor",), "governor", ["Republican", DEM, None, None, None]),
+    (1908, 565, slice(0, 5), ("1907:NJ:governor",), "governor", ["Republican", DEM, None, None, None]),
+    (1910, 543, slice(0, 5), ("1910:NJ:governor", "1910-11-08:NJ:governor"), "governor", [DEM, "Republican", None, None, None]),
+    (1914, 628, slice(0, 7), ("1913:NJ:governor",), "governor", [None, None, None, DEM, None, None, "Republican"]),
     (1916, 618, slice(0, 2), ("1916-11-07:NJ:president",), "president", ["Republican", DEM]),
     (1916, 618, slice(2, 4), ("1916-11-07:NJ:senate",), "senate", ["Republican", DEM]),
     (1916, 618, slice(4, 6), ("1916-11-07:NJ:governor", "1916:NJ:governor"), "governor", ["Republican", DEM]),
@@ -210,6 +217,8 @@ def emit():
             contest = contests[key]
             result_set = cs.key(f"{SOURCE}.result_set", key)
             ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
+            if conn.execute("select from result_set where id = %s", [result_set]).fetchone() is not None:
+                continue
             options = conn.execute(
                 """select o.id, o.kind, coalesce(o.ballot_label, '') || ' ' || coalesce(n.text, '')
                    from contest_option o left join name n on n.entity_id = o.party_id and n.is_preferred
@@ -270,8 +279,6 @@ def emit():
                 completeness=round(min(counted / official, 1), 4) if official else None,
                 supersedes_id=old[0][0] if old and old[0][0] != result_set else None,
             )
-            if conn.execute("select from result_set where id = %s", [result_set]).fetchone() is not None:
-                continue
             for (county, option), cells in lines.group_by("county", "option", maintain_order=True):
                 unit = counties[nj_manual._plain(str(county))]
                 cs.add(
