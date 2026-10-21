@@ -126,6 +126,7 @@ def emit() -> Path:
                     contests.setdefault((date.fromisoformat(key[:10]), kind, int(found[1])), []).append(entity)
                     break
         placed = 0
+        done: set[tuple[object, str]] = set()
         rows = list(wording.iter_rows())
         for index, (day, kind, number, page, statement, link) in enumerate(rows):
             if kind != "advisory":
@@ -149,6 +150,9 @@ def emit() -> Path:
                 continue
             contest = cs.survivors.get(entities[0], entities[0])
             address = f"{link}#page={page}"
+            if (contest, address) in done:
+                continue
+            done.add((contest, address))
             for body_kind, body in (("text", statement), ("link", None)):
                 cs.add(
                     "ballot_question_text",
