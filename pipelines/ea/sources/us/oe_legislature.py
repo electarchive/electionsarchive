@@ -21,6 +21,7 @@ COMMITS = {
     "CA": ("84c2cbb08a268c683800b513726a1ac7dbf08dac", (2022,)),
     "CT": ("f948d0a1ce36871de4a1d696612ab2a268fd0758", (2018,)),
     "DE": ("a2f49b3c57253914c75d1306ab452d354174bd1f", (2016,)),
+    "GA": ("36b7453793848c02d8f41601d9304a66ad828dd0", (2000, 2002, 2004, 2006, 2008, 2010, 2012, 2014)),
     "HI": ("56655e716b7752e2ffe0acb2b85c09e70807c4fa", (2016, 2022)),
     "IA": ("9ec8f4e142b5159f67b6aa447a583b63e249fd12", (2022,)),
     "IN": ("b130b78cd7b55e57e766623772424f60c0e640bd", (2016, 2018, 2020, 2022)),
@@ -50,7 +51,7 @@ ALIASES = {
     ("TX", "hildalgo"): "hidalgo",
     ("IN", "clar"): "clark",
 }
-TIERS = ["__county", "__town", "", "__precinct"]
+TIERS = ["__county", "__county-level", "__town", "", "__precinct"]
 OTHER = r"\b(u\.?\s?s\.?|united states|congress\w*|county|city|party|levy|referendum|measure|amendment|board|commission\w*|court|judge|regents?|school|recorder|clerk)\b"
 
 
@@ -64,7 +65,7 @@ def picks() -> list[tuple[str, int, str]]:
             found: dict[int, list[str]] = {}
             for entry in paths:
                 matched = re.fullmatch(
-                    rf"(?:[^/]+/)*{year}1[01]\d\d__{state.lower()}__general(__[a-z_']+?)?(_precinct)?\.csv",
+                    rf"(?:[^/]+/)*{year}1[01]\d\d__{state.lower()}__general(__[a-z_'-]+?)?(_precinct)?\.csv",
                     entry["path"],
                 )
                 if entry["type"] != "blob" or matched is None:
@@ -118,12 +119,12 @@ def parse() -> None:
         frame = frame.rename(renamed)
         if "votes" not in frame.columns and "total" in frame.columns:
             frame = frame.rename({"total": "votes"})
-        if "votes" not in frame.columns and {"election_day", "absentee"} & set(frame.columns):
+        if "votes" not in frame.columns and {"election_day", "absentee", "election_day_votes"} & set(frame.columns):
             frame = frame.with_columns(
                 votes=pl.sum_horizontal(
                     pl.col(column).str.replace_all(r"[,\s]", "").cast(pl.Int64, strict=False)
                     for column in frame.columns
-                    if re.fullmatch(r"election_day|early_voting|absentee|mail|provisional|early|in_person", column)
+                    if re.fullmatch(r"(election_day|advanced|absentee_by_mail|provisional)(_votes)?|early_voting|absentee|mail|early|in_person", column)
                 ).cast(pl.String)
             )
         for column in ("vote_type", "votetype"):
@@ -277,7 +278,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="State legislative general elections by county 2016–2023 from OpenElections' state files, "
+            summary="State legislative general elections by county 2000–2023 from OpenElections' state files, "
             "summed from precincts where no county file exists",
             polity="US",
         )
@@ -286,7 +287,7 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from result_set r
                    join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
-                   where r.status = 'active' and x.value ~ '^20(1[5-9]|2[0-5])-'
+                   where r.status = 'active' and x.value ~ '^20(0[0-9]|1[0-9]|2[0-5])-'
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
                                    and u.scheme_code in ('us.county', 'us.county_part', 'us.town', 'us.precinct'))"""
