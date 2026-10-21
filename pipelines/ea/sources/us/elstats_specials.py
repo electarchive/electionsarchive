@@ -12,13 +12,13 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import special_files, special_md, special_nc
+from ea.sources.us import special_files, special_md, special_nc, special_pdfs
 from ea.sources.us.elstats import SOURCE as ARCHIVE
 from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "11"
+VERSION = "12"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -59,6 +59,8 @@ STATES = {
     "IL": "Illinois",
     "NC": "North Carolina",
     "MD": "Maryland",
+    "NE": "Nebraska",
+    "KS": "Kansas",
 }
 OFFICIAL = {
     "NC": (
@@ -73,8 +75,20 @@ OFFICIAL = {
         "https://elections.maryland.gov/elections/special_elections_past.html",
         [page for page, _, _ in special_md.PAGES],
     ),
+    "NE": (
+        "Nebraska Secretary of State",
+        "Board of State Canvassers official reports",
+        "https://sos.nebraska.gov/previous-elections",
+        [special_pdfs.NEBRASKA],
+    ),
+    "KS": (
+        "Kansas Secretary of State",
+        "Official election results",
+        "https://www.sos.ks.gov/elections/election-results.html",
+        [special_pdfs.KANSAS],
+    ),
 }
-FIPS = {"GA": "13", "IL": "17"}
+FIPS = {"GA": "13", "IL": "17", "KS": "20"}
 PARTIES = {
     "Democratic": "democratic-party",
     "Republican": "republican-party",
@@ -110,6 +124,7 @@ def fetch() -> None:
     special_files.fetch_illinois()
     special_nc.fetch()
     special_md.fetch()
+    special_pdfs.fetch()
     for election, race, _, _, _ in TEXAS_PAGES:
         raw.fetch(SOURCE, TEXAS.format(election, race), suffix=".htm")
     for link in links:
@@ -348,6 +363,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_files.illinois_rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nc.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_md.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
