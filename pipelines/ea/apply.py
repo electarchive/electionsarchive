@@ -96,7 +96,9 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
         target = sql.Identifier(table)
         compared = [column for column in columns if column != "id"]
         if table in FACTS:
-            query = sql.SQL("select count(*), 0, 0 from {}").format(staged)
+            query = sql.SQL(
+                "select count(*), 0, 0, (select count(*) from public.{} where result_set_k in ({})) from {}"
+            ).format(target, stage.replaced(table), staged)
         elif "id" in columns:
             query = sql.SQL(
                 """select count(*) filter (where s.id is not null and p.id is null or s.id is null and not {present}),
@@ -124,7 +126,12 @@ def _diff(conn: Connection, stage: Stage) -> dict[str, dict[str, int]]:
             ).format(present=_present(conn, table, columns), staged=staged)
         row = conn.execute(query).fetchone()
         assert row is not None
-        diff[table] = {"insert": row[0], "update": row[1], "unchanged": row[2], "delete": 0}
+        diff[table] = {
+            "insert": row[0],
+            "update": row[1],
+            "unchanged": row[2],
+            "delete": row[3] if table in FACTS else 0,
+        }
         if table in stage.parents:
             deleted = conn.execute(
                 sql.SQL("select count(*) from public.{} p, changeset c where {}").format(
@@ -201,6 +208,17 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                 raise ValueError(
                     f"{table}: rows whose keys resolve to nothing would be dropped: "
                     + ", ".join(f"{count} by {column}" for column, count in missing.items())
+                )
+        replaced = [key for (key,) in conn.execute(stage.replaced(table)).fetchall()]
+        if replaced:
+            conn.execute(
+                "update result_set set is_default = is_default where k = any(%s) and changeset_id <> ea_current_changeset()",
+                [replaced],
+            )
+            for fact in (table, *(("result_rollup_sum", "result_rollup_unit") if table == "result_value" else ())):
+                conn.execute(
+                    sql.SQL("delete from public.{} where result_set_k = any(%s)").format(sql.Identifier(fact)),
+                    [replaced],
                 )
         conn.execute(
             sql.SQL("insert into public.{} ({}) select {} from {} s {}").format(

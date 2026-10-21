@@ -74,6 +74,12 @@ class Stage:
             ),
         )
 
+    def replaced(self, table: str) -> sql.Composed:
+        return sql.SQL(
+            """select r.k from public.result_set r join public.changeset c on c.id = r.changeset_id
+               where c.pipeline = {} and r.id in (select result_set_id from {})"""
+        ).format(sql.Literal(self.pipeline), self.staged(table))
+
     def stale(self, table: str) -> sql.Composable:
         parent = sql.Identifier(self.parents[table])
         return sql.SQL(
@@ -267,8 +273,10 @@ def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]
                     "facts.immutable",
                     sql.SQL(
                         """select distinct null::uuid, s.result_set_id, jsonb_build_object('table', {table})
-                           from {facts} s join public.result_set p on p.id = s.result_set_id"""
-                    ).format(table=sql.Literal(table), facts=stage.staged(table)),
+                           from {facts} s join public.result_set p on p.id = s.result_set_id
+                           join public.changeset c on c.id = p.changeset_id
+                           where c.pipeline is distinct from {pipeline}"""
+                    ).format(table=sql.Literal(table), facts=stage.staged(table), pipeline=sql.Literal(stage.pipeline)),
                 )
             )
     if "result_set" in stage.tables:
@@ -281,7 +289,7 @@ def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]
                             """select null::uuid, r.id, jsonb_build_object('table', {table}, 'column', {column}, 'rows', count(*))
                                from {sets} s join public.result_set r on r.id = s.id
                                join public.{facts} t on t.result_set_k = r.k
-                               where t.{key} <> 0 and not exists (select from public.{parent} p where p.k = t.{key})
+                               where t.{key} <> 0 and not exists (select from public.{parent} p where p.k = t.{key}){fresh}
                                  and not exists (
                                    select from public.flag f where f.result_set_id = r.id and f.check_code = 'reference.stranded'
                                      and f.details ->> 'table' = {table} and f.details ->> 'column' = {column})
@@ -293,6 +301,9 @@ def _references(conn: Connection, stage: Stage) -> list[tuple[str, sql.Composed]
                             facts=sql.Identifier(table),
                             key=sql.Identifier(column),
                             parent=sql.Identifier(parent),
+                            fresh=sql.SQL(" and r.k not in ({})").format(stage.replaced(table))
+                            if table in stage.tables
+                            else sql.SQL(""),
                         ),
                     )
                 )
