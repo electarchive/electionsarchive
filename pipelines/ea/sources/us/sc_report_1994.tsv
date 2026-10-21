@@ -1,0 +1,783 @@
+office	name	party	county	votes	page	x0	y0	x1	y1
+lieutenant-governor	Charles E. Bunch		ABBEVILLE	20	30	911	807	928	816
+lieutenant-governor	Charles E. Bunch		AIKEN	311	30	901	817	927	833
+lieutenant-governor	Charles E. Bunch		ALLENDALE	58	30	901	834	928	851
+lieutenant-governor	Charles E. Bunch		ANDERSON	314	30	901	851	928	868
+lieutenant-governor	Charles E. Bunch		BAMBERG	93	30	901	869	928	885
+lieutenant-governor	Charles E. Bunch		BARNWELL	114	30	902	887	928	903
+lieutenant-governor	Charles E. Bunch		BEAUFORT	204	30	901	904	929	921
+lieutenant-governor	Charles E. Bunch		BERKELEY	606	30	901	921	929	938
+lieutenant-governor	Charles E. Bunch		CALHOUN	33	30	901	939	928	955
+lieutenant-governor	Charles E. Bunch		CHARLESTON	1261	30	901	956	928	973
+lieutenant-governor	Charles E. Bunch		CHEROKEE	120	30	881	974	927	991
+lieutenant-governor	Charles E. Bunch		CHESTER	91	30	901	991	927	1008
+lieutenant-governor	Charles E. Bunch		CHESTERFIELD	120	30	901	1009	927	1025
+lieutenant-governor	Charles E. Bunch		CLARENDON	39	30	901	1026	927	1043
+lieutenant-governor	Charles E. Bunch		COLLETON	169	30	901	1043	926	1060
+lieutenant-governor	Charles E. Bunch		DARLINGTON	185	30	901	1061	927	1078
+lieutenant-governor	Charles E. Bunch		DILLON	34	30	901	1079	928	1095
+lieutenant-governor	Charles E. Bunch		DORCHESTER	327	30	901	1096	927	1113
+lieutenant-governor	Charles E. Bunch		EDGEFIELD	105	30	900	1113	927	1130
+lieutenant-governor	Charles E. Bunch		FAIRFIELD	84	30	901	1131	929	1147
+lieutenant-governor	Charles E. Bunch		FLORENCE	193	30	901	1149	927	1165
+lieutenant-governor	Charles E. Bunch		GEORGETOWN	110	30	901	1166	927	1183
+lieutenant-governor	Charles E. Bunch		GREENVILLE	418	30	900	1183	927	1200
+lieutenant-governor	Charles E. Bunch		GREENWOOD	214	30	900	1201	927	1217
+lieutenant-governor	Charles E. Bunch		HAMPTON	136	30	900	1218	927	1235
+lieutenant-governor	Charles E. Bunch		HORRY	674	30	901	1236	927	1253
+lieutenant-governor	Charles E. Bunch		JASPER	59	30	901	1253	928	1270
+lieutenant-governor	Charles E. Bunch		KERSHAW	140	30	901	1271	927	1287
+lieutenant-governor	Charles E. Bunch		LANCASTER	190	30	901	1288	927	1305
+lieutenant-governor	Charles E. Bunch		LAURENS	64	30	901	1305	927	1322
+lieutenant-governor	Charles E. Bunch		LEE	37	30	909	1323	927	1340
+lieutenant-governor	Charles E. Bunch		LEXINGTON	459	30	900	1341	927	1357
+lieutenant-governor	Charles E. Bunch		MCCORMICK	24	30	900	1358	927	1375
+lieutenant-governor	Charles E. Bunch		MARION	129	30	901	1375	927	1392
+lieutenant-governor	Charles E. Bunch		MARLBORO	87	30	901	1393	927	1409
+lieutenant-governor	Charles E. Bunch		NEWBERRY	135	30	901	1411	927	1427
+lieutenant-governor	Charles E. Bunch		OCONEE	131	30	901	1428	927	1445
+lieutenant-governor	Charles E. Bunch		ORANGEBURG	195	30	901	1445	927	1462
+lieutenant-governor	Charles E. Bunch		PICKENS	135	30	901	1463	927	1479
+lieutenant-governor	Charles E. Bunch		RICHLAND	1040	30	901	1480	928	1497
+lieutenant-governor	Charles E. Bunch		SALUDA	40	30	880	1498	927	1515
+lieutenant-governor	Charles E. Bunch		SPARTANBURG	614	30	900	1515	927	1532
+lieutenant-governor	Charles E. Bunch		SUMTER	154	30	900	1533	927	1549
+lieutenant-governor	Charles E. Bunch		UNION	40	30	901	1550	927	1567
+lieutenant-governor	Charles E. Bunch		WILLIAMSBURG	92	30	911	1568	928	1585
+lieutenant-governor	Charles E. Bunch		YORK	328	30	901	1585	928	1602
+lieutenant-governor	Bob Peeler	R	ABBEVILLE	3158	30	961	807	1008	816
+lieutenant-governor	Bob Peeler	R	AIKEN	21906	30	951	817	1008	833
+lieutenant-governor	Bob Peeler	R	ALLENDALE	637	30	951	834	1008	851
+lieutenant-governor	Bob Peeler	R	ANDERSON	26216	30	951	851	1008	868
+lieutenant-governor	Bob Peeler	R	BAMBERG	1202	30	951	869	1008	885
+lieutenant-governor	Bob Peeler	R	BARNWELL	3054	30	961	887	1008	903
+lieutenant-governor	Bob Peeler	R	BEAUFORT	13863	30	951	904	1008	921
+lieutenant-governor	Bob Peeler	R	BERKELEY	13888	30	951	921	1008	938
+lieutenant-governor	Bob Peeler	R	CALHOUN	1795	30	952	939	1008	955
+lieutenant-governor	Bob Peeler	R	CHARLESTON	36692	30	951	956	1009	973
+lieutenant-governor	Bob Peeler	R	CHEROKEE	6902	30	951	974	1008	991
+lieutenant-governor	Bob Peeler	R	CHESTER	3061	30	960	991	1008	1008
+lieutenant-governor	Bob Peeler	R	CHESTERFIELD	3928	30	960	1009	1007	1025
+lieutenant-governor	Bob Peeler	R	CLARENDON	3690	30	960	1026	1008	1043
+lieutenant-governor	Bob Peeler	R	COLLETON	3477	30	959	1043	1007	1060
+lieutenant-governor	Bob Peeler	R	DARLINGTON	7955	30	959	1061	1007	1078
+lieutenant-governor	Bob Peeler	R	DILLON	2725	30	959	1079	1007	1095
+lieutenant-governor	Bob Peeler	R	DORCHESTER	11061	30	951	1096	1008	1113
+lieutenant-governor	Bob Peeler	R	EDGEFIELD	2957	30	951	1113	1007	1130
+lieutenant-governor	Bob Peeler	R	FAIRFIELD	1873	30	960	1131	1007	1147
+lieutenant-governor	Bob Peeler	R	FLORENCE	16925	30	951	1149	1007	1165
+lieutenant-governor	Bob Peeler	R	GEORGETOWN	5496	30	951	1166	1007	1183
+lieutenant-governor	Bob Peeler	R	GREENVILLE	62470	30	950	1183	1007	1200
+lieutenant-governor	Bob Peeler	R	GREENWOOD	8529	30	950	1201	1007	1217
+lieutenant-governor	Bob Peeler	R	HAMPTON	1621	30	959	1218	1007	1235
+lieutenant-governor	Bob Peeler	R	HORRY	19651	30	951	1236	1005	1253
+lieutenant-governor	Bob Peeler	R	JASPER	1201	30	951	1253	1005	1270
+lieutenant-governor	Bob Peeler	R	KERSHAW	7309	30	960	1271	1006	1287
+lieutenant-governor	Bob Peeler	R	LANCASTER	6743	30	960	1288	1007	1305
+lieutenant-governor	Bob Peeler	R	LAURENS	8293	30	959	1305	1007	1322
+lieutenant-governor	Bob Peeler	R	LEE	1991	30	959	1323	1007	1340
+lieutenant-governor	Bob Peeler	R	LEXINGTON	34381	30	950	1341	1005	1357
+lieutenant-governor	Bob Peeler	R	MCCORMICK	801	30	949	1358	1005	1375
+lieutenant-governor	Bob Peeler	R	MARION	3138	30	979	1375	1007	1392
+lieutenant-governor	Bob Peeler	R	MARLBORO	1656	30	958	1393	1007	1409
+lieutenant-governor	Bob Peeler	R	NEWBERRY	4774	30	959	1411	1006	1427
+lieutenant-governor	Bob Peeler	R	OCONEE	12236	30	951	1428	1007	1445
+lieutenant-governor	Bob Peeler	R	ORANGEBURG	7860	30	951	1445	1006	1462
+lieutenant-governor	Bob Peeler	R	PICKENS	17441	30	951	1463	1007	1479
+lieutenant-governor	Bob Peeler	R	RICHLAND	30507	30	950	1480	1007	1497
+lieutenant-governor	Bob Peeler	R	SALUDA	2488	30	949	1498	1007	1515
+lieutenant-governor	Bob Peeler	R	SPARTANBURG	27659	30	949	1515	1008	1532
+lieutenant-governor	Bob Peeler	R	SUMTER	10526	30	949	1533	1007	1549
+lieutenant-governor	Bob Peeler	R	UNION	3308	30	950	1550	1007	1567
+lieutenant-governor	Bob Peeler	R	WILLIAMSBURG	3412	30	959	1568	1008	1585
+lieutenant-governor	Bob Peeler	R	YORK	18963	30	951	1585	1007	1602
+lieutenant-governor	Liz J. Patterson	D	ABBEVILLE	2933	30	1041	807	1089	816
+lieutenant-governor	Liz J. Patterson	D	AIKEN	11021	30	1031	817	1088	833
+lieutenant-governor	Liz J. Patterson	D	ALLENDALE	1663	30	1031	834	1088	851
+lieutenant-governor	Liz J. Patterson	D	ANDERSON	11331	30	1032	851	1088	868
+lieutenant-governor	Liz J. Patterson	D	BAMBERG	2632	30	1032	869	1088	885
+lieutenant-governor	Liz J. Patterson	D	BARNWELL	2366	30	1041	887	1088	903
+lieutenant-governor	Liz J. Patterson	D	BEAUFORT	10469	30	1031	904	1088	921
+lieutenant-governor	Liz J. Patterson	D	BERKELEY	11256	30	1031	921	1087	938
+lieutenant-governor	Liz J. Patterson	D	CALHOUN	2378	30	1031	939	1087	955
+lieutenant-governor	Liz J. Patterson	D	CHARLESTON	33684	30	1031	956	1088	973
+lieutenant-governor	Liz J. Patterson	D	CHEROKEE	4592	30	1030	974	1088	991
+lieutenant-governor	Liz J. Patterson	D	CHESTER	4377	30	1040	991	1087	1008
+lieutenant-governor	Liz J. Patterson	D	CHESTERFIELD	5373	30	1041	1009	1086	1025
+lieutenant-governor	Liz J. Patterson	D	CLARENDON	5415	30	1040	1026	1088	1043
+lieutenant-governor	Liz J. Patterson	D	COLLETON	4539	30	1039	1043	1087	1060
+lieutenant-governor	Liz J. Patterson	D	DARLINGTON	7603	30	1039	1061	1087	1078
+lieutenant-governor	Liz J. Patterson	D	DILLON	4027	30	1039	1079	1087	1095
+lieutenant-governor	Liz J. Patterson	D	DORCHESTER	8543	30	1039	1096	1086	1113
+lieutenant-governor	Liz J. Patterson	D	EDGEFIELD	2367	30	1039	1113	1087	1130
+lieutenant-governor	Liz J. Patterson	D	FAIRFIELD	4021	30	1039	1131	1085	1147
+lieutenant-governor	Liz J. Patterson	D	FLORENCE	14583	30	1031	1149	1087	1165
+lieutenant-governor	Liz J. Patterson	D	GEORGETOWN	7085	30	1031	1166	1087	1183
+lieutenant-governor	Liz J. Patterson	D	GREENVILLE	28038	30	1030	1183	1087	1200
+lieutenant-governor	Liz J. Patterson	D	GREENWOOD	5021	30	1030	1201	1086	1217
+lieutenant-governor	Liz J. Patterson	D	HAMPTON	4237	30	1039	1218	1086	1235
+lieutenant-governor	Liz J. Patterson	D	HORRY	19410	30	1031	1236	1086	1253
+lieutenant-governor	Liz J. Patterson	D	JASPER	2510	30	1031	1253	1086	1270
+lieutenant-governor	Liz J. Patterson	D	KERSHAW	7319	30	1039	1271	1086	1287
+lieutenant-governor	Liz J. Patterson	D	LANCASTER	8724	30	1039	1288	1086	1305
+lieutenant-governor	Liz J. Patterson	D	LAURENS	5306	30	1039	1305	1087	1322
+lieutenant-governor	Liz J. Patterson	D	LEE	3577	30	1039	1323	1086	1340
+lieutenant-governor	Liz J. Patterson	D	LEXINGTON	23242	30	1030	1341	1087	1357
+lieutenant-governor	Liz J. Patterson	D	MCCORMICK	1604	30	1030	1358	1087	1375
+lieutenant-governor	Liz J. Patterson	D	MARION	4105	30	1039	1375	1088	1392
+lieutenant-governor	Liz J. Patterson	D	MARLBORO	3772	30	1039	1393	1087	1409
+lieutenant-governor	Liz J. Patterson	D	NEWBERRY	4403	30	1039	1411	1086	1427
+lieutenant-governor	Liz J. Patterson	D	OCONEE	4450	30	1039	1428	1086	1445
+lieutenant-governor	Liz J. Patterson	D	ORANGEBURG	16242	30	1030	1445	1086	1462
+lieutenant-governor	Liz J. Patterson	D	PICKENS	5218	30	1030	1463	1086	1479
+lieutenant-governor	Liz J. Patterson	D	RICHLAND	46720	30	1031	1480	1087	1497
+lieutenant-governor	Liz J. Patterson	D	SALUDA	2461	30	1030	1498	1085	1515
+lieutenant-governor	Liz J. Patterson	D	SPARTANBURG	22880	30	1030	1515	1086	1532
+lieutenant-governor	Liz J. Patterson	D	SUMTER	10686	30	1030	1533	1086	1549
+lieutenant-governor	Liz J. Patterson	D	UNION	5038	30	1031	1550	1086	1567
+lieutenant-governor	Liz J. Patterson	D	WILLIAMSBURG	6534	30	1039	1568	1088	1585
+lieutenant-governor	Liz J. Patterson	D	YORK	12275	30	1031	1585	1087	1602
+secretary-of-state	Jim Miles	R	ABBEVILLE	3260	31	310	804	357	816
+secretary-of-state	Jim Miles	R	AIKEN	23473	31	301	821	357	833
+secretary-of-state	Jim Miles	R	ALLENDALE	921	31	330	839	356	851
+secretary-of-state	Jim Miles	R	ANDERSON	26040	31	300	856	357	868
+secretary-of-state	Jim Miles	R	BAMBERG	1663	31	311	869	358	885
+secretary-of-state	Jim Miles	R	BARNWELL	3452	31	310	891	358	903
+secretary-of-state	Jim Miles	R	BEAUFORT	15460	31	301	908	357	921
+secretary-of-state	Jim Miles	R	BERKELEY	16747	31	301	925	357	938
+secretary-of-state	Jim Miles	R	CALHOUN	2262	31	310	943	358	955
+secretary-of-state	Jim Miles	R	CHARLESTON	42862	31	300	961	357	973
+secretary-of-state	Jim Miles	R	CHEROKEE	6558	31	311	979	358	991
+secretary-of-state	Jim Miles	R	CHESTER	3541	31	310	995	355	1008
+secretary-of-state	Jim Miles	R	CHESTERFIELD	4935	31	310	1013	358	1025
+secretary-of-state	Jim Miles	R	CLARENDON	4570	31	310	1029	357	1043
+secretary-of-state	Jim Miles	R	COLLETON	4387	31	310	1047	357	1060
+secretary-of-state	Jim Miles	R	DARLINGTON	9309	31	309	1065	357	1078
+secretary-of-state	Jim Miles	R	DILLON	3259	31	311	1083	357	1095
+secretary-of-state	Jim Miles	R	DORCHESTER	13021	31	301	1100	355	1113
+secretary-of-state	Jim Miles	R	EDGEFIELD	3197	31	310	1119	357	1130
+secretary-of-state	Jim Miles	R	FAIRFIELD	2500	31	310	1131	357	1147
+secretary-of-state	Jim Miles	R	FLORENCE	19731	31	301	1149	355	1165
+secretary-of-state	Jim Miles	R	GEORGETOWN	6866	31	311	1166	357	1183
+secretary-of-state	Jim Miles	R	GREENVILLE	64287	31	300	1183	357	1200
+secretary-of-state	Jim Miles	R	GREENWOOD	8503	31	309	1201	358	1217
+secretary-of-state	Jim Miles	R	HAMPTON	2514	31	310	1218	358	1235
+secretary-of-state	Jim Miles	R	HORRY	25239	31	301	1241	357	1253
+secretary-of-state	Jim Miles	R	JASPER	1318	31	311	1253	359	1270
+secretary-of-state	Jim Miles	R	KERSHAW	9693	31	311	1271	358	1287
+secretary-of-state	Jim Miles	R	LANCASTER	8716	31	309	1288	357	1305
+secretary-of-state	Jim Miles	R	LAURENS	8412	31	309	1305	358	1322
+secretary-of-state	Jim Miles	R	LEE	2488	31	310	1329	358	1340
+secretary-of-state	Jim Miles	R	LEXINGTON	43395	31	300	1341	358	1357
+secretary-of-state	Jim Miles	R	MCCORMICK	1008	31	311	1358	358	1375
+secretary-of-state	Jim Miles	R	MARION	3647	31	311	1375	357	1392
+secretary-of-state	Jim Miles	R	MARLBORO	2149	31	311	1398	357	1409
+secretary-of-state	Jim Miles	R	NEWBERRY	5916	31	310	1415	357	1427
+secretary-of-state	Jim Miles	R	OCONEE	11861	31	301	1431	356	1445
+secretary-of-state	Jim Miles	R	ORANGEBURG	10693	31	301	1449	358	1461
+secretary-of-state	Jim Miles	R	PICKENS	17079	31	301	1466	357	1479
+secretary-of-state	Jim Miles	R	RICHLAND	38868	31	300	1483	358	1497
+secretary-of-state	Jim Miles	R	SALUDA	3233	31	310	1501	358	1513
+secretary-of-state	Jim Miles	R	SPARTANBURG	31677	31	301	1518	357	1531
+secretary-of-state	Jim Miles	R	SUMTER	12402	31	301	1536	358	1549
+secretary-of-state	Jim Miles	R	UNION	4632	31	311	1554	358	1567
+secretary-of-state	Jim Miles	R	WILLIAMSBURG	4324	31	311	1572	358	1585
+secretary-of-state	Jim Miles	R	YORK	19619	31	301	1589	357	1602
+secretary-of-state	Milton Kimpson	D	ABBEVILLE	2664	31	390	805	437	816
+secretary-of-state	Milton Kimpson	D	AIKEN	8621	31	389	821	435	833
+secretary-of-state	Milton Kimpson	D	ALLENDALE	1325	31	391	839	437	851
+secretary-of-state	Milton Kimpson	D	ANDERSON	10004	31	381	851	437	868
+secretary-of-state	Milton Kimpson	D	BAMBERG	2101	31	390	869	435	885
+secretary-of-state	Milton Kimpson	D	BARNWELL	1881	31	391	887	435	903
+secretary-of-state	Milton Kimpson	D	BEAUFORT	7923	31	391	909	437	921
+secretary-of-state	Milton Kimpson	D	BERKELEY	7934	31	390	925	437	938
+secretary-of-state	Milton Kimpson	D	CALHOUN	1866	31	391	943	437	955
+secretary-of-state	Milton Kimpson	D	CHARLESTON	25286	31	380	956	437	973
+secretary-of-state	Milton Kimpson	D	CHEROKEE	4227	31	389	979	436	991
+secretary-of-state	Milton Kimpson	D	CHESTER	3487	31	390	991	436	1008
+secretary-of-state	Milton Kimpson	D	CHESTERFIELD	4025	31	390	1009	437	1025
+secretary-of-state	Milton Kimpson	D	CLARENDON	4428	31	389	1031	438	1043
+secretary-of-state	Milton Kimpson	D	COLLETON	3446	31	390	1043	437	1060
+secretary-of-state	Milton Kimpson	D	DARLINGTON	5759	31	389	1061	436	1078
+secretary-of-state	Milton Kimpson	D	DILLON	3286	31	389	1079	437	1095
+secretary-of-state	Milton Kimpson	D	DORCHESTER	6087	31	389	1096	437	1113
+secretary-of-state	Milton Kimpson	D	EDGEFIELD	2013	31	390	1113	437	1130
+secretary-of-state	Milton Kimpson	D	FAIRFIELD	3233	31	390	1131	437	1147
+secretary-of-state	Milton Kimpson	D	FLORENCE	11188	31	381	1149	437	1165
+secretary-of-state	Milton Kimpson	D	GEORGETOWN	5424	31	390	1166	437	1183
+secretary-of-state	Milton Kimpson	D	GREENVILLE	21817	31	380	1183	437	1200
+secretary-of-state	Milton Kimpson	D	GREENWOOD	4397	31	381	1201	437	1217
+secretary-of-state	Milton Kimpson	D	HAMPTON	3039	31	390	1218	437	1235
+secretary-of-state	Milton Kimpson	D	HORRY	12711	31	381	1236	435	1253
+secretary-of-state	Milton Kimpson	D	JASPER	2281	31	381	1253	435	1270
+secretary-of-state	Milton Kimpson	D	KERSHAW	4510	31	389	1271	437	1287
+secretary-of-state	Milton Kimpson	D	LANCASTER	5854	31	389	1288	437	1305
+secretary-of-state	Milton Kimpson	D	LAURENS	4561	31	390	1305	435	1322
+secretary-of-state	Milton Kimpson	D	LEE	3007	31	390	1323	437	1340
+secretary-of-state	Milton Kimpson	D	LEXINGTON	12401	31	381	1341	435	1357
+secretary-of-state	Milton Kimpson	D	MCCORMICK	1356	31	391	1358	437	1375
+secretary-of-state	Milton Kimpson	D	MARION	3494	31	390	1375	437	1392
+secretary-of-state	Milton Kimpson	D	MARLBORO	3200	31	389	1393	436	1409
+secretary-of-state	Milton Kimpson	D	NEWBERRY	2965	31	390	1411	437	1427
+secretary-of-state	Milton Kimpson	D	OCONEE	3970	31	390	1428	436	1445
+secretary-of-state	Milton Kimpson	D	ORANGEBURG	13024	31	381	1450	437	1462
+secretary-of-state	Milton Kimpson	D	PICKENS	4541	31	390	1463	435	1479
+secretary-of-state	Milton Kimpson	D	RICHLAND	35804	31	380	1480	437	1497
+secretary-of-state	Milton Kimpson	D	SALUDA	1570	31	391	1498	437	1515
+secretary-of-state	Milton Kimpson	D	SPARTANBURG	15181	31	381	1519	435	1532
+secretary-of-state	Milton Kimpson	D	SUMTER	8486	31	389	1538	437	1549
+secretary-of-state	Milton Kimpson	D	UNION	3276	31	390	1550	436	1567
+secretary-of-state	Milton Kimpson	D	WILLIAMSBURG	4958	31	391	1568	437	1585
+secretary-of-state	Milton Kimpson	D	YORK	9938	31	390	1585	437	1602
+secretary-of-state	Ted Adams		ABBEVILLE	59	31	500	805	517	816
+secretary-of-state	Ted Adams		AIKEN	766	31	491	822	517	833
+secretary-of-state	Ted Adams		ALLENDALE	32	31	501	840	518	851
+secretary-of-state	Ted Adams		ANDERSON	1072	31	471	851	518	868
+secretary-of-state	Ted Adams		BAMBERG	61	31	501	869	517	885
+secretary-of-state	Ted Adams		BARNWELL	78	31	501	892	518	903
+secretary-of-state	Ted Adams		BEAUFORT	659	31	490	910	517	921
+secretary-of-state	Ted Adams		BERKELEY	408	31	491	927	517	938
+secretary-of-state	Ted Adams		CALHOUN	76	31	501	944	517	955
+secretary-of-state	Ted Adams		CHARLESTON	994	31	490	962	518	973
+secretary-of-state	Ted Adams		CHEROKEE	480	31	490	980	517	991
+secretary-of-state	Ted Adams		CHESTER	421	31	490	997	515	1008
+secretary-of-state	Ted Adams		CHESTERFIELD	315	31	490	1014	517	1025
+secretary-of-state	Ted Adams		CLARENDON	94	31	500	1031	517	1043
+secretary-of-state	Ted Adams		COLLETON	153	31	491	1050	517	1060
+secretary-of-state	Ted Adams		DARLINGTON	336	31	490	1061	517	1078
+secretary-of-state	Ted Adams		DILLON	67	31	501	1085	517	1095
+secretary-of-state	Ted Adams		DORCHESTER	277	31	490	1096	517	1113
+secretary-of-state	Ted Adams		EDGEFIELD	73	31	501	1120	518	1130
+secretary-of-state	Ted Adams		FAIRFIELD	124	31	491	1131	518	1147
+secretary-of-state	Ted Adams		FLORENCE	562	31	489	1149	518	1165
+secretary-of-state	Ted Adams		GEORGETOWN	234	31	489	1166	518	1183
+secretary-of-state	Ted Adams		GREENVILLE	3097	31	470	1183	517	1200
+secretary-of-state	Ted Adams		GREENWOOD	193	31	471	1201	517	1217
+secretary-of-state	Ted Adams		HAMPTON	119	31	491	1218	517	1235
+secretary-of-state	Ted Adams		HORRY	618	31	491	1236	519	1253
+secretary-of-state	Ted Adams		JASPER	81	31	491	1253	517	1270
+secretary-of-state	Ted Adams		KERSHAW	377	31	490	1271	517	1287
+secretary-of-state	Ted Adams		LANCASTER	848	31	489	1288	518	1305
+secretary-of-state	Ted Adams		LAURENS	428	31	490	1305	518	1322
+secretary-of-state	Ted Adams		LEE	61	31	500	1323	515	1340
+secretary-of-state	Ted Adams		LEXINGTON	1603	31	471	1341	517	1357
+secretary-of-state	Ted Adams		MCCORMICK	47	31	471	1358	517	1375
+secretary-of-state	Ted Adams		MARION	108	31	491	1375	518	1392
+secretary-of-state	Ted Adams		MARLBORO	156	31	491	1393	517	1409
+secretary-of-state	Ted Adams		NEWBERRY	114	31	491	1411	518	1427
+secretary-of-state	Ted Adams		OCONEE	584	31	489	1428	518	1445
+secretary-of-state	Ted Adams		ORANGEBURG	370	31	490	1451	517	1462
+secretary-of-state	Ted Adams		PICKENS	671	31	490	1463	515	1479
+secretary-of-state	Ted Adams		RICHLAND	1371	31	472	1480	516	1497
+secretary-of-state	Ted Adams		SALUDA	168	31	482	1498	518	1515
+secretary-of-state	Ted Adams		SPARTANBURG	843	31	490	1515	518	1532
+secretary-of-state	Ted Adams		SUMTER	346	31	490	1533	517	1549
+secretary-of-state	Ted Adams		UNION	350	31	490	1550	517	1567
+secretary-of-state	Ted Adams		WILLIAMSBURG	101	31	491	1568	516	1585
+secretary-of-state	Ted Adams		YORK	1201	31	471	1585	515	1602
+treasurer	Richard Eckstrom	R	ABBEVILLE	1813	31	631	805	677	816
+treasurer	Richard Eckstrom	R	AIKEN	20956	31	620	817	677	833
+treasurer	Richard Eckstrom	R	ALLENDALE	534	31	641	834	677	851
+treasurer	Richard Eckstrom	R	ANDERSON	19661	31	621	851	675	868
+treasurer	Richard Eckstrom	R	BAMBERG	996	31	641	869	677	885
+treasurer	Richard Eckstrom	R	BARNWELL	2710	31	631	892	677	903
+treasurer	Richard Eckstrom	R	BEAUFORT	14158	31	621	904	677	921
+treasurer	Richard Eckstrom	R	BERKELEY	14004	31	621	921	677	938
+treasurer	Richard Eckstrom	R	CALHOUN	1608	31	622	939	678	955
+treasurer	Richard Eckstrom	R	CHARLESTON	35353	31	620	956	677	973
+treasurer	Richard Eckstrom	R	CHEROKEE	5341	31	629	974	675	991
+treasurer	Richard Eckstrom	R	CHESTER	2650	31	629	991	677	1008
+treasurer	Richard Eckstrom	R	CHESTERFIELD	3625	31	629	1009	677	1025
+treasurer	Richard Eckstrom	R	CLARENDON	3257	31	630	1026	677	1043
+treasurer	Richard Eckstrom	R	COLLETON	3362	31	630	1043	677	1060
+treasurer	Richard Eckstrom	R	DARLINGTON	7553	31	630	1061	677	1078
+treasurer	Richard Eckstrom	R	DILLON	2619	31	630	1079	677	1095
+treasurer	Richard Eckstrom	R	DORCHESTER	11217	31	621	1096	677	1113
+treasurer	Richard Eckstrom	R	EDGEFIELD	2581	31	621	1113	675	1130
+treasurer	Richard Eckstrom	R	FAIRFIELD	1570	31	630	1131	677	1147
+treasurer	Richard Eckstrom	R	FLORENCE	16506	31	621	1149	677	1165
+treasurer	Richard Eckstrom	R	GEORGETOWN	5575	31	621	1166	677	1183
+treasurer	Richard Eckstrom	R	GREENVILLE	54094	31	621	1183	677	1200
+treasurer	Richard Eckstrom	R	GREENWOOD	6429	31	620	1201	677	1217
+treasurer	Richard Eckstrom	R	HAMPTON	1402	31	631	1218	677	1235
+treasurer	Richard Eckstrom	R	HORRY	20350	31	620	1236	677	1253
+treasurer	Richard Eckstrom	R	JASPER	1119	31	621	1253	677	1270
+treasurer	Richard Eckstrom	R	KERSHAW	7558	31	630	1271	677	1287
+treasurer	Richard Eckstrom	R	LANCASTER	6296	31	630	1288	677	1305
+treasurer	Richard Eckstrom	R	LAURENS	5949	31	630	1305	676	1322
+treasurer	Richard Eckstrom	R	LEE	1760	31	630	1323	676	1340
+treasurer	Richard Eckstrom	R	LEXINGTON	33351	31	620	1341	675	1357
+treasurer	Richard Eckstrom	R	MCCORMICK	602	31	621	1358	677	1375
+treasurer	Richard Eckstrom	R	MARION	2685	31	630	1375	678	1392
+treasurer	Richard Eckstrom	R	MARLBORO	1606	31	630	1393	677	1409
+treasurer	Richard Eckstrom	R	NEWBERRY	3974	31	629	1411	677	1427
+treasurer	Richard Eckstrom	R	OCONEE	9442	31	629	1428	677	1445
+treasurer	Richard Eckstrom	R	ORANGEBURG	7644	31	630	1445	677	1462
+treasurer	Richard Eckstrom	R	PICKENS	13384	31	621	1463	677	1479
+treasurer	Richard Eckstrom	R	RICHLAND	27333	31	620	1480	677	1497
+treasurer	Richard Eckstrom	R	SALUDA	2108	31	621	1498	678	1515
+treasurer	Richard Eckstrom	R	SPARTANBURG	26186	31	620	1515	677	1532
+treasurer	Richard Eckstrom	R	SUMTER	10168	31	621	1533	678	1549
+treasurer	Richard Eckstrom	R	UNION	2897	31	621	1550	677	1567
+treasurer	Richard Eckstrom	R	WILLIAMSBURG	3021	31	630	1568	674	1585
+treasurer	Richard Eckstrom	R	YORK	16925	31	621	1585	677	1602
+treasurer	David Morris		ABBEVILLE	54	31	739	805	757	816
+treasurer	David Morris		AIKEN	1075	31	710	817	757	833
+treasurer	David Morris		ALLENDALE	58	31	739	840	757	851
+treasurer	David Morris		ANDERSON	1549	31	710	851	757	868
+treasurer	David Morris		BAMBERG	62	31	739	875	757	885
+treasurer	David Morris		BARNWELL	106	31	730	892	757	903
+treasurer	David Morris		BEAUFORT	537	31	729	909	757	921
+treasurer	David Morris		BERKELEY	650	31	729	927	756	938
+treasurer	David Morris		CALHOUN	118	31	730	944	757	955
+treasurer	David Morris		CHARLESTON	1607	31	711	956	757	973
+treasurer	David Morris		CHEROKEE	425	31	721	974	757	991
+treasurer	David Morris		CHESTER	344	31	729	991	757	1008
+treasurer	David Morris		CHESTERFIELD	282	31	729	1009	757	1025
+treasurer	David Morris		CLARENDON	189	31	730	1031	757	1043
+treasurer	David Morris		COLLETON	150	31	731	1043	756	1060
+treasurer	David Morris		DARLINGTON	614	31	729	1067	757	1078
+treasurer	David Morris		DILLON	88	31	738	1085	757	1095
+treasurer	David Morris		DORCHESTER	452	31	729	1102	757	1113
+treasurer	David Morris		EDGEFIELD	121	31	730	1120	755	1130
+treasurer	David Morris		FAIRFIELD	127	31	730	1131	757	1147
+treasurer	David Morris		FLORENCE	545	31	729	1149	757	1165
+treasurer	David Morris		GEORGETOWN	244	31	729	1166	757	1183
+treasurer	David Morris		GREENVILLE	2328	31	709	1183	757	1200
+treasurer	David Morris		GREENWOOD	291	31	709	1201	757	1217
+treasurer	David Morris		HAMPTON	192	31	729	1218	757	1235
+treasurer	David Morris		HORRY	892	31	729	1236	757	1253
+treasurer	David Morris		JASPER	68	31	730	1253	757	1270
+treasurer	David Morris		KERSHAW	516	31	729	1271	757	1287
+treasurer	David Morris		LANCASTER	612	31	729	1288	757	1305
+treasurer	David Morris		LAURENS	368	31	729	1305	757	1322
+treasurer	David Morris		LEE	66	31	730	1323	757	1340
+treasurer	David Morris		LEXINGTON	2064	31	709	1341	757	1357
+treasurer	David Morris		MCCORMICK	59	31	709	1358	757	1375
+treasurer	David Morris		MARION	221	31	729	1375	755	1392
+treasurer	David Morris		MARLBORO	253	31	729	1393	757	1409
+treasurer	David Morris		NEWBERRY	285	31	729	1411	758	1427
+treasurer	David Morris		OCONEE	662	31	729	1428	757	1445
+treasurer	David Morris		ORANGEBURG	566	31	729	1445	757	1462
+treasurer	David Morris		PICKENS	784	31	729	1463	757	1479
+treasurer	David Morris		RICHLAND	2279	31	709	1480	757	1497
+treasurer	David Morris		SALUDA	179	31	710	1498	757	1515
+treasurer	David Morris		SPARTANBURG	1102	31	711	1515	757	1532
+treasurer	David Morris		SUMTER	437	31	711	1533	757	1549
+treasurer	David Morris		UNION	238	31	729	1550	758	1567
+treasurer	David Morris		WILLIAMSBURG	163	31	729	1568	757	1585
+treasurer	David Morris		YORK	1131	31	711	1585	757	1602
+treasurer	Grady L. Patterson Jr.	D	ABBEVILLE	4222	31	789	805	835	816
+treasurer	Grady L. Patterson Jr.	D	AIKEN	10873	31	779	817	835	833
+treasurer	Grady L. Patterson Jr.	D	ALLENDALE	1703	31	789	834	835	851
+treasurer	Grady L. Patterson Jr.	D	ANDERSON	15925	31	780	851	835	868
+treasurer	Grady L. Patterson Jr.	D	BAMBERG	2766	31	781	869	835	885
+treasurer	Grady L. Patterson Jr.	D	BARNWELL	2614	31	789	887	835	903
+treasurer	Grady L. Patterson Jr.	D	BEAUFORT	9361	31	789	904	833	921
+treasurer	Grady L. Patterson Jr.	D	BERKELEY	10465	31	780	921	836	938
+treasurer	Grady L. Patterson Jr.	D	CALHOUN	2443	31	780	939	843	955
+treasurer	Grady L. Patterson Jr.	D	CHARLESTON	31909	31	779	956	835	973
+treasurer	Grady L. Patterson Jr.	D	CHEROKEE	5567	31	788	974	834	991
+treasurer	Grady L. Patterson Jr.	D	CHESTER	4459	31	789	991	834	1008
+treasurer	Grady L. Patterson Jr.	D	CHESTERFIELD	5420	31	789	1009	834	1025
+treasurer	Grady L. Patterson Jr.	D	CLARENDON	5642	31	789	1026	835	1043
+treasurer	Grady L. Patterson Jr.	D	COLLETON	4541	31	789	1043	835	1060
+treasurer	Grady L. Patterson Jr.	D	DARLINGTON	7298	31	789	1061	835	1078
+treasurer	Grady L. Patterson Jr.	D	DILLON	4375	31	789	1079	835	1095
+treasurer	Grady L. Patterson Jr.	D	DORCHESTER	7763	31	789	1096	835	1113
+treasurer	Grady L. Patterson Jr.	D	EDGEFIELD	2586	31	789	1113	835	1130
+treasurer	Grady L. Patterson Jr.	D	FAIRFIELD	4053	31	789	1131	835	1147
+treasurer	Grady L. Patterson Jr.	D	FLORENCE	14323	31	780	1149	835	1165
+treasurer	Grady L. Patterson Jr.	D	GEORGETOWN	6699	31	780	1166	835	1183
+treasurer	Grady L. Patterson Jr.	D	GREENVILLE	32695	31	779	1183	835	1200
+treasurer	Grady L. Patterson Jr.	D	GREENWOOD	6477	31	779	1201	835	1217
+treasurer	Grady L. Patterson Jr.	D	HAMPTON	4077	31	789	1218	835	1235
+treasurer	Grady L. Patterson Jr.	D	HORRY	17450	31	780	1236	835	1253
+treasurer	Grady L. Patterson Jr.	D	JASPER	2496	31	780	1253	834	1270
+treasurer	Grady L. Patterson Jr.	D	KERSHAW	6495	31	789	1271	835	1287
+treasurer	Grady L. Patterson Jr.	D	LANCASTER	8535	31	789	1288	835	1305
+treasurer	Grady L. Patterson Jr.	D	LAURENS	7149	31	789	1305	835	1322
+treasurer	Grady L. Patterson Jr.	D	LEE	3738	31	789	1323	835	1340
+treasurer	Grady L. Patterson Jr.	D	LEXINGTON	22169	31	779	1341	835	1357
+treasurer	Grady L. Patterson Jr.	D	MCCORMICK	1778	31	779	1358	835	1375
+treasurer	Grady L. Patterson Jr.	D	MARION	4326	31	789	1375	835	1392
+treasurer	Grady L. Patterson Jr.	D	MARLBORO	3702	31	789	1393	835	1409
+treasurer	Grady L. Patterson Jr.	D	NEWBERRY	4803	31	789	1411	835	1427
+treasurer	Grady L. Patterson Jr.	D	OCONEE	6379	31	789	1428	835	1445
+treasurer	Grady L. Patterson Jr.	D	ORANGEBURG	15846	31	780	1445	835	1462
+treasurer	Grady L. Patterson Jr.	D	PICKENS	8163	31	780	1463	835	1479
+treasurer	Grady L. Patterson Jr.	D	RICHLAND	45109	31	779	1480	835	1497
+treasurer	Grady L. Patterson Jr.	D	SALUDA	2710	31	784	1498	835	1515
+treasurer	Grady L. Patterson Jr.	D	SPARTANBURG	20946	31	779	1515	835	1532
+treasurer	Grady L. Patterson Jr.	D	SUMTER	10602	31	779	1533	835	1549
+treasurer	Grady L. Patterson Jr.	D	UNION	5191	31	781	1550	835	1567
+treasurer	Grady L. Patterson Jr.	D	WILLIAMSBURG	6592	31	789	1568	835	1585
+treasurer	Grady L. Patterson Jr.	D	YORK	12816	31	780	1585	835	1602
+attorney-general	Charlie Condon	R	ABBEVILLE	2823	31	946	807	994	816
+attorney-general	Charlie Condon	R	AIKEN	22281	31	937	817	993	833
+attorney-general	Charlie Condon	R	ALLENDALE	728	31	937	834	995	851
+attorney-general	Charlie Condon	R	ANDERSON	22641	31	937	851	994	868
+attorney-general	Charlie Condon	R	BAMBERG	1316	31	937	869	993	885
+attorney-general	Charlie Condon	R	BARNWELL	2937	31	946	887	993	903
+attorney-general	Charlie Condon	R	BEAUFORT	15679	31	937	904	993	921
+attorney-general	Charlie Condon	R	BERKELEY	18267	31	937	921	993	938
+attorney-general	Charlie Condon	R	CALHOUN	1630	31	937	939	993	955
+attorney-general	Charlie Condon	R	CHARLESTON	47690	31	937	956	993	973
+attorney-general	Charlie Condon	R	CHEROKEE	6169	31	947	974	993	991
+attorney-general	Charlie Condon	R	CHESTER	3149	31	947	991	993	1008
+attorney-general	Charlie Condon	R	CHESTERFIELD	4232	31	946	1009	995	1025
+attorney-general	Charlie Condon	R	CLARENDON	3546	31	946	1026	994	1043
+attorney-general	Charlie Condon	R	COLLETON	4678	31	946	1043	994	1060
+attorney-general	Charlie Condon	R	DARLINGTON	7922	31	946	1061	994	1078
+attorney-general	Charlie Condon	R	DILLON	2957	31	946	1079	994	1095
+attorney-general	Charlie Condon	R	DORCHESTER	13723	31	937	1096	993	1113
+attorney-general	Charlie Condon	R	EDGEFIELD	3007	31	937	1113	993	1130
+attorney-general	Charlie Condon	R	FAIRFIELD	1722	31	947	1131	994	1147
+attorney-general	Charlie Condon	R	FLORENCE	17580	31	937	1149	994	1165
+attorney-general	Charlie Condon	R	GEORGETOWN	6614	31	937	1166	994	1183
+attorney-general	Charlie Condon	R	GREENVILLE	59337	31	936	1183	993	1200
+attorney-general	Charlie Condon	R	GREENWOOD	7600	31	935	1201	993	1217
+attorney-general	Charlie Condon	R	HAMPTON	2355	31	946	1218	994	1235
+attorney-general	Charlie Condon	R	HORRY	22141	31	937	1236	994	1253
+attorney-general	Charlie Condon	R	JASPER	1326	31	937	1253	993	1270
+attorney-general	Charlie Condon	R	KERSHAW	6649	31	947	1271	994	1287
+attorney-general	Charlie Condon	R	LANCASTER	7098	31	947	1288	994	1305
+attorney-general	Charlie Condon	R	LAURENS	7190	31	947	1305	994	1322
+attorney-general	Charlie Condon	R	LEE	1673	31	947	1323	994	1340
+attorney-general	Charlie Condon	R	LEXINGTON	31515	31	937	1341	994	1357
+attorney-general	Charlie Condon	R	MCCORMICK	879	31	936	1358	994	1375
+attorney-general	Charlie Condon	R	MARION	3307	31	947	1375	993	1392
+attorney-general	Charlie Condon	R	MARLBORO	1982	31	947	1393	994	1409
+attorney-general	Charlie Condon	R	NEWBERRY	4201	31	946	1411	994	1427
+attorney-general	Charlie Condon	R	OCONEE	10095	31	937	1428	995	1445
+attorney-general	Charlie Condon	R	ORANGEBURG	8359	31	937	1445	995	1462
+attorney-general	Charlie Condon	R	PICKENS	15785	31	937	1463	994	1479
+attorney-general	Charlie Condon	R	RICHLAND	31627	31	937	1480	994	1497
+attorney-general	Charlie Condon	R	SALUDA	2379	31	936	1498	993	1515
+attorney-general	Charlie Condon	R	SPARTANBURG	29484	31	937	1515	994	1532
+attorney-general	Charlie Condon	R	SUMTER	9429	31	937	1533	994	1549
+attorney-general	Charlie Condon	R	UNION	3880	31	947	1550	993	1567
+attorney-general	Charlie Condon	R	WILLIAMSBURG	3844	31	947	1568	994	1585
+attorney-general	Charlie Condon	R	YORK	17563	31	937	1585	994	1602
+attorney-general	Dick Harpootlian	D	ABBEVILLE	3394	31	1026	807	1074	816
+attorney-general	Dick Harpootlian	D	AIKEN	10774	31	1017	817	1074	833
+attorney-general	Dick Harpootlian	D	ALLENDALE	1599	31	1017	834	1073	851
+attorney-general	Dick Harpootlian	D	ANDERSON	14840	31	1017	851	1073	868
+attorney-general	Dick Harpootlian	D	BAMBERG	2535	31	1017	869	1074	885
+attorney-general	Dick Harpootlian	D	BARNWELL	2506	31	1027	887	1073	903
+attorney-general	Dick Harpootlian	D	BEAUFORT	8597	31	1027	904	1073	921
+attorney-general	Dick Harpootlian	D	BERKELEY	7721	31	1027	921	1071	938
+attorney-general	Dick Harpootlian	D	CALHOUN	2549	31	1026	939	1073	955
+attorney-general	Dick Harpootlian	D	CHARLESTON	24122	31	1016	956	1074	973
+attorney-general	Dick Harpootlian	D	CHEROKEE	5192	31	1017	974	1074	991
+attorney-general	Dick Harpootlian	D	CHESTER	4297	31	1026	991	1073	1008
+attorney-general	Dick Harpootlian	D	CHESTERFIELD	5058	31	1027	1009	1074	1025
+attorney-general	Dick Harpootlian	D	CLARENDON	5538	31	1026	1026	1074	1043
+attorney-general	Dick Harpootlian	D	COLLETON	3497	31	1026	1043	1073	1060
+attorney-general	Dick Harpootlian	D	DARLINGTON	7201	31	1026	1061	1071	1078
+attorney-general	Dick Harpootlian	D	DILLON	4189	31	1026	1079	1073	1095
+attorney-general	Dick Harpootlian	D	DORCHESTER	6169	31	1026	1096	1073	1113
+attorney-general	Dick Harpootlian	D	EDGEFIELD	2349	31	1026	1113	1073	1130
+attorney-general	Dick Harpootlian	D	FAIRFIELD	4269	31	1026	1131	1073	1147
+attorney-general	Dick Harpootlian	D	FLORENCE	13915	31	1017	1149	1074	1165
+attorney-general	Dick Harpootlian	D	GEORGETOWN	5999	31	1017	1166	1074	1183
+attorney-general	Dick Harpootlian	D	GREENVILLE	30589	31	1017	1183	1073	1200
+attorney-general	Dick Harpootlian	D	GREENWOOD	5716	31	1016	1201	1073	1217
+attorney-general	Dick Harpootlian	D	HAMPTON	3247	31	1025	1218	1073	1235
+attorney-general	Dick Harpootlian	D	HORRY	17199	31	1017	1236	1073	1253
+attorney-general	Dick Harpootlian	D	JASPER	2352	31	1017	1253	1073	1270
+attorney-general	Dick Harpootlian	D	KERSHAW	8112	31	1025	1271	1073	1287
+attorney-general	Dick Harpootlian	D	LANCASTER	8505	31	1025	1288	1074	1305
+attorney-general	Dick Harpootlian	D	LAURENS	6252	31	1025	1305	1074	1322
+attorney-general	Dick Harpootlian	D	LEE	3837	31	1027	1323	1073	1340
+attorney-general	Dick Harpootlian	D	LEXINGTON	26417	31	1016	1341	1073	1357
+attorney-general	Dick Harpootlian	D	MCCORMICK	1519	31	1016	1358	1073	1375
+attorney-general	Dick Harpootlian	D	MARION	3971	31	1027	1375	1072	1392
+attorney-general	Dick Harpootlian	D	MARLBORO	3622	31	1026	1393	1074	1409
+attorney-general	Dick Harpootlian	D	NEWBERRY	4943	31	1025	1411	1073	1427
+attorney-general	Dick Harpootlian	D	OCONEE	6531	31	1027	1428	1073	1445
+attorney-general	Dick Harpootlian	D	ORANGEBURG	15792	31	1017	1445	1073	1462
+attorney-general	Dick Harpootlian	D	PICKENS	6724	31	1017	1463	1073	1479
+attorney-general	Dick Harpootlian	D	RICHLAND	46580	31	1016	1480	1073	1497
+attorney-general	Dick Harpootlian	D	SALUDA	2608	31	1020	1498	1074	1515
+attorney-general	Dick Harpootlian	D	SPARTANBURG	19703	31	1017	1515	1074	1532
+attorney-general	Dick Harpootlian	D	SUMTER	11722	31	1017	1533	1073	1549
+attorney-general	Dick Harpootlian	D	UNION	4434	31	1017	1550	1073	1567
+attorney-general	Dick Harpootlian	D	WILLIAMSBURG	5882	31	1027	1568	1073	1585
+attorney-general	Dick Harpootlian	D	YORK	13617	31	1017	1585	1073	1602
+superintendent-of-education	Barbara Nielsen	R	ABBEVILLE	2777	32	311	711	357	725
+superintendent-of-education	Barbara Nielsen	R	AIKEN	21355	32	301	729	359	742
+superintendent-of-education	Barbara Nielsen	R	ALLENDALE	856	32	331	748	357	759
+superintendent-of-education	Barbara Nielsen	R	ANDERSON	21381	32	300	764	355	777
+superintendent-of-education	Barbara Nielsen	R	BAMBERG	1460	32	312	782	357	795
+superintendent-of-education	Barbara Nielsen	R	BARNWELL	2975	32	311	799	359	812
+superintendent-of-education	Barbara Nielsen	R	BEAUFORT	16079	32	301	817	357	829
+superintendent-of-education	Barbara Nielsen	R	BERKELEY	14595	32	301	830	359	847
+superintendent-of-education	Barbara Nielsen	R	CALHOUN	1962	32	311	852	357	865
+superintendent-of-education	Barbara Nielsen	R	CHARLESTON	38631	32	301	869	355	882
+superintendent-of-education	Barbara Nielsen	R	CHEROKEE	6296	32	311	883	357	899
+superintendent-of-education	Barbara Nielsen	R	CHESTER	3320	32	310	900	357	917
+superintendent-of-education	Barbara Nielsen	R	CHESTERFIELD	4288	32	311	917	359	934
+superintendent-of-education	Barbara Nielsen	R	CLARENDON	3796	32	310	935	357	952
+superintendent-of-education	Barbara Nielsen	R	COLLETON	3942	32	311	958	358	969
+superintendent-of-education	Barbara Nielsen	R	DARLINGTON	8486	32	310	970	357	987
+superintendent-of-education	Barbara Nielsen	R	DILLON	2816	32	310	987	357	1004
+superintendent-of-education	Barbara Nielsen	R	DORCHESTER	11353	32	301	1005	358	1021
+superintendent-of-education	Barbara Nielsen	R	EDGEFIELD	2876	32	311	1023	357	1039
+superintendent-of-education	Barbara Nielsen	R	FAIRFIELD	2279	32	310	1040	357	1057
+superintendent-of-education	Barbara Nielsen	R	FLORENCE	16788	32	301	1057	357	1074
+superintendent-of-education	Barbara Nielsen	R	GEORGETOWN	6166	32	311	1075	357	1091
+superintendent-of-education	Barbara Nielsen	R	GREENVILLE	59037	32	300	1097	357	1109
+superintendent-of-education	Barbara Nielsen	R	GREENWOOD	8099	32	310	1110	357	1127
+superintendent-of-education	Barbara Nielsen	R	HAMPTON	2480	32	310	1127	357	1144
+superintendent-of-education	Barbara Nielsen	R	HORRY	23423	32	300	1145	357	1161
+superintendent-of-education	Barbara Nielsen	R	JASPER	1515	32	311	1162	358	1179
+superintendent-of-education	Barbara Nielsen	R	KERSHAW	8427	32	309	1180	357	1197
+superintendent-of-education	Barbara Nielsen	R	LANCASTER	9520	32	311	1197	357	1214
+superintendent-of-education	Barbara Nielsen	R	LAURENS	7857	32	310	1215	357	1231
+superintendent-of-education	Barbara Nielsen	R	LEE	2298	32	310	1232	357	1249
+superintendent-of-education	Barbara Nielsen	R	LEXINGTON	34399	32	300	1249	357	1266
+superintendent-of-education	Barbara Nielsen	R	MCCORMICK	955	32	331	1273	358	1284
+superintendent-of-education	Barbara Nielsen	R	MARION	2906	32	309	1289	357	1301
+superintendent-of-education	Barbara Nielsen	R	MARLBORO	2067	32	310	1307	357	1319
+superintendent-of-education	Barbara Nielsen	R	NEWBERRY	5016	32	309	1319	357	1336
+superintendent-of-education	Barbara Nielsen	R	OCONEE	10716	32	301	1337	357	1353
+superintendent-of-education	Barbara Nielsen	R	ORANGEBURG	9720	32	310	1355	357	1371
+superintendent-of-education	Barbara Nielsen	R	PICKENS	15599	32	301	1372	357	1389
+superintendent-of-education	Barbara Nielsen	R	RICHLAND	37687	32	300	1389	357	1406
+superintendent-of-education	Barbara Nielsen	R	SALUDA	2360	32	310	1407	357	1423
+superintendent-of-education	Barbara Nielsen	R	SPARTANBURG	31488	32	301	1424	358	1441
+superintendent-of-education	Barbara Nielsen	R	SUMTER	10656	32	301	1447	357	1459
+superintendent-of-education	Barbara Nielsen	R	UNION	4488	32	310	1464	358	1476
+superintendent-of-education	Barbara Nielsen	R	WILLIAMSBURG	3423	32	311	1477	358	1493
+superintendent-of-education	Barbara Nielsen	R	YORK	18936	32	301	1499	357	1511
+superintendent-of-education	Sylvia Weinberg	D	ABBEVILLE	3078	32	391	712	439	725
+superintendent-of-education	Sylvia Weinberg	D	AIKEN	10339	32	382	730	438	742
+superintendent-of-education	Sylvia Weinberg	D	ALLENDALE	1413	32	392	743	439	759
+superintendent-of-education	Sylvia Weinberg	D	ANDERSON	13768	32	381	764	438	777
+superintendent-of-education	Sylvia Weinberg	D	BAMBERG	2365	32	391	778	439	795
+superintendent-of-education	Sylvia Weinberg	D	BARNWELL	2240	32	391	795	437	812
+superintendent-of-education	Sylvia Weinberg	D	BEAUFORT	7548	32	391	813	439	829
+superintendent-of-education	Sylvia Weinberg	D	BERKELEY	10324	32	382	830	439	847
+superintendent-of-education	Sylvia Weinberg	D	CALHOUN	2041	32	391	848	435	865
+superintendent-of-education	Sylvia Weinberg	D	CHARLESTON	30378	32	381	865	439	882
+superintendent-of-education	Sylvia Weinberg	D	CHEROKEE	4365	32	391	883	439	899
+superintendent-of-education	Sylvia Weinberg	D	CHESTER	3721	32	391	900	435	917
+superintendent-of-education	Sylvia Weinberg	D	CHESTERFIELD	4692	32	391	917	439	934
+superintendent-of-education	Sylvia Weinberg	D	CLARENDON	5145	32	390	935	438	952
+superintendent-of-education	Sylvia Weinberg	D	COLLETON	3995	32	391	953	439	969
+superintendent-of-education	Sylvia Weinberg	D	DARLINGTON	6672	32	391	970	438	987
+superintendent-of-education	Sylvia Weinberg	D	DILLON	4217	32	390	987	438	1004
+superintendent-of-education	Sylvia Weinberg	D	DORCHESTER	7924	32	390	1005	438	1021
+superintendent-of-education	Sylvia Weinberg	D	EDGEFIELD	2380	32	391	1023	437	1039
+superintendent-of-education	Sylvia Weinberg	D	FAIRFIELD	3557	32	390	1040	437	1057
+superintendent-of-education	Sylvia Weinberg	D	FLORENCE	13736	32	381	1057	437	1074
+superintendent-of-education	Sylvia Weinberg	D	GEORGETOWN	6178	32	382	1075	438	1091
+superintendent-of-education	Sylvia Weinberg	D	GREENVILLE	23981	32	380	1093	435	1109
+superintendent-of-education	Sylvia Weinberg	D	GREENWOOD	5015	32	390	1110	438	1127
+superintendent-of-education	Sylvia Weinberg	D	HAMPTON	3055	32	390	1127	439	1144
+superintendent-of-education	Sylvia Weinberg	D	HORRY	14994	32	381	1145	438	1161
+superintendent-of-education	Sylvia Weinberg	D	JASPER	2230	32	390	1162	437	1179
+superintendent-of-education	Sylvia Weinberg	D	KERSHAW	5677	32	389	1180	437	1197
+superintendent-of-education	Sylvia Weinberg	D	LANCASTER	6366	32	391	1197	437	1214
+superintendent-of-education	Sylvia Weinberg	D	LAURENS	4852	32	390	1215	438	1231
+superintendent-of-education	Sylvia Weinberg	D	LEE	3302	32	390	1232	437	1249
+superintendent-of-education	Sylvia Weinberg	D	LEXINGTON	20006	32	381	1249	438	1266
+superintendent-of-education	Sylvia Weinberg	D	MCCORMICK	1400	32	391	1267	437	1284
+superintendent-of-education	Sylvia Weinberg	D	MARION	4147	32	391	1285	437	1301
+superintendent-of-education	Sylvia Weinberg	D	MARLBORO	3366	32	390	1302	437	1319
+superintendent-of-education	Sylvia Weinberg	D	NEWBERRY	3907	32	390	1319	437	1336
+superintendent-of-education	Sylvia Weinberg	D	OCONEE	4609	32	390	1337	437	1353
+superintendent-of-education	Sylvia Weinberg	D	ORANGEBURG	13990	32	381	1355	437	1371
+superintendent-of-education	Sylvia Weinberg	D	PICKENS	5442	32	383	1372	437	1389
+superintendent-of-education	Sylvia Weinberg	D	RICHLAND	36791	32	380	1389	437	1406
+superintendent-of-education	Sylvia Weinberg	D	SALUDA	2291	32	390	1407	435	1423
+superintendent-of-education	Sylvia Weinberg	D	SPARTANBURG	15866	32	381	1424	437	1441
+superintendent-of-education	Sylvia Weinberg	D	SUMTER	10232	32	381	1442	438	1459
+superintendent-of-education	Sylvia Weinberg	D	UNION	3457	32	390	1459	437	1476
+superintendent-of-education	Sylvia Weinberg	D	WILLIAMSBURG	6436	32	391	1477	437	1493
+superintendent-of-education	Sylvia Weinberg	D	YORK	10519	32	381	1494	438	1511
+superintendent-of-education	Ralph Lindblad		ABBEVILLE	132	32	492	713	519	725
+superintendent-of-education	Ralph Lindblad		AIKEN	1061	32	472	731	517	742
+superintendent-of-education	Ralph Lindblad		ALLENDALE	39	32	501	743	518	759
+superintendent-of-education	Ralph Lindblad		ANDERSON	1625	32	471	765	519	777
+superintendent-of-education	Ralph Lindblad		BAMBERG	57	32	501	783	519	795
+superintendent-of-education	Ralph Lindblad		BARNWELL	92	32	501	801	519	812
+superintendent-of-education	Ralph Lindblad		BEAUFORT	726	32	491	819	518	829
+superintendent-of-education	Ralph Lindblad		BERKELEY	584	32	491	830	518	847
+superintendent-of-education	Ralph Lindblad		CALHOUN	120	32	492	853	518	865
+superintendent-of-education	Ralph Lindblad		CHARLESTON	1324	32	472	871	519	882
+superintendent-of-education	Ralph Lindblad		CHEROKEE	548	32	473	883	519	899
+superintendent-of-education	Ralph Lindblad		CHESTER	355	32	491	900	519	917
+superintendent-of-education	Ralph Lindblad		CHESTERFIELD	349	32	491	917	519	934
+superintendent-of-education	Ralph Lindblad		CLARENDON	112	32	491	935	519	952
+superintendent-of-education	Ralph Lindblad		COLLETON	143	32	491	953	519	969
+superintendent-of-education	Ralph Lindblad		DARLINGTON	339	32	491	970	519	987
+superintendent-of-education	Ralph Lindblad		DILLON	80	32	491	987	518	1004
+superintendent-of-education	Ralph Lindblad		DORCHESTER	377	32	491	1005	517	1021
+superintendent-of-education	Ralph Lindblad		EDGEFIELD	86	32	491	1023	518	1039
+superintendent-of-education	Ralph Lindblad		FAIRFIELD	114	32	491	1040	519	1057
+superintendent-of-education	Ralph Lindblad		FLORENCE	911	32	491	1057	518	1074
+superintendent-of-education	Ralph Lindblad		GEORGETOWN	253	32	491	1075	518	1091
+superintendent-of-education	Ralph Lindblad		GREENVILLE	3624	32	471	1093	519	1109
+superintendent-of-education	Ralph Lindblad		GREENWOOD	239	32	471	1110	518	1127
+superintendent-of-education	Ralph Lindblad		HAMPTON	97	32	491	1127	518	1144
+superintendent-of-education	Ralph Lindblad		HORRY	638	32	491	1145	519	1161
+superintendent-of-education	Ralph Lindblad		JASPER	132	32	492	1162	519	1179
+superintendent-of-education	Ralph Lindblad		KERSHAW	549	32	490	1180	518	1197
+superintendent-of-education	Ralph Lindblad		LANCASTER	714	32	490	1197	519	1214
+superintendent-of-education	Ralph Lindblad		LAURENS	603	32	491	1215	518	1231
+superintendent-of-education	Ralph Lindblad		LEE	56	32	491	1232	517	1249
+superintendent-of-education	Ralph Lindblad		LEXINGTON	2240	32	471	1249	518	1266
+superintendent-of-education	Ralph Lindblad		MCCORMICK	46	32	473	1267	517	1284
+superintendent-of-education	Ralph Lindblad		MARION	134	32	491	1285	518	1301
+superintendent-of-education	Ralph Lindblad		MARLBORO	124	32	491	1302	519	1319
+superintendent-of-education	Ralph Lindblad		NEWBERRY	157	32	491	1319	518	1336
+superintendent-of-education	Ralph Lindblad		OCONEE	892	32	490	1337	518	1353
+superintendent-of-education	Ralph Lindblad		ORANGEBURG	461	32	490	1355	518	1371
+superintendent-of-education	Ralph Lindblad		PICKENS	1098	32	471	1372	519	1389
+superintendent-of-education	Ralph Lindblad		RICHLAND	1326	32	471	1389	518	1406
+superintendent-of-education	Ralph Lindblad		SALUDA	231	32	471	1407	517	1423
+superintendent-of-education	Ralph Lindblad		SPARTANBURG	1035	32	472	1424	519	1441
+superintendent-of-education	Ralph Lindblad		SUMTER	360	32	473	1442	518	1459
+superintendent-of-education	Ralph Lindblad		UNION	345	32	491	1459	519	1476
+superintendent-of-education	Ralph Lindblad		WILLIAMSBURG	123	32	491	1477	519	1493
+superintendent-of-education	Ralph Lindblad		YORK	1293	32	472	1494	519	1511
+superintendent-of-education	Gerald Stiles		ABBEVILLE	0	32	592	714	598	725
+superintendent-of-education	Gerald Stiles		AIKEN	145	32	572	731	599	742
+superintendent-of-education	Gerald Stiles		ALLENDALE	0	32	593	743	598	759
+superintendent-of-education	Gerald Stiles		ANDERSON	202	32	571	766	598	777
+superintendent-of-education	Gerald Stiles		BAMBERG	0	32	593	778	598	795
+superintendent-of-education	Gerald Stiles		BARNWELL	0	32	592	802	598	812
+superintendent-of-education	Gerald Stiles		BEAUFORT	0	32	592	818	597	829
+superintendent-of-education	Gerald Stiles		BERKELEY	43	32	581	836	599	847
+superintendent-of-education	Gerald Stiles		CALHOUN	0	32	592	854	598	865
+superintendent-of-education	Gerald Stiles		CHARLESTON	123	32	572	871	599	882
+superintendent-of-education	Gerald Stiles		CHEROKEE	41	32	575	883	597	899
+superintendent-of-education	Gerald Stiles		CHESTER	0	32	587	900	599	917
+superintendent-of-education	Gerald Stiles		CHESTERFIELD	0	32	593	917	599	934
+superintendent-of-education	Gerald Stiles		CLARENDON	0	32	592	935	599	952
+superintendent-of-education	Gerald Stiles		COLLETON	0	32	592	953	598	969
+superintendent-of-education	Gerald Stiles		DARLINGTON	0	32	592	970	599	987
+superintendent-of-education	Gerald Stiles		DILLON	0	32	592	987	599	1004
+superintendent-of-education	Gerald Stiles		DORCHESTER	0	32	592	1005	599	1021
+superintendent-of-education	Gerald Stiles		EDGEFIELD	0	32	592	1023	599	1039
+superintendent-of-education	Gerald Stiles		FAIRFIELD	0	32	592	1040	599	1057
+superintendent-of-education	Gerald Stiles		FLORENCE	0	32	592	1057	599	1074
+superintendent-of-education	Gerald Stiles		GEORGETOWN	0	32	592	1075	599	1091
+superintendent-of-education	Gerald Stiles		GREENVILLE	1894	32	551	1093	599	1109
+superintendent-of-education	Gerald Stiles		GREENWOOD	0	32	552	1110	599	1127
+superintendent-of-education	Gerald Stiles		HAMPTON	0	32	592	1127	598	1144
+superintendent-of-education	Gerald Stiles		HORRY	0	32	592	1145	599	1161
+superintendent-of-education	Gerald Stiles		JASPER	0	32	592	1162	599	1179
+superintendent-of-education	Gerald Stiles		KERSHAW	44	32	581	1180	599	1197
+superintendent-of-education	Gerald Stiles		LANCASTER	0	32	586	1197	599	1214
+superintendent-of-education	Gerald Stiles		LAURENS	0	32	592	1215	599	1231
+superintendent-of-education	Gerald Stiles		LEE	0	32	592	1232	598	1249
+superintendent-of-education	Gerald Stiles		LEXINGTON	787	32	571	1249	599	1266
+superintendent-of-education	Gerald Stiles		MCCORMICK	0	32	572	1267	598	1284
+superintendent-of-education	Gerald Stiles		MARION	55	32	581	1285	599	1301
+superintendent-of-education	Gerald Stiles		MARLBORO	0	32	581	1302	599	1319
+superintendent-of-education	Gerald Stiles		NEWBERRY	0	32	592	1319	598	1336
+superintendent-of-education	Gerald Stiles		OCONEE	165	32	572	1337	599	1353
+superintendent-of-education	Gerald Stiles		ORANGEBURG	0	32	572	1355	599	1371
+superintendent-of-education	Gerald Stiles		PICKENS	188	32	571	1372	599	1389
+superintendent-of-education	Gerald Stiles		RICHLAND	364	32	571	1389	599	1406
+superintendent-of-education	Gerald Stiles		SALUDA	80	32	571	1407	599	1423
+superintendent-of-education	Gerald Stiles		SPARTANBURG	196	32	572	1424	599	1441
+superintendent-of-education	Gerald Stiles		SUMTER	50	32	572	1442	599	1459
+superintendent-of-education	Gerald Stiles		UNION	0	32	581	1459	599	1476
+superintendent-of-education	Gerald Stiles		WILLIAMSBURG	0	32	593	1477	599	1493
+superintendent-of-education	Gerald Stiles		YORK	0	32	593	1494	599	1511
+commissioner-of-agriculture	Les Tindal	R	ABBEVILLE	2748	32	948	715	996	725
+commissioner-of-agriculture	Les Tindal	R	AIKEN	22847	32	938	725	995	742
+commissioner-of-agriculture	Les Tindal	R	ALLENDALE	898	32	939	743	996	759
+commissioner-of-agriculture	Les Tindal	R	ANDERSON	24557	32	938	761	995	777
+commissioner-of-agriculture	Les Tindal	R	BAMBERG	1714	32	939	778	995	795
+commissioner-of-agriculture	Les Tindal	R	BARNWELL	3351	32	948	795	995	812
+commissioner-of-agriculture	Les Tindal	R	BEAUFORT	15419	32	939	813	995	829
+commissioner-of-agriculture	Les Tindal	R	BERKELEY	17020	32	939	830	995	847
+commissioner-of-agriculture	Les Tindal	R	CALHOUN	2257	32	939	848	995	865
+commissioner-of-agriculture	Les Tindal	R	CHARLESTON	42501	32	938	865	993	882
+commissioner-of-agriculture	Les Tindal	R	CHEROKEE	6276	32	943	883	995	899
+commissioner-of-agriculture	Les Tindal	R	CHESTER	3322	32	949	900	995	917
+commissioner-of-agriculture	Les Tindal	R	CHESTERFIELD	5124	32	948	917	995	934
+commissioner-of-agriculture	Les Tindal	R	CLARENDON	4699	32	948	935	995	952
+commissioner-of-agriculture	Les Tindal	R	COLLETON	4666	32	947	953	994	969
+commissioner-of-agriculture	Les Tindal	R	DARLINGTON	9613	32	948	970	995	987
+commissioner-of-agriculture	Les Tindal	R	DILLON	3486	32	949	987	995	1004
+commissioner-of-agriculture	Les Tindal	R	DORCHESTER	13058	32	938	1005	996	1021
+commissioner-of-agriculture	Les Tindal	R	EDGEFIELD	2796	32	939	1023	995	1039
+commissioner-of-agriculture	Les Tindal	R	FAIRFIELD	2454	32	947	1040	995	1057
+commissioner-of-agriculture	Les Tindal	R	FLORENCE	20273	32	938	1057	995	1074
+commissioner-of-agriculture	Les Tindal	R	GEORGETOWN	6980	32	938	1075	995	1091
+commissioner-of-agriculture	Les Tindal	R	GREENVILLE	59096	32	937	1093	994	1109
+commissioner-of-agriculture	Les Tindal	R	GREENWOOD	7992	32	937	1110	995	1127
+commissioner-of-agriculture	Les Tindal	R	HAMPTON	2855	32	947	1127	995	1144
+commissioner-of-agriculture	Les Tindal	R	HORRY	24877	32	937	1145	995	1161
+commissioner-of-agriculture	Les Tindal	R	JASPER	1370	32	938	1162	995	1179
+commissioner-of-agriculture	Les Tindal	R	KERSHAW	9399	32	947	1180	994	1197
+commissioner-of-agriculture	Les Tindal	R	LANCASTER	8823	32	947	1197	995	1214
+commissioner-of-agriculture	Les Tindal	R	LAURENS	7787	32	947	1215	995	1231
+commissioner-of-agriculture	Les Tindal	R	LEE	2584	32	947	1232	995	1249
+commissioner-of-agriculture	Les Tindal	R	LEXINGTON	41414	32	937	1249	995	1266
+commissioner-of-agriculture	Les Tindal	R	MCCORMICK	895	32	938	1267	995	1284
+commissioner-of-agriculture	Les Tindal	R	MARION	3865	32	947	1285	995	1301
+commissioner-of-agriculture	Les Tindal	R	MARLBORO	1582	32	947	1302	995	1319
+commissioner-of-agriculture	Les Tindal	R	NEWBERRY	5575	32	947	1319	995	1336
+commissioner-of-agriculture	Les Tindal	R	OCONEE	11092	32	938	1337	995	1353
+commissioner-of-agriculture	Les Tindal	R	ORANGEBURG	10122	32	939	1355	995	1371
+commissioner-of-agriculture	Les Tindal	R	PICKENS	15780	32	939	1372	995	1389
+commissioner-of-agriculture	Les Tindal	R	RICHLAND	40614	32	938	1389	995	1406
+commissioner-of-agriculture	Les Tindal	R	SALUDA	2482	32	939	1407	995	1423
+commissioner-of-agriculture	Les Tindal	R	SPARTANBURG	31167	32	938	1424	995	1441
+commissioner-of-agriculture	Les Tindal	R	SUMTER	12947	32	937	1442	995	1459
+commissioner-of-agriculture	Les Tindal	R	UNION	4631	32	939	1459	992	1476
+commissioner-of-agriculture	Les Tindal	R	WILLIAMSBURG	4420	32	948	1477	995	1493
+commissioner-of-agriculture	Les Tindal	R	YORK	19242	32	939	1494	995	1511
+commissioner-of-agriculture	Tracy Childers	D	ABBEVILLE	3251	32	1029	715	1072	725
+commissioner-of-agriculture	Tracy Childers	D	AIKEN	9912	32	1029	725	1075	742
+commissioner-of-agriculture	Tracy Childers	D	ALLENDALE	1371	32	1029	743	1075	759
+commissioner-of-agriculture	Tracy Childers	D	ANDERSON	12106	32	1019	761	1075	777
+commissioner-of-agriculture	Tracy Childers	D	BAMBERG	2136	32	1019	778	1075	795
+commissioner-of-agriculture	Tracy Childers	D	BARNWELL	2155	32	1028	795	1076	812
+commissioner-of-agriculture	Tracy Childers	D	BEAUFORT	8247	32	1027	813	1074	829
+commissioner-of-agriculture	Tracy Childers	D	BERKELEY	7979	32	1029	830	1075	847
+commissioner-of-agriculture	Tracy Childers	D	CALHOUN	1914	32	1029	848	1075	865
+commissioner-of-agriculture	Tracy Childers	D	CHARLESTON	25256	32	1018	865	1075	882
+commissioner-of-agriculture	Tracy Childers	D	CHEROKEE	4957	32	1019	883	1075	899
+commissioner-of-agriculture	Tracy Childers	D	CHESTER	4048	32	1028	900	1075	917
+commissioner-of-agriculture	Tracy Childers	D	CHESTERFIELD	4162	32	1028	917	1075	934
+commissioner-of-agriculture	Tracy Childers	D	CLARENDON	4388	32	1028	935	1075	952
+commissioner-of-agriculture	Tracy Childers	D	COLLETON	3350	32	1029	953	1075	969
+commissioner-of-agriculture	Tracy Childers	D	DARLINGTON	5665	32	1028	970	1075	987
+commissioner-of-agriculture	Tracy Childers	D	DILLON	3712	32	1028	987	1075	1004
+commissioner-of-agriculture	Tracy Childers	D	DORCHESTER	6246	32	1027	1005	1075	1021
+commissioner-of-agriculture	Tracy Childers	D	EDGEFIELD	2535	32	1028	1023	1075	1039
+commissioner-of-agriculture	Tracy Childers	D	FAIRFIELD	3352	32	1028	1040	1075	1057
+commissioner-of-agriculture	Tracy Childers	D	FLORENCE	11041	32	1019	1057	1075	1074
+commissioner-of-agriculture	Tracy Childers	D	GEORGETOWN	5485	32	1019	1075	1075	1091
+commissioner-of-agriculture	Tracy Childers	D	GREENVILLE	28628	32	1017	1093	1075	1109
+commissioner-of-agriculture	Tracy Childers	D	GREENWOOD	5080	32	1017	1110	1075	1127
+commissioner-of-agriculture	Tracy Childers	D	HAMPTON	2832	32	1027	1127	1075	1144
+commissioner-of-agriculture	Tracy Childers	D	HORRY	13429	32	1017	1145	1075	1161
+commissioner-of-agriculture	Tracy Childers	D	JASPER	2296	32	1018	1162	1074	1179
+commissioner-of-agriculture	Tracy Childers	D	KERSHAW	5177	32	1028	1180	1074	1197
+commissioner-of-agriculture	Tracy Childers	D	LANCASTER	6549	32	1027	1197	1074	1214
+commissioner-of-agriculture	Tracy Childers	D	LAURENS	5534	32	1027	1215	1075	1231
+commissioner-of-agriculture	Tracy Childers	D	LEE	2975	32	1027	1232	1075	1249
+commissioner-of-agriculture	Tracy Childers	D	LEXINGTON	15748	32	1018	1249	1075	1266
+commissioner-of-agriculture	Tracy Childers	D	MCCORMICK	1497	32	1018	1267	1075	1284
+commissioner-of-agriculture	Tracy Childers	D	MARION	3320	32	1028	1285	1073	1301
+commissioner-of-agriculture	Tracy Childers	D	MARLBORO	2170	32	1028	1302	1074	1319
+commissioner-of-agriculture	Tracy Childers	D	NEWBERRY	3439	32	1027	1319	1074	1336
+commissioner-of-agriculture	Tracy Childers	D	OCONEE	5253	32	1027	1337	1075	1353
+commissioner-of-agriculture	Tracy Childers	D	ORANGEBURG	14070	32	1018	1355	1075	1371
+commissioner-of-agriculture	Tracy Childers	D	PICKENS	6401	32	1018	1372	1074	1389
+commissioner-of-agriculture	Tracy Childers	D	RICHLAND	33235	32	1018	1389	1075	1406
+commissioner-of-agriculture	Tracy Childers	D	SALUDA	2512	32	1017	1407	1075	1423
+commissioner-of-agriculture	Tracy Childers	D	SPARTANBURG	16443	32	1018	1424	1075	1441
+commissioner-of-agriculture	Tracy Childers	D	SUMTER	8194	32	1018	1442	1075	1459
+commissioner-of-agriculture	Tracy Childers	D	UNION	3682	32	1027	1459	1075	1476
+commissioner-of-agriculture	Tracy Childers	D	WILLIAMSBURG	5546	32	1028	1477	1075	1493
+commissioner-of-agriculture	Tracy Childers	D	YORK	11311	32	1019	1494	1075	1511

@@ -23,8 +23,8 @@ LANDING = "https://scvotes.gov/election-results/"
 LICENSE = "Public record"
 DPI = 200
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
-BOOKS = {2002: "2002", 1998: "1997-1998"}
-DAYS = {2002: date(2002, 11, 5), 1998: date(1998, 11, 3)}
+BOOKS = {2002: "2002", 1998: "1997-1998", 1994: "1994-1995"}
+DAYS = {2002: date(2002, 11, 5), 1998: date(1998, 11, 3), 1994: date(1994, 11, 8)}
 FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5", "B": "8", "Z": "2", "|": "1"})
 COUNTIES = [
     "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
@@ -160,6 +160,30 @@ def parse() -> None:
                             "box": [round(v * DPI / 72) for v in box],
                         }
                     )
+    book = raw.cached(SOURCE, URL.format(BOOKS[1994]))
+    scan = pl.read_csv(Path(__file__).with_name("sc_report_1994.tsv"), separator="\t", schema_overrides={"party": pl.String})
+    for page in scan["page"].unique().to_list():
+        image = PAGES / f"{book.sha256}-{page}.png"
+        if not image.exists():
+            subprocess.run(
+                ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(page), "-l", str(page), "-singlefile", str(book.path), str(image.with_suffix(""))],
+                check=True,
+            )
+    totals = scan.group_by("office", "name").agg(pl.col("votes").sum().alias("printed"))
+    for line in scan.join(totals, on=["office", "name"]).iter_rows(named=True):
+        rows.append(
+            {
+                "year": 1994,
+                "office": line["office"],
+                "name": line["name"],
+                "party": line["party"] or "",
+                "county": line["county"].title(),
+                "votes": line["votes"],
+                "printed": line["printed"],
+                "page": line["page"],
+                "box": [line["x0"], line["y0"], line["x1"], line["y1"]],
+            }
+        )
     frame = pl.DataFrame(rows, schema_overrides={"box": pl.List(pl.Int64)})
     frame.write_parquet(PARSED / "lines.parquet")
     print(frame.group_by("office", "name").agg(pl.col("votes").sum(), pl.len()).sort("office"))
@@ -173,7 +197,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="South Carolina's lieutenant governor, secretary of state, treasurer, attorney general, comptroller general, "
-            "superintendent of education, and commissioner of agriculture elections of 1998 and 2002 by county from the "
+            "superintendent of education, and commissioner of agriculture elections of 1994, 1998, and 2002 by county from the "
             "State Election Commission's election report",
             polity="US",
         )
@@ -240,7 +264,7 @@ def emit() -> Path:
         contests = {
             value
             for (value,) in conn.execute(
-                "select value from external_id where scheme = 'us.contest' and value ~ '^(2002|1998)-11.*:SC:'"
+                "select value from external_id where scheme = 'us.contest' and value ~ '^(2002|1998|1994)-11.*:SC:'"
             )
         }
         people: dict[str, set[UUID]] = {}
