@@ -215,6 +215,7 @@ OHIO = {
     date(2025, 5, 6): ("20250621212835", "2025/pri/issues-final-summary.xlsx"),
 }
 SOUTH_DAKOTA = {
+    date(2018, 6, 5): "Prior%20to%202026/OfficialStateCanvass2018PrimaryElection.pdf",
     date(2016, 11, 8): "2016%20Assets/2016GeneralElectionOfficialResultsStateCanvass.pdf",
     date(2018, 11, 6): "2018%20Assets/2018GeneralElectionCanvassPDF.pdf",
     date(2020, 11, 3): "2020%20Assests/2020GeneralStateCanvassFinal%26Certificate.pdf",
@@ -789,7 +790,17 @@ def parse() -> None:
             path = raw.cached(source, url).path
         except LookupError:
             continue
-        if (model := PARSED / "model" / f"{state.lower()}-{day.year}.json").exists():
+        if model := next(
+            (
+                path
+                for path in (
+                    PARSED / "model" / f"{state.lower()}-{day}.json",
+                    PARSED / "model" / f"{state.lower()}-{day.year}.json",
+                )
+                if path.exists()
+            ),
+            None,
+        ):
             total = pl.col("county").str.to_uppercase() == "TOTAL"
             table = (
                 pl.DataFrame(json.loads(model.read_text()))
