@@ -721,8 +721,9 @@ def emit(source: ModuleType) -> Path:
             cs.add("name", entity_id=unit, text=label, lang="en", kind="official", is_preferred=True)
         contests: dict[str, UUID] = dict(
             conn.execute(
-                "select value, entity_id from external_id where scheme = 'us.contest' and value like %s",
-                [f"%:{source.STATE or ''}%:{getattr(source, 'CHAMBER', 'house')}:%"],
+                """select value, entity_id from external_id where scheme = 'us.contest'
+                   and (value like %s or value like %s)""",
+                [f"%:{source.STATE or ''}%:{getattr(source, 'CHAMBER', 'house')}:%", f"%:{source.STATE or ''}:senate"],
             ).fetchall()
         )
         folder.mkdir(parents=True, exist_ok=True)
