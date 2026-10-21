@@ -266,6 +266,8 @@ CALIFORNIA = {
     date(2022, 11, 8): "2022-general/sov/csv-ballotmeasures.xlsx",
     date(2024, 11, 5): "2024-general/sov/csv-ballot-measures.xlsx",
 }
+TEXAS = {date(2013, 11, 5): 167, date(2015, 11, 3): 190, date(2017, 11, 7): 320}
+TEXAS_SITE = "https://elections.sos.state.tx.us/elchist{}_{}.htm"
 NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
 METHOD = (
     "{level} totals from {document}, the state's certified results. They replace {replaced} as this question's "
@@ -299,6 +301,12 @@ DOCUMENTS = {
         wa_local.TITLE,
         "https://results.vote.wa.gov/results/",
         "the Washington Secretary of State's county results export",
+    ),
+    "TX": (
+        "Texas Secretary of State",
+        "Election history: constitutional amendment elections by county",
+        "https://elections.sos.state.tx.us/",
+        "the Texas Secretary of State's election history",
     ),
     "AZ": (
         "Arizona Secretary of State",
@@ -493,6 +501,8 @@ def link(state: str, day: date) -> tuple[str, str]:
     if state in ("GA", "WV", "SC", "DC"):
         entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT}[state].get(day, "")
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
+    if state == "TX":
+        return SOURCE, TEXAS_SITE.format(TEXAS[day], "raceselect") if day in TEXAS else ""
     if state == "OK":
         return (
             SOURCE,
@@ -622,6 +632,11 @@ def fetch() -> None:
             raw.fetch(SOURCE, la_sos.blob(day, "Votes_Multiparish.htm"), suffix=".json")
             continue
         source, url = link(state, day)
+        if state == "TX":
+            if url:
+                for race in re.findall(r'OPTION value="(\d+)"', raw.fetch(SOURCE, url, suffix=".htm").path.read_text()):
+                    raw.fetch(SOURCE, TEXAS_SITE.format(TEXAS[day], f"race{race}"), suffix=".htm")
+            continue
         if state == "ND" and url:
             try:
                 raw.cached(SOURCE, url)
@@ -1512,6 +1527,37 @@ def parse() -> None:
                     answer="Candidate",
                     votes=pl.col("Votes").cast(pl.String),
                 )
+            )
+        elif state == "TX":
+            records = []
+            for race in re.findall(r'OPTION value="(\d+)"', path.read_text()):
+                race_url = TEXAS_SITE.format(TEXAS[day], f"race{race}")
+                body = raw.cached(SOURCE, race_url).path.read_text(errors="replace")
+                title = re.search(r"(?:Prop|Proposition No\.) (\d+)", body)
+                rows = [
+                    [re.sub(r"<[^>]+>", "", cell).strip() for cell in re.findall(r"(?is)<td[^>]*>(.*?)</td>", row)]
+                    for row in re.findall(r"(?is)<tr[^>]*>(.*?)</tr>", body)
+                ]
+                rows = [row for row in rows if len(row) == 6]
+                if title is None or not rows or rows[0][0] != "ALL COUNTIES":
+                    continue
+                votes = [[int(cell.replace(",", "")) for cell in row[1:3]] for row in rows]
+                if [sum(column) for column in zip(*votes[1:], strict=True)] != votes[0]:
+                    print(f"TX {day} {title[0]}: counties do not add up to ALL COUNTIES, skipped")
+                    continue
+                for row, pair in zip(rows[1:], votes[1:], strict=True):
+                    for answer, count in zip(("FOR", "AGAINST"), pair, strict=True):
+                        records.append((row[0], f"Proposition {title[1]}", answer, str(count), race_url))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "url": pl.String,
+                },
+                orient="row",
             )
         elif state == "OK":
             with zipfile.ZipFile(path) as archive:
