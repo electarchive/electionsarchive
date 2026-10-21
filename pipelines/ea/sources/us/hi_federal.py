@@ -15,6 +15,12 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://files.hawaii.gov/elections/files/results/"
 DAYS = {
+    date(2008, 9, 20): "2008/primary",
+    date(2010, 9, 18): "2010/primary",
+    date(2012, 8, 11): "2012/primary",
+    date(2014, 8, 9): "2014/primary",
+    date(2016, 8, 13): "2016/primary",
+    date(2018, 8, 11): "2018/primary",
     date(2020, 8, 8): "2020/primary",
     date(2022, 8, 13): "2022/primary",
     date(2024, 8, 10): "2024/Primary",
@@ -23,7 +29,8 @@ COUNTIES = {"coh": "15001", "cch": "15003", "cok": "15007", "com": "15009"}
 PARTIES = {"R": "republican", "D": "democratic", "L": "libertarian", "G": "green"}
 PUBLISHER = "Hawaii Office of Elections"
 TITLE = "Primary election summary reports by county"
-HEADER = re.compile(r"^(U\.S\. Senator|U\.S\. Representative, Dist (I+)|President[^-]*) - ([A-Z]+)$")
+HEADER = re.compile(r"^(U\.?S\.? Senator|U\.?S\.? Representative, Dist (I+)|President[^-]*) - ([A-Z]+)$")
+GUTTER = re.compile(r" {3,}")
 ROMAN = {"I": 1, "II": 2}
 
 
@@ -38,7 +45,7 @@ def parse() -> None:
     for day, folder in DAYS.items():
         for county, code in COUNTIES.items():
             text = subprocess.run(
-                ["pdftotext", "-layout" if day.year == 2020 else "-raw", str(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf").path), "-"],
+                ["pdftotext", "-layout" if day.year <= 2020 else "-raw", str(raw.cached(SOURCE, f"{BASE}{folder}/{county}.pdf").path), "-"],
                 capture_output=True,
                 text=True,
                 check=True,
@@ -48,8 +55,30 @@ def parse() -> None:
             for line in text.splitlines():
                 if day.year == 2020:
                     cells.extend((i, line[i * 65 : (i + 1) * 65].strip()) for i in range(3))
-                else:
+                elif day.year > 2020:
                     cells.append((0, line.strip()))
+            if day.year < 2020:
+                cells = []
+                for page in text.split("\f"):
+                    lines = page.splitlines()
+                    body = lines[next((i for i, line in enumerate(lines) if "FINAL SUMMARY REPORT" in line), -1) + 1 :]
+                    width = max((len(line) for line in body), default=0)
+                    padded = [line.ljust(width) for line in body]
+                    head = next((line for line in padded if line.strip()), "")
+                    starts = [0, *(found.end() for found in GUTTER.finditer(head.rstrip()))]
+                    spans = list(zip(starts, [*starts[1:], width]))
+                    for index, (left, right) in enumerate(spans):
+                        pending = None
+                        for line in padded:
+                            cell = line[left:right].strip()
+                            if re.fullmatch(r"[\d,]+\s+[\d.]+%", cell):
+                                pending = cell
+                                continue
+                            if pending and cell and not cell.startswith(("Blank Votes", "Over Votes")) and not re.search(r"\d%$|\d of \d", cell):
+                                cell = f"{cell} {pending}"
+                            if cell:
+                                pending = None
+                            cells.append((index, cell))
             for index, line in cells:
                 current = states.get(index)
                 if found := HEADER.match(line):
@@ -105,7 +134,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Hawaii's 2020, 2022, and 2024 president, U.S. Senate, and House primaries by county",
+            summary="Hawaii's 2008–2024 president, U.S. Senate, and House primaries by county",
             polity="US-HI",
         )
         source = cs.source(PUBLISHER, TITLE)
