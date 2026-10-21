@@ -1,5 +1,6 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
+  import { invalidateAll } from "$app/navigation";
   import { page } from "$app/state";
   import { createQuery } from "@tanstack/svelte-query";
   import { onMount } from "svelte";
@@ -7,10 +8,10 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
-  import type { ActionData, PageData } from "./$types";
+  import type { PageData } from "./$types";
   import Rows from "./rows.svelte";
 
-  const { data, form }: { data: PageData; form: ActionData } = $props();
+  const { data }: { data: PageData } = $props();
 
   const VIEWS = ["percent", "left", "done"] as const;
   let view = $state<(typeof VIEWS)[number]>("percent");
@@ -33,6 +34,14 @@
       hideDone = localStorage.getItem("coverage-hide-done") === "true";
       local = localStorage.getItem("coverage-local") !== "false";
     } catch {}
+  });
+
+  $effect(() => {
+    if (!data.building) {
+      return;
+    }
+    const timer = setInterval(() => void invalidateAll(), 5000);
+    return () => clearInterval(timer);
   });
 
   const summary = $derived.by(() => {
@@ -118,16 +127,16 @@
           <div class="flex items-center gap-2 text-xs text-muted-foreground">
             {built}
             {#if data.dev}
-              {#if form?.requested}
+              <form method="POST" action="?/refresh" use:enhance>
+                <button
+                  type="submit"
+                  disabled={data.building}
+                  class="rounded-sm border border-border px-2 block-6 text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50 disabled:hover:bg-transparent"
+                  >{m.coverage_refresh()}</button
+                >
+              </form>
+              {#if data.building}
                 <span>{m.coverage_refresh_requested()}</span>
-              {:else}
-                <form method="POST" action="?/refresh" use:enhance>
-                  <button
-                    type="submit"
-                    class="rounded-sm border border-border px-2 block-6 text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring"
-                    >{m.coverage_refresh()}</button
-                  >
-                </form>
               {/if}
             {/if}
           </div>
