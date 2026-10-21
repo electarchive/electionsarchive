@@ -18,7 +18,7 @@ from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, p
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "8"
+VERSION = "9"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -331,6 +331,7 @@ def emit() -> Path:
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
+        primary=pl.col("primary").fill_null(""),
         district=pl.col("district_name").cast(pl.Int32),
         votes=pl.col("votes").cast(pl.Int64),
     )
@@ -461,11 +462,15 @@ def emit() -> Path:
         created: set[UUID] = set()
         elections: set[UUID] = set()
         contests: dict[str, UUID] = {}
-        for (state, day, district, runoff), lines in frame.sort("day").group_by(
-            "state", "day", "district", "runoff", maintain_order=True
+        for (state, day, district, runoff, primary), lines in frame.sort("day").group_by(
+            "state", "day", "district", "runoff", "primary", maintain_order=True
         ):
             label = STATES[state]
-            key = f"{day}:{state}:house:{district}:special" + (":runoff" if runoff else "")
+            key = (
+                f"{day}:{state}:house:{district}:{primary.lower()}"
+                if primary
+                else f"{day}:{state}:house:{district}:special" + (":runoff" if runoff else "")
+            )
             general = conn.execute(
                 """select ct.id, ct.district_area_id, ct.boundary_set_id from external_id e
                    join contest ct on ct.id = e.entity_id
@@ -475,7 +480,8 @@ def emit() -> Path:
             ).fetchone()
             if general is None:
                 raise ValueError(f"{key}: no earlier general for the district")
-            election = cs.key("us.election", f"{day}:{state}:{'runoff' if runoff else 'special'}")
+            stage = "primary" if primary else "runoff" if runoff else "special"
+            election = cs.key("us.election", f"{day}:{state}:{stage}")
             if election in cs.minted and election not in elections:
                 elections.add(election)
                 cs.add(
@@ -483,7 +489,7 @@ def emit() -> Path:
                     id=election,
                     polity_id=cs.polity(f"US-{state}"),
                     parent_id=None,
-                    kind="runoff" if runoff else "special",
+                    kind=stage,
                     date_from=day,
                     date_to=day,
                     status="held",
@@ -491,12 +497,12 @@ def emit() -> Path:
                 cs.add(
                     "name",
                     entity_id=election,
-                    text=f"{day:%B} {day.day}, {day.year} {label} special {'runoff' if runoff else 'election'}",
+                    text=f"{day:%B} {day.day}, {day.year} {label} special {'primary' if primary else 'runoff' if runoff else 'election'}",
                     lang="en",
                     kind="official",
                     is_preferred=True,
                 )
-                cs.add("slug", path=f"us/{state.lower()}/{day}-{'runoff' if runoff else 'special'}", entity_id=election)
+                cs.add("slug", path=f"us/{state.lower()}/{day}-{stage}", entity_id=election)
             contest = cs.key("us.contest", key)
             contests[key] = contest
             ordinal = f"{district}{'th' if district % 100 in (11, 12, 13) else {1: 'st', 2: 'nd', 3: 'rd'}.get(district % 10, 'th')}"
@@ -510,7 +516,7 @@ def emit() -> Path:
                 seat_id=None,
                 term="remainder",
                 boundary_set_id=general[2],
-                party_scope_id=None,
+                party_scope_id=cs.key("us.party", PARTIES[primary]) if primary else None,
                 magnitude=1,
                 round_number=2 if runoff else 1,
                 previous_round_id=next(
@@ -529,14 +535,14 @@ def emit() -> Path:
             cs.add(
                 "name",
                 entity_id=contest,
-                text=f"{day.year} U.S. House special {'runoff' if runoff else 'election'} in {label}'s {ordinal} congressional district",
+                text=f"{day.year} U.S. House special {primary + ' primary' if primary else 'runoff' if runoff else 'election'} in {label}'s {ordinal} congressional district",
                 lang="en",
                 kind="official",
                 is_preferred=True,
             )
             cs.add(
                 "slug",
-                path=f"us/{state.lower()}/{day}-{'runoff' if runoff else 'special'}/house-{district}-special",
+                path=f"us/{state.lower()}/{day}-{stage}/house-{district}-{primary.lower() or 'special'}",
                 entity_id=contest,
             )
 
@@ -589,7 +595,7 @@ def emit() -> Path:
                         [house, day, day, f"%{name.split()[-1].removesuffix(' Jr.').removesuffix(' Sr.')}%"],
                     ).fetchone()
                     if row is None:
-                        if name in winners and day.year < 2026:
+                        if name in winners and day.year < 2026 and not primary:
                             raise ValueError(f"{key}: no House tenure for {name}")
                         person = known.get(slug(name)) or cs.key(f"{SOURCE}.person", f"{state}:{slug(name)}")
                         if person in cs.minted and person not in created:
@@ -628,7 +634,7 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result_set,
                     option_id=option,
-                    kind="elected" if name in winners else "advanced" if outcomes.get(name) == "Runoff" else "lost",
+                    kind=("won" if primary else "elected") if name in winners else "advanced" if outcomes.get(name) == "Runoff" else "lost",
                 )
                 by_unit = {
                     str(division): int(count)

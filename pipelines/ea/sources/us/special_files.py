@@ -51,6 +51,8 @@ LOADED = (
         date(2021, 11, 2),
         "2021-11-02-oh11-oh15-special-general/2021-11-2_11and15congressionalresultsbycounty.xlsx",
     ),
+    ("MF-001", "OH", 0, date(2021, 8, 3), "2021-08-03-oh11-oh15-special-primary/2021-08-03_countydem.xlsx"),
+    ("MF-001", "OH", 0, date(2021, 8, 3), "2021-08-03-oh11-oh15-special-primary/2021-08-03_countyrep.xlsx"),
     ("MF-001", "OH", 6, date(2024, 6, 11), "2024-06-11-oh06-special-general/results-by-county---summary.xlsx"),
     ("MF-005", "GA", 6, date(2017, 4, 18), "2017-04-18-ga06-special"),
     ("MF-005", "GA", 6, date(2017, 6, 20), "2017-06-20-ga06-special-runoff"),
@@ -248,6 +250,7 @@ def rows() -> list[dict[str, object]]:
                         "votes": str(count),
                         "outcome": ("Elected" if decided else "Runoff") if name in leaders else "Defeated",
                         "runoff": runoff_day,
+                        "primary": "Democratic" if relative.endswith("countydem.xlsx") else "Republican" if relative.endswith("countyrep.xlsx") else None,
                         "manual": mf,
                     }
                 )
