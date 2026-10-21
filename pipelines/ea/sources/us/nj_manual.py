@@ -98,13 +98,13 @@ def _tables(path: Path) -> list[dict[str, object]]:
     return tables
 
 
-def parse() -> None:
+def parse(volumes=VOLUMES, models=PARSED / "model", target=PARSED / "values.parquet", flipped=TRANSPOSED) -> None:
     rows: list[dict[str, object]] = []
     failed: list[str] = []
-    for year, (*_, pages, turned) in VOLUMES.items():
+    for year, (*_, pages, turned) in volumes.items():
         book = _artifact(year)
-        firsts = _tables(PARSED / "model" / f"{year}.txt")
-        seconds = _tables(PARSED / "model" / f"{year}.v2.txt")
+        firsts = _tables(models / f"{year}.txt")
+        seconds = _tables(models / f"{year}.v2.txt")
         if [(t["page"], t["district"], [r[0] for r in t["rows"]]) for t in firsts] != [
             (t["page"], t["district"], [r[0] for r in t["rows"]]) for t in seconds
         ]:
@@ -141,7 +141,7 @@ def parse() -> None:
                         re.sub(r"\D", "", row["text"].translate(scan.CONFUSABLE)),
                     }:
                         tokens.append((digits, box))
-            flip = year in TRANSPOSED
+            flip = year in flipped
             if flip:
                 tokens = [(digits, (box[1], box[0], box[3], box[2])) for digits, box in tokens]
             tolerance = 60 if flip else 20
@@ -322,7 +322,7 @@ def parse() -> None:
     missing = frame.filter(pl.col("box").is_null())
     if missing.height:
         raise ValueError(f"no box for {missing.select('year', 'district', 'county', 'column').rows()}")
-    frame.write_parquet(PARSED / "values.parquet")
+    frame.write_parquet(target)
 
 
 def emit() -> Path:
