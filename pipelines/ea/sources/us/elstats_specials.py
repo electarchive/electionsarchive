@@ -12,13 +12,13 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import special_files
+from ea.sources.us import special_files, special_nc
 from ea.sources.us.elstats import SOURCE as ARCHIVE
 from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
 from ea.store import connect
 
 SOURCE = "us.elstats_specials"
-VERSION = "9"
+VERSION = "10"
 SEARCHES = [
     ("NY", 2009),
     ("NY", 2011),
@@ -57,6 +57,7 @@ STATES = {
     "UT": "Utah",
     "PA": "Pennsylvania",
     "IL": "Illinois",
+    "NC": "North Carolina",
 }
 FIPS = {"GA": "13", "IL": "17"}
 PARTIES = {
@@ -92,6 +93,7 @@ def fetch() -> None:
     for special, stage, extension, _ in CALIFORNIA_FILES:
         raw.fetch(SOURCE, CALIFORNIA.format(special, stage, extension), suffix=f".{extension}")
     special_files.fetch_illinois()
+    special_nc.fetch()
     for election, race, _, _, _ in TEXAS_PAGES:
         raw.fetch(SOURCE, TEXAS.format(election, race), suffix=".htm")
     for link in links:
@@ -328,6 +330,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(texas, infer_schema_length=None))
     frames.append(pl.DataFrame(special_files.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_files.illinois_rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_nc.rows(), infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
@@ -403,6 +406,22 @@ def emit() -> Path:
                 for owner, link in special_files.STORED:
                     if owner == state:
                         cs.artifact(raw.cached(SOURCE, link), sources[state])
+                continue
+            if state == "NC":
+                publisher, title = "North Carolina State Board of Elections", "Election results data"
+                sources[state] = cs.source(publisher, title)
+                if sources[state] in cs.minted:
+                    cs.add(
+                        "source",
+                        id=sources[state],
+                        kind="official_body",
+                        publisher=publisher,
+                        title=title,
+                        url="https://www.ncsbe.gov/results-data/election-results",
+                        license="Public record",
+                    )
+                for day in special_nc.DAYS:
+                    cs.artifact(raw.cached(SOURCE, special_nc.link(day)), sources[state])
                 continue
             if state == "TX":
                 publisher, title = "Texas Secretary of State", "Election history: official results"
