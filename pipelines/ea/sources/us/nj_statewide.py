@@ -1,4 +1,5 @@
 import re
+from datetime import date
 from uuid import UUID
 
 import polars as pl
@@ -13,6 +14,10 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DIGITIZED = 8
 DERIVED = 1
+BOOKS = nj_manual.VOLUMES | {
+    1918: ("manualoflegislat1919mull", nj_manual.MANUAL.format(1919), nj_manual.PUBLISHER, date(1918, 11, 5), (), False),
+    1919: ("manualoflegislat1920mull", nj_manual.MANUAL.format(1920), nj_manual.PUBLISHER, date(1919, 11, 4), (), False),
+}
 VOLUMES = {
     1892: range(361, 363),
     1896: range(430, 432),
@@ -24,8 +29,11 @@ VOLUMES = {
     1912: range(653, 654),
     1914: range(628, 629),
     1916: range(618, 619),
+    1918: (539, 540),
+    1919: (543,),
     1920: range(540, 541),
 }
+TURNED = {1919}
 DEM = r"(?<!Social )(?<!National )Democrat"
 TABLES = [
     (
@@ -97,6 +105,9 @@ TABLES = [
     (1908, 565, slice(0, 5), ("1907:NJ:governor",), "governor", ["Republican", DEM, None, None, None]),
     (1910, 543, slice(0, 5), ("1910:NJ:governor", "1910-11-08:NJ:governor"), "governor", [DEM, "Republican", None, None, None]),
     (1914, 628, slice(0, 7), ("1913:NJ:governor",), "governor", [None, None, None, DEM, None, None, "Republican"]),
+    (1918, 539, slice(0, 3), ("1918-11-05:NJ:senate",), "senate", ["Republican", DEM, "Socialist"]),
+    (1918, 540, slice(0, 3), ("1918-11-05:NJ:senate",), "senate", ["Republican", DEM, "Socialist"]),
+    (1919, 543, slice(0, 6), ("1919:NJ:governor",), "governor", ["Republican", DEM, None, None, None, None]),
     (1916, 618, slice(0, 2), ("1916-11-07:NJ:president",), "president", ["Republican", DEM]),
     (1916, 618, slice(2, 4), ("1916-11-07:NJ:senate",), "senate", ["Republican", DEM]),
     (1916, 618, slice(4, 6), ("1916-11-07:NJ:governor", "1916:NJ:governor"), "governor", ["Republican", DEM]),
@@ -126,7 +137,7 @@ def prepare() -> None:
             title, data = next(
                 block
                 for block in blocks[f"{volume}_{page}"]
-                if re.search("Governor|Elector|President", block[0], re.IGNORECASE)
+                if re.search("Governor|Elector|President|Senator", block[0], re.IGNORECASE)
             )
             out[volume].append(f"@{page}") if f"@{page}" not in out[volume] else None
             out[volume].append(f"{tid} | " + ", ".join(pattern or "Others" for pattern in patterns))
@@ -138,7 +149,7 @@ def prepare() -> None:
 
 def parse() -> None:
     nj_manual.parse(
-        {year: (*nj_manual.VOLUMES[year][:4], pages, False) for year, pages in VOLUMES.items()},
+        {year: (*BOOKS[year][:4], pages, year in TURNED) for year, pages in VOLUMES.items()},
         PARSED / "model",
         PARSED / "values.parquet",
         set(),
@@ -169,7 +180,7 @@ def emit():
         sources: dict[int, UUID] = {}
         pages: dict[tuple[int, int], tuple[UUID, int, int]] = {}
         for year, numbers in VOLUMES.items():
-            item, title, publisher, *_ = nj_manual.VOLUMES[year]
+            item, title, publisher, *_ = BOOKS[year]
             sources[year] = cs.source(publisher, title)
             cs.add(
                 "source",
@@ -180,7 +191,7 @@ def emit():
                 url=nj_manual.ITEM.format(item=item),
                 license="Public domain",
             )
-            book = nj_manual._artifact(year)
+            book = nj_manual._artifact(item)
             artifact = cs.artifact(book, sources[year])
             for number in numbers:
                 image = nj_manual.PAGES / f"{book.sha256}-{number}.png"
@@ -211,8 +222,12 @@ def emit():
             "completeness",
             "supersedes_id",
         )
-        for tid, (volume, _, _, keys, _, patterns) in enumerate(TABLES, 1):
-            lines = frame.filter((pl.col("year") == volume) & (pl.col("district") == tid))
+        groups: dict[tuple[int, tuple[str, ...]], list[int]] = {}
+        for tid, table in enumerate(TABLES, 1):
+            groups.setdefault((table[0], table[3]), []).append(tid)
+        for (volume, keys), tids in groups.items():
+            patterns = TABLES[tids[0] - 1][5]
+            lines = frame.filter((pl.col("year") == volume) & pl.col("district").is_in(tids))
             key = next(k for k in keys if k in contests)
             contest = contests[key]
             result_set = cs.key(f"{SOURCE}.result_set", key)
@@ -292,8 +307,9 @@ def emit():
                     flags=DIGITIZED | (DERIVED if cells.height > 1 else 0),
                     value=int(cells["votes"].sum()),
                 )
-                boxes = [list(box) for box in cells["box"]]
-                page, width, height = pages[(volume, int(cells["page"][0]))]
+                first = int(cells["page"].min())
+                boxes = [list(box) for box, page in zip(cells["box"], cells["page"], strict=True) if page == first]
+                page, width, height = pages[(volume, first)]
                 cs.add(
                     "value_locator",
                     result_set_id=result_set,

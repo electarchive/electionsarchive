@@ -48,8 +48,8 @@ MISPRINTED: set[tuple[int, int]] = set()
 TRANSPOSED = {1916}
 
 
-def _artifact(year: int) -> raw.Artifact:
-    url = FILE.format(item=VOLUMES[year][0])
+def _artifact(item: str) -> raw.Artifact:
+    url = FILE.format(item=item)
     try:
         return raw.cached(SOURCE, url)
     except LookupError:
@@ -57,8 +57,8 @@ def _artifact(year: int) -> raw.Artifact:
 
 
 def fetch() -> None:
-    for year in VOLUMES:
-        _artifact(year)
+    for volume in VOLUMES.values():
+        _artifact(volume[0])
 
 
 def _plain(text: str) -> str:
@@ -102,7 +102,7 @@ def parse(volumes=VOLUMES, models=PARSED / "model", target=PARSED / "values.parq
     rows: list[dict[str, object]] = []
     failed: list[str] = []
     for year, (*_, pages, turned) in volumes.items():
-        book = _artifact(year)
+        book = _artifact(volumes[year][0])
         firsts = _tables(models / f"{year}.txt")
         seconds = _tables(models / f"{year}.v2.txt")
         if [(t["page"], t["district"], [r[0] for r in t["rows"]]) for t in firsts] != [
@@ -363,7 +363,7 @@ def emit() -> Path:
                 url=ITEM.format(item=item),
                 license="Public domain",
             )
-            book = _artifact(year)
+            book = _artifact(item)
             artifact = cs.artifact(book, sources[year])
             for number in numbers:
                 image = PAGES / f"{book.sha256}-{number}.png"
