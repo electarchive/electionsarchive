@@ -273,6 +273,18 @@ CALIFORNIA = {
     date(2022, 11, 8): "2022-general/sov/csv-ballotmeasures.xlsx",
     date(2024, 11, 5): "2024-general/sov/csv-ballot-measures.xlsx",
 }
+NEW_JERSEY = {
+    date(2012, 11, 6): ["2012/2012-official-general-results-question1-020513", "2012/2012-official-general-results-question2-020513"],
+    date(2013, 11, 5): ["2013/2013-official-general-election-results-pq1", "2013/2013-official-general-election-results-pq2"],
+    date(2014, 11, 4): ["2014/2014-official-general-public-question-1", "2014/2014-official-general-public-question-2"],
+    date(2016, 11, 8): ["2016/2016-official-general-results-question1", "2016/2016-official-general-results-question2"],
+    date(2017, 11, 7): ["2017/2017-official-general-election-results-pq1", "2017/2017-official-general-election-results-pq2"],
+    date(2018, 11, 6): ["2018/2018-official-general-election-results-pq1"],
+    date(2019, 11, 5): ["2019/2019-official-general-results-public-question"],
+    date(2020, 11, 3): [f"2020/2020-official-general-results-public-question-{n}" for n in (1, 2, 3)],
+    date(2021, 11, 2): [f"2021/2021-official-general-results-public-question-{n}" for n in (1, 2)],
+}
+NEW_JERSEY_SITE = "https://www.nj.gov/state/elections/assets/pdf/election-results/{}.pdf"
 TEXAS = {date(2013, 11, 5): 167, date(2015, 11, 3): 190, date(2017, 11, 7): 320}
 TEXAS_SITE = "https://elections.sos.state.tx.us/elchist{}_{}.htm"
 NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
@@ -308,6 +320,12 @@ DOCUMENTS = {
         wa_local.TITLE,
         "https://results.vote.wa.gov/results/",
         "the Washington Secretary of State's county results export",
+    ),
+    "NJ": (
+        "New Jersey Division of Elections",
+        "Public question results by county",
+        "https://www.nj.gov/state/elections/election-information-results.shtml",
+        "the New Jersey Division of Elections' public question results",
     ),
     "TX": (
         "Texas Secretary of State",
@@ -508,6 +526,8 @@ def link(state: str, day: date) -> tuple[str, str]:
     if state in ("GA", "WV", "SC", "DC"):
         entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT}[state].get(day, "")
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
+    if state == "NJ":
+        return SOURCE, NEW_JERSEY_SITE.format(NEW_JERSEY[day][0]) if day in NEW_JERSEY else ""
     if state == "TX":
         return SOURCE, TEXAS_SITE.format(TEXAS[day], "raceselect") if day in TEXAS else ""
     if state == "OK":
@@ -639,6 +659,13 @@ def fetch() -> None:
             raw.fetch(SOURCE, la_sos.blob(day, "Votes_Multiparish.htm"), suffix=".json")
             continue
         source, url = link(state, day)
+        if state == "NJ":
+            for name in NEW_JERSEY.get(day, []):
+                try:
+                    raw.fetch(SOURCE, NEW_JERSEY_SITE.format(name), suffix=".pdf")
+                except httpx.HTTPStatusError as error:
+                    print(f"NJ {day}: {error}")
+            continue
         if state == "TX":
             if url:
                 for race in re.findall(r'OPTION value="(\d+)"', raw.fetch(SOURCE, url, suffix=".htm").path.read_text()):
@@ -1534,6 +1561,38 @@ def parse() -> None:
                     answer="Candidate",
                     votes=pl.col("Votes").cast(pl.String),
                 )
+            )
+        elif state == "NJ":
+            records = []
+            for name in NEW_JERSEY[day]:
+                question_url = NEW_JERSEY_SITE.format(name)
+                text = subprocess.run(
+                    ["pdftotext", "-layout", str(raw.cached(SOURCE, question_url).path), "-"],
+                    capture_output=True,
+                    text=True,
+                    check=True,
+                ).stdout
+                number = re.search(r"Public Question NO\. (\d+)", text)
+                rows = re.findall(r"(?m)^\s*([A-Za-z ]+?)\s{2,}([\d,]+)\s+([\d,]+)\s*$", text)
+                counted = [[int(cell.replace(",", "")) for cell in row[1:]] for row in rows if row[0] != "Total"]
+                totals = [[int(cell.replace(",", "")) for cell in row[1:]] for row in rows if row[0] == "Total"]
+                if number is None or len(totals) != 1 or [sum(c) for c in zip(*counted, strict=True)] != totals[0]:
+                    print(f"NJ {day} {name}: counties do not add up, skipped")
+                    continue
+                for row in rows:
+                    if row[0] != "Total":
+                        for answer, count in zip(("YES", "NO"), row[1:], strict=True):
+                            records.append((row[0], f"Public Question {number[1]}", answer, count, question_url))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "url": pl.String,
+                },
+                orient="row",
             )
         elif state == "TX":
             records = []
