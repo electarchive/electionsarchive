@@ -5,6 +5,7 @@ import sys
 import time
 from collections import Counter, defaultdict
 from datetime import date
+from pathlib import Path
 
 import polars as pl
 
@@ -209,6 +210,20 @@ def request() -> None:
     )
 
 
+FINGERPRINT_SQL = """
+select concat_ws(':', current_date, count(*) filter (where status = 'published'), max(published_at),
+    count(*) filter (where status = 'rejected'))
+from changeset
+"""
+
+
+def fingerprint(conn) -> str:
+    row = conn.execute(FINGERPRINT_SQL).fetchone()
+    files = [Path(__file__).parent / name for name in ("coverage.py", "coverage_tables.py", "statewide_table.py")]
+    files += sorted((DATA / "parsed" / "us.cog").glob("*.parquet"))
+    return ":".join([row[0] if row else "", *(f"{f.name}{f.stat().st_mtime_ns}" for f in files)])
+
+
 def refresh() -> str:
     built = []
     with connect(autocommit=True) as conn:
@@ -223,7 +238,15 @@ def refresh() -> str:
                        where built_at is null or requested_at > built_at returning started_at"""
                 ).fetchone()
             ) is not None:
-                built.append(build())
+                conn.execute("create table if not exists coverage_cache_state (fingerprint text not null)")
+                current = fingerprint(conn)
+                previous = conn.execute("select fingerprint from coverage_cache_state").fetchone()
+                if previous is not None and previous[0] == current:
+                    built.append("nothing has changed since the last build")
+                else:
+                    built.append(build())
+                    conn.execute("delete from coverage_cache_state")
+                    conn.execute("insert into coverage_cache_state values (%s)", [current])
                 conn.execute("update coverage_build set built_at = %s", [started[0]])
             conn.execute("select pg_advisory_unlock(%s)", [LOCK])
             pending = conn.execute("select built_at is null or requested_at > built_at from coverage_build").fetchone()

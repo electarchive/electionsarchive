@@ -121,9 +121,35 @@ from result_set r join cc on cc.id = r.contest_id join changeset cs on cs.id = r
 left join source s on s.id = r.source_id
 where r.status <> 'withdrawn';
 
-create temp table rsm as
+create table if not exists coverage_cache_unit (result_set_k integer not null, unit_k integer not null,
+    primary key (result_set_k, unit_k));
+
+create table if not exists coverage_cache_measure (result_set_k integer not null, measure smallint not null,
+    primary key (result_set_k, measure));
+
+create table if not exists coverage_cache_done (result_set_k integer primary key);
+
+create temp table fresh as
+select r.k from result_set r where not exists (select from coverage_cache_done d where d.result_set_k = r.k);
+
+insert into coverage_cache_unit
+select distinct rv.result_set_k, rv.unit_k from result_value rv where rv.result_set_k in (select k from fresh)
+on conflict do nothing;
+
+insert into coverage_cache_measure
 select distinct rv.result_set_k, rv.measure from result_value rv
-where rv.measure in (2, 3, 14, 24, 25) and rv.result_set_k in (select k from result_set where status <> 'withdrawn');
+where rv.measure in (2, 3, 14, 24, 25) and rv.result_set_k in (select k from fresh)
+on conflict do nothing;
+
+insert into coverage_cache_done select k from fresh on conflict do nothing;
+
+analyze coverage_cache_unit;
+
+analyze coverage_cache_measure;
+
+create temp view rsm as
+select cm.result_set_k, cm.measure from coverage_cache_measure cm
+join result_set r on r.k = cm.result_set_k and r.status <> 'withdrawn';
 
 create temp table tn as
 select cc.id from cc join contest c on c.id = cc.id
@@ -132,8 +158,7 @@ where exists (select from result_set r join rsm on rsm.result_set_k = r.k and rs
     and exists (select from result_set r join rsm on rsm.result_set_k = r.k and rsm.measure in (3, 14, 25)
         where r.election_id = c.election_id and (r.contest_id is null or r.contest_id = c.id));
 
-create temp table rsu as
-select distinct rv.result_set_k, rv.unit_k from result_value rv where rv.result_set_k in (select k from rs);
+create temp view rsu as select result_set_k, unit_k from coverage_cache_unit;
 
 create temp table ug as
 select u.k,
