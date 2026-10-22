@@ -554,8 +554,9 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1836,)
+YEARS = (1832,)
 ELECTION_DAYS = {
+    1832: "1832-11-02",
     1836: "1836-11-03",
     1840: "1840-10-30",
     1844: "1844-11-01",
@@ -569,7 +570,7 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
 }
-YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254", 1836: "om254t"}
+YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254", 1836: "om254t", 1832: "om254t"}
 PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
 PRINT_COLUMNS = {
     "v65": {
@@ -593,6 +594,8 @@ PRINT_COLUMNS = {
         1: (1868, "Seymour"),
     },
     "om254t": {
+        6: (1832, "Clay"),
+        7: (1832, "Jackson"),
         8: (1836, "Harrison"),
         9: (1836, "Van Buren"),
     },
@@ -630,6 +633,8 @@ CANDIDATES = {
     "Polk": ("James K. Polk (Democratic)", "democraticparty"),
     "Birney": ("James G. Birney (Liberty)", "libertyparty"),
     "Harrison": ("William Henry Harrison (Whig)", "whigparty"),
+    "Jackson": ("Andrew Jackson (Democratic)", "democraticparty"),
+    "Adams": ("John Quincy Adams (National Republican)", "nationalrepublicanparty"),
 }
 EARLY: dict[tuple[int, str, str], int] = {
     (1868, "AL", "Grant"): 76366,
@@ -1271,6 +1276,47 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1836, "VT", "Van Buren"): 14037,
     (1836, "VA", "Harrison"): 23368,
     (1836, "VA", "Van Buren"): 30261,
+    (1832, "CT", "Clay"): 17755,
+    (1832, "CT", "Jackson"): 11269,
+    (1832, "DE", "Clay"): 4276,
+    (1832, "DE", "Jackson"): 4110,
+    (1832, "GA", "Jackson"): 20750,
+    (1832, "IL", "Clay"): 5429,
+    (1832, "IL", "Jackson"): 14147,
+    (1832, "IN", "Clay"): 15472,
+    (1832, "IN", "Jackson"): 31552,
+    (1832, "KY", "Clay"): 43396,
+    (1832, "KY", "Jackson"): 36247,
+    (1832, "LA", "Clay"): 2528,
+    (1832, "LA", "Jackson"): 4049,
+    (1832, "ME", "Clay"): 27204,
+    (1832, "ME", "Jackson"): 33291,
+    (1832, "MD", "Clay"): 19160,
+    (1832, "MD", "Jackson"): 19156,
+    (1832, "MA", "Clay"): 33003,
+    (1832, "MA", "Jackson"): 14545,
+    (1832, "MS", "Jackson"): 5919,
+    (1832, "MO", "Jackson"): 5192,
+    (1832, "NH", "Clay"): 19010,
+    (1832, "NH", "Jackson"): 25486,
+    (1832, "NJ", "Clay"): 23393,
+    (1832, "NJ", "Jackson"): 23856,
+    (1832, "NY", "Clay"): 154896,
+    (1832, "NY", "Jackson"): 168497,
+    (1832, "NC", "Clay"): 4563,
+    (1832, "NC", "Jackson"): 24862,
+    (1832, "OH", "Clay"): 76539,
+    (1832, "OH", "Jackson"): 81246,
+    (1832, "PA", "Clay"): 56716,
+    (1832, "PA", "Jackson"): 90983,
+    (1832, "RI", "Clay"): 2810,
+    (1832, "RI", "Jackson"): 2126,
+    (1832, "TN", "Clay"): 1436,
+    (1832, "TN", "Jackson"): 28740,
+    (1832, "VT", "Clay"): 11152,
+    (1832, "VT", "Jackson"): 7870,
+    (1832, "VA", "Clay"): 11451,
+    (1832, "VA", "Jackson"): 33609,
 }
 
 
