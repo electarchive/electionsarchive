@@ -1,5 +1,6 @@
 import csv
 import io
+import re
 import subprocess
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -12,7 +13,7 @@ from ea.sources.us import me_federal, medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.me_pri_csv"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{}id_/http://www.maine.gov/sos/cec/elec/{}"
 FILES = [
@@ -30,6 +31,17 @@ FILES = [
     (date(2006, 6, 13), "20061104162741", "2006p/pri06c2r.txt", "republican"),
     (date(2006, 6, 13), "20061104163114", "2006p/pri06sd.txt", "democratic"),
     (date(2006, 6, 13), "20061104163019", "2006p/pri06sr.txt", "republican"),
+    (date(2008, 6, 10), "20080814085732", "2008/tabs-can-cg-dem-1st-district-6-08.txt", "democratic"),
+    (date(2008, 6, 10), "20080814085658", "2008/tabs-can-cg-dem-2nd-district-6-08.txt", "democratic"),
+    (date(2008, 6, 10), "20080814085236", "2008/tabs-can-cg-rep-1st-district-6-08.txt", "republican"),
+    (date(2008, 6, 10), "20080814085148", "2008/tabs-can-cg-rep-2nd-district-6-08.txt", "republican"),
+    (date(2008, 6, 10), "20080814085445", "2008/tabs-can-us-dem-6-08.txt", "democratic"),
+    (date(2008, 6, 10), "20080814085224", "2008/tabs-can-us-rep-6-08.txt", "republican"),
+    (date(2012, 6, 12), "20120822192430", "2012/d-repcng1.txt", "democratic"),
+    (date(2012, 6, 12), "20120802012936", "2012/r-repcng1.txt", "republican"),
+    (date(2012, 6, 12), "20120822192804", "2012/r-repcng2.txt", "republican"),
+    (date(2012, 6, 12), "20120822192742", "2012/d-senator.txt", "democratic"),
+    (date(2012, 6, 12), "20120822192806", "2012/r-senator.txt", "republican"),
 ]
 
 
@@ -53,8 +65,49 @@ def parse() -> None:
     rows = []
     for day, stamp, path, party in FILES:
         text = raw.cached(SOURCE, WAYBACK.format(stamp, path)).path.read_text(encoding="latin-1")
+        if path.startswith("2012/"):
+            names: list[str] = []
+            fresh = True
+            for line in text.splitlines():
+                cells = line.split("|")
+                if line.startswith("|||") and "VOTES1" not in line:
+                    if fresh:
+                        names = [re.sub(r"\s*\(Declared Write-In\)", "", c).strip().upper() for c in cells[3:-2:2]]
+                        fresh = False
+                elif cells[0] == "DISTRICT" or "VOTES1" in line:
+                    fresh = True
+                elif len(cells) > 3 and (cells[1] in me_federal.COUNTIES or "UOCAVA" in cells[2]):
+                    fresh = True
+                    for i, name in enumerate(names):
+                        if name != "BLANK":
+                            rows.append(
+                                (
+                                    day,
+                                    f"{'senate' if 'senator' in path else 'house'}:{party}",
+                                    int(cells[0]) if cells[0] else None,
+                                    cells[1],
+                                    cells[2],
+                                    name,
+                                    int(cells[3 + 2 * i] or 0),
+                                )
+                            )
+            continue
         for record in csv.DictReader(io.StringIO(text)):
             record = {key.strip().lower(): (value or "").strip() for key, value in record.items() if key}
+            if path.startswith("2008/"):
+                district = record.get("dist_#")
+                rows.append(
+                    (
+                        day,
+                        f"{'senate' if record['office_code' if 'office_code' in record else 'off_code'] == 'US' else 'house'}:{party}",
+                        int(district) if district else None,
+                        record["county_code"],
+                        record["town_name"],
+                        " ".join(record["can_name"].upper().split()),
+                        int(record["votes"] or 0),
+                    )
+                )
+                continue
             office = record["office"]
             district = int(record["district"]) if record["district"] else None
             for number in [k.removeprefix("fullname") for k in record if k.startswith("fullname")]:
@@ -84,7 +137,7 @@ def parse() -> None:
     frame = frame.join(homes, on="town", how="left").with_columns(
         pl.when(pl.col("county") != "").then(pl.col("county")).otherwise(pl.col("home")).alias("county")
     )
-    lost = frame.filter(~pl.col("county").is_in(list(me_federal.COUNTIES)))
+    lost = frame.filter(~pl.col("county").is_in(list(me_federal.COUNTIES)) & ~pl.col("town").str.contains("UOCAVA"))
     if lost.height:
         raise ValueError(f"unplaced towns: {lost['town'].unique().to_list()[:10]}")
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -92,10 +145,12 @@ def parse() -> None:
         year=pl.col("day").dt.year().cast(pl.Int32),
         special=pl.lit(False),
         state=pl.lit("ME"),
-        code=pl.col("county").replace_strict(me_federal.COUNTIES),
+        code=pl.when(pl.col("town").str.contains("UOCAVA"))
+        .then(pl.lit("ME:uocava"))
+        .otherwise(pl.col("county").replace_strict(me_federal.COUNTIES, default=None)),
         measure=pl.lit(1, pl.Int16),
         writein=pl.lit(False),
-        kind=pl.lit("county"),
+        kind=pl.when(pl.col("town").str.contains("UOCAVA")).then(pl.lit("aggregate")).otherwise(pl.lit("county")),
         source=pl.lit("ME"),
         district=pl.col("district").cast(pl.Int16),
     ).group_by(
@@ -109,7 +164,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's 2002, 2004, and 2006 U.S. Senate and House primaries by county, summed from the Secretary of State's town and ward files",
+            summary="Maine's 2002, 2004, 2006, 2008, and 2012 U.S. Senate and House primaries by county, summed from the Secretary of State's town and ward files",
             polity="US-ME",
         )
         source = cs.source(me_federal.PUBLISHER, me_federal.TITLE)
