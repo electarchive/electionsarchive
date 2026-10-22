@@ -10,7 +10,7 @@ from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.cage"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 ACCESS = "https://dataverse.harvard.edu/api/access/datafile"
 RETURNS = f"{ACCESS}/13461690"
@@ -34,6 +34,28 @@ PARTIES = {
     "Const": "constitution-party",
     "DFL": "MN:minnesota-democratic-farmer-labor-party",
 }
+OFFICIAL = {
+    (2024, "IN"): (
+        "Indiana Election Division",
+        "2024 General Election Results",
+        "https://enr.indianavoters.in.gov/archive/2024General/data/OffCatC_1007_A.json",
+    ),
+    (2024, "MO"): (
+        "Missouri Secretary of State",
+        "2024 General Election Official Results",
+        "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/2024GeneralElection.pdf",
+    ),
+    (2024, "WV"): (
+        "West Virginia Secretary of State",
+        "2024 General Election Official Results",
+        "https://www.presidency.ucsb.edu/sites/default/files/election-maps/2024/2024_wv.pdf",
+    ),
+}
+OFFICIAL_METHOD = (
+    "Votes from the state's certified statewide results, which list every candidate. The Cha, Kuriwaki, and Snyder "
+    "compilation shows only the Democratic, Republican, Libertarian, Green, and Constitution candidates and a few "
+    "independents."
+)
 TRUSTED = {(2008, "MO"), (2012, "MO"), (2016, "MO")}
 UNAFFILIATED = {"I", "NPA", "Unaffiliated", "Petition"}
 SYSTEMS = {"GA": "two_round", "LA": "two_round"}
@@ -58,6 +80,8 @@ NEVADA = "Nevada ballots include “None of These Candidates” in statewide rac
 def fetch() -> None:
     raw.fetch(SOURCE, RETURNS, suffix=".tab")
     raw.fetch(SOURCE, GUIDE, suffix=".pdf")
+    for _, _, url in OFFICIAL.values():
+        raw.fetch(SOURCE, url, suffix=Path(url).suffix)
 
 
 def parse() -> None:
@@ -81,6 +105,18 @@ def parse() -> None:
             raise ValueError(f"{year} {state}: {race['won'].sum()} winners")
         if race["votes"].sum() != race["total"][0]:
             raise ValueError(f"{year} {state}{' special' if special else ''}: the lines don't sum to the total")
+    official = pl.read_csv(Path(__file__).with_name("cage_official.tsv"), separator="\t").with_columns(
+        special=pl.lit(False)
+    )
+    for (year, state), race in official.group_by("year", "state"):
+        if race["won"].sum() != 1:
+            raise ValueError(f"{year} {state}: {race['won'].sum()} official winners")
+    frame = pl.concat(
+        [
+            frame.join(official.select("year", "state").unique(), on=["year", "state"], how="anti"),
+            official.with_columns(total=pl.lit(0, dtype=pl.Int64)).select(frame.columns),
+        ]
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.drop("total").sort("year", "state", "special", "votes", descending=[False, False, False, True]).write_parquet(
         PARSED / "governors.parquet"
@@ -250,8 +286,22 @@ def emit() -> Path:
                         ),
                         is_default=False,
                     )
-            elif contest_key in done:
+            elif contest_key in done and (year, state) not in OFFICIAL:
                 continue
+            elif contest_key in done:
+                election = cs.key("us.election", f"{day}:{state}")
+                contest = cs.key("us.contest", contest_key)
+                publisher, official_title, url = OFFICIAL[(year, state)]
+                result_source = cs.source(publisher, official_title)
+                cs.add(
+                    "source",
+                    id=result_source,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=official_title,
+                    url=url,
+                )
+                cs.artifact(raw.cached(SOURCE, url), result_source)
             else:
                 if state not in offices:
                     offices[state] = cs.key("us.office", f"governor:{state}")
@@ -303,6 +353,8 @@ def emit() -> Path:
                     entity_id=contest,
                 )
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            if (year, state) not in OFFICIAL:
+                result_source = source
             cs.add(
                 "result_set",
                 id=result_set,
@@ -311,11 +363,17 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=source,
+                source_id=result_source,
                 is_default=True,
                 completeness=1,
             )
-            note(result_set, "methodology", METHOD)
+            if (year, state) in OFFICIAL:
+                (methodology,) = conn.execute(
+                    "select id from note where entity_id = %s and kind = 'methodology'", [result_set]
+                ).fetchone()
+                cs.add("note", id=methodology, entity_id=result_set, kind="methodology", body_md=OFFICIAL_METHOD)
+            else:
+                note(result_set, "methodology", METHOD)
             if kind == "runoff" and placeholder is None:
                 note(contest, "caveat", RUNOFF)
             if state == "NV" and placeholder is None:
@@ -339,8 +397,9 @@ def emit() -> Path:
                 else:
                     if (state, slug(text)) not in persons:
                         persons[(state, slug(text))] = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
-                        cs.add("person", id=persons[(state, slug(text))])
-                        name(persons[(state, slug(text))], text)
+                        if persons[(state, slug(text))] in cs.minted:
+                            cs.add("person", id=persons[(state, slug(text))])
+                            name(persons[(state, slug(text))], text)
                     person = persons[(state, slug(text))]
                     option = cs.key("us.option", f"{contest_key}:{person}")
                     main = (label or "").split(",")[0]
