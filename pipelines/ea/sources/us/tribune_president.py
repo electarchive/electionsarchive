@@ -1,4 +1,5 @@
 import csv
+import json
 import itertools
 import re
 import subprocess
@@ -480,7 +481,11 @@ def note(year: int, volume: int) -> str:
     )
 
 
-CAVEATS: dict[int, str] = {}
+CAVEATS: dict[int, str] = {
+    1888: " The printed Prohibition column adds to 250,124 against a printed Total row of 250,125.",
+    1900: " The printed total for Kentucky (490,812) is the 1908 figure repeated; its lines add to 467,600, which is the total carried and the one the Total row adds up from.",
+    1912: " The printed totals for Missouri (698,652), Ohio (1,103,557), Utah (112,315), and Vermont (62,941) differ from the sums of their lines (698,562; 1,033,557; 112,385; 62,841); the sums are carried and are the figures the printed Total row adds up from. Oklahoma's joint Republican and Progressive ticket is printed split evenly between the two.",
+}
 DEMOTED = {(1872, "MN"), (1872, "NE"), (1872, "TN"), (1880, "LA"), (1880, "NV"), (1880, "TX")}
 HELD = (
     "The printed figure for a top-two candidate differs from Wikipedia's by more than 1 percent and no second source "
@@ -499,6 +504,44 @@ NAMES = {
 LEGENDS = {
     "Weaver": ("James B. Weaver (Greenback)", "greenbackparty"),
     "Dow": ("Neal Dow (Prohibition)", "prohibitionparty"),
+}
+LATE_LEGENDS = {
+    (1888, "Harrison"): ("Benjamin Harrison (Republican)", "republicanparty"),
+    (1888, "Streeter"): ("Alson J. Streeter (Union Labor)", None),
+    (1888, "Fisk"): ("Clinton B. Fisk (Prohibition)", "prohibitionparty"),
+    (1892, "Harrison"): ("Benjamin Harrison (Republican)", "republicanparty"),
+    (1892, "Weaver"): ("James B. Weaver (People's)", "peoplesparty"),
+    (1892, "Bidwell"): ("John Bidwell (Prohibition)", "prohibitionparty"),
+    (1896, "McKinley"): ("William McKinley (Republican)", "republicanparty"),
+    (1896, "Bryan"): ("William Jennings Bryan (Democratic / Populist)", "democraticparty"),
+    (1896, "Palmer"): ("John M. Palmer (National Democratic)", None),
+    (1896, "Levering"): ("Joshua Levering (Prohibition)", "prohibitionparty"),
+    (1896, "Matchett"): ("Charles H. Matchett (Socialist Labor)", "socialistlaborpartyofamerica"),
+    (1900, "McKinley"): ("William McKinley (Republican)", "republicanparty"),
+    (1900, "Bryan"): ("William Jennings Bryan (Democratic)", "democraticparty"),
+    (1900, "Woolley"): ("John G. Woolley (Prohibition)", "prohibitionparty"),
+    (1900, "Malloney"): ("Joseph F. Malloney (Socialist Labor)", "socialistlaborpartyofamerica"),
+    (1900, "Debs"): ("Eugene V. Debs (Social Democratic)", "socialistpartyofamerica"),
+    (1900, "Barker"): ("Wharton Barker (Populist)", "peoplesparty"),
+    (1904, "Roosevelt"): ("Theodore Roosevelt (Republican)", "republicanparty"),
+    (1904, "Parker"): ("Alton B. Parker (Democratic)", "democraticparty"),
+    (1904, "Swallow"): ("Silas C. Swallow (Prohibition)", "prohibitionparty"),
+    (1904, "Debs"): ("Eugene V. Debs (Socialist)", "socialistpartyofamerica"),
+    (1904, "Corregan"): ("Charles H. Corregan (Socialist Labor)", "socialistlaborpartyofamerica"),
+    (1904, "Watson"): ("Thomas E. Watson (Populist)", "peoplesparty"),
+    (1908, "Taft"): ("William Howard Taft (Republican)", "republicanparty"),
+    (1908, "Bryan"): ("William Jennings Bryan (Democratic)", "democraticparty"),
+    (1908, "Chafin"): ("Eugene W. Chafin (Prohibition)", "prohibitionparty"),
+    (1908, "Debs"): ("Eugene V. Debs (Socialist)", "socialistpartyofamerica"),
+    (1908, "Gilhaus"): ("August Gillhaus (Socialist Labor)", "socialistlaborpartyofamerica"),
+    (1908, "Watson"): ("Thomas E. Watson (Populist)", "peoplesparty"),
+    (1908, "Hisgen"): ("Thomas L. Hisgen (Independence)", None),
+    (1912, "Wilson"): ("Woodrow Wilson (Democratic)", "democraticparty"),
+    (1912, "Taft"): ("William Howard Taft (Republican)", "republicanparty"),
+    (1912, "Roosevelt"): ("Theodore Roosevelt (Progressive)", None),
+    (1912, "Debs"): ("Eugene V. Debs (Socialist)", "socialistpartyofamerica"),
+    (1912, "Chafin"): ("Eugene W. Chafin (Prohibition)", "prohibitionparty"),
+    (1912, "Reimer"): ("Arthur E. Reimer (Socialist Labor)", "socialistlaborpartyofamerica"),
 }
 FIXES: dict[tuple[str, int], int | None] = {
     ("Arkansas", 3): 58071,
@@ -572,7 +615,7 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1884,)
+YEARS = (1912,)
 WHIG_LABEL = "Whig candidates"
 WHIG_NOTE = (
     'The almanac prints the Whig vote as one line, "Harrison etc.", so the Whig tickets of Wikipedia\'s table '
@@ -596,6 +639,13 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
     1884: "1884-11-04",
+    1888: "1888-11-06",
+    1892: "1892-11-08",
+    1896: "1896-11-03",
+    1900: "1900-11-06",
+    1904: "1904-11-08",
+    1908: "1908-11-03",
+    1912: "1912-11-05",
 }
 YEAR_PRINT = {
     1856: "v65",
@@ -614,9 +664,13 @@ YEAR_PRINT = {
 }
 V81_YEARS = (1872, 1876, 1880)
 URLS = {year: volume[0] for year, volume in tribune_almanac.VOLUMES.items()} | {
-    1884: "https://archive.org/download/vol1885tribuneal00unse/vol1885tribuneal00unse.pdf"
+    1884: "https://archive.org/download/vol1885tribuneal00unse/vol1885tribuneal00unse.pdf",
+    1912: "https://archive.org/download/tribunealmanacpo1913newy/tribunealmanacpo1913newy.pdf",
 }
-TITLES = tribune_almanac.TITLES | {1884: "The Tribune Almanac and Political Register for 1885"}
+TITLES = tribune_almanac.TITLES | {
+    1884: "The Tribune Almanac and Political Register for 1885",
+    1912: "The Tribune Almanac and Political Register for 1913",
+}
 PRINT_VOLUME = {"v85": 1884, "v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
 PRINT_COLUMNS = {
     "v65": {
@@ -669,6 +723,26 @@ PRINT_COLUMNS = {
         5: (1844, "Birney"),
     },
 }
+ABBREVIATIONS = STATES | {
+    "Arizona": "AZ",
+    "Idaho": "ID",
+    "Montana": "MT",
+    "New Mexico": "NM",
+    "North Dakota": "ND",
+    "Oklahoma": "OK",
+    "South Dakota": "SD",
+    "Utah": "UT",
+    "Washington": "WA",
+    "Wyoming": "WY",
+}
+V13 = json.loads((Path(__file__).parent / "tribune_president_1913.json").read_text())
+for print_key, print_spec in V13["prints"].items():
+    PRINTS[print_key] = {key: value for key, value in print_spec.items() if key not in ("columns", "year")} | {
+        "scales": ((2, "7"),)
+    }
+    PRINT_COLUMNS[print_key] = {int(col): (year, surname) for col, (year, surname) in print_spec["columns"].items()}
+    PRINT_VOLUME[print_key] = 1912
+    YEAR_PRINT.setdefault(print_spec["year"], print_key)
 FUSION = {(1860, "NY", "Douglas"), (1860, "NJ", "Douglas"), (1860, "PA", "Breckinridge")}
 CANDIDATES = {
     "Lincoln": ("Abraham Lincoln (Republican)", "republicanparty"),
@@ -1613,6 +1687,11 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1884, "WI", "St. John"): 7656,
 }
 
+for late_year, late_states in V13["values"].items():
+    for late_state, late_lines in late_states.items():
+        for late_surname, late_votes in late_lines.items():
+            EARLY[(int(late_year), late_state, late_surname)] = late_votes
+
 
 def emit() -> Path:
     boxes: dict[tuple[int, str, str], tuple[tuple[float, float, float, float], str]] = {}
@@ -1674,12 +1753,25 @@ def emit() -> Path:
             polity="US",
         )
         pages: dict[str, tuple[UUID, str, int, int]] = {}
-        for year in YEARS:
-            key = "v81p95" if year in V81_YEARS else YEAR_PRINT[year]
+        pages_seen: dict[tuple[int, int], tuple[UUID, str, int, int]] = {}
+        sources_added: set[UUID] = set()
+        page_keys = [
+            key
+            for year in YEARS
+            for key in (
+                ["v81p95"]
+                if year in V81_YEARS
+                else [k for k, columns in PRINT_COLUMNS.items() if any(y == year for y, _ in columns.values())]
+            )
+        ]
+        for key in page_keys:
             if key in pages:
                 continue
             volume = 1880 if key == "v81p95" else PRINT_VOLUME[key]
             page_number = 95 if key == "v81p95" else PRINTS[key]["page"]
+            if (volume, page_number) in pages_seen:
+                pages[key] = pages_seen[(volume, page_number)]
+                continue
             book = raw.cached(RAW, URLS[volume])
             image = DATA / "pages" / SOURCE / f"{book.sha256}-{page_number}.png"
             image.parent.mkdir(parents=True, exist_ok=True)
@@ -1688,7 +1780,11 @@ def emit() -> Path:
             with Image.open(image) as rendered:
                 width, height = rendered.size
             source = cs.source(tribune_almanac.PUBLISHER, TITLES[volume])
-            if not conn.execute("select 1 from source where id = %s", [source]).fetchone():
+            if (
+                source not in sources_added
+                and not conn.execute("select 1 from source where id = %s", [source]).fetchone()
+            ):
+                sources_added.add(source)
                 cs.add(
                     "source",
                     id=source,
@@ -1710,7 +1806,7 @@ def emit() -> Path:
                     width=width,
                     height=height,
                 )
-            pages[key] = (page, source, volume, page_number)
+            pages[key] = pages_seen[(volume, page_number)] = (page, source, volume, page_number)
         if needs_1881:
             with Image.open(PARSED / "native" / "v81p95-mask.png") as mask:
                 mask_width, mask_height = mask.size
@@ -1724,13 +1820,13 @@ def emit() -> Path:
                     (
                         value
                         for option, label, kind, unit, measure, value in options.get(
-                            old.get((year, STATES[name]), (None,))[0], []
+                            old.get((year, ABBREVIATIONS[name]), (None,))[0], []
                         )
                         if kind == "ticket" and surname in (label or "")
                     ),
                     None,
                 )
-                cell = (year, STATES[name], surname)
+                cell = (year, ABBREVIATIONS[name], surname)
                 boxes[cell] = (
                     (box[0] / mask_width, box[1] / mask_height, box[2] / mask_width, box[3] / mask_height),
                     "v81p95",
@@ -1760,7 +1856,7 @@ def emit() -> Path:
                         skipped.append(
                             f"cell {name} {surname}: reads {reads} against Wikipedia's {ticket}, not settled"
                         )
-        for key in {YEAR_PRINT[year] for year in YEARS if year in YEAR_PRINT}:
+        for key in {key for key in page_keys if key != "v81p95"}:
             spec = PRINTS[key]
             with Image.open(PARSED / "native" / f"{spec['mask']}-mask.png") as mask:
                 mask_width, mask_height = mask.size
@@ -1770,7 +1866,7 @@ def emit() -> Path:
                     continue
                 left = spec["cols"][col - 1][1] + 2 if col > 0 else spec["cols"][col][0] - 60
                 for index, name in enumerate(spec["rows"]):
-                    cell = (year, STATES[name], surname)
+                    cell = (year, ABBREVIATIONS[name], surname)
                     if cell not in EARLY:
                         continue
                     center = round(spec["y0"] + spec["pitch"] * index)
@@ -1814,7 +1910,10 @@ def emit() -> Path:
                 matched["Harrison"] = combined
             unmatched = [surname for surname in surnames if surname not in matched]
             if any(
-                surname not in LEGENDS and surname not in CANDIDATES and (year, state, surname) not in FUSION
+                surname not in LEGENDS
+                and surname not in CANDIDATES
+                and (year, surname) not in LATE_LEGENDS
+                and (year, state, surname) not in FUSION
                 for surname in unmatched
             ):
                 skipped.append(f"{tag}: a printed candidate has no Wikipedia ticket")
@@ -1846,7 +1945,7 @@ def emit() -> Path:
                 if (year, state, surname) in FUSION:
                     label, party_name = "Fusion electors", None
                 else:
-                    label, party_name = LEGENDS.get(surname) or CANDIDATES[surname]
+                    label, party_name = LATE_LEGENDS.get((year, surname)) or LEGENDS.get(surname) or CANDIDATES[surname]
                 ids[surname] = cs.key(f"{SOURCE}.option", f"{year}:{state}:{slug(label)}")
                 cs.add(
                     "contest_option",
