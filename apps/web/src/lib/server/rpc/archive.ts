@@ -6224,7 +6224,7 @@ async function races(
     names(
       owned.flatMap((row) => [
         row.id,
-        ...[row.owner, row.area].filter((id) => id != null),
+        ...[row.owner, row.area, row.party].filter((id) => id != null),
       ]),
       date,
     ),
@@ -6587,6 +6587,7 @@ async function races(
           labels.full.get(
             (single == null ? head?.owner : single.id) ?? head?.id ?? "",
           ) ?? "",
+        scope: head?.party == null ? null : labels.full.get(head.party),
         path: single == null ? null : (slugs.get(single.id) ?? null),
         kind: head?.kind ?? "",
         isOffice: head?.isOffice ?? false,
@@ -6735,12 +6736,19 @@ async function races(
         spread,
         chamber,
         isNational,
+        scope,
         ...race
       }) => {
         const stage = stages.find((entry) => entry.office === office);
         const rows = (
           stage == null && race.measure === "electoral_votes" ? race : stage
         )?.results;
+        const name =
+          isNational && race.count === 1 && race.body != null
+            ? chambers.indexOf(chamber) === chambers.lastIndexOf(chamber)
+              ? (chamber ?? race.name)
+              : [chamber ?? "", ...race.name.split(", ").slice(1)].join(", ")
+            : race.name;
         return {
           ...race,
           before:
@@ -6753,11 +6761,9 @@ async function races(
               })) ??
             null,
           name:
-            isNational && race.count === 1 && race.body != null
-              ? chambers.indexOf(chamber) === chambers.lastIndexOf(chamber)
-                ? (chamber ?? race.name)
-                : [chamber ?? "", ...race.name.split(", ").slice(1)].join(", ")
-              : race.name,
+            scope == null || name.includes(scope.split(" ")[0] ?? "")
+              ? name
+              : `${name} (${scope})`,
           partners: spread.map((row) => [row.from, row.to]),
           electors:
             rows == null
