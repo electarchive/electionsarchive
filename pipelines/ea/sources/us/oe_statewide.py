@@ -293,6 +293,12 @@ def parse() -> None:
         frame = frame.rename(renamed)
         if "votes" not in frame.columns and "total_votes" in frame.columns:
             frame = frame.rename({"total_votes": "votes"})
+        if "votes" not in frame.columns and "election_day_votes" in frame.columns:
+            frame = frame.with_columns(
+                votes=pl.sum_horizontal(
+                    pl.col(column).cast(pl.Int64, strict=False).fill_null(0) for column in openelections.CHANNELS
+                ).cast(pl.String)
+            )
         if "county" not in frame.columns and {"jurisdiction", "reporting_level"} <= set(frame.columns):
             frame = frame.filter(pl.col("reporting_level") == "county").rename({"jurisdiction": "county"})
         if not {"county", "office", "candidate", "votes"} <= set(frame.columns):

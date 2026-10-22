@@ -92,7 +92,7 @@ MISSPELLED = {
     ("WA", "wahkiukum"): "wahkiakum",
     ("MS", "launderdale"): "lauderdale",
 }
-LEVELS = {"__county": 0, "": 1, "__precinct": 2, "__ward": 3}
+LEVELS = {"__county": 0, "__county-level": 0, "": 1, "__precinct": 2, "__ward": 3}
 MISFILED = {"2010/20101102__ri__general__town.csv"}
 ALIASES = {"officename": "office", "ballotname": "candidate", "total_votes": "votes"}
 SENATE = re.compile(r"\b(u\.?\s?s\.?|united states)\s*senat")
@@ -133,7 +133,7 @@ def picks() -> list[tuple[str, int, str]]:
         best: dict[int, tuple[int, list[str]]] = {}
         for entry in tree["tree"]:
             found = re.fullmatch(
-                rf"(?:.*/)?(\d{{4}})11\d{{2}}__{state.lower()}__general(__county|__precinct|__ward|__[a-z_]+__precinct|__[a-z_]+)?\.csv",
+                rf"(?:.*/)?(\d{{4}})11\d{{2}}__{state.lower()}__general(__county|__county-level|__precinct|__ward|__[a-z_]+__precinct|__[a-z_]+)?\.csv",
                 entry["path"],
             )
             if entry["type"] != "blob" or found is None or entry["path"] in MISFILED:
