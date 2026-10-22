@@ -137,6 +137,8 @@ READERS = {
     "first": Reader("claude-haiku-5-5", "low", 0.05, 0.25),
     "second": Reader("claude-sonnet-5-5", "medium", 1.0, 5.0),
 }
+LEDGER = DATA / "scans-ledger.json"
+BUDGET = 190.0
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
@@ -555,6 +557,15 @@ def pending(name: str, reader: str, pages: set[str] | None) -> dict[str, Read]:
     }
 
 
+def guess(reader: str, request: Read) -> float:
+    _, _, price_in, price_out = READERS[reader]
+    return (min(request.pixels, 3_500_000) / 750 * price_in + 6000 * price_out) / 1e6
+
+
+def ledger() -> dict[str, dict[str, float]]:
+    return json.loads(LEDGER.read_text()) if LEDGER.exists() else {"spent": {}, "pending": {}}
+
+
 def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list[Batch]]]) -> list[str]:
     api = client()
     groups: list[list[Read]] = [[]]
@@ -566,6 +577,14 @@ def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list
             size = 0
         groups[-1].append(request)
         size += weight
+    books = ledger()
+    projected = sum(guess(reader, request) for request in wanted.values())
+    total = sum(books["spent"].values()) + sum(books["pending"].values())
+    if total + projected > BUDGET:
+        raise SystemExit(
+            f"BLOCKED: budget; ${total:.2f} spent or pending plus ${projected:.2f} projected passes ${BUDGET}"
+        )
+    print(f"projected ${projected:.3f}; ${total:.2f} spent or pending of ${BUDGET}")
     ids: list[str] = []
     for group in groups:
         created = api.messages.batches.create(
@@ -574,7 +593,9 @@ def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list
         state.setdefault("batches", {}).setdefault(reader, []).append(
             {"id": created.id, "keys": {request.custom: request.key for request in group}}
         )
+        books["pending"][created.id] = sum(guess(reader, request) for request in group)
         ids.append(created.id)
+    LEDGER.write_text(json.dumps(books, indent=2))
     return ids
 
 
@@ -588,8 +609,13 @@ def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
             notes.append(f"{batch['id']} {status.processing_status}, {status.request_counts.processing} processing")
             remaining.append(batch)
             continue
+        books = ledger()
+        _, _, price_in, price_out = READERS[reader]
+        dollars = 0.0
         for result in api.messages.batches.results(batch["id"]):
             if result.result.type == "succeeded":
+                usage = result.result.message.usage
+                dollars += (usage.input_tokens * price_in + usage.output_tokens * price_out) / 1e6
                 raw.store(
                     SOURCE,
                     batch["keys"][result.custom_id],
@@ -600,6 +626,9 @@ def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
                 )
             else:
                 notes.append(f"{result.custom_id} {result.result.type}")
+        books["pending"].pop(batch["id"], None)
+        books["spent"][batch["id"]] = dollars
+        LEDGER.write_text(json.dumps(books, indent=2))
     state["batches"][reader] = remaining
     return "; ".join(notes)
 
@@ -709,9 +738,9 @@ def prepare(name: str) -> str:
     out = []
     for reader, (model, _, price_in, price_out) in READERS.items():
         plan = requests(name, reader)
-        pixels = sum(min(request.pixels, 3_500_000) for request in plan.values())
-        guess = (pixels / 750 * price_in + len(plan) * 6000 * price_out) / 1e6
-        out.append(f"{reader} ({model}): {len(plan)} requests, about ${guess:.3f} if every page goes")
+        out.append(
+            f"{reader} ({model}): {len(plan)} requests, about ${sum(guess(reader, r) for r in plan.values()):.3f} if every page goes"
+        )
     unmatched = [column for column, total in held.items() if total is None]
     return "\n".join(out + [f"no official total held for {len(unmatched)} of {len(held)} columns", *unmatched[:20]])
 
@@ -888,6 +917,10 @@ def status() -> str:
             f"{'tables' if (folder / 'tables.parquet').exists() else 'no tables yet'}"
             f"{'' if review is None else f', {len(review)} in review'}"
         )
+    books = ledger()
+    out.append(
+        f"spent ${sum(books['spent'].values()):.2f}, pending ${sum(books['pending'].values()):.2f}, budget ${BUDGET}"
+    )
     return "\n".join(out)
 
 
