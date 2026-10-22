@@ -71,6 +71,8 @@ def emit() -> Path:
         starts: set[date] = set()
         for state, code, geom, point, source in states:
             cuts = [day for (day,) in conn.execute(CUTS, {"state": state, "from": CENSUS_FROM}).fetchall()]
+            if not cuts:
+                continue
             runs: list[list[object]] = []
             for lo, hi in zip(cuts, [*cuts[1:], CENSUS_FROM], strict=True):
                 found = conn.execute(UNION, {"state": state, "day": lo, "close": CLOSE}).fetchone()
