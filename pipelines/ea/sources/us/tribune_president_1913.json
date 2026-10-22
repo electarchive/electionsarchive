@@ -19,17 +19,44 @@
       "y0": 3034,
       "pitch": 39.14,
       "cols": [
-        [912, 1109],
-        [1113, 1370],
-        [1374, 1632],
-        [1636, 1894],
-        [1898, 2208]
+        [
+          912,
+          1109
+        ],
+        [
+          1113,
+          1370
+        ],
+        [
+          1374,
+          1632
+        ],
+        [
+          1636,
+          1894
+        ],
+        [
+          1898,
+          2208
+        ]
       ],
       "columns": {
-        "0": [1888, "Harrison"],
-        "1": [1888, "Cleveland"],
-        "2": [1888, "Streeter"],
-        "3": [1888, "Fisk"]
+        "0": [
+          1888,
+          "Harrison"
+        ],
+        "1": [
+          1888,
+          "Cleveland"
+        ],
+        "2": [
+          1888,
+          "Streeter"
+        ],
+        "3": [
+          1888,
+          "Fisk"
+        ]
       },
       "year": 1888
     },
@@ -68,17 +95,44 @@
       "y0": 423,
       "pitch": 39.14,
       "cols": [
-        [912, 1110],
-        [1114, 1372],
-        [1376, 1634],
-        [1638, 1895],
-        [1899, 2210]
+        [
+          912,
+          1110
+        ],
+        [
+          1114,
+          1372
+        ],
+        [
+          1376,
+          1634
+        ],
+        [
+          1638,
+          1895
+        ],
+        [
+          1899,
+          2210
+        ]
       ],
       "columns": {
-        "0": [1888, "Harrison"],
-        "1": [1888, "Cleveland"],
-        "2": [1888, "Streeter"],
-        "3": [1888, "Fisk"]
+        "0": [
+          1888,
+          "Harrison"
+        ],
+        "1": [
+          1888,
+          "Cleveland"
+        ],
+        "2": [
+          1888,
+          "Streeter"
+        ],
+        "3": [
+          1888,
+          "Fisk"
+        ]
       },
       "year": 1888
     },
@@ -132,38 +186,95 @@
       "y0": 1826,
       "pitch": 39.4,
       "cols": [
-        [916, 1114],
-        [1118, 1376],
-        [1380, 1638],
-        [1642, 1900],
-        [1904, 2212]
+        [
+          916,
+          1114
+        ],
+        [
+          1118,
+          1376
+        ],
+        [
+          1380,
+          1638
+        ],
+        [
+          1642,
+          1900
+        ],
+        [
+          1904,
+          2212
+        ]
       ],
       "columns": {
-        "0": [1892, "Harrison"],
-        "1": [1892, "Cleveland"],
-        "2": [1892, "Weaver"],
-        "3": [1892, "Bidwell"]
+        "0": [
+          1892,
+          "Harrison"
+        ],
+        "1": [
+          1892,
+          "Cleveland"
+        ],
+        "2": [
+          1892,
+          "Weaver"
+        ],
+        "3": [
+          1892,
+          "Bidwell"
+        ]
       },
       "year": 1892
     },
     "v13s1892b": {
       "mask": "v13p405",
       "page": 405,
-      "rows": ["Wisconsin", "Wyoming"],
+      "rows": [
+        "Wisconsin",
+        "Wyoming"
+      ],
       "y0": 316,
       "pitch": 36.6,
       "cols": [
-        [914, 1110],
-        [1114, 1370],
-        [1374, 1630],
-        [1634, 1890],
-        [1894, 2202]
+        [
+          914,
+          1110
+        ],
+        [
+          1114,
+          1370
+        ],
+        [
+          1374,
+          1630
+        ],
+        [
+          1634,
+          1890
+        ],
+        [
+          1894,
+          2202
+        ]
       ],
       "columns": {
-        "0": [1892, "Harrison"],
-        "1": [1892, "Cleveland"],
-        "2": [1892, "Weaver"],
-        "3": [1892, "Bidwell"]
+        "0": [
+          1892,
+          "Harrison"
+        ],
+        "1": [
+          1892,
+          "Cleveland"
+        ],
+        "2": [
+          1892,
+          "Weaver"
+        ],
+        "3": [
+          1892,
+          "Bidwell"
+        ]
       },
       "year": 1892
     },
@@ -220,19 +331,52 @@
       "y0": 702,
       "pitch": 39.3,
       "cols": [
-        [598, 801],
-        [805, 1069],
-        [1073, 1338],
-        [1342, 1608],
-        [1612, 1877],
-        [1881, 2197]
+        [
+          598,
+          801
+        ],
+        [
+          805,
+          1069
+        ],
+        [
+          1073,
+          1338
+        ],
+        [
+          1342,
+          1608
+        ],
+        [
+          1612,
+          1877
+        ],
+        [
+          1881,
+          2197
+        ]
       ],
       "columns": {
-        "0": [1896, "McKinley"],
-        "1": [1896, "Bryan"],
-        "2": [1896, "Palmer"],
-        "3": [1896, "Levering"],
-        "4": [1896, "Matchett"]
+        "0": [
+          1896,
+          "McKinley"
+        ],
+        "1": [
+          1896,
+          "Bryan"
+        ],
+        "2": [
+          1896,
+          "Palmer"
+        ],
+        "3": [
+          1896,
+          "Levering"
+        ],
+        "4": [
+          1896,
+          "Matchett"
+        ]
       },
       "year": 1896
     },
@@ -261,21 +405,60 @@
       "y0": 2779,
       "pitch": 39.4,
       "cols": [
-        [675, 830],
-        [834, 1048],
-        [1052, 1266],
-        [1270, 1486],
-        [1490, 1703],
-        [1707, 1921],
-        [1925, 2191]
+        [
+          675,
+          830
+        ],
+        [
+          834,
+          1048
+        ],
+        [
+          1052,
+          1266
+        ],
+        [
+          1270,
+          1486
+        ],
+        [
+          1490,
+          1703
+        ],
+        [
+          1707,
+          1921
+        ],
+        [
+          1925,
+          2191
+        ]
       ],
       "columns": {
-        "0": [1900, "McKinley"],
-        "1": [1900, "Bryan"],
-        "2": [1900, "Woolley"],
-        "3": [1900, "Malloney"],
-        "4": [1900, "Debs"],
-        "5": [1900, "Barker"]
+        "0": [
+          1900,
+          "McKinley"
+        ],
+        "1": [
+          1900,
+          "Bryan"
+        ],
+        "2": [
+          1900,
+          "Woolley"
+        ],
+        "3": [
+          1900,
+          "Malloney"
+        ],
+        "4": [
+          1900,
+          "Debs"
+        ],
+        "5": [
+          1900,
+          "Barker"
+        ]
       },
       "year": 1900
     },
@@ -315,21 +498,60 @@
       "y0": 311,
       "pitch": 39.4,
       "cols": [
-        [698, 852],
-        [856, 1071],
-        [1075, 1290],
-        [1294, 1509],
-        [1513, 1728],
-        [1732, 1946],
-        [1950, 2218]
+        [
+          698,
+          852
+        ],
+        [
+          856,
+          1071
+        ],
+        [
+          1075,
+          1290
+        ],
+        [
+          1294,
+          1509
+        ],
+        [
+          1513,
+          1728
+        ],
+        [
+          1732,
+          1946
+        ],
+        [
+          1950,
+          2218
+        ]
       ],
       "columns": {
-        "0": [1900, "McKinley"],
-        "1": [1900, "Bryan"],
-        "2": [1900, "Woolley"],
-        "3": [1900, "Malloney"],
-        "4": [1900, "Debs"],
-        "5": [1900, "Barker"]
+        "0": [
+          1900,
+          "McKinley"
+        ],
+        "1": [
+          1900,
+          "Bryan"
+        ],
+        "2": [
+          1900,
+          "Woolley"
+        ],
+        "3": [
+          1900,
+          "Malloney"
+        ],
+        "4": [
+          1900,
+          "Debs"
+        ],
+        "5": [
+          1900,
+          "Barker"
+        ]
       },
       "year": 1900
     },
@@ -384,46 +606,127 @@
       "y0": 1765,
       "pitch": 39.4,
       "cols": [
-        [688, 843],
-        [847, 1062],
-        [1066, 1283],
-        [1287, 1502],
-        [1506, 1722],
-        [1726, 1941],
-        [1945, 2214]
+        [
+          688,
+          843
+        ],
+        [
+          847,
+          1062
+        ],
+        [
+          1066,
+          1283
+        ],
+        [
+          1287,
+          1502
+        ],
+        [
+          1506,
+          1722
+        ],
+        [
+          1726,
+          1941
+        ],
+        [
+          1945,
+          2214
+        ]
       ],
       "columns": {
-        "0": [1904, "Roosevelt"],
-        "1": [1904, "Parker"],
-        "2": [1904, "Swallow"],
-        "3": [1904, "Debs"],
-        "4": [1904, "Corregan"],
-        "5": [1904, "Watson"]
+        "0": [
+          1904,
+          "Roosevelt"
+        ],
+        "1": [
+          1904,
+          "Parker"
+        ],
+        "2": [
+          1904,
+          "Swallow"
+        ],
+        "3": [
+          1904,
+          "Debs"
+        ],
+        "4": [
+          1904,
+          "Corregan"
+        ],
+        "5": [
+          1904,
+          "Watson"
+        ]
       },
       "year": 1904
     },
     "v13s1904b": {
       "mask": "v13p407",
       "page": 407,
-      "rows": ["Wisconsin", "Wyoming"],
+      "rows": [
+        "Wisconsin",
+        "Wyoming"
+      ],
       "y0": 311,
       "pitch": 35.6,
       "cols": [
-        [678, 834],
-        [838, 1050],
-        [1054, 1268],
-        [1272, 1487],
-        [1491, 1706],
-        [1710, 1923],
-        [1927, 2196]
+        [
+          678,
+          834
+        ],
+        [
+          838,
+          1050
+        ],
+        [
+          1054,
+          1268
+        ],
+        [
+          1272,
+          1487
+        ],
+        [
+          1491,
+          1706
+        ],
+        [
+          1710,
+          1923
+        ],
+        [
+          1927,
+          2196
+        ]
       ],
       "columns": {
-        "0": [1904, "Roosevelt"],
-        "1": [1904, "Parker"],
-        "2": [1904, "Swallow"],
-        "3": [1904, "Debs"],
-        "4": [1904, "Corregan"],
-        "5": [1904, "Watson"]
+        "0": [
+          1904,
+          "Roosevelt"
+        ],
+        "1": [
+          1904,
+          "Parker"
+        ],
+        "2": [
+          1904,
+          "Swallow"
+        ],
+        "3": [
+          1904,
+          "Debs"
+        ],
+        "4": [
+          1904,
+          "Corregan"
+        ],
+        "5": [
+          1904,
+          "Watson"
+        ]
       },
       "year": 1904
     },
@@ -481,23 +784,68 @@
       "y0": 649,
       "pitch": 39.36,
       "cols": [
-        [613, 766],
-        [770, 984],
-        [988, 1188],
-        [1192, 1392],
-        [1396, 1570],
-        [1574, 1750],
-        [1754, 1928],
-        [1932, 2198]
+        [
+          613,
+          766
+        ],
+        [
+          770,
+          984
+        ],
+        [
+          988,
+          1188
+        ],
+        [
+          1192,
+          1392
+        ],
+        [
+          1396,
+          1570
+        ],
+        [
+          1574,
+          1750
+        ],
+        [
+          1754,
+          1928
+        ],
+        [
+          1932,
+          2198
+        ]
       ],
       "columns": {
-        "0": [1908, "Taft"],
-        "1": [1908, "Bryan"],
-        "2": [1908, "Chafin"],
-        "3": [1908, "Debs"],
-        "4": [1908, "Gilhaus"],
-        "5": [1908, "Watson"],
-        "6": [1908, "Hisgen"]
+        "0": [
+          1908,
+          "Taft"
+        ],
+        "1": [
+          1908,
+          "Bryan"
+        ],
+        "2": [
+          1908,
+          "Chafin"
+        ],
+        "3": [
+          1908,
+          "Debs"
+        ],
+        "4": [
+          1908,
+          "Gilhaus"
+        ],
+        "5": [
+          1908,
+          "Watson"
+        ],
+        "6": [
+          1908,
+          "Hisgen"
+        ]
       },
       "year": 1908
     },
@@ -557,35 +905,183 @@
       "y0": 1421,
       "pitch": 39.38,
       "cols": [
-        [697, 848],
-        [852, 1062],
-        [1066, 1277],
-        [1281, 1492],
-        [1496, 1707],
-        [1711, 1921],
-        [1925, 2202]
+        [
+          697,
+          848
+        ],
+        [
+          852,
+          1062
+        ],
+        [
+          1066,
+          1277
+        ],
+        [
+          1281,
+          1492
+        ],
+        [
+          1496,
+          1707
+        ],
+        [
+          1711,
+          1921
+        ],
+        [
+          1925,
+          2202
+        ]
       ],
       "columns": {
-        "0": [1912, "Wilson"],
-        "1": [1912, "Taft"],
-        "2": [1912, "Roosevelt"],
-        "3": [1912, "Debs"],
-        "4": [1912, "Chafin"],
-        "5": [1912, "Reimer"]
+        "0": [
+          1912,
+          "Wilson"
+        ],
+        "1": [
+          1912,
+          "Taft"
+        ],
+        "2": [
+          1912,
+          "Roosevelt"
+        ],
+        "3": [
+          1912,
+          "Debs"
+        ],
+        "4": [
+          1912,
+          "Chafin"
+        ],
+        "5": [
+          1912,
+          "Reimer"
+        ]
       },
       "year": 1912
+    },
+    "v17s1916": {
+      "mask": "v17p848",
+      "page": 848,
+      "rows": [
+        "Alabama",
+        "Arizona",
+        "Arkansas",
+        "California",
+        "Colorado",
+        "Connecticut",
+        "Delaware",
+        "Florida",
+        "Georgia",
+        "Idaho",
+        "Illinois",
+        "Indiana",
+        "Iowa",
+        "Kansas",
+        "Kentucky",
+        "Louisiana",
+        "Maine",
+        "Maryland",
+        "Massachusetts",
+        "Michigan",
+        "Minnesota",
+        "Mississippi",
+        "Missouri",
+        "Montana",
+        "Nebraska",
+        "Nevada",
+        "New Hampshire",
+        "New Jersey",
+        "New Mexico",
+        "New York",
+        "North Carolina",
+        "North Dakota",
+        "Ohio",
+        "Oklahoma",
+        "Oregon",
+        "Pennsylvania",
+        "Rhode Island",
+        "South Carolina",
+        "South Dakota",
+        "Tennessee",
+        "Texas",
+        "Utah",
+        "Vermont",
+        "Virginia",
+        "Washington",
+        "West Virginia",
+        "Wisconsin",
+        "Wyoming"
+      ],
+      "y0": 512,
+      "pitch": 27.5,
+      "cols": [
+        [
+          666,
+          785
+        ],
+        [
+          790,
+          915
+        ],
+        [
+          930,
+          1045
+        ],
+        [
+          1050,
+          1175
+        ],
+        [
+          1180,
+          1305
+        ]
+      ],
+      "columns": {
+        "0": [
+          1916,
+          "Wilson"
+        ],
+        "1": [
+          1916,
+          "Hughes"
+        ],
+        "2": [
+          1916,
+          "Benson"
+        ],
+        "3": [
+          1916,
+          "Hanly"
+        ],
+        "4": [
+          1916,
+          "Reimer"
+        ]
+      },
+      "year": 1916
     }
   },
   "values": {
     "1888": {
-      "AL": { "Harrison": 56197, "Cleveland": 117320, "Fisk": 583 },
+      "AL": {
+        "Harrison": 56197,
+        "Cleveland": 117320,
+        "Fisk": 583
+      },
       "AR": {
         "Harrison": 60245,
         "Cleveland": 86717,
         "Streeter": 10671,
         "Fisk": 615
       },
-      "CA": { "Harrison": 124816, "Cleveland": 117729, "Fisk": 5761 },
+      "CA": {
+        "Harrison": 124816,
+        "Cleveland": 117729,
+        "Fisk": 5761
+      },
       "CO": {
         "Harrison": 50774,
         "Cleveland": 37567,
@@ -598,8 +1094,16 @@
         "Streeter": 240,
         "Fisk": 4236
       },
-      "DE": { "Harrison": 12973, "Cleveland": 16414, "Fisk": 400 },
-      "FL": { "Harrison": 26654, "Cleveland": 39656, "Fisk": 418 },
+      "DE": {
+        "Harrison": 12973,
+        "Cleveland": 16414,
+        "Fisk": 400
+      },
+      "FL": {
+        "Harrison": 26654,
+        "Cleveland": 39656,
+        "Fisk": 418
+      },
       "GA": {
         "Harrison": 40453,
         "Cleveland": 100472,
@@ -630,7 +1134,11 @@
         "Streeter": 37788,
         "Fisk": 6779
       },
-      "KY": { "Harrison": 155134, "Cleveland": 183800, "Fisk": 5225 },
+      "KY": {
+        "Harrison": 155134,
+        "Cleveland": 183800,
+        "Fisk": 5225
+      },
       "LA": {
         "Harrison": 30701,
         "Cleveland": 85032,
@@ -643,8 +1151,16 @@
         "Streeter": 1349,
         "Fisk": 2691
       },
-      "MD": { "Harrison": 99986, "Cleveland": 106168, "Fisk": 4767 },
-      "MA": { "Harrison": 183892, "Cleveland": 151905, "Fisk": 8701 },
+      "MD": {
+        "Harrison": 99986,
+        "Cleveland": 106168,
+        "Fisk": 4767
+      },
+      "MA": {
+        "Harrison": 183892,
+        "Cleveland": 151905,
+        "Fisk": 8701
+      },
       "MI": {
         "Harrison": 236387,
         "Cleveland": 213469,
@@ -657,7 +1173,11 @@
         "Streeter": 1097,
         "Fisk": 15311
       },
-      "MS": { "Harrison": 31120, "Cleveland": 85467, "Fisk": 258 },
+      "MS": {
+        "Harrison": 31120,
+        "Cleveland": 85467,
+        "Fisk": 258
+      },
       "MO": {
         "Harrison": 236252,
         "Cleveland": 261943,
@@ -670,14 +1190,22 @@
         "Streeter": 4226,
         "Fisk": 9429
       },
-      "NV": { "Harrison": 7088, "Cleveland": 5149, "Fisk": 41 },
+      "NV": {
+        "Harrison": 7088,
+        "Cleveland": 5149,
+        "Fisk": 41
+      },
       "NH": {
         "Harrison": 45728,
         "Cleveland": 43456,
         "Streeter": 42,
         "Fisk": 1593
       },
-      "NJ": { "Harrison": 144360, "Cleveland": 151508, "Fisk": 7933 },
+      "NJ": {
+        "Harrison": 144360,
+        "Cleveland": 151508,
+        "Fisk": 7933
+      },
       "NY": {
         "Harrison": 650338,
         "Cleveland": 635965,
@@ -708,17 +1236,36 @@
         "Streeter": 3876,
         "Fisk": 20966
       },
-      "RI": { "Harrison": 21969, "Cleveland": 17530, "Fisk": 1251 },
-      "SC": { "Harrison": 13740, "Cleveland": 65825 },
-      "TN": { "Harrison": 138988, "Cleveland": 158779, "Fisk": 5977 },
+      "RI": {
+        "Harrison": 21969,
+        "Cleveland": 17530,
+        "Fisk": 1251
+      },
+      "SC": {
+        "Harrison": 13740,
+        "Cleveland": 65825
+      },
+      "TN": {
+        "Harrison": 138988,
+        "Cleveland": 158779,
+        "Fisk": 5977
+      },
       "TX": {
         "Harrison": 88280,
         "Cleveland": 234883,
         "Streeter": 29459,
         "Fisk": 4749
       },
-      "VT": { "Harrison": 45192, "Cleveland": 16788, "Fisk": 1460 },
-      "VA": { "Harrison": 150449, "Cleveland": 151979, "Fisk": 1682 },
+      "VT": {
+        "Harrison": 45192,
+        "Cleveland": 16788,
+        "Fisk": 1460
+      },
+      "VA": {
+        "Harrison": 150449,
+        "Cleveland": 151979,
+        "Fisk": 1682
+      },
       "WV": {
         "Harrison": 78171,
         "Cleveland": 78677,
@@ -751,15 +1298,27 @@
         "Weaver": 25311,
         "Bidwell": 8096
       },
-      "CO": { "Harrison": 38620, "Weaver": 53584, "Bidwell": 1687 },
+      "CO": {
+        "Harrison": 38620,
+        "Weaver": 53584,
+        "Bidwell": 1687
+      },
       "CT": {
         "Harrison": 77032,
         "Cleveland": 82395,
         "Weaver": 809,
         "Bidwell": 4026
       },
-      "DE": { "Harrison": 18077, "Cleveland": 18581, "Bidwell": 564 },
-      "FL": { "Cleveland": 30143, "Weaver": 4843, "Bidwell": 570 },
+      "DE": {
+        "Harrison": 18077,
+        "Cleveland": 18581,
+        "Bidwell": 564
+      },
+      "FL": {
+        "Cleveland": 30143,
+        "Weaver": 4843,
+        "Bidwell": 570
+      },
       "GA": {
         "Harrison": 48305,
         "Cleveland": 129386,
@@ -790,14 +1349,21 @@
         "Weaver": 20595,
         "Bidwell": 6402
       },
-      "KS": { "Harrison": 157241, "Weaver": 163111, "Bidwell": 4553 },
+      "KS": {
+        "Harrison": 157241,
+        "Weaver": 163111,
+        "Bidwell": 4553
+      },
       "KY": {
         "Harrison": 135441,
         "Cleveland": 175461,
         "Weaver": 23500,
         "Bidwell": 6442
       },
-      "LA": { "Harrison": 27903, "Cleveland": 87662 },
+      "LA": {
+        "Harrison": 27903,
+        "Cleveland": 87662
+      },
       "ME": {
         "Harrison": 62878,
         "Cleveland": 48024,
@@ -882,7 +1448,11 @@
         "Weaver": 44732,
         "Bidwell": 2630
       },
-      "ND": { "Harrison": 17506, "Weaver": 17700, "Bidwell": 899 },
+      "ND": {
+        "Harrison": 17506,
+        "Weaver": 17700,
+        "Bidwell": 899
+      },
       "OH": {
         "Harrison": 405187,
         "Cleveland": 404115,
@@ -907,8 +1477,16 @@
         "Weaver": 228,
         "Bidwell": 1654
       },
-      "SC": { "Harrison": 13384, "Cleveland": 54698, "Weaver": 2410 },
-      "SD": { "Harrison": 34888, "Cleveland": 9081, "Weaver": 26544 },
+      "SC": {
+        "Harrison": 13384,
+        "Cleveland": 54698,
+        "Weaver": 2410
+      },
+      "SD": {
+        "Harrison": 34888,
+        "Cleveland": 9081,
+        "Weaver": 26544
+      },
       "TN": {
         "Harrison": 99851,
         "Cleveland": 136594,
@@ -951,7 +1529,11 @@
         "Weaver": 9909,
         "Bidwell": 13132
       },
-      "WY": { "Harrison": 8454, "Weaver": 7722, "Bidwell": 530 }
+      "WY": {
+        "Harrison": 8454,
+        "Weaver": 7722,
+        "Bidwell": 530
+      }
     },
     "1896": {
       "CA": {
@@ -1061,14 +1643,22 @@
         "Levering": 7799,
         "Matchett": 1311
       },
-      "WY": { "McKinley": 10072, "Bryan": 10375, "Levering": 159 },
+      "WY": {
+        "McKinley": 10072,
+        "Bryan": 10375,
+        "Levering": 159
+      },
       "AL": {
         "McKinley": 54737,
         "Bryan": 131226,
         "Palmer": 6464,
         "Levering": 2147
       },
-      "AR": { "McKinley": 37512, "Bryan": 110103, "Levering": 893 },
+      "AR": {
+        "McKinley": 37512,
+        "Bryan": 110103,
+        "Levering": 893
+      },
       "DE": {
         "McKinley": 16883,
         "Bryan": 13425,
@@ -1081,7 +1671,11 @@
         "Palmer": 2809,
         "Levering": 5613
       },
-      "ID": { "McKinley": 6314, "Bryan": 23135, "Levering": 172 },
+      "ID": {
+        "McKinley": 6314,
+        "Bryan": 23135,
+        "Levering": 172
+      },
       "IL": {
         "McKinley": 607130,
         "Bryan": 464523,
@@ -1089,7 +1683,11 @@
         "Levering": 9818,
         "Matchett": 1147
       },
-      "LA": { "McKinley": 22037, "Bryan": 77175, "Palmer": 1834 },
+      "LA": {
+        "McKinley": 22037,
+        "Bryan": 77175,
+        "Palmer": 1834
+      },
       "ME": {
         "McKinley": 80461,
         "Bryan": 34587,
@@ -1123,8 +1721,15 @@
         "Palmer": 1071,
         "Levering": 485
       },
-      "MT": { "McKinley": 10494, "Bryan": 42537, "Levering": 186 },
-      "NV": { "McKinley": 1938, "Bryan": 8376 },
+      "MT": {
+        "McKinley": 10494,
+        "Bryan": 42537,
+        "Levering": 186
+      },
+      "NV": {
+        "McKinley": 1938,
+        "Bryan": 8376
+      },
       "NY": {
         "McKinley": 819838,
         "Bryan": 551513,
@@ -1165,16 +1770,32 @@
         "Levering": 1161,
         "Matchett": 558
       },
-      "SC": { "McKinley": 9313, "Bryan": 58801, "Palmer": 824 },
-      "SD": { "McKinley": 41042, "Bryan": 41225, "Levering": 683 },
+      "SC": {
+        "McKinley": 9313,
+        "Bryan": 58801,
+        "Palmer": 824
+      },
+      "SD": {
+        "McKinley": 41042,
+        "Bryan": 41225,
+        "Levering": 683
+      },
       "TX": {
         "McKinley": 158894,
         "Bryan": 361224,
         "Palmer": 4853,
         "Levering": 1722
       },
-      "ND": { "McKinley": 26335, "Bryan": 20686, "Levering": 358 },
-      "UT": { "McKinley": 13491, "Bryan": 64607, "Palmer": 21 },
+      "ND": {
+        "McKinley": 26335,
+        "Bryan": 20686,
+        "Levering": 358
+      },
+      "UT": {
+        "McKinley": 13491,
+        "Bryan": 64607,
+        "Palmer": 21
+      },
       "VT": {
         "McKinley": 51127,
         "Bryan": 10640,
@@ -1229,7 +1850,12 @@
         "Malloney": 908,
         "Debs": 1029
       },
-      "DE": { "McKinley": 22535, "Bryan": 18863, "Woolley": 546, "Debs": 57 },
+      "DE": {
+        "McKinley": 22535,
+        "Bryan": 18863,
+        "Woolley": 546,
+        "Debs": 57
+      },
       "FL": {
         "McKinley": 7420,
         "Bryan": 28007,
@@ -1287,8 +1913,16 @@
         "Debs": 770,
         "Barker": 2017
       },
-      "LA": { "McKinley": 14233, "Bryan": 53671 },
-      "ME": { "McKinley": 65412, "Bryan": 36822, "Woolley": 2585, "Debs": 878 },
+      "LA": {
+        "McKinley": 14233,
+        "Bryan": 53671
+      },
+      "ME": {
+        "McKinley": 65412,
+        "Bryan": 36822,
+        "Woolley": 2585,
+        "Debs": 878
+      },
       "MD": {
         "McKinley": 136185,
         "Bryan": 122238,
@@ -1318,7 +1952,11 @@
         "Malloney": 1329,
         "Debs": 3065
       },
-      "MS": { "McKinley": 5753, "Bryan": 51706, "Barker": 1644 },
+      "MS": {
+        "McKinley": 5753,
+        "Bryan": 51706,
+        "Barker": 1644
+      },
       "MO": {
         "McKinley": 314092,
         "Bryan": 351922,
@@ -1341,8 +1979,16 @@
         "Debs": 823,
         "Barker": 1104
       },
-      "NV": { "McKinley": 3849, "Bryan": 6347 },
-      "NH": { "McKinley": 54799, "Bryan": 35489, "Woolley": 1270, "Debs": 790 },
+      "NV": {
+        "McKinley": 3849,
+        "Bryan": 6347
+      },
+      "NH": {
+        "McKinley": 54799,
+        "Bryan": 35489,
+        "Woolley": 1270,
+        "Debs": 790
+      },
       "NJ": {
         "McKinley": 221754,
         "Bryan": 164879,
@@ -1400,7 +2046,10 @@
         "Woolley": 1529,
         "Malloney": 1423
       },
-      "SC": { "McKinley": 3579, "Bryan": 47233 },
+      "SC": {
+        "McKinley": 3579,
+        "Bryan": 47233
+      },
       "SD": {
         "McKinley": 54530,
         "Bryan": 39544,
@@ -1466,7 +2115,10 @@
         "Malloney": 503,
         "Debs": 7048
       },
-      "WY": { "McKinley": 14482, "Bryan": 10164 }
+      "WY": {
+        "McKinley": 14482,
+        "Bryan": 10164
+      }
     },
     "1904": {
       "AL": {
@@ -1571,7 +2223,11 @@
         "Corregan": 596,
         "Watson": 2511
       },
-      "LA": { "Roosevelt": 5205, "Parker": 47747, "Debs": 995 },
+      "LA": {
+        "Roosevelt": 5205,
+        "Parker": 47747,
+        "Debs": 995
+      },
       "ME": {
         "Roosevelt": 64438,
         "Parker": 27648,
@@ -1609,7 +2265,12 @@
         "Corregan": 974,
         "Watson": 2103
       },
-      "MS": { "Roosevelt": 3187, "Parker": 53374, "Debs": 392, "Watson": 1425 },
+      "MS": {
+        "Roosevelt": 3187,
+        "Parker": 53374,
+        "Debs": 392,
+        "Watson": 1425
+      },
       "MO": {
         "Roosevelt": 321449,
         "Parker": 296312,
@@ -1633,7 +2294,12 @@
         "Debs": 7412,
         "Watson": 20518
       },
-      "NV": { "Roosevelt": 6864, "Parker": 3982, "Debs": 925, "Watson": 344 },
+      "NV": {
+        "Roosevelt": 6864,
+        "Parker": 3982,
+        "Debs": 925,
+        "Watson": 344
+      },
       "NH": {
         "Roosevelt": 54163,
         "Parker": 34074,
@@ -1700,7 +2366,12 @@
         "Debs": 956,
         "Corregan": 488
       },
-      "SC": { "Roosevelt": 2554, "Parker": 52563, "Debs": 22, "Watson": 1 },
+      "SC": {
+        "Roosevelt": 2554,
+        "Parker": 52563,
+        "Debs": 22,
+        "Watson": 1
+      },
       "SD": {
         "Roosevelt": 72083,
         "Parker": 21969,
@@ -1723,8 +2394,17 @@
         "Corregan": 421,
         "Watson": 8062
       },
-      "UT": { "Roosevelt": 62446, "Parker": 33413, "Debs": 5767 },
-      "VT": { "Roosevelt": 40459, "Parker": 9777, "Swallow": 792, "Debs": 859 },
+      "UT": {
+        "Roosevelt": 62446,
+        "Parker": 33413,
+        "Debs": 5767
+      },
+      "VT": {
+        "Roosevelt": 40459,
+        "Parker": 9777,
+        "Swallow": 792,
+        "Debs": 859
+      },
       "VA": {
         "Roosevelt": 47880,
         "Parker": 80650,
@@ -1756,7 +2436,12 @@
         "Corregan": 223,
         "Watson": 530
       },
-      "WY": { "Roosevelt": 20489, "Parker": 8930, "Swallow": 217, "Debs": 1077 }
+      "WY": {
+        "Roosevelt": 20489,
+        "Parker": 8930,
+        "Swallow": 217,
+        "Debs": 1077
+      }
     },
     "1908": {
       "AL": {
@@ -1782,7 +2467,12 @@
         "Debs": 28659,
         "Hisgen": 4278
       },
-      "CO": { "Taft": 123700, "Bryan": 126644, "Chafin": 5559, "Debs": 7974 },
+      "CO": {
+        "Taft": 123700,
+        "Bryan": 126644,
+        "Chafin": 5559,
+        "Debs": 7974
+      },
       "CT": {
         "Taft": 112815,
         "Bryan": 68255,
@@ -1863,7 +2553,12 @@
         "Watson": 333,
         "Hisgen": 200
       },
-      "LA": { "Taft": 8958, "Bryan": 63568, "Debs": 2538, "Hisgen": 82 },
+      "LA": {
+        "Taft": 8958,
+        "Bryan": 63568,
+        "Debs": 2538,
+        "Hisgen": 82
+      },
       "ME": {
         "Taft": 66987,
         "Bryan": 35403,
@@ -1901,7 +2596,12 @@
         "Debs": 14527,
         "Hisgen": 426
       },
-      "MS": { "Taft": 4363, "Bryan": 60287, "Debs": 978, "Watson": 1276 },
+      "MS": {
+        "Taft": 4363,
+        "Bryan": 60287,
+        "Debs": 978,
+        "Watson": 1276
+      },
       "MO": {
         "Taft": 347203,
         "Bryan": 346574,
@@ -1918,8 +2618,18 @@
         "Debs": 5855,
         "Hisgen": 481
       },
-      "NE": { "Taft": 126997, "Bryan": 131099, "Chafin": 5179, "Debs": 3524 },
-      "NV": { "Taft": 10775, "Bryan": 11212, "Debs": 2103, "Hisgen": 436 },
+      "NE": {
+        "Taft": 126997,
+        "Bryan": 131099,
+        "Chafin": 5179,
+        "Debs": 3524
+      },
+      "NV": {
+        "Taft": 10775,
+        "Bryan": 11212,
+        "Debs": 2103,
+        "Hisgen": 436
+      },
       "NH": {
         "Taft": 53149,
         "Bryan": 33655,
@@ -1943,7 +2653,11 @@
         "Gilhaus": 3877,
         "Hisgen": 35817
       },
-      "NC": { "Taft": 114887, "Bryan": 136928, "Debs": 345 },
+      "NC": {
+        "Taft": 114887,
+        "Bryan": 136928,
+        "Debs": 345
+      },
       "ND": {
         "Taft": 57680,
         "Bryan": 32885,
@@ -1990,7 +2704,12 @@
         "Gilhaus": 183,
         "Hisgen": 1105
       },
-      "SC": { "Taft": 3965, "Bryan": 62290, "Debs": 100, "Hisgen": 43 },
+      "SC": {
+        "Taft": 3965,
+        "Bryan": 62290,
+        "Debs": 100,
+        "Hisgen": 43
+      },
       "SD": {
         "Taft": 67536,
         "Bryan": 40266,
@@ -2015,8 +2734,18 @@
         "Watson": 994,
         "Hisgen": 115
       },
-      "UT": { "Taft": 61165, "Bryan": 42601, "Debs": 4890, "Hisgen": 92 },
-      "VT": { "Taft": 39552, "Bryan": 11496, "Chafin": 799, "Hisgen": 804 },
+      "UT": {
+        "Taft": 61165,
+        "Bryan": 42601,
+        "Debs": 4890,
+        "Hisgen": 92
+      },
+      "VT": {
+        "Taft": 39552,
+        "Bryan": 11496,
+        "Chafin": 799,
+        "Hisgen": 804
+      },
       "VA": {
         "Taft": 52573,
         "Bryan": 82946,
@@ -2056,7 +2785,12 @@
       }
     },
     "1912": {
-      "AL": { "Wilson": 82438, "Taft": 9732, "Roosevelt": 22680, "Debs": 3029 },
+      "AL": {
+        "Wilson": 82438,
+        "Taft": 9732,
+        "Roosevelt": 22680,
+        "Debs": 3029
+      },
       "AZ": {
         "Wilson": 10324,
         "Taft": 3021,
@@ -2158,7 +2892,12 @@
         "Chafin": 3233,
         "Reimer": 956
       },
-      "LA": { "Wilson": 61035, "Taft": 3834, "Roosevelt": 9323, "Debs": 5249 },
+      "LA": {
+        "Wilson": 61035,
+        "Taft": 3834,
+        "Roosevelt": 9323,
+        "Debs": 5249
+      },
       "ME": {
         "Wilson": 51113,
         "Taft": 26545,
@@ -2198,7 +2937,12 @@
         "Chafin": 7886,
         "Reimer": 2212
       },
-      "MS": { "Wilson": 57227, "Taft": 1597, "Roosevelt": 3646, "Debs": 2062 },
+      "MS": {
+        "Wilson": 57227,
+        "Taft": 1597,
+        "Roosevelt": 3646,
+        "Debs": 2062
+      },
       "MO": {
         "Wilson": 330746,
         "Taft": 207821,
@@ -2220,7 +2964,12 @@
         "Debs": 10219,
         "Chafin": 3419
       },
-      "NV": { "Wilson": 7980, "Taft": 3210, "Roosevelt": 5525, "Debs": 3263 },
+      "NV": {
+        "Wilson": 7980,
+        "Taft": 3210,
+        "Roosevelt": 5525,
+        "Debs": 3263
+      },
       "NH": {
         "Wilson": 34724,
         "Taft": 32927,
@@ -2236,7 +2985,12 @@
         "Chafin": 2871,
         "Reimer": 1321
       },
-      "NM": { "Wilson": 20437, "Taft": 17733, "Roosevelt": 8347, "Debs": 2859 },
+      "NM": {
+        "Wilson": 20437,
+        "Taft": 17733,
+        "Roosevelt": 8347,
+        "Debs": 2859
+      },
       "NY": {
         "Wilson": 655475,
         "Taft": 455428,
@@ -2296,7 +3050,12 @@
         "Chafin": 616,
         "Reimer": 236
       },
-      "SC": { "Wilson": 48355, "Taft": 536, "Roosevelt": 1293, "Debs": 164 },
+      "SC": {
+        "Wilson": 48355,
+        "Taft": 536,
+        "Roosevelt": 1293,
+        "Debs": 164
+      },
       "SD": {
         "Wilson": 48942,
         "Roosevelt": 58811,
@@ -2369,6 +3128,303 @@
         "Roosevelt": 9232,
         "Debs": 2760,
         "Chafin": 434
+      }
+    },
+    "1916": {
+      "AL": {
+        "Wilson": 98811,
+        "Hughes": 27491,
+        "Benson": 1916,
+        "Hanly": 1034
+      },
+      "AZ": {
+        "Wilson": 33170,
+        "Hughes": 20524,
+        "Benson": 3174,
+        "Hanly": 1153
+      },
+      "AR": {
+        "Wilson": 112282,
+        "Hughes": 47135,
+        "Benson": 6998,
+        "Hanly": 2015
+      },
+      "CA": {
+        "Wilson": 466289,
+        "Hughes": 462516,
+        "Benson": 42898,
+        "Hanly": 27713
+      },
+      "CO": {
+        "Wilson": 178816,
+        "Hughes": 102308,
+        "Benson": 10049,
+        "Hanly": 2793
+      },
+      "CT": {
+        "Wilson": 99786,
+        "Hughes": 106514,
+        "Benson": 5179,
+        "Hanly": 1789,
+        "Reimer": 606
+      },
+      "DE": {
+        "Wilson": 24753,
+        "Hughes": 26011,
+        "Benson": 480,
+        "Hanly": 566
+      },
+      "FL": {
+        "Wilson": 55984,
+        "Hughes": 14611,
+        "Benson": 5353,
+        "Hanly": 4855
+      },
+      "GA": {
+        "Wilson": 121969,
+        "Hughes": 10553,
+        "Benson": 819
+      },
+      "ID": {
+        "Wilson": 70054,
+        "Hughes": 55368,
+        "Benson": 8066,
+        "Hanly": 1127
+      },
+      "IL": {
+        "Wilson": 950229,
+        "Hughes": 1152549,
+        "Benson": 61389,
+        "Hanly": 23739,
+        "Reimer": 1443
+      },
+      "IN": {
+        "Wilson": 334063,
+        "Hughes": 341005,
+        "Benson": 21855,
+        "Hanly": 16368,
+        "Reimer": 1659
+      },
+      "IA": {
+        "Wilson": 222505,
+        "Hughes": 279065,
+        "Benson": 10976,
+        "Hanly": 3377
+      },
+      "KS": {
+        "Wilson": 314588,
+        "Hughes": 277658,
+        "Benson": 24685,
+        "Hanly": 12882
+      },
+      "KY": {
+        "Wilson": 269990,
+        "Hughes": 241854,
+        "Benson": 4734,
+        "Hanly": 3036,
+        "Reimer": 333
+      },
+      "LA": {
+        "Wilson": 79875,
+        "Hughes": 6466,
+        "Benson": 292
+      },
+      "ME": {
+        "Wilson": 64118,
+        "Hughes": 69506,
+        "Benson": 2186,
+        "Hanly": 595
+      },
+      "MD": {
+        "Wilson": 138359,
+        "Hughes": 117347,
+        "Benson": 2674,
+        "Hanly": 2903,
+        "Reimer": 756
+      },
+      "MA": {
+        "Wilson": 247885,
+        "Hughes": 268784,
+        "Benson": 11058,
+        "Hanly": 2993,
+        "Reimer": 1097
+      },
+      "MI": {
+        "Wilson": 283993,
+        "Hughes": 337952,
+        "Benson": 16120,
+        "Hanly": 8139,
+        "Reimer": 842
+      },
+      "MN": {
+        "Wilson": 179157,
+        "Hughes": 179553,
+        "Benson": 20117,
+        "Hanly": 7793,
+        "Reimer": 468
+      },
+      "MS": {
+        "Wilson": 80422,
+        "Hughes": 4253,
+        "Benson": 1484
+      },
+      "MO": {
+        "Wilson": 397016,
+        "Hughes": 369167,
+        "Benson": 14608,
+        "Hanly": 3881,
+        "Reimer": 899
+      },
+      "MT": {
+        "Wilson": 101063,
+        "Hughes": 66750,
+        "Benson": 9564
+      },
+      "NE": {
+        "Wilson": 159027,
+        "Hughes": 117771,
+        "Benson": 7141,
+        "Hanly": 2897
+      },
+      "NV": {
+        "Wilson": 17778,
+        "Hughes": 12131,
+        "Benson": 3069
+      },
+      "NH": {
+        "Wilson": 43781,
+        "Hughes": 43725,
+        "Benson": 1318,
+        "Hanly": 303
+      },
+      "NJ": {
+        "Wilson": 211018,
+        "Hughes": 268982,
+        "Benson": 10405,
+        "Hanly": 3182,
+        "Reimer": 855
+      },
+      "NM": {
+        "Wilson": 33693,
+        "Hughes": 31163,
+        "Benson": 1999,
+        "Hanly": 112
+      },
+      "NY": {
+        "Wilson": 759426,
+        "Hughes": 879238,
+        "Benson": 45944,
+        "Hanly": 19031,
+        "Reimer": 2666
+      },
+      "NC": {
+        "Wilson": 168383,
+        "Hughes": 120890,
+        "Benson": 490,
+        "Hanly": 51
+      },
+      "ND": {
+        "Wilson": 55206,
+        "Hughes": 53471,
+        "Benson": 5716,
+        "Hanly": 997
+      },
+      "OH": {
+        "Wilson": 604361,
+        "Hughes": 514858,
+        "Benson": 38092,
+        "Hanly": 8080
+      },
+      "OK": {
+        "Wilson": 148626,
+        "Hughes": 98299,
+        "Benson": 45431
+      },
+      "OR": {
+        "Wilson": 120087,
+        "Hughes": 126813,
+        "Benson": 9711,
+        "Hanly": 4729
+      },
+      "PA": {
+        "Wilson": 521784,
+        "Hughes": 703734,
+        "Benson": 42637,
+        "Hanly": 28525,
+        "Reimer": 417
+      },
+      "RI": {
+        "Wilson": 40394,
+        "Hughes": 44858,
+        "Benson": 1914,
+        "Hanly": 470,
+        "Reimer": 180
+      },
+      "SC": {
+        "Wilson": 61837,
+        "Hughes": 1558,
+        "Benson": 135
+      },
+      "SD": {
+        "Wilson": 59335,
+        "Hughes": 64207,
+        "Benson": 3658,
+        "Hanly": 1764
+      },
+      "TN": {
+        "Wilson": 152955,
+        "Hughes": 116257,
+        "Benson": 2542,
+        "Hanly": 147
+      },
+      "TX": {
+        "Wilson": 285980,
+        "Hughes": 64673,
+        "Benson": 19011,
+        "Hanly": 2057
+      },
+      "UT": {
+        "Wilson": 84025,
+        "Hughes": 54133,
+        "Benson": 4460,
+        "Reimer": 144
+      },
+      "VT": {
+        "Wilson": 22708,
+        "Hughes": 40250,
+        "Benson": 798,
+        "Hanly": 709
+      },
+      "VA": {
+        "Wilson": 102824,
+        "Hughes": 49358,
+        "Benson": 1062,
+        "Hanly": 683,
+        "Reimer": 67
+      },
+      "WA": {
+        "Wilson": 182993,
+        "Hughes": 166399,
+        "Benson": 22544,
+        "Hanly": 6823,
+        "Reimer": 700
+      },
+      "WV": {
+        "Wilson": 140403,
+        "Hughes": 143124,
+        "Benson": 6150
+      },
+      "WI": {
+        "Wilson": 193042,
+        "Hughes": 221323,
+        "Benson": 27846,
+        "Hanly": 7166
+      },
+      "WY": {
+        "Wilson": 28316,
+        "Hughes": 21700,
+        "Benson": 1453,
+        "Hanly": 373
       }
     }
   }

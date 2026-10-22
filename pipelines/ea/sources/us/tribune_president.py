@@ -470,6 +470,14 @@ NOTE = (
 
 
 def note(year: int, volume: int) -> str:
+    if year == 1916:
+        return (
+            f"The state's popular vote for president in 1916 as printed in {TITLES[volume]}, a newspaper almanac that "
+            "compiles the states' returns before most canvasses were certified. Tickets that Wikipedia's "
+            "results-by-state table names keep that table's candidates. A vision model read the printed page and the "
+            "figures were checked against the page's own row totals and its Total row; each number carries its page "
+            "and box. Wikipedia's earlier figures are kept as a superseded, non-default set."
+        )
     return (
         f"The state's popular vote for president in {year} as printed in {TITLES[volume]}, which "
         "compiles the states' official returns and is a compilation rather than a certified canvass. Tickets that "
@@ -482,6 +490,7 @@ def note(year: int, volume: int) -> str:
 
 
 CAVEATS: dict[int, str] = {
+    1916: " The almanac prints no state total in its table of candidates; the total carried is the sum of the printed lines, which leaves out the Progressive and scattering votes the almanac counts separately (Georgia and Louisiana print no Prohibition line).",
     1888: " The printed Prohibition column adds to 250,124 against a printed Total row of 250,125.",
     1900: " The printed total for Kentucky (490,812) is the 1908 figure repeated; its lines add to 467,600, which is the total carried and the one the Total row adds up from.",
     1912: " The printed totals for Missouri (698,652), Ohio (1,103,557), Utah (112,315), and Vermont (62,941) differ from the sums of their lines (698,562; 1,033,557; 112,385; 62,841); the sums are carried and are the figures the printed Total row adds up from. Oklahoma's joint Republican and Progressive ticket is printed split evenly between the two.",
@@ -542,6 +551,11 @@ LATE_LEGENDS = {
     (1912, "Debs"): ("Eugene V. Debs (Socialist)", "socialistpartyofamerica"),
     (1912, "Chafin"): ("Eugene W. Chafin (Prohibition)", "prohibitionparty"),
     (1912, "Reimer"): ("Arthur E. Reimer (Socialist Labor)", "socialistlaborpartyofamerica"),
+    (1916, "Wilson"): ("Woodrow Wilson (Democratic)", "democraticparty"),
+    (1916, "Hughes"): ("Charles E. Hughes (Republican)", "republicanparty"),
+    (1916, "Benson"): ("Allan L. Benson (Socialist)", "socialistpartyofamerica"),
+    (1916, "Hanly"): ("J. Frank Hanly (Prohibition)", "prohibitionparty"),
+    (1916, "Reimer"): ("Arthur E. Reimer (Socialist Labor)", "socialistlaborpartyofamerica"),
 }
 FIXES: dict[tuple[str, int], int | None] = {
     ("Arkansas", 3): 58071,
@@ -615,7 +629,7 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1912,)
+YEARS = (1916,)
 WHIG_LABEL = "Whig candidates"
 WHIG_NOTE = (
     'The almanac prints the Whig vote as one line, "Harrison etc.", so the Whig tickets of Wikipedia\'s table '
@@ -646,6 +660,7 @@ ELECTION_DAYS = {
     1904: "1904-11-08",
     1908: "1908-11-03",
     1912: "1912-11-05",
+    1916: "1916-11-07",
 }
 YEAR_PRINT = {
     1856: "v65",
@@ -666,11 +681,14 @@ V81_YEARS = (1872, 1876, 1880)
 URLS = {year: volume[0] for year, volume in tribune_almanac.VOLUMES.items()} | {
     1884: "https://archive.org/download/vol1885tribuneal00unse/vol1885tribuneal00unse.pdf",
     1912: "https://archive.org/download/tribunealmanacpo1913newy/tribunealmanacpo1913newy.pdf",
+    1916: "https://archive.org/download/worldalmanacency1917newy/worldalmanacency1917newy.pdf",
 }
 TITLES = tribune_almanac.TITLES | {
     1884: "The Tribune Almanac and Political Register for 1885",
     1912: "The Tribune Almanac and Political Register for 1913",
+    1916: "The World Almanac and Encyclopedia 1917",
 }
+WORLD_ALMANAC = "The Press Publishing Co. (The New York World)"
 PRINT_VOLUME = {"v85": 1884, "v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
 PRINT_COLUMNS = {
     "v65": {
@@ -741,7 +759,7 @@ for print_key, print_spec in V13["prints"].items():
         "scales": ((2, "7"),)
     }
     PRINT_COLUMNS[print_key] = {int(col): (year, surname) for col, (year, surname) in print_spec["columns"].items()}
-    PRINT_VOLUME[print_key] = 1912
+    PRINT_VOLUME[print_key] = print_spec["year"] if print_spec["year"] == 1916 else 1912
     YEAR_PRINT.setdefault(print_spec["year"], print_key)
 FUSION = {(1860, "NY", "Douglas"), (1860, "NJ", "Douglas"), (1860, "PA", "Breckinridge")}
 CANDIDATES = {
@@ -1779,7 +1797,7 @@ def emit() -> Path:
                 house_books._render(book, page_number, 100, image, False)
             with Image.open(image) as rendered:
                 width, height = rendered.size
-            source = cs.source(tribune_almanac.PUBLISHER, TITLES[volume])
+            source = cs.source(WORLD_ALMANAC if volume == 1916 else tribune_almanac.PUBLISHER, TITLES[volume])
             if (
                 source not in sources_added
                 and not conn.execute("select 1 from source where id = %s", [source]).fetchone()
@@ -1789,7 +1807,7 @@ def emit() -> Path:
                     "source",
                     id=source,
                     kind=getattr(tribune_almanac, "KIND", "official_body"),
-                    publisher=tribune_almanac.PUBLISHER,
+                    publisher=WORLD_ALMANAC if volume == 1916 else tribune_almanac.PUBLISHER,
                     title=TITLES[volume],
                     url=URLS[volume].replace("/download/", "/details/").rsplit("/", 1)[0],
                     license=tribune_almanac.LICENSE,
