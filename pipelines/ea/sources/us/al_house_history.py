@@ -18,6 +18,11 @@ LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 PUBLISHER = "Alabama Secretary of State"
 TITLE = "Election data: U.S. House election history 1980-2012"
 STACKED = {
+    "Gen.80": (date(1980, 11, 4), "house"),
+    "Gen82": (date(1982, 11, 2), "house"),
+    "Gen. 84": (date(1984, 11, 6), "house"),
+    "GEN86": (date(1986, 11, 4), "house"),
+    "GEN90": (date(1990, 11, 6), "house"),
     "GEN92": (date(1992, 11, 3), "house"),
     "GEN96": (date(1996, 11, 5), "house"),
     "GEN98": (date(1998, 11, 3), "house"),
