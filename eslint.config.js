@@ -132,6 +132,8 @@ export default antfu({
     "prefer-const": "off",
   },
   ignores: [
+    "apps/landing/public/showcase/**/*",
+    "apps/landing/showcase/src/**/*",
     "apps/web/src/lib/paraglide/**/*",
     "apps/web/src/lib/components/ui/**/*",
     "apps/web/project.inlang/**/*",

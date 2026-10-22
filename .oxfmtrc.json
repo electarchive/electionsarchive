@@ -18,6 +18,8 @@
     "apps/web/project.inlang",
     "packages/db/migrations",
     "packages/db/src/core.ts",
+    "apps/landing/public/showcase",
+    "apps/landing/public/photos",
     "packages/db/src/core-relations.ts"
   ]
 }
