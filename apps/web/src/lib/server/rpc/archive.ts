@@ -255,6 +255,7 @@ const PlaceRow = v.object({
   margin: v.nullable(v.number()),
   earlier: v.nullable(v.array(v.number())),
   prior: v.nullable(v.number()),
+  redrawn: v.optional(v.number()),
   within: v.optional(v.number()),
   seats: v.optional(v.nullable(v.number())),
   isCounted: v.optional(v.boolean()),
@@ -1854,7 +1855,7 @@ async function places(
       owner: null,
     })),
   ];
-  const [tabulated, at] = await Promise.all([
+  const [counted, at, moved] = await Promise.all([
     tabulate(
       [contest.root],
       listed,
@@ -1869,7 +1870,22 @@ async function places(
       listed.map((row) => row.k),
       contest.date ?? "infinity",
     ),
+    redrawn(
+      [...shown.map((kid) => kid.id), ...nested.map((row) => row.area)],
+      contest,
+      chosen,
+      area.id,
+    ),
   ]);
+  const tabulated = {
+    ...counted,
+    rows: counted.rows.map((row) => {
+      const overlap = moved.get(row.k);
+      return overlap == null
+        ? row
+        : { ...row, earlier: null, prior: null, redrawn: overlap };
+    }),
+  };
   const [turned, prior] = await Promise.all([
     turnout(
       contest.root,
@@ -2190,7 +2206,8 @@ type Note = {
     | "different_race"
     | "annulled"
     | "partial"
-    | "alternative";
+    | "alternative"
+    | "redrawn";
   side: "current" | "target" | null;
   value: string | null;
 };
@@ -2658,6 +2675,7 @@ export const contests = {
                 "annulled",
                 "partial",
                 "alternative",
+                "redrawn",
               ]),
               side: v.nullable(v.picklist(["current", "target"])),
               value: v.nullable(v.string()),
@@ -3386,37 +3404,52 @@ export const contests = {
         [],
         round,
       );
-      const [now, before, grid, cast, seats, pairs, steps] = await Promise.all([
-        loading,
-        chosen == null
-          ? null
-          : load(
-              [chosen.id],
-              [area.k],
-              chosen.date ?? "infinity",
-              [chosen.id].filter(() => isRoot),
-            ),
-        places(
-          contest,
-          area,
-          isRoot,
-          scopePath,
-          input.by,
-          chosen,
-          lineage,
-          input.match,
-          input.group,
-          round,
-        ),
-        counterpart?.indirect === true
-          ? load([counterpart.id], [area.k], counterpart.date ?? "infinity", [])
-          : null,
-        chamber(contest, area, loading, lineage, isRoot),
-        db.execute<{ from: string; to: string }>(
-          sisters([contest.root], contest.date ?? "infinity"),
-        ),
-        tally(contest, area.k, round, last, lineage, input.match, input.group),
-      ]);
+      const [now, before, grid, cast, seats, pairs, steps, shifted] =
+        await Promise.all([
+          loading,
+          chosen == null
+            ? null
+            : load(
+                [chosen.id],
+                [area.k],
+                chosen.date ?? "infinity",
+                [chosen.id].filter(() => isRoot),
+              ),
+          places(
+            contest,
+            area,
+            isRoot,
+            scopePath,
+            input.by,
+            chosen,
+            lineage,
+            input.match,
+            input.group,
+            round,
+          ),
+          counterpart?.indirect === true
+            ? load(
+                [counterpart.id],
+                [area.k],
+                counterpart.date ?? "infinity",
+                [],
+              )
+            : null,
+          chamber(contest, area, loading, lineage, isRoot),
+          db.execute<{ from: string; to: string }>(
+            sisters([contest.root], contest.date ?? "infinity"),
+          ),
+          tally(
+            contest,
+            area.k,
+            round,
+            last,
+            lineage,
+            input.match,
+            input.group,
+          ),
+          redrawn([area.id], contest, chosen),
+        ]);
       const current = now.get(area.k);
       if (current == null) {
         return { ...page, series, places: grid, targets };
@@ -3476,8 +3509,18 @@ export const contests = {
           })),
         }))
         .toArray();
+      const overlap = earlier == null ? undefined : shifted.get(area.k);
       const notesOut: Array<Note> = [
         ...picked,
+        ...(overlap == null
+          ? []
+          : [
+              {
+                code: "redrawn" as const,
+                side: null,
+                value: String(Math.round(overlap * 100)),
+              },
+            ]),
         ...caveats("current", current.sets),
         ...caveats("target", earlier?.sets ?? []),
       ];
@@ -3723,8 +3766,12 @@ export const contests = {
       }
       const day = contest.date ?? "infinity";
       const [own, kids] = await Promise.all([
-        db.execute<{ scheme: string }>(sql`
-          select scheme_code as scheme from area where id = ${area.id}::uuid
+        db.execute<{ scheme: string; shaped: string | null }>(sql`
+          select a.scheme_code as scheme, bs.as_of::text as shaped
+          from area a
+          left join contest c on c.id = ${contest.id}::uuid
+          left join boundary_set bs on bs.id = c.boundary_set_id and bs.scheme_code = a.scheme_code
+          where a.id = ${area.id}::uuid
         `),
         input.level == null
           ? []
@@ -3764,7 +3811,10 @@ export const contests = {
       );
       const absent = whole.filter((row) => !present.has(row.k));
       const [frames, blankLabels] = await Promise.all([
-        framing(area.id, day, [...present, ...whole.map((row) => row.k)]),
+        framing(area.id, own.rows[0]?.shaped ?? day, [
+          ...present,
+          ...whole.map((row) => row.k),
+        ]),
         names(
           absent.map((row) => row.id),
           contest.date,
@@ -5344,6 +5394,57 @@ async function anchors(ks: Array<number>, day: string) {
   `);
   return new Map(
     points.rows.map((row) => [row.k, [row.x, row.y] as [number, number]]),
+  );
+}
+
+async function redrawn(
+  ids: Array<string>,
+  now: { id: string; date: string | null },
+  then: { id: string; date: string | null } | null,
+  scope: string | null = null,
+) {
+  if (then == null || ids.length === 0) {
+    return new Map<number, number>();
+  }
+  const found = await db.execute<{ k: number; overlap: number }>(sql`
+    with picked as (
+      select a.id, a.k,
+        coalesce((
+          select bs.as_of from boundary_set bs
+          where bs.scheme_code = a.scheme_code
+            and bs.id = (select boundary_set_id from contest where id = ${now.id}::uuid)
+        ), ${now.date ?? "infinity"}::date) as now_at,
+        coalesce((
+          select bs.as_of from boundary_set bs
+          where bs.scheme_code = a.scheme_code
+            and bs.id = (select boundary_set_id from contest where id = ${then.id}::uuid)
+        ), ${then.date ?? "infinity"}::date) as then_at
+      from area a where a.id = any(${sql.param([...ids, ...(scope == null ? [] : [scope])])}::uuid[])
+    ),
+    versions as (
+      select p.id, p.k, g1.geom as a, g2.geom as b, g1.valid <> g2.valid as differs
+      from picked p
+      join area_geometry g1 on g1.area_id = p.id and g1.valid @> p.now_at
+      join area_geometry g2 on g2.area_id = p.id and g2.valid @> p.then_at
+    ),
+    frame as (
+      select a, b from versions where id = ${scope}::uuid and differs
+    ),
+    paired as (
+      select v.k,
+        case when f.a is null then v.a else ST_CollectionExtract(ST_Intersection(v.a, f.a, 0.00001), 3) end as a,
+        case when f.a is null then v.b else ST_CollectionExtract(ST_Intersection(v.b, f.b, 0.00001), 3) end as b
+      from versions v left join frame f on true
+      where v.id = any(${sql.param(ids)}::uuid[]) and (v.differs or f.a is not null)
+    )
+    select k, (ST_Area(ST_Intersection(a, b, 0.00001)) / greatest(ST_Area(a), ST_Area(b)))::float8 as overlap
+    from paired
+    where greatest(ST_Area(a), ST_Area(b)) > 0
+  `);
+  return new Map(
+    found.rows
+      .filter((row) => row.overlap < 0.97)
+      .map((row) => [row.k, row.overlap]),
   );
 }
 

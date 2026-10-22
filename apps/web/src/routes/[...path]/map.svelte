@@ -219,7 +219,8 @@
   );
   const hit = $derived(nested == null ? ["fill"] : ["nested-fill", "fill"]);
   const isCompared = $derived(
-    span != null && places.rows.some((row) => row.earlier != null),
+    span != null &&
+      places.rows.some((row) => row.earlier != null || row.redrawn != null),
   );
   const changes = $derived(
     new Map(
@@ -248,6 +249,17 @@
       }),
     ),
   );
+  const unmatched = $derived(
+    new Map(
+      isCompared
+        ? [...places.rows, ...(places.districts ?? [])].flatMap((row) =>
+            row.earlier == null && (row.valid > 0 || row.leader != null)
+              ? [[row.k, row.redrawn ?? null] as const]
+              : [],
+          )
+        : [],
+    ),
+  );
   const turnouts = $derived(
     new Map(
       [...places.rows, ...(places.districts ?? [])].flatMap((row) =>
@@ -270,6 +282,9 @@
       (shading === "turnout_change" && surges.size === 0)
       ? "winner"
       : shading,
+  );
+  const isUnmatched = $derived(
+    unmatched.size > 0 && typeof view === "string" && COMPARED.has(view),
   );
   const flips = $derived(
     Map.groupBy(
@@ -864,6 +879,14 @@
                       paint: { "fill-pattern": "hatch" },
                     },
                   ]),
+              {
+                id: "unmatched",
+                type: "fill" as const,
+                source: "places",
+                "source-layer": "areas",
+                filter: ["in", ["id"], ["literal", []]],
+                paint: { "fill-pattern": "hatch" },
+              },
               ...(isApproximate
                 ? [
                     {
@@ -1352,6 +1375,7 @@
     const tones = paint(host);
     const colorsNow = style(tones.read);
     const painted = fills(tones.read);
+    const hatched = isUnmatched ? [...unmatched.keys()] : [];
     const tips = [0, 1].map((index) =>
       tones.read(colors[index] ?? "var(--muted-foreground)"),
     );
@@ -1384,6 +1408,7 @@
             map.setFilter(layer, scopes[index] ?? null);
           }
         }
+        map.setFilter("unmatched", ["in", ["id"], ["literal", hatched]]);
         map.setPaintProperty("paper", "background-color", colorsNow.paper);
         map.setPaintProperty("fill", "fill-color", [
           "coalesce",
@@ -2060,6 +2085,38 @@
         </div>
       {/if}
     {/if}
+    {#if isUnmatched && span != null}
+      {const redrawn = $derived(
+        unmatched
+          .values()
+          .filter((overlap) => overlap != null)
+          .toArray().length,
+      )}
+      <span class="flex flex-wrap items-center gap-x-1.5 text-muted-foreground">
+        <span
+          class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_4px)] ring-1 ring-border block-3 inline-4"
+        ></span>
+        <span class="text-foreground">{m.map_unmatched_key()}</span>
+        <span class="font-figures text-xs tabular-nums"
+          >{[
+            redrawn > 0
+              ? m.map_unmatched_redrawn({
+                  count: count(redrawn),
+                  year: span.from,
+                })
+              : null,
+            unmatched.size > redrawn
+              ? m.map_unmatched_missing({
+                  count: count(unmatched.size - redrawn),
+                  year: span.forward ? span.to : span.from,
+                })
+              : null,
+          ]
+            .filter((part) => part != null)
+            .join(", ")}</span
+        >
+      </span>
+    {/if}
     {#if isApproximate}
       <span class="flex items-center gap-1.5 text-muted-foreground">
         <span
@@ -2263,6 +2320,18 @@
         </span>
       {/each}
     </span>
+    {#if isCompared && current.earlier == null && span != null}
+      <span class="text-xs text-pretty text-muted-foreground"
+        >{current.redrawn == null
+          ? m.map_unmatched_missing_line({
+              year: span.forward ? span.to : span.from,
+            })
+          : m.map_unmatched_redrawn_line({
+              year: span.from,
+              percent: percent(current.redrawn),
+            })}</span
+      >
+    {/if}
     {#if current.valid === 0 && current.leader != null}
       <span
         class="flex items-center gap-2 text-[0.8125rem]"

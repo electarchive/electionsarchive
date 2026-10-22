@@ -2,7 +2,7 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, points } from "#lib/format.js";
+  import { count, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -14,6 +14,7 @@
     span,
     valid,
     counted,
+    redrawn,
     places,
     picked,
     onpick,
@@ -22,6 +23,7 @@
     span: { from: string; to: string; forward: boolean; race: string | null };
     valid: { before: number; after: number };
     counted: string;
+    redrawn: string | null;
     places: Extract<PageData, { kind: "contest" }>["contest"]["places"];
     picked: number | string | null;
     onpick: (value: string | null) => void;
@@ -244,6 +246,15 @@
     {#if span.race != null}
       <p class="mbs-1 text-[0.8125rem] text-muted-foreground">
         {m.note_different_race()}
+      </p>
+    {/if}
+    {#if redrawn != null}
+      <p class="mbs-1 text-[0.8125rem] text-pretty text-muted-foreground">
+        {m.note_redrawn({
+          from: span.from,
+          to: span.to,
+          percent: percent(Number(redrawn) / 100),
+        })}
       </p>
     {/if}
   </div>

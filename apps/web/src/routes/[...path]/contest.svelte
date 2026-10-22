@@ -752,13 +752,24 @@
   ]);
   const notes = $derived([
     ...contest.comparison.notes
-      .filter((note) => span == null || note.code !== "different_race")
+      .filter(
+        (note) =>
+          span == null ||
+          (note.code !== "different_race" && note.code !== "redrawn"),
+      )
       .map((note) => {
         if (note.code === "partial") {
           const value = percent(Number(note.value));
           return note.side === "target"
             ? m.note_partial_target({ percent: value })
             : m.note_partial_current({ percent: value });
+        }
+        if (note.code === "redrawn") {
+          return m.note_redrawn({
+            from: span?.from ?? "",
+            to: span?.to ?? "",
+            percent: percent(Number(note.value) / 100),
+          });
         }
         if (note.code === "alternative") {
           const publisher = note.value ?? "";
@@ -1300,6 +1311,8 @@
         ? { before: contest.current.valid, after: contest.target.valid }
         : { before: contest.target.valid, after: contest.current.valid }}
       counted={counted ?? m.stat_valid()}
+      redrawn={contest.comparison.notes.find((note) => note.code === "redrawn")
+        ?.value ?? null}
       places={placed}
       picked={only}
       onpick={(value) => {
