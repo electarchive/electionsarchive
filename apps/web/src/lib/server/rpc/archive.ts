@@ -721,10 +721,12 @@ async function load(
           : sql`join unnest(${sql.param(areaKs)}::int[], ${sql.param(owners)}::uuid[]) as a(k, owner) on a.owner = rs.root`
       }
       join lateral (
-        select 1 from (${FACTS[facts](sql`rs.k`, sql`a.k`)}) f where f.measure = any(${COUNTED}) and f.value > 0 limit 1
+        select count(distinct f.option_k) filter (where f.option_k <> 0) as options
+        from (${FACTS[facts](sql`rs.k`, sql`a.k`)}) f where f.measure = any(${COUNTED}) and f.value > 0
+        having count(*) > 0
       ) hit on true
       order by rs.contest_id, a.k, rs.is_default desc, array_position(${STAGES}, rs.stage),
-        rs.completeness desc nulls last
+        hit.options desc, rs.completeness desc nulls last
     )
     select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
       s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution
@@ -8273,6 +8275,7 @@ export const polities = {
             lead: v.nullable(v.object({ place: v.string(), more: v.number() })),
           }),
         ),
+        mapped: v.nullable(v.string()),
         latest: v.nullable(
           v.object({
             name: v.string(),
@@ -8306,7 +8309,7 @@ export const polities = {
       }),
     )
     .handler(async ({ input }) => {
-      const [found, subdivisions, electionRows, crumbs, here] =
+      const [found, subdivisions, electionRows, crumbs, here, mapped] =
         await Promise.all([
           db.execute<{ kind: string; parent: string | null }>(
             sql`
@@ -8396,7 +8399,48 @@ export const polities = {
               )
             )
           `),
+          db.execute<{ date: string }>(sql`
+            select e.date_from::text as date
+            from election e
+            join contest c on c.election_id = e.id and c.allocation_parent_id is null and c.party_scope_id is null
+            join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from <= current_date
+              and (c.district_area_id is null or c.district_area_id = pt.area_id)
+              and exists (
+                select from result_set rs cross join lateral (
+                  select from result_rollup r
+                  join area_parent ap on ap.area_id = (select id from area where k = r.area_k) and ap.parent_id = pt.area_id
+                  where r.result_set_k = rs.k
+                  limit 1
+                ) x
+                where rs.contest_id = c.id and rs.is_default
+              )
+            order by e.date_from desc
+            limit 1
+          `),
         ]);
+      const newest = mapped.rows[0]?.date;
+      const ranked =
+        newest == null
+          ? null
+          : await db.execute<{ id: string }>(sql`
+            select c.id
+            from election e
+            join contest c on c.election_id = e.id and c.allocation_parent_id is null and c.party_scope_id is null
+            join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+            join area a on a.id = pt.area_id
+            cross join lateral (
+              select sum(r.value) as total from result_set rs cross join lateral (
+                select r.value from result_rollup r
+                where r.result_set_k = rs.k and r.area_k = a.k and r.measure = any(${COUNTED}) offset 0
+              ) r
+              where rs.contest_id = c.id and rs.is_default
+            ) v
+            where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from = ${newest}::date
+              and (c.district_area_id is null or c.district_area_id = pt.area_id)
+            order by c.kind = 'ballot_question', c.term is not distinct from 'remainder', v.total desc nulls last
+            limit 1
+          `);
       const polity = found.rows[0];
       if (polity == null) {
         throw new ORPCError("NOT_FOUND");
@@ -8558,6 +8602,7 @@ export const polities = {
                   more: (row.parts ?? 1) - 1,
                 },
         })),
+        mapped: ranked?.rows[0]?.id ?? null,
         latest:
           recent == null
             ? null

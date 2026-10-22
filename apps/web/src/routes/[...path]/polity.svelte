@@ -173,9 +173,10 @@
         unit: race.path.split("/").at(-1),
       };
     }
-    return headline?.contest == null
+    const contest = isNational ? null : (polity.mapped ?? headline?.contest);
+    return contest == null
       ? null
-      : { key: headline.contest, id: headline.contest, unit: undefined };
+      : { key: contest, id: contest, unit: undefined };
   });
 
   let loaded = $state<{
