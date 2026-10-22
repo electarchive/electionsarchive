@@ -16,6 +16,17 @@ from ea.store import connect
 SOURCE = "us.clerk_president"
 VERSION = "1"
 RELIABLE = {"agreed", "confirmed", "settled"}
+DEMOTED = {
+    (1920, "FL"),
+    (1928, "ID"),
+    (1940, "TX"),
+    (1956, "GA"),
+    (1960, "WY"),
+    (1964, "NH"),
+    (1968, "CA"),
+    (1972, "FL"),
+    (1976, "VT"),
+}
 ALIASES = {
     "democrat": "democratic",
     "prohibitionist": "prohibition",
@@ -63,9 +74,11 @@ def emit() -> Path:
                from result_set r join contest k on k.id = r.contest_id join election e on e.id = r.election_id
                join slug sl on sl.entity_id = k.id and sl.path like 'us/__/%%/president'
                join source s on s.id = r.source_id
-               where k.kind = 'elector_slate' and r.is_default and e.date_from between '1920-01-01' and '1983-12-31'
-                 and s.publisher = 'Wikipedia' and sl.path not like %s""",
-            ["us/me/%"],
+               where k.kind = 'elector_slate' and e.date_from between '1920-01-01' and '1983-12-31'
+                 and s.publisher = 'Wikipedia' and sl.path not like %s
+                 and (r.is_default or exists (select 1 from result_set c join changeset ch on ch.id = c.changeset_id
+                      where c.supersedes_id = r.id and ch.pipeline = %s))""",
+            ["us/me/%", SOURCE],
         ).fetchall():
             old[(row[0], row[1])] = row[2:]
         options: dict[UUID, list[tuple]] = defaultdict(list)
@@ -104,20 +117,46 @@ def emit() -> Path:
             polity="US",
         )
         artifacts = {}
+        books = {}
         for year in clerk.YEARS:
             title = (
                 f"Statistics of the {'Presidential and ' if year % 4 == 0 else ''}Congressional Election of "
                 f"{days[year]:%B %-d, %Y}"
             )
-            artifacts[year] = cs.artifact(
-                raw.cached(clerk.SOURCE, clerk.BOOK.format(year=year)), cs.source(clerk.PUBLISHER, title)
-            )
+            books[year] = cs.source(clerk.PUBLISHER, title)
+            artifacts[year] = cs.artifact(raw.cached(clerk.SOURCE, clerk.BOOK.format(year=year)), books[year])
         for (year, state), group in lines.group_by(["year", "state"]):
             if (year, state) not in old:
                 continue
             rs, _, election, contest, stage, kind, source, completeness, _ = old[(year, state)]
             rows = group.sort("page", "line").to_dicts()
             tag = f"{year} {state}"
+            if (year, state) in DEMOTED:
+                cs.add(
+                    "result_set",
+                    id=cs.key(f"{SOURCE}.result_set", f"{year}:{state}"),
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    source_id=books[year],
+                    status="withdrawn",
+                    is_default=False,
+                    completeness=1,
+                )
+                cs.add(
+                    "result_set",
+                    id=rs,
+                    election_id=election,
+                    contest_id=contest,
+                    stage=stage,
+                    kind=kind,
+                    source_id=source,
+                    status="active",
+                    is_default=True,
+                    completeness=completeness,
+                )
+                continue
             if any(row["kind"] == "subtotal" for row in rows):
                 skipped.append(f"{tag}: subtotal lines (fusion)")
                 continue
@@ -133,6 +172,8 @@ def emit() -> Path:
             for row in rows:
                 label = (row["label"] or "").strip()
                 if row["votes"] is None or row["kind"] in ("total", "blank"):
+                    continue
+                if re.search(r"(?i)\b(blank|void|defective|spoiled|rejected)\b", label):
                     continue
                 if row["kind"] == "scattering" or re.match(
                     r"(?i)^(write-?ins?|scattering|others?|all others|void and scattering)$", label
