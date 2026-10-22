@@ -5,7 +5,10 @@ import re
 import time
 import zipfile
 from collections import Counter
+from collections.abc import Mapping
 from datetime import date, datetime, timedelta
+from pathlib import Path
+from uuid import UUID
 from xml.etree import ElementTree
 
 import httpx
@@ -13,7 +16,7 @@ import polars as pl
 import shapefile
 
 from ea import portals, raw
-from ea.changeset import slug
+from ea.changeset import Changeset, slug
 from ea.store import DATA, connect
 
 SOURCE = "us.enr_clarity"
@@ -196,11 +199,11 @@ FILLER = re.compile(
     r"COUNCIL|DIRECTORS?|SEAT|MUNICIPAL|ELECT|IN|AN|ONE|TWO|THREE|FOUR|FIVE|SIX|SEVEN|NEW|YEAR|YEARS|DISTRICT)\b|[-#/]"
 )
 METHOD = (
-    "Votes are the {publishers} election night reporting results by precinct, summed across the ways of voting each "
-    "county reports. Every candidate's precinct votes add up to the county's printed total."
+    "Votes are the election night reporting results posted by {publishers}, by precinct, summed across the ways of "
+    "voting each county reports. Every candidate's precinct votes add up to the county's printed total."
 )
 TOTALS = (
-    "Votes are the {publishers} election night reporting results, counted as one total per county, because a "
+    "Votes are the election night reporting results posted by {publishers}, counted as one total per county where a "
     "county's precincts do not add up to its printed total or are already in the archive under other names."
 )
 PARTIAL = (
@@ -212,6 +215,10 @@ UNOFFICIAL = (
     "at least two weeks after election day."
 )
 WITHDRAWN = "Withdrawn: a corrected reading of the counties' election night files no longer loads this race this way."
+
+
+PARTY_KEYS = {"precinct-chair", "county-chair", "state-committee", "committeeman", "committeewoman", "committee-person"}
+OFFICER_KEYS = {"judge-of-elections", "inspector-of-elections"}
 
 
 def tenants() -> list[dict[str, str]]:
@@ -310,7 +317,7 @@ def _residue(text: str, *patterns: str) -> str:
     return re.sub(r"\s+", " ", FILLER.sub(" ", text)).strip()
 
 
-def _shapes(fips: str, layer: str) -> list[tuple[dict[str, object], str]]:
+def _shapes(fips: str, layer: str) -> list[tuple[Mapping[str, object], str]]:
     with zipfile.ZipFile(raw.cached(SOURCE, CENSUS.format(fips=fips, layer=layer)).path) as archive:
         parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
     reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
@@ -468,7 +475,7 @@ def parse() -> None:
             elif found["key"] == "question":
                 skipped["question with candidates"] += 1
                 continue
-            rows = []
+            rows: list[dict[str, object]] = []
             for choice in choices:
                 label = re.sub(r"\s+", " ", choice.get("text") or "").strip()
                 tag = _party(choice.get("party"))
@@ -564,8 +571,8 @@ def parse() -> None:
     )
     table = table.with_columns(base=base)
     variants = []
-    for (_, _), rows in table.group_by("tenant", "election"):
-        for _, group in rows.group_by("base"):
+    for (_, _), files_rows in table.group_by("tenant", "election"):
+        for _, group in files_rows.group_by("base"):
             if group.height == 1:
                 continue
             terms = group["term"].to_list()
@@ -859,3 +866,675 @@ def _county(st: str, county: str, key: str, office: str, body: bool, seat: str |
         "seat": seat,
         "label": label,
     }
+
+
+def emit() -> Path:
+    contests = pl.read_parquet(PARSED / "contests.parquet")
+    lines = pl.read_parquet(PARSED / "lines.parquet")
+    made = {
+        (scheme, code): (display, geom, json.loads(shares))
+        for scheme, code, display, geom, shares in pl.read_parquet(PARSED / "polities.parquet").iter_rows()
+    }
+    sizes = (
+        lines.filter(pl.col("place").is_null())
+        .group_by("county", "election", "contest")
+        .agg(pl.col("votes").sum().alias("size"))
+    )
+    contests = (
+        contests.join(sizes, on=["county", "election", "contest"], how="left")
+        .sort("size", descending=True)
+        .unique(["contest_key", "county"], keep="first")
+        .sort("day", "contest_key", "county")
+    )
+    grouped = {keys: rows for keys, rows in lines.group_by("county", "election", "contest")}
+    states = sorted(set(contests["state"].to_list()))
+    fips = sorted({county[:2] for county in contests["county"].to_list()})
+    counties_listed = sorted(set(contests["county"].to_list()))
+    pattern = "|".join(states)
+    with connect() as conn:
+        polities: dict[str, tuple[UUID, str, str]] = {}
+        for scheme, code, polity, text, path in conn.execute(
+            """select a.scheme_code, c.code, t.polity_id, n.text, s.path from area a
+               join area_code c on c.area_id = a.id
+               join polity_territory t on t.area_id = a.id
+               join polity p on p.id = t.polity_id
+               join name n on n.entity_id = p.id and n.is_preferred and n.lang = 'en'
+               join slug s on s.entity_id = p.id and s.is_current
+               where a.scheme_code in ('us.county', 'us.place', 'us.town', 'us.school_district', 'us.special_district')
+                 and left(c.code, 2) = any(%s)""",
+            [fips],
+        ).fetchall():
+            polities[f"{scheme}:{code}"] = (polity, text, path)
+        slugs = dict(
+            conn.execute(
+                "select path, entity_id from slug where path like any(%s)", [[f"us/{st.lower()}/%" for st in states]]
+            ).fetchall()
+        )
+        taken = set(
+            conn.execute(
+                """select e.date_from, x.value from contest c
+                   join election e on e.id = c.election_id
+                   join result_set r on r.contest_id = c.id
+                   join changeset g on g.id = r.changeset_id
+                   join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
+                     and x.scheme in ('us.office', 'us.body')
+                   where split_part(x.value, ':', 1) = any(%s) and g.pipeline <> %s""",
+                [states, SOURCE],
+            ).fetchall()
+        )
+        asked = set(
+            conn.execute(
+                """select e.date_from, a.code from contest c
+                   join election e on e.id = c.election_id
+                   join result_set r on r.contest_id = c.id
+                   join changeset g on g.id = r.changeset_id
+                   join area_code a on a.area_id = c.district_area_id
+                   where c.kind = 'ballot_question' and g.pipeline <> %s and left(a.code, 2) = any(%s)""",
+                [SOURCE, fips],
+            ).fetchall()
+        )
+        held = {
+            value
+            for (value,) in conn.execute(
+                """select x.value from external_id x
+                   join result_set r on r.contest_id = x.entity_id
+                   join changeset g on g.id = r.changeset_id
+                   where x.scheme = 'us.contest' and g.pipeline <> %s and split_part(x.value, ':', 2) = any(%s)""",
+                [SOURCE, states],
+            ).fetchall()
+        }
+        precincts: dict[str, UUID] = dict(
+            conn.execute(
+                """select code, id from reporting_unit where scheme_code = 'us.precinct'
+                   and split_part(code, ':', 3) = any(%s)""",
+                [counties_listed],
+            ).fetchall()
+        )
+        foreign = {":".join(code.split(":")[:3]) for code in precincts}
+        county_units: dict[str, tuple[UUID, UUID]] = {
+            code: (unit, area)
+            for code, unit, area in conn.execute(
+                """select code, id, area_id from reporting_unit where scheme_code = 'us.county' and code = any(%s)
+                   and valid_to is null""",
+                [counties_listed],
+            ).fetchall()
+        }
+        parents: dict[str, str] = dict(
+            conn.execute(
+                """select x.value, e.kind from external_id x join election e on e.id = x.entity_id
+                     where x.scheme = 'us.election'
+                       and x.value ~ %s""",
+                [rf"^[0-9]{{4}}-[0-9]{{2}}-[0-9]{{2}}:({pattern})(:(primary|runoff|special))?$"],
+            ).fetchall()
+        )
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="County, municipal, school, special district, and party offices and local questions from county election night reporting sites",
+            polity="US",
+        )
+
+        def name(entity: UUID, text: str) -> None:
+            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+
+        systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "referendum")}
+        parties = {key: cs.key("us.party", f"{key}-party") for key in ("republican", "democratic")}
+        if cs.minted & {*systems.values(), *parties.values()}:
+            raise ValueError("the fptp, block, and referendum systems and the two parties must already exist")
+        census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
+        for code in fips:
+            for layer in LAYERS:
+                cs.artifact(raw.cached(SOURCE, CENSUS.format(fips=code, layer=layer)), census)
+        sources: dict[str, UUID] = {}
+        publishers: dict[str, str] = {}
+        for row in tenants():
+            county = row["county_fips"]
+            if county not in counties_listed:
+                continue
+            publishers[county] = f"{row['county']} County, {STATE_NAMES[row['state']]}"
+            sources[county] = cs.source(publishers[county], TITLE)
+            if sources[county] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources[county],
+                    kind="official_body",
+                    publisher=publishers[county],
+                    title=TITLE,
+                    url=row["tenant"],
+                    license="Public record",
+                )
+        for link in {raw_link for raw_link in raw._index(SOURCE)[1] if raw_link.endswith("detailxml.zip")}:
+            county = next((row["county_fips"] for row in tenants() if link.startswith(row["tenant"])), None)
+            if county in sources:
+                cs.artifact(raw.cached(SOURCE, link), sources[county])
+        used = set(contests.select("scheme", "code").unique().iter_rows())
+        for (scheme, code), (display, geom, _) in sorted(made.items()):
+            if f"{scheme}:{code}" in polities or (scheme, code) not in used:
+                continue
+            st = next(row["state"] for row in tenants() if row["county_fips"][:2] == code[:2])
+            prefix = {
+                "us.town": "town",
+                "us.place": "place",
+                "us.school_district": "school",
+                "us.special_district": "special",
+            }[scheme]
+            polity = cs.key("us.polity", f"{prefix}:{code}")
+            county_path = polities[f"us.county:{code[:5]}"][2] if f"us.county:{code[:5]}" in polities else None
+            path = (
+                f"{county_path}/{slug(display)}"
+                if scheme == "us.special_district"
+                else f"us/{st.lower()}/{slug(display)}"
+            )
+            for suffix in (
+                "",
+                f"-{slug(polities[f'us.county:{code[:5]}'][1])}" if scheme == "us.town" and county_path else "",
+                "-township" if scheme == "us.town" else "-village",
+            ):
+                if slugs.get(f"{path}{suffix}", polity) == polity:
+                    path = f"{path}{suffix}"
+                    break
+            else:
+                print(f"{display} would take {path}; skipped")
+                continue
+            slugs[path] = polity
+            polities[f"{scheme}:{code}"] = (polity, display, path)
+            if polity not in cs.minted:
+                continue
+            cs.add(
+                "polity",
+                id=polity,
+                kind={"us.school_district": "school_district", "us.special_district": "special_district"}.get(
+                    scheme, "municipality"
+                ),
+                iso_code=None,
+            )
+            name(polity, display)
+            parent = polities[f"us.county:{code[:5]}"][0] if scheme == "us.special_district" else cs.polity(f"US-{st}")
+            cs.add("polity_parent", polity_id=polity, parent_id=parent)
+            cs.add("slug", path=path, entity_id=polity)
+            area = cs.area(scheme, code)
+            cs.add("area", id=area, scheme_code=scheme)
+            cs.add("area_code", area_id=area, code=code, valid_from=None)
+            cs.add(
+                "area_parent",
+                area_id=area,
+                parent_id=cs.area("us.county", code[:5])
+                if scheme in ("us.town", "us.special_district")
+                else cs.area("us.state", code[:2]),
+            )
+            name(area, f"{display}, {st}")
+            cs.add("polity_territory", polity_id=polity, area_id=area)
+            if geom is not None:
+                cs.add(
+                    "area_geometry",
+                    area_id=area,
+                    valid_from=None,
+                    geom=geom,
+                    label_point=None,
+                    quality="official",
+                    source_id=census,
+                )
+            cs.add(
+                "reporting_unit",
+                id=cs.unit(scheme, code),
+                polity_id=polity,
+                scheme_code=scheme,
+                code=code,
+                area_relation="equals",
+                area_id=area,
+                kind="standard",
+                valid_from=None,
+            )
+        firsts: dict[str, list[tuple[date, str]]] = {}
+        for key, day, runoff in contests.select("contest_key", "day", "runoff").unique().iter_rows():
+            if not runoff:
+                firsts.setdefault(key.split(":", 1)[1], []).append((day, key))
+        previous: dict[str, str] = {}
+        for key, day in contests.filter("runoff").select("contest_key", "day").unique().iter_rows():
+            base = key.split(":", 1)[1].replace(":runoff", "", 1)
+            earlier = [entry for entry in firsts.get(base, []) if day - timedelta(days=120) <= entry[0] < day]
+            if earlier:
+                previous[key] = max(earlier)[1]
+        advancing: dict[str, set[str]] = {}
+        for key, first in previous.items():
+            labels = lines.join(
+                contests.filter(pl.col("contest_key") == key).select("county", "election", "contest"),
+                on=["county", "election", "contest"],
+            )
+            advancing[first] = {
+                slug(_title(label)) for label in labels["choice"].unique().to_list() if label != "Write-ins"
+            }
+        owners: set[UUID] = set()
+        elections: set[UUID] = set()
+        persons: set[UUID] = set()
+        districts: set[str] = set()
+        minted: dict[str, tuple[str, date]] = {}
+        memberships: set[tuple[UUID, UUID, date]] = set()
+        values: list[tuple[str, str, str, int]] = []
+        emitted: list[UUID] = []
+        skipped: Counter[str] = Counter()
+        for key, rows in contests.group_by("contest_key", maintain_order=True):
+            contest_key = str(key[0])
+            first = rows.row(0, named=True)
+            scheme, code, office_key, seat, day, st = (
+                first[k] for k in ("scheme", "code", "key", "seat", "day", "state")
+            )
+            question = office_key == "question"
+            party, primary, runoff = first["party"], first["primary"], first["runoff"]
+            if f"{scheme}:{code}" not in polities:
+                skipped["no polity"] += 1
+                continue
+            polity, place, path = polities[f"{scheme}:{code}"]
+            owner_key = f"{st}:{code}:{office_key}" + (f"-{party}" if office_key in PARTY_KEYS else "")
+            aliases = {
+                owner_key,
+                f"{st}:{code}:"
+                + {"commissioners-court": "commission", "council": "city-council"}.get(office_key, office_key),
+            }
+            if (
+                contest_key in held
+                or (not question and any((day, alias) in taken for alias in aliases))
+                or (question and (day, code) in asked)
+            ):
+                skipped["held by another pipeline"] += 1
+                continue
+            shares = made[(scheme, code)][2] if (scheme, code) in made else {code[:5]: 1.0}
+            carried = set(rows["county"].to_list())
+            whole = sum(shares.values()) or 1.0
+            missing = sorted(county for county, share in shares.items() if share >= 0.01 and county not in carried)
+            completeness = 1.0 if not missing else round(sum(shares.get(county, 0.0) for county in carried) / whole, 3)
+            if completeness < 0.5:
+                skipped["under half its area reported"] += 1
+                continue
+            kind = (
+                "primary"
+                if primary and not runoff
+                else "runoff"
+                if runoff
+                else "special"
+                if first["special"]
+                else "general"
+                if day.month == 11 and day.day <= 8
+                else "local"
+            )
+            suffix = ":primary" if kind == "primary" else ":runoff" if runoff else ""
+            options_keys = [f"{day}:{st}{suffix}"] + (
+                [] if kind == "primary" else [f"{day}:{st}", f"{day}:{st}:runoff", f"{day}:{st}:special"]
+            )
+            parent_key = next((option for option in options_keys if option in parents), options_keys[0])
+            parent = cs.key("us.election", parent_key)
+            if parent in cs.minted and parent not in elections:
+                elections.add(parent)
+                parents[parent_key] = kind
+                cs.add(
+                    "election",
+                    id=parent,
+                    polity_id=cs.polity(f"US-{st}"),
+                    kind=kind,
+                    date_from=day,
+                    date_to=day,
+                    date_precision="day",
+                    status="held",
+                )
+                name(
+                    parent,
+                    f"{day.year} {STATE_NAMES[st]} "
+                    + {"general": "general election", "primary": "primary elections", "runoff": "runoff elections"}.get(
+                        kind, f"{kind} elections"
+                    ),
+                )
+                umbrella_path = f"us/{st.lower()}/{day}-{kind}"
+                if slugs.get(umbrella_path, parent) != parent:
+                    umbrella_path = f"{umbrella_path}-elections"
+                slugs[umbrella_path] = parent
+                cs.add("slug", path=umbrella_path, entity_id=parent)
+            kind = parents.get(parent_key, kind) if kind not in ("primary", "runoff") else kind
+            election = cs.key("us.election", f"{day}:{st}:{code}{suffix}")
+            if election in cs.minted and election not in elections:
+                elections.add(election)
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=polity,
+                    parent_id=parent,
+                    kind=kind,
+                    date_from=day,
+                    date_to=day,
+                    date_precision="day",
+                    status="held",
+                )
+                name(election, f"{day.year} {place} {kind} election")
+                if slugs.get(f"{path}/{day}-{kind}", election) == election:
+                    slugs[f"{path}/{day}-{kind}"] = election
+                    cs.add("slug", path=f"{path}/{day}-{kind}", entity_id=election)
+            whole_area = cs.area(scheme, code)
+            area, unit = whole_area, cs.unit(scheme, code)
+            label = str(first["label"] or first["text"])
+            party_name = (party or "").capitalize()
+            proposition = re.search(
+                r"\b(?:PROPOSITION|PROP|REFERENDUM|QUESTION|MEASURE)\.? (?:NO\.? |#)?([A-Z0-9]{1,3})\b", label.upper()
+            )
+            contest_path = (
+                f"{path}/{day}-{kind}/"
+                + (
+                    (f"proposition-{proposition[1].lower()}" if proposition else slug(label)[:60].rstrip("-"))
+                    if question
+                    else office_key
+                )
+                + (f"-{party}" if party else "")
+                + (f"-{slug(seat)}" if seat else "")
+                + ("-unexpired" if first["remainder"] else "")
+                + (f"-{first['variant']}" if first["variant"] else "")
+            )
+            contest = cs.key("us.contest", contest_key)
+            contest_path = next(
+                (
+                    candidate
+                    for candidate in (contest_path, *(f"{contest_path}-{n}" for n in range(2, 10)))
+                    if slugs.get(candidate, contest) == contest
+                ),
+                "",
+            )
+            if not contest_path:
+                skipped["slug taken"] += 1
+                continue
+            slugs[contest_path] = contest
+            if question:
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="ballot_question",
+                    district_area_id=area,
+                    electoral_system_id=systems["referendum"],
+                    round_number=1,
+                    default_result_kind="counted",
+                )
+                cs.add("ballot_question", contest_id=contest, type="mandatory_referendum")
+                name(
+                    contest,
+                    f"{day.year} {place}: {_title(re.sub(r'\s*\((?:VOTE|Vote) [^)]*\)', '', str(first['text'])))}",
+                )
+            else:
+                office_title = (
+                    f"Mayor of {place}"
+                    if office_key == "mayor"
+                    else f"{place} {party_name} {first['office']}"
+                    if office_key in PARTY_KEYS
+                    else f"{place} {first['office']}"
+                )
+                owner = cs.key("us.body" if first["body"] else "us.office", owner_key)
+                if owner in cs.minted and owner not in owners:
+                    owners.add(owner)
+                    if first["body"]:
+                        cs.add("body", id=owner, polity_id=polity, kind="council")
+                    else:
+                        cs.add("office", id=owner, polity_id=polity, kind="mayor" if office_key == "mayor" else "other")
+                    name(owner, office_title)
+                if seat and (
+                    seat.startswith(("Ward", "District", "Precinct", "Region", "Zone"))
+                    or office_key in PARTY_KEYS
+                    or office_key in OFFICER_KEYS
+                    or re.fullmatch(r"\d{2}-\d-\d{2,3}", seat)
+                ):
+                    district = f"{code[:2]}:{code}:{office_key}:{slug(seat)}"
+                    area, unit = cs.area("us.local_district", district), cs.unit("us.local_district", district)
+                    if area in cs.minted and district not in districts:
+                        districts.add(district)
+                        cs.add("area", id=area, scheme_code="us.local_district")
+                        cs.add("area_code", area_id=area, code=district, valid_from=None)
+                        cs.add("area_parent", area_id=area, parent_id=whole_area, valid_from=None)
+                        name(area, f"{place} {first['office']}, {seat}")
+                        cs.add(
+                            "reporting_unit",
+                            id=unit,
+                            polity_id=polity,
+                            scheme_code="us.local_district",
+                            code=district,
+                            area_relation="equals",
+                            area_id=area,
+                            kind="standard",
+                        )
+                magnitude = int(first["magnitude"])
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=election,
+                    kind="body_seats" if first["body"] else "office",
+                    office_id=None if first["body"] else owner,
+                    body_id=owner if first["body"] else None,
+                    district_area_id=area,
+                    party_scope_id=parties[party] if party else None,
+                    magnitude=magnitude,
+                    round_number=2 if runoff else 1,
+                    previous_round_id=cs.key("us.contest", previous[contest_key])
+                    if contest_key in previous and previous[contest_key] not in held
+                    else None,
+                    electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
+                    default_result_kind="counted",
+                    term="remainder" if first["remainder"] else "full",
+                )
+                name(
+                    contest,
+                    (
+                        f"{day.year} {office_title} primary"
+                        if office_key in PARTY_KEYS
+                        else f"{day.year} {party_name} primary for {office_title}"
+                        if party
+                        else f"{day.year} {office_title} election"
+                    )
+                    + (f", {seat}" if seat else "")
+                    + (" (unexpired term)" if first["remainder"] else "")
+                    + (f" ({first['variant'].replace('-', ' ')})" if first["variant"] else "")
+                    + (" runoff" if runoff else ""),
+                )
+            cs.add("slug", path=contest_path, entity_id=contest)
+            emitted.append(contest)
+            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            main = max(carried, key=lambda county: shares.get(county, 0.0))
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official" if all(stage == "official" for stage in rows["stage"].to_list()) else "preliminary",
+                kind="counted",
+                status="active",
+                source_id=sources[main],
+                is_default=True,
+                completeness=completeness,
+            )
+            counted = pl.concat(
+                [
+                    grouped[(county, election_id, xml)]
+                    for county, election_id, xml in rows.select("county", "election", "contest").iter_rows()
+                ]
+            )
+            balanced = dict(zip(rows["county"].to_list(), rows["balanced"].to_list(), strict=True))
+            precise: dict[str, bool] = {}
+            for county in carried:
+                prefix = f"{day.year}:{st}:{county}"
+                names = (
+                    counted.filter((pl.col("county") == county) & pl.col("place").is_not_null())["place"]
+                    .unique()
+                    .to_list()
+                )
+                jurisdiction = registry_name(county)
+                precise[county] = bool(balanced[county]) and (
+                    prefix not in foreign
+                    or all(f"{prefix}:{jurisdiction}:{place_name}" in precincts for place_name in names)
+                )
+            named = " and ".join(sorted(publishers[county].split(",")[0] for county in carried))
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=(METHOD if all(precise.values()) else TOTALS).format(publishers=named),
+            )
+            if "official" not in rows["stage"].to_list():
+                cs.add("note", entity_id=result_set, kind="caveat", body_md=UNOFFICIAL)
+            if missing:
+                lacking = " and ".join(
+                    polities[f"us.county:{county}"][1] if f"us.county:{county}" in polities else county
+                    for county in missing
+                )
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=PARTIAL.format(share=f"{completeness:.0%}", missing=lacking),
+                )
+            totals = (
+                counted.filter(pl.col("place").is_null())
+                .with_columns(same=pl.col("choice").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", ""))
+                .group_by("same")
+                .agg(pl.col("choice").first(), pl.col("party").drop_nulls().first(), pl.col("votes").sum())
+                .sort("votes", "choice", descending=[True, False])
+            )
+            options: dict[str, UUID] = {}
+            ranked: list[tuple[int, UUID, str]] = []
+            for same, choice, choice_party, votes in totals.select("same", "choice", "party", "votes").iter_rows():
+                if question:
+                    answer = "yes" if re.match(r"(?i)\s*(?:yes|for|si|bonds? yes)\b", choice) else "no"
+                    option = options[same] = cs.key("us.option", f"{contest_key}:{answer}")
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="answer",
+                        ballot_position=1 if answer == "yes" else 2,
+                        ballot_label=answer.capitalize(),
+                    )
+                elif choice == "Write-ins":
+                    options[same] = cs.key("us.option", f"{contest_key}:write-ins")
+                    cs.add(
+                        "contest_option",
+                        id=options[same],
+                        contest_id=contest,
+                        kind="write_in",
+                        ballot_label="Write-ins",
+                    )
+                    continue
+                else:
+                    ballot = _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", choice))
+                    person = cs.key(f"{SOURCE}.person", f"{st}:{code}:{slug(ballot)}")
+                    if person in cs.minted and person not in persons:
+                        persons.add(person)
+                        cs.add("person", id=person)
+                        name(person, ballot)
+                    option = options[same] = cs.key("us.option", f"{contest_key}:{slug(ballot)}")
+                    tag = party or choice_party
+                    cs.add(
+                        "contest_option",
+                        id=option,
+                        contest_id=contest,
+                        kind="candidate",
+                        party_id=parties.get(tag) if tag else None,
+                        ballot_label=ballot,
+                    )
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{contest_key}:{slug(ballot)}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=ballot,
+                        is_independent=False,
+                    )
+                ranked.append((votes, option, slug(_title(choice))))
+            if not missing and ranked:
+                if question:
+                    if len(ranked) == 2 and ranked[0][0] != ranked[1][0]:
+                        cs.add("outcome", result_set_id=result_set, option_id=ranked[0][1], kind="won")
+                elif contest_key in advancing:
+                    for _, option, person_slug in ranked:
+                        if person_slug in advancing[contest_key]:
+                            cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced")
+                else:
+                    cut = int(first["magnitude"])
+                    total = sum(votes for votes, _, _ in ranked)
+                    majority = st != "TX" or runoff or cut > 1 or ranked[0][0] * 2 > total
+                    if majority and (len(ranked) <= cut or ranked[cut - 1][0] != ranked[cut][0]):
+                        for _, option, _ in ranked[:cut]:
+                            cs.add(
+                                "outcome",
+                                result_set_id=result_set,
+                                option_id=option,
+                                kind="won" if party else "elected",
+                                seats=1,
+                            )
+            for county in carried:
+                part = counted.filter(pl.col("county") == county).with_columns(
+                    same=pl.col("choice").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", "")
+                )
+                if not precise[county]:
+                    target = unit if len(carried) == 1 and not missing else county_units[county][0]
+                    for same, votes in (
+                        part.filter(pl.col("place").is_null()).group_by("same").agg(pl.col("votes").sum()).iter_rows()
+                    ):
+                        values.append((str(result_set), str(target), str(options[same]), votes))
+                    continue
+                prefix = f"{day.year}:{st}:{county}:{registry_name(county)}"
+                for same, place_name, votes in (
+                    part.filter(pl.col("place").is_not_null())
+                    .group_by("same", "place")
+                    .agg(pl.col("votes").sum())
+                    .iter_rows()
+                ):
+                    place_code = f"{prefix}:{place_name}"
+                    target = precincts.get(place_code) or cs.unit("us.precinct", place_code)
+                    if place_code not in precincts:
+                        minted.setdefault(place_code, (county, day))
+                    memberships.add((target, area, day))
+                    values.append((str(result_set), str(target), str(options[same]), votes))
+        print(
+            f"{len(emitted)} contests emitted; skipped: "
+            + ", ".join(f"{reason} {count}" for reason, count in skipped.most_common())
+        )
+        columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
+        for row in conn.execute(
+            f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
+                join changeset g on g.id = r.changeset_id
+                where g.pipeline = %s and r.status = 'active' and r.contest_id <> all(%s)""",
+            [SOURCE, emitted],
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn")
+            cs.add("note", entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
+        states_of = {row["county_fips"]: row["state"] for row in tenants()}
+        for place_code, (county, day) in minted.items():
+            cs.add(
+                "reporting_unit",
+                id=cs.unit("us.precinct", place_code),
+                polity_id=cs.polity(f"US-{states_of[county]}"),
+                scheme_code="us.precinct",
+                code=place_code,
+                parent_id=county_units[county][0],
+                area_relation="within",
+                area_id=county_units[county][1],
+                kind="standard",
+                valid_from=day,
+                valid_to=day + timedelta(days=1),
+            )
+        for target, area, day in memberships:
+            cs.add(
+                "reporting_unit_area", unit_id=target, area_id=area, valid_from=day, valid_to=day + timedelta(days=1)
+            )
+        cs.frame(
+            "result_value",
+            pl.DataFrame(
+                values,
+                schema={"result_set_id": pl.String, "unit_id": pl.String, "option_id": pl.String, "value": pl.Int64},
+                orient="row",
+            ).with_columns(
+                channel=pl.lit(0, pl.Int16),
+                measure=pl.lit(1, pl.Int16),
+                count_round=pl.lit(0, pl.Int16),
+                flags=pl.lit(0, pl.Int16),
+            ),
+        )
+        return cs.write()
+
+
+def registry_name(county: str) -> str:
+    return next(row["county"] for row in tenants() if row["county_fips"] == county).upper()
