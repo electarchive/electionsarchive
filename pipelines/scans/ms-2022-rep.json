@@ -1,0 +1,894 @@
+{
+  "polity": "US-MS",
+  "publisher": "Mississippi Secretary of State",
+  "title": "Republican primary official results, June 7, 2022",
+  "license": "Public record",
+  "file": {
+    "url": "https://www.sos.ms.gov/elections/electionResults/2022%20Republican%20Primary%20Official%20Results.pdf"
+  },
+  "raw_source": "us.ms_pri_scans",
+  "contests": {
+    "h1": {
+      "year": 2022,
+      "chamber": "house:republican",
+      "day": "2022-06-07",
+      "special": false,
+      "state": "MS",
+      "district": 1
+    },
+    "h2": {
+      "year": 2022,
+      "chamber": "house:republican",
+      "day": "2022-06-07",
+      "special": false,
+      "state": "MS",
+      "district": 2
+    },
+    "h3": {
+      "year": 2022,
+      "chamber": "house:republican",
+      "day": "2022-06-07",
+      "special": false,
+      "state": "MS",
+      "district": 3
+    },
+    "h4": {
+      "year": 2022,
+      "chamber": "house:republican",
+      "day": "2022-06-07",
+      "special": false,
+      "state": "MS",
+      "district": 4
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 3,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 5,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 6,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 7,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 8,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 9,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Trent Kelly, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Trent Kelly"
+        },
+        {
+          "label": "Mark D. Strauss, Republican, U.S. House District 1",
+          "contest": "h1",
+          "candidate": "Mark D. Strauss"
+        },
+        {
+          "label": "Michael Carson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Michael Carson"
+        },
+        {
+          "label": "Ronald Eller, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Ronald Eller"
+        },
+        {
+          "label": "Brian Flowers, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Brian Flowers"
+        },
+        {
+          "label": "Stanford Johnson, Republican, U.S. House District 2",
+          "contest": "h2",
+          "candidate": "Stanford Johnson"
+        },
+        {
+          "label": "Michael Cassidy, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Cassidy"
+        },
+        {
+          "label": "Thomas B. Griffin, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Thomas B. Griffin"
+        },
+        {
+          "label": "Michael Guest, Republican, U.S. House District 3",
+          "contest": "h3",
+          "candidate": "Michael Guest"
+        },
+        {
+          "label": "Carl Boyanton, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Carl Boyanton"
+        },
+        {
+          "label": "Raymond N. Brooks, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Raymond N. Brooks"
+        },
+        {
+          "label": "Mike Ezell, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Mike Ezell"
+        }
+      ]
+    },
+    {
+      "page": 10,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    },
+    {
+      "page": 11,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    },
+    {
+      "page": 12,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    },
+    {
+      "page": 13,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    },
+    {
+      "page": 14,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    },
+    {
+      "page": 15,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    },
+    {
+      "page": 16,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    },
+    {
+      "page": 17,
+      "turn": -90,
+      "orientation": "counties_across",
+      "crop": [
+        0.03,
+        0.08,
+        0.98,
+        0.9
+      ],
+      "columns": [
+        {
+          "label": "Steven M. Palazzo, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Steven M. Palazzo"
+        },
+        {
+          "label": "Kidron Peterson, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Kidron Peterson"
+        },
+        {
+          "label": "Clay Wagner, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Clay Wagner"
+        },
+        {
+          "label": "Brice Wiggins, Republican, U.S. House District 4",
+          "contest": "h4",
+          "candidate": "Brice Wiggins"
+        }
+      ]
+    }
+  ]
+}

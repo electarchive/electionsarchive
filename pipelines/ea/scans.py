@@ -283,8 +283,8 @@ def bands(name: str) -> list[tuple[str, int, tuple[float, float], list[ImageBloc
                 pixels += part.width * part.height
             text = (
                 f"The columns are the counties and the rows are the candidates' lines, one row per line in this "
-                f"order: {labels}. Put the county names in header, left to right, including a total column if one "
-                "is printed. Each row's values has one string per header entry."
+                f"order: {labels}. Skip heading lines that carry no cells. Put the county names in header, left to right, "
+                "including a total column if one is printed. Each row's values has one string per header entry."
                 if spec.get("orientation") == "counties_across"
                 else f"The rows are the counties, and a total row if one is printed. The data columns, left to "
                 f"right, are: {labels}. Header has one entry per data column and each row's values has one string "
