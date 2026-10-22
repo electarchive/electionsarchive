@@ -244,7 +244,6 @@ export async function chamber(path: string) {
     call(router.bodies.get, { id }),
     call(router.polities.record, { id: polity, body: id }),
   ]);
-  const points = record.series[0]?.points ?? [];
   const size = (on: string) =>
     (
       body.sizes.find(
@@ -259,6 +258,17 @@ export async function chamber(path: string) {
           (entry.to == null || entry.to > on),
       )
     )?.seats ?? null;
+  const filled = (record.series[0]?.points ?? []).map((point) => ({
+    point,
+    seats: total(point.parties),
+  }));
+  let most = 0;
+  for (const entry of filled) {
+    most = Math.max(most, entry.seats);
+  }
+  const points = filled
+    .filter((entry) => entry.seats >= 0.25 * (size(entry.point.date) ?? most))
+    .map((entry) => entry.point);
   const covered = body.makeup.filter((term) => {
     const seats = size(term.start);
     return seats == null || total(term.parties) >= 0.85 * seats;
