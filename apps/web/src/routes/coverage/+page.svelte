@@ -131,7 +131,7 @@
                 <button
                   type="submit"
                   disabled={data.building}
-                  class="rounded-sm border border-border px-2 block-6 text-foreground hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50 disabled:hover:bg-transparent"
+                  class="rounded-sm border border-border px-2 text-foreground block-6 hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50 disabled:hover:bg-transparent"
                   >{m.coverage_refresh()}</button
                 >
               </form>

@@ -133,18 +133,20 @@ describe("multiple candidacies", () => {
       const id = `${college}: ${list}`;
       transferred.set(id, (transferred.get(id) ?? 0) + 1);
     }
-    const moved = [
-      "Emilia-Romagna - P01",
-      "Emilia-Romagna - P02",
-      "Toscana - P01",
-      "Toscana - P02",
-    ].map(
-      (college) =>
-        `Chamber of Deputies, ${college}: FRATELLI D'ITALIA CON GIORGIA MELONI`,
+    const moved = new Set(
+      [
+        "Emilia-Romagna - P01",
+        "Emilia-Romagna - P02",
+        "Toscana - P01",
+        "Toscana - P02",
+      ].map(
+        (college) =>
+          `Chamber of Deputies, ${college}: FRATELLI D'ITALIA CON GIORGIA MELONI`,
+      ),
     );
     for (const slate of slates) {
       const result = results.get(slate.id);
-      if (moved.includes(slate.id)) {
+      if (moved.has(slate.id)) {
         expect(result?.elected, slate.id).not.toEqual(slate.expected);
         continue;
       }

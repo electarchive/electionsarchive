@@ -1,6 +1,6 @@
 import type { RouterClient } from "@orpc/server";
-import { BASE_URL } from "$app/env/public";
 import { browser } from "$app/env";
+import { BASE_URL } from "$app/env/public";
 import { createORPCClient } from "@orpc/client";
 import { RPCLink } from "@orpc/client/fetch";
 import { createTanstackQueryUtils } from "@orpc/tanstack-query";

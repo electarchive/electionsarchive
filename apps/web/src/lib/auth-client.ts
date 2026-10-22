@@ -1,5 +1,5 @@
-import { BASE_URL } from "$app/env/public";
 import { browser } from "$app/env";
+import { BASE_URL } from "$app/env/public";
 import { apiKeyClient } from "@better-auth/api-key/client";
 import { adminClient } from "better-auth/client/plugins";
 import { createAuthClient } from "better-auth/svelte";

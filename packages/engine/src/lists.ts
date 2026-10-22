@@ -18,7 +18,7 @@ export type Filled = {
 };
 
 const byRank = (a: Candidate, b: Candidate) =>
-  (a.rank ?? Number.POSITIVE_INFINITY) - (b.rank ?? Number.POSITIVE_INFINITY);
+  (a.rank ?? Infinity) - (b.rank ?? Infinity);
 const byVotes = (a: Candidate, b: Candidate) =>
   (b.votes ?? 0) - (a.votes ?? 0) || byRank(a, b);
 

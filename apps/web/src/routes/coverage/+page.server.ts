@@ -25,12 +25,14 @@ export const actions: Actions = {
     if (!dev) {
       error(404);
     }
-    const pipelines = fileURLToPath(new URL("../../../../../pipelines", import.meta.url));
-    spawn(`${pipelines}/.venv/bin/python`, ["-c", "from ea.cli import main; main()", "coverage", "refresh"], {
-      cwd: pipelines,
-      detached: true,
-      stdio: "ignore",
-    }).unref();
+    const pipelines = fileURLToPath(
+      new URL("../../../../../pipelines", import.meta.url),
+    );
+    spawn(
+      `${pipelines}/.venv/bin/python`,
+      ["-c", "from ea.cli import main; main()", "coverage", "refresh"],
+      { cwd: pipelines, detached: true, stdio: "ignore" },
+    ).unref();
     return { requested: true };
   },
 };

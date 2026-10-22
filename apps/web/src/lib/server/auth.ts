@@ -1,3 +1,4 @@
+import { dev } from "$app/env";
 import {
   BETTER_AUTH_SECRET,
   BETTER_AUTH_URL,
@@ -7,7 +8,6 @@ import {
   GOOGLE_CLIENT_SECRET,
   RESEND_API_KEY,
 } from "$app/env/private";
-import { dev } from "$app/env";
 import { getRequestEvent } from "$app/server";
 import { apiKey } from "@better-auth/api-key";
 import { drizzleAdapter } from "@better-auth/drizzle-adapter";

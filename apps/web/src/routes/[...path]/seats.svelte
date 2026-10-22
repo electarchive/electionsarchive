@@ -78,7 +78,7 @@
           return [];
         }
         let [seats, local] = [0, 0];
-        let delta: number | null | undefined = undefined;
+        let delta: number | null | undefined;
         for (const party of group) {
           seats += party.seats;
           local += party.here;
