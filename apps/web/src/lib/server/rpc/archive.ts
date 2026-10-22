@@ -225,11 +225,21 @@ const GROUPS = [
   "local_measure",
 ] as const;
 
+const Unreconciled = v.object({
+  reason: v.picklist(["drifted", "overcounted", "no official total"]),
+  counted: v.number(),
+  official: v.nullable(v.number()),
+  drifted: v.array(
+    v.object({ party: v.string(), counted: v.number(), official: v.number() }),
+  ),
+});
+
 const ResultSet = v.object({
   stage: v.string(),
   status: v.string(),
   completeness: v.nullable(v.number()),
   isDefault: v.boolean(),
+  unreconciled: v.optional(v.nullable(Unreconciled)),
   source: v.object({
     kind: v.string(),
     publisher: v.string(),
@@ -302,6 +312,9 @@ const Places = v.nullable(
     rows: v.array(PlaceRow),
     districts: v.optional(v.array(PlaceRow)),
     sources: v.array(v.string()),
+    unreconciled: v.optional(
+      v.array(v.object({ ...Unreconciled.entries, publisher: v.string() })),
+    ),
     estimated: v.optional(v.boolean()),
   }),
 );
@@ -728,6 +741,7 @@ async function load(
     url: string | null;
     license: string | null;
     attribution: string | null;
+    unreconciled: v.InferOutput<typeof Unreconciled> | null;
   }>(sql`
     with recursive grp(id, root) as (
       select id, id from unnest(${sql.param(roots)}::uuid[]) as r(id)
@@ -735,11 +749,11 @@ async function load(
       select c.id, grp.root from contest c join grp on c.allocation_parent_id = grp.id
     ),
     sets as materialized (
-      select rs.k, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
+      select rs.k, rs.id, rs.contest_id, grp.root, rs.stage, rs.status, rs.completeness, rs.is_default, rs.source_id
       from grp cross join lateral (select * from result_set x where x.contest_id = grp.id offset 0) rs
     ),
     picked as (
-      select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.contest_id as contest, rs.root, rs.stage, rs.status,
+      select distinct on (rs.contest_id, a.k) a.k as area, rs.k, rs.id, rs.contest_id as contest, rs.root, rs.stage, rs.status,
         rs.completeness, rs.is_default, rs.source_id
       from sets rs
       ${
@@ -757,7 +771,8 @@ async function load(
         array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
     )
     select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
-      s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution
+      s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
+      (select f.details from flag f where f.result_set_id = p.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
     from picked p join source s on s.id = p.source_id
   `);
   if (picked.rows.length === 0) {
@@ -1164,6 +1179,7 @@ async function load(
         status: row.status,
         completeness: row.completeness,
         isDefault: row.is_default,
+        unreconciled: row.unreconciled,
         source: {
           kind: row.kind,
           publisher: row.publisher,
@@ -2115,6 +2131,10 @@ async function tabulate(
     }
   >();
   const sources = new Set<string>();
+  const unreconciled = new Map<
+    string,
+    v.InferOutput<typeof Unreconciled> & { publisher: string }
+  >();
   const results = rows.map((row, index) => {
     const current = now[tier[index] ?? 0]?.get(row.k);
     return current == null
@@ -2138,6 +2158,12 @@ async function tabulate(
     const sets = current?.sets ?? [];
     for (const set of sets) {
       sources.add(set.source.publisher);
+      if (set.unreconciled != null) {
+        unreconciled.set(JSON.stringify(set.unreconciled), {
+          ...set.unreconciled,
+          publisher: set.source.publisher,
+        });
+      }
     }
     const result = (results[index] ?? []).map((entry) =>
       entry.key.startsWith("party:") &&
@@ -2294,6 +2320,7 @@ async function tabulate(
       };
     }),
     sources: [...sources],
+    unreconciled: [...unreconciled.values()],
   };
 }
 
@@ -2960,9 +2987,11 @@ export const contests = {
           url: string | null;
           license: string | null;
           attribution: string | null;
+          unreconciled: v.InferOutput<typeof Unreconciled> | null;
         }>(sql`
           select rs.stage::text, rs.status::text, rs.completeness::float8 as completeness, rs.is_default,
-            s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution
+            s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
+            (select f.details from flag f where f.result_set_id = rs.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
           from result_set rs join source s on s.id = rs.source_id
           where rs.contest_id = ${contest.id}::uuid
           order by rs.is_default desc, array_position(${STAGES}, rs.stage)
@@ -3084,6 +3113,7 @@ export const contests = {
           status: row.status,
           completeness: row.completeness,
           isDefault: row.is_default,
+          unreconciled: row.unreconciled,
           source: {
             kind: row.kind,
             publisher: row.publisher,
@@ -3779,7 +3809,9 @@ export const contests = {
           paths(found.rows.map((row) => row.id)),
         ]);
         const keyed = (row: (typeof found.rows)[number]) =>
-          row.party == null ? `option:${row.option ?? ""}` : `party:${row.party}`;
+          row.party == null
+            ? `option:${row.option ?? ""}`
+            : `party:${row.party}`;
         const legend = Map.groupBy(
           found.rows.filter((row) => row.option != null),
           keyed,

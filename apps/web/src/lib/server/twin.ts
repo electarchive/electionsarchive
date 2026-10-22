@@ -654,6 +654,28 @@ function placesMarkdown(
     ...(isCompared && places.estimated === true
       ? [m.atlas_estimated_note({ year: then })]
       : []),
+    ...(places.unreconciled ?? []).map((flag) =>
+      flag.official == null
+        ? `> ${m.places_unreconciled_missing({ publisher: flag.publisher })}`
+        : `> ${[
+            m.places_unreconciled_lead({ publisher: flag.publisher }),
+            ...(flag.reason === "overcounted" || flag.drifted.length === 0
+              ? [
+                  m.places_unreconciled_overcounted({
+                    counted: count(flag.counted),
+                    official: count(flag.official),
+                  }),
+                ]
+              : flag.drifted.map((drift) =>
+                  m.places_unreconciled_drifted({
+                    party: drift.party,
+                    counted: count(drift.counted),
+                    official: count(drift.official),
+                  }),
+                )),
+            m.places_unreconciled_official(),
+          ].join(" ")}`,
+    ),
   ];
 }
 

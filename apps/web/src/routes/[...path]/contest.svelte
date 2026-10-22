@@ -69,6 +69,8 @@
     court_revised: m.stage_court_revised,
     recount: m.stage_recount,
     alternative: m.stage_alternative,
+    unreconciled: m.stage_unreconciled,
+    secondary: m.stage_secondary,
   };
   const DEFINITIONS: Record<string, () => string> = {
     list_votes: m.term_list_votes,
@@ -81,6 +83,8 @@
     court_revised: m.term_stage_court_revised,
     recount: m.term_stage_recount,
     alternative: m.term_stage_alternative,
+    unreconciled: m.term_stage_unreconciled,
+    secondary: m.term_stage_secondary,
   };
   const DECLARED: Record<string, () => string> = {
     tacit: m.declared_tacit,
@@ -858,11 +862,49 @@
   const publishers = $derived([
     ...new Set(contest.current?.sets.map((set) => set.source.publisher) ?? []),
   ]);
+  const tier = (set: (typeof contest.sets)[number]) =>
+    set.unreconciled != null
+      ? "unreconciled"
+      : set.source.kind === "community"
+        ? "secondary"
+        : set.stage;
+  const secondary = $derived(
+    contest.current?.sets.some((set) => tier(set) === "secondary") ?? false,
+  );
+  const unreconciled = $derived(
+    (placed?.unreconciled ?? []).map((flag) =>
+      flag.reason === "no official total" || flag.official == null
+        ? {
+            lead: null,
+            body: m.places_unreconciled_missing({ publisher: flag.publisher }),
+          }
+        : {
+            lead: m.places_unreconciled_lead({ publisher: flag.publisher }),
+            body: [
+              ...(flag.reason === "overcounted" || flag.drifted.length === 0
+                ? [
+                    m.places_unreconciled_overcounted({
+                      counted: count(flag.counted),
+                      official: count(flag.official),
+                    }),
+                  ]
+                : flag.drifted.map((drift) =>
+                    m.places_unreconciled_drifted({
+                      party: drift.party,
+                      counted: count(drift.counted),
+                      official: count(drift.official),
+                    }),
+                  )),
+              m.places_unreconciled_official(),
+            ].join(" "),
+          },
+    ),
+  );
   const captions = $derived([
     ...new Set(
       contest.current?.sets.map((set) =>
         m.sources_caption({
-          stage: STAGES[set.stage]?.() ?? set.stage,
+          stage: STAGES[tier(set)]?.() ?? set.stage,
           publisher: set.source.publisher,
         }),
       ) ?? [],
@@ -1113,6 +1155,9 @@
   {/if}
   {#if contest.electors != null}
     <Electors electors={contest.electors} {ladder} bind:focus />
+  {/if}
+  {#if drawn != null}
+    {@render caveat()}
   {/if}
   {#if drawn != null && placed != null}
     <div
@@ -1544,6 +1589,9 @@
 {/if}
 
 {#if placed != null}
+  {#if drawn == null}
+    {@render caveat()}
+  {/if}
   {#key here}
     <Places
       places={placed}
@@ -1620,6 +1668,23 @@
   }}
 />
 
+{#snippet caveat()}
+  {#if unreconciled.length > 0}
+    <section class="col-span-12 bg-card px-3.5 py-2.5">
+      {#each unreconciled as flag, index (index)}
+        <p
+          class="border-s-[3px] border-destructive ps-2.5 text-sm/snug text-pretty text-muted-foreground max-inline-[72ch]"
+        >
+          {#if flag.lead != null}
+            <strong class="font-semibold text-foreground">{flag.lead}</strong>
+          {/if}
+          {flag.body}
+        </p>
+      {/each}
+    </section>
+  {/if}
+{/snippet}
+
 {#if notes.length > 0}
   <section
     id="notes"
@@ -1648,15 +1713,15 @@
           {#each sets as set, index (index)}
             <li class="grid gap-0.5">
               <span class="flex flex-wrap items-baseline gap-x-2">
-                {#if DEFINITIONS[set.stage] == null}
+                {#if DEFINITIONS[tier(set)] == null}
                   <span class="font-semibold"
-                    >{STAGES[set.stage]?.() ?? set.stage}</span
+                    >{STAGES[tier(set)]?.() ?? set.stage}</span
                   >
                 {:else}
                   <Term
                     class="font-semibold"
-                    label={STAGES[set.stage]?.() ?? set.stage}
-                    definition={DEFINITIONS[set.stage]?.() ?? ""}
+                    label={STAGES[tier(set)]?.() ?? set.stage}
+                    definition={DEFINITIONS[tier(set)]?.() ?? ""}
                   />
                 {/if}
                 {#if set.isDefault}
@@ -1989,7 +2054,8 @@
       <p class="px-2 text-[0.8125rem] text-muted-foreground">
         <a
           class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-          href="#sources">{captions.join("; ")}</a
+          href={secondary && notes.length > 0 ? "#notes" : "#sources"}
+          >{captions.join("; ")}</a
         >
       </p>
     {/if}

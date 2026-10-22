@@ -923,6 +923,11 @@
       data-source={foreign.join("; ")}
     >
       {m.places_sources({ publisher: foreign.join(", ") })}
+      {#if places.unreconciled?.some((flag) => flag.official != null)}
+        <strong class="font-semibold text-foreground"
+          >{m.places_unreconciled_short()}</strong
+        >
+      {/if}
     </p>
   {/if}
 </section>
