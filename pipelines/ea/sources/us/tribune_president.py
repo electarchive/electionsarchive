@@ -554,8 +554,9 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1828,)
+YEARS = (1824,)
 ELECTION_DAYS = {
+    1824: "1824-10-26",
     1828: "1828-10-31",
     1832: "1832-11-02",
     1836: "1836-11-03",
@@ -571,7 +572,7 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
 }
-YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254", 1836: "om254t", 1832: "om254t", 1828: "om254t"}
+YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254", 1836: "om254t", 1832: "om254t", 1828: "om254t", 1824: "om254t"}
 PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
 PRINT_COLUMNS = {
     "v65": {
@@ -595,6 +596,10 @@ PRINT_COLUMNS = {
         1: (1868, "Seymour"),
     },
     "om254t": {
+        0: (1824, "Adams"),
+        1: (1824, "Jackson"),
+        2: (1824, "Crawford"),
+        3: (1824, "Clay"),
         4: (1828, "Adams"),
         5: (1828, "Jackson"),
         6: (1832, "Clay"),
@@ -638,6 +643,7 @@ CANDIDATES = {
     "Harrison": ("William Henry Harrison (Whig)", "whigparty"),
     "Jackson": ("Andrew Jackson (Democratic)", "democraticparty"),
     "Adams": ("John Quincy Adams (National Republican)", "nationalrepublicanparty"),
+    "Crawford": ("William Crawford (Democratic-Republican)", "democraticrepublicanparty"),
 }
 EARLY: dict[tuple[int, str, str], int] = {
     (1868, "AL", "Grant"): 76366,
@@ -1365,6 +1371,58 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1828, "VA", "Jackson"): 26752,
     (1828, "AL", "Adams"): 1938,
     (1828, "AL", "Jackson"): 17138,
+    (1824, "AL", "Adams"): 2416,
+    (1824, "AL", "Jackson"): 9443,
+    (1824, "AL", "Crawford"): 1680,
+    (1824, "AL", "Clay"): 67,
+    (1824, "CT", "Adams"): 7587,
+    (1824, "CT", "Crawford"): 1978,
+    (1824, "IL", "Adams"): 1542,
+    (1824, "IL", "Jackson"): 1901,
+    (1824, "IL", "Crawford"): 219,
+    (1824, "IL", "Clay"): 1047,
+    (1824, "IN", "Adams"): 3095,
+    (1824, "IN", "Jackson"): 7343,
+    (1824, "IN", "Clay"): 5315,
+    (1824, "KY", "Jackson"): 6453,
+    (1824, "KY", "Clay"): 16782,
+    (1824, "ME", "Adams"): 6870,
+    (1824, "ME", "Jackson"): 2330,
+    (1824, "MD", "Adams"): 14632,
+    (1824, "MD", "Jackson"): 14523,
+    (1824, "MD", "Crawford"): 3646,
+    (1824, "MD", "Clay"): 695,
+    (1824, "MA", "Adams"): 30687,
+    (1824, "MA", "Crawford"): 6616,
+    (1824, "MS", "Adams"): 1694,
+    (1824, "MS", "Jackson"): 3234,
+    (1824, "MS", "Crawford"): 119,
+    (1824, "MO", "Adams"): 311,
+    (1824, "MO", "Jackson"): 987,
+    (1824, "MO", "Clay"): 1401,
+    (1824, "NH", "Adams"): 4107,
+    (1824, "NH", "Jackson"): 643,
+    (1824, "NJ", "Adams"): 9110,
+    (1824, "NJ", "Jackson"): 10985,
+    (1824, "NJ", "Crawford"): 1196,
+    (1824, "NC", "Jackson"): 20415,
+    (1824, "NC", "Crawford"): 15621,
+    (1824, "OH", "Adams"): 12280,
+    (1824, "OH", "Jackson"): 18457,
+    (1824, "OH", "Clay"): 19255,
+    (1824, "PA", "Adams"): 5440,
+    (1824, "PA", "Jackson"): 36100,
+    (1824, "PA", "Crawford"): 4206,
+    (1824, "PA", "Clay"): 1609,
+    (1824, "RI", "Adams"): 2145,
+    (1824, "RI", "Crawford"): 200,
+    (1824, "TN", "Adams"): 216,
+    (1824, "TN", "Jackson"): 20197,
+    (1824, "TN", "Crawford"): 312,
+    (1824, "VA", "Adams"): 3189,
+    (1824, "VA", "Jackson"): 2861,
+    (1824, "VA", "Crawford"): 8489,
+    (1824, "VA", "Clay"): 416,
 }
 
 
