@@ -23,7 +23,7 @@
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Switch } from "#lib/components/ui/switch/index.js";
-  import { count, percent, points } from "#lib/format.js";
+  import { count, date, percent, points } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -2187,7 +2187,18 @@
       <p
         class="pointer-events-none absolute inset-e-14 inset-be-1 z-0 truncate text-[0.625rem] text-muted-foreground max-inline-[40%] max-sm:hidden"
       >
-        {m.map_boundaries({ publishers: credits.join("; ") })}
+        {const vintage = $derived(
+          /\/(\d{4}-\d{2}-\d{2})$/u.exec(
+            sheet.levels.find((entry) => entry.code === sheet.level)?.tiles ??
+              "",
+          )?.[1],
+        )}
+        {vintage == null
+          ? m.map_boundaries({ publishers: credits.join("; ") })
+          : m.map_boundaries_dated({
+              publishers: credits.join("; "),
+              date: date(vintage),
+            })}
       </p>
     {/if}
   </div>

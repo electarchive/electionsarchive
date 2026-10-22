@@ -458,6 +458,7 @@
   "map_shaped": "Only {shaped} of the {count} districts have boundary shapes. The table below lists results for all districts.",
   "map_unmapped": "{percent} of the vote was reported for units not shown on the map (such as absentee, early, or questioned ballots). These counts are included in the totals but do not appear in any specific location.",
   "map_boundaries": "Boundaries from {publishers}",
+  "map_boundaries_dated": "Boundaries as of {date}; from {publishers}",
   "boundaries_approximate": "Approximate",
   "term_boundaries_approximate": "These shapes are reconstructed from other geography, such as historic counties and town locations, instead of surveyed boundary maps. Borders are approximate.",
   "boundaries_missing": "No shape for {names}",
