@@ -4,7 +4,6 @@
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { count, date } from "#lib/format.js";
-  import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -197,33 +196,6 @@
               /></a
             >
           {/if}
-          <span
-            class="inline-flex items-center gap-2"
-            title={m.party_color_note()}
-          >
-            <label class="inline-flex items-center gap-1.5">
-              <input
-                class="cursor-pointer rounded-xs border border-input bg-card p-0 block-5 inline-7"
-                type="color"
-                value={palette.overrides[data.id] ?? party.color ?? "#888888"}
-                oninput={(event) =>
-                  (palette.overrides[data.id] = event.currentTarget.value)}
-              />
-              {m.party_color_pick({ name: party.short ?? party.name })}
-            </label>
-            {#if palette.overrides[data.id] != null}
-              <button
-                type="button"
-                class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                onclick={() =>
-                  (palette.overrides = Object.fromEntries(
-                    Object.entries(palette.overrides).filter(
-                      ([key]) => key !== data.id,
-                    ),
-                  ))}>{m.party_color_reset()}</button
-              >
-            {/if}
-          </span>
         </p>
       {/if}
     </header>
@@ -265,7 +237,14 @@
       </dl>
     {/if}
 
-    <History history={data.history} name={party.name} {color} />
+    <History
+      history={data.history}
+      name={party.name}
+      short={party.short}
+      id={data.id}
+      fallback={party.color}
+      {color}
+    />
 
     {#if data.election != null}
       <Strength election={data.election} party={data.id} name={party.name} />

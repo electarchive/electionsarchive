@@ -4,6 +4,7 @@
   import Export from "#lib/components/export.svelte";
   import { count, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
+  import { palette } from "#lib/palette.svelte.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
@@ -12,10 +13,20 @@
   const {
     history,
     name,
+    short,
+    id,
+    fallback,
     color,
-  }: { history: PageData["history"]; name: string; color: string } = $props();
+  }: {
+    history: PageData["history"];
+    name: string;
+    short: string | null;
+    id: string;
+    fallback: string | null;
+    color: string;
+  } = $props();
 
-  const PAD = { top: 16, right: 18, bottom: 26, left: 36 };
+  const PAD = { top: 16, right: 18, bottom: 26, left: 40 };
 
   let width = $state(720);
   let chosen = $state<string | null>(page.url.searchParams.get("series"));
@@ -266,7 +277,7 @@
             y={sy(level) + 3.5}
             text-anchor="end"
             class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
-            >{Math.round(level * 100)}</text
+            >{Math.round(level * 100)}%</text
           >
         {/each}
         {#if top >= 0.5}
@@ -415,6 +426,64 @@
             </span>
           {/if}
         </div>
+      {/if}
+    </div>
+    <div
+      class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[0.8125rem] text-muted-foreground"
+    >
+      <span class="inline-flex items-center gap-2">
+        <label
+          class="relative grid cursor-pointer place-items-center rounded-xs ring-1 ring-border block-5 inline-5 focus-within:ring-2 focus-within:ring-ring hover:ring-foreground"
+          title="{m.party_color_pick({
+            name: short ?? name,
+          })}. {m.party_color_note()}"
+        >
+          <span class="block rounded-[1px] bg-(--party) block-3.5 inline-3.5"
+          ></span>
+          <input
+            class="absolute inset-0 cursor-pointer opacity-0 block-full inline-full"
+            type="color"
+            aria-label={m.party_color_pick({ name: short ?? name })}
+            value={palette.overrides[id] ?? fallback ?? "#888888"}
+            oninput={(event) =>
+              (palette.overrides[id] = event.currentTarget.value)}
+          />
+        </label>
+        {m.party_history_key_votes({ name: short ?? name })}
+        {#if palette.overrides[id] != null}
+          <button
+            type="button"
+            class="text-xs underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
+            onclick={() =>
+              (palette.overrides = Object.fromEntries(
+                Object.entries(palette.overrides).filter(([key]) => key !== id),
+              ))}>{m.party_color_reset()}</button
+          >
+        {/if}
+      </span>
+      {#if !isOffice && active.points.some((point) => point.held != null)}
+        <span class="inline-flex items-center gap-2">
+          <span
+            class="block border-bs-2 border-(--party) bg-[color-mix(in_oklab,var(--party)_20%,transparent)] block-3.5 inline-3"
+          ></span>
+          {m.party_history_key_seats()}
+        </span>
+      {/if}
+      {#if series.length > 1}
+        <span class="inline-flex items-center gap-2">
+          <svg class="block-2 inline-5" viewBox="0 0 20 2" aria-hidden="true">
+            <line
+              x1="0"
+              x2="20"
+              y1="1"
+              y2="1"
+              class="stroke-muted-foreground/70"
+              stroke-width="1.25"
+              stroke-dasharray="4 3"
+            />
+          </svg>
+          {m.party_history_key_others()}
+        </span>
       {/if}
     </div>
     <ol class="flex gap-1 overflow-x-auto pbe-1 text-xs">
