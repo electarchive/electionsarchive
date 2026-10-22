@@ -22,6 +22,7 @@ PAGES = DATA / "pages" / SOURCE
 BASE = "https://www.sos.ms.gov/elections/electionResults/"
 PUBLISHER = "Mississippi Secretary of State"
 READS: dict[str, dict[str, object]] = json.loads(Path(__file__).with_name("ms_pri_reads.json").read_text())
+NAMED: dict[str, dict[str, object]] = json.loads(Path(__file__).with_name("ms_pri_named.json").read_text())
 COUNTIES = 82
 FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2012, "democratic"): ("Democrat%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
@@ -30,6 +31,10 @@ FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2014, "republican"): ("2014%20Republican%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
     (2014, "democratic-runoff"): ("2014%20Democrat%20Primary%20Runoff%20Election%20Results_Certified%207%207%202014.pdf", date(2014, 6, 24)),
     (2022, "republican"): ("2022%20Republican%20Primary%20Official%20Results.pdf", date(2022, 6, 7)),
+    (2018, "democratic"): ("2018%20Democratic%20Primary%20Certified%20Results.pdf", date(2018, 6, 5)),
+    (2018, "republican"): ("2018%20Republican%20Primary%20Certified%20Results.pdf", date(2018, 6, 5)),
+    (2018, "democratic-runoff"): ("2018%20State%20Democratic%20Party%20Certified%20Primary%20Runoff%20Results.pdf", date(2018, 6, 26)),
+    (2018, "republican-runoff"): ("2018%20State%20Republican%20Party%20Certified%20Primary%20Runoff%20Results.pdf", date(2018, 6, 26)),
 }
 RULED = {(2014, "democratic"): range(2, 8)}
 ROTATED = {(2012, "republican"): range(9, 15)}
@@ -41,7 +46,8 @@ EMIT = {
     (2014, "democratic-runoff"): {("house", 3)},
     (2022, "republican"): {("house", 1), ("house", 2), ("house", 3), ("house", 4)},
 }
-PARSE = {(2022, "republican"), (2022, "republican+")}
+PARSE: set[tuple[int, str]] = set()
+PARSE_NAMED = {"2018:democratic", "2018:democratic-runoff", "2018:republican", "2018:republican-runoff"}
 GRIDDED = {
     (2022, "republican"): {
         0: ("house", 1, "KELLY, TRENT"),
@@ -316,6 +322,56 @@ def parse() -> None:
                         "y1": box[3] / shape[0],
                     }
                 )
+    for tag, sheet in NAMED.items():
+        if tag not in PARSE_NAMED:
+            continue
+        year, party = int(tag[:4]), tag[5:]
+        pdf = raw.cached(SOURCE, url(year, party)).path
+        names = sorted({c for each in NAMED.values() for page in each["pages"] for c in page["counties"]})
+        if len(names) != COUNTIES:
+            raise ValueError(f"{len(names)} county names")
+        code_of = dict(zip(names, codes))
+        sums = [0] * len(sheet["rows"])
+        for page in sheet["pages"]:
+            image = ms_scan.render(pdf, page["page"], dpi=300, turn=sheet.get("turn", 0))
+            if sheet["rules"]:
+                ys, xs = ms_scan.rules(image, share=0.5)
+            for index, name in enumerate(page["counties"]):
+                for r, (office, district, candidate) in enumerate(sheet["rows"]):
+                    value = page["values"][index][r]
+                    if value is None:
+                        continue
+                    sums[r] += value
+                    if sheet["rules"]:
+                        x0, x1 = xs[page["first"] + index], xs[page["first"] + index + 1]
+                        y0, y1 = (ys[0] + y for y in page["rows"][r])
+                    else:
+                        x0, y0, x1, y1 = page["boxes"][index]
+                    out.append(
+                        {
+                            "year": year,
+                            "chamber": f"{office}:{party.removesuffix('-runoff')}",
+                            "day": FILES[(year, party)][1],
+                            "special": False,
+                            "state": "MS",
+                            "district": district,
+                            "code": code_of[name],
+                            "candidate": candidate,
+                            "measure": 1,
+                            "writein": False,
+                            "votes": value,
+                            "kind": "county",
+                            "source": f"MS{year}{party}",
+                            "file": 0,
+                            "page": page["page"],
+                            "x0": (x0 + 8) / image.shape[1],
+                            "y0": (y0 + 8) / image.shape[0],
+                            "x1": (x1 - 8) / image.shape[1],
+                            "y1": (y1 - 8) / image.shape[0],
+                        }
+                    )
+        for r, (_, _, candidate) in enumerate(sheet["rows"]):
+            print(year, party, candidate, sheet["printed"][r], "tied" if sheet["printed"][r] == sums[r] else f"printed total exceeds the county sum by {sheet['printed'][r] - sums[r]}")
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(out, infer_schema_length=None).with_columns(
         year=pl.col("year").cast(pl.Int32),
