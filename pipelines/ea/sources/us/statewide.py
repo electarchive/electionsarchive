@@ -16,6 +16,7 @@ import polars as pl
 
 from ea import names, raw
 from ea.changeset import Changeset, slug
+from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.elstats import (
     FORMER,
     GAZETTEER,
@@ -27,7 +28,6 @@ from ea.sources.us.elstats import (
     TITLE,
     plain,
 )
-from ea.sources.us.county_changes import ct_regions
 from ea.store import DATA, connect
 
 SOURCE = "us.statewide"
@@ -332,7 +332,12 @@ def parse() -> None:
     regions = ct_regions()
     frame = frame.with_columns(
         code=pl.when((pl.col("state") == "CT") & (pl.col("year") >= 2022))
-        .then(pl.col("division").str.slice(3).map_elements(plain, return_dtype=pl.String).replace_strict(regions, default=None))
+        .then(
+            pl.col("division")
+            .str.slice(3)
+            .map_elements(plain, return_dtype=pl.String)
+            .replace_strict(regions, default=None)
+        )
         .otherwise("code")
     )
     lost = frame.filter(pl.col("code").is_null())
@@ -528,6 +533,14 @@ def emit() -> Path:
                     else "progressive-party-1924"
                     if year == 1924
                     else f"{state}:progressive-party"
+                )
+            elif label == "Republican" and year < 1854:
+                key = (
+                    "democratic-republican-party"
+                    if year < 1825
+                    else "national-republican-party"
+                    if year < 1834
+                    else "whig-party"
                 )
             else:
                 key = LABELS.get(label, "").format(state=state) or next(
@@ -840,7 +853,9 @@ def emit() -> Path:
                         id=root,
                         contest_id=contest,
                         kind="write_in" if write_in else "ticket" if re.search(TICKET, ballot) else "candidate",
-                        party_id=published.get(root, resolved[0][0] if len(resolved) == 1 else None),
+                        party_id=(resolved[0][0] if len(resolved) == 1 else None)
+                        if year < 1854
+                        else published.get(root, resolved[0][0] if len(resolved) == 1 else None),
                         ballot_label=ballot,
                     )
                     members = re.split(TICKET, ballot, maxsplit=1) if person is not None else []
@@ -887,7 +902,7 @@ def emit() -> Path:
                         contest_id=contest,
                         parent_option_id=root,
                         kind="write_in" if label == "Write In" else "candidate",
-                        party_id=published.get(target, party_id),
+                        party_id=party_id if year < 1854 else published.get(target, party_id),
                         ballot_label=f"{printed} ({label or 'no party'})",
                     )
                     targets.append(target)

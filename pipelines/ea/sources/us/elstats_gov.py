@@ -160,9 +160,7 @@ def parse() -> None:
                 candidate=pl.col("candidate_name").fill_null("").str.strip_chars(),
                 party=pl.col("candidate_party_name"),
                 winner=pl.col("is_winner") == "true",
-                code=pl.when(
-                    (pl.lit(state) == "CT") & (pl.col("election_date").str.slice(0, 4).cast(pl.Int32) >= 2022)
-                )
+                code=pl.when((pl.lit(state) == "CT") & (pl.col("election_date").str.slice(0, 4).cast(pl.Int32) >= 2022))
                 .then(division.map_elements(plain, return_dtype=pl.String).replace_strict(regions, default=None))
                 .when(pl.col("division_type").replace_strict(DIVISIONS) == "county")
                 .then(
@@ -326,12 +324,22 @@ def emit() -> Path:
         persons: dict[tuple[str, str], UUID] = {}
         parties: dict[str, UUID] = {}
 
-        def party_of(state: str, label: str | None) -> UUID | None:
+        def party_of(state: str, year: int, label: str | None) -> UUID | None:
             text = (label or "").split("/")[0].strip()
             if text.lower() in UNAFFILIATED or not text:
                 return None
-            if f"{state}:{text}" not in parties:
-                key = NATIONAL.get(text.lower()) or next(
+            if text.lower() == "republican" and year < 1854:
+                era = (
+                    "democratic-republican-party"
+                    if year < 1825
+                    else "national-republican-party"
+                    if year < 1834
+                    else "whig-party"
+                )
+            else:
+                era = NATIONAL.get(text.lower())
+            if f"{state}:{text}:{era}" not in parties:
+                key = era or next(
                     (
                         key
                         for key in (f"{state}:{slug(text)}", f"{state}:{slug(text)}-party", f"{slug(text)}-party")
@@ -339,18 +347,22 @@ def emit() -> Path:
                     ),
                     f"{state}:{slug(text)}",
                 )
-                parties[f"{state}:{text}"] = cs.key("us.party", key)
+                parties[f"{state}:{text}:{era}"] = cs.key("us.party", key)
                 if key not in labels:
                     labels.add(key)
-                    cs.add("party", id=parties[f"{state}:{text}"], kind="party", polity_id=cs.polity(f"US-{state}"))
-                    name(parties[f"{state}:{text}"], text)
-            return parties[f"{state}:{text}"]
+                    cs.add(
+                        "party", id=parties[f"{state}:{text}:{era}"], kind="party", polity_id=cs.polity(f"US-{state}")
+                    )
+                    name(parties[f"{state}:{text}:{era}"], text)
+            return parties[f"{state}:{text}:{era}"]
 
         def person(state: str, text: str) -> UUID:
             if (state, slug(text)) not in persons:
-                persons[(state, slug(text))] = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
-                cs.add("person", id=persons[(state, slug(text))])
-                name(persons[(state, slug(text))], text)
+                id = cs.key(f"{SOURCE}.person", f"{state}:{slug(text)}")
+                if id not in persons.values():
+                    cs.add("person", id=id)
+                persons[(state, slug(text))] = id
+                name(id, text)
             return persons[(state, slug(text))]
 
         folds: dict[UUID, list[UUID]] = {}
@@ -406,7 +418,7 @@ def emit() -> Path:
                     kind="office",
                     office_id=offices[state],
                     district_area_id=area,
-                    party_scope_id=party_of(state, primary),
+                    party_scope_id=party_of(state, day.year, primary),
                     term="full",
                     magnitude=1,
                     round_number=2 if runoff else 1,
@@ -521,13 +533,13 @@ def emit() -> Path:
                     options[candidate] = key
                     continue
                 options[candidate] = key
-                party_id = party_of(state, party)
+                party_id = party_of(state, day.year, party)
                 cs.add(
                     "contest_option",
                     id=options[candidate],
                     contest_id=contest,
                     kind="candidate",
-                    party_id=published.get(options[candidate], party_id),
+                    party_id=published.get(options[candidate], party_id) if day.year >= 1854 else party_id,
                     ballot_label=candidate,
                 )
                 for role, text in (("head", head), ("running_mate", mate)):
@@ -545,7 +557,7 @@ def emit() -> Path:
             for survivor in dict.fromkeys(folded.values()):
                 kept = person(state, survivor.partition(" and ")[0] if primary is None else survivor)
                 for printed in [survivor, *(candidate for candidate, into in folded.items() if into == survivor)]:
-                    party_id = party_of(state, lines.filter(pl.col("candidate") == printed)["party"][0])
+                    party_id = party_of(state, day.year, lines.filter(pl.col("candidate") == printed)["party"][0])
                     targets[printed] = cs.key("us.option", f"{contest_key}:{kept}:{slug(printed)}")
                     cs.add(
                         "contest_option",
@@ -553,7 +565,7 @@ def emit() -> Path:
                         contest_id=contest,
                         parent_option_id=options[survivor],
                         kind="candidate",
-                        party_id=published.get(targets[printed], party_id),
+                        party_id=published.get(targets[printed], party_id) if day.year >= 1854 else party_id,
                         ballot_label=printed,
                     )
                     if printed == survivor:
