@@ -11445,15 +11445,59 @@ export const search = {
           from q, regexp_split_to_table(q.t, '\\s+') w where w <> ''
         ),
         hits as (
-          select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + word_similarity(q.t, d.text) + d.rank_boost * 0.15 as score
+          select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + 0.5 + 0.5 * word_similarity(q.t, d.text) + d.rank_boost * 0.15 as score, true as matched,
+            d.tsv @@ plainto_tsquery('simple', q.t) as exact
           from search_document d, q, terms
           where d.tsv @@ terms.tq
           union all
-          select d.entity_id, d.type, word_similarity(q.t, d.text) + d.rank_boost * 0.15
+          select d.entity_id, d.type, word_similarity(q.t, d.text) + d.rank_boost * 0.15, false, false
           from search_document d, q, terms
           where q.t <% d.text and not d.tsv @@ terms.tq
         ),
-        top as (select * from hits order by score desc limit ${input.limit * 2})
+        pool as (select * from hits order by score desc limit ${q.length < 3 ? 1000 : 50_000}),
+        tiered as (
+          select h.entity_id, h.type, h.matched, coalesce(el.polity_id, case when h.type = 'polity' then h.entity_id end) as polity_id, el.date_from, h.score
+            + case
+              when not h.matched then 0
+              when h.type = 'polity' then 0.75 * h.exact::int
+              when h.type = 'election' then (el.kind = 'general' and q.t ~ '\\m\\d{4}\\M')::int
+              when h.type <> 'contest' or c.kind = 'ballot_question' or c.allocation_parent_id is not null then 0
+              when c.district_area_id is null or c.district_area_id = pt.area_id then
+                (0.5 + 0.3 * (
+                  coalesce(o.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor'), false)
+                  or c.kind = 'elector_slate' or coalesce(b.polity_id <> el.polity_id, false)
+                )::int) * case when el.kind in ('primary', 'caucus') then 0.5 else 1 end
+              when b.polity_id <> el.polity_id then 0.25
+              else 0
+            end as score
+          from pool h cross join q
+          left join contest c on h.type = 'contest' and c.id = h.entity_id
+          left join election el on el.id = coalesce(c.election_id, case when h.type = 'election' then h.entity_id end)
+          left join body b on b.id = c.body_id
+          left join office o on o.id = c.office_id
+          left join polity_territory pt on pt.polity_id = el.polity_id and pt.valid @> el.date_from
+          order by score desc nulls last, el.date_from desc nulls last limit 200
+        ),
+        top as (
+          select t.entity_id, t.type, t.score
+            + case
+              when not t.matched then 0
+              when t.type = 'person' then coalesce((
+                select 0.1 * ln(1 + count(*)) + 0.15 * bool_or(tn.office_id is not null)::int
+                from tenure tn where tn.person_id = t.entity_id), 0)
+                + coalesce((
+                select 0.2 * greatest(0, least(1, (extract(year from max(e.date_from)) - 1850) / 176))
+                from candidacy cy join contest_option o on o.id = cy.option_id
+                join contest c on c.id = o.contest_id join election e on e.id = c.election_id
+                where cy.person_id = t.entity_id), 0)
+              when t.polity_id is not null then coalesce((
+                select least(0.3, greatest(0, 0.1 * (log(max(g.population)) - 4)))
+                from coverage_government g where g.polity_id = t.polity_id), 0)
+              else 0
+            end as score
+          from tiered t
+          order by score desc nulls last, t.date_from desc nulls last limit ${input.limit * 2}
+        )
         select top.entity_id as id, top.type::text as type, x.target, x.context,
           coalesce(x.date, (select e.date_from from contest c join election e on e.id = c.election_id where c.id = x.target and top.type = 'person'))::text as date
         from top
