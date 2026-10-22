@@ -29,6 +29,14 @@ TITLE = "Informe Estadístico, Elecciones Generales: votes for governor by munic
 BASE = "https://ww2.ceepur.org/sites/ComisionEE/es-pr/Documents/"
 SITE = "https://ww2.ceepur.org/sites/ComisionEE/es-pr/"
 ELECTIONS = {
+    "1988-11-08": {
+        "url": SITE + "Informe%20Estadstico/ESTADISTICAS%20DE%20LAS%20ELECCIONES%201988.pdf",
+        "pages": (62, 63, 64, 65),
+        "island": "The municipio rows sum exactly to the eight district rows, which together make up the island total.",
+        "split": 2,
+        "surnames": ("hernandez", "corrada", "berrios"),
+        "text": True,
+    },
     "1992-11-03": {
         "url": SITE + "Informe%20Estadstico/ESTADISTICAS%20DE%20LAS%20ELECCIONES%201992.pdf",
         "pages": (71, 72, 73),
@@ -344,6 +352,70 @@ def read_page(image: Path, candidates: int, split: int, darkness: int = 215) -> 
     return rows
 
 
+def read_text_page(image: Path, candidates: int) -> list[dict[str, object]]:
+    rows = []
+    for scale in (1, 0.75, 1.25):
+        source = Image.open(image).convert("L")
+        scaled = source.resize((int(source.width * scale), int(source.height * scale)), Image.Resampling.LANCZOS)
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "page.png"
+            scaled.save(target)
+            tsv = subprocess.run(
+                ["tesseract", str(target), "-", "--psm", "6", "-l", "eng", "tsv"], capture_output=True, text=True, check=True
+            ).stdout
+        lines: dict[tuple[str, str, str], list[tuple[str, int, int, int, int]]] = {}
+        for record in tsv.splitlines()[1:]:
+            fields = record.split("\t")
+            if len(fields) == 12 and fields[11].strip() and fields[0] == "5":
+                lines.setdefault((fields[2], fields[3], fields[4]), []).append(
+                    (fields[11].strip(), *(round(int(value) / scale) for value in fields[6:10]))
+                )
+        found = []
+        for words in lines.values():
+            merged: list[tuple[str, int, int, int, int]] = []
+            for word in words:
+                if merged and (
+                    (word[0][0] in ",." and merged[-1][0][-1].isdigit())
+                    or (merged[-1][0][-1] in ",." and merged[-1][0][:-1].isdigit() and word[0][0].isdigit())
+                ):
+                    last = merged.pop()
+                    merged.append((last[0] + word[0], last[1], min(last[2], word[2]), word[1] + word[3] - last[1], max(last[4], word[4])))
+                else:
+                    merged.append(word)
+            words = [(re.sub(r"^[^A-Za-zñÑ\d]+", "", word[0]), *word[1:]) if i == 0 else word for i, word in enumerate(merged)]
+            texts = [word[0] for word in words]
+            kind = "district" if fold("".join(texts[:2])).startswith("TOTALESDEL") else "precinct"
+            if kind == "precinct" and fold(texts[0]).startswith(("DISTRITO", "GRAN")):
+                continue
+            if kind == "precinct" and not (re.fullmatch(r"[A-Za-z.ñÑ]+", texts[0]) and any(re.fullmatch(r"\d{1,3}", t) for t in texts)):
+                continue
+            position = 0 if kind == "district" else next(i for i, t in enumerate(texts) if re.fullmatch(r"\d{1,3}", t)) + 1
+            name = " ".join(texts[:position]) if kind == "precinct" else "TOTALES"
+            tail = [word for word in words[position:] if re.search(r"\d", word[0])]
+            figures = [(word, re.sub(r"[^\d.,%]", "", word[0]).rstrip(".,")) for word in tail]
+            votes = [(word, int(re.sub(r"\D", "", figure))) for word, figure in figures if re.fullmatch(r"\d{1,3}(,\d{3})*", figure)]
+            if len(votes) != 1 + candidates:
+                found.append({"kind": kind, "name": name, "solved": None, "boxes": [], "y": (words[0][2], words[0][2] + words[0][4])})
+                continue
+            total, counts = votes[0][1], [value for _, value in votes[1:]]
+            percents = [float(re.sub(r"[^\d.]", "", figure[:-1]).replace(",", ".")) for _, figure in figures if figure.endswith("%") and re.fullmatch(r"\d+\.\d\d%", figure)]
+            ok = sum(counts) == total and (len(percents) != candidates or all(abs(count / total * 100 - percent) <= 0.0051 for count, percent in zip(counts, percents, strict=True)))
+            boxes = [(w[1], w[2], w[1] + w[3], w[2] + w[4]) for w, _ in votes[1:]]
+            found.append({"kind": kind, "name": name, "solved": (total, counts) if ok else None, "boxes": boxes, "y": (words[0][2], words[0][2] + words[0][4])})
+        found.sort(key=lambda row: row["y"][0])
+        if not rows:
+            rows = found
+        else:
+            for index, row in enumerate(rows):
+                if row["solved"] is None:
+                    match = next((other for other in found if other["name"] == row["name"] and other["solved"] is not None and abs(other["y"][0] - row["y"][0]) < 15), None)
+                    if match is not None:
+                        rows[index] = match
+        if all(row["solved"] is not None for row in rows):
+            break
+    return rows
+
+
 def prepare(pdf: Path, number: int, election: dict[str, object], target: Path) -> None:
     with tempfile.TemporaryDirectory() as folder:
         stem = Path(folder) / "page"
@@ -414,9 +486,10 @@ def parse() -> None:
 def parse_precincts() -> None:
     PAGES.mkdir(parents=True, exist_ok=True)
     PARSED.mkdir(parents=True, exist_ok=True)
-    rows: list[dict[str, object]] = []
+    kept = pl.read_parquet(PARSED / "precincts.parquet") if (PARSED / "precincts.parquet").exists() else None
+    rows: list[dict[str, object]] = kept.to_dicts() if kept is not None else []
     for day, election in ELECTIONS.items():
-        if "split" not in election:
+        if "split" not in election or (kept is not None and day in kept["day"].unique()):
             continue
         artifact = raw.cached(SOURCE, election["url"])
         candidates = len(election["surnames"])
@@ -432,7 +505,7 @@ def parse_precincts() -> None:
                 with Image.open(image) as opened:
                     width, height = opened.size
                 ordinal = 0
-                rows_read = read_page(image, candidates, election["split"])
+                rows_read = read_text_page(image, candidates) if election.get("text") else read_page(image, candidates, election["split"])
                 if election.get("shaded"):
                     rows_read += [
                         row
