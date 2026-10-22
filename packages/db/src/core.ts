@@ -749,6 +749,12 @@ export const partyColor = pgTable("party_color", {
 	primaryKey({ columns: [table.partyId, table.valid], name: "party_color_pkey"}),
 check("party_color_color_check", sql`(color ~ '^#[0-9a-f]{6}$'::text)`),]);
 
+export const partyPage = pgTable("party_page", {
+	partyId: uuid("party_id").primaryKey(),
+	page: jsonb().notNull(),
+	builtAt: timestamp("built_at", { withTimezone: true }).default(sql`now()`).notNull(),
+});
+
 export const partyPosition = pgTable("party_position", {
 	partyId: uuid("party_id").notNull().references(() => party.id, { onDelete: "cascade" } ),
 	low: smallint().notNull(),

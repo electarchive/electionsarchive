@@ -26,6 +26,7 @@ def main() -> None:
         "scheme", nargs="?", help="scheme_code prefix, such as tr or tr.il; omit to build every set"
     )
     commands.add_parser("search", help="rebuild the search index from names and slugs")
+    commands.add_parser("parties", help="rebuild the precomputed party pages the app serves")
     commands.add_parser("merged", help="list rows anywhere in the database that still reference a merged entity")
     commands.add_parser(
         "coverage",
@@ -51,6 +52,10 @@ def main() -> None:
             print(tiles.build(args.scheme))
         case "search":
             print(search.build())
+        case "parties":
+            subprocess.run(
+                ["node", "scripts/party-pages.js"], cwd=Path(__file__).resolve().parents[2] / "apps" / "web", check=True
+            )
         case "coverage" if args.polity == "refresh":
             print(coverage_tables.refresh())
         case "coverage":

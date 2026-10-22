@@ -190,6 +190,19 @@ export async function party(path: string, place: string | null = null) {
   if (scope != null && within == null) {
     error(404);
   }
+  if (within == null) {
+    const stored = await db.execute<{
+      page: Awaited<ReturnType<typeof contents>>;
+    }>(sql`select page from party_page where party_id = ${id}::uuid`);
+    const page = stored.rows[0]?.page;
+    if (page != null) {
+      return { kind: "party" as const, id, ...page };
+    }
+  }
+  return { kind: "party" as const, id, ...(await contents(id, within)) };
+}
+
+export async function contents(id: string, within?: string) {
   const [party, record, history, latest] = await Promise.all([
     call(router.parties.get, { id, within }),
     call(router.parties.elections, { id, within }),
@@ -214,14 +227,7 @@ export async function party(path: string, place: string | null = null) {
       order by e.date_from desc limit 1
     `),
   ]);
-  return {
-    kind: "party" as const,
-    id,
-    party,
-    record,
-    history,
-    election: latest.rows[0]?.id ?? null,
-  };
+  return { party, record, history, election: latest.rows[0]?.id ?? null };
 }
 
 function total(parties: Array<{ seats: number }>) {
