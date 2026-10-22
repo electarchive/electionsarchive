@@ -1,0 +1,333 @@
+import itertools
+import re
+from collections import Counter, defaultdict
+from datetime import date
+from decimal import Decimal
+from pathlib import Path
+from uuid import UUID
+
+import polars as pl
+
+from ea import raw
+from ea.changeset import Changeset, slug
+from ea.sources.us import clerk
+from ea.store import connect
+
+SOURCE = "us.clerk_president"
+VERSION = "1"
+RELIABLE = {"agreed", "confirmed", "settled"}
+ALIASES = {
+    "democrat": "democratic",
+    "prohibitionist": "prohibition",
+    "socialistlabour": "socialistlabor",
+    "socialistworker": "socialistworkers",
+    "socialistworkers": "socialistworkers",
+    "statesrightsdemocrats": "statesrightsdemocratic",
+    "statesrights": "statesrightsdemocratic",
+    "nationalstatesrights": "statesrightsdemocratic",
+}
+NOTE = (
+    "The state's official vote for presidential electors as printed in the Clerk of the House's biennial Statistics of "
+    "the Presidential and Congressional Election. The book prints each party's electors under the party's name, so "
+    "tickets that Wikipedia's results-by-state table names keep that table's candidates, and every other party is a "
+    "legend line without a candidate. Write-ins and scattering votes are pooled as Others. Two readings of the page by "
+    "a vision model and one reading of each number by cell OCR were reconciled, and each digitized number carries "
+    "its page and box. Wikipedia's earlier figures are kept as a superseded, non-default set."
+)
+
+
+def norm(text: str | None) -> str:
+    text = re.sub(r"(?i)\b(party|electors?|presidential|the)\b", "", text or "").lower()
+    text = re.sub(r"[^a-z]", "", text)
+    return ALIASES.get(text, text)
+
+
+def emit() -> Path:
+    lines = (
+        pl.read_parquet(clerk.PARSED / "lines.parquet")
+        .filter(pl.col("office") == "electors", pl.col("state").is_not_null())
+        .with_columns(
+            label=pl.when(pl.col("name").is_null() | pl.col("name").str.contains(r"(?i)^presidential electors?$"))
+            .then(pl.col("party"))
+            .otherwise(pl.col("name"))
+        )
+    )
+    days = {year: date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in clerk.YEARS}
+    skipped: list[str] = []
+    differences: list[str] = []
+    with connect() as conn:
+        old: dict[tuple[int, str], tuple] = {}
+        for row in conn.execute(
+            """select extract(year from e.date_from)::int, upper(split_part(sl.path, '/', 2)), r.id, r.k, r.election_id,
+                      r.contest_id, r.stage, r.kind, r.source_id, r.completeness, sl.path
+               from result_set r join contest k on k.id = r.contest_id join election e on e.id = r.election_id
+               join slug sl on sl.entity_id = k.id and sl.path like 'us/__/%%/president'
+               join source s on s.id = r.source_id
+               where k.kind = 'elector_slate' and r.is_default and e.date_from between '1920-01-01' and '1983-12-31'
+                 and s.publisher = 'Wikipedia' and sl.path not like %s""",
+            ["us/me/%"],
+        ).fetchall():
+            old[(row[0], row[1])] = row[2:]
+        options: dict[UUID, list[tuple]] = defaultdict(list)
+        for rs, option, label, kind, party, unit, measure, value in conn.execute(
+            """select r.id, o.id, o.ballot_label, o.kind, o.party_id, u.id, v.measure, v.value
+               from result_set r join result_value v on v.result_set_k = r.k
+               left join contest_option o on o.k = v.option_k join reporting_unit u on u.k = v.unit_k
+               where r.id = any(%s) and v.channel = 0""",
+            [[row[0] for row in old.values()]],
+        ).fetchall():
+            options[rs].append((option, label, kind, party, unit, measure, Decimal(value)))
+        outcomes: dict[UUID, list[tuple]] = defaultdict(list)
+        for rs, option, kind, seats, candidacy in conn.execute(
+            "select result_set_id, option_id, kind, seats, candidacy_id from outcome where result_set_id = any(%s)",
+            [[row[0] for row in old.values()]],
+        ).fetchall():
+            outcomes[rs].append((option, kind, seats, candidacy))
+        parties = {
+            re.sub(r"[^a-z]", "", text.lower()): party
+            for text, party in conn.execute(
+                """select n.text, p.id from party p join name n on n.entity_id = p.id and n.lang = 'en'
+                   join polity y on y.id = p.polity_id where y.iso_code = 'US' and n.text <> 'Progressive Party'"""
+            ).fetchall()
+        }
+        sizes = {
+            (artifact, number): (width, height)
+            for artifact, number, width, height in conn.execute(
+                "select artifact_id, page_number, width, height from source_page"
+            ).fetchall()
+        }
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Presidential results by state 1920–1980 from the Clerk's statistics, superseding Wikipedia's",
+            polity="US",
+        )
+        artifacts = {}
+        for year in clerk.YEARS:
+            title = (
+                f"Statistics of the {'Presidential and ' if year % 4 == 0 else ''}Congressional Election of "
+                f"{days[year]:%B %-d, %Y}"
+            )
+            artifacts[year] = cs.artifact(
+                raw.cached(clerk.SOURCE, clerk.BOOK.format(year=year)), cs.source(clerk.PUBLISHER, title)
+            )
+        for (year, state), group in lines.group_by(["year", "state"]):
+            if (year, state) not in old:
+                continue
+            rs, _, election, contest, stage, kind, source, completeness, _ = old[(year, state)]
+            rows = group.sort("page", "line").to_dicts()
+            tag = f"{year} {state}"
+            if any(row["kind"] == "subtotal" for row in rows):
+                skipped.append(f"{tag}: subtotal lines (fusion)")
+                continue
+            tickets: dict[UUID, tuple[set[str], Decimal]] = {}
+            for option, label, okind, party, unit, measure, value in options[rs]:
+                if okind == "ticket":
+                    match = re.search(r"\(([^()]*)\)\s*$", label or "")
+                    tickets[option] = ({norm(part) for part in (match[1] if match else label or "").split("/")}, value)
+            others = next((o for o, _, k, _, _, _, _ in options[rs] if k == "others"), None)
+            unit = next(u for _, _, _, _, u, _, _ in options[rs])
+            taken: list[dict] = []
+            scatter_rows: list[dict] = []
+            for row in rows:
+                label = (row["label"] or "").strip()
+                if row["votes"] is None or row["kind"] in ("total", "blank"):
+                    continue
+                if row["kind"] == "scattering" or re.match(
+                    r"(?i)^(write-?ins?|scattering|others?|all others|void and scattering)$", label
+                ):
+                    scatter_rows.append(row)
+                elif not any(line["label"] == label and line["votes"] == row["votes"] for line in taken):
+                    taken.append(row | {"label": label})
+            if any(not norm(row["label"]) for row in taken):
+                skipped.append(f"{tag}: a line with no name")
+                continue
+            matched: dict[int, UUID] = {}
+            names = []
+            for row in taken:
+                inner = re.findall(r"\(([^()]*)\)", row["label"])
+                head = re.sub(r"\(.*?\)", "", row["label"]).split(":")[0]
+                names.append(
+                    {norm(head), *(norm(part) for text in inner for part in text.split("/"))} - {"", "writein"}
+                )
+            for option, (tokens, value) in tickets.items():
+                same = [i for i, row in enumerate(taken) if i not in matched and row["votes"] == value]
+                if len(same) > 1:
+                    same = [i for i in same if tokens & names[i]]
+                if len(same) == 1 and (tokens & names[same[0]] or value):
+                    matched[same[0]] = option
+            for option, (tokens, value) in tickets.items():
+                if option in matched.values():
+                    continue
+                hits = [i for i in range(len(taken)) if i not in matched and tokens & names[i]]
+                if len(hits) == 1:
+                    matched[hits[0]] = option
+            free = [o for o, (_, value) in tickets.items() if value and o not in matched.values()]
+            loose = [i for i in range(len(taken)) if i not in matched]
+            if len(free) == 1 and len(loose) == 1:
+                before = tickets[free[0]][1]
+                if abs(taken[loose[0]]["votes"] - before) <= before / 10:
+                    matched[loose[0]] = free.pop()
+            winning = {option for option, *_ in outcomes[rs]}
+            total_before = next(v for _, _, _, _, _, m, v in options[rs] if m == 4)
+            free = [o for o in free if o in winning or tickets[o][1] * 100 > total_before]
+            fused = [
+                index
+                for index, option in matched.items()
+                if tickets[option][1] != taken[index]["votes"]
+                and any(
+                    taken[index]["votes"] + sum(taken[i]["votes"] for i in extra) == tickets[option][1]
+                    for size in (1, 2)
+                    for extra in itertools.combinations([i for i in range(len(taken)) if i not in matched], size)
+                )
+            ]
+            if fused:
+                skipped.append(f"{tag}: fusion, Wikipedia's ticket sums lines the book prints apart")
+                continue
+            if free:
+                skipped.append(f"{tag}: Wikipedia lines not in the book: {[(tickets[o][1]) for o in free]}")
+                continue
+            problem = next(
+                (
+                    f"{row['label']} {row['votes']} is {row['status']} and is not Wikipedia's figure"
+                    for index, row in enumerate(taken)
+                    if row["status"] not in RELIABLE
+                    and (index not in matched or tickets[matched[index]][1] != row["votes"])
+                ),
+                None,
+            ) or next(
+                (
+                    f"scattering {row['votes']} is {row['status']}"
+                    for row in scatter_rows
+                    if row["status"] not in RELIABLE
+                ),
+                None,
+            )
+            if problem:
+                skipped.append(f"{tag}: {problem}")
+                continue
+            scatter = sum(row["votes"] for row in scatter_rows)
+            winners = outcomes[rs]
+            if any(option not in matched.values() for option, *_ in winners):
+                skipped.append(f"{tag}: a winning option is not in the book's lines")
+                continue
+            result_set = cs.key(f"{SOURCE}.result_set", f"{year}:{state}")
+            ids: dict[int, UUID] = dict(matched)
+            seen: Counter[str] = Counter()
+            for index, row in enumerate(taken):
+                if index in ids:
+                    continue
+                seen[slug(row["label"])] += 1
+                ids[index] = cs.key(
+                    f"{SOURCE}.option", f"{year}:{state}:{slug(row['label'])}:{seen[slug(row['label'])]}"
+                )
+                party = next(
+                    (
+                        parties[candidate]
+                        for candidate in (
+                            re.sub(r"[^a-z]", "", f"{row['label']} party".lower()),
+                            re.sub(r"[^a-z]", "", row["label"].lower()),
+                        )
+                        if candidate in parties
+                    ),
+                    None,
+                )
+                cs.add(
+                    "contest_option",
+                    id=ids[index],
+                    contest_id=contest,
+                    kind="legend",
+                    party_id=party,
+                    ballot_label=row["label"],
+                )
+            if scatter and others is None:
+                others = cs.key(f"{SOURCE}.option", f"{year}:{state}:others")
+                cs.add("contest_option", id=others, contest_id=contest, kind="others", ballot_label="Others")
+            cs.add(
+                "result_set",
+                id=rs,
+                election_id=election,
+                contest_id=contest,
+                stage=stage,
+                kind=kind,
+                source_id=source,
+                status="superseded",
+                is_default=False,
+                completeness=completeness,
+            )
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                source_id=cs.source(
+                    clerk.PUBLISHER,
+                    f"Statistics of the Presidential and Congressional Election of {days[year]:%B %-d, %Y}",
+                ),
+                status="active",
+                is_default=True,
+                supersedes_id=rs,
+                completeness=1,
+            )
+            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
+            cells: dict[UUID, int] = {ids[index]: row["votes"] for index, row in enumerate(taken)}
+            if scatter:
+                cells[others] = scatter
+            total = sum(cells.values())
+            for option, label, okind, party, u, measure, value in options[rs]:
+                if measure == 4 and value and abs(total - value) / value > Decimal("0.01"):
+                    differences.append(f"{tag}: total {total} against Wikipedia's {value}")
+            for index, row in enumerate(taken):
+                before = tickets[matched[index]][1] if index in matched else None
+                if before and abs(row["votes"] - before) / before > Decimal("0.01"):
+                    differences.append(f"{tag}: {row['label']} {row['votes']} against Wikipedia's {before}")
+            for option, votes in [*cells.items(), (None, total)]:
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=option,
+                    channel=0,
+                    measure=1 if option else 4,
+                    count_round=0,
+                    flags=clerk.DIGITIZED if option else 0,
+                    value=votes,
+                )
+            for index, row in enumerate(taken):
+                if row["box"] is None:
+                    continue
+                width, height = sizes[(artifacts[year], row["page"])]
+                x0, y0, x1, y1 = row["box"]
+                cs.add(
+                    "value_locator",
+                    result_set_id=result_set,
+                    unit_id=unit,
+                    option_id=ids[index],
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    page_id=cs.page(artifacts[year], int(row["page"])),
+                    source_id=None,
+                    x0=x0 / width / 3,
+                    y0=y0 / height / 3,
+                    x1=x1 / width / 3,
+                    y1=y1 / height / 3,
+                )
+            for option, okind, seats, candidacy in winners:
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=option,
+                    kind=okind,
+                    seats=seats,
+                    candidacy_id=candidacy,
+                )
+        for line in sorted(skipped):
+            print("skipped", line)
+        for line in sorted(differences):
+            print("differs", line)
+        print(f"{len(skipped)} states skipped, {len(differences)} differences over 1%")
+        return cs.write()
