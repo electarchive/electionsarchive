@@ -35,6 +35,10 @@ GRIDDED = {
         12: ("house", 3, "BIGGS, CRYSTAL"),
     },
 }
+FOOTING = {
+    "2012-03-13:MS:senate:democratic": "The sheet's printed state totals exceed the sum of its county cells for three candidates: Albert N. Gore Jr. printed 49,157, county sum 49,151 (6 short); Will Oatis printed 16,300, county sum 16,299 (1 short); Roger Weiner printed 21,131, county sum 21,127 (4 short). Every county cell was read twice and checked by eye, so the difference is in the sheet's own footing.",
+    "2012-03-13:MS:house:3:democratic": "The sheet's printed state total for Crystal Biggs is 15,291, and the sum of its county cells is 15,283 (8 short). Every county cell was read twice and checked by eye, so the difference is in the sheet's own footing.",
+}
 FIXES: dict[tuple[int, str, int, int], int] = {(2012, "democratic", 4, 77): 27}
 
 
@@ -194,4 +198,10 @@ def emit() -> Path:
             ),
         ).with_columns(page=pl.lit(1))
         medsl.attach(cs, conn, frame, sources, strict=True)
+        for row in list(cs.rows.get("result_set", [])):
+            key = conn.execute(
+                "select value from external_id where scheme = 'us.contest' and entity_id = %s", [row["contest_id"]]
+            ).fetchone()
+            if key is not None and key[0] in FOOTING:
+                cs.add("note", entity_id=row["id"], kind="caveat", body_md=FOOTING[key[0]])
         return cs.write()
