@@ -753,7 +753,7 @@
       const hatch = document.createElement("canvas");
       hatch.width = 8;
       hatch.height = 8;
-      const pen = hatch.getContext("2d");
+      const pen = hatch.getContext("2d", { willReadFrequently: true });
       if (pen != null) {
         pen.strokeStyle = colorsNow.hatch;
         pen.lineWidth = 1;
@@ -765,7 +765,7 @@
       const shaft = document.createElement("canvas");
       shaft.width = 64;
       shaft.height = 24;
-      const arrow = shaft.getContext("2d");
+      const arrow = shaft.getContext("2d", { willReadFrequently: true });
       if (arrow != null) {
         arrow.fillStyle = "#fff";
         arrow.shadowColor = "#fff";

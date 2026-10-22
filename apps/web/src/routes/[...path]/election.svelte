@@ -657,30 +657,6 @@
       };
     }),
   );
-  const portraits = $derived.by(() => {
-    const found: Array<{
-      key: string;
-      label: string;
-      photo: { license: string; artist: string | null; source: string };
-    }> = [];
-    for (const race of races) {
-      if (race.isLater) {
-        continue;
-      }
-      for (const part of race.balance.parts
-        .filter((entry) => entry.value > 0)
-        .toSorted((a, b) => b.value - a.value)
-        .slice(0, 2)) {
-        if (
-          part.photo != null &&
-          !found.some((entry) => entry.key === part.key)
-        ) {
-          found.push({ key: part.key, label: part.label, photo: part.photo });
-        }
-      }
-    }
-    return found;
-  });
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -827,31 +803,6 @@
         {/if}
       {/each}
     </ol>
-    {#if portraits.length > 0}
-      <div
-        class="grid gap-0.5 border-bs border-border pbs-2 pbe-3 text-xs/relaxed text-muted-foreground"
-      >
-        <p class="font-medium">{m.results_photos()}</p>
-        <ul class="flex flex-wrap gap-x-3">
-          {#each portraits as entry (entry.key)}
-            <li>
-              {entry.label}:
-              <a
-                class="underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
-                href={entry.photo.source}
-                rel="external noopener"
-                >{entry.photo.artist == null
-                  ? m.photo_credit_anonymous({ license: entry.photo.license })
-                  : m.photo_credit({
-                      artist: entry.photo.artist,
-                      license: entry.photo.license,
-                    })}</a
-              >
-            </li>
-          {/each}
-        </ul>
-      </div>
-    {/if}
   </section>
 {/if}
 

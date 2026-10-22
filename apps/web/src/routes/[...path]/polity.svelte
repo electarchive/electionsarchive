@@ -313,7 +313,10 @@
       </p>
     {:else}
       <h2 class="text-[0.8125rem] font-bold">
-        {m.polity_map_title({ race: headline?.name ?? "", noun: drawn.noun })}
+        {m.polity_map_title({
+          race: loaded?.contest.name ?? headline?.name ?? "",
+          noun: drawn.noun,
+        })}
       </h2>
       <PlaceMap
         places={drawn.places}
