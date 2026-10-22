@@ -33,7 +33,26 @@ GENERALS = {
     2020: ("ElectionReturns_2020_General_PrecinctReturns.txt", date(2020, 11, 3)),
     2022: ("ElectionReturns_2022_General_PrecinctReturns.txt", date(2022, 11, 8)),
 }
+PRIMARIES = {
+    1994: ("ElectionReturns_1994_Primary_PrecinctReturns.txt", date(1994, 5, 10)),
+    1996: ("ElectionReturns_1996_Primary_PrecinctReturns.txt", date(1996, 4, 23)),
+    1998: ("ElectionReturns_1998_Primary_Precinct_Returns.txt", date(1998, 5, 19)),
+    2000: ("ElectionReturns_2000_Primary_PrecinctReturns.txt", date(2000, 4, 4)),
+    2002: ("ElectionReturns_2002_Primary_PrecinctReturns.txt", date(2002, 5, 21)),
+    2004: ("ElectionReturns_2004_Primary_PrecinctReturns.txt", date(2004, 4, 27)),
+    2006: ("ElectionReturns_2006_Primary_PrecinctReturns.txt", date(2006, 5, 16)),
+    2008: ("ElectionReturns_2008_Primary_PrecinctReturns.txt", date(2008, 4, 22)),
+    2010: ("ElectionReturns_2010_Primary_PrecinctReturns.txt", date(2010, 5, 18)),
+    2012: ("ElectionReturns_2012_Primary_PrecinctReturns.txt", date(2012, 4, 24)),
+    2014: ("ElectionReturns_2014_Primary_PrecinctReturns.txt", date(2014, 5, 20)),
+    2016: ("ElectionReturns_2016_Primary_PrecinctReturns.txt", date(2016, 4, 26)),
+    2018: ("ElectionReturns_2018_Primary_PrecinctReturns.txt", date(2018, 5, 15)),
+    2020: ("ElectionReturns_2020_Primary_PrecinctReturns.txt", date(2020, 6, 2)),
+    2022: ("ElectionReturns_2022_Primary_PrecinctReturns.txt", date(2022, 5, 17)),
+}
+PARTIES = {"DEM": "democratic", "REP": "republican"}
 CONTESTS = {
+    "LTG": "lieutenant-governor",
     "STH": "house:{d}:g",
     "STS": "senate:{d}:g",
     "USC": "house:{d}",
@@ -68,20 +87,22 @@ NAMES = [
 ]
 
 
-def url(year: int) -> str:
-    return BASE + GENERALS[year][0]
+def url(year: int, primary: bool = False) -> str:
+    return BASE + (PRIMARIES if primary else GENERALS)[year][0]
 
 
 def fetch() -> None:
     for year in GENERALS:
         raw.fetch(RAW_SOURCE, url(year), suffix=".txt")
+    for year in PRIMARIES:
+        raw.fetch(RAW_SOURCE, url(year, True), suffix=".txt")
 
 
 def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
-    for year in GENERALS:
+    for year, primary in [(year, False) for year in GENERALS] + [(year, True) for year in PRIMARIES]:
         frame = pl.read_csv(
-            raw.cached(RAW_SOURCE, url(year)).path,
+            raw.cached(RAW_SOURCE, url(year, primary)).path,
             has_header=False,
             encoding="latin1",
             infer_schema=False,
@@ -97,19 +118,26 @@ def parse() -> None:
             pl.col("mcd", "fips", "vtd").fill_null(""),
             pl.col("municipality", "break1_code", "break1_name", "break2_code", "break2_name").fill_null(""),
         )
-        frame.write_parquet(PARSED / f"{year}.parquet")
-        print(year, frame.group_by("office").agg(pl.col("precinct").n_unique(), pl.col("votes").sum()).sort("office"))
+        frame.write_parquet(PARSED / f"{year}{'p' if primary else ''}.parquet")
+        print(
+            year,
+            primary,
+            frame.group_by("office").agg(pl.col("precinct").n_unique(), pl.col("votes").sum()).sort("office"),
+        )
 
 
 def emit() -> Path:
     year = int(os.environ["PA_YEAR"])
     offices = os.environ["PA_OFFICES"].split(",")
-    day = GENERALS[year][1]
-    title = f"Precinct Election Returns {year}"
+    primary = "PA_PRIMARY" in os.environ
+    day = (PRIMARIES if primary else GENERALS)[year][1]
+    title = f"Precinct Election Returns {year}" + (" Primary" if "PA_PRIMARY" in os.environ else "")
     frame = (
-        pl.read_parquet(PARSED / f"{year}.parquet")
+        pl.read_parquet(PARSED / f"{year}{'p' if primary else ''}.parquet")
         .filter(pl.col("office").is_in(offices))
+        .filter(pl.col("party").is_in(list(PARTIES)) if primary else pl.lit(True))
         .with_columns(
+            party=pl.col("party") if primary else pl.lit(""),
             district=pl.when(pl.col("office").is_in(["STH", "STS", "USC"])).then(pl.col("district")).otherwise(0),
             label=pl.concat_str(
                 [pl.col("first"), pl.col("middle"), pl.col("last"), pl.col("suffix")], separator=" ", ignore_nulls=True
@@ -126,7 +154,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary=f"Pennsylvania's {year} general election returns by precinct from the Department of State's precinct files",
+            summary=f"Pennsylvania's {year} {'primary' if primary else 'general'} election returns by precinct from the Department of State's precinct files",
             polity="US-PA",
         )
         source = cs.source(PUBLISHER, title)
@@ -140,7 +168,7 @@ def emit() -> Path:
                 url=LANDING,
                 license="Public record",
             )
-        cs.artifact(raw.cached(RAW_SOURCE, url(year)), source)
+        cs.artifact(raw.cached(RAW_SOURCE, url(year, primary)), source)
         counties = {
             (int(code) - 42000 + 1) // 2: (str(unit), str(area))
             for code, unit, area in conn.execute(
@@ -162,8 +190,10 @@ def emit() -> Path:
         values = []
         memberships: set[tuple[str, str]] = set()
         loaded: set[str] = set()
-        for (office, district), rows in frame.group_by("office", "district", maintain_order=True):
-            key = f"{day}:PA:" + CONTESTS[office].format(d=district)
+        for (office, district, party), rows in frame.group_by("office", "district", "party", maintain_order=True):
+            key = f"{day}:PA:" + CONTESTS[office].removesuffix(":g" if primary else "").format(d=district)
+            if primary:
+                key += ":" + (PARTIES[party][0] + "p" if office in ("STH", "STS") else PARTIES[party])
             contest = contests.get(key)
             if contest is None:
                 print(f"{key}: no contest in the archive")
@@ -283,7 +313,9 @@ def emit() -> Path:
                 completeness=1,
             )
             body = (
-                "Precinct totals from the Department of State's precinct returns file for the general election "
+                "Precinct totals from the Department of State's precinct returns file for the "
+                + ("primary" if primary else "general")
+                + " election "
                 "(extracted 2005 for 1992 through 2004 and by the Bureau of Commissions, Elections and Legislation after). "
                 "County and district totals are rolled up from the precincts."
             )
