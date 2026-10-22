@@ -22,7 +22,7 @@
     publishers,
     votes,
     isMapped = false,
-    limit = 100,
+    limit = 10,
     trace = null,
     only = $bindable(null),
     focus = $bindable(null),
@@ -48,8 +48,10 @@
   const uid = $props.id();
 
   let query = $state("");
-  let column = $state<"name" | "leader" | "margin" | "valid" | "shift">("name");
-  let descending = $state(false);
+  let picked = $state<{
+    column: "name" | "leader" | "margin" | "valid" | "shift";
+    descending: boolean;
+  } | null>(null);
   let all = $state(false);
 
   const noun = $derived(
@@ -84,6 +86,10 @@
     span != null && places.rows.some((row) => row.earlier != null),
   );
   const listed = $derived([...places.rows, ...(places.districts ?? [])]);
+  const column = $derived(
+    picked?.column ?? (listed.length > limit ? "valid" : "name"),
+  );
+  const descending = $derived(picked?.descending ?? column !== "name");
   const owner = $derived.by(() => {
     const head = /^.+?'s /u.exec(places.rows[0]?.name ?? "")?.[0];
     return head != null &&
@@ -563,12 +569,13 @@
                       )}
                       aria-label={m.sort_by({ column: entry.label })}
                       onclick={() => {
-                        if (column === entry.key) {
-                          descending = !descending;
-                        } else {
-                          column = entry.key;
-                          descending = entry.key !== "name";
-                        }
+                        picked = {
+                          column: entry.key,
+                          descending:
+                            column === entry.key
+                              ? !descending
+                              : entry.key !== "name",
+                        };
                       }}
                     >
                       {entry.label}
