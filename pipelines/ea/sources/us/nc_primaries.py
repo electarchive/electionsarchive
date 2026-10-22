@@ -13,7 +13,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.nc_primaries"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 FILES = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{day:%Y_%m_%d}/results_pct_{day:%Y%m%d}.zip"
 DAYS = [
@@ -67,6 +67,10 @@ CONTEST = re.compile(
     r"^(US SENATE|US HOUSE OF REPRESENTATIVES|US HOUSE|US CONGRESS|PRESIDENTIAL PREFERENCE)"
     r"(?: DISTRICT (\d+)| \((\d+)\w* DISTRICT\))?"
 )
+STATE = (
+    r"^(?:NC )?(?:STATE )?(HOUSE|SENATE)(?: OF REPRESENTATIVES)?(?: DISTRICT)? \(?0*(\d+)\)?"
+    r"(?: - |\s*\()(DEM|REP)\)?$"
+)
 
 
 def fetch() -> None:
@@ -108,22 +112,34 @@ def parse() -> None:
         frame = frame.unique(maintain_order=True)
         contest = pl.col("contest").str.strip_chars().str.replace_all(r"\s+", " ").str.to_uppercase()
         parts = contest.str.extract_groups(CONTEST.pattern)
+        seat = contest.str.extract_groups(STATE)
         frames.append(
-            frame.with_columns(parts=parts, name=contest)
+            frame.with_columns(parts=parts, seat=seat, name=contest)
             .filter(
-                pl.col("parts").struct.field("1").is_not_null(),
+                pl.col("parts").struct.field("1").is_not_null() | pl.col("seat").struct.field("1").is_not_null(),
                 ~pl.col("name").str.contains("UNEXPIRED|SPECIAL"),
                 pl.col("party").str.strip_chars().is_in(list(PARTIES)),
             )
             .select(
                 year=pl.lit(day.year, pl.Int32),
-                chamber=pl.when(pl.col("parts").struct.field("1") == "US SENATE")
-                .then(pl.lit("senate"))
-                .when(pl.col("parts").struct.field("1") == "PRESIDENTIAL PREFERENCE")
-                .then(pl.lit("president"))
-                .otherwise(pl.lit("house"))
-                + pl.lit(":")
-                + pl.col("party").str.strip_chars().replace_strict(PARTIES),
+                chamber=pl.when(pl.col("seat").struct.field("1").is_not_null())
+                .then(
+                    pl.concat_str(
+                        pl.col("seat").struct.field("1").str.to_lowercase(),
+                        pl.col("seat").struct.field("2"),
+                        pl.when(pl.col("seat").struct.field("3") == "DEM").then(pl.lit("dp")).otherwise(pl.lit("rp")),
+                        separator=":",
+                    )
+                )
+                .otherwise(
+                    pl.when(pl.col("parts").struct.field("1") == "US SENATE")
+                    .then(pl.lit("senate"))
+                    .when(pl.col("parts").struct.field("1") == "PRESIDENTIAL PREFERENCE")
+                    .then(pl.lit("president"))
+                    .otherwise(pl.lit("house"))
+                    + pl.lit(":")
+                    + pl.col("party").str.strip_chars().replace_strict(PARTIES)
+                ),
                 day=pl.lit(day),
                 special=pl.lit(False),
                 state=pl.lit("NC"),
@@ -183,13 +199,38 @@ def emit() -> Path:
             value
             for (value,) in conn.execute(
                 """select e.value from external_id e
-                   where e.scheme = 'us.contest' and e.value ~ '^20[01][0-9]-[0-9]{2}-[0-9]{2}:NC:(house:[0-9]+|senate|president):[a-z-]+$'
+                   where e.scheme = 'us.contest' and e.value ~ '^20[01][0-9]-[0-9]{2}-[0-9]{2}:NC:((house|senate):[0-9]+|senate|president):[a-z-]+$'
                      and exists (select 1 from result_set rs join source s on s.id = rs.source_id
                                  where rs.contest_id = e.entity_id and rs.status = 'active'
-                                   and s.publisher <> 'Federal Election Commission' and s.id <> %s)""",
+                                   and s.publisher <> 'Federal Election Commission' and s.id <> %s
+                                   and (e.value !~ ':[dr]p[a-z]*$'
+                                        or exists (select from result_value v join reporting_unit u on u.k = v.unit_k
+                                                   where v.result_set_k = rs.k
+                                                     and u.scheme_code in ('us.county', 'us.county_part', 'us.precinct'))))""",
                 [source],
             ).fetchall()
         }
+        keys = {
+            value
+            for (value,) in conn.execute(
+                "select value from external_id where scheme = 'us.contest' and value ~ ':NC:(house|senate):[0-9]+:[dr]p'"
+            ).fetchall()
+        }
+        frame = frame.with_columns(
+            chamber=pl.struct("day", "chamber").map_elements(
+                lambda row: next(
+                    (
+                        variant
+                        for variant in (row["chamber"], *(f"{row['chamber']}f{kind}" for kind in ("settled", "unsettled", "partunsettled")))
+                        if f"{row['day']}:NC:{variant}" in keys
+                    ),
+                    row["chamber"],
+                )
+                if row["chamber"].endswith(("dp", "rp"))
+                else row["chamber"],
+                return_dtype=pl.String,
+            )
+        )
         medsl.attach(
             cs,
             conn,
@@ -197,7 +238,9 @@ def emit() -> Path:
                 ~pl.concat_str(
                     pl.col("day").cast(pl.String),
                     pl.lit("NC"),
-                    pl.when(pl.col("district").is_not_null())
+                    pl.when(pl.col("chamber").str.contains(r"\d"))
+                    .then(pl.col("chamber"))
+                    .when(pl.col("district").is_not_null())
                     .then(
                         pl.concat_str(
                             pl.lit("house:"),

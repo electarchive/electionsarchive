@@ -13,7 +13,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.ncsbe"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FILES = "https://s3.amazonaws.com/dl.ncsbe.gov/ENRS/{day:%Y_%m_%d}/results_pct_{day:%Y%m%d}.zip"
 DAYS = [date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7) for year in range(2000, 2015, 2)]
@@ -41,6 +41,7 @@ COLUMNS = {
     "total votes": "votes",
 }
 CONTEST = re.compile(r"^US (SENATE|HOUSE OF REP\w*\.?|HOUSE|CONGRESS)( DISTRICT (\d+)| \((\d+)\w* DISTRICT\))?")
+STATE = r"^(?:NC )?(?:STATE )?(HOUSE|SENATE)(?: OF REPRESENTATIVES)?(?: DISTRICT)? \(?0*(\d+)\)?$"
 
 
 def fetch() -> None:
@@ -76,13 +77,24 @@ def parse() -> None:
         frame = frame.rename(
             {column: COLUMNS[column.strip().lower()] for column in frame.columns if column.strip().lower() in COLUMNS}
         )
-        parts = pl.col("contest").str.strip_chars().str.extract_groups(CONTEST.pattern)
+        name = pl.col("contest").str.strip_chars().str.replace_all(r"\s+", " ").str.to_uppercase()
+        parts = name.str.extract_groups(CONTEST.pattern)
+        seat = name.str.extract_groups(STATE)
         frames.append(
-            frame.with_columns(parts=parts)
-            .filter(pl.col("parts").struct.field("1").is_not_null())
+            frame.with_columns(parts=parts, seat=seat)
+            .filter(pl.col("parts").struct.field("1").is_not_null() | pl.col("seat").struct.field("1").is_not_null())
             .select(
                 year=pl.lit(day.year, pl.Int32),
-                chamber=pl.when(pl.col("parts").struct.field("1") == "SENATE")
+                chamber=pl.when(pl.col("seat").struct.field("1").is_not_null())
+                .then(
+                    pl.concat_str(
+                        pl.col("seat").struct.field("1").str.to_lowercase(),
+                        pl.col("seat").struct.field("2"),
+                        pl.lit("g"),
+                        separator=":",
+                    )
+                )
+                .when(pl.col("parts").struct.field("1") == "SENATE")
                 .then(pl.lit("senate"))
                 .otherwise(pl.lit("house")),
                 day=pl.lit(day),
@@ -125,7 +137,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="North Carolina's House and Senate general elections by county, 2000–2014",
+            summary="North Carolina's House and Senate and state House and Senate general elections by county, 2000–2014",
             polity="US-NC",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -140,5 +152,21 @@ def emit() -> Path:
         )
         for day in DAYS:
             cs.artifact(raw.cached(SOURCE, FILES.format(day=day)), source)
+        held = {
+            value
+            for (value,) in conn.execute(
+                """select distinct x.value from result_set r
+                   join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
+                   join changeset c on c.id = r.changeset_id
+                   where r.status = 'active' and c.pipeline <> %s and x.value ~ ':NC:(house|senate):[0-9]+:g$'
+                     and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
+                                 where v.result_set_k = r.k
+                                   and u.scheme_code in ('us.county', 'us.county_part', 'us.precinct'))""",
+                [SOURCE],
+            ).fetchall()
+        }
+        frame = frame.filter(
+            ~pl.concat_str(pl.col("day").cast(pl.String), pl.col("state"), "chamber", separator=":").is_in(list(held))
+        )
         medsl.attach(cs, conn, frame, {"NC": source})
         return cs.write()
