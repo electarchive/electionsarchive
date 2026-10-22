@@ -271,6 +271,24 @@ NORTH = ("Pole of Freedoms", "Polo delle Libertà")
 SOUTH = ("Pole of Good Government", "Polo del Buon Governo")
 CENTER_LEFT = ("Center-left coalition", "Coalizione di centrosinistra")
 CENTER_RIGHT = ("Center-right coalition", "Coalizione di centrodestra")
+MEMBERS = {
+    ("Pole of Freedoms", 1994): {"FORZA ITALIA", "LEGA NORD", "CENTRO CRIST.DEM.", "LISTA PANNELLA"},
+    ("Pole of Good Government", 1994): {"FORZA ITALIA", "ALLEANZA NAZIONALE", "CENTRO CRIST.DEM."},
+    ("Progressives", 1994): {
+        "PDS",
+        "RIFONDAZIONE COMUNISTA",
+        "FEDERAZIONE DEI VERDI",
+        "PSI",
+        "LA RETE-MOV.DEM.",
+        "ALLEANZA DEMOCRATICA",
+        "RINASCITA SOCIALISTA",
+    },
+    ("Pact for Italy", 1994): {"P.POPOLARE ITALIANO", "PATTO SEGNI"},
+    ("Pole for Freedoms", 1996): {"FORZA ITALIA", "ALLEANZA NAZIONALE", "CCD-CDU"},
+    ("The Olive Tree", 1996): {"PDS", "POP-SVP-PRI-UD-PRODI", "RINNOVAMENTO IT-DINI", "FEDERAZIONE DEI VERDI"},
+    ("House of Freedoms", 2001): {"FORZA ITALIA", "ALLEANZA NAZIONALE", "CCD-CDU", "LEGA NORD", "NUOVO PSI"},
+    ("The Olive Tree", 2001): {"DEMOCRATICI SINISTRA", "LA MARGHERITA", "IL GIRASOLE", "COMUNISTI ITALIANI"},
+}
 SYSTEMS = {
     "camera-proportional-1948": (
         {"formula": "imperiali_quota", "lists": {"order": "open", "vacancy": "next_by_votes"}},
@@ -1201,8 +1219,7 @@ def emit() -> Path:
                                 name(alliances[coalition], coalition[0])
                                 name(alliances[coalition], coalition[1], "it", "native")
                         alliance = alliances[coalition]
-                        if day >= ROSATO:
-                            members[coalition] |= held
+                        members[coalition] |= held if day >= ROSATO else MEMBERS.get((coalition[0], year), set())
                     party = party_of(symbols[0], year) if coalition is None and len(held) == 1 else None
                     ballot = f"{surname} {forename}"
                     option_key = f"{single_key}:{surname}:{forename}"
@@ -1230,7 +1247,7 @@ def emit() -> Path:
                     if fresh:
                         value_row(declared, unit, option, VOTES, votes)
             for coalition, labels in members.items():
-                if alliances[coalition] in cs.minted:
+                if alliances[coalition] in cs.minted or (coalition[0], year) in MEMBERS:
                     for label in sorted(labels):
                         cs.add("alliance_member", alliance_id=alliances[coalition], party_id=party_of(label, year))
         return cs.write()
