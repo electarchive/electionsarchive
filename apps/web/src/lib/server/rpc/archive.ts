@@ -9589,7 +9589,8 @@ export const bodies = {
         ),
         db.execute<{ start: string; party: string | null; seats: number }>(sql`
           with t as materialized (
-            select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id
+            select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id,
+              (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) as won
             from tenure t left join seat st on st.id = t.seat_id
             where t.body_id = ${input.id}::uuid and t.from_date is not null and coalesce(st.voting, true)
           ),
@@ -9602,11 +9603,18 @@ export const bodies = {
             )
           ),
           sat as (
-            select distinct on (s.start, coalesce(t.seat_id, t.id)) s.start, t.id
-            from starts s join t on t.to_date > s.start
-              and (t.from_date <= s.start or t.seat_id is not null and t.from_date < s.start + 30)
-            where not exists (select from starts l where l.start > s.start and l.start < s.start + 90)
-            order by s.start, coalesce(t.seat_id, t.id), t.from_date > s.start, t.from_date
+            select r.start, r.id from (
+              select q.start, q.id,
+                row_number() over (partition by q.start, q.slot order by q.from_date > q.start, q.won desc nulls last, q.from_date, q.to_date) as rank,
+                greatest(1, count(*) filter (where q.won = q.first) over (partition by q.start, q.slot)) as cap
+              from (
+                select s.start, t.id, coalesce(t.seat_id, t.id) as slot, t.from_date, t.to_date, t.won,
+                  min(t.won) filter (where t.won <= s.start) over (partition by s.start, coalesce(t.seat_id, t.id)) as first
+                from starts s join t on t.to_date > s.start
+                  and (t.from_date <= s.start or t.seat_id is not null and t.from_date < s.start + 30)
+                where not exists (select from starts l where l.start > s.start and l.start < s.start + 90)
+              ) q
+            ) r where r.rank <= r.cap
           ),
           fallback as materialized (
             select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id) as party
@@ -9788,7 +9796,7 @@ export const bodies = {
               select t.person_id as person, t.from_date::text as from, t.to_date::text as to,
                 coalesce(s.voting, true) as "isVoting",
                 t.acquired_via::text as acquired, t.ended_via::text as ended, t.contest_id as contest,
-                s.label as seat, coalesce(s.district_area_id, c.district_area_id, pc.district_area_id) as place,
+                s.label as seat, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id) as place,
                 coalesce(
                   (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
                     left join entity_merge pm on pm.entity_id = a.party_id

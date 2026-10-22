@@ -383,6 +383,9 @@
           place={body.name}
           link={null}
           size={term.size != null && term.total <= term.size ? term.size : null}
+          vacant={term.size == null || !term.isSeated
+            ? 0
+            : Math.max(0, term.size - term.total)}
           {change}
         />
       {/key}

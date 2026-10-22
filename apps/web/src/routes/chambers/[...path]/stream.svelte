@@ -20,6 +20,7 @@
       end: string | null;
       total: number;
       size: number | null;
+      isSeated: boolean;
       parties: Array<{ party: string | null; seats: number }>;
       election: { name: string; path: string | null; date: string } | null;
     }>;
@@ -104,7 +105,11 @@
     terms.map((term, index) => {
       const x0 = sx(Date.parse(term.start));
       const x1 = sx(Date.parse(term.end ?? today));
-      const whole = Math.max(term.total, 1);
+      const empty =
+        term.isSeated && term.size != null
+          ? Math.max(0, term.size - term.total)
+          : 0;
+      const whole = Math.max(term.total + empty, 1);
       const unit = isShare ? inner / whole : inner / peak;
       const seats = new Map(
         term.parties.map((entry) => [entry.party, entry.seats]),
@@ -130,6 +135,11 @@
         x0,
         x1,
         stack: new Map(layers),
+        empty,
+        vacant: {
+          y0: PAD.top + inner - below * unit,
+          y1: PAD.top + inner - (below + empty) * unit,
+        },
         line:
           PAD.top +
           inner -
@@ -362,7 +372,28 @@
         }
       }}
     >
+      <defs>
+        <pattern
+          id="{uid}-vacant"
+          width="4"
+          height="4"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <rect width="1" height="4" class="fill-muted-foreground" />
+        </pattern>
+      </defs>
       <g>
+        {#each columns.filter((column) => column.empty > 0) as column (column.index)}
+          <rect
+            x={column.x0}
+            y={column.vacant.y1}
+            width={Math.max(column.x1 - column.x0, 0.5)}
+            height={column.vacant.y0 - column.vacant.y1}
+            fill="url(#{uid}-vacant)"
+            opacity="0.55"
+          />
+        {/each}
         {#each bands as entry (entry.party ?? "none")}
           <path
             d={entry.d}
@@ -487,11 +518,29 @@
               <span class="font-figures tabular-nums"
                 ><span class="font-semibold">{count(entry.seats)}</span>
                 <span class="text-muted-foreground"
-                  >{percent(entry.seats / Math.max(lit.term.total, 1))}</span
+                  >{percent(
+                    entry.seats / Math.max(lit.term.total + lit.empty, 1),
+                  )}</span
                 ></span
               >
             </li>
           {/each}
+          {#if lit.empty > 0}
+            <li class="flex items-center justify-between gap-3">
+              <span class="flex items-center gap-1.5 truncate">
+                <span
+                  class="shrink-0 rounded-xs ring-1 ring-muted-foreground block-2.5 inline-2.5 ring-inset"
+                ></span>
+                <span class="truncate">{m.seats_vacant()}</span>
+              </span>
+              <span class="font-figures tabular-nums"
+                ><span class="font-semibold">{count(lit.empty)}</span>
+                <span class="text-muted-foreground"
+                  >{percent(lit.empty / (lit.term.total + lit.empty))}</span
+                ></span
+              >
+            </li>
+          {/if}
         </ul>
         {#if leader != null}
           <span class="text-muted-foreground"

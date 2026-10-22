@@ -285,6 +285,7 @@ export async function chamber(path: string) {
     start: point.date,
     parties: point.parties,
     election: { name: point.name, path: point.path, date: point.date },
+    isSeated: false,
   }));
   const first = Date.parse(body.makeup[0]?.start ?? "9999-12-31") - 2e10;
   const earlier = results.filter((term) => Date.parse(term.start) < first);
@@ -298,6 +299,7 @@ export async function chamber(path: string) {
           return {
             start: term.start,
             parties: term.parties,
+            isSeated: true,
             election:
               point == null ||
               Date.parse(term.start) - Date.parse(point.date) > 8e10

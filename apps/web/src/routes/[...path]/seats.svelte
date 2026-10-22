@@ -29,6 +29,7 @@
     place,
     link,
     size,
+    vacant = 0,
     isComplete = true,
     change: moved = null,
     partners: pairs = [],
@@ -52,6 +53,7 @@
     place: string;
     link: { name: string; path: string | null } | null;
     size: number | null;
+    vacant?: number;
     isComplete?: boolean;
     change?: Record<string, number> | null;
     partners?: Array<Array<string>>;
@@ -155,7 +157,7 @@
     ),
   );
   const totals = $derived.by(() => {
-    let [all, local] = [0, 0];
+    let [all, local] = [vacant, 0];
     for (const party of folded) {
       all += party.seats;
       local += party.here;
@@ -339,7 +341,7 @@
       seat.member == null || places.length < 2
         ? null
         : (places[seat.member.place] ?? null);
-    const party = labels.get(seat.party) ?? "";
+    const party = labels.get(seat.party) ?? m.seats_vacant();
     const own = seat.member?.affiliation ?? null;
     return {
       seat,
@@ -571,12 +573,11 @@
             )}ms"
             cx={seat.x}
             cy={seat.y}
-            r={dot}
             role="option"
             aria-selected={active === seat.index}
             aria-label={[
               seat.member?.name,
-              labels.get(seat.party),
+              labels.get(seat.party) ?? m.seats_vacant(),
               where,
               seat.member?.position == null
                 ? null
@@ -584,10 +585,18 @@
             ]
               .filter((part) => part != null)
               .join(", ")}
-            stroke-width={link != null && seat.local ? 0.45 * ring : undefined}
-            style:fill={lit
-              ? colors.get(seat.party)
-              : `color-mix(in oklab, ${colors.get(seat.party)} 28%, var(--card))`}
+            r={seat.party === "" ? dot - 0.3 * ring : dot}
+            stroke-width={seat.party === ""
+              ? 0.6 * ring
+              : link != null && seat.local
+                ? 0.45 * ring
+                : undefined}
+            style:stroke={seat.party === "" ? "var(--muted-foreground)" : null}
+            style:fill={seat.party === ""
+              ? "var(--card)"
+              : lit
+                ? colors.get(seat.party)
+                : `color-mix(in oklab, ${colors.get(seat.party)} 28%, var(--card))`}
           />
         {/each}
         {#if tip != null}
@@ -666,7 +675,9 @@
             })}
           >
             <span
-              class="shrink-0 rounded-xs block-2 inline-2"
+              class={cn("shrink-0 rounded-xs block-2 inline-2", {
+                "ring-1 ring-background/70 ring-inset": tip.color == null,
+              })}
               style:background-color={tip.color}
             ></span>
             {tip.own ?? tip.party}
@@ -811,6 +822,28 @@
         {/if}
       </li>
     {/each}
+    {#if vacant > 0}
+      <li
+        class="flex items-center gap-2 rounded-xs px-1.5 py-1 text-muted-foreground"
+      >
+        <span
+          class="shrink-0 rounded-xs ring-1 ring-muted-foreground block-2.5 inline-2.5 ring-inset"
+        ></span>
+        <span class="flex-1 truncate font-semibold min-inline-0"
+          >{m.seats_vacant()}</span
+        >
+        {#if moved != null}
+          <span class="inline-10"></span>
+        {/if}
+        <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
+          >{count(vacant)}</span
+        >
+        <span
+          class="text-end font-figures text-[0.8125rem] tabular-nums inline-14"
+          >{percent(vacant / totals.all)}</span
+        >
+      </li>
+    {/if}
   </ul>
   {#if whole && paths.length > 1}
     <div class="grid gap-2 border-bs pbs-3">

@@ -191,6 +191,7 @@
   "seats_whole": "All of {place}",
   "seats_filled": "{count} seats filled in this election.",
   "seats_part": "Shows {count} of the {total} total seats.",
+  "seats_vacant": "Vacant",
   "electors_title": "Electoral votes",
   "electors_majority": "{count} to win",
   "electors_cast": "Cast by electors on {date}",

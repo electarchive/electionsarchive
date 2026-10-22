@@ -272,16 +272,28 @@ def emit() -> Path:
                     ((day, found) for day, found in won.get((person, chamber), []) if window[0] <= day <= window[1]),
                     default=(None, None),
                 )[1]
-                if chamber == "house" and seat is None and contest is None and start.year >= 2025:
-                    seat = cs.key("us.seat", f"house:{term['state']}:{term['district']}")
+                if chamber == "house" and seat is None:
+                    district = term.get("district") or 0
+                    if district < 0:
+                        district = min(
+                            (
+                                (abs(date.fromisoformat(other["start"]) - start), other["district"])
+                                for other in member["terms"]
+                                if other["type"] == "rep"
+                                and other["state"] == term["state"]
+                                and (other.get("district") or 0) > 0
+                            ),
+                            default=(None, 0),
+                        )[1]
+                    seat = cs.key("us.seat", f"house:{term['state']}:{district}")
                     if seat not in seated:
                         seated.add(seat)
                         cs.add(
                             "seat",
                             id=seat,
                             body_id=bodies["house"],
-                            district_area_id=districts[(term["state"], str(term["district"]))],
-                            label=f"{term['state']}-{term['district']}",
+                            district_area_id=districts.get((term["state"], str(district))),
+                            label=f"{term['state']}-{district}" if district else f"{term['state']} at-large",
                             voting=True,
                             valid_from=None,
                             valid_to=None,
