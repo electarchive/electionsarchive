@@ -14,10 +14,39 @@ from ea.sources.us import me_federal, medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.me_pri_csv"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
 MAINE = "http://www.maine.gov/sos/cec/elec/"
+LLDC = "https://lldc.mainelegislature.org/Open/Elections/Returns/2000/20000613/elec_20000613{}.pdf"
+FILES_2000 = [
+    ("k", "house", "democratic"),
+    ("l", "house", "republican"),
+    ("m", "senate", "democratic"),
+    ("n", "senate", "republican"),
+]
+COUNTY_NAMES = {
+    c
+    for c in [
+        "ANDROSCOGGIN",
+        "AROOSTOOK",
+        "CUMBERLAND",
+        "FRANKLIN",
+        "HANCOCK",
+        "KENNEBEC",
+        "KNOX",
+        "LINCOLN",
+        "OXFORD",
+        "PENOBSCOT",
+        "PISCATAQUIS",
+        "SAGADAHOC",
+        "SOMERSET",
+        "WALDO",
+        "WASHINGTON",
+        "YORK",
+    ]
+}
+DISTRICTS_2000 = {"ALLEN": 1, "BALDACCI": 2, "AMERO": 1, "CAMPBELL": 2, "WINSLOW": 2}
 FILES = [
     (date(2002, 6, 11), "20030728201528", MAINE + "2002p/pri02c1d.txt", "democratic"),
     (date(2002, 6, 11), "20030728201703", MAINE + "2002p/pri02c1r.txt", "republican"),
@@ -44,12 +73,24 @@ FILES = [
     (date(2012, 6, 12), "20120822192804", MAINE + "2012/r-repcng2.txt", "republican"),
     (date(2012, 6, 12), "20120822192742", MAINE + "2012/d-senator.txt", "democratic"),
     (date(2012, 6, 12), "20120822192806", MAINE + "2012/r-senator.txt", "republican"),
-    (date(2016, 6, 14), "20170203093541", "https://www1.maine.gov/sos/cec/elec/results/2016/Rep%20to%20Congress%20DEM.xlsx", "democratic"),
-    (date(2016, 6, 14), "20170201143509", "http://maine.gov/sos/cec/elec/results/2016/Rep%20to%20Congress%20REP.xlsx", "republican"),
+    (
+        date(2016, 6, 14),
+        "20170203093541",
+        "https://www1.maine.gov/sos/cec/elec/results/2016/Rep%20to%20Congress%20DEM.xlsx",
+        "democratic",
+    ),
+    (
+        date(2016, 6, 14),
+        "20170201143509",
+        "http://maine.gov/sos/cec/elec/results/2016/Rep%20to%20Congress%20REP.xlsx",
+        "republican",
+    ),
 ]
 
 
 def fetch() -> None:
+    for letter, _, _ in FILES_2000:
+        raw.fetch(SOURCE, LLDC.format(letter), suffix=".pdf")
     for _, stamp, path, _ in FILES:
         url = WAYBACK.format(stamp, path)
         try:
@@ -74,16 +115,70 @@ def fetch() -> None:
 
 def parse() -> None:
     rows = []
+    for letter, chamber, party in FILES_2000:
+        lines = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, LLDC.format(letter)).path), "-"],
+            capture_output=True,
+            text=True,
+            check=True,
+        ).stdout.splitlines()
+        county = None
+        names: list[str] = []
+        pending = None
+        for position, line in enumerate(lines):
+            text = line.strip()
+            if not text:
+                continue
+            ahead = next(
+                (
+                    n
+                    for n in lines[position + 1 : position + 12]
+                    if re.fullmatch(r"[A-Z][A-Z .'-]+, [A-Z][A-Z .'-]+(\s{2,}.+)?", n.strip())
+                ),
+                "",
+            )
+            if ahead and text in COUNTY_NAMES:
+                county = text[:3]
+                names = [n.strip() for n in re.split(r"\s{2,}", ahead.strip())]
+                continue
+            if county is None or re.search(r"(Ward \d|Central Voting|Precinct \d)", text):
+                continue
+            if re.fullmatch(r"[A-Z][A-Z .'-]+", text):
+                pending = text
+                continue
+            tokens = [t for t in text.split() if "%" not in t]
+            tail = len(tokens)
+            while tail and re.fullmatch(r"[\d,]+", tokens[tail - 1]):
+                tail -= 1
+            if tail == len(tokens):
+                continue
+            tail = max(tail, len(tokens) - len(names))
+            label = " ".join(tokens[:tail])
+            values = [int(v.replace(",", "")) for v in tokens[tail:]]
+            if len(values) != len(names) or not re.search(r"[A-Za-z]{2}", label) or label == "County Total":
+                continue
+            if label == "Municipal Total":
+                label = pending or label
+            for name, votes in zip(names, values, strict=True):
+                surname = name.split(",")[0]
+                rows.append(
+                    (
+                        date(2000, 6, 13),
+                        f"{chamber}:{party}",
+                        DISTRICTS_2000.get(surname) if chamber == "house" else None,
+                        county,
+                        label,
+                        name,
+                        votes,
+                    )
+                )
     for day, stamp, path, party in FILES:
         cached = raw.cached(SOURCE, WAYBACK.format(stamp, path)).path
         if path.endswith("xlsx"):
             workbook = fastexcel.read_excel(cached)
             for number, sheet in enumerate(workbook.sheet_names, 1):
                 table = workbook.load_sheet(sheet, header_row=None, dtypes="string").to_polars().rows()
-                names = [
-                    " ".join((cell or "").upper().split())
-                    for cell in table[0][2:]
-                ]
+                names = [" ".join((cell or "").upper().split()) for cell in table[0][2:]]
                 for row in table[2:]:
                     town = (row[1] or "").strip().upper()
                     if not town or "TOTAL" in town:
@@ -157,11 +252,7 @@ def parse() -> None:
         schema=["day", "chamber", "district", "county", "town", "candidate", "votes"],
         orient="row",
     )
-    homes = (
-        frame.filter(pl.col("county") != "")
-        .group_by("town")
-        .agg(pl.col("county").mode().first().alias("home"))
-    )
+    homes = frame.filter(pl.col("county") != "").group_by("town").agg(pl.col("county").mode().first().alias("home"))
     frame = frame.join(homes, on="town", how="left").with_columns(
         pl.when(pl.col("county") != "").then(pl.col("county")).otherwise(pl.col("home")).alias("county")
     )
@@ -182,7 +273,18 @@ def parse() -> None:
         source=pl.lit("ME"),
         district=pl.col("district").cast(pl.Int16),
     ).group_by(
-        "year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein", "kind", "source"
+        "year",
+        "chamber",
+        "day",
+        "special",
+        "state",
+        "district",
+        "code",
+        "candidate",
+        "measure",
+        "writein",
+        "kind",
+        "source",
     ).agg(pl.col("votes").sum()).write_parquet(PARSED / "counties.parquet")
 
 
@@ -192,7 +294,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's 2002, 2004, 2006, 2008, 2012, and 2016 U.S. Senate and House primaries by county, summed from the Secretary of State's town and ward files",
+            summary="Maine's 2000, 2002, 2004, 2006, 2008, 2012, and 2016 U.S. Senate and House primaries by county, summed from the Secretary of State's town and ward files",
             polity="US-ME",
         )
         source = cs.source(me_federal.PUBLISHER, me_federal.TITLE)
@@ -207,5 +309,7 @@ def emit() -> Path:
         )
         for _, stamp, path, _ in FILES:
             cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, path)), source)
+        for letter, _, _ in FILES_2000:
+            cs.artifact(raw.cached(SOURCE, LLDC.format(letter)), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"ME": source}, strict=True)
         return cs.write()
