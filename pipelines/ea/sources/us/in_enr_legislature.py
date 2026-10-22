@@ -21,8 +21,10 @@ DAYS = {
     2006: date(2006, 11, 7),
     2008: date(2008, 11, 4),
     2010: date(2010, 11, 2),
+    2024: date(2024, 11, 5),
 }
 OFFICES = {"State Representative": "house", "State Senator": "senate"}
+STATEWIDE = {2024: {"Governor & Lt. Governor": "governor"}}
 
 
 def links(year: int) -> list[str]:
@@ -42,7 +44,7 @@ def links(year: int) -> list[str]:
                 "filterElectionType": "false",
             }
         )
-        for office in OFFICES
+        for office in STATEWIDE.get(year, OFFICES)
         for start in range(0, len(NAMES), 10)
     ]
 
@@ -62,10 +64,14 @@ def parse() -> None:
             if body:
                 frames.append(pl.DataFrame(body, schema=head, orient="row").with_columns(year=pl.lit(year, pl.Int32), day=pl.lit(day)))
     frame = pl.concat(frames).with_columns(
-        chamber=pl.col("Office").replace_strict(OFFICES)
-        + ":"
-        + pl.col("District").str.extract(r"^(?:District )?0*(\d+)$", 1)
-        + ":g",
+        chamber=pl.when(pl.col("Office").is_in(list(OFFICES)))
+        .then(
+            pl.col("Office").replace_strict(OFFICES, default=None)
+            + ":"
+            + pl.col("District").str.extract(r"^(?:District )?0*(\d+)$", 1)
+            + ":g"
+        )
+        .otherwise(pl.col("Office").replace_strict(STATEWIDE[2024], default=None)),
         code=pl.col("County").str.to_lowercase().str.replace_all("[^a-z]", "").replace_strict(CODES),
         candidate=pl.col("Candidate").str.to_uppercase().str.replace_all(r"\s+", " "),
         writein=pl.col("Candidate").str.contains("(?i)write"),
@@ -91,7 +97,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Indiana's state legislative generals by county, 2002-2010 (Election Division)",
+            summary="Indiana's state legislative generals by county, 2002-2010, and its 2024 governor by county (Election Division)",
             polity="US-IN",
         )
         source = cs.source(PUBLISHER, TITLE)
