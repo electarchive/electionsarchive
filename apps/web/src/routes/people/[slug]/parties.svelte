@@ -104,14 +104,19 @@
 {#snippet mark(how: string, color: string)}
   <span
     class={cn(
-      "block rounded-full border-2 border-(--party) block-2.5 inline-2.5",
+      "block border-2 border-(--party) block-2.5 inline-2.5",
       {
         "bg-(--party)":
           how === "nominated" || how === "line" || how === "member",
         "bg-card": how === "endorsed" || how === "supported",
         "border-dashed bg-card": how === "independent",
       },
-      { "ring-2 ring-card ring-offset-0": how === "member" },
+      {
+        "rounded-full":
+          how === "nominated" || how === "endorsed" || how === "independent",
+        "rounded-[1px]": how === "line" || how === "supported",
+        "scale-90 rotate-45 rounded-[1px]": how === "member",
+      },
     )}
     style:--party={color}
   ></span>
