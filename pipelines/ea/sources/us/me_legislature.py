@@ -58,6 +58,7 @@ COUNTIES = {
     "YOR": "23031",
 }
 NUMBER = re.compile(r"^[\d,.·'`IlOo]+$")
+OCR = {"lllRAM": "HIRAM", "DTT9 & TIO TWP.": "DTT9 & T10 TWP."}
 PUBLISHER = "Maine Secretary of State"
 TITLE = "General Election Tabulations"
 
@@ -68,8 +69,8 @@ def url(day: date, letter: str) -> str:
 
 def town(text: str) -> str:
     plain = re.sub(r"[^A-Z0-9 ]", "", text.upper().replace("ST.", "SAINT ").replace("ST ", "SAINT "))
-    plain = re.sub(r"\b(PLT|PLANTATION|TWP|TOWNSHIP|TOWN|CITY|ISL|ISLAND)\b", " ", plain)
-    return re.sub(r"\s+", "", plain)
+    plain = re.sub(r"\b(PLT|PLANTATION|TWP|TOWNSHIP|TOWN|CITY|ISL|ISLAND|UT)\b", " ", plain)
+    return re.sub(r"(TWP|PLT)$", "", re.sub(r"\s+", "", plain))
 
 
 def fetch() -> None:
@@ -79,6 +80,7 @@ def fetch() -> None:
 
 def parse() -> None:
     rows = []
+    districts: dict[tuple[date, str, int], int] = {}
     for (day, chamber), letter in FILES.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, url(day, letter)).path), "-"],
@@ -90,6 +92,7 @@ def parse() -> None:
         block = -1
         district = None
         closed = False
+        heading = None
         for line in text.splitlines():
             if not line.strip():
                 continue
@@ -113,22 +116,71 @@ def parse() -> None:
                     )
                     closed = True
                 continue
-            if re.match(r"\s*District\b", line) and not re.search(r"(?i)\btotals\b", line):
-                block += 1
+            if re.match(r"\s*D[il1]s\w{2,4}t\b", line) and not re.search(r"(?i)\btotals\b", line):
+                number = re.match(r"\s*D[il1]s\w{2,4}t\s*#?\s*([\dIlOoJ][\dIlOoJ ]*)", line)
+                number = re.sub(r"\D", "", number[1].translate(str.maketrans("IlOoJ", "11001"))) if number else None
+                if day.year != 2004 or number is None or number != heading:
+                    block += 1
+                heading = number
+                if number:
+                    districts[(day, chamber, block)] = int(number)
                 continue
             if block < 0:
                 continue
             if not coded and re.search(r"\d%", line) and block >= 0:
-                head = re.match(r"\s*(\S.*?)\s{2,}(?=[\d<])", line)
-                tokens = line[len(head[0]) :].split() if head else []
+                if day.year == 2004:
+                    line = re.sub(r"(\d+\.\d%)(\d+)\b", r"\2 \1", line)
+                head = re.match(r"\s*(\S.*?)\s{2,}(?=[\d<Il!|])", line)
+                tokens = (
+                    [
+                        t
+                        for t in re.sub(r"\s+%", "%", line[len(head[0]) :]).split()
+                        if not re.fullmatch(r"[*.\-'`·•,]+", t)
+                    ]
+                    if head
+                    else []
+                )
                 groups = []
+                shares = []
                 for position, token in enumerate(tokens):
-                    if re.search(r"\d%", token):
-                        previous = (
-                            tokens[position - 1] if position and not re.search(r"\d%", tokens[position - 1]) else None
-                        )
+                    if "%" in token:
+                        previous = tokens[position - 1] if position and "%" not in tokens[position - 1] else None
+                        if day.year == 2004:
+                            previous = previous.translate(str.maketrans("IlOo!|", "110011")) if previous else None
                         groups.append(re.sub(r"[^\d]", "", previous) if previous else "")
+                        share = re.search(r"(\d+\.\d)%", token)
+                        shares.append(float(share[1]) if share else None)
+                if day.year == 2004:
+                    cells = [int(g) if g else None for g in groups]
+
+                    def fits(row: list[int | None], shares: list[float | None] = shares) -> bool:
+                        total = sum(x or 0 for x in row)
+                        return all(
+                            p is None or abs((100 * (x or 0) / total if total else 0) - p) <= 0.0501
+                            for x, p in zip(row, shares)
+                        )
+
+                    if None in cells and cells.count(None) == 1:
+                        spot = cells.index(None)
+                        ceiling = 3 * max((c for c in cells if c is not None), default=0) + 10
+                        hits = [x for x in range(ceiling) if fits([*cells[:spot], x, *cells[spot + 1 :]])]
+                        cells = [*cells[:spot], hits[0], *cells[spot + 1 :]] if len(hits) == 1 else cells
+                    elif None not in cells and not fits(cells):
+                        ceiling = 3 * max(c or 0 for c in cells) + 10
+                        hits = [
+                            (spot, x)
+                            for spot in range(len(cells))
+                            for x in range(ceiling)
+                            if fits([*cells[:spot], x, *cells[spot + 1 :]])
+                        ]
+                        if len(hits) == 1:
+                            cells[hits[0][0]] = hits[0][1]
+                        else:
+                            cells = [None] * len(cells)
+                    groups = [str(c) if c is not None else "" for c in cells]
                 values = groups[:-1]
+                if day.year == 2004 and len(shares) > 2 and shares[-1] and sum(s or 0 for s in shares[:-1]) < 99.5:
+                    values = groups
                 if head and values and all(values):
                     name = head[1].strip()
                     total = bool(re.search(r"(?i)totals?(:|$)", name))
@@ -179,11 +231,19 @@ def parse() -> None:
             "votes": pl.Int64,
         },
         orient="row",
+    ).join(
+        pl.DataFrame(
+            [(*key, number) for key, number in districts.items()],
+            schema={"day": pl.Date, "chamber": pl.String, "block": pl.Int32, "district": pl.Int32},
+            orient="row",
+        ),
+        on=["day", "chamber", "block"],
+        how="left",
     ).write_parquet(PARSED / "lines.parquet")
 
 
 def emit() -> Path:
-    lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("day").dt.year() == 2010)
+    lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("day").dt.year() == 2004)
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
@@ -197,11 +257,26 @@ def emit() -> Path:
         places.setdefault(town(name), set()).add(COUNTIES[county])
         spelled[town(name)] = name
     with connect() as conn:
+        for (code,) in conn.execute(
+            "select code from reporting_unit where scheme_code = 'us.precinct' and code ~ '^(199[0-9]|20(0[0-9]|1[0-4])):ME:23[0-9]{3}::'"
+        ).fetchall():
+            _, _, fips, _, label = code.split(":", 4)
+            label = re.sub(r"( \d+[ -]\d+)+$", "", label)
+            places.setdefault(town(label), set()).add(fips)
+            spelled.setdefault(town(label), label)
+        for label, fips in (
+            ("LANGTOWN TWP", "23017"),
+            ("PERKINS TWP", "23007"),
+            ("NO. 14 TWP", "23009"),
+            ("NO. 7 TWP", "23009"),
+        ):
+            places.setdefault(town(label), set()).add(fips)
+            spelled.setdefault(town(label), label)
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine House and Senate general elections by municipality 1996 and 1998, from the Secretary of "
+            summary="Maine House and Senate general elections by municipality 2004, from the Secretary of "
             "State's tabulations",
             polity="US",
         )
@@ -255,7 +330,11 @@ def emit() -> Path:
         done: set[str] = set()
         for (day, chamber, block), rows in lines.group_by("day", "chamber", "block", maintain_order=True):
             totals = rows.filter(pl.col("town").is_null()).sort("column")["votes"].to_list()
-            body = rows.filter(pl.col("town").is_not_null(), ~pl.col("town").str.contains(r"(?i)uocava|emergency"))
+            body = rows.filter(
+                pl.col("town").is_not_null(),
+                ~pl.col("town").str.contains(r"(?i)uocava|emergency|included with"),
+                pl.col("town").str.contains(r"[A-Za-z]{2}"),
+            )
             towns = body["town"].unique(maintain_order=True).to_list()
             if not totals or not towns:
                 skipped.setdefault("no totals", []).append(f"{day} {chamber} {block}")
@@ -269,34 +348,41 @@ def emit() -> Path:
             ):
                 skipped.setdefault("columns do not add up to the printed totals", []).append(f"{day} {chamber} {block}")
                 continue
-            wanted = sorted(v for v in totals if v)
-            hits = [entry for entry in official.get((day, chamber), []) if sorted(v for _, v in entry[4]) == wanted]
+            district = rows["district"][0]
+            hits = [entry for entry in official.get((day, chamber), []) if int(entry[0].split(":")[3]) == district]
             if len(hits) != 1:
-                skipped.setdefault("no single contest with these totals", []).append(f"{day} {chamber} {block}")
+                skipped.setdefault("no single contest in this district", []).append(f"{day} {chamber} {block}")
                 continue
             key, contest, election, first, options = hits[0]
             if key in filled or key in done:
                 skipped.setdefault("already has a precinct set", []).append(key)
                 continue
-            mapping = {
-                column: next(option for option, votes in options if votes == total)
-                for column, total in enumerate(totals)
-                if total
-            }
-            if len(set(mapping.values())) != len(mapping):
-                skipped.setdefault("tied totals", []).append(key)
+            ranked = sorted((column for column, votes in enumerate(totals) if votes), key=lambda c: totals[c])
+            held = sorted(options, key=lambda item: item[1])
+            if (
+                len({totals[c] for c in ranked}) != len(ranked)
+                or len(ranked) != len(held)
+                or any(abs(totals[c] - votes) > votes / 10 for c, (_, votes) in zip(ranked, held))
+            ):
+                skipped.setdefault("totals do not match the held contest", []).append(key)
                 continue
+            mapping = {column: option for column, (option, _) in zip(ranked, held)}
             resolved = {}
             labels = {}
+            candidates = {}
             for name, county in body.select("town", "county").unique().iter_rows():
+                spelling = OCR.get(name, re.sub(r"^T[lI]", "T1", name))
                 close = difflib.get_close_matches(
-                    town(re.sub(r"II", "H", re.sub(r"[1Il]3", "B", name))), list(places), n=1, cutoff=0.8
+                    town(re.sub(r"II", "H", re.sub(r"[1Il]3", "B", spelling))), list(places), n=1, cutoff=0.8
                 )
-                match = town(name) if town(name) in places else close[0] if close else None
-                found = {COUNTIES[county]} if county else places[match] if match else set()
-                resolved[name] = next(iter(found)) if len(found) == 1 else None
+                match = town(spelling) if town(spelling) in places else close[0] if close else None
+                candidates[name] = {COUNTIES[county]} if county else places[match] if match else set()
+                resolved[name] = next(iter(candidates[name])) if len(candidates[name]) == 1 else None
                 labels[name] = name if county or match is None else spelled[match]
             known = {fips for fips in resolved.values() if fips}
+            for name, found in candidates.items():
+                if resolved[name] is None and len(found & known) == 1:
+                    resolved[name] = next(iter(found & known))
             if len(known) == 1:
                 resolved = {name: fips or next(iter(known)) for name, fips in resolved.items()}
             if not all(resolved.values()):
@@ -316,8 +402,12 @@ def emit() -> Path:
                 status="active",
                 source_id=source,
                 is_default=False,
-                completeness=round(
-                    sum(body.filter(pl.col("column").is_in(list(mapping)))["votes"]) / sum(v for _, v in options), 4
+                completeness=min(
+                    1,
+                    round(
+                        sum(body.filter(pl.col("column").is_in(list(mapping)))["votes"]) / sum(v for _, v in options),
+                        4,
+                    ),
                 ),
             )
             picked = body.filter(pl.col("column").is_in(list(mapping)), pl.col("votes") > 0).with_columns(
@@ -348,7 +438,7 @@ def emit() -> Path:
                 )
             )
         for reason, keys in skipped.items():
-            print(f"{len(keys)} skipped: {reason}", keys[:6])
+            print(f"{len(keys)} skipped: {reason}", keys[:30])
         existing = {
             code
             for (code,) in conn.execute(
