@@ -350,6 +350,27 @@ PRINTS = {
         ],
         scales=((2, "7"), (3, "7"), (2, "8"), (4, "7")),
     ),
+    "om254": dict(
+        mask="om254",
+        page=254,
+        sha="390fdb7684afb596b0eb8d472ccc6e0d65186cdb0096f3a113e2a80ea0c5e5be",
+        rows=FORTIES,
+        y0=2065,
+        pitch=36.65,
+        total=3163,
+        cols=[
+            (685, 835),
+            (838, 1000),
+            (1003, 1097),
+            (1115, 1275),
+            (1278, 1435),
+            (1438, 1566),
+            (1574, 1736),
+            (1739, 1899),
+            (1902, 2046),
+        ],
+        scales=((1, "7"), (2, "7")),
+    ),
 }
 
 
@@ -511,8 +532,9 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1868,)
+YEARS = (1848,)
 ELECTION_DAYS = {
+    1848: "1848-11-07",
     1852: "1852-11-02",
     1856: "1856-11-04",
     1860: "1860-11-06",
@@ -522,8 +544,8 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
 }
-YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69"}
-PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868}
+YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254"}
+PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876}
 PRINT_COLUMNS = {
     "v65": {
         0: (1864, "Lincoln"),
@@ -545,6 +567,11 @@ PRINT_COLUMNS = {
         0: (1868, "Grant"),
         1: (1868, "Seymour"),
     },
+    "om254": {
+        6: (1848, "Taylor"),
+        7: (1848, "Cass"),
+        8: (1848, "Van Buren"),
+    },
 }
 FUSION = {(1860, "NY", "Douglas"), (1860, "NJ", "Douglas"), (1860, "PA", "Breckinridge")}
 CANDIDATES = {
@@ -561,6 +588,9 @@ CANDIDATES = {
     "McClellan": ("George B. McClellan (Democratic)", "democraticparty"),
     "Grant": ("Ulysses S. Grant (Republican)", "republicanparty"),
     "Seymour": ("Horatio Seymour (Democratic)", "democraticparty"),
+    "Taylor": ("Zachary Taylor (Whig)", "whigparty"),
+    "Cass": ("Lewis Cass (Democratic)", "democraticparty"),
+    "Van Buren": ("Martin Van Buren (Free Soil)", "freesoilparty"),
 }
 EARLY: dict[tuple[int, str, str], int] = {
     (1868, "AL", "Grant"): 76366,
@@ -951,6 +981,82 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1860, "WI", "Breckinridge"): 888,
     (1860, "WI", "Douglas"): 65021,
     (1860, "WI", "Lincoln"): 86110,
+    (1848, "AL", "Taylor"): 30482,
+    (1848, "AL", "Cass"): 31363,
+    (1848, "AR", "Taylor"): 7588,
+    (1848, "AR", "Cass"): 9300,
+    (1848, "CT", "Taylor"): 30314,
+    (1848, "CT", "Cass"): 27046,
+    (1848, "CT", "Van Buren"): 5005,
+    (1848, "DE", "Taylor"): 6421,
+    (1848, "DE", "Cass"): 5898,
+    (1848, "DE", "Van Buren"): 80,
+    (1848, "FL", "Taylor"): 3116,
+    (1848, "FL", "Cass"): 1847,
+    (1848, "GA", "Taylor"): 47544,
+    (1848, "GA", "Cass"): 44802,
+    (1848, "IL", "Taylor"): 53047,
+    (1848, "IL", "Cass"): 56300,
+    (1848, "IL", "Van Buren"): 15774,
+    (1848, "IN", "Taylor"): 69907,
+    (1848, "IN", "Cass"): 74745,
+    (1848, "IN", "Van Buren"): 8100,
+    (1848, "IA", "Taylor"): 11084,
+    (1848, "IA", "Cass"): 12093,
+    (1848, "IA", "Van Buren"): 1126,
+    (1848, "KY", "Taylor"): 67141,
+    (1848, "KY", "Cass"): 49720,
+    (1848, "LA", "Taylor"): 18217,
+    (1848, "LA", "Cass"): 15370,
+    (1848, "ME", "Taylor"): 35125,
+    (1848, "ME", "Cass"): 39880,
+    (1848, "ME", "Van Buren"): 12096,
+    (1848, "MD", "Taylor"): 37702,
+    (1848, "MD", "Cass"): 34528,
+    (1848, "MD", "Van Buren"): 125,
+    (1848, "MA", "Taylor"): 61070,
+    (1848, "MA", "Cass"): 35281,
+    (1848, "MA", "Van Buren"): 38058,
+    (1848, "MI", "Taylor"): 23940,
+    (1848, "MI", "Cass"): 30687,
+    (1848, "MI", "Van Buren"): 10389,
+    (1848, "MS", "Taylor"): 25922,
+    (1848, "MS", "Cass"): 26537,
+    (1848, "MO", "Taylor"): 32671,
+    (1848, "MO", "Cass"): 40077,
+    (1848, "NH", "Taylor"): 14781,
+    (1848, "NH", "Cass"): 27763,
+    (1848, "NH", "Van Buren"): 7560,
+    (1848, "NJ", "Taylor"): 40015,
+    (1848, "NJ", "Cass"): 36901,
+    (1848, "NJ", "Van Buren"): 829,
+    (1848, "NY", "Taylor"): 218603,
+    (1848, "NY", "Cass"): 114318,
+    (1848, "NY", "Van Buren"): 120510,
+    (1848, "NC", "Taylor"): 43550,
+    (1848, "NC", "Cass"): 34869,
+    (1848, "OH", "Taylor"): 138360,
+    (1848, "OH", "Cass"): 154775,
+    (1848, "OH", "Van Buren"): 35354,
+    (1848, "PA", "Taylor"): 185513,
+    (1848, "PA", "Cass"): 171176,
+    (1848, "PA", "Van Buren"): 11263,
+    (1848, "RI", "Taylor"): 6779,
+    (1848, "RI", "Cass"): 3646,
+    (1848, "RI", "Van Buren"): 730,
+    (1848, "TN", "Taylor"): 64705,
+    (1848, "TN", "Cass"): 58419,
+    (1848, "TX", "Taylor"): 4509,
+    (1848, "TX", "Cass"): 10668,
+    (1848, "VT", "Taylor"): 23122,
+    (1848, "VT", "Cass"): 10948,
+    (1848, "VT", "Van Buren"): 13837,
+    (1848, "VA", "Taylor"): 45124,
+    (1848, "VA", "Cass"): 46586,
+    (1848, "VA", "Van Buren"): 9,
+    (1848, "WI", "Taylor"): 13747,
+    (1848, "WI", "Cass"): 15001,
+    (1848, "WI", "Van Buren"): 10418,
 }
 
 
@@ -1090,28 +1196,29 @@ def emit() -> Path:
                         skipped.append(
                             f"cell {name} {surname}: reads {reads} against Wikipedia's {ticket}, not settled"
                         )
-        early_keys = {YEAR_PRINT[year] for year in YEARS if year < 1872}
-        if early_keys:
-            with (PARSED / "reads_prints.tsv").open() as handle:
-                for row in csv.DictReader(handle, delimiter="\t"):
-                    if row["print"] not in early_keys or row["state"] == "Total":
+        for key in {YEAR_PRINT[year] for year in YEARS if year < 1872}:
+            spec = PRINTS[key]
+            with Image.open(PARSED / "native" / f"{spec['mask']}-mask.png") as mask:
+                mask_width, mask_height = mask.size
+            half = round(spec["pitch"] * 0.42)
+            for col, (year, surname) in PRINT_COLUMNS[key].items():
+                if year not in YEARS:
+                    continue
+                left = spec["cols"][col - 1][1] + 2 if col > 0 else spec["cols"][col][0] - 60
+                for index, name in enumerate(spec["rows"]):
+                    cell = (year, STATES[name], surname)
+                    if cell not in EARLY:
                         continue
-                    named = PRINT_COLUMNS.get(row["print"], {}).get(int(row["col"]))
-                    abbreviation = STATES[row["state"]]
-                    if named is None or named[0] not in YEARS or (named[0], abbreviation, named[1]) not in EARLY:
-                        continue
-                    with Image.open(PARSED / "native" / f"{PRINTS[row['print']]['mask']}-mask.png") as mask:
-                        mask_width, mask_height = mask.size
-                    cell = (named[0], abbreviation, named[1])
+                    center = round(spec["y0"] + spec["pitch"] * index)
                     values[cell] = EARLY[cell]
                     boxes[cell] = (
                         (
-                            int(row["x0"]) / mask_width,
-                            int(row["y0"]) / mask_height,
-                            int(row["x1"]) / mask_width,
-                            int(row["y1"]) / mask_height,
+                            left / mask_width,
+                            (center - half) / mask_height,
+                            (spec["cols"][col][1] + 4) / mask_width,
+                            (center + half) / mask_height,
                         ),
-                        row["print"],
+                        key,
                     )
         winners_ok = 0
         for (year, state), (rs, election, contest, stage, kind, source_id, completeness) in sorted(old.items()):
