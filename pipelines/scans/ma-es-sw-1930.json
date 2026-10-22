@@ -1,0 +1,54 @@
+{
+ "kind": "statewide",
+ "polity": "US-MA",
+ "publisher": "Massachusetts Secretary of the Commonwealth",
+ "title": "Election Statistics 1930 (P.D. 43), state officers, total vote for",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/electionstatisti19291930mass/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/electionstatisti19291930mass"
+ },
+ "raw_source": "us.scans",
+ "pages": [
+  {
+   "page": 49,
+   "tables": [
+    {
+     "id": "1930-49",
+     "year": 1930,
+     "day": "1930-11-04",
+     "state": "MA",
+     "offices": [
+      "lieutenant-governor",
+      "secretary-of-the-commonwealth",
+      "treasurer",
+      "auditor",
+      "attorney-general"
+     ],
+     "anchors": [
+      {
+       "contest": "1930-11-04:MA:governor",
+       "candidate": "Joseph B. Ely",
+       "official": 606902
+      },
+      {
+       "contest": "1930-11-04:MA:governor",
+       "candidate": "Frank G. Allen",
+       "official": 590238
+      },
+      {
+       "contest": "1928-11-06:MA:governor",
+       "candidate": "Charles H. Cole",
+       "official": 750137
+      },
+      {
+       "contest": "1928-11-06:MA:governor",
+       "candidate": "Frank G. Allen",
+       "official": 769372
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}

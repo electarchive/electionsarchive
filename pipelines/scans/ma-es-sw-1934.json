@@ -1,0 +1,69 @@
+{
+ "kind": "statewide",
+ "polity": "US-MA",
+ "publisher": "Massachusetts Secretary of the Commonwealth",
+ "title": "Election Statistics 1934 (P.D. 43), state officers, total vote for",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/electionstatisti19331934mass/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/electionstatisti19331934mass"
+ },
+ "raw_source": "us.scans",
+ "pages": [
+  {
+   "page": 58,
+   "tables": [
+    {
+     "id": "1934-58",
+     "year": 1934,
+     "day": "1934-11-06",
+     "state": "MA",
+     "offices": [
+      "lieutenant-governor"
+     ],
+     "anchors": [
+      {
+       "contest": "1934-11-06:MA:governor",
+       "candidate": "James M. Curley",
+       "official": 736463
+      },
+      {
+       "contest": "1934-11-06:MA:governor",
+       "candidate": "Gaspar G. Bacon",
+       "official": 627413
+      }
+     ]
+    }
+   ]
+  },
+  {
+   "page": 59,
+   "tables": [
+    {
+     "id": "1934-59",
+     "year": 1934,
+     "day": "1934-11-06",
+     "state": "MA",
+     "offices": [
+      "secretary-of-the-commonwealth",
+      "treasurer",
+      "auditor",
+      "attorney-general"
+     ],
+     "anchors": [
+      {
+       "contest": "1932-11-08:MA:governor",
+       "candidate": "Joseph B. Ely",
+       "official": 825479
+      },
+      {
+       "contest": "1932-11-08:MA:governor",
+       "candidate": "William Sterling Youngman",
+       "official": 704576
+      }
+     ]
+    }
+   ]
+  }
+ ]
+}
