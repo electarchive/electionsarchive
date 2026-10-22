@@ -168,30 +168,50 @@
       : (polity.latest?.races.find((race) => race.contest != null) ?? null),
   );
 
+  const source = $derived.by(() => {
+    const race = isLocal ? polity.results[0]?.races[0] : undefined;
+    if (race?.path != null) {
+      return {
+        key: `${race.id}/${race.path}`,
+        id: race.id,
+        unit: race.path.split("/").at(-1),
+      };
+    }
+    return headline?.contest == null
+      ? null
+      : { key: headline.contest, id: headline.contest, unit: undefined };
+  });
+
   let loaded = $state<{
     id: string;
     contest: Awaited<ReturnType<typeof orpc.contests.get.call>>;
     bounds: Awaited<ReturnType<typeof orpc.contests.boundaries.call>>;
   } | null>(null);
+  let failed = $state<string | null>(null);
 
   $effect(() => {
-    const id = headline?.contest;
-    if (id == null || loaded?.id === id) {
+    const wanted = source;
+    if (wanted == null || loaded?.id === wanted.key) {
       return;
     }
     const stop = new AbortController();
     void (async () => {
       try {
-        const contest = await orpc.contests.get.call({ id });
+        const contest = await orpc.contests.get.call({
+          id: wanted.id,
+          unit: wanted.unit,
+        });
         const bounds = await orpc.contests.boundaries.call({
-          id,
+          id: wanted.id,
+          unit: wanted.unit,
           level: contest.places?.level,
         });
         if (!stop.signal.aborted) {
-          loaded = { id, contest, bounds };
+          loaded = { id: wanted.key, contest, bounds };
         }
       } catch {
         loaded = null;
+        failed = wanted.key;
       }
     })();
     return () => {
@@ -244,8 +264,8 @@
       : { name: parent.name, path: parent.path };
   });
   const isMapped = $derived(
-    headline?.contest != null &&
-      (loaded?.id !== headline.contest || drawn != null),
+    source != null &&
+      (loaded?.id === source.key ? drawn != null : failed !== source.key),
   );
 </script>
 
@@ -272,34 +292,6 @@
     </p>
   {/if}
 </header>
-
-{#if isLocal}
-  {#if shared != null}
-    <section
-      class="col-span-12 grid gap-1 bg-card px-3.5 pbs-4 pbe-1"
-      aria-labelledby="{uid}-versus"
-    >
-      <h2
-        id="{uid}-versus"
-        class="text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[760] tracking-[-0.015em]"
-      >
-        {m.polity_versus_title({ place: polity.name })}
-      </h2>
-      <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem]">
-        <span class="text-pretty text-muted-foreground"
-          >{m.polity_versus_lede({ place: polity.name, parent: above })}</span
-        >
-        <a
-          class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
-          href={resolve(`/compare?a=${id}&b=${polity.parent ?? ""}`)}
-          >{m.polity_versus_all({ place: polity.name, parent: above })}</a
-        >
-      </p>
-    </section>
-    <Versus data={shared} />
-  {/if}
-  {@render inPlace()}
-{/if}
 
 {#if isMapped}
   <div
@@ -452,6 +444,34 @@
       {/each}
     </ul>
   </section>
+{/if}
+
+{#if isLocal}
+  {#if shared != null}
+    <section
+      class="col-span-12 grid gap-1 bg-card px-3.5 pbs-4 pbe-1"
+      aria-labelledby="{uid}-versus"
+    >
+      <h2
+        id="{uid}-versus"
+        class="text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[760] tracking-[-0.015em]"
+      >
+        {m.polity_versus_title({ place: polity.name })}
+      </h2>
+      <p class="flex flex-wrap items-baseline gap-x-3 gap-y-1 text-[0.9375rem]">
+        <span class="text-pretty text-muted-foreground"
+          >{m.polity_versus_lede({ place: polity.name, parent: above })}</span
+        >
+        <a
+          class="text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground"
+          href={resolve(`/compare?a=${id}&b=${polity.parent ?? ""}`)}
+          >{m.polity_versus_all({ place: polity.name, parent: above })}</a
+        >
+      </p>
+    </section>
+    <Versus data={shared} />
+  {/if}
+  {@render inPlace()}
 {/if}
 
 <Timeline
