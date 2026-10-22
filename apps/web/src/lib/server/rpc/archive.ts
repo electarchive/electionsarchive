@@ -10417,6 +10417,7 @@ export const parties = {
           from entered n join election g on g.id = n.grp join election e on coalesce(e.parent_id, e.id) = n.grp
           join contest c on c.election_id = e.id and coalesce(c.body_id, c.office_id) = n.seat
             and c.allocation_parent_id is null and c.party_scope_id is null
+            and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
         ),
