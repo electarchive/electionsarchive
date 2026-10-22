@@ -153,14 +153,15 @@ def emit(
         held: set[tuple[str, int]] = set()
         taken: set[str] = set()
         foreign: set[UUID] = set()
-        for office, year, contest_key, election_id in conn.execute(
-            """select o.value, extract(year from e.date_from)::int, k.value, e.id from contest c
+        for office, year, contest_key, election_id, election_kind in conn.execute(
+            """select o.value, extract(year from e.date_from)::int, k.value, e.id, e.kind from contest c
                join election e on e.id = c.election_id
                join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
                join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'"""
         ):
             if contest_key not in ours:
-                held.add((office, year))
+                if election_kind == "general":
+                    held.add((office, year))
                 taken.add(contest_key)
                 foreign.add(election_id)
         generals: dict[tuple[str, str], dict[UUID, tuple[date, date]]] = {}
