@@ -452,6 +452,17 @@ export const crosswalkWeight = pgTable("crosswalk_weight", {
 	primaryKey({ columns: [table.crosswalkId, table.fromK, table.toK], name: "crosswalk_weight_pkey"}),
 ]);
 
+export const districtCounty = pgTable("district_county", {
+	districtAreaId: uuid("district_area_id").notNull(),
+	districtValid: daterange("district_valid").notNull(),
+	countyAreaId: uuid("county_area_id").notNull(),
+	countyValid: daterange("county_valid").notNull(),
+	share: real().notNull(),
+	rest: real(),
+}, (table) => [
+	primaryKey({ columns: [table.districtAreaId, table.districtValid, table.countyAreaId, table.countyValid], name: "district_county_pkey"}),
+]);
+
 export const election = pgTable("election", {
 	id: uuid().default(sql`uuidv7()`).primaryKey().references(() => entity.id, { onDelete: "cascade" } ),
 	polityId: uuid("polity_id").notNull().references(() => polity.id),
