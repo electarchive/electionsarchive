@@ -466,11 +466,17 @@ def parse() -> None:
             remainder = REMAINDER.search(plain) is not None
             term = TERM.search(plain)
             found = _classify(plain, st, county, county_name, names, school_names, munis.get(county, []))
-            if found is None and (prefix := _prefix(heading, plain, names, school_names)):
-                found = _classify(
-                    f"{prefix} {plain}", st, county, county_name, names, school_names, munis.get(county, [])
+            if (found is None or found.get("loose")) and (prefix := _prefix(heading, plain, names, school_names)):
+                found = (
+                    retry
+                    if (
+                        retry := _classify(
+                            f"{prefix} {plain}", st, county, county_name, names, school_names, munis.get(county, [])
+                        )
+                    )
+                    and retry["scheme"] != "us.county"
+                    else found
                 )
-                found = found if found and found["scheme"] != "us.county" else None
             if found is None:
                 skipped[re.sub(r"\d+", "N", plain)[:70]] += 1
                 continue
@@ -793,9 +799,9 @@ def _classify(
                 break
             if re.search(rf"\b(?:{pattern})\b", plain) and (st == "TX" or key != "constable"):
                 seat, rest = _seat(plain)
-                if _residue(rest, pattern):
+                if _residue(rest, pattern) or st == "TX" and seat and not seat.startswith("Precinct"):
                     return None
-                return _county(st, county, key, office, body, seat, label)
+                return {**_county(st, county, key, office, body, seat, label), "loose": True}
         if re.search(r"\bCOUNTY\b", plain) and re.search(r"\bPROP|QUESTION|BOND|REFERENDUM|ISSUE", plain):
             return _county(st, county, "question", "", False, None, label)
         return None
@@ -1123,6 +1129,7 @@ def emit() -> Path:
         memberships: set[tuple[UUID, UUID, date]] = set()
         values: list[tuple[str, str, str, int]] = []
         emitted: list[UUID] = []
+        done: dict[str, UUID] = {}
         skipped: Counter[str] = Counter()
         for key, rows in contests.group_by("contest_key", maintain_order=True):
             contest_key = str(key[0])
@@ -1318,9 +1325,7 @@ def emit() -> Path:
                     party_scope_id=parties[party] if party else None,
                     magnitude=magnitude,
                     round_number=2 if runoff else 1,
-                    previous_round_id=cs.key("us.contest", previous[contest_key])
-                    if contest_key in previous and previous[contest_key] not in held
-                    else None,
+                    previous_round_id=done.get(previous.get(contest_key, "")),
                     electoral_system_id=systems["fptp" if magnitude == 1 else "block"],
                     default_result_kind="counted",
                     term="remainder" if first["remainder"] else "full",
@@ -1341,6 +1346,7 @@ def emit() -> Path:
                 )
             cs.add("slug", path=contest_path, entity_id=contest)
             emitted.append(contest)
+            done[contest_key] = contest
             result_set = cs.key(f"{SOURCE}.result_set", contest_key)
             main = max(carried, key=lambda county: shares.get(county, 0.0))
             cs.add(
