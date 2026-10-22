@@ -437,7 +437,19 @@ def emit() -> Path:
             original = kind
             suffix = {"general": "", "primary": ":primary", "runoff": ":runoff", "special": ":special"}[kind]
             if kind == "special" and day is not None:
-                for other, other_suffix in (("general", ""), ("primary", ":primary")):
+                scoped = all(
+                    classify(etype)[2] is not None
+                    for etype in dated.filter(
+                        pl.col("sab") == sab,
+                        pl.col("year") == year,
+                        pl.col("month") == month,
+                        pl.col("day").eq_missing(day),
+                        pl.col("kind") == kind,
+                    )["etype"]
+                )
+                for other, other_suffix in (
+                    (("primary", ":primary"),) if scoped else (("general", ""), ("primary", ":primary"))
+                ):
                     if (sab, year, month, day, other) in on_day or (
                         f"{year}-{month:02}-{day:02}:{sab}{other_suffix}" in elections_known
                     ):

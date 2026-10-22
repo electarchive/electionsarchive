@@ -4699,7 +4699,7 @@ def emit() -> Path:
             .when(pl.col("name").is_in(["None of the Names Shown", "No Candidate", "Candidate None"]))
             .then(pl.lit("none_of_the_above"))
             .when(pl.col("name").is_in(["Scattered", "Scattering", "All Others", "Miscellaneous", "Other"]))
-            .then(pl.lit("write_in"))
+            .then(pl.lit("write_in")),
         )
         .with_columns(
             key=pl.when(pl.col("kind").is_null()).then(
@@ -5613,36 +5613,16 @@ def emit() -> Path:
             previous = None
             for number, (when, stage, rows) in enumerate(stages):
                 main = stage == "primary" and not held and when == calendar.get((year, state, None), (None,))[0]
-                occasion = "general" if when == days[year] else stage
-                parent = (
-                    election(
-                        f"{when}:{state}",
-                        polity,
-                        "general",
-                        when,
-                        f"{year} {state_name} general election",
-                        f"us/{state.lower()}/{when}-general",
-                        election(
-                            str(when),
-                            us,
-                            "general",
-                            when,
-                            f"{year} United States general election",
-                            f"us/{when}-general",
-                        ),
-                    )
-                    if occasion == "general"
-                    else election(
-                        f"{when}:{state}:{stage}",
-                        polity,
-                        stage,
-                        when,
-                        f"{year} {state_name} primary election"
-                        if main
-                        else f"{when:%B %-d, %Y} {state_name} {'special ' if held else ''}primary"
-                        f"{' runoff' if stage == 'runoff' else ''} election",
-                        f"us/{state.lower()}/{when}-{stage}",
-                    )
+                parent = election(
+                    f"{when}:{state}:{stage}",
+                    polity,
+                    stage,
+                    when,
+                    f"{year} {state_name} primary election"
+                    if main
+                    else f"{when:%B %-d, %Y} {state_name} {'special ' if held else ''}primary"
+                    f"{' runoff' if stage == 'runoff' else ''} election",
+                    f"us/{state.lower()}/{when}-{stage}",
                 )
                 contest_key = (
                     f"{when}:{state}:{chamber}"
@@ -5677,9 +5657,8 @@ def emit() -> Path:
                 )
                 cs.add(
                     "slug",
-                    path=f"us/{state.lower()}/{when}-{occasion}/{part}{'-special' if special else ''}"
-                    + ("" if blanket else f"-{slug(title)}")
-                    + ("" if occasion == stage else f"-primary-{stage}"),
+                    path=f"us/{state.lower()}/{when}-{stage}/{part}{'-special' if special else ''}"
+                    + ("" if blanket else f"-{slug(title)}"),
                     entity_id=contest,
                 )
                 result_set = cs.key(f"{SOURCE}.result_set", contest_key)
