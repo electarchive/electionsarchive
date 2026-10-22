@@ -8918,13 +8918,16 @@ export const polities = {
             where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from <= current_date
               and (c.district_area_id is null or c.district_area_id = pt.area_id)
               and exists (
-                select from result_set rs cross join lateral (
-                  select from result_rollup r
-                  join area_parent ap on ap.area_id = (select id from area where k = r.area_k) and ap.parent_id = pt.area_id
-                  where r.result_set_k = rs.k
-                  limit 1
-                ) x
-                where rs.contest_id = c.id and rs.is_default
+                select from result_set rs
+                where rs.contest_id = c.id and rs.is_default and exists (
+                  select from (
+                    select u.area_k from result_rollup_unit u where u.result_set_k = rs.k
+                    union all
+                    select s.area_k from result_rollup_sum s where s.result_set_k = rs.k
+                  ) r
+                  join area a on a.k = r.area_k
+                  join area_parent ap on ap.area_id = a.id and ap.parent_id = pt.area_id
+                )
               )
             order by e.date_from desc
             limit 1
