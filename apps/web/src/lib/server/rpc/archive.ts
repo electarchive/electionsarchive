@@ -10487,18 +10487,15 @@ export const parties = {
       ),
     )
     .handler(async ({ input }) => {
-      const found = await db.execute<{
-        grp: string | null;
+      const listed = await db.execute<{
+        id: string;
+        grp: string;
         seat: string;
-        root: string;
         date: string;
         year: number;
-        races: number;
-        votes: number | null;
-        total: number | null;
-        seats: number | null;
-        filled: number | null;
-        predecessor: string | null;
+        round: number | null;
+        area: number | null;
+        bucket: string;
       }>(sql`
         with recursive ids(id) as (
           select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
@@ -10528,27 +10525,26 @@ export const parties = {
           union select em.entity_id, p.id from entity_merge em join predecessors p on em.into_id = p.id
         ),
         ours as (select id from family union select id from early),
-        mine as materialized (
-          select o.id as option, o.contest_id from contest_option o
-          where o.party_id in (select id from ours)
-        ),
-        up(id, parent) as (
-          select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
-          union
-          select c.id, c.allocation_parent_id from up join contest c on c.id = up.parent
+        candidates as materialized (
+          select c.id, coalesce(e.parent_id, e.id) as grp, coalesce(c.body_id, c.office_id) as seat
+          from contest c join election e on e.id = c.election_id
+          left join body b on b.id = c.body_id
+          left join office f on f.id = c.office_id
+          where c.allocation_parent_id is null and c.party_scope_id is null and e.kind in ('general', 'local')
+            and coalesce(c.body_id, c.office_id) is not null
+            and ((select polity from home) is null or coalesce(b.polity_id, f.polity_id) = (select polity from home))
         ),
         entered as materialized (
-          select distinct coalesce(e.parent_id, e.id) as grp, coalesce(c.body_id, c.office_id) as seat
-          from up join contest c on c.id = up.id join election e on e.id = c.election_id
-          where up.parent is null and coalesce(c.body_id, c.office_id) is not null
-            and c.party_scope_id is null and e.kind in ('general', 'local')
-            and ((select polity from home) is null or coalesce(
-              (select polity_id from body where id = c.body_id),
-              (select polity_id from office where id = c.office_id)
-            ) = (select polity from home))
+          select distinct grp, seat from candidates k
+          where exists (
+            with recursive t(id) as (
+              select k.id union all select c.id from contest c join t on c.allocation_parent_id = t.id
+            )
+            select from t join contest_option o on o.contest_id = t.id where o.party_id in (select id from ours)
+          )
         ),
         roots as materialized (
-          select c.id, n.grp, n.seat, e.date_from as date, ${CYCLE} as year, c.round_number, a.k as area,
+          select c.id, n.grp, n.seat, e.date_from as date, ${CYCLE} as year, c.round_number as round, a.k as area,
             case when g.polity_id = (select polity from home) then n.grp::text else (${CYCLE})::text end as bucket
           from entered n join election g on g.id = n.grp join election e on coalesce(e.parent_id, e.id) = n.grp
           join contest c on c.election_id = e.id and coalesce(c.body_id, c.office_id) = n.seat
@@ -10559,77 +10555,174 @@ export const parties = {
             )))
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
-        ),
-        tree(root, id, area) as (
-          select id, id, area from roots where round_number = 1
-          union all
-          select tree.root, c.id, tree.area from contest c join tree on c.allocation_parent_id = tree.id
-        ),
-        picked as materialized (
-          select distinct on (rs.contest_id) t.root, rs.k, t.area
-          from tree t cross join lateral (select * from result_set x where x.contest_id = t.id offset 0) rs
-          cross join lateral (
-            select from result_rollup x where x.result_set_k = rs.k and x.area_k = t.area and x.measure = any(${COUNTED}) limit 1
-          ) hit
-          order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
-        ),
-        fetched as (
-          select p.root, x.option_k, x.measure, x.value::float8 as value, x.count_round,
-            min(x.count_round) over (partition by p.root, x.measure) as first,
-            min(array_position(${COUNTED}, x.measure)) over (partition by p.root) as main
-          from picked p cross join lateral (
-            select x.option_k, x.measure, x.value, x.count_round from result_rollup x
-            where x.result_set_k = p.k and x.area_k = p.area and x.measure = any(${COUNTED}) and x.option_k <> 0
-            offset 0
-          ) x
-        ),
-        tallied as (
-          select f.root, sum(f.value) as total, min(pe.via::text) as via,
-            coalesce(sum(f.value) filter (
-              where o.party_id in (select id from ours)
-                or (select po.party_id from contest_option po where po.id = o.parent_option_id) in (select id from ours)
-            ), 0) as votes
-          from fetched f
-          join contest_option o on o.k = f.option_k
-          left join early pe on pe.id = o.party_id
-          where f.count_round = f.first and array_position(${COUNTED}, f.measure) = f.main
-          group by f.root
-        ),
-        seated as (
-          select w.root, coalesce(sum(w.seats) filter (where w.mine), 0) as seats, sum(w.seats) as filled
-          from (
-            select r.id as root, o.id,
-              bool_or(
-                o.party_id in (select id from ours)
-                or o.party_id is null and ${fused(sql`o.id`, sql`o.contest_id`)} in (select id from family)
-              ) as mine,
-              max(coalesce(x.seats, 1)) as seats
-            from roots r
-            join lateral (
-              with recursive t(id) as (
-                select r.id union all select c.id from contest c join t on c.allocation_parent_id = t.id
-              )
-              select id from t
-            ) sub on true
-            join contest_option o on o.contest_id = sub.id
-            join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-            join result_set rs on rs.id = x.result_set_id and rs.is_default
-            where not exists (select from contest k where k.allocation_parent_id = sub.id)
-              or sub.id = r.id and not exists (select from contest k where k.allocation_parent_id = r.id)
-            group by r.id, o.id
-          ) w
-          group by w.root
         )
-        select case when count(distinct r.grp) = 1 then min(r.grp::text) end as grp, r.seat,
-          (array_agg(r.id order by r.id))[1] as root, min(r.date)::text as date,
-          min(r.year) as year, count(distinct r.id)::int as races,
-          sum(t.votes)::float8 as votes, sum(t.total)::float8 as total,
-          sum(s.seats)::int as seats, sum(s.filled)::int as filled,
-          min(t.via) as predecessor
-        from roots r left join tallied t on t.root = r.id left join seated s on s.root = r.id
-        group by r.bucket, r.seat
-        order by min(r.date)
+        select id, grp, seat, date::text as date, year, round, area, bucket from roots
       `);
+      const chunks = Map.groupBy(listed.rows, (_row, index) => index % 4)
+        .values()
+        .toArray();
+      const counted = await Promise.all(
+        chunks.map((chunk) =>
+          db.execute<{
+            root: string;
+            votes: number | null;
+            total: number | null;
+            seats: number | null;
+            filled: number | null;
+            via: string | null;
+          }>(sql`
+            with recursive ids(id) as (
+              select coalesce((select into_id from entity_merge where entity_id = ${input.id}::uuid), ${input.id}::uuid)
+              union
+              select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+            ),
+            home as (
+              select coalesce(${input.within ?? null}::uuid, polity_id) as polity from party where id = (select id from ids limit 1)
+            ),
+            branches as (
+              select pa.party_id as id from party_affiliation pa
+              where pa.kind = 'regional_branch' and pa.parent_party_id in (select id from ids)
+            ),
+            family as (
+              select id from ids union select id from branches
+              union select em.entity_id from entity_merge em where em.into_id in (select id from branches)
+            ),
+            predecessors as (
+              select coalesce(fm.into_id, r.from_party_id) as id
+              from party_relation r
+              left join entity_merge fm on fm.entity_id = r.from_party_id
+              left join entity_merge tm on tm.entity_id = r.to_party_id
+              where r.kind = 'merged_into' and coalesce(tm.into_id, r.to_party_id) in (select id from ids)
+            ),
+            early as materialized (
+              select id, id as via from predecessors
+              union select em.entity_id, p.id from entity_merge em join predecessors p on em.into_id = p.id
+            ),
+            ours as (select id from family union select id from early),
+            roots as materialized (
+              select * from unnest(
+                ${sql.param(chunk.map((row) => row.id))}::uuid[],
+                ${sql.param(chunk.map((row) => row.round))}::int[],
+                ${sql.param(chunk.map((row) => row.area))}::int[]
+              ) as r(id, round, area)
+            ),
+            tree(root, id, area) as (
+              select id, id, area from roots where round = 1
+              union all
+              select tree.root, c.id, tree.area from contest c join tree on c.allocation_parent_id = tree.id
+            ),
+            picked as materialized (
+              select distinct on (rs.contest_id) t.root, rs.k, t.area
+              from tree t cross join lateral (select * from result_set x where x.contest_id = t.id offset 0) rs
+              cross join lateral (
+                select from result_rollup x where x.result_set_k = rs.k and x.area_k = t.area and x.measure = any(${COUNTED}) limit 1
+              ) hit
+              order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last, rs.k
+            ),
+            fetched as (
+              select p.root, x.option_k, x.measure, x.value::float8 as value, x.count_round,
+                min(x.count_round) over (partition by p.root, x.measure) as first,
+                min(array_position(${COUNTED}, x.measure)) over (partition by p.root) as main
+              from picked p cross join lateral (
+                select x.option_k, x.measure, x.value, x.count_round from result_rollup x
+                where x.result_set_k = p.k and x.area_k = p.area and x.measure = any(${COUNTED}) and x.option_k <> 0
+                offset 0
+              ) x
+            ),
+            tallied as (
+              select f.root, sum(f.value) as total, min(pe.via::text) as via,
+                coalesce(sum(f.value) filter (
+                  where o.party_id in (select id from ours)
+                    or (select po.party_id from contest_option po where po.id = o.parent_option_id) in (select id from ours)
+                ), 0) as votes
+              from fetched f
+              join contest_option o on o.k = f.option_k
+              left join early pe on pe.id = o.party_id
+              where f.count_round = f.first and array_position(${COUNTED}, f.measure) = f.main
+              group by f.root
+            ),
+            seated as (
+              select w.root, coalesce(sum(w.seats) filter (where w.mine), 0) as seats, sum(w.seats) as filled
+              from (
+                select r.id as root, o.id,
+                  bool_or(
+                    o.party_id in (select id from ours)
+                    or o.party_id is null and ${fused(sql`o.id`, sql`o.contest_id`)} in (select id from family)
+                  ) as mine,
+                  max(coalesce(x.seats, 1)) as seats
+                from roots r
+                join lateral (
+                  with recursive t(id) as (
+                    select r.id union all select c.id from contest c join t on c.allocation_parent_id = t.id
+                  )
+                  select id from t
+                ) sub on true
+                join contest_option o on o.contest_id = sub.id
+                join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+                join result_set rs on rs.id = x.result_set_id and rs.is_default
+                where not exists (select from contest k where k.allocation_parent_id = sub.id)
+                  or sub.id = r.id and not exists (select from contest k where k.allocation_parent_id = r.id)
+                group by r.id, o.id
+              ) w
+              group by w.root
+            )
+            select r.id as root, t.votes::float8 as votes, t.total::float8 as total, s.seats::int as seats,
+              s.filled::int as filled, t.via
+            from roots r left join tallied t on t.root = r.id left join seated s on s.root = r.id
+          `),
+        ),
+      );
+      const byRoot = new Map(
+        counted.flatMap((result) =>
+          result.rows.map((row) => [row.root, row] as const),
+        ),
+      );
+      const found = {
+        rows: Map.groupBy(listed.rows, (row) => `${row.bucket} ${row.seat}`)
+          .values()
+          .map((group) => {
+            const sum = (
+              pick: (
+                row: (typeof counted)[number]["rows"][number],
+              ) => number | null,
+            ) => {
+              let total: number | null = null;
+              for (const row of group) {
+                const tally = byRoot.get(row.id);
+                const value = tally == null ? null : pick(tally);
+                if (value != null) {
+                  total = (total ?? 0) + value;
+                }
+              }
+              return total;
+            };
+            const grps = new Set(group.map((row) => row.grp));
+            const vias = group
+              .flatMap((row) => byRoot.get(row.id)?.via ?? [])
+              .toSorted((a, b) => Number(a > b) - Number(a < b));
+            return {
+              grp: grps.size === 1 ? (group[0]?.grp ?? null) : null,
+              seat: group[0]?.seat ?? "",
+              root:
+                group
+                  .map((row) => row.id)
+                  .toSorted((a, b) => Number(a > b) - Number(a < b))[0] ?? "",
+              date:
+                group
+                  .map((row) => row.date)
+                  .toSorted((a, b) => Number(a > b) - Number(a < b))[0] ?? "",
+              year: Math.min(...group.map((row) => row.year)),
+              races: new Set(group.map((row) => row.id)).size,
+              votes: sum((row) => row.votes),
+              total: sum((row) => row.total),
+              seats: sum((row) => row.seats),
+              filled: sum((row) => row.filled),
+              predecessor: vias[0] ?? null,
+            };
+          })
+          .toArray()
+          .toSorted((a, b) => a.date.localeCompare(b.date)),
+      };
       const seats = [...new Set(found.rows.map((row) => row.seat))];
       const linked = found.rows.flatMap((row) => [
         ...(row.races === 1 ? [row.root] : []),
