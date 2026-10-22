@@ -18,6 +18,10 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 RETURNS = "https://lldc.mainelegislature.org/Open/Elections/Returns/{year}/{day}/elec_{day}{letter}.pdf"
 FILES = {
+    (date(1996, 11, 5), "house"): "g",
+    (date(1996, 11, 5), "senate"): "i",
+    (date(1998, 11, 3), "house"): "g",
+    (date(1998, 11, 3), "senate"): "i",
     (date(2000, 11, 7), "house"): "d",
     (date(2000, 11, 7), "senate"): "f",
     (date(2002, 11, 5), "house"): "g",
@@ -114,6 +118,25 @@ def parse() -> None:
                 continue
             if block < 0:
                 continue
+            if not coded and re.search(r"\d%", line) and block >= 0:
+                head = re.match(r"\s*(\S.*?)\s{2,}(?=[\d<])", line)
+                tokens = line[len(head[0]) :].split() if head else []
+                groups = []
+                for position, token in enumerate(tokens):
+                    if re.search(r"\d%", token):
+                        previous = (
+                            tokens[position - 1] if position and not re.search(r"\d%", tokens[position - 1]) else None
+                        )
+                        groups.append(re.sub(r"[^\d]", "", previous) if previous else "")
+                values = groups[:-1]
+                if head and values and all(values):
+                    name = head[1].strip()
+                    total = bool(re.search(r"(?i)totals?:", name))
+                    rows.extend(
+                        (day, chamber, block, None if total else name, None, column, int(votes.replace(",", "")))
+                        for column, votes in enumerate(values)
+                    )
+                continue
             if re.search(r"(?i)office\s*t\S*:|\bt[o0]t\S{1,3}s:", stripped):
                 values = [
                     int(re.sub(r"[^\d]", "", t.translate(str.maketrans("IlOo", "1100"))) or 0)
@@ -150,7 +173,7 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    lines = pl.read_parquet(PARSED / "lines.parquet")
+    lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("day").dt.year() < 2000)
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
@@ -168,7 +191,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine House and Senate general elections by municipality 2000–2014, from the Secretary of "
+            summary="Maine House and Senate general elections by municipality 1996 and 1998, from the Secretary of "
             "State's tabulations",
             polity="US",
         )
@@ -176,7 +199,7 @@ def emit() -> Path:
             key
             for (key,) in conn.execute(
                 """select distinct cx.value from external_id cx join result_set rs on rs.contest_id = cx.entity_id
-                   where cx.scheme = 'us.contest' and cx.value ~ '^20(0[0-9]|1[0-4])-11-\\d\\d:ME:(house|senate):'
+                   where cx.scheme = 'us.contest' and cx.value ~ '^(199[68]|20(0[0-9]|1[0-4]))-11-\\d\\d:ME:(house|senate):'
                      and rs.changeset_id not in (select id from changeset where pipeline = %s)
                      and exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')""",
@@ -193,7 +216,7 @@ def emit() -> Path:
                join contest_option o on o.contest_id = c.id and o.parent_option_id is null
                left join lateral (select sum(w.value) votes from result_value w
                                   where w.result_set_k = rs.k and w.option_k = o.k and w.measure = 1) t on true
-               where x.scheme = 'us.contest' and x.value ~ '^20(0[0-9]|1[0-4])-11-\\d\\d:ME:(house|senate):[0-9]+:g$'
+               where x.scheme = 'us.contest' and x.value ~ '^(199[68]|20(0[0-9]|1[0-4]))-11-\\d\\d:ME:(house|senate):[0-9]+:g$'
                group by 1, 2, 3""",
         ).fetchall():
             pairs = [tuple(item.strip("()").split(",")) for item in options]
@@ -256,7 +279,7 @@ def emit() -> Path:
             resolved = {}
             labels = {}
             for name, county in body.select("town", "county").unique().iter_rows():
-                close = difflib.get_close_matches(town(re.sub(r"[1Il]3", "B", name)), list(places), n=1, cutoff=0.8)
+                close = difflib.get_close_matches(town(re.sub(r"II", "H", re.sub(r"[1Il]3", "B", name))), list(places), n=1, cutoff=0.8)
                 match = town(name) if town(name) in places else close[0] if close else None
                 found = {COUNTIES[county]} if county else places[match] if match else set()
                 resolved[name] = next(iter(found)) if len(found) == 1 else None
@@ -295,6 +318,7 @@ def emit() -> Path:
             picked = picked.with_columns(
                 code=pl.concat_str(pl.lit(str(day.year)), pl.lit("ME"), "fips", pl.lit(""), "label", separator=":")
             )
+            picked = picked.group_by("code", "fips", "column").agg(pl.col("votes").sum())
             for code, fips in picked.select("code", "fips").unique().iter_rows():
                 minted.setdefault(code, (fips, day))
             values.append(
