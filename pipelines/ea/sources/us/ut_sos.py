@@ -26,6 +26,7 @@ FILES = {
     (2006, "general"): ("20110927154942", "General/2006Gen.pdf"),
     (2008, "general"): ("20110927154940", "General/2008Gen.xls"),
     (2010, "general"): ("20110927154938", "General/2010Gen.xls"),
+    (2012, "general"): (None, "https://vote.utah.gov/wp-content/uploads/2023/09/2012-General-Canvass-Report.xls"),
 }
 DAYS = {
     (2000, "general"): date(2000, 11, 7),
@@ -33,6 +34,7 @@ DAYS = {
     (2006, "general"): date(2006, 11, 7),
     (2008, "general"): date(2008, 11, 4),
     (2010, "general"): date(2010, 11, 2),
+    (2012, "general"): date(2012, 11, 6),
 }
 TABLES = {
     (2000, "general"): [
@@ -240,16 +242,20 @@ STATEWIDE = (
 )
 
 
+def address(stamp: str | None, path: str) -> str:
+    return path if stamp is None else WAYBACK.format(stamp, SITE + path)
+
+
 def fetch() -> None:
     for stamp, path in FILES.values():
-        address = WAYBACK.format(stamp, SITE + path)
+        location = address(stamp, path)
         try:
-            raw.cached(SOURCE, address)
+            raw.cached(SOURCE, location)
         except LookupError:
             for attempt in range(6):
                 time.sleep(4 + 60 * attempt)
                 try:
-                    raw.fetch(SOURCE, address, suffix="." + path.rsplit(".", 1)[1])
+                    raw.fetch(SOURCE, location, suffix="." + path.rsplit(".", 1)[1])
                     break
                 except httpx.TransportError:
                     if attempt == 5:
@@ -260,7 +266,7 @@ def parse() -> None:
     rows: list[dict[str, object]] = []
     for (year, stage), tables in TABLES.items():
         stamp, path = FILES[(year, stage)]
-        document = raw.cached(SOURCE, WAYBACK.format(stamp, SITE + path)).path
+        document = raw.cached(SOURCE, address(stamp, path)).path
         for page, backward, offset, office, headers in tables:
             text = subprocess.run(
                 ["pdftotext", "-layout", "-f", str(page), "-l", str(page), str(document), "-"],
@@ -309,7 +315,37 @@ def parse() -> None:
     for (year, stage), (stamp, path) in FILES.items():
         if path.endswith(".pdf"):
             continue
-        book = fastexcel.read_excel(raw.cached(SOURCE, WAYBACK.format(stamp, SITE + path)).path)
+        book = fastexcel.read_excel(raw.cached(SOURCE, address(stamp, path)).path)
+        if year == 2012:
+            table = book.load_sheet("Constitutional", header_row=None, dtypes="string").to_polars()
+            cells = [[str(cell).strip() if cell is not None else "" for cell in row] for row in table.iter_rows()]
+            offices = {}
+            for column, label in enumerate(cells[0][4:], 4):
+                if label:
+                    offices[column] = SHEETS[label.replace("State ", "").replace("Attorney General", "Attorney Gen")]
+            office = ""
+            total = next(row for row in cells if row[0].upper() == "TOTAL")
+            counties = cells[2 : cells.index(total)]
+            for column in range(4, len(cells[1])):
+                office = offices.get(column, office)
+                header = re.sub(r"\s+", " ", cells[1][column])
+                header = re.sub(r"\s*,\s*", " & ", header, count=1) if office == "governor" else header
+                header = re.sub(r"\s*\(([A-Z]+)\)$", r' "\1"', header)
+                counted = sum(int(float(row[column])) for row in counties if row[column])
+                if counted and counted != int(float(total[column])):
+                    raise ValueError(f"{year} {office} {header}: {counted} against {total[column]}")
+                for row in counties if counted else [total]:
+                    rows.append(
+                        {
+                            "year": year,
+                            "stage": stage,
+                            "office": office,
+                            "header": header,
+                            "county": row[0] if counted else "",
+                            "votes": int(float(row[column])) if row[column] else 0,
+                        }
+                    )
+            continue
         for sheet in book.sheet_names:
             if sheet not in SHEETS:
                 continue
@@ -373,7 +409,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Utah's president, U.S. Senate, governor, and statewide executive elections 2008–2010 by county "
+            summary="Utah's president, U.S. Senate, governor, and statewide executive elections 2008–2012 by county "
             "from the state's official canvass",
             polity="US",
         )
@@ -413,7 +449,7 @@ def emit() -> Path:
             license="Public record",
         )
         for stamp, path in FILES.values():
-            cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, SITE + path)), source)
+            cs.artifact(raw.cached(SOURCE, address(stamp, path)), source)
         ((area,),) = conn.execute(
             """select u.area_id from reporting_unit u
                join polity_territory t on t.area_id = u.area_id
