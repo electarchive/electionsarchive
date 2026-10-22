@@ -1,0 +1,24 @@
+{
+  "kind": "statewide",
+  "year": 1974,
+  "day": "1974-11-05",
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1974",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1974%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "general-treasurer": "General Treasurer"
+  },
+  "leaves": [
+    22,
+    23
+  ]
+}

@@ -1,0 +1,24 @@
+{
+  "kind": "statewide",
+  "year": 1978,
+  "day": "1978-11-07",
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1978",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1978%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "general-treasurer": "General Treasurer"
+  },
+  "leaves": [
+    28,
+    29
+  ]
+}
