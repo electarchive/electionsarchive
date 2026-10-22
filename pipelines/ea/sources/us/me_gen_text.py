@@ -15,16 +15,18 @@ SOURCE = "us.me_gen_text"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 TITLE = "Election results: general election tabulations by municipality"
-WAYBACK = "https://web.archive.org/web/2012id_/http://www.maine.gov/sos/cec/elec/{}"
+WAYBACK = "https://web.archive.org/web/{}"
 FILES = [
-    ("2000g/gen00sr.txt", date(2000, 11, 7), "house"),
-    ("2000g/gen00ss.txt", date(2000, 11, 7), "senate"),
-    ("2002g/gen02sr.txt", date(2002, 11, 5), "house"),
-    ("2002g/gen02ss.txt", date(2002, 11, 5), "senate"),
-    ("2006g/sr.txt", date(2006, 11, 7), "house"),
-    ("2006g/ss.txt", date(2006, 11, 7), "senate"),
-    ("2008/tabs-can-sr-11-08.txt", date(2008, 11, 4), "house"),
-    ("2008/tabs-can-ss-11-08.txt", date(2008, 11, 4), "senate"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2000g/gen00sr.txt", date(2000, 11, 7), "house"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2000g/gen00ss.txt", date(2000, 11, 7), "senate"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2002g/gen02sr.txt", date(2002, 11, 5), "house"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2002g/gen02ss.txt", date(2002, 11, 5), "senate"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2006g/sr.txt", date(2006, 11, 7), "house"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2006g/ss.txt", date(2006, 11, 7), "senate"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2008/tabs-can-sr-11-08.txt", date(2008, 11, 4), "house"),
+    ("2012id_/http://www.maine.gov/sos/cec/elec/2008/tabs-can-ss-11-08.txt", date(2008, 11, 4), "senate"),
+    ("2015id_/http://www.maine.gov:80/sos/cec/elec/results/2010-11/staterep.txt", date(2010, 11, 2), "house"),
+    ("2015id_/http://www.maine.gov:80/sos/cec/elec/results/2010-11/statesenator.txt", date(2010, 11, 2), "senate"),
 ]
 UNLISTED = {"CHEBEAGUEISLAND": "CUM", "NO14": "WAS"}
 
@@ -45,6 +47,31 @@ def parse() -> None:
                         last, first, middle, suffix = (part.strip() for part in row[start + 1 : start + 5])
                         name = f"{last}, {' '.join(part for part in (first, middle, suffix) if part)}"
                         lines.append((day, chamber, int(row[4]), row[1], row[2], name, int(row[start])))
+            continue
+        if day.year == 2010:
+            names: list[str] = []
+            heading = 0
+            for row in csv.reader(io.StringIO(text), delimiter="|"):
+                if len(row) > 5 and not any(cell.strip() for cell in row[:5]):
+                    heading += 1
+                    if heading == 1:
+                        names = [cell.strip() for cell in row[5:]]
+                    continue
+                heading = 0
+                if len(row) > 5 and row[1].strip().isdigit():
+                    for name, votes in zip(names, row[5:], strict=False):
+                        if name and name.upper() != "BLANK" and votes.strip():
+                            lines.append(
+                                (
+                                    day,
+                                    chamber,
+                                    int(row[1]),
+                                    row[2].strip() or None,
+                                    row[3].strip(),
+                                    name.upper(),
+                                    int(votes.replace(",", "")),
+                                )
+                            )
             continue
         rows = list(csv.reader(io.StringIO(text)))
         header = [cell.strip().lower() for cell in rows[0]]
@@ -88,6 +115,7 @@ def parse() -> None:
         .str.replace_all(r"\b(?:UN\.? TWP\.? (?:OF )?|TWP\.?$)", "")
         .str.replace_all(r"[^A-Z0-9]", ""),
         county=pl.col("county").str.strip_chars(),
+        uocava=pl.col("town").str.to_uppercase().str.contains("UOCAVA"),
     )
     homes = frame.filter(pl.col("county").is_not_null()).select("place", "county").unique()
     if homes.filter(pl.len().over("place") > 1).height:
@@ -96,7 +124,7 @@ def parse() -> None:
     frame = frame.join(homes.rename({"county": "home"}), on="place", how="left").with_columns(
         county=pl.coalesce("county", "home", pl.col("place").replace_strict(UNLISTED, default=None))
     )
-    lost = frame.filter(pl.col("county").is_null())
+    lost = frame.filter(pl.col("county").is_null(), ~pl.col("uocava"))
     if lost.height:
         raise ValueError(f"no county for {lost['town'].unique().to_list()}")
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -108,8 +136,10 @@ def parse() -> None:
             special=pl.lit(False),
             state=pl.lit("ME"),
             district=pl.lit(None, pl.Int16),
-            code=pl.col("county").replace_strict(COUNTIES),
-            kind=pl.lit("county"),
+            code=pl.when("uocava")
+            .then(pl.lit("ME:uocava"))
+            .otherwise(pl.col("county").replace_strict(COUNTIES, default=None)),
+            kind=pl.when("uocava").then(pl.lit("aggregate")).otherwise(pl.lit("county")),
             candidate=pl.col("candidate").str.to_uppercase(),
             measure=pl.lit(1, pl.Int16),
             writein=pl.col("candidate").str.contains("(?i)write|others"),
@@ -129,7 +159,7 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from external_id x
                    join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
-                   where x.scheme = 'us.contest' and x.value ~ '^20(00|02|06|08)-11-0[0-9]:ME:(house|senate):[0-9]+:g$'
+                   where x.scheme = 'us.contest' and x.value ~ '^20(00|02|06|08|10)-11-0[0-9]:ME:(house|senate):[0-9]+:g$'
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
                                    and u.scheme_code in ('us.precinct', 'us.county', 'us.town', 'us.county_part'))"""
@@ -139,7 +169,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's 2000, 2002, 2006, and 2008 State House and Senate generals by county",
+            summary="Maine's 2000, 2002, 2006, 2008, and 2010 State House and Senate generals by county",
             polity="US-ME",
         )
         source = cs.source(PUBLISHER, TITLE)
