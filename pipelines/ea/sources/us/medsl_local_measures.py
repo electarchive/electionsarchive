@@ -301,6 +301,7 @@ def emit() -> Path:
             summary="Local ballot questions voted in November 2016 through 2024, from MEDSL's precinct files",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -462,7 +463,7 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            if result_set not in cs.minted:
+            if result_set not in cs.minted and result_set not in zeroed:
                 continue
             cs.add("note", entity_id=result_set, kind="methodology", body_md=METHOD.format(year=day.year))
             unit = cs.unit(scheme, code)

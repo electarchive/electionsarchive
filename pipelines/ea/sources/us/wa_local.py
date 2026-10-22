@@ -593,6 +593,7 @@ def emit() -> Path:
             summary="Washington's city, town, school board, special district, and county elections, 2014–2025",
             polity="US-WA",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -1007,9 +1008,9 @@ def emit() -> Path:
                         is_independent=label == "STATES NO",
                     )
                     ranked.append((votes, option))
-                if result_set in cs.minted and counted is None:
+                if (result_set in cs.minted or result_set in zeroed) and counted is None:
                     values.append((str(result_set), str(unit), str(option), votes))
-                if result_set in cs.minted and counted is not None:
+                if (result_set in cs.minted or result_set in zeroed) and counted is not None:
                     for place, value in (
                         counted.filter(pl.col("token") == token).group_by("unit").agg(pl.col("votes").sum()).iter_rows()
                     ):

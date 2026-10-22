@@ -18,7 +18,7 @@ from ea.sources.us.alged import SOURCE as ALGED
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 TOWNS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_09_cousub_500k.zip"
 COUNTY = ("board-of-commissioners", "Board of Commissioners", None)
@@ -252,16 +252,14 @@ def fetch() -> None:
     raw.fetch(SOURCE, TOWNS, suffix=".zip")
     for state, (first, *_) in STATES.items():
         for year in range(first, 2026):
-            raw.fetch(SOURCE, url(state, year), suffix=".csv")
+            elstats.gaps(elstats.TENANTS[state][0], url(state, year), fetching=True, source=SOURCE)
 
 
 def parse() -> None:
     frames = []
     for state, (first, offices, districts, *_) in STATES.items():
         for year in range(first, 2026):
-            frame = pl.read_csv(
-                raw.cached(SOURCE, url(state, year)).path, infer_schema=False, truncate_ragged_lines=True
-            )
+            frame = elstats.searched(elstats.TENANTS[state][0], url(state, year), source=SOURCE)
             if frame.height == 0:
                 continue
             frames.append(
@@ -527,6 +525,7 @@ def emit() -> Path:
             summary="County, city, town, and school board elections and primaries from the archives of Virginia, New Hampshire, Idaho, New Mexico, Connecticut, and Vermont",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -538,6 +537,8 @@ def emit() -> Path:
                 if (artifact := raw.cached(SOURCE, url(state, year))).storage_key not in stored:
                     stored.add(artifact.storage_key)
                     cs.artifact(artifact, sources[state])
+                    for link in elstats.gaps(elstats.TENANTS[state][0], url(state, year), source=SOURCE):
+                        cs.artifact(raw.cached(SOURCE, link), sources[state])
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         cs.artifact(raw.cached(SOURCE, TOWNS), census)
         cs.add("scheme", code="us.town", polity_id=cs.polity("US"), kind="administrative", rank=3, noun="town")
@@ -938,7 +939,7 @@ def emit() -> Path:
                             kind="won" if primary else "elected",
                             seats=None,
                         )
-                if result_set in cs.minted and counted is None:
+                if (result_set in cs.minted or result_set in zeroed) and counted is None:
                     cs.add(
                         "result_value",
                         result_set_id=result_set,
@@ -950,7 +951,7 @@ def emit() -> Path:
                         flags=0,
                         value=votes,
                     )
-                if result_set in cs.minted and counted is not None:
+                if (result_set in cs.minted or result_set in zeroed) and counted is not None:
                     for place, value in (
                         counted.filter(pl.col("candidate") == candidate_id).select("unit", "votes").iter_rows()
                     ):

@@ -12,7 +12,7 @@ from ea.sources.us.pa_dos_returns import SOURCE as RAW_SOURCE
 from ea.store import DATA, connect
 
 SOURCE = "us.pa_dos_precincts"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://www.pa.gov/content/dam/copapwp-pagov/en/dos/resources/voting-and-elections/bulk-data/"
 GENERALS = {
@@ -198,6 +198,22 @@ def emit() -> Path:
             if contest is None:
                 print(f"{key}: no contest in the archive")
                 continue
+            if rows["votes"].sum() == 0:
+                if key in ours:
+                    columns = ("id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of")
+                    columns += ("completeness", "supersedes_id", "is_default")
+                    stale = conn.execute(
+                        f"select {', '.join(columns)} from result_set where id = %s", [ours[key]]
+                    ).fetchone()
+                    if stale is not None:
+                        cs.add("result_set", **dict(zip(columns, stale, strict=True)) | {"status": "withdrawn"})
+                        if stale[10] and stale[9] is not None:
+                            prior = conn.execute(
+                                f"select {', '.join(columns)} from result_set where id = %s", [stale[9]]
+                            ).fetchone()
+                            if prior is not None:
+                                cs.add("result_set", **dict(zip(columns, prior, strict=True)) | {"is_default": True})
+                continue
             current = conn.execute(
                 """select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness,
                           supersedes_id, is_default
@@ -251,7 +267,11 @@ def emit() -> Path:
                         dropped += votes
                     continue
                 found = [
-                    p for p in people if p[1] == letters or p[1].endswith(letters[-7:]) or letters.endswith(p[1][-7:])
+                    p
+                    for p in people
+                    if p[1] == letters
+                    or p[1].endswith(letters[-7:])
+                    or letters.endswith(p[1][-7:])
                     or ("PA_ADD" in os.environ and p[1][-5:] == letters[-5:])
                 ]
                 found = [p for p in found if p[0] not in targets.values()]
@@ -269,7 +289,8 @@ def emit() -> Path:
                 for candidate, label, votes in unmatched:
                     display = label.title()
                     (person,) = conn.execute(
-                        "select p.id from person p join name n on n.entity_id = p.id where n.text = %s limit 1", [display]
+                        "select p.id from person p join name n on n.entity_id = p.id where n.text = %s limit 1",
+                        [display],
                     ).fetchone() or (None,)
                     if person is None:
                         person = cs.key(f"{SOURCE}.person", re.sub(r"[^a-z]", "", display.lower()))

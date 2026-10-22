@@ -1264,6 +1264,7 @@ def emit() -> Path:
             "precinct files",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -1768,7 +1769,7 @@ def emit() -> Path:
                                 cs.add("candidacy_nomination", candidacy_id=head, party_id=line_party, kind="nominated")
                             options[(token, pooled, line)] = child
                 options[(token, pooled, "")] = option
-            if result_set in cs.minted:
+            if result_set in cs.minted or result_set in zeroed:
                 for token, pooled, line, place, votes in (
                     counted.filter(pl.col("votes").is_not_null())
                     .select("token", "pooled", "line", "unit", "votes")

@@ -632,6 +632,7 @@ def emit() -> Path:
             summary="City, village, borough, and township elections and local questions from county election night reporting sites in Illinois, Kansas, Michigan, Nebraska, Ohio, and Pennsylvania",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         cs.renamed.update(RENAMED)
 
@@ -962,7 +963,7 @@ def emit() -> Path:
                         is_independent=False,
                     )
                 ranked.append((votes, option))
-            if result_set not in cs.minted:
+            if result_set not in cs.minted and result_set not in zeroed:
                 continue
             if question:
                 if len(ranked) == 2 and ranked[0][0] != ranked[1][0]:

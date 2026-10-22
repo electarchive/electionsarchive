@@ -18,7 +18,7 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats"
-VERSION = "6"
+VERSION = "7"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
 PRIMARIES = 2022
@@ -83,10 +83,11 @@ def url(tenant: str, year: int) -> str:
     return SEARCH.format(tenant=tenant) + urlencode({"search": json.dumps(search, separators=(",", ":"))})
 
 
-def gaps(tenant: str, address: str, fetching: bool = False) -> list[str]:
+def gaps(tenant: str, address: str, fetching: bool = False, source: str = SOURCE) -> list[str]:
     frame = pl.read_csv(
-        (raw.fetch(SOURCE, address, suffix=".csv") if fetching else raw.cached(SOURCE, address)).path,
+        (raw.fetch(source, address, suffix=".csv") if fetching else raw.cached(source, address)).path,
         infer_schema=False,
+        truncate_ragged_lines=True,
     )
     if "contest_id" not in frame.columns or frame.height == 0:
         return []
@@ -99,15 +100,15 @@ def gaps(tenant: str, address: str, fetching: bool = False) -> list[str]:
     ]
     if fetching:
         for link in links:
-            raw.fetch(SOURCE, link, suffix=".csv")
+            raw.fetch(source, link, suffix=".csv")
     return links
 
 
-def searched(tenant: str, address: str) -> pl.DataFrame:
-    frame = pl.read_csv(raw.cached(SOURCE, address).path, infer_schema=False)
+def searched(tenant: str, address: str, source: str = SOURCE) -> pl.DataFrame:
+    frame = pl.read_csv(raw.cached(source, address).path, infer_schema=False, truncate_ragged_lines=True)
     squeeze = pl.col("candidate_name").fill_null("").str.replace_all(r"\s+", " ").str.strip_chars()
-    for link in gaps(tenant, address):
-        table = pl.read_csv(raw.cached(SOURCE, link).path, infer_schema=False, has_header=False)
+    for link in gaps(tenant, address, source=source):
+        table = pl.read_csv(raw.cached(source, link).path, infer_schema=False, has_header=False)
         names = [re.sub(r"\s+", " ", name or "").strip() for name in table.row(0)]
         filled = pl.DataFrame(
             [
@@ -118,15 +119,25 @@ def searched(tenant: str, address: str) -> pl.DataFrame:
             ],
             schema={"division_type": pl.String, "division_name": pl.String, "key": pl.String, "votes": pl.String},
         )
-        if filled["votes"].cast(pl.Float64, strict=False).sum() == 0:
+        filled = filled.filter(pl.col("votes").cast(pl.Float64, strict=False).sum().over("division_type") > 0)
+        if filled.height == 0:
             continue
         contest = link.rsplit("/", 1)[1].split("_", 1)[0]
         rows = frame.filter(pl.col("contest_id") == contest)
         rows = (
-            rows.filter(pl.col("vote_channel").eq_missing(rows["vote_channel"][0]))
-            .drop("votes")
-            .with_columns(key=squeeze)
-            .join(filled, on=["division_type", "division_name", "key"], how="left")
+            filled.join(
+                rows.with_columns(key=squeeze)
+                .unique("key", keep="first", maintain_order=True)
+                .drop("division_type", "division_name", "division_id", "votes"),
+                on="key",
+            )
+            .join(
+                rows.select("division_type", "division_name", "division_id").unique(
+                    ["division_type", "division_name"], keep="first"
+                ),
+                on=["division_type", "division_name"],
+                how="left",
+            )
             .drop("key")
             .with_columns(vote_channel=pl.lit("Total"))
             .select(frame.columns)

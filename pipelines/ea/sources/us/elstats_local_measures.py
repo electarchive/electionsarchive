@@ -14,7 +14,7 @@ from ea.sources.us.elstats_local import STAGES
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_local_measures"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1990, 2025
 TENANTS = ("VA", "NM", "CT", "ID", "CO", "NH", "VT")
@@ -56,16 +56,14 @@ def url(state: str, year: int) -> str:
 def fetch() -> None:
     for state in TENANTS:
         for year in range(FIRST, LAST + 1):
-            raw.fetch(SOURCE, url(state, year), suffix=".csv")
+            elstats.gaps(elstats.TENANTS[state][0], url(state, year), fetching=True, source=SOURCE)
 
 
 def parse() -> None:
     frames = []
     for state in TENANTS:
         for year in range(FIRST, LAST + 1):
-            frame = pl.read_csv(
-                raw.cached(SOURCE, url(state, year)).path, infer_schema=False, truncate_ragged_lines=True
-            )
+            frame = elstats.searched(elstats.TENANTS[state][0], url(state, year), source=SOURCE)
             if "question_text" not in frame.columns or frame.height == 0:
                 continue
             frames.append(
@@ -300,12 +298,15 @@ def emit() -> Path:
         if system in cs.minted:
             raise ValueError("the referendum system must already exist")
         sources = {state: cs.source(elstats.TENANTS[state][1], elstats.TITLE) for state in TENANTS}
+        zeroed = cs.zeroed()
         stored: set[str] = set()
         for state in sorted(set(questions["state"])):
             for year in range(FIRST, LAST + 1):
                 if (artifact := raw.cached(SOURCE, url(state, year))).storage_key not in stored:
                     stored.add(artifact.storage_key)
                     cs.artifact(artifact, sources[state])
+                    for link in elstats.gaps(elstats.TENANTS[state][0], url(state, year), source=SOURCE):
+                        cs.artifact(raw.cached(SOURCE, link), sources[state])
         elections: set[UUID] = set()
         districts: set[str] = set()
         minted: dict[str, tuple[str, date]] = {}
@@ -444,7 +445,7 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
-            if result_set not in cs.minted:
+            if result_set not in cs.minted and result_set not in zeroed:
                 continue
             cs.add(
                 "note",

@@ -217,6 +217,7 @@ def emit() -> Path:
             summary="State legislative general, special, and primary elections 1967–2022 by district",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -692,7 +693,7 @@ def emit() -> Path:
                 supersedes_id=None if result_set == first else first,
                 completeness=None if group["votes"].is_null().any() else 1,
             )
-            fresh = result_set in cs.minted
+            fresh = result_set in cs.minted or result_set in zeroed
             nomination = "primary" in label
             for index, (candid, rows) in enumerate(group.group_by("candid", maintain_order=True)):
                 row = rows.row(0, named=True)

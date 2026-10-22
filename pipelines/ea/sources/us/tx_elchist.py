@@ -248,6 +248,7 @@ def emit() -> Path:
             "runoffs, and generals of 2000 to 2014 by county from the Secretary of State's election history",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -467,7 +468,7 @@ def emit() -> Path:
             if stage != "runoff":
                 firsts[(day.year, base)] = contest
             result_set = cs.key(f"{SOURCE}.result_set", key)
-            if result_set not in cs.minted:
+            if result_set not in cs.minted and result_set not in zeroed:
                 continue
             options: list[tuple[UUID, str, str]] = []
             outcomes: list[tuple[UUID, str, int | None]] = []

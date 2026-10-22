@@ -235,6 +235,7 @@ def emit() -> Path:
             summary="Indiana city, town, township, and school board elections by precinct from the Election Division's results archive",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -497,7 +498,7 @@ def emit() -> Path:
                     ballot_name=ballot,
                     is_independent=party == "Independent",
                 )
-                if winner and consistent and result_set in cs.minted:
+                if winner and consistent and (result_set in cs.minted or result_set in zeroed):
                     cs.add("outcome", result_set_id=result_set, option_id=option, kind="elected", seats=1)
             for same, level, county, fips, place_name, votes in (
                 counted.with_columns(same=pl.col("name").str.to_lowercase().str.replace_all(r"[^a-z0-9]+", ""))

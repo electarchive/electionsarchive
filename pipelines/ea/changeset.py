@@ -176,9 +176,22 @@ class Changeset:
             "page", f"{artifact_id}:{number}", "select artifact_id || ':' || page_number, id from source_page"
         )
 
+    def zeroed(self) -> set[UUID]:
+        return {
+            id
+            for (id,) in self.conn.execute(
+                """select rs.id from result_set rs join changeset c on c.id = rs.changeset_id
+                   where c.pipeline = %s and rs.status = 'active' and rs.kind = 'counted'
+                     and exists (select from result_value v where v.result_set_k = rs.k)
+                     and not exists (select from result_value v where v.result_set_k = rs.k and v.value <> 0)""",
+                [self.manifest["pipeline"]],
+            )
+        }
+
     def write(self) -> Path:
         folder = DATA / "changesets" / str(self.id)
         folder.mkdir(parents=True)
+        tables: dict[str, pl.DataFrame] = {}
         for table, rows in self.rows.items():
             frames = list(self.frames[table])
             if rows:
@@ -201,7 +214,61 @@ class Changeset:
                         infer_schema_length=None,
                     ),
                 )
-            pl.concat(frames, how="diagonal_relaxed").write_parquet(folder / f"{table}.parquet")
+            tables[table] = pl.concat(frames, how="diagonal_relaxed")
+        if "result_set" in tables and "result_value" in tables:
+            sets, values = tables["result_set"], tables["result_value"]
+            counted = sets.filter(pl.col("kind") == "counted")["id"].cast(pl.String)
+            zeroed = (
+                values.with_columns(pl.col("result_set_id", "option_id").cast(pl.String))
+                .filter(pl.col("result_set_id").is_in(counted.implode()))
+                .group_by("result_set_id")
+                .agg(pl.col("value").abs().max().alias("most"), pl.col("option_id").unique().alias("options"))
+                .filter(pl.col("most") == 0)
+            )
+            kinds: dict[str, str] = (
+                dict(tables["contest_option"].select(pl.col("id", "kind").cast(pl.String)).iter_rows())
+                if "contest_option" in tables
+                else {}
+            )
+            unknown = [option for options in zeroed["options"] for option in options if option not in kinds]
+            if unknown:
+                kinds |= {
+                    str(option): kind
+                    for option, kind in self.conn.execute(
+                        "select id, kind::text from contest_option where id = any(%s::uuid[])", [unknown]
+                    )
+                }
+            declared: dict[str, set[str]] = {}
+            if "outcome" in tables:
+                for result_set, option in (
+                    tables["outcome"]
+                    .filter(pl.col("kind").is_in(["elected", "won"]))
+                    .select(pl.col("result_set_id", "option_id").cast(pl.String))
+                    .iter_rows()
+                ):
+                    declared.setdefault(result_set, set()).add(option)
+            tacit, missing = [], []
+            for result_set, options in zeroed.select("result_set_id", "options").iter_rows():
+                named = {option for option in options if kinds.get(option) != "write_in"}
+                if not named:
+                    continue
+                if named <= declared.get(result_set, set()):
+                    tacit.append(result_set)
+                else:
+                    missing.append(result_set)
+            if tacit or missing:
+                identity = pl.col("id").cast(pl.String)
+                tables["result_set"] = sets.with_columns(
+                    kind=pl.when(identity.is_in(tacit)).then(pl.lit("tacit")).otherwise(pl.col("kind")),
+                    completeness=pl.when(identity.is_in(tacit))
+                    .then(None)
+                    .when(identity.is_in(missing))
+                    .then(0)
+                    .otherwise(pl.col("completeness") if "completeness" in sets.columns else None),
+                )
+                tables["result_value"] = values.filter(~pl.col("result_set_id").cast(pl.String).is_in(tacit))
+        for table, frame in tables.items():
+            frame.write_parquet(folder / f"{table}.parquet")
         edges = self.conn.execute(
             """select conrelid::regclass::text, confrelid::regclass::text from pg_constraint
                where contype = 'f' and connamespace = 'public'::regnamespace and conrelid <> confrelid"""

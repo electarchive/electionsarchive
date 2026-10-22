@@ -329,6 +329,7 @@ def emit() -> Path:
             summary="House of Commons general elections 1832–2024 by constituency, from Umit's candidate-level results",
             polity="GB",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str, start: date | None = None) -> None:
             cs.add(
@@ -599,7 +600,7 @@ def emit() -> Path:
                     is_default=True,
                     completeness=1,
                 )
-                fresh = result_set in cs.minted
+                fresh = result_set in cs.minted or result_set in zeroed
                 caveat = {
                     "derived": DERIVED_CAVEAT,
                     "tie": TIE_CAVEAT,

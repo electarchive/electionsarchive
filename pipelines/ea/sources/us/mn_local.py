@@ -311,6 +311,7 @@ def emit() -> Path:
             summary="Minnesota city, township, and school district elections by precinct from the Secretary of State's results files",
             polity="US",
         )
+        zeroed = cs.zeroed()
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -610,7 +611,7 @@ def emit() -> Path:
                         is_independent=False,
                     )
                 ranked.append((votes, option))
-            if result_set in cs.minted:
+            if result_set in cs.minted or result_set in zeroed:
                 cut = 1 if question else row["magnitude"]
                 if question and len(ranked) != 2:
                     cut = 0
