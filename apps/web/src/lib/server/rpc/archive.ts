@@ -11699,6 +11699,13 @@ export const search = {
           where q.t <% d.text and not d.tsv @@ terms.tq
         ),
         pool as (select * from hits order by score desc limit ${q.length < 3 ? 1000 : 50_000}),
+        seats as (
+          select c.id, array_agg(t.polity_id) as polities
+          from pool h join contest c on c.id = h.entity_id join election el on el.id = c.election_id
+          join polity_territory t on t.area_id = c.district_area_id
+          where h.type = 'contest' and el.date_from >= coalesce(lower(t.valid), '-infinity') and el.date_from < coalesce(upper(t.valid), 'infinity')
+          group by c.id
+        ),
         tiered as (
           select h.entity_id, h.type, h.matched, coalesce(el.polity_id, case when h.type = 'polity' then h.entity_id end) as polity_id, el.date_from, h.score
             + case
@@ -11706,12 +11713,12 @@ export const search = {
               when h.type = 'polity' then 0.75 * h.exact::int
               when h.type = 'election' then (el.kind = 'general' and q.t ~ '\\m\\d{4}\\M')::int
               when h.type <> 'contest' or c.kind = 'ballot_question' or c.allocation_parent_id is not null then 0
-              when c.district_area_id is null or c.district_area_id = pt.area_id then
+              when f.whole then
                 (0.5 + 0.3 * (
                   coalesce(o.kind in ('head_of_state', 'head_of_government', 'governor', 'mayor'), false)
-                  or c.kind = 'elector_slate' or coalesce(b.polity_id <> el.polity_id, false)
+                  or c.kind = 'elector_slate' or f.federal
                 )::int) * case when el.kind in ('primary', 'caucus') then 0.5 else 1 end
-              when b.polity_id <> el.polity_id then 0.25
+              when f.federal then 0.25
               else 0
             end as score
           from pool h cross join q
@@ -11720,6 +11727,16 @@ export const search = {
           left join body b on b.id = c.body_id
           left join office o on o.id = c.office_id
           left join polity_territory pt on pt.polity_id = el.polity_id and pt.valid @> el.date_from
+          left join seats on seats.id = c.id
+          cross join lateral (
+            select
+              c.district_area_id is null or c.district_area_id = pt.area_id or seats.id is not null as whole,
+              exists (
+                select from polity_parent p1 left join polity_parent p2 on p2.polity_id = p1.parent_id
+                where b.polity_id in (p1.parent_id, p2.parent_id)
+                  and (p1.polity_id = el.polity_id or p1.polity_id = any(seats.polities))
+              ) as federal
+          ) f
           order by score desc nulls last, el.date_from desc nulls last limit 200
         ),
         top as (
