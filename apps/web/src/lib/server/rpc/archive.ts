@@ -113,6 +113,28 @@ const paint = (party: SQL, elections: SQL, date: SQL) => sql`
   )
 `;
 
+const abbreviate = (party: SQL, date: SQL) => sql`
+  (select a.text from name a
+    left join lateral (
+      select f.text from name f
+      where f.entity_id = a.entity_id and f.kind in ('official', 'english')
+      order by coalesce(f.valid @> coalesce(${date}, current_date), false) desc, f.is_preferred desc,
+        (f.lang = a.lang) desc, (f.kind = 'official') desc
+      limit 1
+    ) f on true
+    where a.entity_id = ${party} and a.kind = 'abbreviation'
+    order by coalesce(a.valid @> coalesce(${date}, current_date), false) desc,
+      (lower_inf(a.valid) and upper_inf(a.valid)), a.is_preferred desc, (a.lang = 'en') desc,
+      coalesce(
+        upper(array_to_string(array(
+          select left(w, 1) from regexp_split_to_table(f.text, '[^[:alnum:]]+') w where w <> ''
+        ), ''))
+        like array_to_string(regexp_split_to_array(regexp_replace(upper(a.text), '[^[:alnum:]]', '', 'g'), ''), '%') || '%',
+        false) desc,
+      length(a.text), a.text
+    limit 1)
+`;
+
 const sisters = (roots: Array<string>, day: string) => sql`
   with recursive tree(id) as (
     select unnest(${sql.param(roots)}::uuid[])
@@ -355,11 +377,16 @@ async function names(ids: Array<string>, on: string | null = null) {
     kind: string;
     text: string;
   }>(sql`
-    select distinct on (entity_id, kind = 'abbreviation') entity_id, kind::text, text
+    (select distinct on (entity_id) entity_id, kind::text, text
     from name
-    where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english', 'abbreviation')
-    order by entity_id, kind = 'abbreviation', coalesce(valid @> ${on}::date, false) desc, is_preferred desc,
-      (lang = 'en') desc, (kind = 'official') desc
+    where entity_id = any(${sql.param(ids)}::uuid[]) and kind in ('official', 'english')
+    order by entity_id, coalesce(valid @> ${on}::date, false) desc, is_preferred desc,
+      (lang = 'en') desc, (kind = 'official') desc)
+    union all
+    select i.id, 'abbreviation', short.text
+    from (select distinct unnest(${sql.param(ids)}::uuid[]) as id) i
+    cross join lateral (select ${abbreviate(sql`i.id`, sql`${on}::date`)} as text) short
+    where short.text is not null
   `);
   const full = new Map<string, string>();
   const short = new Map<string, string>();
@@ -3403,9 +3430,7 @@ export const contests = {
              (select n.text from name n where n.entity_id = x.party and n.kind in ('official', 'english')
                order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
                  (n.kind = 'official') desc limit 1) as party_label,
-             (select n.text from name n where n.entity_id = x.party and n.kind = 'abbreviation'
-               order by coalesce(n.valid @> e.date_from, false) desc, n.is_preferred desc, (n.lang = 'en') desc
-               limit 1) as party_short
+             ${abbreviate(sql`x.party`, sql`e.date_from`)} as party_short
            from tops t
            join contest c on c.id = t.root
            join election e on e.id = c.election_id
@@ -5226,7 +5251,7 @@ export const contests = {
           ...groups.map((row) => row.sample),
           ...[top, election].filter((id) => id != null),
         ]),
-        refs(parties),
+        refs(parties, contest.date),
       ]);
       const placed = await db.execute<{ id: string; area: string }>(sql`
         select c.id, coalesce(c.district_area_id, pt.area_id) as area
@@ -7244,10 +7269,13 @@ export const elections = {
           general?.date ?? null,
         ),
         paths(found.rows.map((row) => row.id)),
-        refs([
-          ...rows.flatMap((row) => row.party ?? []),
-          ...won.rows.flatMap((row) => row.party ?? []),
-        ]),
+        refs(
+          [
+            ...rows.flatMap((row) => row.party ?? []),
+            ...won.rows.flatMap((row) => row.party ?? []),
+          ],
+          general?.date ?? null,
+        ),
       ]);
       const party = (id: string | null) =>
         id == null ? null : (colors.get(id) ?? null);
@@ -8166,6 +8194,9 @@ export const elections = {
             )[0]?.party ?? alliance,
           ]),
       );
+      const when = await db.execute<{ day: string }>(sql`
+        select date_from::text as day from election where id = ${input.id}::uuid
+      `);
       const [labels, colors, positions, nouns] = await Promise.all([
         names(
           [
@@ -8174,7 +8205,7 @@ export const elections = {
           ],
           null,
         ),
-        refs([...parties, ...anchor.values()]),
+        refs([...parties, ...anchor.values()], when.rows[0]?.day ?? null),
         db.execute<{ party_id: string; lean: number }>(sql`
           select distinct on (party_id) party_id, (low + high) * 100 + coalesce(rank, 99) as lean from party_position
           where party_id = any(${sql.param([...parties, ...anchor.values()])}::uuid[])
@@ -9654,10 +9685,10 @@ async function branches(day: string): Promise<Array<Relation>> {
   return found.rows.map((row) => ({ ...row, toLabel: "" }));
 }
 
-async function refs(ids: Array<string>) {
+async function refs(ids: Array<string>, on: string | null = null) {
   const unique = [...new Set(ids)];
   const [labels, colors] = await Promise.all([
-    names(unique),
+    names(unique, on),
     db.execute<{ party: string; color: string }>(sql`
       select distinct on (party) party, color from (
         select party_id as party, color, false as lent, upper(valid) as until from party_color
@@ -10496,9 +10527,7 @@ export const people = {
           (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
             order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
               (n.kind = 'official') desc limit 1) as party_label,
-          (select n.text from name n where n.entity_id = lead.party and n.kind = 'abbreviation'
-            order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc
-            limit 1) as party_short,
+          ${abbreviate(sql`lead.party`, sql`p.date`)} as party_short,
           coalesce(${paint(sql`lead.party`, sql`select election_id from contest where id = p.root`, sql`p.date`)},
             (select pc.color from party_color pc where pc.party_id = lead.party
               order by upper(pc.valid) desc nulls first limit 1)) as party_color
