@@ -1,0 +1,27 @@
+{
+  "kind": "statewide",
+  "year": 1986,
+  "day": "1986-11-04",
+  "polity": "US-ID",
+  "publisher": "Idaho Secretary of State",
+  "title": "Abstract of Votes Cast at the General Election November 4, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/micro_IA40706925_0209/micro_IA40706925_0209.pdf",
+    "item": "https://archive.org/details/micro_IA40706925_0209"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer",
+    "superintendent-of-public-instruction": "Superintendent of Public Instruction"
+  },
+  "leaves": [
+    1
+  ]
+}
