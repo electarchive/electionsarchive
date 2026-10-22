@@ -25,9 +25,11 @@ COUNTIES = 82
 FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2012, "democratic"): ("Democrat%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
     (2012, "republican"): ("Republican%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
+    (2014, "democratic"): ("2014%20Democrat%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
 }
+RULED = {(2014, "democratic"): range(2, 8)}
 ROTATED = {(2012, "republican"): range(9, 15)}
-EMIT = {(2012, "republican"): {("house", 1), ("house", 2)}}
+EMIT = {(2012, "republican"): {("house", 1), ("house", 2)}, (2014, "democratic"): {("house", 1), ("house", 2), ("house", 3)}}
 GRIDDED = {
     (2012, "democratic"): {
         1: ("president", None, "OBAMA, BARACK"),
@@ -38,6 +40,21 @@ GRIDDED = {
         9: ("house", 2, "MCTEER, HEATHER"),
         10: ("house", 2, "THOMPSON, BENNIE G."),
         12: ("house", 3, "BIGGS, CRYSTAL"),
+    },
+    (2014, "democratic"): {
+        1: ("senate", None, "CHILDERS, TRAVIS W."),
+        2: ("senate", None, "COMPTON, WILLIAM BOND, JR."),
+        3: ("senate", None, "MARCY, BILL"),
+        4: ("senate", None, "RAWL, JONATHAN"),
+        7: ("house", 1, "DICKEY, RON E."),
+        8: ("house", 1, "WEATHERS, REX N."),
+        11: ("house", 2, "FAIRCLOTH, DAMIEN"),
+        12: ("house", 2, "THOMPSON, BENNIE G."),
+        15: ("house", 3, "LILJEBERG, JIM"),
+        16: ("house", 3, "MAGEE, DOUGLAS MACARTHUR (DOUG)"),
+        17: ("house", 3, "QUINN, DENNIS C."),
+        20: ("house", 4, "CAUSEY, TRISH"),
+        21: ("house", 4, "MOORE, MATT"),
     },
     (2012, "republican"): {
         1: ("president", None, "BACHMANN, MICHELE"),
@@ -110,7 +127,8 @@ def parse() -> None:
         sites: dict[tuple[int, int], tuple[int, tuple[int, int, int, int], tuple[int, int]]] = {}
         printed: dict[int, Counter[int]] = {r: Counter() for r in layout}
         turned = ROTATED.get((year, party))
-        sheet = turned if turned is not None else range(2, pages + 1)
+        ruled = RULED.get((year, party))
+        sheet = turned if turned is not None else ruled if ruled is not None else range(2, pages + 1)
         for page in sheet:
             image = ms_scan.render(pdf, page, dpi=300, turn=-90 if turned is not None else 0)
             if turned is not None:
@@ -127,6 +145,14 @@ def parse() -> None:
                 first = 0
                 if page == sheet[-1]:
                     xs = xs[: max(next(i for i in range(14) if xs[i] <= cx < xs[i + 1]) for _, cx, _, _ in found if cx > xs[0]) + 2]
+            elif ruled is not None:
+                body = (image[480:1860] < 225).mean(0)
+                xs = [x for x in ms_scan.clusters(np.where(body > 0.3)[0]) if x > 700]
+                top = next(y for y in ms_scan.clusters(np.where((image[:, 100:3900] < 200).mean(1) > 0.45)[0]) if y > 400)
+                rows = [top + 60.45 * k for k in range(24)]
+                first = 0
+                if page == sheet[-1]:
+                    xs = xs[: COUNTIES - county + 2]
             else:
                 ys, xs = ms_scan.rules(image)
                 ys = [y for i, y in enumerate(ys) if not (i + 1 < len(ys) and ys[i + 1] - y < 45)]
@@ -141,17 +167,28 @@ def parse() -> None:
                 r = next((i for i in layout if rows[i] <= cy < rows[i + 1]), None)
                 if c is None or r is None:
                     continue
-                if last and c == len(xs) - 2:
+                if last and ruled is not None:
+                    if c < COUNTIES - county:
+                        reads.setdefault((r, county + columns.index(c)), Counter())[int(text)] += 1
+                elif last and c == len(xs) - 2:
                     printed[r][int(text)] += 1
                 else:
                     reads.setdefault((r, county + columns.index(c)), Counter())[int(text)] += 1
+            if ruled is not None and last:
+                n = COUNTIES - county
+                for r in layout:
+                    crop = Image.fromarray(ms_scan.erase(image)[int(rows[r]) + 8 : int(rows[r + 1]) - 8, int(xs[n]) + 6 : int(xs[n]) + 232])
+                    for scale, psm in ((1, 7), (2, 7), (1, 8), (2, 8), (1, 13), (2, 13)):
+                        text = ms_scan.read(crop, scale, psm, whitelist="0123456789,").replace(" ", "").replace(",", "")
+                        if text.isdigit():
+                            printed[r][int(text)] += 1
             for r in layout:
                 for c in columns[: len(columns) - (1 if last else 0)]:
                     box = (int(xs[c]) + 8, int(rows[r]) + 8, int(xs[c + 1]) - 8, int(rows[r + 1]) - 8)
                     sites[(r, county + columns.index(c))] = (page, box, image.shape)
             county += len(columns) - (1 if last else 0)
-            cleans[page] = ms_scan.erase(image) if turned is not None else None
-        if turned is not None:
+            cleans[page] = ms_scan.erase(image) if turned is not None or ruled is not None else None
+        if turned is not None or ruled is not None:
             for key in list(sites):
                 page, (x0, y0, x1, y1), _ = sites[key]
                 crop = cleans[page][y0:y1, x0:x1]
