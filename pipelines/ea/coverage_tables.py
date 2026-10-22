@@ -200,6 +200,12 @@ def tokens(text: str) -> frozenset[str]:
 
 
 def request() -> None:
+    with connect(autocommit=True) as conn:
+        recent = conn.execute(
+            "update coverage_build set requested_at = now() returning built_at > now() - interval '3 hours'"
+        ).fetchone()
+    if recent is not None and recent[0]:
+        return
     subprocess.Popen(
         [sys.executable, "-c", "from ea.cli import main; main()", "coverage", "refresh"],
         cwd=ROOT / "pipelines",
