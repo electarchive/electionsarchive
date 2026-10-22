@@ -532,8 +532,9 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1844,)
+YEARS = (1840,)
 ELECTION_DAYS = {
+    1840: "1840-10-30",
     1844: "1844-11-01",
     1848: "1848-11-07",
     1852: "1852-11-02",
@@ -545,7 +546,7 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
 }
-YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254"}
+YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254"}
 PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876}
 PRINT_COLUMNS = {
     "v65": {
@@ -572,6 +573,9 @@ PRINT_COLUMNS = {
         6: (1848, "Taylor"),
         7: (1848, "Cass"),
         8: (1848, "Van Buren"),
+        0: (1840, "Harrison"),
+        1: (1840, "Van Buren"),
+        2: (1840, "Birney"),
         3: (1844, "Clay"),
         4: (1844, "Polk"),
         5: (1844, "Birney"),
@@ -598,6 +602,7 @@ CANDIDATES = {
     "Clay": ("Henry Clay (Whig)", "whigparty"),
     "Polk": ("James K. Polk (Democratic)", "democraticparty"),
     "Birney": ("James G. Birney (Liberty)", "libertyparty"),
+    "Harrison": ("William Henry Harrison (Whig)", "whigparty"),
 }
 EARLY: dict[tuple[int, str, str], int] = {
     (1868, "AL", "Grant"): 76366,
@@ -1127,6 +1132,68 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1844, "VT", "Birney"): 3954,
     (1844, "VA", "Clay"): 43677,
     (1844, "VA", "Polk"): 49570,
+    (1840, "AL", "Harrison"): 28471,
+    (1840, "AL", "Van Buren"): 33991,
+    (1840, "AR", "Harrison"): 5160,
+    (1840, "AR", "Van Buren"): 6049,
+    (1840, "CT", "Harrison"): 31601,
+    (1840, "CT", "Van Buren"): 25296,
+    (1840, "CT", "Birney"): 174,
+    (1840, "DE", "Harrison"): 5967,
+    (1840, "DE", "Van Buren"): 4884,
+    (1840, "GA", "Harrison"): 40261,
+    (1840, "GA", "Van Buren"): 31933,
+    (1840, "IL", "Harrison"): 45537,
+    (1840, "IL", "Van Buren"): 47476,
+    (1840, "IL", "Birney"): 149,
+    (1840, "IN", "Harrison"): 65302,
+    (1840, "IN", "Van Buren"): 51695,
+    (1840, "KY", "Harrison"): 58489,
+    (1840, "KY", "Van Buren"): 32616,
+    (1840, "LA", "Harrison"): 11296,
+    (1840, "LA", "Van Buren"): 7617,
+    (1840, "ME", "Harrison"): 46612,
+    (1840, "ME", "Van Buren"): 46201,
+    (1840, "ME", "Birney"): 194,
+    (1840, "MD", "Harrison"): 33528,
+    (1840, "MD", "Van Buren"): 28752,
+    (1840, "MA", "Harrison"): 72874,
+    (1840, "MA", "Van Buren"): 51948,
+    (1840, "MA", "Birney"): 1621,
+    (1840, "MI", "Harrison"): 22933,
+    (1840, "MI", "Van Buren"): 21098,
+    (1840, "MI", "Birney"): 321,
+    (1840, "MS", "Harrison"): 19518,
+    (1840, "MS", "Van Buren"): 16995,
+    (1840, "MO", "Harrison"): 22972,
+    (1840, "MO", "Van Buren"): 29760,
+    (1840, "NH", "Harrison"): 26158,
+    (1840, "NH", "Van Buren"): 32670,
+    (1840, "NH", "Birney"): 126,
+    (1840, "NJ", "Harrison"): 33351,
+    (1840, "NJ", "Van Buren"): 31034,
+    (1840, "NJ", "Birney"): 69,
+    (1840, "NY", "Harrison"): 225817,
+    (1840, "NY", "Van Buren"): 212519,
+    (1840, "NY", "Birney"): 2798,
+    (1840, "NC", "Harrison"): 46376,
+    (1840, "NC", "Van Buren"): 34218,
+    (1840, "OH", "Harrison"): 148157,
+    (1840, "OH", "Van Buren"): 124782,
+    (1840, "OH", "Birney"): 903,
+    (1840, "PA", "Harrison"): 144021,
+    (1840, "PA", "Van Buren"): 143676,
+    (1840, "PA", "Birney"): 343,
+    (1840, "RI", "Harrison"): 5278,
+    (1840, "RI", "Van Buren"): 3301,
+    (1840, "RI", "Birney"): 42,
+    (1840, "TN", "Harrison"): 60391,
+    (1840, "TN", "Van Buren"): 48289,
+    (1840, "VT", "Harrison"): 32440,
+    (1840, "VT", "Van Buren"): 18009,
+    (1840, "VT", "Birney"): 319,
+    (1840, "VA", "Harrison"): 42501,
+    (1840, "VA", "Van Buren"): 43893,
 }
 
 
