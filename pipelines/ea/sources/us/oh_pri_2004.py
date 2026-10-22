@@ -13,26 +13,42 @@ from ea.store import DATA, connect
 SOURCE = "us.oh_pri_2004"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-DAY = date(2004, 3, 2)
-INDEX = "https://www.ohiosos.gov/elections/election-results-and-data/2004-elections-results/{}-march-2-2004/"
+BASE = "https://www.ohiosos.gov/elections/election-results-and-data/"
 WAYBACK = "http://web.archive.org/web/2023id_/{}"
-PAGES = {
-    ("house", "democratic"): "democratic-u.s.-representative",
-    ("house", "republican"): "republican-u.s.-representative",
-    ("senate", "democratic"): "democratic-u.s.-senate",
-    ("senate", "republican"): "republican-u.s.-senate",
+ELECTIONS = {
+    date(2002, 5, 7): (
+        "2002-elections-results/{}/",
+        {("house", party): f"{party}-u.s.-representative" for party in ("democratic", "republican")},
+    ),
+    date(2004, 3, 2): (
+        "2004-elections-results/{}-march-2-2004/",
+        {
+            (chamber, party): f"{party}-u.s.-{office}"
+            for chamber, office in (("house", "representative"), ("senate", "senate"))
+            for party in ("democratic", "republican")
+        },
+    ),
+    date(2010, 5, 4): (
+        "2010-elections-results/{}-may-4-2010/",
+        {
+            ("house", party): f"representative-to-congress---{party}"
+            for party in ("democratic", "republican", "libertarian", "green", "constitution")
+        }
+        | {("senate", party): f"u.-s.-senator---{party}" for party in ("democratic", "republican", "constitution", "socialist")},
+    ),
 }
 PUBLISHER = "Ohio Secretary of State"
-TITLE = "Official results, March 2, 2004 primary election"
+TITLE = "Official results, {} primary election"
 
 
-def link(page: str) -> str:
-    return WAYBACK.format(INDEX.format(page))
+def link(day: date, page: str) -> str:
+    return WAYBACK.format(BASE + ELECTIONS[day][0].format(page))
 
 
 def fetch() -> None:
-    for page in PAGES.values():
-        raw.fetch(SOURCE, link(page), suffix=".html")
+    for day, (_, pages) in ELECTIONS.items():
+        for page in pages.values():
+            raw.fetch(SOURCE, link(day, page), suffix=".html")
 
 
 def parse() -> None:
@@ -46,53 +62,61 @@ def parse() -> None:
             ).fetchall()
         }
     rows: list[tuple] = []
-    for (chamber, party), page in PAGES.items():
-        text = raw.cached(SOURCE, link(page)).path.read_text(errors="replace")
-        district = None if chamber == "senate" else 0
-        names: list[str] = []
-        parts: list[tuple[str, list[int]]] = []
-        for tr in re.findall(r"<tr.*?</tr>", text, flags=re.DOTALL):
-            cells = [
-                re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
-                for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", tr, flags=re.DOTALL)
-            ]
-            while cells and not cells[-1]:
-                cells.pop()
-            if not cells:
-                continue
-            numeric = all(re.fullmatch(r"[\d,]+", cell) for cell in cells[1:])
-            if found := re.fullmatch(r"DISTRICT NUMBER:\s*(\d+)", cells[0], flags=re.IGNORECASE):
-                district = int(found[1])
-                names, parts = [], []
-            elif cells[0] == "COUNTY":
-                names = [" ".join(reversed([part.strip() for part in name.split(",", 1)])) for name in cells[1:]]
-            elif not names or len(cells) != 1 + len(names) or not numeric:
-                continue
-            elif cells[0]:
-                parts.append((cells[0], [int(cell.replace(",", "")) for cell in cells[1:]]))
-            else:
-                total = [int(cell.replace(",", "")) for cell in cells[1:]]
-                sums = [sum(votes[c] for _, votes in parts) for c in range(len(names))]
-                if sums != total:
-                    raise ValueError(f"{chamber} {party} {district}: {sums} by county, {total} printed")
-                for county, votes in parts:
-                    rows.extend(
-                        (
-                            2004,
-                            f"{chamber}:{party}",
-                            DAY,
-                            False,
-                            "OH",
-                            district,
-                            counties[re.sub(r"[^a-z]", "", county.lower())],
-                            name.upper(),
-                            1,
-                            False,
-                            count,
+    for day, (_, pages) in ELECTIONS.items():
+        for (chamber, party), page in pages.items():
+            text = raw.cached(SOURCE, link(day, page)).path.read_text(errors="replace")
+            district = None if chamber == "senate" else 0
+            names: list[str] = []
+            parts: list[tuple[str, list[int]]] = []
+            for tr in re.findall(r"<tr.*?</tr>", text, flags=re.DOTALL):
+                cells = [
+                    re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", "", cell))).strip()
+                    for cell in re.findall(r"<t[hd][^>]*>(.*?)</t[hd]>", tr, flags=re.DOTALL)
+                ]
+                while cells and not cells[-1]:
+                    cells.pop()
+                if not cells:
+                    continue
+                numeric = all(re.fullmatch(r"[\d,]+", cell) for cell in cells[1:])
+                header = [
+                    " ".join(reversed([part.strip() for part in name.strip("*").split(",", 1)])) for name in cells[1:]
+                ]
+                if found := re.fullmatch(r"(?:DISTRICT NUMBER:\s*|District\s+)(\d+)", cells[0], flags=re.IGNORECASE):
+                    district = int(found[1])
+                    names, parts = header, []
+                elif cells[0].lower() == "county":
+                    if header != names:
+                        names, parts = header, []
+                elif not names or len(cells) != 1 + len(names) or not numeric or cells[0].lower().startswith("percent"):
+                    continue
+                elif cells[0] and not cells[0].lower().endswith("total"):
+                    parts.append((cells[0].rstrip("*"), [int(cell.replace(",", "")) for cell in cells[1:]]))
+                else:
+                    total = [int(cell.replace(",", "")) for cell in cells[1:]]
+                    if single := re.fullmatch(r"(.+?)\**\s*Total", cells[0], flags=re.IGNORECASE):
+                        parts.append((single[1], total))
+                    sums = [sum(votes[c] for _, votes in parts) for c in range(len(names))]
+                    if sums != total:
+                        print(f"{day} {chamber} {party} {district}: {sums} by county, {total} printed, skipped")
+                    else:
+                        rows.extend(
+                            (
+                                day.year,
+                                f"{chamber}:{party}",
+                                day,
+                                False,
+                                "OH",
+                                district,
+                                counties[re.sub(r"[^a-z]", "", county.lower())],
+                                name.upper(),
+                                1,
+                                "write" in name.lower(),
+                                count,
+                            )
+                            for county, votes in parts
+                            for name, count in zip(names, votes, strict=True)
                         )
-                        for name, count in zip(names, votes, strict=True)
-                    )
-                names, parts = ([], []) if chamber == "house" else (names, [])
+                    names, parts = ([], []) if chamber == "house" else (names, [])
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         pl.DataFrame(
@@ -124,20 +148,24 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Ohio's March 2, 2004 U.S. House and Senate primaries by county from the Secretary of State's official results",
+            summary="Ohio's 2002, 2004, and 2010 U.S. House and Senate primaries by county from the Secretary of State's official results",
             polity="US-OH",
         )
-        source = cs.source(PUBLISHER, TITLE)
-        cs.add(
-            "source",
-            id=source,
-            kind="official_body",
-            publisher=PUBLISHER,
-            title=TITLE,
-            url="https://www.ohiosos.gov/elections/election-results-and-data/2004-elections-results/",
-            license="Public record",
-        )
-        for page in PAGES.values():
-            cs.artifact(raw.cached(SOURCE, link(page)), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"OH": source}, strict=True)
+        frame = pl.read_parquet(PARSED / "counties.parquet")
+        for day, (_, pages) in ELECTIONS.items():
+            title = TITLE.format(f"{day:%B} {day.day}, {day.year}")
+            source = cs.source(PUBLISHER, title)
+            if source in cs.minted:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=BASE + ELECTIONS[day][0].split("/")[0] + "/",
+                    license="Public record",
+                )
+            for page in pages.values():
+                cs.artifact(raw.cached(SOURCE, link(day, page)), source)
+            medsl.attach(cs, conn, frame.filter(pl.col("day") == day), {"OH": source}, strict=True)
         return cs.write()
