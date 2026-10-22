@@ -1,4 +1,5 @@
 import csv
+import html
 import re
 import subprocess
 from datetime import UTC, date, datetime, timedelta
@@ -21,21 +22,39 @@ FILES = {
     date(2018, 8, 21): "18PRIM/data/resultsbyprecinct.txt",
     date(2020, 8, 18): "20PRIM/data/sovc/resultsbyprecinct20.txt",
 }
+SOVC = {date(2008, 8, 26): "08PRIM", date(2010, 8, 24): "10PRIM", date(2012, 8, 28): "12PRIM"}
+SOVC_URL = BASE + "{}/data/sovc/hd{}.pdf"
 PARTIES = {"DEM": "democratic", "REP": "republican", "LIB": "libertarian", "AD": "democratic"}
-STATS = {"Number of Precincts", "Number of Precincts for Race", "Number of Precincts Reporting", "Registered Voters", "Times Counted"}
+STATS = {
+    "Number of Precincts",
+    "Number of Precincts for Race",
+    "Number of Precincts Reporting",
+    "Registered Voters",
+    "Times Counted",
+}
 PUBLISHER = "Alaska Division of Elections"
 TITLE = "Primary election results by precinct"
 
 
 def fetch() -> None:
-    for path in FILES.values():
+    urls = [BASE + path for path in FILES.values()]
+    urls += [SOVC_URL.format(folder, number) for folder in SOVC.values() for number in range(1, 41)]
+    for url in urls:
         try:
-            raw.cached(SOURCE, BASE + path)
+            raw.cached(SOURCE, url)
         except LookupError:
             body = subprocess.run(
-                ["curl", "-sfkL", "--compressed", "-A", raw.USER_AGENT, BASE + path], capture_output=True, check=True
+                ["curl", "-sfkL", "--compressed", "-A", raw.USER_AGENT, url], capture_output=True, check=True
             ).stdout
-            raw.store(SOURCE, BASE + path, body, suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/plain")
+            pdf = url.endswith(".pdf")
+            raw.store(
+                SOURCE,
+                url,
+                body,
+                suffix=".pdf" if pdf else ".txt",
+                retrieved_at=datetime.now(UTC),
+                media_type="application/pdf" if pdf else "text/plain",
+            )
 
 
 def parse() -> None:
@@ -45,7 +64,9 @@ def parse() -> None:
         printed: dict[tuple[str, str], int] = {}
         lines = raw.cached(SOURCE, BASE + path).path.read_text(encoding="latin-1").splitlines()
         for row in csv.reader(lines):
-            if len(row) < 8 or not row[1].strip().upper().replace(".", "").startswith(("US SENATOR", "US REPRESENTATIVE")):
+            if len(row) < 8 or not row[1].strip().upper().replace(".", "").startswith(
+                ("US SENATOR", "US REPRESENTATIVE")
+            ):
                 continue
             place, race, ballot, _, name, party, column, votes = (cell.strip() for cell in row[:8])
             race = race.upper().replace(".", "")
@@ -93,6 +114,92 @@ def parse() -> None:
         for key in set(totals) | set(printed):
             if printed and totals.get(key) != printed.get(key):
                 print(day, key, "sum", totals.get(key), "printed", printed.get(key))
+    for day, folder in SOVC.items():
+        for number in range(1, 41):
+            blocks: list[list] = []
+            pdf = raw.cached(SOURCE, SOVC_URL.format(folder, number)).path
+            markup = subprocess.run(
+                ["pdftotext", "-bbox", str(pdf), "-"], capture_output=True, text=True, check=True
+            ).stdout
+            for sheet in markup.split("<page ")[1:]:
+                words = [
+                    (float(x0), float(y0), float(x1), float(y1), html.unescape(text))
+                    for x0, y0, x1, y1, text in re.findall(
+                        r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">(.*?)</word>', sheet
+                    )
+                ]
+                total = [w for w in words if w[4] == "Total" and w[0] < 50 and w[1] > 150]
+                if not total:
+                    continue
+                numbers = [
+                    w[4].replace(",", "")
+                    for w in sorted(
+                        (w for w in words if abs(w[1] - total[0][1]) < 1 and w[0] > 100), key=lambda w: w[0]
+                    )
+                ]
+                stacks: dict[float, list[tuple[float, float, float, float, str]]] = {}
+                for w in words:
+                    if 7.1 < w[2] - w[0] < 7.3 and w[1] > 100 and w[3] < 235:
+                        stacks.setdefault(round(w[0]), []).append(w)
+                heads = [
+                    (x, " ".join(w[4] for w in sorted(stack, key=lambda w: -w[3])))
+                    for x, stack in sorted(stacks.items())
+                ]
+                if len(heads) != len(numbers):
+                    print(day, number, "columns", len(heads), "numbers", len(numbers))
+                    continue
+                titles: list[list[float | str]] = []
+                for w in sorted((w for w in words if 80 < w[1] < 100 and w[0] > 100), key=lambda w: w[0]):
+                    if titles and w[0] - titles[-1][1] < 6:
+                        titles[-1][1] = w[2]
+                        titles[-1][2] += f" {w[4]}"
+                    else:
+                        titles.append([w[0], w[2], w[4]])
+                starts = [i for i, (_, label) in enumerate(heads) if label.startswith("Reg")]
+                if starts and starts[0] > 0 and blocks:
+                    blocks[-1][2].extend(label for _, label in heads[: starts[0]])
+                    blocks[-1][3].extend(int(n) for n in numbers[: starts[0]])
+                for k, begin in enumerate(starts):
+                    end = starts[k + 1] if k + 1 < len(starts) else len(heads)
+                    left, right = heads[begin][0], heads[end - 1][0] + 10
+                    best = max(
+                        titles,
+                        key=lambda t: min(right, t[1]) - max(left, t[0]),
+                        default=None,
+                    )
+                    if best is None or not str(best[2]).startswith(("US SENATOR", "US REPRESENTATIVE")):
+                        continue
+                    blocks.append(
+                        [
+                            str(best[2]),
+                            int(numbers[begin + 1]),
+                            [label for _, label in heads[begin + 2 : end]],
+                            [int(n) for n in numbers[begin + 2 : end]],
+                        ]
+                    )
+            for title, printed, names, cells in blocks:
+                if sum(cells) != printed:
+                    print(day, number, title, "sum", sum(cells), "printed", printed)
+                    continue
+                office = "senate" if title.startswith("US SENATOR") else "house"
+                for label, votes in zip(names, cells, strict=True):
+                    found = re.fullmatch(r"(.*) \((\w+)\)", label)
+                    if found is None or found[2] not in PARTIES:
+                        continue
+                    rows.append(
+                        (
+                            day.year,
+                            f"{office}:{PARTIES[found[2]]}",
+                            day,
+                            False,
+                            "AK",
+                            0 if office == "house" else None,
+                            f"{day.isoformat()}:{number:02}",
+                            found[1].strip().upper(),
+                            "district",
+                            votes,
+                        )
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
@@ -123,7 +230,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska's 2014, 2016, 2018, and 2020 U.S. Senate and House primaries by House district",
+            summary="Alaska's 2008, 2010, 2012, 2014, 2016, 2018, and 2020 U.S. Senate and House primaries by House district",
             polity="US-AK",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -136,8 +243,10 @@ def emit() -> Path:
             url="https://www.elections.alaska.gov/election-results/",
             license="Public record",
         )
-        for path in FILES.values():
-            cs.artifact(raw.cached(SOURCE, BASE + path), source)
+        for url in [BASE + path for path in FILES.values()] + [
+            SOVC_URL.format(folder, number) for folder in SOVC.values() for number in range(1, 41)
+        ]:
+            cs.artifact(raw.cached(SOURCE, url), source)
         state, parent = conn.execute(
             """select p.id, u.id from reporting_unit u join polity p on p.id = u.polity_id
                where u.scheme_code = 'us.state' and p.iso_code = 'US-AK'"""
