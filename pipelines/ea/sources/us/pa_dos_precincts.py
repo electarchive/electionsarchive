@@ -108,6 +108,30 @@ def parse() -> None:
             infer_schema=False,
             truncate_ragged_lines=True,
         )
+        names = frame.columns
+        if (frame[names[5]].cast(pl.Int64, strict=False).fill_null(0) == 0).all():
+            frame = frame.with_columns(
+                pl.when(pl.col(names[8]) == "STH")
+                .then(pl.col(names[18]))
+                .when(pl.col(names[8]) == "STS")
+                .then(pl.col(names[17]))
+                .when(pl.col(names[8]) == "USC")
+                .then(pl.col(names[16]))
+                .otherwise(pl.col(names[5]))
+                .alias(names[5])
+            )
+            home = (
+                frame.group_by(names[8], names[10], names[5])
+                .len()
+                .sort("len", descending=True)
+                .unique([names[8], names[10]], keep="first", maintain_order=True)
+                .select(names[8], names[10], pl.col(names[5]).alias("home"))
+            )
+            frame = (
+                frame.join(home, on=[names[8], names[10]], how="left")
+                .with_columns(pl.coalesce("home", names[5]).alias(names[5]))
+                .drop("home")
+            )
         shift = 2 if frame.width >= 37 else 0
         picks = [0, 2, 3, 5, 8, 9, 10, 11, 12, 13, 14, 15, 20 + shift, 21 + shift, 22 + shift, 23 + shift, 24 + shift]
         picks += [26 + shift, 27 + shift, 28 + shift]
