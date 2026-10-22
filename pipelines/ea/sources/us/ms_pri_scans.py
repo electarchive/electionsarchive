@@ -29,17 +29,40 @@ FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2014, "democratic"): ("2014%20Democrat%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
     (2014, "republican"): ("2014%20Republican%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
     (2014, "democratic-runoff"): ("2014%20Democrat%20Primary%20Runoff%20Election%20Results_Certified%207%207%202014.pdf", date(2014, 6, 24)),
+    (2022, "republican"): ("2022%20Republican%20Primary%20Official%20Results.pdf", date(2022, 6, 7)),
 }
 RULED = {(2014, "democratic"): range(2, 8)}
 ROTATED = {(2012, "republican"): range(9, 15)}
+TURNED = {(2022, "republican")}
 EMIT = {
     (2012, "republican"): {("house", 1), ("house", 2)},
     (2014, "democratic"): {("house", 1), ("house", 2), ("house", 3)},
     (2014, "republican"): {("house", 1), ("house", 3)},
     (2014, "democratic-runoff"): {("house", 3)},
+    (2022, "republican"): {("house", 1), ("house", 2), ("house", 3), ("house", 4)},
 }
-PARSE = {(2014, "republican")}
+PARSE = {(2022, "republican"), (2022, "republican+")}
 GRIDDED = {
+    (2022, "republican"): {
+        0: ("house", 1, "KELLY, TRENT"),
+        1: ("house", 1, "STRAUSS, MARK D."),
+        3: ("house", 2, "CARSON, MICHAEL"),
+        4: ("house", 2, "ELLER, RONALD"),
+        5: ("house", 2, "FLOWERS, BRIAN"),
+        6: ("house", 2, "JOHNSON, STANFORD"),
+        8: ("house", 3, "CASSIDY, MICHAEL"),
+        9: ("house", 3, "GRIFFIN, THOMAS B."),
+        10: ("house", 3, "GUEST, MICHAEL"),
+        12: ("house", 4, "BOYANTON, CARL"),
+        13: ("house", 4, "BROOKS, RAYMOND N."),
+        14: ("house", 4, "EZELL, MIKE"),
+    },
+    (2022, "republican+"): {
+        0: ("house", 4, "PALAZZO, STEVEN M."),
+        1: ("house", 4, "PETERSON, KIDRON"),
+        2: ("house", 4, "WAGNER, CLAY"),
+        3: ("house", 4, "WIGGINS, BRICE"),
+    },
     (2012, "democratic"): {
         1: ("president", None, "OBAMA, BARACK"),
         3: ("senate", None, "GORE, ALBERT N., JR."),
@@ -139,9 +162,10 @@ def parse() -> None:
     if len(codes) != COUNTIES:
         raise ValueError(f"{len(codes)} counties")
     out: list[dict[str, object]] = []
-    for (year, party), layout in GRIDDED.items():
-        if (year, party) not in PARSE:
+    for (year, tag), layout in GRIDDED.items():
+        if (year, tag) not in PARSE:
             continue
+        party = tag.rstrip("+")
         pdf = raw.cached(SOURCE, url(year, party)).path
         pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout)[1])
         county = 0
@@ -152,10 +176,10 @@ def parse() -> None:
         turned = ROTATED.get((year, party))
         ruled = RULED.get((year, party))
         sheet = turned if turned is not None else ruled if ruled is not None else range(2, pages + 1)
-        read = READS.get(f"{year}:{party}")
+        read = READS.get(f"{year}:{tag}")
         if read is not None:
             for page, count in zip(read["pages"], read["columns"]):
-                image = ms_scan.render(pdf, page, dpi=300)
+                image = ms_scan.render(pdf, page, dpi=300, turn=read.get("turn", 0))
                 body = (image[read["band"][0] : read["band"][1]] < 225).mean(0)
                 found = [x for x in ms_scan.clusters(np.where(body > read["share"])[0]) if read["xmin"].get(str(page), read["xmin"]["default"]) < x < read["xmax"].get(str(page), read["xmax"]["default"])]
                 pitch = float(np.median(np.diff(found)))
@@ -336,7 +360,7 @@ def emit() -> Path:
                         + [str(pdf.path), str(image.with_suffix(""))],
                         check=True,
                     )
-                if (year, party) in ROTATED:
+                if (year, party) in ROTATED or (year, party) in TURNED:
                     Image.open(image).rotate(-90, expand=True).save(image)
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
                 page = cs.page(artifact, number)
