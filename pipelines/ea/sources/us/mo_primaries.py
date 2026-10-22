@@ -12,13 +12,16 @@ from ea.sources.us import fec_totals, medsl, openelections
 from ea.store import DATA, connect
 
 SOURCE = "us.mo_primaries"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://web.archive.org/web/2025id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
 FILES = {
     date(1998, 8, 4): [SITE + "CountyPrimary1998.pdf"],
+    date(2000, 8, 8): [SITE + "CountyPrimary2000.pdf"],
     date(2004, 8, 3): [SITE + "CountyPrimary2004.pdf", SITE + "CountyPrimary2004Part2.pdf"],
+    date(2012, 2, 7): [SITE + "CountyPresidential2012.pdf", SITE + "CountyPresidential2012Part2.pdf"],
 }
+PARTIAL = {date(2000, 8, 8): 5}
 STATS = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
 MATRICES = {
     date(2016, 3, 15): "ActualResults-April122016.pdf",
@@ -86,13 +89,17 @@ def parse() -> None:
             office: tuple[str, int | None] | None = None
             lines: list[dict[str, object]] = []
             for line in text.splitlines():
-                if heading := re.fullmatch(r" {5}([A-Z][A-Z .']+)", line):
+                if re.match(r"(http|\d+/\d+/\d{4}\s|\* Election)", line):
+                    continue
+                if heading := re.fullmatch(r" {0,5}([A-Z][A-Z .']+)", line):
                     county, office = codes[re.sub(r"[^a-z]", "", heading[1].lower())], None
-                elif re.fullmatch(r" {5}U\.S\. Senator", line):
+                elif re.fullmatch(r" {0,5}U\.S\. Senator(?:\s{2,}Precincts.*)?", line):
                     office, lines = ("senate", None), []
-                elif found := re.fullmatch(r" {5}U\.S\. Representative \W+ District (\d+)", line):
+                elif found := re.fullmatch(r" {0,5}U\.S\. Representative \W+ District (\d+)(?:\s{2,}Precincts.*)?", line):
                     office, lines = ("house", int(found[1])), []
-                elif re.fullmatch(r" {5}\S.*", line):
+                elif re.fullmatch(r" {0,5}U\.S\. President And Vice President(?:\s{2,}Precincts.*)?", line):
+                    office, lines = ("president", None), []
+                elif re.fullmatch(r" {0,5}\S.*", line):
                     office = None
                 elif office is not None and (
                     row := re.fullmatch(r"\s+(\S.*?)\s{2,}([A-Z]{2,3})\s+([\d,]+)(?:\s+[\d.]+%)?(?:\d+/\d+)?\s*", line)
@@ -245,7 +252,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Missouri's 1998, 2004, 2012, 2014, and 2016–2022 House, Senate, and presidential primaries by county",
+            summary="Missouri's 1998, 2000, 2004, 2012, 2014, and 2016–2022 House, Senate, and presidential primaries by county",
             polity="US-MO",
         )
         sources = {"MO": cs.source(PUBLISHER, TITLE), "OE": cs.source("OpenElections", OE_TITLE)}
@@ -277,7 +284,7 @@ def emit() -> Path:
             value
             for (value,) in conn.execute(
                 """select e.value from external_id e
-                   where e.scheme = 'us.contest' and e.value ~ '^(1998|20(04|12|14))-08-[0-9]{2}:MO:(house:[0-9]+|senate):[a-z-]+$'
+                   where e.scheme = 'us.contest' and e.value ~ '^(1998|20(00|04|12|14))-08-[0-9]{2}:MO:(house:[0-9]+|senate):[a-z-]+$'
                      and exists (select 1 from result_set rs join source s on s.id = rs.source_id
                                  where rs.contest_id = e.entity_id and rs.status = 'active'
                                    and s.publisher <> 'Federal Election Commission' and s.id <> all(%s))""",
@@ -288,6 +295,9 @@ def emit() -> Path:
             cs,
             conn,
             frame.filter(
+                pl.all_horizontal(
+                    (pl.col("day") != day) | (pl.col("district") == district) for day, district in PARTIAL.items()
+                ),
                 ~pl.concat_str(
                     pl.col("day").cast(pl.String),
                     pl.lit("MO"),
