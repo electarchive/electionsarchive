@@ -37,6 +37,7 @@ class Column(TypedDict):
     candidate: str
     official: NotRequired[int]
     writein: NotRequired[bool]
+    party: NotRequired[str]
 
 
 class Page(TypedDict):
@@ -61,6 +62,7 @@ class Contest(TypedDict):
     special: bool
     state: str
     district: int | None
+    create: NotRequired[bool]
 
 
 class Manifest(TypedDict):
@@ -997,10 +999,68 @@ def status() -> str:
     return "\n".join(out)
 
 
+def totals(manifest: Manifest, frame: pl.DataFrame) -> Path:
+    folder = Path(__file__).resolve().parent / "sources" / "us" / "totals"
+    parties = {
+        f"{column['contest']}|{column['candidate']}": column.get("party", "")
+        for spec in manifest["pages"]
+        for column in spec.get("columns", [])
+    }
+    rows: list[dict[str, object]] = []
+    for (contest, candidate), lines in frame.group_by("contest", "candidate", maintain_order=True):
+        found = manifest["contests"][contest]
+        rows.append(
+            {
+                "source": manifest["name"],
+                "state": found["state"],
+                "date": found["day"],
+                "office": found["chamber"],
+                "title": found["chamber"].replace("-", " ").title(),
+                "name": candidate,
+                "party": parties.get(f"{contest}|{candidate}", ""),
+                "votes": lines["votes"].sum(),
+                "winner": 0,
+                "page": lines["page"].min(),
+            }
+        )
+    table = pl.DataFrame(rows)
+    leader = table.group_by("office").agg(pl.col("votes").max().alias("top"))
+    table = (
+        table.join(leader, on="office")
+        .with_columns(winner=pl.when(pl.col("votes") == pl.col("top")).then(1).otherwise(None))
+        .drop("top")
+    )
+    table.write_csv(folder / f"{manifest['name']}.tsv", separator="\t")
+    book = folder / "sources.tsv"
+    if manifest["name"] not in book.read_text():
+        with book.open("a") as handle:
+            handle.write(
+                "\t".join(
+                    [
+                        manifest["name"],
+                        manifest["publisher"],
+                        manifest["title"],
+                        manifest["file"]["url"],
+                        manifest["file"].get("item", manifest["file"]["url"]),
+                        manifest.get("license", "Public record"),
+                        ".pdf",
+                        "0",
+                    ]
+                )
+                + "\n"
+            )
+    return folder / f"{manifest['name']}.tsv"
+
+
 def emit(name: str) -> Path:
     manifest = load(name)
     contests = manifest["contests"]
     frame = pl.read_parquet(WORK / name / "tables.parquet")
+    with connect() as conn:
+        ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
+    missing = {label for label, contest in contests.items() if contest.get("create") and key_of(contest) not in ids}
+    if missing:
+        return totals(manifest, frame.filter(pl.col("contest").is_in(missing)))
     towns = manifest.get("unit_scheme") == "town"
     if towns:
         frame = frame.group_by("contest", "candidate", "code", maintain_order=True).agg(

@@ -13,7 +13,7 @@ from anthropic.types.message_create_params import MessageCreateParamsNonStreamin
 from ea import scans
 from ea.store import connect
 
-PROMPT = "1"
+PROMPT = "2"
 VOLUMES = scans.MANIFESTS / "volumes"
 SYSTEM = (
     "You describe the layout of one scanned page from a volume of election returns, so that a second reader can "
@@ -25,6 +25,9 @@ SYSTEM = (
 class LayoutColumn(TypedDict):
     label: str
     role: str
+    name: str
+    office: str
+    party: str
 
 
 class LayoutTable(TypedDict):
@@ -35,6 +38,8 @@ class LayoutTable(TypedDict):
     special: bool
     continued: bool
     concluded: bool
+    x0: int
+    x1: int
     y0: int
     y1: int
     header_y1: int
@@ -62,6 +67,7 @@ class Volume(TypedDict):
     unit_codes: NotRequired[dict[str, str]]
     offices: dict[str, str]
     leaves: list[int]
+    create: NotRequired[bool]
 
 
 def schema(offices: list[str]) -> dict[str, object]:
@@ -69,12 +75,14 @@ def schema(offices: list[str]) -> dict[str, object]:
         "type": "object",
         "properties": {
             "title": {"type": "string"},
-            "office": {"type": "string", "enum": [*offices, "other"]},
+            "office": {"type": "string", "enum": [*offices, "mixed", "other"]},
             "district": {"type": "integer"},
             "party": {"type": "string"},
             "special": {"type": "boolean"},
             "continued": {"type": "boolean"},
             "concluded": {"type": "boolean"},
+            "x0": {"type": "integer"},
+            "x1": {"type": "integer"},
             "y0": {"type": "integer"},
             "y1": {"type": "integer"},
             "header_y1": {"type": "integer"},
@@ -87,8 +95,11 @@ def schema(offices: list[str]) -> dict[str, object]:
                     "properties": {
                         "label": {"type": "string"},
                         "role": {"type": "string", "enum": ["candidate", "blanks", "total", "other"]},
+                        "name": {"type": "string"},
+                        "office": {"type": "string", "enum": [*offices, "other"]},
+                        "party": {"type": "string"},
                     },
-                    "required": ["label", "role"],
+                    "required": ["label", "role", "name", "office", "party"],
                     "additionalProperties": False,
                 },
             },
@@ -101,6 +112,8 @@ def schema(offices: list[str]) -> dict[str, object]:
             "special",
             "continued",
             "concluded",
+            "x0",
+            "x1",
             "y0",
             "y1",
             "header_y1",
@@ -131,15 +144,19 @@ def instructions(volume: Volume) -> str:
         "For each table: title is its heading as printed; district is the district number (0 when the office has "
         "none); party is the party named in the heading of a primary table, lowercase ('' for a general election "
         "table); special is true for a special election; continued is true when the table began on an earlier page "
-        "and this page shows its later rows; concluded is true when its Total row is on this page. y0 is the top of "
+        "and this page shows its later rows; concluded is true when its Total row is on this page. x0 and x1 are the "
+        "table's left and right edges: a table printed in two side-by-side panels is two tables, one per panel, "
+        "each with its own edges and columns and the right one marked continued. y0 is the top of "
         "the table (its heading line, or its first row when continued) and y1 the bottom of its last row on this "
-        "page, Total row included; the next table's y0 must lie below this table's y1. header_y1 is the bottom of "
+        "page, Total row included; a table under another in the same panel has a y0 below that table's y1. header_y1 is the bottom of "
         "the column heading block (0 when this page shows no column headings for the table). unit is what each row "
         "is; orientation is units_down when the rows are units and units_across when the columns are. columns lists "
         "every data column left to right, leaving out the column of unit names: label is the heading as printed "
         "(candidate name and party, read turned if it is printed sideways), and role is candidate for a named "
         "candidate or an all-others or scattering column, blanks for blank or void ballots, total for a total of "
-        "ballots, and other for anything else. In a table that continues, repeat the columns even if the heading is "
+        "ballots, and other for anything else; name is the candidate's name alone ('' for a column that is not a "
+        "candidate), office is the office key the column belongs to (a table with columns under several office "
+        "headings has office 'mixed'), and party is the party printed for the candidate ('' if none). In a table that continues, repeat the columns even if the heading is "
         "not reprinted."
     )
 
@@ -192,8 +209,14 @@ def day_of(year: int) -> str:
 
 def sound(page: LayoutPage) -> bool:
     found = sorted((table for table in page["tables"] if table["office"] != "other"), key=lambda table: table["y0"])
-    return all(0 <= table["y0"] < table["y1"] <= 1000 and 0 <= table["header_y1"] <= 1000 for table in found) and all(
-        before["y1"] <= after["y0"] + 10 for before, after in itertools.pairwise(found)
+    return all(
+        0 <= table["x0"] < table["x1"] <= 1000
+        and 0 <= table["y0"] < table["y1"] <= 1000
+        and 0 <= table["header_y1"] <= 1000
+        for table in found
+    ) and all(
+        before["y1"] <= after["y0"] + 10 or before["x1"] <= after["x0"] + 10 or after["x1"] <= before["x0"] + 10
+        for before, after in itertools.combinations(found, 2)
     )
 
 
@@ -233,7 +256,7 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
     state = volume["polity"].removeprefix("US-")
     contests: dict[str, scans.Contest] = {}
     sections: list[scans.Page] = []
-    columns: dict[str, list[scans.Column]] = {}
+    cache: dict[str, list[LayoutColumn]] = {}
     unmatched: dict[str, list[str]] = {}
     notes: list[str] = []
     with connect() as conn:
@@ -246,50 +269,84 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 (table for table in page["tables"] if table["office"] != "other"), key=lambda table: table["y0"]
             )
             for index, table in enumerate(found):
-                label = f"{table['office']}{table['district'] or ''}"
                 if table["party"] or table["special"]:
                     notes.append(f"{leaf}: {table['title']!r} skipped ({table['party'] or 'special'})")
                     continue
-                contest: scans.Contest = {
-                    "year": volume["year"],
-                    "chamber": table["office"],
-                    "day": volume["day"],
-                    "special": False,
-                    "state": state,
-                    "district": table["district"] or None,
-                }
-                key = scans.key_of(contest)
-                if key not in ids:
-                    notes.append(f"{leaf}: {table['title']!r} has no contest {key}")
+                if table["office"] == "mixed" and not volume.get("create"):
+                    notes.append(f"{leaf}: {table['title']!r} mixes offices")
                     continue
-                contests[label] = contest
-                if label not in columns or (table["columns"] and not columns[label]):
-                    named, unmatched[label] = scans.match(
-                        [column["label"] for column in table["columns"] if column["role"] == "candidate"],
-                        scans.options(conn, ids[key]),
-                        label,
-                    )
-                    by_label = {column["label"]: column for column in named}
-                    columns[label] = [
-                        by_label.get(column["label"]) or {"label": column["label"], "contest": None, "candidate": ""}
-                        for column in table["columns"]
-                    ]
-                before = found[index - 1]["y1"] if index > 0 else None
-                after = found[index + 1]["y0"] if index + 1 < len(found) else None
+                if not table["columns"] and table["office"] in cache:
+                    table["columns"] = cache[table["office"]]
+                cache[table["office"]] = table["columns"]
+                built: list[scans.Column] = []
+                for office in dict.fromkeys(
+                    column["office"]
+                    for column in table["columns"]
+                    if column["role"] == "candidate" and column["office"] != "other"
+                ):
+                    label = f"{office}{table['district'] or ''}"
+                    contest: scans.Contest = {
+                        "year": volume["year"],
+                        "chamber": office,
+                        "day": volume["day"],
+                        "special": False,
+                        "state": state,
+                        "district": table["district"] or None,
+                    }
+                    key = scans.key_of(contest)
+                    candidates = [c for c in table["columns"] if c["role"] == "candidate" and c["office"] == office]
+                    if key in ids:
+                        named, unmatched[label] = scans.match(
+                            [column["label"] for column in candidates], scans.options(conn, ids[key]), label
+                        )
+                        matched = {column["label"]: column for column in named}
+                    elif volume.get("create"):
+                        contest["create"] = True
+                        matched = {
+                            column["label"]: scans.Column(
+                                **{
+                                    "label": column["label"],
+                                    "contest": label,
+                                    "candidate": column["name"],
+                                    "party": column["party"],
+                                }
+                            )
+                            for column in candidates
+                        }
+                    else:
+                        notes.append(f"{leaf}: {table['title']!r} has no contest {key}")
+                        continue
+                    contests[label] = contest
+                    built.extend(matched.values())
+                if not built:
+                    continue
+                by_label = {column["label"]: column for column in built}
+                cols = [
+                    by_label.get(column["label"]) or {"label": column["label"], "contest": None, "candidate": ""}
+                    for column in table["columns"]
+                ]
+                beside = [
+                    other
+                    for other in found
+                    if other is not table and other["x0"] < table["x1"] and table["x0"] < other["x1"]
+                ]
+                before = max((other["y1"] for other in beside if other["y0"] < table["y0"]), default=None)
+                after = min((other["y0"] for other in beside if other["y0"] > table["y0"]), default=None)
                 top = table["y0"] if before is None else (before + table["y0"]) // 2
                 bottom = table["y1"] if after is None else (table["y1"] + after) // 2
                 top = max(0, top - (0 if table["continued"] else 4)) / 1000
                 bottom = min(1000, bottom + 4) / 1000
+                left, right = max(0, table["x0"] - 8) / 1000, min(1000, table["x1"] + 8) / 1000
                 section: scans.Page = {
                     "page": leaf,
                     "id": f"{leaf}-{index}",
-                    "columns": columns[label],
+                    "columns": cols,
                     "orientation": "counties_across" if table["orientation"] == "units_across" else "counties_down",
-                    "crop": [0.0, round(top, 4), 1.0, round(bottom, 4)],
+                    "crop": [round(left, 4), round(top, 4), round(right, 4), round(bottom, 4)],
                     "hint": f"Read only the table headed {table['title']!r}; ignore any other table visible in the image.",
                 }
                 count = max(1, ceil((bottom - top) / 0.45))
-                if count > 1 and table["header_y1"] > 0 and not table["continued"]:
+                if count > 1 and table["header_y1"] > 0:
                     section["bands"] = count
                     section["header"] = [0.0, round((table["header_y1"] / 1000 - top) / (bottom - top), 4)]
                 sections.append(section)

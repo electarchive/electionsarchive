@@ -9,8 +9,11 @@
   },
   "raw_source": "us.scans",
   "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
   "contests": {
-    "d1": {
+    "house1": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -18,7 +21,7 @@
       "state": "MA",
       "district": 1
     },
-    "d2": {
+    "house2": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -26,7 +29,7 @@
       "state": "MA",
       "district": 2
     },
-    "d3": {
+    "house3": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -34,7 +37,7 @@
       "state": "MA",
       "district": 3
     },
-    "d4": {
+    "house4": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -42,7 +45,7 @@
       "state": "MA",
       "district": 4
     },
-    "d5": {
+    "house5": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -50,7 +53,7 @@
       "state": "MA",
       "district": 5
     },
-    "d6": {
+    "house6": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -58,7 +61,7 @@
       "state": "MA",
       "district": 6
     },
-    "d7": {
+    "house7": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -66,7 +69,7 @@
       "state": "MA",
       "district": 7
     },
-    "d8": {
+    "house8": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -74,7 +77,7 @@
       "state": "MA",
       "district": 8
     },
-    "d9": {
+    "house9": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -82,7 +85,7 @@
       "state": "MA",
       "district": 9
     },
-    "d10": {
+    "house10": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -90,7 +93,7 @@
       "state": "MA",
       "district": 10
     },
-    "d11": {
+    "house11": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -98,7 +101,7 @@
       "state": "MA",
       "district": 11
     },
-    "d12": {
+    "house12": {
       "year": 1968,
       "chamber": "house",
       "day": "1968-11-05",
@@ -111,204 +114,572 @@
     {
       "page": 348,
       "id": "348-0",
-      "discover": "d1",
+      "columns": [
+        {
+          "label": "Silvio O. Conte of Pittsfield, Republican",
+          "contest": "house1",
+          "candidate": "Silvio O. Conte"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.075,
-        1.0,
-        0.663
+        0.036,
+        0.116,
+        0.496,
+        0.693
       ],
-      "hint": "This is U.S. Representative, District 1, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "hint": "Read only the table headed 'District 1'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
-        0.1531
+        0.1282
       ]
     },
     {
       "page": 348,
       "id": "348-1",
-      "discover": "d2",
+      "columns": [
+        {
+          "label": "Silvio O. Conte of Pittsfield, Republican",
+          "contest": "house1",
+          "candidate": "Silvio O. Conte"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.663,
-        1.0,
-        0.985
+        0.502,
+        0.12,
+        0.963,
+        0.693
       ],
-      "hint": "This is U.S. Representative, District 2, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+      "hint": "Read only the table headed 'District 1 \u2014 Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1222
+      ]
+    },
+    {
+      "page": 348,
+      "id": "348-2",
+      "columns": [
+        {
+          "label": "Edward P. Boland of Springfield, Democratic",
+          "contest": "house2",
+          "candidate": "Edward P. Boland"
+        },
+        {
+          "label": "Frederick M. Whitney, Jr., of Springfield, Republican",
+          "contest": "house2",
+          "candidate": "Frederick M. Whitney, Jr."
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.036,
+        0.685,
+        0.963,
+        0.95
+      ],
+      "hint": "Read only the table headed 'District 2'; ignore any other table visible in the image."
     },
     {
       "page": 349,
       "id": "349-0",
-      "discover": "d2",
+      "columns": [
+        {
+          "label": "Edward P. Boland of Springfield, Democratic",
+          "contest": "house2",
+          "candidate": "Edward P. Boland"
+        },
+        {
+          "label": "Frederick M. Whitney, Jr., of Springfield, Republican",
+          "contest": "house2",
+          "candidate": "Frederick M. Whitney, Jr."
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.075,
-        1.0,
-        0.4092
+        0.027,
+        0.125,
+        0.948,
+        0.416
       ],
-      "hint": "This is U.S. Representative, District 2, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+      "hint": "Read only the table headed 'District 2 \u2014 Concluded'; ignore any other table visible in the image."
     },
     {
       "page": 349,
       "id": "349-1",
-      "discover": "d3",
+      "columns": [
+        {
+          "label": "Philip J. Philbin of Clinton Democratic",
+          "contest": "house3",
+          "candidate": "Philip J. Philbin"
+        },
+        {
+          "label": "Laurence Curtis of Newton Republican",
+          "contest": "house3",
+          "candidate": "Laurence Curtis"
+        },
+        {
+          "label": "Chandler Harrison Stevens of Concord, Independent",
+          "contest": "house3",
+          "candidate": "Chandler H. Stevens"
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.4092,
-        1.0,
-        0.8846
+        0.032,
+        0.408,
+        0.953,
+        0.884
       ],
-      "hint": "This is U.S. Representative, District 3, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "hint": "Read only the table headed 'District 3'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
-        0.1893
+        0.2941
       ]
     },
     {
       "page": 350,
       "id": "350-0",
-      "discover": "d4",
+      "columns": [
+        {
+          "label": "Harold D. Donohue of Worcester, Democratic",
+          "contest": "house4",
+          "candidate": "Harold D. Donahue"
+        },
+        {
+          "label": "Howard A. Miller, Jr. of Franklin, Republican",
+          "contest": "house4",
+          "candidate": "Howard A. Miller, Jr."
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.075,
-        1.0,
-        0.5304
+        0.04,
+        0.074,
+        0.968,
+        0.533
       ],
-      "hint": "This is U.S. Representative, District 4, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "hint": "Read only the table headed 'District 4'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
-        0.1976
+        0.2527
       ]
     },
     {
       "page": 350,
       "id": "350-1",
-      "discover": "d5",
+      "columns": [
+        {
+          "label": "F. Bradford Morse of Lowell, Republican",
+          "contest": "house5",
+          "candidate": "F. Bradford Morse"
+        },
+        {
+          "label": "Robert C. Maguire of Lowell, Democratic",
+          "contest": "house5",
+          "candidate": "Robert C. Maguire"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.5304,
-        1.0,
-        0.8901
+        0.047,
+        0.525,
+        0.973,
+        0.887
       ],
-      "hint": "This is U.S. Representative, District 5, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+      "hint": "Read only the table headed 'District 5'; ignore any other table visible in the image."
     },
     {
       "page": 351,
       "id": "351-0",
-      "discover": "d6",
+      "columns": [
+        {
+          "label": "William H. Bates of Salem, Republican",
+          "contest": "house6",
+          "candidate": "William H. Bates"
+        },
+        {
+          "label": "Deirdre Henderson of Essex, Democratic",
+          "contest": "house6",
+          "candidate": "Deirdre Henderson"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.075,
-        1.0,
-        0.5031
+        0.032,
+        0.114,
+        0.948,
+        0.506
       ],
-      "hint": "This is U.S. Representative, District 6, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+      "hint": "Read only the table headed 'District 6'; ignore any other table visible in the image."
     },
     {
       "page": 351,
       "id": "351-1",
-      "discover": "d7",
+      "columns": [
+        {
+          "label": "Torbert H. Macdonald of Malden, Democratic",
+          "contest": "house7",
+          "candidate": "Torbert H. MacDonald"
+        },
+        {
+          "label": "William S. Abbott of Arlington, Republican",
+          "contest": "house7",
+          "candidate": "William S. Abbott"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.5031,
-        1.0,
-        0.9609
+        0.027,
+        0.498,
+        0.948,
+        0.766
       ],
-      "hint": "This is U.S. Representative, District 7, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.1966
-      ]
+      "hint": "Read only the table headed 'District 7'; ignore any other table visible in the image."
+    },
+    {
+      "page": 351,
+      "id": "351-2",
+      "columns": [
+        {
+          "label": "Thomas P. O'Neill, Jr. of Cambridge, Democratic",
+          "contest": "house8",
+          "candidate": "Thomas P. O'Neill, Jr."
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.758,
+        0.943,
+        0.952
+      ],
+      "hint": "Read only the table headed 'District 8'; ignore any other table visible in the image."
     },
     {
       "page": 352,
       "id": "352-0",
-      "discover": "d8",
+      "columns": [
+        {
+          "label": "John W. McCormack of Boston, Democratic",
+          "contest": "house9",
+          "candidate": "John W. McCormack"
+        },
+        {
+          "label": "Alan C. Freeman of Boston Republican",
+          "contest": "house9",
+          "candidate": "Alan C. Freeman"
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.075,
-        1.0,
-        0.1814
+        0.037,
+        0.111,
+        0.968,
+        0.213
       ],
-      "hint": "This is U.S. Representative, District 8, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+      "hint": "Read only the table headed 'District 9'; ignore any other table visible in the image."
     },
     {
       "page": 352,
       "id": "352-1",
-      "discover": "d9",
+      "columns": [
+        {
+          "label": "Margaret M. Heckler of Wellesley, Republican",
+          "contest": "house10",
+          "candidate": "Margaret M. Heckler"
+        },
+        {
+          "label": "Edmund Dinis of Fall River, Democratic",
+          "contest": "house10",
+          "candidate": "Edmund Dinis"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.1814,
-        1.0,
-        0.6875
+        0.04,
+        0.205,
+        0.968,
+        0.696
       ],
-      "hint": "This is U.S. Representative, District 9, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "hint": "Read only the table headed 'District 10'; ignore any other table visible in the image.",
       "bands": 2,
       "header": [
         0.0,
-        0.1778
+        0.277
       ]
     },
     {
       "page": 352,
       "id": "352-2",
-      "discover": "d10",
+      "columns": [
+        {
+          "label": "James A. Burke of Milton, Democratic",
+          "contest": "house11",
+          "candidate": "James A. Burke"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.6875,
-        1.0,
-        0.9533
+        0.047,
+        0.688,
+        0.973,
+        0.945
       ],
-      "hint": "This is U.S. Representative, District 10, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+      "hint": "Read only the table headed 'District 11'; ignore any other table visible in the image."
     },
     {
       "page": 353,
       "id": "353-0",
-      "discover": "d11",
+      "columns": [
+        {
+          "label": "Hastings Keith of West Bridgewater, Republican",
+          "contest": "house12",
+          "candidate": "Hastings Keith"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.075,
-        1.0,
-        0.4963
+        0.027,
+        0.121,
+        0.491,
+        0.486
       ],
-      "hint": "This is U.S. Representative, District 11, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+      "hint": "Read only the table headed 'District 12'; ignore any other table visible in the image."
     },
     {
       "page": 353,
       "id": "353-1",
-      "discover": "d12",
+      "columns": [
+        {
+          "label": "Hastings Keith of West Bridgewater, Republican",
+          "contest": "house12",
+          "candidate": "Hastings Keith"
+        },
+        {
+          "label": "All Others",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
       "orientation": "counties_down",
       "crop": [
-        0.0,
-        0.4963,
-        1.0,
-        0.985
+        0.482,
+        0.125,
+        0.948,
+        0.486
       ],
-      "hint": "This is U.S. Representative, District 12, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
-      "bands": 2,
-      "header": [
-        0.0,
-        0.1842
-      ]
+      "hint": "Read only the table headed 'District 12 \u2014 Concluded'; ignore any other table visible in the image."
     }
-  ],
-  "unit_codes": {
-    "Gay Head": "25007"
-  }
+  ]
 }

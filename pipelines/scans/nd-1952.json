@@ -1,0 +1,463 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held November 4, 1952",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1950%20through%201958%20Statewide%20Election%20Results/1952/General%20Election%2011-04-1952.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "superintendent-of-public-instruction": {
+      "year": 1952,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1952,
+      "chamber": "tax-commissioner",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1952,
+      "chamber": "president",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1952,
+      "chamber": "senate",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1952,
+      "chamber": "governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1952,
+      "chamber": "lieutenant-governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1952,
+      "chamber": "secretary-of-state",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1952,
+      "chamber": "auditor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1952,
+      "chamber": "treasurer",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1952,
+      "chamber": "attorney-general",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1952,
+      "chamber": "insurance-commissioner",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1952,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1952,
+      "chamber": "public-service-commissioner",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court GEORGE E DUIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. O. SATHRE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction EDWARD A. MILLIGAN",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "EDWARD A. MILLIGAN",
+          "party": ""
+        },
+        {
+          "label": "M. F. PETERSON",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. PETERSON",
+          "party": ""
+        },
+        {
+          "label": "State Tax Commissioner B B CONYNE",
+          "contest": "tax-commissioner",
+          "candidate": "B B CONYNE",
+          "party": ""
+        },
+        {
+          "label": "J. ARTHUR ENGEN",
+          "contest": "tax-commissioner",
+          "candidate": "J. ARTHUR ENGEN",
+          "party": ""
+        },
+        {
+          "label": "BEN MEIER",
+          "contest": "tax-commissioner",
+          "candidate": "BEN MEIER",
+          "party": ""
+        },
+        {
+          "label": "Judges of District Court O. B. BURTNESS First District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ALBERT LUNDBERG Second District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HARVEY J. MILLER Sixth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Constitutional Amendment Authorizing Municipal Liquor Stores No. 1 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measure Clearing Checks at Par by Banks and Trust Companies No. 1 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Exempting Food and Food Products, Drugs and Medicine from Sales Tax No. 2 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hours of sale of Alcoholic Beverages and Closing of Places where Alcoholic Beverages are Sold No. 3 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.37,
+        0.229,
+        0.955,
+        0.814
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO PARTY VOTES AND VOTES CAST ON MEASURES AT THE GENERAL ELECTION HELD NOVEMBER 4, 1952'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3094
+      ]
+    },
+    {
+      "page": 1,
+      "id": "1-1",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EISENHOWER Ernest Erickson Curtis Olson Anton J. Schmidt Hester S. Wells",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "STEVENSON A. N. Bauman J. J. Daly Etta Fenelon Frank Traynor",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "MacARTHUR Edwin Ankerfelt Myrtle Branvold A. H. Evert J. E. R. Patterson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HALLINAN George Austin Lucille Olson Ole H. Olson Andrew Skarvold",
+          "contest": "president",
+          "candidate": "Vincent Hallinan (Progressive)"
+        },
+        {
+          "label": "HAMBLEN G. E. Splinter Abel Compan David G. Wallin G. A. Forthun",
+          "contest": "president",
+          "candidate": "Stuart Hamblen (Prohibition)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.253,
+        0.374,
+        0.814
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 4, 1952 PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2799
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "United States Senator\u2014WILLIAM LANGER (Republican)",
+          "contest": "senate",
+          "candidate": "William Langer"
+        },
+        {
+          "label": "HAROLD A MORRISON (Democrat)",
+          "contest": "senate",
+          "candidate": "Harold A. Morrison"
+        },
+        {
+          "label": "FRED G AANDAHL (Independent)",
+          "contest": "senate",
+          "candidate": "Fred G. Aandahl"
+        },
+        {
+          "label": "Representatives In Congress\u2014USHER L. BURDICK (Republican)",
+          "contest": "house",
+          "candidate": "USHER L. BURDICK",
+          "party": "Republican"
+        },
+        {
+          "label": "OTTO KRUEGER (Republican)",
+          "contest": "house",
+          "candidate": "OTTO KRUEGER",
+          "party": "Republican"
+        },
+        {
+          "label": "EDWARD NESEMEIER (Democrat)",
+          "contest": "house",
+          "candidate": "EDWARD NESEMEIER",
+          "party": "Democrat"
+        },
+        {
+          "label": "Governor\u2014NORMAN BRUNSDALE (Republican)",
+          "contest": "governor",
+          "candidate": "Norman Brunsdale"
+        },
+        {
+          "label": "OLE S. JOHNSON (Democrat)",
+          "contest": "governor",
+          "candidate": "Ole S. Johnson"
+        },
+        {
+          "label": "Lieutenant Governor\u2014C. P. DAHL (Republican)",
+          "contest": "lieutenant-governor",
+          "candidate": "C. P. DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "HENDRY MACKENZIE (Democrat)",
+          "contest": "lieutenant-governor",
+          "candidate": "HENDRY MACKENZIE",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State\u2014THOMAS HALL (Republican)",
+          "contest": "secretary-of-state",
+          "candidate": "THOMAS HALL",
+          "party": "Republican"
+        },
+        {
+          "label": "ROBERT MOSES (Democrat)",
+          "contest": "secretary-of-state",
+          "candidate": "ROBERT MOSES",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor\u2014BERTA E. BAKER (Republican)",
+          "contest": "auditor",
+          "candidate": "BERTA E. BAKER",
+          "party": "Republican"
+        },
+        {
+          "label": "ETHEL ANN KNUDSEN (Democrat)",
+          "contest": "auditor",
+          "candidate": "ETHEL ANN KNUDSEN",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer\u2014RAY THOMPSON (Republican)",
+          "contest": "treasurer",
+          "candidate": "RAY THOMPSON",
+          "party": "Republican"
+        },
+        {
+          "label": "ELLEN MAYOUE (Democrat)",
+          "contest": "treasurer",
+          "candidate": "ELLEN MAYOUE",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General\u2014E. T. CHRISTIANSON (Republican)",
+          "contest": "attorney-general",
+          "candidate": "E. T. CHRISTIANSON",
+          "party": "Republican"
+        },
+        {
+          "label": "MILTON K HIGGINS (Democrat)",
+          "contest": "attorney-general",
+          "candidate": "MILTON K HIGGINS",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Insurance\u2014A. J. JENSEN (Republican)",
+          "contest": "insurance-commissioner",
+          "candidate": "A. J. JENSEN",
+          "party": "Republican"
+        },
+        {
+          "label": "R. R. REMBOLDT (Democrat)",
+          "contest": "insurance-commissioner",
+          "candidate": "R. R. REMBOLDT",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Agriculture and Labor\u2014MATH DAHL (Republican)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "B. W. MEIER (Democrat)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "B. W. MEIER",
+          "party": "Democrat"
+        },
+        {
+          "label": "Public Service Commissioner\u2014ERNEST D. NELSON (Republican)",
+          "contest": "public-service-commissioner",
+          "candidate": "ERNEST D. NELSON",
+          "party": "Republican"
+        },
+        {
+          "label": "DAN M HEMMESCH (Democrat)",
+          "contest": "public-service-commissioner",
+          "candidate": "DAN M HEMMESCH",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.239,
+        0.836,
+        0.823
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 4, 1952'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3065
+      ]
+    }
+  ]
+}
