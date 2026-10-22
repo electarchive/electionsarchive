@@ -1,4 +1,5 @@
 import re
+import subprocess
 from datetime import date
 from pathlib import Path
 
@@ -19,8 +20,9 @@ FILES = {
     ("senate", date(2010, 11, 2), True): ("20121004080201", "2010/general/2010USSenator2YrRecertified09122012.xls"),
     ("house", date(2010, 11, 2), False): ("20121004081147", "2010/general/2010CongressRecertified09122012.xls"),
     ("house", date(2018, 11, 6), False): ("20200218182300", "2018/general/2018Congress.xlsx"),
+    ("house", date(2011, 9, 13), True): ("20120324155926", "2011/Special/SpecialElectionVoteResults09132011.pdf"),
 }
-DISTRICTS = {date(2010, 11, 2): {29}, date(2018, 11, 6): {18, 20, 21}}
+DISTRICTS = {date(2010, 11, 2): {29}, date(2018, 11, 6): {18, 20, 21}, date(2011, 9, 13): {9}}
 PARTY_WORDS = {
     "Republican",
     "Democratic",
@@ -73,6 +75,26 @@ def parse() -> None:
         )
 
     for (chamber, day, special), (stamp, path) in FILES.items():
+        if path.endswith(".pdf"):
+            text = subprocess.run(
+                ["pdftotext", "-layout", str(raw.cached(SOURCE, ny_boe.WAYBACK.format(stamp, path)).path), "-"],
+                capture_output=True,
+                text=True,
+                check=True,
+            ).stdout.split("RECAP:")[0]
+            (district,) = DISTRICTS[day]
+            places = [county(place) for place in re.findall(r"Part of \w+", text.split("CANDIDATE", 1)[1].splitlines()[0])]
+            lines = []
+            for found in re.finditer(r"^(?:[A-Z]{3})?\s+(\S.*?)\s{2,}((?:[\d,]+\s+)+[\d,]+)$", text, re.MULTILINE):
+                *votes, total = [int(value.replace(",", "")) for value in found[2].split()]
+                if len(votes) != len(places) or sum(votes) != total:
+                    raise ValueError(f"{day} house {district} {found[1]}: {votes} do not add to {total}")
+                if found[1] in ("BLANK", "VOID") or found[1].startswith("TOTAL"):
+                    continue
+                name = "Scattering" if found[1] == "SCATTERING" else found[1]
+                lines.extend(zip([name] * len(places), places, votes, strict=True))
+            add(chamber, day, special, district, lines)
+            continue
         book = fastexcel.read_excel(raw.cached(SOURCE, ny_boe.WAYBACK.format(stamp, path)).path)
         if path.endswith(".xlsx"):
             for sheet in book.sheet_names:
@@ -161,7 +183,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New York's 2006 and 2010 U.S. Senate elections and 2010 and 2018 U.S. House elections by county, "
+            summary="New York's 2010 U.S. Senate elections and 2010, 2011, and 2018 U.S. House elections by county, "
             "from the State Board of Elections",
             polity="US-NY",
         )
