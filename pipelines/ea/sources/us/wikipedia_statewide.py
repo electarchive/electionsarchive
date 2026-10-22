@@ -34,7 +34,24 @@ GENERIC = re.compile(
 )
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 MAJORITY_RUNOFF = {"GA": 1964, "LA": 1975}
+PRIMARIES = {"GA": (2014, 2018, 2022)}
+PRIMARY_OFFICES = (
+    "governor",
+    "lieutenant-governor",
+    "attorney-general",
+    "secretary-of-state",
+    "commissioner-of-agriculture",
+    "commissioner-of-insurance",
+    "commissioner-of-labor",
+    "school-superintendent",
+)
+STAGE = re.compile(r"primar|run-?off", re.IGNORECASE)
+NOT_STAGE = re.compile(r"special|recount|vacanc|convention|caucus|nominat", re.IGNORECASE)
+SCOPE = re.compile(r"democratic|republican|libertarian|green|constitution", re.IGNORECASE)
 OFFICE_WORDS = {
+    "governor": r"^(?!.*lieutenant).*(?:governor|gubernatorial)",
+    "commissioner-of-insurance": r"insurance",
+    "school-superintendent": r"superintendent|school",
     "lieutenant-governor": r"lieutenant|lt\.? gub",
     "treasurer": r"treasurer",
     "auditor": r"auditor",
@@ -150,8 +167,43 @@ def omnibus(download: bool) -> dict[tuple[str, int], str]:
     }
 
 
+def primary_pages(download: bool) -> tuple[dict[tuple[str, int, str], list[str]], dict[str, str]]:
+    with connect() as conn:
+        labels = dict(
+            conn.execute(
+                """select o.value, n.text from external_id o
+                   join name n on n.entity_id = o.entity_id and n.is_preferred
+                   where o.scheme = 'us.office' and o.value like any(%s)""",
+                [[f"%:{state}" for state in PRIMARIES]],
+            ).fetchall()
+        )
+    asked = {
+        (state, year, f"{office}:{state}"): [f"{year} {STATES[state]} gubernatorial election"]
+        if office == "governor"
+        else variants(state, year, labels[f"{office}:{state}"])
+        for state, years in PRIMARIES.items()
+        for year in years
+        for office in PRIMARY_OFFICES
+    }
+    fallback = {
+        (state, year): [f"{year} {STATES[state]} {tail}" for tail in ("state elections", "elections")]
+        for state, year, _ in asked
+    }
+    found = existing(
+        sorted({title for options in [*asked.values(), *fallback.values()] for title in options}), download
+    )
+    pages: dict[tuple[str, int, str], list[str]] = {}
+    for (state, year, value), options in asked.items():
+        title = next((found[title] for title in [*options, *fallback[(state, year)]] if title in found), None)
+        if title is not None:
+            pages.setdefault((state, year, title), []).append(value)
+    return pages, labels
+
+
 def fetch() -> None:
     for title in sorted({*resolve(True).values(), *omnibus(True).values()}):
+        read(page(title), True)
+    for _, _, title in primary_pages(True)[0]:
         read(page(title), True)
 
 
@@ -176,7 +228,14 @@ def parse() -> None:
     held: list[tuple[str, str]] = []
 
     def load(
-        title: str, state: str, year: int, day: date, value: str, members: list[tuple[str, dict[str, str]]]
+        title: str,
+        state: str,
+        year: int,
+        day: date,
+        value: str,
+        members: list[tuple[str, dict[str, str]]],
+        stage: str = "general",
+        scope: str | None = None,
     ) -> None:
         office = value.split(":")[0]
         rows, listed, total = [], 0, None
@@ -200,7 +259,7 @@ def parse() -> None:
                     rows.append(
                         {
                             "name": candidate,
-                            "party": label or None,
+                            "party": scope or label or None,
                             "votes": int(digits),
                             "winner": 1 if "winning" in name else None,
                             "percentage": params.get("percentage") or params.get("%"),
@@ -219,7 +278,7 @@ def parse() -> None:
             if not percent or abs(lead["votes"] * 100 / listed - float(percent)) > 1.5:
                 held.append((title, "no total line and percentages do not confirm the rows"))
                 return
-        if sum(row["winner"] == 1 for row in rows) > 1:
+        if stage == "general" and sum(row["winner"] == 1 for row in rows) > 1:
             held.append((title, "more than one winning row"))
             return
         label = re.sub(rf" of {STATES[state]}$", "", labels[value])
@@ -236,6 +295,8 @@ def parse() -> None:
                     "votes": row["votes"],
                     "winner": row["winner"],
                     "page": None,
+                    "stage": stage,
+                    "scope": scope,
                 }
             )
 
@@ -322,6 +383,55 @@ def parse() -> None:
                 held.append((f"{title} {value}", f"{len(boxes)} general-election boxes"))
                 continue
             load(title, state, year, day, value, boxes[0][1])
+    with connect() as conn:
+        stage_days = {
+            (state, year, kind): day
+            for state, year, kind, day in conn.execute(
+                """select substr(p.iso_code, 4), extract(year from e.date_from)::int, e.kind, e.date_from
+                   from election e join polity p on p.id = e.polity_id and p.iso_code like 'US-%%'
+                   where e.kind in ('primary', 'runoff') and e.date_from = e.date_to
+                     and extract(month from e.date_from) < 11
+                   order by (select count(*) from contest where election_id = e.id)"""
+            )
+        }
+    pages, office_labels = primary_pages(False)
+    labels |= office_labels
+    for (state, year, title), values in sorted(pages.items()):
+        text = read(page(title), False)["parse"]["wikitext"]
+        text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+        text = re.sub(r"<ref[^>]*/\s*>|<ref(?:\s[^>]*[^/])?>.*?</ref>", "", text, flags=re.DOTALL | re.IGNORECASE)
+        text = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", text)
+        pending: list[tuple[str, list[tuple[str, dict[str, str]]]]] = []
+        staged: list[tuple[str, list[tuple[str, dict[str, str]]]]] = []
+        sections: list[tuple[str, str, list[tuple[str, dict[str, str]]]]] = []
+        for begin in re.finditer(r"\{\{\s*election box begin", text, re.IGNORECASE):
+            end = re.search(r"\{\{\s*election box end\s*\}\}", text[begin.start() :], re.IGNORECASE)
+            members = templates(text[begin.start() : begin.start() + end.end()] if end else text[begin.start() :])
+            label = box_label(text, begin.start(), members[0][1] if members else {})
+            if re.search(r"recount", label, re.IGNORECASE) and pending:
+                pending[-1] = staged[-1] = (label, members[1:])
+                continue
+            if STAGE.search(label) and not NOT_STAGE.search(label):
+                pending.append((label, members[1:]))
+                staged.append((label, members[1:]))
+                continue
+            for value in values:
+                words = OFFICE_WORDS.get(value.split(":")[0]) or re.escape(
+                    re.sub(rf" of {STATES[state]}$", "", labels[value]).lower()
+                )
+                if re.search(words, label, re.IGNORECASE):
+                    sections.extend((value, *box) for box in pending)
+                    break
+            pending = []
+        if len(values) == 1:
+            sections = [(values[0], *box) for box in staged]
+        for value, label, members in sections:
+            stage = "runoff" if re.search(r"run-?off", label, re.IGNORECASE) else "primary"
+            scope = SCOPE.search(label)
+            if scope is None or (state, year, stage) not in stage_days:
+                held.append((f"{title} {value}", f"no party or no {stage} date in {label.strip()}"))
+                continue
+            load(title, state, year, stage_days[(state, year, stage)], value, members, stage, scope[0].title())
     frame = pl.DataFrame(
         lines,
         schema={
@@ -335,17 +445,20 @@ def parse() -> None:
             "votes": pl.Int64,
             "winner": pl.Int64,
             "page": pl.Int64,
+            "stage": pl.String,
+            "scope": pl.String,
         },
     )
-    contest = ["state", "date", "office"]
+    contest = ["state", "date", "office", "scope"]
     doubled = frame.group_by(*contest, "name").len().filter(pl.col("len") > 1)
-    for state, day, office, _, _ in doubled.iter_rows():
-        held.append((f"{day} {state} {office}", "a name appears twice"))
-    frame = frame.join(doubled.select(contest).unique(), on=contest, how="anti")
+    for state, day, office, scope, _, _ in doubled.iter_rows():
+        held.append((f"{day} {state} {office} {scope or ''}".strip(), "a name appears twice"))
+    frame = frame.join(doubled.select(contest).unique(), on=contest, how="anti", nulls_equal=True)
     leaders = (
         frame.sort("votes", descending=True)
         .group_by(*contest, maintain_order=True)
         .agg(
+            pl.col("stage").first().alias("stage"),
             pl.col("name").first().alias("leader"),
             pl.col("name").filter(pl.col("winner") == 1).first().alias("declared"),
             (pl.col("votes").first() == pl.col("votes").get(1, null_on_oob=True)).alias("tied"),
@@ -374,7 +487,9 @@ def parse() -> None:
     for value, start, holder in tenures:
         holders.setdefault(value, []).append((start, surname(holder)))
     dropped = []
-    for state, day, office, leader, declared, tied in leaders.iter_rows():
+    for state, day, office, scope, stage, leader, declared, tied in leaders.iter_rows():
+        if stage != "general":
+            continue
         winner = declared or leader
         if declared is None and tied:
             dropped.append((state, day, office))

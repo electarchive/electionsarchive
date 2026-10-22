@@ -107,6 +107,14 @@ def emit(
         frame = pl.read_parquet(PARSED / "lines.parquet")
     if book is None:
         book = {row["id"]: row for row in sources().iter_rows(named=True)}
+    if "stage" not in frame.columns:
+        frame = frame.with_columns(stage=pl.lit("general"), scope=pl.lit(None, pl.String))
+    runoffs = {
+        (state, int(str(day)[:4]), office, scope)
+        for state, day, office, scope in frame.filter(pl.col("stage") == "runoff")
+        .select("state", "date", "office", "scope")
+        .iter_rows()
+    }
     with connect() as conn:
         cs = Changeset(conn, pipeline=pipeline, version=version, summary=summary, polity="US")
 
@@ -142,6 +150,7 @@ def emit(
             for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{pipeline}.result_set"])
         }
         held: set[tuple[str, int]] = set()
+        taken: set[str] = set()
         foreign: set[UUID] = set()
         for office, year, contest_key, election_id in conn.execute(
             """select o.value, extract(year from e.date_from)::int, k.value, e.id from contest c
@@ -151,20 +160,32 @@ def emit(
         ):
             if contest_key not in ours:
                 held.add((office, year))
+                taken.add(contest_key)
                 foreign.add(election_id)
-        generals: dict[str, dict[UUID, tuple[date, date]]] = {}
-        for election_id, code, date_from, date_to in conn.execute(
-            """select distinct e.id, substr(p.iso_code, 4), e.date_from, e.date_to from election e
+        generals: dict[tuple[str, str], dict[UUID, tuple[date, date]]] = {}
+        for election_id, code, kind, date_from, date_to in conn.execute(
+            """select distinct e.id, substr(p.iso_code, 4), e.kind, e.date_from, e.date_to from election e
                join polity p on p.id = e.polity_id and p.iso_code like 'US-%%'
-               where e.kind = 'general'"""
+               where e.kind in ('general', 'primary', 'runoff')"""
         ):
             if election_id in foreign:
-                generals.setdefault(code, {})[election_id] = (date_from, date_to)
+                generals.setdefault((code, kind), {})[election_id] = (date_from, date_to)
         election_paths: dict[UUID, str] = {}
+        prior = {
+            (contest_key, ballot): person
+            for contest_key, ballot, person in conn.execute(
+                """select k.value, cd.ballot_name, cd.person_id from candidacy cd
+                   join contest_option o on o.id = cd.option_id
+                   join external_id k on k.entity_id = o.contest_id and k.scheme = 'us.contest'
+                   where k.value = any(%s)""",
+                [list(ours)],
+            )
+        }
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         slugs = {value for (value,) in conn.execute("select path from slug")}
         fptp = cs.key("us.electoral_system", "fptp")
+        two_round = cs.key("us.electoral_system", "two_round")
         if fptp in cs.minted:
             raise ValueError("the electoral system must already exist")
         minted: set[UUID] = set()
@@ -190,14 +211,17 @@ def emit(
                 name(found, text)
             return found, False
 
-        for (state, day, office, source_id), lines in frame.sort("state", "date", "office").group_by(
-            "state", "date", "office", "source", maintain_order=True
+        firsts: dict[tuple[str, int, str, str | None], UUID] = {}
+        for (state, day, office, stage, scope, source_id), lines in frame.sort("state", "date", "office").group_by(
+            "state", "date", "office", "stage", "scope", "source", maintain_order=True
         ):
             year = int(str(day)[:4])
             unit_code, area, state_name = state_units[str(state)]
             title = str(lines["title"][0])
-            key = f"{day}:{state}:{office}"
-            if (f"{office}:{state}", year) in held:
+            scope_slug = slug(str(scope).removesuffix(" Party")).removesuffix("-party") if scope else None
+            key = f"{day}:{state}:{office}" + (f":{scope_slug}" if scope else "")
+            election_key = f"{day}:{state}" if stage == "general" else f"{day}:{state}:{stage}"
+            if (key in taken) if stage != "general" else (f"{office}:{state}", year) in held:
                 print(f"{key}: held by another pipeline, skipped")
                 skipped += 1
                 continue
@@ -205,37 +229,42 @@ def emit(
             target = min(
                 (
                     (end - start, election_id)
-                    for election_id, (start, end) in generals.get(str(state), {}).items()
+                    for election_id, (start, end) in generals.get((str(state), str(stage)), {}).items()
                     if start <= on <= end
                     or (start == end and start.day == 1 and (start.year, start.month) == (on.year, on.month))
                 ),
                 default=(None, None),
             )[1]
-            own = elections.get(f"{day}:{state}")
+            own = elections.get(election_key)
             if target is not None:
                 if own is not None and own != target:
                     cs.merge(own, target)
-                elections[f"{day}:{state}"] = target
+                elections[election_key] = target
             elif own is None:
-                election = cs.key("us.election", f"{day}:{state}")
-                elections[f"{day}:{state}"] = election
+                election = cs.key("us.election", election_key)
+                elections[election_key] = election
                 cs.add(
                     "election",
                     id=election,
                     polity_id=cs.polity(f"US-{state}"),
-                    kind="general",
+                    kind=stage,
                     date_from=on,
                     date_to=on,
                     status="held",
                 )
-                name(election, f"{year} {state_name} general election")
-                path = f"us/{str(state).lower()}/{day}-general"
+                name(
+                    election,
+                    f"{on:%B} {on.day}, {year} {state_name} primary runoff election"
+                    if stage == "runoff"
+                    else f"{year} {state_name} {stage} election",
+                )
+                path = f"us/{str(state).lower()}/{day}-{stage}"
                 if path in slugs:
                     raise ValueError(f"slug taken: {path}")
                 slugs.add(path)
                 cs.add("slug", path=path, entity_id=election)
                 election_paths[election] = path
-            election = elections[f"{day}:{state}"]
+            election = elections[election_key]
             if election not in election_paths:
                 (election_paths[election],) = conn.execute(
                     "select path from slug where entity_id = %s and is_current", [election]
@@ -275,6 +304,9 @@ def emit(
                         catalog.setdefault(f"{plain(text.split()[0])}|{surname(text)}", []).append((person, seen))
                 people[str(state)] = catalog
             contest = cs.key("us.contest", key)
+            round_key = (str(state), year, str(office), scope)
+            if stage == "primary":
+                firsts[round_key] = contest
             cs.add(
                 "contest",
                 id=contest,
@@ -284,12 +316,23 @@ def emit(
                 district_area_id=area,
                 term="full",
                 magnitude=1,
-                round_number=1,
-                electoral_system_id=fptp,
+                party_scope_id=party(str(state), scope)[0],
+                round_number=2 if stage == "runoff" else 1,
+                previous_round_id=firsts.get(round_key) if stage == "runoff" else None,
+                electoral_system_id=fptp if stage == "general" else two_round,
                 default_result_kind="counted",
             )
-            name(contest, f"{year} {state_name} {title} election")
-            cs.add("slug", path=f"{election_paths[election]}/{office}", entity_id=contest)
+            name(
+                contest,
+                f"{year} {state_name} {title} election"
+                if stage == "general"
+                else f"{year} {state_name} {title} {scope} primary" + (" runoff" if stage == "runoff" else ""),
+            )
+            cs.add(
+                "slug",
+                path=f"{election_paths[election]}/{office}" + (f"-{scope_slug}" if scope else ""),
+                entity_id=contest,
+            )
             result_set = cs.key(f"{pipeline}.result_set", key)
             cs.add(
                 "result_set",
@@ -307,16 +350,19 @@ def emit(
                 cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
             totals: dict[UUID, int] = {}
             declared: UUID | None = None
+            marked: list[UUID] = []
             for candidate, party_label, votes, winner, page in (
                 lines.sort("votes", descending=True).select("name", "party", "votes", "winner", "page").iter_rows()
             ):
                 probe = f"{plain(candidate.split()[0])}|{surname(candidate)}"
                 found = {person for person, seen in people[str(state)].get(probe, []) if abs(seen - year) <= 16}
-                person = (
-                    next(iter(found))
-                    if len(found) == 1
-                    else cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
-                )
+                person = prior.get((key, candidate))
+                if person is None:
+                    person = (
+                        next(iter(found))
+                        if len(found) == 1
+                        else cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
+                    )
                 if person in cs.minted and person not in minted:
                     minted.add(person)
                     cs.add("person", id=person)
@@ -395,13 +441,19 @@ def emit(
                 totals[option] = votes
                 if winner == 1:
                     declared = option
-            cs.add(
-                "outcome",
-                result_set_id=result_set,
-                option_id=declared if declared is not None else max(totals, key=totals.__getitem__),
-                kind="elected",
-                seats=1,
-            )
+                    marked.append(option)
+            if stage == "general":
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=declared if declared is not None else max(totals, key=totals.__getitem__),
+                    kind="elected",
+                    seats=1,
+                )
+            else:
+                more = round_key in runoffs and stage == "primary"
+                for option in marked or sorted(totals, key=totals.__getitem__, reverse=True)[: 2 if more else 1]:
+                    cs.add("outcome", result_set_id=result_set, option_id=option, kind="advanced" if more else "won")
             filled += 1
         print(filled, "contests,", skipped, "skipped")
         return cs.write()
