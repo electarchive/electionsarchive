@@ -5,9 +5,10 @@ import re
 import time
 import zipfile
 from collections import Counter
-from collections.abc import Mapping
+from collections.abc import Callable, Iterator, Mapping
 from datetime import date, datetime, timedelta
 from pathlib import Path
+from typing import Any
 from uuid import UUID
 from xml.etree import ElementTree
 
@@ -21,7 +22,6 @@ from ea.store import DATA, connect
 
 SOURCE = "us.enr_clarity"
 VERSION = "1"
-PARSED = DATA / "parsed" / SOURCE
 HOST = "results.enr.clarityelections.com"
 CENSUS = "https://www2.census.gov/geo/tiger/GENZ2020/shp/cb_2020_{fips}_{layer}_500k.zip"
 LAYERS = ("place", "cousub", "unsd")
@@ -225,12 +225,12 @@ PARTY_KEYS = {"precinct-chair", "county-chair", "state-committee", "committeeman
 OFFICER_KEYS = {"judge-of-elections", "inspector-of-elections"}
 
 
-def tenants() -> list[dict[str, str]]:
+def tenants(platform: str = "clarity") -> list[dict[str, str]]:
     with portals.REGISTRY.open() as file:
         return [
             row
             for row in csv.DictReader(file)
-            if row["platform"] == "clarity" and row["status"] == "listed" and row["tenant"].startswith("https://")
+            if row["platform"] == platform and row["status"] == "listed" and row["tenant"].startswith("https://")
         ]
 
 
@@ -324,8 +324,8 @@ def _residue(text: str, *patterns: str) -> str:
     return re.sub(r"\s+", " ", FILLER.sub(" ", text)).strip()
 
 
-def _shapes(fips: str, layer: str) -> list[tuple[Mapping[str, object], str]]:
-    with zipfile.ZipFile(raw.cached(SOURCE, CENSUS.format(fips=fips, layer=layer)).path) as archive:
+def _shapes(fips: str, layer: str, source: str = SOURCE) -> list[tuple[Mapping[str, object], str]]:
+    with zipfile.ZipFile(raw.cached(source, CENSUS.format(fips=fips, layer=layer)).path) as archive:
         parts = {name.rsplit(".", 1)[1].lower(): archive.read(name) for name in archive.namelist()}
     reader = shapefile.Reader(shp=io.BytesIO(parts["shp"]), shx=io.BytesIO(parts["shx"]), dbf=io.BytesIO(parts["dbf"]))
     return [
@@ -335,18 +335,57 @@ def _shapes(fips: str, layer: str) -> list[tuple[Mapping[str, object], str]]:
     ]
 
 
-def parse() -> None:
-    registry = {row["tenant"]: row for row in tenants()}
+def _read(registry: Mapping[str, Mapping[str, str]]) -> Iterator[dict[str, Any]]:
     files: dict[tuple[str, str], tuple[int, str]] = {}
     for url in raw._index(SOURCE)[1]:
         found = re.fullmatch(r"(.+/)(\d+)/(\d+)/reports/detailxml\.zip", url)
         if found and found[1] in registry and int(found[3]) > files.get((found[1], found[2]), (0, ""))[0]:
             files[(found[1], found[2])] = (int(found[3]), url)
+    for (tenant, election), (_, link) in sorted(files.items()):
+        with zipfile.ZipFile(raw.cached(SOURCE, link).path) as archive:
+            root = ElementTree.fromstring(archive.read("detail.xml"))
+        yield {
+            "tenant": tenant,
+            "election": election,
+            "day": datetime.strptime(root.findtext("ElectionDate") or "", "%m/%d/%Y").date(),
+            "title": root.findtext("ElectionName") or "",
+            "official": False,
+            "primary": False,
+            "contests": [
+                {
+                    "key": node.get("key"),
+                    "text": node.get("text") or "",
+                    "vote_for": int(node.get("voteFor") or 1),
+                    "choices": [
+                        {
+                            "text": choice.get("text") or "",
+                            "party": choice.get("party"),
+                            "total": choice.get("totalVotes") or "0",
+                            "places": [
+                                (place.get("name") or "", place.get("votes") or "0")
+                                for kind in choice.iter("VoteType")
+                                for place in kind.iter("Precinct")
+                            ],
+                        }
+                        for choice in node.iter("Choice")
+                    ],
+                }
+                for node in root.iter("Contest")
+            ],
+        }
+
+
+def parse(
+    source: str = SOURCE,
+    platform: str = "clarity",
+    read: Callable[[Mapping[str, Mapping[str, str]]], Iterator[dict[str, Any]]] = _read,
+) -> None:
+    registry = {row["tenant"]: row for row in tenants(platform)}
     states = sorted({row["county_fips"][:2] for row in registry.values()})
     jurisdictions: dict[tuple[str, str], tuple[str, str, str]] = {}
     geoms: list[tuple[str, str, str]] = []
     for fips in states:
-        for record, geom in _shapes(fips, "cousub"):
+        for record, geom in _shapes(fips, "cousub", source):
             proper, whole = str(record["NAME"]), str(record["NAMELSAD"])
             kind = whole[len(proper) :].strip().lower()
             if kind not in ("township", "borough", "town", "city"):
@@ -354,14 +393,14 @@ def parse() -> None:
             display = f"{proper} Township" if kind == "township" else proper
             jurisdictions[("us.town", str(record["GEOID"]))] = (display, kind, proper)
             geoms.append(("us.town", str(record["GEOID"]), geom))
-        for record, geom in _shapes(fips, "place"):
+        for record, geom in _shapes(fips, "place", source):
             lsad = str(record["LSAD"])
             if lsad not in ("21", "25", "43", "47"):
                 continue
             kind = {"21": "borough", "25": "city", "43": "town", "47": "village"}[lsad]
             jurisdictions[("us.place", str(record["GEOID"]))] = (str(record["NAME"]), kind, str(record["NAME"]))
             geoms.append(("us.place", str(record["GEOID"]), geom))
-        for record, geom in _shapes(fips, "unsd"):
+        for record, geom in _shapes(fips, "unsd", source):
             jurisdictions[("us.school_district", str(record["GEOID"]))] = (
                 str(record["NAME"]),
                 "school",
@@ -414,31 +453,31 @@ def parse() -> None:
     contests: list[dict[str, object]] = []
     lines: list[dict[str, object]] = []
     skipped: Counter[str] = Counter()
-    for (tenant, election), (_, link) in sorted(files.items()):
+    for record in read(registry):
+        tenant, election, day = record["tenant"], record["election"], record["day"]
         row = registry[tenant]
         county, st = row["county_fips"], row["state"]
         county_name = row["county"].upper()
-        with zipfile.ZipFile(raw.cached(SOURCE, link).path) as archive:
-            root = ElementTree.fromstring(archive.read("detail.xml"))
-        day = datetime.strptime(root.findtext("ElectionDate") or "", "%m/%d/%Y").date()
-        title = re.sub(r"\s+", " ", root.findtext("ElectionName") or "").strip()
+        title = re.sub(r"\s+", " ", record["title"]).strip()
         heading = _plain(title)
         if re.search(r"\bTEST\b|MOCK|PRACTICE|SAMPLE", heading):
             continue
-        primary = "PRIMARY" in heading
+        primary = record["primary"] or "PRIMARY" in heading
         runoff = "RUNOFF" in heading or "RUN OFF" in heading
         heading_party = next((PARTIES[word] for word in heading.split() if word in PARTIES), None)
-        stage = "official" if re.search(r"(?<!UN)OFFICIAL|CERTIFIED|CANVASS", heading) else "preliminary"
+        stage = (
+            "official"
+            if record["official"] or re.search(r"(?<!UN)OFFICIAL|CERTIFIED|CANVASS", heading)
+            else "preliminary"
+        )
         names = sorted({entry[0] for entry in munis.get(county, [])}, key=len, reverse=True)
         school_names = sorted(schools.get(county, []), key=lambda entry: len(entry[0]), reverse=True)
-        for node in root.iter("Contest"):
-            text = re.sub(r"\s+", " ", node.get("text") or "").strip()
+        for node in record["contests"]:
+            text = re.sub(r"\s+", " ", node["text"]).strip()
             plain = _plain(text)
             plain = re.sub(rf"\b{re.escape(county_name)} COUNTYWIDE\b", "", plain).strip()
             choices = [
-                choice
-                for choice in node.iter("Choice")
-                if not VACANT.match(choice.get("text") or "") and (choice.get("totalVotes") or "0").isdigit()
+                choice for choice in node["choices"] if not VACANT.match(choice["text"]) and choice["total"].isdigit()
             ]
             if not choices:
                 continue
@@ -453,13 +492,13 @@ def parse() -> None:
             if SKIPPED.search(plain):
                 skipped["state or federal"] += 1
                 continue
-            labels = [choice.get("text") or "" for choice in choices if not WRITE_IN.match(choice.get("text") or "")]
+            labels = [choice["text"] for choice in choices if not WRITE_IN.match(choice["text"])]
             if not labels:
                 skipped["write-ins only"] += 1
                 continue
             question = bool(labels) and all(QUESTION.match(label) for label in labels)
             if primary:
-                tagged = Counter(_party(choice.get("party")) for choice in choices if choice.get("party"))
+                tagged = Counter(_party(choice["party"]) for choice in choices if choice["party"])
                 party = party or heading_party or next((key for key, _ in tagged.most_common() if key), None)
                 if party is None or question:
                     skipped["primary question" if question else "primary with no party"] += 1
@@ -490,8 +529,8 @@ def parse() -> None:
                 continue
             rows: list[dict[str, object]] = []
             for choice in choices:
-                label = re.sub(r"\s+", " ", choice.get("text") or "").strip()
-                tag = _party(choice.get("party"))
+                label = re.sub(r"\s+", " ", choice["text"]).strip()
+                tag = _party(choice["party"])
                 if prefix := re.match(r"(?:\(([RD])\)|(DEM|REP|LIB|GRN|IND))\s+(?=\S)", label):
                     tag = tag or _party(prefix[1] or prefix[2])
                     label = label[prefix.end() :]
@@ -500,32 +539,30 @@ def parse() -> None:
                     or primary
                     and party
                     and tag is None
-                    and any(_party(other.get("party")) for other in choices)
+                    and any(_party(other["party"]) for other in choices)
                 ):
                     label = "Write-ins"
-                for kind_node in choice.iter("VoteType"):
-                    for place in kind_node.iter("Precinct"):
-                        votes = place.get("votes") or "0"
-                        rows.append(
-                            {
-                                "county": county,
-                                "election": election,
-                                "contest": node.get("key"),
-                                "choice": label,
-                                "party": tag,
-                                "place": re.sub(r"\s+", " ", (place.get("name") or "").upper()).strip(),
-                                "votes": int(votes) if votes.isdigit() else 0,
-                            }
-                        )
+                for place, votes in choice["places"]:
+                    rows.append(
+                        {
+                            "county": county,
+                            "election": election,
+                            "contest": node["key"],
+                            "choice": label,
+                            "party": tag,
+                            "place": re.sub(r"\s+", " ", place.upper()).strip(),
+                            "votes": int(votes) if votes.isdigit() else 0,
+                        }
+                    )
                 rows.append(
                     {
                         "county": county,
                         "election": election,
-                        "contest": node.get("key"),
+                        "contest": node["key"],
                         "choice": label,
                         "party": tag,
                         "place": None,
-                        "votes": int(choice.get("totalVotes") or 0),
+                        "votes": int(choice["total"]),
                     }
                 )
             lines.extend(rows)
@@ -536,7 +573,7 @@ def parse() -> None:
                     "county_name": row["county"],
                     "tenant": tenant,
                     "election": election,
-                    "contest": node.get("key"),
+                    "contest": node["key"],
                     "day": day,
                     "title": title,
                     "text": text,
@@ -547,7 +584,7 @@ def parse() -> None:
                     "party": party,
                     "remainder": remainder,
                     "term": f"{NUMBERS.get(term[1], term[1])}-year term" if term else None,
-                    "magnitude": int(node.get("voteFor") or 1),
+                    "magnitude": node["vote_for"],
                     **found,
                 }
             )
@@ -628,10 +665,11 @@ def parse() -> None:
             for scheme, count in table.group_by("scheme").len().sort("len", descending=True).iter_rows()
         )
     )
-    PARSED.mkdir(parents=True, exist_ok=True)
-    table.drop("repeated").write_parquet(PARSED / "contests.parquet")
+    parsed = DATA / "parsed" / source
+    parsed.mkdir(parents=True, exist_ok=True)
+    table.drop("repeated").write_parquet(parsed / "contests.parquet")
     frame.join(table.select("county", "election", "contest"), on=["county", "election", "contest"]).write_parquet(
-        PARSED / "lines.parquet"
+        parsed / "lines.parquet"
     )
     shapes = {(scheme, code): geom for scheme, code, geom in geoms}
     used = table.filter(pl.col("scheme") != "us.county").unique(["scheme", "code"]).sort("scheme", "code")
@@ -648,7 +686,7 @@ def parse() -> None:
         ],
         schema=["scheme", "code", "display", "geom", "shares"],
         orient="row",
-    ).write_parquet(PARSED / "polities.parquet")
+    ).write_parquet(parsed / "polities.parquet")
 
 
 def _prefix(heading: str, plain: str, names: list[str], school_names: list[tuple[str, str]]) -> str | None:
@@ -887,12 +925,19 @@ def _county(st: str, county: str, key: str, office: str, body: bool, seat: str |
     }
 
 
-def emit() -> Path:
-    contests = pl.read_parquet(PARSED / "contests.parquet")
-    lines = pl.read_parquet(PARSED / "lines.parquet")
+def emit(
+    source: str = SOURCE,
+    platform: str = "clarity",
+    owns: Callable[[str, str], bool] = lambda link, tenant: link.startswith(tenant) and link.endswith("detailxml.zip"),
+) -> Path:
+    parsed = DATA / "parsed" / source
+    listed = tenants(platform)
+    county_names = {row["county_fips"]: row["county"].upper() for row in listed}
+    contests = pl.read_parquet(parsed / "contests.parquet")
+    lines = pl.read_parquet(parsed / "lines.parquet")
     made = {
         (scheme, code): (display, geom, json.loads(shares))
-        for scheme, code, display, geom, shares in pl.read_parquet(PARSED / "polities.parquet").iter_rows()
+        for scheme, code, display, geom, shares in pl.read_parquet(parsed / "polities.parquet").iter_rows()
     }
     sizes = (
         lines.filter(pl.col("place").is_null())
@@ -938,7 +983,7 @@ def emit() -> Path:
                    join external_id x on x.entity_id = coalesce(c.office_id, c.body_id)
                      and x.scheme in ('us.office', 'us.body')
                    where split_part(x.value, ':', 1) = any(%s) and g.pipeline <> %s""",
-                [states, SOURCE],
+                [states, source],
             ).fetchall()
         )
         asked = set(
@@ -949,7 +994,7 @@ def emit() -> Path:
                    join changeset g on g.id = r.changeset_id
                    join area_code a on a.area_id = c.district_area_id
                    where c.kind = 'ballot_question' and g.pipeline <> %s and left(a.code, 2) = any(%s)""",
-                [SOURCE, fips],
+                [source, fips],
             ).fetchall()
         )
         held = {
@@ -959,7 +1004,7 @@ def emit() -> Path:
                    join result_set r on r.contest_id = x.entity_id
                    join changeset g on g.id = r.changeset_id
                    where x.scheme = 'us.contest' and g.pipeline <> %s and split_part(x.value, ':', 2) = any(%s)""",
-                [SOURCE, states],
+                [source, states],
             ).fetchall()
         }
         precincts: dict[str, UUID] = dict(
@@ -988,7 +1033,7 @@ def emit() -> Path:
         )
         cs = Changeset(
             conn,
-            pipeline=SOURCE,
+            pipeline=source,
             version=VERSION,
             summary="County, municipal, school, special district, and party offices and local questions from county election night reporting sites",
             polity="US",
@@ -1004,10 +1049,10 @@ def emit() -> Path:
         census = cs.source("U.S. Census Bureau", "Cartographic Boundary Files, 1:500,000")
         for code in fips:
             for layer in LAYERS:
-                cs.artifact(raw.cached(SOURCE, CENSUS.format(fips=code, layer=layer)), census)
+                cs.artifact(raw.cached(source, CENSUS.format(fips=code, layer=layer)), census)
         sources: dict[str, UUID] = {}
         publishers: dict[str, str] = {}
-        for row in tenants():
+        for row in listed:
             county = row["county_fips"]
             if county not in counties_listed:
                 continue
@@ -1023,15 +1068,15 @@ def emit() -> Path:
                     url=row["tenant"],
                     license="Public record",
                 )
-        for link in {raw_link for raw_link in raw._index(SOURCE)[1] if raw_link.endswith("detailxml.zip")}:
-            county = next((row["county_fips"] for row in tenants() if link.startswith(row["tenant"])), None)
+        for link in raw._index(source)[1]:
+            county = next((row["county_fips"] for row in listed if owns(link, row["tenant"])), None)
             if county in sources:
-                cs.artifact(raw.cached(SOURCE, link), sources[county])
+                cs.artifact(raw.cached(source, link), sources[county])
         used = set(contests.select("scheme", "code").unique().iter_rows())
         for (scheme, code), (display, geom, _) in sorted(made.items()):
             if f"{scheme}:{code}" in polities or (scheme, code) not in used:
                 continue
-            st = next(row["state"] for row in tenants() if row["county_fips"][:2] == code[:2])
+            st = next(row["state"] for row in listed if row["county_fips"][:2] == code[:2])
             prefix = {
                 "us.town": "town",
                 "us.place": "place",
@@ -1350,7 +1395,7 @@ def emit() -> Path:
             cs.add("slug", path=contest_path, entity_id=contest)
             emitted.append(contest)
             done[contest_key] = contest
-            result_set = cs.key(f"{SOURCE}.result_set", contest_key)
+            result_set = cs.key(f"{source}.result_set", contest_key)
             main = max(carried, key=lambda county: shares.get(county, 0.0))
             cs.add(
                 "result_set",
@@ -1379,7 +1424,7 @@ def emit() -> Path:
                     .unique()
                     .to_list()
                 )
-                jurisdiction = registry_name(county)
+                jurisdiction = county_names[county]
                 precise[county] = bool(balanced[county]) and (
                     prefix not in foreign
                     or all(f"{prefix}:{jurisdiction}:{place_name}" in precincts for place_name in names)
@@ -1437,7 +1482,7 @@ def emit() -> Path:
                     continue
                 else:
                     ballot = _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", choice))
-                    person = cs.key(f"{SOURCE}.person", f"{st}:{code}:{slug(ballot)}")
+                    person = cs.key(f"{source}.person", f"{st}:{code}:{slug(ballot)}")
                     if person not in persons:
                         persons.add(person)
                         if person in cs.minted:
@@ -1495,7 +1540,7 @@ def emit() -> Path:
                     ):
                         values.append((str(result_set), str(target), str(options[same]), votes))
                     continue
-                prefix = f"{day.year}:{st}:{county}:{registry_name(county)}"
+                prefix = f"{day.year}:{st}:{county}:{county_names[county]}"
                 for same, place_name, votes in (
                     part.filter(pl.col("place").is_not_null())
                     .group_by("same", "place")
@@ -1519,11 +1564,11 @@ def emit() -> Path:
                 join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
                 where g.pipeline = %s and r.status = 'active' and r.contest_id <> all(%s)
                   and split_part(x.value, ':', 2) = any(%s)""",
-            [SOURCE, emitted, states],
+            [source, emitted, states],
         ).fetchall():
             cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn")
             cs.add("note", entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
-        states_of = {row["county_fips"]: row["state"] for row in tenants()}
+        states_of = {row["county_fips"]: row["state"] for row in listed}
         for place_code, (county, day) in minted.items():
             cs.add(
                 "reporting_unit",
@@ -1556,7 +1601,3 @@ def emit() -> Path:
             ),
         )
         return cs.write()
-
-
-def registry_name(county: str) -> str:
-    return next(row["county"] for row in tenants() if row["county_fips"] == county).upper()
