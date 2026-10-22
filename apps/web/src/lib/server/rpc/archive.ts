@@ -9055,7 +9055,12 @@ export const polities = {
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
             c.kind = 'list_allocation' as "isList",
             e.date_from as date, ${CYCLE} as year, a.k as area,
-            case when e.polity_id = ${input.id}::uuid then e.id
+            case when g.polity_id = ${input.id}::uuid and g.id <> e.id and exists (
+                select from contest rc join election r on r.id = rc.election_id
+                where r.parent_id = g.id and r.id <> e.id and rc.round_number > 1
+                  and coalesce(rc.office_id, rc.body_id) = coalesce(c.office_id, c.body_id)
+              ) then g.id
+              when e.polity_id = ${input.id}::uuid then e.id
               when g.polity_id = ${input.id}::uuid then g.id
               else (
                 select n.id from election n

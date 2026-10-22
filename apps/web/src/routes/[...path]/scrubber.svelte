@@ -181,6 +181,77 @@
       (entry) => entry.map != null && entry.places != null,
     ) ?? null,
   );
+  const places = $derived.by(() => {
+    const own = race?.places;
+    if (race == null || own == null || race.count <= 1) {
+      return own ?? null;
+    }
+    const later = (hub.data?.races ?? [])
+      .filter(
+        (other) =>
+          other.name === race.name &&
+          (other.round ?? 1) > (race.round ?? 1) &&
+          other.places?.level === own.level,
+      )
+      .toSorted((a, b) => (a.round ?? 1) - (b.round ?? 1));
+    const finals = new Map(
+      later.flatMap((other) =>
+        (other.places?.rows ?? []).map((row) => [
+          row.k,
+          { row, legend: other.places?.legend ?? [] },
+        ]),
+      ),
+    );
+    if (finals.size === 0) {
+      return own;
+    }
+    const legend = [
+      ...own.legend,
+      ...Map.groupBy(
+        later.flatMap((other) => other.places?.legend ?? []),
+        (item) => item.key,
+      )
+        .values()
+        .flatMap((items) =>
+          items[0] == null ||
+          own.legend.some((item) => item.key === items[0]?.key)
+            ? []
+            : [items[0]],
+        ),
+    ];
+    const at = new Map(legend.map((item, spot) => [item.key, spot]));
+    return {
+      ...own,
+      legend,
+      districts: undefined,
+      rows: own.rows.map((row) => {
+        const final = finals.get(row.k);
+        if (final == null) {
+          return {
+            ...row,
+            shares: legend.map((_, spot) => row.shares[spot] ?? 0),
+          };
+        }
+        const shares = legend.map(() => 0);
+        for (const [spot, item] of final.legend.entries()) {
+          shares[at.get(item.key) ?? 0] = final.row.shares[spot] ?? 0;
+        }
+        return {
+          ...row,
+          turnout: final.row.turnout,
+          valid: final.row.valid,
+          shares,
+          leader:
+            final.row.leader == null
+              ? null
+              : (at.get(final.legend[final.row.leader]?.key ?? "") ?? null),
+          margin: final.row.margin,
+          earlier: null,
+          prior: null,
+        };
+      }),
+    };
+  });
   const isStale = $derived(
     hub.isPlaceholderData ||
       located.isPlaceholderData ||
@@ -501,22 +572,20 @@
             {/if}
           </div>
         {/if}
-        {#if race?.map != null && race.places != null}
+        {#if race?.map != null && places != null}
           {#key `${race.map.tiles}:${race.map.own?.tiles ?? ""}`}
             <PlaceMap
-              places={race.places}
-              colors={race.places.legend.map((item) =>
-                swatch(item.color, item.key),
-              )}
+              {places}
+              colors={places.legend.map((item) => swatch(item.color, item.key))}
               tiles={race.map.tiles}
               own={race.map.own}
               nested={race.map.nested}
               frames={race.map.frames}
               isApproximate={race.map.isApproximate}
               sources={race.map.credits}
-              noun={race.places.levels[0]?.noun ?? ""}
+              noun={places.levels[0]?.noun ?? ""}
               votes={m.col_votes()}
-              names={race.places.legend.map((item) =>
+              names={places.legend.map((item) =>
                 item.person == null ? (item.short ?? item.label) : item.label,
               )}
               levels={[]}
