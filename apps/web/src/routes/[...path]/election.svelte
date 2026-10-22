@@ -1231,7 +1231,7 @@
       )}
       aria-hidden="true"
     >
-      {#each bar.isCount ? bar.parts : shown as part, at (part.key)}
+      {#each bar.isCount ? [shown[0], ...bar.parts.filter((part) => !shown.includes(part)), shown[1]].filter((part) => part != null) : shown as part, at (part.key)}
         <span
           class={cn("block block-full", {
             "ms-auto": !bar.isCount && at === 1,

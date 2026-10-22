@@ -59,7 +59,7 @@
       {/each}
     </span>
     <span class="relative flex overflow-hidden bg-muted block-3">
-      {#each race.results as row (row.key)}
+      {#each [race.results[0], ...race.results.slice(2), race.results[1]].filter((row) => row != null) as row (row.key)}
         <span
           style:inline-size="{(isSeated
             ? (row.seats ?? 0) / race.contested
