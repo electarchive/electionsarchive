@@ -1052,7 +1052,7 @@
   "coverage_reason_coarse": "County results only",
   "coverage_reason_coarse_def": "Results by county or town, but not yet by precinct.",
   "coverage_reason_partial": "Some counties missing",
-  "coverage_reason_partial_def": "County results that cover less than 90% of the state's counties.",
+  "coverage_reason_partial_def": "Results cover fewer than 90% of a state's counties or the sum of results is less than the official total.",
   "coverage_reason_totals": "Totals only",
   "coverage_reason_totals_def": "The statewide or district total, with no breakdown by county.",
   "coverage_reason_bare": "No vote counts",
