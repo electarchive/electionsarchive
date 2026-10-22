@@ -11682,11 +11682,14 @@ export const search = {
       }>(sql`
         with q as (select lower(unaccent(${q})) as t),
         terms as (
-          select to_tsquery('simple', string_agg(quote_literal(w) || ':*', ' & ')) as tq
-          from q, regexp_split_to_table(q.t, '\\s+') w where w <> ''
+          select to_tsquery('simple', string_agg(quote_literal(w) || case when n = last then ':*' else '' end, ' & ' order by n)) as tq
+          from (
+            select w, n, max(n) over () as last
+            from q, regexp_split_to_table(q.t, '\\s+') with ordinality as t(w, n) where w <> ''
+          ) words
         ),
         hits as (
-          select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + 0.5 + 0.5 * word_similarity(q.t, d.text) + d.rank_boost * 0.15 as score, true as matched,
+          select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + 0.5 + 0.5 * word_similarity(q.t, d.text) + 0.5 * (d.tsv @@ plainto_tsquery('simple', q.t))::int + d.rank_boost * 0.15 as score, true as matched,
             d.tsv @@ plainto_tsquery('simple', q.t) as exact
           from search_document d, q, terms
           where d.tsv @@ terms.tq
