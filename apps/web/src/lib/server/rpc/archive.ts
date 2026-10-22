@@ -3862,15 +3862,15 @@ export const contests = {
         const found = await db.execute<{ noun: string }>(sql`
           select sc.noun
           from result_set rs
-          cross join lateral (
-            select ru.scheme_code from result_value x join reporting_unit ru on ru.k = x.unit_k
-            where x.result_set_k = rs.k and ru.area_relation = 'within'
-              and ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
-            limit 1
-          ) u
-          join scheme sc on sc.code = u.scheme_code
+          join result_value x on x.result_set_k = rs.k
+          join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within'
+          join scheme sc on sc.code = ru.scheme_code
           where rs.contest_id = ${contest.id}::uuid and rs.status = 'active'
+            and ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
             and sc.rank > (select rank from scheme where code = ${grid.level})
+          group by sc.noun, sc.rank
+          having count(distinct ru.k) > ${grid.rows.length}
+          order by sc.rank desc
           limit 1
         `);
         return found.rows[0]?.noun ?? null;

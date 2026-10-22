@@ -2204,7 +2204,9 @@
     )}
     {const publishers = $derived(
       credited.filter(
-        (credit) => !notices.some((notice) => notice.includes(credit)),
+        (credit) =>
+          !notices.includes(credit) &&
+          !credited.some((other) => other !== credit && other.includes(credit)),
       ),
     )}
     <div class="grid gap-0.5 px-1 text-xs text-muted-foreground">
