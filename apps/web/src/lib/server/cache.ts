@@ -5,7 +5,15 @@ import { db } from "#lib/server/db/index.js";
 const LIMIT = 800;
 const CHECK = 5000;
 
-const entries = new Map<string, Promise<unknown>>();
+const entries = new Map<
+  string,
+  {
+    value: Promise<unknown>;
+    version: string;
+    isSettled: boolean;
+    isRenewing: boolean;
+  }
+>();
 const procedures = new WeakMap<object, number>();
 const state: {
   version: string;
@@ -21,15 +29,31 @@ async function refresh() {
         count(*) filter (where status = 'rejected'), (select built_at from coverage_build)) as version
       from changeset
     `);
-    const version = result.rows[0]?.version ?? "";
-    if (version !== state.version) {
-      entries.clear();
-      state.version = version;
-    }
+    state.version = result.rows[0]?.version ?? "";
     state.checked = Date.now();
   } finally {
     state.checking = null;
   }
+}
+
+function store<T>(key: string, compute: () => Promise<T>) {
+  const entry = {
+    value: compute() as Promise<unknown>,
+    version: state.version,
+    isSettled: false,
+    isRenewing: false,
+  };
+  void (async () => {
+    try {
+      await entry.value;
+      entry.isSettled = true;
+    } catch {
+      if (entries.get(key) === entry) {
+        entries.delete(key);
+      }
+    }
+  })();
+  return entry;
 }
 
 export async function remember<T>(key: string, compute: () => Promise<T>) {
@@ -41,26 +65,31 @@ export async function remember<T>(key: string, compute: () => Promise<T>) {
   if (hit != null) {
     entries.delete(key);
     entries.set(key, hit);
-    return hit as Promise<T>;
-  }
-  const pending = compute();
-  entries.set(key, pending);
-  void (async () => {
-    try {
-      await pending;
-    } catch {
-      if (entries.get(key) === pending) {
-        entries.delete(key);
-      }
+    if (hit.version !== state.version && hit.isSettled && !hit.isRenewing) {
+      hit.isRenewing = true;
+      const next = store(key, compute);
+      void (async () => {
+        try {
+          await next.value;
+          if (entries.get(key) === hit) {
+            entries.set(key, next);
+          }
+        } catch {
+          hit.isRenewing = false;
+        }
+      })();
     }
-  })();
+    return hit.value as Promise<T>;
+  }
+  const entry = store(key, compute);
+  entries.set(key, entry);
   if (entries.size > LIMIT) {
     const oldest = entries.keys().next().value;
     if (oldest != null) {
       entries.delete(oldest);
     }
   }
-  return pending;
+  return entry.value as Promise<T>;
 }
 
 export const os = base.use(async ({ next, procedure }, input) => {
