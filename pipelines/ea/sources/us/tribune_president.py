@@ -480,12 +480,7 @@ def note(year: int, volume: int) -> str:
     )
 
 
-CAVEATS = {
-    1884: (
-        " The sum of the printed state lines for Cleveland is 300 below the printed Total row and was not reconciled; "
-        "the other three columns match it, with the Blaine total read as 4,851,981 from a smudged glyph."
-    ),
-}
+CAVEATS: dict[int, str] = {}
 DEMOTED = {(1872, "MN"), (1872, "NE"), (1872, "TN"), (1880, "LA"), (1880, "NV"), (1880, "TX")}
 HELD = (
     "The printed figure for a top-two candidate differs from Wikipedia's by more than 1 percent and no second source "
@@ -1542,7 +1537,7 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1884, "MD", "Butler"): 531,
     (1884, "MD", "St. John"): 2794,
     (1884, "MA", "Blaine"): 146724,
-    (1884, "MA", "Cleveland"): 122181,
+    (1884, "MA", "Cleveland"): 122481,
     (1884, "MA", "Butler"): 24433,
     (1884, "MA", "St. John"): 10026,
     (1884, "MI", "Blaine"): 192669,
