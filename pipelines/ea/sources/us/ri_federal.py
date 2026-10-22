@@ -1,7 +1,7 @@
 import html
 import json
 import re
-from datetime import datetime
+from datetime import date, datetime
 from pathlib import Path
 
 import httpx
@@ -39,6 +39,7 @@ MISSING = {("2020/statewide_primary", town) for town in ("barrington", "warren",
 PARTIES = {"DEM": "democratic", "REP": "republican"}
 PUBLISHER = "Rhode Island Board of Elections"
 TITLE = "Election results by city and town"
+ARCHIVE = "https://web.archive.org/web/2009id_/http://www.elections.ri.gov/elections/results/2008/presidential_preference_primary/"
 
 
 def fetch() -> None:
@@ -50,18 +51,48 @@ def fetch() -> None:
                 if error.response.status_code != 403:
                     raise
                 print("no file:", folder, town)
+    for town in [*TOWNS, "statewide"]:
+        raw.fetch(
+            SOURCE, ARCHIVE + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php"), suffix=".html"
+        )
 
 
 def parse() -> None:
     rows = []
-    for folder in FOLDERS:
+    for folder in [*FOLDERS, "2008/presidential_preference_primary"]:
         totals: dict[tuple[str, str, str], int] = {}
         statewide: dict[tuple[str, str, str], int] = {}
         for town in [*TOWNS, "statewide"]:
             if (folder, town) in MISSING:
                 continue
-            data = json.loads(raw.cached(SOURCE, f"{BASE}{folder}/{town}.json").path.read_text())
-            day = datetime.strptime(data["election_date"], "%B %d, %Y").date()
+            if folder in FOLDERS:
+                data = json.loads(raw.cached(SOURCE, f"{BASE}{folder}/{town}.json").path.read_text())
+                day = datetime.strptime(data["election_date"], "%B %d, %Y").date()
+            else:
+                page = raw.cached(
+                    SOURCE, ARCHIVE + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php")
+                )
+                lines = [
+                    line.strip()
+                    for line in html.unescape(
+                        re.sub(r"<[^>]+>", "\n", page.path.read_text(errors="replace"))
+                    ).splitlines()
+                    if line.strip()
+                ]
+                day, data, current = date(2008, 3, 4), {"contests": []}, None
+                for n, line in enumerate(lines):
+                    if line.endswith("PRESIDENTIAL CANDIDATE"):
+                        current = {"name": line, "candidates": []}
+                        data["contests"].append(current)
+                    elif line.startswith("DELEGATES") or line == "Contact Us":
+                        current = None
+                    elif (
+                        current is not None
+                        and line not in ("Candidate", "Total votes")
+                        and n + 1 < len(lines)
+                        and re.fullmatch(r"[\d,]+", lines[n + 1])
+                    ):
+                        current["candidates"].append({"name": line, "votes": lines[n + 1]})
             for contest in data["contests"]:
                 name = contest["name"].upper()
                 if "GENERAL ASSEMBLY" in name or "DELEGATE" in name:
@@ -147,7 +178,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Rhode Island's 2012 to 2022 president, U.S. Senate, and House primaries by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
+            summary="Rhode Island's 2008 to 2022 president, U.S. Senate, and House primaries by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
             polity="US-RI",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -165,6 +196,11 @@ def emit() -> Path:
                 if (folder, town) in MISSING:
                     continue
                 cs.artifact(raw.cached(SOURCE, f"{BASE}{folder}/{town}.json"), source)
+        for town in [*TOWNS, "statewide"]:
+            cs.artifact(
+                raw.cached(SOURCE, ARCHIVE + ("statewidesummary.php" if town == "statewide" else f"{town}/index.php")),
+                source,
+            )
         frame = pl.read_parquet(PARSED / "counties.parquet")
         medsl.attach(cs, conn, frame, {"RI": source}, strict=True)
         staged = {str(row["id"]) for row in cs.rows.get("result_set", [])}
