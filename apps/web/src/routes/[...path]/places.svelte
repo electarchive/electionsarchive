@@ -117,6 +117,17 @@
     }
     return size === 0 ? null : lead.slice(0, size).join(", ");
   });
+  const tail = $derived.by(() => {
+    const noun = places.levels.find(
+      (level) => level.code === places.level,
+    )?.noun;
+    const end = ` ${noun}`.toLowerCase();
+    return noun?.includes(" ") === true &&
+      listed.length > 1 &&
+      listed.every((row) => row.name.toLowerCase().endsWith(end))
+      ? end.length
+      : 0;
+  });
   const first = $derived(places.legend[0]);
   const second = $derived(places.legend[1]);
   const moves = $derived(
@@ -201,7 +212,9 @@
             ? entry.row.name
                 .slice(prefix.length)
                 .replace(" congressional district", " district")
-            : entry.row.name;
+            : tail > 0
+              ? entry.row.name.slice(0, -tail)
+              : entry.row.name;
         return {
           ...entry.row,
           move: entry.move,
