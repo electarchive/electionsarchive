@@ -66,6 +66,19 @@
     annulled: m.election_annulled,
   };
 
+  const ordered = $derived.by(() => {
+    const decisive = election.races.findIndex(
+      (race) =>
+        race.path != null && race.path === election.races[0]?.runoff?.path,
+    );
+    return decisive < 1
+      ? election.races
+      : [
+          election.races[decisive],
+          ...election.races.filter((_, spot) => spot !== decisive),
+        ].filter((race) => race != null);
+  });
+
   const stages = $derived(
     election.elections
       .filter((child) => child.isStage)
@@ -92,7 +105,7 @@
 
   const unplaced = $derived.by(() => {
     const placed = new Set(
-      election.races.flatMap((race) => [
+      ordered.flatMap((race) => [
         ...(race.places?.rows.flatMap((row) => row.path ?? []) ?? []),
         ...(race.path == null ? [] : [race.path]),
       ]),
@@ -118,10 +131,10 @@
   );
 
   const bodies = $derived([
-    ...new Set(election.races.flatMap((race) => race.body ?? [])),
+    ...new Set(ordered.flatMap((race) => race.body ?? [])),
   ]);
   const swings = createQueries(() => ({
-    queries: election.races.map((race, index) => {
+    queries: ordered.map((race, index) => {
       const path = race.path ?? "";
       const by = race.places?.level;
       return {
@@ -161,7 +174,7 @@
   const regional = $state<Record<number, boolean>>({});
   const firstRound = $state<Record<number, boolean>>({});
   const regionals = createQueries(() => ({
-    queries: election.races.map((race, index) => ({
+    queries: ordered.map((race, index) => ({
       ...orpc.elections.regional.queryOptions({
         input: { id, contest: race.sample ?? "" },
       }),
@@ -234,7 +247,7 @@
   );
 
   const chamber = $derived.by(() => {
-    const entries = election.races
+    const entries = ordered
       .filter((race) => !race.isOffice && race.size != null)
       .map((race) => {
         let filled = 0;
@@ -274,7 +287,7 @@
   const named = (row: { label: string; short: string | null }) =>
     row.label.length > 28 ? (row.short ?? row.label) : row.label;
   const races = $derived(
-    election.races.map((race) => {
+    ordered.map((race) => {
       const winners = race.results.filter((row) => (row.seats ?? 0) > 0);
       let total = 0;
       for (const row of winners) {
@@ -389,7 +402,7 @@
       const top = whole?.parts.toSorted((a, b) => b.value - a.value) ?? [];
       const isRound =
         race.round != null &&
-        election.races.some(
+        ordered.some(
           (other) =>
             other !== race &&
             other.name === race.name &&
@@ -397,7 +410,7 @@
         );
       const isSplit =
         race.count > 1 &&
-        election.races.some(
+        ordered.some(
           (other) =>
             other !== race && other.name === race.name && other.count === 1,
         );
@@ -415,7 +428,7 @@
         race.places != null
       ) {
         const level = race.places.level;
-        const later = election.races
+        const later = ordered
           .filter(
             (other) =>
               other.name === race.name &&
@@ -599,7 +612,7 @@
             : isSplit
               ? m.race_split({ name: race.name, noun })
               : race.isRemainder &&
-                  election.races.some(
+                  ordered.some(
                     (other) => other !== race && other.name === race.name,
                   )
                 ? m.race_special({ name: race.name })
@@ -1233,7 +1246,7 @@
     {id}
     {parts}
     noun={partNoun ?? ""}
-    race={election.races.find((race) => race.electors != null)?.name ?? null}
+    race={ordered.find((race) => race.electors != null)?.name ?? null}
   />
 {:else if parts.length >= 40}
   <Winners {id} {parts} />
