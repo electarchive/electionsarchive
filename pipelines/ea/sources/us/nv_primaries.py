@@ -12,7 +12,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.nv_primaries"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{}id_/{}"
 BASE = "http://www.nvsos.gov/SOSelectionPages/results/"
@@ -26,7 +26,13 @@ FILES = [
     (date(2012, 6, 12), "2013", BASE + "2012STatewidePrimary/ElectionSummary.aspx"),
     (date(2014, 6, 10), "2015", BASE + "2014STatewidePrimary/ElectionSummary.aspx"),
     (date(2016, 6, 14), "2017", BASE + "2016STatewidePrimary/ElectionSummary.aspx"),
+    (date(2022, 6, 14), "", "https://www.nvsos.gov/SOSelectionPages/results/2022StateWidePrimary/ElectionSummary.aspx"),
+    (date(2024, 2, 6), "", "https://www.nvsos.gov/SOSelectionPages/results/2024PPP/ElectionSummary.aspx"),
 ]
+INBOX = {
+    "2022StateWidePrimary": "nv-2022-primary-election-summary.html",
+    "2024PPP": "nv-2024-presidential-primary-election-summary.html",
+}
 COUNTIES = {
     "CARSON CITY": "32510",
     "CHURCHILL": "32001",
@@ -58,13 +64,17 @@ PUBLISHER = "Nevada Secretary of State"
 TITLE = "Election results: primary election summary by county"
 
 
+def address(stamp: str, url: str) -> str:
+    return WAYBACK.format(stamp, url) if stamp else url
+
+
 def fetch() -> None:
     for _, stamp, url in FILES:
-        target = WAYBACK.format(stamp, url)
+        target = address(stamp, url)
         try:
             raw.cached(SOURCE, target)
         except LookupError:
-            body = subprocess.run(
+            body = (DATA / "inbox" / "manual" / "MF-024" / INBOX[url.split("/")[-2]]).read_bytes() if not stamp else subprocess.run(
                 ["curl", "-sfL", "--resolve", "web.archive.org:443:207.241.237.2", "-A", raw.USER_AGENT, target],
                 capture_output=True,
                 check=True,
@@ -77,7 +87,7 @@ def fetch() -> None:
 def parse() -> None:
     rows = []
     for day, stamp, url in FILES:
-        text = raw.cached(SOURCE, WAYBACK.format(stamp, url)).path.read_text(encoding="utf-8", errors="ignore")
+        text = raw.cached(SOURCE, address(stamp, url)).path.read_text(encoding="utf-8", errors="ignore")
         text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.S)
         text = re.sub(r"(\|\s*)+", "|", html.unescape(re.sub(r"<[^>]+>", "|", text)))
         tokens = [token.strip() for token in text.split("|")]
@@ -93,7 +103,7 @@ def parse() -> None:
                 chamber, number = "senate", None
             elif re.match(r"(U\.S\. )?REPRESENTATIVE IN CONGRESS", title) and district:
                 chamber, number = "house", int(district[1])
-            elif re.match(r"PRESIDENT", title):
+            elif re.match(r"(UNITED STATES )?PRESIDENT", title):
                 chamber, number = "president", None
             else:
                 continue
@@ -137,7 +147,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Nevada's U.S. Senate, House, and presidential primaries by county from the Secretary of State's election summary pages",
+            summary="Nevada's 2000-2016 and 2022 U.S. Senate and House primaries and the 2024 presidential primary by county from the Secretary of State's election summary pages",
             polity="US-NV",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -151,6 +161,6 @@ def emit() -> Path:
             license="Public record",
         )
         for _, stamp, url in FILES:
-            cs.artifact(raw.cached(SOURCE, WAYBACK.format(stamp, url)), source)
+            cs.artifact(raw.cached(SOURCE, address(stamp, url)), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"NV": source}, strict=True)
         return cs.write()
