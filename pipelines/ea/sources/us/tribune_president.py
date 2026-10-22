@@ -350,6 +350,23 @@ PRINTS = {
         ],
         scales=((2, "7"), (3, "7"), (2, "8"), (4, "7")),
     ),
+    "v85": dict(
+        mask="v85",
+        page=106,
+        turned=True,
+        sha="87164b718e158e1902728a93493d3af8e4ac286073f638e739791a346ced23d6",
+        rows=ORDER,
+        y0=354.5,
+        pitch=26.84,
+        total=1400,
+        cols=[
+            (950, 1058),
+            (1066, 1175),
+            (1182, 1270),
+            (1280, 1368),
+        ],
+        scales=((2, "7"), (3, "7"), (4, "7")),
+    ),
     "om254": dict(
         mask="om254",
         page=254,
@@ -453,7 +470,7 @@ NOTE = (
 
 def note(year: int, volume: int) -> str:
     return (
-        f"The state's popular vote for president in {year} as printed in {tribune_almanac.TITLES[volume]}, which "
+        f"The state's popular vote for president in {year} as printed in {TITLES[volume]}, which "
         "compiles the states' official returns and is a compilation rather than a certified canvass. Tickets that "
         "Wikipedia's results-by-state table names keep that table's candidates; the printed lines are carried "
         "and the total is their sum. Each digitized number was read from the printed page by cell OCR, checked "
@@ -463,6 +480,12 @@ def note(year: int, volume: int) -> str:
     )
 
 
+CAVEATS = {
+    1884: (
+        " The sum of the printed state lines for Cleveland is 300 below the printed Total row and was not reconciled; "
+        "the other three columns match it, with the Blaine total read as 4,851,981 from a smudged glyph."
+    ),
+}
 DEMOTED = {(1872, "MN"), (1872, "NE"), (1872, "TN"), (1880, "LA"), (1880, "NV"), (1880, "TX")}
 HELD = (
     "The printed figure for a top-two candidate differs from Wikipedia's by more than 1 percent and no second source "
@@ -554,7 +577,7 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1836,)
+YEARS = (1884,)
 WHIG_LABEL = "Whig candidates"
 WHIG_NOTE = (
     'The almanac prints the Whig vote as one line, "Harrison etc.", so the Whig tickets of Wikipedia\'s table '
@@ -577,6 +600,7 @@ ELECTION_DAYS = {
     1872: "1872-11-05",
     1876: "1876-11-07",
     1880: "1880-11-02",
+    1884: "1884-11-04",
 }
 YEAR_PRINT = {
     1856: "v65",
@@ -584,6 +608,7 @@ YEAR_PRINT = {
     1864: "v65",
     1852: "v61",
     1868: "v69",
+    1884: "v85",
     1848: "om254",
     1844: "om254",
     1840: "om254",
@@ -592,7 +617,12 @@ YEAR_PRINT = {
     1828: "om254t",
     1824: "om254t",
 }
-PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
+V81_YEARS = (1872, 1876, 1880)
+URLS = {year: volume[0] for year, volume in tribune_almanac.VOLUMES.items()} | {
+    1884: "https://archive.org/download/vol1885tribuneal00unse/vol1885tribuneal00unse.pdf"
+}
+TITLES = tribune_almanac.TITLES | {1884: "The Tribune Almanac and Political Register for 1885"}
+PRINT_VOLUME = {"v85": 1884, "v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
 PRINT_COLUMNS = {
     "v65": {
         0: (1864, "Lincoln"),
@@ -609,6 +639,12 @@ PRINT_COLUMNS = {
         7: (1852, "Scott"),
         8: (1852, "Pierce"),
         9: (1852, "Hale"),
+    },
+    "v85": {
+        0: (1884, "Blaine"),
+        1: (1884, "Cleveland"),
+        2: (1884, "Butler"),
+        3: (1884, "St. John"),
     },
     "v69": {
         0: (1868, "Grant"),
@@ -653,6 +689,10 @@ CANDIDATES = {
     "McClellan": ("George B. McClellan (Democratic)", "democraticparty"),
     "Grant": ("Ulysses S. Grant (Republican)", "republicanparty"),
     "Seymour": ("Horatio Seymour (Democratic)", "democraticparty"),
+    "Blaine": ("James G. Blaine (Republican)", "republicanparty"),
+    "Cleveland": ("Grover Cleveland (Democratic)", "democraticparty"),
+    "Butler": ("Benjamin F. Butler (Greenback)", "greenbackparty"),
+    "St. John": ("John P. St. John (Prohibition)", "prohibitionparty"),
     "Taylor": ("Zachary Taylor (Whig)", "whigparty"),
     "Cass": ("Lewis Cass (Democratic)", "democraticparty"),
     "Van Buren": ("Martin Van Buren (Free Soil)", "freesoilparty"),
@@ -1442,6 +1482,140 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1824, "VA", "Jackson"): 2861,
     (1824, "VA", "Crawford"): 8489,
     (1824, "VA", "Clay"): 416,
+    (1884, "AL", "Blaine"): 59591,
+    (1884, "AL", "Cleveland"): 93951,
+    (1884, "AL", "Butler"): 873,
+    (1884, "AL", "St. John"): 612,
+    (1884, "AR", "Blaine"): 50895,
+    (1884, "AR", "Cleveland"): 72927,
+    (1884, "AR", "Butler"): 1847,
+    (1884, "CA", "Blaine"): 102416,
+    (1884, "CA", "Cleveland"): 89288,
+    (1884, "CA", "Butler"): 2017,
+    (1884, "CA", "St. John"): 2920,
+    (1884, "CO", "Blaine"): 36290,
+    (1884, "CO", "Cleveland"): 27723,
+    (1884, "CO", "Butler"): 1958,
+    (1884, "CO", "St. John"): 761,
+    (1884, "CT", "Blaine"): 65923,
+    (1884, "CT", "Cleveland"): 67199,
+    (1884, "CT", "Butler"): 1688,
+    (1884, "CT", "St. John"): 2305,
+    (1884, "DE", "Blaine"): 12951,
+    (1884, "DE", "Cleveland"): 16964,
+    (1884, "DE", "Butler"): 6,
+    (1884, "DE", "St. John"): 55,
+    (1884, "FL", "Blaine"): 28031,
+    (1884, "FL", "Cleveland"): 31766,
+    (1884, "FL", "St. John"): 72,
+    (1884, "GA", "Blaine"): 48603,
+    (1884, "GA", "Cleveland"): 94667,
+    (1884, "GA", "Butler"): 145,
+    (1884, "GA", "St. John"): 195,
+    (1884, "IL", "Blaine"): 337474,
+    (1884, "IL", "Cleveland"): 312355,
+    (1884, "IL", "Butler"): 10910,
+    (1884, "IL", "St. John"): 12074,
+    (1884, "IN", "Blaine"): 238463,
+    (1884, "IN", "Cleveland"): 244990,
+    (1884, "IN", "Butler"): 8293,
+    (1884, "IN", "St. John"): 3028,
+    (1884, "IA", "Blaine"): 197089,
+    (1884, "IA", "Cleveland"): 177316,
+    (1884, "IA", "St. John"): 1472,
+    (1884, "KS", "Blaine"): 154406,
+    (1884, "KS", "Cleveland"): 90132,
+    (1884, "KS", "Butler"): 16341,
+    (1884, "KS", "St. John"): 4495,
+    (1884, "KY", "Blaine"): 118122,
+    (1884, "KY", "Cleveland"): 152961,
+    (1884, "KY", "Butler"): 1691,
+    (1884, "KY", "St. John"): 3139,
+    (1884, "LA", "Blaine"): 46347,
+    (1884, "LA", "Cleveland"): 62540,
+    (1884, "ME", "Blaine"): 72209,
+    (1884, "ME", "Cleveland"): 52140,
+    (1884, "ME", "Butler"): 3953,
+    (1884, "ME", "St. John"): 2160,
+    (1884, "MD", "Blaine"): 85699,
+    (1884, "MD", "Cleveland"): 96932,
+    (1884, "MD", "Butler"): 531,
+    (1884, "MD", "St. John"): 2794,
+    (1884, "MA", "Blaine"): 146724,
+    (1884, "MA", "Cleveland"): 122181,
+    (1884, "MA", "Butler"): 24433,
+    (1884, "MA", "St. John"): 10026,
+    (1884, "MI", "Blaine"): 192669,
+    (1884, "MI", "Cleveland"): 149835,
+    (1884, "MI", "Butler"): 42243,
+    (1884, "MI", "St. John"): 18403,
+    (1884, "MN", "Blaine"): 111923,
+    (1884, "MN", "Cleveland"): 70144,
+    (1884, "MN", "Butler"): 3583,
+    (1884, "MN", "St. John"): 4684,
+    (1884, "MS", "Blaine"): 43509,
+    (1884, "MS", "Cleveland"): 76510,
+    (1884, "MO", "Blaine"): 202929,
+    (1884, "MO", "Cleveland"): 235988,
+    (1884, "MO", "St. John"): 2153,
+    (1884, "NE", "Blaine"): 76912,
+    (1884, "NE", "Cleveland"): 54391,
+    (1884, "NE", "St. John"): 2899,
+    (1884, "NV", "Blaine"): 7193,
+    (1884, "NV", "Cleveland"): 5578,
+    (1884, "NV", "Butler"): 26,
+    (1884, "NH", "Blaine"): 43249,
+    (1884, "NH", "Cleveland"): 39183,
+    (1884, "NH", "Butler"): 552,
+    (1884, "NH", "St. John"): 1571,
+    (1884, "NY", "Blaine"): 562005,
+    (1884, "NY", "Cleveland"): 563154,
+    (1884, "NY", "Butler"): 16994,
+    (1884, "NY", "St. John"): 25016,
+    (1884, "NC", "Blaine"): 125068,
+    (1884, "NC", "Cleveland"): 142952,
+    (1884, "NC", "St. John"): 454,
+    (1884, "OH", "Blaine"): 400082,
+    (1884, "OH", "Cleveland"): 368280,
+    (1884, "OH", "Butler"): 5179,
+    (1884, "OH", "St. John"): 11069,
+    (1884, "OR", "Blaine"): 26860,
+    (1884, "OR", "Cleveland"): 24604,
+    (1884, "OR", "Butler"): 726,
+    (1884, "OR", "St. John"): 492,
+    (1884, "PA", "Blaine"): 473804,
+    (1884, "PA", "Cleveland"): 392785,
+    (1884, "PA", "Butler"): 16992,
+    (1884, "PA", "St. John"): 15283,
+    (1884, "RI", "Blaine"): 19030,
+    (1884, "RI", "Cleveland"): 12391,
+    (1884, "RI", "Butler"): 422,
+    (1884, "RI", "St. John"): 928,
+    (1884, "SC", "Blaine"): 21733,
+    (1884, "SC", "Cleveland"): 69890,
+    (1884, "TN", "Blaine"): 124078,
+    (1884, "TN", "Cleveland"): 133258,
+    (1884, "TN", "Butler"): 957,
+    (1884, "TN", "St. John"): 1131,
+    (1884, "TX", "Blaine"): 93141,
+    (1884, "TX", "Cleveland"): 225309,
+    (1884, "TX", "Butler"): 3321,
+    (1884, "TX", "St. John"): 3534,
+    (1884, "VT", "Blaine"): 39514,
+    (1884, "VT", "Cleveland"): 17331,
+    (1884, "VT", "Butler"): 785,
+    (1884, "VT", "St. John"): 1752,
+    (1884, "VA", "Blaine"): 139356,
+    (1884, "VA", "Cleveland"): 145497,
+    (1884, "VA", "St. John"): 138,
+    (1884, "WV", "Blaine"): 63096,
+    (1884, "WV", "Cleveland"): 67317,
+    (1884, "WV", "Butler"): 810,
+    (1884, "WV", "St. John"): 939,
+    (1884, "WI", "Blaine"): 161157,
+    (1884, "WI", "Cleveland"): 146459,
+    (1884, "WI", "Butler"): 4598,
+    (1884, "WI", "St. John"): 7656,
 }
 
 
@@ -1450,7 +1624,7 @@ def emit() -> Path:
     values: dict[tuple[int, str, str], int] = {}
     skipped: list[str] = []
     differences: list[str] = []
-    needs_1881 = any(year >= 1872 for year in YEARS)
+    needs_1881 = any(year in V81_YEARS for year in YEARS)
     if needs_1881:
         cells: dict[tuple[str, int], tuple[list[int], tuple[int, int, int, int]]] = {}
         with (PARSED / "reads_1881.tsv").open() as handle:
@@ -1506,19 +1680,29 @@ def emit() -> Path:
         )
         pages: dict[str, tuple[UUID, str, int, int]] = {}
         for year in YEARS:
-            key = "v81p95" if year >= 1872 else YEAR_PRINT[year]
+            key = "v81p95" if year in V81_YEARS else YEAR_PRINT[year]
             if key in pages:
                 continue
             volume = 1880 if key == "v81p95" else PRINT_VOLUME[key]
             page_number = 95 if key == "v81p95" else PRINTS[key]["page"]
-            book = raw.cached(RAW, tribune_almanac.VOLUMES[volume][0])
+            book = raw.cached(RAW, URLS[volume])
             image = DATA / "pages" / SOURCE / f"{book.sha256}-{page_number}.png"
             image.parent.mkdir(parents=True, exist_ok=True)
             if not image.exists():
                 house_books._render(book, page_number, 100, image, False)
             with Image.open(image) as rendered:
                 width, height = rendered.size
-            source = cs.source(tribune_almanac.PUBLISHER, tribune_almanac.TITLES[volume])
+            source = cs.source(tribune_almanac.PUBLISHER, TITLES[volume])
+            if not conn.execute("select 1 from source where id = %s", [source]).fetchone():
+                cs.add(
+                    "source",
+                    id=source,
+                    kind=getattr(tribune_almanac, "KIND", "official_body"),
+                    publisher=tribune_almanac.PUBLISHER,
+                    title=TITLES[volume],
+                    url=URLS[volume].replace("/download/", "/details/").rsplit("/", 1)[0],
+                    license=tribune_almanac.LICENSE,
+                )
             artifact = cs.artifact(book, source)
             page = cs.page(artifact, page_number)
             if not conn.execute("select 1 from source_page where id = %s", [page]).fetchone():
@@ -1581,7 +1765,7 @@ def emit() -> Path:
                         skipped.append(
                             f"cell {name} {surname}: reads {reads} against Wikipedia's {ticket}, not settled"
                         )
-        for key in {YEAR_PRINT[year] for year in YEARS if year < 1872}:
+        for key in {YEAR_PRINT[year] for year in YEARS if year in YEAR_PRINT}:
             spec = PRINTS[key]
             with Image.open(PARSED / "native" / f"{spec['mask']}-mask.png") as mask:
                 mask_width, mask_height = mask.size
@@ -1596,15 +1780,13 @@ def emit() -> Path:
                         continue
                     center = round(spec["y0"] + spec["pitch"] * index)
                     values[cell] = EARLY[cell]
-                    boxes[cell] = (
-                        (
-                            left / mask_width,
-                            (center - half) / mask_height,
-                            (spec["cols"][col][1] + 4) / mask_width,
-                            (center + half) / mask_height,
-                        ),
-                        key,
+                    u0, v0, u1, v1 = (
+                        left / mask_width,
+                        (center - half) / mask_height,
+                        (spec["cols"][col][1] + 4) / mask_width,
+                        (center + half) / mask_height,
                     )
+                    boxes[cell] = ((1 - v1, u0, 1 - v0, u1) if spec.get("turned") else (u0, v0, u1, v1), key)
         winners_ok = 0
         for (year, state), (rs, election, contest, stage, kind, source_id, completeness) in sorted(old.items()):
             tag = f"{year} {state}"
@@ -1694,7 +1876,7 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="official",
                 kind="counted",
-                source_id=pages["v81p95" if year >= 1872 else YEAR_PRINT[year]][1],
+                source_id=pages["v81p95" if year in V81_YEARS else YEAR_PRINT[year]][1],
                 status="active",
                 is_default=default,
                 supersedes_id=rs if default else None,
@@ -1712,12 +1894,13 @@ def emit() -> Path:
                 is_default=not default,
                 completeness=completeness,
             )
-            volume = pages["v81p95" if year >= 1872 else YEAR_PRINT[year]][2]
+            volume = pages["v81p95" if year in V81_YEARS else YEAR_PRINT[year]][2]
             cs.add(
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=(NOTE if year >= 1872 else note(year, volume))
+                body_md=(NOTE if year in V81_YEARS else note(year, volume))
+                + CAVEATS.get(year, "")
                 + ("" if combined is None else " " + WHIG_NOTE)
                 + ("" if default else " " + HELD),
             )
