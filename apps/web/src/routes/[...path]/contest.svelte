@@ -101,6 +101,30 @@
 
   const tether = TooltipPrimitive.createTether<string>();
 
+  const single = $derived.by(() => {
+    if (contest.chamber?.link == null) {
+      return null;
+    }
+    const winners = contest.chamber.parties.filter((party) => party.here > 0);
+    const [winner] = winners;
+    if (winners.length !== 1 || winner == null || winner.here !== 1) {
+      return null;
+    }
+    let total = 0;
+    for (const party of contest.chamber.parties) {
+      total += party.seats;
+    }
+    return {
+      winner,
+      party:
+        /^(?:party:)?([0-9a-f]{8}-[0-9a-f-]{27})$/.exec(winner.key)?.[1] ??
+        null,
+      total: contest.chamber.size ?? total,
+      link: contest.chamber.link,
+    };
+  });
+  const chamber = $derived(single == null ? contest.chamber : null);
+
   const origins = $derived.by(() => {
     const list = contest.origins ?? [];
     const year = contest.series.find((entry) => entry.current)?.year;
@@ -1035,8 +1059,8 @@
   {#if drawn != null && placed != null}
     <div
       class={cn("col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0", {
-        "lg:col-span-8": contest.chamber != null,
-        "lg:col-span-7 xl:col-span-8": contest.chamber == null,
+        "lg:col-span-8": chamber != null,
+        "lg:col-span-7 xl:col-span-8": chamber == null,
       })}
     >
       {#key `${here}:${drawn.tiles}`}
@@ -1078,7 +1102,7 @@
         </p>
       {/if}
     </div>
-    {#if contest.chamber == null}
+    {#if chamber == null}
       <div
         class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
       >
@@ -1092,12 +1116,12 @@
     {:else}
       <Seats
         isLinked
-        parties={contest.chamber.parties}
-        places={contest.chamber.places}
-        here={contest.chamber.here}
+        parties={chamber.parties}
+        places={chamber.places}
+        here={chamber.here}
         place={contest.scope.name}
-        link={contest.chamber.link}
-        size={contest.chamber.size}
+        link={chamber.link}
+        size={chamber.size}
         {change}
       />
     {/if}
@@ -1395,29 +1419,29 @@
     {/if}
   {/if}
 
-  {#if drawn == null || contest.chamber != null}
+  {#if drawn == null || chamber != null}
     {#if drawn != null}
       {@render stats(false)}
     {/if}
     <div
       class={cn(
         "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-        { "lg:col-span-8": contest.chamber != null && drawn == null },
+        { "lg:col-span-8": chamber != null && drawn == null },
       )}
     >
       {@render results()}
     </div>
   {/if}
 
-  {#if contest.chamber != null && drawn == null}
+  {#if chamber != null && drawn == null}
     <Seats
       isLinked
-      parties={contest.chamber.parties}
-      places={contest.chamber.places}
-      here={contest.chamber.here}
+      parties={chamber.parties}
+      places={chamber.places}
+      here={chamber.here}
       place={contest.scope.name}
-      link={contest.chamber.link}
-      size={contest.chamber.size}
+      link={chamber.link}
+      size={chamber.size}
       {change}
     />
   {/if}
@@ -1764,6 +1788,38 @@
           </dt>
           <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             {contest.rows.filter((row) => row.current != null).length}
+          </dd>
+        </div>
+      {/if}
+      {#if single != null}
+        <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
+          <dt class="text-[0.8125rem] text-muted-foreground">
+            {m.stat_seat()}
+          </dt>
+          <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
+            1 <span class="text-sm font-normal text-muted-foreground"
+              >{m.seats_of({ count: count(single.total) })}</span
+            >
+          </dd>
+          <dd class="text-[0.8125rem] text-muted-foreground">
+            {const pieces = $derived(
+              m
+                .seats_single_national({
+                  count: single.winner.seats,
+                  party: "\u0001party\u0001",
+                  where: "\u0001where\u0001",
+                })
+                .split("\u0001"),
+            )}
+            {#each pieces as piece, index (index)}{#if index % 2 === 1 && piece === "party"}<Name
+                  class="text-foreground"
+                  label={single.winner.short ?? single.winner.label}
+                  color={swatch(single.winner.color, single.winner.key)}
+                  party={single.party}
+                />{:else if index % 2 === 1 && piece === "where"}{#if single.link.path != null}<Preview
+                    class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+                    path={single.link.path}>{single.link.name}</Preview
+                  >{:else}{single.link.name}{/if}{:else}{piece}{/if}{/each}
           </dd>
         </div>
       {/if}

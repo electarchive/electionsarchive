@@ -189,6 +189,22 @@
   "seats_majority": "{count} for a majority",
   "seats_focus": "{place} provided {count} of the {total} seats.",
   "seats_of": "of {count}",
+  "stat_seat": "Seat",
+  "seats_single_national": [
+    {
+      "declarations": [
+        "input count",
+        "input party",
+        "input where",
+        "local countPlural = count: plural"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{party} won {count} seat in {where}",
+        "countPlural=*": "{party} won {count} seats in {where}"
+      }
+    }
+  ],
   "seats_position": "No. {position} on the list",
   "seats_keys": "Use arrow keys to move between seats; press Enter to open a seat's district.",
   "seats_whole": "All of {place}",
