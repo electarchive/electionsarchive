@@ -101,6 +101,57 @@
 
   const tether = TooltipPrimitive.createTether<string>();
 
+  const origins = $derived.by(() => {
+    const list = contest.origins ?? [];
+    const year = contest.series.find((entry) => entry.current)?.year;
+    if (list.length === 0 || year == null) {
+      return [];
+    }
+    const [only] = list;
+    if (
+      list.length === 1 &&
+      only != null &&
+      only.share >= 0.9 &&
+      only.first != null &&
+      only.year != null &&
+      only.first < only.year
+    ) {
+      const [before = "", after = ""] = m
+        .origins_one({ year, seat: "\u0001", from: only.first, to: only.year })
+        .split("\u0001");
+      return [
+        { text: before, path: null },
+        { text: only.name, path: only.path },
+        { text: after, path: null },
+      ];
+    }
+    const [before = "", after = ""] = m
+      .origins_many({ year, seats: "\u0001" })
+      .split("\u0001");
+    const parts = new Intl.ListFormat(getLocale(), {
+      type: "conjunction",
+    }).formatToParts(list.map((_, index) => String(index)));
+    return [
+      { text: before, path: null },
+      ...parts.flatMap((part) => {
+        const origin =
+          part.type === "element" ? list[Number(part.value)] : undefined;
+        if (origin == null) {
+          return [{ text: part.value, path: null }];
+        }
+        const [head = "", tail = ""] = m
+          .origins_item({ name: "\u0001", share: percent(origin.share, 0) })
+          .split("\u0001");
+        return [
+          { text: head, path: null },
+          { text: origin.name, path: origin.path },
+          { text: tail, path: null },
+        ];
+      }),
+      { text: after, path: null },
+    ];
+  });
+
   let filter = $state<{ at: string; value: number | string | null }>({
     at: "",
     value: null,
@@ -866,6 +917,15 @@
   </div>
   {#if contest.series.length > 1}
     <Series series={contest.series} />
+  {:else if origins.length > 0}
+    <p
+      class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch] md:col-span-2"
+    >
+      {#each origins as part, index (index)}{#if part.path == null}{part.text}{:else}<Preview
+            class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+            path={part.path}>{part.text}</Preview
+          >{/if}{/each}
+    </p>
   {/if}
   {#if contest.scope.trail.length > 1 || below != null}
     <nav class="md:col-span-2" aria-label={m.scope_path()}>

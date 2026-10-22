@@ -2779,6 +2779,17 @@ export const contests = {
             previous: v.boolean(),
           }),
         ),
+        origins: v.optional(
+          v.array(
+            v.object({
+              name: v.string(),
+              path: v.nullable(v.string()),
+              share: v.number(),
+              first: v.nullable(v.number()),
+              year: v.nullable(v.number()),
+            }),
+          ),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -3166,6 +3177,68 @@ export const contests = {
       const comparable = covering.rows.filter(
         (row) => row.counted && row.indirect === contest.indirect,
       );
+      const day = contest.date;
+      const origins = (async () => {
+        if (
+          !isRoot ||
+          day == null ||
+          sameRace.some((row) => row.date != null && row.date <= day)
+        ) {
+          return [];
+        }
+        const found = await db.execute<{
+          id: string;
+          area: string;
+          date: string;
+          year: number | null;
+          first: number | null;
+          share: number;
+        }>(sql`
+          with me as (
+            select c.body_id, c.office_id, c.kind, c.round_number, c.party_scope_id, c.district_area_id, e.date_from, g.geom
+            from contest c join election e on e.id = c.election_id
+            join area_geometry g on g.area_id = c.district_area_id and g.valid @> e.date_from
+            where c.id = ${contest.root}::uuid
+          ),
+          peers as (
+            select c.* from me join contest c
+              on c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
+              and c.kind = me.kind and c.round_number = me.round_number
+              and c.party_scope_id is not distinct from me.party_scope_id
+              and c.allocation_parent_id is null and c.district_area_id is not null
+          ),
+          before as materialized (
+            select max(e.date_from) as day from me, peers c
+            join election e on e.id = c.election_id
+            where e.date_from < me.date_from and e.kind = 'general'
+          )
+          select c.id, c.district_area_id as area, e.date_from::text as date, extract(year from e.date_from)::int as year,
+            (select min(extract(year from e2.date_from))::int from peers c2 join election e2 on e2.id = c2.election_id
+              where c2.district_area_id = c.district_area_id) as first,
+            (ST_Area(ST_Intersection(g.geom, me.geom, 0.00001)) / ST_Area(me.geom))::float8 as share
+          from me, before, peers c
+          join election e on e.id = c.election_id
+          join area_geometry g on g.area_id = c.district_area_id and g.valid @> e.date_from
+          where e.date_from = before.day and e.kind = 'general' and c.district_area_id <> me.district_area_id
+            and g.geom && me.geom and ST_Intersects(g.geom, me.geom)
+          order by share desc
+        `);
+        const kept = found.rows.filter((row) => row.share >= 0.01);
+        const [labels, slugs] = await Promise.all([
+          names(
+            kept.map((row) => row.area),
+            kept[0]?.date ?? null,
+          ),
+          paths(kept.map((row) => row.id)),
+        ]);
+        return kept.map((row) => ({
+          name: labels.full.get(row.area) ?? "",
+          path: slugs.get(row.id) ?? null,
+          share: Math.round(row.share * 100) / 100,
+          first: row.first,
+          year: row.year,
+        }));
+      })();
       const counterpart = sameRace.find(
         (row) =>
           isRoot &&
@@ -3528,7 +3601,13 @@ export const contests = {
         ]);
       const current = now.get(area.k);
       if (current == null) {
-        return { ...page, series, places: grid, targets };
+        return {
+          ...page,
+          series,
+          places: grid,
+          targets,
+          origins: await origins,
+        };
       }
       const earlier = before?.get(area.k);
       const flagged = await db.execute<{
@@ -3748,6 +3827,7 @@ export const contests = {
             faces.get(row.current?.person ?? row.earlier?.person ?? "") ?? null,
         })),
         targets,
+        origins: await origins,
       };
     }),
   places: os
