@@ -249,7 +249,7 @@ def emit() -> Path:
             ).fetchall()
             writein = [option for option, _, kind, _ in roots if kind == "write_in"]
             people = [
-                (option, re.sub(r"[^a-z]", "", label.lower()), int(value))
+                (option, re.sub(r"(jr|sr|ii|iii|iv)$", "", re.sub(r"[^a-z]", "", label.lower())), int(value))
                 for option, label, kind, value in roots
                 if kind in ("candidate", "ticket")
             ]
@@ -258,8 +258,20 @@ def emit() -> Path:
             exact = True
             dropped = 0
             unmatched: list[tuple[str, str, int]] = []
-            for candidate, label, votes in rows.group_by("candidate", "label").agg(pl.col("votes").sum()).iter_rows():
-                letters = re.sub(r"[^a-z]", "", label.lower())
+            tallies = rows.group_by("candidate", "label").agg(pl.col("votes").sum()).rows()
+            for candidate, label, _ in tallies:
+                letters = re.sub(r"(jr|sr|ii|iii|iv)$", "", re.sub(r"[^a-z]", "", label.lower()))
+                same = [p for p in people if p[1] == letters and p[0] not in targets.values()]
+                if len(same) == 1 and label.upper() not in ("WRITE-IN", "OTHER", "WRITE IN", "SCATTERED"):
+                    targets[candidate] = same[0][0]
+            for candidate, label, votes in tallies:
+                if candidate in targets:
+                    held = next(p[2] for p in people if p[0] == targets[candidate])
+                    if held != votes:
+                        exact = False
+                        notes.append(f"{label.title()}: {votes:,} here, {held:,} in the default set")
+                    continue
+                letters = re.sub(r"(jr|sr|ii|iii|iv)$", "", re.sub(r"[^a-z]", "", label.lower()))
                 if label.upper() in ("WRITE-IN", "OTHER", "WRITE IN", "SCATTERED"):
                     if len(writein) == 1:
                         targets[candidate] = writein[0]
@@ -270,8 +282,7 @@ def emit() -> Path:
                     p
                     for p in people
                     if p[1] == letters
-                    or p[1].endswith(letters[-7:])
-                    or letters.endswith(p[1][-7:])
+                    or p[1][:1] == letters[:1] and (p[1].endswith(letters[-7:]) or letters.endswith(p[1][-7:]))
                     or ("PA_ADD" in os.environ and p[1][-5:] == letters[-5:])
                 ]
                 found = [p for p in found if p[0] not in targets.values()]
