@@ -1814,7 +1814,7 @@
     >
   </header>
 
-  <div class="relative min-block-0">
+  <main class="relative min-block-0">
     <div
       class="absolute inset-0"
       role="application"
@@ -2201,5 +2201,5 @@
             })}
       </p>
     {/if}
-  </div>
+  </main>
 </div>

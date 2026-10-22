@@ -35,7 +35,7 @@
   <title>{copy[0]()} | {m.wordmark()}</title>
 </svelte:head>
 
-<section
+<main
   class="grid content-start gap-4 px-4 pbs-16 pbe-24 max-inline-160 sm:pbs-28"
   aria-labelledby="error-title"
 >
@@ -66,4 +66,4 @@
       href={resolve("/")}>{m.error_home()}</a
     >
   </div>
-</section>
+</main>
