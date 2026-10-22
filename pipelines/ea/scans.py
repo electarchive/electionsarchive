@@ -7,18 +7,118 @@ import os
 import re
 import subprocess
 import tempfile
+from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import cache
 from pathlib import Path
+from typing import Literal, NamedTuple, NotRequired, TypedDict
 
 import anthropic
 import polars as pl
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+from anthropic.types.messages.batch_create_params import Request
 from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset
 from ea.sources.us import medsl
 from ea.store import DATA, connect
+
+
+class Column(TypedDict):
+    label: str
+    contest: str | None
+    candidate: str
+    official: NotRequired[int]
+    writein: NotRequired[bool]
+
+
+class Page(TypedDict):
+    page: int
+    columns: list[Column]
+    crop: NotRequired[list[float]]
+    dpi: NotRequired[int]
+    bands: NotRequired[int]
+    header: NotRequired[list[float]]
+    turn: NotRequired[int]
+    orientation: NotRequired[str]
+
+
+class Contest(TypedDict):
+    year: int
+    chamber: str
+    day: str
+    special: bool
+    state: str
+    district: int | None
+
+
+class Manifest(TypedDict):
+    name: str
+    polity: str
+    publisher: str
+    title: str
+    file: dict[str, str]
+    contests: dict[str, Contest]
+    pages: list[Page]
+    kind: NotRequired[str]
+    license: NotRequired[str]
+    raw_source: NotRequired[str]
+    unit_codes: NotRequired[dict[str, str]]
+
+
+class Header(TypedDict):
+    label: str
+    x0: int
+    x1: int
+
+
+class Row(TypedDict):
+    label: str
+    y0: int
+    y1: int
+    values: list[str]
+
+
+class Table(TypedDict):
+    header: list[Header]
+    rows: list[Row]
+
+
+class Batch(TypedDict):
+    id: str
+    keys: dict[str, str]
+
+
+class Reader(NamedTuple):
+    model: str
+    effort: Literal["low", "medium"]
+    price_in: float
+    price_out: float
+
+
+@dataclass
+class Read:
+    custom: str
+    page: int
+    span: tuple[float, float]
+    digest: str
+    pixels: int
+    key: str
+    params: MessageCreateParamsNonStreaming
+
+
+@dataclass
+class Series:
+    pages: list[int]
+    printed: int | None
+    official: int | None
+    total: int = 0
+    status: str = ""
+    errors: list[str] = field(default_factory=list)
+    cells: dict[tuple[int, str], tuple[int, list[float]]] = field(default_factory=dict)
+
 
 SOURCE = "us.scans"
 VERSION = "1"
@@ -27,13 +127,13 @@ MANIFESTS = Path(__file__).resolve().parents[1] / "scans"
 WORK = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 READERS = {
-    "first": ("claude-haiku-5-5", "low", 0.05, 0.25),
-    "second": ("claude-sonnet-5-5", "medium", 1.0, 5.0),
+    "first": Reader("claude-haiku-5-5", "low", 0.05, 0.25),
+    "second": Reader("claude-sonnet-5-5", "medium", 1.0, 5.0),
 }
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
-SCHEMA = {
+SCHEMA: dict[str, object] = {
     "type": "object",
     "properties": {
         "header": {
@@ -79,10 +179,10 @@ def client() -> anthropic.Anthropic:
     return anthropic.Anthropic()
 
 
-def key_of(contest: dict[str, object]) -> str:
-    chamber, day, state, district = str(contest["chamber"]), contest["day"], contest["state"], contest["district"]
+def key_of(contest: Contest) -> str:
+    chamber, day, state, district = contest["chamber"], contest["day"], contest["state"], contest["district"]
     base = (
-        f"{day}:{state}-{int(str(district)):02}:president"
+        f"{day}:{state}-{district:02}:president"
         if chamber == "president" and district is not None
         else f"{day}:{state}:{chamber}"
         if district is None
@@ -91,8 +191,8 @@ def key_of(contest: dict[str, object]) -> str:
     return f"{base}:special" if contest["special"] else base
 
 
-def load(name: str) -> dict[str, object]:
-    manifest = json.loads((MANIFESTS / f"{name}.json").read_text())
+def load(name: str) -> Manifest:
+    manifest: Manifest = json.loads((MANIFESTS / f"{name}.json").read_text())
     manifest["name"] = name
     return manifest
 
@@ -111,15 +211,15 @@ def encode(image: Image.Image) -> tuple[str, bytes]:
     return "image/png", buffer.getvalue()
 
 
-def artifact(manifest: dict[str, object]) -> raw.Artifact:
-    file = dict(manifest["file"])
+def artifact(manifest: Manifest) -> raw.Artifact:
+    url = manifest["file"]["url"]
     try:
-        return raw.cached(str(manifest.get("raw_source", SOURCE)), file["url"])
+        return raw.cached(manifest.get("raw_source", SOURCE), url)
     except LookupError:
-        return raw.fetch(SOURCE, file["url"], suffix=".pdf" if file["url"].lower().endswith(".pdf") else ".png")
+        return raw.fetch(SOURCE, url, suffix=".pdf" if url.lower().endswith(".pdf") else ".png")
 
 
-def render(manifest: dict[str, object], spec: dict[str, object], dpi: int) -> Image.Image:
+def render(manifest: Manifest, spec: Page, dpi: int) -> Image.Image:
     source = artifact(manifest)
     if source.path.suffix == ".pdf":
         with tempfile.TemporaryDirectory() as folder:
@@ -132,30 +232,29 @@ def render(manifest: dict[str, object], spec: dict[str, object], dpi: int) -> Im
             image.load()
     else:
         image = Image.open(source.path).convert("L")
-    if spec.get("turn"):
+    if "turn" in spec:
         image = image.rotate(spec["turn"], expand=True)
     return image
 
 
 @cache
-def bands(name: str) -> list[dict[str, object]]:
+def bands(name: str) -> list[tuple[str, int, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]]:
     manifest = load(name)
     folder = WORK / name / "crops"
     folder.mkdir(parents=True, exist_ok=True)
-    out: list[dict[str, object]] = []
+    out: list[tuple[str, int, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]] = []
     for spec in manifest["pages"]:
-        image = render(manifest, spec, int(spec.get("dpi", 300)))
+        image = render(manifest, spec, spec.get("dpi", 300))
         width, height = image.size
         x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
         crop = image.crop((round(x0 * width), round(y0 * height), round(x1 * width), round(y1 * height)))
-        count = int(spec.get("bands", 1))
-        across = spec.get("orientation", "counties_down") == "counties_across"
+        count = spec.get("bands", 1)
         overlap = round(crop.height * 0.02) if count > 1 else 0
         header = None
-        if count > 1 and spec.get("header"):
+        if count > 1 and "header" in spec:
             top, bottom = spec["header"]
             header = crop.crop((0, round(top * crop.height), crop.width, round(bottom * crop.height)))
-        labels = [column.get("label", column["candidate"]) for column in spec["columns"]]
+        labels = json.dumps([column["label"] for column in spec["columns"]])
         for band in range(count):
             start = max(0, round(band * crop.height / count) - overlap)
             stop = min(crop.height, round((band + 1) * crop.height / count) + overlap)
@@ -164,63 +263,71 @@ def bands(name: str) -> list[dict[str, object]]:
                 for part in (header if band > 0 else None, crop.crop((0, start, crop.width, stop)))
                 if part is not None
             ]
-            blocks: list[dict[str, object]] = []
+            blocks: list[ImageBlockParam | TextBlockParam] = []
             digest = hashlib.sha256()
             pixels = 0
             for position, part in enumerate(parts):
                 media, data = encode(part)
                 (folder / f"p{spec['page']}-b{band}-{position}.{media.split('/')[1]}").write_bytes(data)
                 blocks.append(
-                    {
-                        "type": "image",
-                        "source": {"type": "base64", "media_type": media, "data": base64.b64encode(data).decode()},
-                    }
+                    ImageBlockParam(
+                        type="image",
+                        source={
+                            "type": "base64",
+                            "media_type": "image/jpeg" if media == "image/jpeg" else "image/png",
+                            "data": base64.b64encode(data).decode(),
+                        },
+                    )
                 )
                 digest.update(data)
                 pixels += part.width * part.height
             text = (
-                f"The columns are the counties and the rows are the candidates' lines, one row per line in this order: "
-                f"{json.dumps(labels)}. Put the county names in header, left to right, including a total column if one "
+                f"The columns are the counties and the rows are the candidates' lines, one row per line in this "
+                f"order: {labels}. Put the county names in header, left to right, including a total column if one "
                 "is printed. Each row's values has one string per header entry."
-                if across
-                else f"The rows are the counties, and a total row if one is printed. The {len(labels)} data columns, left "
-                f"to right, are: {json.dumps(labels)}. Header has one entry per data column and each row's values has "
-                "one string per data column; leave out any column not in this list."
+                if spec.get("orientation") == "counties_across"
+                else f"The rows are the counties, and a total row if one is printed. The data columns, left to "
+                f"right, are: {labels}. Header has one entry per data column and each row's values has one string "
+                "per data column; leave out any column not in this list."
             )
             if count > 1:
                 text += (
                     f" This is band {band + 1} of {count} of the table: read only the rows visible in the last image."
                 )
-            blocks.append({"type": "text", "text": text})
+            blocks.append(TextBlockParam(type="text", text=text))
             digest.update(text.encode())
             out.append(
-                {
-                    "custom": f"p{spec['page']}-b{band}",
-                    "page": int(spec["page"]),
-                    "span": (start / crop.height, stop / crop.height),
-                    "blocks": blocks,
-                    "digest": digest.hexdigest(),
-                    "pixels": pixels,
-                }
+                (
+                    f"p{spec['page']}-b{band}",
+                    spec["page"],
+                    (start / crop.height, stop / crop.height),
+                    blocks,
+                    digest.hexdigest(),
+                    pixels,
+                )
             )
     return out
 
 
-def requests(name: str, reader: str) -> dict[str, dict[str, object]]:
+def requests(name: str, reader: str) -> dict[str, Read]:
     model, effort, _, _ = READERS[reader]
     return {
-        band["custom"]: {
-            **band,
-            "key": f"anthropic-batch:{model}/{PROMPT}/{effort}/{band['digest']}",
-            "params": {
-                "model": model,
-                "max_tokens": 32000,
-                "system": SYSTEM,
-                "messages": [{"role": "user", "content": band["blocks"]}],
-                "output_config": {"effort": effort, "format": {"type": "json_schema", "schema": SCHEMA}},
-            },
-        }
-        for band in bands(name)
+        custom: Read(
+            custom=custom,
+            page=page,
+            span=span,
+            digest=digest,
+            pixels=pixels,
+            key=f"anthropic-batch:{model}/{PROMPT}/{effort}/{digest}",
+            params=MessageCreateParamsNonStreaming(
+                model=model,
+                max_tokens=32000,
+                system=SYSTEM,
+                messages=[{"role": "user", "content": blocks}],
+                output_config={"effort": effort, "format": {"type": "json_schema", "schema": SCHEMA}},
+            ),
+        )
+        for custom, page, span, blocks, digest, pixels in bands(name)
     }
 
 
@@ -231,10 +338,17 @@ def cached(key: str) -> dict[str, object] | None:
         return None
 
 
-def parse(response: dict[str, object]) -> dict[str, object] | str:
+def parse(response: dict[str, object] | None) -> Table | str:
+    if response is None:
+        return "not read yet"
     if response.get("stop_reason") != "end_turn":
         return f"stopped on {response.get('stop_reason')}"
-    text = next((block["text"] for block in response["content"] if block["type"] == "text"), None)
+    content = response["content"]
+    text = (
+        next((block["text"] for block in content if block["type"] == "text"), None)
+        if isinstance(content, list)
+        else None
+    )
     if text is None:
         return "no text block"
     try:
@@ -263,34 +377,34 @@ def counties(polity: str) -> dict[str, str]:
 
 
 def cells(
-    manifest: dict[str, object], plan: dict[str, dict[str, object]], names: dict[str, str]
+    manifest: Manifest, plan: dict[str, Read], names: dict[str, str]
 ) -> tuple[dict[tuple[int, str, int], tuple[int, list[float]]], dict[tuple[int, int], int], dict[int, str]]:
     values: dict[tuple[int, str, int], tuple[int, list[float]]] = {}
     printed: dict[tuple[int, int], int] = {}
     errors: dict[int, str] = {}
-    extra = {slug(label): code for label, code in dict(manifest.get("unit_codes", {})).items()}
+    extra = {slug(label): code for label, code in manifest.get("unit_codes", {}).items()}
     for spec in manifest["pages"]:
-        across = spec.get("orientation", "counties_down") == "counties_across"
+        across = spec.get("orientation") == "counties_across"
         x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
-        number = int(spec["page"])
+        number = spec["page"]
         for custom, request in plan.items():
-            if request["page"] != number:
+            if request.page != number:
                 continue
-            response = cached(str(request["key"]))
-            table = parse(response) if response is not None else "not read yet"
+            table = parse(cached(request.key))
             if isinstance(table, str):
                 errors[number] = f"{custom}: {table}"
                 continue
             header, rows = table["header"], table["rows"]
             if len(rows if across else header) != len(spec["columns"]):
                 errors[number] = (
-                    f"{custom}: {len(rows if across else header)} {'rows' if across else 'columns'} for {len(spec['columns'])}"
+                    f"{custom}: {len(rows if across else header)} {'rows' if across else 'columns'} "
+                    f"for {len(spec['columns'])}"
                 )
                 continue
             if any(after["y0"] < before["y0"] for before, after in itertools.pairwise(rows)):
                 errors[number] = f"{custom}: row bands are not ascending"
                 continue
-            start, stop = request["span"]
+            start, stop = request.span
             for r, row in enumerate(rows):
                 if len(row["values"]) != len(header):
                     errors[number] = f"{custom}: row {row['label']!r} has {len(row['values'])} cells for {len(header)}"
@@ -325,75 +439,75 @@ def cells(
     return values, printed, errors
 
 
-def evaluate(
-    manifest: dict[str, object], reader: str, names: dict[str, str], held: dict[str, int | None]
-) -> dict[str, dict[str, object]]:
-    values, printed, errors = cells(manifest, requests(str(manifest["name"]), reader), names)
-    series: dict[str, dict[str, object]] = {}
+def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[str, int | None]) -> dict[str, Series]:
+    values, printed, errors = cells(manifest, requests(manifest["name"], reader), names)
+    series: dict[str, Series] = {}
     for spec in manifest["pages"]:
+        page = spec["page"]
         for index, column in enumerate(spec["columns"]):
             if column["contest"] is None:
                 continue
             name = f"{column['contest']}|{column['candidate']}"
-            entry = series.setdefault(
-                name,
-                {"sum": 0, "printed": None, "official": held.get(name), "pages": [], "errors": [], "cells": {}},
-            )
-            entry["pages"].append(int(spec["page"]))
-            if int(spec["page"]) in errors:
-                entry["errors"].append(errors[int(spec["page"])])
-            if (int(spec["page"]), index) in printed:
-                entry["printed"] = printed[(int(spec["page"]), index)]
-            for (page, code, position), (value, box) in values.items():
-                if page == int(spec["page"]) and position == index:
-                    entry["sum"] += value
-                    entry["cells"][(page, code)] = (value, box)
+            entry = series.setdefault(name, Series(pages=[], printed=None, official=held.get(name)))
+            entry.pages.append(page)
+            if page in errors:
+                entry.errors.append(errors[page])
+            if (page, index) in printed:
+                entry.printed = printed[(page, index)]
+            for (found, code, position), (value, box) in values.items():
+                if found == page and position == index:
+                    entry.total += value
+                    entry.cells[(page, code)] = (value, box)
     for entry in series.values():
-        total, official = entry["printed"], entry["official"]
-        entry["status"] = (
+        entry.status = (
             "failed"
-            if entry["errors"]
+            if entry.errors
             else "unchecked"
-            if total is None and official is None
+            if entry.printed is None and entry.official is None
             else "tied"
-            if entry["sum"] == total or (total is None and abs(entry["sum"] - official) <= max(50, official * 0.01))
+            if entry.total == entry.printed
+            or (
+                entry.printed is None
+                and entry.official is not None
+                and abs(entry.total - entry.official) <= max(50, entry.official * 0.01)
+            )
             else "failed"
         )
     return series
 
 
-def pending(name: str, reader: str, pages: set[int] | None) -> dict[str, dict[str, object]]:
+def pending(name: str, reader: str, pages: set[int] | None) -> dict[str, Read]:
     return {
         custom: request
         for custom, request in requests(name, reader).items()
-        if (pages is None or request["page"] in pages) and cached(str(request["key"])) is None
+        if (pages is None or request.page in pages) and cached(request.key) is None
     }
 
 
-def submit(reader: str, wanted: dict[str, dict[str, object]], state: dict[str, object]) -> list[str]:
+def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list[Batch]]]) -> list[str]:
     api = client()
-    groups: list[list[tuple[str, dict[str, object]]]] = [[]]
+    groups: list[list[Read]] = [[]]
     size = 0
-    for custom, request in wanted.items():
-        weight = len(json.dumps(request["params"]))
+    for request in wanted.values():
+        weight = len(json.dumps(request.params))
         if groups[-1] and size + weight > BATCH_LIMIT:
             groups.append([])
             size = 0
-        groups[-1].append((custom, request))
+        groups[-1].append(request)
         size += weight
     ids: list[str] = []
     for group in groups:
         created = api.messages.batches.create(
-            requests=[{"custom_id": custom, "params": request["params"]} for custom, request in group]
+            requests=[Request(custom_id=request.custom, params=request.params) for request in group]
         )
         state.setdefault("batches", {}).setdefault(reader, []).append(
-            {"id": created.id, "keys": {custom: request["key"] for custom, request in group}}
+            {"id": created.id, "keys": {request.custom: request.key for request in group}}
         )
         ids.append(created.id)
     return ids
 
 
-def collect(reader: str, state: dict[str, object]) -> str:
+def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
     api = client()
     notes: list[str] = []
     remaining = []
@@ -419,9 +533,8 @@ def collect(reader: str, state: dict[str, object]) -> str:
     return "; ".join(notes)
 
 
-def official_totals(manifest: dict[str, object]) -> dict[str, int | None]:
+def official_totals(manifest: Manifest) -> dict[str, int | None]:
     held: dict[str, int | None] = {}
-    contests = dict(manifest["contests"])
     with connect() as conn:
         ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
         for spec in manifest["pages"]:
@@ -429,7 +542,7 @@ def official_totals(manifest: dict[str, object]) -> dict[str, int | None]:
                 if column["contest"] is None:
                     continue
                 name = f"{column['contest']}|{column['candidate']}"
-                contest = ids.get(key_of(contests[column["contest"]]))
+                contest = ids.get(key_of(manifest["contests"][column["contest"]]))
                 words = [word for word in slug(column["candidate"]).split() if len(word) > 1]
                 if "official" in column:
                     held[name] = column["official"]
@@ -467,7 +580,7 @@ def prepare(name: str) -> str:
     out = []
     for reader, (model, _, price_in, price_out) in READERS.items():
         plan = requests(name, reader)
-        pixels = sum(min(int(request["pixels"]), 3_500_000) for request in plan.values())
+        pixels = sum(min(request.pixels, 3_500_000) for request in plan.values())
         guess = (pixels / 750 * price_in + len(plan) * 6000 * price_out) / 1e6
         out.append(f"{reader} ({model}): {len(plan)} requests, about ${guess:.3f} if every page goes")
     unmatched = [column for column, total in held.items() if total is None]
@@ -479,22 +592,17 @@ def run(name: str) -> str:
     folder = WORK / name
     folder.mkdir(parents=True, exist_ok=True)
     state_path = folder / "state.json"
-    state: dict[str, object] = json.loads(state_path.read_text()) if state_path.exists() else {}
+    state: dict[str, dict[str, list[Batch]]] = json.loads(state_path.read_text()) if state_path.exists() else {}
     if not (folder / "official.json").exists():
         (folder / "official.json").write_text(json.dumps(official_totals(manifest), indent=2))
     held: dict[str, int | None] = json.loads((folder / "official.json").read_text())
-    names = counties(str(manifest["polity"]))
+    names = counties(manifest["polity"])
     message = ""
-    outcome: dict[str, dict[str, dict[str, object]] | None] = {"first": None, "second": None}
+    outcome: dict[str, dict[str, Series]] = {}
     redo: set[int] | None = None
     for reader in ("first", "second"):
         if reader == "second":
-            redo = {
-                page
-                for entry in (outcome["first"] or {}).values()
-                if entry["status"] != "tied"
-                for page in entry["pages"]
-            }
+            redo = {page for entry in outcome["first"].values() if entry.status != "tied" for page in entry.pages}
             if not redo:
                 break
         if state.get("batches", {}).get(reader):
@@ -506,14 +614,14 @@ def run(name: str) -> str:
         if pending(name, reader, redo):
             return message or f"{reader}: waiting for the batch"
         outcome[reader] = evaluate(manifest, reader, names, held)
-    return finalize(manifest, folder, outcome["first"] or {}, outcome["second"], held)
+    return finalize(manifest, folder, outcome["first"], outcome.get("second"), held)
 
 
 def finalize(
-    manifest: dict[str, object],
+    manifest: Manifest,
     folder: Path,
-    first: dict[str, dict[str, object]],
-    second: dict[str, dict[str, object]] | None,
+    first: dict[str, Series],
+    second: dict[str, Series] | None,
     held: dict[str, int | None],
 ) -> str:
     overrides = json.loads((folder / "overrides.json").read_text()) if (folder / "overrides.json").exists() else {}
@@ -527,50 +635,48 @@ def finalize(
     passed: list[dict[str, object]] = []
     review: list[dict[str, object]] = []
     for name, one in first.items():
-        two = second[name] if second is not None and one["status"] != "tied" else None
+        two = second[name] if second is not None and one.status != "tied" else None
         chosen, how = one, "first"
-        if one["status"] != "tied":
-            if two is not None and two["status"] == "tied":
+        if one.status != "tied":
+            if two is not None and two.status == "tied":
                 chosen, how = two, "second"
             elif (
                 two is not None
-                and one["status"] == "unchecked"
-                and not one["errors"]
-                and not two["errors"]
-                and {k: v[0] for k, v in one["cells"].items()} == {k: v[0] for k, v in two["cells"].items()}
+                and one.status == "unchecked"
+                and not one.errors
+                and not two.errors
+                and {k: v[0] for k, v in one.cells.items()} == {k: v[0] for k, v in two.cells.items()}
             ):
                 chosen, how = two, "agreed"
             else:
                 chosen, how = two or one, "review"
-        cellmap = {key: list(value) for key, value in chosen["cells"].items()}
+        cellmap = {key: (value, box) for key, (value, box) in chosen.cells.items()}
         fixes = [item for item in overrides.get("cells", []) if item["series"] == name]
         if how == "review" and fixes:
             for item in fixes:
-                if (int(item["page"]), str(item["county"])) in cellmap:
-                    cellmap[(int(item["page"]), str(item["county"]))][0] = int(item["value"])
-            total = sum(value for value, _ in cellmap.values())
-            target = chosen["printed"] if chosen["printed"] is not None else held.get(name)
-            slack = 0 if chosen["printed"] is not None else max(50, (target or 0) * 0.01)
-            if target is not None and abs(total - target) <= slack:
+                key = (int(item["page"]), str(item["county"]))
+                if key in cellmap:
+                    cellmap[key] = (int(item["value"]), cellmap[key][1])
+            target = chosen.printed if chosen.printed is not None else held.get(name)
+            slack = 0 if chosen.printed is not None else max(50, (target or 0) * 0.01)
+            if target is not None and abs(sum(value for value, _ in cellmap.values()) - target) <= slack:
                 how = "settled"
         if how == "review" and name in accepted:
             how = "accepted"
         if how == "review":
+            other = two.cells if two is not None else {}
             differing = {
                 f"{page}:{code}"
-                for page, code in set(one["cells"]) | set(two["cells"] if two else {})
-                if one["cells"].get((page, code), (None,))[0]
-                != (two["cells"] if two else {}).get((page, code), (None,))[0]
+                for page, code in set(one.cells) | set(other)
+                if one.cells.get((page, code), (None,))[0] != other.get((page, code), (None,))[0]
             }
             review.append(
                 {
                     "series": name,
-                    "pages": chosen["pages"],
-                    "first": {"sum": one["sum"], "status": one["status"], "errors": one["errors"]},
-                    "second": None
-                    if two is None
-                    else {"sum": two["sum"], "status": two["status"], "errors": two["errors"]},
-                    "printed": chosen["printed"],
+                    "pages": chosen.pages,
+                    "first": {"sum": one.total, "status": one.status, "errors": one.errors},
+                    "second": None if two is None else {"sum": two.total, "status": two.status, "errors": two.errors},
+                    "printed": chosen.printed,
                     "official": held.get(name),
                     "differing": sorted(differing)[:40],
                 }
@@ -582,7 +688,7 @@ def finalize(
                 "series": name,
                 "contest": contest,
                 "candidate": candidate,
-                "writein": bool(columns[name].get("writein", False)),
+                "writein": columns[name].get("writein", False),
                 "page": page,
                 "code": code,
                 "votes": value,
@@ -601,14 +707,11 @@ def finalize(
     lines = [f"# {manifest['name']}", ""]
     for reader, (model, _, price_in, price_out) in READERS.items():
         seen: dict[int, tuple[int, int]] = {}
-        for request in requests(str(manifest["name"]), reader).values():
-            response = cached(str(request["key"]))
-            if response is not None:
-                before = seen.get(int(request["page"]), (0, 0))
-                seen[int(request["page"])] = (
-                    before[0] + response["usage"]["input_tokens"],
-                    before[1] + response["usage"]["output_tokens"],
-                )
+        for request in requests(manifest["name"], reader).values():
+            response = cached(request.key)
+            if response is not None and isinstance(usage := response["usage"], dict):
+                before = seen.get(request.page, (0, 0))
+                seen[request.page] = (before[0] + usage["input_tokens"], before[1] + usage["output_tokens"])
         if seen:
             dollars = sum(i * price_in + o * price_out for i, o in seen.values()) / 1e6
             lines += [
@@ -618,14 +721,14 @@ def finalize(
             lines += [f"- p{page}: {i} in, {o} out" for page, (i, o) in sorted(seen.items())] + [""]
     counts: dict[tuple[str, str], int] = {}
     for row in passed:
-        counts[(str(row["series"]), str(row["how"]))] = counts.get((str(row["series"]), str(row["how"])), 0) + 1
+        pair = (str(row["series"]), str(row["how"]))
+        counts[pair] = counts.get(pair, 0) + 1
     lines += ["## passed", "", *[f"- {series}: {how}, {count} cells" for (series, how), count in counts.items()]]
     lines += ["", "## review", ""]
-    lines += [
-        f"- {item['series']}: first {item['first']['sum']}, second {item['second'] and item['second']['sum']}, "
-        f"printed {item['printed']}, official {item['official']}"
-        for item in review
-    ]
+    for item in review:
+        lines.append(
+            f"- {item['series']}: first {item['first']}, second {item['second']}, printed {item['printed']}, official {item['official']}"
+        )
     (folder / "report.md").write_text("\n".join(lines))
     return f"{len({row['series'] for row in passed})} series passed, {len(review)} in review; {folder / 'report.md'}"
 
@@ -647,12 +750,12 @@ def status() -> str:
 
 def emit(name: str) -> Path:
     manifest = load(name)
-    contests = dict(manifest["contests"])
+    contests = manifest["contests"]
     frame = pl.read_parquet(WORK / name / "tables.parquet")
     frame = frame.with_columns(
         **{
-            field: pl.col("contest").replace_strict({key: value[field] for key, value in contests.items()})
-            for field in ("year", "chamber", "day", "special", "state", "district")
+            name_: pl.col("contest").replace_strict({key: value[name_] for key, value in contests.items()})
+            for name_ in ("year", "chamber", "day", "special", "state", "district")
         },
         measure=pl.lit(1, pl.Int16),
         kind=pl.lit("county"),
@@ -673,23 +776,23 @@ def emit(name: str) -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=f"{manifest['title']}: county tables read from the scan by a vision model and checked against the printed and held totals",
-            polity=str(manifest["polity"]),
+            polity=manifest["polity"],
         )
-        source = cs.source(str(manifest["publisher"]), str(manifest["title"]))
+        source = cs.source(manifest["publisher"], manifest["title"])
         cs.add(
             "source",
             id=source,
             kind=manifest.get("kind", "official_body"),
             publisher=manifest["publisher"],
             title=manifest["title"],
-            url=dict(manifest["file"])["url"],
+            url=manifest["file"]["url"],
             license=manifest.get("license", "Public record"),
         )
         stored = artifact(manifest)
         file = cs.artifact(stored, source)
         PAGES.mkdir(parents=True, exist_ok=True)
         pages: dict[int, str] = {}
-        specs = {int(spec["page"]): spec for spec in manifest["pages"]}
+        specs = {spec["page"]: spec for spec in manifest["pages"]}
         for number in sorted(set(frame["page"])):
             image = PAGES / f"{stored.sha256}-{number}.png"
             if not image.exists():
