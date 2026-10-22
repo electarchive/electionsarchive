@@ -31,6 +31,7 @@ FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2014, "republican"): ("2014%20Republican%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
     (2014, "democratic-runoff"): ("2014%20Democrat%20Primary%20Runoff%20Election%20Results_Certified%207%207%202014.pdf", date(2014, 6, 24)),
     (2022, "republican"): ("2022%20Republican%20Primary%20Official%20Results.pdf", date(2022, 6, 7)),
+    (2022, "republican-runoff"): ("2022%20June%2028th%20Republican%20Runoff%20Final%20Results.pdf", date(2022, 6, 28)),
     (2018, "democratic"): ("2018%20Democratic%20Primary%20Certified%20Results.pdf", date(2018, 6, 5)),
     (2018, "republican"): ("2018%20Republican%20Primary%20Certified%20Results.pdf", date(2018, 6, 5)),
     (2018, "democratic-runoff"): ("2018%20State%20Democratic%20Party%20Certified%20Primary%20Runoff%20Results.pdf", date(2018, 6, 26)),
@@ -46,8 +47,17 @@ EMIT = {
     (2014, "democratic-runoff"): {("house", 3)},
     (2022, "republican"): {("house", 1), ("house", 2), ("house", 3), ("house", 4)},
 }
+TEXTED = {(2022, "republican-runoff"): (4, 9)}
+TEXT_CANDIDATES = {
+    "Eller": ("house", 2, "ELLER, RONALD"),
+    "Flowers": ("house", 2, "FLOWERS, BRIAN"),
+    "Cassidy": ("house", 3, "CASSIDY, MICHAEL"),
+    "Guest": ("house", 3, "GUEST, MICHAEL"),
+    "Ezell": ("house", 4, "EZELL, MIKE"),
+    "Palazzo": ("house", 4, "PALAZZO, STEVEN M."),
+}
 PARSE: set[tuple[int, str]] = set()
-PARSE_NAMED = {"2018:democratic", "2018:democratic-runoff", "2018:republican", "2018:republican-runoff"}
+PARSE_NAMED: set[str] = set()
 GRIDDED = {
     (2022, "republican"): {
         0: ("house", 1, "KELLY, TRENT"),
@@ -322,15 +332,66 @@ def parse() -> None:
                         "y1": box[3] / shape[0],
                     }
                 )
+    names = sorted({c for each in NAMED.values() for page in each["pages"] for c in page["counties"]})
+    if len(names) != COUNTIES:
+        raise ValueError(f"{len(names)} county names")
+    code_of = dict(zip(names, codes))
+    for year, party in TEXTED:
+        pdf = raw.cached(SOURCE, url(year, party)).path
+        first, last = TEXTED[(year, party)]
+        html = subprocess.run(["pdftotext", "-bbox", "-f", str(first), "-l", str(last), str(pdf), "-"], capture_output=True, text=True, check=True).stdout
+        sums: Counter[str] = Counter()
+        printed: dict[str, int] = {}
+        for number, body in enumerate(html.split("<page ")[1:], first):
+            width, height = (float(v) for v in re.match(r'width="([\d.]+)" height="([\d.]+)"', body).groups())
+            words = [(float(a), float(b), float(c), float(d), t) for a, b, c, d, t in re.findall(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="([\d.]+)">([^<]*)</word>', body)]
+            if len(words) < 100:
+                continue
+            header = " ".join(w[4] for w in sorted((w for w in words if 105 < w[1] < 175), key=lambda w: w[0])).replace("Jeff Davis", "JeffDavis").replace("Pearl River", "PearlRiver").split()
+            total = header[-1] == "TOTAL"
+            header = [re.sub(r"[^a-z]", "", {"JeffDavis": "jeffersondavis"}.get(h, h).lower()) for h in header[: len(header) - total]]
+            for surname, (office, district, candidate) in TEXT_CANDIDATES.items():
+                line_y = next(w[1] for w in words if w[4] == surname)
+                cells = sorted((w for w in words if abs(w[1] - line_y) < 3 and w[0] > 260), key=lambda w: w[0])
+                if len(cells) != len(header) + total:
+                    raise ValueError(f"{year} {party} page {number}: {len(cells)} cells for {len(header)} counties")
+                for name, cell in zip(header, cells):
+                    if cell[4] == "X":
+                        continue
+                    value = int(cell[4].replace(",", ""))
+                    sums[candidate] += value
+                    out.append(
+                        {
+                            "year": year,
+                            "chamber": f"{office}:{party.removesuffix('-runoff')}",
+                            "day": FILES[(year, party)][1],
+                            "special": False,
+                            "state": "MS",
+                            "district": district,
+                            "code": code_of[name],
+                            "candidate": candidate,
+                            "measure": 1,
+                            "writein": False,
+                            "votes": value,
+                            "kind": "county",
+                            "source": f"MS{year}{party}",
+                            "file": 0,
+                            "page": number,
+                            "x0": cell[0] / width,
+                            "y0": cell[1] / height,
+                            "x1": cell[2] / width,
+                            "y1": cell[3] / height,
+                        }
+                    )
+                if total:
+                    printed[candidate] = int(cells[-1][4].replace(",", ""))
+        for candidate, count in printed.items():
+            print(year, party, candidate, count, "tied" if count == sums[candidate] else f"printed total exceeds the county sum by {count - sums[candidate]}")
     for tag, sheet in NAMED.items():
         if tag not in PARSE_NAMED:
             continue
         year, party = int(tag[:4]), tag[5:]
         pdf = raw.cached(SOURCE, url(year, party)).path
-        names = sorted({c for each in NAMED.values() for page in each["pages"] for c in page["counties"]})
-        if len(names) != COUNTIES:
-            raise ValueError(f"{len(names)} county names")
-        code_of = dict(zip(names, codes))
         sums = [0] * len(sheet["rows"])
         for page in sheet["pages"]:
             image = ms_scan.render(pdf, page["page"], dpi=300, turn=sheet.get("turn", 0))
