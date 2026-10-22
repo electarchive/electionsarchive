@@ -6,7 +6,7 @@ import unicodedata
 import zipfile
 from datetime import UTC, date, datetime
 from pathlib import Path
-from uuid import UUID
+from uuid import UUID, uuid5
 
 import polars as pl
 
@@ -287,6 +287,8 @@ def emit() -> Path:
             code = f"{postal}:{plain}"
             unit = cs.unit("us.former_county", code)
             units[code] = str(unit)
+            if unit not in cs.minted:
+                continue
             cs.add(
                 "reporting_unit",
                 id=unit,
@@ -321,7 +323,8 @@ def emit() -> Path:
         def resolve(study: str, year: int, postal: str, rest: str) -> str | None:
             if study == "13":
                 key = f"{_day(year)}:{postal}:{rest}"
-                return key if key in contests else None
+                if key in contests:
+                    return key
             found = dated.get((year, postal, rest), [])
             return found[0] if len(found) == 1 else None
 
@@ -356,43 +359,47 @@ def emit() -> Path:
             for seat, rest in zip(sizes, [str(office), f"{office}:special"], strict=False):
                 key = resolve(str(study), int(year), str(postal), rest)
                 groups.append((key or f"{year}:{postal}:{rest}", lines.filter(pl.col("seat") == seat)))
-        skipped: dict[str, int] = {}
+        skips: list[tuple[str, str, int | None, int | None, str | None]] = []
         values: list[pl.DataFrame] = []
         for key, lines in groups:
             contest = contests.get(key)
             if contest is None:
-                skipped["no contest"] = skipped.get("no contest", 0) + 1
+                skips.append((key, "no contest", None, None, None))
                 continue
             if contest in filled:
-                skipped["already by county"] = skipped.get("already by county", 0) + 1
+                skips.append((key, "already by county", None, None, None))
                 continue
             row = conn.execute(
-                """select c.election_id, min(v.count_round),
+                """select c.election_id, coalesce(min(v.count_round), 1),
                           coalesce(sum(v.value) filter (where v.measure = 4 and v.option_k = 0),
                                    sum(v.value) filter (where v.measure = 1))::bigint
-                   from contest c join result_set rs on rs.contest_id = c.id and rs.is_default
-                   join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
+                   from contest c left join result_set rs on rs.contest_id = c.id and rs.is_default
+                   left join result_value v on v.result_set_k = rs.k and v.measure in (1, 4)
                    where c.id = %s group by 1""",
                 [contest],
             ).fetchone()
-            if row is None or row[1] is None or row[1] > 1 or not row[2]:
-                skipped["no official total"] = skipped.get("no official total", 0) + 1
-                continue
+            assert row is not None
             election, first, official = row
+            if first > 1:
+                skips.append((key, "later round", None, official, None))
+                continue
+            official = official or None
             known = conn.execute(
                 """select o.id, o.kind, lower(coalesce(n.text, '')),
                           (select sum(v.value)::bigint from result_value v
                            where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1 and v.count_round = %s)
                    from contest_option o
-                   join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+                   left join result_set rs on rs.contest_id = o.contest_id and rs.is_default
                    left join name n on n.entity_id = o.party_id and n.is_preferred and n.lang = 'en'
                    where o.contest_id = %s""",
                 [first, contest],
             ).fetchall()
-            known = [(option, kind, party, total) for option, kind, party, total in known if total]
+            known = [
+                (option, kind, party, total or 0) for option, kind, party, total in known if total or official is None
+            ]
             sums = dict(lines.group_by("party").agg(pl.col("value").sum()).iter_rows())
             counted = sum(sums.values())
-            complete = abs(counted - official) <= max(50, official * 0.01)
+            complete = official is not None and abs(counted - official) <= max(50, official * 0.01)
             picked: dict[str, UUID | None] = {}
             free = list(known)
             for party in sorted(sums, key=lambda party: -sums[party]):
@@ -423,7 +430,7 @@ def emit() -> Path:
             drifted = [
                 (party, sums[party], total)
                 for party, option in picked.items()
-                if option is not None
+                if option is not None and official is not None
                 for known_option, _, _, total in known
                 if known_option == option
                 and (
@@ -432,21 +439,21 @@ def emit() -> Path:
                 )
             ]
             for party, _, total in drifted:
-                if party not in ("0100", "0200") and total < official * 0.05:
+                if party not in ("0100", "0200") and official is not None and total < official * 0.05:
                     picked[party] = None
             drifted = [line for line in drifted if picked[line[0]] is not None]
-            if drifted:
-                print(f"{key}: {drifted} against the official totals, skipped")
-                skipped["drifted"] = skipped.get("drifted", 0) + 1
-                continue
             if "0100" in sums and picked.get("0100") is None or "0200" in sums and picked.get("0200") is None:
-                print(f"{key}: no Democratic or Republican option, skipped")
-                skipped["no major option"] = skipped.get("no major option", 0) + 1
+                skips.append((key, "no major option", counted, official, None))
                 continue
-            if counted > official * 1.02:
-                print(f"{key}: the county sum {counted} exceeds the official {official}, skipped")
-                skipped["overcounted"] = skipped.get("overcounted", 0) + 1
-                continue
+            unreconciled = (
+                "no official total"
+                if official is None
+                else "drifted"
+                if drifted
+                else "overcounted"
+                if counted > official * 1.02
+                else None
+            )
             result_set = cs.key(f"{SOURCE}.result_set", f"{key}:county")
             if result_set not in cs.minted:
                 continue
@@ -464,8 +471,27 @@ def emit() -> Path:
                 status="active",
                 source_id=sources[str(lines["study"][0])],
                 is_default=False,
-                completeness=round(counted / official, 4),
+                completeness=None if official is None else round(counted / official, 4),
             )
+            if unreconciled is not None:
+                skips.append((key, unreconciled, counted, official, str(drifted) if drifted else None))
+                cs.add(
+                    "flag",
+                    id=uuid5(result_set, "reconcile.official"),
+                    result_set_id=result_set,
+                    check_code="reconcile.official",
+                    severity="warning",
+                    status="accepted",
+                    details={
+                        "reason": unreconciled,
+                        "counted": counted,
+                        "official": official,
+                        "drifted": [
+                            {"party": names.get(party, party), "counted": votes, "official": total}
+                            for party, votes, total in drifted
+                        ],
+                    },
+                )
             values.append(
                 lines.select(
                     result_set_id=pl.lit(str(result_set)),
@@ -480,6 +506,10 @@ def emit() -> Path:
                 .group_by("result_set_id", "unit_id", "option_id", "channel", "measure", "count_round", "flags")
                 .agg(pl.col("value").sum())
             )
-        print(skipped, len(values))
+        skipped = pl.DataFrame(
+            skips, schema=["key", "reason", "counted", "official", "detail"], orient="row", infer_schema_length=None
+        )
+        skipped.write_parquet(PARSED / "skips.parquet")
+        print(skipped["reason"].value_counts(sort=True), len(values))
         cs.frame("result_value", pl.concat(values))
         return cs.write()
