@@ -355,19 +355,54 @@
       ),
   );
   const edges = $derived.by(() => {
-    if (typeof view !== "number" && view !== "turnout") {
+    if (typeof view !== "number") {
       return [];
     }
     const index = view;
-    const sorted = (
-      typeof index === "number"
-        ? places.rows.map((row) => row.shares[index] ?? 0)
-        : [...turnouts.values()]
-    ).toSorted((a, b) => a - b);
+    const sorted = places.rows
+      .map((row) => row.shares[index] ?? 0)
+      .toSorted((a, b) => a - b);
     const cuts = [0.2, 0.4, 0.6, 0.8].map(
       (at) => sorted[Math.floor(at * (sorted.length - 1))] ?? 0,
     );
     return [...new Set(cuts)];
+  });
+  const scale = $derived.by(() => {
+    const values = [...turnouts.values()].toSorted((a, b) => a - b);
+    if (values.length === 0) {
+      return null;
+    }
+    const trim = values.length >= 20 ? 0.05 : 0;
+    const low = values[Math.floor(trim * (values.length - 1))] ?? 0;
+    const high = values[Math.ceil((1 - trim) * (values.length - 1))] ?? 0;
+    const span = (size: number) =>
+      Math.max(
+        1,
+        Math.ceil(high / size - 1e-9) - Math.floor(low / size + 1e-9),
+      );
+    const step =
+      [0.01, 0.02, 0.025, 0.05, 0.1, 0.2].find((size) => span(size) <= 6) ??
+      0.25;
+    const count = span(step);
+    const from = Math.floor(low / step + 1e-9) * step;
+    return {
+      from,
+      ticks: Array.from({ length: count + 1 }, (_, index) =>
+        index === 0
+          ? Math.min(from, values[0] ?? from)
+          : index === count
+            ? Math.max(from + count * step, values.at(-1) ?? 0)
+            : from + index * step,
+      ),
+      step,
+      count,
+      digits: step < 0.01 || step === 0.025 ? 1 : 0,
+      tones: Array.from(
+        { length: count },
+        (_, index) =>
+          `color-mix(in oklab, var(--turnout-high) ${count === 1 ? 100 : Math.round((index / (count - 1)) * 100)}%, var(--turnout-low))`,
+      ),
+    };
   });
   const dots = $derived({
     type: "FeatureCollection" as const,
@@ -585,18 +620,11 @@
       }
       if (view === "turnout") {
         const share = turnouts.get(row.k);
-        if (share != null) {
-          let step = 0;
-          for (const edge of edges) {
-            if (share > edge) {
-              step += 1;
-            }
-          }
+        if (share != null && scale != null) {
+          const at = Math.floor((share - scale.from) / scale.step + 1e-9);
           result.push([
             row.k,
-            read(
-              `color-mix(in oklab, var(--foreground) ${STEPS[step] ?? 100}%, var(--map-low))`,
-            ),
+            read(scale.tones[Math.min(scale.count - 1, Math.max(0, at))] ?? ""),
           ]);
         }
         continue;
@@ -1384,6 +1412,13 @@
     const hatched = [
       ...(isUnmatched ? unmatched.keys() : []),
       ...(isEstimated ? changes.keys() : []),
+      ...(view === "turnout" || view === "turnout_change"
+        ? [...places.rows, ...(places.districts ?? [])]
+            .filter(
+              (row) => !(view === "turnout" ? turnouts : surges).has(row.k),
+            )
+            .map((row) => row.k)
+        : []),
     ];
     const tips = [0, 1].map((index) =>
       tones.read(colors[index] ?? "var(--muted-foreground)"),
@@ -1969,28 +2004,38 @@
           })}</span
         >
       </div>
-    {:else if view === "turnout"}
-      <div class="flex flex-wrap items-center gap-2.5" aria-hidden="true">
+    {:else if view === "turnout" && scale != null}
+      <div
+        class="flex flex-wrap items-center gap-x-4 gap-y-2"
+        aria-hidden="true"
+      >
         <span class="text-muted-foreground">{m.map_turnout_key()}</span>
         <span
-          class="flex items-center gap-1.5 font-figures text-xs tabular-nums"
+          class="relative flex pbe-4.5 font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
         >
-          <span>{percent(edges[0] ?? 0)}</span>
-          <span class="flex">
-            {#each STEPS.slice(0, edges.length + 1) as strength (strength)}
-              <span
-                class="block-3 inline-6 first:rounded-s-xs last:rounded-e-xs"
-                style:background-color="color-mix(in oklab, var(--foreground) {strength}%,
-                var(--map-low))"
-              ></span>
-            {/each}
-          </span>
-          <span>{percent(edges.at(-1) ?? 0)}</span>
+          {#each scale.tones as tone, index (index)}
+            <span
+              class="block block-3 inline-10 first:rounded-s-xs last:rounded-e-xs"
+              style:background-color={tone}
+            ></span>
+          {/each}
+          {#each scale.ticks as tick, index (index)}
+            <span
+              class="absolute inset-bs-3 -translate-x-1/2 border-s border-foreground/50 block-1"
+              style:inset-inline-start="{index * 2.5}rem"
+            ></span>
+            <span
+              class="absolute inset-bs-4 -translate-x-1/2 leading-none whitespace-nowrap"
+              style:inset-inline-start="{index * 2.5}rem"
+              >{percent(tick, scale.digits)}</span
+            >
+          {/each}
         </span>
         {#if turnouts.size < places.rows.length}
-          <span
-            class="flex items-baseline gap-1.5 text-xs text-muted-foreground"
-            ><span>{m.map_turnout_none()}</span><span
+          <span class="flex items-center gap-1.5 text-xs text-muted-foreground"
+            ><span
+              class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_4px)] ring-1 ring-border block-3 inline-4"
+            ></span><span>{m.map_turnout_none()}</span><span
               class="font-figures tabular-nums"
               >{count(places.rows.length - turnouts.size)}</span
             ></span
