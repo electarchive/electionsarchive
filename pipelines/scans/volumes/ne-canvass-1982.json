@@ -1,0 +1,27 @@
+{
+  "kind": "statewide",
+  "year": 1982,
+  "day": "1982-11-02",
+  "polity": "US-NE",
+  "publisher": "Nebraska Secretary of State",
+  "title": "Official Report of the Board of State Canvassers, general election 1982-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://govdocs.nebraska.gov/epubs/S1200/S001-1982prim_gen.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor (joint ticket)",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "Auditor of Public Accounts",
+    "treasurer": "State Treasurer",
+    "attorney-general": "Attorney General"
+  },
+  "leaves": [
+    32,
+    33,
+    34
+  ]
+}

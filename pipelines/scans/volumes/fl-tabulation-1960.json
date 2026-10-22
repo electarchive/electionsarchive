@@ -1,0 +1,29 @@
+{
+  "kind": "statewide",
+  "year": 1960,
+  "day": "1960-11-08",
+  "polity": "US-FL",
+  "publisher": "Florida Department of State, Division of Elections",
+  "title": "Tabulation of Official Votes, Florida General Election 1960-11-08",
+  "license": "Public record",
+  "file": {
+    "url": "http://edocs.dlis.state.fl.us/fldocs/dos/de/generalelectionvotes/generalelectionvotes_1948-1968/1960.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor (printed with the governor from 1978)",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "comptroller": "Comptroller",
+    "treasurer": "State Treasurer",
+    "commissioner-of-education": "Superintendent of Public Instruction or Commissioner of Education",
+    "commissioner-of-agriculture": "Commissioner of Agriculture"
+  },
+  "leaves": [
+    3,
+    4,
+    5
+  ]
+}
