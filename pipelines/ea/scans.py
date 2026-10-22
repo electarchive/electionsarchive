@@ -36,6 +36,7 @@ class Column(TypedDict):
 
 class Page(TypedDict):
     page: int
+    id: NotRequired[str]
     columns: list[Column]
     crop: NotRequired[list[float]]
     dpi: NotRequired[int]
@@ -101,7 +102,7 @@ class Reader(NamedTuple):
 @dataclass
 class Read:
     custom: str
-    page: int
+    section: str
     span: tuple[float, float]
     digest: str
     pixels: int
@@ -111,13 +112,13 @@ class Read:
 
 @dataclass
 class Series:
-    pages: list[int]
+    pages: list[str]
     printed: int | None
     official: int | None
     total: int = 0
     status: str = ""
     errors: list[str] = field(default_factory=list)
-    cells: dict[tuple[int, str], tuple[int, list[float]]] = field(default_factory=dict)
+    cells: dict[tuple[str, str], tuple[int, list[float]]] = field(default_factory=dict)
 
 
 SOURCE = "us.scans"
@@ -238,11 +239,11 @@ def render(manifest: Manifest, spec: Page, dpi: int) -> Image.Image:
 
 
 @cache
-def bands(name: str) -> list[tuple[str, int, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]]:
+def bands(name: str) -> list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]]:
     manifest = load(name)
     folder = WORK / name / "crops"
     folder.mkdir(parents=True, exist_ok=True)
-    out: list[tuple[str, int, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]] = []
+    out: list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]] = []
     for spec in manifest["pages"]:
         image = render(manifest, spec, spec.get("dpi", 300))
         width, height = image.size
@@ -268,7 +269,7 @@ def bands(name: str) -> list[tuple[str, int, tuple[float, float], list[ImageBloc
             pixels = 0
             for position, part in enumerate(parts):
                 media, data = encode(part)
-                (folder / f"p{spec['page']}-b{band}-{position}.{media.split('/')[1]}").write_bytes(data)
+                (folder / f"p{spec.get('id', spec['page'])}-b{band}-{position}.{media.split('/')[1]}").write_bytes(data)
                 blocks.append(
                     ImageBlockParam(
                         type="image",
@@ -298,8 +299,8 @@ def bands(name: str) -> list[tuple[str, int, tuple[float, float], list[ImageBloc
             digest.update(text.encode())
             out.append(
                 (
-                    f"p{spec['page']}-b{band}",
-                    spec["page"],
+                    f"p{spec.get('id', spec['page'])}-b{band}",
+                    str(spec.get("id", spec["page"])),
                     (start / crop.height, stop / crop.height),
                     blocks,
                     digest.hexdigest(),
@@ -314,7 +315,7 @@ def requests(name: str, reader: str) -> dict[str, Read]:
     return {
         custom: Read(
             custom=custom,
-            page=page,
+            section=page,
             span=span,
             digest=digest,
             pixels=pixels,
@@ -371,24 +372,24 @@ def counties(polity: str) -> dict[str, str]:
             re.sub(
                 r"\s+(county|parish|borough|census area|city and borough|municipio)\b.*$", "", text, flags=re.IGNORECASE
             )
-        ): code
+        ).replace(" ", ""): code
         for text, code in found
     }
 
 
 def cells(
     manifest: Manifest, plan: dict[str, Read], names: dict[str, str]
-) -> tuple[dict[tuple[int, str, int], tuple[int, list[float]]], dict[tuple[int, int], int], dict[int, str]]:
-    values: dict[tuple[int, str, int], tuple[int, list[float]]] = {}
-    printed: dict[tuple[int, int], int] = {}
-    errors: dict[int, str] = {}
-    extra = {slug(label): code for label, code in manifest.get("unit_codes", {}).items()}
+) -> tuple[dict[tuple[str, str, int], tuple[int, list[float]]], dict[tuple[str, int], int], dict[str, str]]:
+    values: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
+    printed: dict[tuple[str, int], int] = {}
+    errors: dict[str, str] = {}
+    extra = {slug(label).replace(" ", ""): code for label, code in manifest.get("unit_codes", {}).items()}
     for spec in manifest["pages"]:
         across = spec.get("orientation") == "counties_across"
         x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
-        number = spec["page"]
+        number = str(spec.get("id", spec["page"]))
         for custom, request in plan.items():
-            if request.page != number:
+            if request.section != number:
                 continue
             table = parse(cached(request.key))
             if isinstance(table, str):
@@ -419,7 +420,7 @@ def cells(
                         continue
                     if value is None:
                         continue
-                    code = extra.get(slug(label)) or names.get(slug(label))
+                    code = extra.get(slug(label).replace(" ", "")) or names.get(slug(label).replace(" ", ""))
                     if code is None:
                         errors[number] = f"{custom}: county {label!r} is not in {manifest['polity']}"
                         break
@@ -443,7 +444,7 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
     values, printed, errors = cells(manifest, requests(manifest["name"], reader), names)
     series: dict[str, Series] = {}
     for spec in manifest["pages"]:
-        page = spec["page"]
+        page = str(spec.get("id", spec["page"]))
         for index, column in enumerate(spec["columns"]):
             if column["contest"] is None:
                 continue
@@ -476,11 +477,11 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
     return series
 
 
-def pending(name: str, reader: str, pages: set[int] | None) -> dict[str, Read]:
+def pending(name: str, reader: str, pages: set[str] | None) -> dict[str, Read]:
     return {
         custom: request
         for custom, request in requests(name, reader).items()
-        if (pages is None or request.page in pages) and cached(request.key) is None
+        if (pages is None or request.section in pages) and cached(request.key) is None
     }
 
 
@@ -599,7 +600,7 @@ def run(name: str) -> str:
     names = counties(manifest["polity"])
     message = ""
     outcome: dict[str, dict[str, Series]] = {}
-    redo: set[int] | None = None
+    redo: set[str] | None = None
     for reader in ("first", "second"):
         if reader == "second":
             redo = {page for entry in outcome["first"].values() if entry.status != "tied" for page in entry.pages}
@@ -632,6 +633,7 @@ def finalize(
         for column in spec["columns"]
         if column["contest"] is not None
     }
+    numbers = {str(spec.get("id", spec["page"])): spec["page"] for spec in manifest["pages"]}
     passed: list[dict[str, object]] = []
     review: list[dict[str, object]] = []
     for name, one in first.items():
@@ -654,7 +656,7 @@ def finalize(
         fixes = [item for item in overrides.get("cells", []) if item["series"] == name]
         if how == "review" and fixes:
             for item in fixes:
-                key = (int(item["page"]), str(item["county"]))
+                key = (str(item.get("section", item.get("page"))), str(item["county"]))
                 if key in cellmap:
                     cellmap[key] = (int(item["value"]), cellmap[key][1])
             target = chosen.printed if chosen.printed is not None else held.get(name)
@@ -689,7 +691,8 @@ def finalize(
                 "contest": contest,
                 "candidate": candidate,
                 "writein": columns[name].get("writein", False),
-                "page": page,
+                "page": numbers[page],
+                "section": page,
                 "code": code,
                 "votes": value,
                 "x0": box[0],
@@ -706,19 +709,19 @@ def finalize(
         pl.DataFrame(passed).write_parquet(folder / "tables.parquet")
     lines = [f"# {manifest['name']}", ""]
     for reader, (model, _, price_in, price_out) in READERS.items():
-        seen: dict[int, tuple[int, int]] = {}
+        seen: dict[str, tuple[int, int]] = {}
         for request in requests(manifest["name"], reader).values():
             response = cached(request.key)
             if response is not None and isinstance(usage := response["usage"], dict):
-                before = seen.get(request.page, (0, 0))
-                seen[request.page] = (before[0] + usage["input_tokens"], before[1] + usage["output_tokens"])
+                before = seen.get(request.section, (0, 0))
+                seen[request.section] = (before[0] + usage["input_tokens"], before[1] + usage["output_tokens"])
         if seen:
             dollars = sum(i * price_in + o * price_out for i, o in seen.values()) / 1e6
             lines += [
                 f"## {reader} ({model}): {len(seen)} pages, ${dollars:.4f}, ${dollars / len(seen):.4f} per page",
                 "",
             ]
-            lines += [f"- p{page}: {i} in, {o} out" for page, (i, o) in sorted(seen.items())] + [""]
+            lines += [f"- {page}: {i} in, {o} out" for page, (i, o) in sorted(seen.items())] + [""]
     counts: dict[tuple[str, str], int] = {}
     for row in passed:
         pair = (str(row["series"]), str(row["how"]))

@@ -1,0 +1,132 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "title": "Official vote, 1992 general election",
+ "license": "Public record",
+ "file": {
+  "url": "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZXrHCzqRzWcetZpt%2bDb3HXpXLIL9t24cXtTS4sHqtrLrmkQMebVS3mfhc%2fKYW43XFJIhitTAKjyz"
+ },
+ "raw_source": "us.state_primaries",
+ "contests": {
+  "d14": {
+   "year": 1992,
+   "chamber": "house",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 14
+  },
+  "d19": {
+   "year": 1992,
+   "chamber": "house",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 19
+  },
+  "d20": {
+   "year": 1992,
+   "chamber": "house",
+   "day": "1992-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 20
+  }
+ },
+ "pages": [
+  {
+   "page": 63,
+   "id": "d14",
+   "crop": [
+    0.0,
+    0.085,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "J. Dennis Hastert",
+     "contest": "d14",
+     "candidate": "J. Dennis Hastert"
+    },
+    {
+     "label": "Jonathan Abram Reich",
+     "contest": "d14",
+     "candidate": "Jonathan Abram Reich"
+    },
+    {
+     "label": "Yvonne Dinwiddie",
+     "contest": "d14",
+     "candidate": "Yvonne Dinwiddie"
+    }
+   ]
+  },
+  {
+   "page": 68,
+   "id": "d19",
+   "crop": [
+    0.0,
+    0.091,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Glenn Poshard",
+     "contest": "d19",
+     "candidate": "Glenn Poshard"
+    },
+    {
+     "label": "Douglas E. Lee",
+     "contest": "d19",
+     "candidate": "Douglas E. Lee"
+    },
+    {
+     "label": "Pat Riker",
+     "contest": "d19",
+     "candidate": "Pat Riker"
+    }
+   ]
+  },
+  {
+   "page": 69,
+   "id": "d20",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Richard J. Durbin",
+     "contest": "d20",
+     "candidate": "Richard J. Durbin"
+    },
+    {
+     "label": "John M. Shimkus",
+     "contest": "d20",
+     "candidate": "John M. Shimkus"
+    }
+   ]
+  }
+ ]
+}

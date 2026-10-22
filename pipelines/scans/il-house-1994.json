@@ -1,0 +1,168 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "title": "Official vote, 1994 general election",
+ "license": "Public record",
+ "file": {
+  "url": "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZXrHCzqRzWcetZpt%2bDb3HXpXLIL9t24cXsieEFM9Snz0TK%2fAE2%2fDZslfe6eoBdwEVu117Zl4GM2N"
+ },
+ "raw_source": "us.state_primaries",
+ "contests": {
+  "d11": {
+   "year": 1994,
+   "chamber": "house",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "IL",
+   "district": 11
+  },
+  "d13": {
+   "year": 1994,
+   "chamber": "house",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "IL",
+   "district": 13
+  },
+  "d18": {
+   "year": 1994,
+   "chamber": "house",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "IL",
+   "district": 18
+  },
+  "d20": {
+   "year": 1994,
+   "chamber": "house",
+   "day": "1994-11-08",
+   "special": false,
+   "state": "IL",
+   "district": 20
+  }
+ },
+ "pages": [
+  {
+   "page": 41,
+   "id": "d11",
+   "crop": [
+    0.0,
+    0.338,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Gerald C. \"Jerry\" Weller",
+     "contest": "d11",
+     "candidate": "Gerald C. \"Jerry\" Weller"
+    },
+    {
+     "label": "Frank Giglio",
+     "contest": "d11",
+     "candidate": "Frank Giglio"
+    },
+    {
+     "label": "Eugene Stachyra",
+     "contest": "d11",
+     "candidate": "Eugene Stachyra"
+    }
+   ]
+  },
+  {
+   "page": 42,
+   "id": "d13",
+   "crop": [
+    0.0,
+    0.445,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Harris W. Fawell",
+     "contest": "d13",
+     "candidate": "Harris W. Fawell"
+    },
+    {
+     "label": "William A. Riley",
+     "contest": "d13",
+     "candidate": "William A. Riley"
+    }
+   ]
+  },
+  {
+   "page": 47,
+   "id": "d18",
+   "crop": [
+    0.0,
+    0.076,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Ray Lahood",
+     "contest": "d18",
+     "candidate": "Ray Lahood"
+    },
+    {
+     "label": "G. Douglas Stephens",
+     "contest": "d18",
+     "candidate": "G. Douglas Stephens"
+    },
+    {
+     "label": "Joyce Harant",
+     "contest": "d18",
+     "candidate": "Joyce Harant"
+    }
+   ]
+  },
+  {
+   "page": 49,
+   "id": "d20",
+   "crop": [
+    0.0,
+    0.075,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Richard J. Durbin",
+     "contest": "d20",
+     "candidate": "Richard J. Durbin"
+    },
+    {
+     "label": "Bill Owens",
+     "contest": "d20",
+     "candidate": "Bill Owens"
+    }
+   ]
+  }
+ ]
+}

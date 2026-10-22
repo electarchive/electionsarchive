@@ -1,0 +1,306 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "title": "Official vote, 1996 general election",
+ "license": "Public record",
+ "file": {
+  "url": "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZXrHCzqRzWcetZpt%2bDb3HXpXLIL9t24cXjTuupDlnxm8vcckbcQT8KZzCLsbqlLlvRI%2fz3q5vo%2bd"
+ },
+ "raw_source": "us.state_primaries",
+ "contests": {
+  "d6": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 6
+  },
+  "d7": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 7
+  },
+  "d12": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 12
+  },
+  "d13": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 13
+  },
+  "d15": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 15
+  },
+  "d19": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 19
+  },
+  "d20": {
+   "year": 1996,
+   "chamber": "house",
+   "day": "1996-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 20
+  }
+ },
+ "pages": [
+  {
+   "page": 32,
+   "id": "d6",
+   "crop": [
+    0.0,
+    0.071,
+    1.0,
+    0.359
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Henry J. Hyde",
+     "contest": "d6",
+     "candidate": "Henry J. Hyde"
+    },
+    {
+     "label": "Stephen De La Rosa",
+     "contest": "d6",
+     "candidate": "Stephen De La Rosa"
+    },
+    {
+     "label": "George Meyers",
+     "contest": "d6",
+     "candidate": "George Meyers"
+    }
+   ]
+  },
+  {
+   "page": 32,
+   "id": "d7",
+   "crop": [
+    0.0,
+    0.331,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Danny K. Davis",
+     "contest": "d7",
+     "candidate": "Danny K. Davis"
+    },
+    {
+     "label": "Randy Borow",
+     "contest": "d7",
+     "candidate": "Randy Borow"
+    },
+    {
+     "label": "Chauncey L. Stroud",
+     "contest": "d7",
+     "candidate": "Chauncey L. Stroud"
+    },
+    {
+     "label": "Toietta Dixon",
+     "contest": "d7",
+     "candidate": "Toietta Dixon"
+    },
+    {
+     "label": "Charles A. Winter",
+     "contest": "d7",
+     "candidate": "Charles A. Winter"
+    }
+   ]
+  },
+  {
+   "page": 35,
+   "id": "d12",
+   "crop": [
+    0.0,
+    0.068,
+    1.0,
+    0.457
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Jerry F. Costello",
+     "contest": "d12",
+     "candidate": "Jerry F. Costello"
+    },
+    {
+     "label": "Shapley R. Hunter",
+     "contest": "d12",
+     "candidate": "Shapley R. Hunter"
+    },
+    {
+     "label": "Geoffrey S. Nathan",
+     "contest": "d12",
+     "candidate": "Geoffrey S. Nathan"
+    }
+   ]
+  },
+  {
+   "page": 35,
+   "id": "d13",
+   "crop": [
+    0.0,
+    0.43,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Harris W. Fawell",
+     "contest": "d13",
+     "candidate": "Harris W. Fawell"
+    },
+    {
+     "label": "Susan W. Hynes",
+     "contest": "d13",
+     "candidate": "Susan W. Hynes"
+    }
+   ]
+  },
+  {
+   "page": 37,
+   "id": "d15",
+   "crop": [
+    0.0,
+    0.075,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Thomas W. Ewing",
+     "contest": "d15",
+     "candidate": "Thomas W. Ewing"
+    },
+    {
+     "label": "Laurel Lunt Prussing",
+     "contest": "d15",
+     "candidate": "Laurel Lunt Prussing"
+    }
+   ]
+  },
+  {
+   "page": 41,
+   "id": "d19",
+   "crop": [
+    0.0,
+    0.073,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Glenn Poshard",
+     "contest": "d19",
+     "candidate": "Glenn Poshard"
+    },
+    {
+     "label": "Brent Winters",
+     "contest": "d19",
+     "candidate": "Brent Winters"
+    },
+    {
+     "label": "Patricia Riker",
+     "contest": "d19",
+     "candidate": "Patricia Riker"
+    },
+    {
+     "label": "James R. Lacher",
+     "contest": "d19",
+     "candidate": "James R. Lacher"
+    }
+   ]
+  },
+  {
+   "page": 42,
+   "id": "d20",
+   "crop": [
+    0.0,
+    0.086,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "John M. Shimkus",
+     "contest": "d20",
+     "candidate": "John M. Shimkus"
+    },
+    {
+     "label": "Jay C. Hoffman",
+     "contest": "d20",
+     "candidate": "Jay C. Hoffman"
+    },
+    {
+     "label": "William R. Down",
+     "contest": "d20",
+     "candidate": "William R. Down"
+    }
+   ]
+  }
+ ]
+}

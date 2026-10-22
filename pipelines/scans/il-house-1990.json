@@ -1,0 +1,276 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "title": "Official vote, 1990 general election",
+ "license": "Public record",
+ "file": {
+  "url": "https://elections.il.gov/NewDocDisplay.aspx?khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZXrHCzqRzWcetZpt%2bDb3HXpXLIL9t24cXpacS2tFsBti%2bDPgAStQjUCCpr0fVwKSZdn0bkGpN0jf"
+ },
+ "raw_source": "us.state_primaries",
+ "contests": {
+  "d10": {
+   "year": 1990,
+   "chamber": "house",
+   "day": "1990-11-06",
+   "special": false,
+   "state": "IL",
+   "district": 10
+  },
+  "d12": {
+   "year": 1990,
+   "chamber": "house",
+   "day": "1990-11-06",
+   "special": false,
+   "state": "IL",
+   "district": 12
+  },
+  "d15": {
+   "year": 1990,
+   "chamber": "house",
+   "day": "1990-11-06",
+   "special": false,
+   "state": "IL",
+   "district": 15
+  },
+  "d18": {
+   "year": 1990,
+   "chamber": "house",
+   "day": "1990-11-06",
+   "special": false,
+   "state": "IL",
+   "district": 18
+  },
+  "d20": {
+   "year": 1990,
+   "chamber": "house",
+   "day": "1990-11-06",
+   "special": false,
+   "state": "IL",
+   "district": 20
+  },
+  "d21": {
+   "year": 1990,
+   "chamber": "house",
+   "day": "1990-11-06",
+   "special": false,
+   "state": "IL",
+   "district": 21
+  },
+  "d22": {
+   "year": 1990,
+   "chamber": "house",
+   "day": "1990-11-06",
+   "special": false,
+   "state": "IL",
+   "district": 22
+  }
+ },
+ "pages": [
+  {
+   "page": 38,
+   "id": "d10",
+   "crop": [
+    0.0,
+    0.331,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "John E. Porter",
+     "contest": "d10",
+     "candidate": "John E. Porter"
+    },
+    {
+     "label": "Peg Mcnamara",
+     "contest": "d10",
+     "candidate": "Peg Mcnamara"
+    },
+    {
+     "label": "Herbert L. Gorrell",
+     "contest": "d10",
+     "candidate": "Herbert L. Gorrell"
+    }
+   ]
+  },
+  {
+   "page": 39,
+   "id": "d12",
+   "crop": [
+    0.0,
+    0.341,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Philip M. Crane",
+     "contest": "d12",
+     "candidate": "Philip M. Crane"
+    },
+    {
+     "label": "Steve Pedersen",
+     "contest": "d12",
+     "candidate": "Steve Pedersen"
+    }
+   ]
+  },
+  {
+   "page": 41,
+   "id": "d15",
+   "crop": [
+    0.0,
+    0.077,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Edward R. Madigan",
+     "contest": "d15",
+     "candidate": "Edward R. Madigan"
+    },
+    {
+     "label": "William Decker, Jr",
+     "contest": "d15",
+     "candidate": "William Decker, Jr"
+    }
+   ]
+  },
+  {
+   "page": 44,
+   "id": "d18",
+   "crop": [
+    0.0,
+    0.076,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Robert H. Michel",
+     "contest": "d18",
+     "candidate": "Robert H. Michel"
+    },
+    {
+     "label": "Walter Gillin",
+     "contest": "d18",
+     "candidate": "Walter Gillin"
+    },
+    {
+     "label": "Alan J. Port",
+     "contest": "d18",
+     "candidate": "Alan J. Port"
+    }
+   ]
+  },
+  {
+   "page": 46,
+   "id": "d20",
+   "crop": [
+    0.0,
+    0.076,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Richard J. Durbin",
+     "contest": "d20",
+     "candidate": "Richard J. Durbin"
+    },
+    {
+     "label": "Paul Jurgens",
+     "contest": "d20",
+     "candidate": "Paul Jurgens"
+    }
+   ]
+  },
+  {
+   "page": 47,
+   "id": "d21",
+   "crop": [
+    0.0,
+    0.078,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Jerry F. Costello",
+     "contest": "d21",
+     "candidate": "Jerry F. Costello"
+    },
+    {
+     "label": "Robert H. Gaffner",
+     "contest": "d21",
+     "candidate": "Robert H. Gaffner"
+    }
+   ]
+  },
+  {
+   "page": 48,
+   "id": "d22",
+   "crop": [
+    0.0,
+    0.078,
+    1.0,
+    1.0
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": "Plurality"
+    },
+    {
+     "label": "Glenn Poshard",
+     "contest": "d22",
+     "candidate": "Glenn Poshard"
+    },
+    {
+     "label": "Jim Wham",
+     "contest": "d22",
+     "candidate": "Jim Wham"
+    }
+   ]
+  }
+ ]
+}
