@@ -377,6 +377,25 @@
     <h2 id="{uid}-title" class="heading">
       {m.places_title({ noun })}
     </h2>
+    {#if comparing && places.estimated === true && span != null}
+      <Tooltip.Root disableCloseOnTriggerClick>
+        <Tooltip.Trigger
+          class="-ms-2 shrink-0 rounded-xs highlighter px-1 text-[0.8125rem] font-semibold"
+        >
+          {m.atlas_estimated()}
+        </Tooltip.Trigger>
+        <Tooltip.Content
+          collisionPadding={8}
+          class="leading-snug max-inline-64"
+        >
+          {m.note_estimated({
+            from: span.from,
+            to: span.to,
+            year: span.forward ? span.to : span.from,
+          })}
+        </Tooltip.Content>
+      </Tooltip.Root>
+    {/if}
     {#if levels.length > 1 && !isMapped}
       <div class="flex" role="group" aria-label={m.places_level()}>
         {#each levels as level (level.code)}

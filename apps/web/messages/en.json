@@ -138,6 +138,7 @@
   "note_alternative_current": "These counts come from {publisher}, not from the official count.",
   "note_alternative_target": "The earlier counts come from {publisher}, not from the official count.",
   "note_redrawn": "This area was redrawn between {from} and {to}. The two versions share {percent} of their ground, so the comparison covers different places.",
+  "note_estimated": "Boundaries changed between {from} and {to}, so each place's {year} result is an estimate split from the {year} places that overlap it.",
   "sources_title": "Sources",
   "source_shown": "Shown",
   "source_completeness": "{percent} counted",

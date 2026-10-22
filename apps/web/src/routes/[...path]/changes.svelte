@@ -248,6 +248,15 @@
         {m.note_different_race()}
       </p>
     {/if}
+    {#if places?.estimated === true}
+      <p class="mbs-1 text-[0.8125rem] text-pretty text-muted-foreground">
+        {m.note_estimated({
+          from: span.from,
+          to: span.to,
+          year: span.forward ? span.to : span.from,
+        })}
+      </p>
+    {/if}
     {#if redrawn != null}
       <p class="mbs-1 text-[0.8125rem] text-pretty text-muted-foreground">
         {m.note_redrawn({
