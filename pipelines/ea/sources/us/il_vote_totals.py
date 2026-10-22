@@ -2,6 +2,7 @@ import csv
 import io
 import re
 import unicodedata
+from datetime import date
 from pathlib import Path
 
 import polars as pl
@@ -12,14 +13,23 @@ from ea.sources.us import medsl, state_primaries
 from ea.store import DATA, connect
 
 SOURCE = "us.il_vote_totals"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 CACHE = state_primaries.SOURCE
-YEARS = [year for year in state_primaries.IL_FILES if year <= 2014]
 FEDERAL = re.compile(r"(?:(\d+)(?:ST|ND|RD|TH) CONGRESS|(UNITED STATES SENATOR)|(PRESIDENT))")
+GENERALS = {1998: (date(1998, 11, 3), "khDtbt6dhc8zLboSZnz8zqVh5SQVox7uAOAe2nieWDAlNyd4%2btjArHsz9xVXIJ4p6Y57u3FvWw0%2bgnNWdT3uKyV44EJPSNKJqSNPoTMrt%2fmA2Vga9kq1ZbxtiJ%2fosJgrbL31aBh9d%2f%2bNJIzsDGBT%2bfoloSjs%2f6ALb494jITMllVoS7%2btZRrxqEsxCBlttI4l9csZTGqYG0g%3d")}
+FILES = [
+    *((state_primaries.IL_DAYS[year], state_primaries.IL_FILES[year][0], False) for year in state_primaries.IL_FILES if year <= 2014),
+    *((day, token, True) for day, token in GENERALS.values()),
+]
 PUBLISHER = "Illinois State Board of Elections"
 TITLE = "Election vote totals"
 PARTIES = {"DEM": "democratic", "REP": "republican"}
+
+
+def fetch() -> None:
+    for _, token in GENERALS.values():
+        raw.fetch(CACHE, state_primaries.IL_DOWNLOAD.format(token), suffix=".txt")
 
 
 def parse() -> None:
@@ -33,10 +43,8 @@ def parse() -> None:
             ).fetchall()
         }
     rows: list[tuple[object, str, int | None, str, str, int]] = []
-    for year in YEARS:
-        text = raw.cached(CACHE, state_primaries.IL_DOWNLOAD.format(state_primaries.IL_FILES[year][0])).path.read_text(
-            encoding="latin-1"
-        )
+    for day, token, general in FILES:
+        text = raw.cached(CACHE, state_primaries.IL_DOWNLOAD.format(token)).path.read_text(encoding="latin-1")
         table = list(csv.reader(io.StringIO(text), delimiter="\t" if "\t" in text.split("\n", 1)[0] else ","))
         heads = [cell.strip() for cell in table[0]]
         for row in table[1:]:
@@ -44,15 +52,15 @@ def parse() -> None:
                 continue
             line = dict(zip(heads, [cell.strip() for cell in row], strict=False))
             found = FEDERAL.fullmatch(line["OfficeName"])
-            party = PARTIES.get(line["PartyAbbrev"])
+            party = line["PartyAbbrev"] if general else PARTIES.get(line["PartyAbbrev"])
             if found is None or party is None:
                 continue
             kind = "house" if found[1] else "senate" if found[2] else "president"
             name = re.sub(r"\s+", " ", f"{line['CanFirstName']} {line['CanLastName']}").strip().upper()
             rows.append(
                 (
-                    state_primaries.IL_DAYS[year],
-                    f"{kind}:{party}",
+                    day,
+                    kind if general else f"{kind}:{party}",
                     int(found[1]) if found[1] else None,
                     name,
                     fips[re.sub(r"[^a-z]", "", line["County"].lower())],
@@ -94,7 +102,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Illinois's 2000–2014 House, Senate, and presidential primaries by county",
+            summary="Illinois's 2000–2014 primaries and 1998 general House and Senate results by county",
             polity="US-IL",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -107,9 +115,7 @@ def emit() -> Path:
             url="https://www.elections.il.gov/ElectionOperations/DownloadVoteTotals.aspx",
             license="Public record",
         )
-        for year in YEARS:
-            cs.artifact(
-                raw.cached(CACHE, state_primaries.IL_DOWNLOAD.format(state_primaries.IL_FILES[year][0])), source
-            )
+        for _, token, _ in FILES:
+            cs.artifact(raw.cached(CACHE, state_primaries.IL_DOWNLOAD.format(token)), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"IL": source}, strict=True)
         return cs.write()
