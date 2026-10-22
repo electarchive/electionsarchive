@@ -13,7 +13,11 @@ SOURCE = "us.elstats_pri92"
 VERSION = "1"
 YEAR = 1992
 GENERAL = "1992-11-03"
-PARTIES = {"democratic": "democratic-party", "republican": "republican-party", "liberty-union": "VT:liberty-union-party"}
+PARTIES = {
+    "democratic": "democratic-party",
+    "republican": "republican-party",
+    "liberty-union": "VT:liberty-union-party",
+}
 LATIN = str.maketrans("АВЕКМНОРСТХ", "ABEKMHOPCTX")
 METHOD = (
     "The FEC's book for 1992 prints presidential primaries only, so this contest is built from the state's own "
@@ -46,18 +50,28 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="1992 House and Senate primaries in Colorado, Idaho, Virginia, and Vermont from the states' election "
-            "archives",
+            summary="1992 House and Senate primaries in Colorado, Idaho, Massachusetts, Virginia, and Vermont from the "
+            "states' election archives",
             polity="US",
         )
         bodies = {"house": cs.key("us.body", "house"), "senate": cs.key("us.body", "senate")}
         sources: dict[str, UUID] = {}
         for state in frame["state"].unique().sort():
-            tenant, publisher, _ = elstats.TENANTS[state]
+            publisher = elstats.MA_PUBLISHER if state == "MA" else elstats.TENANTS[state][1]
             sources[state] = cs.source(publisher, elstats.TITLE)
             if sources[state] in cs.minted:
                 raise ValueError(f"{state}: the archive's source must already exist")
-            cs.artifact(raw.cached(elstats.SOURCE, elstats.url(tenant, YEAR)), sources[state])
+            if state != "MA":
+                cs.artifact(raw.cached(elstats.SOURCE, elstats.url(elstats.TENANTS[state][0], YEAR)), sources[state])
+                continue
+            for office in elstats.MA_OFFICES:
+                listing = raw.cached(elstats.SOURCE, elstats.ma_primary_search(office, YEAR))
+                cs.artifact(listing, sources[state])
+                for election, *_ in elstats.ma_primary_rows(listing.path.read_text()):
+                    cs.artifact(
+                        raw.cached(elstats.SOURCE, f"{elstats.MASSACHUSETTS}download/{election}/precincts_include:0/"),
+                        sources[state],
+                    )
         elections: set[UUID] = set()
         for (state, day, office, party, district), lines in frame.sort("state", "office", "party", "district").group_by(
             "state", "day", "office", "party", "district", maintain_order=True

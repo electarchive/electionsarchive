@@ -45,6 +45,7 @@ MA_ROW = re.compile(
     r'id="election-id-(\d+)".*?<td[^>]*>(\d{4})</td>\s*<td[^>]*>[^<]*</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>',
     re.DOTALL,
 )
+MA_PRIMARIES = {1992: date(1992, 9, 15)}
 OFFICES = ["U.S. House", "U.S. Senate", "United States", "Congress"]
 DIVISIONS = {"County": "county", "Locality": "county", "City/Town": "town"}
 FORMER = {
@@ -85,6 +86,14 @@ def ma_search(office: int) -> str:
     return f"{MASSACHUSETTS}search/year_from:{FIRST}/year_to:{LAST}/office_id:{office}/stage:General"
 
 
+def ma_primary_search(office: int, year: int) -> str:
+    return f"{MASSACHUSETTS}search/year_from:{year}/year_to:{year}/office_id:{office}"
+
+
+def ma_primary_rows(listing: str) -> list[tuple[str, ...]]:
+    return [row for row in MA_ROW.findall(listing) if re.fullmatch(r"(Democratic|Republican) Primary", row[3])]
+
+
 def plain(text: str) -> str:
     return re.sub(
         r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower().replace("saint ", "st ").replace("&", "and")
@@ -97,6 +106,10 @@ def fetch() -> None:
         listing = raw.fetch(SOURCE, ma_search(office), suffix=".html").path.read_text()
         for election, *_ in MA_ROW.findall(listing):
             raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
+        for year in MA_PRIMARIES:
+            listing = raw.fetch(SOURCE, ma_primary_search(office, year), suffix=".html").path.read_text()
+            for election, *_ in ma_primary_rows(listing):
+                raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
     for state, (tenant, _, _) in TENANTS.items():
         for year in range(EARLY.get(state, FIRST), PRIMARIES + 1):
             raw.fetch(SOURCE, url(tenant, year), suffix=".csv")
@@ -239,16 +252,21 @@ def parse() -> None:
                 )
             )
     for office, chamber in MA_OFFICES.items():
-        listing = raw.cached(SOURCE, ma_search(office)).path.read_text()
-        for election, year, district, stage in MA_ROW.findall(listing):
+        entries = MA_ROW.findall(raw.cached(SOURCE, ma_search(office)).path.read_text())
+        for primary_year in MA_PRIMARIES:
+            entries += ma_primary_rows(raw.cached(SOURCE, ma_primary_search(office, primary_year)).path.read_text())
+        for election, year, district, stage in entries:
             if "Special" in stage:
                 continue
+            party = stage.removesuffix(" Primary").lower() if stage.endswith(" Primary") else None
             table = pl.read_csv(
                 raw.cached(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/").path,
                 infer_schema=False,
                 skip_rows_after_header=1,
             )
-            general = date(int(year), 11, 2 + (-date(int(year), 11, 1).weekday()) % 7)
+            held = (
+                MA_PRIMARIES[int(year)] if party else date(int(year), 11, 2 + (-date(int(year), 11, 1).weekday()) % 7)
+            )
             frames.append(
                 table.filter(pl.col("City/Town").is_not_null() & (pl.col("City/Town") != "TOTALS"))
                 .with_columns(
@@ -261,8 +279,8 @@ def parse() -> None:
                 .unpivot([column for column in table.columns[3:] if column], index="City/Town", variable_name="name")
                 .select(
                     year=pl.lit(int(year), pl.Int32),
-                    chamber=pl.lit(chamber),
-                    day=pl.lit(general),
+                    chamber=pl.lit(f"{chamber}:{party}" if party else chamber),
+                    day=pl.lit(held),
                     special=pl.lit(False),
                     state=pl.lit("MA"),
                     district=pl.lit(int(district.split()[0][:-2]) if chamber == "house" else None, pl.Int16),
@@ -360,6 +378,14 @@ def emit() -> Path:
                 cs.artifact(
                     raw.cached(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/"), sources["MA"]
                 )
+            for year in MA_PRIMARIES:
+                listing = raw.cached(SOURCE, ma_primary_search(office, year))
+                cs.artifact(listing, sources["MA"])
+                for election, *_ in ma_primary_rows(listing.path.read_text()):
+                    cs.artifact(
+                        raw.cached(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/"),
+                        sources["MA"],
+                    )
         gazetteer = cs.source("U.S. Census Bureau", "2020 Gazetteer Files")
         if gazetteer in cs.minted:
             cs.add(
