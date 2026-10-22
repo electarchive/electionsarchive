@@ -12,6 +12,7 @@ from datetime import UTC, datetime
 from functools import cache
 from pathlib import Path
 from typing import Literal, NamedTuple, NotRequired, TypedDict
+from uuid import UUID
 
 import anthropic
 import polars as pl
@@ -212,8 +213,8 @@ def encode(image: Image.Image) -> tuple[str, bytes]:
     return "image/png", buffer.getvalue()
 
 
-def artifact(manifest: Manifest) -> raw.Artifact:
-    url = manifest["file"]["url"]
+def artifact(manifest: Manifest, spec: Page) -> raw.Artifact:
+    url = manifest["file"]["url"].format(page=spec["page"])
     try:
         return raw.cached(manifest.get("raw_source", SOURCE), url)
     except LookupError:
@@ -221,7 +222,7 @@ def artifact(manifest: Manifest) -> raw.Artifact:
 
 
 def render(manifest: Manifest, spec: Page, dpi: int) -> Image.Image:
-    source = artifact(manifest)
+    source = artifact(manifest, spec)
     if source.path.suffix == ".pdf":
         with tempfile.TemporaryDirectory() as folder:
             subprocess.run(
@@ -443,6 +444,7 @@ def cells(
 def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[str, int | None]) -> dict[str, Series]:
     values, printed, errors = cells(manifest, requests(manifest["name"], reader), names)
     series: dict[str, Series] = {}
+    joined: set[tuple[str, str]] = set()
     for spec in manifest["pages"]:
         page = str(spec.get("id", spec["page"]))
         for index, column in enumerate(spec["columns"]):
@@ -453,12 +455,15 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
             entry.pages.append(page)
             if page in errors:
                 entry.errors.append(errors[page])
+            again = (name, page) in joined
+            joined.add((name, page))
             if (page, index) in printed:
-                entry.printed = printed[(page, index)]
+                entry.printed = (entry.printed or 0) + printed[(page, index)] if again else printed[(page, index)]
             for (found, code, position), (value, box) in values.items():
                 if found == page and position == index:
                     entry.total += value
-                    entry.cells[(page, code)] = (value, box)
+                    before = entry.cells.get((page, code))
+                    entry.cells[(page, code)] = (value + before[0], before[1]) if before is not None else (value, box)
     for entry in series.values():
         entry.status = (
             "failed"
@@ -788,26 +793,29 @@ def emit(name: str) -> Path:
             kind=manifest.get("kind", "official_body"),
             publisher=manifest["publisher"],
             title=manifest["title"],
-            url=manifest["file"]["url"],
+            url=manifest["file"].get("item", manifest["file"]["url"]),
             license=manifest.get("license", "Public record"),
         )
-        stored = artifact(manifest)
-        file = cs.artifact(stored, source)
         PAGES.mkdir(parents=True, exist_ok=True)
         pages: dict[int, str] = {}
+        each = "{page}" in manifest["file"]["url"]
+        file: UUID | None = None
         specs = {spec["page"]: spec for spec in manifest["pages"]}
         for number in sorted(set(frame["page"])):
+            stored = artifact(manifest, specs[number])
+            if each or file is None:
+                file = cs.artifact(stored, source)
             image = PAGES / f"{stored.sha256}-{number}.png"
             if not image.exists():
                 render(manifest, specs[number], 100).save(image)
             width, height = Image.open(image).size
-            page = cs.page(file, number)
+            page = cs.page(file, 1 if each else number)
             pages[number] = str(page)
             cs.add(
                 "source_page",
                 id=page,
                 artifact_id=file,
-                page_number=number,
+                page_number=1 if each else number,
                 image_key=f"pages/{SOURCE}/{image.name}",
                 width=width,
                 height=height,
