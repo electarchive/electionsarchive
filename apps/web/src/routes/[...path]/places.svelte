@@ -511,7 +511,7 @@
   {/if}
 
   <div class="flex flex-wrap gap-1.5">
-    {#each isMapped ? [] : leads as [index, won] (index)}
+    {#each isMapped || leads.every(([, won]) => won < 2) ? [] : leads as [index, won] (index)}
       <button
         type="button"
         class={cn(

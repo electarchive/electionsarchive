@@ -285,6 +285,7 @@
   "race_lede_electors_only": "{party} won {seats} of the {total} electoral votes.",
   "race_lede_electors_tied": "{party} and {runner} tied with {seats} of the {total} electoral votes each.",
   "race_lede_districts": "{seats} seats filled in {count} separate district races.",
+  "race_lede_primaries": "Primaries in {count} districts.",
   "race_lede_won": "{party} won with {share} of the vote, {margin} points ahead of {runner}.",
   "race_lede_votes": "{party} led with {share} of the vote, {margin} points ahead of {runner}.",
   "race_lede_lost": "{answer} led with {share} of the vote, but the measure did not pass.",

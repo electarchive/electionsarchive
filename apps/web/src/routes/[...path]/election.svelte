@@ -780,8 +780,9 @@
           origin: null,
           photo: row.photo,
         })),
-        lede:
-          elector != null
+        lede: race.isPrimaries
+          ? m.race_lede_primaries({ count: count(race.count) })
+          : elector != null
             ? second?.votes === elector.votes
               ? m.race_lede_electors_tied({
                   party: elector.label,
@@ -1047,7 +1048,7 @@
           {race.lede}
         </p>
       {/if}
-      {#if race.results.length === 0}
+      {#if race.results.length === 0 && !race.isPrimaries}
         <p class="text-[0.9375rem] text-muted-foreground">{m.no_results()}</p>
       {:else if isFolding && index > 0}
         <button
@@ -1067,7 +1068,7 @@
       {/if}
     </section>
   {/if}
-  {#if (race.results.length > 1 || (index === 0 && race.results.length > 0)) && (!isFolding || index === 0 || opened[index] === true)}
+  {#if (race.results.length > 1 || race.isPrimaries || (index === 0 && race.results.length > 0)) && (!isFolding || index === 0 || opened[index] === true)}
     {#if race.electors != null && race.electors.rows.length > 0 && races.length === 1}
       <Electors electors={race.electors} />
     {/if}
@@ -1213,27 +1214,29 @@
         governing={race.size === chamber?.size ? governing : []}
       />
     {/if}
-    <div
-      class={cn(
-        "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-        {
-          "lg:col-span-5 xl:col-span-4": isMapped && !isSeated,
-          "lg:col-span-8": isSeated && !isMapped,
-        },
-      )}
-    >
-      <Results
-        rows={race.rows}
-        trace={race.count === 1 ? race.path : null}
-        span={null}
-        votes={race.votes}
-        seats={race.isLone || (race.isOffice && race.electors == null)
-          ? null
-          : race.electors == null && !race.isSlate
-            ? m.col_seats()
-            : m.col_electors()}
-      />
-    </div>
+    {#if !race.isPrimaries}
+      <div
+        class={cn(
+          "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
+          {
+            "lg:col-span-5 xl:col-span-4": isMapped && !isSeated,
+            "lg:col-span-8": isSeated && !isMapped,
+          },
+        )}
+      >
+        <Results
+          rows={race.rows}
+          trace={race.count === 1 ? race.path : null}
+          span={null}
+          votes={race.votes}
+          seats={race.isLone || (race.isOffice && race.electors == null)
+            ? null
+            : race.electors == null && !race.isSlate
+              ? m.col_seats()
+              : m.col_electors()}
+        />
+      </div>
+    {/if}
     {#if race.places != null && !race.isTotal}
       {const shown = $derived(
         regional[index] === true
@@ -1296,19 +1299,22 @@
             {#if other.lede != null}
               <div
                 class={cn({
-                  "max-sm:hidden": races.length > 4 && other.next == null,
+                  "max-sm:hidden":
+                    races.length > 4 &&
+                    other.next == null &&
+                    !other.isPrimaries,
                 })}
               >
                 {@render lede(other, false)}
               </div>
             {/if}
           </div>
-          {#if other.results.length === 0}
+          {#if other.results.length > 0}
+            {@render tally(other, false)}
+          {:else if !other.isPrimaries}
             <p class="text-[0.9375rem] text-muted-foreground">
               {m.no_results()}
             </p>
-          {:else}
-            {@render tally(other, false)}
           {/if}
         </li>
       {/each}

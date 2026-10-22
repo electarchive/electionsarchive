@@ -6253,6 +6253,8 @@ async function races(
             ).rows[0]?.last ?? null);
       const districts = group.filter((row) => row.k != null);
       const first = districts[0];
+      const isPrimaries =
+        single == null && head?.party != null && districts.length > 1;
       const grouping =
         group.find((row) => row.grouping === "alliance")?.grouping ?? "party";
       const counted = [
@@ -6362,7 +6364,7 @@ async function races(
                       },
                   lineage,
                   "party",
-                  grouping,
+                  isPrimaries ? "option" : grouping,
                 ),
                 anchors(
                   districts.map((row) => row.k ?? 0),
@@ -6469,7 +6471,7 @@ async function races(
         filled += row.seats ?? 0;
       }
       const [map, previous, runoff, seated] = await Promise.all([
-        level == null || isBrief
+        level == null || isBrief || isPrimaries
           ? null
           : sketch(
               place,
@@ -6619,7 +6621,8 @@ async function races(
         spread: spread.rows,
         measure: here?.measure ?? "votes",
         valid: here?.side.valid ?? 0,
-        results,
+        results: isPrimaries ? [] : results,
+        isPrimaries,
         holders:
           seated == null
             ? null
@@ -6859,6 +6862,7 @@ export const elections = {
             kind: v.string(),
             isOffice: v.boolean(),
             isRemainder: v.boolean(),
+            isPrimaries: v.boolean(),
             body: v.nullable(v.string()),
             round: v.nullable(v.number()),
             count: v.number(),

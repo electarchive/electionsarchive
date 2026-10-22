@@ -431,6 +431,23 @@ function electionMarkdown(
     ...election.races.flatMap((race) => {
       const hasSeats = race.results.some((row) => row.seats != null);
       const seats = race.electors == null ? m.col_seats() : m.col_electors();
+      const districts = race.isPrimaries ? race.places : null;
+      if (districts != null) {
+        return [
+          `## ${link(race.name, race.path)}`,
+          m.race_lede_primaries({ count: count(race.count) }),
+          table(
+            [m.col_name(), m.col_leader(), m.col_share()],
+            districts.rows.map((row) => [
+              link(row.name, row.path),
+              row.leader == null
+                ? null
+                : (districts.legend[row.leader]?.label ?? null),
+              row.leader == null ? null : percent(row.shares[row.leader] ?? 0),
+            ]),
+          ),
+        ];
+      }
       return [
         `## ${link(race.name, race.path)}`,
         table(
