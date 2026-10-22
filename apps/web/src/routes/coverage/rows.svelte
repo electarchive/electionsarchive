@@ -90,6 +90,8 @@
         )
       : all,
   );
+  const limit = $derived(depth === 0 ? 13 : 20);
+  let isAll = $state(false);
   const opened = new SvelteSet<string>();
   const current = new Date().getUTCFullYear();
   const compact = new Intl.NumberFormat(getLocale(), {
@@ -185,7 +187,7 @@
     {all.length === 0 ? m.coverage_empty() : m.coverage_all_done()}
   </div>
 {/if}
-{#each list as row (row.path)}
+{#each isAll ? list : list.slice(0, limit) as row (row.path)}
   {const isOpen = $derived(opened.has(row.path))}
   {const label = $derived(name(row))}
   {const isYear = $derived(row.kind === "year")}
@@ -304,3 +306,19 @@
     <Self parent={row.path} depth={depth + 1} {view} {hideDone} {local} />
   {/if}
 {/each}
+{#if !isAll && list.length > limit}
+  <div
+    role="row"
+    class="bg-card pe-2 pbs-1.5 pbe-2"
+    style:padding-inline-start="{0.5 + depth * 1.125}rem"
+  >
+    <span role="gridcell" class="grid">
+      <button
+        type="button"
+        class="flex items-center justify-center rounded-sm border border-input bg-card text-[0.8125rem] font-semibold keycap block-8 hover:bg-secondary"
+        onclick={() => (isAll = true)}
+        >{m.places_show_all({ count: count(list.length) })}</button
+      >
+    </span>
+  </div>
+{/if}
