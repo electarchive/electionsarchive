@@ -8443,6 +8443,7 @@ export const polities = {
             year: number | null;
             area: string;
             k: number;
+            tier: number;
           }>(sql`
             with recursive up(id) as (
               select parent_id from polity_parent where polity_id = ${input.id}::uuid
@@ -8456,10 +8457,22 @@ export const polities = {
               order by upper(t.valid) desc nulls first limit 1
             )
             select c.id, c.allocation_parent_id as parent, s.path, e.date_from::text as date, ${CYCLE} as year,
-              place.id as area, place.k
+              place.id as area, place.k,
+              case
+                when c.kind = 'ballot_question' then 5
+                when c.kind = 'elector_slate' or o.kind in ('head_of_state', 'head_of_government') then 0
+                when (c.district_area_id is null or c.district_area_id = pt.area_id)
+                  and (o.kind = 'governor' or b.polity_id <> e.polity_id) then 1
+                when b.polity_id <> e.polity_id then 2
+                when c.district_area_id is null or c.district_area_id = pt.area_id then 3
+                else 4
+              end as tier
             from place, election e
             join contest c on c.election_id = e.id
             join slug s on s.entity_id = c.id and s.is_current
+            left join body b on b.id = c.body_id
+            left join office o on o.id = c.office_id
+            left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             where e.polity_id in (select id from up) and e.date_from is not null and exists (
               select 1 from result_set rs
               where rs.contest_id = c.id and rs.status = 'active' and exists (
@@ -8638,6 +8651,7 @@ export const polities = {
             .toSorted(
               (a, b) =>
                 b.date.localeCompare(a.date) ||
+                a.tier - b.tier ||
                 b.valid - a.valid ||
                 a.name.localeCompare(b.name, undefined, { numeric: true }),
             ),
