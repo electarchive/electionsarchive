@@ -497,7 +497,9 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                      and c.confrelid::regclass::text = any(%s)
                      and c.conrelid::regclass::text not in
                        ('name', 'note', 'external_id', 'slug', 'label', 'flag', 'search_document', 'entity_retirement')
-                     and (c.conrelid::regclass::text, a.attname) <> (%s, 'id')""",
+                     and (c.conrelid::regclass::text, a.attname) <> (%s, 'id')
+                     and (c.conrelid::regclass::text, c.confrelid::regclass::text)
+                       <> ('candidacy_nomination', 'candidacy')""",
                 [["entity", kind], kind],
             ).fetchall():
                 held += [
