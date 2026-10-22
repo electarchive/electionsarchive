@@ -272,20 +272,25 @@ const Cell = v.nullable(
   }),
 );
 
+const FINE = v.pipe(
+  v.number(),
+  v.transform((value) => Math.round(value * 1e5) / 1e5),
+);
+
 const PlaceRow = v.object({
   k: v.number(),
   turnout: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
-  turnedBefore: v.optional(v.nullable(v.number())),
-  at: v.optional(v.nullable(v.tuple([v.number(), v.number()]))),
+  turnedBefore: v.optional(v.nullable(FINE)),
+  at: v.optional(v.nullable(v.tuple([FINE, FINE]))),
   name: v.string(),
   path: v.nullable(v.string()),
   contest: v.boolean(),
   isRemainder: v.boolean(),
   valid: v.number(),
-  shares: v.array(v.number()),
+  shares: v.array(FINE),
   leader: v.nullable(v.number()),
-  margin: v.nullable(v.number()),
-  earlier: v.nullable(v.array(v.number())),
+  margin: v.nullable(FINE),
+  earlier: v.nullable(v.array(FINE)),
   prior: v.nullable(v.number()),
   redrawn: v.optional(v.number()),
   within: v.optional(v.number()),
