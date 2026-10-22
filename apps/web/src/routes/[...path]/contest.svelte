@@ -260,7 +260,7 @@
               side: sides.findIndex((side) => side.person === item.person),
               leader: titles[row.leader ?? -1] ?? "",
               margin,
-              color: `color-mix(in oklab, ${tones[row.leader ?? -1]} ${[34, 54, 76, 100][strength]}%, var(--card))`,
+              color: `color-mix(in oklab, ${tones[row.leader ?? -1]} ${[34, 54, 76, 100][strength]}%, var(--map-low))`,
             },
           ];
     });

@@ -98,7 +98,7 @@
   const lean = (party: string | null) =>
     (party == null ? null : parties.get(party)?.lean) ?? Infinity;
   const fill = (color: string, amount: number) =>
-    `color-mix(in oklab, ${color} ${Math.round(amount * 100)}%, var(--card))`;
+    `color-mix(in oklab, ${color} ${Math.round(amount * 100)}%, var(--map-low))`;
 
   const known = $derived(
     new Map(
