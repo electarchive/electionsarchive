@@ -18,15 +18,24 @@ SOURCE = "us.ut_house"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 DPI = 100
-TABLES = {2004: 3, 2006: 2, 2008: "U S House", 2010: "U.S. House"}
+TABLES = [
+    (2002, 1), (2002, 2), (2002, 3), (2004, 3), (2006, 2), (2008, "U S House"), (2010, "U.S. House"),
+    (2014, "U.S. House"), (2016, "U.S. Senate & House"),
+]  # fmt: skip
+VOTE = "https://vote.utah.gov/wp-content/uploads/2023/09/"
+FILES = {2002: "2002Gen.pdf", 2014: "2014-General-Canvass-Report-1-1.xlsx", 2016: "2016-General-Election-Statewide-Canvass.xlsx"}
+DAYS = {2002: date(2002, 11, 5), 2014: date(2014, 11, 4), 2016: date(2016, 11, 8)}
 NAMES = {
-    2004: [
+    (2002, 1): ['Craig Axford "G"', 'Rob Bishop "R"', 'Dave Thomas "D"', 'Susan Howard "WI"', 'Charles Johnston "WI"', 'Cody Judy "WI"'],
+    (2002, 2): ['Ron Copier "L"', 'Patrick Diehl "G"', 'Jim Matheson "D"', 'John Swallow "R"'],
+    (2002, 3): ['Kitty K. Burton "L"', 'Chris Cannon "R"', 'Nancy Jane Woodside "D"', 'John William Maurin "WI"', 'Mark H. Williams "WI"'],
+    (2004, 3): [
         'Rob Bishop "R"', 'Charles Johnston "C"', 'Richard W. Soderberg "PC"', 'Steven Thompson "D"', 'Vena Finau "WI"',
         'Ronald R. Amos "PC"', 'Patrick S. Diehl "G"', 'Jim Matheson "D"', 'Jeremy Paul Petersen "C"', 'John Swallow "R"',
         'Beua Babka "D"', 'Chris Cannon "R"', 'Jim Dexter "L"', 'Curtis James "PC"', 'Darrell Ronald Winfield "C"',
         'Nicolle Rivetti "WI"',
     ],
-    2006: [
+    (2006, 2): [
         'Lynn Badler "L"', 'Rob Bishop "R"', 'Mark Hudson "C"', 'Steven Olsen "D"', 'Bob Brister "GP"',
         'Lavar Christensen "R"', 'Austin Sherwood Lett "L"', 'Jim Matheson "D"', 'W. David Perry "C"',
         'Christian Burridge "D"', 'Chris Cannon "R"', 'Philip Lear Hallman "L"', 'Jim Noorlander "C"',
@@ -34,13 +43,17 @@ NAMES = {
 }  # fmt: skip
 
 
-def url(year: int) -> str:
+def cached(year: int) -> raw.Artifact:
+    if year in FILES:
+        return raw.cached(SOURCE, VOTE + FILES[year])
     stamp, path = ut_sos.FILES[(year, "general")]
-    return ut_sos.WAYBACK.format(stamp, ut_sos.SITE + path)
+    return raw.cached(ut_sos.SOURCE, ut_sos.WAYBACK.format(stamp, ut_sos.SITE + path))
 
 
 def fetch() -> None:
     ut_sos.fetch()
+    for name in FILES.values():
+        raw.fetch(SOURCE, VOTE + name, suffix=Path(name).suffix)
 
 
 def parse() -> None:
@@ -53,9 +66,10 @@ def parse() -> None:
             ).fetchall()
         }
     rows = []
-    for year, table in TABLES.items():
-        document = raw.cached(ut_sos.SOURCE, url(year)).path
+    for year, table in TABLES:
+        document = cached(year).path
         columns: list[tuple[str, dict[str, tuple[int, tuple[float, float, float, float] | None]], int]] = []
+        districts: list[int] = []
         if isinstance(table, str):
             cells = [
                 [str(cell).strip() if cell is not None else "" for cell in row]
@@ -66,9 +80,12 @@ def parse() -> None:
             ]
             start = next(index for index, row in enumerate(cells) if row[0].upper() == "COUNTY")
             end = next(index for index, row in enumerate(cells) if row[0].upper() == "TOTAL")
-            for column in range(4, len(cells[start])):
-                if not cells[start][column]:
+            labels = {column: text for row in cells[:start] for column, text in enumerate(row) if column and text}
+            for column in range(1, len(cells[start])):
+                label = labels.get(max((key for key in labels if key <= column), default=-1), "")
+                if not cells[start][column] or not (found := re.search(r"House\W+District (\d)", label)):
                     continue
+                districts.append(int(found[1]))
                 counties = {
                     row[0]: (int(float(row[column])), None)
                     for row in cells[start + 1 : end]
@@ -128,6 +145,12 @@ def parse() -> None:
                 )
             names: dict[int, list[tuple[float, float, float, float, str]]] = {}
             top = max(index for index, line in enumerate(lines[:header]) if any(word[4] == "District" for word in line))
+            numbered = sorted(
+                (word[0], int(after[4]))
+                for line in lines[:header]
+                for word, after in zip(line, line[1:])
+                if word[4] == "District" and after[4].isdigit()
+            )
             for line in lines[top + 1 : header + 1]:
                 for word in line:
                     if word[4] in ("COUNTY", "VOTERS", "REGISTERED", "NUMBER", "VOTING", "BALLOTS", "CAST", "PERCENT"):
@@ -140,29 +163,33 @@ def parse() -> None:
                 name = " ".join(word[4] for word in sorted(names[index], key=lambda word: (round(word[1]), word[0])))
                 counties = {label: county[index] for label, county in body.items() if index in county}
                 columns.append((name, counties, int(ends[index][4].replace(",", ""))))
-            if year in NAMES:
-                if len(columns) != len(NAMES[year]):
-                    raise ValueError(f"{year}: {len(columns)} columns for {len(NAMES[year])} names")
-                columns = [(name, counties, printed) for name, (_, counties, printed) in zip(NAMES[year], columns, strict=True)]
-        patterns = {frozenset(counties) for _, counties, _ in columns}
-        widest = [pattern for pattern in patterns if not any(pattern < other for other in patterns)]
-        if len(widest) != 3:
-            raise ValueError(f"{year}: {len(widest)} county patterns, not 3 districts")
-        groups: dict[frozenset[str], list[int]] = {pattern: [] for pattern in widest}
-        for index, (name, counties, _) in enumerate(columns):
-            owners = [pattern for pattern in widest if frozenset(counties) <= pattern]
-            if len(owners) != 1:
-                raise ValueError(f"{year} {name}: its counties fit {len(owners)} districts")
-            groups[owners[0]].append(index)
-        for district, members in enumerate(sorted(groups.values()), start=1):
-            for index in members:
-                name, counties, printed = columns[index]
-                if sum(value for value, _ in counties.values()) != printed:
-                    raise ValueError(f"{year} district {district} {name}: counties do not add up to {printed}")
-                for county, (votes, box) in counties.items():
-                    rows.append(
-                        (year, district, codes[county], re.sub(r'\s*"[^"]*"', "", name), votes, '"WI"' in name, table if box else None, *(box or (None,) * 4))
-                    )
+            if (year, table) in NAMES:
+                pinned = NAMES[(year, table)]
+                if len(columns) != len(pinned):
+                    raise ValueError(f"{year}: {len(columns)} columns for {len(pinned)} names")
+                columns = [(name, counties, printed) for name, (_, counties, printed) in zip(pinned, columns, strict=True)]
+            patterns = {frozenset(counties) for _, counties, _ in columns}
+            widest = [pattern for pattern in patterns if not any(pattern < other for other in patterns)]
+            if len(widest) != len(numbered):
+                raise ValueError(f"{year}: {len(widest)} county patterns for {len(numbered)} districts")
+            groups: dict[frozenset[str], list[int]] = {pattern: [] for pattern in widest}
+            for index, (name, counties, _) in enumerate(columns):
+                owners = [pattern for pattern in widest if frozenset(counties) <= pattern]
+                if len(owners) != 1:
+                    raise ValueError(f"{year} {name}: its counties fit {len(owners)} districts")
+                groups[owners[0]].append(index)
+            districts = [0] * len(columns)
+            for (_, number), members in zip(numbered, sorted(groups.values()), strict=True):
+                for index in members:
+                    districts[index] = number
+        for index, district in enumerate(districts):
+            name, counties, printed = columns[index]
+            if sum(value for value, _ in counties.values()) != printed:
+                raise ValueError(f"{year} district {district} {name}: counties do not add up to {printed}")
+            for county, (votes, box) in counties.items():
+                rows.append(
+                    (year, district, codes[county], re.sub(r'\s*"[^"]*"|\s*\((?:DEM|REP|LIB|CON|IAP|Unaffiliated|Write-in|[A-Z]+)\)', "", name), votes, bool(re.search(r'"WI"|(?i:write-in)', name)), table if box else None, *(box or (None,) * 4))
+                )
     frame = pl.DataFrame(
         rows,
         schema={
@@ -195,24 +222,24 @@ def emit() -> Path:
             polity="US-UT",
         )
         source = cs.source(ut_sos.PUBLISHER, ut_sos.TITLE)
-        pages: dict[int, str] = {}
-        for year, table in TABLES.items():
-            cached = raw.cached(ut_sos.SOURCE, url(year))
-            artifact = cs.artifact(cached, source)
+        pages: dict[tuple[int, int], str] = {}
+        for year, table in TABLES:
+            document = cached(year)
+            artifact = cs.artifact(document, source)
             if isinstance(table, str):
                 continue
-            target = DATA / "pages" / SOURCE / f"{cached.path.stem}-{table}.png"
+            target = DATA / "pages" / SOURCE / f"{document.path.stem}-{table}.png"
             if not target.exists():
                 target.parent.mkdir(parents=True, exist_ok=True)
                 subprocess.run(
                     ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(table), "-l", str(table), "-singlefile"]
-                    + [str(cached.path), str(target.with_suffix(""))],
+                    + [str(document.path), str(target.with_suffix(""))],
                     check=True,
                 )
             with Image.open(target) as rendered:
                 width, height = rendered.size
             page = cs.page(artifact, table)
-            pages[year] = str(page)
+            pages[(year, table)] = str(page)
             if UUID(str(page)) in cs.minted:
                 cs.add(
                     "source_page",
@@ -231,7 +258,9 @@ def emit() -> Path:
                 part.select(
                     year="year",
                     chamber=pl.lit("house"),
-                    day=pl.col("year").map_elements(lambda year: ut_sos.DAYS[(year, "general")], return_dtype=pl.Date),
+                    day=pl.col("year").map_elements(
+                        lambda year: DAYS.get(year) or ut_sos.DAYS[(year, "general")], return_dtype=pl.Date
+                    ),
                     special=pl.lit(False),
                     state=pl.lit("UT"),
                     district="district",
@@ -244,7 +273,9 @@ def emit() -> Path:
                     source=pl.lit("UT"),
                     *(
                         [
-                            pl.col("year").replace_strict(pages, return_dtype=pl.String).alias("page_id"),
+                            pl.struct("year", "page")
+                            .map_elements(lambda key: pages[(key["year"], key["page"])], return_dtype=pl.String)
+                            .alias("page_id"),
                             "x0",
                             "y0",
                             "x1",
