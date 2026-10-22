@@ -98,6 +98,23 @@
       ? head
       : null;
   });
+  const shared = $derived.by(() => {
+    if (owner != null || places.rows.length < 2) {
+      return null;
+    }
+    const split = places.rows.map((row) => row.name.split(", "));
+    const [lead = []] = split;
+    let size = 0;
+    while (
+      size < lead.length - 1 &&
+      split.every(
+        (parts) => parts.length > size + 1 && parts[size] === lead[size],
+      )
+    ) {
+      size += 1;
+    }
+    return size === 0 ? null : lead.slice(0, size).join(", ");
+  });
   const first = $derived(places.legend[0]);
   const second = $derived(places.legend[1]);
   const moves = $derived(
@@ -174,7 +191,9 @@
       .map((entry) => {
         const parent = places.rows.find((row) => row.k === entry.row.within);
         const isUnder = isNested && parent != null;
-        const prefix = isUnder ? `${parent.name}'s ` : owner;
+        const prefix = isUnder
+          ? `${parent.name}'s `
+          : (owner ?? (shared == null ? null : `${shared}, `));
         const short =
           prefix != null && entry.row.name.startsWith(prefix)
             ? entry.row.name
@@ -532,6 +551,11 @@
     {/if}
   </div>
 
+  {#if shared != null}
+    <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
+      {m.places_shared({ place: shared })}
+    </p>
+  {/if}
   <div class="-mx-2 overflow-x-auto">
     <table class="border-collapse text-sm/tight inline-full">
       <thead>
