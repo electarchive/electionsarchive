@@ -3174,6 +3174,7 @@ export const contests = {
         status: string;
         isRemainder: boolean;
         counted: boolean;
+        own: boolean;
       }>(sql`
         with recursive anc(id) as (
           select ${area.id}::uuid
@@ -3184,7 +3185,8 @@ export const contests = {
           select c.id, case when c.kind = 'ballot_question' then c.id::text
             else concat_ws(':', c.office_id, c.body_id, c.kind, c.round_number, c.party_scope_id) end as series,
             e.id as election, e.kind = 'indirect' as indirect, e.date_from, ${CYCLE} as year, e.status,
-            c.term is not distinct from 'remainder' as "isRemainder"
+            c.term is not distinct from 'remainder' as "isRemainder",
+            c.district_area_id is not distinct from ${contest.place?.id ?? null}::uuid as own
           from (
             select x.id from contest x where x.district_area_id in (select id from anc) and x.allocation_parent_id is null
             union
@@ -3229,7 +3231,7 @@ export const contests = {
         )
         select * from (
           select r.id, r.series, r.election, r.indirect, r.date_from::text as date, r.year, r.status::text as status,
-            r."isRemainder", r.id in (select root from tallied) as counted, r.date_from
+            r."isRemainder", r.id in (select root from tallied) as counted, r.own, r.date_from
           from roots r
           where r.id <> ${contest.root}::uuid
         ) r
@@ -3251,8 +3253,15 @@ export const contests = {
           .toSorted((a, b) => a.localeCompare(b))
           .at(-1) ?? null;
       const rootIds = covering.rows.map((row) => row.id);
+      const held = new Set([
+        contest.election,
+        ...covering.rows
+          .filter((row) => row.series === contest.series && row.own)
+          .map((row) => row.election),
+      ]);
       const sameRace = covering.rows.filter(
-        (row) => row.series === contest.series,
+        (row) =>
+          row.series === contest.series && (row.own || !held.has(row.election)),
       );
       const comparable = covering.rows.filter(
         (row) => row.counted && row.indirect === contest.indirect,
@@ -6805,7 +6814,7 @@ async function races(
               })) ??
             null,
           name:
-            scope == null || name.includes(scope.split(" ")[0] ?? "")
+            scope == null || name.includes(scope.split(" ", 1)[0] ?? "")
               ? name
               : `${name} (${scope})`,
           partners: spread.map((row) => [row.from, row.to]),
