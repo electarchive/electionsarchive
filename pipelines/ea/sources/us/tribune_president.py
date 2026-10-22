@@ -289,6 +289,11 @@ NOTE = (
     "from Wikipedia by more than 1 percent, was read from a crop of the printed page; each digitized number carries "
     "its page and box. Wikipedia's earlier figures are kept as a superseded, non-default set."
 )
+DEMOTED = {(1872, "MN"), (1872, "NE"), (1872, "TN"), (1880, "LA"), (1880, "NV"), (1880, "TX")}
+HELD = (
+    "The printed figure for a top-two candidate differs from Wikipedia's by more than 1 percent and no second source "
+    "settles it, so Wikipedia's set stays the default and this one is kept beside it."
+)
 NAMES = {
     0: ("Grant", 1872),
     1: ("Greeley", 1872),
@@ -544,6 +549,21 @@ def emit() -> Path:
                     party_id=parties.get(party_name),
                     ballot_label=label,
                 )
+            total = sum(values[(name, col)] for col in columns)
+            default = (year, state) not in DEMOTED
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="official",
+                kind="counted",
+                source_id=source,
+                status="active",
+                is_default=default,
+                supersedes_id=rs if default else None,
+                completeness=min(Decimal(1), round(Decimal(total) / total_before, 4)),
+            )
             cs.add(
                 "result_set",
                 id=rs,
@@ -552,25 +572,16 @@ def emit() -> Path:
                 stage=stage,
                 kind=kind,
                 source_id=source_id,
-                status="superseded",
-                is_default=False,
+                status="superseded" if default else "active",
+                is_default=not default,
                 completeness=completeness,
             )
-            total = sum(values[(name, col)] for col in columns)
             cs.add(
-                "result_set",
-                id=result_set,
-                election_id=election,
-                contest_id=contest,
-                stage="certified",
-                kind="counted",
-                source_id=source,
-                status="active",
-                is_default=True,
-                supersedes_id=rs,
-                completeness=min(Decimal(1), round(Decimal(total) / total_before, 4)),
+                "note",
+                entity_id=result_set,
+                kind="methodology",
+                body_md=NOTE if default else NOTE + " " + HELD,
             )
-            cs.add("note", entity_id=result_set, kind="methodology", body_md=NOTE)
             if abs(total - total_before) / total_before > Decimal("0.01"):
                 differences.append(f"{tag}: printed lines total {total} against Wikipedia's {total_before}")
             for col in columns:
@@ -615,7 +626,7 @@ def emit() -> Path:
                 flags=0,
                 value=total,
             )
-            for option, okind, seats, candidacy in outcomes[rs]:
+            for option, okind, seats, candidacy in outcomes[rs] if default else []:
                 cs.add(
                     "outcome",
                     result_set_id=result_set,
