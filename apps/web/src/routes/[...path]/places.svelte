@@ -199,7 +199,10 @@
           column === "name"
             ? a.row.name.localeCompare(b.row.name, undefined, { numeric: true })
             : a.value - b.value;
-        return descending ? -order : order;
+        return (
+          Number(a.row.isCounted === false) -
+            Number(b.row.isCounted === false) || (descending ? -order : order)
+        );
       })
       .map((entry) => {
         const parent = places.rows.find((row) => row.k === entry.row.within);

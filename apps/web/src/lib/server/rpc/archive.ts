@@ -6272,9 +6272,10 @@ async function races(
           )
           .map((row) => row.id),
       ];
+      const voting = group.filter((row) => row.isCounted).map((row) => row.id);
       const [totals, grid, table, spread] = await Promise.all([
         load(
-          roots,
+          voting.length > 0 ? voting : roots,
           [place.k],
           day,
           counted.length > 0 ? counted : roots,
