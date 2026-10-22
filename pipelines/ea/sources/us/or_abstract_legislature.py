@@ -1,4 +1,5 @@
 import re
+from itertools import takewhile
 import subprocess
 from datetime import UTC, date, datetime
 from pathlib import Path
@@ -16,20 +17,26 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 URL = "https://records.sos.state.or.us/ORSOSWebDrawer/Record/{}/File/document"
 ABSTRACTS = {
-    2004: (6873503, date(2004, 11, 2)),
-    2006: (6873552, date(2006, 11, 7)),
-    2008: (6873598, date(2008, 11, 4)),
+    2000: (6920724, date(2000, 11, 7), "us.or_abstract_2000"),
+    2004: (6873503, date(2004, 11, 2), SOURCE),
+    2006: (6873552, date(2006, 11, 7), SOURCE),
+    2008: (6873598, date(2008, 11, 4), SOURCE),
 }
 PUBLISHER = "Oregon Secretary of State"
 TITLE = "General Election Abstract of Votes"
 TITLE_LINE = re.compile(r"^\s*(STATE REPRESENTATIVE|STATE SENATOR),\s+(\d+)(?:ST|ND|RD|TH)\s+DISTRICT\s*$")
 STOP = re.compile(r"^\s*(\*+\s*Elected|WI = Write|\w+ \d+, \d{4}, General Election|\d+\s*$)")
+PARTY_2000 = re.compile(r"\([A-Z]{2,5}\)$")
+CELL = re.compile(r"\S+(?: \S+)*")
+NAME_2000 = re.compile(r"^\*?\s*([^,]+),\s*(.*?)\s*\(([A-Za-z]+)\)$")
 ROW = re.compile(r"^\s*([A-Za-z][A-Za-z .'-]*?)\s+((?:\d[\d,]*\s+)*\d[\d,]*)\s*$")
 
 
 def fetch() -> None:
-    for number, _ in ABSTRACTS.values():
+    for number, _, cache in ABSTRACTS.values():
         url = URL.format(number)
+        if cache != SOURCE:
+            continue
         try:
             raw.cached(SOURCE, url)
             continue
@@ -62,9 +69,9 @@ def parse() -> None:
             ).fetchall()
         }
     rows: list[dict] = []
-    for year, (number, day) in ABSTRACTS.items():
+    for year, (number, day, cache) in ABSTRACTS.items():
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, URL.format(number)).path), "-"],
+            ["pdftotext", "-layout", str(raw.cached(cache, URL.format(number)).path), "-"],
             check=True,
             capture_output=True,
             text=True,
@@ -95,16 +102,40 @@ def parse() -> None:
             if not body or body[0] is not None:
                 print(f"{year} {chamber} {district}: no County line, skipped")
                 continue
-            surnames = [
-                part.strip().lstrip("*").strip()
-                for part in re.split(r"\s{2,}", " ".join(header).strip())
-                if part.strip()
-            ]
-            surnames = [name for name in surnames if name != "Misc."]
-            firsts = [part.strip() for part in re.split(r"\s{2,}", first_line.strip()[len("County") :].strip()) if part.strip()]
-            if len(surnames) != len(firsts):
-                print(f"{year} {chamber} {district}: {surnames} against {firsts}, skipped")
-                continue
+            if year == 2000:
+                tokens = [
+                    [(found.start(), found.end(), found[0]) for found in CELL.finditer(line)]
+                    for line in takewhile(lambda line: not ROW.match(line), lines)
+                ]
+                anchors = sorted(token for row in tokens for token in row if PARTY_2000.search(token[2]))
+                cells: list[list[str]] = [[] for _ in anchors]
+                for row in tokens:
+                    for start, end, text in row:
+                        if text not in ("County", "Misc."):
+                            cells[
+                                min(range(len(anchors)), key=lambda i: abs(anchors[i][0] + anchors[i][1] - start - end))
+                            ].append(text)
+                parsed = [NAME_2000.match(" ".join(cell)) for cell in cells]
+                if not anchors or None in parsed:
+                    print(f"{year} {chamber} {district}: header {cells} unreadable, skipped")
+                    continue
+                surnames = [found[1] for found in parsed if found]
+                firsts = [f"{re.sub(r'\s*\(.*?\)', '', found[2])} ({found[3]})" for found in parsed if found]
+            else:
+                surnames = [
+                    part.strip().lstrip("*").strip()
+                    for part in re.split(r"\s{2,}", " ".join(header).strip())
+                    if part.strip()
+                ]
+                surnames = [name for name in surnames if name != "Misc."]
+                firsts = [
+                    part.strip()
+                    for part in re.split(r"\s{2,}", first_line.strip()[len("County") :].strip())
+                    if part.strip()
+                ]
+                if len(surnames) != len(firsts):
+                    print(f"{year} {chamber} {district}: {surnames} against {firsts}, skipped")
+                    continue
             data: list[tuple[str, list[int]]] = []
             for line in body[1:]:
                 matched = ROW.match(line) if line else None
@@ -165,7 +196,9 @@ def parse() -> None:
             kind=pl.lit("county"),
             source=pl.lit("OR"),
         )
-        .group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "kind", "source")
+        .group_by(
+            "year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "kind", "source"
+        )
         .agg(pl.col("writein").any(), pl.col("votes").sum())
         .write_parquet(PARSED / "counties.parquet")
     )
@@ -178,7 +211,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oregon's 2004, 2006, and 2008 state House and Senate general elections by county from the abstracts of votes",
+            summary="Oregon's 2000, 2004, 2006, and 2008 state House and Senate general elections by county from the abstracts of votes",
             polity="US-OR",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -191,8 +224,8 @@ def emit() -> Path:
             url="https://sos.oregon.gov/elections/Pages/electionhistory.aspx",
             license="Public record",
         )
-        for number, _ in ABSTRACTS.values():
-            cs.artifact(raw.cached(SOURCE, URL.format(number)), source)
+        for number, _, cache in ABSTRACTS.values():
+            cs.artifact(raw.cached(cache, URL.format(number)), source)
         covered = {
             key
             for (key,) in conn.execute(
