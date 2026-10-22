@@ -14,22 +14,28 @@ from ea.store import DATA, connect
 SOURCE = "us.ok_house_generals"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-BASE = "https://oklahoma.gov/content/dam/ok/en/elections/election-results/{0}-election-results/{0}-general-election-results/{1}usrep.pdf"
+BASE = "https://oklahoma.gov/content/dam/ok/en/elections/election-results/{0}-election-results/{0}-general-election-results/{1}{2}.pdf"
 LANDING = "https://oklahoma.gov/elections/elections-results/election-results.html"
 PUBLISHER = "Oklahoma State Election Board"
-TITLE = "Official results: United States Representative by county"
-DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2006: date(2006, 11, 7)}
-TITLE_LINE = re.compile(r"UNITED STATES REPRESENTATIVE, DISTRICT (\d+)")
+TITLES = {
+    "OK": "Official results: United States Representative by county",
+    "OKL": "Official results: state legislature by county",
+}
+DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7)}
+FILES = {2000: ("usrep", "sh", "ss"), 2002: ("usrep", "rep", "sen"), 2004: ("sh", "ss"), 2006: ("usrep", "sh", "ss")}
+TITLE_LINE = re.compile(r"(UNITED STATES REPRESENTATIVE|STATE REPRESENTATIVE|STATE SENATOR), DISTRICT (\d+)")
+CHAMBERS = {"UNITED STATES REPRESENTATIVE": "house", "STATE REPRESENTATIVE": "house:{}:g", "STATE SENATOR": "senate:{}:g"}
 ROW = re.compile(r"^([A-Za-z][A-Za-z .]*?):?\s{2,}([\d,]+(?:\s+[\d,]+)*)\s*$")
 
 
-def url(year: int) -> str:
-    return BASE.format(year, str(year)[2:])
+def url(year: int, name: str) -> str:
+    return BASE.format(year, str(year)[2:], name)
 
 
 def fetch() -> None:
-    for year in DAYS:
-        raw.fetch(SOURCE, url(year), suffix=".pdf")
+    for year, names in FILES.items():
+        for name in names:
+            raw.fetch(SOURCE, url(year, name), suffix=".pdf")
 
 
 def parse() -> None:
@@ -43,20 +49,20 @@ def parse() -> None:
             ).fetchall()
         }
     rows = []
-    for year, day in DAYS.items():
+    for year, day, file in ((year, DAYS[year], name) for year, names in FILES.items() for name in names):
         text = subprocess.run(
-            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(year)).path), "-"],
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, url(year, file)).path), "-"],
             capture_output=True,
             check=True,
             text=True,
         ).stdout
-        blocks: list[tuple[int, list[str]]] = []
+        blocks: list[tuple[str, int, list[str]]] = []
         for line in text.splitlines():
             if found := TITLE_LINE.search(line):
-                blocks.append((int(found[1]), []))
+                blocks.append((found[1], int(found[2]), []))
             elif blocks:
-                blocks[-1][1].append(line)
-        for district, lines in blocks:
+                blocks[-1][2].append(line)
+        for office, district, lines in blocks:
             header: list[str] = []
             places: list[tuple[str, list[int]]] = []
             totals: list[tuple[int, int]] = []
@@ -79,10 +85,20 @@ def parse() -> None:
             names = [re.sub(r"\s*\(\w+\)$", "", " ".join(labels[end])) for end in ends[:-1]]
             sums = [sum(cells[i] for _, cells in places) for i in range(len(ends))]
             if any(len(cells) != len(ends) for _, cells in places) or sums != [value for _, value in totals]:
-                print(f"{year} District {district}: counties sum to {sums}, printed {totals}, skipped")
+                print(f"{year} {office} {district}: counties sum to {sums}, printed {totals}, skipped")
                 continue
+            federal = office == "UNITED STATES REPRESENTATIVE"
             rows.extend(
-                (year, day, district, code, name, cells[i])
+                (
+                    year,
+                    day,
+                    CHAMBERS[office].format(district),
+                    district if federal else None,
+                    code,
+                    name,
+                    cells[i],
+                    "OK" if federal else "OKL",
+                )
                 for code, cells in places
                 for i, name in enumerate(names)
             )
@@ -92,20 +108,20 @@ def parse() -> None:
         schema={
             "year": pl.Int32,
             "day": pl.Date,
+            "chamber": pl.String,
             "district": pl.Int16,
             "code": pl.String,
             "candidate": pl.String,
             "votes": pl.Int64,
+            "source": pl.String,
         },
         orient="row",
     ).with_columns(
-        chamber=pl.lit("house"),
         special=pl.lit(False),
         state=pl.lit("OK"),
         measure=pl.lit(1, pl.Int16),
         writein=pl.lit(False),
         kind=pl.lit("county"),
-        source=pl.lit("OK"),
     ).write_parquet(PARSED / "counties.parquet")
 
 
@@ -115,21 +131,23 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oklahoma's U.S. House generals by county, 2000, 2002, and 2006 (State Election Board)",
+            summary="Oklahoma's U.S. House generals by county, 2000, 2002, and 2006, and its legislative generals by county, 2000-2006 (State Election Board)",
             polity="US-OK",
         )
-        source = cs.source(PUBLISHER, TITLE)
-        if source in cs.minted:
-            cs.add(
-                "source",
-                id=source,
-                kind="official_body",
-                publisher=PUBLISHER,
-                title=TITLE,
-                url=LANDING,
-                license="Public record",
-            )
-        for year in DAYS:
-            cs.artifact(raw.cached(SOURCE, url(year)), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"OK": source}, strict=True)
+        sources = {key: cs.source(PUBLISHER, title) for key, title in TITLES.items()}
+        for key, source in sources.items():
+            if source in cs.minted:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=TITLES[key],
+                    url=LANDING,
+                    license="Public record",
+                )
+        for year, names in FILES.items():
+            for name in names:
+                cs.artifact(raw.cached(SOURCE, url(year, name)), sources["OK" if name == "usrep" else "OKL"])
+        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), sources, strict=True)
         return cs.write()
