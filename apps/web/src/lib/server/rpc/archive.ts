@@ -10411,7 +10411,8 @@ export const parties = {
           select pp.polity_id from polity_parent pp join below on pp.parent_id = below.id
         ),
         mine as materialized (
-          select o.id as option, o.contest_id from contest_option o
+          select o.id as option, o.contest_id, c.allocation_parent_id as parent, c.election_id
+          from contest_option o join contest c on c.id = o.contest_id
           where o.party_id in (select id from family) and (
             ${input.within ?? null}::uuid is null or exists (
               select from contest c join election e on e.id = c.election_id
@@ -10419,10 +10420,11 @@ export const parties = {
             )
           )
         ),
-        up(id, parent) as (
-          select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
+        up(id, parent, election_id) as (
+          select contest_id, parent, election_id from mine
           union
-          select c.id, c.allocation_parent_id from up join contest c on c.id = up.parent
+          select c.id, c.allocation_parent_id, c.election_id from up
+          cross join lateral (select * from contest c where c.id = up.parent offset 0) c
         ),
         won as (
           select distinct m.contest_id from mine m
@@ -10432,7 +10434,7 @@ export const parties = {
         tops as (
           select up.id, case when ${input.within ?? null}::uuid is null then coalesce(e.parent_id, e.id) else e.id end as election,
             e.date_from, ${CYCLE} as year
-          from up join contest c on c.id = up.id join election e on e.id = c.election_id
+          from up join election e on e.id = up.election_id
           where case when ${input.within ?? null}::uuid is null then up.parent is null
             else e.polity_id in (select id from below) and not exists (
               select from contest p join election pe on pe.id = p.election_id
