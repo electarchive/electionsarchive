@@ -9451,24 +9451,27 @@ export const polities = {
           group by cand.root
           having count(distinct cand.polity) = 2
         )
-        select c.id,
-          case when c.kind = 'ballot_question' then 'question'
-            else concat_ws(':', coalesce(c.office_id, c.body_id), c.kind, c.round_number) end as series,
-          coalesce(c.office_id, c.body_id) as owner, c.kind = 'ballot_question' as "isQuestion",
-          e.date_from::text as date, ${CYCLE} as year, coalesce(own.k, home.k) as own,
-          (select k from place where polity = ${input.a}::uuid) as a,
-          (select k from place where polity = ${input.b}::uuid) as b
-        from hits h
-        join contest c on c.id = h.root
-        join election e on e.id = c.election_id
-        left join area own on own.id = c.district_area_id
-        left join lateral (
-          select a.k from polity_territory t join area a on a.id = t.area_id
-          where t.polity_id = e.polity_id
-          order by t.valid @> e.date_from desc, upper(t.valid) desc nulls first
-          limit 1
-        ) home on true
-        order by e.date_from
+        select * from (
+          select distinct on (series, e.date_from, case when c.kind = 'ballot_question' then c.id end) c.id,
+            case when c.kind = 'ballot_question' then 'question'
+              else concat_ws(':', coalesce(c.office_id, c.body_id), c.kind, c.round_number) end as series,
+            coalesce(c.office_id, c.body_id) as owner, c.kind = 'ballot_question' as "isQuestion",
+            e.date_from::text as date, ${CYCLE} as year, coalesce(own.k, home.k) as own,
+            (select k from place where polity = ${input.a}::uuid) as a,
+            (select k from place where polity = ${input.b}::uuid) as b
+          from hits h
+          join contest c on c.id = h.root
+          join election e on e.id = c.election_id
+          left join area own on own.id = c.district_area_id
+          left join lateral (
+            select a.k from polity_territory t join area a on a.id = t.area_id
+            where t.polity_id = e.polity_id
+            order by t.valid @> e.date_from desc, upper(t.valid) desc nulls first
+            limit 1
+          ) home on true
+          order by series, e.date_from, case when c.kind = 'ballot_question' then c.id end, c.term = 'remainder', c.id
+        ) s
+        order by date
       `);
       const [labels, slugs, loaded] = await Promise.all([
         names(
