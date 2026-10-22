@@ -5,7 +5,9 @@ from collections import Counter
 from datetime import UTC, date, datetime
 from pathlib import Path
 
+import numpy as np
 import polars as pl
+from PIL import Image
 
 from ea import raw
 from ea.changeset import Changeset
@@ -22,7 +24,10 @@ TITLE = "{party} primary certified results, {day:%B %-d, %Y}"
 COUNTIES = 82
 FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2012, "democratic"): ("Democrat%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
+    (2012, "republican"): ("Republican%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
 }
+ROTATED = {(2012, "republican"): range(9, 15)}
+EMIT = {(2012, "republican"): {("house", 1), ("house", 2)}}
 GRIDDED = {
     (2012, "democratic"): {
         1: ("president", None, "OBAMA, BARACK"),
@@ -34,12 +39,38 @@ GRIDDED = {
         10: ("house", 2, "THOMPSON, BENNIE G."),
         12: ("house", 3, "BIGGS, CRYSTAL"),
     },
+    (2012, "republican"): {
+        1: ("president", None, "BACHMANN, MICHELE"),
+        2: ("president", None, "GINGRICH, NEWT"),
+        3: ("president", None, "HUNTSMAN, JON"),
+        4: ("president", None, "JOHNSON, GARY"),
+        5: ("president", None, "PAUL, RON"),
+        6: ("president", None, "PERRY, RICK"),
+        7: ("president", None, "ROMNEY, MITT"),
+        8: ("president", None, "SANTORUM, RICK"),
+        10: ("senate", None, "HATHCOCK, E. ALLEN"),
+        11: ("senate", None, "MALONEY, ROBERT"),
+        12: ("senate", None, "WICKER, ROGER F."),
+        14: ("house", 1, "ESTES, ROBERT"),
+        15: ("house", 1, "NUNNELEE, ALLEN"),
+        16: ("house", 1, "ROSS, HENRY"),
+        18: ("house", 2, "MARCY, BILL"),
+        20: ("house", 3, "ALLEN, ROBERT"),
+        21: ("house", 3, "HARPER, GREGG"),
+        23: ("house", 4, "BURLESON, CINDY"),
+        24: ("house", 4, "PALAZZO, STEVEN"),
+        25: ("house", 4, "VINCENT, RON"),
+    },
 }
 FOOTING = {
     "2012-03-13:MS:senate:democratic": "The sheet's printed state totals exceed the sum of its county cells for three candidates: Albert N. Gore Jr. printed 49,157, county sum 49,151 (6 short); Will Oatis printed 16,300, county sum 16,299 (1 short); Roger Weiner printed 21,131, county sum 21,127 (4 short). Every county cell was read twice and checked by eye, so the difference is in the sheet's own footing.",
     "2012-03-13:MS:house:3:democratic": "The sheet's printed state total for Crystal Biggs is 15,291, and the sum of its county cells is 15,283 (8 short). Every county cell was read twice and checked by eye, so the difference is in the sheet's own footing.",
 }
-FIXES: dict[tuple[int, str, int, int], int] = {(2012, "democratic", 4, 77): 27}
+FIXES: dict[tuple[int, str, int, int], int] = {
+    (2012, "democratic", 4, 77): 27,
+    (2012, "republican", 16, 52): 11,
+    (2012, "republican", 16, 69): 597,
+}
 
 
 def url(year: int, party: str) -> str:
@@ -74,21 +105,38 @@ def parse() -> None:
         pdf = raw.cached(SOURCE, url(year, party)).path
         pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout)[1])
         county = 0
+        cleans: dict[int, np.ndarray | None] = {}
         reads: dict[tuple[int, int], Counter[int]] = {}
         sites: dict[tuple[int, int], tuple[int, tuple[int, int, int, int], tuple[int, int]]] = {}
         printed: dict[int, Counter[int]] = {r: Counter() for r in layout}
-        for page in range(2, pages + 1):
-            image = ms_scan.render(pdf, page, dpi=300)
-            ys, xs = ms_scan.rules(image)
-            ys = [y for i, y in enumerate(ys) if not (i + 1 < len(ys) and ys[i + 1] - y < 45)]
-            xs = [x for i, x in enumerate(xs) if not (i + 1 < len(xs) and xs[i + 1] - x < 100)]
-            top = max(range(len(ys) - 1), key=lambda i: ys[i + 1] - ys[i]) + 1
-            rows = ys[top:]
-            first = 1 if page == 2 else 0
+        turned = ROTATED.get((year, party))
+        sheet = turned if turned is not None else range(2, pages + 1)
+        for page in sheet:
+            image = ms_scan.render(pdf, page, dpi=300, turn=-90 if turned is not None else 0)
+            if turned is not None:
+                body = (image[520:1700] < 220).mean(0)
+                start = max(range(760, 840), key=lambda x0: sum(body[int(x0 + 161.8 * k) - 2 : int(x0 + 161.8 * k) + 3].sum() for k in range(15)))
+                xs = [start + 161.8 * k for k in range(15)]
+                found = ms_scan.words(ms_scan.erase(image))
+                heights = np.array([cy for _, cx, cy, _ in found if cx > xs[0] and 480 < cy < 1660])
+                top = min(
+                    np.arange(448, 493, 0.5),
+                    key=lambda t: np.abs((heights - t) / 45.35 - 0.5 - np.round((heights - t) / 45.35 - 0.5)).sum(),
+                )
+                rows = [top + 45.35 * k for k in range(27)]
+                first = 0
+                if page == sheet[-1]:
+                    xs = xs[: max(next(i for i in range(14) if xs[i] <= cx < xs[i + 1]) for _, cx, _, _ in found if cx > xs[0]) + 2]
+            else:
+                ys, xs = ms_scan.rules(image)
+                ys = [y for i, y in enumerate(ys) if not (i + 1 < len(ys) and ys[i + 1] - y < 45)]
+                xs = [x for i, x in enumerate(xs) if not (i + 1 < len(xs) and xs[i + 1] - x < 100)]
+                top = max(range(len(ys) - 1), key=lambda i: ys[i + 1] - ys[i]) + 1
+                rows = ys[top:]
+                first = 1 if page == 2 else 0
             columns = list(range(first, len(xs) - 1))
-            last = page == pages
-            clean = ms_scan.erase(image)
-            for _, cx, cy, text in ms_scan.words(clean):
+            last = page == sheet[-1]
+            for _, cx, cy, text in found if turned is not None else ms_scan.words(ms_scan.erase(image)):
                 c = next((i for i in columns if xs[i] <= cx < xs[i + 1]), None)
                 r = next((i for i in layout if rows[i] <= cy < rows[i + 1]), None)
                 if c is None or r is None:
@@ -102,15 +150,34 @@ def parse() -> None:
                     box = (int(xs[c]) + 8, int(rows[r]) + 8, int(xs[c + 1]) - 8, int(rows[r + 1]) - 8)
                     sites[(r, county + columns.index(c))] = (page, box, image.shape)
             county += len(columns) - (1 if last else 0)
+            cleans[page] = ms_scan.erase(image) if turned is not None else None
+        if turned is not None:
+            for key in list(sites):
+                page, (x0, y0, x1, y1), _ = sites[key]
+                crop = cleans[page][y0:y1, x0:x1]
+                if (crop < 150).sum() < 25:
+                    reads.pop(key, None)
+                elif key not in reads or reads[key].most_common(1)[0][1] < 2:
+                    votes: Counter[int] = Counter()
+                    for scale, psm in ((1, 7), (2, 7), (1, 8), (2, 8), (1, 13), (2, 13)):
+                        text = ms_scan.read(Image.fromarray(crop), scale, psm).replace(" ", "")
+                        if text.isdigit():
+                            votes[int(text)] += 1
+                    if votes:
+                        reads[key] = votes
         if county != COUNTIES:
             raise ValueError(f"{year} {party}: {county} counties")
         for r, (office, district, name) in layout.items():
+            if not printed[r]:
+                continue
             total = printed[r].most_common(1)[0][0]
             values = {k: v.most_common(1)[0][0] for k, v in reads.items() if k[0] == r}
             for key in values:
                 values[key] = FIXES.get((year, party, r, key[1]), values[key])
             short = total - sum(values.values())
             print(year, party, name, total, "tied" if short == 0 else f"printed total exceeds the county sum by {short}")
+            if (year, party) in EMIT and (office, district) not in EMIT[(year, party)]:
+                continue
             for (_, index), value in values.items():
                 page, box, shape = sites[(r, index)]
                 out.append(
@@ -151,7 +218,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Mississippi's 2012 Democratic presidential, U.S. Senate, and House primaries by county from the Secretary of State's certified results",
+            summary="Mississippi's 2012 presidential, U.S. Senate, and House primaries by county from the Secretary of State's certified results",
             polity="US-MS",
         )
         sources: dict[str, object] = {}
@@ -180,6 +247,8 @@ def emit() -> Path:
                         + [str(pdf.path), str(image.with_suffix(""))],
                         check=True,
                     )
+                if (year, party) in ROTATED:
+                    Image.open(image).rotate(-90, expand=True).save(image)
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
                 page = cs.page(artifact, number)
                 pages[(f"MS{year}{party}", number)] = str(page)

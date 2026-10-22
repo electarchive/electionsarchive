@@ -81,13 +81,13 @@ def words(image: np.ndarray, psms: tuple[int, ...] = (6, 11, 12)) -> list[tuple[
         Image.fromarray(image).save(handle.name)
         for psm in psms:
             text = subprocess.run(
-                ["tesseract", handle.name, "-", "--psm", str(psm), "-c", "tessedit_char_whitelist=0123456789", "tsv"],
+                ["tesseract", handle.name, "-", "--psm", str(psm), "-c", "tessedit_char_whitelist=0123456789,", "tsv"],
                 capture_output=True,
                 text=True,
                 env={"OMP_THREAD_LIMIT": "2", "PATH": "/usr/bin"},
             ).stdout
             for line in text.splitlines()[1:]:
                 parts = line.split("\t")
-                if len(parts) == 12 and parts[0] == "5" and parts[11].strip().isdigit():
-                    found.append((psm, int(parts[6]) + int(parts[8]) / 2, int(parts[7]) + int(parts[9]) / 2, parts[11].strip()))
+                if len(parts) == 12 and parts[0] == "5" and parts[11].strip().replace(",", "").isdigit():
+                    found.append((psm, int(parts[6]) + int(parts[8]) / 2, int(parts[7]) + int(parts[9]) / 2, parts[11].strip().replace(",", "")))
     return found
