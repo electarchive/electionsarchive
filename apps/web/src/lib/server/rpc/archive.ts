@@ -6145,6 +6145,7 @@ async function races(
       isHome: boolean;
       size: number | null;
       isCounted: boolean;
+      isVoting: boolean;
       isRunoff: boolean;
       previous: string | null;
       party: string | null;
@@ -6204,6 +6205,7 @@ async function races(
         (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
           select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
         ))) and coalesce(st.voting, true) as "isCounted",
+        coalesce(st.voting, true) as "isVoting",
         e.kind = 'runoff' as "isRunoff", c.previous_round_id as previous, c.party_scope_id as party,
         coalesce(runs.ids, '{}') as runoffs,
         c.term is not distinct from 'remainder' as "isRemainder",
@@ -6630,8 +6632,8 @@ async function races(
               head.party != null &&
               groups.filter(
                 (other) =>
-                  other[0].owner === head.owner &&
-                  other[0].party === head.party,
+                  other[0]?.owner === head.owner &&
+                  other[0]?.party === head.party,
               ).length === 1)
               ? head?.owner
               : single.id) ??
@@ -6662,6 +6664,7 @@ async function races(
                   ? 3
                   : 1,
         count: group.length,
+        nonvoting: group.filter((row) => !row.isVoting).length,
         sample: table?.sample ?? null,
         since: table?.since ?? null,
         size: head?.size ?? null,
@@ -6928,6 +6931,7 @@ export const elections = {
             body: v.nullable(v.string()),
             round: v.nullable(v.number()),
             count: v.number(),
+            nonvoting: v.number(),
             sample: v.nullable(v.string()),
             since: v.nullable(v.string()),
             electors: v.nullable(

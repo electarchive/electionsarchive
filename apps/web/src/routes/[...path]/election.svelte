@@ -1356,7 +1356,14 @@
 {#snippet meta(race: (typeof races)[number])}
   <p class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground">
     {#if race.count > 1}
-      <span>{m.race_contests({ count: count(race.count) })}</span>
+      <span
+        >{race.nonvoting > 0
+          ? m.race_contests_nonvoting({
+              count: count(race.count),
+              nonvoting: count(race.nonvoting),
+            })
+          : m.race_contests({ count: count(race.count) })}</span
+      >
     {/if}
     {#if race.path != null}
       <Preview

@@ -293,6 +293,7 @@
   "race_lede_runoff_led": "{party} led the {date} runoff with {share}, {margin} points ahead of {runner}.",
   "race_lede_final": "{party} won with {share} of the final-round vote, {margin} points ahead of {runner}.",
   "race_lede_final_led": "{party} led with {share} of the final-round vote, {margin} points ahead of {runner}.",
+  "race_contests_nonvoting": "{count} contests, including {nonvoting} nonvoting delegate races",
   "race_contests": [
     {
       "declarations": ["input count", "local countPlural = count: plural"],
