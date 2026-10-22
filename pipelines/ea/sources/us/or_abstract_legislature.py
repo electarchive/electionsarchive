@@ -1,10 +1,10 @@
 import re
-from itertools import takewhile
 import subprocess
+import tempfile
 from datetime import UTC, date, datetime
+from itertools import takewhile
 from pathlib import Path
 
-import httpx
 import polars as pl
 
 from ea import raw
@@ -18,9 +18,12 @@ PARSED = DATA / "parsed" / SOURCE
 URL = "https://records.sos.state.or.us/ORSOSWebDrawer/Record/{}/File/document"
 ABSTRACTS = {
     2000: (6920724, date(2000, 11, 7), "us.or_abstract_2000"),
+    2002: (8411079, date(2002, 11, 5), SOURCE),
     2004: (6873503, date(2004, 11, 2), SOURCE),
     2006: (6873552, date(2006, 11, 7), SOURCE),
     2008: (6873598, date(2008, 11, 4), SOURCE),
+    2010: (6873642, date(2010, 11, 2), SOURCE),
+    2012: (6873690, date(2012, 11, 6), SOURCE),
     2014: (6873735, date(2014, 11, 4), SOURCE),
 }
 PUBLISHER = "Oregon Secretary of State"
@@ -46,20 +49,24 @@ def fetch() -> None:
             continue
         except LookupError:
             pass
-        for _ in range(12):
-            response = httpx.get(url, follow_redirects=True, timeout=120, headers={"User-Agent": "Mozilla/5.0"})
-            if response.content.rstrip().endswith(b"%%EOF"):
-                raw.store(
-                    SOURCE,
-                    url,
-                    response.content,
-                    suffix=".pdf",
-                    retrieved_at=datetime.now(UTC),
-                    media_type="application/pdf",
+        with tempfile.TemporaryDirectory() as folder:
+            target = Path(folder) / "abstract.pdf"
+            for _ in range(60):
+                subprocess.run(
+                    ["curl", "-sL", "-m", "120", "-C", "-", "-A", "Mozilla/5.0", "-o", str(target), url], check=False
                 )
-                break
-        else:
-            raise RuntimeError(f"{url}: truncated every time")
+                if target.exists() and subprocess.run(["pdfinfo", str(target)], capture_output=True).returncode == 0:
+                    raw.store(
+                        SOURCE,
+                        url,
+                        target.read_bytes(),
+                        suffix=".pdf",
+                        retrieved_at=datetime.now(UTC),
+                        media_type="application/pdf",
+                    )
+                    break
+            else:
+                raise RuntimeError(f"{url}: truncated every time")
 
 
 def parse() -> None:
@@ -83,13 +90,13 @@ def parse() -> None:
         blocks: list[tuple[str, int, list[str]]] = []
         office = ""
         for line in text.splitlines():
-            if year == 2014:
+            if year >= 2012:
                 if line.startswith("Oregon Secretary of State"):
                     continue
-                if OFFICE_2014.match(line):
+                if OFFICE_2014.match(line.strip()):
                     office = {"State Senator": "senate", "State Representative": "house"}.get(line.strip(), "")
                     blocks.append(("", 0, []))
-                elif office and (found := DISTRICT_2014.match(line)):
+                elif office and (found := DISTRICT_2014.match(line.strip())):
                     blocks.append((office, int(found[1]), []))
                 elif blocks and not STOP.match(line):
                     blocks[-1][2].append(line)
@@ -119,7 +126,7 @@ def parse() -> None:
             if not body or body[0] is not None:
                 print(f"{year} {chamber} {district}: no County line, skipped")
                 continue
-            if year in (2000, 2014):
+            if year in (2000, 2012, 2014):
                 tokens = [
                     [(found.start(), found.end(), found[0]) for found in CELL.finditer(line)]
                     for line in takewhile(lambda line: not ROW.match(line), lines)
@@ -131,7 +138,7 @@ def parse() -> None:
                 cells: list[list[str]] = [[] for _ in anchors]
                 for row in tokens:
                     for start, end, text in row:
-                        if text not in ("County", "Misc."):
+                        if text not in ("County", "Misc.", "Misc"):
                             cells[
                                 min(range(len(anchors)), key=lambda i: abs(anchors[i][0] + anchors[i][1] - start - end))
                             ].append(text)
@@ -239,7 +246,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oregon's 2000, 2004, 2006, and 2008 state House and Senate general elections by county from the abstracts of votes",
+            summary="Oregon's 2000 through 2014 state House and Senate general elections by county from the abstracts of votes",
             polity="US-OR",
         )
         source = cs.source(PUBLISHER, TITLE)
