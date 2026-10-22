@@ -187,6 +187,18 @@ export function compare(
     (side) => side.options,
   );
   const anchors = alliances(options);
+  const anchored = new Set(
+    anchors
+      .values()
+      .flatMap((entry) =>
+        entry.option?.party == null ? [] : [root(entry.option.party)],
+      ),
+  );
+  const allied = new Set(
+    options.flatMap((option) =>
+      option.alliance == null ? [] : [option.contest],
+    ),
+  );
   const lines = new Map<string, Option>();
   const totals = new Map<string, number>();
   const owned = new Map<string, string>(
@@ -239,6 +251,14 @@ export function compare(
     }
     const line = lines.get(`${option.contest}:${option.person}`) ?? option;
     const party = line.party == null ? null : root(line.party);
+    if (
+      grouping === "alliance" &&
+      party != null &&
+      anchored.has(party) &&
+      allied.has(option.contest)
+    ) {
+      return `alliance:${party}`;
+    }
     if (
       option.person != null &&
       (grouping !== "party" || party == null) &&
