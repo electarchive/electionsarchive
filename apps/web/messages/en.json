@@ -303,6 +303,8 @@
     }
   ],
   "race_open": "View full results",
+  "race_show": "Show results",
+  "race_hide": "Hide results",
   "election_parent": "Part of {name}",
   "polity_subdivisions": "Subdivisions",
   "polity_local_one": "Local: {place}",

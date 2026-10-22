@@ -1,11 +1,13 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
+  import ChevronDownIcon from "@lucide/svelte/icons/chevron-down";
   import {
     createQueries,
     createQuery,
     useQueryClient,
   } from "@tanstack/svelte-query";
-  import { untrack } from "svelte";
+  import { tick, untrack } from "svelte";
+  import { MediaQuery } from "svelte/reactivity";
   import { count, date, percent, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -284,6 +286,9 @@
     }),
   }));
   const regional = $state<Record<number, boolean>>({});
+  const opened = $state<Record<number, boolean>>({});
+  const wide = new MediaQuery("min-width: 40rem");
+  let isHydrated = $state(false);
   const firstRound = $state<Record<number, boolean>>({});
   const regionals = createQueries(() => ({
     queries: ordered.map((race, index) => ({
@@ -893,6 +898,19 @@
   const others = $derived(
     isBallot ? races : races.slice(1).filter((race) => !race.isLater),
   );
+  const isFolding = $derived(isHydrated && !wide.current && races.length > 4);
+  $effect(() => {
+    isHydrated = true;
+    const spot = untrack(() =>
+      races.findIndex((race) => `#race-${race.anchor}` === location.hash),
+    );
+    if (spot > 0) {
+      opened[spot] = true;
+      void tick().then(() =>
+        document.querySelector(location.hash)?.scrollIntoView(),
+      );
+    }
+  });
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -1031,10 +1049,25 @@
       {/if}
       {#if race.results.length === 0}
         <p class="text-[0.9375rem] text-muted-foreground">{m.no_results()}</p>
+      {:else if isFolding && index > 0}
+        <button
+          type="button"
+          class="mbs-1.5 mbe-2 flex items-center justify-center gap-1.5 rounded-sm border border-input bg-card text-[0.8125rem] font-semibold keycap block-10 hover:bg-secondary"
+          aria-expanded={opened[index] === true}
+          onclick={() => (opened[index] = opened[index] !== true)}
+          >{opened[index] === true
+            ? m.race_hide()
+            : m.race_show()}<ChevronDownIcon
+            class={cn("transition-transform block-4 inline-4", {
+              "rotate-180": opened[index] === true,
+            })}
+            aria-hidden="true"
+          /></button
+        >
       {/if}
     </section>
   {/if}
-  {#if race.results.length > 1 || (index === 0 && race.results.length > 0)}
+  {#if (race.results.length > 1 || (index === 0 && race.results.length > 0)) && (!isFolding || index === 0 || opened[index] === true)}
     {#if race.electors != null && race.electors.rows.length > 0 && races.length === 1}
       <Electors electors={race.electors} />
     {/if}
@@ -1247,7 +1280,9 @@
               {#if other.results.length !== 1}
                 <a
                   class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                  href="#race-{other.anchor}">{other.name}</a
+                  href="#race-{other.anchor}"
+                  onclick={() => (opened[races.indexOf(other)] = true)}
+                  >{other.name}</a
                 >
               {:else if other.path == null}
                 {other.name}
@@ -1259,7 +1294,13 @@
               {/if}
             </h3>
             {#if other.lede != null}
-              {@render lede(other, false)}
+              <div
+                class={cn({
+                  "max-sm:hidden": races.length > 4 && other.next == null,
+                })}
+              >
+                {@render lede(other, false)}
+              </div>
             {/if}
           </div>
           {#if other.results.length === 0}
