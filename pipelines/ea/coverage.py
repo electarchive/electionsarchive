@@ -229,7 +229,7 @@ where cc.year >= 2000 and cc.level in ('president', 'us_senate', 'governor', 'st
 create temp table cx as
 select s.st, s.d, count(u.k) as n
 from (select distinct st, d from cd) s
-left join (reporting_unit u join pstate ps on ps.id = u.polity_id) on u.scheme_code = 'us.county' and ps.st = s.st and u.valid @> s.d
+left join (reporting_unit u join pstate ps on ps.id = u.polity_id) on u.scheme_code = 'us.county' and u.code <> '15005' and ps.st = s.st and u.valid @> s.d
 group by 1, 2;
 
 create temp table cu as
