@@ -1,0 +1,28 @@
+{
+  "kind": "statewide",
+  "year": 1974,
+  "day": "1974-11-05",
+  "polity": "US-SC",
+  "publisher": "South Carolina State Election Commission",
+  "title": "Report of the State Election Commission, votes cast in the general election held 1974-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1974-1975.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "treasurer": "State Treasurer",
+    "comptroller-general": "Comptroller General",
+    "superintendent-of-education": "State Superintendent of Education",
+    "commissioner-of-agriculture": "State Commissioner of Agriculture"
+  },
+  "leaves": [
+    43,
+    44
+  ]
+}
