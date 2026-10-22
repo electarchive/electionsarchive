@@ -251,36 +251,7 @@
     {/if}
 
     {#if party.scope == null}
-      <Lineage {party} {color} />
-    {/if}
-
-    {#if links.length > 0 && party.scope == null}
-      <section class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5">
-        <h2 class="text-[0.8125rem] font-bold">{m.party_relations()}</h2>
-        <ul class="grid gap-1 text-sm">
-          {#each links as link, index (index)}
-            <li class="flex items-baseline gap-2">
-              <span
-                class="shrink-0 self-center rounded-xs block-2 inline-2"
-                style:background-color={swatch(
-                  link.party.color,
-                  `party:${link.party.id}`,
-                )}
-              ></span>
-              <a
-                class="hover:highlighter"
-                href={resolve("/id/[id]", { id: link.party.id })}>{link.text}</a
-              >
-              {#if link.year != null}
-                <span
-                  class="font-figures text-xs text-muted-foreground tabular-nums"
-                  >{link.year}</span
-                >
-              {/if}
-            </li>
-          {/each}
-        </ul>
-      </section>
+      <Lineage {party} {color} {links} />
     {/if}
 
     <section class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3 pbe-3.5">

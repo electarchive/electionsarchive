@@ -5,8 +5,19 @@
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
 
-  const { party, color }: { party: PageData["party"]; color: string } =
-    $props();
+  const {
+    party,
+    color,
+    links,
+  }: {
+    party: PageData["party"];
+    color: string;
+    links: Array<{
+      text: string;
+      party: { id: string; color: string | null };
+      year: string | null;
+    }>;
+  } = $props();
 
   const INTO = new Set([
     "merged_into:in",
@@ -146,109 +157,152 @@
   });
 </script>
 
-{#if rows.length > 0}
+{#if rows.length > 0 || links.length > 0}
   <section
     class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="lineage-title"
     data-export
   >
-    <Export name="lineage" class="absolute inset-e-2 inset-bs-2" />
+    {#if rows.length > 0}
+      <Export name="lineage" class="absolute inset-e-2 inset-bs-2" />
+    {/if}
     <div class="grid gap-0.5 pe-8">
       <h2 id="lineage-title" class="heading">
-        {m.party_lineage_title()}
+        {party.parents.length > 0
+          ? m.party_relations()
+          : m.party_lineage_title()}
       </h2>
-      <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
-        {m.party_lineage_lede()}
-      </p>
+      {#if rows.length > 0}
+        <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
+          {m.party_lineage_lede()}
+        </p>
+      {/if}
     </div>
-    <div class="min-inline-0" bind:clientWidth={width}>
-      <svg
-        class="block overflow-visible block-auto max-inline-full"
-        viewBox="0 0 {width} {height}"
-        {width}
-        {height}
-        role="img"
-        aria-label={m.party_lineage_title()}
-      >
-        {#each ticks as tick (tick)}
-          <line
-            x1={sx(tick)}
-            x2={sx(tick)}
-            y1={PAD.top}
-            y2={height - PAD.bottom}
-            class="stroke-border"
-            stroke-dasharray="2 3"
-          />
-          <text
-            x={sx(tick)}
-            y={height - 6}
-            text-anchor="middle"
-            class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
-            >{tick}</text
-          >
-        {/each}
-        {#each rows as entry (entry.party.id)}
-          {const tint = $derived(
-            swatch(entry.party.color, `party:${entry.party.id}`),
-          )}
-          {#each entry.events as event, index (index)}
-            {#if event.at != null}
-              {const x = $derived(sx(event.at))}
-              {const y0 = $derived(sy(entry.row))}
-              {const y1 = $derived(sy(0))}
-              <path
-                d={event.isInto
-                  ? `M${x - 18},${y0} Q${x},${y0} ${x},${(y0 + y1) / 2} L${x},${y1}`
-                  : `M${x},${y1} L${x},${(y0 + y1) / 2} Q${x},${y0} ${x + 18},${y0}`}
-                fill="none"
-                stroke={tint}
-                stroke-width="2"
-                stroke-opacity="0.85"
-              />
-              <circle cx={x} cy={y1} r="3.5" fill={tint} class="stroke-card" />
-            {/if}
-          {/each}
-          <rect
-            x={sx(entry.from)}
-            y={sy(entry.row) - 3}
-            width={Math.max(4, sx(entry.to) - sx(entry.from))}
-            height="6"
-            rx="3"
-            fill={tint}
-          />
-        {/each}
-        {#if Number.isFinite(main.from)}
-          <rect
-            x={sx(main.from)}
-            y={sy(0) - 5}
-            width={Math.max(6, sx(main.to) - sx(main.from))}
-            height="10"
-            rx="5"
-            fill={color}
-          />
-          <text
-            x={Math.min(sx(main.from), width - 140)}
-            y={sy(0) - 10}
-            class="fill-foreground stroke-card text-[0.8125rem] font-bold"
-            stroke-width="4"
-            stroke-linejoin="round"
-            paint-order="stroke">{party.short ?? party.name}</text
-          >
-        {/if}
-        {#each rows as entry (entry.party.id)}
-          <a href={resolve("/id/[id]", { id: entry.party.id })}>
+    {#if rows.length > 0}
+      <div class="min-inline-0" bind:clientWidth={width}>
+        <svg
+          class="block overflow-visible block-auto max-inline-full"
+          viewBox="0 0 {width} {height}"
+          {width}
+          {height}
+          role="img"
+          aria-label={m.party_lineage_title()}
+          aria-describedby={links.length > 0 ? "lineage-links" : undefined}
+        >
+          {#each ticks as tick (tick)}
+            <line
+              x1={sx(tick)}
+              x2={sx(tick)}
+              y1={PAD.top}
+              y2={height - PAD.bottom}
+              class="stroke-border"
+              stroke-dasharray="2 3"
+            />
             <text
-              x={Math.min(sx(entry.from), width - 120)}
-              y={sy(entry.row) - 7}
-              class="fill-foreground stroke-card text-[0.75rem] font-semibold hover:underline"
+              x={sx(tick)}
+              y={height - 6}
+              text-anchor="middle"
+              class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
+              >{tick}</text
+            >
+          {/each}
+          {#each rows as entry (entry.party.id)}
+            {const tint = $derived(
+              swatch(entry.party.color, `party:${entry.party.id}`),
+            )}
+            {#each entry.events as event, index (index)}
+              {#if event.at != null}
+                {const x = $derived(sx(event.at))}
+                {const y0 = $derived(sy(entry.row))}
+                {const y1 = $derived(sy(0))}
+                <path
+                  d={event.isInto
+                    ? `M${x - 18},${y0} Q${x},${y0} ${x},${(y0 + y1) / 2} L${x},${y1}`
+                    : `M${x},${y1} L${x},${(y0 + y1) / 2} Q${x},${y0} ${x + 18},${y0}`}
+                  fill="none"
+                  stroke={tint}
+                  stroke-width="2"
+                  stroke-opacity="0.85"
+                />
+                <circle
+                  cx={x}
+                  cy={y1}
+                  r="3.5"
+                  fill={tint}
+                  class="stroke-card"
+                />
+              {/if}
+            {/each}
+            <rect
+              x={sx(entry.from)}
+              y={sy(entry.row) - 3}
+              width={Math.max(4, sx(entry.to) - sx(entry.from))}
+              height="6"
+              rx="3"
+              fill={tint}
+            />
+          {/each}
+          {#if Number.isFinite(main.from)}
+            <rect
+              x={sx(main.from)}
+              y={sy(0) - 5}
+              width={Math.max(6, sx(main.to) - sx(main.from))}
+              height="10"
+              rx="5"
+              fill={color}
+            />
+            <text
+              x={Math.min(sx(main.from), width - 140)}
+              y={sy(0) - 10}
+              class="fill-foreground stroke-card text-[0.8125rem] font-bold"
               stroke-width="4"
               stroke-linejoin="round"
-              paint-order="stroke"
-              >{entry.party.short ?? entry.party.label}</text
+              paint-order="stroke">{party.short ?? party.name}</text
             >
-          </a>
+          {/if}
+          {#each rows as entry (entry.party.id)}
+            <a href={resolve("/id/[id]", { id: entry.party.id })}>
+              <text
+                x={Math.min(sx(entry.from), width - 120)}
+                y={sy(entry.row) - 7}
+                class="fill-foreground stroke-card text-[0.75rem] font-semibold hover:underline"
+                stroke-width="4"
+                stroke-linejoin="round"
+                paint-order="stroke"
+                >{entry.party.short ?? entry.party.label}</text
+              >
+            </a>
+          {/each}
+        </svg>
+      </div>
+    {/if}
+    {#if links.length > 0}
+      <ul
+        id="lineage-links"
+        class="grid gap-x-6 gap-y-1 text-sm md:grid-cols-2"
+      >
+        {#each links as link, index (index)}
+          <li class="flex items-baseline gap-2">
+            <span
+              class="shrink-0 self-center rounded-xs block-2 inline-2"
+              style:background-color={swatch(
+                link.party.color,
+                `party:${link.party.id}`,
+              )}
+            ></span>
+            <a
+              class="hover:highlighter"
+              href={resolve("/id/[id]", { id: link.party.id })}>{link.text}</a
+            >
+            {#if link.year != null}
+              <span
+                class="font-figures text-xs text-muted-foreground tabular-nums"
+                >{link.year}</span
+              >
+            {/if}
+          </li>
         {/each}
-      </svg>
-    </div>
+      </ul>
+    {/if}
   </section>
 {/if}
