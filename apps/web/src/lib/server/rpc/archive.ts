@@ -8530,6 +8530,7 @@ export const polities = {
                 id: v.string(),
                 name: v.string(),
                 path: v.string(),
+                unit: v.nullable(v.string()),
                 leaders: v.array(
                   v.object({
                     key: v.string(),
@@ -8664,7 +8665,9 @@ export const polities = {
             ),
             place as (
               select a.id, a.k from polity_territory t join area a on a.id = t.area_id
-              join polity p on p.id = t.polity_id and p.kind in ('county', 'municipality')
+              join polity p on p.id = t.polity_id and (
+                p.kind in ('county', 'municipality') or not exists (select from election e where e.polity_id = p.id)
+              )
               where t.polity_id = ${input.id}::uuid
               order by upper(t.valid) desc nulls first limit 1
             )
@@ -8673,10 +8676,12 @@ export const polities = {
               case
                 when c.kind = 'ballot_question' then 5
                 when c.kind = 'elector_slate' or o.kind in ('head_of_state', 'head_of_government') then 0
-                when (c.district_area_id is null or c.district_area_id = pt.area_id)
-                  and (o.kind = 'governor' or b.polity_id <> e.polity_id) then 1
-                when b.polity_id <> e.polity_id then 2
-                when c.district_area_id is null or c.district_area_id = pt.area_id then 3
+                when (c.district_area_id is null or c.district_area_id in (pt.area_id, place.id)) and (
+                  o.kind = 'governor'
+                  or b.polity_id in (select id from up) and (b.polity_id <> e.polity_id or c.district_area_id = place.id)
+                ) then 1
+                when b.polity_id in (select id from up) and b.polity_id <> e.polity_id then 2
+                when c.district_area_id is null or c.district_area_id in (pt.area_id, place.id) then 3
                 else 4
               end as tier
             from place, election e
@@ -8804,6 +8809,7 @@ export const polities = {
               const loaded = totals.get(row.k);
               return {
                 ...row,
+                unit,
                 valid: loaded?.side.valid ?? 0,
                 name: label.full.get(row.id) ?? "",
                 path: [row.path, unit].filter((part) => part !== "").join("/"),
@@ -8877,6 +8883,7 @@ export const polities = {
               id: race.id,
               name: race.name,
               path: race.path,
+              unit: race.unit === "" ? null : race.unit,
               leaders: race.leaders,
             })),
           }))

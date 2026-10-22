@@ -42,9 +42,10 @@
   const isLocal = $derived(
     polity.parent != null &&
       polity.results.length > 0 &&
-      !["sovereign_state", "supranational", "federal_unit"].includes(
-        polity.kind,
-      ),
+      (polity.elections.length === 0 ||
+        !["sovereign_state", "supranational", "federal_unit"].includes(
+          polity.kind,
+        )),
   );
   const above = $derived(polity.breadcrumbs.at(-1)?.name ?? "");
   const versus = createQuery(() => ({
@@ -172,7 +173,7 @@
       return {
         key: `${race.id}/${race.path}`,
         id: race.id,
-        unit: race.path.split("/").at(-1),
+        unit: race.unit ?? undefined,
       };
     }
     const contest = isNational ? null : (polity.mapped ?? headline?.contest);
