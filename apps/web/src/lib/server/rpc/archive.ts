@@ -6590,12 +6590,11 @@ async function races(
           labels.full.get(
             (single == null ||
             (head?.isOffice === true &&
-              head.party == null &&
-              (head.round ?? 1) === 1 &&
-              !head.isRunoff &&
-              head.runoffs.length === 0 &&
-              groups.filter((other) => other[0]?.office === head.office)
-                .length === 1)
+              groups.filter(
+                (other) =>
+                  other[0]?.office === head.office &&
+                  other[0]?.party === head.party,
+              ).length === 1)
               ? head?.owner
               : single.id) ??
               head?.id ??
