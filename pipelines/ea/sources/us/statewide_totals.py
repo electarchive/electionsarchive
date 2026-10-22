@@ -14,7 +14,6 @@ from ea.store import DATA, connect
 SOURCE = "us.statewide_totals"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-PAGES = DATA / "pages" / SOURCE
 FOLDER = Path(__file__).with_name("totals")
 DPI = 100
 PARTIES = {
@@ -30,6 +29,14 @@ PARTIES = {
     "reform": "reform-party",
     "american independent": "american-independent-party",
     "natural law": "natural-law-party",
+    "greenback": "greenback-party",
+    "populist": "peoples-party",
+    "people's": "peoples-party",
+    "socialist": "socialist-party-of-america",
+    "socialist workers": "socialist-workers-party",
+    "socialist party usa": "socialist-party-usa",
+    "free soil": "free-soil-party",
+    "know nothing": "know-nothing-party",
 }
 INDEPENDENT = {"independent", "nonpartisan", "none", "no party", "scattering", "write-in", "write-ins"}
 
@@ -88,17 +95,20 @@ def parse() -> None:
     print(frame.group_by("state", "office").agg(pl.col("date").n_unique().alias("years")).sort("state", "office"))
 
 
-def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "lines.parquet")
-    book = {row["id"]: row for row in sources().iter_rows(named=True)}
+def emit(
+    pipeline: str = SOURCE,
+    version: str = VERSION,
+    summary: str = "Statewide executive offices by state total from state manuals and blue books",
+    frame: pl.DataFrame | None = None,
+    book: dict[str, dict[str, str | int]] | None = None,
+    note: str | None = None,
+) -> Path:
+    if frame is None:
+        frame = pl.read_parquet(PARSED / "lines.parquet")
+    if book is None:
+        book = {row["id"]: row for row in sources().iter_rows(named=True)}
     with connect() as conn:
-        cs = Changeset(
-            conn,
-            pipeline=SOURCE,
-            version=VERSION,
-            summary="Statewide executive offices by state total from state manuals and blue books",
-            polity="US",
-        )
+        cs = Changeset(conn, pipeline=pipeline, version=version, summary=summary, polity="US")
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
@@ -127,10 +137,19 @@ def emit() -> Path:
         elections = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'us.election'").fetchall()
         )
-        contests = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.contest'")}
         ours = {
             value
-            for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{SOURCE}.result_set"])
+            for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{pipeline}.result_set"])
+        }
+        held = {
+            (office, year)
+            for office, year, contest_key in conn.execute(
+                """select o.value, extract(year from e.date_from)::int, k.value from contest c
+                   join election e on e.id = c.election_id
+                   join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
+                   join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'"""
+            )
+            if contest_key not in ours
         }
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
@@ -151,7 +170,7 @@ def emit() -> Path:
                 return None, label is not None
             if (national := PARTIES.get(label.lower().removesuffix(" party"))) is not None:
                 return cs.key("us.party", national), False
-            text = label if label.lower().endswith("party") else f"{label} Party"
+            text = label if re.search(r"\bparty\b", label, re.IGNORECASE) else f"{label} Party"
             options = [f"{state}:{slug(text)}", f"{state}:{slug(text.removesuffix(' Party'))}", slug(text)]
             key = next((key for key in options if key in parties_known), options[0])
             found = cs.key("us.party", key)
@@ -168,7 +187,7 @@ def emit() -> Path:
             unit_code, area, state_name = state_units[str(state)]
             title = str(lines["title"][0])
             key = f"{day}:{state}:{office}"
-            if key in contests and key not in ours:
+            if (f"{office}:{state}", year) in held:
                 print(f"{key}: held by another pipeline, skipped")
                 skipped += 1
                 continue
@@ -199,13 +218,13 @@ def emit() -> Path:
                     cs.add(
                         "source",
                         id=made,
-                        kind="official_body",
+                        kind=row.get("kind", "official_body"),
                         publisher=row["publisher"],
                         title=row["title"],
                         url=row["landing"],
                         license=row["license"],
                     )
-                artifacts[str(source_id)] = cs.artifact(raw.cached(SOURCE, row["url"]), made)
+                artifacts[str(source_id)] = cs.artifact(raw.cached(pipeline, row["url"]), made)
             office_key = f"{office}:{state}"
             office_id = cs.key("us.office", office_key)
             if office_key not in offices_known:
@@ -222,7 +241,8 @@ def emit() -> Path:
                        where c.district_area_id = %s""",
                     [area],
                 ).fetchall():
-                    catalog.setdefault(f"{plain(text.split()[0])}|{surname(text)}", []).append((person, seen))
+                    if text.split():
+                        catalog.setdefault(f"{plain(text.split()[0])}|{surname(text)}", []).append((person, seen))
                 people[str(state)] = catalog
             contest = cs.key("us.contest", key)
             cs.add(
@@ -241,7 +261,7 @@ def emit() -> Path:
             name(contest, f"{year} {state_name} {title} election")
             path = f"us/{str(state).lower()}/{day}-general/{office}"
             cs.add("slug", path=path, entity_id=contest)
-            result_set = cs.key(f"{SOURCE}.result_set", key)
+            result_set = cs.key(f"{pipeline}.result_set", key)
             cs.add(
                 "result_set",
                 id=result_set,
@@ -254,6 +274,8 @@ def emit() -> Path:
                 is_default=True,
                 completeness=1,
             )
+            if note is not None:
+                cs.add("note", entity_id=result_set, kind="methodology", body_md=note)
             totals: dict[UUID, int] = {}
             declared: UUID | None = None
             for candidate, party_label, votes, winner, page in (
@@ -264,7 +286,7 @@ def emit() -> Path:
                 person = (
                     next(iter(found))
                     if len(found) == 1
-                    else cs.key(f"{SOURCE}.person", f"{state}:{slug(candidate)}:{year}")
+                    else cs.key(f"{pipeline}.person", f"{state}:{slug(candidate)}:{year}")
                 )
                 if person in cs.minted and person not in minted:
                     minted.add(person)
@@ -305,10 +327,10 @@ def emit() -> Path:
                     row = book[str(source_id)]
                     number = int(page) + int(row["page_offset"])
                     if (str(source_id), number) not in page_ids:
-                        pdf = raw.cached(SOURCE, row["url"]).path
-                        target = PAGES / f"{pdf.stem}-{number}.png"
+                        pdf = raw.cached(pipeline, row["url"]).path
+                        target = DATA / "pages" / pipeline / f"{pdf.stem}-{number}.png"
                         if not target.exists():
-                            PAGES.mkdir(parents=True, exist_ok=True)
+                            target.parent.mkdir(parents=True, exist_ok=True)
                             subprocess.run(
                                 ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(number), "-l", str(number)]
                                 + ["-singlefile", str(pdf), str(target.with_suffix(""))],
@@ -322,7 +344,7 @@ def emit() -> Path:
                             id=page_ids[(str(source_id), number)],
                             artifact_id=artifacts[str(source_id)],
                             page_number=number,
-                            image_key=f"pages/{SOURCE}/{target.name}",
+                            image_key=f"pages/{pipeline}/{target.name}",
                             width=width,
                             height=height,
                         )
