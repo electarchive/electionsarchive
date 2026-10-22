@@ -22,7 +22,7 @@ VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
 PRIMARIES = 2022
-EARLY = {"CT": 1789, "VT": 1789}
+EARLY = {"CO": 1902, "CT": 1789, "VA": 1924, "VT": 1789}
 ORDINALS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
 SEARCH = "https://{tenant}.civera.com/api/download_search.csv?"
 TABLE = "https://{tenant}.civera.com/api/download_contest/{contest}_table.csv?split_party=false"
@@ -184,7 +184,7 @@ def parse() -> None:
             names.setdefault(plain(text), code)
         days: dict[tuple[str, str, int, int | None], list[date]] = {}
         for (value,) in conn.execute(
-            "select value from external_id where scheme = 'us.contest' and value ~ '^\\d{4}-\\d\\d-\\d\\d:(CT|VT):'"
+            "select value from external_id where scheme = 'us.contest' and value ~ '^\\d{4}-\\d\\d-\\d\\d:(CO|CT|VA|VT):'"
         ).fetchall():
             held, state, chamber, *rest = value.split(":")
             if chamber in ("house", "senate", "president") and (not rest or (len(rest) == 1 and rest[0].isdigit())):
