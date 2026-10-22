@@ -26,7 +26,9 @@ SENATE = {"State Senate", "STATE SENATOR"}
 
 def url(state: str, day: str) -> str:
     name, folder = FILES[(state, day)]
-    return openelections.REPOSITORY.format(state=state.lower(), commit=openelections.COMMITS[state], path=f"{folder}/{name}")
+    return openelections.REPOSITORY.format(
+        state=state.lower(), commit=openelections.COMMITS[state], path=f"{folder}/{name}"
+    )
 
 
 def fetch() -> None:
@@ -40,7 +42,9 @@ def parse() -> None:
     frames = []
     for state, day in FILES:
         frame = pl.read_csv(
-            io.BytesIO(raw.cached(SOURCE, url(state, day)).path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")),
+            io.BytesIO(
+                raw.cached(SOURCE, url(state, day)).path.read_bytes().replace(b"\r\n", b"\n").replace(b"\r", b"\n")
+            ),
             infer_schema_length=0,
             truncate_ragged_lines=True,
         )
@@ -75,7 +79,9 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         frame.with_columns(
-            measure=pl.col("candidate").str.to_uppercase().replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
+            measure=pl.col("candidate")
+            .str.to_uppercase()
+            .replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
             writein=pl.col("candidate").str.to_uppercase().is_in([*medsl.POOLED, "MISC."])
             | pl.col("candidate").str.to_uppercase().str.contains("WRITE"),
         )
@@ -139,5 +145,6 @@ def emit() -> Path:
             ),
             sources,
             extend=True,
+            partial="the OpenElections county file does not account for every vote in the official total",
         )
         return cs.write()

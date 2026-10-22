@@ -168,5 +168,7 @@ def emit() -> Path:
         frame = frame.filter(
             ~pl.concat_str(pl.col("day").cast(pl.String), pl.col("state"), "chamber", separator=":").is_in(list(held))
         )
-        medsl.attach(cs, conn, frame, {"NC": source})
+        medsl.attach(
+            cs, conn, frame, {"NC": source}, partial="the State Board's precinct file has no absentee or one-stop rows"
+        )
         return cs.write()
