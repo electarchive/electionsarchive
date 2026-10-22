@@ -297,6 +297,49 @@
           ],
         };
   });
+  const locating = $derived.by(() => {
+    const own = boundaries.find(
+      (entry) => entry.k != null && entry.frames.length > 0,
+    );
+    if (
+      drawn != null ||
+      chamber != null ||
+      contest.locator == null ||
+      own?.tiles == null ||
+      own.k == null
+    ) {
+      return null;
+    }
+    const legend = contest.locator.legend;
+    return {
+      places: contest.locator,
+      tiles: own.tiles,
+      own: { tiles: own.tiles, k: own.k },
+      frames: own.frames.map((frame) => {
+        const wide = (frame.east - frame.west) * 1.5;
+        const tall = (frame.north - frame.south) * 1.5;
+        return {
+          west: frame.west - wide,
+          south: frame.south - tall,
+          east: frame.east + wide,
+          north: frame.north + tall,
+        };
+      }),
+      isApproximate: own.isApproximate,
+      noun: own.noun,
+      sources: [
+        ...new Set(
+          own.sources.flatMap((source) =>
+            source.attribution == null
+              ? [source.publisher]
+              : [source.publisher, source.attribution],
+          ),
+        ),
+      ],
+      colors: legend.map((item) => swatch(item.color, item.key)),
+      names: legend.map((item) => item.short ?? item.label),
+    };
+  });
   const unmapped = $derived.by(() => {
     const total = contest.current?.valid ?? 0;
     let mapped = 0;
@@ -1426,11 +1469,35 @@
     <div
       class={cn(
         "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-        { "lg:col-span-8": chamber != null && drawn == null },
+        {
+          "lg:col-span-8": chamber != null && drawn == null,
+          "lg:col-span-7 xl:col-span-8": locating != null,
+        },
       )}
     >
       {@render results()}
     </div>
+    {#if locating != null}
+      <div
+        class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-5 xl:col-span-4"
+      >
+        <PlaceMap
+          places={locating.places}
+          colors={locating.colors}
+          tiles={locating.tiles}
+          own={locating.own}
+          frames={locating.frames}
+          isApproximate={locating.isApproximate}
+          noun={locating.noun}
+          sources={locating.sources}
+          votes={m.col_votes()}
+          names={locating.names}
+          levels={[]}
+          span={null}
+          isLinked
+        />
+      </div>
+    {/if}
   {/if}
 
   {#if chamber != null && drawn == null}

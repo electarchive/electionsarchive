@@ -2779,6 +2779,7 @@ export const contests = {
             previous: v.boolean(),
           }),
         ),
+        locator: v.optional(Places),
         origins: v.optional(
           v.array(
             v.object({
@@ -3599,6 +3600,129 @@ export const contests = {
           ),
           redrawn([area.id], contest, chosen),
         ]);
+      const locator = (async () => {
+        if (!isRoot || contest.place == null) {
+          return null;
+        }
+        const found = await db.execute<{
+          id: string;
+          area: string;
+          k: number;
+          scheme: string;
+          noun: string;
+          party: string | null;
+          option: number | null;
+          label: string | null;
+          color: string | null;
+          valid: number;
+          margin: number | null;
+        }>(sql`
+          with me as (
+            select c.*, a.scheme_code as scheme, e.date_from as day
+            from contest c join area a on a.id = c.district_area_id join election e on e.id = c.election_id
+            where c.id = ${contest.root}::uuid
+              and not exists (
+                select from boundary_set bs
+                where bs.scheme_code = ${grid?.level ?? ""} and bs.valid @> e.date_from
+              )
+          ),
+          peers as (
+            select c.id, a.id as area, a.k, me.scheme, me.day
+            from me join contest c
+              on c.election_id = me.election_id and c.kind = me.kind and c.round_number = me.round_number
+              and c.body_id is not distinct from me.body_id and c.office_id is not distinct from me.office_id
+              and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null
+            join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
+          )
+          select p.id, p.area, p.k, p.scheme, sc.noun, w.party, w.option, w.label,
+            ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
+            coalesce(w.valid, 0)::float8 as valid,
+            case when w.valid > 0 then ((w.first - w.second) / w.valid)::float8 end as margin
+          from peers p
+          join scheme sc on sc.code = p.scheme
+          left join lateral (
+            select coalesce(pm.into_id, o.party_id) as party, o.k as option, o.ballot_label as label,
+              t.first, t.second, t.valid
+            from (
+              select rs.k from result_set rs where rs.contest_id = p.id and rs.is_default limit 1
+            ) rs
+            cross join lateral (
+              select (array_agg(r.option_k order by r.value desc))[1] as top,
+                max(r.value) as first,
+                coalesce((array_agg(r.value order by r.value desc))[2], 0) as second,
+                sum(r.value) as valid
+              from result_rollup r
+              where r.result_set_k = rs.k and r.area_k = p.k and r.option_k <> 0
+                and r.measure = (
+                  select x.measure from result_rollup x
+                  where x.result_set_k = rs.k and x.area_k = p.k and x.measure = any(${COUNTED})
+                  order by array_position(${COUNTED}, x.measure) limit 1
+                )
+                and r.count_round = (
+                  select max(x.count_round) from result_rollup x where x.result_set_k = rs.k and x.area_k = p.k
+                )
+            ) t
+            join contest_option o on o.k = t.top
+            left join entity_merge pm on pm.entity_id = o.party_id
+          ) w on true
+        `);
+        const [first] = found.rows;
+        if (first == null) {
+          return null;
+        }
+        const [labels, slugs] = await Promise.all([
+          names(
+            found.rows.flatMap((row) =>
+              row.party == null ? [row.area] : [row.area, row.party],
+            ),
+            contest.date,
+          ),
+          paths(found.rows.map((row) => row.id)),
+        ]);
+        const keyed = (row: (typeof found.rows)[number]) =>
+          row.party == null ? `option:${row.option ?? ""}` : `party:${row.party}`;
+        const legend = Map.groupBy(
+          found.rows.filter((row) => row.option != null),
+          keyed,
+        )
+          .entries()
+          .map(([key, rows]) => ({ key, rows }))
+          .toArray()
+          .toSorted((a, b) => b.rows.length - a.rows.length)
+          .map(({ key, rows }) => {
+            const party = rows[0]?.party ?? null;
+            return {
+              key,
+              label: labels.full.get(party ?? "") ?? rows[0]?.label ?? "",
+              short: labels.short.get(party ?? "") ?? null,
+              color: rows[0]?.color ?? null,
+              person: null,
+              party,
+            };
+          });
+        const index = new Map(legend.map((item, at) => [item.key, at]));
+        return {
+          levels: [
+            { code: first.scheme, noun: first.noun, count: found.rows.length },
+          ],
+          level: first.scheme,
+          legend,
+          rows: found.rows.map((row) => ({
+            k: row.k,
+            name: labels.full.get(row.area) ?? "",
+            path: slugs.get(row.id) ?? null,
+            contest: true,
+            isRemainder: false,
+            valid: row.valid,
+            shares: [],
+            leader: row.option == null ? null : (index.get(keyed(row)) ?? null),
+            margin: row.margin,
+            earlier: null,
+            prior: null,
+          })),
+          sources: [],
+        };
+      })();
       const current = now.get(area.k);
       if (current == null) {
         return {
@@ -3607,6 +3731,7 @@ export const contests = {
           places: grid,
           targets,
           origins: await origins,
+          locator: await locator,
         };
       }
       const earlier = before?.get(area.k);
@@ -3828,6 +3953,7 @@ export const contests = {
         })),
         targets,
         origins: await origins,
+        locator: await locator,
       };
     }),
   places: os
