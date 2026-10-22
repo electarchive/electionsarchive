@@ -80,8 +80,12 @@ def parse() -> None:
             )
             body = html.unescape(re.sub(r"<[^>]+>", "", re.search(r"<pre>(.*?)</pre>", text, re.S)[1])).splitlines()
             start = next(i for i, line in enumerate(body) if line.startswith("County"))
-            names = re.split(r"\s{2,}", body[start - 4].strip())
+            ends = [found.end() for found in re.finditer(r"\S+", body[start - 2])]
             printed = [int(cell.replace(",", "")) for cell in body[start - 2].split()]
+            names = [""] * len(printed)
+            for word in re.finditer(r"\S+", body[start - 4]):
+                column = next(index for index, end in enumerate(ends) if word.end() <= end + 1)
+                names[column] = f"{names[column]} {word[0]}".strip()
             if len(names) != len(printed):
                 raise ValueError(f"{day} {heading[1]}: {len(names)} names for {len(printed)} totals")
             summed = [0] * len(names)
