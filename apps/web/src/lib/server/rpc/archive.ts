@@ -9751,7 +9751,7 @@ export const polities = {
             (select k from place where polity = ${input.a}::uuid) as a,
             (select k from place where polity = ${input.b}::uuid) as b
           from hits h
-          join contest c on c.id = h.root
+          cross join lateral (select * from contest x where x.id = h.root offset 0) c
           join election e on e.id = c.election_id
           left join area own on own.id = c.district_area_id
           left join lateral (
