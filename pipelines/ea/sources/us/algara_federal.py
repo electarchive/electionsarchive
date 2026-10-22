@@ -57,6 +57,11 @@ LICENSE = (
     "CC0 1.0 as deposited, but compiled from CQ Press and ICPSR's United States Historical Election Returns, "
     "so held under the ICPSR terms of use"
 )
+WITHDRAWN = {"1936-11-03:FL:senate:special"}
+WITHDRAWN_NOTE = (
+    "The county file adds the votes of Florida's two same-day Senate races of 1936 into one line per county, so its "
+    "figures belong to neither contest alone. We withdrew this set."
+)
 PROVENANCE = (
     "Algara and Amlani's returns are reported as compiled from CQ Press and ICPSR's United States Historical "
     "Election Returns, so these county figures are kept beside the official total, never as the default, "
@@ -242,6 +247,24 @@ def emit() -> Path:
                 continue
             key, contest = found[0]
             lines = groups[0]
+            if key in WITHDRAWN:
+                election, completeness = conn.execute(
+                    "select election_id, completeness from result_set where id = %s", [published[key]]
+                ).fetchone()
+                cs.add(
+                    "result_set",
+                    id=published[key],
+                    election_id=election,
+                    contest_id=contest,
+                    stage="certified",
+                    kind="counted",
+                    status="withdrawn",
+                    source_id=sources[office],
+                    is_default=False,
+                    completeness=completeness,
+                )
+                cs.add("note", entity_id=published[key], kind="caveat", body_md=WITHDRAWN_NOTE)
+                continue
             if contest in counted_already:
                 if key in published:
                     cs.add("note", entity_id=published[key], kind="caveat", body_md=PROVENANCE)

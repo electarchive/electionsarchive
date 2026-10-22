@@ -1313,7 +1313,7 @@ def emit() -> Path:
             counted = [votes for _, votes, _, _ in values if votes is not None]
             if counted:
                 values.append((None, sum(counted), DERIVED, None))
-            if result_set in cs.minted:
+            if result_set in cs.minted or contest_key in RESEATED.values():
                 for option, votes, flags, row in values:
                     if votes is None:
                         continue
