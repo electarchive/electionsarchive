@@ -54,29 +54,30 @@ def parse(source: ModuleType) -> None:
             ),
             reverse=True,
         )
-        if not scored or scored[0][0] < 0.75 or len(scored) > 1 and scored[1][0] == scored[0][0]:
+        best = list({row[2]: row for row in scored if row[0] == scored[0][0]}.values())
+        if not scored or scored[0][0] < 0.75 or len({row[1] for row in best}) != len(best):
             failed.append(f"{where} {district}: no option for {label}")
             continue
-        _, contest, option, name, filed = scored[0]
-        if option in used:
-            failed.append(f"{where} {district}: {label} matches {name} twice")
-            continue
-        used.add(option)
-        summed = sum(votes for _, votes in column)
-        if summed != filed and (contest, surname(name)) not in source.CHECKED:
-            failed.append(f"{contest}: {name} sums to {summed:,}, the FEC has {filed:,}")
-            continue
-        for (county, votes), place in zip(column, places, strict=True):
-            rows_out.append(
-                {
-                    "contest": contest,
-                    "option": option,
-                    "county": county,
-                    "votes": votes,
-                    "page": place[0],
-                    "box": place[1],
-                }
-            )
+        for _, contest, option, name, filed in best:
+            if option in used:
+                failed.append(f"{where} {district}: {label} matches {name} twice")
+                continue
+            used.add(option)
+            summed = sum(votes for _, votes in column)
+            if summed != filed and (contest, surname(name)) not in source.CHECKED:
+                failed.append(f"{contest}: {name} sums to {summed:,}, the FEC has {filed:,}")
+                continue
+            for (county, votes), place in zip(column, places, strict=True):
+                rows_out.append(
+                    {
+                        "contest": contest,
+                        "option": option,
+                        "county": county,
+                        "votes": votes,
+                        "page": place[0],
+                        "box": place[1],
+                    }
+                )
     left = {contest for contest, *_ in options} - {str(row["contest"]) for row in rows_out}
     for line in failed:
         print(line)
