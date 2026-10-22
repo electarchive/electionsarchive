@@ -623,40 +623,51 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 )
             )
             if (start - convened).days > 45 and not continuing and not early:
-                seated[(term["state"], level, term.get("class"))].append((start, term.get("how") == "appointment"))
+                seated[(term["state"], level, term.get("class"))].append(
+                    (start, term.get("how") == "appointment", date.fromisoformat(term["end"]))
+                )
 
     specials = defaultdict(list)
     for st, level, year, day in conn.execute(SPECIALS_SQL):
         specials[(st, level)].append([day, year, False])
 
-    implied: list[tuple[str, str, date, int]] = []
+    implied: list[tuple[str, str, date, int, date | None]] = []
     for (st, level, seat_class), events in seated.items():
         events.sort()
-        groups: list[list[tuple[date, bool]]] = []
+        groups: list[list[tuple[date, bool, date]]] = []
         for event in events:
             if level == "us_senate" and groups and (event[0] - groups[-1][-1][0]).days <= 900:
                 groups[-1].append(event)
             else:
                 groups.append([event])
         for group in groups:
-            elected = [day for day, appointed in group if not appointed]
+            elected = [
+                day
+                for day, appointed, _ in group
+                if not appointed
+                and not (level == "us_senate" and day.year % 2 and (day.year - 1) % 6 == {1: 2, 2: 4, 3: 0}[seat_class])
+            ]
             if level == "us_house" or elected:
                 for day in elected:
-                    implied.append((st, level, day, day.year))
+                    implied.append((st, level, day, day.year, None))
+                continue
+            if any(not appointed for _, appointed, _ in group) or group[-1][2] == date(group[-1][2].year, 1, 3):
                 continue
             year = group[0][0].year + (1 if group[0][0].year % 2 else 0)
             if group[0][0] >= date(year, 11, 8):
                 year += 2
             if year % 6 != {1: 2, 2: 4, 3: 0}[seat_class]:
-                implied.append((st, level, date(year, 11, 1), year))
+                implied.append((st, level, date(year, 11, 1), year, group[0][0]))
 
-    for st, level, day, year in implied:
+    for st, level, day, year, since in implied:
         near = [
             hold
             for hold in specials[(st, level)]
             if not hold[2]
             and (
-                abs((hold[0] - day).days) <= 200
+                0 <= (hold[0] - since).days <= 900
+                if since is not None
+                else abs((hold[0] - day).days) <= 200
                 if (day.month, day.day) == (11, 1)
                 else -450 <= (hold[0] - day).days <= 60
             )
