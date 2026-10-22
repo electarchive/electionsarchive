@@ -252,7 +252,7 @@
       const path = race.path ?? "";
       const by = race.places?.level;
       return {
-        queryKey: ["swing", path, by],
+        queryKey: ["swing", race.path ?? race.anchor, by],
         enabled:
           race.path != null &&
           race.count === 1 &&
