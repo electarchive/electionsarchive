@@ -146,6 +146,20 @@ ELECTIONS = {
         "surnames": ("gonzalez", "ortiz", "cordova", "dalmau", "jimenez"),
     },
 }
+COMMISSIONERS = {
+    "2008-11-04": {
+        "pages": (95, 96, 97),
+        "island": "The municipio rows also sum exactly to the island row printed on page 95.",
+        "surnames": ("salazar", "pierluisi", "martinez", "velazquez"),
+    },
+    "2012-11-06": {
+        "pages": (35, 36, 37, 38),
+        "island": "The municipio rows also sum exactly to the island row printed on page 35.",
+        "surnames": ("pierluisi", "cox", "mercado", "guzman", "guillont", "cordova"),
+    },
+}
+for day, election in COMMISSIONERS.items():
+    ELECTIONS[f"{day}:commissioner"] = {key: value for key, value in ELECTIONS[day].items() if key not in ("pages", "surnames", "island", "fixes")} | election
 
 
 def fold(text: str) -> str:
@@ -628,7 +642,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Puerto Rico governor general elections by municipio from the State Elections Commission's statistical reports, read from the reports' page images and checked against each row's printed total and percentages",
+            summary="Puerto Rico governor and Resident Commissioner general elections by municipio from the State Elections Commission's statistical reports, read from the reports' page images and checked against each row's printed total and percentages",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -652,7 +666,7 @@ def emit() -> Path:
         if len(units) != 78:
             raise ValueError("Puerto Rico needs 78 municipios")
         contests = dict(
-            conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':PR:governor'")
+            conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':PR:(governor|house:0$)'")
         )
         days = [(day, frame.filter(pl.col("day") == day)) for day in frame["day"].unique(maintain_order=True)]
         days += [(day, precincts.filter(pl.col("day") == day)) for day in precincts["day"].unique(maintain_order=True)]
@@ -660,7 +674,7 @@ def emit() -> Path:
         for day, lines in days:
             day = (day,)
             election = ELECTIONS[day[0]]
-            key = f"{day[0]}:PR:governor"
+            key = f"{day[0][:10]}:PR:house:0" if day[0].endswith(":commissioner") else f"{day[0]}:PR:governor"
             contest = contests[key]
             ((election_id,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             result_set = cs.key(f"{SOURCE}.result_set", key)
@@ -737,7 +751,7 @@ def emit() -> Path:
             )
             if "split" in election:
                 pages_text = ", ".join(str(number) for number in election["pages"])
-                body = f"Votes by municipio summed from the electoral-precinct rows of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election{' (' + election['member'].removesuffix('.pdf').title() + ')' if 'member' in election else ''}, pages {pages_text}, a table of page images read by OCR. Each precinct row's candidate votes match its printed percentages and do not exceed its printed total, and the precinct rows of every senatorial district sum to that district's printed totals row for each candidate. {election['island']} Each value's locator boxes the candidate's cells for the municipio's precinct rows on the first page where they appear; the sum also includes precinct rows on later pages and in other districts. Write-in and blank votes are not in the table."
+                body = f"Votes for {'Resident Commissioner' if day[0].endswith(':commissioner') else 'governor'} by municipio summed from the electoral-precinct rows of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election{' (' + election['member'].removesuffix('.pdf').title() + ')' if 'member' in election else ''}, pages {pages_text}, a table of page images read by OCR. Each precinct row's candidate votes match its printed percentages and do not exceed its printed total, and the precinct rows of every senatorial district sum to that district's printed totals row for each candidate. {election['island']} Each value's locator boxes the candidate's cells for the municipio's precinct rows on the first page where they appear; the sum also includes precinct rows on later pages and in other districts. Write-in and blank votes are not in the table."
             else:
                 body = f"Votes by municipio read from pages {election['pages'][0]}–{election['pages'][1]} of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election, a table of page images. Each row's candidate votes sum to its printed total and match its printed percentages. Write-in and blank votes are not in the table. The municipio rows sum to within five votes per candidate of the island totals printed on the report's last row."
             published = conn.execute("select from result_set where id = %s", [result_set]).fetchone() is not None
