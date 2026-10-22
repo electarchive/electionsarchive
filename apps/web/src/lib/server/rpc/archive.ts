@@ -6585,7 +6585,18 @@ async function races(
         anchor: segment(labels.full.get(head?.owner ?? head?.id ?? "") ?? ""),
         name:
           labels.full.get(
-            (single == null ? head?.owner : single.id) ?? head?.id ?? "",
+            (single == null ||
+            (head?.isOffice === true &&
+              head.party == null &&
+              (head.round ?? 1) === 1 &&
+              !head.isRunoff &&
+              head.runoffs.length === 0 &&
+              groups.filter((other) => other[0]?.office === head.office)
+                .length === 1)
+              ? head?.owner
+              : single.id) ??
+              head?.id ??
+              "",
           ) ?? "",
         scope: head?.party == null ? null : labels.full.get(head.party),
         path: single == null ? null : (slugs.get(single.id) ?? null),
