@@ -1599,6 +1599,7 @@
       {span}
       {publishers}
       isMapped={drawn != null}
+      deeper={contest.deeper ?? null}
       votes={counted ?? m.col_votes()}
       bind:only={
         () => only,

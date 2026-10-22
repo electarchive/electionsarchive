@@ -22,6 +22,7 @@
     publishers,
     votes,
     isMapped = false,
+    deeper = null,
     limit = 10,
     trace = null,
     only = $bindable(null),
@@ -39,6 +40,7 @@
     publishers: Array<string>;
     votes: string;
     isMapped?: boolean;
+    deeper?: string | null;
     limit?: number;
     trace?: string | null;
     only?: number | string | null;
@@ -554,6 +556,11 @@
   {#if shared != null}
     <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
       {m.places_shared({ place: shared })}
+    </p>
+  {/if}
+  {#if deeper != null}
+    <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
+      {m.places_deeper({ noun, finer: deeper })}
     </p>
   {/if}
   <div class="-mx-2 overflow-x-auto">

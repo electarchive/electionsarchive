@@ -174,6 +174,7 @@
   "origins_item": "{name} ({share})",
   "series_annulled": "{year} (annulled)",
   "places_shared": "Located in {place}",
+  "places_deeper": "View {noun} results by {finer}",
   "places_title": "Results by {noun}",
   "places_no_earlier": "{year} has no results at this level; shifts cannot be shown.",
   "places_level": "Show results by",

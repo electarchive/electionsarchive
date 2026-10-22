@@ -2320,7 +2320,7 @@ async function tabulate(
       };
     }),
     sources: [...sources],
-    unreconciled: [...unreconciled.values()],
+    unreconciled: unreconciled.values().toArray(),
   };
 }
 
@@ -2836,6 +2836,7 @@ export const contests = {
           }),
         ),
         locator: v.optional(Places),
+        deeper: v.optional(v.nullable(v.string())),
         county: v.optional(
           v.nullable(
             v.object({ name: v.string(), path: v.nullable(v.string()) }),
@@ -3854,6 +3855,26 @@ export const contests = {
           sources: [],
         };
       })();
+      const deeper = (async () => {
+        if (!isRoot || grid == null || grid.rows.length === 0) {
+          return null;
+        }
+        const found = await db.execute<{ noun: string }>(sql`
+          select sc.noun
+          from result_set rs
+          cross join lateral (
+            select ru.scheme_code from result_value x join reporting_unit ru on ru.k = x.unit_k
+            where x.result_set_k = rs.k and ru.area_relation = 'within'
+              and ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
+            limit 1
+          ) u
+          join scheme sc on sc.code = u.scheme_code
+          where rs.contest_id = ${contest.id}::uuid and rs.status = 'active'
+            and sc.rank > (select rank from scheme where code = ${grid.level})
+          limit 1
+        `);
+        return found.rows[0]?.noun ?? null;
+      })();
       const current = now.get(area.k);
       if (current == null) {
         return {
@@ -3864,6 +3885,7 @@ export const contests = {
           origins: await origins,
           county: await county,
           locator: await locator,
+          deeper: await deeper,
         };
       }
       const earlier = before?.get(area.k);
@@ -4087,6 +4109,7 @@ export const contests = {
         origins: await origins,
         county: await county,
         locator: await locator,
+        deeper: await deeper,
       };
     }),
   places: os
