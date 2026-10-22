@@ -16,11 +16,12 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 MANUAL = Path.home() / "Downloads"
 BASE = "https://sos.iowa.gov/elections/pdf/{year}/primary/canvsummary.pdf"
-FILES = {2020: (date(2020, 6, 2), "ia_2020_pri_canvsummary.pdf"), 2022: (date(2022, 6, 7), "ia_2022_pri_canvsummary.pdf")}
-PARTIES = {"Rep.": "republican", "Dem.": "democratic", "Republican": "republican", "Democratic": "democratic"}
+FILES = {2018: (date(2018, 6, 5), "ia_2018_pri_canvsummary.pdf"), 2020: (date(2020, 6, 2), "ia_2020_pri_canvsummary.pdf"), 2022: (date(2022, 6, 7), "ia_2022_pri_canvsummary.pdf")}
+PARTIES = {"Rep.": "republican", "Dem.": "democratic", "Republican": "republican", "Democratic": "democratic", "Democrat": "democratic", "Libertarian": "libertarian"}
 PUBLISHER = "Iowa Secretary of State"
 TITLE = "Primary election canvass summary"
 TITLE_LINE = re.compile(r"^\s+(United States Senator|United States Representative District (\d+)) - (\S+)\s*$")
+COUNTY_ROW = re.compile(r"^\s?([A-Z][A-Za-z.' ]+?)\s{2,}([\d,]+(?:\s+[\d,]+)+)\s*$")
 ROW = re.compile(r"^\s*(?:(\S.*?)\s{2,})?Total\s+([\d,]+(?:\s+[\d,]+)*)\s*$")
 
 
@@ -61,10 +62,11 @@ def parse() -> None:
         text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout
         lines = text.replace("\f", "\n").splitlines()
         contest = None
+        seen: set[tuple[tuple[str, str, int | None] | None, str]] = set()
         names: list[str] = []
         county = None
         for i, line in enumerate(lines):
-            if line.strip().startswith(("2022 Primary", "Primary Election")):
+            if line.strip().startswith(("2022 Primary", "Primary Election", "PRIMARY ELECTION")):
                 contest = None
                 continue
             found = TITLE_LINE.match(line)
@@ -75,25 +77,45 @@ def parse() -> None:
                     contest = ("senate" if found[2] is None else "house", party, int(found[2]) if found[2] else None)
                     header = []
                     for later in lines[i + 1 :]:
-                        if "Election Day" in later:
+                        if year != 2018 and "Election Day" in later:
                             break
                         if later.strip():
                             header.append(later)
-                    joined = re.sub(r"Write-in Under Votes Over Votes\s+Total", "", " ".join(header))
-                    joined = re.sub(r"\b(REP|DEM|LIB|GRN|IND|NPA|NP)\b", "", joined)
-                    names = [" ".join(n.split()).upper() for n in joined.split(",") if n.strip()]
+                        if year == 2018 and "Over Votes" in later:
+                            break
+                    if year == 2018:
+                        stacked = sorted((h for h in header if "Write-in Candidate" not in h), key=lambda h: len(h) - len(h.lstrip()))
+                        tokens = " ".join(h.split("Write-in")[0] for h in stacked).split()
+                        names = []
+                        while tokens:
+                            take = 3 if len(tokens) > 2 and re.fullmatch(r"[A-Z]\.", tokens[1]) else 2
+                            names.append(" ".join(tokens[:take]).upper())
+                            tokens = tokens[take:]
+                    else:
+                        joined = re.sub(r"Write-in Under Votes Over Votes\s+Total", "", " ".join(header))
+                        joined = re.sub(r"\b(REP|DEM|LIB|GRN|IND|NPA|NP)\b", "", joined)
+                        names = [" ".join(n.split()).upper() for n in joined.split(",") if n.strip()]
                 county = None
                 continue
             if contest is None:
                 continue
-            found_county = re.match(r"^\s?(\S.*?)\s+(?:Election Day|Absentee)", line)
-            if found_county:
-                county = found_county[1]
-                continue
-            row = ROW.match(line)
-            if row is None or county is None:
-                continue
-            values = [int(v.replace(",", "")) for v in row[2].split()]
+            if year == 2018:
+                row = COUNTY_ROW.match(line)
+                if row is None:
+                    continue
+                county, values = row[1], [int(v.replace(",", "")) for v in row[2].split()]
+                if (contest, county) in seen:
+                    continue
+                seen.add((contest, county))
+            else:
+                found_county = re.match(r"^\s?(\S.*?)\s+(?:Election Day|Absentee)", line)
+                if found_county:
+                    county = found_county[1]
+                    continue
+                row = ROW.match(line)
+                if row is None or county is None:
+                    continue
+                values = [int(v.replace(",", "")) for v in row[2].split()]
             key = re.sub(r"[^a-z]", "", county.lower())
             county = None
             if len(values) != len(names) + 4 or key not in fips:
@@ -128,7 +150,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Iowa's 2020 and 2022 U.S. Senate and House primaries by county",
+            summary="Iowa's 2018, 2020, and 2022 U.S. Senate and House primaries by county",
             polity="US-IA",
         )
         source = cs.source(PUBLISHER, TITLE)
