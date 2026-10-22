@@ -468,16 +468,18 @@ def emit() -> Path:
         offices_known = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'").fetchall()
         }
-        existing: dict[str, list[tuple[UUID, set[str]]]] = {}
-        for key, option, label in conn.execute(
-            """select e.value, o.id, o.ballot_label from external_id e
+        existing: dict[str, list[tuple[UUID, set[str], bool]]] = {}
+        for key, option, label, kind in conn.execute(
+            """select e.value, o.id,
+                      coalesce(o.ballot_label, (select string_agg(a.ballot_name, ' ') from candidacy a where a.option_id = o.id)),
+                      o.kind = 'write_in' from external_id e
                join contest c on c.id = e.entity_id
                join changeset s on s.id = c.changeset_id and s.pipeline <> %s
                join contest_option o on o.contest_id = c.id and o.parent_option_id is null
-               where e.scheme = 'us.contest' and e.value like '%%:governor%%'""",
+               where e.scheme = 'us.contest' and (e.value like '%%:governor%%' or e.value like '%%:MA:%%')""",
             [SOURCE],
         ).fetchall():
-            existing.setdefault(key, []).append((option, set(slug(label or "").split("-"))))
+            existing.setdefault(key, []).append((option, set(slug(label or "").split("-")), kind))
         slugs: dict[str, UUID | None] = dict(conn.execute("select path, entity_id from slug").fetchall())
         current = dict(conn.execute("select entity_id, path from slug where is_current").fetchall())
         published: dict[UUID, UUID | None] = dict(
@@ -839,13 +841,31 @@ def emit() -> Path:
                 if reused:
                     words = [
                         word
-                        for word in slug(re.split(TICKET, ballot)[0]).split("-")
+                        for word in slug(re.split(f"/|{TICKET}", ballot)[0]).split("-")
                         if len(word) > 1 and word not in ("jr", "sr", "ii", "iii")
                     ]
                     matched = next(
-                        (option for option, texts in existing.get(contest_key, []) if words and words[-1] in texts),
+                        (
+                            option
+                            for option, texts, is_write_in in existing.get(contest_key, [])
+                            if (is_write_in and write_in) or (words and not write_in and words[-1] in texts)
+                        ),
                         None,
                     )
+                if matched is not None:
+                    twin = conn.execute(
+                        "select entity_id from external_id where scheme = 'us.option' and value = %s", [option_key]
+                    ).fetchone()
+                    if twin is not None and twin[0] != matched:
+                        cs.merge(twin[0], matched)
+                        heads = conn.execute(
+                            "select id, option_id from candidacy where option_id in (%s, %s) and role = 'head'",
+                            [twin[0], matched],
+                        ).fetchall()
+                        if len(heads) == 2:
+                            (gone,) = (id for id, option in heads if option == twin[0])
+                            (kept_head,) = (id for id, option in heads if option == matched)
+                            cs.merge(gone, kept_head)
                 root = matched or cs.key("us.option", option_key)
                 if matched is None:
                     cs.add(
