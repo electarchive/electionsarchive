@@ -7,6 +7,7 @@ import os
 import re
 import subprocess
 import tempfile
+import zipfile
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import cache
@@ -20,10 +21,11 @@ from anthropic.types import ImageBlockParam, TextBlockParam
 from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
 from anthropic.types.messages.batch_create_params import Request
 from PIL import Image
+from psycopg import Connection
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import medsl
+from ea.sources.us import elstats, medsl
 from ea.store import DATA, connect
 
 
@@ -38,7 +40,9 @@ class Column(TypedDict):
 class Page(TypedDict):
     page: int
     id: NotRequired[str]
-    columns: list[Column]
+    columns: NotRequired[list[Column]]
+    discover: NotRequired[str]
+    hint: NotRequired[str]
     crop: NotRequired[list[float]]
     dpi: NotRequired[int]
     bands: NotRequired[int]
@@ -68,6 +72,7 @@ class Manifest(TypedDict):
     license: NotRequired[str]
     raw_source: NotRequired[str]
     unit_codes: NotRequired[dict[str, str]]
+    unit_scheme: NotRequired[Literal["town"]]
 
 
 class Header(TypedDict):
@@ -135,6 +140,8 @@ READERS = {
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
+SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
+WARD = re.compile(r"[\s,.:\-]*\b(wards?|precincts?)\b.*$", re.IGNORECASE)
 SCHEMA: dict[str, object] = {
     "type": "object",
     "properties": {
@@ -196,6 +203,12 @@ def key_of(contest: Contest) -> str:
 def load(name: str) -> Manifest:
     manifest: Manifest = json.loads((MANIFESTS / f"{name}.json").read_text())
     manifest["name"] = name
+    found = WORK / name / "columns.json"
+    if found.exists():
+        resolved: dict[str, list[Column]] = json.loads(found.read_text())["columns"]
+        for spec in manifest["pages"]:
+            if "discover" in spec and str(spec.get("id", spec["page"])) in resolved:
+                spec["columns"] = resolved[str(spec.get("id", spec["page"]))]
     return manifest
 
 
@@ -240,7 +253,9 @@ def render(manifest: Manifest, spec: Page, dpi: int) -> Image.Image:
 
 
 @cache
-def bands(name: str) -> list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]]:
+def bands(
+    name: str, reader: str
+) -> list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]]:
     manifest = load(name)
     folder = WORK / name / "crops"
     folder.mkdir(parents=True, exist_ok=True)
@@ -256,7 +271,8 @@ def bands(name: str) -> list[tuple[str, str, tuple[float, float], list[ImageBloc
         if count > 1 and "header" in spec:
             top, bottom = spec["header"]
             header = crop.crop((0, round(top * crop.height), crop.width, round(bottom * crop.height)))
-        labels = json.dumps([column["label"] for column in spec["columns"]])
+        labelled = "columns" in spec and not ("discover" in spec and reader == "first")
+        labels = json.dumps([column["label"] for column in spec.get("columns", [])])
         for band in range(count):
             start = max(0, round(band * crop.height / count) - overlap)
             stop = min(crop.height, round((band + 1) * crop.height / count) + overlap)
@@ -283,15 +299,32 @@ def bands(name: str) -> list[tuple[str, str, tuple[float, float], list[ImageBloc
                 )
                 digest.update(data)
                 pixels += part.width * part.height
-            text = (
-                f"The columns are the counties and the rows are the candidates' lines, one row per line in this "
-                f"order: {labels}. Skip heading lines that carry no cells. Put the county names in header, left to right, "
-                "including a total column if one is printed. Each row's values has one string per header entry."
-                if spec.get("orientation") == "counties_across"
-                else f"The rows are the counties, and a total row if one is printed. The data columns, left to "
-                f"right, are: {labels}. Header has one entry per data column and each row's values has one string "
-                "per data column; leave out any column not in this list."
-            )
+            across = spec.get("orientation") == "counties_across"
+            unit = "towns" if manifest.get("unit_scheme") == "town" else "counties"
+            if labelled:
+                text = (
+                    f"The columns are the {unit} and the rows are the candidates' lines, one row per line in this "
+                    f"order: {labels}. Skip heading lines that carry no cells. Put the {unit[:-1]} names in header, "
+                    "left to right, including a total column if one is printed. Each row's values has one string "
+                    "per header entry."
+                    if across
+                    else f"The rows are the {unit}, and a total row if one is printed. The data columns, left to "
+                    f"right, are: {labels}. Header has one entry per data column and each row's values has one "
+                    "string per data column; leave out any column not in this list."
+                )
+            else:
+                text = (
+                    f"The columns are the {unit} and the rows are the candidates' lines. Put the {unit[:-1]} names "
+                    "in header, left to right, including a total column if one is printed. Each row's label is the "
+                    "candidate as printed, with party if printed, and its values has one string per header entry."
+                    if across
+                    else f"The rows are the {unit}, and a total row if one is printed. Header has one entry per "
+                    "printed data column, left to right, labeled exactly as printed (the candidate's name, with "
+                    "party if printed), including a total column if one is printed. Each row's values has one "
+                    "string per header entry."
+                )
+            if "hint" in spec:
+                text += f" {spec['hint']}"
             if count > 1:
                 text += (
                     f" This is band {band + 1} of {count} of the table: read only the rows visible in the last image."
@@ -329,7 +362,7 @@ def requests(name: str, reader: str) -> dict[str, Read]:
                 output_config={"effort": effort, "format": {"type": "json_schema", "schema": SCHEMA}},
             ),
         )
-        for custom, page, span, blocks, digest, pixels in bands(name)
+        for custom, page, span, blocks, digest, pixels in bands(name, reader)
     }
 
 
@@ -359,14 +392,28 @@ def parse(response: dict[str, object] | None) -> Table | str:
         return "invalid JSON"
 
 
-def counties(polity: str) -> dict[str, str]:
+def counties(manifest: Manifest) -> dict[str, str]:
+    if manifest.get("unit_scheme") == "town":
+        with zipfile.ZipFile(raw.cached("us.elstats", elstats.GAZETTEER).path) as archive:
+            gazetteer = pl.read_csv(
+                io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
+            ).filter(pl.col("USPS") == manifest["polity"].removeprefix("US-"))
+        towns: dict[str, str] = {}
+        for geoid, name in (
+            gazetteer.sort(pl.col("NAME").str.contains(r" (gore|grant|location|purchase|UT)$"))
+            .select("GEOID", "NAME")
+            .iter_rows()
+        ):
+            towns.setdefault(elstats.plain(name), geoid[:5])
+            towns.setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+        return towns
     with connect() as conn:
         found = conn.execute(
             """select n.text, u.code from reporting_unit u
                join name n on n.entity_id = u.area_id
                join polity p on p.id = u.polity_id
                where u.scheme_code = 'us.county' and p.iso_code = %s""",
-            [polity],
+            [manifest["polity"]],
         ).fetchall()
     return {
         slug(
@@ -385,6 +432,8 @@ def cells(
     printed: dict[tuple[str, int], int] = {}
     errors: dict[str, str] = {}
     extra = {slug(label).replace(" ", ""): code for label, code in manifest.get("unit_codes", {}).items()}
+    towns = manifest.get("unit_scheme") == "town"
+    home: dict[str, str] = {}
     for spec in manifest["pages"]:
         across = spec.get("orientation") == "counties_across"
         x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
@@ -397,6 +446,9 @@ def cells(
                 errors[number] = f"{custom}: {table}"
                 continue
             header, rows = table["header"], table["rows"]
+            if "columns" not in spec:
+                errors[number] = f"{custom}: columns not discovered"
+                continue
             if len(rows if across else header) != len(spec["columns"]):
                 errors[number] = (
                     f"{custom}: {len(rows if across else header)} {'rows' if across else 'columns'} "
@@ -421,23 +473,36 @@ def cells(
                         continue
                     if value is None:
                         continue
-                    code = extra.get(slug(label).replace(" ", "")) or names.get(slug(label).replace(" ", ""))
+                    stem = slug(WARD.sub("", label) if towns else label).replace(" ", "")
+                    code = extra.get(stem) or names.get(stem)
                     if code is None:
-                        errors[number] = f"{custom}: county {label!r} is not in {manifest['polity']}"
+                        errors[number] = (
+                            f"{custom}: {'town' if towns else 'county'} {label!r} is not in {manifest['polity']}"
+                        )
                         break
+                    unit = slug(label).replace(" ", "") if towns else code
+                    home[unit] = code
                     box = [
                         x0 + (x1 - x0) * header[c]["x0"] / 1000,
                         y0 + (y1 - y0) * (start + (stop - start) * row["y0"] / 1000),
                         x0 + (x1 - x0) * header[c]["x1"] / 1000,
                         y0 + (y1 - y0) * (start + (stop - start) * row["y1"] / 1000),
                     ]
-                    if (number, code, series) in values and values[(number, code, series)][0] != value:
+                    if (number, unit, series) in values and values[(number, unit, series)][0] != value:
                         errors[number] = f"{custom}: {label!r} read twice with different values"
                         break
-                    values.setdefault((number, code, series), (value, box))
+                    values.setdefault((number, unit, series), (value, box))
                 else:
                     continue
                 break
+    if towns:
+        folded: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
+        for (number, unit, series), (value, box) in values.items():
+            before = folded.get((number, home[unit], series))
+            folded[(number, home[unit], series)] = (
+                (value + before[0], before[1]) if before is not None else (value, box)
+            )
+        values = folded
     return values, printed, errors
 
 
@@ -447,7 +512,7 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
     joined: set[tuple[str, str]] = set()
     for spec in manifest["pages"]:
         page = str(spec.get("id", spec["page"]))
-        for index, column in enumerate(spec["columns"]):
+        for index, column in enumerate(spec.get("columns", [])):
             if column["contest"] is None:
                 continue
             name = f"{column['contest']}|{column['candidate']}"
@@ -539,12 +604,34 @@ def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
     return "; ".join(notes)
 
 
+def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int]]:
+    if contest is None:
+        return []
+    return [
+        (label or text, text, total)
+        for label, text, total in conn.execute(
+            """select coalesce(o.ballot_label, ''), coalesce(n.text, ''),
+                      (select sum(v.value)::bigint from result_value v
+                       where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
+                         and v.count_round = (select min(count_round) from result_value
+                                              where result_set_k = rs.k))
+               from contest_option o
+               join result_set rs on rs.contest_id = o.contest_id and rs.is_default
+               left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+               left join name n on n.entity_id = cy.person_id and n.is_preferred
+               where o.contest_id = %s and o.parent_option_id is null""",
+            [contest],
+        ).fetchall()
+        if total
+    ]
+
+
 def official_totals(manifest: Manifest) -> dict[str, int | None]:
     held: dict[str, int | None] = {}
     with connect() as conn:
         ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
         for spec in manifest["pages"]:
-            for column in spec["columns"]:
+            for column in spec.get("columns", []):
                 if column["contest"] is None:
                     continue
                 name = f"{column['contest']}|{column['candidate']}"
@@ -558,23 +645,59 @@ def official_totals(manifest: Manifest) -> dict[str, int | None]:
                     surname = words[0] if "," in column["candidate"] else words[-1]
                     found = [
                         total
-                        for label, text, total in conn.execute(
-                            """select o.ballot_label, coalesce(n.text, ''),
-                                      (select sum(v.value)::bigint from result_value v
-                                       where v.result_set_k = rs.k and v.option_k = o.k and v.measure = 1
-                                         and v.count_round = (select min(count_round) from result_value
-                                                              where result_set_k = rs.k))
-                               from contest_option o
-                               join result_set rs on rs.contest_id = o.contest_id and rs.is_default
-                               left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
-                               left join name n on n.entity_id = cy.person_id and n.is_preferred
-                               where o.contest_id = %s and o.parent_option_id is null""",
-                            [contest],
-                        ).fetchall()
-                        if total and surname in slug(f"{label or ''} {text}").split()
+                        for label, text, total in options(conn, contest)
+                        if surname in slug(f"{label} {text}").split()
                     ]
                     held[name] = found[0] if len(found) == 1 else None
     return held
+
+
+def discover(manifest: Manifest, folder: Path) -> str:
+    found = folder / "columns.json"
+    state: dict[str, dict[str, object]] = (
+        json.loads(found.read_text()) if found.exists() else {"columns": {}, "unmatched": {}}
+    )
+    plan = requests(manifest["name"], "first")
+    problems: list[str] = []
+    with connect() as conn:
+        ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
+        for spec in manifest["pages"]:
+            number = str(spec.get("id", spec["page"]))
+            if "discover" not in spec or number in state["columns"]:
+                continue
+            first = next(request for request in plan.values() if request.section == number)
+            table = parse(cached(first.key))
+            if isinstance(table, str):
+                problems.append(f"{number}: {table}")
+                continue
+            labels = (
+                [row["label"] for row in table["rows"]]
+                if spec.get("orientation") == "counties_across"
+                else [entry["label"] for entry in table["header"]]
+            )
+            held = options(conn, ids.get(key_of(manifest["contests"][spec["discover"]])))
+            columns: list[Column] = []
+            unmatched: list[str] = []
+            surnames: list[tuple[str, set[str]]] = []
+            for name, text, _ in held:
+                found_surnames = set()
+                for form in (name, text):
+                    forms = [word for word in slug(form).split() if len(word) > 1 and word not in SUFFIX_WORDS]
+                    if forms:
+                        found_surnames.add(forms[0] if "," in form else forms[-1])
+                surnames.append((name, found_surnames))
+            for label in labels:
+                words = set(slug(label).split())
+                found_options = [name for name, options_ in surnames if options_ & words]
+                if len(found_options) == 1:
+                    columns.append({"label": label, "contest": spec["discover"], "candidate": found_options[0]})
+                else:
+                    columns.append({"label": label, "contest": None, "candidate": ""})
+                    unmatched.append(label)
+            state["columns"][number] = columns
+            state["unmatched"][number] = unmatched
+    found.write_text(json.dumps(state, indent=2))
+    return "; ".join(problems)
 
 
 def prepare(name: str) -> str:
@@ -602,7 +725,7 @@ def run(name: str) -> str:
     if not (folder / "official.json").exists():
         (folder / "official.json").write_text(json.dumps(official_totals(manifest), indent=2))
     held: dict[str, int | None] = json.loads((folder / "official.json").read_text())
-    names = counties(manifest["polity"])
+    names = counties(manifest)
     message = ""
     outcome: dict[str, dict[str, Series]] = {}
     redo: set[str] | None = None
@@ -619,6 +742,14 @@ def run(name: str) -> str:
         state_path.write_text(json.dumps(state, indent=2))
         if pending(name, reader, redo):
             return message or f"{reader}: waiting for the batch"
+        if reader == "first" and any("discover" in spec and "columns" not in spec for spec in manifest["pages"]):
+            problems = discover(manifest, folder)
+            manifest = load(name)
+            bands.cache_clear()
+            held = official_totals(manifest)
+            (folder / "official.json").write_text(json.dumps(held, indent=2))
+            if problems:
+                return f"discovery failed: {problems}"
         outcome[reader] = evaluate(manifest, reader, names, held)
     return finalize(manifest, folder, outcome["first"], outcome.get("second"), held)
 
@@ -635,7 +766,7 @@ def finalize(
     columns = {
         f"{column['contest']}|{column['candidate']}": column
         for spec in manifest["pages"]
-        for column in spec["columns"]
+        for column in spec.get("columns", [])
         if column["contest"] is not None
     }
     numbers = {str(spec.get("id", spec["page"])): spec["page"] for spec in manifest["pages"]}
@@ -732,6 +863,10 @@ def finalize(
         pair = (str(row["series"]), str(row["how"]))
         counts[pair] = counts.get(pair, 0) + 1
     lines += ["## passed", "", *[f"- {series}: {how}, {count} cells" for (series, how), count in counts.items()]]
+    if (folder / "columns.json").exists():
+        unmatched: dict[str, list[str]] = json.loads((folder / "columns.json").read_text())["unmatched"]
+        lines += ["", "## unmatched columns", ""]
+        lines += [f"- {page}: {', '.join(labels)}" for page, labels in unmatched.items() if labels]
     lines += ["", "## review", ""]
     for item in review:
         lines.append(
@@ -760,6 +895,11 @@ def emit(name: str) -> Path:
     manifest = load(name)
     contests = manifest["contests"]
     frame = pl.read_parquet(WORK / name / "tables.parquet")
+    towns = manifest.get("unit_scheme") == "town"
+    if towns:
+        frame = frame.group_by("contest", "candidate", "code", maintain_order=True).agg(
+            pl.col("votes").sum(), pl.exclude("contest", "candidate", "code", "votes").first()
+        )
     frame = frame.with_columns(
         **{
             name_: pl.col("contest").replace_strict({key: value[name_] for key, value in contests.items()})
@@ -831,6 +971,11 @@ def emit(name: str) -> Path:
                 entity_id=row["id"],
                 kind="caveat",
                 body_md="Read from the scan by a vision model. Each cell's box is its column's band by its row's band as the model reported them, so it is approximate."
+                + (
+                    " Each county's votes are the sum of its towns' returns, towns placed in counties by the 2020 Census Gazetteer, and the box is the first town's."
+                    if towns
+                    else ""
+                )
                 + (f" {caveats[found[0]]}" if found is not None and found[0] in caveats else ""),
             )
         return cs.write()
