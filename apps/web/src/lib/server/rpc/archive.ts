@@ -1834,7 +1834,15 @@ async function places(
         Number(a.kind === "administrative") ||
       b.count - a.count,
   );
-  const level = levels.find((entry) => entry.code === by) ?? levels[0];
+  const tiled = await db.execute<{ code: string }>(sql`
+    select distinct bs.scheme_code as code from boundary_set bs
+    where bs.scheme_code = any(${sql.param(levels.map((entry) => entry.code))}::text[])
+      and (bs.id = (select boundary_set_id from contest where id = ${contest.id}::uuid) or bs.valid @> ${contest.date ?? "infinity"}::date)
+  `);
+  const level =
+    levels.find((entry) => entry.code === by) ??
+    levels.find((entry) => tiled.rows.some((row) => row.code === entry.code)) ??
+    levels[0];
   if (level == null) {
     return null;
   }
@@ -4208,11 +4216,12 @@ export const contests = {
         .toSorted((a, b) => a.count - b.count || a.rank - b.rank);
       const level =
         levels.find((entry) => entry.code === input.level) ??
-        levels.find((entry) => entry.code === federal) ??
+        levels.find((entry) => entry.code === federal && entry.tiles != null) ??
         (input.level === "coarse"
           ? levels.find((entry) => entry.tiles != null)
           : undefined) ??
         levels.findLast((entry) => entry.tiles != null) ??
+        levels.find((entry) => entry.code === federal) ??
         levels.at(-1) ??
         null;
       const shown = level == null ? [] : (counted.get(level.code) ?? []);
