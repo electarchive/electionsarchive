@@ -674,6 +674,70 @@ def _rollup(conn: Connection, stage: Stage, moved: list[str], repointed: list[st
     )
 
 
+def defaults(
+    conn: Connection, contests: list[str] | None
+) -> tuple[list[tuple[str, str, bool]], list[dict[str, object]]]:
+    tally = """select coalesce(jsonb_object_agg(t.option_k, t.votes), '{{}}') from (
+                 select v.option_k, sum(v.value) as votes from result_value v
+                 where v.result_set_k = p.{0} and v.measure = 1 and v.option_k <> 0
+                   and v.count_round = (select max(z.count_round) from result_value z
+                                        where z.result_set_k = p.{0} and z.measure = 1)
+                 group by v.option_k) t"""
+    picks = conn.execute(
+        cast(
+            LiteralString,
+            f"""with picked as (
+                  select distinct on (d.id) d.id as old, d.k as old_k, r.id as new, r.k as new_k,
+                         r.stage = d.stage as same, d.contest_id
+                  from result_set d
+                  join source ds on ds.id = d.source_id and ds.kind <> 'official_body'
+                  join result_set r on r.election_id = d.election_id and r.contest_id = d.contest_id
+                    and not r.is_default and r.status = 'active' and r.kind = 'counted'
+                    and coalesce(r.completeness, 1) >= 0.98
+                    and (r.stage = d.stage or (r.stage > d.stage and r.stage <> 'alternative' and not exists (
+                      select from result_set x where x.election_id = r.election_id and x.contest_id = r.contest_id
+                        and x.stage = r.stage and x.is_default)))
+                  join source rs on rs.id = r.source_id and rs.kind = 'official_body'
+                  where d.is_default and d.status = 'active' and d.kind = 'counted' and d.contest_id is not null
+                    and (%(contests)s::uuid[] is null or d.contest_id = any(%(contests)s::uuid[]))
+                    and not exists (select from flag f where f.result_set_id = r.id and f.check_code = 'reconcile.official')
+                  order by d.id, r.stage desc, r.completeness desc nulls last, r.k
+                )
+                select p.old::text, p.new::text, p.same, p.contest_id::text, ({tally.format("old_k")}),
+                       ({tally.format("new_k")}),
+                       array(select o.k::text from outcome x join contest_option o on o.id = x.option_id
+                             where x.result_set_id = p.old and x.candidacy_id is null and x.kind in ('elected', 'won'))
+                from picked p""",
+        ),
+        {"contests": contests},
+    ).fetchall()
+    flipped: list[tuple[str, str, bool]] = []
+    skipped: list[dict[str, object]] = []
+    for old, new, same, contest, before, after, winners in picks:
+        total, counted = sum(before.values()), sum(after.values())
+        losing = [votes for option, votes in after.items() if option not in winners]
+        reason = (
+            "no votes"
+            if not counted
+            else f"counts {counted} against {total}"
+            if total and not 0.98 <= counted / total <= 1.02
+            else "winner differs"
+            if winners
+            and (
+                any(option not in after for option in winners)
+                or (losing and min(after[option] for option in winners) <= max(losing))
+            )
+            else "already promoted"
+            if new in {promoted for _, promoted, _ in flipped}
+            else None
+        )
+        if reason is None:
+            flipped.append((old, new, same))
+        else:
+            skipped.append({"contest": contest, "default": old, "official": new, "reason": reason})
+    return flipped, skipped
+
+
 def publish(conn: Connection, changeset_id: str) -> None:
     stage = _stage(conn, changeset_id)
     with conn.transaction():
@@ -762,6 +826,36 @@ def publish(conn: Connection, changeset_id: str) -> None:
                     sql.SQL("select distinct unit_id from {}").format(stage.staged("reporting_unit_area"))
                 ).fetchall()
             ]
+        if "is_default" in stage.tables.get("result_set", []):
+            group = "d.election_id = s.election_id and d.contest_id = s.contest_id and d.stage = s.stage"
+            official = sql.SQL(
+                "exists (select from {} k where k.id = s.source_id and k.kind = 'official_body')"
+            ).format(stage.either("source", "id", "kind"))
+            conn.execute(
+                sql.SQL(
+                    """update {staged} s set is_default = false
+                       where s.is_default and not {official} and exists (
+                         select from public.result_set d join public.source o on o.id = d.source_id
+                         where d.is_default and d.id <> s.id and o.kind = 'official_body' and {group})"""
+                ).format(staged=stage.staged("result_set"), official=official, group=sql.SQL(group))
+            )
+            conn.execute(
+                sql.SQL(
+                    """update {staged} s set is_default = true
+                       from public.result_set d
+                       where d.id = s.id and d.is_default and not s.is_default and {official}
+                         and not exists (select from {staged} x where x.is_default and x.election_id = s.election_id
+                                           and x.contest_id = s.contest_id and x.stage = s.stage)"""
+                ).format(staged=stage.staged("result_set"), official=official)
+            )
+            conn.execute(
+                sql.SQL(
+                    """update public.result_set d set is_default = false
+                       from {staged} s
+                       where s.is_default and d.is_default and d.id <> s.id and {official} and {group}
+                         and not exists (select from public.source o where o.id = d.source_id and o.kind = 'official_body')"""
+                ).format(staged=stage.staged("result_set"), official=official, group=sql.SQL(group))
+            )
         for table in stage.tables:
             _publish_table(conn, stage, table)
         stray = checks.merged(conn, changeset_id, set(stage.tables))
@@ -774,6 +868,34 @@ def publish(conn: Connection, changeset_id: str) -> None:
                 )
             )
         _rollup(conn, stage, moved, repointed)
+        if "result_set" in stage.tables or stage.pipeline == "defaults":
+            flipped, _ = defaults(
+                conn,
+                None
+                if stage.pipeline == "defaults"
+                else [
+                    str(contest)
+                    for (contest,) in conn.execute(
+                        sql.SQL("select distinct contest_id from {} where contest_id is not null").format(
+                            stage.staged("result_set")
+                        )
+                    ).fetchall()
+                ],
+            )
+            conn.execute(
+                "update result_set set is_default = false where id = any(%s::uuid[])",
+                [[old for old, _, same in flipped if same]],
+            )
+            conn.execute(
+                "update result_set set is_default = true where id = any(%s::uuid[])", [[new for _, new, _ in flipped]]
+            )
+            conn.execute(
+                """insert into outcome (result_set_id, option_id, candidacy_id, kind, seats, notes)
+                   select f.new, x.option_id, x.candidacy_id, x.kind, x.seats, x.notes
+                   from unnest(%s::uuid[], %s::uuid[]) f(old, new) join outcome x on x.result_set_id = f.old
+                   on conflict do nothing""",
+                [[old for old, _, _ in flipped], [new for _, new, _ in flipped]],
+            )
         with (
             conn.cursor() as cursor,
             cursor.copy("copy flag (entity_id, result_set_id, check_code, severity, details) from stdin") as copy,

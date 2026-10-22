@@ -4900,7 +4900,7 @@ def emit() -> Path:
             title = (
                 "Official 2024 Presidential General Election Results"
                 if year == 2024
-                else f"Federal Elections {year if year in FILES else f'{year % 100:02d}'}"
+                else f"Federal Elections {year if year in FILES or year == 2000 else year % 100}"
             )
             sources[year] = cs.source(PUBLISHER, title)
             cs.add(
