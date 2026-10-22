@@ -159,6 +159,7 @@
     }),
   }));
   const regional = $state<Record<number, boolean>>({});
+  const firstRound = $state<Record<number, boolean>>({});
   const regionals = createQueries(() => ({
     queries: election.races.map((race, index) => ({
       ...orpc.elections.regional.queryOptions({
@@ -402,8 +403,93 @@
         );
       const isTallied = isSplit && districts.length === race.count;
       const noun = race.places?.levels[0]?.noun ?? "";
+      let decided: {
+        places: NonNullable<typeof race.places>;
+        tones: Array<string>;
+        titles: Array<string>;
+      } | null = null;
+      if (
+        isRound &&
+        race.round === 1 &&
+        seated.length > 0 &&
+        race.places != null
+      ) {
+        const level = race.places.level;
+        const later = election.races
+          .filter(
+            (other) =>
+              other.name === race.name &&
+              (other.round ?? 1) > 1 &&
+              other.places?.level === level,
+          )
+          .toSorted((a, b) => (a.round ?? 1) - (b.round ?? 1));
+        const finals = new Map(
+          later.flatMap((other) =>
+            (other.places?.rows ?? []).map((row) => [
+              row.k,
+              { row, legend: other.places?.legend ?? [] },
+            ]),
+          ),
+        );
+        if (finals.size > 0) {
+          const merged = [
+            ...race.places.legend,
+            ...Map.groupBy(
+              later.flatMap((other) => other.places?.legend ?? []),
+              (item) => item.key,
+            )
+              .values()
+              .flatMap((items) =>
+                items[0] == null ||
+                race.places?.legend.some((item) => item.key === items[0]?.key)
+                  ? []
+                  : [items[0]],
+              ),
+          ];
+          const at = new Map(merged.map((item, spot) => [item.key, spot]));
+          decided = {
+            places: {
+              ...race.places,
+              legend: merged,
+              districts: undefined,
+              rows: race.places.rows.map((row) => {
+                const final = finals.get(row.k);
+                if (final == null) {
+                  return {
+                    ...row,
+                    shares: merged.map((_, spot) => row.shares[spot] ?? 0),
+                  };
+                }
+                const shares = merged.map(() => 0);
+                for (const [spot, item] of final.legend.entries()) {
+                  shares[at.get(item.key) ?? 0] = final.row.shares[spot] ?? 0;
+                }
+                return {
+                  ...row,
+                  turnout: final.row.turnout,
+                  valid: final.row.valid,
+                  shares,
+                  leader:
+                    final.row.leader == null
+                      ? null
+                      : (at.get(final.legend[final.row.leader]?.key ?? "") ??
+                        null),
+                  margin: final.row.margin,
+                  earlier: null,
+                  prior: null,
+                };
+              }),
+            },
+            tones: merged.map((item) => swatch(item.color, item.key)),
+            titles: merged.map((item) =>
+              item.person == null ? (item.short ?? item.label) : item.label,
+            ),
+          };
+        }
+      }
       return {
         ...race,
+        decided,
         change,
         whole: isPartial ? whole : null,
         sequel:
@@ -507,17 +593,21 @@
                   isWhole: false,
                 },
         isLater: isRound && (race.round ?? 1) > 1,
-        name: isRound
-          ? m.race_round({ name: race.name, round: race.round ?? 1 })
-          : isSplit
-            ? m.race_split({ name: race.name, noun })
-            : race.isRemainder &&
-                election.races.some(
-                  (other) => other !== race && other.name === race.name,
-                )
-              ? m.race_special({ name: race.name })
-              : race.name,
-        votes: MEASURES[race.measure]?.() ?? m.col_votes(),
+        name:
+          isRound && decided == null
+            ? m.race_round({ name: race.name, round: race.round ?? 1 })
+            : isSplit
+              ? m.race_split({ name: race.name, noun })
+              : race.isRemainder &&
+                  election.races.some(
+                    (other) => other !== race && other.name === race.name,
+                  )
+                ? m.race_special({ name: race.name })
+                : race.name,
+        votes:
+          decided == null
+            ? (MEASURES[race.measure]?.() ?? m.col_votes())
+            : m.col_votes_first(),
         isSlate: race.kind === "elector_slate",
         seated: (seated.length === 0 &&
         race.kind === "body_seats" &&
@@ -808,14 +898,42 @@
       {const option = $derived(regionals[index]?.data ?? null)}
       {const region = $derived(regional[index] === true ? option : null)}
       {const swing = $derived(swings[index]?.data ?? null)}
-      {const places = $derived(region?.places ?? swing?.places ?? race.places)}
+      {const final = $derived(
+        region == null && firstRound[index] !== true ? race.decided : null,
+      )}
+      {const places = $derived(
+        region?.places ?? swing?.places ?? final?.places ?? race.places,
+      )}
       {const shape = $derived(region?.map ?? race.map)}
-      <div class="lg:sticky lg:inset-bs-3">
+      <div class="grid gap-2 lg:sticky lg:inset-bs-3">
+        {#if race.decided != null && region == null}
+          <div
+            class="flex self-start"
+            role="group"
+            aria-label={m.map_round_label()}
+          >
+            {#each [false, true] as isFirst (isFirst)}
+              <button
+                type="button"
+                class={cn(
+                  "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold whitespace-nowrap keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary pointer-coarse:block-10",
+                  {
+                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                      (firstRound[index] === true) === isFirst,
+                  },
+                )}
+                aria-pressed={(firstRound[index] === true) === isFirst}
+                onclick={() => (firstRound[index] = isFirst)}
+                >{isFirst ? m.round_first() : m.map_round_seats()}</button
+              >
+            {/each}
+          </div>
+        {/if}
         {#key places.level}
           <PlaceMap
             {places}
             colors={swing == null && region == null
-              ? race.tones
+              ? (final?.tones ?? race.tones)
               : places.legend.map((item) => swatch(item.color, item.key))}
             tiles={shape.tiles}
             own={shape.own}
@@ -825,9 +943,9 @@
             isApproximate={shape.isApproximate}
             sources={shape.credits}
             noun={places.levels[0]?.noun ?? ""}
-            votes={race.votes}
+            votes={final == null ? race.votes : m.col_votes()}
             names={swing == null && region == null
-              ? race.titles
+              ? (final?.titles ?? race.titles)
               : places.legend.map((item) =>
                   item.person == null ? (item.short ?? item.label) : item.label,
                 )}
@@ -921,7 +1039,9 @@
     {const shown = $derived(
       regional[index] === true
         ? (regionals[index]?.data?.places ?? race.places)
-        : race.places,
+        : firstRound[index] === true
+          ? race.places
+          : (race.decided?.places ?? race.places),
     )}
     <Places
       places={{
@@ -931,7 +1051,7 @@
       span={null}
       trace={race.count === 1 ? race.path : null}
       publishers={[]}
-      votes={race.votes}
+      votes={shown === race.decided?.places ? m.col_votes() : race.votes}
       {isMapped}
       limit={10}
     />
