@@ -904,7 +904,10 @@ def emit(source: ModuleType) -> Path:
                 if source.REVISION > 1
                 else None
             )
-            if result_set not in cs.minted:
+            fresh = result_set in cs.minted
+            if not fresh and conn.execute(
+                "select coalesce(bool_or(is_default), true) from result_set where id = %s", [result_set]
+            ).fetchone() == (True,):
                 continue
             if len(picked) < lines["column"].n_unique():
                 rest = int(lines.filter(~pl.col("column").is_in(list(picked)))["votes"].sum())
@@ -923,18 +926,47 @@ def emit(source: ModuleType) -> Path:
                     pool = empty[0]
                 else:
                     pool = cs.key("us.option", f"{key}:others:{source.SOURCE.removeprefix('us.')}")
-                    cs.add("contest_option", id=pool, contest_id=contest, kind="others", ballot_label="Others")
+                    if fresh:
+                        cs.add("contest_option", id=pool, contest_id=contest, kind="others", ballot_label="Others")
                 picked = {int(column): picked.get(int(column), pool) for column in lines["column"].unique()}
             lines = lines.with_columns(
                 option=pl.col("column").replace_strict({column: str(option) for column, option in picked.items()})
             )
             counted = int(lines["votes"].sum())
+            ties = any(total for _, _, _, total in known)
             for option, kind, name, total in known:
                 sum_ = int(lines.filter(pl.col("option") == str(option))["votes"].sum())
                 if total and sum_ != total:
+                    ties = False
                     print(f"{key}: {name or kind} {sum_} by county, {total} in the default set")
+            if ties:
+                for row in conn.execute(
+                    "select id, election_id, contest_id, stage, kind, status, source_id, as_of, completeness, supersedes_id"
+                    " from result_set where contest_id = %s and is_default and id <> %s",
+                    [contest, result_set],
+                ).fetchall():
+                    cs.add(
+                        "result_set",
+                        **dict(
+                            zip(
+                                (
+                                    "id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of",
+                                    "completeness", "supersedes_id",
+                                ),
+                                row,
+                                strict=True,
+                            )
+                        ),
+                        is_default=False,
+                    )
+                    for option, outcome_kind, seats in conn.execute(
+                        "select option_id, kind, seats from outcome where result_set_id = %s", [row[0]]
+                    ).fetchall():
+                        cs.add("outcome", result_set_id=result_set, option_id=option, kind=outcome_kind, seats=seats)
+            if not fresh and not ties:
+                continue
             for id, status in ((previous, "superseded"), (result_set, "active")):
-                if id is not None:
+                if id is not None and (fresh or id == result_set):
                     cs.add(
                         "result_set",
                         id=id,
@@ -944,10 +976,12 @@ def emit(source: ModuleType) -> Path:
                         kind="counted",
                         status=status,
                         source_id=sources[int(year)],
-                        is_default=False,
+                        is_default=ties and id == result_set,
                         supersedes_id=previous if id == result_set else None,
                         completeness=round(min(counted / official, 1), 4) if official else None,
                     )
+            if not fresh:
+                continue
             held = {
                 code
                 for (code,) in conn.execute(
