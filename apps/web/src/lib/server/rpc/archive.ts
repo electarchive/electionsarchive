@@ -10451,8 +10451,11 @@ export const parties = {
             case when g.polity_id = (select polity from home) then n.grp::text else (${CYCLE})::text end as bucket
           from entered n join election g on g.id = n.grp join election e on coalesce(e.parent_id, e.id) = n.grp
           join contest c on c.election_id = e.id and coalesce(c.body_id, c.office_id) = n.seat
-            and c.allocation_parent_id is null and c.party_scope_id is null
+            and c.allocation_parent_id is null and c.party_scope_id is null and e.kind <> 'indirect'
             and coalesce((select st.voting from seat st where st.id = c.seat_id), true)
+            and (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
+              select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
+            )))
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           left join area a on a.id = coalesce(c.district_area_id, pt.area_id)
         ),
