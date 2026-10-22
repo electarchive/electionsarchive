@@ -49,7 +49,7 @@ def offices() -> list[tuple[str, int, str, str]]:
                       (select n.text from name n where n.entity_id = y.office_id and n.is_preferred limit 1)
                from statewide_office_year y
                join external_id o on o.entity_id = y.office_id and o.scheme = 'us.office'
-               where y.year < 2000 and not y.joint_ticket
+               where (y.year < 2000 or (y.state = 'KS' and y.year = 2002)) and not y.joint_ticket
                order by 1, 2, 3"""
         ).fetchall()
 
@@ -86,10 +86,14 @@ def read(url: str, download: bool) -> dict:
 def resolve(download: bool) -> dict[tuple[str, int, str], str]:
     rows = offices()
     asked = {(state, year, value): variants(state, year, label) for state, year, value, label in rows}
-    titles = sorted({title for options in asked.values() for title in options})
+    batches: list[list[str]] = []
+    for early in (True, False):
+        titles = sorted(
+            {title for (_, year, _), options in asked.items() if (year < 2000) == early for title in options}
+        )
+        batches.extend(titles[start : start + 50] for start in range(0, len(titles), 50))
     found: dict[str, str] = {}
-    for start in range(0, len(titles), 50):
-        chunk = titles[start : start + 50]
+    for chunk in batches:
         url = API + urlencode(
             {"action": "query", "titles": "|".join(chunk), "redirects": 1, "format": "json", "formatversion": 2}
         )
