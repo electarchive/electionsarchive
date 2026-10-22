@@ -235,7 +235,7 @@ def emit() -> Path:
             people = [
                 (option, re.sub(r"[^a-z]", "", label.lower()), int(value))
                 for option, label, kind, value in roots
-                if kind == "candidate"
+                if kind in ("candidate", "ticket")
             ]
             targets: dict[str, object] = {}
             notes: list[str] = []
@@ -252,6 +252,7 @@ def emit() -> Path:
                     continue
                 found = [
                     p for p in people if p[1] == letters or p[1].endswith(letters[-7:]) or letters.endswith(p[1][-7:])
+                    or ("PA_ADD" in os.environ and p[1][-5:] == letters[-5:])
                 ]
                 found = [p for p in found if p[0] not in targets.values()]
                 if len(found) != 1:
@@ -264,6 +265,33 @@ def emit() -> Path:
                     exact = False
                     notes.append(f"{label.title()}: {votes:,} here, {found[0][2]:,} in the default set")
             remaining = sorted((p for p in people if p[0] not in targets.values()), key=lambda p: p[2], reverse=True)
+            if "PA_ADD" in os.environ and not remaining:
+                for candidate, label, votes in unmatched:
+                    display = label.title()
+                    (person,) = conn.execute(
+                        "select p.id from person p join name n on n.entity_id = p.id where n.text = %s limit 1", [display]
+                    ).fetchone() or (None,)
+                    if person is None:
+                        person = cs.key(f"{SOURCE}.person", re.sub(r"[^a-z]", "", display.lower()))
+                        cs.add("person", id=person)
+                        cs.add("name", entity_id=person, text=display, lang="en", kind="official", is_preferred=True)
+                    option = cs.key("us.option", f"{key}:{person}")
+                    cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=display)
+                    cs.add(
+                        "candidacy",
+                        id=cs.key("us.candidacy", f"{key}:{person}:head"),
+                        person_id=person,
+                        option_id=option,
+                        role="head",
+                        ballot_name=display,
+                        member_of_party_id=None,
+                        is_independent=False,
+                        is_incumbent=None,
+                    )
+                    targets[candidate] = option
+                    notes.append(f"{display}: {votes:,} here, not in the default set")
+                    exact = False
+                unmatched = []
             if len(unmatched) != len(remaining):
                 print(f"{key}: {[(u[1], u[2]) for u in unmatched]} has no match in {[(p[1], p[2]) for p in remaining]}")
                 continue
