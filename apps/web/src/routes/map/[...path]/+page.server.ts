@@ -41,6 +41,7 @@ export const load: PageServerLoad = async ({ params, url }) => {
         unit: unit === "" ? undefined : unit,
         level: url.searchParams.get("level") ?? undefined,
         vs: url.searchParams.get("vs") ?? undefined,
+        group: url.searchParams.get("group") ?? undefined,
       }),
     };
   } catch (error_) {

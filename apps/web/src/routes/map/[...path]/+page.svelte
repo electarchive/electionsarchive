@@ -58,6 +58,7 @@
       decodeURI(url.pathname).slice(`/map/${data.path}`.length + 1),
       url.searchParams.get("level") ?? "",
       url.searchParams.get("vs") ?? "",
+      url.searchParams.get("group") === "alliance" ? "alliance" : "",
     ].join("|");
   let href = $state(untrack(() => page.url.href));
   const asked = $derived(locate(new URL(href)));
@@ -66,6 +67,7 @@
     key: untrack(() => locate(page.url)),
   });
   const sheet = $derived(loaded.sheet);
+  const grouped = $derived(asked.endsWith("|alliance"));
   let isLoading = $state(false);
   let pending = $state(0);
 
@@ -362,7 +364,8 @@
         { at: 1, label: percent(1).replace(/[.,]0/u, "") },
       ];
     }
-    const name = (item: typeof first) => item?.label ?? "";
+    const name = (item: typeof first) =>
+      item?.label.replace(/ \([^)]*\)$/u, "") ?? "";
     return [
       {
         at: low,
@@ -460,7 +463,8 @@
     level: string | null,
     vs: string | null,
   ) {
-    const key = [data.contest, where, level ?? "", vs ?? ""].join("|");
+    const [, , , group = ""] = asked.split("|");
+    const key = [data.contest, where, level ?? "", vs ?? "", group].join("|");
     const known = cache[key];
     if (known != null) {
       return known;
@@ -470,6 +474,7 @@
       unit: where === "" ? undefined : where,
       level: level ?? undefined,
       vs: vs ?? undefined,
+      group: group === "" ? undefined : group,
     });
     cache[key] = fetched;
     fetched.catch(() => {
@@ -480,13 +485,19 @@
     return fetched;
   }
 
-  function move(where: string, level: string | null, vs: string | null) {
+  function move(
+    where: string,
+    level: string | null,
+    vs: string | null,
+    group: string | null = grouped ? "alliance" : null,
+  ) {
     const [now = ""] = asked.split("|");
     const path = [data.path, where].filter((part) => part !== "").join("/");
     const params = new SvelteURLSearchParams(location.search);
     for (const [key, value] of [
       ["level", level],
       ["vs", vs],
+      ["group", group],
     ] as const) {
       if (value == null) {
         params.delete(key);
@@ -2035,6 +2046,37 @@
         </div>
       {:else if isParts}
         <p class="text-xs text-muted-foreground">{m.atlas_zoom_hint()}</p>
+      {/if}
+      {#if sheet.isAllied || grouped}
+        <div class="grid gap-1.5">
+          <span class="text-xs font-semibold text-muted-foreground"
+            >{m.group_label()}</span
+          >
+          <div class="flex">
+            {#each [{ isAlliance: false, label: m.group_option() }, { isAlliance: true, label: m.group_alliance() }] as choice (choice.label)}
+              <button
+                type="button"
+                class={cn(
+                  "-ms-px flex items-center border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 first:ms-0 first:rounded-s-sm last:rounded-e-sm hover:bg-secondary",
+                  {
+                    "relative z-10 bg-primary text-primary-foreground hover:bg-primary":
+                      choice.isAlliance === grouped,
+                  },
+                )}
+                aria-pressed={choice.isAlliance === grouped}
+                onclick={() => {
+                  const [where = "", level = "", vs = ""] = asked.split("|");
+                  move(
+                    where,
+                    level === "" ? null : level,
+                    vs === "" ? null : vs,
+                    choice.isAlliance ? "alliance" : null,
+                  );
+                }}>{choice.label}</button
+              >
+            {/each}
+          </div>
+        </div>
       {/if}
     </section>
 

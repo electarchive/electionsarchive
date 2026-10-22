@@ -2147,6 +2147,15 @@ async function tabulate(
   const kept = ranked.filter((item, index) => index < 8 || item.lead);
   const position = new Map(kept.map((item, index) => [item.key, index]));
   return {
+    isAllied: now.some((loaded) =>
+      loaded
+        .values()
+        .some((entry) =>
+          entry.side.options.some(
+            (option) => option.alliance != null && option.votes > 0,
+          ),
+        ),
+    ),
     legend: kept.map((item) => ({
       key: item.key,
       label: item.label,
@@ -3905,6 +3914,7 @@ export const contests = {
         unit: v.optional(v.string()),
         level: v.optional(v.string()),
         vs: v.optional(v.string()),
+        group: Input.entries.group,
       }),
     )
     .output(
@@ -3944,6 +3954,7 @@ export const contests = {
         ),
         target: v.nullable(v.string()),
         estimated: v.boolean(),
+        isAllied: v.boolean(),
         legend: v.array(
           v.object({
             key: v.string(),
@@ -4248,6 +4259,7 @@ export const contests = {
               },
           relations,
           "party",
+          input.group,
         ),
         anchors(
           shown.map((row) => row.k),
@@ -4305,6 +4317,7 @@ export const contests = {
         })),
         target: wanted?.id ?? null,
         estimated: spread.size > 0,
+        isAllied: tabulated.isAllied,
         legend: tabulated.legend.map((item) => ({
           key: item.key,
           label:

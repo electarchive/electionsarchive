@@ -1688,7 +1688,9 @@
     <div class="ms-auto flex items-center gap-2">
       {#if explore != null}
         <a
-          href={resolve("/map/[...path]", { path: explore })}
+          href={page.url.searchParams.get("group") === "alliance"
+            ? resolve("/map/[...path]?group=alliance", { path: explore })
+            : resolve("/map/[...path]", { path: explore })}
           class="flex items-center rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary pointer-coarse:block-10"
           >{m.atlas_explore()}</a
         >
