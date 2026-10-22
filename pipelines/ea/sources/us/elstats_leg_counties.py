@@ -16,7 +16,7 @@ from ea.store import DATA, connect
 SOURCE = "us.elstats_leg_counties"
 VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
-YEARS = {"CT": range(2000, 2025, 2), "NY": range(2000, 2025, 2), "VA": range(2001, 2026, 2)}
+YEARS = {"CT": range(1990, 2025, 2), "NY": range(1996, 2025, 2), "VA": range(1991, 2026, 2)}
 YEARS |= {"ID": range(2000, 2025, 2), "NM": range(2000, 2025, 2), "CO": range(2000, 2003, 2)}
 TERMS = ["State Senat", "State Representative", "Assembly", "Delegate"]
 CHAMBERS = {"NY": "assembly", "VA": "house-of-delegates"}
@@ -135,7 +135,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="State legislative general elections by county from the ElectionStats archives of Connecticut "
-            "(by town, summed to county), New York, Virginia, Idaho, New Mexico, and Colorado, 2000–2025",
+            "(by town, summed to county), New York, Virginia, Idaho, New Mexico, and Colorado, 1990–2025",
             polity="US",
         )
         covered = {
