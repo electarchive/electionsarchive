@@ -47,6 +47,7 @@ MA_ROW = re.compile(
     re.DOTALL,
 )
 MA_PRIMARIES = {1992: date(1992, 9, 15)}
+MA_FIRST = 1970
 OFFICES = ["U.S. House", "U.S. Senate", "United States", "Congress"]
 DIVISIONS = {"County": "county", "Locality": "county", "City/Town": "town"}
 FORMER = {
@@ -147,7 +148,7 @@ def searched(tenant: str, address: str, source: str = SOURCE) -> pl.DataFrame:
 
 
 def ma_search(office: int) -> str:
-    return f"{MASSACHUSETTS}search/year_from:{FIRST}/year_to:{LAST}/office_id:{office}/stage:General"
+    return f"{MASSACHUSETTS}search/year_from:{MA_FIRST}/year_to:{LAST}/office_id:{office}/stage:General"
 
 
 def ma_primary_search(office: int, year: int) -> str:
@@ -363,7 +364,7 @@ def parse() -> None:
         if year < FIRST and len(held) == 1
     }
     frame = frame.with_columns(
-        day=pl.when(pl.col("year") < FIRST)
+        day=pl.when((pl.col("year") < FIRST) & (pl.col("state") != "MA"))
         .then(
             pl.struct("state", "chamber", "year", "district").map_elements(
                 lambda row: (
