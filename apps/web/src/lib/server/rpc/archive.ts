@@ -8287,7 +8287,13 @@ export const polities = {
     .input(
       v.object({
         id: v.pipe(v.string(), v.uuid()),
-        all: v.optional(v.boolean(), false),
+        all: v.optional(
+          v.pipe(
+            v.union([v.boolean(), v.picklist(["true", "false"])]),
+            v.transform((value) => value === true || value === "true"),
+          ),
+          false,
+        ),
       }),
     )
     .output(
