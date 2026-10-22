@@ -1,4 +1,5 @@
 import base64
+import difflib
 import hashlib
 import io
 import itertools
@@ -477,6 +478,9 @@ def cells(
                         continue
                     stem = slug(WARD.sub("", label) if towns else label).replace(" ", "")
                     code = extra.get(stem) or names.get(stem)
+                    if code is None and not towns:
+                        close = difflib.get_close_matches(stem, list(names), n=2, cutoff=0.88)
+                        code = names[close[0]] if len(close) == 1 else None
                     if code is None:
                         errors[number] = (
                             f"{custom}: {'town' if towns else 'county'} {label!r} is not in {manifest['polity']}"
