@@ -22,10 +22,13 @@ TITLE = "{year} Election Report"
 URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7)}
 PAGES = {2000: (37, 38), 2002: (39, 40), 2004: (47, 48), 2006: (52, 57)}
+LEGISLATURE = {2000: (39, 63), 2002: (46, 63), 2004: (49, 73)}
 CLARITY = "https://www.enr-scvotes.org/SC/19077/40477/reports/detailxml.zip"
 CLARITY_TITLE = "2010 General Election: detail results"
 CODES = {name.upper(): f"45{2 * i + 1:03}" for i, name in enumerate(COUNTIES)}
 TITLE_LINE = re.compile(r"(?:REPRESENTATIVE IN CONGRESS|House of Representatives)\s+DISTRICT\s+0*(\d)", re.IGNORECASE)
+LEGISLATURE_LINE = re.compile(r"(SENATE|HOUS\S*\s+OF\s+\.?R\S*)\s+DISTRICT\s+0*(\d+)\s*$", re.IGNORECASE)
+CLARITY_TITLES = re.compile(r"(U\.S\. House|State House) of Representatives District (\d+)")
 ROW = re.compile(r"^\s*(\D*?)\s{2,}(?=\S*\d)(\S.*)$")
 SKIP = {"#", "OF", "# OF", "COUNTY", "PRECINCTS"}
 
@@ -38,16 +41,18 @@ def county(text: str) -> str | None:
     return scores[0][1] if scores[0][0] >= 0.7 and scores[0][0] - scores[1][0] >= 0.05 else None
 
 
-def blocks(text: str) -> list[tuple[int, list[str]]]:
-    found: list[tuple[int, list[str]]] = []
+def blocks(text: str, legislature: bool) -> list[tuple[str, int, list[str]]]:
+    found: list[tuple[str, int, list[str]]] = []
     for line in text.splitlines():
-        if title := TITLE_LINE.search(line):
-            found.append((int(title[1]), []))
+        if legislature and (title := LEGISLATURE_LINE.search(line)):
+            found.append(("senate" if "SENATE" in title[1].upper() else "state", int(title[2]), []))
+        elif not legislature and (title := TITLE_LINE.search(line)):
+            found.append(("house", int(title[1]), []))
         elif "===" in line or "OFFICIAL RESULTS" in line.upper():
-            found.append((0, []))
+            found.append(("", 0, []))
         elif found:
-            found[-1][1].append(line)
-    return [(district, lines) for district, lines in found if district]
+            found[-1][2].append(line)
+    return [block for block in found if block[1]]
 
 
 def read(lines: list[str]) -> list[tuple[str, str, bool, int]] | str:
@@ -125,7 +130,8 @@ def parse() -> None:
     with zipfile.ZipFile(raw.cached(SOURCE, CLARITY).path) as archive:
         root = ElementTree.fromstring(archive.read("detail.xml"))
     for contest in root.iter("Contest"):
-        if found := re.fullmatch(r"U\.S\. House of Representatives District (\d)", contest.get("text", "")):
+        if found := CLARITY_TITLES.fullmatch(contest.get("text", "")):
+            chamber, district = ("house", int(found[2])) if found[1] == "U.S. House" else (f"house:{found[2]}:g", None)
             for choice in contest.iter("Choice"):
                 writein = choice.get("text", "").upper() == "WRITE-IN"
                 for place in choice.iter("County"):
@@ -133,32 +139,39 @@ def parse() -> None:
                         (
                             2010,
                             date(2010, 11, 2),
-                            int(found[1]),
+                            chamber,
+                            district,
                             CODES[place.get("name", "").upper()],
                             "WRITE-INS" if writein else choice.get("text", "").upper(),
                             writein,
                             int(place.get("votes", "0")),
                         )
                     )
-    for year, (first, last) in PAGES.items():
-        text = subprocess.run(
-            ["pdftotext", "-layout", "-f", str(first), "-l", str(last), str(raw.cached(CACHE, URL.format(year)).path), "-"],
-            capture_output=True,
-            check=True,
-            text=True,
-        ).stdout
-        for district, lines in blocks(text):
-            rows = read(lines)
-            if isinstance(rows, str):
-                print(f"{year} District {district}: {rows}, skipped")
-                continue
-            out.extend((year, DAYS[year], district, CODES[place], name, writein, votes) for place, name, writein, votes in rows)
+    for year, ranges in PAGES.items():
+        for legislature, (first, last) in ((False, ranges), *(((True, LEGISLATURE[year]),) if year in LEGISLATURE else ())):
+            text = subprocess.run(
+                ["pdftotext", "-layout", "-f", str(first), "-l", str(last), str(raw.cached(CACHE, URL.format(year)).path), "-"],
+                capture_output=True,
+                check=True,
+                text=True,
+            ).stdout
+            for office, district, lines in blocks(text, legislature):
+                rows = read(lines)
+                if isinstance(rows, str):
+                    print(f"{year} {office} {district}: {rows}, skipped")
+                    continue
+                chamber = "house" if office == "house" else f"{'senate' if office == 'senate' else 'house'}:{district}:g"
+                out.extend(
+                    (year, DAYS[year], chamber, district if office == "house" else None, CODES[place], name, writein, votes)
+                    for place, name, writein, votes in rows
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         out,
         schema={
             "year": pl.Int32,
             "day": pl.Date,
+            "chamber": pl.String,
             "district": pl.Int16,
             "code": pl.String,
             "candidate": pl.String,
@@ -167,7 +180,6 @@ def parse() -> None:
         },
         orient="row",
     ).with_columns(
-        chamber=pl.lit("house"),
         special=pl.lit(False),
         state=pl.lit("SC"),
         measure=pl.lit(1, pl.Int16),
@@ -183,7 +195,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Carolina's U.S. House generals by county, 2000-2010 (State Election Commission election reports and 2010 detail results)",
+            summary="South Carolina's U.S. House and legislative generals by county, 2000-2010 (State Election Commission election reports and 2010 detail results)",
             polity="US-SC",
         )
         for year in sorted(frame["year"].unique()):
