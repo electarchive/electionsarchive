@@ -15,7 +15,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/2000-2009/"
 LANDING = "https://elect.ky.gov/results/2000-2009/Pages/default.aspx"
-TITLE = "General election results by county"
+TITLES = {"KY": "General election results by county", "KYL": "General election results by county: state legislature"}
 FILES = {
     date(2000, 11, 7): "2000/00Gen_Statewidebycounty.txt",
     date(2002, 11, 5): "2002/General%20Election/2002statebycounty.txt",
@@ -23,7 +23,8 @@ FILES = {
     date(2006, 11, 7): "2006/General%20Election/STATEwidebycounty.txt",
     date(2008, 11, 4): "2008/General%20Election/STATEwide%20by%20candidate%20by%20county%20gen%2008.txt",
 }
-OFFICE = re.compile(r"OFFICE: \S+\s+U\.S\. REPRESENTATIVE (\d+)(?:ST|ND|RD|TH) DIST\s*$")
+OFFICE = re.compile(r"OFFICE: \S+\s+(U\.S\. REPRESENTATIVE|KY REPRESENTATIVE|KY SENATOR)\s+(\d+)(?:ST|ND|RD|TH)\s+DIST?\s*$")
+CHAMBERS = {"U.S. REPRESENTATIVE": "house", "KY REPRESENTATIVE": "house:{}:g", "KY SENATOR": "senate:{}:g"}
 
 
 def fetch() -> None:
@@ -39,13 +40,13 @@ def parse() -> None:
         columns: list[str] = []
         counts: dict[str, dict[str, int]] = {}
         totals: dict[str, int] = {}
-        blocks: list[tuple[int, dict[str, dict[str, int]], dict[str, int]]] = []
+        blocks: list[tuple[str, int, dict[str, dict[str, int]], dict[str, int]]] = []
         for line in text.splitlines():
             if "OFFICE:" in line:
                 found = OFFICE.search(line.rstrip())
-                district, columns, counts, totals = (int(found[1]) if found else None), [], {}, {}
-                if district:
-                    blocks.append((district, counts, totals))
+                district, columns, counts, totals = (int(found[2]) if found else None), [], {}, {}
+                if found and district:
+                    blocks.append((found[1], district, counts, totals))
             elif district is None:
                 continue
             elif not line.strip():
@@ -65,30 +66,45 @@ def parse() -> None:
                             cells[min(len(columns) - 1, max(0, match.end() - 35) // 8)] = int(match[0].replace(",", ""))
                 for code, value in zip(columns, cells, strict=True):
                     counts.setdefault(name, {})[code] = value
-        for district, counts, totals in blocks:
+        for office, district, counts, totals in blocks:
             sums = {name: sum(values.values()) for name, values in counts.items()}
             if {name: totals.get(name) for name in sums} != sums:
-                print(f"{day} District {district}: counties sum to {sums}, printed {totals}, skipped")
+                print(f"{day} {office} {district}: counties sum to {sums}, printed {totals}, skipped")
                 continue
+            federal = office == "U.S. REPRESENTATIVE"
             rows.extend(
-                (day, district, f"21{2 * CODES.index(code) + 1:03}", name, votes)
+                (
+                    day,
+                    CHAMBERS[office].format(district),
+                    district if federal else None,
+                    f"21{2 * CODES.index(code) + 1:03}",
+                    name,
+                    votes,
+                    "KY" if federal else "KYL",
+                )
                 for name, values in counts.items()
                 for code, votes in values.items()
             )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
-        schema={"day": pl.Date, "district": pl.Int16, "code": pl.String, "candidate": pl.String, "votes": pl.Int64},
+        schema={
+            "day": pl.Date,
+            "chamber": pl.String,
+            "district": pl.Int16,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+            "source": pl.String,
+        },
         orient="row",
     ).with_columns(
         year=pl.col("day").dt.year().cast(pl.Int32),
-        chamber=pl.lit("house"),
         special=pl.lit(False),
         state=pl.lit("KY"),
         measure=pl.lit(1, pl.Int16),
         writein=pl.col("candidate").str.contains("(?i)write"),
         kind=pl.lit("county"),
-        source=pl.lit("KY"),
     ).write_parquet(PARSED / "counties.parquet")
 
 
@@ -98,21 +114,22 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kentucky's U.S. House generals by county, 2000-2008 (State Board of Elections)",
+            summary="Kentucky's U.S. House and legislative generals by county, 2000-2008 (State Board of Elections)",
             polity="US-KY",
         )
-        source = cs.source(PUBLISHER, TITLE)
-        if source in cs.minted:
-            cs.add(
-                "source",
-                id=source,
-                kind="official_body",
-                publisher=PUBLISHER,
-                title=TITLE,
-                url=LANDING,
-                license="Public record",
-            )
-        for path in FILES.values():
-            cs.artifact(raw.cached(SOURCE, BASE + path), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"KY": source}, strict=True)
+        sources = {key: cs.source(PUBLISHER, title) for key, title in TITLES.items()}
+        for key, title in TITLES.items():
+            if sources[key] in cs.minted:
+                cs.add(
+                    "source",
+                    id=sources[key],
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=LANDING,
+                    license="Public record",
+                )
+            for path in FILES.values():
+                cs.artifact(raw.cached(SOURCE, BASE + path), sources[key])
+        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), sources, strict=True)
         return cs.write()
