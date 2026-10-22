@@ -362,6 +362,7 @@ export const contestOption = pgTable("contest_option", {
 	}),
 	index("contest_option_contest_idx").using("btree", table.contestId.asc().nullsLast()),
 	index("contest_option_parent_option_idx").using("btree", table.parentOptionId.asc().nullsLast()),
+	index("contest_option_party_idx").using("btree", table.partyId.asc().nullsLast()),
 	unique("contest_option_k_key").on(table.k),]);
 
 export const coverageBuild = pgTable("coverage_build", {
