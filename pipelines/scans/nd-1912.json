@@ -1,0 +1,741 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1912-11-05, General Election 11-05-1912",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1910%20through%201919%20Statewide%20Election%20Results/1912/General%20Election%2011-05-1912.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1912,
+      "chamber": "president",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house1": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": 1
+    },
+    "house2": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": 2
+    },
+    "house3": {
+      "year": 1912,
+      "chamber": "house",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": 3
+    },
+    "governor": {
+      "year": 1912,
+      "chamber": "governor",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1912,
+      "chamber": "lieutenant-governor",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1912,
+      "chamber": "secretary-of-state",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1912,
+      "chamber": "auditor",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1912,
+      "chamber": "treasurer",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1912,
+      "chamber": "attorney-general",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1912,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1912,
+      "chamber": "insurance-commissioner",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1912,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1912,
+      "chamber": "railroad-commissioner",
+      "day": "1912-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "W. M. Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. W. Cathro",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. P. Paulson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. J. Seiler",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. H. Stone",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.105,
+        0.108,
+        0.896,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF NORTH DAKOTA (November 5, 1912) PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3969
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "D. I. Armstrong",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. S. Cameron",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thos. C. Kelly",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. B. Kerlin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. D. Williams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. M. Calderwood",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Geo. Lippman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Little",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. B. Saunders",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. B. Stevenson",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.15,
+        0.938,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1912\u2014Continued PRESIDENTIAL, ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3706
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Max Evenholm",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. E. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. G. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. G. Mowers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S. A. Smith",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "D. P. Barnes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. C. Carney",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. L. Engen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. A. Hazen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gilbert Johnson.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.14,
+        0.938,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1912\u2014Continued PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3779
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "H. T. Helgesen..R",
+          "contest": "house1",
+          "candidate": "Henry Thomas Helgesen"
+        },
+        {
+          "label": "V. R. Lovell....D",
+          "contest": "house1",
+          "candidate": "V R Lovell"
+        },
+        {
+          "label": "Leon Durocher...S",
+          "contest": "house1",
+          "candidate": "Leon Durocher"
+        },
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.391,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1912\u2014Continued REPRESENTATIVE IN CONGRESS First District.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.5304
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Geo. M. Young..R",
+          "contest": "house2",
+          "candidate": "George Morley Young"
+        },
+        {
+          "label": "J. A. Minckler...D",
+          "contest": "house2",
+          "candidate": "J A Minckler"
+        },
+        {
+          "label": "John A. Toder...S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.239,
+        0.894,
+        0.706
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1912\u2014Continued REPRESENTATIVE IN CONGRESS Second District.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4368
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "P. D. Norton R",
+          "contest": "house3",
+          "candidate": "Patrick Daniel Norton"
+        },
+        {
+          "label": "Hal. Halvorsen..D",
+          "contest": "house3",
+          "candidate": "Hal Halvorsen"
+        },
+        {
+          "label": "Arthur LeSeuer..S",
+          "contest": "house3",
+          "candidate": "Arthur Leseuer"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.389,
+        0.95,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1912\u2014Continued REPRESENTATIVE IN CONGRESS Third District.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.5254
+      ]
+    },
+    {
+      "page": 7,
+      "id": "7-0",
+      "columns": [
+        {
+          "label": "L. B. Hanna....R",
+          "contest": "governor",
+          "candidate": "Louis B. Hanna"
+        },
+        {
+          "label": "F. O. Hellstrom..D",
+          "contest": "governor",
+          "candidate": "F. O. Hellstrom"
+        },
+        {
+          "label": "A. E. Bowen, Jr..S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. D. Sweet....P",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. T. Kraabel R",
+          "contest": "lieutenant-governor",
+          "candidate": "A. T. Kraabel",
+          "party": "R"
+        },
+        {
+          "label": "F. L. Brandt....D",
+          "contest": "lieutenant-governor",
+          "candidate": "F. L. Brandt",
+          "party": "D"
+        },
+        {
+          "label": "A. G. Brastrup...S",
+          "contest": "lieutenant-governor",
+          "candidate": "A. G. Brastrup",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.137,
+        0.155,
+        0.928,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, General Election 1912\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3633
+      ]
+    },
+    {
+      "page": 8,
+      "id": "8-0",
+      "columns": [
+        {
+          "label": "Thos. Hall.........R",
+          "contest": "secretary-of-state",
+          "candidate": "Thos. Hall",
+          "party": "R"
+        },
+        {
+          "label": "C. A. Berg.......D",
+          "contest": "secretary-of-state",
+          "candidate": "C. A. Berg",
+          "party": "D"
+        },
+        {
+          "label": "C. O. Jorgenson..R",
+          "contest": "auditor",
+          "candidate": "C. O. Jorgenson",
+          "party": "R"
+        },
+        {
+          "label": "Frank Shanley...D",
+          "contest": "auditor",
+          "candidate": "Frank Shanley",
+          "party": "D"
+        },
+        {
+          "label": "Howard Elliott...S",
+          "contest": "auditor",
+          "candidate": "Howard Elliott",
+          "party": "S"
+        },
+        {
+          "label": "Gunder Olson....R",
+          "contest": "treasurer",
+          "candidate": "Gunder Olson",
+          "party": "R"
+        },
+        {
+          "label": "Frank Lish......D",
+          "contest": "treasurer",
+          "candidate": "Frank Lish",
+          "party": "D"
+        },
+        {
+          "label": "Arthur Bassett...S",
+          "contest": "treasurer",
+          "candidate": "Arthur Bassett",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.15,
+        0.948,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, General Election 1912\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3612
+      ]
+    },
+    {
+      "page": 9,
+      "id": "9-0",
+      "columns": [
+        {
+          "label": "Andrew Miller R",
+          "contest": "attorney-general",
+          "candidate": "Andrew Miller",
+          "party": "R"
+        },
+        {
+          "label": "John F. Sullivan D",
+          "contest": "attorney-general",
+          "candidate": "John F. Sullivan",
+          "party": "D"
+        },
+        {
+          "label": "R. Goer S",
+          "contest": "attorney-general",
+          "candidate": "R. Goer",
+          "party": "S"
+        },
+        {
+          "label": "E. J. Taylor R",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "E. J. Taylor",
+          "party": "R"
+        },
+        {
+          "label": "Marie Baxter S",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Marie Baxter",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.144,
+        0.14,
+        0.938,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, General Election 1912\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3628
+      ]
+    },
+    {
+      "page": 10,
+      "id": "10-0",
+      "columns": [
+        {
+          "label": "W. C. Taylor...R",
+          "contest": "insurance-commissioner",
+          "candidate": "W. C. Taylor",
+          "party": "R"
+        },
+        {
+          "label": "C. S. Whittlessy.D",
+          "contest": "insurance-commissioner",
+          "candidate": "C. S. Whittlessy",
+          "party": "D"
+        },
+        {
+          "label": "J. E. Kulstad...S",
+          "contest": "insurance-commissioner",
+          "candidate": "J. E. Kulstad",
+          "party": "S"
+        },
+        {
+          "label": "W. C. Gilbreath..R",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "W. C. Gilbreath",
+          "party": "R"
+        },
+        {
+          "label": "Alex. Morrison...D",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Alex. Morrison",
+          "party": "D"
+        },
+        {
+          "label": "H. B. Thompson..S",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "H. B. Thompson",
+          "party": "S"
+        },
+        {
+          "label": "M. Jacobsan..Prog",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "M. Jacobsan",
+          "party": "Prog"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.165,
+        0.118,
+        0.955,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, General Election 1912\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3424
+      ]
+    },
+    {
+      "page": 11,
+      "id": "11-0",
+      "columns": [
+        {
+          "label": "O. P. N. Anderson R",
+          "contest": "railroad-commissioner",
+          "candidate": "O. P. N. Anderson",
+          "party": "R"
+        },
+        {
+          "label": "W. H. Mann R",
+          "contest": "railroad-commissioner",
+          "candidate": "W. H. Mann",
+          "party": "R"
+        },
+        {
+          "label": "W. H. Stutsman R",
+          "contest": "railroad-commissioner",
+          "candidate": "W. H. Stutsman",
+          "party": "R"
+        },
+        {
+          "label": "Chas. D. Perry D",
+          "contest": "railroad-commissioner",
+          "candidate": "Chas. D. Perry",
+          "party": "D"
+        },
+        {
+          "label": "Jas. W. McHose D",
+          "contest": "railroad-commissioner",
+          "candidate": "Jas. W. McHose",
+          "party": "D"
+        },
+        {
+          "label": "W. J. Bailey D",
+          "contest": "railroad-commissioner",
+          "candidate": "W. J. Bailey",
+          "party": "D"
+        },
+        {
+          "label": "Z. R. Davidson S",
+          "contest": "railroad-commissioner",
+          "candidate": "Z. R. Davidson",
+          "party": "S"
+        },
+        {
+          "label": "E. A. Meyer S",
+          "contest": "railroad-commissioner",
+          "candidate": "E. A. Meyer",
+          "party": "S"
+        },
+        {
+          "label": "Olaf O. Bjorke S",
+          "contest": "railroad-commissioner",
+          "candidate": "Olaf O. Bjorke",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.064,
+        0.118,
+        0.85,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, General Election 1912\u2014Continued COMMISSIONER OF RAILROADS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.322
+      ]
+    }
+  ]
+}

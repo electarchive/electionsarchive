@@ -1,0 +1,336 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1954-11-02, General Election 11-02-1954",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1950%20through%201958%20Statewide%20Election%20Results/1954/General%20Election%2011-02-1954.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1954,
+      "chamber": "house",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1954,
+      "chamber": "governor",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1954,
+      "chamber": "lieutenant-governor",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1954,
+      "chamber": "secretary-of-state",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1954,
+      "chamber": "auditor",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1954,
+      "chamber": "treasurer",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1954,
+      "chamber": "attorney-general",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1954,
+      "chamber": "insurance-commissioner",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1954,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1954,
+      "chamber": "public-service-commissioner",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1954,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U. S. Representatives OTTO KRUEGER (Republican)",
+          "contest": "house",
+          "candidate": "OTTO KRUEGER",
+          "party": "Republican"
+        },
+        {
+          "label": "USHER L. BURDICK (Republican)",
+          "contest": "house",
+          "candidate": "USHER L. BURDICK",
+          "party": "Republican"
+        },
+        {
+          "label": "P. W. LANIER (Democrat)",
+          "contest": "house",
+          "candidate": "P. W. LANIER",
+          "party": "Democrat"
+        },
+        {
+          "label": "RAYMOND G. VENDSEL (Democrat)",
+          "contest": "house",
+          "candidate": "RAYMOND G. VENDSEL",
+          "party": "Democrat"
+        },
+        {
+          "label": "Governor NORMAN BRUNSDALE (Republican)",
+          "contest": "governor",
+          "candidate": "Norman Brunsdale"
+        },
+        {
+          "label": "CORNELIUS BYMERS (Democrat)",
+          "contest": "governor",
+          "candidate": "Cornelius Bymers"
+        },
+        {
+          "label": "Lieutenant Governor C. P. DAHL (Republican)",
+          "contest": "lieutenant-governor",
+          "candidate": "C. P. DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "S. B. HOCKING (Democrat)",
+          "contest": "lieutenant-governor",
+          "candidate": "S. B. HOCKING",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State BEN MEIER (Republican)",
+          "contest": "secretary-of-state",
+          "candidate": "BEN MEIER",
+          "party": "Republican"
+        },
+        {
+          "label": "B. EARLE ROBINSON (Democrat)",
+          "contest": "secretary-of-state",
+          "candidate": "B. EARLE ROBINSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor BERTA E. BAKER (Republican)",
+          "contest": "auditor",
+          "candidate": "BERTA E. BAKER",
+          "party": "Republican"
+        },
+        {
+          "label": "S. J. CHRISTOPHERSON (Democrat)",
+          "contest": "auditor",
+          "candidate": "S. J. CHRISTOPHERSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer ALBERT JACOBSON (Republican)",
+          "contest": "treasurer",
+          "candidate": "ALBERT JACOBSON",
+          "party": "Republican"
+        },
+        {
+          "label": "ETHEL KNUDSEN (Democrat)",
+          "contest": "treasurer",
+          "candidate": "ETHEL KNUDSEN",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General LESLIE R. BURGUM (Republican)",
+          "contest": "attorney-general",
+          "candidate": "LESLIE R. BURGUM",
+          "party": "Republican"
+        },
+        {
+          "label": "S. E. HALPERN (Democrat)",
+          "contest": "attorney-general",
+          "candidate": "S. E. HALPERN",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Insurance A. J. JENSEN (Republican)",
+          "contest": "insurance-commissioner",
+          "candidate": "A. J. JENSEN",
+          "party": "Republican"
+        },
+        {
+          "label": "H. N. JENSON (Democrat)",
+          "contest": "insurance-commissioner",
+          "candidate": "H. N. JENSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Agriculture and Labor MATH DAHL (Republican)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "WILLIAM L. GUY (Democrat)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "WILLIAM L. GUY",
+          "party": "Democrat"
+        },
+        {
+          "label": "Public Service Commissioner ANSON J. ANDERSON (Republican)",
+          "contest": "public-service-commissioner",
+          "candidate": "ANSON J. ANDERSON",
+          "party": "Republican"
+        },
+        {
+          "label": "LAWRENCE KNOKE (Democrat)",
+          "contest": "public-service-commissioner",
+          "candidate": "LAWRENCE KNOKE",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.156,
+        0.234,
+        0.841,
+        0.546
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 2, 1954'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court JAMES MORRIS (Regular Term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NELS G. JOHNSON (Unexpired Term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction M. F. PETERSON",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. PETERSON",
+          "party": ""
+        },
+        {
+          "label": "Judges of District Court First JOHN C. POLLOCK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second ASMUNDUR BENSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Third WM. H. HUTCHINSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth ARNOLD O. GINNOW",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth HARRY E. RITTGERS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth EUGENE A. BURDICK",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth J. O. WIGEN",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.146,
+        0.22,
+        0.496,
+        0.811
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO-PARTY VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 2, 1954'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2995
+      ]
+    }
+  ]
+}

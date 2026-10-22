@@ -1,0 +1,405 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1938-11-08, General Election 11-08-1938",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1930%20through%201939%20Statewide%20Election%20Results/1938/General%20Election%2011-08-1938.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1938,
+      "chamber": "senate",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1938,
+      "chamber": "house",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1938,
+      "chamber": "governor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1938,
+      "chamber": "lieutenant-governor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1938,
+      "chamber": "secretary-of-state",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1938,
+      "chamber": "auditor",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1938,
+      "chamber": "treasurer",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1938,
+      "chamber": "attorney-general",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1938,
+      "chamber": "insurance-commissioner",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1938,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1938,
+      "chamber": "railroad-commissioner",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1938,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1938-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U. S. Senator\u2014 GERALD P. NYE (Republican)",
+          "contest": "senate",
+          "candidate": "Gerald P. Nye"
+        },
+        {
+          "label": "J. J. NYGAARD (Democrat)",
+          "contest": "senate",
+          "candidate": "J. J. Nygaard"
+        },
+        {
+          "label": "WILLIAM LANGER (Independent)",
+          "contest": "senate",
+          "candidate": "William Langer"
+        },
+        {
+          "label": "Representatives in Congress\u2014 USHER L. BURDICK (Republican)",
+          "contest": "house",
+          "candidate": "USHER L. BURDICK",
+          "party": "Republican"
+        },
+        {
+          "label": "WILLIAM LEMKE (Republican)",
+          "contest": "house",
+          "candidate": "WILLIAM LEMKE",
+          "party": "Republican"
+        },
+        {
+          "label": "ALFRED S. DALE (Democrat)",
+          "contest": "house",
+          "candidate": "ALFRED S. DALE",
+          "party": "Democrat"
+        },
+        {
+          "label": "HOWARD I. HENRY (Democrat)",
+          "contest": "house",
+          "candidate": "HOWARD I. HENRY",
+          "party": "Democrat"
+        },
+        {
+          "label": "J. B. FIELD (Independent)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor\u2014 JOHN N. HAGAN (Republican)",
+          "contest": "governor",
+          "candidate": "John N. Hagan"
+        },
+        {
+          "label": "JOHN MOSES (Democrat)",
+          "contest": "governor",
+          "candidate": "John Moses"
+        },
+        {
+          "label": "Lieutenant Governor\u2014 JACK A. PATTERSON (Republican)",
+          "contest": "lieutenant-governor",
+          "candidate": "JACK A. PATTERSON",
+          "party": "Republican"
+        },
+        {
+          "label": "DAVID G. KELLY (Democrat)",
+          "contest": "lieutenant-governor",
+          "candidate": "DAVID G. KELLY",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State\u2014 JAMES D. GRONNA (Republican)",
+          "contest": "secretary-of-state",
+          "candidate": "JAMES D. GRONNA",
+          "party": "Republican"
+        },
+        {
+          "label": "RITA A. MURPHY (Democrat)",
+          "contest": "secretary-of-state",
+          "candidate": "RITA A. MURPHY",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor\u2014 BERTA E. BAKER (Republican)",
+          "contest": "auditor",
+          "candidate": "BERTA E. BAKER",
+          "party": "Republican"
+        },
+        {
+          "label": "MIKE COYNE (Democrat)",
+          "contest": "auditor",
+          "candidate": "MIKE COYNE",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer\u2014 JOHN R. OMLAND (Republican)",
+          "contest": "treasurer",
+          "candidate": "JOHN R. OMLAND",
+          "party": "Republican"
+        },
+        {
+          "label": "ADOLPH MICKELSON (Democrat)",
+          "contest": "treasurer",
+          "candidate": "ADOLPH MICKELSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General\u2014 ALVIN C. STRUTZ (Republican)",
+          "contest": "attorney-general",
+          "candidate": "ALVIN C. STRUTZ",
+          "party": "Republican"
+        },
+        {
+          "label": "WILLIAM T. DePUY (Democrat)",
+          "contest": "attorney-general",
+          "candidate": "WILLIAM T. DePUY",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Insurance\u2014 OSCAR E. ERICKSON (Republican)",
+          "contest": "insurance-commissioner",
+          "candidate": "OSCAR E. ERICKSON",
+          "party": "Republican"
+        },
+        {
+          "label": "CLARENCE E. OMDAHL (Democrat)",
+          "contest": "insurance-commissioner",
+          "candidate": "CLARENCE E. OMDAHL",
+          "party": "Democrat"
+        },
+        {
+          "label": "Comm'r of Agri. & Labor\u2014 MATH DAHL (Republican)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "GEORGE P. WOLF (Democrat)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "GEORGE P. WOLF",
+          "party": "Democrat"
+        },
+        {
+          "label": "Railroad Commissioner\u2014 BEN C. LARKIN (Republican)",
+          "contest": "railroad-commissioner",
+          "candidate": "BEN C. LARKIN",
+          "party": "Republican"
+        },
+        {
+          "label": "JAMES S. McGOGY (Democrat)",
+          "contest": "railroad-commissioner",
+          "candidate": "JAMES S. McGOGY",
+          "party": "Democrat"
+        },
+        {
+          "label": "Referred Measure, Regulation and License of Creameries\u2014 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measures, Repeal of Liquor Control Act\u2014 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Old Age Assistance Act Amendment\u2014 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.171,
+        0.95,
+        0.719
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8, 1938'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2956
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judges of Supreme Court (Regular Term) A. M. CHRISTIANSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. L. FRASER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "(Unexpired Term) THOMAS J. BURKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. O. SATHRE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction MARTHA E. BRATCHER",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Martha E. Bratcher",
+          "party": ""
+        },
+        {
+          "label": "ARTHUR E. THOMPSON",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Arthur E. Thompson",
+          "party": ""
+        },
+        {
+          "label": "Judges District Court, First District M. J. ENGLERT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second District C. W. BUTTZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Third District GEO. M. MCKENNA",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth District FRED JANSONIUS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth District A. J. GRONNA",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth District HARRY L. BERRY",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.335,
+        0.258,
+        0.688,
+        0.814
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO-PARTY VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8, 1938'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3094
+      ]
+    }
+  ]
+}

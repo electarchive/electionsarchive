@@ -1,0 +1,475 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1926-11-02, General Election 11-02-1926",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1920%20through%201928%20Statewide%20%20Election%20Results/1926/General%20Election%2011-02-1926.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1926,
+      "chamber": "senate",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "governor": {
+      "year": 1926,
+      "chamber": "governor",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1926,
+      "chamber": "lieutenant-governor",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1926,
+      "chamber": "secretary-of-state",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1926,
+      "chamber": "auditor",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1926,
+      "chamber": "treasurer",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1926,
+      "chamber": "attorney-general",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1926,
+      "chamber": "insurance-commissioner",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1926,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1926,
+      "chamber": "railroad-commissioner",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "house1": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": 1
+    },
+    "house2": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": 2
+    },
+    "house3": {
+      "year": 1926,
+      "chamber": "house",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": 3
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1926,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1926-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Gerald P. Nye, R.",
+          "contest": "senate",
+          "candidate": "Gerald P. Nye"
+        },
+        {
+          "label": "Norris H. Nelson, R.",
+          "contest": "senate",
+          "candidate": "Norris H. Nelson"
+        },
+        {
+          "label": "O. P. Stone, E.",
+          "contest": "senate",
+          "candidate": "C. P. Stone"
+        },
+        {
+          "label": "F. F. Burchard, D.",
+          "contest": "senate",
+          "candidate": "F. F. Burchard"
+        },
+        {
+          "label": "Wm. Lemke, F-L.",
+          "contest": "senate",
+          "candidate": "William Lemke"
+        },
+        {
+          "label": "Arthur G. Sorlie, R.",
+          "contest": "governor",
+          "candidate": "Arthur G. Sorlie"
+        },
+        {
+          "label": "D. M. Holmes, D.",
+          "contest": "governor",
+          "candidate": "D. M. Holmes"
+        },
+        {
+          "label": "Ralph Ingerson, F-L.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter Haddock, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Walter Haddock",
+          "party": "R"
+        },
+        {
+          "label": "A. C. Pagenkopf, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "A. C. Pagenkopf",
+          "party": "D"
+        },
+        {
+          "label": "Robert Byrne, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Robert Byrne",
+          "party": "R"
+        },
+        {
+          "label": "F. L. Walker, D.",
+          "contest": "secretary-of-state",
+          "candidate": "F. L. Walker",
+          "party": "D"
+        },
+        {
+          "label": "Charles G. Johnson, F-L.",
+          "contest": "secretary-of-state",
+          "candidate": "Charles G. Johnson",
+          "party": "F-L"
+        },
+        {
+          "label": "John Steen, R.",
+          "contest": "auditor",
+          "candidate": "John Steen",
+          "party": "R"
+        },
+        {
+          "label": "Ole S. Johnson, D.",
+          "contest": "auditor",
+          "candidate": "Ole S. Johnson",
+          "party": "D"
+        },
+        {
+          "label": "Allan McManus, F-L.",
+          "contest": "auditor",
+          "candidate": "Allan McManus",
+          "party": "F-L"
+        },
+        {
+          "label": "C. A. Fisher, R.",
+          "contest": "treasurer",
+          "candidate": "C. A. Fisher",
+          "party": "R"
+        },
+        {
+          "label": "Lillian Lillibridge, D.",
+          "contest": "treasurer",
+          "candidate": "Lillian Lillibridge",
+          "party": "D"
+        },
+        {
+          "label": "E. W. Cart, F-L.",
+          "contest": "treasurer",
+          "candidate": "E. W. Cart",
+          "party": "F-L"
+        },
+        {
+          "label": "George F. Shafer, R.",
+          "contest": "attorney-general",
+          "candidate": "George F. Shafer",
+          "party": "R"
+        },
+        {
+          "label": "S. L. Nuchols, D.",
+          "contest": "attorney-general",
+          "candidate": "S. L. Nuchols",
+          "party": "D"
+        },
+        {
+          "label": "A. S. Olsness, R.",
+          "contest": "insurance-commissioner",
+          "candidate": "A. S. Olsness",
+          "party": "R"
+        },
+        {
+          "label": "W. S. Hooper, D.",
+          "contest": "insurance-commissioner",
+          "candidate": "W. S. Hooper",
+          "party": "D"
+        },
+        {
+          "label": "Magnus Snowfield, F-L.",
+          "contest": "insurance-commissioner",
+          "candidate": "Magnus Snowfield",
+          "party": "F-L"
+        },
+        {
+          "label": "Joseph A. Kitchen, R.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Joseph A. Kitchen",
+          "party": "R"
+        },
+        {
+          "label": "Charles K. Otto, D.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Charles K. Otto",
+          "party": "D"
+        },
+        {
+          "label": "I. Todd, F-L.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "I. Todd",
+          "party": "F-L"
+        },
+        {
+          "label": "Fay Harding, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "Fay Harding",
+          "party": "R"
+        },
+        {
+          "label": "W. C. McDonnell, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "W. C. McDonnell",
+          "party": "R"
+        },
+        {
+          "label": "Frank Milhollan, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "Frank Milhollan",
+          "party": "R"
+        },
+        {
+          "label": "C. H. Boatman, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "C. H. Boatman",
+          "party": "D"
+        },
+        {
+          "label": "John A. Helling, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "John A. Helling",
+          "party": "D"
+        },
+        {
+          "label": "Thomas H. Maloney, F-L",
+          "contest": "railroad-commissioner",
+          "candidate": "Thomas H. Maloney",
+          "party": "F-L"
+        },
+        {
+          "label": "James Wenstrom, F-L",
+          "contest": "railroad-commissioner",
+          "candidate": "James Wenstrom",
+          "party": "F-L"
+        },
+        {
+          "label": "Oscar Korsmo, F-L",
+          "contest": "railroad-commissioner",
+          "candidate": "Oscar Korsmo",
+          "party": "F-L"
+        },
+        {
+          "label": "J. A. McGovern, F-L",
+          "contest": "railroad-commissioner",
+          "candidate": "J. A. McGovern",
+          "party": "F-L"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.051,
+        0.938,
+        0.395
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION, NOVEMBER 2, 1926'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-1",
+      "columns": [
+        {
+          "label": "O. B. Burtness, R.",
+          "contest": "house1",
+          "candidate": "Olger B. Burtness"
+        },
+        {
+          "label": "E. E. Smith, D.",
+          "contest": "house1",
+          "candidate": "R. E. Smith"
+        },
+        {
+          "label": "Donald McDonald, F-L.",
+          "contest": "house1",
+          "candidate": "Donald MacDonald"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.055,
+        0.387,
+        0.183,
+        0.552
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-2",
+      "columns": [
+        {
+          "label": "Thomas Hall, R.",
+          "contest": "house2",
+          "candidate": "Thomas Hall"
+        },
+        {
+          "label": "J. L. Page, D.",
+          "contest": "house2",
+          "candidate": "J. L. Page"
+        },
+        {
+          "label": "C. W. Reichert, F-L.",
+          "contest": "house2",
+          "candidate": "C. W. Reichert"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.202,
+        0.387,
+        0.326,
+        0.577
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-3",
+      "columns": [
+        {
+          "label": "J. H. Sinclair, K.",
+          "contest": "house3",
+          "candidate": "James H. Sinclair"
+        },
+        {
+          "label": "Reuben H. Leavitt, D.",
+          "contest": "house3",
+          "candidate": "Reuben H. Leavitt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.349,
+        0.387,
+        0.478,
+        0.592
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of the Supreme Court A. M. Christianson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judge of the Supreme Court (scattering)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Pub. Inst Bertha R. Palmer",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Bertha R. Palmer",
+          "party": ""
+        },
+        {
+          "label": "Supt. of Pub. Inst John E. Bjorlie",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "John E. Bjorlie",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.25,
+        0.519,
+        0.41,
+        0.876
+      ],
+      "hint": "Read only the table headed 'NONPARTISAN JUDICIARY AND SHOOL VOTES GENERAL ELECTION, NOVEMBER 2, 1926.'; ignore any other table visible in the image."
+    }
+  ]
+}

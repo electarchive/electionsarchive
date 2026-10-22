@@ -1,0 +1,411 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1934-11-06, General Election 11-06-1934",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1930%20through%201939%20Statewide%20Election%20Results/1934/General%20Election%2011-06-1934.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1934,
+      "chamber": "senate",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1934,
+      "chamber": "house",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1934,
+      "chamber": "governor",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1934,
+      "chamber": "lieutenant-governor",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1934,
+      "chamber": "secretary-of-state",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1934,
+      "chamber": "auditor",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1934,
+      "chamber": "treasurer",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1934,
+      "chamber": "attorney-general",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1934,
+      "chamber": "insurance-commissioner",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1934,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1934,
+      "chamber": "railroad-commissioner",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1934,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1934-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Lynn J. Frazier (R)",
+          "contest": "senate",
+          "candidate": "Lynn J. Frazier"
+        },
+        {
+          "label": "Henry Holt (D)",
+          "contest": "senate",
+          "candidate": "Henry Holt"
+        },
+        {
+          "label": "Alfred S. Dale (I)",
+          "contest": "senate",
+          "candidate": "Alfred S. Dale"
+        },
+        {
+          "label": "Arvo F. Husa (I)",
+          "contest": "senate",
+          "candidate": "Arvo F. Husa"
+        },
+        {
+          "label": "Usher L. Burdick (R)",
+          "contest": "house",
+          "candidate": "Usher L. Burdick",
+          "party": "R"
+        },
+        {
+          "label": "William Lemke (R)",
+          "contest": "house",
+          "candidate": "William Lemke",
+          "party": "R"
+        },
+        {
+          "label": "G. F. Lamb (D)",
+          "contest": "house",
+          "candidate": "G. F. Lamb",
+          "party": "D"
+        },
+        {
+          "label": "William D. Lynch (D)",
+          "contest": "house",
+          "candidate": "William D. Lynch",
+          "party": "D"
+        },
+        {
+          "label": "Jasper Haaland (I)",
+          "contest": "house",
+          "candidate": "Jasper Haaland",
+          "party": "I"
+        },
+        {
+          "label": "Effie Kjorstad (I)",
+          "contest": "house",
+          "candidate": "Effie Kjorstad",
+          "party": "I"
+        },
+        {
+          "label": "J. H. Sinclair (I)",
+          "contest": "house",
+          "candidate": "J. H. Sinclair",
+          "party": "I"
+        },
+        {
+          "label": "Lydia Langer (R)",
+          "contest": "governor",
+          "candidate": "Lydia Langer"
+        },
+        {
+          "label": "Thos. H. Moodie (D)",
+          "contest": "governor",
+          "candidate": "Thomas H. Moodie"
+        },
+        {
+          "label": "P. J. Barrett (I)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Walter Welford (R)",
+          "contest": "lieutenant-governor",
+          "candidate": "Walter Welford",
+          "party": "R"
+        },
+        {
+          "label": "P. H. Costello (D)",
+          "contest": "lieutenant-governor",
+          "candidate": "P. H. Costello",
+          "party": "D"
+        },
+        {
+          "label": "B. J. Helland (I)",
+          "contest": "lieutenant-governor",
+          "candidate": "B. J. Helland",
+          "party": "I"
+        },
+        {
+          "label": "James D. Gronna (R)",
+          "contest": "secretary-of-state",
+          "candidate": "James D. Gronna",
+          "party": "R"
+        },
+        {
+          "label": "Laura Wahl Pulscher (D)",
+          "contest": "secretary-of-state",
+          "candidate": "Laura Wahl Pulscher",
+          "party": "D"
+        },
+        {
+          "label": "Berta E. Baker (R)",
+          "contest": "auditor",
+          "candidate": "Berta E. Baker",
+          "party": "R"
+        },
+        {
+          "label": "Walter G. McDonald (D)",
+          "contest": "auditor",
+          "candidate": "Walter G. McDonald",
+          "party": "D"
+        },
+        {
+          "label": "John Gray (R)",
+          "contest": "treasurer",
+          "candidate": "John Gray",
+          "party": "R"
+        },
+        {
+          "label": "Oscar Nygaard (D)",
+          "contest": "treasurer",
+          "candidate": "Oscar Nygaard",
+          "party": "D"
+        },
+        {
+          "label": "P. O. Sathre (R)",
+          "contest": "attorney-general",
+          "candidate": "P. O. Sathre",
+          "party": "R"
+        },
+        {
+          "label": "John Moses (D)",
+          "contest": "attorney-general",
+          "candidate": "John Moses",
+          "party": "D"
+        },
+        {
+          "label": "Harold Hopton (R)",
+          "contest": "insurance-commissioner",
+          "candidate": "Harold Hopton",
+          "party": "R"
+        },
+        {
+          "label": "John P. Jungers (D)",
+          "contest": "insurance-commissioner",
+          "candidate": "John P. Jungers",
+          "party": "D"
+        },
+        {
+          "label": "Theo. Martell (R)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Theo. Martell",
+          "party": "R"
+        },
+        {
+          "label": "O. W. Klindworth (D)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "O. W. Klindworth",
+          "party": "D"
+        },
+        {
+          "label": "Harry Juul (I)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Harry Juul",
+          "party": "I"
+        },
+        {
+          "label": "Elmer Cart (R)",
+          "contest": "railroad-commissioner",
+          "candidate": "Elmer Cart",
+          "party": "R"
+        },
+        {
+          "label": "J. R. Kennedy (D)",
+          "contest": "railroad-commissioner",
+          "candidate": "J. R. Kennedy",
+          "party": "D"
+        },
+        {
+          "label": "Ashbel Ingerson (I)",
+          "contest": "railroad-commissioner",
+          "candidate": "Ashbel Ingerson",
+          "party": "I"
+        },
+        {
+          "label": "Sunday Movies and Theatres Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sunday Movies and Theatres No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Repeal Statutory Prohibition Laws Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Repeal Statutory Prohibition Laws No",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.076,
+        0.218,
+        0.944,
+        0.759
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 6th, 1934'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2847
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Charles G. Bangert",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. G. Burr",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. L. Fraser",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George H. Moellring",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James Morris",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. Nuessle",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. M. Anderson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "J. M. Anderson",
+          "party": ""
+        },
+        {
+          "label": "Arthur E. Thompson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Arthur E. Thompson",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.228,
+        0.256,
+        0.514,
+        0.77
+      ],
+      "hint": "Read only the table headed 'NO-PARTY VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 6th, 1934'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2432
+      ]
+    }
+  ]
+}

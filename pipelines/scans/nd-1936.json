@@ -1,0 +1,472 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1936-11-03, General Election 11-03-1936",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1930%20through%201939%20Statewide%20Election%20Results/1936/General%20Election%2011-03-1936.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1936,
+      "chamber": "house",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1936,
+      "chamber": "governor",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1936,
+      "chamber": "lieutenant-governor",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1936,
+      "chamber": "secretary-of-state",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1936,
+      "chamber": "auditor",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1936,
+      "chamber": "treasurer",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1936,
+      "chamber": "attorney-general",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1936,
+      "chamber": "insurance-commissioner",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1936,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1936,
+      "chamber": "railroad-commissioner",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1936,
+      "chamber": "president",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1936,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1936-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Representatives in Congress\u2014Usher L. Burdick (Republican)",
+          "contest": "house",
+          "candidate": "Usher L. Burdick",
+          "party": "republican"
+        },
+        {
+          "label": "William Lemke (Republican)",
+          "contest": "house",
+          "candidate": "William Lemke",
+          "party": "republican"
+        },
+        {
+          "label": "Henry Holt (Democrat)",
+          "contest": "house",
+          "candidate": "Henry Holt",
+          "party": "democrat"
+        },
+        {
+          "label": "J. J. Nygaard (Democrat)",
+          "contest": "house",
+          "candidate": "J. J. Nygaard",
+          "party": "democrat"
+        },
+        {
+          "label": "E. A. Johansson (Independent)",
+          "contest": "house",
+          "candidate": "E. A. Johansson",
+          "party": "independent"
+        },
+        {
+          "label": "P. H. Miller (Independent)",
+          "contest": "house",
+          "candidate": "P. H. Miller",
+          "party": "independent"
+        },
+        {
+          "label": "I. J. Moe (Independent)",
+          "contest": "house",
+          "candidate": "I. J. Moe",
+          "party": "independent"
+        },
+        {
+          "label": "Jasper Haaland (Independent)",
+          "contest": "house",
+          "candidate": "Jasper Haaland",
+          "party": "independent"
+        },
+        {
+          "label": "W. D. Webster (Independent)",
+          "contest": "house",
+          "candidate": "W. D. Webster",
+          "party": "independent"
+        },
+        {
+          "label": "Governor\u2014Walter Welford (Republican)",
+          "contest": "governor",
+          "candidate": "Walter Welford"
+        },
+        {
+          "label": "John Moses (Democrat)",
+          "contest": "governor",
+          "candidate": "John Moses"
+        },
+        {
+          "label": "William Langer (Independent)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. J. Wehe (Independent)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. J. Barrett (Independent)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lieutenant Governor\u2014T. H. H. Thoresen (Republican)",
+          "contest": "lieutenant-governor",
+          "candidate": "T. H. H. Thoresen",
+          "party": "republican"
+        },
+        {
+          "label": "P. H. Costello (Democrat)",
+          "contest": "lieutenant-governor",
+          "candidate": "P. H. Costello",
+          "party": "democrat"
+        },
+        {
+          "label": "William Crockett (Independent)",
+          "contest": "lieutenant-governor",
+          "candidate": "William Crockett",
+          "party": "independent"
+        },
+        {
+          "label": "Secretary of State\u2014James D. Gronna (Republican)",
+          "contest": "secretary-of-state",
+          "candidate": "James D. Gronna",
+          "party": "republican"
+        },
+        {
+          "label": "Mary A. Fenelon (Democrat)",
+          "contest": "secretary-of-state",
+          "candidate": "Mary A. Fenelon",
+          "party": "democrat"
+        },
+        {
+          "label": "State Auditor\u2014Berta A. Baker (Republican)",
+          "contest": "auditor",
+          "candidate": "Berta A. Baker",
+          "party": "republican"
+        },
+        {
+          "label": "E. A. Lillibridge (Democrat)",
+          "contest": "auditor",
+          "candidate": "E. A. Lillibridge",
+          "party": "democrat"
+        },
+        {
+          "label": "State Treasurer\u2014John Gray (Republican)",
+          "contest": "treasurer",
+          "candidate": "John Gray",
+          "party": "republican"
+        },
+        {
+          "label": "Philip Heiling (Democrat)",
+          "contest": "treasurer",
+          "candidate": "Philip Heiling",
+          "party": "democrat"
+        },
+        {
+          "label": "Attorney General\u2014P. O. Sathre (Republican)",
+          "contest": "attorney-general",
+          "candidate": "P. O. Sathre",
+          "party": "republican"
+        },
+        {
+          "label": "William T. Depuy (Democrat)",
+          "contest": "attorney-general",
+          "candidate": "William T. Depuy",
+          "party": "democrat"
+        },
+        {
+          "label": "Owen T. Owen (Independent)",
+          "contest": "attorney-general",
+          "candidate": "Owen T. Owen",
+          "party": "independent"
+        },
+        {
+          "label": "Commissioner of Insurance\u2014O. B. (Oscar) Erickson (Republican)",
+          "contest": "insurance-commissioner",
+          "candidate": "O. B. (Oscar) Erickson",
+          "party": "republican"
+        },
+        {
+          "label": "S. A. Olsness (Democrat)",
+          "contest": "insurance-commissioner",
+          "candidate": "S. A. Olsness",
+          "party": "democrat"
+        },
+        {
+          "label": "Comm'r of Agri. & Labor\u2014John N. Hagan (Republican)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "John N. Hagan",
+          "party": "republican"
+        },
+        {
+          "label": "Wm. Kane (Democrat)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Wm. Kane",
+          "party": "democrat"
+        },
+        {
+          "label": "Railroad Commissioner\u2014S. S. McDonald (Republican)",
+          "contest": "railroad-commissioner",
+          "candidate": "S. S. McDonald",
+          "party": "republican"
+        },
+        {
+          "label": "M. S. Hyland (Democrat)",
+          "contest": "railroad-commissioner",
+          "candidate": "M. S. Hyland",
+          "party": "democrat"
+        },
+        {
+          "label": "Theo Martell (Independent)",
+          "contest": "railroad-commissioner",
+          "candidate": "Theo Martell",
+          "party": "independent"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.082,
+        0.214,
+        0.903,
+        0.511
+      ],
+      "hint": "Read only the table headed 'PARTY BALLOT\u2014STATE OFFICERS\u2014GENERAL ELECTION, NOVEMBER 3rd, 1936'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Total No. Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Presidential Electors",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LANDON: Lee Brooks, Lyle Johnson, A. G. Sundfor, Z. Vlasoff",
+          "contest": "president",
+          "candidate": "Alfred Landon (Republican)"
+        },
+        {
+          "label": "ROOSEVELT: M. A. Hildreth, Ole S. Johnson, John A. Layne, John Stambaugh",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "LEMKE: George Engel, O. S. Gunderson, Thomas Mohagen, D. D. Riley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "THOMAS: O. L. Aasgaard, Aubrey W. Harkess, Mrs. Alemda Lee, C. A. Schultz",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "BROWDER: L. F. Dibble, Arvo Husa, William Moxness, Clarence Nelson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "COLVIN: L. S. Eberly, Emil W. Johnson, O. E. Swingseth, Winifred M. Thomas",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.201,
+        0.223,
+        0.478,
+        0.762
+      ],
+      "hint": "Read only the table headed 'PARTY BALLOT\u2014PRESIDENTIAL ELECTORS General Election, November 3rd, 1936'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2876
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court\u2014Wm. M. Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Burke",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction\u2014Martha E. Bratcher",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Martha E. Bratcher",
+          "party": ""
+        },
+        {
+          "label": "Arthur E. Thompson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Arthur E. Thompson",
+          "party": ""
+        },
+        {
+          "label": "Initiated Measure\u2014Liquor Control Act\u2014YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judges District Court, First District\u2014Daniel B. Holt",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second District\u2014G. Grimson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Third District\u2014W. J. Austin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. H. Hutchinson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth District\u2014R. G. McFarland",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth District\u2014John C. Lowe",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth District\u2014Frank T. Lembke",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.462,
+        0.223,
+        0.793,
+        0.762
+      ],
+      "hint": "Read only the table headed 'NO-PARTY BALLOT AND INITIATED MEASURE General Election, November 3rd, 1936'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2876
+      ]
+    }
+  ]
+}

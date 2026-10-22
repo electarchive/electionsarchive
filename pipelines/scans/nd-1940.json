@@ -1,0 +1,504 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1940-11-05, General Election 11-05-1940",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1940%20through%201948%20Statewide%20Election%20Results/1940/General%20Election%2011-05-1940.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1940,
+      "chamber": "senate",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1940,
+      "chamber": "house",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1940,
+      "chamber": "governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1940,
+      "chamber": "lieutenant-governor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1940,
+      "chamber": "secretary-of-state",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1940,
+      "chamber": "auditor",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1940,
+      "chamber": "treasurer",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1940,
+      "chamber": "attorney-general",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1940,
+      "chamber": "insurance-commissioner",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1940,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1940,
+      "chamber": "public-service-commissioner",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1940,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1940,
+      "chamber": "tax-commissioner",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1940,
+      "chamber": "president",
+      "day": "1940-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Total Number Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Senator WILLIAM LANGER",
+          "contest": "senate",
+          "candidate": "William Langer"
+        },
+        {
+          "label": "CHARLES J. VOGEL",
+          "contest": "senate",
+          "candidate": "Charles J. Vogel"
+        },
+        {
+          "label": "JASPER HAALAND",
+          "contest": "senate",
+          "candidate": "Jasper Haaland"
+        },
+        {
+          "label": "WILLIAM LEMKE",
+          "contest": "house",
+          "candidate": "WILLIAM LEMKE",
+          "party": ""
+        },
+        {
+          "label": "U. S. Representatives USHER L. BURDICK",
+          "contest": "house",
+          "candidate": "USHER L. BURDICK",
+          "party": ""
+        },
+        {
+          "label": "CHARLES R. ROBERTSON",
+          "contest": "house",
+          "candidate": "CHARLES R. ROBERTSON",
+          "party": ""
+        },
+        {
+          "label": "R. J. DOWNEY",
+          "contest": "house",
+          "candidate": "R. J. DOWNEY",
+          "party": ""
+        },
+        {
+          "label": "ADOLPH MICHELSON",
+          "contest": "house",
+          "candidate": "ADOLPH MICHELSON",
+          "party": ""
+        },
+        {
+          "label": "THOMAS HALL",
+          "contest": "house",
+          "candidate": "THOMAS HALL",
+          "party": ""
+        },
+        {
+          "label": "JOHN OMDAHL",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor JACK A. PATTERSON",
+          "contest": "governor",
+          "candidate": "Jack A. Patterson"
+        },
+        {
+          "label": "JOHN MOSES",
+          "contest": "governor",
+          "candidate": "John Moses"
+        },
+        {
+          "label": "Lieutenant Governor OSCAR W. HAGEN",
+          "contest": "lieutenant-governor",
+          "candidate": "OSCAR W. HAGEN",
+          "party": ""
+        },
+        {
+          "label": "LESLIE R. BURGUM",
+          "contest": "lieutenant-governor",
+          "candidate": "LESLIE R. BURGUM",
+          "party": ""
+        },
+        {
+          "label": "Secretary of State HERMAN THORSON",
+          "contest": "secretary-of-state",
+          "candidate": "HERMAN THORSON",
+          "party": ""
+        },
+        {
+          "label": "ALFRED S. DALE",
+          "contest": "secretary-of-state",
+          "candidate": "ALFRED S. DALE",
+          "party": ""
+        },
+        {
+          "label": "State Auditor BERTA E. BAKER",
+          "contest": "auditor",
+          "candidate": "BERTA E. BAKER",
+          "party": ""
+        },
+        {
+          "label": "BERNHARD M. KLINGER",
+          "contest": "auditor",
+          "candidate": "BERNHARD M. KLINGER",
+          "party": ""
+        },
+        {
+          "label": "State Treasurer CARL ANDERSON",
+          "contest": "treasurer",
+          "candidate": "CARL ANDERSON",
+          "party": ""
+        },
+        {
+          "label": "MAX H. STREHLOW",
+          "contest": "treasurer",
+          "candidate": "MAX H. STREHLOW",
+          "party": ""
+        },
+        {
+          "label": "Attorney General ALVIN C. STRUTZ",
+          "contest": "attorney-general",
+          "candidate": "ALVIN C. STRUTZ",
+          "party": ""
+        },
+        {
+          "label": "HALVOR L. HALVORSON",
+          "contest": "attorney-general",
+          "candidate": "HALVOR L. HALVORSON",
+          "party": ""
+        },
+        {
+          "label": "Commissioner of Insurance OSCAR E. ERICKSON",
+          "contest": "insurance-commissioner",
+          "candidate": "OSCAR E. ERICKSON",
+          "party": ""
+        },
+        {
+          "label": "OLE H. OLSON",
+          "contest": "insurance-commissioner",
+          "candidate": "OLE H. OLSON",
+          "party": ""
+        },
+        {
+          "label": "Commr. Agri. & Labor",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "MATH DAHL",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": ""
+        },
+        {
+          "label": "A. L. LINDSTROM",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "A. L. LINDSTROM",
+          "party": ""
+        },
+        {
+          "label": "Public Service Commrs. BEN C. LARKIN",
+          "contest": "public-service-commissioner",
+          "candidate": "BEN C. LARKIN",
+          "party": ""
+        },
+        {
+          "label": "C. W. MCDONNELL",
+          "contest": "public-service-commissioner",
+          "candidate": "C. W. MCDONNELL",
+          "party": ""
+        },
+        {
+          "label": "J. C. COSTELLO",
+          "contest": "public-service-commissioner",
+          "candidate": "J. C. COSTELLO",
+          "party": ""
+        },
+        {
+          "label": "RUDOLPH RABER",
+          "contest": "public-service-commissioner",
+          "candidate": "RUDOLPH RABER",
+          "party": ""
+        },
+        {
+          "label": "CONRAD C. JOHNSON",
+          "contest": "public-service-commissioner",
+          "candidate": "CONRAD C. JOHNSON",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.039,
+        0.228,
+        0.982,
+        0.775
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF CONSOLIDATED BALLOT VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2852
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Supreme Court Judges\u2014 M. J. ENGLERT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. NUESSLE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "District Judges\u2014 P. G. SWENSON (1st District)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. J. KNEESHAW (2nd District)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HARVEY J. MILLER (6th District)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. Public Instruction\u2014 MARTHA E. BRATCHER",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Martha E. Bratcher",
+          "party": ""
+        },
+        {
+          "label": "ARTHUR E. THOMPSON",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Arthur E. Thompson",
+          "party": ""
+        },
+        {
+          "label": "State Tax Commissioner\u2014 JOHN GRAY",
+          "contest": "tax-commissioner",
+          "candidate": "John Gray",
+          "party": ""
+        },
+        {
+          "label": "NELS P. JENSEN",
+          "contest": "tax-commissioner",
+          "candidate": "Nels P. Jensen",
+          "party": ""
+        },
+        {
+          "label": "Constitutional Amendment\u2014 Amending Sec. 176 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measures\u2014 Classification of Taxable Property YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Abatement of Taxes YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.116,
+        0.221,
+        0.589,
+        0.784
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO-PARTY VOTES AND VOTES ON MEASURES CAST AT THE GENERAL ELECTION ON NOVEMBER 5, 1940'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3037
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Total Number Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILLKIE\u2014 M. S. Byrne P. L. Foss H. P. Remington C. F. Sweet",
+          "contest": "president",
+          "candidate": "Wendell Willkie (Republican)"
+        },
+        {
+          "label": "ROOSEVELT\u2014 Mrs. R. J. Coughlin Harry Gray George Lamb Thomas Ose",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred Knutson",
+          "contest": "president",
+          "candidate": "Alfred Knutson"
+        },
+        {
+          "label": "THOMAS\u2014 Walter Cart Aubrey W. Harkness Selmer Hoel Almeda Lee",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "BABSON",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.661,
+        0.266,
+        0.906,
+        0.775
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2475
+      ]
+    }
+  ]
+}

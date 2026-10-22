@@ -1,0 +1,157 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1890-11-04, Congress and Governor 1889-1890",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1889%20Statewide%20Election%20Results/1889/Congress%20and%20Governor%201889-1890.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1890,
+      "chamber": "house",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1890,
+      "chamber": "governor",
+      "day": "1890-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Congress 1889 R Hansbrough",
+          "contest": "house",
+          "candidate": "Hansbrough",
+          "party": "R"
+        },
+        {
+          "label": "Congress 1889 D Maratta",
+          "contest": "house",
+          "candidate": "Maratta",
+          "party": "D"
+        },
+        {
+          "label": "Governor 1889 R Miller",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor 1889 D Roach",
+          "contest": "governor",
+          "candidate": "William Roach"
+        },
+        {
+          "label": "Congress 1890 R Johnson",
+          "contest": "house",
+          "candidate": "Johnson",
+          "party": "R"
+        },
+        {
+          "label": "Congress 1890 D Benton",
+          "contest": "house",
+          "candidate": "Benton",
+          "party": "D"
+        },
+        {
+          "label": "Governor 1890 R Burke",
+          "contest": "governor",
+          "candidate": "Andrew H. Burke"
+        },
+        {
+          "label": "Governor 1890 D Roach",
+          "contest": "governor",
+          "candidate": "William Roach"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.156,
+        0.83,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMAN AND GOVERNOR, 1889 AND 1890.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3934
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Congress 1889 Hansborough R",
+          "contest": "house",
+          "candidate": "Hansborough",
+          "party": "R"
+        },
+        {
+          "label": "Congress 1889 Maratta D",
+          "contest": "house",
+          "candidate": "Maratta",
+          "party": "D"
+        },
+        {
+          "label": "Governor 1889 Miller R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor 1889 Roach D",
+          "contest": "governor",
+          "candidate": "William Roach"
+        },
+        {
+          "label": "Congress 1890 Roach R",
+          "contest": "house",
+          "candidate": "Roach",
+          "party": "R"
+        },
+        {
+          "label": "Congress 1890 Johnson D",
+          "contest": "house",
+          "candidate": "Johnson",
+          "party": "D"
+        },
+        {
+          "label": "Governor 1890 Benton R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor 1890 Burke D",
+          "contest": "governor",
+          "candidate": "Andrew H. Burke"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.171,
+        0.94,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMAN AND GOVERNOR, 1889 AND 1890'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3872
+      ]
+    }
+  ]
+}

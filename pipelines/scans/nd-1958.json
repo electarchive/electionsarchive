@@ -1,0 +1,354 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1958-11-04, General Election 11-04-1958",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1950%20through%201958%20Statewide%20Election%20Results/1958/General%20Election%2011-04-1958.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1958,
+      "chamber": "senate",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1958,
+      "chamber": "house",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1958,
+      "chamber": "governor",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1958,
+      "chamber": "lieutenant-governor",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1958,
+      "chamber": "secretary-of-state",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1958,
+      "chamber": "auditor",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1958,
+      "chamber": "treasurer",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1958,
+      "chamber": "attorney-general",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1958,
+      "chamber": "insurance-commissioner",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1958,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1958,
+      "chamber": "public-service-commissioner",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1958,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1958-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Senator WILLIAM LANGER Rep.",
+          "contest": "senate",
+          "candidate": "William Langer"
+        },
+        {
+          "label": "RAYMOND VENDSEL Dem.",
+          "contest": "senate",
+          "candidate": "Raymond Vendsel"
+        },
+        {
+          "label": "A. C. TOWNLEY Ind.",
+          "contest": "senate",
+          "candidate": "A. C. Townley"
+        },
+        {
+          "label": "CUSTER SOLEM Ind.",
+          "contest": "senate",
+          "candidate": "Custer Solem"
+        },
+        {
+          "label": "Representatives In Congress ORRIS G. NORDHOUGEN Rep.",
+          "contest": "house",
+          "candidate": "ORRIS G. NORDHOUGEN",
+          "party": "Rep."
+        },
+        {
+          "label": "DON L. SHORT Rep.",
+          "contest": "house",
+          "candidate": "DON L. SHORT",
+          "party": "Rep."
+        },
+        {
+          "label": "QUENTIN N. BURDICK Dem.",
+          "contest": "house",
+          "candidate": "QUENTIN N. BURDICK",
+          "party": "Dem."
+        },
+        {
+          "label": "S. B. HOCKING Dem.",
+          "contest": "house",
+          "candidate": "S. B. HOCKING",
+          "party": "Dem."
+        },
+        {
+          "label": "Governor JOHN E. DAVIS Rep.",
+          "contest": "governor",
+          "candidate": "John E. Davis"
+        },
+        {
+          "label": "JOHN F. LORD Dem.",
+          "contest": "governor",
+          "candidate": "John F. Lord"
+        },
+        {
+          "label": "Lieutenant Governor C. P. DAHL Rep.",
+          "contest": "lieutenant-governor",
+          "candidate": "C. P. DAHL",
+          "party": "Rep."
+        },
+        {
+          "label": "LAVERN SCHOEDER Dem.",
+          "contest": "lieutenant-governor",
+          "candidate": "LAVERN SCHOEDER",
+          "party": "Dem."
+        },
+        {
+          "label": "Secretary of State BEN MEIER Rep.",
+          "contest": "secretary-of-state",
+          "candidate": "BEN MEIER",
+          "party": "Rep."
+        },
+        {
+          "label": "ALBERT HEIDE Dem.",
+          "contest": "secretary-of-state",
+          "candidate": "ALBERT HEIDE",
+          "party": "Dem."
+        },
+        {
+          "label": "State Auditor CURTIS OLSON Rep.",
+          "contest": "auditor",
+          "candidate": "CURTIS OLSON",
+          "party": "Rep."
+        },
+        {
+          "label": "WELDON HAUGEN Dem.",
+          "contest": "auditor",
+          "candidate": "WELDON HAUGEN",
+          "party": "Dem."
+        },
+        {
+          "label": "State Treasurer JOHN R. ERICKSON Rep.",
+          "contest": "treasurer",
+          "candidate": "JOHN R. ERICKSON",
+          "party": "Rep."
+        },
+        {
+          "label": "MRS. RAY THOMPSON Dem.",
+          "contest": "treasurer",
+          "candidate": "MRS. RAY THOMPSON",
+          "party": "Dem."
+        },
+        {
+          "label": "Attorney General LESLIE R. BURGUM Rep.",
+          "contest": "attorney-general",
+          "candidate": "LESLIE R. BURGUM",
+          "party": "Rep."
+        },
+        {
+          "label": "GLENN SWANSON Dem.",
+          "contest": "attorney-general",
+          "candidate": "GLENN SWANSON",
+          "party": "Dem."
+        },
+        {
+          "label": "Commissioner of Insurance A. J. JENSEN Rep.",
+          "contest": "insurance-commissioner",
+          "candidate": "A. J. JENSEN",
+          "party": "Rep."
+        },
+        {
+          "label": "WALLY WOLSKY Dem.",
+          "contest": "insurance-commissioner",
+          "candidate": "WALLY WOLSKY",
+          "party": "Dem."
+        },
+        {
+          "label": "Commissioner of Agriculture and Labor MATH DAHL Rep.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Rep."
+        },
+        {
+          "label": "JAMES J. MAHER Dem.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "JAMES J. MAHER",
+          "party": "Dem."
+        },
+        {
+          "label": "Public Service Commissioner ERNEST D. NELSON Rep.",
+          "contest": "public-service-commissioner",
+          "candidate": "ERNEST D. NELSON",
+          "party": "Rep."
+        },
+        {
+          "label": "CON BYMERS Dem.",
+          "contest": "public-service-commissioner",
+          "candidate": "CON BYMERS",
+          "party": "Dem."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.218,
+        0.891,
+        0.791
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 4, 1958'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2932
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court NELS G. JOHNSON No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction M. F. PETERSON No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. PETERSON",
+          "party": "No-Party"
+        },
+        {
+          "label": "EUGENE VAN DER HOEVEN No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judges of District Court First O. B. BURTNESS No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second ALBERT LUNDBERG No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth CHARLES L. FOSTER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth HARVEY J. MILLER No-Party",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.552,
+        0.216,
+        0.784,
+        0.801
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO-PARTY VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 4, 1958'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3145
+      ]
+    }
+  ]
+}

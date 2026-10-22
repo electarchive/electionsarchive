@@ -1,0 +1,422 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1922-11-07, General Election 11-07-1922",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1920%20through%201928%20Statewide%20%20Election%20Results/1922/General%20Election%2011-07-1922.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1922,
+      "chamber": "senate",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "governor": {
+      "year": 1922,
+      "chamber": "governor",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1922,
+      "chamber": "lieutenant-governor",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1922,
+      "chamber": "secretary-of-state",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1922,
+      "chamber": "auditor",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1922,
+      "chamber": "treasurer",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1922,
+      "chamber": "attorney-general",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1922,
+      "chamber": "insurance-commissioner",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1922,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1922,
+      "chamber": "railroad-commissioner",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1922,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "house3": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": 3
+    },
+    "house2": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": 2
+    },
+    "house1": {
+      "year": 1922,
+      "chamber": "house",
+      "day": "1922-11-07",
+      "special": false,
+      "state": "ND",
+      "district": 1
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Lynn J. Frazier, R.",
+          "contest": "senate",
+          "candidate": "Lynn J. Frazier"
+        },
+        {
+          "label": "J. F. T. O'Connor, D.",
+          "contest": "senate",
+          "candidate": "J. F. T. O'Connor"
+        },
+        {
+          "label": "R. A. Nestos, R.",
+          "contest": "governor",
+          "candidate": "Ragnvald A. Nestos"
+        },
+        {
+          "label": "Wm. Lemke, N. P.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank H. Hyland, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Frank H. Hyland",
+          "party": "R"
+        },
+        {
+          "label": "Eric A. Bowman, N.P.",
+          "contest": "lieutenant-governor",
+          "candidate": "Eric A. Bowman",
+          "party": "N.P."
+        },
+        {
+          "label": "Thomas Hall, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": "R"
+        },
+        {
+          "label": "P. A. Moeller, N. P.",
+          "contest": "secretary-of-state",
+          "candidate": "P. A. Moeller",
+          "party": "N.P."
+        },
+        {
+          "label": "D. C. Poindexter, R.",
+          "contest": "auditor",
+          "candidate": "D. C. Poindexter",
+          "party": "R"
+        },
+        {
+          "label": "Hans Anderson, D.",
+          "contest": "auditor",
+          "candidate": "Hans Anderson",
+          "party": "D"
+        },
+        {
+          "label": "John Steen, R.",
+          "contest": "treasurer",
+          "candidate": "John Steen",
+          "party": "R"
+        },
+        {
+          "label": "E. G. Larson, N. P.",
+          "contest": "treasurer",
+          "candidate": "E. G. Larson",
+          "party": "N.P."
+        },
+        {
+          "label": "George F. Shafer, R.",
+          "contest": "attorney-general",
+          "candidate": "George F. Shafer",
+          "party": "R"
+        },
+        {
+          "label": "J. H. Ulsrud, N.P.",
+          "contest": "attorney-general",
+          "candidate": "J. H. Ulsrud",
+          "party": "N.P."
+        },
+        {
+          "label": "S. A. Olsness, R.",
+          "contest": "insurance-commissioner",
+          "candidate": "S. A. Olsness",
+          "party": "R"
+        },
+        {
+          "label": "E. A. Lillibridge, D.",
+          "contest": "insurance-commissioner",
+          "candidate": "E. A. Lillibridge",
+          "party": "D"
+        },
+        {
+          "label": "J. A. Kitchen, R.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "J. A. Kitchen",
+          "party": "R"
+        },
+        {
+          "label": "Bert F. Baker, N. P.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Bert F. Baker",
+          "party": "N.P."
+        },
+        {
+          "label": "Fay Harding, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "Fay Harding",
+          "party": "R"
+        },
+        {
+          "label": "C. W. McDonnell, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "C. W. McDonnell",
+          "party": "R"
+        },
+        {
+          "label": "Frank Milhollan, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "Frank Milhollan",
+          "party": "R"
+        },
+        {
+          "label": "Arthur Dixon, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "Arthur Dixon",
+          "party": "D"
+        },
+        {
+          "label": "Wm. J. O'Leary, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "Wm. J. O'Leary",
+          "party": "D"
+        },
+        {
+          "label": "C. W. Pollock, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "C. W. Pollock",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.06,
+        0.596,
+        0.587
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES GENERAL ELECTION, NOVEMBER 7, 1922'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2334
+      ]
+    },
+    {
+      "page": 1,
+      "id": "1-1",
+      "columns": [
+        {
+          "label": "L. E. Birdzell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. G. Burr",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. J. Englert",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sveinbjorn Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. L. Nuessle",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Seth W. Richardson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Minnie J. Nielson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Minnie J. Nielson",
+          "party": ""
+        },
+        {
+          "label": "Martha T. Fulton",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Martha T. Fulton",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.589,
+        0.066,
+        0.834,
+        0.581
+      ],
+      "hint": "Read only the table headed 'NON-PARTISAN JUDICIARY AND SCHOOL VOTES, GENERAL ELECTION, NOVEMBER 7, 1922'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2602
+      ]
+    },
+    {
+      "page": 1,
+      "id": "1-2",
+      "columns": [
+        {
+          "label": "J. H. Sinclair",
+          "contest": "house3",
+          "candidate": "James H. Sinclair"
+        },
+        {
+          "label": "E. J. Hughes",
+          "contest": "house3",
+          "candidate": "E. J. Hughes"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.247,
+        0.579,
+        0.371,
+        0.856
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS THIRD DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-3",
+      "columns": [
+        {
+          "label": "George M. Young",
+          "contest": "house2",
+          "candidate": "George M. Young"
+        },
+        {
+          "label": "J. W. Deemey",
+          "contest": "house2",
+          "candidate": "J. W. Deemy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.389,
+        0.579,
+        0.512,
+        0.81
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-4",
+      "columns": [
+        {
+          "label": "O. B. Burtness",
+          "contest": "house1",
+          "candidate": "Olger B. Burtness"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.58,
+        0.225,
+        0.804
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS FIRST DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

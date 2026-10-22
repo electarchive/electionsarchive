@@ -1,0 +1,361 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1942-11-03, General Election 11-03-1942",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1940%20through%201948%20Statewide%20Election%20Results/1942/General%20Election%2011-03-1942.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1942,
+      "chamber": "governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1942,
+      "chamber": "lieutenant-governor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1942,
+      "chamber": "secretary-of-state",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1942,
+      "chamber": "auditor",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1942,
+      "chamber": "treasurer",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1942,
+      "chamber": "attorney-general",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1942,
+      "chamber": "insurance-commissioner",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1942,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1942,
+      "chamber": "public-service-commissioner",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1942,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Total Number of Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Representatives in Congress\u2014 USHER L. BURDICK",
+          "contest": "house",
+          "candidate": "Usher L. Burdick",
+          "party": ""
+        },
+        {
+          "label": "WILLIAM LEMKE",
+          "contest": "house",
+          "candidate": "William Lemke",
+          "party": ""
+        },
+        {
+          "label": "HALVOR L. HALVORSON",
+          "contest": "house",
+          "candidate": "Halvor L. Halvorson",
+          "party": ""
+        },
+        {
+          "label": "E. A. JOHANSON",
+          "contest": "house",
+          "candidate": "E. A. Johanson",
+          "party": ""
+        },
+        {
+          "label": "CHARLES R. ROBERTSON",
+          "contest": "house",
+          "candidate": "Charles R. Robertson",
+          "party": ""
+        },
+        {
+          "label": "Governor \u2014 OSCAR W. HAGEN",
+          "contest": "governor",
+          "candidate": "Oscar W. Hagen"
+        },
+        {
+          "label": "JOHN MOSES",
+          "contest": "governor",
+          "candidate": "John Moses"
+        },
+        {
+          "label": "Lieut. Governor\u2014 QUENTIN N. BURDICK",
+          "contest": "lieutenant-governor",
+          "candidate": "Quentin N. Burdick",
+          "party": ""
+        },
+        {
+          "label": "HENRY HOLT",
+          "contest": "lieutenant-governor",
+          "candidate": "Henry Holt",
+          "party": ""
+        },
+        {
+          "label": "Secretary of State\u2014 HERMAN THORSON",
+          "contest": "secretary-of-state",
+          "candidate": "Herman Thorson",
+          "party": ""
+        },
+        {
+          "label": "THOMAS HALL",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": ""
+        },
+        {
+          "label": "State Auditor\u2014 BERTA E. BAKER",
+          "contest": "auditor",
+          "candidate": "Berta E. Baker",
+          "party": ""
+        },
+        {
+          "label": "ALBERT H. HAUT",
+          "contest": "auditor",
+          "candidate": "Albert H. Haut",
+          "party": ""
+        },
+        {
+          "label": "State Treasurer\u2014 CARL ANDERSON",
+          "contest": "treasurer",
+          "candidate": "Carl Anderson",
+          "party": ""
+        },
+        {
+          "label": "JOHN OMLAND",
+          "contest": "treasurer",
+          "candidate": "John Omland",
+          "party": ""
+        },
+        {
+          "label": "Attorney General\u2014 ALVIN C. STRUTZ",
+          "contest": "attorney-general",
+          "candidate": "Alvin C. Strutz",
+          "party": ""
+        },
+        {
+          "label": "WALTER O. BUCK",
+          "contest": "attorney-general",
+          "candidate": "Walter O. Buck",
+          "party": ""
+        },
+        {
+          "label": "Comm. of Insurance\u2014 OSCAR E. ERICKSON",
+          "contest": "insurance-commissioner",
+          "candidate": "Oscar E. Erickson",
+          "party": ""
+        },
+        {
+          "label": "JOHN N. HAGAN",
+          "contest": "insurance-commissioner",
+          "candidate": "John N. Hagan",
+          "party": ""
+        },
+        {
+          "label": "Comm. of Agr. and Labor\u2014 MATH DAHL",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Math Dahl",
+          "party": ""
+        },
+        {
+          "label": "C. P. DAHL",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "C. P. Dahl",
+          "party": ""
+        },
+        {
+          "label": "Public Service Comm.\u2014 S. S. MCDONALD GEORGE SCHUETT",
+          "contest": "public-service-commissioner",
+          "candidate": "S. S. McDonald",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.088,
+        0.157,
+        0.883,
+        0.533
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 3RD, 1942'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court\u2014A. G. BURR",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction\u2014JACK O. RIEDEL",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Jack O. Riedel",
+          "party": ""
+        },
+        {
+          "label": "ARTHUR E. THOMPSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Referred Measure\u2014Posting of Butterfat Prices YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Referred Measure\u2014Posting of Butterfat Prices NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measure\u2014Prohibiting Liquor in Public Eating Places YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measure\u2014Prohibiting Liquor in Public Eating Places NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "District Judges\u2014DANIEL B. HOLT (District 1)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. GRIMSON (District 2)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. L. BROULLARD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WM. H. HUTCHINSON (District 3)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. G. MCFARLAND (District 4)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. A. JACOBSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHN C. LOWE (District 5)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PAUL W. BOEHM",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRANK T. LEMBKE (District 6)",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.263,
+        0.164,
+        0.717,
+        0.536
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 3RD, 1942'; ignore any other table visible in the image."
+    }
+  ]
+}

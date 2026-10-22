@@ -1,0 +1,158 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1966-11-08, General Election 11-08-1966",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1960%20through%201968%20Statewide%20Election%20Results/1966/General%20Election%2011-08-1966.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1966,
+      "chamber": "house",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1966,
+      "chamber": "public-service-commissioner",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1966,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FIRST DISTRICT S. F. Buckshot Hoffner Dem.",
+          "contest": "house",
+          "candidate": "S. F. Buckshot Hoffner",
+          "party": "Dem."
+        },
+        {
+          "label": "Mark Andrews Rep.",
+          "contest": "house",
+          "candidate": "Mark Andrews",
+          "party": "Rep."
+        },
+        {
+          "label": "SECOND DISTRICT Rolland Redlin Dem.",
+          "contest": "house",
+          "candidate": "Rolland Redlin",
+          "party": "Dem."
+        },
+        {
+          "label": "Thomas S. Kleppe Rep.",
+          "contest": "house",
+          "candidate": "Thomas S. Kleppe",
+          "party": "Rep."
+        },
+        {
+          "label": "B. C Thompson Dem.",
+          "contest": "public-service-commissioner",
+          "candidate": "B. C Thompson",
+          "party": "Dem."
+        },
+        {
+          "label": "Richard Elkin Rep.",
+          "contest": "public-service-commissioner",
+          "candidate": "Richard Elkin",
+          "party": "Rep."
+        },
+        {
+          "label": "William S. Murray No-party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wm. L. Paulson No-party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Earl W. Anderson No-party",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Earl W. Anderson",
+          "party": "No-party"
+        },
+        {
+          "label": "Orville W. Hagen No-party",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Orville W. Hagen",
+          "party": "No-party"
+        },
+        {
+          "label": "FIRST Roy K. Redetzke No-party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SECOND Ray R. Friederich No-party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "THIRD Clifford Schneller No-party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FOURTH M. C. Fredricks No-party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FIFTH Eugene. A. Burdick No-party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SIXTH Emil A. Giese No-party",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.002,
+        0.146,
+        0.64,
+        0.744
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8,1966'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2826
+      ]
+    }
+  ]
+}

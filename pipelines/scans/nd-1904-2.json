@@ -1,0 +1,94 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1904-11-08, President, Congressman and Governor 1904 (Page 2)",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1900%20through%201908%20Statewide%20Election%20Results/1904/President,%20Congressman%20and%20Governor%201904%20(Page%202).pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1904,
+      "chamber": "house",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1904,
+      "chamber": "governor",
+      "day": "1904-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Dow Soc",
+          "contest": "house",
+          "candidate": "Dow",
+          "party": "Soc"
+        },
+        {
+          "label": "Herring Soc",
+          "contest": "house",
+          "candidate": "Herring",
+          "party": "Soc"
+        },
+        {
+          "label": "Colby Pro",
+          "contest": "house",
+          "candidate": "Colby",
+          "party": "Pro"
+        },
+        {
+          "label": "Tibbets Pro",
+          "contest": "house",
+          "candidate": "Tibbets",
+          "party": "Pro"
+        },
+        {
+          "label": "Sarles R",
+          "contest": "governor",
+          "candidate": "Elmore Y. Sarles"
+        },
+        {
+          "label": "Hegge D",
+          "contest": "governor",
+          "candidate": "M. F. Hegge"
+        },
+        {
+          "label": "Basset Soc",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Aaker Pro",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.178,
+        0.84,
+        0.966
+      ],
+      "hint": "Read only the table headed 'Vote for President Congressman and Governor, 1904.\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4239
+      ]
+    }
+  ]
+}

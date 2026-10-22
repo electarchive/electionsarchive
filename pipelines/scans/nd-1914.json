@@ -1,0 +1,742 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1914-11-03, General Election 11-03-1914",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1910%20through%201919%20Statewide%20Election%20Results/1914/General%20Election%2011-03-1914.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1914,
+      "chamber": "senate",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "governor": {
+      "year": 1914,
+      "chamber": "governor",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1914,
+      "chamber": "lieutenant-governor",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1914,
+      "chamber": "secretary-of-state",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1914,
+      "chamber": "auditor",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1914,
+      "chamber": "treasurer",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1914,
+      "chamber": "attorney-general",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1914,
+      "chamber": "insurance-commissioner",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1914,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "house1": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": 1
+    },
+    "house2": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": 2
+    },
+    "railroad-commissioner": {
+      "year": 1914,
+      "chamber": "railroad-commissioner",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1914,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "house3": {
+      "year": 1914,
+      "chamber": "house",
+      "day": "1914-11-03",
+      "special": false,
+      "state": "ND",
+      "district": 3
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "A. J. Gronna",
+          "contest": "senate",
+          "candidate": "Asle Jorgenson Gronna"
+        },
+        {
+          "label": "W. E. Purcell",
+          "contest": "senate",
+          "candidate": "W. E. Purcell"
+        },
+        {
+          "label": "W. H. Brown",
+          "contest": "senate",
+          "candidate": "W. H. Brown"
+        },
+        {
+          "label": "Sever Serumgard",
+          "contest": "senate",
+          "candidate": "Sever Scrumgard"
+        },
+        {
+          "label": "L. B. Hanna",
+          "contest": "governor",
+          "candidate": "Louis B. Hanna"
+        },
+        {
+          "label": "F. O. Hellstrom",
+          "contest": "governor",
+          "candidate": "F. O. Hellstrom"
+        },
+        {
+          "label": "J. A. Williams",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. H. Aaker",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. H. Fraine",
+          "contest": "lieutenant-governor",
+          "candidate": "J. H. Fraine",
+          "party": ""
+        },
+        {
+          "label": "James E. Hall",
+          "contest": "lieutenant-governor",
+          "candidate": "James E. Hall",
+          "party": ""
+        },
+        {
+          "label": "H. E. Thompson",
+          "contest": "lieutenant-governor",
+          "candidate": "H. E. Thompson",
+          "party": ""
+        },
+        {
+          "label": "D. J. Campbell",
+          "contest": "lieutenant-governor",
+          "candidate": "D. J. Campbell",
+          "party": ""
+        },
+        {
+          "label": "Thomas Hall",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": ""
+        },
+        {
+          "label": "W. J. Anderson",
+          "contest": "secretary-of-state",
+          "candidate": "W. J. Anderson",
+          "party": ""
+        },
+        {
+          "label": "W. G. Johnson",
+          "contest": "secretary-of-state",
+          "candidate": "W. G. Johnson",
+          "party": ""
+        },
+        {
+          "label": "C.O. Jorgenson",
+          "contest": "auditor",
+          "candidate": "C.O. Jorgenson",
+          "party": ""
+        },
+        {
+          "label": "F. Shanley",
+          "contest": "auditor",
+          "candidate": "F. Shanley",
+          "party": ""
+        },
+        {
+          "label": "J. E. Kulstad",
+          "contest": "auditor",
+          "candidate": "J. E. Kulstad",
+          "party": ""
+        },
+        {
+          "label": "C. H. Starke",
+          "contest": "auditor",
+          "candidate": "C. H. Starke",
+          "party": ""
+        },
+        {
+          "label": "John Steen",
+          "contest": "treasurer",
+          "candidate": "John Steen",
+          "party": ""
+        },
+        {
+          "label": "M. F. Hegge",
+          "contest": "treasurer",
+          "candidate": "M. F. Hegge",
+          "party": ""
+        },
+        {
+          "label": "L. S. Jones",
+          "contest": "treasurer",
+          "candidate": "L. S. Jones",
+          "party": ""
+        },
+        {
+          "label": "L. B. Garnaas",
+          "contest": "treasurer",
+          "candidate": "L. B. Garnaas",
+          "party": ""
+        },
+        {
+          "label": "H. J. Linde",
+          "contest": "attorney-general",
+          "candidate": "H. J. Linde",
+          "party": ""
+        },
+        {
+          "label": "S. Cameron",
+          "contest": "attorney-general",
+          "candidate": "S. Cameron",
+          "party": ""
+        },
+        {
+          "label": "J. L. Koeppler",
+          "contest": "attorney-general",
+          "candidate": "J. L. Koeppler",
+          "party": ""
+        },
+        {
+          "label": "Dorr Carroll",
+          "contest": "attorney-general",
+          "candidate": "Dorr Carroll",
+          "party": ""
+        },
+        {
+          "label": "W. C. Taylor",
+          "contest": "insurance-commissioner",
+          "candidate": "W. C. Taylor",
+          "party": ""
+        },
+        {
+          "label": "C. S. Whittlesey",
+          "contest": "insurance-commissioner",
+          "candidate": "C. S. Whittlesey",
+          "party": ""
+        },
+        {
+          "label": "F. Spaeth",
+          "contest": "insurance-commissioner",
+          "candidate": "F. Spaeth",
+          "party": ""
+        },
+        {
+          "label": "J. P. Reed",
+          "contest": "insurance-commissioner",
+          "candidate": "J. P. Reed",
+          "party": ""
+        },
+        {
+          "label": "Robert Flint",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Robert Flint",
+          "party": ""
+        },
+        {
+          "label": "E. A. Lillibridge",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "E. A. Lillibridge",
+          "party": ""
+        },
+        {
+          "label": "Robert Grant",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Robert Grant",
+          "party": ""
+        },
+        {
+          "label": "Karl Klein",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Karl Klein",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.015,
+        0.76,
+        0.335
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION, NOVEMBER 3, 1914'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-1",
+      "columns": [
+        {
+          "label": "H. T. Helgesen",
+          "contest": "house1",
+          "candidate": "Henry Thomas Helgesen"
+        },
+        {
+          "label": "F. Bartholomew",
+          "contest": "house1",
+          "candidate": "F Bartholomew"
+        },
+        {
+          "label": "Leon Durocher",
+          "contest": "house1",
+          "candidate": "Leon Durocher"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.759,
+        0.058,
+        0.945,
+        0.228
+      ],
+      "hint": "Read only the table headed 'REP. IN CONGRESS FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-2",
+      "columns": [
+        {
+          "label": "Geo. M. Young",
+          "contest": "house2",
+          "candidate": "George Morley Young"
+        },
+        {
+          "label": "James J. Weeks",
+          "contest": "house2",
+          "candidate": "James J Weeks"
+        },
+        {
+          "label": "N. H. Bjornstad",
+          "contest": "house2",
+          "candidate": "N H Bjornstad"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.759,
+        0.22,
+        0.945,
+        0.39
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-3",
+      "columns": [
+        {
+          "label": "W. H. Mann",
+          "contest": "railroad-commissioner",
+          "candidate": "W. H. Mann",
+          "party": ""
+        },
+        {
+          "label": "O. P. N. Anderson",
+          "contest": "railroad-commissioner",
+          "candidate": "O. P. N. Anderson",
+          "party": ""
+        },
+        {
+          "label": "W. H. Stutsman",
+          "contest": "railroad-commissioner",
+          "candidate": "W. H. Stutsman",
+          "party": ""
+        },
+        {
+          "label": "S. A. Hall",
+          "contest": "railroad-commissioner",
+          "candidate": "S. A. Hall",
+          "party": ""
+        },
+        {
+          "label": "O. Greenland",
+          "contest": "railroad-commissioner",
+          "candidate": "O. Greenland",
+          "party": ""
+        },
+        {
+          "label": "Wm. Loughland",
+          "contest": "railroad-commissioner",
+          "candidate": "Wm. Loughland",
+          "party": ""
+        },
+        {
+          "label": "G. E. Anderson",
+          "contest": "railroad-commissioner",
+          "candidate": "G. E. Anderson",
+          "party": ""
+        },
+        {
+          "label": "H. Reische",
+          "contest": "railroad-commissioner",
+          "candidate": "H. Reische",
+          "party": ""
+        },
+        {
+          "label": "L. A. Knoke",
+          "contest": "railroad-commissioner",
+          "candidate": "L. A. Knoke",
+          "party": ""
+        },
+        {
+          "label": "J. A. Hyland",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. L. Engen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M. P. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. F. Spalding",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. M. Christianson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. J. Taylor",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "E. J. Taylor",
+          "party": ""
+        },
+        {
+          "label": "R. Heyward",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "R. Heyward",
+          "party": ""
+        },
+        {
+          "label": "YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.327,
+        0.709,
+        0.627
+      ],
+      "hint": "Read only the table headed 'Commissioners of Railroads'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-4",
+      "columns": [
+        {
+          "label": "P. D. Norton",
+          "contest": "house3",
+          "candidate": "Patrick Daniel Norton"
+        },
+        {
+          "label": "Halvor Halvorson",
+          "contest": "house3",
+          "candidate": "Halvor Halvorson"
+        },
+        {
+          "label": "S. Griffith",
+          "contest": "house3",
+          "candidate": "S Griffith"
+        },
+        {
+          "label": "H. R. Ringoen",
+          "contest": "house3",
+          "candidate": "H R Ringoen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.759,
+        0.382,
+        0.945,
+        0.609
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "J. H. Gogin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. Bartholomew",
+          "contest": "house1",
+          "candidate": "F Bartholomew"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.192,
+        0.424,
+        0.372,
+        0.586
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-2",
+      "columns": [
+        {
+          "label": "James J. Weeks",
+          "contest": "house2",
+          "candidate": "James J Weeks"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.364,
+        0.424,
+        0.545,
+        0.622
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-3",
+      "columns": [
+        {
+          "label": "H. Halvorson",
+          "contest": "house3",
+          "candidate": "Halvor Halvorson"
+        },
+        {
+          "label": "Scattering",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.538,
+        0.424,
+        0.718,
+        0.608
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Judge of the Supreme Court A. M. Christianson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judge of the Supreme Court B. F. Spalding",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction M. Brumwell",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. Brumwell",
+          "party": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction Richard Heyward",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Richard Heyward",
+          "party": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction E. J. Taylor",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "E. J. Taylor",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.536,
+        0.142,
+        0.734,
+        0.66
+      ],
+      "hint": "Read only the table headed 'NON-PARTISAN JUDICIARY AND NON-PARTISAN SCHOOL VOTES, PRIMARY ELECTION, JUNE 24, 1914'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.278
+      ]
+    }
+  ]
+}

@@ -1,0 +1,320 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1964-11-03, General Election 11-03-1964 (Page 1)",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1960%20through%201968%20Statewide%20Election%20Results/1964/General%20Election%2011-03-1964%20(Page%201).pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1964,
+      "chamber": "president",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1964,
+      "chamber": "senate",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1964,
+      "chamber": "house",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1964,
+      "chamber": "governor",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1964,
+      "chamber": "lieutenant-governor",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1964,
+      "chamber": "secretary-of-state",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1964,
+      "chamber": "auditor",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1964,
+      "chamber": "treasurer",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1964,
+      "chamber": "attorney-general",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1964,
+      "chamber": "insurance-commissioner",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1964,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1964,
+      "chamber": "public-service-commissioner",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MRS. EMMA STENEHJEM, RUDY H. HOFFS, LOUIS EASTON, MRS. HARVEY ROBINSON (Goldwater Rep.)",
+          "contest": "president",
+          "candidate": "Barry Goldwater (Republican)"
+        },
+        {
+          "label": "MRS. DAPHNA NYGAARD, JOHN HOVE, HAROLD HANSON, RICHARD HOLMES (Johnson Dem.)",
+          "contest": "president",
+          "candidate": "Lyndon B. Johnson (Democratic)"
+        },
+        {
+          "label": "C. J. GUTTING, FRED E. SCHMIDT, CARRIE MURPHY, OLIVER ROSENBERG (De Berry Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROY S. LUND, EARL C. ODERMAN, ROBERT M. OSBORN, MRS. G. A. FORTHUN (Munn Ind.)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOM KLEPPE Republican",
+          "contest": "senate",
+          "candidate": "Tom Kleppe"
+        },
+        {
+          "label": "QUENTIN N. BURDICK Democrat",
+          "contest": "senate",
+          "candidate": "Quentin N. Burdick"
+        },
+        {
+          "label": "MARK ANDREWS Republican",
+          "contest": "house",
+          "candidate": "Mark Andrews",
+          "party": "Republican"
+        },
+        {
+          "label": "GEORGE A. SINNER Democrat",
+          "contest": "house",
+          "candidate": "George A. Sinner",
+          "party": "Democrat"
+        },
+        {
+          "label": "ROGER VORACHEK Independent",
+          "contest": "house",
+          "candidate": "Roger Vorachek",
+          "party": "Independent"
+        },
+        {
+          "label": "EUGENE VAN DER HOEVEN Independent",
+          "contest": "house",
+          "candidate": "Eugene Van Der Hoeven",
+          "party": "Independent"
+        },
+        {
+          "label": "DON L. SHORT Republican",
+          "contest": "house",
+          "candidate": "Don L. Short",
+          "party": "Republican"
+        },
+        {
+          "label": "ROLLAND REDLIN Democrat",
+          "contest": "house",
+          "candidate": "Rolland Redlin",
+          "party": "Democrat"
+        },
+        {
+          "label": "DON HALCROW Republican",
+          "contest": "governor",
+          "candidate": "Don Halcrow"
+        },
+        {
+          "label": "WILLIAM L. GUY Democrat",
+          "contest": "governor",
+          "candidate": "William L. Guy"
+        },
+        {
+          "label": "FRANK A. WENSTROM Republican",
+          "contest": "lieutenant-governor",
+          "candidate": "Frank A. Wenstrom",
+          "party": "Republican"
+        },
+        {
+          "label": "CHARLES TIGHE Democrat",
+          "contest": "lieutenant-governor",
+          "candidate": "Charles Tighe",
+          "party": "Democrat"
+        },
+        {
+          "label": "BEN MEIER Republican",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Meier",
+          "party": "Republican"
+        },
+        {
+          "label": "ELMER STRAND Democrat",
+          "contest": "secretary-of-state",
+          "candidate": "Elmer Strand",
+          "party": "Democrat"
+        },
+        {
+          "label": "CURTIS OLSON Republican",
+          "contest": "auditor",
+          "candidate": "Curtis Olson",
+          "party": "Republican"
+        },
+        {
+          "label": "TED MILLER Democrat",
+          "contest": "auditor",
+          "candidate": "Ted Miller",
+          "party": "Democrat"
+        },
+        {
+          "label": "PHIL HOGHAUG Republican",
+          "contest": "treasurer",
+          "candidate": "Phil Hoghaug",
+          "party": "Republican"
+        },
+        {
+          "label": "WALTER CHRISTENSEN Democrat",
+          "contest": "treasurer",
+          "candidate": "Walter Christensen",
+          "party": "Democrat"
+        },
+        {
+          "label": "HELGI JOHANNESON Republican",
+          "contest": "attorney-general",
+          "candidate": "Helgi Johannes\u00f3n",
+          "party": "Republican"
+        },
+        {
+          "label": "LEE W. FRAASE Democrat",
+          "contest": "attorney-general",
+          "candidate": "Lee W. Fraase",
+          "party": "Democrat"
+        },
+        {
+          "label": "TED WEISENBURGER Republican",
+          "contest": "insurance-commissioner",
+          "candidate": "Ted Weisenburger",
+          "party": "Republican"
+        },
+        {
+          "label": "K. O. NYGAARD Democrat",
+          "contest": "insurance-commissioner",
+          "candidate": "K. O. Nygaard",
+          "party": "Democrat"
+        },
+        {
+          "label": "ARNE DAHL Republican",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Arne Dahl",
+          "party": "Republican"
+        },
+        {
+          "label": "ISAK HYSTAD Democrat",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Isak Hystad",
+          "party": "Democrat"
+        },
+        {
+          "label": "DEAN MILLER Republican",
+          "contest": "public-service-commissioner",
+          "candidate": "Dean Miller",
+          "party": "Republican"
+        },
+        {
+          "label": "BRUCE HAGEN Democrat",
+          "contest": "public-service-commissioner",
+          "candidate": "Bruce Hagen",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.042,
+        0.181,
+        0.891,
+        0.814
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 3, 1964'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3349
+      ]
+    }
+  ]
+}

@@ -1,0 +1,649 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1960-11-08, General Election 11-08-1960",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1960%20through%201968%20Statewide%20Election%20Results/1960/General%20Election%2011-08-1960.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1960,
+      "chamber": "president",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1960,
+      "chamber": "governor",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1960,
+      "chamber": "lieutenant-governor",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1960,
+      "chamber": "secretary-of-state",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1960,
+      "chamber": "auditor",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1960,
+      "chamber": "treasurer",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1960,
+      "chamber": "attorney-general",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1960,
+      "chamber": "insurance-commissioner",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1960,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1960,
+      "chamber": "public-service-commissioner",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1960,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1960,
+      "chamber": "tax-commissioner",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Presidential Electors NIXON Ben Wolf Harold Hofstrand Mrs. Oscar Sorlie Sharpe Preutz",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "KENNEDY Myron Bright C. M. Copenhaver Jim Hardy Albert Lockwood",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        },
+        {
+          "label": "DOBBS Selemer M. Hoel Einar Hoel Gilbert Holme Arnold Skarvold",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Representative In Congress HJALMAR NYGAARD Republican",
+          "contest": "house",
+          "candidate": "Hjalmar Nygaard",
+          "party": "Republican"
+        },
+        {
+          "label": "DON L. SHORT Republican",
+          "contest": "house",
+          "candidate": "Don L. Short",
+          "party": "Republican"
+        },
+        {
+          "label": "ANSON J ANDERSON Democrat",
+          "contest": "house",
+          "candidate": "Anson J. Anderson",
+          "party": "Democrat"
+        },
+        {
+          "label": "RAYMOND VENDSEL Democrat",
+          "contest": "house",
+          "candidate": "Raymond Vendsel",
+          "party": "Democrat"
+        },
+        {
+          "label": "Governor C. P. DAHL Republican",
+          "contest": "governor",
+          "candidate": "C. P. Dahl"
+        },
+        {
+          "label": "WILLIAM L. GUY Democrat",
+          "contest": "governor",
+          "candidate": "William L. Guy"
+        },
+        {
+          "label": "HERSCHEL LASHKOWITZ Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lieutenant Governor ORVILLE W. HAGEN Republican",
+          "contest": "lieutenant-governor",
+          "candidate": "Orville W. Hagen",
+          "party": "Republican"
+        },
+        {
+          "label": "LAVERN SCHOEDER Democrat",
+          "contest": "lieutenant-governor",
+          "candidate": "Lavern Schoeder",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State BEN MEIER Republican",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Meier",
+          "party": "Republican"
+        },
+        {
+          "label": "LLOYD B OMDAHL Democrat",
+          "contest": "secretary-of-state",
+          "candidate": "Lloyd B. Omdahl",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor CURTIS OLSON Republican",
+          "contest": "auditor",
+          "candidate": "Curtis Olson",
+          "party": "Republican"
+        },
+        {
+          "label": "WELDON HAUGEN Democrat",
+          "contest": "auditor",
+          "candidate": "Weldon Haugen",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer JOHN R. ERICKSON Republican",
+          "contest": "treasurer",
+          "candidate": "John R. Erickson",
+          "party": "Republican"
+        },
+        {
+          "label": "ALBERT HEIDE Democrat",
+          "contest": "treasurer",
+          "candidate": "Albert Heide",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General LESLIE R. BURGUM Republican",
+          "contest": "attorney-general",
+          "candidate": "Leslie R. Burgum",
+          "party": "Republican"
+        },
+        {
+          "label": "CHARLES MURPHY Democrat",
+          "contest": "attorney-general",
+          "candidate": "Charles Murphy",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Insurance A. J. JENSEN Republican",
+          "contest": "insurance-commissioner",
+          "candidate": "A. J. Jensen",
+          "party": "Republican"
+        },
+        {
+          "label": "DON SLOAN Democrat",
+          "contest": "insurance-commissioner",
+          "candidate": "Don Sloan",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Agriculture & Labor MATH DAHL Republican",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Math Dahl",
+          "party": "Republican"
+        },
+        {
+          "label": "BRUCE HAGEN Democrat",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Bruce Hagen",
+          "party": "Democrat"
+        },
+        {
+          "label": "Public Service Commissioner RICHARD J. THOMPSON Republican",
+          "contest": "public-service-commissioner",
+          "candidate": "Richard J. Thompson",
+          "party": "Republican"
+        },
+        {
+          "label": "RALPH DEWING Democrat",
+          "contest": "public-service-commissioner",
+          "candidate": "Ralph Dewing",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.209,
+        0.896,
+        0.545
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8, 1960'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court OBERT C. TEIGEN Regular Term No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judge of Supreme Court ALVIN C. STRUTZ Unexpired Term No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction M. F. PETERSON No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. PETERSON",
+          "party": "No-Party"
+        },
+        {
+          "label": "Tax Commissioner J. ARTHUR ENGEN No-Party",
+          "contest": "tax-commissioner",
+          "candidate": "J. ARTHUR ENGEN",
+          "party": "No-Party"
+        },
+        {
+          "label": "JOHN LEIER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judges of District Court First ROT K. REDETZKE No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second ROLAND A. HERINGER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GLENN K. SWANSON No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Third CLIFFORD SCHNELLER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth M. C. FREDRICKS No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "THOMAS W. NIELSEN No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth EUGENE A. BURDICK No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth EMIL A. GIESE No-Party",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.138,
+        0.468,
+        0.553
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8, 1960'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Presidential Electors NIXON Ben Wolf Harold Hofstrand Mrs Oscar Sorlie Sharpe Preutz",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "KENNEDY Myron Bright C. M. Copenhaver Jim Hardy Albert Lockwood",
+          "contest": "president",
+          "candidate": "John F. Kennedy (Democratic)"
+        },
+        {
+          "label": "DOBBS Selemer M. Hoel Elmar Hoel Gilbert Bolme Arnold Skarvold",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Representative In Congress HJALMAR NYGAARD Republican",
+          "contest": "house",
+          "candidate": "HJALMAR NYGAARD",
+          "party": "Republican"
+        },
+        {
+          "label": "DON L. SHORT Republican",
+          "contest": "house",
+          "candidate": "DON L. SHORT",
+          "party": "Republican"
+        },
+        {
+          "label": "ANSON J ANDERSON Democrat",
+          "contest": "house",
+          "candidate": "ANSON J ANDERSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "RAYMOND VENDSEL Democrat",
+          "contest": "house",
+          "candidate": "RAYMOND VENDSEL",
+          "party": "Democrat"
+        },
+        {
+          "label": "Governor C. P. DAHL Republican",
+          "contest": "governor",
+          "candidate": "C. P. Dahl"
+        },
+        {
+          "label": "WILLIAM L. GUY Democrat",
+          "contest": "governor",
+          "candidate": "William L. Guy"
+        },
+        {
+          "label": "HERSCHEL LASHKOWITZ Independent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lieutenant Governor ORVILLE W. HAGEN Republican",
+          "contest": "lieutenant-governor",
+          "candidate": "ORVILLE W. HAGEN",
+          "party": "Republican"
+        },
+        {
+          "label": "LAVERN SCHOEDER Democrat",
+          "contest": "lieutenant-governor",
+          "candidate": "LAVERN SCHOEDER",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State BEN MEIER Republican",
+          "contest": "secretary-of-state",
+          "candidate": "BEN MEIER",
+          "party": "Republican"
+        },
+        {
+          "label": "LLOYD B OMDAHL Democrat",
+          "contest": "secretary-of-state",
+          "candidate": "LLOYD B OMDAHL",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor CURTIS OLSON Republican",
+          "contest": "auditor",
+          "candidate": "CURTIS OLSON",
+          "party": "Republican"
+        },
+        {
+          "label": "WELDON HAUGEN Democrat",
+          "contest": "auditor",
+          "candidate": "WELDON HAUGEN",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer JOHN R. ERICKSON Republican",
+          "contest": "treasurer",
+          "candidate": "JOHN R. ERICKSON",
+          "party": "Republican"
+        },
+        {
+          "label": "ALBERT HEIDE Democrat",
+          "contest": "treasurer",
+          "candidate": "ALBERT HEIDE",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General LESLIE R. BURGUM Republican",
+          "contest": "attorney-general",
+          "candidate": "LESLIE R. BURGUM",
+          "party": "Republican"
+        },
+        {
+          "label": "CHARLES MURPHY Democrat",
+          "contest": "attorney-general",
+          "candidate": "CHARLES MURPHY",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Insurance A. J. JENSEN Republican",
+          "contest": "insurance-commissioner",
+          "candidate": "A. J. JENSEN",
+          "party": "Republican"
+        },
+        {
+          "label": "DON SLOAN Democrat",
+          "contest": "insurance-commissioner",
+          "candidate": "DON SLOAN",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Agriculture & Labor MATH DAHL Republican",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "BRUCE HAGEN Democrat",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "BRUCE HAGEN",
+          "party": "Democrat"
+        },
+        {
+          "label": "Public Service Commissioner RICHARD J. THOMPSON Republican",
+          "contest": "public-service-commissioner",
+          "candidate": "RICHARD J. THOMPSON",
+          "party": "Republican"
+        },
+        {
+          "label": "RALPH DEWING Democrat",
+          "contest": "public-service-commissioner",
+          "candidate": "RALPH DEWING",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.21,
+        0.896,
+        0.814
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8, 1960'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2798
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court OBERT C. TEIGEN Regular Term No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ALVIN C. STRUTZ Unexpired Term No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction M. F. PETERSON No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. PETERSON",
+          "party": "No-Party"
+        },
+        {
+          "label": "Tax Commissioner J. ARTHUR ENGEN No-Party",
+          "contest": "tax-commissioner",
+          "candidate": "J. ARTHUR ENGEN",
+          "party": "No-Party"
+        },
+        {
+          "label": "JOHN LEIER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judges of District Court First ROY K. REDETZKE No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second ROLAND A. HERINGER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GLENN K. SWANSON No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Third CLIFFORD SCHNELLER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth M. C. FREDRICKS No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "THOMAS W. NIELSEN No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth EUGENE A. BURDICK No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth EMIL A. GIESE No-Party",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.131,
+        0.208,
+        0.468,
+        0.828
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8, 1960'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2984
+      ]
+    }
+  ]
+}

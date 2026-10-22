@@ -1,0 +1,537 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1944-11-07, General Election 11-07-1944",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1940%20through%201948%20Statewide%20Election%20Results/1944/General%20Election%2011-07-1944.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1944,
+      "chamber": "senate",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1944,
+      "chamber": "house",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1944,
+      "chamber": "governor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1944,
+      "chamber": "lieutenant-governor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1944,
+      "chamber": "secretary-of-state",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1944,
+      "chamber": "treasurer",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1944,
+      "chamber": "auditor",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1944,
+      "chamber": "attorney-general",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1944,
+      "chamber": "insurance-commissioner",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1944,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1944,
+      "chamber": "public-service-commissioner",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1944,
+      "chamber": "president",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1944,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1944,
+      "chamber": "tax-commissioner",
+      "day": "1944-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Total Number Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Senator GERALD P. NYE",
+          "contest": "senate",
+          "candidate": "Gerald P. Nye"
+        },
+        {
+          "label": "JOHN MOSES",
+          "contest": "senate",
+          "candidate": "John Moses"
+        },
+        {
+          "label": "BERNARD H. O'LAUGHLIN",
+          "contest": "senate",
+          "candidate": "Bernard J. O'Laughlin"
+        },
+        {
+          "label": "LYNN U. STAMBAUGH",
+          "contest": "house",
+          "candidate": "Lynn U. Stambaugh",
+          "party": ""
+        },
+        {
+          "label": "L. D. HARRIS",
+          "contest": "house",
+          "candidate": "L. D. Harris",
+          "party": ""
+        },
+        {
+          "label": "U.S. Representatives WILLIAM LEMKE",
+          "contest": "house",
+          "candidate": "William Lemke",
+          "party": ""
+        },
+        {
+          "label": "CHARLES R. ROBERTSON",
+          "contest": "house",
+          "candidate": "Charles R. Robertson",
+          "party": ""
+        },
+        {
+          "label": "HALVOR L. HALVORSON",
+          "contest": "house",
+          "candidate": "Halvor L. Halvorson",
+          "party": ""
+        },
+        {
+          "label": "J. R. KENNEDY",
+          "contest": "house",
+          "candidate": "J. R. Kennedy",
+          "party": ""
+        },
+        {
+          "label": "USHER L. BURDICK",
+          "contest": "house",
+          "candidate": "Usher L. Burdick",
+          "party": ""
+        },
+        {
+          "label": "GEO. McCLELLAN",
+          "contest": "house",
+          "candidate": "Geo. McClellan",
+          "party": ""
+        },
+        {
+          "label": "A. C. TOWNLEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Governor FRED G. AANDAHL",
+          "contest": "governor",
+          "candidate": "Fred G. Aandahl"
+        },
+        {
+          "label": "WILLIAM T. DEPUY",
+          "contest": "governor",
+          "candidate": "William T. DePuy"
+        },
+        {
+          "label": "ALVIN C. STRUTZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. M. WILEY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lieutenant Governor C. P. DAHL",
+          "contest": "lieutenant-governor",
+          "candidate": "C. P. Dahl",
+          "party": ""
+        },
+        {
+          "label": "S. B. HOCKING",
+          "contest": "lieutenant-governor",
+          "candidate": "S. B. Hocking",
+          "party": ""
+        },
+        {
+          "label": "OSCAR W. HAGEN",
+          "contest": "lieutenant-governor",
+          "candidate": "Oscar W. Hagen",
+          "party": ""
+        },
+        {
+          "label": "W. H. NORTHRUP",
+          "contest": "secretary-of-state",
+          "candidate": "W. H. Northrup",
+          "party": ""
+        },
+        {
+          "label": "Secretary of State THOMAS HALL",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": ""
+        },
+        {
+          "label": "CARL ANDERSON",
+          "contest": "treasurer",
+          "candidate": "Carl Anderson",
+          "party": ""
+        },
+        {
+          "label": "G. A. FORTHUN",
+          "contest": "auditor",
+          "candidate": "G. A. Forthun",
+          "party": ""
+        },
+        {
+          "label": "State Auditor BERTA E. BAKER",
+          "contest": "auditor",
+          "candidate": "Berta E. Baker",
+          "party": ""
+        },
+        {
+          "label": "ALICE D. WAGNER",
+          "contest": "auditor",
+          "candidate": "Alice D. Wagner",
+          "party": ""
+        },
+        {
+          "label": "State Treasurer OTTO KRUEGER",
+          "contest": "treasurer",
+          "candidate": "Otto Krueger",
+          "party": ""
+        },
+        {
+          "label": "JULIA M. LYNCH",
+          "contest": "treasurer",
+          "candidate": "Julia M. Lynch",
+          "party": ""
+        },
+        {
+          "label": "VIC GILBREATH",
+          "contest": "treasurer",
+          "candidate": "Vic Gilbreath",
+          "party": ""
+        },
+        {
+          "label": "KARL M. LUNDH",
+          "contest": "attorney-general",
+          "candidate": "Karl M. Lundh",
+          "party": ""
+        },
+        {
+          "label": "Attorney General NELS G. JOHNSON",
+          "contest": "attorney-general",
+          "candidate": "Nels G. Johnson",
+          "party": ""
+        },
+        {
+          "label": "JOHN A. LAYNE",
+          "contest": "attorney-general",
+          "candidate": "John A. Layne",
+          "party": ""
+        },
+        {
+          "label": "OLAF M. THORSEN",
+          "contest": "attorney-general",
+          "candidate": "Olaf M. Thorsen",
+          "party": ""
+        },
+        {
+          "label": "H. E. MIELKE",
+          "contest": "insurance-commissioner",
+          "candidate": "H. E. Mielke",
+          "party": ""
+        },
+        {
+          "label": "Commissioner of Insurance OSCAR E. ERICKSON",
+          "contest": "insurance-commissioner",
+          "candidate": "Oscar E. Erickson",
+          "party": ""
+        },
+        {
+          "label": "ED. P. COSGRIFF",
+          "contest": "insurance-commissioner",
+          "candidate": "Ed. P. Cosgriff",
+          "party": ""
+        },
+        {
+          "label": "O. R. VOLD",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "O. R. Vold",
+          "party": ""
+        },
+        {
+          "label": "Commr. Agric. & Labor MATH DAHL",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Math Dahl",
+          "party": ""
+        },
+        {
+          "label": "Public Service Commr. C. W. McDONNELL",
+          "contest": "public-service-commissioner",
+          "candidate": "C. W. McDonnell",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.017,
+        0.221,
+        0.993,
+        0.52
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF CONSOLIDATED BALLOT VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 7, 1944'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Total Number Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Vote",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dewey - Stina Kjos, Mrs. C. F. Sweet, Gilmore Berge, Mrs. McKinley Nelson",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "Roosevelt - W. H. Walton, Leslie R. Burgum, Joseph Lynch, Nick Nelson",
+          "contest": "president",
+          "candidate": "Franklin D. Roosevelt (Democratic)"
+        },
+        {
+          "label": "Watson - S. G. Samuelson, D. L. Draper, Clarence Miller, C. H. Cottam",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas - Mrs. Fred Becker, Thelma Bowen, Lillian E. Lee, Lorraine Smith",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.667,
+        0.284,
+        0.968,
+        0.564
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Supreme Court Judge - JAMES MORRIS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction - NORMAN G. JENSEN",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Norman G. Jensen",
+          "party": ""
+        },
+        {
+          "label": "ARTHUR E. THOMPSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "State Tax Commissioner - JOHN GRAY",
+          "contest": "tax-commissioner",
+          "candidate": "John Gray",
+          "party": ""
+        },
+        {
+          "label": "NELS P. NOBEN",
+          "contest": "tax-commissioner",
+          "candidate": "Nels P. Noben",
+          "party": ""
+        },
+        {
+          "label": "Constitutional Amendments - Legislative Pay YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Legislative Pay NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Municipal Liquor Stores YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Municipal Liquor Stores NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measures - Financing of Highway Construction YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Financing of Highway Construction NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Restriction Sale of Liquor YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Restriction Sale of Liquor NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "County Judges - M. J. ENGLERT First District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. W. BUTTZ Second District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EUGENE F. COYNE Third District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRED JANSONIUS Fourth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. J. GRONNA Fifth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. C. BRODERICK Sixth District",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.085,
+        0.294,
+        0.549,
+        0.582
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO-PARTY VOTES AND VOTES ON MEASURES CAST AT THE GENERAL ELECTION ON NOVEMBER 7, 1944'; ignore any other table visible in the image."
+    }
+  ]
+}

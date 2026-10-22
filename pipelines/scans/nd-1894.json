@@ -1,0 +1,88 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1894-11-06, Congressman and Governor 1894",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1890%20through%201898%20Statewide%20Election%20Results/1894/Congressman%20and%20Governor%201894.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1894,
+      "chamber": "house",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1894,
+      "chamber": "governor",
+      "day": "1894-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Johnson R",
+          "contest": "house",
+          "candidate": "Johnson",
+          "party": "R"
+        },
+        {
+          "label": "Muir Pop",
+          "contest": "house",
+          "candidate": "Muir",
+          "party": "Pop"
+        },
+        {
+          "label": "Ellis Pro",
+          "contest": "house",
+          "candidate": "Ellis",
+          "party": "Pro"
+        },
+        {
+          "label": "Reeve Ind",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Allen R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kinter D",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wallace Pop",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.089,
+        0.144,
+        0.78,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMAN AND GOVERNOR, 1894.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.375
+      ]
+    }
+  ]
+}

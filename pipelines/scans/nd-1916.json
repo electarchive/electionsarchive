@@ -1,0 +1,650 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1916-11-07, General Election 11-07-1916",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1910%20through%201919%20Statewide%20Election%20Results/1916/General%20Election%2011-07-1916.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1916,
+      "chamber": "senate",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "governor": {
+      "year": 1916,
+      "chamber": "governor",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1916,
+      "chamber": "lieutenant-governor",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1916,
+      "chamber": "secretary-of-state",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1916,
+      "chamber": "auditor",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1916,
+      "chamber": "treasurer",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1916,
+      "chamber": "attorney-general",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1916,
+      "chamber": "insurance-commissioner",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1916,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1916,
+      "chamber": "railroad-commissioner",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1916,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1916,
+      "chamber": "president",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house1": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": 1
+    },
+    "house2": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": 2
+    },
+    "house3": {
+      "year": 1916,
+      "chamber": "house",
+      "day": "1916-11-07",
+      "special": false,
+      "state": "ND",
+      "district": 3
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Porter J. McCumber, R.",
+          "contest": "senate",
+          "candidate": "Porter James McCumber"
+        },
+        {
+          "label": "John Burke, D.",
+          "contest": "senate",
+          "candidate": "John Burke"
+        },
+        {
+          "label": "E. R. Fry, S.",
+          "contest": "senate",
+          "candidate": "E. R. Fry"
+        },
+        {
+          "label": "Lynn J. Frazier, E.",
+          "contest": "governor",
+          "candidate": "Lynn J. Frazier"
+        },
+        {
+          "label": "D. H. McArthur, D.",
+          "contest": "governor",
+          "candidate": "D. H. McArthur"
+        },
+        {
+          "label": "Oscar A. Johnson, S.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. T. Kraebel, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "A. T. Kraebel",
+          "party": "R"
+        },
+        {
+          "label": "M. J. Kitzman, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "M. J. Kitzman",
+          "party": "D"
+        },
+        {
+          "label": "John Fleckten, S.",
+          "contest": "lieutenant-governor",
+          "candidate": "John Fleckten",
+          "party": "S"
+        },
+        {
+          "label": "Thomas Hall, E.",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": "E"
+        },
+        {
+          "label": "William Olson, D.",
+          "contest": "secretary-of-state",
+          "candidate": "William Olson",
+          "party": "D"
+        },
+        {
+          "label": "H. E. Martinson, S.",
+          "contest": "secretary-of-state",
+          "candidate": "H. E. Martinson",
+          "party": "S"
+        },
+        {
+          "label": "Carl E. Kositzky, R.",
+          "contest": "auditor",
+          "candidate": "Carl E. Kositzky",
+          "party": "R"
+        },
+        {
+          "label": "G. I. Solum, D.",
+          "contest": "auditor",
+          "candidate": "G. I. Solum",
+          "party": "D"
+        },
+        {
+          "label": "John W. Clark, S.",
+          "contest": "auditor",
+          "candidate": "John W. Clark",
+          "party": "S"
+        },
+        {
+          "label": "John Steen, R.",
+          "contest": "treasurer",
+          "candidate": "John Steen",
+          "party": "R"
+        },
+        {
+          "label": "P. M. Casey, D.",
+          "contest": "treasurer",
+          "candidate": "P. M. Casey",
+          "party": "D"
+        },
+        {
+          "label": "O. E. Lofthus, S.",
+          "contest": "treasurer",
+          "candidate": "O. E. Lofthus",
+          "party": "S"
+        },
+        {
+          "label": "William Langer, R.",
+          "contest": "attorney-general",
+          "candidate": "William Langer",
+          "party": "R"
+        },
+        {
+          "label": "G. S. Wooledge, D.",
+          "contest": "attorney-general",
+          "candidate": "G. S. Wooledge",
+          "party": "D"
+        },
+        {
+          "label": "E. Goer, S.",
+          "contest": "attorney-general",
+          "candidate": "E. Goer",
+          "party": "S"
+        },
+        {
+          "label": "A. S. Olsness, R.",
+          "contest": "insurance-commissioner",
+          "candidate": "A. S. Olsness",
+          "party": "R"
+        },
+        {
+          "label": "Denis M. Lynch, D.",
+          "contest": "insurance-commissioner",
+          "candidate": "Denis M. Lynch",
+          "party": "D"
+        },
+        {
+          "label": "James Maloney, S.",
+          "contest": "insurance-commissioner",
+          "candidate": "James Maloney",
+          "party": "S"
+        },
+        {
+          "label": "John N. Hagan, R.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "John N. Hagan",
+          "party": "R"
+        },
+        {
+          "label": "John Harvey, D.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "John Harvey",
+          "party": "D"
+        },
+        {
+          "label": "L. Knoke, S.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "L. Knoke",
+          "party": "S"
+        },
+        {
+          "label": "S. J. Aandahl, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "S. J. Aandahl",
+          "party": "R"
+        },
+        {
+          "label": "Charles W. Bleick, E.",
+          "contest": "railroad-commissioner",
+          "candidate": "Charles W. Bleick",
+          "party": "E"
+        },
+        {
+          "label": "M. P. Johnson, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "M. P. Johnson",
+          "party": "R"
+        },
+        {
+          "label": "F. Brockhoff, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "F. Brockhoff",
+          "party": "D"
+        },
+        {
+          "label": "Charles Hein, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "Charles Hein",
+          "party": "D"
+        },
+        {
+          "label": "Martin C. Murphy, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "Martin C. Murphy",
+          "party": "D"
+        },
+        {
+          "label": "George S. Kirkpatrick, S.",
+          "contest": "railroad-commissioner",
+          "candidate": "George S. Kirkpatrick",
+          "party": "S"
+        },
+        {
+          "label": "Carl J. Knutson, S.",
+          "contest": "railroad-commissioner",
+          "candidate": "Carl J. Knutson",
+          "party": "S"
+        },
+        {
+          "label": "Jas. Murphy, S.",
+          "contest": "railroad-commissioner",
+          "candidate": "Jas. Murphy",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.139,
+        0.559,
+        0.455
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION, NOVEMBER 7, 1916'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Luther E. Birdzell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. T. Burke",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chas. J. Fisk",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. R. Grace",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. E. Robinson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Burleigh F. Spalding",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. E. Hoover",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "W. E. Hoover",
+          "party": ""
+        },
+        {
+          "label": "N. C. Macdonald",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "N. C. Macdonald",
+          "party": ""
+        },
+        {
+          "label": "A. B. Cox",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "F. M. Jackson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. E. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. Nelson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John H. Werner",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George A. Gilmore",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "David J. Gorman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John Mahon",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Samuel L. Nuchols",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John A. Wright",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "N. H. Bjornstad",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. T. Hegreberg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. G. Johnson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T. L. Potts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Otto O. Solberg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. S. Walter",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George Lippman",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. P. Massuers",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. P. Shively",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "E. Saunders",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Sec. 216 Dickinson Normal School Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Sec. 216 Dickinson Normal School No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Sec. 216 Second Hospital for Insane Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Amendment Sec. 216 Second Hospital for Insane No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Referendum Repeal of Mill Tax for Terminal Elevators Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Referendum Repeal of Mill Tax for Terminal Elevators No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Referendum Definition of Crime of Bootlegging Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Referendum Definition of Crime of Bootlegging No",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.095,
+        0.16,
+        0.866,
+        0.504
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION NOVEMBER 7, 1916 (Continued)'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "H. T. Helgesen, R.",
+          "contest": "house1",
+          "candidate": "Henry Thomas Helgesen"
+        },
+        {
+          "label": "George A. Bangs, D.",
+          "contest": "house1",
+          "candidate": "George A Bangs"
+        },
+        {
+          "label": "V. Gram, S.",
+          "contest": "house1",
+          "candidate": "V Gram"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.08,
+        0.396,
+        0.222
+      ],
+      "hint": "Read only the table headed 'FIRST CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-1",
+      "columns": [
+        {
+          "label": "Geo. M. Young, R.",
+          "contest": "house2",
+          "candidate": "George Morley Young"
+        },
+        {
+          "label": "Hugh McDonald, D.",
+          "contest": "house2",
+          "candidate": "Hugh McDonald"
+        },
+        {
+          "label": "Samuel O. Olson, S.",
+          "contest": "house2",
+          "candidate": "Samuel O Olson"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.214,
+        0.396,
+        0.393
+      ],
+      "hint": "Read only the table headed 'SECOND CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-2",
+      "columns": [
+        {
+          "label": "P. D. Norton, R.",
+          "contest": "house3",
+          "candidate": "Patrick Daniel Norton"
+        },
+        {
+          "label": "Charles Simon, D.",
+          "contest": "house3",
+          "candidate": "Charles Simon"
+        },
+        {
+          "label": "Anton Klemmens, S.",
+          "contest": "house3",
+          "candidate": "Anton Klemmens"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.187,
+        0.385,
+        0.396,
+        0.567
+      ],
+      "hint": "Read only the table headed 'THIRD CONGRESSIONAL DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

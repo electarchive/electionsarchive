@@ -1,0 +1,498 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1968-11-05, General Election 11-05-1968",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1960%20through%201968%20Statewide%20Election%20Results/1968/General%20Election%2011-05-1968.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1968,
+      "chamber": "president",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1968,
+      "chamber": "senate",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1968,
+      "chamber": "governor",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1968,
+      "chamber": "lieutenant-governor",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1968,
+      "chamber": "secretary-of-state",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1968,
+      "chamber": "auditor",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1968,
+      "chamber": "treasurer",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1968,
+      "chamber": "attorney-general",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1968,
+      "chamber": "insurance-commissioner",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1968,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1968,
+      "chamber": "public-service-commissioner",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1968,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1968,
+      "chamber": "tax-commissioner",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nixon Rep. A. W. Luick, Charles Harris, Brooks Keogh, Max Wishek",
+          "contest": "president",
+          "candidate": "Richard Nixon (Republican)"
+        },
+        {
+          "label": "Humphrey Dem. James R. Jungroth, Chester Rue, Joyce Conrad, Ellen Austin",
+          "contest": "president",
+          "candidate": "Hubert H. Humphrey (Democratic)"
+        },
+        {
+          "label": "Wallace Ind. Mark Moore, William J. Shide, Robert J. Piton, Norman L. Jacobsen",
+          "contest": "president",
+          "candidate": "George Wallace (American Independent)"
+        },
+        {
+          "label": "Halstead Ind. Joan Primeau, Frances Wilson, Fred E. Schmidt, Oliver Rosenberg",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Munn, Sr. Ind. Mrs. A. C. Malin, Earl C. Oderman, Robert M. Osborn, Mrs. Henry E. Nelson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Troxell Ind. Henry Luehr, Ferdinand A. Zirbel, Herman Retzlaff Jr., George A. Berge",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Milton R. Young Rep.",
+          "contest": "senate",
+          "candidate": "Milton R. Young"
+        },
+        {
+          "label": "Herschel Lashkowitz Dem.",
+          "contest": "senate",
+          "candidate": "Herschel Lashkowitz"
+        },
+        {
+          "label": "Duane Mutch TRT Taxpayers Ticket Ind.",
+          "contest": "senate",
+          "candidate": "Duane Mutch"
+        },
+        {
+          "label": "Mark Andrews Rep.",
+          "contest": "house",
+          "candidate": "Mark Andrews",
+          "party": "Rep."
+        },
+        {
+          "label": "Bruce Hagen Dem",
+          "contest": "house",
+          "candidate": "Bruce Hagen",
+          "party": "Dem."
+        },
+        {
+          "label": "Rosemary M. Landsberger TRT Taxpayers Ticket Ind.",
+          "contest": "house",
+          "candidate": "Rosemary M. Landsberger",
+          "party": "Ind."
+        },
+        {
+          "label": "Thomas S. Kleppe Rep.",
+          "contest": "house",
+          "candidate": "Thomas S. Kleppe",
+          "party": "Rep."
+        },
+        {
+          "label": "Rolland Redlin Dem",
+          "contest": "house",
+          "candidate": "Rolland Redlin",
+          "party": "Dem."
+        },
+        {
+          "label": "Russell Kleppe TRT Taxpayers Ticket Ind.",
+          "contest": "house",
+          "candidate": "Russell Kleppe",
+          "party": "Ind."
+        },
+        {
+          "label": "Robert P. McCarney Rep.",
+          "contest": "governor",
+          "candidate": "Robert P. McCarney"
+        },
+        {
+          "label": "William L. Guy Dem.",
+          "contest": "governor",
+          "candidate": "William L. Guy"
+        },
+        {
+          "label": "Leo B. Landsberger TRT Taxpayers Ticket Ind.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard F. Larsen Rep.",
+          "contest": "lieutenant-governor",
+          "candidate": "Richard F. Larsen",
+          "party": "Rep."
+        },
+        {
+          "label": "Charles Tighe Dem.",
+          "contest": "lieutenant-governor",
+          "candidate": "Charles Tighe",
+          "party": "Dem."
+        },
+        {
+          "label": "Arthur G. Bilden TRT Taxpayers Ticket Ind.",
+          "contest": "lieutenant-governor",
+          "candidate": "Arthur G. Bilden",
+          "party": "Ind."
+        },
+        {
+          "label": "Ben Meier Rep.",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Meier",
+          "party": "Rep."
+        },
+        {
+          "label": "Clara Wheelihan Dem.",
+          "contest": "secretary-of-state",
+          "candidate": "Clara Wheelihan",
+          "party": "Dem."
+        },
+        {
+          "label": "Vaughn Braddock TRT Taxpayers Ticket Ind.",
+          "contest": "secretary-of-state",
+          "candidate": "Vaughn Braddock",
+          "party": "Ind."
+        },
+        {
+          "label": "Curtis Olson Rep.",
+          "contest": "auditor",
+          "candidate": "Curtis Olson",
+          "party": "Rep."
+        },
+        {
+          "label": "Orlando (Duke) Ellingson Dem.",
+          "contest": "auditor",
+          "candidate": "Orlando (Duke) Ellingson",
+          "party": "Dem."
+        },
+        {
+          "label": "James Ueckert TRT Taxpayers Ticket Ind.",
+          "contest": "auditor",
+          "candidate": "James Ueckert",
+          "party": "Ind."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.037,
+        0.144,
+        0.886,
+        0.759
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 5, 1968'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3138
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Bernice Asbridge Rep.",
+          "contest": "treasurer",
+          "candidate": "Bernice Asbridge",
+          "party": "Republican"
+        },
+        {
+          "label": "Walter Christensen Dem.",
+          "contest": "treasurer",
+          "candidate": "Walter Christensen",
+          "party": "Democratic"
+        },
+        {
+          "label": "A. L. Buck \"TRT Taxpayers Ticket\" Ind.",
+          "contest": "treasurer",
+          "candidate": "A. L. Buck",
+          "party": "Independent"
+        },
+        {
+          "label": "Helgi Johannesson Rep.",
+          "contest": "attorney-general",
+          "candidate": "Helgi Johannesson",
+          "party": "Republican"
+        },
+        {
+          "label": "Tom Burgum Dem.",
+          "contest": "attorney-general",
+          "candidate": "Tom Burgum",
+          "party": "Democratic"
+        },
+        {
+          "label": "Jorris O Wigen Rep.",
+          "contest": "insurance-commissioner",
+          "candidate": "Jorris O Wigen",
+          "party": "Republican"
+        },
+        {
+          "label": "K. O. (Kelly) Nygaard Dem.",
+          "contest": "insurance-commissioner",
+          "candidate": "K. O. (Kelly) Nygaard",
+          "party": "Democratic"
+        },
+        {
+          "label": "William B. (Bill) Baker \"TRT Taxpayers Ticket\" Ind.",
+          "contest": "insurance-commissioner",
+          "candidate": "William B. Baker",
+          "party": "Independent"
+        },
+        {
+          "label": "Arne Dahl Rep.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Arne Dahl",
+          "party": "Republican"
+        },
+        {
+          "label": "Russell Belquist Dem.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Russell Belquist",
+          "party": "Democratic"
+        },
+        {
+          "label": "James N. Kent \"TRT Taxpayers Ticket\" Ind.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "James N. Kent",
+          "party": "Independent"
+        },
+        {
+          "label": "Ben J. Wolf Rep.",
+          "contest": "public-service-commissioner",
+          "candidate": "Ben J. Wolf",
+          "party": "Republican"
+        },
+        {
+          "label": "Earl Anderson Dem.",
+          "contest": "public-service-commissioner",
+          "candidate": "Earl Anderson",
+          "party": "Democratic"
+        },
+        {
+          "label": "Donald S. Omdahl \"TRT Taxpayers Ticket\" Ind.",
+          "contest": "public-service-commissioner",
+          "candidate": "Donald S. Omdahl",
+          "party": "Independent"
+        },
+        {
+          "label": "Alvin C. Strutz",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Karl Gustav Maurer",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Karl Gustav Maurer",
+          "party": ""
+        },
+        {
+          "label": "M. F. Peterson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. Peterson",
+          "party": ""
+        },
+        {
+          "label": "Dean Miller",
+          "contest": "tax-commissioner",
+          "candidate": "Dean Miller",
+          "party": ""
+        },
+        {
+          "label": "Edwin Sjaastad",
+          "contest": "tax-commissioner",
+          "candidate": "Edwin Sjaastad",
+          "party": ""
+        },
+        {
+          "label": "A. C. Bakken",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hamilton E. Englert",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ralph B. Maxwell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Douglas B. Heen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Adam Gefreh",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clifford Jansonius",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Eugene Coyne",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Boy A. Ilvedson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. F. Kelsch",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lyle G. Stuart",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.135,
+        0.896,
+        0.751
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 5, 1968'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3084
+      ]
+    }
+  ]
+}

@@ -1,0 +1,93 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1900-11-06, President, Congressman and Governor 1900",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1900%20through%201908%20Statewide%20Election%20Results/1900/President,%20Congressman%20and%20Governor%201900.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1900,
+      "chamber": "president",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1900,
+      "chamber": "house",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1900,
+      "chamber": "governor",
+      "day": "1900-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "McKinley .. R",
+          "contest": "president",
+          "candidate": "William McKinley (Republican)"
+        },
+        {
+          "label": "Bryan D",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Marshall ... R",
+          "contest": "house",
+          "candidate": "Marshall",
+          "party": "R"
+        },
+        {
+          "label": "Hildreth ... D",
+          "contest": "house",
+          "candidate": "Hildreth",
+          "party": "D"
+        },
+        {
+          "label": "White R",
+          "contest": "governor",
+          "candidate": "White",
+          "party": "R"
+        },
+        {
+          "label": "Wipperman ..D",
+          "contest": "governor",
+          "candidate": "Wipperman",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.142,
+        0.153,
+        0.83,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR PRESIDENT, CONGRESSMAN AND GOVERNOR, 1900.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4002
+      ]
+    }
+  ]
+}

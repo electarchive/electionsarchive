@@ -1,0 +1,383 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1932-11-08, General Election 11-08-1932",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1930%20through%201939%20Statewide%20Election%20Results/1932/General%20Election%2011-08-1932.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1932,
+      "chamber": "president",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1932,
+      "chamber": "senate",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1932,
+      "chamber": "house",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1932,
+      "chamber": "governor",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1932,
+      "chamber": "lieutenant-governor",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1932,
+      "chamber": "secretary-of-state",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1932,
+      "chamber": "auditor",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1932,
+      "chamber": "treasurer",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1932,
+      "chamber": "attorney-general",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1932,
+      "chamber": "insurance-commissioner",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1932,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1932,
+      "chamber": "railroad-commissioner",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1932,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1932-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Hoover (E. H. Brant, Anne A. Cary, Nels Magnuson, P. D. Morton)",
+          "contest": "president",
+          "candidate": "Hoover (Republican)"
+        },
+        {
+          "label": "Roosevelt (Pierce Blewett, P. H. Costello, W. D. Lynch, W. H. Porter)",
+          "contest": "president",
+          "candidate": "Roosevelt (Democratic)"
+        },
+        {
+          "label": "Foster (Louis Tveidt, Pete Barry, Charles Hill, LeRoy Gilbertson)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harvey (J. H. Ulvan, Wm. Tallackson, C. C. Hibbs, George Medley)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas (William Ballou, Lloyd B. Monson, H. A. Morris, Alex DeGroot)",
+          "contest": "president",
+          "candidate": "Thomas (Socialist)"
+        },
+        {
+          "label": "Gerald P. Nye (R)",
+          "contest": "senate",
+          "candidate": "Gerald P. Nye"
+        },
+        {
+          "label": "P. W. Lanier (D)",
+          "contest": "senate",
+          "candidate": "P. W. Lanier"
+        },
+        {
+          "label": "Frank Witty (I)",
+          "contest": "senate",
+          "candidate": "Frank Witty"
+        },
+        {
+          "label": "Wm. Lemke (R)",
+          "contest": "house",
+          "candidate": "Wm. Lemke",
+          "party": "R"
+        },
+        {
+          "label": "J. H. Sinclair (R)",
+          "contest": "house",
+          "candidate": "J. H. Sinclair",
+          "party": "R"
+        },
+        {
+          "label": "W. D. Lynch (D)",
+          "contest": "house",
+          "candidate": "W. D. Lynch",
+          "party": "D"
+        },
+        {
+          "label": "R. B. Murphy (D)",
+          "contest": "house",
+          "candidate": "R. B. Murphy",
+          "party": "D"
+        },
+        {
+          "label": "Pat J. Barrett (I)",
+          "contest": "house",
+          "candidate": "Pat J. Barrett",
+          "party": "I"
+        },
+        {
+          "label": "Ella Reeve Bloor (I)",
+          "contest": "house",
+          "candidate": "Ella Reeve Bloor",
+          "party": "I"
+        },
+        {
+          "label": "William Langer (R)",
+          "contest": "governor",
+          "candidate": "William Langer"
+        },
+        {
+          "label": "Herbert C. DePuy (D)",
+          "contest": "governor",
+          "candidate": "Herbert C. Depuy"
+        },
+        {
+          "label": "Andrew Omholt (I)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. H. Olson (R)",
+          "contest": "lieutenant-governor",
+          "candidate": "O. H. Olson",
+          "party": "R"
+        },
+        {
+          "label": "R. A. Johnson (D)",
+          "contest": "lieutenant-governor",
+          "candidate": "R. A. Johnson",
+          "party": "D"
+        },
+        {
+          "label": "B. J. Helland (I)",
+          "contest": "lieutenant-governor",
+          "candidate": "B. J. Helland",
+          "party": "I"
+        },
+        {
+          "label": "Robert Byrne (R)",
+          "contest": "secretary-of-state",
+          "candidate": "Robert Byrne",
+          "party": "R"
+        },
+        {
+          "label": "Stanley F. Casey (D)",
+          "contest": "secretary-of-state",
+          "candidate": "Stanley F. Casey",
+          "party": "D"
+        },
+        {
+          "label": "Roy W. Dalziel (I)",
+          "contest": "secretary-of-state",
+          "candidate": "Roy W. Dalziel",
+          "party": "I"
+        },
+        {
+          "label": "Berta B. Baker (R)",
+          "contest": "auditor",
+          "candidate": "Berta B. Baker",
+          "party": "R"
+        },
+        {
+          "label": "Grace Hoopes (D)",
+          "contest": "auditor",
+          "candidate": "Grace Hoopes",
+          "party": "D"
+        },
+        {
+          "label": "Alfred S. Dale (R)",
+          "contest": "treasurer",
+          "candidate": "Alfred S. Dale",
+          "party": "R"
+        },
+        {
+          "label": "William M. Schantz (D)",
+          "contest": "treasurer",
+          "candidate": "William M. Schantz",
+          "party": "D"
+        },
+        {
+          "label": "A. J. Gronna (R)",
+          "contest": "attorney-general",
+          "candidate": "A. J. Gronna",
+          "party": "R"
+        },
+        {
+          "label": "Scott Cameron (D)",
+          "contest": "attorney-general",
+          "candidate": "Scott Cameron",
+          "party": "D"
+        },
+        {
+          "label": "K. P. Loesch (I)",
+          "contest": "attorney-general",
+          "candidate": "K. P. Loesch",
+          "party": "I"
+        },
+        {
+          "label": "S. A. Olsness (R)",
+          "contest": "insurance-commissioner",
+          "candidate": "S. A. Olsness",
+          "party": "R"
+        },
+        {
+          "label": "Perry R. Benner (D)",
+          "contest": "insurance-commissioner",
+          "candidate": "Perry R. Benner",
+          "party": "D"
+        },
+        {
+          "label": "John Husby (R)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "John Husby",
+          "party": "R"
+        },
+        {
+          "label": "John Magill (D)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "John Magill",
+          "party": "D"
+        },
+        {
+          "label": "Ben C. Larkin (R)",
+          "contest": "railroad-commissioner",
+          "candidate": "Ben C. Larkin",
+          "party": "R"
+        },
+        {
+          "label": "Arthur L. Chapman (D)",
+          "contest": "railroad-commissioner",
+          "candidate": "Arthur L. Chapman",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.079,
+        0.229,
+        0.941,
+        0.774
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 8th, 1932'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3138
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "A. M. Christianson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bertha R. Palmer",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Bertha R. Palmer",
+          "party": ""
+        },
+        {
+          "label": "Arthur E. Thompson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Arthur E. Thompson",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.225,
+        0.127,
+        0.375,
+        0.471
+      ],
+      "hint": "Read only the table headed 'Judge Supreme Court / Superintendent of Public Instruction'; ignore any other table visible in the image."
+    }
+  ]
+}

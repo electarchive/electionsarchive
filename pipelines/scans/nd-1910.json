@@ -1,0 +1,469 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1910-11-08, General Election 1910",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1910%20through%201919%20Statewide%20Election%20Results/1910/General%20Election%201910.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1910,
+      "chamber": "house",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1910,
+      "chamber": "governor",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1910,
+      "chamber": "lieutenant-governor",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1910,
+      "chamber": "secretary-of-state",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1910,
+      "chamber": "auditor",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1910,
+      "chamber": "treasurer",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1910,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1910,
+      "chamber": "attorney-general",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1910,
+      "chamber": "insurance-commissioner",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1910,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1910,
+      "chamber": "railroad-commissioner",
+      "day": "1910-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "L. B. Hanna R",
+          "contest": "house",
+          "candidate": "L. B. Hanna",
+          "party": "R"
+        },
+        {
+          "label": "H. T. Helgesen R",
+          "contest": "house",
+          "candidate": "H. T. Helgesen",
+          "party": "R"
+        },
+        {
+          "label": "Tobias D. Casey D",
+          "contest": "house",
+          "candidate": "Tobias D. Casey",
+          "party": "D"
+        },
+        {
+          "label": "M. A. Hildreth D",
+          "contest": "house",
+          "candidate": "M. A. Hildreth",
+          "party": "D"
+        },
+        {
+          "label": "Arthur Hagendorf S",
+          "contest": "house",
+          "candidate": "Arthur Hagendorf",
+          "party": "S"
+        },
+        {
+          "label": "N. H. Bjornstead S",
+          "contest": "house",
+          "candidate": "N. H. Bjornstead",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.168,
+        0.85,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF NORTH DAKOTA, 1910. REPRESENTATIVES IN CONGRESS.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3173
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "C. A. Johnson ..R",
+          "contest": "governor",
+          "candidate": "C. A. Johnson"
+        },
+        {
+          "label": "John Burke D",
+          "contest": "governor",
+          "candidate": "John Burke"
+        },
+        {
+          "label": "I. S. Lampman..S",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "U. L. Burdick...R",
+          "contest": "lieutenant-governor",
+          "candidate": "U. L. Burdick",
+          "party": "R"
+        },
+        {
+          "label": "W. L. Richards..D",
+          "contest": "lieutenant-governor",
+          "candidate": "W. L. Richards",
+          "party": "D"
+        },
+        {
+          "label": "J. E. Kulstad....S",
+          "contest": "lieutenant-governor",
+          "candidate": "J. E. Kulstad",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.175,
+        0.176,
+        0.858,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1910\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3665
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "P. D. Norton R",
+          "contest": "secretary-of-state",
+          "candidate": "P. D. Norton",
+          "party": "R"
+        },
+        {
+          "label": "W. F. Robertson D",
+          "contest": "secretary-of-state",
+          "candidate": "W. F. Robertson",
+          "party": "D"
+        },
+        {
+          "label": "G. A. Esval S",
+          "contest": "secretary-of-state",
+          "candidate": "G. A. Esval",
+          "party": "S"
+        },
+        {
+          "label": "D. K. Brightbill R",
+          "contest": "auditor",
+          "candidate": "D. K. Brightbill",
+          "party": "R"
+        },
+        {
+          "label": "Peter G. Rooks D",
+          "contest": "auditor",
+          "candidate": "Peter G. Rooks",
+          "party": "D"
+        },
+        {
+          "label": "Jos. Scholleart S",
+          "contest": "auditor",
+          "candidate": "Jos. Scholleart",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.162,
+        0.175,
+        0.848,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1910\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3673
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "Gunder Olson ..R",
+          "contest": "treasurer",
+          "candidate": "Gunder Olson",
+          "party": "R"
+        },
+        {
+          "label": "H. L. Halvorson D",
+          "contest": "treasurer",
+          "candidate": "H. L. Halvorson",
+          "party": "D"
+        },
+        {
+          "label": "M. C. Wartenbe S",
+          "contest": "treasurer",
+          "candidate": "M. C. Wartenbe",
+          "party": "S"
+        },
+        {
+          "label": "Edwin J. Taylor R",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Edwin J. Taylor",
+          "party": "R"
+        },
+        {
+          "label": "Mrs. E. C. Paine S",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Mrs. E. C. Paine",
+          "party": "S"
+        },
+        {
+          "label": "Andrew Miller ..R",
+          "contest": "attorney-general",
+          "candidate": "Andrew Miller",
+          "party": "R"
+        },
+        {
+          "label": "S. L. Nuchols...D",
+          "contest": "attorney-general",
+          "candidate": "S. L. Nuchols",
+          "party": "D"
+        },
+        {
+          "label": "Arthur LeSueur, S",
+          "contest": "attorney-general",
+          "candidate": "Arthur LeSueur",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.185,
+        0.846,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1910\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3644
+      ]
+    },
+    {
+      "page": 5,
+      "id": "5-0",
+      "columns": [
+        {
+          "label": "Walter C. Taylor R",
+          "contest": "insurance-commissioner",
+          "candidate": "Walter C. Taylor",
+          "party": "R"
+        },
+        {
+          "label": "C. S. Whittlesey D",
+          "contest": "insurance-commissioner",
+          "candidate": "C. S. Whittlesey",
+          "party": "D"
+        },
+        {
+          "label": "C. W. Maude...S",
+          "contest": "insurance-commissioner",
+          "candidate": "C. W. Maude",
+          "party": "S"
+        },
+        {
+          "label": "W. C. Gilbreath.R",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "W. C. Gilbreath",
+          "party": "R"
+        },
+        {
+          "label": "Alex Morrison ..D",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Alex Morrison",
+          "party": "D"
+        },
+        {
+          "label": "E. A. Meyer S",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "E. A. Meyer",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.189,
+        0.183,
+        0.874,
+        0.991
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1910\u2014Continued'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3651
+      ]
+    },
+    {
+      "page": 6,
+      "id": "6-0",
+      "columns": [
+        {
+          "label": "O. P. N. Anderson R",
+          "contest": "railroad-commissioner",
+          "candidate": "O. P. N. Anderson",
+          "party": "R"
+        },
+        {
+          "label": "W. H. Maun R",
+          "contest": "railroad-commissioner",
+          "candidate": "W. H. Maun",
+          "party": "R"
+        },
+        {
+          "label": "W. H. Stutsman R",
+          "contest": "railroad-commissioner",
+          "candidate": "W. H. Stutsman",
+          "party": "R"
+        },
+        {
+          "label": "J. I. Hanson R",
+          "contest": "railroad-commissioner",
+          "candidate": "J. I. Hanson",
+          "party": "R"
+        },
+        {
+          "label": "Geo. L. Mateer D",
+          "contest": "railroad-commissioner",
+          "candidate": "Geo. L. Mateer",
+          "party": "D"
+        },
+        {
+          "label": "F. L. Walker S",
+          "contest": "railroad-commissioner",
+          "candidate": "F. L. Walker",
+          "party": "S"
+        },
+        {
+          "label": "S. A. Johnson S",
+          "contest": "railroad-commissioner",
+          "candidate": "S. A. Johnson",
+          "party": "S"
+        },
+        {
+          "label": "William Tarns S",
+          "contest": "railroad-commissioner",
+          "candidate": "William Tarns",
+          "party": "S"
+        },
+        {
+          "label": "H. N. Fisher S",
+          "contest": "railroad-commissioner",
+          "candidate": "H. N. Fisher",
+          "party": "S"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.159,
+        0.131,
+        0.843,
+        0.934
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1910.\u2014Continued. COMMISSIONERS OF RAILROADS.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2229
+      ]
+    }
+  ]
+}

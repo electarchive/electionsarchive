@@ -1,0 +1,78 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1892-11-08, Congressman and Governor 1892",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1890%20through%201898%20Statewide%20Election%20Results/1892/Congressman%20and%20Governor%201892.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1892,
+      "chamber": "house",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1892,
+      "chamber": "governor",
+      "day": "1892-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Johnson R",
+          "contest": "house",
+          "candidate": "Johnson",
+          "party": "R"
+        },
+        {
+          "label": "O'Brien D",
+          "contest": "house",
+          "candidate": "O'Brien",
+          "party": "D"
+        },
+        {
+          "label": "Foss Fus",
+          "contest": "house",
+          "candidate": "Foss",
+          "party": "Fus"
+        },
+        {
+          "label": "Burke R",
+          "contest": "governor",
+          "candidate": "Andrew H. Burke"
+        },
+        {
+          "label": "Shortridge Fus",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.164,
+        0.171,
+        0.848,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMAN AND GOVERNOR, 1892.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3884
+      ]
+    }
+  ]
+}

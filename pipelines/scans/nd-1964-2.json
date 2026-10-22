@@ -1,0 +1,170 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1964-11-03, General Election 11-03-1964 (Page 2)",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1960%20through%201968%20Statewide%20Election%20Results/1964/General%20Election%2011-03-1964%20(Page%202).pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "superintendent-of-public-instruction": {
+      "year": 1964,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1964,
+      "chamber": "tax-commissioner",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "HARVEY B. KNUDSON No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WM. L. PAULSON No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CRAIG A. GANNON No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "CRAIG A. GANNON",
+          "party": "No-Party"
+        },
+        {
+          "label": "M. F. PETERSON No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. PETERSON",
+          "party": "No-Party"
+        },
+        {
+          "label": "JOHN R. ERICKSON No-Party",
+          "contest": "tax-commissioner",
+          "candidate": "JOHN R. ERICKSON",
+          "party": "No-Party"
+        },
+        {
+          "label": "LLOYD OMDAHL No-Party",
+          "contest": "tax-commissioner",
+          "candidate": "LLOYD OMDAHL",
+          "party": "No-Party"
+        },
+        {
+          "label": "HAROLD HAGER First",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ELTON W. RINGSAK Second",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GLENN K. SWANSON Second",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. C. LYNCH Fourth",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NORBERT J. MUGGLI Sixth",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1 Repeals 10th paragraph of Sec. 25 of State Constitution YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2 Exempts personal property from taxation YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 3 Repeals Statutes requiring number of men on freight trains and self propelled equipment YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 3 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 4 Require a man crew on freight trains over 1/2 mile in length and on switch crews in municipalities YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 4 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 5 Requires daily local mix passenger and freight trains by railroad with exceptions YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 5 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 6 Relating to sale of alcoholic beverages where food and other commodities are served or sold YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 6 NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.108,
+        0.776,
+        0.752
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 3, 1964 \u2014 NO-PARTY'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3525
+      ]
+    }
+  ]
+}

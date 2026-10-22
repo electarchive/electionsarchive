@@ -1,0 +1,78 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1906-11-06, Representatives in Congress 1906",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1900%20through%201908%20Statewide%20Election%20Results/1906/Representatives%20in%20Congress%201906.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1906,
+      "chamber": "house",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "T. F. Marshall.",
+          "contest": "house",
+          "candidate": "T. F. Marshall",
+          "party": ""
+        },
+        {
+          "label": "A. J. Gronna .. R",
+          "contest": "house",
+          "candidate": "A. J. Gronna",
+          "party": "R"
+        },
+        {
+          "label": "John D. Benton D",
+          "contest": "house",
+          "candidate": "John D. Benton",
+          "party": "D"
+        },
+        {
+          "label": "A. G. Burr ...D",
+          "contest": "house",
+          "candidate": "A. G. Burr",
+          "party": "D"
+        },
+        {
+          "label": "H. Halvorson Soc",
+          "contest": "house",
+          "candidate": "H. Halvorson",
+          "party": "Soc"
+        },
+        {
+          "label": "W. J. Bailey Soc",
+          "contest": "house",
+          "candidate": "W. J. Bailey",
+          "party": "Soc"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.125,
+        0.196,
+        0.816,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR REPRESENTATIVES IN CONGRESS, 1906,'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3184
+      ]
+    }
+  ]
+}

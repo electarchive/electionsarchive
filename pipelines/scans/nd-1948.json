@@ -1,0 +1,481 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1948-11-02, General Election 11-02-1948",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1940%20through%201948%20Statewide%20Election%20Results/1948/General%20Election%2011-02-1948.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1948,
+      "chamber": "house",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1948,
+      "chamber": "governor",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1948,
+      "chamber": "lieutenant-governor",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1948,
+      "chamber": "secretary-of-state",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1948,
+      "chamber": "auditor",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1948,
+      "chamber": "treasurer",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1948,
+      "chamber": "attorney-general",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1948,
+      "chamber": "insurance-commissioner",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1948,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1948,
+      "chamber": "public-service-commissioner",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1948,
+      "chamber": "president",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1948,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1948,
+      "chamber": "tax-commissioner",
+      "day": "1948-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "U. S. Representatives USHER L. BURDICK",
+          "contest": "house",
+          "candidate": "Usher L. Burdick",
+          "party": ""
+        },
+        {
+          "label": "WILLIAM LEMKE",
+          "contest": "house",
+          "candidate": "William Lemke",
+          "party": ""
+        },
+        {
+          "label": "ALFRED DALE",
+          "contest": "house",
+          "candidate": "Alfred Dale",
+          "party": ""
+        },
+        {
+          "label": "JOHN M. WEILER",
+          "contest": "house",
+          "candidate": "John M. Weiler",
+          "party": ""
+        },
+        {
+          "label": "Governor\u2014 FRED G AANDAHL",
+          "contest": "governor",
+          "candidate": "Fred G. Aandahl"
+        },
+        {
+          "label": "HOWARD HENRY",
+          "contest": "governor",
+          "candidate": "Howard Henry"
+        },
+        {
+          "label": "GEORGE S. LUND",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "H. A. PORTER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lieutenant Governor\u2014 C. P. DAHL",
+          "contest": "lieutenant-governor",
+          "candidate": "C. P. Dahl",
+          "party": ""
+        },
+        {
+          "label": "J. W. MATEJCEK",
+          "contest": "lieutenant-governor",
+          "candidate": "J. W. Matejcek",
+          "party": ""
+        },
+        {
+          "label": "OTTO OTTESON",
+          "contest": "lieutenant-governor",
+          "candidate": "Otto Otteson",
+          "party": ""
+        },
+        {
+          "label": "Secretary of State\u2014",
+          "contest": "secretary-of-state",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "THOMAS HALL",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": ""
+        },
+        {
+          "label": "ELLEN F. MAYOUE",
+          "contest": "secretary-of-state",
+          "candidate": "Ellen F. Mayoue",
+          "party": ""
+        },
+        {
+          "label": "State Auditor\u2014 BERTA E. BAKER",
+          "contest": "auditor",
+          "candidate": "Berta E. Baker",
+          "party": ""
+        },
+        {
+          "label": "BYRON KRANTZ",
+          "contest": "auditor",
+          "candidate": "Byron Krantz",
+          "party": ""
+        },
+        {
+          "label": "State Treasurer\u2014 ALBERT JACOBSON",
+          "contest": "treasurer",
+          "candidate": "Albert Jacobson",
+          "party": ""
+        },
+        {
+          "label": "LAWRENCE KNOKE",
+          "contest": "treasurer",
+          "candidate": "Lawrence Knoke",
+          "party": ""
+        },
+        {
+          "label": "Attorney General\u2014 WALLACE E. WARNER",
+          "contest": "attorney-general",
+          "candidate": "Wallace E. Warner",
+          "party": ""
+        },
+        {
+          "label": "THOS. D. MORROW",
+          "contest": "attorney-general",
+          "candidate": "Thos. D. Morrow",
+          "party": ""
+        },
+        {
+          "label": "Commissioner of Insurance\u2014",
+          "contest": "insurance-commissioner",
+          "candidate": "",
+          "party": ""
+        },
+        {
+          "label": "OTTO KRUEGER",
+          "contest": "insurance-commissioner",
+          "candidate": "Otto Krueger",
+          "party": ""
+        },
+        {
+          "label": "J. ARTHUR ENGEN",
+          "contest": "insurance-commissioner",
+          "candidate": "J. Arthur Engen",
+          "party": ""
+        },
+        {
+          "label": "Commr. of Agric. & Labor\u2014 MATH DAHL",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Math Dahl",
+          "party": ""
+        },
+        {
+          "label": "J. B. MERTES",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "J. B. Mertes",
+          "party": ""
+        },
+        {
+          "label": "Public Service Commissioner\u2014 ELMER W. CART",
+          "contest": "public-service-commissioner",
+          "candidate": "Elmer W. Cart",
+          "party": ""
+        },
+        {
+          "label": "DOUGLAS DAHLIN",
+          "contest": "public-service-commissioner",
+          "candidate": "Douglas Dahlin",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.134,
+        0.228,
+        0.833,
+        0.538
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 2, 1948.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEWEY Mrs. Bernt Anderson Ernest Nelson A. R. Bergesen W. M. Smart",
+          "contest": "president",
+          "candidate": "Thomas E. Dewey (Republican)"
+        },
+        {
+          "label": "TRUMAN J. J. Nygard G. S. Wooledge J. J. Daly G. F. Drew",
+          "contest": "president",
+          "candidate": "Harry S. Truman (Democratic)"
+        },
+        {
+          "label": "THOMAS F. P. Reibhoff Thelma Bowen Karl Petterson Ty Weller",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        },
+        {
+          "label": "WALLACE Edwin C. Cooper J. M. Glaser E. L. Haaven Caleb Johnson",
+          "contest": "president",
+          "candidate": "Henry Wallace (Progressive)"
+        },
+        {
+          "label": "THURMOND J. H. Grainer Jack Berger John Connolly Ole O. Sundby",
+          "contest": "president",
+          "candidate": "J. Strom Thurmond (Dixiecrat)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.601,
+        0.22,
+        0.957,
+        0.795
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 2nd, 1948 \u2014 PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2748
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-1",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court\u2014A. M. CHRISTIANSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction\u2014G. B. NORDRUM",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "G. B. Nordrum",
+          "party": ""
+        },
+        {
+          "label": "State Tax Commissioner\u2014JOHN GRAY",
+          "contest": "tax-commissioner",
+          "candidate": "John Gray",
+          "party": ""
+        },
+        {
+          "label": "HAROLD BORG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judges of District Court\u2014JOHN C. POLLOCK First District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "G. GRIMSON Second District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WM. H. HUTCHINSON Third District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. G. McFARLAND Fourth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROY A. ILVEDSON Fifth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. B. OVERSON Fifth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. O. WIGEN Sixth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Constitutional Amendments\u2014Municipal Liquor Stores YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Constitutional Amendments\u2014Municipal Liquor Stores NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Legislature Fix Salaries YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Legislature Fix Salaries NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Post War Rehabilitation YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Post War Rehabilitation NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "State Medical Center YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "State Medical Center NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measure\u2014Repeal Parking Meter YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated Measure\u2014Repeal Parking Meter NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.221,
+        0.609,
+        0.804
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO-PARTY VOTES AND VOTES CAST ON MEASURES AT THE GENERAL ELECTION HELD NOVEMBER 2, 1948'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2796
+      ]
+    }
+  ]
+}

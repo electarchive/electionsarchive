@@ -1,0 +1,308 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1918-11-05, General Election 11-05-1918",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1910%20through%201919%20Statewide%20Election%20Results/1918/General%20Election%2011-05-1918.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1918,
+      "chamber": "house",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1918,
+      "chamber": "governor",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1918,
+      "chamber": "lieutenant-governor",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1918,
+      "chamber": "secretary-of-state",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1918,
+      "chamber": "auditor",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1918,
+      "chamber": "treasurer",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1918,
+      "chamber": "attorney-general",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1918,
+      "chamber": "insurance-commissioner",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1918,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1918,
+      "chamber": "railroad-commissioner",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1918,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1918-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "First District\u2014John M. Baer, R.",
+          "contest": "house",
+          "candidate": "John M. Baer",
+          "party": "R"
+        },
+        {
+          "label": "Fred Bartholomew, D.",
+          "contest": "house",
+          "candidate": "Fred Bartholomew",
+          "party": "D"
+        },
+        {
+          "label": "Second District George M. Young, R.",
+          "contest": "house",
+          "candidate": "George M. Young",
+          "party": "R"
+        },
+        {
+          "label": "L. N. Torson, D.",
+          "contest": "house",
+          "candidate": "L. N. Torson",
+          "party": "D"
+        },
+        {
+          "label": "Third District J. H. Sinclair, B.",
+          "contest": "house",
+          "candidate": "J. H. Sinclair",
+          "party": "B"
+        },
+        {
+          "label": "Halvor Halvorson, D.",
+          "contest": "house",
+          "candidate": "Halvor Halvorson",
+          "party": "D"
+        },
+        {
+          "label": "Lynn J. Frazier, R.",
+          "contest": "governor",
+          "candidate": "Lynn J. Frazier"
+        },
+        {
+          "label": "S. J. Doyle, D.",
+          "contest": "governor",
+          "candidate": "S. J. Doyle"
+        },
+        {
+          "label": "Howard R. Wood, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Howard R. Wood",
+          "party": "R"
+        },
+        {
+          "label": "J. P. Smith, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "J. P. Smith",
+          "party": "D"
+        },
+        {
+          "label": "Thomas Hall, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": "R"
+        },
+        {
+          "label": "Carl R. Kositzky, R.",
+          "contest": "auditor",
+          "candidate": "Carl R. Kositzky",
+          "party": "R"
+        },
+        {
+          "label": "Theo. Serr, D.",
+          "contest": "auditor",
+          "candidate": "Theo. Serr",
+          "party": "D"
+        },
+        {
+          "label": "Obert A. Olson",
+          "contest": "treasurer",
+          "candidate": "Obert A. Olson",
+          "party": ""
+        },
+        {
+          "label": "M. F. Hegge",
+          "contest": "treasurer",
+          "candidate": "M. F. Hegge",
+          "party": ""
+        },
+        {
+          "label": "William Langer, R.",
+          "contest": "attorney-general",
+          "candidate": "William Langer",
+          "party": "R"
+        },
+        {
+          "label": "G. S. Wooledge, D.",
+          "contest": "attorney-general",
+          "candidate": "G. S. Wooledge",
+          "party": "D"
+        },
+        {
+          "label": "S. A. Olsness, R.",
+          "contest": "insurance-commissioner",
+          "candidate": "S. A. Olsness",
+          "party": "R"
+        },
+        {
+          "label": "F. B. Schneller, D.",
+          "contest": "insurance-commissioner",
+          "candidate": "F. B. Schneller",
+          "party": "D"
+        },
+        {
+          "label": "John N. Hagen, R.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "John N. Hagen",
+          "party": "R"
+        },
+        {
+          "label": "David Gorman, D.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "David Gorman",
+          "party": "D"
+        },
+        {
+          "label": "S. J. Aandahl, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "S. J. Aandahl",
+          "party": "R"
+        },
+        {
+          "label": "O. F. Dupuis, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "O. F. Dupuis",
+          "party": "R"
+        },
+        {
+          "label": "Frank Milhollan, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "Frank Milhollan",
+          "party": "R"
+        },
+        {
+          "label": "J. L. Harvey, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "J. L. Harvey",
+          "party": "D"
+        },
+        {
+          "label": "M. P. Johnson, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "M. P. Johnson",
+          "party": "D"
+        },
+        {
+          "label": "Adam G. Lesmeister, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "Adam G. Lesmeister",
+          "party": "D"
+        },
+        {
+          "label": "H. A. Bronson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "O. J. Fisk",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Minnie J. Nielson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Minnie J. Nielson",
+          "party": ""
+        },
+        {
+          "label": "N. C. Macdonald",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "N. C. Macdonald",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.113,
+        0.142,
+        0.856,
+        0.502
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION, NOVEMBER 5, 1918'; ignore any other table visible in the image."
+    }
+  ]
+}

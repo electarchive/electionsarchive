@@ -1,0 +1,354 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1950-11-07, General Election 11-07-1950",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1950%20through%201958%20Statewide%20Election%20Results/1950/General%20Election%2011-07-1950.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1950,
+      "chamber": "senate",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1950,
+      "chamber": "house",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1950,
+      "chamber": "governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1950,
+      "chamber": "lieutenant-governor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1950,
+      "chamber": "secretary-of-state",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1950,
+      "chamber": "auditor",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1950,
+      "chamber": "treasurer",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1950,
+      "chamber": "attorney-general",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1950,
+      "chamber": "insurance-commissioner",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1950,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1950,
+      "chamber": "public-service-commissioner",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1950,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1950-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Senator\u2014 MILTON R. YOUNG (Rep.)",
+          "contest": "senate",
+          "candidate": "Milton R. Young"
+        },
+        {
+          "label": "HARRY O'BRIEN (Dem.)",
+          "contest": "senate",
+          "candidate": "Harry O'Brien"
+        },
+        {
+          "label": "United States Representative\u2014 FRED G. AANDAHL (Rep.)",
+          "contest": "house",
+          "candidate": "FRED G. AANDAHL",
+          "party": "Rep"
+        },
+        {
+          "label": "USHER L. BURDICK (Rep.)",
+          "contest": "house",
+          "candidate": "USHER L. BURDICK",
+          "party": "Rep"
+        },
+        {
+          "label": "E. A. JOHANSSON (Dem.)",
+          "contest": "house",
+          "candidate": "E. A. JOHANSSON",
+          "party": "Dem"
+        },
+        {
+          "label": "ERVIN SCHUMACHER (Dem.)",
+          "contest": "house",
+          "candidate": "ERVIN SCHUMACHER",
+          "party": "Dem"
+        },
+        {
+          "label": "Governor\u2014 NORMAN BRUNSDALE (Rep.)",
+          "contest": "governor",
+          "candidate": "Norman Brunsdale"
+        },
+        {
+          "label": "CLYDE G. BYERLY (Dem.)",
+          "contest": "governor",
+          "candidate": "Clyde G. Byerly"
+        },
+        {
+          "label": "Lieutenant Governor\u2014 RAY SCHNELL (Rep.)",
+          "contest": "lieutenant-governor",
+          "candidate": "RAY SCHNELL",
+          "party": "Rep"
+        },
+        {
+          "label": "MILTON K. HIGGINS (Dem.)",
+          "contest": "lieutenant-governor",
+          "candidate": "MILTON K. HIGGINS",
+          "party": "Dem"
+        },
+        {
+          "label": "Secretary of State\u2014 THOMAS HALL (Rep.)",
+          "contest": "secretary-of-state",
+          "candidate": "THOMAS HALL",
+          "party": "Rep"
+        },
+        {
+          "label": "RUTH B. HERZBERG (Dem.)",
+          "contest": "secretary-of-state",
+          "candidate": "RUTH B. HERZBERG",
+          "party": "Dem"
+        },
+        {
+          "label": "State Auditor\u2014 BERTA E. BAKER (Rep.)",
+          "contest": "auditor",
+          "candidate": "BERTA E. BAKER",
+          "party": "Rep"
+        },
+        {
+          "label": "State Treasurer\u2014 ALBERT JACOBSON (Rep.)",
+          "contest": "treasurer",
+          "candidate": "ALBERT JACOBSON",
+          "party": "Rep"
+        },
+        {
+          "label": "LORETTA GRAY (Dem.)",
+          "contest": "treasurer",
+          "candidate": "LORETTA GRAY",
+          "party": "Dem"
+        },
+        {
+          "label": "Attorney General\u2014 E. T. CHRISTIANSON (Rep.)",
+          "contest": "attorney-general",
+          "candidate": "E. T. CHRISTIANSON",
+          "party": "Rep"
+        },
+        {
+          "label": "RICHARD BOULGER (Dem.)",
+          "contest": "attorney-general",
+          "candidate": "RICHARD BOULGER",
+          "party": "Dem"
+        },
+        {
+          "label": "Commissioner of Insurance\u2014 A. J. JENSEN (Rep.)",
+          "contest": "insurance-commissioner",
+          "candidate": "A. J. JENSEN",
+          "party": "Rep"
+        },
+        {
+          "label": "HENRY W. ANDERBERG (Dem.)",
+          "contest": "insurance-commissioner",
+          "candidate": "HENRY W. ANDERBERG",
+          "party": "Dem"
+        },
+        {
+          "label": "Commissioner of Agr. & Labor\u2014 MATH DAHL (Rep.)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Rep"
+        },
+        {
+          "label": "FRED PORT (Dem.)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "FRED PORT",
+          "party": "Dem"
+        },
+        {
+          "label": "Public Service Commissioner\u2014 E. H. BRANT (Rep.)",
+          "contest": "public-service-commissioner",
+          "candidate": "E. H. BRANT",
+          "party": "Rep"
+        },
+        {
+          "label": "NORMAN B. JENSEN (Dem.)",
+          "contest": "public-service-commissioner",
+          "candidate": "NORMAN B. JENSEN",
+          "party": "Dem"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.114,
+        0.139,
+        0.806,
+        0.521
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 7, 1950'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court G. GRIMSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HARVEY J. MILLER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "P. O. SATHRE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction MARIE MYNSTER FEIDLER",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Marie Mynster Feidler",
+          "party": ""
+        },
+        {
+          "label": "G. B. NORDRUM",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "G. B. Nordrum",
+          "party": ""
+        },
+        {
+          "label": "Judges of District Court M. J. ENGLERT First District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "J. J. KEHOE Second District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. G. PORTER Third District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GEO. THOM, JR. Fourth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. J. GRONNA Fifth District",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "L. C. BRODERICK Sixth District",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.29,
+        0.199,
+        0.642,
+        0.804
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 7, 1950'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3289
+      ]
+    }
+  ]
+}

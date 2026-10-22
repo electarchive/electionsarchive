@@ -1,0 +1,95 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1902-11-04, Congressman and Governor 1902",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1900%20through%201908%20Statewide%20Election%20Results/1902/Congressman%20and%20Governor%201902.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1902,
+      "chamber": "house",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1902,
+      "chamber": "governor",
+      "day": "1902-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "R Marshall",
+          "contest": "house",
+          "candidate": "Marshall",
+          "party": "R"
+        },
+        {
+          "label": "R Spalding",
+          "contest": "house",
+          "candidate": "Spalding",
+          "party": "R"
+        },
+        {
+          "label": "D Lovell",
+          "contest": "house",
+          "candidate": "Lovell",
+          "party": "D"
+        },
+        {
+          "label": "D Ueland",
+          "contest": "house",
+          "candidate": "Ueland",
+          "party": "D"
+        },
+        {
+          "label": "Soc King",
+          "contest": "house",
+          "candidate": "King",
+          "party": "Soc"
+        },
+        {
+          "label": "R White",
+          "contest": "governor",
+          "candidate": "Frank White"
+        },
+        {
+          "label": "D Cronan",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Soc Grant",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.22,
+        0.168,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR CONGRESSMAN AND GOVERNOR, 1902.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3894
+      ]
+    }
+  ]
+}

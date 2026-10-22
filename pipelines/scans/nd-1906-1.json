@@ -1,0 +1,56 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1906-11-06, Governor 1906",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1900%20through%201908%20Statewide%20Election%20Results/1906/Governor%201906.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "governor": {
+      "year": 1906,
+      "chamber": "governor",
+      "day": "1906-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Sarles R",
+          "contest": "governor",
+          "candidate": "Elmore Y. Sarles"
+        },
+        {
+          "label": "Burke D",
+          "contest": "governor",
+          "candidate": "John Burke"
+        },
+        {
+          "label": "Dow Soc",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.177,
+        0.176,
+        0.86,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR, 1906.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.301
+      ]
+    }
+  ]
+}

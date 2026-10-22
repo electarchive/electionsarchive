@@ -1,0 +1,209 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1908-11-03, General Election 11-03-1908",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1900%20through%201908%20Statewide%20Election%20Results/1908/General%20Election%2011-03-1908.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1908,
+      "chamber": "president",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1908,
+      "chamber": "house",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1908,
+      "chamber": "governor",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1908,
+      "chamber": "lieutenant-governor",
+      "day": "1908-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Taft",
+          "contest": "president",
+          "candidate": "William Howard Taft (Republican)"
+        },
+        {
+          "label": "Bryan",
+          "contest": "president",
+          "candidate": "William Jennings Bryan (Democratic)"
+        },
+        {
+          "label": "Debbs",
+          "contest": "president",
+          "candidate": "Eugene V. Debs (Socialist)"
+        },
+        {
+          "label": "Onafin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Hisgen",
+          "contest": "president",
+          "candidate": "Thomas Hisgen (Independence)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.19,
+        0.254,
+        0.874,
+        1.0
+      ],
+      "hint": "Read only the table headed 'OFFICIAL VOTE OF NORTH DAKOTA. (November 3,1908) PRESIDENT.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2359
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "A. J. Gronna R",
+          "contest": "house",
+          "candidate": "A. J. Gronna",
+          "party": "R"
+        },
+        {
+          "label": "L. B. Hanna R",
+          "contest": "house",
+          "candidate": "L. B. Hanna",
+          "party": "R"
+        },
+        {
+          "label": "T. D. Casey D",
+          "contest": "house",
+          "candidate": "T. D. Casey",
+          "party": "D"
+        },
+        {
+          "label": "O. G. Major D",
+          "contest": "house",
+          "candidate": "O. G. Major",
+          "party": "D"
+        },
+        {
+          "label": "Francis Cooper Ind",
+          "contest": "house",
+          "candidate": "Francis Cooper",
+          "party": "Ind"
+        },
+        {
+          "label": "E. D. Herring Ind",
+          "contest": "house",
+          "candidate": "E. D. Herring",
+          "party": "Ind"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.141,
+        0.848,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1908\u2014Continued. REPRESENTATIVES IN CONGRESS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3155
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "columns": [
+        {
+          "label": "B. F. Spalding, R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A. G. Braskup, D",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C. A. Johnson, R",
+          "contest": "governor",
+          "candidate": "C. A. Johnson"
+        },
+        {
+          "label": "John Burke, D",
+          "contest": "governor",
+          "candidate": "John Burke"
+        },
+        {
+          "label": "L. F. Dow, Ind",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "R. S. Lewis, R",
+          "contest": "lieutenant-governor",
+          "candidate": "R. S. Lewis",
+          "party": "R"
+        },
+        {
+          "label": "H. D. Mack, D",
+          "contest": "lieutenant-governor",
+          "candidate": "H. D. Mack",
+          "party": "D"
+        },
+        {
+          "label": "Valdomar Gram, Ind",
+          "contest": "lieutenant-governor",
+          "candidate": "Valdomar Gram",
+          "party": "Ind"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.192,
+        0.155,
+        0.888,
+        1.0
+      ],
+      "hint": "Read only the table headed 'Official Vote of North Dakota, 1908\u2014Continued.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3633
+      ]
+    }
+  ]
+}

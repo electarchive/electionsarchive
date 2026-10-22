@@ -1,0 +1,467 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1920-11-02, General Election 11-02-1920",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1920%20through%201928%20Statewide%20%20Election%20Results/1920/General%20Election%2011-02-1920.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1920,
+      "chamber": "senate",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "governor": {
+      "year": 1920,
+      "chamber": "governor",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1920,
+      "chamber": "lieutenant-governor",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1920,
+      "chamber": "secretary-of-state",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1920,
+      "chamber": "auditor",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1920,
+      "chamber": "treasurer",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1920,
+      "chamber": "attorney-general",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1920,
+      "chamber": "insurance-commissioner",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1920,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1920,
+      "chamber": "railroad-commissioner",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "house": {
+      "year": 1920,
+      "chamber": "house",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1920,
+      "chamber": "president",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1920,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1920-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "E. F. Ladd, B.",
+          "contest": "senate",
+          "candidate": "Edwin F. Ladd"
+        },
+        {
+          "label": "H. H. Perry, D.",
+          "contest": "senate",
+          "candidate": "H. H. Perry"
+        },
+        {
+          "label": "Lynn J. Frazier, R.",
+          "contest": "governor",
+          "candidate": "Lynn J. Frazier"
+        },
+        {
+          "label": "J. F. T. O'Connor, D.",
+          "contest": "governor",
+          "candidate": "J. F.T. O'Connor"
+        },
+        {
+          "label": "John F. McGrann, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "John F. McGrann",
+          "party": "D."
+        },
+        {
+          "label": "Howard R. Wood, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Howard R. Wood",
+          "party": "R."
+        },
+        {
+          "label": "Thomas Hall, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Thomas Hall",
+          "party": "R."
+        },
+        {
+          "label": "Alfhild Alfson, N.",
+          "contest": "secretary-of-state",
+          "candidate": "Alfhild Alfson",
+          "party": "N."
+        },
+        {
+          "label": "Carl R. Kositzky, D.",
+          "contest": "auditor",
+          "candidate": "Carl R. Kositzky",
+          "party": "D."
+        },
+        {
+          "label": "D. C. Poindexter, R.",
+          "contest": "auditor",
+          "candidate": "D. C. Poindexter",
+          "party": "R."
+        },
+        {
+          "label": "Ole Kaldor, N.",
+          "contest": "treasurer",
+          "candidate": "Ole Kaldor",
+          "party": "N."
+        },
+        {
+          "label": "John Steen, R.",
+          "contest": "treasurer",
+          "candidate": "John Steen",
+          "party": "R."
+        },
+        {
+          "label": "Rheinhart J. Kamplin, D.",
+          "contest": "attorney-general",
+          "candidate": "Rheinhart J. Kamplin",
+          "party": "D."
+        },
+        {
+          "label": "William Demise, R.",
+          "contest": "attorney-general",
+          "candidate": "William Demise",
+          "party": "R."
+        },
+        {
+          "label": "S. A. Olsness, R.",
+          "contest": "insurance-commissioner",
+          "candidate": "S. A. Olsness",
+          "party": "R."
+        },
+        {
+          "label": "G. I. Solum, D.",
+          "contest": "insurance-commissioner",
+          "candidate": "G. I. Solum",
+          "party": "D."
+        },
+        {
+          "label": "John N. Hagen, R.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "John N. Hagen",
+          "party": "R."
+        },
+        {
+          "label": "J. T. Nelson, N.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "J. T. Nelson",
+          "party": "N."
+        },
+        {
+          "label": "H. D. Allert, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "H. D. Allert",
+          "party": "D."
+        },
+        {
+          "label": "F. C. Hildebrand, N.",
+          "contest": "railroad-commissioner",
+          "candidate": "F. C. Hildebrand",
+          "party": "N."
+        },
+        {
+          "label": "C. W. McDonnell, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "C. W. McDonnell",
+          "party": "R."
+        },
+        {
+          "label": "Frank Milhollan, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "Frank Milhollan",
+          "party": "R."
+        },
+        {
+          "label": "F. J. Krueger, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "F. J. Krueger",
+          "party": "R."
+        },
+        {
+          "label": "W. H. Stutsman, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "W. H. Stutsman",
+          "party": "R."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.102,
+        0.143,
+        0.698,
+        0.485
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION, NOV. 2, 1920.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-1",
+      "columns": [
+        {
+          "label": "O. B. Burtness",
+          "contest": "house",
+          "candidate": "O. B. Burtness",
+          "party": ""
+        },
+        {
+          "label": "John M. Baer",
+          "contest": "house",
+          "candidate": "John M. Baer",
+          "party": ""
+        },
+        {
+          "label": "George M. Young",
+          "contest": "house",
+          "candidate": "George M. Young",
+          "party": ""
+        },
+        {
+          "label": "Ole H. Olson",
+          "contest": "house",
+          "candidate": "Ole H. Olson",
+          "party": ""
+        },
+        {
+          "label": "J. H. Sinclair",
+          "contest": "house",
+          "candidate": "J. H. Sinclair",
+          "party": ""
+        },
+        {
+          "label": "R. H. Johnson",
+          "contest": "house",
+          "candidate": "R. H. Johnson",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.7,
+        0.147,
+        0.883,
+        0.485
+      ],
+      "hint": "Read only the table headed 'Representatives in Congress'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Republican P. M. Cole",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Republican L. E. Heaton",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Republican E. L. Garden",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Republican Edward Hoverson",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Republican P. R. Trubshaw",
+          "contest": "president",
+          "candidate": "Warren G. Harding (Republican)"
+        },
+        {
+          "label": "Democratic Jas. P. Lamb",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Democratic John F. Sullivan",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Democratic M. F. Hegge",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Democratic Anna H. Roach",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Democratic Jens Pederson",
+          "contest": "president",
+          "candidate": "James Cox (Democratic)"
+        },
+        {
+          "label": "Individual Tom L. Akam",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Individual A. S. Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Individual F. L. Burdick",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Individual Frank B. McPharlin",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Individual Henry Bach",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.292,
+        0.215,
+        0.682,
+        0.72
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION, NOV. 2, 1920.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2495
+      ]
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "A. M. Christianson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Seth Richardson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Minnie J. Nielson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Minnie J. Nielson",
+          "party": ""
+        },
+        {
+          "label": "Ruth M. Johnson",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Ruth M. Johnson",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.253,
+        0.215,
+        0.421,
+        0.719
+      ],
+      "hint": "Read only the table headed 'NONPARTISAN JUDICIARY AND SCHOOL VOTES, GENERAL ELECTION, NOVEMBER 2, 1920'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2341
+      ]
+    }
+  ]
+}

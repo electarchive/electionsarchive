@@ -1,0 +1,399 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1956-11-06, General Election 11-06-1956",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1950%20through%201958%20Statewide%20Election%20Results/1956/General%20Election%2011-06-1956.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1956,
+      "chamber": "president",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1956,
+      "chamber": "senate",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1956,
+      "chamber": "house",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1956,
+      "chamber": "governor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1956,
+      "chamber": "lieutenant-governor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1956,
+      "chamber": "secretary-of-state",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1956,
+      "chamber": "auditor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1956,
+      "chamber": "treasurer",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1956,
+      "chamber": "attorney-general",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1956,
+      "chamber": "insurance-commissioner",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1956,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1956,
+      "chamber": "public-service-commissioner",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1956,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1956,
+      "chamber": "tax-commissioner",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EISENHOWER Republican",
+          "contest": "president",
+          "candidate": "Dwight D. Eisenhower (Republican)"
+        },
+        {
+          "label": "STEVENSON Democrat",
+          "contest": "president",
+          "candidate": "Adlai Stevenson (Democratic)"
+        },
+        {
+          "label": "ANDREWS",
+          "contest": "president",
+          "candidate": "T. Coleman Andrews (Unpledged Electors / States' Rights)"
+        },
+        {
+          "label": "United States Senator MILTON R YOUNG Republican",
+          "contest": "senate",
+          "candidate": "Milton R. Young"
+        },
+        {
+          "label": "QUENTIN BURDICK Democrat",
+          "contest": "senate",
+          "candidate": "Quentin Burdick"
+        },
+        {
+          "label": "A. C. TOWNLEY Independent",
+          "contest": "senate",
+          "candidate": "A. C. Townley"
+        },
+        {
+          "label": "Representative in Congress USHER L. BURDICK Republican",
+          "contest": "house",
+          "candidate": "Usher L. Burdick",
+          "party": "Republican"
+        },
+        {
+          "label": "OTTO KRUEGER Republican",
+          "contest": "house",
+          "candidate": "Otto Krueger",
+          "party": "Republican"
+        },
+        {
+          "label": "AGNES GEELAN Democrat",
+          "contest": "house",
+          "candidate": "Agnes Geelan",
+          "party": "Democrat"
+        },
+        {
+          "label": "S. B. HOCKING Democrat",
+          "contest": "house",
+          "candidate": "S. B. Hocking",
+          "party": "Democrat"
+        },
+        {
+          "label": "Governor JOHN E. DAVIS Republican",
+          "contest": "governor",
+          "candidate": "John E. Davis"
+        },
+        {
+          "label": "WALLACE E. WARNER Democrat",
+          "contest": "governor",
+          "candidate": "Wallace E. Warner"
+        },
+        {
+          "label": "Lieutenant Governor CLYDE DUFFY Republican",
+          "contest": "lieutenant-governor",
+          "candidate": "Clyde Duffy",
+          "party": "Republican"
+        },
+        {
+          "label": "OSCAR SOLBERG Democrat",
+          "contest": "lieutenant-governor",
+          "candidate": "Oscar Solberg",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State BEN MEIER Republican",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Meier",
+          "party": "Republican"
+        },
+        {
+          "label": "GUY TIMBOE Democrat",
+          "contest": "secretary-of-state",
+          "candidate": "Guy Timboe",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor CURTIS OLSON Republican",
+          "contest": "auditor",
+          "candidate": "Curtis Olson",
+          "party": "Republican"
+        },
+        {
+          "label": "WELDON HAUGEN Democrat",
+          "contest": "auditor",
+          "candidate": "Weldon Haugen",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer ALBERT JACOBSON Republican",
+          "contest": "treasurer",
+          "candidate": "Albert Jacobson",
+          "party": "Republican"
+        },
+        {
+          "label": "ALBERT HEIDE Democrat",
+          "contest": "treasurer",
+          "candidate": "Albert Heide",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General LESLIE R. BURGUM Republican",
+          "contest": "attorney-general",
+          "candidate": "Leslie R. Burgum",
+          "party": "Republican"
+        },
+        {
+          "label": "A. C. BAKKEN Democrat",
+          "contest": "attorney-general",
+          "candidate": "A. C. Bakken",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Insurance A. J. JENSEN Republican",
+          "contest": "insurance-commissioner",
+          "candidate": "A. J. Jensen",
+          "party": "Republican"
+        },
+        {
+          "label": "E. G. RANUM Democrat",
+          "contest": "insurance-commissioner",
+          "candidate": "E. G. Ranum",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Agriculture & Labor MATH DAHL Republican",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Math Dahl",
+          "party": "Republican"
+        },
+        {
+          "label": "JAMES J MAHER Democrat",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "James J. Maher",
+          "party": "Democrat"
+        },
+        {
+          "label": "Public Service Commissioner MARTIN VAALER Republican",
+          "contest": "public-service-commissioner",
+          "candidate": "Martin Vaaler",
+          "party": "Republican"
+        },
+        {
+          "label": "ROY S. NELSON Democrat",
+          "contest": "public-service-commissioner",
+          "candidate": "Roy S. Nelson",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.024,
+        0.228,
+        0.896,
+        0.795
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 6, 1956 - PRESIDENTIAL ELECTORS'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2698
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court THOMAS J. BURKE No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Superintendent of Public Instruction GERALD W. BREKKE No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Gerald W. Brekke",
+          "party": "No-Party"
+        },
+        {
+          "label": "M. F. PETERSON No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. Peterson",
+          "party": "No-Party"
+        },
+        {
+          "label": "State Tax Commissioner J. ARTHUR ENGEN No-Party",
+          "contest": "tax-commissioner",
+          "candidate": "J. Arthur Engen",
+          "party": "No-Party"
+        },
+        {
+          "label": "JOHN R. ERICKSON No-Party",
+          "contest": "tax-commissioner",
+          "candidate": "John R. Erickson",
+          "party": "No-Party"
+        },
+        {
+          "label": "Judges of District Court First JOHN SAD No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second OBERT C. TEIGEN No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Third A. G. PORTER No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth GEO. THOM, Jr. No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth A. J. GRONNA No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth MARK H. AMUNDSON No-Party",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.143,
+        0.123,
+        0.478,
+        0.523
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF NO-PARTY VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 6, 1956'; ignore any other table visible in the image."
+    }
+  ]
+}

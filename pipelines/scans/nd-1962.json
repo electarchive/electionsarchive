@@ -1,0 +1,369 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1962-11-06, General Election 11-06-1962",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1960%20through%201968%20Statewide%20Election%20Results/1962/General%20Election%2011-06-1962.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1962,
+      "chamber": "senate",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1962,
+      "chamber": "house",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1962,
+      "chamber": "governor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1962,
+      "chamber": "lieutenant-governor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1962,
+      "chamber": "secretary-of-state",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1962,
+      "chamber": "auditor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1962,
+      "chamber": "treasurer",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1962,
+      "chamber": "attorney-general",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1962,
+      "chamber": "insurance-commissioner",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1962,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1962,
+      "chamber": "public-service-commissioner",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1962,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Senator MILTON R. YOUNG Republican",
+          "contest": "senate",
+          "candidate": "Milton R. Young"
+        },
+        {
+          "label": "WILLIAM LANIER Democrat",
+          "contest": "senate",
+          "candidate": "William Lanier"
+        },
+        {
+          "label": "Representative in Congress First District HJALMAR C. NYGAARD Republican",
+          "contest": "house",
+          "candidate": "HJALMAR C. NYGAARD",
+          "party": "Republican"
+        },
+        {
+          "label": "SCOTT ANDERSON Democrat",
+          "contest": "house",
+          "candidate": "SCOTT ANDERSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "Second District DON L. SHORT Republican",
+          "contest": "house",
+          "candidate": "DON L. SHORT",
+          "party": "Republican"
+        },
+        {
+          "label": "ROBERT VOGEL Democrat",
+          "contest": "house",
+          "candidate": "ROBERT VOGEL",
+          "party": "Democrat"
+        },
+        {
+          "label": "Governor MARK ANDREWS Republican",
+          "contest": "governor",
+          "candidate": "Mark Andrews"
+        },
+        {
+          "label": "WILLIAM L. GUY Democrat",
+          "contest": "governor",
+          "candidate": "William L. Guy"
+        },
+        {
+          "label": "Lieutenant Governor FRANK A. WENSTROM Republican",
+          "contest": "lieutenant-governor",
+          "candidate": "FRANK A. WENSTROM",
+          "party": "Republican"
+        },
+        {
+          "label": "LEONELL W. (Lee) FRAASE Democrat",
+          "contest": "lieutenant-governor",
+          "candidate": "LEONELL W. (Lee) FRAASE",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State BEN MEIER Republican",
+          "contest": "secretary-of-state",
+          "candidate": "BEN MEIER",
+          "party": "Republican"
+        },
+        {
+          "label": "LARRY SCHNEIDER Democrat",
+          "contest": "secretary-of-state",
+          "candidate": "LARRY SCHNEIDER",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor CURTIS OLSON Republican",
+          "contest": "auditor",
+          "candidate": "CURTIS OLSON",
+          "party": "Republican"
+        },
+        {
+          "label": "FLORENCE SWENSON Democrat",
+          "contest": "auditor",
+          "candidate": "FLORENCE SWENSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer PHIL HOGHAUG Republican",
+          "contest": "treasurer",
+          "candidate": "PHIL HOGHAUG",
+          "party": "Republican"
+        },
+        {
+          "label": "ELMER STRAND Democrat",
+          "contest": "treasurer",
+          "candidate": "ELMER STRAND",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General HELGI JOHANNESON Republican",
+          "contest": "attorney-general",
+          "candidate": "HELGI JOHANNESON",
+          "party": "Republican"
+        },
+        {
+          "label": "CHARLES TIGHE Democrat",
+          "contest": "attorney-general",
+          "candidate": "CHARLES TIGHE",
+          "party": "Democrat"
+        },
+        {
+          "label": "Comm'r. of Insurance FRANK ALBERS Republican",
+          "contest": "insurance-commissioner",
+          "candidate": "FRANK ALBERS",
+          "party": "Republican"
+        },
+        {
+          "label": "HANS WALKER, Jr. Democrat",
+          "contest": "insurance-commissioner",
+          "candidate": "HANS WALKER, Jr.",
+          "party": "Democrat"
+        },
+        {
+          "label": "Comm'r. of Agriculture and Labor MATH DAHL Republican",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "HAROLD R. HANSON Democrat",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "HAROLD R. HANSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "Public Service Commissioner BEN J. WOLF Republican",
+          "contest": "public-service-commissioner",
+          "candidate": "BEN J. WOLF",
+          "party": "Republican"
+        },
+        {
+          "label": "E. ODIN SJAASTAD Democrat",
+          "contest": "public-service-commissioner",
+          "candidate": "E. ODIN SJAASTAD",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.032,
+        0.147,
+        0.899,
+        0.531
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 6, 1962'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Judge of Supreme Court RALPH J. ERICKSTAD No Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judge of Supreme Court HARVEY B. KNUDSON No Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction M. F. PETERSON No Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "M. F. PETERSON",
+          "party": "No Party"
+        },
+        {
+          "label": "Judge of the District Court First HAMILTON E ENGLERT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HARRY LASHKOWITZ",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Second DOUGLAS B HEEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Third AUGUST DOERR",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ADAM GEFREH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fourth CLIFFORD JANSONIUS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FRED E SAEFKE, Jr",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Fifth F LESLIE FORSGREN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROY A ILVEDSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sixth C F KELSCH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LYLE G STUART",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.044,
+        0.209,
+        0.486,
+        0.537
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 6, 1962'; ignore any other table visible in the image."
+    }
+  ]
+}

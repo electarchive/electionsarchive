@@ -1,0 +1,384 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1928-11-06, General Election 11-06-1928",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1920%20through%201928%20Statewide%20%20Election%20Results/1928/General%20Election%2011-06-1928.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1928,
+      "chamber": "senate",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "governor": {
+      "year": 1928,
+      "chamber": "governor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1928,
+      "chamber": "lieutenant-governor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1928,
+      "chamber": "secretary-of-state",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1928,
+      "chamber": "auditor",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1928,
+      "chamber": "treasurer",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1928,
+      "chamber": "attorney-general",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1928,
+      "chamber": "insurance-commissioner",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1928,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "railroad-commissioner": {
+      "year": 1928,
+      "chamber": "railroad-commissioner",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "president": {
+      "year": 1928,
+      "chamber": "president",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house1": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": 1
+    },
+    "house2": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": 2
+    },
+    "house3": {
+      "year": 1928,
+      "chamber": "house",
+      "day": "1928-11-06",
+      "special": false,
+      "state": "ND",
+      "district": 3
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Lynn J. Frazier, R",
+          "contest": "senate",
+          "candidate": "Lynn J. Frazier"
+        },
+        {
+          "label": "F. F. Burchard, D.",
+          "contest": "senate",
+          "candidate": "F. F. Burchard"
+        },
+        {
+          "label": "Alfred Knutson, F-L.",
+          "contest": "senate",
+          "candidate": "Alfred Knutson"
+        },
+        {
+          "label": "George F. Shafer, R",
+          "contest": "governor",
+          "candidate": "George F. Shafer"
+        },
+        {
+          "label": "Walter Haddock, D",
+          "contest": "governor",
+          "candidate": "Walter Maddock"
+        },
+        {
+          "label": "K. P. Loesch, F-L.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John W. Carr, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "John W. Carr",
+          "party": "R"
+        },
+        {
+          "label": "E. J. Hughes, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "E. J. Hughes",
+          "party": "D"
+        },
+        {
+          "label": "Robert Byrne, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Robert Byrne",
+          "party": "R"
+        },
+        {
+          "label": "John Steen, R.",
+          "contest": "auditor",
+          "candidate": "John Steen",
+          "party": "R"
+        },
+        {
+          "label": "W. G. Riebe, D.",
+          "contest": "auditor",
+          "candidate": "W. G. Riebe",
+          "party": "D"
+        },
+        {
+          "label": "Berta E. Baker, R.",
+          "contest": "treasurer",
+          "candidate": "Berta E. Baker",
+          "party": "R"
+        },
+        {
+          "label": "Kenneth Ferguson, D.",
+          "contest": "treasurer",
+          "candidate": "Kenneth Ferguson",
+          "party": "D"
+        },
+        {
+          "label": "James Morris, R.",
+          "contest": "attorney-general",
+          "candidate": "James Morris",
+          "party": "R"
+        },
+        {
+          "label": "P. W. Lanier, D.",
+          "contest": "attorney-general",
+          "candidate": "P. W. Lanier",
+          "party": "D"
+        },
+        {
+          "label": "S. A. Olsness, R.",
+          "contest": "insurance-commissioner",
+          "candidate": "S. A. Olsness",
+          "party": "R"
+        },
+        {
+          "label": "Luella D. Hildreth, D.",
+          "contest": "insurance-commissioner",
+          "candidate": "Luella D. Hildreth",
+          "party": "D"
+        },
+        {
+          "label": "Joseph A. Kitchen, R.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Joseph A. Kitchen",
+          "party": "R"
+        },
+        {
+          "label": "G. J. Kimball, D.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "G. J. Kimball",
+          "party": "D"
+        },
+        {
+          "label": "Fay Harding, R.",
+          "contest": "railroad-commissioner",
+          "candidate": "Fay Harding",
+          "party": "R"
+        },
+        {
+          "label": "V. P. Cadieux, D.",
+          "contest": "railroad-commissioner",
+          "candidate": "V. P. Cadieux",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.107,
+        0.053,
+        0.618,
+        0.591
+      ],
+      "hint": "Read only the table headed 'PARTY VOTES, GENERAL ELECTION, NOVEMBER 6, 1928'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2751
+      ]
+    },
+    {
+      "page": 1,
+      "id": "1-1",
+      "columns": [
+        {
+          "label": "Hoover",
+          "contest": "president",
+          "candidate": "Herbert Hoover (Republican)"
+        },
+        {
+          "label": "Smith",
+          "contest": "president",
+          "candidate": "Al Smith (Democratic)"
+        },
+        {
+          "label": "Foster",
+          "contest": "president",
+          "candidate": "William Foster (Communist)"
+        },
+        {
+          "label": "Thomas",
+          "contest": "president",
+          "candidate": "Norman Thomas (Socialist)"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.637,
+        0.057,
+        0.943,
+        0.577
+      ],
+      "hint": "Read only the table headed 'Presidential electors: Hoover, Smith, Foster, Thomas'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2596
+      ]
+    },
+    {
+      "page": 1,
+      "id": "1-2",
+      "columns": [
+        {
+          "label": "O. B. Burtness, R.",
+          "contest": "house1",
+          "candidate": "Olger B. Burtness"
+        },
+        {
+          "label": "W. S. Hooper, D.",
+          "contest": "house1",
+          "candidate": "W. S. Hooper"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.16,
+        0.583,
+        0.285,
+        0.795
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS FIRST DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-3",
+      "columns": [
+        {
+          "label": "Thomas Hall, R.",
+          "contest": "house2",
+          "candidate": "Thomas Hall"
+        },
+        {
+          "label": "J. L. Page, D.",
+          "contest": "house2",
+          "candidate": "J. L. Page"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.302,
+        0.583,
+        0.41,
+        0.839
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS SECOND DISTRICT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 1,
+      "id": "1-4",
+      "columns": [
+        {
+          "label": "James H. Sinclair, R.",
+          "contest": "house3",
+          "candidate": "James H. Sinclair"
+        },
+        {
+          "label": "B. H. Leavitt, D.",
+          "contest": "house3",
+          "candidate": "Reuben H. Leavitt"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.444,
+        0.583,
+        0.567,
+        0.852
+      ],
+      "hint": "Read only the table headed 'REPRESENTATIVES IN CONGRESS THIRD DISTRICT'; ignore any other table visible in the image."
+    }
+  ]
+}

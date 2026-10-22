@@ -1,0 +1,346 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1946-11-05, General Election 11-05-1946",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1940%20through%201948%20Statewide%20Election%20Results/1946/General%20Election%2011-05-1946.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1946,
+      "chamber": "senate",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1946,
+      "chamber": "house",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1946,
+      "chamber": "governor",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1946,
+      "chamber": "lieutenant-governor",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1946,
+      "chamber": "secretary-of-state",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1946,
+      "chamber": "auditor",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1946,
+      "chamber": "treasurer",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1946,
+      "chamber": "attorney-general",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1946,
+      "chamber": "insurance-commissioner",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1946,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1946,
+      "chamber": "public-service-commissioner",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1946,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1946-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "United States Senate\u2014 WILLIAM LANGER Republican",
+          "contest": "senate",
+          "candidate": "William Langer"
+        },
+        {
+          "label": "ABNER B LARSON Democrat",
+          "contest": "senate",
+          "candidate": "Abner B. Larson"
+        },
+        {
+          "label": "ARTHUR E. THOMPSON Independent",
+          "contest": "senate",
+          "candidate": "Arthur E. Thompson"
+        },
+        {
+          "label": "Representatives in Congress\u2014 WILLIAM LEMKE Republican",
+          "contest": "house",
+          "candidate": "WILLIAM LEMKE",
+          "party": "Republican"
+        },
+        {
+          "label": "CHARLES R ROBERTSON Republican",
+          "contest": "house",
+          "candidate": "CHARLES R ROBERTSON",
+          "party": "Republican"
+        },
+        {
+          "label": "EDWIN COOPER Democrat",
+          "contest": "house",
+          "candidate": "EDWIN COOPER",
+          "party": "Democrat"
+        },
+        {
+          "label": "JAMES M HANLEY Democrat",
+          "contest": "house",
+          "candidate": "JAMES M HANLEY",
+          "party": "Democrat"
+        },
+        {
+          "label": "Governor\u2014 FRED G. AANDAHL Republican",
+          "contest": "governor",
+          "candidate": "Fred G. Aandahl"
+        },
+        {
+          "label": "QUENTIN BURDICK Democrat",
+          "contest": "governor",
+          "candidate": "Quentin N. Burdick"
+        },
+        {
+          "label": "Lieutenant Governor\u2014 C. P. DAHL Republican",
+          "contest": "lieutenant-governor",
+          "candidate": "C. P. DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "B. E. ROBINSON Democrat",
+          "contest": "lieutenant-governor",
+          "candidate": "B. E. ROBINSON",
+          "party": "Democrat"
+        },
+        {
+          "label": "Secretary of State\u2014 THOMAS HALL Republican",
+          "contest": "secretary-of-state",
+          "candidate": "THOMAS HALL",
+          "party": "Republican"
+        },
+        {
+          "label": "VERNON B. HATHAWAY Democrat",
+          "contest": "secretary-of-state",
+          "candidate": "VERNON B. HATHAWAY",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Auditor\u2014 BERTA E BAKER Republican",
+          "contest": "auditor",
+          "candidate": "BERTA E BAKER",
+          "party": "Republican"
+        },
+        {
+          "label": "DOUGLAS DAHLIN Democrat",
+          "contest": "auditor",
+          "candidate": "DOUGLAS DAHLIN",
+          "party": "Democrat"
+        },
+        {
+          "label": "State Treasurer\u2014 H. W. SWENSON Republican",
+          "contest": "treasurer",
+          "candidate": "H. W. SWENSON",
+          "party": "Republican"
+        },
+        {
+          "label": "AGNES MOLZAHN Democrat",
+          "contest": "treasurer",
+          "candidate": "AGNES MOLZAHN",
+          "party": "Democrat"
+        },
+        {
+          "label": "Attorney General\u2014 NELS G JOHNSON Republican",
+          "contest": "attorney-general",
+          "candidate": "NELS G JOHNSON",
+          "party": "Republican"
+        },
+        {
+          "label": "TOM LYNCH Democrat",
+          "contest": "attorney-general",
+          "candidate": "TOM LYNCH",
+          "party": "Democrat"
+        },
+        {
+          "label": "Commissioner of Insurance\u2014 OTTO KRUEGER Republican",
+          "contest": "insurance-commissioner",
+          "candidate": "OTTO KRUEGER",
+          "party": "Republican"
+        },
+        {
+          "label": "MIKE PURDY Democrat",
+          "contest": "insurance-commissioner",
+          "candidate": "MIKE PURDY",
+          "party": "Democrat"
+        },
+        {
+          "label": "Comm. of Agricul. & Labor\u2014 MATH DAHL Republican",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "MATH DAHL",
+          "party": "Republican"
+        },
+        {
+          "label": "J. ARTHUR ENGEN Democrat",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "J. ARTHUR ENGEN",
+          "party": "Democrat"
+        },
+        {
+          "label": "Public Service Commissioner\u2014 BEN C LARKIN Republican",
+          "contest": "public-service-commissioner",
+          "candidate": "BEN C LARKIN",
+          "party": "Republican"
+        },
+        {
+          "label": "MARTIN A. STANLEY Democrat",
+          "contest": "public-service-commissioner",
+          "candidate": "MARTIN A. STANLEY",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.121,
+        0.285,
+        0.818,
+        0.849
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 5TH, 1946'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2961
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Judge Supreme Court\u2014 THOMAS J. BURKE No-Party",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Supt. of Public Instruction\u2014 No-Party G. B. NORDRUM",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "G. B. NORDRUM",
+          "party": "No-Party"
+        },
+        {
+          "label": "J. O. RIEDEL No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "J. O. RIEDEL",
+          "party": "No-Party"
+        },
+        {
+          "label": "ALFRED DALE No-Party",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "ALFRED DALE",
+          "party": "No-Party"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.171,
+        0.338,
+        0.756
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES AT THE GENERAL ELECTION HELD NOVEMBER 5TH, 1946'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.306
+      ]
+    }
+  ]
+}

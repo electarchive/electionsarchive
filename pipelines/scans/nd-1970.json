@@ -1,0 +1,196 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1970-11-03, General Election 11-03-1970",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1970%20through%201978%20Statewide%20Election%20Results/1970/General%20Election%2011-03-1970.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1970,
+      "chamber": "senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1970,
+      "chamber": "house",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1970,
+      "chamber": "public-service-commissioner",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1970,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas S. Kleppe (Republican)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Quentin N. Burdick (Democrat)",
+          "contest": "senate",
+          "candidate": "Quentin N. Burdick"
+        },
+        {
+          "label": "Russell Kleppe (Independent)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mark Andrews (Republican)",
+          "contest": "house",
+          "candidate": "Mark Andrews",
+          "party": "Republican"
+        },
+        {
+          "label": "James E. Brooks (Democrat)",
+          "contest": "house",
+          "candidate": "James E. Brooks",
+          "party": "Democrat"
+        },
+        {
+          "label": "Robert P. McCarney (Republican)",
+          "contest": "house",
+          "candidate": "Robert P. McCarney",
+          "party": "Republican"
+        },
+        {
+          "label": "Arthur A Link (Democrat)",
+          "contest": "house",
+          "candidate": "Arthur A Link",
+          "party": "Democrat"
+        },
+        {
+          "label": "Earl Redlin (Republican)",
+          "contest": "public-service-commissioner",
+          "candidate": "Earl Redlin",
+          "party": "Republican"
+        },
+        {
+          "label": "Bruce Hagen (Democrat)",
+          "contest": "public-service-commissioner",
+          "candidate": "Bruce Hagen",
+          "party": "Democrat"
+        },
+        {
+          "label": "Judge of Supreme Court Obert C. Teigen (No-Party)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Orville W. Hagen (No-Party)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Orville W. Hagen",
+          "party": "No-Party"
+        },
+        {
+          "label": "Daryl E. Thompson (No-Party)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Daryl E. Thompson",
+          "party": "No-Party"
+        },
+        {
+          "label": "Harold M. Hager First (No-Party)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James H O'Keefe Second (No-Party)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Glenn K. Swanson Second (No-Party)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W. C. Lynch Fourth (No-Party)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Norbert J. Muggli Sixth (No-Party)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1, S.C.R. 7 Legislative Compensation Commission Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1, S.C.R. 7 Legislative Compensation Commission No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2, S.C.R. 24, Removal of term limitation on State Treasurer Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2, S.C.R. 24, Removal of term limitation on State Treasurer No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1, Repealing the law relating to Combined Enforcement Council, Chap. 12-61 N.D.C.C. Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1, Repealing the law relating to Combined Enforcement Council, Chap. 12-61 N.D.C.C. No",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.099,
+        0.843,
+        0.526
+      ],
+      "hint": "Read only the table headed 'Official Abstract of Votes Cast at the General Election Held November 3, 1970'; ignore any other table visible in the image."
+    }
+  ]
+}
