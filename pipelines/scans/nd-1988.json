@@ -1,0 +1,448 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1988-11-08, General Election 11-08-1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1980%20throguh%201989%20Statewide%20Election%20Results/1988/General%20Election%2011-08-1988.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1988,
+      "chamber": "president",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1988,
+      "chamber": "senate",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1988,
+      "chamber": "house",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1988,
+      "chamber": "governor",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "secretary-of-state": {
+      "year": 1988,
+      "chamber": "secretary-of-state",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1988,
+      "chamber": "auditor",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1988,
+      "chamber": "treasurer",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1988,
+      "chamber": "attorney-general",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1988,
+      "chamber": "insurance-commissioner",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1988,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1988,
+      "chamber": "public-service-commissioner",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1988,
+      "chamber": "tax-commissioner",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1988,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "NUMBER OF PRECINCT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BUSH REPUBLICAN",
+          "contest": "president",
+          "candidate": "George Bush"
+        },
+        {
+          "label": "DUKAKIS DEMOCRAT",
+          "contest": "president",
+          "candidate": "Michael S. Dukakis"
+        },
+        {
+          "label": "FULANI NEW ALLIANCE",
+          "contest": "president",
+          "candidate": "Lenora B. Fulani"
+        },
+        {
+          "label": "LaROUCHE NATIONAL ECONOMIC RECOVERY",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche"
+        },
+        {
+          "label": "PAUL LIBERTARIAN",
+          "contest": "president",
+          "candidate": "Ronald E. Paul"
+        },
+        {
+          "label": "WARREN SOCIALIST WORKERS",
+          "contest": "president",
+          "candidate": "James Mac Warren"
+        },
+        {
+          "label": "QUENTIN N. BURDICK, Dem.",
+          "contest": "senate",
+          "candidate": "Quentin N. Burdick"
+        },
+        {
+          "label": "EARL STRINDEN, Rep.",
+          "contest": "senate",
+          "candidate": "Earl Strinden"
+        },
+        {
+          "label": "KENNETH C. GARDNER, Libertarian",
+          "contest": "senate",
+          "candidate": "Kenneth C. Gardner"
+        },
+        {
+          "label": "BYRON L. DORGAN, Dem.",
+          "contest": "house",
+          "candidate": "Byron L. Dorgan",
+          "party": "Dem."
+        },
+        {
+          "label": "STEVE SYDNESS, Rep.",
+          "contest": "house",
+          "candidate": "Steve Sydness",
+          "party": "Rep."
+        },
+        {
+          "label": "KRIS BREKKE, Libertarian",
+          "contest": "house",
+          "candidate": "Kris Brekke",
+          "party": "Libertarian"
+        },
+        {
+          "label": "GEORGE A. SINNER / LLOYD OMDAHL, Dem.",
+          "contest": "governor",
+          "candidate": "George A. Sinner"
+        },
+        {
+          "label": "LEON L. MALLBERG / DONNA NALEWAJA, Rep.",
+          "contest": "governor",
+          "candidate": "Leon L. Mallberg"
+        },
+        {
+          "label": "JIM KUSLER, Dem.",
+          "contest": "secretary-of-state",
+          "candidate": "Jim Kusler",
+          "party": "Dem."
+        },
+        {
+          "label": "DAVE KOLAND, Rep.",
+          "contest": "secretary-of-state",
+          "candidate": "Dave Koland",
+          "party": "Rep."
+        },
+        {
+          "label": "STEVE PEDERSON, Dem.",
+          "contest": "auditor",
+          "candidate": "Steve Pederson",
+          "party": "Dem."
+        },
+        {
+          "label": "ROBERT (Bob) PETERSON, Rep.",
+          "contest": "auditor",
+          "candidate": "Robert (Bob) Peterson",
+          "party": "Rep."
+        },
+        {
+          "label": "ROBERT E. (Bob) HANSON, Dem.",
+          "contest": "treasurer",
+          "candidate": "Robert E. (Bob) Hanson",
+          "party": "Dem."
+        },
+        {
+          "label": "STEVE EASTON, Rep.",
+          "contest": "treasurer",
+          "candidate": "Steve Easton",
+          "party": "Rep."
+        },
+        {
+          "label": "NICHOLAS SPAETH, Dem.",
+          "contest": "attorney-general",
+          "candidate": "Nicholas Spaeth",
+          "party": "Dem."
+        },
+        {
+          "label": "JOHN GOSBEE, Rep.",
+          "contest": "attorney-general",
+          "candidate": "John Gosbee",
+          "party": "Rep."
+        },
+        {
+          "label": "EARL R. POMEROY, Dem.",
+          "contest": "insurance-commissioner",
+          "candidate": "Earl R. Pomeroy",
+          "party": "Dem."
+        },
+        {
+          "label": "MARGARET BUSHEE, Rep.",
+          "contest": "insurance-commissioner",
+          "candidate": "Margaret Bushee",
+          "party": "Rep."
+        },
+        {
+          "label": "SARAH VOGEL, Dem.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Sarah Vogel",
+          "party": "Dem."
+        },
+        {
+          "label": "KEITH BJERKE, Rep.",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Keith Bjerke",
+          "party": "Rep."
+        },
+        {
+          "label": "KENT JONES, Independent Nomination",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Kent Jones",
+          "party": "Independent"
+        },
+        {
+          "label": "HARLEY McLAIN, Independent Nomination",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Harley McLain",
+          "party": "Independent"
+        },
+        {
+          "label": "BRUCE HAGEN, Dem.",
+          "contest": "public-service-commissioner",
+          "candidate": "Bruce Hagen",
+          "party": "Dem."
+        },
+        {
+          "label": "LESLIE VOLOCHENKO, Rep.",
+          "contest": "public-service-commissioner",
+          "candidate": "Leslie Volochenko",
+          "party": "Rep."
+        },
+        {
+          "label": "M.K. HEIDI HEITKAMP, Dem.",
+          "contest": "tax-commissioner",
+          "candidate": "M.K. Heidi Heitkamp",
+          "party": "Dem."
+        },
+        {
+          "label": "MARSHALL MOORE, Rep.",
+          "contest": "tax-commissioner",
+          "candidate": "Marshall Moore",
+          "party": "Rep."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.027,
+        0.138,
+        0.898,
+        0.536
+      ],
+      "hint": "Read only the table headed 'PARTY BALLOT ABSTRACT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "NUMBER OF PRECINCT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BERYL J. LEVINE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BERT L. WILSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JAMES H. O'KEEFE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BRUCE E. BOHLMAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "KIRK SMITH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CYNTHIA A. ROTHE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GERALD G. GLASER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MAURICE R. HUNKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ALLAN SCHMALENBERGER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WAYNE G. SANSTEAD",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Wayne G. Sanstead",
+          "party": ""
+        },
+        {
+          "label": "REFERRED TAX MEASURE YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REFERRED TAX MEASURE NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "STATE BOARD OF HIGHER EDUCATION YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "STATE BOARD OF HIGHER EDUCATION NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROPERTY TAXES YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "PROPERTY TAXES NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RESTORE BALANCE VETERAN'S POSTWAR TRUST FUND YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RESTORE BALANCE VETERAN'S POSTWAR TRUST FUND NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.104,
+        0.126,
+        0.82,
+        0.532
+      ],
+      "hint": "Read only the table headed 'NO PARTY BALLOT ABSTRACT / MEASURES BALLOT ABSTRACT'; ignore any other table visible in the image."
+    }
+  ]
+}

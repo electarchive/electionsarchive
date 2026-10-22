@@ -1,0 +1,573 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1980-11-04, General Election 11-04-1980",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1980%20throguh%201989%20Statewide%20Election%20Results/1980/General%20Election%2011-04-1980.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1980,
+      "chamber": "president",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1980,
+      "chamber": "senate",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1980,
+      "chamber": "house",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1980,
+      "chamber": "governor",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "secretary-of-state": {
+      "year": 1980,
+      "chamber": "secretary-of-state",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1980,
+      "chamber": "auditor",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1980,
+      "chamber": "treasurer",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1980,
+      "chamber": "attorney-general",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1980,
+      "chamber": "insurance-commissioner",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1980,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1980,
+      "chamber": "public-service-commissioner",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1980,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1980,
+      "chamber": "tax-commissioner",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Reagan (Republican) Edna V Folden, Robert F Reimers, John E Von Rueden",
+          "contest": "president",
+          "candidate": "Ronald Reagan (Republican)"
+        },
+        {
+          "label": "Carter (Democrat) George Gaukler, Agnes Geelan, George Rait",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "Clark (Libertarian)",
+          "contest": "president",
+          "candidate": "Ed Clark (Libertarian)"
+        },
+        {
+          "label": "McReynolds (Socialist)",
+          "contest": "president",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "Hall (Communist)",
+          "contest": "president",
+          "candidate": "Communist"
+        },
+        {
+          "label": "Anderson (Independent)",
+          "contest": "president",
+          "candidate": "John Anderson (Independent)"
+        },
+        {
+          "label": "Bubar (Statesman)",
+          "contest": "president",
+          "candidate": "Statesman"
+        },
+        {
+          "label": "Greaves (American)",
+          "contest": "president",
+          "candidate": "American"
+        },
+        {
+          "label": "DeBerry (Socialist Workers)",
+          "contest": "president",
+          "candidate": "Socialist"
+        },
+        {
+          "label": "Commoner (Citizens)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McLain (Natural People's League)",
+          "contest": "president",
+          "candidate": "Natural People's League"
+        },
+        {
+          "label": "Mark Andrews Rep.",
+          "contest": "senate",
+          "candidate": "Mark Andrews"
+        },
+        {
+          "label": "Kent Johanneson Dem.",
+          "contest": "senate",
+          "candidate": "Kent Johanneson"
+        },
+        {
+          "label": "Don J Klingensmith States man",
+          "contest": "senate",
+          "candidate": "Don J. KlingenSmith"
+        },
+        {
+          "label": "Harley J McLain Chemical Farming Banned",
+          "contest": "senate",
+          "candidate": "Harley J. McLain"
+        },
+        {
+          "label": "Jim Smykowski Rep.",
+          "contest": "house",
+          "candidate": "Jim Smykowski",
+          "party": "Republican"
+        },
+        {
+          "label": "Byron L Dorgan Dem.",
+          "contest": "house",
+          "candidate": "Byron L Dorgan",
+          "party": "Democrat"
+        },
+        {
+          "label": "John Lengenfelder ACF, Prolife-Family",
+          "contest": "house",
+          "candidate": "John Lengenfelder",
+          "party": ""
+        },
+        {
+          "label": "Torfin A Teigen Ind",
+          "contest": "house",
+          "candidate": "Torfin A Teigen",
+          "party": "Independent"
+        },
+        {
+          "label": "Allen I Olson & Ernest M Sands Rep",
+          "contest": "governor",
+          "candidate": "Allen I. Olson"
+        },
+        {
+          "label": "Arthur A Link & Wayne G Sanstead Dem",
+          "contest": "governor",
+          "candidate": "Arthur A. Link"
+        },
+        {
+          "label": "Ben Meier Rep",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Meier",
+          "party": "Republican"
+        },
+        {
+          "label": "Bob Black Dem",
+          "contest": "secretary-of-state",
+          "candidate": "Bob Black",
+          "party": "Democrat"
+        },
+        {
+          "label": "Robert Peterson Rep",
+          "contest": "auditor",
+          "candidate": "Robert Peterson",
+          "party": "Republican"
+        },
+        {
+          "label": "Austin Engel Dem",
+          "contest": "auditor",
+          "candidate": "Austin Engel",
+          "party": "Democrat"
+        },
+        {
+          "label": "John Steven Lesmeister Rep",
+          "contest": "treasurer",
+          "candidate": "John Steven Lesmeister",
+          "party": "Republican"
+        },
+        {
+          "label": "Bob Hanson Dem",
+          "contest": "treasurer",
+          "candidate": "Bob Hanson",
+          "party": "Democrat"
+        },
+        {
+          "label": "Robert Wefald Rep",
+          "contest": "attorney-general",
+          "candidate": "Robert Wefald",
+          "party": "Republican"
+        },
+        {
+          "label": "Alice K Olson Dem",
+          "contest": "attorney-general",
+          "candidate": "Alice K Olson",
+          "party": "Democrat"
+        },
+        {
+          "label": "J O Bud Wigen Rep",
+          "contest": "insurance-commissioner",
+          "candidate": "J O Wigen",
+          "party": "Republican"
+        },
+        {
+          "label": "Bryon Knutson Rep",
+          "contest": "insurance-commissioner",
+          "candidate": "Bryon Knutson",
+          "party": "Democrat"
+        },
+        {
+          "label": "Kent Jones Rep",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Kent Jones",
+          "party": "Republican"
+        },
+        {
+          "label": "S F Buckshot Hoffner Dem",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "S F Hoffner",
+          "party": "Democrat"
+        },
+        {
+          "label": "Leo Reinbold Rep",
+          "contest": "public-service-commissioner",
+          "candidate": "Leo Reinbold",
+          "party": "Republican"
+        },
+        {
+          "label": "Rick Maixner Dem.",
+          "contest": "public-service-commissioner",
+          "candidate": "Rick Maixner",
+          "party": "Democrat"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.234,
+        0.933,
+        0.524
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 4, 1980'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Vernon R Pederson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William Beede",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Wallace D Berning",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Jon R Kerian",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Douglas B Heen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William A Neumann",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A c Bakken",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frank Kosanda",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joel D. Medd",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Norman J Backes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lawrence A Leclerc, Jr",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elizabeth F Maxwell",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Michael O McGuire",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "John T (Jack) Paulson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "C James Cieminski",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Larry M Hatch",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Benny A Graff",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert A Mandel",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "William F Hodny",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lester J Schirado",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Dennis A Schneider",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joe Crawford",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Joe Crawford",
+          "party": ""
+        },
+        {
+          "label": "Howard J Snortland",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Howard J Snortland",
+          "party": ""
+        },
+        {
+          "label": "Kent Conrad",
+          "contest": "tax-commissioner",
+          "candidate": "Kent Conrad",
+          "party": ""
+        },
+        {
+          "label": "John T Korsmo",
+          "contest": "tax-commissioner",
+          "candidate": "John T Korsmo",
+          "party": ""
+        },
+        {
+          "label": "No 1 SCR 4004 State Bond Security YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 1 SCR 4004 State Bond Security NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 2 HCR 3002 Legislative Compensation YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 2 HCR 3002 Legislative Compensation NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 3 HCR 3001 Legislative Article YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 3 HCR 3001 Legislative Article NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 4 HCR 3005 Executive Article YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 4 HCR 3005 Executive Article NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 5 HCR 3088 Coal Development Impact Trust Fund YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 5 HCR 3088 Coal Development Impact Trust Fund NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 6 Oil Extraction Tax Levy and Tax Relief YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 6 Oil Extraction Tax Levy and Tax Relief NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 7 Establish a State Housing Finance Agency YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 7 Establish a State Housing Finance Agency NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 8 HB 1138 Election Law Revision YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 8 HB 1138 Election Law Revision NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.002,
+        0.224,
+        0.963,
+        0.769
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 4, 1980 - NO-PARTY / MEASURES'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2826
+      ]
+    }
+  ]
+}

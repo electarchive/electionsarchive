@@ -1,0 +1,411 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1990-11-06, General Election 11-06-1990",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1990%20through%201998%20Statewide%20Election%20Results/1990/General%20Election%2011-06-1990.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1990,
+      "chamber": "house",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1990,
+      "chamber": "public-service-commissioner",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1990,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1990-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BYRON L. DORGAN (D)",
+          "contest": "house",
+          "candidate": "Byron L. Dorgan",
+          "party": "D"
+        },
+        {
+          "label": "EDWARD T. SCHAFER (R)",
+          "contest": "house",
+          "candidate": "Edward T. Schafer",
+          "party": "R"
+        },
+        {
+          "label": "FLOYD TROMMF (D)",
+          "contest": "public-service-commissioner",
+          "candidate": "Floyd Trommf",
+          "party": "D"
+        },
+        {
+          "label": "DALE SANDSTROM (R)",
+          "contest": "public-service-commissioner",
+          "candidate": "Dale Sandstrom",
+          "party": "R"
+        },
+        {
+          "label": "CRAIG HAGEN",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Craig Hagen",
+          "party": ""
+        },
+        {
+          "label": "S.F. HOFFNER",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "S.F. Hoffner",
+          "party": ""
+        },
+        {
+          "label": "HERBERT L. MESCHKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EVERETT NELS OLSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILLIAM A. NEUMANN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LAWRENCE E. JAHNKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CYNTHIA A. ROTHE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GORDON O. HOBERG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROBERT L. ECKERT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DONALD L. JORGENSEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 3 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 3 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 4 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 4 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 5 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 5 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 6 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 6 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 7 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 7 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 8 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 8 NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.136,
+        0.978,
+        0.592
+      ],
+      "hint": "Read only the table headed 'PARTY BALLOT / NO-PARTY BALLOT / MEASURES BALLOT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.25
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BYRON L. DORGAN (D)",
+          "contest": "house",
+          "candidate": "Byron L. Dorgan",
+          "party": "D"
+        },
+        {
+          "label": "EDWARD T. SCHAFER (R)",
+          "contest": "house",
+          "candidate": "Edward T. Schafer",
+          "party": "R"
+        },
+        {
+          "label": "FLOYD STROMME (D)",
+          "contest": "public-service-commissioner",
+          "candidate": "Floyd Stromme",
+          "party": "D"
+        },
+        {
+          "label": "DALE SANDSTROM (R)",
+          "contest": "public-service-commissioner",
+          "candidate": "Dale Sandstrom",
+          "party": "R"
+        },
+        {
+          "label": "CRAIG HAGEN",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Craig Hagen",
+          "party": ""
+        },
+        {
+          "label": "SF BUCKSHOT-HOFFNER",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "SF Buckshot-Hoffner",
+          "party": ""
+        },
+        {
+          "label": "HERBERT L. MESCHKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EVERETT NELS OLSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILLIAM A. NEUMANN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LAWRENCE E. JAHNKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CYNTHIA A. ROTHE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GORDON O. HOBERG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROBERT L. ECKERT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DONALD L. JORGENSEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 1 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 2 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 3 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 3 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 4 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 4 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 5 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 5 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 6 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 6 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 7 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 7 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 8 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No. 8 NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.139,
+        0.983,
+        0.732
+      ],
+      "hint": "Read only the table headed 'PARTY BALLOT / NO-PARTY BALLOT / MEASURES BALLOT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1922
+      ]
+    }
+  ]
+}

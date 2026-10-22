@@ -165,7 +165,11 @@ def tables(volume: Volume, reads: dict[str, scans.Read]) -> dict[tuple[int, int,
                     bad = True
                     continue
                 name = RESIDENCE.sub("", row["name"].strip())
-                entry = merged.setdefault(name, {"name": name, "party": row["party"], "votes": 0})
+                words = re.sub(r"[^A-Za-z ]", " ", name).split()
+                who = f"{words[-1].lower()} {words[0][0].lower()}" if len(words) > 1 else name.lower()
+                entry = merged.setdefault(who, {"name": name, "party": row["party"], "votes": 0})
+                if len(name) > len(str(entry["name"])):
+                    entry["name"] = name
                 entry["votes"] = cast(int, entry["votes"]) + votes
             found.setdefault(
                 (int(request.section), year, office),

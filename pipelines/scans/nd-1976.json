@@ -1,0 +1,458 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1976-11-02, General Election 11-02-1976",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1970%20through%201978%20Statewide%20Election%20Results/1976/General%20Election%2011-02-1976.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1976,
+      "chamber": "president",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "senate": {
+      "year": 1976,
+      "chamber": "senate",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1976,
+      "chamber": "governor",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "secretary-of-state": {
+      "year": 1976,
+      "chamber": "secretary-of-state",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1976,
+      "chamber": "auditor",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1976,
+      "chamber": "treasurer",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1976,
+      "chamber": "attorney-general",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1976,
+      "chamber": "insurance-commissioner",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1976,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1976,
+      "chamber": "public-service-commissioner",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1976,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1976,
+      "chamber": "tax-commissioner",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "FORD Rep",
+          "contest": "president",
+          "candidate": "Gerald Ford (Republican)"
+        },
+        {
+          "label": "CARTER Dem",
+          "contest": "president",
+          "candidate": "Jimmy Carter (Democratic)"
+        },
+        {
+          "label": "ANDERSON Amer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HALL Comm",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MACBRIDE Libt",
+          "contest": "president",
+          "candidate": "Roger MacBride (Libertarian)"
+        },
+        {
+          "label": "BUBAR Proh",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "CAMEJO soc Wok",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ZEIDLER Soc",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MCCARTHY ind",
+          "contest": "president",
+          "candidate": "Eugene McCarthy (Independent)"
+        },
+        {
+          "label": "MADDOX Am Ind",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LaROUCHE US Labor",
+          "contest": "president",
+          "candidate": "U.S. Labor"
+        },
+        {
+          "label": "Robert Stroup Rep",
+          "contest": "senate",
+          "candidate": "Robert Stroup"
+        },
+        {
+          "label": "Quentin N Brudick Dem",
+          "contest": "senate",
+          "candidate": "Quentin N. Burdick"
+        },
+        {
+          "label": "Clarence Haggard Amer",
+          "contest": "senate",
+          "candidate": "Clarence Haggard"
+        },
+        {
+          "label": "Mark Andrews Rep",
+          "contest": "house",
+          "candidate": "Mark Andrews",
+          "party": "Rep"
+        },
+        {
+          "label": "Lloyd B Omdahl Dem",
+          "contest": "house",
+          "candidate": "Lloyd B Omdahl",
+          "party": "Dem"
+        },
+        {
+          "label": "Russell Kleppe Amer",
+          "contest": "house",
+          "candidate": "Russell Kleppe",
+          "party": "Amer"
+        },
+        {
+          "label": "Richard Elkin & Ernest G Pyle Rep",
+          "contest": "governor",
+          "candidate": "Richard Elkin"
+        },
+        {
+          "label": "Arthur A Art Link & Wayne Sanstead Dem",
+          "contest": "governor",
+          "candidate": "Arthur A. Link"
+        },
+        {
+          "label": "Martin Vaaler & Truman C Wold Amer",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ben Meier Rep",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Meier",
+          "party": "Rep"
+        },
+        {
+          "label": "Darrell Sorensen Dem",
+          "contest": "secretary-of-state",
+          "candidate": "Darrell Sorensen",
+          "party": "Dem"
+        },
+        {
+          "label": "Robert Peterson Rep",
+          "contest": "auditor",
+          "candidate": "Robert Peterson",
+          "party": "Rep"
+        },
+        {
+          "label": "G Kent Conrad Dem",
+          "contest": "auditor",
+          "candidate": "G Kent Conrad",
+          "party": "Dem"
+        },
+        {
+          "label": "Bernice Asbridge Rep",
+          "contest": "treasurer",
+          "candidate": "Bernice Asbridge",
+          "party": "Rep"
+        },
+        {
+          "label": "Walter Christensen Dem",
+          "contest": "treasurer",
+          "candidate": "Walter Christensen",
+          "party": "Dem"
+        },
+        {
+          "label": "Allen I Olson Rep",
+          "contest": "attorney-general",
+          "candidate": "Allen I Olson",
+          "party": "Rep"
+        },
+        {
+          "label": "Kent Johanneson Dem",
+          "contest": "attorney-general",
+          "candidate": "Kent Johanneson",
+          "party": "Dem"
+        },
+        {
+          "label": "J O Bud Wigen Rep",
+          "contest": "insurance-commissioner",
+          "candidate": "J O Wigen",
+          "party": "Rep"
+        },
+        {
+          "label": "Byron Knutson Dem",
+          "contest": "insurance-commissioner",
+          "candidate": "Byron Knutson",
+          "party": "Dem"
+        },
+        {
+          "label": "Robert Nasset Rep",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Robert Nasset",
+          "party": "Rep"
+        },
+        {
+          "label": "Myron Just Dem",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Myron Just",
+          "party": "Dem"
+        },
+        {
+          "label": "Berger Rodne Amer",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Berger Rodne",
+          "party": "Amer"
+        },
+        {
+          "label": "Edith Kjos Rep",
+          "contest": "public-service-commissioner",
+          "candidate": "Edith Kjos",
+          "party": "Rep"
+        },
+        {
+          "label": "Bruce Hagen Dem",
+          "contest": "public-service-commissioner",
+          "candidate": "Bruce Hagen",
+          "party": "Dem"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.156,
+        0.993,
+        0.794
+      ],
+      "hint": "Read only the table headed 'PRESIDENTIAL ELECTORS / General Election November 2, 1976 abstract'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3668
+      ]
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Joseph Charles Crawford",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Joseph Charles Crawford",
+          "party": ""
+        },
+        {
+          "label": "H J Snortland",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "H J Snortland",
+          "party": ""
+        },
+        {
+          "label": "Byron L Dorgan",
+          "contest": "tax-commissioner",
+          "candidate": "Byron L Dorgan",
+          "party": ""
+        },
+        {
+          "label": "Kermit Schauer",
+          "contest": "tax-commissioner",
+          "candidate": "Kermit Schauer",
+          "party": ""
+        },
+        {
+          "label": "Wm L Paulson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Harold W E Anderson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kirk Smith",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James H O'Keefe",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert L Eckert (Unexpired Term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gerald G Glaser",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Alfred A Thompson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Norbert J Muggli",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "T L Secrest (Unexpired term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lyle G Stuart (Unexpired Term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Constitutional Measure Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Constitutional Measure No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiative Statute Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiative Statute No",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.155,
+        0.08,
+        0.778,
+        0.529
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 2, 1976'; ignore any other table visible in the image."
+    }
+  ]
+}

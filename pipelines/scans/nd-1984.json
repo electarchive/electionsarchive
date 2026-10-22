@@ -1,0 +1,466 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1984-11-06, General Election 11-06-1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1980%20throguh%201989%20Statewide%20Election%20Results/1984/General%20Election%2011-06-1984.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "president": {
+      "year": 1984,
+      "chamber": "president",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1984,
+      "chamber": "house",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "governor": {
+      "year": 1984,
+      "chamber": "governor",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "lieutenant-governor": {
+      "year": 1984,
+      "chamber": "lieutenant-governor",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1984,
+      "chamber": "secretary-of-state",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "auditor": {
+      "year": 1984,
+      "chamber": "auditor",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "treasurer": {
+      "year": 1984,
+      "chamber": "treasurer",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1984,
+      "chamber": "attorney-general",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "insurance-commissioner": {
+      "year": 1984,
+      "chamber": "insurance-commissioner",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1984,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1984,
+      "chamber": "public-service-commissioner",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "superintendent-of-public-instruction": {
+      "year": 1984,
+      "chamber": "superintendent-of-public-instruction",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "tax-commissioner": {
+      "year": 1984,
+      "chamber": "tax-commissioner",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "NUMBER OF PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CAST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BERGLAND / ANDERSON LIBERTARIAN",
+          "contest": "president",
+          "candidate": "David Bergland"
+        },
+        {
+          "label": "DODGE / ELLSWORTH",
+          "contest": "president",
+          "candidate": "Earl F. Dodge"
+        },
+        {
+          "label": "HALL / FIELDS COMMUNIST",
+          "contest": "president",
+          "candidate": "Gus Hall"
+        },
+        {
+          "label": "JOHNSON / DONALDSON CITIZENS",
+          "contest": "president",
+          "candidate": "Sonia Johnson"
+        },
+        {
+          "label": "LaROUCHE / BLOMQUIST INDEPENDENTS",
+          "contest": "president",
+          "candidate": "Lyndon H. LaRouche Jr."
+        },
+        {
+          "label": "MASON / DOLL SOCIALIST WORKERS",
+          "contest": "president",
+          "candidate": "Mel Mason"
+        },
+        {
+          "label": "MONDALE / KING PETERSON DEMOCRAT",
+          "contest": "president",
+          "candidate": "Walter F. Mondale"
+        },
+        {
+          "label": "REAGAN / McDANIEL REPUBLICAN",
+          "contest": "president",
+          "candidate": "Ronald Reagan"
+        },
+        {
+          "label": "RICHARDS / CRAIG POPULIST",
+          "contest": "president",
+          "candidate": "Bob Richards"
+        },
+        {
+          "label": "SERETTE / NEUHART NEW ALLIANCE",
+          "contest": "president",
+          "candidate": "Dennis L. Serrette"
+        },
+        {
+          "label": "LOIS IVERS ALTENBURG (R)",
+          "contest": "house",
+          "candidate": "Lois Ivers Altenburg",
+          "party": "R"
+        },
+        {
+          "label": "BYRON L. DORGAN (D)",
+          "contest": "house",
+          "candidate": "Byron L. Dorgan",
+          "party": "D"
+        },
+        {
+          "label": "ALLEN \"AL\" OLSON (R)",
+          "contest": "governor",
+          "candidate": "Allen I. Olson"
+        },
+        {
+          "label": "ERNEST M. \"ERNIE\" SANDS (R)",
+          "contest": "lieutenant-governor",
+          "candidate": "Ernest M. Sands",
+          "party": "R"
+        },
+        {
+          "label": "GEORGE A. SINNER (D)",
+          "contest": "governor",
+          "candidate": "George A. Sinner"
+        },
+        {
+          "label": "RUTH MEIERS (D)",
+          "contest": "lieutenant-governor",
+          "candidate": "Ruth Meiers",
+          "party": "D"
+        },
+        {
+          "label": "CLAIRE EDWIN BLOMQUIST (I)",
+          "contest": "secretary-of-state",
+          "candidate": "Claire Edwin Blomquist",
+          "party": "I"
+        },
+        {
+          "label": "BRYON KNUTSON (D)",
+          "contest": "secretary-of-state",
+          "candidate": "Bryon Knutson",
+          "party": "D"
+        },
+        {
+          "label": "BEN MEIER (R)",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Meier",
+          "party": "R"
+        },
+        {
+          "label": "M.K. \"HEIDI\" HEITKAMP (D)",
+          "contest": "auditor",
+          "candidate": "M.K. Heidi Heitkamp",
+          "party": "D"
+        },
+        {
+          "label": "ROBERT \"BOB\" PETERSON (R)",
+          "contest": "auditor",
+          "candidate": "Robert Bob Peterson",
+          "party": "R"
+        },
+        {
+          "label": "BOB HANSON (D)",
+          "contest": "treasurer",
+          "candidate": "Bob Hanson",
+          "party": "D"
+        },
+        {
+          "label": "JOHN STEVEN LESMEISTER (R)",
+          "contest": "treasurer",
+          "candidate": "John Steven Lesmeister",
+          "party": "R"
+        },
+        {
+          "label": "NICHOLAS \"NICK\" SPAETH (D)",
+          "contest": "attorney-general",
+          "candidate": "Nicholas Nick Spaeth",
+          "party": "D"
+        },
+        {
+          "label": "ROBERT WEFALD (R)",
+          "contest": "attorney-general",
+          "candidate": "Robert Wefald",
+          "party": "R"
+        },
+        {
+          "label": "DIANE ALM (R)",
+          "contest": "insurance-commissioner",
+          "candidate": "Diane Alm",
+          "party": "R"
+        },
+        {
+          "label": "JAN GERHART-SHELVER (D)",
+          "contest": "insurance-commissioner",
+          "candidate": "Jan Gerhart-Shelver",
+          "party": "D"
+        },
+        {
+          "label": "EARL POMEROY (D)",
+          "contest": "insurance-commissioner",
+          "candidate": "Earl Pomeroy",
+          "party": "D"
+        },
+        {
+          "label": "KENT JONES (R)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Kent Jones",
+          "party": "R"
+        },
+        {
+          "label": "BRUCE W. LARSON (D)",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Bruce W. Larson",
+          "party": "D"
+        },
+        {
+          "label": "S.F. \"BUCKSHOT\" HOFFNER (D)",
+          "contest": "public-service-commissioner",
+          "candidate": "S.F. Buckshot Hoffner",
+          "party": "D"
+        },
+        {
+          "label": "DALE SANDSTROM (R)",
+          "contest": "public-service-commissioner",
+          "candidate": "Dale Sandstrom",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.234,
+        0.97,
+        0.552
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 6, 1984 PARTY BALLOT ABSTRACT'; ignore any other table visible in the image."
+    },
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "GERALD W. VANDEWALLE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HERMAN F. \"SPARKY\" GIERKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "EVERETT NELS OLSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILLIAM A. NEUMANN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JOHN O. GARASS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HAROLD B. HERSETH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "GORDON O. HOBERG",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ROBERT L. ECKERT",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DONALD L. JORGENSEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LYLE G. STUART",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LARRY NUDELL",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Larry Nudell",
+          "party": ""
+        },
+        {
+          "label": "WAYNE W. SANSTEAD",
+          "contest": "superintendent-of-public-instruction",
+          "candidate": "Wayne W. Sanstead",
+          "party": ""
+        },
+        {
+          "label": "KENT CONRAD",
+          "contest": "tax-commissioner",
+          "candidate": "Kent Conrad",
+          "party": ""
+        },
+        {
+          "label": "SCOTT HOVE",
+          "contest": "tax-commissioner",
+          "candidate": "Scott Hove",
+          "party": ""
+        },
+        {
+          "label": "NO. 1 H.C.R. 3011 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO. 1 H.C.R. 3011 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO. 2 H.C.R. 3029 YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO. 2 H.C.R. 3029 NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO. 3 ESTABLISHES RIGHT TO BEAR ARMS YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO. 3 ESTABLISHES RIGHT TO BEAR ARMS NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO. 4 RETURN 3 JUNIOR COLLEGES TO LOCAL CONTROL YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "NO. 4 RETURN 3 JUNIOR COLLEGES TO LOCAL CONTROL NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.133,
+        0.057,
+        0.852,
+        0.532
+      ],
+      "hint": "Read only the table headed 'NO PARTY BALLOT ABSTRACT / MEASURES BALLOT ABSTRACT'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4168
+      ]
+    }
+  ]
+}

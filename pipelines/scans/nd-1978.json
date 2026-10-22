@@ -1,0 +1,232 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1978-11-07, General Election 11-07-1978",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1970%20through%201978%20Statewide%20Election%20Results/1978/General%20Election%2011-07-1978.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "house": {
+      "year": 1978,
+      "chamber": "house",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1978,
+      "chamber": "public-service-commissioner",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1978,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Mark Andrews",
+          "contest": "house",
+          "candidate": "Mark Andrews",
+          "party": "republican"
+        },
+        {
+          "label": "Bruce Hagen",
+          "contest": "house",
+          "candidate": "Bruce Hagen",
+          "party": ""
+        },
+        {
+          "label": "Don J. Klingensmith",
+          "contest": "house",
+          "candidate": "Don J. Klingensmith",
+          "party": ""
+        },
+        {
+          "label": "Harley J. McLain",
+          "contest": "house",
+          "candidate": "Harley J. McLain",
+          "party": ""
+        },
+        {
+          "label": "Richard \"Dick\" Elkin",
+          "contest": "public-service-commissioner",
+          "candidate": "Richard Elkin",
+          "party": "republican"
+        },
+        {
+          "label": "Robert E. \"Bob\" Hanson",
+          "contest": "public-service-commissioner",
+          "candidate": "Robert E. Hanson",
+          "party": ""
+        },
+        {
+          "label": "Paul M Sand (Regular Term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Maurice E Cook (Unexpired)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gerald W VandeWalle (Unexpired Term)",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Orville W Hagen",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Orville W Hagen",
+          "party": ""
+        },
+        {
+          "label": "John O Garaas 1st Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Norman J Backes 1st Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ray R Friederich 2nd Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Robert L Eckert 3rd Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "M C Fredricks 4th Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "W A Jacobsen 5th Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Nels Olson 5th Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lyle G Stuart 6th Dist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 1 SCR 4024 Open Records YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 1 SCR 4024 Open Records NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 2 HCR 3014 Elective Franchise YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 2 HCR 3014 Elective Franchise NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 3 HCR 3088 Initiative, Referendum, Recall YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 3 HCR 3088 Initiative, Referendum, Recall NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 1 State Revenue Sharing YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 1 State Revenue Sharing NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 2 Income Tax Reductions YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 2 Income Tax Reductions NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 3 Interest Income of Game & Fish Dept YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 3 Interest Income of Game & Fish Dept NO",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 4 Peoples Control of Health Care Costs YES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Initiated No 4 Peoples Control of Health Care Costs NO",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.016,
+        0.176,
+        0.995,
+        0.509
+      ],
+      "hint": "Read only the table headed 'OFFICIAL ABSTRACT OF VOTES CAST AT THE GENERAL ELECTION HELD NOVEMBER 7, 1978 - NO-PARTY / MEASURES'; ignore any other table visible in the image."
+    }
+  ]
+}

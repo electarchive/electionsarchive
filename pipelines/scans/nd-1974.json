@@ -1,0 +1,142 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1974-11-05, General Election 11-05-1974",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1970%20through%201978%20Statewide%20Election%20Results/1974/General%20Election%2011-05-1974.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1974,
+      "chamber": "senate",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1974,
+      "chamber": "house",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1974,
+      "chamber": "public-service-commissioner",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 2,
+      "id": "2-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Milton R. Young Rep",
+          "contest": "senate",
+          "candidate": "Milton R. Young"
+        },
+        {
+          "label": "William L. \"Bill\" Guy Dem",
+          "contest": "senate",
+          "candidate": "William L. \"Bill\" Guy"
+        },
+        {
+          "label": "Kenneth C Gardner, Jr. Ind",
+          "contest": "senate",
+          "candidate": "Kenneth C. Gardner"
+        },
+        {
+          "label": "James R. Jungroth Ind",
+          "contest": "senate",
+          "candidate": "James R. Jungroth"
+        },
+        {
+          "label": "Mark Andrews Rep",
+          "contest": "house",
+          "candidate": "Mark Andrews",
+          "party": "Rep"
+        },
+        {
+          "label": "Byron L Dorgan Dem.",
+          "contest": "house",
+          "candidate": "Byron L Dorgan",
+          "party": "Dem"
+        },
+        {
+          "label": "Ben J Wolf Rep.",
+          "contest": "public-service-commissioner",
+          "candidate": "Ben J Wolf",
+          "party": "Rep"
+        },
+        {
+          "label": "Byron Knutson Dem.",
+          "contest": "public-service-commissioner",
+          "candidate": "Byron Knutson",
+          "party": "Dem"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.194,
+        0.227,
+        0.724,
+        0.585
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR / REPRESENTATIVE IN CONGRESS / PUBLIC SERVICE COMMISSIONER'; ignore any other table visible in the image."
+    },
+    {
+      "page": 3,
+      "id": "3-0",
+      "columns": [
+        {
+          "label": "Rep. Milton R. Young",
+          "contest": "senate",
+          "candidate": "Milton R. Young"
+        },
+        {
+          "label": "Dem. William L. \"Bill\" Guy",
+          "contest": "senate",
+          "candidate": "William L. \"Bill\" Guy"
+        },
+        {
+          "label": "Ind. James R. Jungroth",
+          "contest": "senate",
+          "candidate": "James R. Jungroth"
+        },
+        {
+          "label": "Ind. Kenneth C. Gardner, Jr.",
+          "contest": "senate",
+          "candidate": "Kenneth C. Gardner"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.31,
+        0.223,
+        0.63,
+        0.585
+      ],
+      "hint": "Read only the table headed 'UNITED STATES SENATOR'; ignore any other table visible in the image."
+    }
+  ]
+}

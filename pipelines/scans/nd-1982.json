@@ -1,0 +1,229 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1982-11-02, General Election 11-02-1982",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1980%20throguh%201989%20Statewide%20Election%20Results/1982/General%20Election%2011-02-1982.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1982,
+      "chamber": "senate",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1982,
+      "chamber": "house",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1982,
+      "chamber": "public-service-commissioner",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "Precincts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Quentin N. Burdick (D)",
+          "contest": "senate",
+          "candidate": "Quentin N. Burdick"
+        },
+        {
+          "label": "Gene Knorr (R)",
+          "contest": "senate",
+          "candidate": "Gene Knorr"
+        },
+        {
+          "label": "Anna B. Bourgois (I)",
+          "contest": "senate",
+          "candidate": "Anna B. Bourgois"
+        },
+        {
+          "label": "Byron L. Dorgan",
+          "contest": "house",
+          "candidate": "Byron L. Dorgan",
+          "party": ""
+        },
+        {
+          "label": "Kent Jones",
+          "contest": "house",
+          "candidate": "Kent Jones",
+          "party": ""
+        },
+        {
+          "label": "Don J. Klingensmith (I)",
+          "contest": "house",
+          "candidate": "Don J. Klingensmith",
+          "party": "I"
+        },
+        {
+          "label": "Bruce Hagen (D)",
+          "contest": "public-service-commissioner",
+          "candidate": "Bruce Hagen",
+          "party": "D"
+        },
+        {
+          "label": "Dale Sandstrom (R)",
+          "contest": "public-service-commissioner",
+          "candidate": "Dale Sandstrom",
+          "party": "R"
+        },
+        {
+          "label": "Ralph J. Erickstad",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Bert L. Wilson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "James H. O'Keefe",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Kirk Smith",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gerald G Glasser",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Maurice R Hunke",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas Ewing",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Allen Schmalenberger",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Orville W Hagen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Byron Knutson",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 1 Medical Center Mill Levy Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 1 Medical Center Mill Levy No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 2 Eminent Domain Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 2 Eminent Domain No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 3 Obsolete Constitutional Measures Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 3 Obsolete Constitutional Measures No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 4 Election of Governor Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 4 Election of Governor No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 5 Higher Education Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 5 Higher Education No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 6 Charitable Gambling Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 6 Charitable Gambling No",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 7 Nuclear Weapons Yes",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "No 7 Nuclear Weapons No",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.144,
+        0.952,
+        0.547
+      ],
+      "hint": "Read only the table headed 'PARTY BALLOT / NO-PARTY / MEASURES'; ignore any other table visible in the image."
+    }
+  ]
+}

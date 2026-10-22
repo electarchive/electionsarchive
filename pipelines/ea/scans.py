@@ -719,7 +719,7 @@ def read_direct(reader: str, wanted: dict[str, Read]) -> str:
                 try:
                     message = future.result()
                 except anthropic.APIError as error:
-                    notes.append(f"{request.custom} {type(error).__name__}")
+                    notes.append(f"{request.custom} {type(error).__name__}: {str(error)[:300]}")
                     continue
                 keep(request.key, message)
                 spent += dollars(message, DIRECT_FULL)

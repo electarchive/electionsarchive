@@ -84,7 +84,7 @@ def parse() -> None:
         .agg(
             pl.col("name").first().alias("leader"),
             pl.col("name").filter(pl.col("winner") == 1).first().alias("declared"),
-            (pl.col("votes").first() == pl.col("votes").get(1)).alias("tied"),
+            (pl.col("votes").first() == pl.col("votes").get(1, null_on_oob=True)).alias("tied"),
         )
     )
     for row in ranked.filter(pl.col("declared").is_not_null() & (pl.col("declared") != pl.col("leader"))).iter_rows():

@@ -1,0 +1,230 @@
+{
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1986-11-04, General Election 11-04-1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1980%20throguh%201989%20Statewide%20Election%20Results/1986/General%20Election%2011-04-1986.pdf"
+  },
+  "raw_source": "us.scans",
+  "contests": {
+    "senate": {
+      "year": 1986,
+      "chamber": "senate",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null
+    },
+    "house": {
+      "year": 1986,
+      "chamber": "house",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "public-service-commissioner": {
+      "year": 1986,
+      "chamber": "public-service-commissioner",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    },
+    "commissioner-of-agriculture": {
+      "year": 1986,
+      "chamber": "commissioner-of-agriculture",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "ND",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 1,
+      "id": "1-0",
+      "columns": [
+        {
+          "label": "NUMBER OF PRECINCTS",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "TOTAL VOTES CASE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MARK ANDREWS (R)",
+          "contest": "senate",
+          "candidate": "Mark Andrews"
+        },
+        {
+          "label": "KENT CONRAD (D)",
+          "contest": "senate",
+          "candidate": "Kent Conrad"
+        },
+        {
+          "label": "ANNA BELLE BOURGOIS (I)",
+          "contest": "senate",
+          "candidate": "Anna Belle Bourgois"
+        },
+        {
+          "label": "SYVER VINJE (R)",
+          "contest": "house",
+          "candidate": "Syver Vinje",
+          "party": "R"
+        },
+        {
+          "label": "BYRON L. DORGAN (D)",
+          "contest": "house",
+          "candidate": "Byron L. Dorgan",
+          "party": "D"
+        },
+        {
+          "label": "GERALD W. KOPP (I)",
+          "contest": "house",
+          "candidate": "Gerald W. Kopp",
+          "party": "I"
+        },
+        {
+          "label": "LEO M. REINBOLD (R)",
+          "contest": "public-service-commissioner",
+          "candidate": "Leo M. Reinbold",
+          "party": "R"
+        },
+        {
+          "label": "JIM KUSLER (D)",
+          "contest": "public-service-commissioner",
+          "candidate": "Jim Kusler",
+          "party": "D"
+        },
+        {
+          "label": "HERMAN F. \"SPARKY\" GIERKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "HERBERT L. MESCHKE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BERYL J. LEVINE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WILLIAM BEEDE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "WALLACE D. BERNING",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "JON R. KERIAN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#1 LEE A. CHRISTOFFERSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "RONALD M. DOSCH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "A.C. BAKKEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#3 JOEL D. MEDD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#2 NORMAN J. BACKES",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#3 LAWRENCE A. LECLERC",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#4 CHARLES CHINQUIST",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#4 MICHAEL O. MCGUIRE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#2 JOHN T. (JACK) PAULSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#1 LARRY M. HATCH",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#1 ROLF P. SLETTEN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#2 BENNY A. GRAFF",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#3 WILLIAM F. HODNY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "#5 DENNIS A. SCHNEIDER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ORVILLE W. 'IKE' HAGEN",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Orville W. Hagen",
+          "party": ""
+        },
+        {
+          "label": "BYRON KNUTSON",
+          "contest": "commissioner-of-agriculture",
+          "candidate": "Byron Knutson",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.173,
+        0.955,
+        0.566
+      ],
+      "hint": "Read only the table headed 'PARTY BALLOT ABSTRACT / NO PARTY BALLOT ABSTRACT'; ignore any other table visible in the image."
+    }
+  ]
+}
