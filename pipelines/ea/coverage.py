@@ -260,7 +260,7 @@ with c as (
         exists (select from tn where tn.id = cc.id) as turnout,
         cc.stage = 'primary' and (select count(*) from contest_option o where o.contest_id = cc.id and o.kind = 'candidate') >= 2
             as multi,
-        tacit and stage in ('primary', 'runoff') and st in ('AL', 'AR', 'CO', 'CT', 'DE', 'FL', 'KY', 'LA', 'MS', 'NC',
+        tacit and stage in ('primary', 'runoff') and st in ('AL', 'AR', 'CO', 'CT', 'DE', 'FL', 'KY', 'LA', 'MN', 'MS', 'NC',
             'NY', 'OK', 'SC', 'SD', 'UT', 'VA') as cancelled
     from cc left join cg on cg.contest_id = cc.id
 )
