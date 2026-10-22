@@ -428,7 +428,20 @@ function electionMarkdown(
     `# ${election.name}`,
     byline(election.breadcrumbs, link, election.date),
     ...election.notes.map((note) => `> ${note.body}`),
-    ...election.races.flatMap((race) => {
+    ...election.races.flatMap((entry) => {
+      const race =
+        entry.round != null &&
+        election.races.some(
+          (other) =>
+            other !== entry &&
+            other.name === entry.name &&
+            other.round !== entry.round,
+        )
+          ? {
+              ...entry,
+              name: m.race_round({ name: entry.name, round: entry.round }),
+            }
+          : entry;
       const hasSeats = race.results.some((row) => row.seats != null);
       const seats = race.electors == null ? m.col_seats() : m.col_electors();
       const districts = race.isPrimaries ? race.places : null;
@@ -699,11 +712,33 @@ function placesMarkdown(
 function sourcesMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
 ) {
+  const sets = contest.sets.filter(
+    (set, index) =>
+      contest.sets.findIndex(
+        (other) =>
+          other.stage === set.stage &&
+          other.status === set.status &&
+          other.isDefault === set.isDefault &&
+          other.source.publisher === set.source.publisher &&
+          other.source.title === set.source.title,
+      ) === index,
+  );
+  const statuses: Record<string, () => string> = {
+    superseded: m.status_superseded,
+    annulled: m.status_annulled,
+    withdrawn: m.status_withdrawn,
+  };
   const sources = [
-    ...contest.sets.map(
-      ({ source }) =>
-        `- ${source.url == null ? source.title : `[${source.title}](${source.url})`}, ${source.publisher}${source.license == null ? "" : `. ${m.source_license({ license: source.license })}`}`,
-    ),
+    ...sets.map(({ source, isDefault, status }) => {
+      const marks =
+        sets.length < 2
+          ? []
+          : [
+              ...(isDefault ? [m.source_shown()] : []),
+              ...(status === "active" ? [] : [statuses[status]?.() ?? status]),
+            ];
+      return `- ${marks.length === 0 ? "" : `${marks.join(", ")}: `}${source.url == null ? source.title : `[${source.title}](${source.url})`}, ${source.publisher}${source.license == null ? "" : `. ${m.source_license({ license: source.license })}`}`;
+    }),
     ...contest.citations.map(
       (citation) =>
         `- ${citation.url == null ? citation.title : `[${citation.title}](${citation.url})`}, ${citation.publisher}`,
