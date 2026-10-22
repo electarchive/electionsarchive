@@ -110,9 +110,10 @@
 
   const isCompared = $derived(
     sheet.target != null &&
-      sheet.places.before.some((column) =>
-        column.some((value) => value != null),
-      ),
+      (sheet.places.redrawn.some((value) => value != null) ||
+        sheet.places.before.some((column) =>
+          column.some((value) => value != null),
+        )),
   );
   const shown = $derived(
     !isCompared && (view === "swing" || view === "flips") ? "winner" : view,
@@ -148,6 +149,22 @@
       .find((target) => target.id === sheet.target)
       ?.date.slice(0, 4) ?? null,
   );
+  const unmatched = $derived.by(() => {
+    let redrawn = 0;
+    let missing = 0;
+    if (isCompared) {
+      for (const [i] of sheet.places.k.entries()) {
+        if (read(sheet, i).isUnmatched) {
+          if (sheet.places.redrawn[i] == null) {
+            missing += 1;
+          } else {
+            redrawn += 1;
+          }
+        }
+      }
+    }
+    return { redrawn, missing };
+  });
   const tones = $derived(
     Object.fromEntries(
       sheet.legend.map((item) => [item.key, swatch(item.color, item.key)]),
@@ -226,6 +243,10 @@
       swing,
       value,
       isFlip: prior != null && leader != null && prior !== leader,
+      isUnmatched:
+        isCompared &&
+        leader != null &&
+        set.places.before.every((column) => column[i] == null),
     };
   }
 
@@ -269,6 +290,9 @@
       );
     }
     if (shown === "flips") {
+      if (reading.isUnmatched) {
+        return DIM;
+      }
       return mix(hue(set, reading.leader), reading.isFlip ? 100 : 16);
     }
     return mix(
@@ -907,7 +931,7 @@
         {
           color: isDotted ? ground : color,
           on: true,
-          hatched: set.estimated && needsBefore,
+          hatched: needsBefore && (set.estimated || read(set, i).isUnmatched),
         },
       );
       if (gl.getSource(dots) != null) {
@@ -1675,6 +1699,14 @@
         </li>
       {/each}
     </ul>
+    {#if reading.isUnmatched && year != null}
+      {const overlap = $derived(hit.set.places.redrawn[hit.i] ?? null)}
+      <p class="text-[0.8125rem] text-pretty text-muted-foreground">
+        {overlap == null
+          ? m.map_unmatched_missing_line({ year })
+          : m.map_unmatched_redrawn_line({ year, percent: percent(overlap) })}
+      </p>
+    {/if}
     {#if isCompared && year != null && reading.swing != null}
       {const side = $derived(reading.swing >= 0 ? first : second)}
       <p class="text-[0.8125rem] text-muted-foreground">
@@ -1878,6 +1910,32 @@
       {#if sheet.target != null && !isCompared}
         <p class="text-[0.8125rem] text-muted-foreground">
           {m.atlas_no_comparison()}
+        </p>
+      {/if}
+      {#if needsBefore && year != null && unmatched.redrawn + unmatched.missing > 0}
+        <p class="flex flex-wrap items-center gap-x-1.5 text-[0.8125rem]">
+          <span
+            class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_4px)] ring-1 ring-border block-3 inline-4"
+          ></span>
+          <span class="font-semibold">{m.map_unmatched_key()}</span>
+          <span class="font-figures text-xs text-muted-foreground tabular-nums"
+            >{[
+              unmatched.redrawn > 0
+                ? m.map_unmatched_redrawn({
+                    count: count(unmatched.redrawn),
+                    year,
+                  })
+                : null,
+              unmatched.missing > 0
+                ? m.map_unmatched_missing({
+                    count: count(unmatched.missing),
+                    year,
+                  })
+                : null,
+            ]
+              .filter((part) => part != null)
+              .join(", ")}</span
+          >
         </p>
       {/if}
       {#if isEstimated && year != null}

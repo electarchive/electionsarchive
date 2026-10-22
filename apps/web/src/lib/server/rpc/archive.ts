@@ -3962,6 +3962,7 @@ export const contests = {
           prior: v.array(v.nullable(v.number())),
           shares: v.array(v.array(v.number())),
           before: v.array(v.array(v.nullable(v.number()))),
+          redrawn: v.array(v.nullable(v.number())),
         }),
       }),
     )
@@ -4185,17 +4186,19 @@ export const contests = {
       const counterpart =
         wanted == null
           ? null
-          : await db.execute<{ id: string }>(sql`
+          : await db.execute<{ id: string; date: string }>(sql`
             with recursive grp(id) as (
               select ${wanted.id}::uuid
               union all
               select c.id from contest c join grp on c.allocation_parent_id = grp.id
             )
-            select c.id from grp join contest c on c.id = grp.id
-            join election e on e.id = c.election_id
-            left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-            where coalesce(c.district_area_id, pt.area_id) = ${owner.place}::uuid
-            limit 1
+            select coalesce((
+              select c.id from grp join contest c on c.id = grp.id
+              join election e on e.id = c.election_id
+              left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+              where coalesce(c.district_area_id, pt.area_id) = ${owner.place}::uuid
+              limit 1
+            ), ${wanted.id}::uuid)::text as id, ${wanted.date}::text as date
           `);
       const crosswalk = await db.execute<{
         from_k: number;
@@ -4224,7 +4227,8 @@ export const contests = {
         list.push([row.to_k, row.weight]);
         spread.set(row.from_k, list);
       }
-      const [tabulated, at] = await Promise.all([
+      const then = counterpart?.rows[0] ?? null;
+      const [tabulated, at, moved] = await Promise.all([
         tabulate(
           [owner.id],
           shown.map((row) => ({
@@ -4235,11 +4239,11 @@ export const contests = {
             owner: null,
           })),
           contest.date,
-          wanted == null
+          then == null
             ? null
             : {
-                ids: [counterpart?.rows[0]?.id ?? wanted.id],
-                date: wanted.date,
+                ids: [then.id],
+                date: then.date,
                 ...(spread.size > 0 && { spread }),
               },
           relations,
@@ -4249,12 +4253,21 @@ export const contests = {
           shown.map((row) => row.k),
           day,
         ),
+        redrawn(
+          shown.filter(() => spread.size === 0).map((row) => row.id),
+          contest,
+          then,
+          area.id,
+        ),
       ]);
       const titles = await names(
         targets.rows.map((row) => row.id),
         null,
       );
-      const rows = tabulated.rows;
+      const rows = tabulated.rows.map((row) => ({
+        ...row,
+        ...(moved.has(row.k) && { earlier: null, prior: null }),
+      }));
       const tail = /, [^,]+$/u.exec(rows[0]?.name ?? "")?.[0];
       const isShared =
         tail != null &&
@@ -4330,6 +4343,7 @@ export const contests = {
                 : Math.round((row.earlier[index] ?? 0) * 10_000),
             ),
           ),
+          redrawn: rows.map((row) => moved.get(row.k) ?? null),
         },
       };
     }),
@@ -5444,7 +5458,7 @@ async function redrawn(
   return new Map(
     found.rows
       .filter((row) => row.overlap < 0.97)
-      .map((row) => [row.k, row.overlap]),
+      .map((row) => [row.k, Math.round(row.overlap * 1000) / 1000]),
   );
 }
 
