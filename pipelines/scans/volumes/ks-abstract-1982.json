@@ -1,0 +1,32 @@
+{
+  "kind": "statewide",
+  "year": 1982,
+  "day": "1982-11-02",
+  "polity": "US-KS",
+  "publisher": "University of Kansas, Institute for Policy and Social Research (Kansas Statistical Abstract, from the Secretary of State's Election Statistics)",
+  "title": "Kansas Statistical Abstract, Kansas general election statistics, 1982-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://ksdata.ku.edu/ksdata/ksah/KSA18.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor and Lieutenant Governor (one ticket)",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "treasurer": "State Treasurer",
+    "commissioner-of-insurance": "Commissioner of Insurance"
+  },
+  "leaves": [
+    82,
+    83,
+    84,
+    85,
+    86,
+    87,
+    88,
+    89,
+    90
+  ]
+}

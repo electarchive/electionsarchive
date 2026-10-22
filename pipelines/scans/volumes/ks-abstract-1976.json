@@ -1,0 +1,27 @@
+{
+  "kind": "statewide",
+  "year": 1976,
+  "day": "1976-11-02",
+  "polity": "US-KS",
+  "publisher": "University of Kansas, Institute for Policy and Social Research (Kansas Statistical Abstract, from the Secretary of State's Election Statistics)",
+  "title": "Kansas Statistical Abstract, Kansas general election statistics, 1976-11-02",
+  "license": "Public record",
+  "file": {
+    "url": "https://ksdata.ku.edu/ksdata/ksah/KSA12.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor and Lieutenant Governor (one ticket)",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "treasurer": "State Treasurer",
+    "commissioner-of-insurance": "Commissioner of Insurance"
+  },
+  "leaves": [
+    73,
+    74,
+    75,
+    76
+  ]
+}
