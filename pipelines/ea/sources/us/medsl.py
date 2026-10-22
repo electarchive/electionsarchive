@@ -699,6 +699,7 @@ def attach(
     redone: frozenset[str] = frozenset(),
     grain: str = "county",
     strict: bool = False,
+    extend: bool = False,
 ) -> None:
     tag = str(cs.manifest["pipeline"])
     located = "page_id" in congress.columns
@@ -778,6 +779,7 @@ def attach(
             known.append((option, kind, label, texts, fec))
         picked: dict[str, str] = {}
         missing: list[tuple[str, str, int, int]] = []
+        added: list[str] = []
         for candidate, writein, votes in (
             lines.filter(pl.col("measure") == 1)
             .group_by("candidate", maintain_order=True)
@@ -829,7 +831,10 @@ def attach(
                     picked[candidate] = str(chosen.pop())
                     continue
                 if not writein:
-                    if votes:
+                    if votes and extend:
+                        added.append(candidate)
+                        picked[candidate] = "pool"
+                    elif votes:
                         missing.append((key, candidate, votes, official))
                     continue
             picked[candidate] = "pool"
@@ -889,6 +894,22 @@ def attach(
             print(f"{key}: the county sum covers under half the official total, skipped")
             continue
         unmatched.extend(missing)
+        for candidate in added:
+            person = cs.key(f"{tag}.person", f"{key}:{slug(candidate)}")
+            option = cs.key("us.option", f"{key}:{person}")
+            cs.add("person", id=person)
+            cs.add("name", entity_id=person, text=candidate, lang="en", kind="official", is_preferred=True)
+            cs.add("contest_option", id=option, contest_id=contest, kind="candidate", ballot_label=candidate)
+            cs.add(
+                "candidacy",
+                id=cs.key("us.candidacy", f"{key}:{person}:head"),
+                person_id=person,
+                option_id=option,
+                role="head",
+                ballot_name=candidate,
+                is_independent=False,
+            )
+            picked[candidate] = str(option)
         result_set = cs.key(f"{tag}.result_set", f"{key}:{grain}")
         previous = None
         if key in redone or (
