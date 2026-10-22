@@ -19,9 +19,13 @@ PARSED = DATA / "parsed" / SOURCE
 ARCHIVE = "https://elections.maryland.gov/elections/archive/"
 SUMMARIES = [1990, 1994, 1998]
 COUNTY_FILES = {
-    2000: r"([A-Za-z_.']+)_General_2000\.csv",
-    2006: r"([A-Za-z_.']+)_County_2006_General\.csv",
-    2008: r"([A-Za-z_.']+)_County_2008_General\.csv",
+    2000: r"([A-Za-z][A-Za-z_.']*)_General_2000\.csv",
+    2004: r"([A-Za-z][A-Za-z_.']*)_General_2004\.csv",
+    2006: r"([A-Za-z][A-Za-z_.']*)_County_2006_General\.csv",
+    2008: r"([A-Za-z][A-Za-z_.']*)_County_2008_General\.csv",
+    2010: r"([A-Za-z][A-Za-z_.']*)_County_2010_General\.csv",
+    2012: r"([A-Za-z][A-Za-z_.']*)_County_2012_General\.csv",
+    2014: r"([A-Za-z][A-Za-z_.']*)_County_2014_General\.csv",
 }
 PUBLISHER = "Maryland State Board of Elections"
 TITLE = "Election results archive"
@@ -116,7 +120,7 @@ def parse() -> None:
                 "Office Name", "Office District", label, "Total Votes"
             ).iter_rows():
                 office = chamber(office or "")
-                if office is not None:
+                if office is not None and votes != "#NULL#":
                     rows.append(
                         (
                             year,
@@ -164,7 +168,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maryland's House and Senate general elections by county, 1990–2008",
+            summary="Maryland's House and Senate general elections by county, 1990–2014",
             polity="US-MD",
         )
         source = cs.source(PUBLISHER, TITLE)
