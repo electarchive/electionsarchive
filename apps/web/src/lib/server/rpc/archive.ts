@@ -9959,9 +9959,7 @@ export const people = {
             )),
       );
       const isIndependent =
-        current == null
-          ? general?.independent === true
-          : current.party == null;
+        current == null ? general?.independent === true : current.party == null;
       const own = isIndependent
         ? null
         : (current?.party ??
@@ -10393,9 +10391,10 @@ export const parties = {
           select id, id as via from predecessors
           union select em.entity_id, p.id from entity_merge em join predecessors p on em.into_id = p.id
         ),
+        ours as (select id from family union select id from early),
         mine as materialized (
           select o.id as option, o.contest_id from contest_option o
-          where o.party_id in (select id from family) or o.party_id in (select id from early)
+          where o.party_id in (select id from ours)
         ),
         up(id, parent) as (
           select c.id, c.allocation_parent_id from contest c where c.id in (select contest_id from mine)
@@ -10436,25 +10435,24 @@ export const parties = {
         ),
         fetched as (
           select p.root, x.option_k, x.measure, x.value::float8 as value, x.count_round,
-            min(x.count_round) over (partition by p.root, x.measure) as first
+            min(x.count_round) over (partition by p.root, x.measure) as first,
+            min(array_position(${COUNTED}, x.measure)) over (partition by p.root) as main
           from picked p cross join lateral (
             select x.option_k, x.measure, x.value, x.count_round from result_rollup x
             where x.result_set_k = p.k and x.area_k = p.area and x.measure = any(${COUNTED}) and x.option_k <> 0
             offset 0
           ) x
         ),
-        mains as (
-          select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by root
-        ),
         tallied as (
           select f.root, sum(f.value) as total, min(pe.via::text) as via,
             coalesce(sum(f.value) filter (
-              where o.id in (select option from mine) or o.parent_option_id in (select option from mine)
+              where o.party_id in (select id from ours)
+                or (select po.party_id from contest_option po where po.id = o.parent_option_id) in (select id from ours)
             ), 0) as votes
-          from fetched f join mains m on m.root = f.root and m.main = f.measure
+          from fetched f
           join contest_option o on o.k = f.option_k
           left join early pe on pe.id = o.party_id
-          where f.count_round = f.first
+          where f.count_round = f.first and array_position(${COUNTED}, f.measure) = f.main
           group by f.root
         ),
         seated as (
@@ -10462,7 +10460,7 @@ export const parties = {
           from (
             select r.id as root, o.id,
               bool_or(
-                o.id in (select option from mine)
+                o.party_id in (select id from ours)
                 or o.party_id is null and ${fused(sql`o.id`, sql`o.contest_id`)} in (select id from family)
               ) as mine,
               max(coalesce(x.seats, 1)) as seats
