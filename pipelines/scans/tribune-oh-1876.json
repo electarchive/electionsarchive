@@ -1,0 +1,163 @@
+{
+  "polity": "US-OH",
+  "publisher": "The Tribune Association",
+  "title": "The Tribune Almanac for 1877, Ohio county returns",
+  "kind": "compendium",
+  "license": "Public domain",
+  "file": {
+    "url": "https://archive.org/download/tribunealmanacpo18751879newy/tribunealmanacpo18751879newy.pdf"
+  },
+  "raw_source": "us.tribune_almanac",
+  "contests": {
+    "1876-pres": {
+      "year": 1876,
+      "chamber": "president",
+      "day": "1876-11-07",
+      "special": false,
+      "state": "OH",
+      "district": null
+    },
+    "1872-pres": {
+      "year": 1872,
+      "chamber": "president",
+      "day": "1872-11-05",
+      "special": false,
+      "state": "OH",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 389,
+      "crop": [
+        0.0,
+        0.56,
+        1.0,
+        1.0
+      ],
+      "columns": [
+        {
+          "label": "Secretary of State 1876 Republican",
+          "contest": null,
+          "candidate": "Secretary of State 1876 Republican"
+        },
+        {
+          "label": "Secretary of State 1876 Democrat",
+          "contest": null,
+          "candidate": "Secretary of State 1876 Democrat"
+        },
+        {
+          "label": "Secretary of State 1876 Prohibition",
+          "contest": null,
+          "candidate": "Secretary of State 1876 Prohibition"
+        },
+        {
+          "label": "President 1876 Hayes",
+          "contest": "1876-pres",
+          "candidate": "Rutherford B. Hayes"
+        },
+        {
+          "label": "President 1876 Tilden",
+          "contest": "1876-pres",
+          "candidate": "Samuel J. Tilden"
+        },
+        {
+          "label": "President 1876 Smith",
+          "contest": "1876-pres",
+          "candidate": "Green Clay Smith"
+        },
+        {
+          "label": "President 1876 Cooper",
+          "contest": "1876-pres",
+          "candidate": "Peter Cooper"
+        },
+        {
+          "label": "Governor 1875 Republican",
+          "contest": null,
+          "candidate": "Governor 1875 Republican"
+        },
+        {
+          "label": "Governor 1875 Democrat",
+          "contest": null,
+          "candidate": "Governor 1875 Democrat"
+        },
+        {
+          "label": "President 1872 Grant",
+          "contest": "1872-pres",
+          "candidate": "Ulysses S. Grant"
+        },
+        {
+          "label": "President 1872 Greeley",
+          "contest": "1872-pres",
+          "candidate": "Horace Greeley"
+        }
+      ]
+    },
+    {
+      "page": 390,
+      "crop": [
+        0.0,
+        0.04,
+        1.0,
+        0.43
+      ],
+      "columns": [
+        {
+          "label": "Secretary of State 1876 Republican",
+          "contest": null,
+          "candidate": "Secretary of State 1876 Republican"
+        },
+        {
+          "label": "Secretary of State 1876 Democrat",
+          "contest": null,
+          "candidate": "Secretary of State 1876 Democrat"
+        },
+        {
+          "label": "Secretary of State 1876 Prohibition",
+          "contest": null,
+          "candidate": "Secretary of State 1876 Prohibition"
+        },
+        {
+          "label": "President 1876 Hayes",
+          "contest": "1876-pres",
+          "candidate": "Rutherford B. Hayes"
+        },
+        {
+          "label": "President 1876 Tilden",
+          "contest": "1876-pres",
+          "candidate": "Samuel J. Tilden"
+        },
+        {
+          "label": "President 1876 Smith",
+          "contest": "1876-pres",
+          "candidate": "Green Clay Smith"
+        },
+        {
+          "label": "President 1876 Cooper",
+          "contest": "1876-pres",
+          "candidate": "Peter Cooper"
+        },
+        {
+          "label": "Governor 1875 Republican",
+          "contest": null,
+          "candidate": "Governor 1875 Republican"
+        },
+        {
+          "label": "Governor 1875 Democrat",
+          "contest": null,
+          "candidate": "Governor 1875 Democrat"
+        },
+        {
+          "label": "President 1872 Grant",
+          "contest": "1872-pres",
+          "candidate": "Ulysses S. Grant"
+        },
+        {
+          "label": "President 1872 Greeley",
+          "contest": "1872-pres",
+          "candidate": "Horace Greeley"
+        }
+      ]
+    }
+  ]
+}

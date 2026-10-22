@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from ea import cache, checks, coverage, coverage_tables, fixtures, portals, raw, search, tiles
+from ea import cache, checks, coverage, coverage_tables, fixtures, portals, raw, scans, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import DATA, connect
 
@@ -36,6 +36,16 @@ def main() -> None:
     portal = commands.add_parser("portals", help="find county results portals and record them in us-portals.csv")
     portal.add_argument("action", choices=("census",))
     portal.add_argument("state", help="two-letter state code, such as TX")
+    scanning = commands.add_parser(
+        "scans", help="batch vision pipeline for scanned county tables (manifests in pipelines/scans)"
+    )
+    scanning.add_argument(
+        "action",
+        choices=("prepare", "run", "status", "emit"),
+        help="render crops and fill held totals, advance the Message Batches steps once, list manifests, "
+        "or emit the tables that passed",
+    )
+    scanning.add_argument("name", nargs="?", help="manifest name, such as tribune-oh-1876")
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -51,6 +61,8 @@ def main() -> None:
             print(apply(args.changeset))
         case "portals":
             print(portals.census(args.state.upper()))
+        case "scans":
+            print(scans.status() if args.action == "status" else getattr(scans, args.action)(args.name))
         case "fixtures":
             print(fixtures.export())
         case "tiles":
