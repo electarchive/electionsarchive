@@ -732,42 +732,6 @@
   {/if}
 </header>
 
-<Cycle
-  primaries={cycle.primaries.map((primary) => ({
-    ...primary,
-    key: primary.id,
-    label:
-      primary.party == null
-        ? primary.name
-        : primary.until == null
-          ? m.cycle_primary({ party: primary.party.label })
-          : m.cycle_primaries({ party: primary.party.label }),
-    color: primary.party?.color ?? null,
-    runoff: null,
-    local: null,
-  }))}
-  general={cycle.general == null
-    ? null
-    : { ...cycle.general, winners: [], local: null }}
-  others={cycle.parts.map((part) => ({
-    key: part.place,
-    label: part.place,
-    color: null,
-    races: part.races.map((race) => ({
-      ...race,
-      label: [
-        race.date == null
-          ? null
-          : monthDay.format(new Date(`${race.date}T00:00:00Z`)),
-        race.party?.short ?? race.party?.label ?? null,
-      ]
-        .filter((part) => part != null)
-        .join(", "),
-    })),
-  }))}
-  othersTitle={m.cycle_parts()}
-/>
-
 {#if races.length === 0 && election.contests.length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
     <h2 class="mbe-1.5 text-[0.8125rem] font-bold">{m.election_contests()}</h2>
@@ -1126,6 +1090,42 @@
     </ul>
   </section>
 {/if}
+
+<Cycle
+  primaries={cycle.primaries.map((primary) => ({
+    ...primary,
+    key: primary.id,
+    label:
+      primary.party == null
+        ? primary.name
+        : primary.until == null
+          ? m.cycle_primary({ party: primary.party.label })
+          : m.cycle_primaries({ party: primary.party.label }),
+    color: primary.party?.color ?? null,
+    runoff: null,
+    local: null,
+  }))}
+  general={cycle.general == null
+    ? null
+    : { ...cycle.general, winners: [], local: null }}
+  others={cycle.parts.map((part) => ({
+    key: part.place,
+    label: part.place,
+    color: null,
+    races: part.races.map((race) => ({
+      ...race,
+      label: [
+        race.date == null
+          ? null
+          : monthDay.format(new Date(`${race.date}T00:00:00Z`)),
+        race.party?.short ?? race.party?.label ?? null,
+      ]
+        .filter((part) => part != null)
+        .join(", "),
+    })),
+  }))}
+  othersTitle={m.cycle_parts()}
+/>
 
 <Governments {id} {chamber} />
 <Regions {id} />

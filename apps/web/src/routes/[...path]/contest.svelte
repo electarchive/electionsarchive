@@ -904,43 +904,6 @@
   <Rounds {rounds} />
 {/if}
 
-<Cycle
-  primaries={cycle.primaries.map((step) => ({
-    ...step,
-    key: step.id,
-    label:
-      step.party == null
-        ? ""
-        : step.until == null
-          ? m.cycle_primary({ party: step.party.label })
-          : m.cycle_primaries({ party: step.party.label }),
-    color: step.party?.color ?? null,
-  }))}
-  general={cycle.general}
-  others={cycle.others.map((entry) => ({
-    key: entry.party.id,
-    label: entry.party.label,
-    color: entry.party.color,
-    races: entry.races.map((race) => ({ ...race, label: race.place })),
-  }))}
-  othersTitle={m.cycle_others()}
-  day={{
-    ...cycle.day,
-    groups: cycle.day.groups.flatMap((group, index) =>
-      group.path == null
-        ? []
-        : [
-            {
-              ...group,
-              path: group.path,
-              key: `${group.kind}:${index}`,
-              label: group.label ?? DAY[group.kind]?.() ?? "",
-            },
-          ],
-    ),
-  }}
-/>
-
 {#if contest.current == null && contest.declared != null}
   <section class="col-span-12 grid gap-2.5 bg-card px-3.5 py-4">
     <p class="text-[0.9375rem] text-muted-foreground">
@@ -1434,6 +1397,43 @@
 {#if ballot.length > 0}
   <Ballot {ballot} place={contest.scope.name} />
 {/if}
+
+<Cycle
+  primaries={cycle.primaries.map((step) => ({
+    ...step,
+    key: step.id,
+    label:
+      step.party == null
+        ? ""
+        : step.until == null
+          ? m.cycle_primary({ party: step.party.label })
+          : m.cycle_primaries({ party: step.party.label }),
+    color: step.party?.color ?? null,
+  }))}
+  general={cycle.general}
+  others={cycle.others.map((entry) => ({
+    key: entry.party.id,
+    label: entry.party.label,
+    color: entry.party.color,
+    races: entry.races.map((race) => ({ ...race, label: race.place })),
+  }))}
+  othersTitle={m.cycle_others()}
+  day={{
+    ...cycle.day,
+    groups: cycle.day.groups.flatMap((group, index) =>
+      group.path == null
+        ? []
+        : [
+            {
+              ...group,
+              path: group.path,
+              key: `${group.kind}:${index}`,
+              label: group.label ?? DAY[group.kind]?.() ?? "",
+            },
+          ],
+    ),
+  }}
+/>
 
 {#if notes.length > 0}
   <section
