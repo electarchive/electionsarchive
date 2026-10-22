@@ -1,6 +1,7 @@
 import re
 import struct
 import subprocess
+from collections import Counter
 from datetime import UTC, date, datetime
 from pathlib import Path
 
@@ -34,10 +35,7 @@ GRIDDED = {
         12: ("house", 3, "BIGGS, CRYSTAL"),
     },
 }
-KEEP = {
-    (2012, "democratic"): {("president", None), ("senate", None), ("house", 1), ("house", 2), ("house", 3)},
-}
-FIXES: dict[tuple[int, str, int, int, int], int] = {}
+FIXES: dict[tuple[int, str, int, int], int] = {(2012, "democratic", 4, 77): 27}
 
 
 def url(year: int, party: str) -> str:
@@ -72,81 +70,128 @@ def parse() -> None:
         pdf = raw.cached(SOURCE, url(year, party)).path
         pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout)[1])
         county = 0
-        rows: dict[int, list[tuple[int, int, list[int | None], tuple[int, int, int, int] | None, int, int]]] = {r: [] for r in layout}
-        totals: dict[int, list[int | None]] = {}
+        reads: dict[tuple[int, int], Counter[int]] = {}
+        sites: dict[tuple[int, int], tuple[int, tuple[int, int, int, int], tuple[int, int]]] = {}
+        printed: dict[int, Counter[int]] = {r: Counter() for r in layout}
         for page in range(2, pages + 1):
-            image = ms_scan.render(pdf, page)
-            height, width = image.shape
-            _, grid_rows, xs = geometry(image)
+            image = ms_scan.render(pdf, page, dpi=300)
+            ys, xs = ms_scan.rules(image)
+            ys = [y for i, y in enumerate(ys) if not (i + 1 < len(ys) and ys[i + 1] - y < 45)]
+            xs = [x for i, x in enumerate(xs) if not (i + 1 < len(xs) and xs[i + 1] - x < 100)]
+            top = max(range(len(ys) - 1), key=lambda i: ys[i + 1] - ys[i]) + 1
+            rows = ys[top:]
             first = 1 if page == 2 else 0
             columns = list(range(first, len(xs) - 1))
             last = page == pages
-            data_columns = columns[:-1] if last else columns
-            grid = [
-                (int(xs[c]), int(grid_rows[r]), int(xs[c + 1]), int(grid_rows[r + 1]))
-                for r in layout
-                for c in columns
-            ]
-            read = ms_scan.cells(image, grid)
-            across = ms_scan.strips(image, grid_rows, xs, columns)
-            read = [
-                (across.get((c, r), []) + values, box)
-                for (values, box), (r, c) in zip(read, [(r, c) for r in layout for c in columns], strict=True)
-            ]
-            for index, r in enumerate(layout):
-                cells = read[index * len(columns) : (index + 1) * len(columns)]
-                for offset, (values, box) in enumerate(cells[: len(data_columns)]):
-                    rows[r].append((page, county + offset, values, box, width, height))
-                if last:
-                    totals[r] = cells[-1][0]
-            county += len(data_columns)
+            clean = ms_scan.erase(image)
+            for _, cx, cy, text in ms_scan.words(clean):
+                c = next((i for i in columns if xs[i] <= cx < xs[i + 1]), None)
+                r = next((i for i in layout if rows[i] <= cy < rows[i + 1]), None)
+                if c is None or r is None:
+                    continue
+                if last and c == len(xs) - 2:
+                    printed[r][int(text)] += 1
+                else:
+                    reads.setdefault((r, county + columns.index(c)), Counter())[int(text)] += 1
+            for r in layout:
+                for c in columns[: len(columns) - (1 if last else 0)]:
+                    box = (int(xs[c]) + 8, int(rows[r]) + 8, int(xs[c + 1]) - 8, int(rows[r + 1]) - 8)
+                    sites[(r, county + columns.index(c))] = (page, box, image.shape)
+            county += len(columns) - (1 if last else 0)
         if county != COUNTIES:
             raise ValueError(f"{year} {party}: {county} counties")
-        samples = []
-        for cells in rows.values():
-            for page, index, values, box, width, height in cells:
-                seen = {v for v in values if v is not None}
-                if box is not None and len(values) >= 6 and len(seen) == 1:
-                    samples.append((len(str(next(iter(seen)))), box[2] - box[0]))
-        slope, intercept = ms_scan.digit_model(samples)
         for r, (office, district, name) in layout.items():
-            printed = [v for v in totals[r] if v is not None]
-            total = max(set(printed), key=printed.count) if printed else None
-            cells = rows[r]
-            fixed = {
-                i: FIXES[(year, party, page, r, i)]
-                for i, (page, *_) in enumerate(cells)
-                if (year, party, page, r, i) in FIXES
-            }
-            try:
-                digits = [max(1, round((c[3][2] - c[3][0] - intercept) / slope)) if c[3] is not None else None for c in cells]
-                values, open_cells = ms_scan.settle([c[2] for c in cells], total, fixed, digits)
-            except ValueError as error:
-                top = [max(set(v for v in c[2] if v is not None) or {0}, key=[x for x in c[2] if x is not None].count) for c in cells]
-                print(year, party, "row", r, name, "held:", error, "total", total, "short by", total - sum(top))
-                for i, c in enumerate(cells):
-                    if len({v for v in c[2] if v is not None}) != 1 and c[3] is not None:
-                        print("   ", f"{c[0]}/{r}/{i}", codes[c[1]], c[2])
-                continue
-            print(year, party, "row", r, name, "total", total, "settled", [(cells[i][0], i) for i in open_cells])
-            for (page, index, _, box, width, height), value in zip(cells, values, strict=True):
-                if value is None or box is None:
-                    continue
+            total = printed[r].most_common(1)[0][0]
+            values = {k: v.most_common(1)[0][0] for k, v in reads.items() if k[0] == r}
+            for key in values:
+                values[key] = FIXES.get((year, party, r, key[1]), values[key])
+            short = total - sum(values.values())
+            print(year, party, name, total, "tied" if short == 0 else f"printed total exceeds the county sum by {short}")
+            for (_, index), value in values.items():
+                page, box, shape = sites[(r, index)]
                 out.append(
                     {
                         "year": year,
-                        "party": party,
-                        "office": office,
+                        "chamber": f"{office}:{party}",
+                        "day": FILES[(year, party)][1],
+                        "special": False,
+                        "state": "MS",
                         "district": district,
+                        "code": codes[index],
                         "candidate": name,
-                        "county": codes[index],
+                        "measure": 1,
+                        "writein": False,
                         "votes": value,
+                        "kind": "county",
+                        "source": f"MS{year}{party}",
+                        "file": 0,
                         "page": page,
-                        "x0": box[0] / width,
-                        "y0": box[1] / height,
-                        "x1": box[2] / width,
-                        "y1": box[3] / height,
+                        "x0": box[0] / shape[1],
+                        "y0": box[1] / shape[0],
+                        "x1": box[2] / shape[1],
+                        "y1": box[3] / shape[0],
                     }
                 )
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(out, infer_schema_length=None).write_parquet(PARSED / "cells.parquet")
+    pl.DataFrame(out, infer_schema_length=None).with_columns(
+        year=pl.col("year").cast(pl.Int32),
+        district=pl.col("district").cast(pl.Int16),
+        measure=pl.col("measure").cast(pl.Int16),
+    ).write_parquet(PARSED / "counties.parquet")
+
+
+def emit() -> Path:
+    frame = pl.read_parquet(PARSED / "counties.parquet")
+    with connect() as conn:
+        cs = Changeset(
+            conn,
+            pipeline=SOURCE,
+            version=VERSION,
+            summary="Mississippi's 2012 Democratic presidential, U.S. Senate, and House primaries by county from the Secretary of State's certified results",
+            polity="US-MS",
+        )
+        sources: dict[str, object] = {}
+        pages: dict[tuple[str, int], str] = {}
+        for (year, party), (_, day) in FILES.items():
+            title = TITLE.format(party=party.capitalize(), day=day)
+            source = cs.source(PUBLISHER, title)
+            sources[f"MS{year}{party}"] = source
+            cs.add(
+                "source",
+                id=source,
+                kind="official_body",
+                publisher=PUBLISHER,
+                title=title,
+                url=url(year, party),
+                license="Public record",
+            )
+            pdf = raw.cached(SOURCE, url(year, party))
+            artifact = cs.artifact(pdf, source)
+            PAGES.mkdir(parents=True, exist_ok=True)
+            for number in sorted(set(frame.filter(pl.col("source") == f"MS{year}{party}")["page"])):
+                image = PAGES / f"{pdf.sha256}-{number}.png"
+                if not image.exists():
+                    subprocess.run(
+                        ["pdftoppm", "-r", "100", "-gray", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                        + [str(pdf.path), str(image.with_suffix(""))],
+                        check=True,
+                    )
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                page = cs.page(artifact, number)
+                pages[(f"MS{year}{party}", number)] = str(page)
+                cs.add(
+                    "source_page",
+                    id=page,
+                    artifact_id=artifact,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
+        frame = frame.with_columns(
+            page_id=pl.struct("source", "page").map_elements(
+                lambda s: pages[(s["source"], s["page"])], return_dtype=pl.String
+            ),
+        ).with_columns(page=pl.lit(1))
+        medsl.attach(cs, conn, frame, sources, strict=True)
+        return cs.write()
