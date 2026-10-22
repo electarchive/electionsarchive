@@ -147,6 +147,11 @@ ELECTIONS = {
     },
 }
 COMMISSIONERS = {
+    "1984-11-06": {"pages": (74, 75, 76), "split": 3, "triple": True, "surnames": ("fuster", "famadas", "catala", "viera")},
+    "1992-11-03": {"pages": (83, 84, 85), "split": 3, "triple": True, "surnames": ("romero", "colorado", "garcia")},
+    "1996-11-05": {"pages": (91, 92, 93), "split": 3, "triple": True, "surnames": ("romero", "benitez", "rodriguez")},
+    "2000-11-07": {"pages": (91, 92, 93), "split": 3, "triple": True, "surnames": ("romero", "acevedo", "rodriguez")},
+    "2004-11-02": {"pages": (90, 91, 92), "split": 3, "triple": True, "surnames": ("prats", "fortuno", "irizarry"), "settled": "The OCR misread a few cells, which were settled against the page image and the printed district rows: Moca 37 on page 90; Yauco 52, Juana Díaz 63, Villalba 65, Coamo 68, Aibonito 69, Naranjito 73, Cayey 77, Maunabo 92, and one printed district row on page 91; and Carolina 107 on page 92.", "fixes": {(90, 36): (2790, [986, 1765, 39]), (91, 5): (17857, [8688, 8644, 525]), (91, 21): (20856, [10645, 9861, 350]), (91, 30): (25744, [13788, 11006, 950]), (91, -2): (0, [132279, 131911, 6830]), (91, 45): (7685, [3647, 3768, 270]), (91, 16): (22981, [11187, 11353, 441]), (91, 18): (15616, [6991, 8369, 256]), (91, 22): (15717, [8831, 6358, 528]), (91, 26): (18266, [9858, 8028, 380])}},
     "2008-11-04": {
         "pages": (95, 96, 97),
         "island": "The municipio rows also sum exactly to the island row printed on page 95.",
@@ -159,7 +164,7 @@ COMMISSIONERS = {
     },
 }
 for day, election in COMMISSIONERS.items():
-    ELECTIONS[f"{day}:commissioner"] = {key: value for key, value in ELECTIONS[day].items() if key not in ("pages", "surnames", "island", "fixes")} | election
+    ELECTIONS[f"{day}:commissioner"] = {key: value for key, value in ELECTIONS[day].items() if key not in ("pages", "surnames", "island", "fixes", "split")} | {"split": 2, "island": "The municipio rows sum exactly to the eight district rows, which together make up the island total."} | election
 
 
 def fold(text: str) -> str:
@@ -309,9 +314,35 @@ def solve_row(line: list[list[str]], slack: float = 0.02) -> tuple[int, list[int
     return None
 
 
-def read_page(image: Path, candidates: int, split: int, darkness: int = 215) -> list[dict[str, object]]:
+def solve_triples(cells: list[list[list[str]]]) -> tuple[int, list[int], list[int]] | None:
+    values: list[int] = []
+    weak: list[int] = []
+    for index, columns in enumerate(cells):
+        reads = [Counter(int(digits) for reading in column if (digits := re.sub(r"\D", "", reading))) for column in columns]
+        good: Counter[int] = Counter()
+        for a, na in reads[0].items():
+            for b, nb in reads[1].items():
+                if reads[2][a + b]:
+                    good[a + b] += na + nb + reads[2][a + b]
+                if reads[2][a - b]:
+                    good[a - b] += na + nb + reads[2][a - b]
+        if not good:
+            weak.append(index)
+            wide = [{int(alternative) for text in column for alternative in variants(str(text))} for column in reads]
+            for a in wide[0]:
+                for b in wide[1]:
+                    if a + b in wide[2]:
+                        good[a + b] += (a in reads[0]) + (b in reads[1]) + (a + b in reads[2])
+        if not good:
+            return None
+        values.append(good.most_common(1)[0][0])
+    return sum(values), values, weak
+
+
+def read_page(image: Path, candidates: int, split: int, darkness: int = 215, triple: bool = False) -> list[dict[str, object]]:
     gray = np.asarray(Image.open(image).convert("L"))
-    want = 3 + split * candidates
+    lead = 1 if triple else 2
+    want = lead + 1 + split * candidates
     for threshold, tolerance in ((225, 60), (200, 12), (200, 60), (225, 12), (225, 100)):
         dark = gray < threshold
         cumulative = np.cumsum(dark, axis=0, dtype=np.int32)
@@ -351,7 +382,7 @@ def read_page(image: Path, candidates: int, split: int, darkness: int = 215) -> 
             kept.append((a, b, "island", text[0]))
         elif (
             len(folded) >= 4
-            and (split == 2 or re.search(r"\d\W{0,2}[iIl]?$", text[0].strip()))
+            and (split >= 2 or re.search(r"\d\W{0,2}[iIl]?$", text[0].strip()))
             and not any(word in folded for word in ("DISTR", "PRECINT", "TOTAL", "SENATOR"))
         ):
             kept.append((a, b, "precinct", text[0]))
@@ -369,36 +400,42 @@ def read_page(image: Path, candidates: int, split: int, darkness: int = 215) -> 
     boxes = []
     for a, b, _, _ in kept:
         y0, y1 = band(cols[1], cols[2], a, b)
-        cells.append(((cols[1], y0, cols[2], y1), True))
+        if not triple:
+            cells.append(((cols[1], y0, cols[2], y1), True))
         row_boxes = []
         for candidate in range(candidates):
             for part in range(split):
-                low = 2 + split * candidate + part
+                low = lead + split * candidate + part
                 y0, y1 = band(cols[low], cols[low + 1], a, b)
                 cells.append(((cols[low], y0, cols[low + 1], y1), True))
-                if part == 0:
-                    row_boxes.append((cols[low], y0, cols[low + split], y1))
+                if part == (split - 1 if triple else 0):
+                    row_boxes.append((cols[low], y0, cols[low + (1 if triple else split)], y1))
         boxes.append(row_boxes)
     read = read_cells(cleaned, cells, PASSES)
-    width = 1 + split * candidates
+    width = (0 if triple else 1) + split * candidates
     rows = []
     for index, (a, b, kind, text) in enumerate(kept):
         raw_cells = read[index * width : (index + 1) * width]
-        if kind == "precinct" and not any(re.search(r"\d{3}", reading) for reading in raw_cells[0]):
+        if kind == "precinct" and not triple and not any(re.search(r"\d{3}", reading) for reading in raw_cells[0]):
             continue
 
         def arrange(source: list[list[str]]) -> list[list[str]]:
+            if triple:
+                return [source[split * candidate : split * (candidate + 1)] for candidate in range(candidates)]
             return [source[0]] + [
                 [" ".join(source[1 + split * candidate + part][pass_] for part in range(split)) for pass_ in range(len(source[0]))]
                 for candidate in range(candidates)
             ]
 
-        solved = solve_row(arrange(raw_cells))
+        solver = solve_triples if triple else solve_row
+        solved = solver(arrange(raw_cells))
         if solved is None or solved[2]:
             more = read_cells(cleaned, cells[index * width : (index + 1) * width], EXTRA)
-            again = solve_row(arrange([first + second for first, second in zip(raw_cells, more, strict=True)]))
+            again = solver(arrange([first + second for first, second in zip(raw_cells, more, strict=True)]))
             if again is not None and (solved is None or len(again[2]) <= len(solved[2])):
                 solved = again
+        if triple and kind == "precinct" and solved is None and not re.search(r"\d", text):
+            continue
         rows.append({"kind": kind, "name": text, "solved": solved, "boxes": boxes[index], "y": (a, b)})
     return rows
 
@@ -594,6 +631,7 @@ def parse_precincts() -> None:
         with tempfile.TemporaryDirectory() as folder:
             pdf = Path(zipfile.ZipFile(artifact.path).extract(election["member"], folder)) if "member" in election else artifact.path
             district: list[list[int]] = []
+            starts: list[int] = []
             for number in election["pages"]:
                 image = PAGES / f"{artifact.sha256}-{number}.png"
                 if not image.exists():
@@ -601,7 +639,8 @@ def parse_precincts() -> None:
                 with Image.open(image) as opened:
                     width, height = opened.size
                 ordinal = 0
-                rows_read = read_text_page(image, candidates, election.get("cut", 0), election.get("patch", {}).get(number)) if election.get("text") else read_page(image, candidates, election["split"])
+                districts = 0
+                rows_read = read_text_page(image, candidates, election.get("cut", 0), election.get("patch", {}).get(number)) if election.get("text") else read_page(image, candidates, election["split"], triple=election.get("triple", False))
                 if election.get("shaded"):
                     rows_read += [
                         row
@@ -619,17 +658,36 @@ def parse_precincts() -> None:
                         if "names" in election:
                             row["name"] = election["names"][number][ordinal - 1]
                         district.append(votes)
+                        starts.append(len(rows))
                         rows.extend(
                             {"day": day, "page": number, "name": row["name"], "candidate": index, "votes": value, "total": total, "box": list(row["boxes"][index]), "width": width, "height": height}
                             for index, value in enumerate(votes)
                         )
                     elif row["kind"] == "district":
                         sums = [sum(votes[index] for votes in district) for index in range(candidates)]
+                        row["solved"] = election.get("fixes", {}).get((number, -1 - districts), row["solved"])
+                        districts += 1
+                        if row["solved"] is not None and election.get("triple"):
+                            for index in range(candidates):
+                                gap = row["solved"][1][index] - sums[index]
+                                options = [
+                                    (at, int(alternative))
+                                    for at, votes in enumerate(district)
+                                    for alternative in variants(str(votes[index]))
+                                    if len(alternative) == len(str(votes[index])) and int(alternative) - votes[index] == gap
+                                ]
+                                if gap and len(options) == 1:
+                                    at, value = options[0]
+                                    print("settled", day, number, rows[starts[at]]["name"], index, district[at][index], "->", value)
+                                    district[at][index] = value
+                                    rows[starts[at] + index]["votes"] = value
+                                    sums[index] += gap
                         if row["solved"] is None or sums != row["solved"][1]:
-                            raise ValueError(f"{day} page {number}: district precinct sums {sums} against printed {row['solved']}")
+                            raise ValueError(f"{day} page {number}: district precinct sums {sums} against printed {row['solved']}: {district}")
                         printed = [a + b for a, b in zip(printed, row["solved"][1], strict=True)]
                         found = [a + b for a, b in zip(found, sums, strict=True)]
                         district = []
+                        starts = []
         print(day, "precincts", Counter(row["day"] for row in rows)[day] // candidates, "district sums", found, "match the printed district rows")
     pl.DataFrame(rows).write_parquet(PARSED / "precincts.parquet")
 
@@ -751,7 +809,7 @@ def emit() -> Path:
             )
             if "split" in election:
                 pages_text = ", ".join(str(number) for number in election["pages"])
-                body = f"Votes for {'Resident Commissioner' if day[0].endswith(':commissioner') else 'governor'} by municipio summed from the electoral-precinct rows of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election{' (' + election['member'].removesuffix('.pdf').title() + ')' if 'member' in election else ''}, pages {pages_text}, a table of page images read by OCR. Each precinct row's candidate votes match its printed percentages and do not exceed its printed total, and the precinct rows of every senatorial district sum to that district's printed totals row for each candidate. {election['island']} Each value's locator boxes the candidate's cells for the municipio's precinct rows on the first page where they appear; the sum also includes precinct rows on later pages and in other districts. Write-in and blank votes are not in the table."
+                body = f"Votes for {'Resident Commissioner' if day[0].endswith(':commissioner') else 'governor'} by municipio summed from the electoral-precinct rows of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election{' (' + election['member'].removesuffix('.pdf').title() + ')' if 'member' in election else ''}, pages {pages_text}, a table of page images read by OCR. {"Each precinct row's íntegros and otros votes sum to the printed total for each candidate" if election.get("triple") else "Each precinct row's candidate votes match its printed percentages and do not exceed its printed total"}, and the precinct rows of every senatorial district sum to that district's printed totals row for each candidate. {election['island']} Each value's locator boxes the candidate's cells for the municipio's precinct rows on the first page where they appear; the sum also includes precinct rows on later pages and in other districts. {election.get('settled', '')} Write-in and blank votes are not in the table."
             else:
                 body = f"Votes by municipio read from pages {election['pages'][0]}–{election['pages'][1]} of the State Elections Commission's Informe Estadístico for the {day[0][:4]} general election, a table of page images. Each row's candidate votes sum to its printed total and match its printed percentages. Write-in and blank votes are not in the table. The municipio rows sum to within five votes per candidate of the island totals printed on the report's last row."
             published = conn.execute("select from result_set where id = %s", [result_set]).fetchone() is not None
