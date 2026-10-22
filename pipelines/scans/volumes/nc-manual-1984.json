@@ -1,0 +1,41 @@
+{
+  "kind": "statewide",
+  "year": 1984,
+  "day": "1984-11-06",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, votes cast for state officers, general election 1984-11-06",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinaman1985nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinaman1985nort"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer",
+    "attorney-general": "Attorney General",
+    "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+    "commissioner-of-agriculture": "Commissioner of Agriculture",
+    "commissioner-of-insurance": "Commissioner of Insurance",
+    "commissioner-of-labor": "Commissioner of Labor"
+  },
+  "leaves": [
+    1325,
+    1326,
+    1341,
+    1342,
+    1343,
+    1344,
+    1345,
+    1346,
+    1347,
+    1348,
+    1349,
+    1350
+  ]
+}

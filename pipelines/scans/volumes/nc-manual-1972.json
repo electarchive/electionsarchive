@@ -1,0 +1,40 @@
+{
+  "kind": "statewide",
+  "year": 1972,
+  "day": "1972-11-07",
+  "polity": "US-NC",
+  "publisher": "North Carolina Secretary of State",
+  "title": "North Carolina Manual, votes cast for state officers, general election 1972-11-07",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/northcarolinama1973nort/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/northcarolinama1973nort"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer",
+    "attorney-general": "Attorney General",
+    "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+    "commissioner-of-agriculture": "Commissioner of Agriculture",
+    "commissioner-of-insurance": "Commissioner of Insurance",
+    "commissioner-of-labor": "Commissioner of Labor"
+  },
+  "leaves": [
+    359,
+    360,
+    379,
+    380,
+    381,
+    382,
+    383,
+    384,
+    385,
+    386,
+    387
+  ]
+}
