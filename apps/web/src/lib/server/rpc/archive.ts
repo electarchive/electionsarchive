@@ -6563,6 +6563,9 @@ export const elections = {
             ),
           }),
         ),
+        coalitions: v.array(
+          v.object({ name: v.string(), parties: v.array(v.string()) }),
+        ),
         contests: v.array(
           v.object({
             name: v.string(),
@@ -6596,7 +6599,7 @@ export const elections = {
       if (election == null) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [contestRows, electionRows, notes, crumbs, raced, anchor] =
+      const [contestRows, electionRows, notes, crumbs, raced, anchor, allied] =
         await Promise.all([
           db.execute<{ id: string; children: number }>(sql`
             select c.id, (select count(*)::int from contest x where x.allocation_parent_id = c.id) as children
@@ -6664,6 +6667,24 @@ export const elections = {
             where e.id = ${input.id}::uuid
             limit 1
           `),
+          db.execute<{ id: string; parties: Array<string> }>(sql`
+            with recursive tree(id) as (
+              select ${input.id}::uuid
+              union all
+              select e.id from election e join tree on e.parent_id = tree.id
+            )
+            select a.alliance_id as id, array_agg(distinct x.id::text) as parties
+            from (
+              select distinct o.alliance_id from contest c
+              join contest_option o on o.contest_id = c.id
+              where c.election_id in (select id from tree) and o.alliance_id is not null
+            ) a
+            join alliance_member m on m.alliance_id = a.alliance_id
+            left join entity_merge pm on pm.entity_id = m.party_id
+            cross join lateral (values (m.party_id), (pm.into_id)) x(id)
+            where x.id is not null
+            group by a.alliance_id
+          `),
         ]);
       const anchored = anchor.rows[0];
       const [turned, prior] = await Promise.all([
@@ -6685,6 +6706,7 @@ export const elections = {
           row.polity == null ? [row.id] : [row.id, row.polity],
         ),
         ...(election.parent == null ? [] : [election.parent]),
+        ...allied.rows.map((row) => row.id),
       ];
       const [labels, slugs, faces] = await Promise.all([
         names(ids),
@@ -6735,6 +6757,10 @@ export const elections = {
             ...row,
             photo: faces.get(row.person ?? "") ?? null,
           })),
+        })),
+        coalitions: allied.rows.map((row) => ({
+          name: labels.full.get(row.id) ?? "",
+          parties: row.parties,
         })),
         contests: contestRows.rows
           .map((row) => ({

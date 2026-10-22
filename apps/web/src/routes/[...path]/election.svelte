@@ -71,12 +71,120 @@
       (race) =>
         race.path != null && race.path === election.races[0]?.runoff?.path,
     );
-    return decisive < 1
-      ? election.races
-      : [
-          election.races[decisive],
-          ...election.races.filter((_, spot) => spot !== decisive),
-        ].filter((race) => race != null);
+    const sorted =
+      decisive < 1
+        ? election.races
+        : [
+            election.races[decisive],
+            ...election.races.filter((_, spot) => spot !== decisive),
+          ].filter((race) => race != null);
+    const tiers = Map.groupBy(
+      sorted.filter(
+        (race) =>
+          race.body != null &&
+          !race.isOffice &&
+          race.size != null &&
+          race.electors == null,
+      ),
+      (race) => race.body,
+    )
+      .values()
+      .find((group) => {
+        const size = group[0]?.size ?? 0;
+        let seats = 0;
+        for (const race of group) {
+          for (const row of race.results) {
+            seats += row.seats ?? 0;
+          }
+        }
+        return (
+          new Set(group.map((race) => race.kind)).size > 1 &&
+          group.every(
+            (race) => (race.round ?? 1) === 1 && race.size === size,
+          ) &&
+          sorted.every(
+            (race) => race.body !== group[0]?.body || (race.round ?? 1) === 1,
+          ) &&
+          seats >= size * 0.95 &&
+          seats <= size * 1.02
+        );
+      });
+    const base =
+      tiers?.find((race) => race.map != null) ??
+      tiers?.find((race) => race.count === 1) ??
+      tiers?.[0];
+    if (
+      tiers == null ||
+      base == null ||
+      tiers.some((race) =>
+        race.results.some(
+          (row) =>
+            row.key.startsWith("alliance:") &&
+            (row.seats ?? 0) > 0 &&
+            election.coalitions.every((entry) => entry.name !== row.label),
+        ),
+      )
+    ) {
+      return sorted.map((race) => ({ ...race, isTotal: false }));
+    }
+    const allied = new Map(
+      tiers.flatMap((race) =>
+        race.results.flatMap((row) => {
+          const coalition = row.key.startsWith("alliance:")
+            ? election.coalitions.find((entry) => entry.name === row.label)
+            : null;
+          return coalition == null
+            ? []
+            : coalition.parties.map((party) => [`party:${party}`, row.key]);
+        }),
+      ),
+    );
+    const folded = Map.groupBy(
+      tiers.flatMap((race) =>
+        race.results.map((row) => ({ row, isBase: race === base })),
+      ),
+      (entry) => allied.get(entry.row.key) ?? entry.row.key,
+    )
+      .entries()
+      .map(([key, entries]) => {
+        const head =
+          entries.find((entry) => entry.row.key === key)?.row ??
+          entries[0]?.row;
+        let [votes, share, seats] = [0, 0, null as number | null];
+        for (const { row, isBase } of entries) {
+          if (isBase) {
+            votes += row.votes;
+            share += row.share;
+          }
+          seats = row.seats == null ? seats : (seats ?? 0) + row.seats;
+        }
+        return head == null ? null : { ...head, key, votes, share, seats };
+      })
+      .filter((row) => row != null)
+      .toArray()
+      .toSorted((a, b) => (b.seats ?? 0) - (a.seats ?? 0) || b.votes - a.votes);
+    return [
+      {
+        ...base,
+        anchor: `${tiers[0]?.anchor ?? base.anchor}-total`,
+        path: null,
+        kind: "body_seats",
+        count: 1,
+        sample: null,
+        since: null,
+        before: null,
+        holders: null,
+        partners: [],
+        runoff: null,
+        results: folded,
+        isTotal: true,
+      },
+      ...sorted.map((race) => ({
+        ...race,
+        ...(race === base ? { map: null } : {}),
+        isTotal: false,
+      })),
+    ];
   });
 
   const stages = $derived(
@@ -176,7 +284,7 @@
   const regionals = createQueries(() => ({
     queries: ordered.map((race, index) => ({
       ...orpc.elections.regional.queryOptions({
-        input: { id, contest: race.sample ?? "" },
+        input: { id, contest: race.sample ?? race.anchor },
       }),
       enabled:
         race.sample != null &&
@@ -611,12 +719,17 @@
             ? m.race_round({ name: race.name, round: race.round ?? 1 })
             : isSplit
               ? m.race_split({ name: race.name, noun })
-              : race.isRemainder &&
+              : race.kind === "list_allocation" &&
                   ordered.some(
-                    (other) => other !== race && other.name === race.name,
+                    (other) => other.isTotal && other.body === race.body,
                   )
-                ? m.race_special({ name: race.name })
-                : race.name,
+                ? m.race_list({ name: race.name })
+                : race.isRemainder &&
+                    ordered.some(
+                      (other) => other !== race && other.name === race.name,
+                    )
+                  ? m.race_special({ name: race.name })
+                  : race.name,
         votes:
           decided == null
             ? (MEASURES[race.measure]?.() ?? m.col_votes())
@@ -703,12 +816,8 @@
                         noun,
                         share: percent(leader.share),
                       })
-                    : seated.length > 0 && !race.isOffice
-                      ? (race.kind === "body_seats" && race.body == null
-                          ? m.race_lede_tally
-                          : isRound && race.round === 1
-                            ? m.race_lede_seats_first
-                            : m.race_lede_seats)({
+                    : seated.length > 0 && race.isTotal && leader.share === 0
+                      ? m.race_lede_seats_only({
                           party: named(leader),
                           seats: count(leader.seats ?? 0),
                           total: count(
@@ -716,27 +825,41 @@
                               ? race.size
                               : total,
                           ),
-                          share: percent(leader.share),
                         })
-                      : race.kind === "ballot_question" &&
-                          race.results[0]?.isLost === true
-                        ? m.race_lede_lost({
-                            answer: named(leader),
+                      : seated.length > 0 && !race.isOffice
+                        ? (race.kind === "body_seats" && race.body == null
+                            ? m.race_lede_tally
+                            : isRound && race.round === 1
+                              ? m.race_lede_seats_first
+                              : m.race_lede_seats)({
+                            party: named(leader),
+                            seats: count(leader.seats ?? 0),
+                            total: count(
+                              race.size != null && race.size <= total + 2
+                                ? race.size
+                                : total,
+                            ),
                             share: percent(leader.share),
                           })
-                        : runner == null
-                          ? null
-                          : (seated.length > 0 ||
-                              race.results[0]?.isWon === true
-                              ? m.race_lede_won
-                              : m.race_lede_votes)({
-                              party: named(leader),
+                        : race.kind === "ballot_question" &&
+                            race.results[0]?.isLost === true
+                          ? m.race_lede_lost({
+                              answer: named(leader),
                               share: percent(leader.share),
-                              margin: points(
-                                leader.share - runner.share,
-                              ).replace(/^\+/u, ""),
-                              runner: named(runner),
-                            }),
+                            })
+                          : runner == null
+                            ? null
+                            : (seated.length > 0 ||
+                                race.results[0]?.isWon === true
+                                ? m.race_lede_won
+                                : m.race_lede_votes)({
+                                party: named(leader),
+                                share: percent(leader.share),
+                                margin: points(
+                                  leader.share - runner.share,
+                                ).replace(/^\+/u, ""),
+                                runner: named(runner),
+                              }),
         next:
           race.runoff?.runner == null
             ? null
@@ -1057,7 +1180,7 @@
             : m.col_electors()}
       />
     </div>
-    {#if race.places != null}
+    {#if race.places != null && !race.isTotal}
       {const shown = $derived(
         regional[index] === true
           ? (regionals[index]?.data?.places ?? race.places)
