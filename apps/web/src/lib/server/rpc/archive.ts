@@ -3107,6 +3107,11 @@ export const contests = {
             join election y on y.polity_id = pt.polity_id and pt.valid @> y.date_from
             join contest x on x.election_id = y.id
             where pt.area_id in (select id from anc) and x.district_area_id is null and x.allocation_parent_id is null
+              and not exists (
+                select from contest z
+                where z.election_id = x.election_id and z.kind = x.kind and z.body_id = x.body_id
+                  and z.district_area_id is not null and z.allocation_parent_id is null
+              )
           ) hit
           join contest c on c.id = hit.id
           join election e on e.id = c.election_id
