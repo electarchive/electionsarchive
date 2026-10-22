@@ -6122,6 +6122,8 @@ async function races(
       round: number | null;
       isOffice: boolean;
       isStage: boolean;
+      isExecutive: boolean;
+      isHome: boolean;
       size: number | null;
       isCounted: boolean;
       isRunoff: boolean;
@@ -6175,6 +6177,11 @@ async function races(
         case when c.kind = 'office' then null else c.body_id end as body,
         e.date_from::text as day, c.round_number as round,
         c.kind = 'office' as "isOffice", k.stage as "isStage", z.seats as size,
+        c.kind = 'office' and exists (
+          select from office o where o.id = c.office_id
+            and o.kind in ('governor', 'head_of_state', 'head_of_government', 'mayor')
+        ) as "isExecutive",
+        exists (select from body b where b.id = c.body_id and b.polity_id = ${polity}::uuid) as "isHome",
         (c.term is distinct from 'remainder' or (c.seat_id is not null and not exists (
           select from contest d where d.election_id = c.election_id and d.seat_id = c.seat_id and d.id <> c.id
         ))) and coalesce(st.voting, true) as "isCounted",
@@ -6613,6 +6620,16 @@ async function races(
         day: head?.day ?? null,
         chamber: labels.full.get(head?.owner ?? "") ?? null,
         isNational: head?.area === nation.id,
+        rank:
+          head == null
+            ? 4
+            : head.isExecutive
+              ? 0
+              : head.isOffice
+                ? 2
+                : head.isHome
+                  ? 3
+                  : 1,
         count: group.length,
         sample: table?.sample ?? null,
         since: table?.since ?? null,
@@ -6739,7 +6756,10 @@ async function races(
           Number(b.kind === "ballot_question") ||
         (a.kind === "ballot_question"
           ? a.name.localeCompare(b.name, undefined, { numeric: true })
-          : b.valid - a.valid),
+          : a.rank - b.rank ||
+            Number(a.rank === 1 && b.count === 1) -
+              Number(a.rank === 1 && a.count === 1) ||
+            b.valid - a.valid),
     )
     .map(
       ({
@@ -6751,6 +6771,7 @@ async function races(
         chamber,
         isNational,
         scope,
+        rank: _rank,
         ...race
       }) => {
         const stage = stages.find((entry) => entry.office === office);
