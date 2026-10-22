@@ -25,6 +25,11 @@ FILES = {
     (date(2002, 11, 5), "house"): ("20041011092813", "02elec/ELUSHSE02G.xls"),
     (date(2002, 11, 5), "senate"): ("20041011231359", "02elec/ELUSSEN02G.xls"),
     (date(2002, 11, 5), "state_house"): ("20041011134508", "02elec/ELKSREP02G.xls"),
+    (date(2002, 11, 5), "governor"): ("20041011135031", "02elec/ELGOV02G.xls"),
+    (date(2002, 11, 5), "attorney-general"): ("20041011102011", "02elec/ELAG02G.xls"),
+    (date(2002, 11, 5), "secretary-of-state"): ("20041011152120", "02elec/ELSOS02G.xls"),
+    (date(2002, 11, 5), "treasurer"): ("20041012003327", "02elec/ELTRES02G.xls"),
+    (date(2002, 11, 5), "commissioner-of-insurance"): ("20041011100614", "02elec/ELINS02G.xls"),
     (date(2004, 11, 2), "house"): ("20041217003958", "04elec/ELUSHOU04G.xls"),
     (date(2004, 11, 2), "senate"): ("20041217000909", "04elec/ELUSSEN04G.xls"),
     (date(2004, 11, 2), "president"): ("20041217020322", "04elec/ELPRES04G.xls"),
@@ -265,9 +270,8 @@ def emit() -> Path:
                 """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness,
                           (select min(v.count_round) from result_value v where v.result_set_k = r.k)
                    from external_id x join result_set r on r.contest_id = x.entity_id
-                   join changeset g on g.id = r.changeset_id and g.pipeline = 'us.klarner'
-                   where x.scheme = 'us.contest' and x.value = %s""",
-                [key],
+                   where x.scheme = 'us.contest' and x.value = %s and r.source_id <> %s""",
+                [key, source],
             ).fetchone()
             options = {
                 row[0]: row
