@@ -1,7 +1,7 @@
 import html
 import re
 import time
-from datetime import date
+from datetime import date, timedelta
 from pathlib import Path
 from uuid import UUID
 
@@ -108,13 +108,14 @@ METHOD = (
 def pages(election: int) -> tuple[str, list[tuple[str, str]]]:
     url = f"{HOST}results_report.aspx?e={election}"
     return url, [
-        (OFFICES[office], f"{HOST}results_report_county_breakdown.aspx?e={election}&t={contest}")
+        (OFFICES.get(office) or f"house:{district[2]}", f"{HOST}results_report_county_breakdown.aspx?e={election}&t={contest}")
         for office, contest in re.findall(
             r'<h3 class="reset-margin">([^<]*)</h3>.*?results_report_county_breakdown\.aspx\?e=\d+&amp;t=(\d+)',
             raw.cached(SOURCE, f"{HOST}results_report.aspx?e={election}").path.read_text(errors="ignore"),
             re.S,
         )
-        if office in OFFICES
+        if (district := re.fullmatch(r"(U\. S\. Representative District #)(\d+)", office) if ELECTIONS[election] >= 1992 else None)
+        or office in OFFICES
     ]
 
 
@@ -127,8 +128,12 @@ def fetch() -> None:
         except (httpx.HTTPError, FileNotFoundError):
             failed += 1
             continue
-        time.sleep(2)
         for _, url in links:
+            try:
+                raw.cached(SOURCE, url)
+                continue
+            except LookupError:
+                pass
             try:
                 raw.fetch(SOURCE, url, suffix=".html")
             except httpx.HTTPError:
@@ -160,7 +165,12 @@ def parse() -> None:
         for office, url in pages(election)[1]:
             printed: dict[str, int] = {}
             block = re.search(
-                r'<h3 class="reset-margin">%s</h3>(.*?)Show County Breakdown' % re.escape(next(k for k, v in OFFICES.items() if v == office)),
+                r'<h3 class="reset-margin">%s</h3>(.*?)Show County Breakdown'
+                % re.escape(
+                    f"U. S. Representative District #{office.removeprefix('house:')}"
+                    if office.startswith("house:")
+                    else next(k for k, v in OFFICES.items() if v == office)
+                ),
                 main,
                 re.S,
             )[1]
@@ -255,8 +265,19 @@ def emit() -> Path:
         contests = dict(
             conn.execute("select value, entity_id from external_id where scheme = 'us.contest' and value ~ ':WA:'")
         )
+        split = {
+            (day, county)
+            for (day, county), titles in frame.filter(pl.col("title").str.starts_with("house:"))
+            .group_by("day", "county")
+            if titles["title"].n_unique() > 1
+        }
+        areas = dict(
+            conn.execute(
+                "select u.code, u.area_id from reporting_unit u where u.scheme_code = 'us.county' and u.code like '53%%'"
+            ).fetchall()
+        )
         for (day, office), rows in frame.group_by("day", "title", maintain_order=True):
-            key = f"{day}:WA:{bases[office]}"
+            key = f"{day}:WA:{office if office.startswith('house:') else bases[office]}"
             contest = contests.get(key)
             if contest is None:
                 print(f"{key}: no contest in the archive")
@@ -279,7 +300,7 @@ def emit() -> Path:
             ((county_rows,),) = conn.execute(
                 """select count(*) from result_value v join result_set r on r.k = v.result_set_k
                    join reporting_unit u on u.k = v.unit_k
-                   where r.id = %s and u.scheme_code = 'us.county'""",
+                   where r.id = %s and u.scheme_code in ('us.county', 'us.county_part')""",
                 [old[0][0]],
             ).fetchall()
             if county_rows:
@@ -338,11 +359,40 @@ def emit() -> Path:
                 continue
             for option, kind, seats in outcomes:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
+            unit_ids = dict(units)
+            if office.startswith("house:"):
+                ((district_area,),) = conn.execute("select district_area_id from contest where id = %s", [contest]).fetchall()
+                for county in rows["county"].unique():
+                    if (day, county) not in split:
+                        continue
+                    part = f"{day[:4]}:{county}:{office.removeprefix('house:')}"
+                    unit_ids[county] = cs.unit("us.county_part", part)
+                    if unit_ids[county] in cs.minted:
+                        cs.add(
+                            "reporting_unit",
+                            id=unit_ids[county],
+                            polity_id=cs.polity("US-WA"),
+                            scheme_code="us.county_part",
+                            code=part,
+                            parent_id=units[county],
+                            area_relation="within",
+                            area_id=areas[county],
+                            kind="standard",
+                            valid_from=date.fromisoformat(day),
+                            valid_to=date.fromisoformat(day) + timedelta(days=1),
+                        )
+                        cs.add(
+                            "reporting_unit_area",
+                            unit_id=unit_ids[county],
+                            area_id=district_area,
+                            valid_from=date.fromisoformat(day),
+                            valid_to=date.fromisoformat(day) + timedelta(days=1),
+                        )
             for county, name, votes in rows.select("county", "candidate", "votes").iter_rows():
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
-                    unit_id=units[county],
+                    unit_id=unit_ids[county],
                     option_id=targets[name],
                     channel=0,
                     measure=1,
