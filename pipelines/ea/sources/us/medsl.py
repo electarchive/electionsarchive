@@ -700,6 +700,8 @@ def attach(
     grain: str = "county",
     strict: bool = False,
     extend: bool = False,
+    canvass: bool = False,
+    partial: str | None = None,
 ) -> None:
     tag = str(cs.manifest["pipeline"])
     located = "page_id" in congress.columns
@@ -844,17 +846,18 @@ def attach(
             .group_by("option")
             .agg(pl.col("votes").sum())
         )
-        overcounted = undercounted = False
+        overcounted = undercounted = held_back = False
         for option, kind, label, _, fec in known:
             medsl = int(tallies.filter(pl.col("option") == str(option))["votes"].sum())
             if kind in ("candidate", "ticket") and fec and abs(medsl - fec) > max(100, fec * 0.02):
                 drifted.append((key, label, medsl, fec))
+                held_back |= medsl < fec * 0.9
                 overcounted |= medsl > fec
                 undercounted |= medsl < fec
-        if overcounted:
+        if overcounted and not canvass:
             print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
             continue
-        if undercounted and (strict or ":" in chamber):
+        if undercounted and (strict or ":" in chamber) and (partial is None or held_back):
             print(f"{key}: a candidate's county sum falls short of the FEC total, skipped")
             continue
         pooled = tallies.with_columns(
@@ -887,7 +890,7 @@ def attach(
                 f"{key}: {max(missing, key=lambda line: line[2])[1]} has over 1 percent of the vote and matches no option, skipped"
             )
             continue
-        if counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1:
+        if not canvass and counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1:
             print(f"{key}: the county sum exceeds the official total by over 10 percent, skipped")
             continue
         if counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() < official * 0.5:
@@ -951,11 +954,21 @@ def attach(
             status="active",
             source_id=sources[lines["source"][0]],
             is_default=False,
-            completeness=round(
+            completeness=1
+            if canvass
+            else round(
                 float(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum()) / float(official), 4
             ),
             supersedes_id=previous,
         )
+        if undercounted and partial is not None:
+            counted_votes = int(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum())
+            cs.add(
+                "note",
+                entity_id=result_set,
+                kind="caveat",
+                body_md=f"The county totals add up to {counted_votes:,} votes against the official {int(official):,}: {partial}.",
+            )
         members: dict[str, str] = {}
         for code, kind in lines.select("code", "kind").unique().iter_rows():
             if (

@@ -27,38 +27,60 @@ FILES = {
     ],
     date(2008, 9, 9): ["Elections/2008/Primary/2008PrimaryReturns.pdf"],
     date(2010, 9, 14): ["elections/2010/Primary/2010PrimaryElectionResults.pdf"],
+    date(2014, 9, 9): ["elections/2014/Primary/2014StateLocalPrimaryElectionResults.pdf"],
 }
 PARTIES = {"rep": "republican", "republican": "republican", "dem": "democratic", "democratic": "democratic"}
+LEGISLATIVE = {
+    "democratic": "dp",
+    "republican": "rp",
+    "conservative": "conservativep",
+    "independence": "indepp",
+    "working families": "workp",
+    "green": "greenp",
+}
+RENAMED = {"RUTH H. THOMPSON": "RUTH HASSELL-THOMPSON"}
 NUMBER = re.compile(r"^\d[\d,]*$")
 TITLE_HOUSE = re.compile(
     r"^\s*(?:Congress\s+(\d+)\s*(?:st|nd|rd|th)?|(\d+)(?:st|nd|rd|th) CD)\s*-\s*([A-Za-z ]+?)(?:\s{2,}(.*))?$"
 )
-TITLE_SENATE = re.compile(r"^\s*Statewide\s+(Democratic|Republican)\s+US Senator Primary", re.I)
-ROW = re.compile(r"^\s*((?:Part of )?[A-Za-z][A-Za-z. ]*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*$", re.I)
+TITLE_LEGISLATURE = re.compile(r"^\s*(Senate|Assembly)\s+(\d+)(?:st|nd|rd|th)\s*-\s*([A-Za-z ]+?)\s*$")
+TITLE_SENATE = re.compile(r"^\s*Statewide\s+(Democratic|Republican)\s+US Senator Primary", re.IGNORECASE)
+ROW = re.compile(r"^\s*((?:Part of )?[A-Za-z][A-Za-z. ]*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*$", re.IGNORECASE)
 
 
 def read(path: Path) -> list[str]:
-    return subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True).stdout.split(
-        "\n"
-    )
+    return subprocess.run(
+        ["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True
+    ).stdout.split("\n")
 
 
 def chunks(line: str) -> list[tuple[float, str]]:
     return [((m.start() + m.end()) / 2, m.group().strip()) for m in re.finditer(r"\S+(?: \S+)*", line)]
 
 
-def blocks(lines: list[str]) -> list[tuple[str, str, int | None, bool, list[list[tuple[float, str]]], list[tuple[str, list[int]]], list[float]]]:
+def blocks(
+    lines: list[str],
+) -> list[tuple[str, str, int | None, bool, list[list[tuple[float, str]]], list[tuple[str, list[int]]], list[float]]]:
     out = []
     i = 0
     while i < len(lines):
         line = lines[i]
         house = TITLE_HOUSE.match(line)
         senate = None if house else TITLE_SENATE.match(line)
-        if not house and not senate:
+        legislature = TITLE_LEGISLATURE.match(line)
+        if not house and not senate and not legislature:
             i += 1
             continue
         head = [chunks(house.group(4))] if house and house.group(4) else []
-        if house:
+        if legislature:
+            office, district, party = (
+                legislature.group(1).lower(),
+                int(legislature.group(2)),
+                legislature.group(3).lower(),
+            )
+            office = f"{office}:{district}:{LEGISLATIVE.get(party, party)}"
+            special = False
+        elif house:
             office, district, party = "house", int(house.group(1) or house.group(2)), house.group(3).strip().lower()
             special = False
         else:
@@ -71,10 +93,12 @@ def blocks(lines: list[str]) -> list[tuple[str, str, int | None, bool, list[list
         anchor = None
         while j < len(lines) and j < i + 120:
             current = lines[j]
-            if TITLE_HOUSE.match(current) and j > i + 1:
+            if (TITLE_HOUSE.match(current) or TITLE_LEGISLATURE.match(current)) and j > i + 1:
+                break
+            if legislature and rows and re.search(r"Board of Elections|\s-\s+[A-Z]", current):
                 break
             row = ROW.match(current)
-            if row and not re.match(r"^\s*(county|candidate)\b", current, re.I):
+            if row and not re.match(r"^\s*(county|candidate)\b", current, re.IGNORECASE):
                 label = row.group(1).strip()
                 numbers = [int(n.replace(",", "")) for n in row.group(2).split()]
                 if label.lower() in ("total", "statewide total"):
@@ -101,13 +125,15 @@ def columns(head: list[list[tuple[float, str]]], anchor: list[float]) -> list[st
         kept = [
             (x, text)
             for x, text in line
-            if not re.fullmatch(r"(candidate|county)", text, re.I)
-            and not re.search(r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\b", text)
+            if not re.fullmatch(r"(candidate|county)", text, re.IGNORECASE)
+            and not re.search(
+                r"\b(January|February|March|April|May|June|July|August|September|October|November|December)\b", text
+            )
         ]
         if len(kept) > len(anchor):
             continue
         for k, (_, text) in enumerate(kept):
-            slot = len(anchor) - 1 if re.search(r"scatter|write", text, re.I) else k
+            slot = len(anchor) - 1 if re.search(r"scatter|write", text, re.IGNORECASE) else k
             names[slot] = f"{names[slot]} {text}".strip()
     return names
 
@@ -133,10 +159,13 @@ def parse() -> None:
         seen = set()
         for name in names:
             for office, party, district, special, head, body in [
-                (b[0], b[1], b[2], b[3], b[4], (b[5], b[6])) for b in blocks(read(raw.cached(SOURCE, WAYBACK + name).path))
+                (b[0], b[1], b[2], b[3], b[4], (b[5], b[6]))
+                for b in blocks(read(raw.cached(SOURCE, WAYBACK + name).path))
             ]:
                 lines, anchor = body
-                party = PARTIES.get(party.split()[0], None)
+                party = PARTIES.get(party.split()[0], None) if office in ("house", "senate") else ""
+                if party == "" and any(text.lower() == "candidate" for line in head for _, text in line):
+                    continue
                 if party is None or special or (office, party, district, special) in seen:
                     continue
                 seen.add((office, party, district, special))
@@ -150,18 +179,20 @@ def parse() -> None:
                     if len(numbers) != len(labels):
                         raise ValueError(f"{name}: {county} has {len(numbers)} numbers for {labels}")
                     for label, votes in zip(labels, numbers, strict=True):
-                        if re.fullmatch(r"sub ?total|blank|void|blank/void", label, re.I) or not label:
+                        if re.fullmatch(r"sub ?total|blank|void|blank/void", label, re.IGNORECASE) or not label:
                             continue
                         rows.append(
                             (
                                 day.year,
-                                f"{office}:{party}",
+                                f"{office}:{party}" if party else office,
                                 day,
                                 special,
                                 "NY",
-                                district,
+                                district if party else None,
                                 counties[key],
-                                "WRITE-INS" if re.search(r"scatter|write", label, re.I) else label.upper(),
+                                "WRITE-INS"
+                                if re.search(r"scatter|write", label, re.IGNORECASE)
+                                else RENAMED.get(label.upper(), label.upper()),
                                 votes,
                             )
                         )
@@ -184,13 +215,37 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    frame = pl.read_parquet(PARSED / "counties.parquet")
     with connect() as conn:
+        filled = [
+            key
+            for (key,) in conn.execute(
+                """select distinct x.value from external_id x
+                   join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
+                   where x.scheme = 'us.contest' and x.value like '%%:NY:%%'
+                     and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
+                                 where v.result_set_k = r.k
+                                   and u.scheme_code in ('us.precinct', 'us.county', 'us.county_part', 'us.nyc_ed'))"""
+            ).fetchall()
+        ]
+        frame = pl.read_parquet(PARSED / "counties.parquet").filter(
+            ~pl.when(pl.col("district").is_null())
+            .then(pl.concat_str(pl.col("day").cast(pl.String), pl.lit("NY"), "chamber", separator=":"))
+            .otherwise(
+                pl.concat_str(
+                    pl.col("day").cast(pl.String),
+                    pl.lit("NY:house"),
+                    pl.col("district").cast(pl.String),
+                    pl.col("chamber").str.strip_prefix("house:"),
+                    separator=":",
+                )
+            )
+            .is_in(filled)
+        )
         cs = Changeset(
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New York's 2002 to 2010 House and Senate primaries by county",
+            summary="New York's 2002 to 2010 House and Senate and 2014 State Senate and Assembly primaries by county",
             polity="US-NY",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -206,5 +261,5 @@ def emit() -> Path:
         for names in FILES.values():
             for name in names:
                 cs.artifact(raw.cached(SOURCE, WAYBACK + name), source)
-        medsl.attach(cs, conn, frame, {"NY": source}, strict=True)
+        medsl.attach(cs, conn, frame, {"NY": source}, strict=True, canvass=True)
         return cs.write()
