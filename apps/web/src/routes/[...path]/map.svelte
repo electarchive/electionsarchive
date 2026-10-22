@@ -286,6 +286,12 @@
   const isUnmatched = $derived(
     unmatched.size > 0 && typeof view === "string" && COMPARED.has(view),
   );
+  const isEstimated = $derived(
+    places.estimated === true &&
+      changes.size > 0 &&
+      typeof view === "string" &&
+      COMPARED.has(view),
+  );
   const flips = $derived(
     Map.groupBy(
       changes
@@ -1375,7 +1381,10 @@
     const tones = paint(host);
     const colorsNow = style(tones.read);
     const painted = fills(tones.read);
-    const hatched = isUnmatched ? [...unmatched.keys()] : [];
+    const hatched = [
+      ...(isUnmatched ? unmatched.keys() : []),
+      ...(isEstimated ? changes.keys() : []),
+    ];
     const tips = [0, 1].map((index) =>
       tones.read(colors[index] ?? "var(--muted-foreground)"),
     );
@@ -2119,6 +2128,19 @@
         >
       </span>
     {/if}
+    {#if isEstimated && span != null}
+      <span class="grid gap-0.5 text-muted-foreground">
+        <span class="flex items-center gap-1.5">
+          <span
+            class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_4px)] ring-1 ring-border block-3 inline-4"
+          ></span>
+          <span class="text-foreground">{m.atlas_estimated()}</span>
+        </span>
+        <span class="text-xs text-pretty max-inline-120"
+          >{m.atlas_estimated_note({ year: span.from })}</span
+        >
+      </span>
+    {/if}
     {#if isApproximate}
       <span class="flex items-center gap-1.5 text-muted-foreground">
         <span
@@ -2322,6 +2344,11 @@
         </span>
       {/each}
     </span>
+    {#if isCompared && places.estimated === true && current.earlier != null && span != null}
+      <span class="text-xs text-muted-foreground"
+        >{m.map_estimated_line({ year: span.from })}</span
+      >
+    {/if}
     {#if isCompared && current.earlier == null && span != null}
       <span class="text-xs text-pretty text-muted-foreground"
         >{current.redrawn == null

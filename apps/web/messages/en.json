@@ -1040,6 +1040,7 @@
   "map_unmatched_missing": "{count} with no {year} result",
   "map_unmatched_redrawn_line": "Redrawn since {year}. It shares {percent} of its ground with the current version and isn't compared.",
   "map_unmatched_missing_line": "No result recorded for this area in {year}, so it isn't compared.",
+  "map_estimated_line": "Estimated: the {year} result is split from the {year} precincts that overlap this area.",
   "places_others_with": "{name} and others",
   "places_others_note": "The county source groups {name} with minor candidates; they appear as one group on this map.",
   "seats_up": "{count} of {total} seats were up for election. Faded dots represent seats not up.",

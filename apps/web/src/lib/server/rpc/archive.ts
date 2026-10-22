@@ -280,6 +280,7 @@ const Places = v.nullable(
     rows: v.array(PlaceRow),
     districts: v.optional(v.array(PlaceRow)),
     sources: v.array(v.string()),
+    estimated: v.optional(v.boolean()),
   }),
 );
 
@@ -1855,12 +1856,47 @@ async function places(
       owner: null,
     })),
   ];
+  const crosswalk =
+    chosen == null
+      ? null
+      : await db.execute<{ from_k: number; to_k: number; weight: number }>(sql`
+        select w.from_k, w.to_k, w.weight::float8 as weight
+        from crosswalk x
+        join crosswalk_weight w on w.crosswalk_id = x.id
+        where x.to_boundary_set_id = (
+            select id from boundary_set
+            where scheme_code = ${level.code}
+              and (id = (select boundary_set_id from contest where id = ${contest.id}::uuid) or valid @> ${contest.date ?? "infinity"}::date)
+            order by id = (select boundary_set_id from contest where id = ${contest.id}::uuid) desc, valid_from desc nulls last
+            limit 1
+          )
+          and x.from_boundary_set_id = (
+            select id from boundary_set
+            where scheme_code = ${level.code} and valid @> ${chosen.date ?? "infinity"}::date
+            order by valid_from desc nulls last
+            limit 1
+          )
+          and w.to_k = any(${sql.param(listed.map((row) => row.k))}::int[])
+      `);
+  const weights = crosswalk?.rows ?? [];
+  const spread = new Map<number, Array<[number, number]>>();
+  for (const row of weights) {
+    const list = spread.get(row.from_k) ?? [];
+    list.push([row.to_k, row.weight]);
+    spread.set(row.from_k, list);
+  }
   const [counted, at, moved] = await Promise.all([
     tabulate(
       [contest.root],
       listed,
       contest.date,
-      chosen == null ? null : { ids: [chosen.id], date: chosen.date },
+      chosen == null
+        ? null
+        : {
+            ids: [chosen.id],
+            date: chosen.date,
+            ...(spread.size > 0 && { spread }),
+          },
       lineage,
       match,
       grouping,
@@ -1871,7 +1907,9 @@ async function places(
       contest.date ?? "infinity",
     ),
     redrawn(
-      [...shown.map((kid) => kid.id), ...nested.map((row) => row.area)],
+      [...shown.map((kid) => kid.id), ...nested.map((row) => row.area)].filter(
+        () => spread.size === 0,
+      ),
       contest,
       chosen,
       area.id,
@@ -1930,6 +1968,7 @@ async function places(
     })),
     level: level.code,
     ...tabulated,
+    estimated: spread.size > 0,
     rows: tabulated.rows
       .slice(0, rows.length)
       .map((row) => ({
