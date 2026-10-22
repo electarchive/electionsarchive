@@ -76,7 +76,7 @@
     span: { from: string; to: string; forward: boolean } | null;
     only?: number | string | null;
     focus?: number | null;
-    shade?: "winner" | number;
+    shade?: "winner" | "bubbles" | number;
     isLinked?: boolean;
     pick?: (code: string) => void;
     sources?: Array<string> | null;
@@ -162,7 +162,7 @@
 
   $effect(() => {
     if (isLinked) {
-      keep({ shade: shading === "winner" ? null : String(shading) });
+      keep({ shade: shading === shade ? null : String(shading) });
     }
   });
   let fit: Maplibre.PaddingOptions = {

@@ -239,15 +239,20 @@
         .replaceAll("%2F", "/"),
     })),
   );
+  const isSolo = $derived(places.legend.length === 1 && !comparing);
   const columns = $derived([
     { key: "name" as const, label: heading, numeric: false },
-    { key: "leader" as const, label: m.col_leader(), numeric: false },
-    {
-      key: "margin" as const,
-      label: m.col_margin(),
-      numeric: true,
-      definition: m.term_margin(),
-    },
+    ...(isSolo
+      ? []
+      : [
+          { key: "leader" as const, label: m.col_leader(), numeric: false },
+          {
+            key: "margin" as const,
+            label: m.col_margin(),
+            numeric: true,
+            definition: m.term_margin(),
+          },
+        ]),
     { key: "valid" as const, label: votes, numeric: true },
     ...(comparing && span != null
       ? [
@@ -588,7 +593,7 @@
               class={cn("px-2 py-1.5 font-medium", {
                 "text-end": entry.numeric,
                 "text-start": !entry.numeric,
-                "max-sm:hidden": entry.key === "valid",
+                "max-sm:hidden": entry.key === "valid" && !isSolo,
                 "max-md:hidden": entry.key === "margin" && comparing,
               })}
               scope="col"
@@ -672,7 +677,7 @@
                 {/if}
               </Tooltip.Root>
             </th>
-            {#if entry.key === "name"}
+            {#if entry.key === "name" && !isSolo}
               <th
                 class="px-2 py-1.5 text-start font-medium inline-[34%] max-sm:hidden"
                 scope="col">{m.col_result()}</th
@@ -729,88 +734,97 @@
                   class="ms-1.5 text-xs font-normal text-muted-foreground"
                   >{m.places_remainder()}</span
                 >{/if}
-              <span
-                class="mbs-1.5 flex overflow-hidden rounded-xs bg-muted block-2 sm:hidden"
-                aria-hidden="true"
-              >
-                {#each row.shares as share, index (index)}
-                  <span
-                    class="shrink-0 bg-(--party) not-last:border-e not-last:border-card"
-                    style:--party={colors[index]}
-                    style:inline-size="{share * 100}%"
-                  ></span>
-                {/each}
-              </span>
-            </th>
-            <td class="px-2 py-1.5 max-sm:hidden">
-              <Tooltip.Trigger tether={strip} payload={index} tabindex={-1}>
-                {#snippet child({ props })}
-                  <svelte:element
-                    this={row.path == null ? "span" : "a"}
-                    {...props}
-                    type={undefined}
-                    class="relative z-1 flex overflow-hidden rounded-xs bg-muted block-3"
-                    href={row.path == null
-                      ? undefined
-                      : resolve("/[...path]", { path: row.path })}
-                    aria-hidden="true"
-                  >
-                    {#each row.shares as share, index (index)}
-                      <span
-                        class={cn(
-                          "shrink-0 bg-(--party) not-last:border-e not-last:border-card",
-                          {
-                            "opacity-35":
-                              only != null && only !== "flip" && only !== index,
-                          },
-                        )}
-                        style:--party={colors[index]}
-                        style:inline-size="{share * 100}%"
-                      ></span>
-                    {/each}
-                  </svelte:element>
-                {/snippet}
-              </Tooltip.Trigger>
-            </td>
-            <td class="px-2 py-1.5 whitespace-nowrap">
-              {#if row.leader != null}
-                <span class="flex items-center gap-1.5">
-                  <Name
-                    class="relative z-1 truncate font-semibold max-inline-40"
-                    label={titles[row.leader] ?? ""}
-                    color={colors[row.leader]}
-                    person={places.legend[row.leader]?.person}
-                    party={places.legend[row.leader]?.party}
-                  />
-                  <span
-                    class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                    >{#if row.valid === 0}{m.map_unopposed()}{:else}{@render cite(
-                        percent(row.shares[row.leader] ?? 0),
-                        "share",
-                        row,
-                        `${titles[row.leader] ?? ""} ${m.col_share()}`,
-                      )}{/if}</span
-                  >
+              {#if !isSolo}
+                <span
+                  class="mbs-1.5 flex overflow-hidden rounded-xs bg-muted block-2 sm:hidden"
+                  aria-hidden="true"
+                >
+                  {#each row.shares as share, index (index)}
+                    <span
+                      class="shrink-0 bg-(--party) not-last:border-e not-last:border-card"
+                      style:--party={colors[index]}
+                      style:inline-size="{share * 100}%"
+                    ></span>
+                  {/each}
                 </span>
               {/if}
-            </td>
+            </th>
+            {#if !isSolo}
+              <td class="px-2 py-1.5 max-sm:hidden">
+                <Tooltip.Trigger tether={strip} payload={index} tabindex={-1}>
+                  {#snippet child({ props })}
+                    <svelte:element
+                      this={row.path == null ? "span" : "a"}
+                      {...props}
+                      type={undefined}
+                      class="relative z-1 flex overflow-hidden rounded-xs bg-muted block-3"
+                      href={row.path == null
+                        ? undefined
+                        : resolve("/[...path]", { path: row.path })}
+                      aria-hidden="true"
+                    >
+                      {#each row.shares as share, index (index)}
+                        <span
+                          class={cn(
+                            "shrink-0 bg-(--party) not-last:border-e not-last:border-card",
+                            {
+                              "opacity-35":
+                                only != null &&
+                                only !== "flip" &&
+                                only !== index,
+                            },
+                          )}
+                          style:--party={colors[index]}
+                          style:inline-size="{share * 100}%"
+                        ></span>
+                      {/each}
+                    </svelte:element>
+                  {/snippet}
+                </Tooltip.Trigger>
+              </td>
+              <td class="px-2 py-1.5 whitespace-nowrap">
+                {#if row.leader != null}
+                  <span class="flex items-center gap-1.5">
+                    <Name
+                      class="relative z-1 truncate font-semibold max-inline-40"
+                      label={titles[row.leader] ?? ""}
+                      color={colors[row.leader]}
+                      person={places.legend[row.leader]?.person}
+                      party={places.legend[row.leader]?.party}
+                    />
+                    <span
+                      class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
+                      >{#if row.valid === 0}{m.map_unopposed()}{:else}{@render cite(
+                          percent(row.shares[row.leader] ?? 0),
+                          "share",
+                          row,
+                          `${titles[row.leader] ?? ""} ${m.col_share()}`,
+                        )}{/if}</span
+                    >
+                  </span>
+                {/if}
+              </td>
+              <td
+                class={cn(
+                  "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
+                  { "max-md:hidden": comparing },
+                )}
+              >
+                {#if row.margin != null}
+                  {@render cite(
+                    points(row.margin),
+                    "margin",
+                    row,
+                    m.col_margin(),
+                  )}
+                {/if}
+              </td>
+            {/if}
             <td
               class={cn(
-                "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums",
-                { "max-md:hidden": comparing },
+                "px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums",
+                { "max-sm:hidden": !isSolo },
               )}
-            >
-              {#if row.margin != null}
-                {@render cite(
-                  points(row.margin),
-                  "margin",
-                  row,
-                  m.col_margin(),
-                )}
-              {/if}
-            </td>
-            <td
-              class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap text-muted-foreground tabular-nums max-sm:hidden"
             >
               {#if row.valid > 0}
                 {@render cite(count(row.valid), "votes", row, votes)}
@@ -910,7 +924,7 @@
           <tr>
             <td
               class="px-2 py-4 text-muted-foreground"
-              colspan={columns.length + 1}
+              colspan={columns.length + (isSolo ? 0 : 1)}
               >{m.places_filter_empty({ query })}</td
             >
           </tr>

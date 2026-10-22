@@ -439,6 +439,14 @@
       rows.toSorted((a, b) => a.valid - b.valid)[Math.floor(rows.length / 2)]
         ?.valid ?? 0;
     const sizable = rows.filter((row) => row.valid >= median / 10);
+    const largest = {
+      label: m.key_largest(),
+      rows: rows.toSorted((a, b) => b.valid - a.valid).slice(0, 3),
+      value: (row: (typeof rows)[number]) => count(row.valid),
+    };
+    if (titles.length < 2) {
+      return [largest];
+    }
     return [
       {
         label: m.key_closest(),
@@ -447,11 +455,7 @@
           .slice(0, 3),
         value: margin,
       },
-      {
-        label: m.key_largest(),
-        rows: rows.toSorted((a, b) => b.valid - a.valid).slice(0, 3),
-        value: (row: (typeof rows)[number]) => count(row.valid),
-      },
+      largest,
       ...[0, 1]
         .filter((index) => titles[index] != null)
         .map((index) => ({
@@ -1170,6 +1174,7 @@
         <PlaceMap
           places={placed}
           colors={tones}
+          shade={titles.length === 1 ? "bubbles" : "winner"}
           tiles={drawn.tiles}
           own={drawn.own}
           nested={drawn.nested}
@@ -1542,7 +1547,9 @@
         class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-5 xl:col-span-4"
       >
         <p class="pbe-2 text-xs text-muted-foreground">
-          {m.locator_key({
+          {(locating.places.legend.length === 1
+            ? m.locator_key_margin
+            : m.locator_key)({
             noun: locating.noun,
             count: count(locating.places.rows.length),
           })}

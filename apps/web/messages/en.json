@@ -693,6 +693,7 @@
   "map_zoom_out": "Zoom out",
   "map_reset": "Show the whole map",
   "locator_key": "Party leading in each {noun}, {count} in all",
+  "locator_key_margin": "Winner's margin in each {noun}, {count} in all",
   "map_margin": "Winner's margin",
   "map_margin_under": "Under {points}",
   "map_margin_over": "{points} or more",
