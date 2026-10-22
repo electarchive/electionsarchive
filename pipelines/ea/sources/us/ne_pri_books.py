@@ -11,6 +11,7 @@ from pathlib import Path
 from uuid import UUID
 
 import polars as pl
+import numpy as np
 from PIL import Image
 
 from ea import raw
@@ -40,7 +41,8 @@ FIXES: dict[tuple[int, int, str | None, str, int], int] = {
     (1994, 10, "INDEPENDENTS VOTING", "garden", 0): 3,
     (1994, 10, "INDEPENDENTS VOTING", "sarpy", 0): 533,
 }
-HELD = {(1998, p) for p in (7, 8, 13, 14, 20)}
+GRID = {(1998, p) for p in (8, 13, 14)}
+SKIP = {(1998, 20)}
 SENATE = {1994: (4, 10), 1996: (8, 9)}
 
 
@@ -219,6 +221,118 @@ def boxes(
     return out
 
 
+def gridboxes(
+    year: int, page: int, tables: list[dict[str, object]]
+) -> dict[tuple[int, str, int], tuple[float, float, float, float]]:
+    image = PARSED / "ocr" / f"{year}-{page}.png"
+    if not image.exists():
+        render(year, page, 300, image)
+    with Image.open(image) as rendered:
+        dark = np.asarray(rendered.convert("L")) < 200
+    height, width = dark.shape
+    runs: list[list[tuple[int, int, int]]] = []
+    for y in range(height):
+        edges = np.flatnonzero(np.diff(np.concatenate(([0], dark[y].astype(np.int8), [0]))))
+        for a, b in zip(edges[::2], edges[1::2], strict=True):
+            if b - a >= 30:
+                if runs and y - runs[-1][-1][0] <= 3:
+                    runs[-1].append((y, int(a), int(b)))
+                else:
+                    runs.append([(y, int(a), int(b))])
+    segments: list[tuple[float, int, int]] = []
+    for group in runs:
+        merged: list[list[int]] = []
+        for _, a, b in sorted(group, key=lambda g: g[1]):
+            if merged and a - merged[-1][1] <= 40:
+                merged[-1][1] = max(merged[-1][1], b)
+            else:
+                merged.append([a, b])
+        segments += [(sum(g[0] for g in group) / len(group), a, b) for a, b in merged if b - a >= 150]
+    spans: list[dict[str, object]] = []
+    for y, a, b in segments:
+        for span in spans:
+            if abs(span["x0"] - a) <= 12 and abs(span["x1"] - b) <= 12:
+                span["ys"].append(y)
+                break
+        else:
+            spans.append({"x0": a, "x1": b, "ys": [y]})
+    pitch = statistics.median(d for span in spans for d in np.diff(sorted(span["ys"])) if 35 <= d <= 60)
+    found: list[dict[str, object]] = []
+    for span in spans:
+        lines: list[float] = []
+        for y in sorted(span["ys"]):
+            if lines and y - lines[-1] <= 3:
+                continue
+            lines.append(y)
+        pieces: list[list[float]] = [[lines[0]]]
+        for y in lines[1:]:
+            if y - pieces[-1][-1] > pitch * 2.2:
+                pieces.append([y])
+            else:
+                pieces[-1].append(y)
+        for piece in pieces:
+            if len(piece) < 3:
+                continue
+            bands = round((piece[-1] - piece[0]) / pitch)
+            if bands != len(piece) - 1:
+                piece = list(np.linspace(piece[0], piece[-1], bands + 1))
+            share = dark[int(piece[0]) : int(piece[-1]) + 1, span["x0"] : span["x1"] + 1].mean(axis=0)
+            groups: list[list[int]] = []
+            for x in np.flatnonzero(share > 0.8) + span["x0"]:
+                if groups and x - groups[-1][-1] <= 4:
+                    groups[-1].append(x)
+                else:
+                    groups.append([x])
+            dividers = [sum(g) / len(g) for g in groups if span["x0"] + 20 < g[0] < span["x1"] - 20]
+            if dividers:
+                found.append({"x0": span["x0"], "x1": span["x1"], "lines": piece, "dividers": dividers})
+    blocks = [
+        b
+        for b in found
+        if not any(
+            a is not b
+            and a["x0"] - 12 <= b["x0"]
+            and b["x1"] <= a["x1"] + 12
+            and a["lines"][0] - 5 <= b["lines"][0]
+            and b["lines"][-1] <= a["lines"][-1] + 5
+            and len(a["lines"]) > len(b["lines"])
+            for a in found
+        )
+    ]
+    blocks.sort(key=lambda b: (round(b["lines"][0] / 150), b["x0"]))
+    order = sorted(enumerate(tables), key=lambda t: (t[1]["where"][2] or 0, "nonpartisan" in t[1]["where"][3].lower()))
+    out: dict[tuple[int, str, int], tuple[float, float, float, float]] = {}
+    cursor = 0
+    for number, table in order:
+        counties = list(table["rows"])
+        columns = len(table["columns"])
+        done = 0
+        while done < len(counties):
+            block = blocks[cursor]
+            cursor += 1
+            bands = len(block["lines"]) - 1
+            remaining = len(counties) - done
+            if bands > remaining:
+                rows = block["lines"][bands - remaining - 1 :]
+                take = remaining
+            else:
+                rows = block["lines"]
+                take = bands
+            if len(block["dividers"]) != columns:
+                raise ValueError(f"{table['where']}: block of {bands} bands and {len(block['dividers'])} dividers")
+            edges = [*block["dividers"], block["x1"]]
+            for offset, county in enumerate(counties[done : done + take]):
+                for column in range(columns):
+                    out[(number, county, column)] = (
+                        float(edges[column] + 3) / width,
+                        float(rows[offset] + 3) / height,
+                        float(edges[column + 1] - 3) / width,
+                        float(rows[offset + 1] - 3) / height,
+                    )
+            done += take
+    return out
+
+
 def parse() -> None:
     lines: list[dict[str, object]] = []
     for year in (1994, 1998):
@@ -227,9 +341,9 @@ def parse() -> None:
         for table in tables:
             by_page.setdefault(table["where"][1], []).append(table)
         for page, group in by_page.items():
-            if (year, page) in HELD:
+            if (year, page) in SKIP:
                 continue
-            placed = boxes(year, page, group)
+            placed = (gridboxes if (year, page) in GRID else boxes)(year, page, group)
             for number, table in enumerate(group):
                 _, _, district, party, _ = table["where"]
                 office = "senate" if district is None and page in SENATE.get(year, ()) else "house"
