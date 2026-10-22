@@ -371,6 +371,28 @@ PRINTS = {
         ],
         scales=((1, "7"), (2, "7")),
     ),
+    "om254t": dict(
+        mask="om254",
+        page=254,
+        sha="390fdb7684afb596b0eb8d472ccc6e0d65186cdb0096f3a113e2a80ea0c5e5be",
+        rows=EARLY,
+        y0=905,
+        pitch=36.3,
+        total=1865,
+        cols=[
+            (675, 805),
+            (808, 935),
+            (938, 1053),
+            (1056, 1168),
+            (1182, 1315),
+            (1318, 1448),
+            (1465, 1605),
+            (1608, 1740),
+            (1755, 1895),
+            (1898, 2035),
+        ],
+        scales=((1, "7"), (2, "7")),
+    ),
 }
 
 
@@ -532,8 +554,9 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1840,)
+YEARS = (1836,)
 ELECTION_DAYS = {
+    1836: "1836-11-03",
     1840: "1840-10-30",
     1844: "1844-11-01",
     1848: "1848-11-07",
@@ -546,8 +569,8 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
 }
-YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254"}
-PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876}
+YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254", 1836: "om254t"}
+PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
 PRINT_COLUMNS = {
     "v65": {
         0: (1864, "Lincoln"),
@@ -568,6 +591,10 @@ PRINT_COLUMNS = {
     "v69": {
         0: (1868, "Grant"),
         1: (1868, "Seymour"),
+    },
+    "om254t": {
+        8: (1836, "Harrison"),
+        9: (1836, "Van Buren"),
     },
     "om254": {
         6: (1848, "Taylor"),
@@ -1194,6 +1221,56 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1840, "VT", "Birney"): 319,
     (1840, "VA", "Harrison"): 42501,
     (1840, "VA", "Van Buren"): 43893,
+    (1836, "AL", "Harrison"): 15637,
+    (1836, "AL", "Van Buren"): 19068,
+    (1836, "AR", "Harrison"): 1238,
+    (1836, "AR", "Van Buren"): 2400,
+    (1836, "CT", "Harrison"): 18466,
+    (1836, "CT", "Van Buren"): 19234,
+    (1836, "DE", "Harrison"): 4738,
+    (1836, "DE", "Van Buren"): 4155,
+    (1836, "GA", "Harrison"): 24930,
+    (1836, "GA", "Van Buren"): 22126,
+    (1836, "IL", "Harrison"): 14983,
+    (1836, "IL", "Van Buren"): 18097,
+    (1836, "IN", "Harrison"): 41281,
+    (1836, "IN", "Van Buren"): 32480,
+    (1836, "KY", "Harrison"): 36955,
+    (1836, "KY", "Van Buren"): 33435,
+    (1836, "LA", "Harrison"): 3383,
+    (1836, "LA", "Van Buren"): 3653,
+    (1836, "ME", "Harrison"): 15239,
+    (1836, "ME", "Van Buren"): 22300,
+    (1836, "MD", "Harrison"): 25852,
+    (1836, "MD", "Van Buren"): 22167,
+    (1836, "MA", "Harrison"): 41093,
+    (1836, "MA", "Van Buren"): 33501,
+    (1836, "MI", "Harrison"): 4000,
+    (1836, "MI", "Van Buren"): 7360,
+    (1836, "MS", "Harrison"): 9688,
+    (1836, "MS", "Van Buren"): 9979,
+    (1836, "MO", "Harrison"): 8337,
+    (1836, "MO", "Van Buren"): 10995,
+    (1836, "NH", "Harrison"): 6228,
+    (1836, "NH", "Van Buren"): 18722,
+    (1836, "NJ", "Harrison"): 26892,
+    (1836, "NJ", "Van Buren"): 26347,
+    (1836, "NY", "Harrison"): 138543,
+    (1836, "NY", "Van Buren"): 166815,
+    (1836, "NC", "Harrison"): 23626,
+    (1836, "NC", "Van Buren"): 26910,
+    (1836, "OH", "Harrison"): 105405,
+    (1836, "OH", "Van Buren"): 96948,
+    (1836, "PA", "Harrison"): 87111,
+    (1836, "PA", "Van Buren"): 91475,
+    (1836, "RI", "Harrison"): 2710,
+    (1836, "RI", "Van Buren"): 2964,
+    (1836, "TN", "Harrison"): 35962,
+    (1836, "TN", "Van Buren"): 26120,
+    (1836, "VT", "Harrison"): 20991,
+    (1836, "VT", "Van Buren"): 14037,
+    (1836, "VA", "Harrison"): 23368,
+    (1836, "VA", "Van Buren"): 30261,
 }
 
 
