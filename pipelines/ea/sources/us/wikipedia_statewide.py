@@ -34,6 +34,21 @@ GENERIC = re.compile(
 )
 SUFFIXES = {"jr", "sr", "ii", "iii", "iv"}
 MAJORITY_RUNOFF = {"GA": 1964, "LA": 1975}
+OFFICE_WORDS = {
+    "lieutenant-governor": r"lieutenant|lt\.? gub",
+    "treasurer": r"treasurer",
+    "auditor": r"auditor",
+    "comptroller": r"comptroller|controller|auditor of public accounts",
+    "superintendent-of-public-instruction": r"superintendent",
+    "commissioner-of-labor": r"labor",
+    "insurance-commissioner": r"insurance",
+    "corporation-commissioner": r"corporation",
+    "auditor-and-inspector": r"auditor",
+    "commissioner-of-agriculture": r"agriculture",
+    "commissioner-of-agriculture-and-industries": r"agriculture",
+    "commissioner-of-state-lands": r"lands",
+    "commissioner-of-education": r"education",
+}
 
 
 def page(title: str) -> str:
@@ -83,17 +98,10 @@ def read(url: str, download: bool) -> dict:
     return json.loads(artifact.path.read_text())
 
 
-def resolve(download: bool) -> dict[tuple[str, int, str], str]:
-    rows = offices()
-    asked = {(state, year, value): variants(state, year, label) for state, year, value, label in rows}
-    batches: list[list[str]] = []
-    for early in (True, False):
-        titles = sorted(
-            {title for (_, year, _), options in asked.items() if (year < 2000) == early for title in options}
-        )
-        batches.extend(titles[start : start + 50] for start in range(0, len(titles), 50))
+def existing(titles: list[str], download: bool) -> dict[str, str]:
     found: dict[str, str] = {}
-    for chunk in batches:
+    for start in range(0, len(titles), 50):
+        chunk = titles[start : start + 50]
         url = API + urlencode(
             {"action": "query", "titles": "|".join(chunk), "redirects": 1, "format": "json", "formatversion": 2}
         )
@@ -106,6 +114,17 @@ def resolve(download: bool) -> dict[tuple[str, int, str], str]:
             target = redirected.get(target, target)
             if target not in missing:
                 found[title] = target
+    return found
+
+
+def resolve(download: bool) -> dict[tuple[str, int, str], str]:
+    asked = {(state, year, value): variants(state, year, label) for state, year, value, label in offices()}
+    found: dict[str, str] = {}
+    for early in (True, False):
+        found |= existing(
+            sorted({title for (_, year, _), options in asked.items() if (year < 2000) == early for title in options}),
+            download,
+        )
     resolved: dict[tuple[str, int, str], str] = {}
     for (state, year, value), options in asked.items():
         for title in options:
@@ -116,8 +135,23 @@ def resolve(download: bool) -> dict[tuple[str, int, str], str]:
     return resolved
 
 
+def omnibus(download: bool) -> dict[tuple[str, int], str]:
+    resolved = resolve(download)
+    years = sorted({(state, year) for state, year, value, _ in offices() if (state, year, value) not in resolved})
+    asked = {
+        (state, year): [f"{year} {STATES[state]} {tail}" for tail in ("elections", "state elections", "state election")]
+        for state, year in years
+    }
+    found = existing(sorted({title for options in asked.values() for title in options}), download)
+    return {
+        key: next(found[title] for title in options if title in found)
+        for key, options in asked.items()
+        if any(title in found for title in options)
+    }
+
+
 def fetch() -> None:
-    for title in sorted(set(resolve(True).values())):
+    for title in sorted({*resolve(True).values(), *omnibus(True).values()}):
         read(page(title), True)
 
 
@@ -140,46 +174,13 @@ def parse() -> None:
     labels = {value: label for _, _, value, label in offices()}
     lines: list[dict[str, object]] = []
     held: list[tuple[str, str]] = []
-    for (state, year, value), title in sorted(found.items()):
+
+    def load(
+        title: str, state: str, year: int, day: date, value: str, members: list[tuple[str, dict[str, str]]]
+    ) -> None:
         office = value.split(":")[0]
-        if year >= MAJORITY_RUNOFF.get(state, 9999):
-            held.append((f"{year} {state} {office}", "majority-vote runoff state"))
-            continue
-        content = read(page(title), False)
-        text = content["parse"]["wikitext"]
-        text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
-        text = re.sub(r"<ref[^>]*/\s*>|<ref(?:\s[^>]*[^/])?>.*?</ref>", "", text, flags=re.DOTALL | re.IGNORECASE)
-        text = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", text)
-        infobox = next((params for name, params in templates(text) if name.startswith("infobox election")), {})
-        stated = infobox.get("election_date", "")
-        if parts := re.search(r"([A-Z][a-z]+)\s+(\d{1,2}),?\s+(\d{4})", stated):
-            day = datetime.strptime(f"{parts[1]} {parts[2]} {parts[3]}", "%B %d %Y").date()
-        elif parts := re.search(r"(\d{1,2})\s+([A-Z][a-z]+)\s+(\d{4})", stated):
-            day = datetime.strptime(f"{parts[1]} {parts[2]} {parts[3]}", "%d %B %Y").date()
-        elif parts := re.search(r"start date\|(\d{4})\|(\d{1,2})\|(\d{1,2})", stated, re.IGNORECASE):
-            day = date(int(parts[1]), int(parts[2]), int(parts[3]))
-        else:
-            held.append((title, "no election date"))
-            continue
-        if day.year != year:
-            held.append((title, f"election date {day} is not in {year}"))
-            continue
-        boxes = []
-        for begin in re.finditer(r"\{\{\s*election box begin", text, re.IGNORECASE):
-            end = re.search(r"\{\{\s*election box end\s*\}\}", text[begin.start() :], re.IGNORECASE)
-            body = text[begin.start() : begin.start() + end.end()] if end else text[begin.start() :]
-            members = templates(body)
-            params = members[0][1] if members else {}
-            label = box_label(text, begin.start(), params)
-            if not SKIP.search(label):
-                boxes.append((label, members[1:]))
-        if len(boxes) > 1:
-            boxes = [box for box in boxes if re.search(r"general", box[0], re.IGNORECASE)] or boxes
-        if len(boxes) != 1:
-            held.append((title, f"{len(boxes)} general-election boxes"))
-            continue
         rows, listed, total = [], 0, None
-        for name, params in boxes[0][1]:
+        for name, params in members:
             digits = re.sub(r"\D", "", clean(params.get("votes", "")))
             if name.startswith("election box total"):
                 total = int(digits) if digits else None
@@ -207,20 +208,20 @@ def parse() -> None:
                     )
         if len(rows) < 1:
             held.append((title, "no candidate rows with votes"))
-            continue
+            return
         if total is not None:
             if abs(listed - total) > max(5, total // 200):
                 held.append((title, f"rows sum {listed}, total line {total}"))
-                continue
+                return
         else:
             lead = max(rows, key=lambda row: row["votes"])
             percent = re.sub(r"[^\d.]", "", str(lead["percentage"] or ""))
             if not percent or abs(lead["votes"] * 100 / listed - float(percent)) > 1.5:
                 held.append((title, "no total line and percentages do not confirm the rows"))
-                continue
+                return
         if sum(row["winner"] == 1 for row in rows) > 1:
             held.append((title, "more than one winning row"))
-            continue
+            return
         label = re.sub(rf" of {STATES[state]}$", "", labels[value])
         for row in rows:
             lines.append(
@@ -237,6 +238,90 @@ def parse() -> None:
                     "page": None,
                 }
             )
+
+    wanted: dict[tuple[str, int, str], list[str]] = {}
+    for (state, year, value), title in found.items():
+        wanted[(state, year, title)] = [value]
+    with connect() as conn:
+        have = {
+            (office, year)
+            for office, year in conn.execute(
+                """select o.value, extract(year from e.date_from)::int from contest c
+                   join election e on e.id = c.election_id
+                   join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
+                   where not exists (
+                     select from result_set r join external_id x on x.entity_id = r.id and x.scheme = %s
+                     where r.contest_id = c.id)""",
+                [f"{SOURCE}.result_set"],
+            )
+        }
+        days = {
+            (state, year): day
+            for state, year, day in conn.execute(
+                """select substr(p.iso_code, 4), extract(year from e.date_from)::int, e.date_from from election e
+                   join polity p on p.id = e.polity_id and p.iso_code like 'US-%%'
+                   where e.kind = 'general' and e.date_from = e.date_to and extract(day from e.date_from) <> 1
+                   order by (select count(*) from contest where election_id = e.id)"""
+            )
+        }
+    named = omnibus(False)
+    for (state, year), title in named.items():
+        if values := [
+            value
+            for st, y, value, _ in offices()
+            if (st, y) == (state, year) and (st, y, value) not in found and (value, year) not in have
+        ]:
+            wanted[(state, year, title)] = values
+    for (state, year, title), values in sorted(wanted.items()):
+        if year >= MAJORITY_RUNOFF.get(state, 9999):
+            held.append((f"{year} {state}", "majority-vote runoff state"))
+            continue
+        text = read(page(title), False)["parse"]["wikitext"]
+        text = re.sub(r"<!--.*?-->", "", text, flags=re.DOTALL)
+        text = re.sub(r"<ref[^>]*/\s*>|<ref(?:\s[^>]*[^/])?>.*?</ref>", "", text, flags=re.DOTALL | re.IGNORECASE)
+        text = re.sub(r"\[\[(?:[^|\]]*\|)?([^\]]*)\]\]", r"\1", text)
+        if (state, year) in named:
+            if (state, year) not in days:
+                held.append((title, "no election date in the archive"))
+                continue
+            day = days[(state, year)]
+        else:
+            infobox = next((params for name, params in templates(text) if name.startswith("infobox election")), {})
+            stated = infobox.get("election_date", "")
+            if parts := re.search(r"([A-Z][a-z]+)\s+(\d{1,2}),?\s+(\d{4})", stated):
+                day = datetime.strptime(f"{parts[1]} {parts[2]} {parts[3]}", "%B %d %Y").date()
+            elif parts := re.search(r"(\d{1,2})\s+([A-Z][a-z]+)\s+(\d{4})", stated):
+                day = datetime.strptime(f"{parts[1]} {parts[2]} {parts[3]}", "%d %B %Y").date()
+            elif parts := re.search(r"start date\|(\d{4})\|(\d{1,2})\|(\d{1,2})", stated, re.IGNORECASE):
+                day = date(int(parts[1]), int(parts[2]), int(parts[3]))
+            else:
+                held.append((title, "no election date"))
+                continue
+            if day.year != year:
+                held.append((title, f"election date {day} is not in {year}"))
+                continue
+        every = []
+        for begin in re.finditer(r"\{\{\s*election box begin", text, re.IGNORECASE):
+            end = re.search(r"\{\{\s*election box end\s*\}\}", text[begin.start() :], re.IGNORECASE)
+            body = text[begin.start() : begin.start() + end.end()] if end else text[begin.start() :]
+            members = templates(body)
+            params = members[0][1] if members else {}
+            label = box_label(text, begin.start(), params)
+            if not SKIP.search(label):
+                every.append((label, members[1:]))
+        for value in values:
+            boxes = every
+            if (state, year) in named:
+                words = OFFICE_WORDS.get(value.split(":")[0]) or re.escape(
+                    re.sub(rf" of {STATES[state]}$", "", labels[value]).lower()
+                )
+                boxes = [box for box in every if re.search(words, box[0], re.IGNORECASE)]
+            if len(boxes) > 1:
+                boxes = [box for box in boxes if re.search(r"general", box[0], re.IGNORECASE)] or boxes
+            if len(boxes) != 1:
+                held.append((f"{title} {value}", f"{len(boxes)} general-election boxes"))
+                continue
+            load(title, state, year, day, value, boxes[0][1])
     frame = pl.DataFrame(
         lines,
         schema={
@@ -273,6 +358,18 @@ def parse() -> None:
                join name n on n.entity_id = t.person_id and n.is_preferred
                where t.from_date is not null"""
         ).fetchall()
+    with connect() as conn:
+        ran_for_governor = {
+            (state, year, surname(text))
+            for state, year, text in conn.execute(
+                """select substr(p.iso_code, 4), extract(year from e.date_from)::int, n.text from candidacy cd
+                   join contest_option o on o.id = cd.option_id join contest c on c.id = o.contest_id
+                   join election e on e.id = c.election_id
+                   join polity p on p.id = e.polity_id and p.iso_code like 'US-%%'
+                   join external_id x on x.entity_id = c.office_id and x.scheme = 'us.office' and x.value like 'governor:%%'
+                   join name n on n.entity_id = cd.person_id and n.is_preferred"""
+            )
+        }
     holders: dict[str, list[tuple[date, str]]] = {}
     for value, start, holder in tenures:
         holders.setdefault(value, []).append((start, surname(holder)))
@@ -282,6 +379,14 @@ def parse() -> None:
         if declared is None and tied:
             dropped.append((state, day, office))
             held.append((f"{day} {state} {office}", "a tie with no declared winner"))
+            continue
+        if (
+            office != "governor"
+            and (state, day.year) in named
+            and (state, day.year, surname(winner)) in ran_for_governor
+        ):
+            dropped.append((state, day, office))
+            held.append((f"{day} {state} {office}", f"winner {winner} ran for governor that year"))
             continue
         window = [name for start, name in holders.get(f"{office}:{state}", []) if 0 <= (start - day).days <= 600]
         if window and surname(winner) not in window:
