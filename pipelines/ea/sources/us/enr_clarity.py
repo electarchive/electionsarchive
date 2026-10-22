@@ -63,7 +63,11 @@ VACANT = re.compile(r"(?i)\s*(?:no (?:nomination|candidate)|over ?votes|under ?v
 REMAINDER = re.compile(r"\bUNEX\w*|\bUNXP\w*|SHORT TERM|VACANCY|REMAINDER|PARTIAL TERM|TO FILL\b|\bFILL\b")
 TERM = re.compile(r"\b(\d+|ONE|TWO|THREE|FOUR|FIVE|SIX)[ -]?(?:YR|YEAR)S?\b(?: TERM)?")
 PARTY_OFFICES = (
-    (r"PRECINCT CHAIR\w*|PCT CHAIR\w*|PRECINCT COMMITTEE CHAIR\w*", "precinct-chair", "Precinct Chair"),
+    (
+        r"(?:PRECINCT|PCT) (?:COMMITTEE )?CHAIR\w*|CHAIR\w*,? (?=(?:PRECINCT|PCT)\b)",
+        "precinct-chair",
+        "Precinct Chair",
+    ),
     (r"COUNTY CHAIR\w*|COUNTY PARTY CHAIR\w*", "county-chair", "County Chair"),
     (r"(?:MEMBER OF )?STATE COMMITTEE\w*", "state-committee", "State Committee Member"),
     (r"COMMITTEE ?MAN|COMMITTEEMEN", "committeeman", "Committeeman"),
@@ -479,6 +483,9 @@ def parse() -> None:
             for choice in choices:
                 label = re.sub(r"\s+", " ", choice.get("text") or "").strip()
                 tag = _party(choice.get("party"))
+                if prefix := re.match(r"(?:\(([RD])\)|(DEM|REP|LIB|GRN|IND))\s+(?=\S)", label):
+                    tag = tag or _party(prefix[1] or prefix[2])
+                    label = label[prefix.end() :]
                 if (
                     WRITE_IN.match(label)
                     or primary
@@ -670,6 +677,7 @@ def _classify(
     school_names: list[tuple[str, str]],
     listed: list[tuple[str, str, str, str]],
 ) -> dict[str, object] | None:
+    plain = re.sub(r"\b(PRECINCT|PCT) (\d+) (CHAIR\w*)", r"\3 \1 \2", plain)
     for options, scope in ((PARTY_OFFICES, "party"), (OFFICERS, "officer")):
         for pattern, key, office in options:
             if found := re.search(rf"\b(?:{pattern})\b", plain):
@@ -767,6 +775,8 @@ def _classify(
         _, key, office, body = held[0]
         if key == "court-of-common-pleas":
             seat, rest = None, re.sub(r"\d+", " ", rest)
+        if seat and (number := re.search(r"(\d+)$", seat)):
+            rest = re.sub(rf"\b0*{number[1]}\b", " ", rest)
         if seat is None and (bare := re.search(r"\b(\d+)\b(?! ?(?:YR|YEAR))", rest)):
             noun = "Court" if "court" in key else "Precinct"
             seat, rest = f"{noun} {int(bare[1])}", re.sub(rf"\b{bare[1]}\b", " ", rest)
