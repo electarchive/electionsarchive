@@ -1,0 +1,314 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "Election Statistics 1968 (P.D. 43), Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/electionstatisti19671968mass/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/electionstatisti19671968mass"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "d1": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "d2": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "d3": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "d4": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "d5": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "d6": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "d7": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "d8": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "d9": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "d10": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "d11": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "d12": {
+      "year": 1968,
+      "chamber": "house",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    }
+  },
+  "pages": [
+    {
+      "page": 348,
+      "id": "348-0",
+      "discover": "d1",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.663
+      ],
+      "hint": "This is U.S. Representative, District 1, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1531
+      ]
+    },
+    {
+      "page": 348,
+      "id": "348-1",
+      "discover": "d2",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.663,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 2, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 349,
+      "id": "349-0",
+      "discover": "d2",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.4092
+      ],
+      "hint": "This is U.S. Representative, District 2, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 349,
+      "id": "349-1",
+      "discover": "d3",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4092,
+        1.0,
+        0.8846
+      ],
+      "hint": "This is U.S. Representative, District 3, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1893
+      ]
+    },
+    {
+      "page": 350,
+      "id": "350-0",
+      "discover": "d4",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.5304
+      ],
+      "hint": "This is U.S. Representative, District 4, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1976
+      ]
+    },
+    {
+      "page": 350,
+      "id": "350-1",
+      "discover": "d5",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.5304,
+        1.0,
+        0.8901
+      ],
+      "hint": "This is U.S. Representative, District 5, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 351,
+      "id": "351-0",
+      "discover": "d6",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.5031
+      ],
+      "hint": "This is U.S. Representative, District 6, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 351,
+      "id": "351-1",
+      "discover": "d7",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.5031,
+        1.0,
+        0.9609
+      ],
+      "hint": "This is U.S. Representative, District 7, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1966
+      ]
+    },
+    {
+      "page": 352,
+      "id": "352-0",
+      "discover": "d8",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.1814
+      ],
+      "hint": "This is U.S. Representative, District 8, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 352,
+      "id": "352-1",
+      "discover": "d9",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.1814,
+        1.0,
+        0.6875
+      ],
+      "hint": "This is U.S. Representative, District 9, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1778
+      ]
+    },
+    {
+      "page": 352,
+      "id": "352-2",
+      "discover": "d10",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.6875,
+        1.0,
+        0.9533
+      ],
+      "hint": "This is U.S. Representative, District 10, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 353,
+      "id": "353-0",
+      "discover": "d11",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.4963
+      ],
+      "hint": "This is U.S. Representative, District 11, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 353,
+      "id": "353-1",
+      "discover": "d12",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4963,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 12, 1968. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1842
+      ]
+    }
+  ],
+  "unit_codes": {
+    "Gay Head": "25007"
+  }
+}

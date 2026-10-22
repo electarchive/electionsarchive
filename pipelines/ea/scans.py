@@ -326,6 +326,11 @@ def bands(
                     "party if printed), including a total column if one is printed. Each row's values has one "
                     "string per header entry."
                 )
+            if unit == "towns":
+                text += (
+                    " A city or town name followed by indented ward or precinct lines is a heading: do not make it "
+                    "a row, and begin each indented line's label with the heading, as in 'Fall River: Wards 1, 2, 3'."
+                )
             if "hint" in spec:
                 text += f" {spec['hint']}"
             if count > 1:
@@ -432,6 +437,7 @@ def cells(
     manifest: Manifest, plan: dict[str, Read], names: dict[str, str]
 ) -> tuple[dict[tuple[str, str, int], tuple[int, list[float]]], dict[tuple[str, int], int], dict[str, str]]:
     values: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
+    margin: dict[tuple[str, str, int], int] = {}
     printed: dict[tuple[str, int], int] = {}
     errors: dict[str, str] = {}
     extra = {slug(label).replace(" ", ""): code for label, code in manifest.get("unit_codes", {}).items()}
@@ -462,12 +468,22 @@ def cells(
                 errors[number] = f"{custom}: row bands are not ascending"
                 continue
             start, stop = request.span
+            heading = ""
             for r, row in enumerate(rows):
+                if towns and not any(row["values"]):
+                    heading = row["label"]
+                    continue
+                named = (
+                    f"{heading} {row['label']}"
+                    if towns and re.match(r"\s*(wards?|precincts?)\b", row["label"], re.IGNORECASE)
+                    else row["label"]
+                )
+                heading = WARD.sub("", named)
                 if len(row["values"]) != len(header):
                     errors[number] = f"{custom}: row {row['label']!r} has {len(row['values'])} cells for {len(header)}"
                     break
                 for c, text in enumerate(row["values"]):
-                    series, label = (r, header[c]["label"]) if across else (c, row["label"])
+                    series, label = (r, header[c]["label"]) if across else (c, named)
                     digits = re.sub(r"[,\s.]", "", text)
                     value = int(digits) if digits.isdigit() else None
                     if TOTAL.match(slug(label)):
@@ -478,9 +494,10 @@ def cells(
                         continue
                     stem = slug(WARD.sub("", label) if towns else label).replace(" ", "")
                     code = extra.get(stem) or names.get(stem)
-                    if code is None and not towns:
-                        close = difflib.get_close_matches(stem, list(names), n=2, cutoff=0.88)
-                        code = names[close[0]] if len(close) == 1 else None
+                    if code is None:
+                        close = difflib.get_close_matches(stem, list(names), n=2, cutoff=0.84)
+                        starts = {names[name] for name in names if name.startswith(stem) and len(stem) > 4}
+                        code = names[close[0]] if len(close) == 1 else starts.pop() if len(starts) == 1 else None
                     if code is None:
                         errors[number] = (
                             f"{custom}: {'town' if towns else 'county'} {label!r} is not in {manifest['polity']}"
@@ -494,10 +511,10 @@ def cells(
                         x0 + (x1 - x0) * header[c]["x1"] / 1000,
                         y0 + (y1 - y0) * (start + (stop - start) * row["y1"] / 1000),
                     ]
-                    if (number, unit, series) in values and values[(number, unit, series)][0] != value:
-                        errors[number] = f"{custom}: {label!r} read twice with different values"
-                        break
-                    values.setdefault((number, unit, series), (value, box))
+                    edge = min(row["y0"], 1000 - row["y1"])
+                    if (number, unit, series) not in values or edge > margin[(number, unit, series)]:
+                        values[(number, unit, series)] = (value, box)
+                        margin[(number, unit, series)] = edge
                 else:
                     continue
                 break
@@ -722,6 +739,12 @@ def discover(manifest: Manifest, folder: Path) -> str:
             for label in labels:
                 words = set(slug(label).split())
                 found_options = [name for name, options_ in surnames if options_ & words]
+                if not found_options:
+                    found_options = [
+                        name
+                        for name, options_ in surnames
+                        if any(difflib.get_close_matches(word, options_, n=1, cutoff=0.85) for word in words)
+                    ]
                 if len(found_options) == 1:
                     columns.append({"label": label, "contest": spec["discover"], "candidate": found_options[0]})
                 else:

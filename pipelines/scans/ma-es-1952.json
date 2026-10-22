@@ -1,0 +1,375 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "Election Statistics 1952 (P.D. 43), Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/electionstatisti1952mass/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/electionstatisti1952mass"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "d1": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "d2": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "d3": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "d4": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "d5": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "d6": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "d7": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "d8": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "d9": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "d10": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "d11": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "d12": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    },
+    "d13": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 13
+    },
+    "d14": {
+      "year": 1952,
+      "chamber": "house",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "MA",
+      "district": 14
+    }
+  },
+  "pages": [
+    {
+      "page": 363,
+      "id": "363-0",
+      "discover": "d1",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 1, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0989
+      ]
+    },
+    {
+      "page": 364,
+      "id": "364-0",
+      "discover": "d1",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.2697
+      ],
+      "hint": "This is U.S. Representative, District 1, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 364,
+      "id": "364-1",
+      "discover": "d2",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.2697,
+        1.0,
+        0.5999
+      ],
+      "hint": "This is U.S. Representative, District 2, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 364,
+      "id": "364-2",
+      "discover": "d3",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.5999,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 3, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 365,
+      "id": "365-0",
+      "discover": "d3",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.4397
+      ],
+      "hint": "This is U.S. Representative, District 3, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 365,
+      "id": "365-1",
+      "discover": "d4",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4397,
+        1.0,
+        0.7624
+      ],
+      "hint": "This is U.S. Representative, District 4, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 365,
+      "id": "365-2",
+      "discover": "d5",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.7624,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 5, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 366,
+      "id": "366-0",
+      "discover": "d5",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.3995
+      ],
+      "hint": "This is U.S. Representative, District 5, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 366,
+      "id": "366-1",
+      "discover": "d6",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.3995,
+        1.0,
+        0.7961
+      ],
+      "hint": "This is U.S. Representative, District 6, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 367,
+      "id": "367-0",
+      "discover": "d7",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.29
+      ],
+      "hint": "This is U.S. Representative, District 7, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 367,
+      "id": "367-1",
+      "discover": "d8",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.29,
+        1.0,
+        0.5379
+      ],
+      "hint": "This is U.S. Representative, District 8, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 367,
+      "id": "367-2",
+      "discover": "d9",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.5379,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 9, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 368,
+      "id": "368-0",
+      "discover": "d9",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.4463
+      ],
+      "hint": "This is U.S. Representative, District 9, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 368,
+      "id": "368-1",
+      "discover": "d10",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4463,
+        1.0,
+        0.6184
+      ],
+      "hint": "This is U.S. Representative, District 10, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 368,
+      "id": "368-2",
+      "discover": "d11",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.6184,
+        1.0,
+        0.8006
+      ],
+      "hint": "This is U.S. Representative, District 11, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 368,
+      "id": "368-3",
+      "discover": "d12",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.8006,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 12, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 369,
+      "id": "369-0",
+      "discover": "d13",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.333
+      ],
+      "hint": "This is U.S. Representative, District 13, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 369,
+      "id": "369-1",
+      "discover": "d14",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.333,
+        1.0,
+        0.8155
+      ],
+      "hint": "This is U.S. Representative, District 14, 1952. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1865
+      ]
+    }
+  ],
+  "unit_codes": {
+    "Gay Head": "25007"
+  }
+}

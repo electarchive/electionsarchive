@@ -1,0 +1,362 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "Election Statistics 1960 (P.D. 43), Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/electionstatisti19591960mass/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/electionstatisti19591960mass"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "d1": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "d2": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "d3": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "d4": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "d5": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "d6": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "d7": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "d8": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "d9": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "d10": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "d11": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "d12": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    },
+    "d13": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 13
+    },
+    "d14": {
+      "year": 1960,
+      "chamber": "house",
+      "day": "1960-11-08",
+      "special": false,
+      "state": "MA",
+      "district": 14
+    }
+  },
+  "pages": [
+    {
+      "page": 454,
+      "id": "454-0",
+      "discover": "d1",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 1, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 3,
+      "header": [
+        0.0,
+        0.0989
+      ]
+    },
+    {
+      "page": 455,
+      "id": "455-0",
+      "discover": "d1",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.2695
+      ],
+      "hint": "This is U.S. Representative, District 1, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 455,
+      "id": "455-1",
+      "discover": "d2",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.2695,
+        1.0,
+        0.6004
+      ],
+      "hint": "This is U.S. Representative, District 2, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 455,
+      "id": "455-2",
+      "discover": "d3",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.6004,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 3, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 456,
+      "id": "456-0",
+      "discover": "d3",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.4664
+      ],
+      "hint": "This is U.S. Representative, District 3, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 456,
+      "id": "456-1",
+      "discover": "d4",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4664,
+        1.0,
+        0.8093
+      ],
+      "hint": "This is U.S. Representative, District 4, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 457,
+      "id": "457-0",
+      "discover": "d5",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.4861
+      ],
+      "hint": "This is U.S. Representative, District 5, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 457,
+      "id": "457-1",
+      "discover": "d6",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4861,
+        1.0,
+        0.8882
+      ],
+      "hint": "This is U.S. Representative, District 6, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 458,
+      "id": "458-0",
+      "discover": "d7",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.3037
+      ],
+      "hint": "This is U.S. Representative, District 7, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 458,
+      "id": "458-1",
+      "discover": "d8",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.3037,
+        1.0,
+        0.5633
+      ],
+      "hint": "This is U.S. Representative, District 8, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 458,
+      "id": "458-2",
+      "discover": "d9",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.5633,
+        1.0,
+        0.985
+      ],
+      "hint": "This is U.S. Representative, District 9, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 459,
+      "id": "459-0",
+      "discover": "d9",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.4966
+      ],
+      "hint": "This is U.S. Representative, District 9, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 459,
+      "id": "459-1",
+      "discover": "d10",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4966,
+        1.0,
+        0.681
+      ],
+      "hint": "This is U.S. Representative, District 10, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 459,
+      "id": "459-2",
+      "discover": "d11",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.681,
+        1.0,
+        0.8747
+      ],
+      "hint": "This is U.S. Representative, District 11, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 460,
+      "id": "460-0",
+      "discover": "d12",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.075,
+        1.0,
+        0.1599
+      ],
+      "hint": "This is U.S. Representative, District 12, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 460,
+      "id": "460-1",
+      "discover": "d13",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.1599,
+        1.0,
+        0.4706
+      ],
+      "hint": "This is U.S. Representative, District 13, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too."
+    },
+    {
+      "page": 460,
+      "id": "460-2",
+      "discover": "d14",
+      "orientation": "counties_down",
+      "crop": [
+        0.0,
+        0.4706,
+        1.0,
+        0.9518
+      ],
+      "hint": "This is U.S. Representative, District 14, 1960. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1871
+      ]
+    }
+  ],
+  "unit_codes": {
+    "Gay Head": "25007"
+  }
+}
