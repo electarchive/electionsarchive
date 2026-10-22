@@ -545,7 +545,14 @@
                     : dated,
                 )}
                 {const label = $derived(
-                  short.charAt(0).toUpperCase() + short.slice(1),
+                  election.lead == null
+                    ? short.charAt(0).toUpperCase() + short.slice(1)
+                    : election.lead.more > 0
+                      ? m.polity_local_more({
+                          place: election.lead.place,
+                          count: count(election.lead.more),
+                        })
+                      : m.polity_local_one({ place: election.lead.place }),
                 )}
                 <li
                   class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3"

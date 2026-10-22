@@ -8270,6 +8270,7 @@ export const polities = {
             year: v.nullable(v.number()),
             kind: v.string(),
             status: v.string(),
+            lead: v.nullable(v.object({ place: v.string(), more: v.number() })),
           }),
         ),
         latest: v.nullable(
@@ -8342,8 +8343,22 @@ export const polities = {
             year: number | null;
             kind: string;
             status: string;
+            top: string | null;
+            parts: number | null;
           }>(sql`
-            select e.id, e.date_from::text as date, ${CYCLE} as year, e.kind::text as kind, e.status::text as status from election e
+            select e.id, e.date_from::text as date, ${CYCLE} as year, e.kind::text as kind, e.status::text as status,
+              lead.top, lead.parts
+            from election e
+            left join lateral (
+              select ch.polity_id as top, count(*) over ()::int as parts
+              from election ch
+              left join lateral (
+                select max(g.population) as population from coverage_government g where g.polity_id = ch.polity_id
+              ) g on true
+              where ch.parent_id = e.id and ch.polity_id <> e.polity_id
+              order by g.population desc nulls last, ch.polity_id
+              limit 1
+            ) lead on e.kind = 'local'
             where e.polity_id = ${input.id}::uuid
               and not exists (select from election p where p.id = e.parent_id and p.polity_id = e.polity_id)
             order by e.date_from desc nulls last
@@ -8389,7 +8404,9 @@ export const polities = {
       const ids = [
         input.id,
         ...subdivisions.rows.map((row) => row.id),
-        ...electionRows.rows.map((row) => row.id),
+        ...electionRows.rows.flatMap((row) =>
+          row.top == null ? [row.id] : [row.id, row.top],
+        ),
       ];
       const today = new Date().toISOString().slice(0, 10);
       const held = electionRows.rows.filter(
@@ -8533,6 +8550,13 @@ export const polities = {
           year: row.year,
           kind: row.kind,
           status: row.status,
+          lead:
+            row.top == null
+              ? null
+              : {
+                  place: labels.full.get(row.top) ?? "",
+                  more: (row.parts ?? 1) - 1,
+                },
         })),
         latest:
           recent == null

@@ -273,6 +273,8 @@
   "race_open": "View full results",
   "election_parent": "Part of {name}",
   "polity_subdivisions": "Subdivisions",
+  "polity_local_one": "Local: {place}",
+  "polity_local_more": "Local: {place} and {count} more",
   "polity_elections": "Elections",
   "polity_no_elections": "No elections are published for this polity yet.",
   "EMAIL_CAN_NOT_BE_UPDATED": "Your email address cannot be changed.",
