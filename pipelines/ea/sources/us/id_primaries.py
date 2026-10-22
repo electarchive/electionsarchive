@@ -26,6 +26,23 @@ CONTESTS = {
     5736: (date(2020, 6, 2), "house", 1, "republican"),
     5737: (date(2020, 6, 2), "house", 2, "democratic"),
     5738: (date(2020, 6, 2), "house", 2, "republican"),
+    16675: (date(2022, 5, 17), "senate", None, "democratic"),
+    16676: (date(2022, 5, 17), "senate", None, "republican"),
+    16677: (date(2022, 5, 17), "senate", None, "constitution"),
+    16678: (date(2022, 5, 17), "senate", None, "libertarian"),
+    16679: (date(2022, 5, 17), "house", 1, "democratic"),
+    16680: (date(2022, 5, 17), "house", 1, "republican"),
+    16681: (date(2022, 5, 17), "house", 1, "libertarian"),
+    16682: (date(2022, 5, 17), "house", 2, "democratic"),
+    16683: (date(2022, 5, 17), "house", 2, "republican"),
+    20315: (date(2024, 5, 21), "house", 1, "constitution"),
+    20316: (date(2024, 5, 21), "house", 1, "democratic"),
+    20317: (date(2024, 5, 21), "house", 1, "libertarian"),
+    20318: (date(2024, 5, 21), "house", 1, "republican"),
+    20319: (date(2024, 5, 21), "house", 2, "constitution"),
+    20320: (date(2024, 5, 21), "house", 2, "democratic"),
+    20321: (date(2024, 5, 21), "house", 2, "libertarian"),
+    20322: (date(2024, 5, 21), "house", 2, "republican"),
 }
 PUBLISHER = "Idaho Secretary of State"
 TITLE = "State of Idaho Elections Database"
@@ -98,7 +115,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Idaho's 2020 presidential, U.S. Senate, and U.S. House primaries by county",
+            summary="Idaho's 2020 presidential and 2020-2024 U.S. Senate and U.S. House primaries by county",
             polity="US-ID",
         )
         source = cs.source(PUBLISHER, TITLE)
