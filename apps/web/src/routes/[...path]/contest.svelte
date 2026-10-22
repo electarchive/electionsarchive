@@ -984,7 +984,8 @@
   </div>
   {#if contest.series.length > 1}
     <Series series={contest.series} />
-  {:else if origins.length > 0}
+  {/if}
+  {#if origins.length > 0}
     <p
       class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch] md:col-span-2"
     >

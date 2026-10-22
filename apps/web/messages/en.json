@@ -357,6 +357,7 @@
   "series_previous": "Previous election: {label}",
   "series_next": "Next election: {label}",
   "series_all": "All {count}",
+  "series_gap": "No elections held in this seat between {from} and {to}",
   "series_all_label": "All {count} elections in this race",
   "series_filter": "Filter by year or winner",
   "series_empty": "No election matches.",

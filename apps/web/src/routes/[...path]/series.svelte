@@ -43,11 +43,17 @@
       timeZone: "UTC",
     });
     const days = Object.groupBy(series, (entry) => entry.date ?? "");
-    return series.map((entry) => {
+    return series.map((entry, index) => {
       const year = entry.year?.toString() ?? "";
       return {
         ...entry,
         year,
+        gap: entry.gap
+          ? m.series_gap({
+              from: series[index - 1]?.year?.toString() ?? "",
+              to: year,
+            })
+          : null,
         label:
           (seen[year]?.length ?? 0) > 1 && entry.isRemainder
             ? m.series_remainder({ year })
@@ -183,6 +189,9 @@
         <span class="font-figures text-xs opacity-70">{date(entry.date)}</span>
       {/if}
       {@render winner(entry)}
+      {#if entry.gap != null}
+        <span class="text-xs opacity-70">{entry.gap}</span>
+      {/if}
     </Tooltip.Content>
   {/if}
 {/snippet}
@@ -285,7 +294,18 @@
       {#snippet children({ payload })}
         <ol class="me-auto flex">
           {#each years as entry, index (entry.path ?? entry.label)}
-            <li class="-ms-px first:ms-0">
+            <li
+              class={cn("-ms-px flex first:ms-0", {
+                "ms-0": entry.gap != null,
+              })}
+            >
+              {#if entry.gap != null}
+                <span
+                  class="flex items-center px-1.5 font-figures text-[0.8125rem] text-muted-foreground"
+                  aria-hidden="true">//</span
+                >
+                <span class="sr-only">{entry.gap}</span>
+              {/if}
               <Tooltip.Trigger {tether} payload={index}>
                 {#snippet child({ props })}
                   <svelte:element

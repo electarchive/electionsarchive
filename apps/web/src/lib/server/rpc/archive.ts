@@ -2320,7 +2320,7 @@ async function pick(
     year: number | null;
     status: string;
   }>,
-  contest: { series: string; date: string | null },
+  contest: { series: string; date: string | null; fence: string | null },
   vs: string | undefined,
 ) {
   if (vs == null || vs === "" || vs === "none") {
@@ -2334,6 +2334,7 @@ async function pick(
           row.date != null &&
           contest.date != null &&
           row.date < contest.date &&
+          (contest.fence == null || row.date > contest.fence) &&
           row.status !== "annulled" &&
           row.status !== "canceled",
       ) ?? null;
@@ -2578,6 +2579,7 @@ export const contests = {
             current: v.boolean(),
             annulled: v.boolean(),
             isRemainder: v.boolean(),
+            gap: v.boolean(),
             winner: v.nullable(
               v.object({
                 key: v.string(),
@@ -3171,6 +3173,20 @@ export const contests = {
         where r.counted or r.id in (select root from decided)
         order by r.date_from desc nulls last, r.id
       `);
+      const gaps = await db.execute<{ stop: string }>(sql`
+        select upper(g.valid)::text as stop from area_geometry g
+        where g.area_id = ${area.id}::uuid and upper(g.valid) is not null
+          and not exists (
+            select from area_geometry h
+            where h.area_id = g.area_id and h.valid && daterange(upper(g.valid), upper(g.valid) + 365)
+          )
+      `);
+      const fence =
+        gaps.rows
+          .map((row) => row.stop)
+          .filter((stop) => contest.date != null && stop <= contest.date)
+          .toSorted((a, b) => a.localeCompare(b))
+          .at(-1) ?? null;
       const rootIds = covering.rows.map((row) => row.id);
       const sameRace = covering.rows.filter(
         (row) => row.series === contest.series,
@@ -3183,7 +3199,12 @@ export const contests = {
         if (
           !isRoot ||
           day == null ||
-          sameRace.some((row) => row.date != null && row.date <= day)
+          sameRace.some(
+            (row) =>
+              row.date != null &&
+              row.date <= day &&
+              (fence == null || row.date > fence),
+          )
         ) {
           return [];
         }
@@ -3198,7 +3219,11 @@ export const contests = {
           with me as (
             select c.body_id, c.office_id, c.kind, c.round_number, c.party_scope_id, c.district_area_id, e.date_from, g.geom
             from contest c join election e on e.id = c.election_id
-            join area_geometry g on g.area_id = c.district_area_id and g.valid @> e.date_from
+            cross join lateral (
+              select g.geom from area_geometry g
+              where g.area_id = c.district_area_id and (upper(g.valid) > e.date_from or upper_inf(g.valid))
+              order by lower(g.valid) nulls first limit 1
+            ) g
             where c.id = ${contest.root}::uuid
           ),
           peers as (
@@ -3215,7 +3240,15 @@ export const contests = {
           )
           select c.id, c.district_area_id as area, e.date_from::text as date, extract(year from e.date_from)::int as year,
             (select min(extract(year from e2.date_from))::int from peers c2 join election e2 on e2.id = c2.election_id
-              where c2.district_area_id = c.district_area_id) as first,
+              where c2.district_area_id = c.district_area_id
+                and not exists (
+                  select from area_geometry x
+                  where x.area_id = c2.district_area_id and upper(x.valid) > e2.date_from and upper(x.valid) <= before.day
+                    and not exists (
+                      select from area_geometry h
+                      where h.area_id = x.area_id and h.valid && daterange(upper(x.valid), upper(x.valid) + 365)
+                    )
+                )) as first,
             (ST_Area(ST_Intersection(g.geom, me.geom, 0.00001)) / ST_Area(me.geom))::float8 as share
           from me, before, peers c
           join election e on e.id = c.election_id
@@ -3485,18 +3518,27 @@ export const contests = {
             (a.date ?? "").localeCompare(b.date ?? "") ||
             a.name.localeCompare(b.name, undefined, { numeric: true }),
         )
-        .map((entry) => ({
+        .map((entry, index, list) => ({
           ...entry,
           winner:
             entries.find(
               (peer) =>
                 !entry.indirect && peer.indirect && peer.year === entry.year,
             )?.winner ?? entry.winner,
+          gap: gaps.rows.some((row) => {
+            const before = list[index - 1]?.date;
+            return (
+              before != null &&
+              entry.date != null &&
+              row.stop > before &&
+              row.stop <= entry.date
+            );
+          }),
         }));
       const [{ chosen, notes: picked }, { chosen: previous }] =
         await Promise.all([
-          pick(comparable, contest, input.vs),
-          pick(comparable, contest, "previous"),
+          pick(comparable, { ...contest, fence }, input.vs),
+          pick(comparable, { ...contest, fence }, "previous"),
         ]);
       const targets = comparable.map((row) => ({
         value: rootSlugs.get(row.id) ?? row.id,
