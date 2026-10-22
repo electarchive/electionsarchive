@@ -3796,7 +3796,7 @@ export const contests = {
           ) w on true
         `);
         const [first] = found.rows;
-        if (first == null) {
+        if (first == null || found.rows.length < 2) {
           return null;
         }
         const [labels, slugs] = await Promise.all([
