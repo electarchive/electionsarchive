@@ -141,16 +141,26 @@ def emit(
             value
             for (value,) in conn.execute("select value from external_id where scheme = %s", [f"{pipeline}.result_set"])
         }
-        held = {
-            (office, year)
-            for office, year, contest_key in conn.execute(
-                """select o.value, extract(year from e.date_from)::int, k.value from contest c
-                   join election e on e.id = c.election_id
-                   join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
-                   join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'"""
-            )
-            if contest_key not in ours
-        }
+        held: set[tuple[str, int]] = set()
+        foreign: set[UUID] = set()
+        for office, year, contest_key, election_id in conn.execute(
+            """select o.value, extract(year from e.date_from)::int, k.value, e.id from contest c
+               join election e on e.id = c.election_id
+               join external_id o on o.entity_id = c.office_id and o.scheme = 'us.office'
+               join external_id k on k.entity_id = c.id and k.scheme = 'us.contest'"""
+        ):
+            if contest_key not in ours:
+                held.add((office, year))
+                foreign.add(election_id)
+        generals: dict[str, dict[UUID, tuple[date, date]]] = {}
+        for election_id, code, date_from, date_to in conn.execute(
+            """select distinct e.id, substr(p.iso_code, 4), e.date_from, e.date_to from election e
+               join polity p on p.id = e.polity_id and p.iso_code like 'US-%%'
+               where e.kind = 'general'"""
+        ):
+            if election_id in foreign:
+                generals.setdefault(code, {})[election_id] = (date_from, date_to)
+        election_paths: dict[UUID, str] = {}
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         slugs = {value for (value,) in conn.execute("select path from slug")}
@@ -191,7 +201,22 @@ def emit(
                 print(f"{key}: held by another pipeline, skipped")
                 skipped += 1
                 continue
-            if f"{day}:{state}" not in elections:
+            on = date.fromisoformat(str(day))
+            target = min(
+                (
+                    (end - start, election_id)
+                    for election_id, (start, end) in generals.get(str(state), {}).items()
+                    if start <= on <= end
+                    or (start == end and start.day == 1 and (start.year, start.month) == (on.year, on.month))
+                ),
+                default=(None, None),
+            )[1]
+            own = elections.get(f"{day}:{state}")
+            if target is not None:
+                if own is not None and own != target:
+                    cs.merge(own, target)
+                elections[f"{day}:{state}"] = target
+            elif own is None:
                 election = cs.key("us.election", f"{day}:{state}")
                 elections[f"{day}:{state}"] = election
                 cs.add(
@@ -199,8 +224,8 @@ def emit(
                     id=election,
                     polity_id=cs.polity(f"US-{state}"),
                     kind="general",
-                    date_from=date.fromisoformat(str(day)),
-                    date_to=date.fromisoformat(str(day)),
+                    date_from=on,
+                    date_to=on,
                     status="held",
                 )
                 name(election, f"{year} {state_name} general election")
@@ -209,7 +234,12 @@ def emit(
                     raise ValueError(f"slug taken: {path}")
                 slugs.add(path)
                 cs.add("slug", path=path, entity_id=election)
+                election_paths[election] = path
             election = elections[f"{day}:{state}"]
+            if election not in election_paths:
+                (election_paths[election],) = conn.execute(
+                    "select path from slug where entity_id = %s and is_current", [election]
+                ).fetchone()
             if source_id not in sources_made:
                 row = book[str(source_id)]
                 made = cs.source(row["publisher"], row["title"])
@@ -259,8 +289,7 @@ def emit(
                 default_result_kind="counted",
             )
             name(contest, f"{year} {state_name} {title} election")
-            path = f"us/{str(state).lower()}/{day}-general/{office}"
-            cs.add("slug", path=path, entity_id=contest)
+            cs.add("slug", path=f"{election_paths[election]}/{office}", entity_id=contest)
             result_set = cs.key(f"{pipeline}.result_set", key)
             cs.add(
                 "result_set",
