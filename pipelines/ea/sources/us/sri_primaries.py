@@ -2,6 +2,7 @@ import difflib
 import re
 from pathlib import Path
 from types import ModuleType
+from datetime import timedelta
 from uuid import UUID
 
 import polars as pl
@@ -130,10 +131,11 @@ def emit(source: ModuleType) -> Path:
                 width=width,
                 height=height,
             )
-        counties: dict[str, UUID] = {
-            house_books._plain(text): unit
-            for text, unit in conn.execute(
-                """select n.text, u.id from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
+        counties: dict[str, tuple[UUID, str, UUID]] = {
+            house_books._plain(text): (unit, code, area)
+            for text, unit, code, area in conn.execute(
+                """select n.text, u.id, u.code, u.area_id from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'short'
                    where u.scheme_code = 'us.county' and u.code like %s""",
                 [f"{source.FIPS}%"],
             ).fetchall()
@@ -159,12 +161,33 @@ def emit(source: ModuleType) -> Path:
             "completeness",
             "supersedes_id",
         )
+        def find(county: str) -> tuple[UUID, str, UUID]:
+            plain = house_books._plain(county)
+            return counties.get(plain) or next(v for name, v in counties.items() if name.startswith(plain))
+
+        districts: dict[str, set[str]] = {}
+        for contest, county in frame.select("contest", "county").unique().iter_rows():
+            if ":house:" in contest:
+                districts.setdefault(find(county)[1], set()).add(contest.split(":")[3])
+        split = {code for code, found in districts.items() if len(found) > 1}
+        state = cs.polity(f"US-{source.STATE}")
+        held_parts = {
+            code
+            for (code,) in conn.execute(
+                "select code from reporting_unit where scheme_code = 'us.county_part' and code like %s and valid_from <> %s",
+                [f"{source.YEAR}:%", source.VOLUMES[source.YEAR][2]],
+            ).fetchall()
+        }
+        day = source.VOLUMES[source.YEAR][2]
+        made: dict[str, UUID] = {}
         for (key,), lines in frame.group_by("contest", maintain_order=True):
             result_set = cs.key(f"{source.SOURCE}.result_set", str(key))
             if result_set not in cs.minted:
                 continue
             contest = contests[str(key)]
-            ((election,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
+            ((election, district_area),) = conn.execute(
+                "select election_id, district_area_id from contest where id = %s", [contest]
+            ).fetchall()
             held = str(key) in source.NONDEFAULT
             for row in conn.execute(
                 f"select {', '.join(columns)} from result_set where contest_id = %s and is_default", [contest]
@@ -191,8 +214,34 @@ def emit(source: ModuleType) -> Path:
             for option, county, votes, number, box in lines.select(
                 "option", "county", "votes", "page", "box"
             ).iter_rows():
-                plain = house_books._plain(str(county))
-                unit = counties.get(plain) or next(u for name, u in counties.items() if name.startswith(plain))
+                unit, code, area = find(str(county))
+                if code in split and ":house:" in str(key):
+                    part = f"{source.YEAR}:{code}:{str(key).split(':')[3]}"
+                    if part in held_parts:
+                        part = f"{day}:{part.split(':', 1)[1]}"
+                    if part not in made:
+                        made[part] = cs.unit("us.county_part", part)
+                        cs.add(
+                            "reporting_unit",
+                            id=made[part],
+                            polity_id=state,
+                            scheme_code="us.county_part",
+                            code=part,
+                            parent_id=unit,
+                            area_relation="within",
+                            area_id=area,
+                            kind="standard",
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                        cs.add(
+                            "reporting_unit_area",
+                            unit_id=made[part],
+                            area_id=district_area,
+                            valid_from=day,
+                            valid_to=day + timedelta(days=1),
+                        )
+                    unit = made[part]
                 fact = {
                     "result_set_id": result_set,
                     "unit_id": unit,

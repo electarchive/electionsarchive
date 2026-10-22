@@ -441,6 +441,10 @@ def parse(source: ModuleType) -> None:
                             )
                             guessed.add((r, c))
                 if not anchors:
+                    given = getattr(source, "ANCHORS", {}).get((page, where), {})
+                    anchors.update(given)
+                    guessed.update(given)
+                if not anchors:
                     raise ValueError(f"{year} page {page} district {where}: no cell found on the page")
                 for (r, c), b in anchors.items():
                     lefts = [
@@ -750,8 +754,12 @@ def emit(source: ModuleType) -> Path:
         contests: dict[str, UUID] = dict(
             conn.execute(
                 """select value, entity_id from external_id where scheme = 'us.contest'
-                   and (value like %s or value like %s)""",
-                [f"%:{source.STATE or ''}%:{getattr(source, 'CHAMBER', 'house')}:%", f"%:{source.STATE or ''}:senate"],
+                   and (value like %s or value like %s or value like %s)""",
+                [
+                    f"%:{source.STATE or ''}%:{getattr(source, 'CHAMBER', 'house')}:%",
+                    f"%:{source.STATE or ''}:senate",
+                    f"%:{source.STATE or ''}%:president",
+                ],
             ).fetchall()
         )
         folder.mkdir(parents=True, exist_ok=True)
@@ -797,7 +805,9 @@ def emit(source: ModuleType) -> Path:
                 )
         split = {
             (int(year), str(where), str(county))
-            for (year, where, county), districts in frame.group_by("year", "state", "county")
+            for (year, where, county), districts in frame.filter(pl.col("district") > 0).group_by(
+                "year", "state", "county"
+            )
             if districts["district"].n_unique() > 1 or _plain(str(county)) == "cook" or hasattr(source, "CHAMBER")
         }
         parts: set[str] = set()
@@ -806,7 +816,7 @@ def emit(source: ModuleType) -> Path:
             state = cs.polity(f"US-{where}")
             key = getattr(source, "KEYS", {}).get(
                 (int(year), int(district)) if source.STATE else (int(year), str(where), int(district)),
-                f"{day}:{where}:house:{district}",
+                f"{day}:{where}:" + (f"house:{district}" if district else "president"),
             )
             if key not in contests:
                 dated = [k for k in contests if re.fullmatch(rf"{year}-[0-9-]+:{where}:house:{district}", k)]
@@ -842,7 +852,7 @@ def emit(source: ModuleType) -> Path:
                 named = [
                     (option, total)
                     for option, kind, name, total in known
-                    if kind in ("candidate", "write_in")
+                    if kind in ("candidate", "write_in", "ticket")
                     and surname not in getattr(source, "PARTIES", ())
                     and (words := [w for w in re.sub(r"\(.*\)", "", name).split() if _plain(w) not in ("jr", "sr")])
                     and (
@@ -857,7 +867,7 @@ def emit(source: ModuleType) -> Path:
                     picked[int(column)] = named[0][0]
                 elif (
                     not named
-                    and len(same := [o for o, k, _, t in known if k in ("candidate", "write_in") and t == summed]) == 1
+                    and len(same := [o for o, k, _, t in known if k in ("candidate", "write_in", "ticket") and t == summed]) == 1
                 ):
                     picked[int(column)] = same[0]
                 elif summed == 0:
