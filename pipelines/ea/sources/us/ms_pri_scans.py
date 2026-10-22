@@ -1,3 +1,4 @@
+import json
 import re
 import struct
 import subprocess
@@ -20,16 +21,24 @@ PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 BASE = "https://www.sos.ms.gov/elections/electionResults/"
 PUBLISHER = "Mississippi Secretary of State"
-TITLE = "{party} primary certified results, {day:%B %-d, %Y}"
+READS: dict[str, dict[str, object]] = json.loads(Path(__file__).with_name("ms_pri_reads.json").read_text())
 COUNTIES = 82
 FILES: dict[tuple[int, str], tuple[str, date]] = {
     (2012, "democratic"): ("Democrat%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
     (2012, "republican"): ("Republican%20Certification_2012%20Primary.pdf", date(2012, 3, 13)),
     (2014, "democratic"): ("2014%20Democrat%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
+    (2014, "republican"): ("2014%20Republican%20Primary%20Election%20Results_Certified%206%2013%202014.pdf", date(2014, 6, 3)),
+    (2014, "democratic-runoff"): ("2014%20Democrat%20Primary%20Runoff%20Election%20Results_Certified%207%207%202014.pdf", date(2014, 6, 24)),
 }
 RULED = {(2014, "democratic"): range(2, 8)}
 ROTATED = {(2012, "republican"): range(9, 15)}
-EMIT = {(2012, "republican"): {("house", 1), ("house", 2)}, (2014, "democratic"): {("house", 1), ("house", 2), ("house", 3)}}
+EMIT = {
+    (2012, "republican"): {("house", 1), ("house", 2)},
+    (2014, "democratic"): {("house", 1), ("house", 2), ("house", 3)},
+    (2014, "republican"): {("house", 1), ("house", 3)},
+    (2014, "democratic-runoff"): {("house", 3)},
+}
+PARSE = {(2014, "democratic-runoff")}
 GRIDDED = {
     (2012, "democratic"): {
         1: ("president", None, "OBAMA, BARACK"),
@@ -55,6 +64,18 @@ GRIDDED = {
         17: ("house", 3, "QUINN, DENNIS C."),
         20: ("house", 4, "CAUSEY, TRISH"),
         21: ("house", 4, "MOORE, MATT"),
+    },
+    (2014, "republican"): {
+        1: ("senate", None, "CAREY, THOMAS L."),
+        2: ("senate", None, "COCHRAN, THAD"),
+        3: ("senate", None, "MCDANIEL, CHRIS"),
+        5: ("house", 1, "NUNNELEE, ALAN"),
+        7: ("house", 3, "CARAWAY, HARDY"),
+        8: ("house", 3, "HARPER, GREGG"),
+    },
+    (2014, "democratic-runoff"): {
+        1: ("house", 3, "MAGEE, DOUGLAS MACARTHUR (DOUG)"),
+        2: ("house", 3, "QUINN, DENNIS C."),
     },
     (2012, "republican"): {
         1: ("president", None, "BACHMANN, MICHELE"),
@@ -119,6 +140,8 @@ def parse() -> None:
         raise ValueError(f"{len(codes)} counties")
     out: list[dict[str, object]] = []
     for (year, party), layout in GRIDDED.items():
+        if (year, party) not in PARSE:
+            continue
         pdf = raw.cached(SOURCE, url(year, party)).path
         pages = int(re.search(r"Pages:\s+(\d+)", subprocess.run(["pdfinfo", str(pdf)], capture_output=True, text=True).stdout)[1])
         county = 0
@@ -129,6 +152,35 @@ def parse() -> None:
         turned = ROTATED.get((year, party))
         ruled = RULED.get((year, party))
         sheet = turned if turned is not None else ruled if ruled is not None else range(2, pages + 1)
+        read = READS.get(f"{year}:{party}")
+        if read is not None:
+            for page, count in zip(read["pages"], read["columns"]):
+                image = ms_scan.render(pdf, page, dpi=300)
+                body = (image[read["band"][0] : read["band"][1]] < 225).mean(0)
+                found = [x for x in ms_scan.clusters(np.where(body > read["share"])[0]) if x > read["xmin"].get(str(page), read["xmin"]["default"])]
+                pitch = float(np.median(np.diff(found)))
+                xs = [found[0]]
+                for x in found[1:]:
+                    gap = round((x - xs[-1]) / pitch)
+                    xs.extend(xs[-1] + (x - xs[-1]) * k / gap for k in range(1, gap))
+                    xs.append(x)
+                xs = xs[: count + 1]
+                if len(xs) != count + 1:
+                    raise ValueError(f"{year} {party} page {page}: {len(xs) - 1} columns, expected {count}")
+                rule = (image[read["anchor"][0] : read["anchor"][1], int(xs[0]) + 30 : int(xs[0]) + 400] < 200).mean(1)
+                anchor = read["anchor"][0] + int(np.argmax(rule))
+                bounds = read["bounds"]
+                for r in layout:
+                    for c in range(count):
+                        box = (int(xs[c]) + 8, anchor + bounds[r] + 8, int(xs[c + 1]) - 8, anchor + bounds[r + 1] - 8)
+                        sites[(r, county + c)] = (page, box, image.shape)
+                county += count
+            for r in layout:
+                for index, value in enumerate(read["rows"][str(r)]):
+                    if value is not None:
+                        reads[(r, index)] = Counter({value: 2})
+                printed[r][read["printed"][str(r)]] += 2
+            sheet = range(0)
         for page in sheet:
             image = ms_scan.render(pdf, page, dpi=300, turn=-90 if turned is not None else 0)
             if turned is not None:
@@ -220,7 +272,7 @@ def parse() -> None:
                 out.append(
                     {
                         "year": year,
-                        "chamber": f"{office}:{party}",
+                        "chamber": f"{office}:{party.removesuffix('-runoff')}",
                         "day": FILES[(year, party)][1],
                         "special": False,
                         "state": "MS",
@@ -255,13 +307,13 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Mississippi's 2012 presidential, U.S. Senate, and House primaries by county from the Secretary of State's certified results",
+            summary="Mississippi's presidential, U.S. Senate, and House primaries and runoffs by county from the Secretary of State's certified results",
             polity="US-MS",
         )
         sources: dict[str, object] = {}
         pages: dict[tuple[str, int], str] = {}
         for (year, party), (_, day) in FILES.items():
-            title = TITLE.format(party=party.capitalize(), day=day)
+            title = f"{party.removesuffix('-runoff').capitalize()} primary {'runoff ' if party.endswith('-runoff') else ''}certified results, {day:%B %-d, %Y}"
             source = cs.source(PUBLISHER, title)
             sources[f"MS{year}{party}"] = source
             cs.add(
