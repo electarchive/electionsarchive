@@ -29,15 +29,23 @@ DAYS = {
     date(2024, 8, 10): "2024/Primary",
 }
 COUNTIES = {"coh": "15001", "cch": "15003", "cok": "15007", "com": "15009"}
-PARTIES = {"R": "republican", "D": "democratic", "L": "libertarian", "G": "green"}
+PARTIES = {
+    "R": "republican",
+    "D": "democratic",
+    "L": "libertarian",
+    "G": "green",
+    "N": "nonpartisan",
+    "C": "constitution",
+    "NL": "natural-law",
+}
 PUBLISHER = "Hawaii Office of Elections"
 TITLE = "Primary election summary reports by county"
-HEADER = re.compile(r"^(U\.?S\.? Senator|U\.?S\.? Representative, Dist (I+)|President[^-]*) - ([A-Z]+)$")
+HEADER = re.compile(r"^(U\.?S\.? Senator|U\.?S\.? Representative, Dist (I+|\d)|President[^-]*) - ([A-Z]+)$")
 GUTTER = re.compile(r" {3,}")
 ROMAN = {"I": 1, "II": 2}
-OLD_HEADER = re.compile(r"^\((\w+)\) (U\.S\. Senator|U\.S\. Representative(?:, \[D (\d)\])?)$")
+OLD_HEADER = re.compile(r"^\((\w+)\) (U\.S\. Senator|U\.S\. Representative(?:(?:,| -) \[D (\d)\])?)$")
 OLD_ROW = re.compile(r"^([\d,]+) (.+?) [\d.]+%$")
-OLD_PARTIES = {"R": "R", "RE": "R", "D": "D", "DE": "D", "L": "L", "LI": "L", "G": "G", "GR": "G"}
+OLD_PARTIES = {"R": "R", "RE": "R", "D": "D", "DE": "D", "L": "L", "LI": "L", "G": "G", "GR": "G", "N": "N", "NP": "N", "C": "C", "NL": "NL"}
 
 
 def fetch() -> None:
@@ -112,7 +120,7 @@ def parse() -> None:
                     office = "senate" if "Senator" in found[1] else "house" if "Representative" in found[1] else "president"
                     current = (
                         f"{office}:{PARTIES[found[3]]}" if found[3] in PARTIES else None,
-                        ROMAN[found[2]] if found[2] else None,
+                        ROMAN.get(found[2]) or int(found[2]) if found[2] else None,
                     )
                 elif re.match(r"^[A-Z].* - [A-Z]+$", line) or line.startswith(("Page ", "Printed")):
                     current = None
