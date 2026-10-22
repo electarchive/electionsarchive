@@ -483,10 +483,20 @@ async function children(
   let found = await db.execute<{ id: string; k: number; scheme: string }>(sql`
     select a.id, a.k, a.scheme_code as scheme
     from area_parent p join area a on a.id = p.area_id
-    where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date and exists (
-      select 1 from unnest(${sql.param(ks)}::int[]) as s(k) cross join lateral (
-        select from result_rollup r where r.result_set_k = s.k and r.area_k = a.k and r.measure = any(${COUNTED}) limit 1
-      ) r
+    where p.parent_id = ${area.id}::uuid and p.valid @> ${date}::date and (
+      exists (
+        select from unnest(${sql.param(ks)}::int[]) as s(k)
+        join result_rollup_sum r on r.result_set_k = s.k and r.area_k = a.k and r.measure = any(${COUNTED})
+      )
+      or exists (
+        select from unnest(${sql.param(ks)}::int[]) as s(k)
+        join result_rollup_unit u on u.result_set_k = s.k and u.area_k = a.k
+        cross join lateral (
+          select from result_value v
+          where v.result_set_k = u.result_set_k and v.unit_k = u.unit_k and v.measure = any(${COUNTED})
+          limit 1
+        ) v
+      )
     )
   `);
   if (isRoot && found.rows.length < 2) {
