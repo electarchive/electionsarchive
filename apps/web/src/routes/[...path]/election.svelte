@@ -657,6 +657,7 @@
       };
     }),
   );
+  const others = $derived(races.slice(1).filter((race) => !race.isLater));
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -734,117 +735,55 @@
   </section>
 {/if}
 
-{#if races.length > 1}
-  <section class="col-span-12 bg-card px-3.5" aria-labelledby="board-title">
-    <h2 id="board-title" class="sr-only">
-      {m.board_title({ count: races.length })}
-    </h2>
-    <ol class="grid">
-      {#each races as race, index (index)}
-        {#if !race.isLater}
-          <li
-            class="grid gap-x-10 gap-y-3 border-bs border-border py-4 first:border-bs-0 first:pbs-1 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
-          >
-            <div class="grid content-start gap-1">
-              <h3
-                class={cn("font-[740] tracking-[-0.012em] text-balance", {
-                  "text-xl/tight": index === 0,
-                  "text-lg/tight": index > 0,
-                })}
-              >
-                <a
-                  class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                  href="#race-{race.anchor}">{race.name}</a
-                >
-              </h3>
-              {#if race.lede != null}
-                <p
-                  class={cn("font-serif text-pretty max-inline-[52ch]", {
-                    "text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug": index === 0,
-                    "text-[1.0625rem]/snug": index > 0,
-                  })}
-                >
-                  {race.sequel ?? race.lede}
-                  {#if race.next != null}
-                    {#if race.runoff?.path == null}
-                      {race.next}
-                    {:else}
-                      <a
-                        class="underline decoration-border underline-offset-4 hover:decoration-foreground"
-                        href={resolve("/[...path]", { path: race.runoff.path })}
-                        >{race.next}</a
-                      >
-                    {/if}
-                  {/if}
-                </p>
-              {/if}
-            </div>
-            <div class="grid content-end gap-3">
-              {#if race.whole == null}
-                {@render balance(race.balance, index === 0)}
-              {:else}
-                <div class="grid gap-1">
-                  <p class="text-[0.8125rem] text-muted-foreground">
-                    {m.board_won()}
-                  </p>
-                  {@render balance(race.balance, index === 0)}
-                </div>
-              {/if}
-              {#if race.whole != null}
-                <div class="grid gap-1">
-                  <p class="text-[0.8125rem] text-muted-foreground">
-                    {m.board_after()}
-                  </p>
-                  {@render balance({ ...race.whole, isCount: true }, false)}
-                </div>
-              {/if}
-            </div>
-          </li>
-        {/if}
-      {/each}
-    </ol>
-  </section>
-{/if}
-
 {#each races as race, index (index)}
-  <section
-    id="race-{race.anchor}"
-    class="col-span-12 grid scroll-mbs-4 gap-1.5 bg-card px-3.5 pbs-4 pbe-1"
-  >
-    <div class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1">
-      <h2
-        class={cn("font-[760] tracking-[-0.015em] text-balance", {
-          "text-[clamp(1.5rem,2.4vw,2rem)]/tight": index === 0,
-          "text-2xl/tight": index > 0,
-        })}
-      >
-        {race.name}
-      </h2>
-      <p
-        class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground"
-      >
-        {#if race.count > 1}
-          <span>{m.race_contests({ count: count(race.count) })}</span>
+  {#if index === 0 && others.length > 0}
+    <section
+      id="race-{race.anchor}"
+      class="col-span-12 grid scroll-mbs-4 gap-x-10 gap-y-3 bg-card px-3.5 pbs-4 pbe-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
+    >
+      <div class="grid content-start gap-1.5">
+        <h2
+          class="text-[clamp(1.5rem,2.4vw,2rem)]/tight font-[760] tracking-[-0.015em] text-balance"
+        >
+          {race.name}
+        </h2>
+        {#if race.lede != null}
+          {@render lede(race, true)}
         {/if}
-        {#if race.path != null}
-          <Preview
-            class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
-            path={race.path}>{m.race_open()}</Preview
-          >
-        {/if}
-      </p>
-    </div>
-    {#if race.lede != null && (races.length === 1 || race.isLater)}
-      <p
-        class={cn("text-pretty max-inline-[64ch]", {
-          "text-[1.0625rem]": index === 0,
-          "text-[0.9375rem]": index > 0,
-        })}
+        {@render meta(race)}
+      </div>
+      {@render tally(race, true)}
+    </section>
+  {:else}
+    <section
+      id="race-{race.anchor}"
+      class="col-span-12 grid scroll-mbs-4 gap-1.5 bg-card px-3.5 pbs-4 pbe-1"
+    >
+      <div
+        class="flex flex-wrap items-baseline justify-between gap-x-4 gap-y-1"
       >
-        {race.lede}
-      </p>
-    {/if}
-  </section>
+        <h2
+          class={cn("font-[760] tracking-[-0.015em] text-balance", {
+            "text-[clamp(1.5rem,2.4vw,2rem)]/tight": index === 0,
+            "text-2xl/tight": index > 0,
+          })}
+        >
+          {race.name}
+        </h2>
+        {@render meta(race)}
+      </div>
+      {#if race.lede != null && (index === 0 || race.isLater)}
+        <p
+          class={cn("text-pretty max-inline-[64ch]", {
+            "text-[1.0625rem]": index === 0,
+            "text-[0.9375rem]": index > 0,
+          })}
+        >
+          {race.lede}
+        </p>
+      {/if}
+    </section>
+  {/if}
   {#if race.electors != null && race.electors.rows.length > 0 && races.length === 1}
     <Electors electors={race.electors} />
   {/if}
@@ -997,7 +936,95 @@
       limit={15}
     />
   {/if}
+  {#if index === 0 && others.length > 0}
+    <section class="col-span-12 bg-card px-3.5" aria-labelledby="board-title">
+      <h2 id="board-title" class="sr-only">
+        {m.board_title({ count: races.length })}
+      </h2>
+      <ol
+        class="grid gap-x-10 lg:grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]"
+      >
+        {#each others as other (other.anchor)}
+          <li
+            class="grid content-start gap-3 border-bs border-border py-4 lg:border-bs-0 max-lg:first:border-bs-0"
+          >
+            <div class="grid content-start gap-1">
+              <h3
+                class="text-lg/tight font-[740] tracking-[-0.012em] text-balance"
+              >
+                <a
+                  class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  href="#race-{other.anchor}">{other.name}</a
+                >
+              </h3>
+              {#if other.lede != null}
+                {@render lede(other, false)}
+              {/if}
+            </div>
+            {@render tally(other, false)}
+          </li>
+        {/each}
+      </ol>
+    </section>
+  {/if}
 {/each}
+
+{#snippet lede(race: (typeof races)[number], isLead: boolean)}
+  <p
+    class={cn("font-serif text-pretty max-inline-[52ch]", {
+      "text-[clamp(1.0625rem,1.5vw,1.25rem)]/snug": isLead,
+      "text-[1.0625rem]/snug": !isLead,
+    })}
+  >
+    {race.sequel ?? race.lede}
+    {#if race.next != null}
+      {#if race.runoff?.path == null}
+        {race.next}
+      {:else}
+        <a
+          class="underline decoration-border underline-offset-4 hover:decoration-foreground"
+          href={resolve("/[...path]", { path: race.runoff.path })}
+          >{race.next}</a
+        >
+      {/if}
+    {/if}
+  </p>
+{/snippet}
+
+{#snippet meta(race: (typeof races)[number])}
+  <p class="flex items-baseline gap-3 text-[0.8125rem] text-muted-foreground">
+    {#if race.count > 1}
+      <span>{m.race_contests({ count: count(race.count) })}</span>
+    {/if}
+    {#if race.path != null}
+      <Preview
+        class="font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+        path={race.path}>{m.race_open()}</Preview
+      >
+    {/if}
+  </p>
+{/snippet}
+
+{#snippet tally(race: (typeof races)[number], isLead: boolean)}
+  <div class="grid content-end gap-3">
+    {#if race.whole == null}
+      {@render balance(race.balance, isLead)}
+    {:else}
+      <div class="grid gap-1">
+        <p class="text-[0.8125rem] text-muted-foreground">
+          {m.board_won()}
+        </p>
+        {@render balance(race.balance, isLead)}
+      </div>
+      <div class="grid gap-1">
+        <p class="text-[0.8125rem] text-muted-foreground">
+          {m.board_after()}
+        </p>
+        {@render balance({ ...race.whole, isCount: true }, false)}
+      </div>
+    {/if}
+  </div>
+{/snippet}
 
 {#if unplaced.length > 0}
   <section class="col-span-12 bg-card px-3.5 py-3">
