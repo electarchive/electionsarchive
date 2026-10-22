@@ -16,6 +16,7 @@ KEYS = {
     "option_id": "contest_option",
     "from_option_id": "contest_option",
 }
+REPLACEABLE = ("area_geometry", "area_parent")
 RULES = Draft7Validator(json.loads((ROOT / "packages" / "engine" / "rules.schema.json").read_text()))
 
 
@@ -50,6 +51,14 @@ class Stage:
     temporal: dict[str, list[str]]
     parents: dict[str, str]
     owners: dict[str, str]
+    replaces: dict[str, list[str]]
+
+    def __post_init__(self) -> None:
+        if unknown := sorted(set(self.replaces) - set(REPLACEABLE)):
+            raise ValueError(f"scope.replaces may name only {', '.join(REPLACEABLE)}, not {', '.join(unknown)}")
+
+    def writers(self, table: str) -> sql.Composable:
+        return sql.Literal([self.pipeline, *self.replaces.get(table, [])])
 
     def staged(self, table: str) -> sql.Composable:
         return sql.SQL("{}.{}").format(sql.Identifier(self.schema), sql.Identifier(table))
@@ -399,7 +408,7 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                            from public.{target} p
                            join {staged} s on {overlaps}
                            join changeset c on c.id = p.changeset_id
-                           where c.pipeline is distinct from {pipeline}"""
+                           where not c.pipeline = any({writers})"""
                     ).format(
                         table=sql.Literal(table),
                         key=sql.Literal(stage.temporal[table][0]),
@@ -407,7 +416,7 @@ def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
                         target=sql.Identifier(table),
                         staged=stage.staged(table),
                         overlaps=stage.overlaps(table),
-                        pipeline=sql.Literal(stage.pipeline),
+                        writers=stage.writers(table),
                     ),
                 )
             )

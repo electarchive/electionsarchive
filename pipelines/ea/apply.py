@@ -17,10 +17,11 @@ MERGE_LOCK = 1700949316
 
 def _stage(conn: Connection, changeset_id: str) -> Stage:
     row = conn.execute(
-        "select pipeline, scope ->> 'polity', artifact_keys from changeset where id = %s", [changeset_id]
+        "select pipeline, scope ->> 'polity', artifact_keys, scope -> 'replaces' from changeset where id = %s",
+        [changeset_id],
     ).fetchone()
     assert row is not None, changeset_id
-    pipeline, polity, keys = row
+    pipeline, polity, keys, replaces = row
     schema = f"cs_{changeset_id.replace('-', '')}"
     tables: dict[str, list[str]] = {}
     for key in keys:
@@ -76,7 +77,7 @@ def _stage(conn: Connection, changeset_id: str) -> Stage:
         ).fetchall()
         if table in parents
     }
-    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners)
+    return Stage(schema, tables, entities, pipeline, polity, temporal, parents, owners, replaces or {})
 
 
 def _not_null(conn: Connection, table: str) -> set[str]:
@@ -568,8 +569,8 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
         conn.execute(
             sql.SQL(
                 """delete from public.{target} p using {staged} s, changeset c
-                   where c.id = p.changeset_id and c.pipeline = {pipeline} and {overlaps}"""
-            ).format(target=target, staged=staged, pipeline=sql.Literal(stage.pipeline), overlaps=stage.overlaps(table))
+                   where c.id = p.changeset_id and c.pipeline = any({writers}) and {overlaps}"""
+            ).format(target=target, staged=staged, writers=stage.writers(table), overlaps=stage.overlaps(table))
         )
     if table in stage.parents:
         conn.execute(sql.SQL("delete from public.{} p using changeset c where {}").format(target, stage.stale(table)))
