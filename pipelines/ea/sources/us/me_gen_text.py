@@ -46,6 +46,7 @@ def parse() -> None:
                     if row[start].strip():
                         last, first, middle, suffix = (part.strip() for part in row[start + 1 : start + 5])
                         name = f"{last}, {' '.join(part for part in (first, middle, suffix) if part)}"
+                        name = name.replace("HASKELL, ANITA P.", "PEAVEYHASKELL, ANITA P.")
                         lines.append((day, chamber, int(row[4]), row[1], row[2], name, int(row[start])))
             continue
         if day.year == 2010:
