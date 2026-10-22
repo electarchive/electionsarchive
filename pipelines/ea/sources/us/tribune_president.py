@@ -356,7 +356,7 @@ PRINTS = {
         sha="390fdb7684afb596b0eb8d472ccc6e0d65186cdb0096f3a113e2a80ea0c5e5be",
         rows=FORTIES,
         y0=2065,
-        pitch=36.65,
+        pitch=36.2,
         total=3163,
         cols=[
             (685, 835),
@@ -532,8 +532,9 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1848,)
+YEARS = (1844,)
 ELECTION_DAYS = {
+    1844: "1844-11-01",
     1848: "1848-11-07",
     1852: "1852-11-02",
     1856: "1856-11-04",
@@ -544,7 +545,7 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
 }
-YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254"}
+YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254"}
 PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876}
 PRINT_COLUMNS = {
     "v65": {
@@ -571,6 +572,9 @@ PRINT_COLUMNS = {
         6: (1848, "Taylor"),
         7: (1848, "Cass"),
         8: (1848, "Van Buren"),
+        3: (1844, "Clay"),
+        4: (1844, "Polk"),
+        5: (1844, "Birney"),
     },
 }
 FUSION = {(1860, "NY", "Douglas"), (1860, "NJ", "Douglas"), (1860, "PA", "Breckinridge")}
@@ -591,6 +595,9 @@ CANDIDATES = {
     "Taylor": ("Zachary Taylor (Whig)", "whigparty"),
     "Cass": ("Lewis Cass (Democratic)", "democraticparty"),
     "Van Buren": ("Martin Van Buren (Free Soil)", "freesoilparty"),
+    "Clay": ("Henry Clay (Whig)", "whigparty"),
+    "Polk": ("James K. Polk (Democratic)", "democraticparty"),
+    "Birney": ("James G. Birney (Liberty)", "libertyparty"),
 }
 EARLY: dict[tuple[int, str, str], int] = {
     (1868, "AL", "Grant"): 76366,
@@ -1057,6 +1064,69 @@ EARLY: dict[tuple[int, str, str], int] = {
     (1848, "WI", "Taylor"): 13747,
     (1848, "WI", "Cass"): 15001,
     (1848, "WI", "Van Buren"): 10418,
+    (1844, "AL", "Clay"): 26084,
+    (1844, "AL", "Polk"): 37740,
+    (1844, "AR", "Clay"): 5504,
+    (1844, "AR", "Polk"): 9546,
+    (1844, "CT", "Clay"): 32832,
+    (1844, "CT", "Polk"): 29841,
+    (1844, "CT", "Birney"): 1943,
+    (1844, "DE", "Clay"): 6278,
+    (1844, "DE", "Polk"): 5996,
+    (1844, "GA", "Clay"): 42100,
+    (1844, "GA", "Polk"): 44177,
+    (1844, "IL", "Clay"): 45528,
+    (1844, "IL", "Polk"): 57920,
+    (1844, "IL", "Birney"): 3570,
+    (1844, "IN", "Clay"): 67867,
+    (1844, "IN", "Polk"): 70181,
+    (1844, "IN", "Birney"): 2106,
+    (1844, "KY", "Clay"): 61255,
+    (1844, "KY", "Polk"): 51988,
+    (1844, "LA", "Clay"): 13083,
+    (1844, "LA", "Polk"): 13782,
+    (1844, "ME", "Clay"): 34378,
+    (1844, "ME", "Polk"): 45719,
+    (1844, "ME", "Birney"): 4836,
+    (1844, "MD", "Clay"): 35984,
+    (1844, "MD", "Polk"): 32676,
+    (1844, "MA", "Clay"): 67418,
+    (1844, "MA", "Polk"): 52846,
+    (1844, "MA", "Birney"): 10860,
+    (1844, "MI", "Clay"): 24337,
+    (1844, "MI", "Polk"): 27759,
+    (1844, "MI", "Birney"): 3632,
+    (1844, "MS", "Clay"): 19206,
+    (1844, "MS", "Polk"): 25126,
+    (1844, "MO", "Clay"): 31251,
+    (1844, "MO", "Polk"): 41369,
+    (1844, "NH", "Clay"): 17866,
+    (1844, "NH", "Polk"): 27160,
+    (1844, "NH", "Birney"): 4161,
+    (1844, "NJ", "Clay"): 38318,
+    (1844, "NJ", "Polk"): 37495,
+    (1844, "NJ", "Birney"): 131,
+    (1844, "NY", "Clay"): 232482,
+    (1844, "NY", "Polk"): 237588,
+    (1844, "NY", "Birney"): 15812,
+    (1844, "NC", "Clay"): 43232,
+    (1844, "NC", "Polk"): 39287,
+    (1844, "OH", "Clay"): 155057,
+    (1844, "OH", "Polk"): 149117,
+    (1844, "OH", "Birney"): 8050,
+    (1844, "PA", "Clay"): 161203,
+    (1844, "PA", "Polk"): 167535,
+    (1844, "PA", "Birney"): 3138,
+    (1844, "RI", "Clay"): 7322,
+    (1844, "RI", "Polk"): 4867,
+    (1844, "RI", "Birney"): 107,
+    (1844, "TN", "Clay"): 60030,
+    (1844, "TN", "Polk"): 59917,
+    (1844, "VT", "Clay"): 26770,
+    (1844, "VT", "Polk"): 18041,
+    (1844, "VT", "Birney"): 3954,
+    (1844, "VA", "Clay"): 43677,
+    (1844, "VA", "Polk"): 49570,
 }
 
 
