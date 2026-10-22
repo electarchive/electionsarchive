@@ -424,31 +424,6 @@ export const coverageGovernmentYear = pgTable("coverage_government_year", {
 	primaryKey({ columns: [table.year, table.governmentId], name: "coverage_government_year_pkey"}),
 ]);
 
-export const coverageRow = pgTable("coverage_row", {
-	path: text().primaryKey(),
-	parent: text(),
-	year: integer().notNull(),
-	sort: integer().notNull(),
-	label: text().notNull(),
-	kind: text().notNull(),
-	expected: integer(),
-	held: integer().notNull(),
-	governments: integer(),
-	missing: integer(),
-	county: integer(),
-	precinct: integer(),
-	shapes: integer(),
-	precincts: integer().default(0).notNull(),
-	shaped: integer().default(0).notNull(),
-	countyTotal: integer("county_total"),
-	precinctTotal: integer("precinct_total"),
-	shapesTotal: integer("shapes_total"),
-	turnout: integer(),
-	turnoutTotal: integer("turnout_total"),
-}, (table) => [
-	index("coverage_row_parent_idx").using("btree", table.parent.asc().nullsLast(), table.sort.asc().nullsLast()),
-]);
-
 export const crosswalk = pgTable("crosswalk", {
 	id: uuid().default(sql`uuidv7()`).primaryKey(),
 	fromKind: crosswalkFromKind("from_kind").notNull(),

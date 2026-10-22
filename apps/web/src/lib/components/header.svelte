@@ -3,6 +3,7 @@
   import { page } from "$app/state";
   import {
     ArrowLeftRightIcon,
+    GaugeIcon,
     LayoutDashboardIcon,
     LogOutIcon,
     MonitorIcon,
@@ -28,13 +29,15 @@
 
 <header class="border-be">
   <div
-    class="mx-auto flex items-center justify-between px-4 block-12 max-inline-7xl"
+    class="mx-auto flex items-center justify-between gap-3 px-4 block-12 max-inline-7xl"
   >
     <a href={resolve("/")} class="flex items-center gap-2.5">
       <Monogram size={26} />
-      <span class="text-lg font-[780] tracking-[-0.015em]">{m.wordmark()}</span>
+      <span class="text-lg font-[780] tracking-[-0.015em] whitespace-nowrap"
+        >{m.wordmark()}</span
+      >
     </a>
-    <div class="flex items-center gap-2">
+    <div class="flex items-center gap-2 max-sm:gap-0">
       <Search />
       <a
         href={resolve("/compare")}
@@ -43,6 +46,14 @@
       >
         <ArrowLeftRightIcon />
         <span class="max-sm:sr-only">{m.versus_action()}</span>
+      </a>
+      <a
+        href={resolve("/coverage")}
+        class={cn(buttonVariants({ variant: "ghost" }), "max-sm:px-2")}
+        aria-current={page.url.pathname === "/coverage" ? "page" : undefined}
+      >
+        <GaugeIcon />
+        <span class="max-sm:sr-only">{m.coverage_nav()}</span>
       </a>
       <DropdownMenu.Root>
         <DropdownMenu.Trigger

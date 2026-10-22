@@ -1,28 +1,23 @@
+import { call } from "@orpc/server";
+import { error } from "@sveltejs/kit";
 import { spawn } from "node:child_process";
 import { fileURLToPath } from "node:url";
-import { error } from "@sveltejs/kit";
-import { call } from "@orpc/server";
-import { sql } from "drizzle-orm";
-import { db } from "#lib/server/db/index.js";
 import { router } from "#lib/server/rpc/router.js";
 import type { Actions, PageServerLoad } from "./$types";
 
-const dev = import.meta.env.DEV;
+const isDev = import.meta.env.DEV;
 
 export const load: PageServerLoad = async () => {
-  const building = await db.execute<{ building: boolean }>(sql`
-    select built_at is null or started_at > built_at as building from coverage_build
-  `);
-  return {
-    ...(await call(router.coverage.rows, {})),
-    dev,
-    building: building.rows[0]?.building ?? false,
-  };
+  const [goals, gaps] = await Promise.all([
+    call(router.coverage.goals, undefined),
+    call(router.coverage.gaps, { goal: "county" }),
+  ]);
+  return { ...goals, gaps, dev: isDev };
 };
 
 export const actions: Actions = {
   refresh: () => {
-    if (!dev) {
+    if (!isDev) {
       error(404);
     }
     const pipelines = fileURLToPath(
