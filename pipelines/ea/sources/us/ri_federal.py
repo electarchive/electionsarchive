@@ -1,4 +1,6 @@
+import html
 import json
+import re
 from datetime import datetime
 from pathlib import Path
 
@@ -11,7 +13,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.ri_federal"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://rigov.s3.amazonaws.com/election/results/"
 FOLDERS = [
@@ -66,23 +68,41 @@ def parse() -> None:
                     continue
                 if name.endswith("PRESIDENTIAL CANDIDATE"):
                     chamber, district = "president", None
+                    designation = {"DEMOCRATIC": "DEM", "REPUBLICAN": "REP"}.get(name.split()[0])
                 elif "SENATOR IN CONGRESS" in name or name.endswith("U.S. SENATOR"):
-                    chamber, district = "senate", None
+                    chamber, district, designation = "senate", None, None
                 elif "REPRESENTATIVE IN CONGRESS DISTRICT" in name:
-                    chamber, district = "house", int(name.rsplit(" ", 1)[1])
+                    chamber, district, designation = "house", int(name.rsplit(" ", 1)[1]), None
                 else:
                     continue
                 for candidate in contest["candidates"]:
-                    party = PARTIES.get(candidate.get("party_code") or contest.get("contest_party_designation"))
+                    party = PARTIES.get(
+                        designation or candidate.get("party_code") or contest.get("contest_party_designation")
+                    )
                     if party is None:
                         continue
-                    key = (f"{chamber}:{party}", str(district), candidate["name"].rstrip("*").upper())
+                    name = re.sub(r"\s+", " ", html.unescape(candidate["name"])).rstrip("*").strip().upper()
+                    key = (f"{chamber}:{party}", str(district), "WRITE-INS" if name == "WRITE-IN" else name)
                     votes = int(candidate["votes"].replace(",", ""))
                     if town == "statewide":
                         statewide[key] = statewide.get(key, 0) + votes
                         continue
                     totals[key] = totals.get(key, 0) + votes
-                    rows.append((day.year, key[0], day, False, "RI", district, TOWNS[town], key[2], 1, False, votes))
+                    rows.append(
+                        (day.year, key[0], day, False, "RI", district, TOWNS[town], key[2], 1, key[2] == "WRITE-INS")
+                        + (votes, "county", 0, 0)
+                    )
+        for key, votes in statewide.items():
+            if key[0].startswith("president:"):
+                mail = votes - totals.pop(key, 0)
+                statewide[key] = 0
+                if mail < 0:
+                    raise ValueError(f"{folder} {key}: towns exceed the statewide total")
+                rows.append(
+                    (day.year, key[0], day, False, "RI", None, "RI:statewide", key[2], 1, key[2] == "WRITE-INS")
+                    + (mail, "aggregate", 3, 33)
+                )
+        statewide = {key: votes for key, votes in statewide.items() if not key[0].startswith("president:")}
         if totals != statewide:
             print(
                 folder,
@@ -108,11 +128,16 @@ def parse() -> None:
             "measure": pl.Int16,
             "writein": pl.Boolean,
             "votes": pl.Int64,
+            "kind": pl.String,
+            "channel": pl.Int16,
+            "flags": pl.Int16,
         },
         orient="row",
-    ).group_by("year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein").agg(
-        pl.col("votes").sum()
-    ).with_columns(kind=pl.lit("county"), source=pl.lit("RI")).write_parquet(PARSED / "counties.parquet")
+    ).group_by(
+        "year", "chamber", "day", "special", "state", "district", "code", "candidate", "measure", "writein", "kind"
+    ).agg(pl.col("votes").sum(), pl.col("channel").first(), pl.col("flags").first()).with_columns(
+        source=pl.lit("RI")
+    ).write_parquet(PARSED / "counties.parquet")
     print(len(rows), "rows")
 
 
@@ -122,7 +147,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Rhode Island's 2012 to 2022 president, U.S. Senate, and House primaries by county",
+            summary="Rhode Island's 2012 to 2022 president, U.S. Senate, and House primaries by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
             polity="US-RI",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -140,5 +165,31 @@ def emit() -> Path:
                 if (folder, town) in MISSING:
                     continue
                 cs.artifact(raw.cached(SOURCE, f"{BASE}{folder}/{town}.json"), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"RI": source}, strict=True)
+        frame = pl.read_parquet(PARSED / "counties.parquet")
+        medsl.attach(cs, conn, frame, {"RI": source}, strict=True)
+        staged = {str(row["id"]) for row in cs.rows.get("result_set", [])}
+        for (day, chamber), lines in frame.filter(pl.col("chamber").str.starts_with("president:")).group_by(
+            "day", "chamber"
+        ):
+            result_set = cs.key(f"{SOURCE}.result_set", f"{day}:RI:{chamber}:county")
+            if str(result_set) not in staged:
+                continue
+            towns = lines.filter(pl.col("kind") == "county")["votes"].sum()
+            total = lines["votes"].sum()
+            cs.add(
+                "note",
+                id=(
+                    conn.execute(
+                        "select id from note where entity_id = %s and kind = 'caveat'", [result_set]
+                    ).fetchone()
+                    or (None,)
+                )[0],
+                entity_id=result_set,
+                kind="caveat",
+                body_md=f"The Board of Elections' statewide file counts {total:,} votes and its 39 town files "
+                f"{towns:,}. The {total - towns:,}-vote difference, the mail ballots the Board counts centrally, "
+                "is one statewide row per candidate: the statewide total less the town sum.",
+                valid_from_precision="day",
+                valid_to_precision="day",
+            )
         return cs.write()

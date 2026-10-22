@@ -985,10 +985,12 @@ def attach(
                 option_id=pl.when(pl.col("measure") == 1).then(
                     pl.col("candidate").replace_strict(picked, default=None)
                 ),
-                channel=pl.lit(0, pl.Int16),
+                channel=pl.col("channel") if "channel" in congress.columns else pl.lit(0, pl.Int16),
                 measure=pl.col("measure"),
                 count_round=pl.lit(first, pl.Int16),
-                flags=pl.when(pl.col("kind") == "aggregate")
+                flags=pl.col("flags")
+                if "flags" in congress.columns
+                else pl.when(pl.col("kind") == "aggregate")
                 .then(pl.lit(32, pl.Int16))
                 .when(pl.lit(located) & pl.col("measure").eq(1))
                 .then(pl.lit(8, pl.Int16))
