@@ -4,6 +4,7 @@
   import { page } from "$app/state";
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import { createQuery } from "@tanstack/svelte-query";
+  import { SvelteSet } from "svelte/reactivity";
   import Name from "#lib/components/name.svelte";
   import { count, date, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
@@ -81,6 +82,7 @@
     });
   });
   let isAllYears = $state(false);
+  const opened = new SvelteSet<string>();
   let isAllElections = $state(false);
   let isAllPlaces = $state(false);
 
@@ -709,7 +711,7 @@
               datetime={group.date}>{group.year ?? ""}</time
             >
             <ul class="grid gap-2">
-              {#each group.races as race (race.id)}
+              {#each opened.has(group.date) ? group.races : group.races.slice(0, 8) as race (race.id)}
                 {const leader = $derived(race.leaders[0])}
                 {const runner = $derived(race.leaders[1])}
                 <li
@@ -761,6 +763,16 @@
                 </li>
               {/each}
             </ul>
+            {#if !opened.has(group.date) && group.races.length > 8}
+              <button
+                type="button"
+                class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary sm:col-start-2"
+                onclick={() => opened.add(group.date)}
+                >{m.places_show_all({
+                  count: count(group.races.length),
+                })}</button
+              >
+            {/if}
           </li>
         {/each}
       </ol>
