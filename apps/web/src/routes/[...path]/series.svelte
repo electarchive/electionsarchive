@@ -262,6 +262,7 @@
             ? `linear-gradient(to right, ${start ? "transparent, black 2.5rem" : "black"}, ${end ? "black calc(100% - 2.5rem), transparent" : "black"})`
             : "";
       };
+      fade();
       void document.fonts.ready.then(() => {
         const current = strip.querySelectorAll("li")[index];
         if (current != null) {
