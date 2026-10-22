@@ -917,19 +917,30 @@ async function load(
       left join entity_merge m on m.entity_id = cy.person_id
       where n.kind in ('endorsed', 'supported')
     `),
-    db.execute<{ alliance: string; party: string }>(sql`
-      select distinct on (m.alliance_id) m.alliance_id as alliance, coalesce(pm.into_id, m.party_id) as party
+    db.execute<{ alliance: string; party: string; wins: number }>(sql`
+      select distinct on (m.alliance_id) m.alliance_id as alliance, coalesce(pm.into_id, m.party_id) as party, w.wins
       from alliance_member m
+      join alliance al on al.id = m.alliance_id
       left join entity_merge pm on pm.entity_id = m.party_id
-      left join contest_option o on o.party_id = m.party_id and o.alliance_id = m.alliance_id
-      left join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-      where m.alliance_id = any(${sql.param([...new Set(options.rows.flatMap((row) => (row.party == null ? (row.alliance ?? []) : [])))])}::uuid[])
-      group by m.alliance_id, coalesce(pm.into_id, m.party_id)
-      order by m.alliance_id, count(x.*) desc
+      cross join lateral (
+        select count(*)::int as wins
+        from election e
+        join contest c on c.election_id = e.id
+        join contest_option o on o.contest_id = c.id and o.party_id = m.party_id and o.alliance_id = m.alliance_id
+        join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
+        where e.id = al.election_id or e.parent_id = al.election_id
+      ) w
+      where m.alliance_id = any(${sql.param([...new Set(options.rows.flatMap((row) => row.alliance ?? []))])}::uuid[])
+      order by m.alliance_id, w.wins desc
     `),
   ]);
   const anchor = new Map(
     coalitions.rows.map((row) => [row.alliance, row.party]),
+  );
+  const leading = new Map(
+    coalitions.rows.flatMap((row) =>
+      row.wins > 0 ? [[row.alliance, row.party] as const] : [],
+    ),
   );
   const stand = (row: {
     party: string | null;
@@ -1104,6 +1115,7 @@ async function load(
                 : {
                     id: row.alliance,
                     label: labels.full.get(row.alliance) ?? "",
+                    anchor: leading.get(row.alliance) ?? null,
                   },
             line: row.is_line
               ? (labels.full.get(row.party ?? "") ??

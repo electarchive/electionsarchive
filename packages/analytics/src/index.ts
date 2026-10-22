@@ -14,7 +14,7 @@ export type Option = {
   votes: number;
   outcome: string | null;
   seats: number | null;
-  alliance: { id: string; label: string } | null;
+  alliance: { id: string; label: string; anchor: string | null } | null;
   line: string | null;
 };
 
@@ -143,8 +143,12 @@ function alliances(options: Array<Option>) {
     string,
     Map<string, { option: Option; votes: number }>
   >();
+  const leads = new Map<string, string>();
   for (const option of options) {
     const id = option.alliance?.id;
+    if (option.alliance?.anchor != null) {
+      leads.set(option.alliance.id, option.alliance.anchor);
+    }
     if (id == null || option.party == null) {
       continue;
     }
@@ -162,10 +166,16 @@ function alliances(options: Array<Option>) {
         .filter((member) => member.votes > 0)
         .toArray()
         .toSorted((a, b) => b.votes - a.votes);
+      const lead = leads.get(id);
+      const option =
+        ranked.find((member) => member.option.party === lead)?.option ??
+        ranked[0]?.option ??
+        null;
       return [
         id,
         {
-          option: ranked[0]?.option ?? null,
+          option,
+          party: lead ?? option?.party ?? null,
           roster: ranked
             .map((member) => member.option.short ?? member.option.label)
             .join(", "),
@@ -190,9 +200,7 @@ export function compare(
   const anchored = new Set(
     anchors
       .values()
-      .flatMap((entry) =>
-        entry.option?.party == null ? [] : [root(entry.option.party)],
-      ),
+      .flatMap((entry) => (entry.party == null ? [] : [root(entry.party)])),
   );
   const allied = new Set(
     options.flatMap((option) =>
@@ -246,7 +254,7 @@ export function compare(
   );
   const identify = (option: Option) => {
     if (grouping === "alliance" && option.alliance != null) {
-      const anchor = anchors.get(option.alliance.id)?.option?.party;
+      const anchor = anchors.get(option.alliance.id)?.party;
       return `alliance:${anchor == null ? option.alliance.id : root(anchor)}`;
     }
     const line = lines.get(`${option.contest}:${option.person}`) ?? option;
