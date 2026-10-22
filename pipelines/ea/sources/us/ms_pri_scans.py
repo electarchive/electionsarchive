@@ -38,7 +38,7 @@ EMIT = {
     (2014, "republican"): {("house", 1), ("house", 3)},
     (2014, "democratic-runoff"): {("house", 3)},
 }
-PARSE = {(2014, "democratic-runoff")}
+PARSE = {(2014, "republican")}
 GRIDDED = {
     (2012, "democratic"): {
         1: ("president", None, "OBAMA, BARACK"),
@@ -157,7 +157,7 @@ def parse() -> None:
             for page, count in zip(read["pages"], read["columns"]):
                 image = ms_scan.render(pdf, page, dpi=300)
                 body = (image[read["band"][0] : read["band"][1]] < 225).mean(0)
-                found = [x for x in ms_scan.clusters(np.where(body > read["share"])[0]) if x > read["xmin"].get(str(page), read["xmin"]["default"])]
+                found = [x for x in ms_scan.clusters(np.where(body > read["share"])[0]) if read["xmin"].get(str(page), read["xmin"]["default"]) < x < read["xmax"].get(str(page), read["xmax"]["default"])]
                 pitch = float(np.median(np.diff(found)))
                 xs = [found[0]]
                 for x in found[1:]:
