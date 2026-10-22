@@ -17,7 +17,7 @@ from ea.store import DATA, connect
 SOURCE = "us.elstats_legislature"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-YEARS = range(2000, 2017, 2)
+YEARS = {"NH": range(2000, 2017, 2), "VT": range(1990, 2017, 2)}
 OFFICES = {8: "house", 9: "senate"}
 GRAPHQL = {
     "NH": "https://nh2.elstats3.civera.com/api/graphql_pr",
@@ -60,7 +60,7 @@ def search(state: str, year: int) -> str:
 def contests() -> pl.DataFrame:
     frames = []
     for state in GRAPHQL:
-        for year in YEARS:
+        for year in YEARS[state]:
             frames.append(
                 pl.read_csv(raw.cached(SOURCE, search(state, year)).path, infer_schema=False)
                 .filter(
@@ -112,7 +112,7 @@ RECOUNTS = {
 def fetch() -> None:
     raw.fetch(SOURCE, JOURNAL, suffix=".pdf")
     for state in GRAPHQL:
-        for year in YEARS:
+        for year in YEARS[state]:
             raw.fetch(SOURCE, search(state, year), suffix=".csv")
     for state, contest in contests().select("state", "contest").iter_rows():
         body = {"query": QUERY, "variables": {"contestId": contest}}
@@ -198,14 +198,14 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="New Hampshire and Vermont House and Senate general elections by town, ward, and polling place "
-            "2000–2016, from the states' ElectionStats archives",
+            "1990–2016, from the states' ElectionStats archives",
             polity="US",
         )
         filled = {
             key
             for (key,) in conn.execute(
                 """select distinct cx.value from external_id cx join result_set rs on rs.contest_id = cx.entity_id
-                   where cx.scheme = 'us.contest' and cx.value ~ '^20(0[0-9]|1[0-6])-1[01]-\\d\\d:(NH|VT):'
+                   where cx.scheme = 'us.contest' and cx.value ~ '^(199[0-9]|20(0[0-9]|1[0-6]))-1[01]-\\d\\d:(NH|VT):'
                      and rs.changeset_id not in (select id from changeset where pipeline = %s)
                      and exists (select 1 from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = rs.k and u.scheme_code = 'us.precinct')""",
@@ -434,7 +434,7 @@ def emit() -> Path:
                 ),
             )
         for state in GRAPHQL:
-            for year in YEARS:
+            for year in YEARS[state]:
                 cs.artifact(raw.cached(SOURCE, search(state, year)), sources[state])
         print(f"{len(values)} precinct sets, {len(minted) - len(existing)} new precincts, {len(existing)} reused")
         if values:
