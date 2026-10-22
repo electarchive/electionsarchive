@@ -6546,9 +6546,14 @@ async function races(
               select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
               from winners w
               join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id and ch.party_id is not null
+              join contest lc on lc.id = ch.contest_id
+              join election le on le.id = lc.election_id
+              left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
+              join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
               join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
               cross join lateral (
-                select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = ch.k
+                select max(y.value) as value from result_rollup y
+                where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = ch.k
               ) y
               where w.party_id is null and y.value is not null
               order by ch.parent_option_id, y.value desc
@@ -6610,6 +6615,13 @@ async function races(
                 (other) =>
                   other[0]?.office === head.office &&
                   other[0]?.party === head.party,
+              ).length === 1) ||
+            (head?.isOffice === false &&
+              head.party != null &&
+              groups.filter(
+                (other) =>
+                  other[0].owner === head.owner &&
+                  other[0].party === head.party,
               ).length === 1)
               ? head?.owner
               : single.id) ??
@@ -6804,6 +6816,7 @@ async function races(
             : race.name;
         return {
           ...race,
+          scope: scope ?? null,
           before:
             race.before ??
             tallies
@@ -6901,6 +6914,7 @@ export const elections = {
             isOffice: v.boolean(),
             isRemainder: v.boolean(),
             isPrimaries: v.boolean(),
+            scope: v.nullable(v.string()),
             body: v.nullable(v.string()),
             round: v.nullable(v.number()),
             count: v.number(),
@@ -8243,9 +8257,14 @@ export const elections = {
           select distinct on (ch.parent_option_id) ch.parent_option_id as parent, ch.party_id
           from winners w
           join contest_option ch on ch.contest_id = w.leaf and ch.parent_option_id = w.id and ch.party_id is not null
+          join contest lc on lc.id = ch.contest_id
+          join election le on le.id = lc.election_id
+          left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
+          join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
           join result_set rs on rs.contest_id = ch.contest_id and rs.is_default
           cross join lateral (
-            select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = ch.k
+            select max(y.value) as value from result_rollup y
+            where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = ch.k
           ) y
           where w.party_id is null and y.value is not null
           order by ch.parent_option_id, y.value desc
@@ -8510,9 +8529,14 @@ export const elections = {
         leads as (
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
+          join contest lc on lc.id = l.contest_id
+          join election le on le.id = lc.election_id
+          left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
+          join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
           cross join lateral (
-            select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = l.k
+            select max(y.value) as value from result_rollup y
+            where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = l.k
           ) y
           where y.value is not null
           order by l.parent, y.value desc
@@ -9276,14 +9300,18 @@ export const polities = {
         seats: number;
         share: number | null;
       }>(sql`
-        with recursive roots as materialized (
+        with recursive later as materialized (
+          select distinct r.parent_id as parent, r.id as election, coalesce(rc.office_id, rc.body_id) as seat
+          from contest rc join election r on r.id = rc.election_id
+          where rc.round_number > 1 and r.parent_id is not null
+        ),
+        roots as materialized (
           select c.id, coalesce(c.office_id, c.body_id) as seat, c.office_id is not null as "isOffice",
             c.kind = 'list_allocation' as "isList",
             e.date_from as date, ${CYCLE} as year, a.k as area,
             case when g.polity_id = ${input.id}::uuid and g.id <> e.id and exists (
-                select from contest rc join election r on r.id = rc.election_id
-                where r.parent_id = g.id and r.id <> e.id and rc.round_number > 1
-                  and coalesce(rc.office_id, rc.body_id) = coalesce(c.office_id, c.body_id)
+                select from later l
+                where l.parent = g.id and l.election <> e.id and l.seat = coalesce(c.office_id, c.body_id)
               ) then g.id
               when e.polity_id = ${input.id}::uuid then e.id
               when g.polity_id = ${input.id}::uuid then g.id
@@ -9337,9 +9365,14 @@ export const polities = {
         leads as (
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
+          join contest lc on lc.id = l.contest_id
+          join election le on le.id = lc.election_id
+          left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
+          join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
           cross join lateral (
-            select max(y.value) as value from result_rollup y where y.result_set_k = rs.k and y.option_k = l.k
+            select max(y.value) as value from result_rollup y
+            where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = l.k
           ) y
           where y.value is not null
           order by l.parent, y.value desc
@@ -9673,8 +9706,10 @@ export const polities = {
         cand as materialized (
           select t.root, pl.polity, rs.k as set_k, pl.k as area_k
           from tree t
-          join contest c on c.id = t.id
-          join result_set rs on rs.contest_id = t.id and rs.status = 'active'
+          cross join lateral (select c.district_area_id from contest c where c.id = t.id offset 0) c
+          cross join lateral (
+            select rs.k from result_set rs where rs.contest_id = t.id and rs.status = 'active' offset 0
+          ) rs
           join place pl on c.district_area_id is null
             or c.district_area_id in (select u.area from ups u where u.polity = pl.polity)
         ),

@@ -80,10 +80,18 @@
             election.races[decisive],
             ...election.races.filter((_, spot) => spot !== decisive),
           ].filter((race) => race != null);
-    const sorted = [
-      ...led.filter((race) => race.results.length !== 1),
-      ...led.filter((race) => race.results.length === 1),
-    ];
+    const grouped = Map.groupBy(led, (race) => race.scope)
+      .values()
+      .flatMap((group) => [
+        ...group.filter((race) => race.results.length !== 1),
+        ...group.filter((race) => race.results.length === 1),
+      ])
+      .toArray();
+    const lead = grouped.find((race) => race.results.length !== 1);
+    const sorted =
+      lead == null
+        ? grouped
+        : [lead, ...grouped.filter((race) => race !== lead)];
     const tiers = Map.groupBy(
       sorted.filter(
         (race) =>
@@ -258,6 +266,7 @@
           race.count === 1 &&
           race.map != null &&
           race.places != null &&
+          race.results.length !== 1 &&
           index < 4,
         staleTime: Infinity,
         queryFn: async () => {
