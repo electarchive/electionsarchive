@@ -289,7 +289,10 @@ def _plain(text: str) -> str:
 
 def _title(text: str) -> str:
     if text != text.upper():
-        return text
+        text = re.sub(r"\b(Mc|Mac|De|Di|La|Le|O')([A-Z]{2,})\b", lambda match: match[1] + match[2].title(), text)
+        return re.sub(
+            r"\b(?!(?:II|III|IV|JR|SR)\b)([A-Z])([A-Z'’-]+)\b", lambda match: match[1] + match[2].lower(), text
+        )
     text = re.sub(r"\b([A-Z][A-Z'’-]+)\b", lambda match: match[1].title() if len(match[1]) > 1 else match[1], text)
     text = re.sub(r"\bMc([a-z])", lambda match: "Mc" + match[1].upper(), text)
     return re.sub(r"(?<=\s)(Of|The|And|For)\b", lambda match: match[0].lower(), text)
@@ -992,7 +995,7 @@ def emit() -> Path:
         )
 
         def name(entity: UUID, text: str) -> None:
-            cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
+            cs.add("name", id=None, entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
 
         systems = {key: cs.key("us.electoral_system", key) for key in ("fptp", "block", "referendum")}
         parties = {key: cs.key("us.party", f"{key}-party") for key in ("republican", "democratic")}
@@ -1435,9 +1438,10 @@ def emit() -> Path:
                 else:
                     ballot = _title(re.sub(r"\s*\((?:DEM|REP|IND|NON|NP|NPA|LIB|GRN|D|R)\)$", "", choice))
                     person = cs.key(f"{SOURCE}.person", f"{st}:{code}:{slug(ballot)}")
-                    if person in cs.minted and person not in persons:
+                    if person not in persons:
                         persons.add(person)
-                        cs.add("person", id=person)
+                        if person in cs.minted:
+                            cs.add("person", id=person)
                         name(person, ballot)
                     option = options[same] = cs.key("us.option", f"{contest_key}:{slug(ballot)}")
                     tag = party or choice_party
@@ -1512,8 +1516,10 @@ def emit() -> Path:
         for row in conn.execute(
             f"""select {", ".join(f"r.{column}" for column in columns)} from result_set r
                 join changeset g on g.id = r.changeset_id
-                where g.pipeline = %s and r.status = 'active' and r.contest_id <> all(%s)""",
-            [SOURCE, emitted],
+                join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
+                where g.pipeline = %s and r.status = 'active' and r.contest_id <> all(%s)
+                  and split_part(x.value, ':', 2) = any(%s)""",
+            [SOURCE, emitted, states],
         ).fetchall():
             cs.add("result_set", **dict(zip(columns, row, strict=True)), status="withdrawn")
             cs.add("note", entity_id=row[0], kind="caveat", body_md=WITHDRAWN)
