@@ -23,12 +23,15 @@ URL = "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_{}.pdf"
 DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7)}
 PAGES = {2000: (37, 38), 2002: (39, 40), 2004: (47, 48), 2006: (52, 57)}
 LEGISLATURE = {2000: (39, 63), 2002: (46, 63), 2004: (49, 73)}
-CLARITY = "https://www.enr-scvotes.org/SC/19077/40477/reports/detailxml.zip"
-CLARITY_TITLE = "2010 General Election: detail results"
+CLARITY = {
+    date(2008, 11, 4): "https://www.enr-scvotes.org/SC/8562/15723/reports/detailxml.zip",
+    date(2010, 11, 2): "https://www.enr-scvotes.org/SC/19077/40477/reports/detailxml.zip",
+}
+CLARITY_TITLE = "{year} General Election: detail results"
 CODES = {name.upper(): f"45{2 * i + 1:03}" for i, name in enumerate(COUNTIES)}
 TITLE_LINE = re.compile(r"(?:REPRESENTATIVE IN CONGRESS|House of Representatives)\s+DISTRICT\s+0*(\d)", re.IGNORECASE)
 LEGISLATURE_LINE = re.compile(r"(SENATE|HOUS\S*\s+OF\s+\.?R\S*)\s+DISTRICT\s+0*(\d+)\s*$", re.IGNORECASE)
-CLARITY_TITLES = re.compile(r"(U\.S\. House|State House) of Representatives District (\d+)")
+CLARITY_TITLES = re.compile(r"(U\.S\. House of Representatives|State House of Representatives|State Senate) District (\d+)")
 ROW = re.compile(r"^\s*(\D*?)\s{2,}(?=\S*\d)(\S.*)$")
 SKIP = {"#", "OF", "# OF", "COUNTY", "PRECINCTS"}
 
@@ -122,23 +125,31 @@ def read(lines: list[str]) -> list[tuple[str, str, bool, int]] | str:
 
 
 def fetch() -> None:
-    raw.fetch(SOURCE, CLARITY, suffix=".zip")
+    for url in CLARITY.values():
+        raw.fetch(SOURCE, url, suffix=".zip")
 
 
 def parse() -> None:
     out = []
-    with zipfile.ZipFile(raw.cached(SOURCE, CLARITY).path) as archive:
-        root = ElementTree.fromstring(archive.read("detail.xml"))
-    for contest in root.iter("Contest"):
-        if found := CLARITY_TITLES.fullmatch(contest.get("text", "")):
-            chamber, district = ("house", int(found[2])) if found[1] == "U.S. House" else (f"house:{found[2]}:g", None)
+    for day, url in CLARITY.items():
+        with zipfile.ZipFile(raw.cached(SOURCE, url).path) as archive:
+            root = ElementTree.fromstring(archive.read(archive.namelist()[0]))
+        for contest in root.iter("Contest"):
+            found = CLARITY_TITLES.fullmatch(contest.get("text", ""))
+            if found is None or found[1].startswith("U.S.") and day.year == 2008:
+                continue
+            chamber, district = (
+                ("house", int(found[2]))
+                if found[1].startswith("U.S.")
+                else (f"{'senate' if found[1] == 'State Senate' else 'house'}:{found[2]}:g", None)
+            )
             for choice in contest.iter("Choice"):
                 writein = choice.get("text", "").upper() == "WRITE-IN"
-                for place in choice.iter("County"):
+                for place in (*choice.iter("County"), *choice.iter("Precinct")):
                     out.append(
                         (
-                            2010,
-                            date(2010, 11, 2),
+                            day.year,
+                            day,
                             chamber,
                             district,
                             CODES[place.get("name", "").upper()],
@@ -195,11 +206,12 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Carolina's U.S. House and legislative generals by county, 2000-2010 (State Election Commission election reports and 2010 detail results)",
+            summary="South Carolina's U.S. House and legislative generals by county, 2000-2010 (State Election Commission election reports and 2008 and 2010 detail results)",
             polity="US-SC",
         )
         for year in sorted(frame["year"].unique()):
-            title, url = (CLARITY_TITLE, CLARITY) if year == 2010 else (TITLE.format(year=year), LANDING)
+            clarity = next((url for day, url in CLARITY.items() if day.year == year), None)
+            title, url = (CLARITY_TITLE.format(year=year), clarity) if clarity else (TITLE.format(year=year), LANDING)
             source = cs.source(PUBLISHER, title)
             if source in cs.minted:
                 cs.add(
@@ -211,6 +223,6 @@ def emit() -> Path:
                     url=url,
                     license="Public record",
                 )
-            cs.artifact(raw.cached(SOURCE, CLARITY) if year == 2010 else raw.cached(CACHE, URL.format(year)), source)
+            cs.artifact(raw.cached(SOURCE, clarity) if clarity else raw.cached(CACHE, URL.format(year)), source)
             medsl.attach(cs, conn, frame.filter(pl.col("year") == year), {"SC": source}, strict=True)
         return cs.write()
