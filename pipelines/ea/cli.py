@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from ea import cache, checks, coverage, coverage_tables, fixtures, raw, search, tiles
+from ea import cache, checks, coverage, coverage_tables, fixtures, portals, raw, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import DATA, connect
 
@@ -33,6 +33,9 @@ def main() -> None:
         help="measure a polity's coverage against its v1 goal and write .agents/spec/{polity}-coverage.md, "
         "or refresh the coverage tables the app's coverage page reads",
     ).add_argument("polity", choices=("us", "refresh"))
+    portal = commands.add_parser("portals", help="find county results portals and record them in us-portals.csv")
+    portal.add_argument("action", choices=("census",))
+    portal.add_argument("state", help="two-letter state code, such as TX")
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -46,6 +49,8 @@ def main() -> None:
     match args.command:
         case "apply":
             print(apply(args.changeset))
+        case "portals":
+            print(portals.census(args.state.upper()))
         case "fixtures":
             print(fixtures.export())
         case "tiles":
