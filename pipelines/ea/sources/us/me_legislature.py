@@ -113,7 +113,7 @@ def parse() -> None:
                     )
                     closed = True
                 continue
-            if re.match(r"\s*District\b", line):
+            if re.match(r"\s*District\b", line) and not re.search(r"(?i)\btotals\b", line):
                 block += 1
                 continue
             if block < 0:
@@ -131,9 +131,19 @@ def parse() -> None:
                 values = groups[:-1]
                 if head and values and all(values):
                     name = head[1].strip()
-                    total = bool(re.search(r"(?i)totals?:", name))
+                    total = bool(re.search(r"(?i)totals?(:|$)", name))
+                    coded_town = re.fullmatch(r"([A-Z]{3})\s+(.+)", name)
+                    county = coded_town[1] if coded_town and coded_town[1] in COUNTIES else None
                     rows.extend(
-                        (day, chamber, block, None if total else name, None, column, int(votes.replace(",", "")))
+                        (
+                            day,
+                            chamber,
+                            block,
+                            None if total else coded_town[2] if county else name,
+                            county,
+                            column,
+                            int(votes.replace(",", "")),
+                        )
                         for column, votes in enumerate(values)
                     )
                 continue
@@ -173,7 +183,7 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("day").dt.year() < 2000)
+    lines = pl.read_parquet(PARSED / "lines.parquet").filter(pl.col("day").dt.year() == 2010)
     with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
         gazetteer = pl.read_csv(
             io.BytesIO(archive.read(archive.namelist()[0])), separator="\t", infer_schema=False
@@ -279,7 +289,9 @@ def emit() -> Path:
             resolved = {}
             labels = {}
             for name, county in body.select("town", "county").unique().iter_rows():
-                close = difflib.get_close_matches(town(re.sub(r"II", "H", re.sub(r"[1Il]3", "B", name))), list(places), n=1, cutoff=0.8)
+                close = difflib.get_close_matches(
+                    town(re.sub(r"II", "H", re.sub(r"[1Il]3", "B", name))), list(places), n=1, cutoff=0.8
+                )
                 match = town(name) if town(name) in places else close[0] if close else None
                 found = {COUNTIES[county]} if county else places[match] if match else set()
                 resolved[name] = next(iter(found)) if len(found) == 1 else None
