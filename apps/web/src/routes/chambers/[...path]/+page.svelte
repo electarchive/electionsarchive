@@ -5,6 +5,7 @@
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
+  import * as Select from "#lib/components/ui/select/index.js";
   import { count, date } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -321,16 +322,25 @@
             onclick={() => (selected = Math.max(0, selected - 1))}
             ><ChevronLeftIcon class="block-4 inline-4" /></button
           >
-          <label class="sr-only" for="term-pick">{m.chamber_term_pick()}</label>
-          <select
-            id="term-pick"
-            class="rounded-sm border border-input bg-card px-2 font-figures text-[0.9375rem] font-semibold tabular-nums block-8"
-            bind:value={selected}
+          <Select.Root
+            type="single"
+            value={String(selected)}
+            onValueChange={(value: string) => (selected = Number(value))}
           >
-            {#each data.terms as entry, index (entry.start)}
-              <option value={index}>{span(entry.start, entry.end)}</option>
-            {/each}
-          </select>
+            <Select.Trigger
+              class="font-figures text-[0.9375rem] font-semibold tabular-nums"
+              aria-label={m.chamber_term_pick()}
+              >{span(term.start, term.end)}</Select.Trigger
+            >
+            <Select.Content align="start">
+              {#each data.terms as entry, index (entry.start)}
+                <Select.Item
+                  value={String(index)}
+                  label={span(entry.start, entry.end)}
+                />
+              {/each}
+            </Select.Content>
+          </Select.Root>
           <button
             type="button"
             class="grid place-items-center rounded-sm border border-input bg-card keycap block-8 inline-8 hover:bg-secondary disabled:opacity-40"

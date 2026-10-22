@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
   import Export from "#lib/components/export.svelte";
+  import * as Select from "#lib/components/ui/select/index.js";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -254,19 +255,25 @@
         </p>
       </div>
       {#if series.length > 4}
-        <select
-          class="rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold keycap block-9 max-inline-full min-inline-0"
-          aria-label={m.record_tabs()}
+        <Select.Root
+          type="single"
           value={current?.id}
-          onchange={(event) => {
-            chosen = event.currentTarget.value;
+          onValueChange={(value: string) => {
+            chosen = value;
             hovered = null;
           }}
         >
-          {#each series as entry (entry.id)}
-            <option value={entry.id}>{entry.name}</option>
-          {/each}
-        </select>
+          <Select.Trigger
+            class="text-sm font-semibold max-inline-full min-inline-0"
+            aria-label={m.record_tabs()}
+            ><span class="truncate">{current?.name ?? ""}</span></Select.Trigger
+          >
+          <Select.Content align="end">
+            {#each series as entry (entry.id)}
+              <Select.Item value={entry.id} label={entry.name} />
+            {/each}
+          </Select.Content>
+        </Select.Root>
       {:else if series.length > 1}
         <div class="flex flex-wrap" role="group" aria-label={m.record_tabs()}>
           {#each series as entry (entry.id)}

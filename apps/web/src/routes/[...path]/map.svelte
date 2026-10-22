@@ -18,6 +18,7 @@
   import { on } from "svelte/events";
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
+  import * as Select from "#lib/components/ui/select/index.js";
   import { count, percent, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -1553,34 +1554,53 @@
           class="shrink-0 text-sm/7 font-semibold whitespace-nowrap sm:self-start"
           >{m.map_color_by()}</span
         >
-        <select
-          class="rounded-sm border border-input bg-card ps-2.5 pe-8 text-sm font-semibold keycap block-10 min-inline-0 sm:hidden"
-          aria-labelledby="{uid}-shading"
+        <Select.Root
+          type="single"
           value={String(view)}
-          onchange={(event) => {
-            const value = event.currentTarget.value;
+          onValueChange={(value: string) => {
             shading = MODES.find((choice) => choice === value) ?? Number(value);
           }}
         >
-          <option value="winner">{m.map_mode_winner()}</option>
-          {#each options as option (option.index)}
-            <option value={String(option.index)}>{option.name}</option>
-          {/each}
-          <option value="bubbles">{m.map_mode_bubbles()}</option>
-          {#if turnouts.size > 0}
-            <option value="turnout">{m.map_mode_turnout()}</option>
-          {/if}
-          {#if isCompared}
-            <option value="swing">{m.map_mode_swing()}</option>
-            <option value="arrows">{m.map_mode_arrows()}</option>
-            <option value="flips">{m.map_mode_flips()}</option>
-            {#if surges.size > 0}
-              <option value="turnout_change"
-                >{m.map_mode_turnout_change()}</option
-              >
+          <Select.Trigger
+            class="text-sm font-semibold min-inline-0 data-[size=default]:block-10 sm:hidden"
+            aria-labelledby="{uid}-shading"
+          >
+            <span class="truncate"
+              >{typeof view === "number"
+                ? (options.find((option) => option.index === view)?.name ?? "")
+                : {
+                    winner: m.map_mode_winner,
+                    bubbles: m.map_mode_bubbles,
+                    turnout: m.map_mode_turnout,
+                    turnout_change: m.map_mode_turnout_change,
+                    swing: m.map_mode_swing,
+                    arrows: m.map_mode_arrows,
+                    flips: m.map_mode_flips,
+                  }[view]()}</span
+            >
+          </Select.Trigger>
+          <Select.Content align="start">
+            <Select.Item value="winner" label={m.map_mode_winner()} />
+            {#each options as option (option.index)}
+              <Select.Item value={String(option.index)} label={option.name} />
+            {/each}
+            <Select.Item value="bubbles" label={m.map_mode_bubbles()} />
+            {#if turnouts.size > 0}
+              <Select.Item value="turnout" label={m.map_mode_turnout()} />
             {/if}
-          {/if}
-        </select>
+            {#if isCompared}
+              <Select.Item value="swing" label={m.map_mode_swing()} />
+              <Select.Item value="arrows" label={m.map_mode_arrows()} />
+              <Select.Item value="flips" label={m.map_mode_flips()} />
+              {#if surges.size > 0}
+                <Select.Item
+                  value="turnout_change"
+                  label={m.map_mode_turnout_change()}
+                />
+              {/if}
+            {/if}
+          </Select.Content>
+        </Select.Root>
         <div class="-my-1 flex flex-wrap gap-2 py-1 min-inline-0 max-sm:hidden">
           {#each [[{ value: "winner" as const, label: m.map_mode_winner() }, ...options.map( (option) => ({ value: option.index, label: option.name }) ), { value: "bubbles" as const, label: m.map_mode_bubbles() }, ...(turnouts.size > 0 ? [{ value: "turnout" as const, label: m.map_mode_turnout() }] : [])], isCompared ? [{ value: "swing" as const, label: m.map_mode_swing() }, { value: "arrows" as const, label: m.map_mode_arrows() }, { value: "flips" as const, label: m.map_mode_flips() }, ...(surges.size > 0 ? [{ value: "turnout_change" as const, label: m.map_mode_turnout_change() }] : [])] : []] as group, at (at)}
             {#if group.length > 0}
