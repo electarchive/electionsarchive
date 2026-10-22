@@ -1481,6 +1481,12 @@
       <div
         class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-5 xl:col-span-4"
       >
+        <p class="pbe-2 text-xs text-muted-foreground">
+          {m.locator_key({
+            noun: locating.noun,
+            count: count(locating.places.rows.length),
+          })}
+        </p>
         <PlaceMap
           places={locating.places}
           colors={locating.colors}
