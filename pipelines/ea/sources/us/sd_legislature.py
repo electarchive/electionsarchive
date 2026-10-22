@@ -18,6 +18,12 @@ LONG = {
     "2008/2008_general_election_legislature_county_totals.aspx": date(2008, 11, 4),
     "2010/2010_general_election_legislature_by_county.aspx": date(2010, 11, 2),
 }
+WIDE = {
+    "2000/2000_general_election_official_returns_legislature.aspx": date(2000, 11, 7),
+    "2002/2002_legislature_official_returns.aspx": date(2002, 11, 5),
+    "2004/2004_legislature_official_Returns.aspx": date(2004, 11, 2),
+}
+HEADING = re.compile(r"(RECOUNT )?(?:(SENATE|HOUSE) )?DISTRICT\s*#?\s*0*(\d+)\s*-?\s*([AB]?)", re.IGNORECASE)
 PDFS = {
     "http://web.archive.org/web/2016id_/https://sdsos.gov/elections-voting/assets/2012%20Assets/2012generalelectionlegislaturebycounty.pdf": date(2012, 11, 6),
     SITE + "2014/legislativeracesbycounty%20.pdf": date(2014, 11, 4),
@@ -26,7 +32,7 @@ TITLE_LINE = re.compile(r"State (Senator|Representatives?) - (?:District )?0*(\d
 
 
 def fetch() -> None:
-    for path in LONG:
+    for path in [*LONG, *WIDE]:
         raw.fetch(SOURCE, url(path), suffix=".html")
     for pdf in PDFS:
         raw.fetch(SOURCE, pdf, suffix=".pdf")
@@ -55,6 +61,37 @@ def parse() -> None:
                     int(votes),
                 )
             )
+    for path, day in WIDE.items():
+        counties: dict[str, list[str]] = {}
+        block: dict | None = None
+        for cells in table(path, SOURCE):
+            if not cells:
+                continue
+            if found := HEADING.match(cells[0]):
+                named = [cell for cell in cells[1:] if cell and not re.match(r"(?i)totals?$|percent", cell) and not re.match(r"[\d.,%]+$", cell)]
+                district = found[3] + (f"-{found[4].lower()}" if found[4] else "")
+                if named:
+                    counties[district] = [fips[re.sub(r"[^a-z]", "", name.lower())] for name in named]
+                block = None if found[1] or not found[2] else {"chamber": f"{found[2].lower()}:{district}:g", "district": district, "rows": []}
+                continue
+            if block is None:
+                continue
+            places = counties.get(block["district"], [])
+            if cells[0] and places and all(re.fullmatch(r"\d+", cell) for cell in cells[1 : 1 + len(places)]):
+                name = re.sub(r"\s*-\s*[A-Z]{1,3}$", "", cells[0])
+                block["rows"].append((name.upper(), [int(cell) for cell in cells[1 : 1 + len(places)]]))
+            elif not cells[0] and block["rows"]:
+                printed = [int(cell) for cell in cells if re.fullmatch(r"\d+", cell)]
+                total = sum(sum(values) for _, values in block["rows"])
+                if printed[-1:] != [total]:
+                    print(f"{day.year} {block['chamber']}: counties sum to {total}, printed {printed}, skipped")
+                else:
+                    rows.extend(
+                        (day, block["chamber"], code, name, value)
+                        for name, values in block["rows"]
+                        for code, value in zip(places, values, strict=True)
+                    )
+                block = None
     for pdf, day in PDFS.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, pdf).path), "-"], capture_output=True, check=True, text=True
@@ -120,7 +157,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Dakota's legislative generals by county, 2008-2014 (Secretary of State election history)",
+            summary="South Dakota's legislative generals by county, 2000-2004 and 2008-2014 (Secretary of State election history)",
             polity="US-SD",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -134,7 +171,7 @@ def emit() -> Path:
                 url=SITE,
                 license="Public record",
             )
-        for path in LONG:
+        for path in [*LONG, *WIDE]:
             cs.artifact(raw.cached(SOURCE, url(path)), source)
         for pdf in PDFS:
             cs.artifact(raw.cached(SOURCE, pdf), source)
