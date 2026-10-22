@@ -103,6 +103,8 @@ left join external_id be on be.entity_id = c.body_id and be.scheme = 'us.body'
 join changeset cs on cs.id = c.changeset_id
 where e.date_from is not null;
 
+analyze cc;
+
 update cc set year = coalesce(
         (select 1786 + 2 * max(n) from (select min(t.from_date) as d from tenure t where t.contest_id = cc.id) f
          cross join generate_series(1, 119) n
