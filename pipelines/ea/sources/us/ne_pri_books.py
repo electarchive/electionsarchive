@@ -1,5 +1,6 @@
 import csv
 import io
+import itertools
 import json
 import re
 import statistics
@@ -43,6 +44,13 @@ FIXES: dict[tuple[int, int, str | None, str, int], int] = {
 }
 GRID = {(1998, p) for p in (8, 13, 14)}
 SKIP = {(1998, 20)}
+TABLES96 = {
+    "10-d1": (10, "house", 1),
+    "10-d2": (10, "house", 2),
+    "11-d3": (11, "house", 3),
+    "12-d3": (12, "house", 3),
+}
+FIXES96: dict[tuple[str, str, int], int] = {}
 SENATE = {1994: (4, 10), 1996: (8, 9)}
 
 
@@ -134,6 +142,44 @@ def settle(year: int) -> list[dict[str, object]]:
             if summed != printed:
                 print(f"{where} column {index}: counties sum to {summed}, printed {printed}")
         tables.append({"where": where, "columns": first["columns"], "rows": table, "total": first["total"]})
+    return tables
+
+
+def settle96() -> list[dict[str, object]]:
+    tables = []
+    for name, (page, office, district) in TABLES96.items():
+        a, b = (json.loads((PARSED / "model96" / reader / f"{name}.json").read_text()) for reader in "ab")
+        if a["columns"] != b["columns"] or list(a["rows"]) != list(b["rows"]):
+            raise ValueError(f"{name}: the reads disagree on the layout")
+        rows = {}
+        for county, first in a["rows"].items():
+            merged = []
+            for index, (x, y) in enumerate(zip(first, b["rows"][county], strict=True)):
+                fix = FIXES96.get((name, plain(county), index), x)
+                if x != y and (name, plain(county), index) not in FIXES96:
+                    print(f"{name} {county} column {index}: {x} against {y}")
+                merged.append(fix)
+            rows[county] = merged
+        if a["total"] != b["total"]:
+            print(f"{name}: the reads disagree on the printed total {a['total']} against {b['total']}")
+        tables.append(
+            {
+                "name": name,
+                "where": (1996, page, district, "", None),
+                "office": office,
+                "columns": a["columns"],
+                "groups": [len(list(g)) for _, g in itertools.groupby(c["group"] for c in a["columns"])],
+                "rows": rows,
+                "total": a["total"],
+            }
+        )
+    for office, district in sorted({(t["office"], t["where"][2]) for t in tables}, key=str):
+        parts = [t for t in tables if t["office"] == office and t["where"][2] == district]
+        printed = next(t["total"] for t in parts if t["total"] is not None)
+        for index, want in enumerate(printed):
+            got = sum(v[index] or 0 for t in parts for v in t["rows"].values())
+            if (want or 0) != got:
+                print(f"{office} {district} column {index}: counties sum to {got}, printed {want}")
     return tables
 
 
@@ -251,7 +297,7 @@ def gridboxes(
     spans: list[dict[str, object]] = []
     for y, a, b in segments:
         for span in spans:
-            if abs(span["x0"] - a) <= 12 and abs(span["x1"] - b) <= 12:
+            if abs(span["x0"] - a) <= 30 and abs(span["x1"] - b) <= 30:
                 span["ys"].append(y)
                 break
         else:
@@ -276,7 +322,7 @@ def gridboxes(
             bands = round((piece[-1] - piece[0]) / pitch)
             if bands != len(piece) - 1:
                 piece = list(np.linspace(piece[0], piece[-1], bands + 1))
-            share = dark[int(piece[0]) : int(piece[-1]) + 1, span["x0"] : span["x1"] + 1].mean(axis=0)
+            share = dark[int(piece[max(len(piece) - 5, 0)]) : int(piece[-1]) + 1, span["x0"] : span["x1"] + 1].mean(axis=0)
             groups: list[list[int]] = []
             for x in np.flatnonzero(share > 0.8) + span["x0"]:
                 if groups and x - groups[-1][-1] <= 4:
@@ -312,21 +358,29 @@ def gridboxes(
             cursor += 1
             bands = len(block["lines"]) - 1
             remaining = len(counties) - done
-            if bands > remaining:
-                rows = block["lines"][bands - remaining - 1 :]
+            extra = 0 if table["total"] is None else 1
+            if bands >= remaining + extra:
+                rows = block["lines"][bands - remaining - extra :]
                 take = remaining
             else:
                 rows = block["lines"]
                 take = bands
-            if len(block["dividers"]) != columns:
-                raise ValueError(f"{table['where']}: block of {bands} bands and {len(block['dividers'])} dividers")
             edges = [*block["dividers"], block["x1"]]
+            if len(block["dividers"]) == columns:
+                bounds = [(edges[column], edges[column + 1]) for column in range(columns)]
+            elif len(block["dividers"]) == len(table.get("groups", ())):
+                bounds = []
+                for group, size in enumerate(table["groups"]):
+                    step = (edges[group + 1] - edges[group]) / size
+                    bounds += [(edges[group] + step * i, edges[group] + step * (i + 1)) for i in range(size)]
+            else:
+                raise ValueError(f"{table['where']}: block of {bands} bands and {len(block['dividers'])} dividers")
             for offset, county in enumerate(counties[done : done + take]):
                 for column in range(columns):
                     out[(number, county, column)] = (
-                        float(edges[column] + 3) / width,
+                        float(bounds[column][0] + 3) / width,
                         float(rows[offset] + 3) / height,
-                        float(edges[column + 1] - 3) / width,
+                        float(bounds[column][1] - 3) / width,
                         float(rows[offset + 1] - 3) / height,
                     )
             done += take
@@ -365,6 +419,36 @@ def parse() -> None:
                                 "y1": placed[(number, county, column)][3],
                             }
                         )
+    tables96 = settle96()
+    placements = {
+        page: gridboxes(1996, page, group)
+        for page in {t["where"][1] for t in tables96}
+        for group in [[t for t in tables96 if t["where"][1] == page]]
+    }
+    for table in tables96:
+        _, page, district, _, _ = table["where"]
+        number = [t for t in tables96 if t["where"][1] == page].index(table)
+        placed = {(0, c, k): v for (n, c, k), v in placements[page].items() if n == number}
+        for county, values in table["rows"].items():
+            for column, (spec, votes) in enumerate(zip(table["columns"], values, strict=True)):
+                if votes is None:
+                    continue
+                name = next(v for k, v in PARTIES.items() if k in spec["group"].lower())
+                box = placed[(0, county, column)]
+                lines.append(
+                    {
+                        "year": 1996,
+                        "key": f"{DAYS[1996]}:NE:{table['office']}" + (f":{district}" if district else "") + f":{name}",
+                        "label": spec["label"],
+                        "county": county,
+                        "votes": votes,
+                        "page": page,
+                        "x0": box[0],
+                        "y0": box[1],
+                        "x1": box[2],
+                        "y1": box[3],
+                    }
+                )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(lines).write_parquet(PARSED / "lines.parquet")
     print(len(lines), "cells")
