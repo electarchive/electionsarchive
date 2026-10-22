@@ -905,6 +905,15 @@
       >
     {/if}
   </p>
+  {#if election.coverage != null}
+    <p class="text-[0.9375rem] font-semibold">
+      {m.election_partial({
+        held: count(election.coverage.held),
+        of: count(election.coverage.of),
+        noun: election.coverage.noun,
+      })}
+    </p>
+  {/if}
   {#if election.turnout != null}
     {const turnout = $derived(election.turnout)}
     {const share = $derived(turnout.voters / turnout.registered)}

@@ -725,8 +725,9 @@ async function load(
         from (${FACTS[facts](sql`rs.k`, sql`a.k`)}) f where f.measure = any(${COUNTED}) and f.value > 0
         having count(*) > 0
       ) hit on true
-      order by rs.contest_id, a.k, rs.is_default desc, array_position(${STAGES}, rs.stage),
-        hit.options desc, rs.completeness desc nulls last
+      order by rs.contest_id, a.k,
+        exists (select from source s where s.id = rs.source_id and s.license ilike '%ICPSR%'), rs.is_default desc,
+        array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
     )
     select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
       s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution
@@ -6565,6 +6566,9 @@ export const elections = {
             ),
           }),
         ),
+        coverage: v.nullable(
+          v.object({ held: v.number(), of: v.number(), noun: v.string() }),
+        ),
         coalitions: v.array(
           v.object({ name: v.string(), parties: v.array(v.string()) }),
         ),
@@ -6601,94 +6605,138 @@ export const elections = {
       if (election == null) {
         throw new ORPCError("NOT_FOUND");
       }
-      const [contestRows, electionRows, notes, crumbs, raced, anchor, allied] =
-        await Promise.all([
-          db.execute<{ id: string; children: number }>(sql`
-            select c.id, (select count(*)::int from contest x where x.allocation_parent_id = c.id) as children
-            from contest c where c.election_id = ${input.id}::uuid and c.allocation_parent_id is null
-          `),
-          db.execute<{
-            id: string;
-            date: string | null;
-            kind: string;
-            polity: string | null;
-            noun: string | null;
-          }>(sql`
-            select e.id, e.date_from::text as date, e.kind::text as kind,
-              nullif(e.polity_id, p.polity_id) as polity, sc.noun
-            from election e
-            join election p on p.id = e.parent_id
-            left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
-            left join area a on a.id = pt.area_id
-            left join scheme sc on sc.code = a.scheme_code
-            where e.parent_id = ${input.id}::uuid
-          `),
-          db.execute<{ kind: string; body: string }>(sql`
-            select kind::text, body_md as body from note where entity_id = ${input.id}::uuid
-          `),
-          breadcrumbs(election.polity),
-          races(input.id, election.polity, election.date),
-          db.execute<{
-            k: number;
-            now: string | null;
-            before: string | null;
-            year: number | null;
-          }>(sql`
-            select a.k,
-              coalesce(
-                (select c.id from contest c where c.election_id = e.id limit 1),
-                (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = e.id and ch.kind = e.kind and ch.date_from = e.date_from limit 1)
-              ) as now,
-              prior.contest as before, prior.year
-            from election e
-            join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+      const [
+        contestRows,
+        electionRows,
+        notes,
+        crumbs,
+        raced,
+        anchor,
+        allied,
+        spread,
+      ] = await Promise.all([
+        db.execute<{ id: string; children: number }>(sql`
+          select c.id, (select count(*)::int from contest x where x.allocation_parent_id = c.id) as children
+          from contest c where c.election_id = ${input.id}::uuid and c.allocation_parent_id is null
+        `),
+        db.execute<{
+          id: string;
+          date: string | null;
+          kind: string;
+          polity: string | null;
+          noun: string | null;
+        }>(sql`
+          select e.id, e.date_from::text as date, e.kind::text as kind,
+            nullif(e.polity_id, p.polity_id) as polity, sc.noun
+          from election e
+          join election p on p.id = e.parent_id
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          left join area a on a.id = pt.area_id
+          left join scheme sc on sc.code = a.scheme_code
+          where e.parent_id = ${input.id}::uuid
+        `),
+        db.execute<{ kind: string; body: string }>(sql`
+          select kind::text, body_md as body from note where entity_id = ${input.id}::uuid
+        `),
+        breadcrumbs(election.polity),
+        races(input.id, election.polity, election.date),
+        db.execute<{
+          k: number;
+          now: string | null;
+          before: string | null;
+          year: number | null;
+        }>(sql`
+          select a.k,
+            coalesce(
+              (select c.id from contest c where c.election_id = e.id limit 1),
+              (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = e.id and ch.kind = e.kind and ch.date_from = e.date_from limit 1)
+            ) as now,
+            prior.contest as before, prior.year
+          from election e
+          join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = pt.area_id
+          left join lateral (
+            select coalesce(
+                (select c.id from contest c where c.election_id = x.id limit 1),
+                (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = x.id and ch.kind = x.kind and ch.date_from = x.date_from limit 1)
+              ) as contest,
+              extract(year from x.date_from)::int as year
+            from election x
+            where x.polity_id = e.polity_id and x.kind = e.kind and x.date_from < e.date_from
+              and exists (select from contest t where t.election_id = e.id and t.office_id is not null)
+                = exists (select from contest u where u.election_id = x.id and u.office_id is not null)
+              and (
+                not exists (select from contest t where t.election_id = e.id and t.office_id is not null)
+                or exists (
+                  select from contest t join contest u on u.office_id = t.office_id
+                  where t.election_id = e.id and u.election_id = x.id
+                )
+              )
+              and exists (
+                select from result_set rs join election y on y.id = rs.election_id
+                where rs.contest_id is null and rs.is_default and y.date_from = x.date_from and y.kind = x.kind
+              )
+            order by x.date_from desc limit 1
+          ) prior on true
+          where e.id = ${input.id}::uuid
+          limit 1
+        `),
+        db.execute<{ id: string; parties: Array<string> }>(sql`
+          with recursive tree(id) as (
+            select ${input.id}::uuid
+            union all
+            select e.id from election e join tree on e.parent_id = tree.id
+          )
+          select a.alliance_id as id, array_agg(distinct x.id::text) as parties
+          from (
+            select distinct o.alliance_id from contest c
+            join contest_option o on o.contest_id = c.id
+            where c.election_id in (select id from tree) and o.alliance_id is not null
+          ) a
+          join alliance_member m on m.alliance_id = a.alliance_id
+          left join entity_merge pm on pm.entity_id = m.party_id
+          cross join lateral (values (m.party_id), (pm.into_id)) x(id)
+          where x.id is not null
+          group by a.alliance_id
+        `),
+        db.execute<{ held: number; of: number; noun: string | null }>(sql`
+          with recursive tree(id) as (
+            select ${input.id}::uuid
+            union all
+            select e.id from election e join tree on e.parent_id = tree.id
+          ),
+          home as (
+            select area_id from polity_territory
+            where polity_id = ${election.polity}::uuid and valid @> ${election.date}::date
+          ),
+          kids as (
+            select pp.polity_id, pt.area_id, a.scheme_code from polity_parent pp
+            join polity_territory pt on pt.polity_id = pp.polity_id and pt.valid @> ${election.date}::date
             join area a on a.id = pt.area_id
-            left join lateral (
-              select coalesce(
-                  (select c.id from contest c where c.election_id = x.id limit 1),
-                  (select c.id from election ch join contest c on c.election_id = ch.id where ch.parent_id = x.id and ch.kind = x.kind and ch.date_from = x.date_from limit 1)
-                ) as contest,
-                extract(year from x.date_from)::int as year
-              from election x
-              where x.polity_id = e.polity_id and x.kind = e.kind and x.date_from < e.date_from
-                and exists (select from contest t where t.election_id = e.id and t.office_id is not null)
-                  = exists (select from contest u where u.election_id = x.id and u.office_id is not null)
-                and (
-                  not exists (select from contest t where t.election_id = e.id and t.office_id is not null)
-                  or exists (
-                    select from contest t join contest u on u.office_id = t.office_id
-                    where t.election_id = e.id and u.election_id = x.id
-                  )
-                )
-                and exists (
-                  select from result_set rs join election y on y.id = rs.election_id
-                  where rs.contest_id is null and rs.is_default and y.date_from = x.date_from and y.kind = x.kind
-                )
-              order by x.date_from desc limit 1
-            ) prior on true
-            where e.id = ${input.id}::uuid
-            limit 1
-          `),
-          db.execute<{ id: string; parties: Array<string> }>(sql`
-            with recursive tree(id) as (
-              select ${input.id}::uuid
-              union all
-              select e.id from election e join tree on e.parent_id = tree.id
-            )
-            select a.alliance_id as id, array_agg(distinct x.id::text) as parties
-            from (
-              select distinct o.alliance_id from contest c
-              join contest_option o on o.contest_id = c.id
-              where c.election_id in (select id from tree) and o.alliance_id is not null
-            ) a
-            join alliance_member m on m.alliance_id = a.alliance_id
-            left join entity_merge pm on pm.entity_id = m.party_id
-            cross join lateral (values (m.party_id), (pm.into_id)) x(id)
-            where x.id is not null
-            group by a.alliance_id
-          `),
-        ]);
+            where pp.parent_id = ${election.polity}::uuid and pp.valid @> ${election.date}::date
+          ),
+          districts as (
+            select distinct c.district_area_id as area from contest c
+            where c.election_id in (select id from tree) and c.allocation_parent_id is null
+          ),
+          up(area, depth) as (
+            select area, 0 from districts where area is not null
+            union
+            select ap.parent_id, up.depth + 1 from up cross join lateral (
+              select ap.parent_id from area_parent ap
+              where ap.area_id = up.area and ap.valid @> ${election.date}::date offset 0
+            ) ap
+            where up.depth < 6
+          )
+          select count(distinct kids.polity_id) filter (where kids.area_id in (select area from up))::int as held,
+            count(distinct kids.polity_id)::int as of, min(s.noun) as noun
+          from kids left join scheme s on s.code = kids.scheme_code
+          where exists (select from districts)
+            and not exists (select from districts where area is null or area in (select area_id from home))
+        `),
+      ]);
       const anchored = anchor.rows[0];
+      const partial = spread.rows[0];
       const [turned, prior] = await Promise.all([
         turnout(anchored?.now ?? null, anchored == null ? [] : [anchored.k]),
         turnout(anchored?.before ?? null, anchored == null ? [] : [anchored.k]),
@@ -6760,6 +6808,12 @@ export const elections = {
             photo: faces.get(row.person ?? "") ?? null,
           })),
         })),
+        coverage:
+          partial?.noun == null ||
+          partial.held === 0 ||
+          partial.held > partial.of * 0.75
+            ? null
+            : { held: partial.held, of: partial.of, noun: partial.noun },
         coalitions: allied.rows.map((row) => ({
           name: labels.full.get(row.id) ?? "",
           parties: row.parties,
