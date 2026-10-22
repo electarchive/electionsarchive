@@ -23,9 +23,10 @@ DOCS = {
     date(2000, 9, 12): dict(zip((2239, 2249, 2247, 2238, 2266), PARTIES, strict=True)),
     date(2004, 9, 14): dict(zip((1418, 1421, 1420, 1417, 1422), PARTIES, strict=True)),
     date(2006, 9, 12): dict(zip((9549, 9579, 9580, 9582, 9581), PARTIES, strict=True))
-    | {9561: "democratic", 9586: "republican"},
+    | {9561: "democratic", 9586: "republican", 9583: "constitution", 9584: "green", 9585: "libertarian"},
+    date(2004, 2, 17): {1446: "democratic", 1450: "republican"},
 }
-OFFICE = re.compile(r"(US Senate|US Congress, District No\. (\d+))\b")
+OFFICE = re.compile(r"(President|US Senate|US Congress, District No\. (\d+))\b")
 ROW = re.compile(r"^\s*(\S.*?)\s*:?\s{2,}((?:[\d,]+\s+)*[\d,]+)\s*$")
 
 
@@ -55,8 +56,7 @@ def parse() -> None:
                 text=True,
             ).stdout
             office = None
-            names: list[str] = []
-            parts: dict[str, list[int]] = {}
+            groups: dict[int, tuple[list[str], dict[str, list[int]]]] = {}
             for page in text.split("\f"):
                 lines = page.splitlines()
                 start = next((i for i, line in enumerate(lines) if "Primary Election" in line), None)
@@ -66,9 +66,10 @@ def parse() -> None:
                     office = None
                     continue
                 if found[0] != office:
-                    office, names, parts = found[0], [], {}
-                    body = lines[lines.index(title) + 1 :]
-                    stop = next(i for i, line in enumerate(body) if ROW.match(line))
+                    office, groups = found[0], {}
+                body = lines[lines.index(title) + 1 :]
+                stop = next(i for i, line in enumerate(body) if ROW.match(line))
+                if len(ROW.match(body[stop])[2].split()) not in groups:
                     tokens = [
                         (match.start(), match[0])
                         for line in body[:stop]
@@ -93,13 +94,14 @@ def parse() -> None:
                     for x, token in tokens:
                         column = next((i for i in range(1, len(ends)) if ends[i] >= x), len(ends) - 1)
                         words.setdefault(column, []).append(token)
-                    names = [" ".join(words.get(i, [])) for i in range(1, len(ends))]
+                    groups.setdefault(len(ends), ([" ".join(words.get(i, [])) for i in range(1, len(ends))], {}))
                 for line in lines:
                     row = ROW.match(line)
                     if row is None:
                         continue
                     cells = [int(cell.replace(",", "")) for cell in row[2].split()]
                     if row[1].startswith("Office Totals"):
+                        names, parts = groups.pop(len(cells), ([], {}))
                         sums = [sum(values[i] for values in parts.values()) for i in range(len(names) + 1)]
                         if len(cells) != len(names) + 1 or sums != cells:
                             print(f"{day} {party} {office}: {names} counties sum to {sums}, printed {cells}, skipped")
@@ -107,7 +109,7 @@ def parse() -> None:
                             rows.extend(
                                 (
                                     day,
-                                    f"{'senate' if found[2] is None else 'house'}:{party}",
+                                    f"{'house' if found[2] else found[1].removeprefix('US ').lower()}:{party}",
                                     None if found[2] is None else int(found[2]),
                                     code,
                                     name.upper(),
@@ -117,9 +119,10 @@ def parse() -> None:
                                 for code, values in parts.items()
                                 for i, name in enumerate(names)
                             )
-                        office = None
-                    elif len(cells) == len(names) + 1:
-                        parts[counties[re.sub(r"[^a-z]", "", row[1].lower().removesuffix("county"))]] = cells
+                        if not groups:
+                            office = None
+                    elif len(cells) in groups:
+                        groups[len(cells)][1][counties[re.sub(r"[^a-z]", "", row[1].lower().removesuffix("county"))]] = cells
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
@@ -150,11 +153,11 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Wisconsin's U.S. House and Senate primaries by county, 2000-2006 (State Elections Board canvass)",
+            summary="Wisconsin's presidential, U.S. House, and Senate primaries by county, 2000-2006 (State Elections Board canvass)",
             polity="US-WI",
         )
         for day, docs in DOCS.items():
-            title = TITLE.format(day.year)
+            title = TITLE.format(f"{day.year} presidential" if day.month < 6 else day.year)
             source = cs.source(PUBLISHER, title)
             if source in cs.minted:
                 cs.add(
