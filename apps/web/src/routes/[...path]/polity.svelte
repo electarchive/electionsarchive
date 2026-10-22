@@ -146,19 +146,13 @@
           .includes(query.trim().toLocaleLowerCase()),
     ),
   );
-  const preview = $derived.by(() => {
-    const shown = [];
-    let races = 0;
-    for (const group of polity.results) {
-      if (shown.length > 0 && races + group.races.length > 16) {
-        break;
-      }
-      shown.push(group);
-      races += group.races.length;
-    }
-    return shown;
-  });
-  const results = $derived(isAllYears ? polity.results : preview);
+  const full = createQuery(() => ({
+    ...orpc.polities.get.queryOptions({ input: { id, all: true } }),
+    enabled: isAllYears && polity.results.length < polity.dates,
+  }));
+  const results = $derived(
+    isAllYears ? (full.data?.results ?? polity.results) : polity.results,
+  );
   const isNational = $derived(
     ["sovereign_state", "supranational"].includes(polity.kind),
   );
@@ -731,7 +725,7 @@
           </li>
         {/each}
       </ol>
-      {#if preview.length < polity.results.length}
+      {#if polity.results.length < polity.dates}
         <button
           type="button"
           class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
@@ -739,9 +733,7 @@
           onclick={() => (isAllYears = !isAllYears)}
           >{isAllYears
             ? m.polity_results_fewer()
-            : m.polity_results_more({
-                count: String(polity.results.length),
-              })}</button
+            : m.polity_results_more({ count: String(polity.dates) })}</button
         >
       {/if}
     </section>

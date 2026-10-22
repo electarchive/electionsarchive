@@ -44,9 +44,12 @@
   const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
   const years = $derived(
     data.kind === "polity"
-      ? [...data.polity.elections, ...data.polity.results].flatMap((entry) =>
-          entry.year == null ? [] : [entry.year],
-        )
+      ? [
+          ...data.polity.elections.flatMap((entry) =>
+            entry.year == null ? [] : [entry.year],
+          ),
+          ...data.polity.years,
+        ]
       : [],
   );
   const description = $derived(

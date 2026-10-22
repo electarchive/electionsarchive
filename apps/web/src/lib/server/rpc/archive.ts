@@ -3176,8 +3176,12 @@ export const contests = {
                0::float8 as votes, 0::float8 as total
              from grp
              cross join lateral (select * from contest_option y where y.contest_id = grp.id offset 0) o
-             join outcome x on x.option_id = o.id and x.kind in ('won', 'elected')
-             cross join lateral (select from result_set z where z.id = x.result_set_id and z.is_default offset 0) rs
+             cross join lateral (
+               select from outcome x
+               where x.option_id = o.id and x.kind in ('won', 'elected')
+                 and exists (select from result_set z where z.id = x.result_set_id and z.is_default)
+               limit 1
+             ) won
              left join entity_merge pm on pm.entity_id = o.party_id
              left join lateral (
                select coalesce(em.into_id, cy.person_id) as person
@@ -5269,14 +5273,16 @@ async function turnout(contest: string | null, ks: Array<number>) {
     targets as (
       select a.k, a.id from area a where a.k = any(${sql.param(ks)}::int[])
     ),
+    kinds as materialized (
+      select distinct q.kind from sets s join election y on y.id = s.election_id join polity q on q.id = y.polity_id
+    ),
     expected as materialized (
       select e.id as election, pt.area_id as area
       from election e
       join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
       join polity p on p.id = e.polity_id
       cross join day d
-      where e.date_from = d.date_from and e.kind = d.kind
-        and p.kind in (select q.kind from sets s join election y on y.id = s.election_id join polity q on q.id = y.polity_id)
+      where e.date_from = d.date_from and e.kind = d.kind and p.kind in (select kind from kinds)
     ),
     up(origin, id, depth) as (
       select distinct x.area, x.area, 0 from (select area from facts union select area from expected) x
@@ -8003,7 +8009,12 @@ export const polities = {
         summary: "Get a polity, its subdivisions, and its elections",
       }),
     )
-    .input(v.object({ id: v.pipe(v.string(), v.uuid()) }))
+    .input(
+      v.object({
+        id: v.pipe(v.string(), v.uuid()),
+        all: v.optional(v.boolean(), false),
+      }),
+    )
     .output(
       v.object({
         name: v.string(),
@@ -8021,6 +8032,8 @@ export const polities = {
           }),
         ),
         within: v.number(),
+        dates: v.number(),
+        years: v.array(v.number()),
         results: v.array(
           v.object({
             year: v.nullable(v.number()),
@@ -8187,61 +8200,77 @@ export const polities = {
         null;
       const parents = new Set(here.rows.map((row) => row.parent));
       const kept = here.rows.filter((row) => !parents.has(row.id));
+      const sizes = Map.groupBy(kept, (row) => row.date)
+        .entries()
+        .map(([day, rows]) => [day, rows.length] as const)
+        .toArray()
+        .toSorted(([a], [b]) => b.localeCompare(a));
+      const shown = new Set<string>();
+      let total = 0;
+      for (const [day, size] of sizes) {
+        if (!input.all && shown.size > 0 && total + size > 16) {
+          break;
+        }
+        shown.add(day);
+        total += size;
+      }
       const [labels, slugs, raced, built] = await Promise.all([
         names(ids),
         paths(ids),
         recent == null ? [] : races(recent.id, input.id, recent.date, true),
         Promise.all(
-          kept.map(async (row) => {
-            const other = await find(row.id);
-            if (other.place == null) {
-              return null;
-            }
-            const kids =
-              other.place.k === row.k
-                ? []
-                : await children(row.id, other.place, true, row.date);
-            const unit =
-              other.place.k === row.k
-                ? ""
-                : kids.find((kid) => kid.k === row.k)?.segment;
-            if (unit == null) {
-              return null;
-            }
-            const [totals, label, lineage] = await Promise.all([
-              load([row.id], [row.k], row.date, [row.id]),
-              names([row.id], row.date),
-              branches(row.date),
-            ]);
-            const loaded = totals.get(row.k);
-            return {
-              ...row,
-              valid: loaded?.side.valid ?? 0,
-              name: label.full.get(row.id) ?? "",
-              path: [row.path, unit].filter((part) => part !== "").join("/"),
-              leaders:
-                loaded == null
+          kept
+            .filter((row) => shown.has(row.date))
+            .map(async (row) => {
+              const other = await find(row.id);
+              if (other.place == null) {
+                return null;
+              }
+              const kids =
+                other.place.k === row.k
                   ? []
-                  : compare(loaded.side, null, lineage, "party")
-                      .flatMap((entry) =>
-                        entry.current == null
-                          ? []
-                          : [
-                              {
-                                key: entry.key,
-                                label: entry.label,
-                                color: entry.color,
-                                person: entry.current.person,
-                                party: entry.current.party,
-                                votes: entry.current.votes,
-                                share: entry.current.share,
-                              },
-                            ],
-                      )
-                      .toSorted((a, b) => b.votes - a.votes)
-                      .slice(0, 2),
-            };
-          }),
+                  : await children(row.id, other.place, true, row.date);
+              const unit =
+                other.place.k === row.k
+                  ? ""
+                  : kids.find((kid) => kid.k === row.k)?.segment;
+              if (unit == null) {
+                return null;
+              }
+              const [totals, label, lineage] = await Promise.all([
+                load([row.id], [row.k], row.date, [row.id]),
+                names([row.id], row.date),
+                branches(row.date),
+              ]);
+              const loaded = totals.get(row.k);
+              return {
+                ...row,
+                valid: loaded?.side.valid ?? 0,
+                name: label.full.get(row.id) ?? "",
+                path: [row.path, unit].filter((part) => part !== "").join("/"),
+                leaders:
+                  loaded == null
+                    ? []
+                    : compare(loaded.side, null, lineage, "party")
+                        .flatMap((entry) =>
+                          entry.current == null
+                            ? []
+                            : [
+                                {
+                                  key: entry.key,
+                                  label: entry.label,
+                                  color: entry.color,
+                                  person: entry.current.person,
+                                  party: entry.current.party,
+                                  votes: entry.current.votes,
+                                  share: entry.current.share,
+                                },
+                              ],
+                        )
+                        .toSorted((a, b) => b.votes - a.votes)
+                        .slice(0, 2),
+              };
+            }),
         ),
       ]);
       return {
@@ -8262,6 +8291,12 @@ export const polities = {
             a.name.localeCompare(b.name, undefined, { numeric: true }),
           ),
         within: subdivisions.rows[0]?.within ?? 0,
+        dates: sizes.length,
+        years: [
+          ...new Set(
+            kept.flatMap((row) => (row.year == null ? [] : [row.year])),
+          ),
+        ],
         results: Map.groupBy(
           built
             .filter((race) => race != null)
