@@ -8,7 +8,6 @@ import time
 import unicodedata
 import zipfile
 from datetime import date, timedelta
-from itertools import product
 from pathlib import Path
 from typing import Any
 from urllib.parse import quote, unquote, urlencode
@@ -21,9 +20,9 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us.county_changes import ct_regions
 from ea.sources.us import elstats, fl_sos, me_legislature, medsl, nyc_general, tx_elchist, wa_local
 from ea.sources.us.city_precincts import WA_COUNTIES
+from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
 from ea.store import DATA, connect
 
