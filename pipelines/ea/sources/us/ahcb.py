@@ -20,7 +20,7 @@ PARSED = DATA / "parsed" / SOURCE
 HOME = "https://digital.newberry.org/ahcb/"
 COUNTIES = "https://digital.newberry.org/ahcb/downloads/gis/US_AtlasHCB_Counties_Gen0001.zip"
 FIELDS = ["ID", "VERSION", "NAME", "FULL_NAME", "STATE_TERR", "FIPS", "CNTY_TYPE", "CHANGE", "CITATION"]
-STATES: set[str] | None = {"51", "21", "47", "37", "45", "13", "24", "10", "11"}
+STATES: set[str] | None = None
 NOT_COUNTY = re.compile(
     r"_nca\d*$|^dcs_|Res\.?$|Reserve|Indian lands|Western Reserve|Mare Island|Sec\. the|Terr\. Part|Disp\.|Claim"
     r"|Settlement|Province|Colony$|Mil Res|Spanish|Indian Terr\.|ANNEXATION|TERRITORY"
