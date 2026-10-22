@@ -413,20 +413,22 @@
               >
             {/if}
           </p>
-          <div
-            class="flex overflow-hidden rounded-xs bg-muted block-2"
-            aria-hidden="true"
-          >
-            {#each race.results as row (row.key)}
-              <span
-                class="block-full"
-                style:inline-size="{(isSeated
-                  ? (row.seats ?? 0) / race.contested
-                  : row.share) * 100}%"
-                style:background-color={swatch(row.color, row.key)}
-              ></span>
-            {/each}
-          </div>
+          {#if race.results.length > 1}
+            <div
+              class="flex overflow-hidden rounded-xs bg-muted block-2"
+              aria-hidden="true"
+            >
+              {#each race.results as row (row.key)}
+                <span
+                  class="block-full"
+                  style:inline-size="{(isSeated
+                    ? (row.seats ?? 0) / race.contested
+                    : row.share) * 100}%"
+                  style:background-color={swatch(row.color, row.key)}
+                ></span>
+              {/each}
+            </div>
+          {/if}
           <ul class="grid gap-0.5 text-sm">
             {#each race.results.slice(0, 2) as row (row.key)}
               <li
@@ -445,7 +447,9 @@
                         seats: count(row.seats ?? 0),
                         size: count(race.contested),
                       })
-                    : percent(row.share)}</span
+                    : race.results.length === 1
+                      ? m.map_unopposed()
+                      : percent(row.share)}</span
                 >
               </li>
             {/each}

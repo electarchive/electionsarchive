@@ -71,13 +71,17 @@
       (race) =>
         race.path != null && race.path === election.races[0]?.runoff?.path,
     );
-    const sorted =
+    const led =
       decisive < 1
         ? election.races
         : [
             election.races[decisive],
             ...election.races.filter((_, spot) => spot !== decisive),
           ].filter((race) => race != null);
+    const sorted = [
+      ...led.filter((race) => race.results.length !== 1),
+      ...led.filter((race) => race.results.length === 1),
+    ];
     const tiers = Map.groupBy(
       sorted.filter(
         (race) =>
@@ -997,7 +1001,7 @@
       </div>
       {@render tally(race, true)}
     </section>
-  {:else}
+  {:else if index === 0 || race.results.length !== 1}
     <section
       id="race-{race.anchor}"
       class="col-span-12 grid scroll-mbs-4 gap-1.5 bg-card px-3.5 pbs-4 pbe-1"
@@ -1030,7 +1034,7 @@
       {/if}
     </section>
   {/if}
-  {#if race.results.length > 0}
+  {#if race.results.length > 1 || (index === 0 && race.results.length > 0)}
     {#if race.electors != null && race.electors.rows.length > 0 && races.length === 1}
       <Electors electors={race.electors} />
     {/if}
@@ -1240,10 +1244,19 @@
             <h3
               class="text-lg/tight font-[740] tracking-[-0.012em] text-balance"
             >
-              <a
-                class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                href="#race-{other.anchor}">{other.name}</a
-              >
+              {#if other.results.length !== 1}
+                <a
+                  class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  href="#race-{other.anchor}">{other.name}</a
+                >
+              {:else if other.path == null}
+                {other.name}
+              {:else}
+                <Preview
+                  class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                  path={other.path}>{other.name}</Preview
+                >
+              {/if}
             </h3>
             {#if other.lede != null}
               {@render lede(other, false)}
@@ -1483,92 +1496,108 @@
   {const isCrowded = $derived(
     bar.isCount && bar.parts.filter((part) => part.value > 0).length > 2,
   )}
-  <div class="grid gap-1.5">
-    <div class="flex items-end justify-between gap-4">
-      {#each shown as part, at (part.key)}
-        <p
-          class={cn("grid min-inline-0", {
-            "justify-items-end text-end": at === 1,
-            "gap-x-3": part.photo != null,
-            "grid-cols-[auto_minmax(0,1fr)]": part.photo != null && at === 0,
-            "grid-cols-[minmax(0,1fr)_auto]": part.photo != null && at === 1,
-          })}
-        >
-          {#if part.photo != null}
-            <img
-              class={cn(
-                "row-span-2 self-end rounded-full bg-muted object-cover object-top ring-2 ring-offset-2 ring-offset-card",
-                { "block-14 inline-14": isLead, "block-11 inline-11": !isLead },
-                { "col-start-2": at === 1 },
-              )}
-              style:--tw-ring-color={part.color}
-              src={part.photo.src}
-              alt=""
-              width="56"
-              height="56"
-            />
-          {/if}
-          <span
-            class={cn(
-              "font-figures leading-none font-[780] tracking-[-0.02em]",
-              { "text-[2.5rem]": isLead, "text-[1.75rem]": !isLead },
-            )}>{bar.isCount ? count(part.value) : percent(part.value)}</span
+  {#if !bar.isCount && shown.length === 1}
+    <p class="flex items-baseline gap-1.5 text-[0.9375rem] font-semibold">
+      <span
+        class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
+        style:background-color={shown[0]?.color}
+      ></span>
+      <span class="truncate">{shown[0]?.label}</span>
+      <span class="shrink-0 text-[0.8125rem] font-normal text-muted-foreground"
+        >{m.map_unopposed()}</span
+      >
+    </p>
+  {:else}
+    <div class="grid gap-1.5">
+      <div class="flex items-end justify-between gap-4">
+        {#each shown as part, at (part.key)}
+          <p
+            class={cn("grid min-inline-0", {
+              "justify-items-end text-end": at === 1,
+              "gap-x-3": part.photo != null,
+              "grid-cols-[auto_minmax(0,1fr)]": part.photo != null && at === 0,
+              "grid-cols-[minmax(0,1fr)_auto]": part.photo != null && at === 1,
+            })}
           >
-          <span
-            class="flex items-baseline gap-1.5 text-[0.9375rem] font-semibold min-inline-0"
-          >
-            {#if isCrowded}
-              <span
-                class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
-                style:background-color={part.color}
-              ></span>
-            {/if}
-            <span class="truncate">{part.label}</span>
-            {#if part.delta !== undefined}
-              <span
+            {#if part.photo != null}
+              <img
                 class={cn(
-                  "shrink-0 font-figures text-[0.8125rem] font-normal",
+                  "row-span-2 self-end rounded-full bg-muted object-cover object-top ring-2 ring-offset-2 ring-offset-card",
                   {
-                    "text-muted-foreground":
-                      part.delta == null || part.delta === 0,
+                    "block-14 inline-14": isLead,
+                    "block-11 inline-11": !isLead,
                   },
+                  { "col-start-2": at === 1 },
                 )}
-                >{part.delta == null
-                  ? m.seats_change_new()
-                  : part.delta === 0
-                    ? "±0"
-                    : `${part.delta > 0 ? "+" : "−"}${count(Math.abs(part.delta))}`}</span
-              >
+                style:--tw-ring-color={part.color}
+                src={part.photo.src}
+                alt=""
+                width="56"
+                height="56"
+              />
             {/if}
-          </span>
-        </p>
-      {/each}
+            <span
+              class={cn(
+                "font-figures leading-none font-[780] tracking-[-0.02em]",
+                { "text-[2.5rem]": isLead, "text-[1.75rem]": !isLead },
+              )}>{bar.isCount ? count(part.value) : percent(part.value)}</span
+            >
+            <span
+              class="flex items-baseline gap-1.5 text-[0.9375rem] font-semibold min-inline-0"
+            >
+              {#if isCrowded}
+                <span
+                  class="shrink-0 self-center rounded-xs block-2.5 inline-2.5"
+                  style:background-color={part.color}
+                ></span>
+              {/if}
+              <span class="truncate">{part.label}</span>
+              {#if part.delta !== undefined}
+                <span
+                  class={cn(
+                    "shrink-0 font-figures text-[0.8125rem] font-normal",
+                    {
+                      "text-muted-foreground":
+                        part.delta == null || part.delta === 0,
+                    },
+                  )}
+                  >{part.delta == null
+                    ? m.seats_change_new()
+                    : part.delta === 0
+                      ? "±0"
+                      : `${part.delta > 0 ? "+" : "−"}${count(Math.abs(part.delta))}`}</span
+                >
+              {/if}
+            </span>
+          </p>
+        {/each}
+      </div>
+      <div
+        class={cn(
+          "relative flex animate-sweep overflow-hidden bg-muted motion-reduce:animate-none",
+          { "block-4": isLead, "block-3": !isLead },
+        )}
+        aria-hidden="true"
+      >
+        {#each bar.isCount ? [shown[0], ...bar.parts.filter((part) => !shown.includes(part)), shown[1]].filter((part) => part != null) : shown as part, at (part.key)}
+          <span
+            class={cn("block block-full", {
+              "ms-auto": !bar.isCount && at === 1,
+            })}
+            style:inline-size="{(part.value / Math.max(bar.total, 0.0001)) *
+              100}%"
+            style:background-color={part.color}
+          ></span>
+        {/each}
+        {#if bar.isWhole && bar.total > 1}
+          <span
+            class="absolute -inset-y-px bg-foreground inline-0.5"
+            style:inset-inline-start="{((Math.floor(bar.total / 2) + 1) /
+              bar.total) *
+              100}%"
+          ></span>
+        {/if}
+      </div>
     </div>
-    <div
-      class={cn(
-        "relative flex animate-sweep overflow-hidden bg-muted motion-reduce:animate-none",
-        { "block-4": isLead, "block-3": !isLead },
-      )}
-      aria-hidden="true"
-    >
-      {#each bar.isCount ? [shown[0], ...bar.parts.filter((part) => !shown.includes(part)), shown[1]].filter((part) => part != null) : shown as part, at (part.key)}
-        <span
-          class={cn("block block-full", {
-            "ms-auto": !bar.isCount && at === 1,
-          })}
-          style:inline-size="{(part.value / Math.max(bar.total, 0.0001)) *
-            100}%"
-          style:background-color={part.color}
-        ></span>
-      {/each}
-      {#if bar.isWhole && bar.total > 1}
-        <span
-          class="absolute -inset-y-px bg-foreground inline-0.5"
-          style:inset-inline-start="{((Math.floor(bar.total / 2) + 1) /
-            bar.total) *
-            100}%"
-        ></span>
-      {/if}
-    </div>
-  </div>
+  {/if}
 {/snippet}
