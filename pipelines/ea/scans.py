@@ -10,6 +10,7 @@ import subprocess
 import tempfile
 import zipfile
 from collections import Counter
+from concurrent.futures import ThreadPoolExecutor, as_completed
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import cache
@@ -145,6 +146,10 @@ READERS = {
     "layout": Reader("claude-sonnet-5-5", "medium", 1.0, 5.0),
 }
 ORDER = ("first", "second", "third")
+PRICES = {reader.model: (reader.price_in, reader.price_out) for reader in READERS.values()}
+DIRECT_FULL = 2.0
+DIRECT_THREADS = 8
+DIRECT_LIMIT = 200
 LEDGER = DATA / "scans-ledger.json"
 BUDGET = 190.0
 IMAGE_LIMIT = 4_500_000
@@ -499,7 +504,7 @@ def cells(
                     break
                 for c, text in enumerate(row["values"]):
                     series, label = (r, header[c]["label"]) if across else (c, named)
-                    digits = re.sub(r"[,\s.]", "", text)
+                    digits = re.sub(r"[,\s.]|(?<=\d)[-~'](?=\d)", "", text)
                     value = int(digits) if digits.isdigit() else None
                     if TOTAL.match(slug(label)):
                         if value is not None:
@@ -595,7 +600,7 @@ def pending(name: str, reader: str, pages: set[str] | None) -> dict[str, Read]:
 
 def guess(reader: str, request: Read) -> float:
     _, _, price_in, price_out = READERS[reader]
-    return (min(request.pixels, 3_500_000) / 750 * price_in + 6000 * price_out) / 1e6
+    return (min(request.pixels, 3_500_000) / 750 * price_in + 3000 * price_out) / 1e6
 
 
 def ledger() -> dict[str, dict[str, float]]:
@@ -635,6 +640,22 @@ def submit(reader: str, wanted: dict[str, Read], state: dict[str, dict[str, list
     return ids
 
 
+def keep(key: str, message: anthropic.types.Message) -> None:
+    raw.store(
+        SOURCE,
+        key,
+        message.model_dump_json().encode(),
+        suffix=".json",
+        retrieved_at=datetime.now(UTC),
+        media_type="application/json",
+    )
+
+
+def dollars(message: anthropic.types.Message, rate: float) -> float:
+    price_in, price_out = PRICES[message.model]
+    return (message.usage.input_tokens * price_in + message.usage.output_tokens * price_out) * rate / 1e6
+
+
 def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
     api = client()
     notes: list[str] = []
@@ -646,27 +667,108 @@ def collect(reader: str, state: dict[str, dict[str, list[Batch]]]) -> str:
             remaining.append(batch)
             continue
         books = ledger()
-        _, _, price_in, price_out = READERS[reader]
-        dollars = 0.0
+        spent = 0.0
         for result in api.messages.batches.results(batch["id"]):
             if result.result.type == "succeeded":
-                usage = result.result.message.usage
-                dollars += (usage.input_tokens * price_in + usage.output_tokens * price_out) / 1e6
-                raw.store(
-                    SOURCE,
-                    batch["keys"][result.custom_id],
-                    result.result.message.model_dump_json().encode(),
-                    suffix=".json",
-                    retrieved_at=datetime.now(UTC),
-                    media_type="application/json",
-                )
+                spent += dollars(result.result.message, 1.0)
+                keep(batch["keys"][result.custom_id], result.result.message)
             else:
                 notes.append(f"{result.custom_id} {result.result.type}")
         books["pending"].pop(batch["id"], None)
-        books["spent"][batch["id"]] = dollars
+        books["spent"][batch["id"]] = spent
         LEDGER.write_text(json.dumps(books, indent=2))
     state["batches"][reader] = remaining
     return "; ".join(notes)
+
+
+def read_direct(reader: str, wanted: dict[str, Read]) -> str:
+    api = anthropic.Anthropic(max_retries=6, timeout=1200)
+    books = ledger()
+    projected = sum(guess(reader, request) for request in wanted.values()) * DIRECT_FULL
+    total = sum(books["spent"].values()) + sum(books["pending"].values())
+    if total + projected > BUDGET:
+        raise SystemExit(
+            f"BLOCKED: budget; ${total:.2f} spent or pending plus ${projected:.2f} projected passes ${BUDGET}"
+        )
+
+    def call(request: Read) -> anthropic.types.Message:
+        params = request.params
+        with api.messages.stream(
+            model=params["model"],
+            max_tokens=params["max_tokens"],
+            system=params["system"],
+            messages=params["messages"],
+            output_config=params["output_config"],
+        ) as stream:
+            return stream.get_final_message()
+
+    notes: list[str] = []
+    spent = 0.0
+    done = 0
+    try:
+        with ThreadPoolExecutor(DIRECT_THREADS) as pool:
+            futures = {pool.submit(call, request): request for request in wanted.values()}
+            for future in as_completed(futures):
+                request = futures[future]
+                try:
+                    message = future.result()
+                except anthropic.APIError as error:
+                    notes.append(f"{request.custom} {type(error).__name__}")
+                    continue
+                keep(request.key, message)
+                spent += dollars(message, DIRECT_FULL)
+                done += 1
+    finally:
+        books = ledger()
+        books["spent"][f"direct-{datetime.now(UTC).isoformat(timespec='seconds')}-{reader}"] = spent
+        LEDGER.write_text(json.dumps(books, indent=2))
+    return "; ".join([f"{reader}: read {done} of {len(wanted)} directly for ${spent:.3f}", *notes])
+
+
+def settle(reader: str, state: dict[str, dict[str, list[Batch]]], mode: str) -> str:
+    message = ""
+    if state.get("batches", {}).get(reader):
+        message = collect(reader, state)
+    if mode == "direct" and state.get("batches", {}).get(reader):
+        api = client()
+        books = ledger()
+        for batch in state["batches"][reader]:
+            api.messages.batches.cancel(batch["id"])
+            books["pending"].pop(batch["id"], None)
+        LEDGER.write_text(json.dumps(books, indent=2))
+        state["batches"][reader] = []
+        message = f"{reader}: canceled the waiting batch"
+    return message
+
+
+def dispatch(reader: str, todo: dict[str, Read], state: dict[str, dict[str, list[Batch]]], mode: str) -> str:
+    if not todo or state.get("batches", {}).get(reader):
+        return ""
+    if mode == "direct" or (mode == "auto" and not (reader == "first" and len(todo) > DIRECT_LIMIT)):
+        return read_direct(reader, todo)
+    return f"{reader}: submitted {len(todo)} requests in {', '.join(submit(reader, todo, state))}"
+
+
+def reconcile() -> str:
+    api = client()
+    books = ledger()
+    notes: list[str] = []
+    for batch_id in list(books["pending"]):
+        status = api.messages.batches.retrieve(batch_id)
+        if status.processing_status != "ended":
+            notes.append(f"{batch_id[-8:]} {status.processing_status}")
+            continue
+        books["pending"].pop(batch_id)
+        spent = sum(
+            dollars(result.result.message, 1.0)
+            for result in api.messages.batches.results(batch_id)
+            if result.result.type == "succeeded"
+        )
+        if spent:
+            books["spent"].setdefault(batch_id, spent)
+        notes.append(f"{batch_id[-8:]} ended, ${spent:.3f}")
+    LEDGER.write_text(json.dumps(books, indent=2))
+    return "\n".join([*notes, status_line(books)])
 
 
 def options(conn: Connection, contest: UUID | None) -> list[tuple[str, str, int]]:
@@ -794,7 +896,7 @@ def prepare(name: str) -> str:
     return "\n".join(out + [f"no official total held for {len(unmatched)} of {len(held)} columns", *unmatched[:20]])
 
 
-def run(name: str) -> str:
+def run(name: str, mode: str = "auto") -> str:
     manifest = load(name)
     folder = WORK / name
     folder.mkdir(parents=True, exist_ok=True)
@@ -817,11 +919,8 @@ def run(name: str) -> str:
             }
             if not redo:
                 break
-        if state.get("batches", {}).get(reader):
-            message = collect(reader, state) or message
-        wanted = pending(name, reader, redo)
-        if wanted and not state.get("batches", {}).get(reader):
-            message = f"{reader}: submitted {len(wanted)} requests in {', '.join(submit(reader, wanted, state))}"
+        message = settle(reader, state, mode) or message
+        message = dispatch(reader, pending(name, reader, redo), state, mode) or message
         state_path.write_text(json.dumps(state, indent=2))
         if pending(name, reader, redo):
             return message or f"{reader}: waiting for the batch"
@@ -992,11 +1091,12 @@ def status() -> str:
             f"{'tables' if (folder / 'tables.parquet').exists() else 'no tables yet'}"
             f"{'' if review is None else f', {len(review)} in review'}"
         )
-    books = ledger()
-    out.append(
-        f"spent ${sum(books['spent'].values()):.2f}, pending ${sum(books['pending'].values()):.2f}, budget ${BUDGET}"
-    )
+    out.append(status_line(ledger()))
     return "\n".join(out)
+
+
+def status_line(books: dict[str, dict[str, float]]) -> str:
+    return f"spent ${sum(books['spent'].values()):.2f}, pending ${sum(books['pending'].values()):.2f}, budget ${BUDGET}"
 
 
 def totals(manifest: Manifest, frame: pl.DataFrame) -> Path:
@@ -1060,7 +1160,16 @@ def emit(name: str) -> Path:
         ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
     missing = {label for label, contest in contests.items() if contest.get("create") and key_of(contest) not in ids}
     if missing:
-        return totals(manifest, frame.filter(pl.col("contest").is_in(missing)))
+        listed = {
+            f"{column['contest']}|{column['candidate']}"
+            for spec in manifest["pages"]
+            for column in spec.get("columns", [])
+        }
+        read = set(frame["series"])
+        whole = {label for label in missing if all(item in read for item in listed if item.startswith(f"{label}|"))}
+        if whole:
+            return totals(manifest, frame.filter(pl.col("contest").is_in(whole)))
+        frame = frame.filter(~pl.col("contest").is_in(missing))
     towns = manifest.get("unit_scheme") == "town"
     if towns:
         frame = frame.group_by("contest", "candidate", "code", maintain_order=True).agg(

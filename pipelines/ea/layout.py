@@ -220,7 +220,7 @@ def sound(page: LayoutPage) -> bool:
     )
 
 
-def step(name: str) -> str:
+def step(name: str, mode: str = "auto") -> str:
     volume: Volume = json.loads((VOLUMES / f"{name}.json").read_text())
     folder = scans.WORK / name
     folder.mkdir(parents=True, exist_ok=True)
@@ -231,11 +231,9 @@ def step(name: str) -> str:
     message = ""
     for reader in ("layout", "third"):
         plan = requests(volume, reader, leaves)
-        if state.get("batches", {}).get(reader):
-            message = scans.collect(reader, state) or message
+        message = scans.settle(reader, state, mode) or message
         wanted = {custom: request for custom, request in plan.items() if scans.cached(request.key) is None}
-        if wanted and not state.get("batches", {}).get(reader):
-            message = f"{reader}: submitted {len(wanted)} requests in {', '.join(scans.submit(reader, wanted, state))}"
+        message = scans.dispatch(reader, wanted, state, mode) or message
         state_path.write_text(json.dumps(state, indent=2))
         if any(scans.cached(request.key) is None for request in plan.values()):
             return message or f"{reader}: waiting for the batch"

@@ -41,11 +41,18 @@ def main() -> None:
     )
     scanning.add_argument(
         "action",
-        choices=("prepare", "run", "status", "emit", "layout"),
+        choices=("prepare", "run", "status", "emit", "layout", "ledger"),
         help="render crops and fill held totals, advance the Message Batches steps once, list manifests, "
         "or emit the tables that passed",
     )
     scanning.add_argument("name", nargs="?", help="manifest name, such as tribune-oh-1876")
+    scanning.add_argument(
+        "--mode",
+        choices=("auto", "direct", "batch"),
+        default="auto",
+        help="run and layout: direct reads at full price in minutes (cancels a waiting batch), batch waits at half "
+        "price, auto reads directly unless a first pass passes 200 requests",
+    )
     caching = commands.add_parser("raw", help="check and maintain the raw cache")
     caching.add_argument(
         "action",
@@ -65,8 +72,12 @@ def main() -> None:
             print(
                 scans.status()
                 if args.action == "status"
-                else layout.step(args.name)
+                else scans.reconcile()
+                if args.action == "ledger"
+                else layout.step(args.name, args.mode)
                 if args.action == "layout"
+                else scans.run(args.name, args.mode)
+                if args.action == "run"
                 else getattr(scans, args.action)(args.name)
             )
         case "fixtures":
