@@ -489,7 +489,7 @@ def parse() -> None:
                     )
                 options.append(pl.concat(rows))
     elections = {
-        f"{year}_{kind}_t{number}": (kind, year, number)
+        f"{year}_{kind.removesuffix('i')}_t{number}": (kind, year, number)
         for kind in ("legi", "presi")
         for year in (2017, 2022)
         for number in (1, 2)
@@ -805,6 +805,7 @@ def emit() -> Path:
             publisher=COUNCIL_PUBLISHER,
             title=COUNCIL_TITLE,
             url="https://www.conseil-constitutionnel.fr/decisions/pdr",
+            license="Freely reproducible with the Conseil constitutionnel's site cited as the source, without altering the text (legal notice)",
         )
         for decisions in COUNCIL.values():
             for decision in decisions:
