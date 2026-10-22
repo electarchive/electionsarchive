@@ -14,7 +14,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import special_counties, special_files, special_md, special_nc, special_nm_1997, special_pdfs
+from ea.sources.us import special_counties, special_files, special_md, special_nc, special_nm_1997, special_pdfs, special_wi_1993
 from ea.sources.us.elstats import SOURCE as ARCHIVE
 from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
 from ea.store import DATA, connect
@@ -153,6 +153,7 @@ def fetch() -> None:
     special_pdfs.fetch()
     special_counties.fetch()
     special_nm_1997.fetch()
+    special_wi_1993.fetch()
     for election, race, _, _, _ in TEXAS_PAGES:
         raw.fetch(SOURCE, TEXAS.format(election, race), suffix=".htm")
     for link in links:
@@ -394,6 +395,7 @@ def emit() -> Path:
     frames.append(pl.DataFrame(special_pdfs.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_counties.rows(), infer_schema_length=None))
     frames.append(pl.DataFrame(special_nm_1997.rows(), infer_schema_length=None))
+    frames.append(pl.DataFrame(special_wi_1993.rows(), infer_schema_length=None))
     frame = pl.concat(frames, how="diagonal").with_columns(
         day=pl.col("election_date").str.slice(0, 10).str.to_date(),
         runoff=pl.col("runoff").fill_null(False),
@@ -541,40 +543,62 @@ def emit() -> Path:
             for year in frame.filter(pl.col("state") == state)["election_date"].str.slice(0, 4).unique():
                 cs.artifact(raw.cached(ARCHIVE, url(TENANTS[state][0], int(year))), sources[state])
 
-        canvass = raw.cached(SOURCE, special_nm_1997.CANVASS)
-        official = cs.source("New Mexico Secretary of State", "1997 special election canvass")
-        if official in cs.minted:
-            cs.add(
-                "source",
-                id=official,
-                kind="official_body",
-                publisher="New Mexico Secretary of State",
-                title="1997 special election canvass",
-                url="https://sos.nm.gov/sos-archive/election-results-archive/1997-election-results/",
-                license="Public record",
-            )
-        canvass_artifact = cs.artifact(canvass, official)
-        canvass_pages: dict[int, UUID] = {}
-        for number in sorted({row["page"] for row in special_nm_1997.rows()}):
-            image = DATA / "pages" / SOURCE / f"{canvass.sha256}-{number}.png"
-            if not image.exists():
-                image.parent.mkdir(parents=True, exist_ok=True)
-                subprocess.run(
-                    ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
-                    + [str(canvass.path), str(image.with_suffix(""))],
-                    check=True,
+        canvass_pages: dict[tuple[str, int], UUID] = {}
+        scan_sources: dict[tuple[str, date], UUID] = {}
+        for state, day, link, publisher, title, site, rows in (
+            (
+                "NM",
+                date(1997, 5, 13),
+                special_nm_1997.CANVASS,
+                "New Mexico Secretary of State",
+                "1997 special election canvass",
+                "https://sos.nm.gov/sos-archive/election-results-archive/1997-election-results/",
+                special_nm_1997.rows(),
+            ),
+            (
+                "WI",
+                date(1993, 5, 4),
+                special_wi_1993.PAGE,
+                "Wisconsin Legislative Reference Bureau",
+                "Wisconsin Blue Book 1993-1994",
+                special_wi_1993.PAGE,
+                special_wi_1993.rows(),
+            ),
+        ):
+            canvass = raw.cached(SOURCE, link)
+            official = cs.source(publisher, title)
+            if official in cs.minted:
+                cs.add(
+                    "source",
+                    id=official,
+                    kind="official_body",
+                    publisher=publisher,
+                    title=title,
+                    url=site,
+                    license="Public record",
                 )
-            width, height = struct.unpack(">II", image.read_bytes()[16:24])
-            canvass_pages[number] = cs.page(canvass_artifact, number)
-            cs.add(
-                "source_page",
-                id=canvass_pages[number],
-                artifact_id=canvass_artifact,
-                page_number=number,
-                image_key=f"pages/{SOURCE}/{image.name}",
-                width=width,
-                height=height,
-            )
+            scan_sources[(state, day)] = official
+            canvass_artifact = cs.artifact(canvass, official)
+            for number in sorted({row["page"] for row in rows}):
+                image = DATA / "pages" / SOURCE / f"{canvass.sha256}-{number}.png"
+                if not image.exists():
+                    image.parent.mkdir(parents=True, exist_ok=True)
+                    subprocess.run(
+                        ["pdftoppm", "-r", "100", "-png", "-f", str(number), "-l", str(number), "-singlefile"]
+                        + [str(canvass.path), str(image.with_suffix(""))],
+                        check=True,
+                    )
+                width, height = struct.unpack(">II", image.read_bytes()[16:24])
+                canvass_pages[(state, number)] = cs.page(canvass_artifact, number)
+                cs.add(
+                    "source_page",
+                    id=canvass_pages[(state, number)],
+                    artifact_id=canvass_artifact,
+                    page_number=number,
+                    image_key=f"pages/{SOURCE}/{image.name}",
+                    width=width,
+                    height=height,
+                )
 
         created: set[UUID] = set()
         elections: set[UUID] = set()
@@ -812,7 +836,7 @@ def emit() -> Path:
                 stage="certified",
                 kind="counted",
                 status="active",
-                source_id=official if state == "NM" and day == date(1997, 5, 13) else sources[state],
+                source_id=scan_sources.get((state, day), sources[state]),
                 is_default=True,
                 completeness=1,
                 supersedes_id=prior[0] if prior is not None else None,
@@ -857,7 +881,7 @@ def emit() -> Path:
                             channel=0,
                             measure=1,
                             count_round=1,
-                            page_id=canvass_pages[page],
+                            page_id=canvass_pages[(state, page)],
                             source_id=None,
                             x0=box[0],
                             y0=box[1],
