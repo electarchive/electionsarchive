@@ -18,14 +18,18 @@ LONG = {
     "2008/2008_general_election_legislature_county_totals.aspx": date(2008, 11, 4),
     "2010/2010_general_election_legislature_by_county.aspx": date(2010, 11, 2),
 }
-PDF = "http://web.archive.org/web/2016id_/https://sdsos.gov/elections-voting/assets/2012%20Assets/2012generalelectionlegislaturebycounty.pdf"
-TITLE_LINE = re.compile(r"State (Senator|Representatives?) - 0*(\d+)([AB]?)")
+PDFS = {
+    "http://web.archive.org/web/2016id_/https://sdsos.gov/elections-voting/assets/2012%20Assets/2012generalelectionlegislaturebycounty.pdf": date(2012, 11, 6),
+    SITE + "2014/legislativeracesbycounty%20.pdf": date(2014, 11, 4),
+}
+TITLE_LINE = re.compile(r"State (Senator|Representatives?) - (?:District )?0*(\d+)([AB]?)")
 
 
 def fetch() -> None:
     for path in LONG:
         raw.fetch(SOURCE, url(path), suffix=".html")
-    raw.fetch(SOURCE, PDF, suffix=".pdf")
+    for pdf in PDFS:
+        raw.fetch(SOURCE, pdf, suffix=".pdf")
 
 
 def chamber(office: str, district: str, part: str) -> str:
@@ -51,33 +55,48 @@ def parse() -> None:
                     int(votes),
                 )
             )
-    text = subprocess.run(
-        ["pdftotext", "-layout", str(raw.cached(SOURCE, PDF).path), "-"], capture_output=True, check=True, text=True
-    ).stdout
-    blocks: list[dict] = []
-    starts: list[int] = []
-    for line in text.splitlines():
-        titles = list(TITLE_LINE.finditer(line))
-        if titles:
-            starts = [found.start() for found in titles]
-            blocks = [{"chamber": chamber(*found.groups()), "names": [], "rows": []} for found in titles]
-            continue
-        for block, start, end in zip(blocks, starts, [*starts[1:], None], strict=True):
-            cells = re.split(r"\s{2,}", line[start:end].strip())
-            if cells[0] == "County":
-                block["names"] = cells[1:-1]
-            elif cells[0] == "TOTAL" and block["names"]:
-                sums = [sum(row[1][i] for row in block["rows"]) for i in range(len(block["names"]) + 1)]
-                if sums != [int(cell) for cell in cells[1:]]:
-                    print(f"2012 {block['chamber']}: counties sum to {sums}, printed {cells[1:]}, skipped")
+    for pdf, day in PDFS.items():
+        text = subprocess.run(
+            ["pdftotext", "-layout", str(raw.cached(SOURCE, pdf).path), "-"], capture_output=True, check=True, text=True
+        ).stdout
+        starts = [0, 0]
+        blocks: list[dict | None] = [None, None]
+        for line in text.splitlines():
+            titles = list(TITLE_LINE.finditer(line))
+            if any(found.start() > 20 for found in titles):
+                starts[1] = next(found.start() for found in titles if found.start() > 20)
+            for column in (0, 1):
+                piece = line[starts[column] : starts[1] if column == 0 and starts[1] else None]
+                if found := TITLE_LINE.search(piece):
+                    blocks[column] = {"chamber": chamber(*found.groups()), "header": [], "rows": []}
                     continue
-                rows.extend(
-                    (date(2012, 11, 6), block["chamber"], code, name.upper(), values[i])
-                    for code, values in block["rows"]
-                    for i, name in enumerate(block["names"])
-                )
-            elif block["names"] and len(cells) == len(block["names"]) + 2 and all(cell.isdigit() for cell in cells[1:]):
-                block["rows"].append((fips[re.sub(r"[^a-z]", "", cells[0].lower())], [int(cell) for cell in cells[1:]]))
+                block = blocks[column]
+                row = re.match(r"\s*(\S.*?)\s{2,}(\d+(?:\s+\d+)*)\s*$", piece)
+                if block is None or not piece.strip():
+                    continue
+                if row is None:
+                    block["header"].append(piece)
+                elif row[1] != "TOTAL":
+                    block["rows"].append((fips[re.sub(r"[^a-z]", "", row[1].lower())], [int(cell) for cell in row[2].split()]))
+                else:
+                    blocks[column] = None
+                    printed = [int(cell) for cell in row[2].split()]
+                    places = [match.start() for match in re.finditer(r"\d+", piece)]
+                    words: dict[int, list[str]] = {}
+                    for text_line in block["header"]:
+                        for word in re.finditer(r"\S+", text_line):
+                            if word[0] != "County" and (column_at := max((i for i, x in enumerate(places) if x <= word.start() + 1), default=None)) is not None:
+                                words.setdefault(column_at, []).append(word[0])
+                    names = [" ".join(words.get(i, [])) for i in range(len(printed) - 1)]
+                    sums = [sum(values[i] for _, values in block["rows"]) for i in range(len(printed))]
+                    if sums != printed or any(len(values) != len(printed) for _, values in block["rows"]) or not all(names):
+                        print(f"{day.year} {block['chamber']}: {names} counties sum to {sums}, printed {printed}, skipped")
+                        continue
+                    rows.extend(
+                        (day, block["chamber"], code, name.upper(), values[i])
+                        for code, values in block["rows"]
+                        for i, name in enumerate(names)
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
@@ -101,7 +120,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Dakota's legislative generals by county, 2008-2012 (Secretary of State election history)",
+            summary="South Dakota's legislative generals by county, 2008-2014 (Secretary of State election history)",
             polity="US-SD",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -117,6 +136,7 @@ def emit() -> Path:
             )
         for path in LONG:
             cs.artifact(raw.cached(SOURCE, url(path)), source)
-        cs.artifact(raw.cached(SOURCE, PDF), source)
+        for pdf in PDFS:
+            cs.artifact(raw.cached(SOURCE, pdf), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"SD": source}, strict=True)
         return cs.write()
