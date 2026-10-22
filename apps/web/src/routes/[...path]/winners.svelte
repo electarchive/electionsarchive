@@ -139,6 +139,7 @@
           own={shape.map.own}
           frames={shape.map.frames}
           isApproximate={shape.map.isApproximate}
+          sources={shape.map.credits}
           noun={shape.places.levels[0]?.noun ?? ""}
           votes=""
           names={shape.places.legend.map((item) => item.short ?? item.label)}

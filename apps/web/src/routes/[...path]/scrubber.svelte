@@ -513,6 +513,7 @@
               nested={race.map.nested}
               frames={race.map.frames}
               isApproximate={race.map.isApproximate}
+              sources={race.map.credits}
               noun={race.places.levels[0]?.noun ?? ""}
               votes={m.col_votes()}
               names={race.places.legend.map((item) =>

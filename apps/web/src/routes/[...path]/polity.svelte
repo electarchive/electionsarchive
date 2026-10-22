@@ -249,6 +249,15 @@
           names: places.legend.map((item) =>
             item.person == null ? (item.short ?? item.label) : item.label,
           ),
+          sources: [
+            ...new Set(
+              [...level.sources, ...own.sources].flatMap((source) =>
+                source.attribution == null
+                  ? [source.publisher]
+                  : [source.publisher, source.attribution],
+              ),
+            ),
+          ],
         };
   });
   const upward = $derived.by(() => {
@@ -315,6 +324,7 @@
         noun={drawn.noun}
         votes={m.col_votes()}
         names={drawn.names}
+        sources={drawn.sources}
         levels={[]}
         span={null}
         neighbors={async () =>
