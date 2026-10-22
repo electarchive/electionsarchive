@@ -81,6 +81,8 @@
     });
   });
   let isAllYears = $state(false);
+  let isAllElections = $state(false);
+  let isAllPlaces = $state(false);
 
   const sorts = $derived(
     polity.elections.map((election) => ({
@@ -521,7 +523,7 @@
       <p class="text-sm text-muted-foreground">{m.polity_none_in_filter()}</p>
     {:else}
       <ol class="grid">
-        {#each years as [year, entries] (year)}
+        {#each isAllElections ? years : years.slice(0, 12) as [year, entries] (year)}
           <li
             class="grid grid-cols-[4.5rem_minmax(0,1fr)] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
           >
@@ -572,6 +574,17 @@
           </li>
         {/each}
       </ol>
+      {#if years.length > 12}
+        <button
+          type="button"
+          class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+          aria-expanded={isAllElections}
+          onclick={() => (isAllElections = !isAllElections)}
+          >{isAllElections
+            ? m.polity_results_fewer()
+            : m.polity_results_more({ count: String(years.length) })}</button
+        >
+      {/if}
     {/if}
   </section>
 {/if}
@@ -625,7 +638,7 @@
       </p>
     {:else}
       <ul class="grid text-sm">
-        {#each children as child, index (index)}
+        {#each isAllPlaces || query.trim() !== "" ? children : children.slice(0, 20) as child, index (index)}
           <li
             class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 py-1 last:border-be-0"
           >
@@ -652,6 +665,14 @@
           </li>
         {/each}
       </ul>
+      {#if !isAllPlaces && query.trim() === "" && children.length > 20}
+        <button
+          type="button"
+          class="justify-self-start rounded-sm border border-input bg-card px-2.5 text-[0.8125rem] font-semibold keycap block-7 hover:bg-secondary"
+          onclick={() => (isAllPlaces = true)}
+          >{m.places_show_all({ count: count(children.length) })}</button
+        >
+      {/if}
     {/if}
   </section>
 {/if}

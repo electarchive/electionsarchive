@@ -933,7 +933,7 @@
       publishers={[]}
       votes={race.votes}
       {isMapped}
-      limit={15}
+      limit={10}
     />
   {/if}
   {#if index === 0 && others.length > 0}
