@@ -1,0 +1,69 @@
+{
+ "kind": "statewide",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1893), Summary of votes for state officers, November 1892",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialdirector00mich/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/officialdirector00mich"
+ },
+ "raw_source": "us.scans",
+ "pages": [
+  {
+   "page": 449,
+   "tables": [
+    {
+     "id": "1892",
+     "year": 1892,
+     "day": "1892-11-08",
+     "state": "MI",
+     "offices": [
+      "lieutenant-governor",
+      "secretary-of-state",
+      "treasurer",
+      "auditor-general",
+      "attorney-general",
+      "superintendent-of-public-instruction",
+      "commissioner-of-the-state-land-office"
+     ],
+     "anchors": [
+      {
+       "contest": "1892-11-08:MI:governor",
+       "candidate": "Allen B. Morse",
+       "official": 205138
+      },
+      {
+       "contest": "1892-11-08:MI:governor",
+       "candidate": "John T. Rich",
+       "official": 221228
+      }
+     ],
+     "printed_total": true
+    }
+   ]
+  },
+  {
+   "page": 450,
+   "tables": [
+    {
+     "id": "1892-b",
+     "year": 1892,
+     "day": "1892-11-08",
+     "state": "MI",
+     "offices": [
+      "lieutenant-governor",
+      "secretary-of-state",
+      "treasurer",
+      "auditor-general",
+      "attorney-general",
+      "superintendent-of-public-instruction",
+      "commissioner-of-the-state-land-office"
+     ],
+     "anchors": [],
+     "printed_total": true
+    }
+   ]
+  }
+ ]
+}

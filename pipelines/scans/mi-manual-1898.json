@@ -1,0 +1,60 @@
+{
+ "kind": "statewide",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Legislative Manual and Official Directory 1899), Summary of votes for state officers, November 1898",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/michiganlegislat00unse/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/michiganlegislat00unse"
+ },
+ "raw_source": "us.scans",
+ "pages": [
+  {
+   "page": 505,
+   "tables": [
+    {
+     "id": "1898",
+     "year": 1898,
+     "day": "1898-11-08",
+     "state": "MI",
+     "offices": [
+      "governor",
+      "lieutenant-governor",
+      "secretary-of-state",
+      "treasurer",
+      "auditor-general",
+      "attorney-general",
+      "superintendent-of-public-instruction",
+      "commissioner-of-the-state-land-office"
+     ],
+     "anchors": [],
+     "printed_total": true
+    }
+   ]
+  },
+  {
+   "page": 506,
+   "tables": [
+    {
+     "id": "1898-b",
+     "year": 1898,
+     "day": "1898-11-08",
+     "state": "MI",
+     "offices": [
+      "governor",
+      "lieutenant-governor",
+      "secretary-of-state",
+      "treasurer",
+      "auditor-general",
+      "attorney-general",
+      "superintendent-of-public-instruction",
+      "commissioner-of-the-state-land-office"
+     ],
+     "anchors": [],
+     "printed_total": true
+    }
+   ]
+  }
+ ]
+}

@@ -1,0 +1,69 @@
+{
+ "kind": "statewide",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1903), Summary of votes for state officers, November 1902",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/michiganofficial00mich_1/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/michiganofficial00mich_1"
+ },
+ "raw_source": "us.scans",
+ "pages": [
+  {
+   "page": 793,
+   "tables": [
+    {
+     "id": "1902",
+     "year": 1902,
+     "day": "1902-11-04",
+     "state": "MI",
+     "offices": [
+      "lieutenant-governor",
+      "secretary-of-state",
+      "treasurer",
+      "auditor-general",
+      "attorney-general",
+      "superintendent-of-public-instruction",
+      "commissioner-of-the-state-land-office"
+     ],
+     "anchors": [
+      {
+       "contest": "1902-11-04:MI:governor",
+       "candidate": "Lorenzo T. Durand",
+       "official": 174077
+      },
+      {
+       "contest": "1902-11-04:MI:governor",
+       "candidate": "Aaron T. Bliss",
+       "official": 211261
+      }
+     ],
+     "printed_total": true
+    }
+   ]
+  },
+  {
+   "page": 794,
+   "tables": [
+    {
+     "id": "1902-b",
+     "year": 1902,
+     "day": "1902-11-04",
+     "state": "MI",
+     "offices": [
+      "lieutenant-governor",
+      "secretary-of-state",
+      "treasurer",
+      "auditor-general",
+      "attorney-general",
+      "superintendent-of-public-instruction",
+      "commissioner-of-the-state-land-office"
+     ],
+     "anchors": [],
+     "printed_total": true
+    }
+   ]
+  }
+ ]
+}

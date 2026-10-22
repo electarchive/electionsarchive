@@ -1,0 +1,47 @@
+{
+ "kind": "statewide",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1917), Summary of votes for state officers, November 1916",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/michiganofficial00mich/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/michiganofficial00mich"
+ },
+ "raw_source": "us.scans",
+ "pages": [
+  {
+   "page": 573,
+   "tables": [
+    {
+     "id": "1916",
+     "year": 1916,
+     "day": "1916-11-07",
+     "state": "MI",
+     "offices": [
+      "lieutenant-governor",
+      "secretary-of-state",
+      "treasurer",
+      "auditor-general",
+      "attorney-general",
+      "superintendent-of-public-instruction",
+      "commissioner-of-the-state-land-office"
+     ],
+     "anchors": [
+      {
+       "contest": "1916-11-07:MI:governor",
+       "candidate": "Edwin F. Sweet",
+       "official": 264440
+      },
+      {
+       "contest": "1916-11-07:MI:governor",
+       "candidate": "Albert E. Sleeper",
+       "official": 363724
+      }
+     ],
+     "printed_total": true
+    }
+   ]
+  }
+ ]
+}
