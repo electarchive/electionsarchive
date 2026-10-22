@@ -1,3 +1,4 @@
+import difflib
 import re
 import subprocess
 import unicodedata
@@ -23,15 +24,69 @@ FIXES = str.maketrans({"&": "6", "l": "1", "I": "1", "O": "0", "o": "0", "S": "5
 HEADING = re.compile(r"STATE\s+(HOUSE OF REPRESENTATIVES|SENATE)\s+DISTRICT\s+(\d+)")
 NUMBER = re.compile(r"[0-9&lIOoSBZ|][0-9&lIOoSBZ|.,]*")
 COUNTIES = [
-    "Abbeville", "Aiken", "Allendale", "Anderson", "Bamberg", "Barnwell", "Beaufort", "Berkeley", "Calhoun",
-    "Charleston", "Cherokee", "Chester", "Chesterfield", "Clarendon", "Colleton", "Darlington", "Dillon",
-    "Dorchester", "Edgefield", "Fairfield", "Florence", "Georgetown", "Greenville", "Greenwood", "Hampton", "Horry",
-    "Jasper", "Kershaw", "Lancaster", "Laurens", "Lee", "Lexington", "McCormick", "Marion", "Marlboro", "Newberry",
-    "Oconee", "Orangeburg", "Pickens", "Richland", "Saluda", "Spartanburg", "Sumter", "Union", "Williamsburg", "York",
+    "Abbeville",
+    "Aiken",
+    "Allendale",
+    "Anderson",
+    "Bamberg",
+    "Barnwell",
+    "Beaufort",
+    "Berkeley",
+    "Calhoun",
+    "Charleston",
+    "Cherokee",
+    "Chester",
+    "Chesterfield",
+    "Clarendon",
+    "Colleton",
+    "Darlington",
+    "Dillon",
+    "Dorchester",
+    "Edgefield",
+    "Fairfield",
+    "Florence",
+    "Georgetown",
+    "Greenville",
+    "Greenwood",
+    "Hampton",
+    "Horry",
+    "Jasper",
+    "Kershaw",
+    "Lancaster",
+    "Laurens",
+    "Lee",
+    "Lexington",
+    "McCormick",
+    "Marion",
+    "Marlboro",
+    "Newberry",
+    "Oconee",
+    "Orangeburg",
+    "Pickens",
+    "Richland",
+    "Saluda",
+    "Spartanburg",
+    "Sumter",
+    "Union",
+    "Williamsburg",
+    "York",
 ]
-ROW = re.compile(
-    r"^\s*(" + "|".join(sorted((c.upper() for c in COUNTIES), key=len, reverse=True)) + r")\s+(\S.*)$|^\s*(STATE TOTAL)\s+(\S.*)$"
-)
+TOKEN = re.compile(r"\S+")
+
+
+def parse_line(line: str) -> tuple[str | None, list[int], list[int]] | None:
+    tokens = list(TOKEN.finditer(line.upper()))
+    first = next((i for i, t in enumerate(tokens) if NUMBER.fullmatch(t[0])), None)
+    if first is None or any(not NUMBER.fullmatch(t[0]) for t in tokens[first:]):
+        return None
+    values = numbers(" ".join(t[0] for t in tokens[first:]))
+    if values is None:
+        return None
+    name = " ".join(t[0] for t in tokens[:first])
+    ends = [t.end() for t in tokens[first:]]
+    if re.search(r"T[OD0]TAL", name) and len(name) <= 16:
+        return ("TOTAL", ends, values)
+    return (re.sub(r"[^A-Z ]", "", name).strip() or None, ends, values)
 
 
 def fetch() -> None:
@@ -73,7 +128,13 @@ def parse() -> None:
             for line in text.splitlines():
                 found = HEADING.search(line)
                 if found:
-                    blocks.append(("house" if found[1].startswith("HOUSE") else "senate", int(found[2]), []))
+                    blocks.append(
+                        (
+                            "house" if found[1].startswith("HOUSE") else "senate",
+                            -1 if "RUNOFF" in line else int(found[2]),
+                            [],
+                        )
+                    )
                 elif blocks:
                     blocks[-1][2].append(line)
             seen: set[str] = set()
@@ -82,22 +143,59 @@ def parse() -> None:
                 key = f"{day}:SC:{chamber}"
                 if key not in contests or key in seen:
                     continue
-                counties: list[tuple[str, list[int]]] = []
-                total: list[int] | None = None
-                for line in lines:
-                    matched = ROW.match(line.upper())
-                    if not matched:
-                        continue
-                    values = numbers(matched[2] or matched[4])
-                    if values is None:
-                        continue
-                    if matched[3]:
-                        total = values
-                    else:
-                        counties.append((matched[1], values))
-                if total is None or not counties or any(len(v) != len(total) for _, v in counties):
+                lines_ = [parse_line(line) for line in lines]
+                lines_ = [item for item in lines_ if item is not None]
+                total_at = next((i for i, item in enumerate(lines_) if item[0] == "TOTAL"), None)
+                if total_at is None and len(lines_) >= 2 and lines_[-1][2] == lines_[-2][2] and lines_[-2][0] is None:
+                    total_at = len(lines_) - 1
+                if total_at is None:
                     skipped += 1
                     continue
+                total_ends = lines_[total_at][1]
+                total = lines_[total_at][2]
+                counties: list = []
+                bad = False
+                for name, ends, values in lines_[:total_at]:
+                    if name is not None:
+                        key_ = re.sub(r"[^a-z]", "", name.lower())
+                        close = [key_] if key_ in fips else difflib.get_close_matches(key_, list(fips), n=1, cutoff=0.7)
+                        if not close:
+                            continue
+                    counties.append((close[0] if name is not None else None, values, ends))
+                if any(c is not None for c, _, _ in counties):
+                    counties = [item for item in counties if item[0] is not None]
+                elif len(counties) != 1:
+                    bad = True
+                aligned: list[tuple[str | None, list[int]]] = []
+                for county, values, ends in counties:
+                    if len(values) != len(total):
+                        placed = [0] * len(total)
+                        for end, value in zip(ends, values, strict=True):
+                            nearest = min(range(len(total)), key=lambda i: abs(total_ends[i] - end))
+                            if abs(total_ends[nearest] - end) > 4 or placed[nearest] != 0:
+                                bad = True
+                            placed[nearest] = value
+                        values = placed
+                    aligned.append((county, values))
+                counties = aligned
+                if bad or not counties:
+                    skipped += 1
+                    continue
+                if counties[0][0] is None:
+                    fraction = conn.execute(
+                        """select u.code, st_area(st_intersection(st_makevalid(dg.geom), st_makevalid(cg.geom))::geography)
+                                  / st_area(dg.geom::geography)
+                           from contest ct
+                           join area_geometry dg on dg.area_id = ct.district_area_id and dg.valid @> %s::date
+                           join reporting_unit u on u.scheme_code = 'us.county' and u.code like '45%%'
+                           join area_geometry cg on cg.area_id = u.area_id and cg.valid @> %s::date
+                           where ct.id = %s and st_intersects(dg.geom, cg.geom) order by 2 desc limit 1""",
+                        [day, day, contests[key]],
+                    ).fetchone()
+                    if fraction is None or fraction[1] < 0.9:
+                        skipped += 1
+                        continue
+                    counties = [(next(k for k, v in fips.items() if v == fraction[0]), counties[0][1])]
                 if [sum(v[i] for _, v in counties) for i in range(len(total))] != total:
                     skipped += 1
                     continue
@@ -128,7 +226,7 @@ def parse() -> None:
                     continue
                 seen.add(key)
                 for county, values in counties:
-                    code = fips[re.sub(r"[^a-z]", "", county.lower())]
+                    code = fips[county]
                     for (candidate, writein), votes in zip(names, values, strict=True):
                         rows.append((year, chamber, day, code, candidate, votes, writein))
         print(len({(r[0], r[1]) for r in rows}), "contests read,", skipped, "skipped")
