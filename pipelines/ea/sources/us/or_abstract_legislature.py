@@ -21,14 +21,18 @@ ABSTRACTS = {
     2004: (6873503, date(2004, 11, 2), SOURCE),
     2006: (6873552, date(2006, 11, 7), SOURCE),
     2008: (6873598, date(2008, 11, 4), SOURCE),
+    2014: (6873735, date(2014, 11, 4), SOURCE),
 }
 PUBLISHER = "Oregon Secretary of State"
 TITLE = "General Election Abstract of Votes"
 TITLE_LINE = re.compile(r"^\s*(STATE REPRESENTATIVE|STATE SENATOR),\s+(\d+)(?:ST|ND|RD|TH)\s+DISTRICT\s*$")
 STOP = re.compile(r"^\s*(\*+\s*Elected|WI = Write|\w+ \d+, \d{4}, General Election|\d+\s*$)")
-PARTY_2000 = re.compile(r"\([A-Z]{2,5}\)$")
-CELL = re.compile(r"\S+(?: \S+)*")
+OFFICE_2014 = re.compile(r"^[A-Z][A-Za-z .&'-]{3,40}$")
+DISTRICT_2014 = re.compile(r"^(\d+)(?:st|nd|rd|th) District\b")
+PARTY_2000 = re.compile(r"\([A-Z]{1,5}\)$")
+CELL = re.compile(r"\S+(?: \S+)*? \([A-Z]{1,5}\)(?=\s|$)|\S+(?: (?!\*)\S+)*")
 NAME_2000 = re.compile(r"^\*?\s*([^,]+),\s*(.*?)\s*\(([A-Za-z]+)\)$")
+NAME_2014 = NAME_2000
 ROW = re.compile(r"^\s*([A-Za-z][A-Za-z .'-]*?)\s+((?:\d[\d,]*\s+)*\d[\d,]*)\s*$")
 
 
@@ -77,8 +81,21 @@ def parse() -> None:
             text=True,
         ).stdout
         blocks: list[tuple[str, int, list[str]]] = []
+        office = ""
         for line in text.splitlines():
-            if found := TITLE_LINE.match(line):
+            if year == 2014:
+                if line.startswith("Oregon Secretary of State"):
+                    continue
+                if OFFICE_2014.match(line):
+                    office = {"State Senator": "senate", "State Representative": "house"}.get(line.strip(), "")
+                    blocks.append(("", 0, []))
+                elif office and (found := DISTRICT_2014.match(line)):
+                    blocks.append((office, int(found[1]), []))
+                elif blocks and not STOP.match(line):
+                    blocks[-1][2].append(line)
+                elif blocks:
+                    blocks.append(("", 0, []))
+            elif found := TITLE_LINE.match(line):
                 blocks.append(("house" if found[1].endswith("REPRESENTATIVE") else "senate", int(found[2]), []))
             elif blocks and not STOP.match(line):
                 blocks[-1][2].append(line)
@@ -102,12 +119,15 @@ def parse() -> None:
             if not body or body[0] is not None:
                 print(f"{year} {chamber} {district}: no County line, skipped")
                 continue
-            if year == 2000:
+            if year in (2000, 2014):
                 tokens = [
                     [(found.start(), found.end(), found[0]) for found in CELL.finditer(line)]
                     for line in takewhile(lambda line: not ROW.match(line), lines)
                 ]
                 anchors = sorted(token for row in tokens for token in row if PARTY_2000.search(token[2]))
+                if not anchors:
+                    print(f"{year} {chamber} {district}: no party-tagged names, skipped")
+                    continue
                 cells: list[list[str]] = [[] for _ in anchors]
                 for row in tokens:
                     for start, end, text in row:
@@ -115,7 +135,15 @@ def parse() -> None:
                             cells[
                                 min(range(len(anchors)), key=lambda i: abs(anchors[i][0] + anchors[i][1] - start - end))
                             ].append(text)
-                parsed = [NAME_2000.match(" ".join(cell)) for cell in cells]
+                if year == 2000:
+                    parsed = [NAME_2000.match(" ".join(cell)) for cell in cells]
+                else:
+                    parsed = [
+                        NAME_2014.match(f"{' '.join(cell[:-1]).lstrip('*').strip()}, {cell[-1]}")
+                        if len(cell) > 1
+                        else None
+                        for cell in cells
+                    ]
                 if not anchors or None in parsed:
                     print(f"{year} {chamber} {district}: header {cells} unreadable, skipped")
                     continue
