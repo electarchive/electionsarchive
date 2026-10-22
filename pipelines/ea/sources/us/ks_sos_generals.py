@@ -61,6 +61,16 @@ FILES = {
 }
 
 
+SWAPPED = {
+    "2008-11-04:KS:house:104:g": {
+        'O\'NEAL, MICHAEL R. "MIKE"': "Michael R. Oneal",
+        'FERGUSON, BENNIE LEE "BEN"': "Bennie Lee Ferguson",
+    },
+}
+CAVEAT = (
+    "Klarner's returns give each candidate the other's party and votes. The Secretary of State's precinct file "
+    "and its official results agree with each other, so this set replaces Klarner's as the default."
+)
 COLUMNS = ["COUNTY", "PRECINCT", "RACE", "DISTRICT", "CANDIDATE", "FIRST", "MIDDLE", "LAST", "SUFFIX", "PARTY", "VOTES"]
 
 
@@ -250,6 +260,92 @@ def emit() -> Path:
         )
         frame = keyed.filter(~pl.col("key").is_in(list(filled))).drop("key")
         medsl.attach(cs, conn, frame.drop("fips"), {"KS": source}, grain="precinct", strict=True)
+        for key, labels in SWAPPED.items():
+            previous, election, contest, stage, kind, origin, completeness, first = conn.execute(
+                """select r.id, r.election_id, r.contest_id, r.stage, r.kind, r.source_id, r.completeness,
+                          (select min(v.count_round) from result_value v where v.result_set_k = r.k)
+                   from external_id x join result_set r on r.contest_id = x.entity_id
+                   join changeset g on g.id = r.changeset_id and g.pipeline = 'us.klarner'
+                   where x.scheme = 'us.contest' and x.value = %s""",
+                [key],
+            ).fetchone()
+            options = {
+                row[0]: row
+                for row in conn.execute(
+                    """select ballot_label, id, contest_id, kind, parent_option_id, party_id, alliance_id, ballot_position
+                       from contest_option where contest_id = %s""",
+                    [contest],
+                ).fetchall()
+            }
+            (a, b) = labels.values()
+            for label, party in ((a, options[b][5]), (b, options[a][5])):
+                _, id, contest_id, option_kind, parent, _, alliance, position = options[label]
+                cs.add(
+                    "contest_option",
+                    id=id,
+                    contest_id=contest_id,
+                    kind=option_kind,
+                    parent_option_id=parent,
+                    party_id=party,
+                    alliance_id=alliance,
+                    ballot_position=position,
+                    ballot_label=label,
+                )
+            lines = frame.filter(
+                pl.concat_str(pl.col("day").cast(pl.String), pl.lit("KS"), "chamber", separator=":") == key
+            ).filter(pl.col("candidate").is_in(list(labels)))
+            result_set = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
+            cs.add(
+                "result_set",
+                id=previous,
+                election_id=election,
+                contest_id=contest,
+                stage=stage,
+                kind=kind,
+                source_id=origin,
+                status="superseded",
+                is_default=False,
+                completeness=completeness,
+            )
+            cs.add(
+                "result_set",
+                id=result_set,
+                election_id=election,
+                contest_id=contest,
+                stage="certified",
+                kind="counted",
+                status="active",
+                source_id=source,
+                is_default=True,
+                supersedes_id=previous,
+                completeness=1,
+            )
+            cs.add("note", entity_id=result_set, kind="caveat", body_md=CAVEAT)
+            totals = lines.group_by("candidate").agg(pl.col("votes").sum()).sort("votes", descending=True)
+            cs.add(
+                "outcome",
+                result_set_id=result_set,
+                option_id=options[labels[totals["candidate"][0]]][1],
+                kind="elected",
+                seats=1,
+            )
+            cs.frame(
+                "result_value",
+                lines.select(
+                    result_set_id=pl.lit(str(result_set)),
+                    unit_id=pl.col("code").map_elements(
+                        lambda code: str(cs.unit("us.precinct", code)), return_dtype=pl.String
+                    ),
+                    option_id=pl.col("candidate").replace_strict(
+                        {name: str(options[label][1]) for name, label in labels.items()}
+                    ),
+                    channel=pl.lit(0, pl.Int16),
+                    measure=pl.lit(1, pl.Int16),
+                    count_round=pl.lit(first, pl.Int16),
+                    flags=pl.lit(0, pl.Int16),
+                    value="votes",
+                ),
+            )
         used = set(pl.concat(cs.frames["result_value"])["unit_id"].unique()) if cs.frames.get("result_value") else set()
         parents = {
             code: (unit, area)
