@@ -26,6 +26,7 @@ FOLDERS = [
     "2020/presidential_preference_primary",
     "2020/statewide_primary",
     "2022/statewide_primary",
+    "2024/presidential_preference_primary",
 ]
 COUNTIES = {
     "44001": "barrington bristol warren",
@@ -99,7 +100,9 @@ def parse() -> None:
                     continue
                 if name.endswith("PRESIDENTIAL CANDIDATE"):
                     chamber, district = "president", None
-                    designation = {"DEMOCRATIC": "DEM", "REPUBLICAN": "REP"}.get(name.split()[0])
+                    designation = {"DEMOCRATIC": "DEM", "REPUBLICAN": "REP", "DEM": "DEM", "REP": "REP"}.get(
+                        name.split()[0]
+                    )
                 elif "SENATOR IN CONGRESS" in name or name.endswith("U.S. SENATOR"):
                     chamber, district, designation = "senate", None, None
                 elif "REPRESENTATIVE IN CONGRESS DISTRICT" in name:
@@ -108,7 +111,9 @@ def parse() -> None:
                     continue
                 for candidate in contest["candidates"]:
                     party = PARTIES.get(
-                        designation or candidate.get("party_code") or contest.get("contest_party_designation")
+                        (
+                            designation or candidate.get("party_code") or contest.get("contest_party_designation") or ""
+                        ).upper()
                     )
                     if party is None:
                         continue
@@ -178,7 +183,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Rhode Island's 2008 to 2022 president, U.S. Senate, and House primaries by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
+            summary="Rhode Island's 2008 to 2024 president, U.S. Senate, and House primaries by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
             polity="US-RI",
         )
         source = cs.source(PUBLISHER, TITLE)
