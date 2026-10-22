@@ -156,6 +156,8 @@ IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
+ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
+EXPANDED = {"mt": "mount", "w": "west", "e": "east", "n": "north", "s": "south", "no": "north", "so": "south"}
 WARD = re.compile(r"[\s,.:\-]*\b(wards?|precincts?)\b.*$", re.IGNORECASE)
 SCHEMA: dict[str, object] = {
     "type": "object",
@@ -512,7 +514,11 @@ def cells(
                         continue
                     if value is None:
                         continue
-                    stem = slug(WARD.sub("", label) if towns else label).replace(" ", "")
+                    stem = slug(
+                        ABBREVIATION.sub(lambda hit: f"{EXPANDED[hit[1].lower()]} ", WARD.sub("", label))
+                        if towns
+                        else label
+                    ).replace(" ", "")
                     code = extra.get(stem) or names.get(stem)
                     if code is None:
                         close = difflib.get_close_matches(stem, list(names), n=2, cutoff=0.84)
@@ -1100,7 +1106,6 @@ def status_line(books: dict[str, dict[str, float]]) -> str:
 
 
 def totals(manifest: Manifest, frame: pl.DataFrame) -> Path:
-    folder = Path(__file__).resolve().parent / "sources" / "us" / "totals"
     parties = {
         f"{column['contest']}|{column['candidate']}": column.get("party", "")
         for spec in manifest["pages"]
@@ -1123,12 +1128,16 @@ def totals(manifest: Manifest, frame: pl.DataFrame) -> Path:
                 "page": lines["page"].min(),
             }
         )
-    table = pl.DataFrame(rows)
-    leader = table.group_by("office").agg(pl.col("votes").max().alias("top"))
+    return write_totals(manifest, pl.DataFrame(rows))
+
+
+def write_totals(manifest: Manifest, table: pl.DataFrame) -> Path:
+    folder = Path(__file__).resolve().parent / "sources" / "us" / "totals"
+    leader = table.group_by("state", "date", "office").agg(pl.col("votes").max().alias("top"))
     table = (
-        table.join(leader, on="office")
+        table.join(leader, on=["state", "date", "office"])
         .with_columns(winner=pl.when(pl.col("votes") == pl.col("top")).then(1).otherwise(None))
-        .drop("top")
+        .select("source", "state", "date", "office", "title", "name", "party", "votes", "winner", "page")
     )
     table.write_csv(folder / f"{manifest['name']}.tsv", separator="\t")
     book = folder / "sources.tsv"

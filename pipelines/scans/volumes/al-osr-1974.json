@@ -1,0 +1,38 @@
+{
+  "kind": "statewide",
+  "year": 1974,
+  "day": "1974-11-05",
+  "polity": "US-AL",
+  "publisher": "Alabama Department of Archives and History",
+  "title": "Alabama Official and Statistical Register, general election 1974-11-05",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/alabama-official-statistical-register-1975/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/alabama-official-statistical-register-1975"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "treasurer": "State Treasurer",
+    "auditor": "State Auditor",
+    "commissioner-of-agriculture-and-industries": "Commissioner of Agriculture and Industries",
+    "public-service-commissioner": "Public Service Commissioner (state office, if printed)"
+  },
+  "leaves": [
+    280,
+    281,
+    282,
+    283,
+    284,
+    285,
+    286,
+    287,
+    288,
+    289,
+    290
+  ]
+}

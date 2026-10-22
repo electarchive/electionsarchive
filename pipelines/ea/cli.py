@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from ea import cache, checks, coverage, coverage_tables, fixtures, layout, portals, raw, scans, search, tiles
+from ea import cache, checks, coverage, coverage_tables, fixtures, layout, portals, raw, scans, search, statewide, tiles
 from ea.apply import apply, publish, revert
 from ea.store import DATA, connect
 
@@ -41,7 +41,7 @@ def main() -> None:
     )
     scanning.add_argument(
         "action",
-        choices=("prepare", "run", "status", "emit", "layout", "ledger"),
+        choices=("prepare", "run", "status", "emit", "layout", "ledger", "statewide"),
         help="render crops and fill held totals, advance the Message Batches steps once, list manifests, "
         "or emit the tables that passed",
     )
@@ -76,6 +76,10 @@ def main() -> None:
                 if args.action == "ledger"
                 else layout.step(args.name, args.mode)
                 if args.action == "layout"
+                else statewide.step(args.name, args.mode)
+                if args.action == "statewide"
+                else statewide.emit(args.name)
+                if args.action == "emit" and not (scans.MANIFESTS / f"{args.name}.json").exists()
                 else scans.run(args.name, args.mode)
                 if args.action == "run"
                 else getattr(scans, args.action)(args.name)

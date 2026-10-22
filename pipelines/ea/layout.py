@@ -276,6 +276,10 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 if not table["columns"] and table["office"] in cache:
                     table["columns"] = cache[table["office"]]
                 cache[table["office"]] = table["columns"]
+                if left := [
+                    c["label"] for c in table["columns"] if c["role"] == "candidate" and c["office"] == "other"
+                ]:
+                    notes.append(f"{leaf}: {table['title']!r} columns for other offices: {'; '.join(left)}")
                 built: list[scans.Column] = []
                 for office in dict.fromkeys(
                     column["office"]

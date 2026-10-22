@@ -1,0 +1,39 @@
+{
+  "kind": "statewide",
+  "year": 1970,
+  "day": "1970-11-03",
+  "polity": "US-AL",
+  "publisher": "Alabama Department of Archives and History",
+  "title": "Alabama Official and Statistical Register, general election 1970-11-03",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/alabama-official-statistical-register-1971/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/alabama-official-statistical-register-1971"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "attorney-general": "Attorney General",
+    "treasurer": "State Treasurer",
+    "auditor": "State Auditor",
+    "commissioner-of-agriculture-and-industries": "Commissioner of Agriculture and Industries",
+    "public-service-commissioner": "Public Service Commissioner (state office, if printed)"
+  },
+  "leaves": [
+    441,
+    442,
+    443,
+    444,
+    445,
+    446,
+    447,
+    448,
+    449,
+    450,
+    451,
+    452
+  ]
+}

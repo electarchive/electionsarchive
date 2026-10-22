@@ -1,0 +1,33 @@
+{
+  "year": 1970,
+  "day": "1970-11-03",
+  "polity": "US-ND",
+  "publisher": "North Dakota Secretary of State",
+  "title": "Official abstract of votes cast at the general election held 1970-11-03, General Election 11-03-1970",
+  "license": "Public record",
+  "file": {
+    "url": "https://vip.sos.nd.gov/pdfs/Abstracts%20by%20Year/1970%20through%201978%20Statewide%20Election%20Results/1970/General%20Election%2011-03-1970.pdf"
+  },
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "president": "presidential electors",
+    "governor": "Governor",
+    "lieutenant-governor": "Lieutenant Governor",
+    "secretary-of-state": "Secretary of State",
+    "auditor": "State Auditor",
+    "treasurer": "State Treasurer",
+    "attorney-general": "Attorney General",
+    "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+    "commissioner-of-agriculture": "Commissioner of Agriculture and Labor",
+    "railroad-commissioner": "Railroad Commissioner",
+    "public-service-commissioner": "Public Service Commissioner",
+    "tax-commissioner": "Tax Commissioner",
+    "insurance-commissioner": "Insurance Commissioner or Commissioner of Insurance",
+    "house": "U.S. Representative (one table, district 0 if at large)",
+    "senate": "U.S. Senator"
+  },
+  "leaves": [
+    1
+  ]
+}

@@ -49,7 +49,8 @@ def sources() -> pl.DataFrame:
 
 def fetch() -> None:
     for url, suffix in sources().select("url", "suffix").iter_rows():
-        raw.fetch(SOURCE, url, suffix=suffix)
+        if "{page}" not in url:
+            raw.fetch(SOURCE, url, suffix=suffix)
 
 
 def parse() -> None:
@@ -283,7 +284,8 @@ def emit(
                         url=row["landing"],
                         license=row["license"],
                     )
-                artifacts[str(source_id)] = cs.artifact(raw.cached(pipeline, row["url"]), made)
+                if "{page}" not in row["url"]:
+                    artifacts[str(source_id)] = cs.artifact(raw.cached(pipeline, row["url"]), made)
             office_key = f"{office}:{state}"
             office_id = cs.key("us.office", office_key)
             if office_key not in offices_known:
@@ -402,23 +404,33 @@ def emit(
                     row = book[str(source_id)]
                     number = int(page) + int(row["page_offset"])
                     if (str(source_id), number) not in page_ids:
-                        pdf = raw.cached(pipeline, row["url"]).path
-                        target = DATA / "pages" / pipeline / f"{pdf.stem}-{number}.png"
+                        each = "{page}" in row["url"]
+                        stored = (
+                            raw.cached("us.scans", row["url"].format(page=number))
+                            if each
+                            else raw.cached(pipeline, row["url"])
+                        )
+                        target = DATA / "pages" / pipeline / f"{stored.path.stem}-{number}.png"
                         if not target.exists():
                             target.parent.mkdir(parents=True, exist_ok=True)
-                            subprocess.run(
-                                ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(number), "-l", str(number)]
-                                + ["-singlefile", str(pdf), str(target.with_suffix(""))],
-                                check=True,
-                            )
+                            if each:
+                                with Image.open(stored.path) as image:
+                                    image.convert("L").save(target)
+                            else:
+                                subprocess.run(
+                                    ["pdftoppm", "-r", str(DPI), "-gray", "-png", "-f", str(number), "-l", str(number)]
+                                    + ["-singlefile", str(stored.path), str(target.with_suffix(""))],
+                                    check=True,
+                                )
                         with Image.open(target) as rendered:
                             width, height = rendered.size
-                        page_ids[(str(source_id), number)] = cs.page(artifacts[str(source_id)], number)
+                        file = cs.artifact(stored, sources_made[str(source_id)]) if each else artifacts[str(source_id)]
+                        page_ids[(str(source_id), number)] = cs.page(file, 1 if each else number)
                         cs.add(
                             "source_page",
                             id=page_ids[(str(source_id), number)],
-                            artifact_id=artifacts[str(source_id)],
-                            page_number=number,
+                            artifact_id=file,
+                            page_number=1 if each else number,
                             image_key=f"pages/{pipeline}/{target.name}",
                             width=width,
                             height=height,
