@@ -736,7 +736,7 @@
 {/if}
 
 {#each races as race, index (index)}
-  {#if index === 0 && others.length > 0}
+  {#if index === 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
     <section
       id="race-{race.anchor}"
       class="col-span-12 grid scroll-mbs-4 gap-x-10 gap-y-3 bg-card px-3.5 pbs-4 pbe-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
