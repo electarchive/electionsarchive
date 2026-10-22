@@ -19,6 +19,7 @@ PAGES = DATA / "pages" / clerk.SOURCE
 DERIVED = 1
 DIGITIZED = 8
 DELEGATES: dict[tuple[int, int], list[tuple[int, int, str, str]]] = {
+    (1940, 36): [(0, 1, "AK", "general"), (2, 2, "HI", "general")],
     (1972, 51): [(10, 14, "DC", "general"), (15, 17, "GU", "general"), (18, 19, "VI", "general")],
     (1974, 42): [(28, 28, "GU", "general")],
     (1974, 43): [(0, 0, "VI", "general")],
@@ -27,7 +28,8 @@ DELEGATES: dict[tuple[int, int], list[tuple[int, int, str, str]]] = {
     (1980, 70): [(10, 13, "AS", "general"), (14, 16, "AS", "runoff")],
     (1980, 71): [(0, 4, "DC", "general"), (5, 7, "GU", "general"), (8, 10, "VI", "general")],
 }
-DISTRICTS = {"PR": "7298", "DC": "1198", "GU": "6698", "VI": "7898", "AS": "6098"}
+DISTRICTS = {"PR": "7298", "DC": "1198", "GU": "6698", "VI": "7898", "AS": "6098", "AK": "02", "HI": "15"}
+TERRITORIAL = ("AK", "HI")
 RUNOFF_DAY = date(1980, 11, 18)
 NATIONAL = {
     "Democrat": ("democratic-party", "Democratic Party"),
@@ -63,6 +65,7 @@ LOCAL = {
     "Workers Party": "Workers",
     "U.S. Labor": "U.S. Labor",
     "Independent Citizens Movement": "Independent Citizens Movement",
+    "Commonwealth": "Commonwealth Party",
 }
 ALIASES = {"hunkin": "faleomavaega"}
 NOTES = {
@@ -93,6 +96,14 @@ def emit() -> Path:
     for row in lines.filter(pl.col("heading") == "For Resident Commissioner").sort("year", "page", "line").to_dicts():
         if row["kind"] in ("candidate", "scattering"):
             races.setdefault((row["year"], "PR", "general"), []).append(row)
+    for row in (
+        pl.read_parquet(raw.parsed(clerk.SOURCE) / "lines.parquet")
+        .filter(pl.col("state").is_in(TERRITORIAL) & (pl.col("heading") == "For Delegate") & (pl.col("year") < 1960))
+        .sort("year", "page", "line")
+        .to_dicts()
+    ):
+        if row["kind"] in ("candidate", "scattering"):
+            races.setdefault((row["year"], row["state"], "general"), []).append(row)
     for (year, page), spans in DELEGATES.items():
         for first, last, territory, stage in spans:
             for row in lines.filter(
@@ -106,10 +117,10 @@ def emit() -> Path:
                 raise ValueError(f"{row['year']} page {row['page']} line {row['line']}: {row['status']}")
     with connect() as conn:
         seats = {
-            value.removeprefix("house:"): entity
+            value.removeprefix("house:").removesuffix(":territory"): entity
             for value, entity in conn.execute(
                 "select value, entity_id from external_id where scheme = 'us.seat' and value = any(%s)",
-                [[f"house:{code}" for code in DISTRICTS]],
+                [[f"house:{code}{':territory' if code in TERRITORIAL else ''}" for code in DISTRICTS]],
             ).fetchall()
         }
         holders: dict[str, list[tuple[UUID, list[str]]]] = {code: [] for code in DISTRICTS}
@@ -118,17 +129,17 @@ def emit() -> Path:
                join external_id x on x.entity_id = t.seat_id and x.scheme = 'us.seat'
                join name n on n.entity_id = t.person_id and n.is_preferred
                where x.value = any(%s)""",
-            [[f"house:{code}" for code in DISTRICTS]],
+            [[f"house:{code}{':territory' if code in TERRITORIAL else ''}" for code in DISTRICTS]],
         ).fetchall():
-            holders[code.removeprefix("house:")].append((person, fold(text)))
+            holders[code.removeprefix("house:").removesuffix(":territory")].append((person, fold(text)))
         areas = {
             code: (unit, area, text)
             for code in DISTRICTS
             for unit, area, text in conn.execute(
                 """select u.id, u.area_id, n.text from reporting_unit u
                    join name n on n.entity_id = u.area_id and n.kind = 'official'
-                   where u.scheme_code = 'us.cd' and u.code = %s""",
-                [DISTRICTS[code]],
+                   where u.scheme_code = %s and u.code = %s""",
+                ["us.state" if code in TERRITORIAL else "us.cd", DISTRICTS[code]],
             ).fetchall()
         }
         places = dict(
@@ -143,8 +154,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Puerto Rico Resident Commissioner 1940–1980 and the District of Columbia, Guam, Virgin Islands, "
-            "and American Samoa delegates 1972–1980, digitized from the Clerk's statistics",
+            summary="Puerto Rico Resident Commissioner 1940–1980, the Alaska and Hawaii territorial delegates 1940–1958, and the "
+            "District of Columbia, Guam, Virgin Islands, and American Samoa delegates 1972–1980, digitized from the "
+            "Clerk's statistics",
             polity="US",
         )
 

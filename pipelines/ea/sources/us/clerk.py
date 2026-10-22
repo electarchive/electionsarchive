@@ -56,6 +56,15 @@ DISTRICTS = {
     (1940, 21, 22): 14,
     (1964, 4, 3): 3,
     (1964, 4, 4): 3,
+    (1936, 6, 2): 3,
+    (1936, 6, 3): 1,
+    (1936, 6, 4): 1,
+    (1954, 21, 6): 2,
+    (1954, 21, 7): 2,
+    (1954, 21, 8): 2,
+    (1954, 21, 12): 1,
+    (1954, 21, 13): 1,
+    (1954, 21, 14): 1,
 }
 DROPPED = {(1960, 47, "VA")}
 MEMBERS = {
@@ -142,7 +151,11 @@ MISNAMED = {
 }
 MISNAMED_NOTE = UUID("01a143c8-3322-7054-b36b-7dbd4af0c9ef")
 CLASSES = {(1950, "AR"): 3}
-RESEATED = {"1950-11-07:AR:senate": "1950-11-07:AR:senate:special"}
+RESEATED = {
+    "1950-11-07:AR:senate": "1950-11-07:AR:senate:special",
+    "1936-11-03:FL:senate:class-3:special": "1936-11-03:FL:senate:special",
+    "1954-11-02:NE:senate:class-2:special": "1954-11-02:NE:senate:special",
+}
 SWAPPED_NOTE = (
     "The Clerk's statistics print these two candidates' votes against each other's names. We swapped them back to "
     "match the state's summary table and the member who took the seat."
@@ -1117,6 +1130,8 @@ def emit() -> Path:
             elected = [row for row in rows if row["elected"]]
             regular = (3, 1, 2)[(year - 2004) % 6 // 2]
             number = next((row["seat_class"] for row in elected if row["seat_class"] is not None), None)
+            if chamber == "senate" and number is None and special and district is not None:
+                number = district
             if chamber == "senate" and number is None and (special or district is not None):
                 raise ValueError(f"{year} {state} senate: no class for the seat")
             number = CLASSES.get((year, state), regular if number is None else number)
