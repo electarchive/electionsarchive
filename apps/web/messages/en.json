@@ -507,6 +507,8 @@
   "search_open": "Search",
   "search_title": "Search the archive",
   "search_placeholder": "Search places, elections, parties, people, or commands",
+  "search_page_placeholder": "Search places, elections, parties, or people",
+  "search_all": "See all results for “{query}”",
   "search_hint": "Try a place and a year, like Georgia 2022 Senate, or a candidate's name.",
   "search_empty": "No results for “{query}”",
   "search_loading": "Searching…",

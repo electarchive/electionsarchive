@@ -317,6 +317,22 @@
         {/each}
       </Command.Group>
     {/each}
+    {#if groups.length > 0}
+      <Command.Group>
+        <Command.Item
+          value="search:all"
+          onSelect={() => {
+            close();
+            void goto(
+              resolve(`/search?${new URLSearchParams({ q: term }).toString()}`),
+            );
+          }}
+        >
+          <SearchIcon class="text-muted-foreground" />
+          {m.search_all({ query: term })}
+        </Command.Item>
+      </Command.Group>
+    {/if}
     {#each commands as section (section.group)}
       <Command.Group heading={section.group}>
         {#each section.items as item (item.key)}
