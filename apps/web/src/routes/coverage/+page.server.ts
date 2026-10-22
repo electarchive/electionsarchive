@@ -11,7 +11,7 @@ const dev = import.meta.env.DEV;
 
 export const load: PageServerLoad = async () => {
   const building = await db.execute<{ building: boolean }>(sql`
-    select built_at is null or requested_at > built_at or started_at > built_at as building from coverage_build
+    select built_at is null or started_at > built_at as building from coverage_build
   `);
   return {
     ...(await call(router.coverage.rows, {})),
