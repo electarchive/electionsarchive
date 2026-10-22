@@ -68,6 +68,7 @@ class Changeset:
         self.rows: dict[str, list[dict[str, object]]] = {}
         self.frames: dict[str, list[pl.DataFrame]] = {}
         self.minted: set[UUID] = set()
+        self.artifacts: set[UUID] = set()
         self._known: dict[str, dict[str, UUID]] = {}
         self._keyed: set[tuple[str, str]] = set()
         self.renamed: dict[str, str] = {}
@@ -154,6 +155,9 @@ class Changeset:
             f"{source_id}\x1f{artifact.storage_key}",
             "select source_id || chr(31) || storage_key, id from source_artifact",
         )
+        if id in self.artifacts:
+            return id
+        self.artifacts.add(id)
         self.add(
             "source_artifact",
             id=id,

@@ -201,12 +201,16 @@ ELSTATS = {
 }
 ELSTATS = {state: offices for state, offices in ELSTATS.items() if state not in elstats.HELD}
 ELSTATS_YEARS = range(2000, 2023)
+MA_YEARS = range(1994, 2023)
 ELSTATS_DATES = {
     ("ID", date(2000, 5, 24)): date(2000, 5, 23),
     ("NH", date(2022, 9, 11)): date(2022, 9, 13),
     ("NY", date(2014, 9, 14)): date(2014, 9, 9),
 }
 MA_DAYS = {
+    1994: date(1994, 9, 20),
+    1996: date(1996, 9, 17),
+    1998: date(1998, 9, 15),
     2000: date(2000, 9, 19),
     2002: date(2002, 9, 17),
     2004: date(2004, 9, 14),
@@ -1102,7 +1106,7 @@ def fetch() -> None:
             raw.fetch(SOURCE, CA_SOV.format(path=path.format(name)), suffix=Path(path).suffix)
     for state, offices in ELSTATS.items():
         for office in offices | (MA_FEDERAL if state == "MA" else {}):
-            for year in ELSTATS_YEARS:
+            for year in MA_YEARS if state == "MA" else ELSTATS_YEARS:
                 if state != "MA":
                     raw.fetch(SOURCE, search(state, office, year), suffix=".csv")
                     continue
@@ -1181,7 +1185,7 @@ def parse() -> None:
     for state, offices in ELSTATS.items():
         fips = STATES[state][0]
         for office, body in (offices | (MA_FEDERAL if state == "MA" else {})).items():
-            for year in ELSTATS_YEARS:
+            for year in MA_YEARS if state == "MA" else ELSTATS_YEARS:
                 if state == "MA":
                     days = MA_PRESIDENT if office == 1 else MA_DAYS
                     if year not in days:
@@ -1192,10 +1196,14 @@ def parse() -> None:
                     for election, _, district, stage in elstats.MA_ROW.findall(listing):
                         if election in empty or "Special" in stage:
                             continue
-                        table = pl.read_csv(
-                            raw.cached(SOURCE, MA_DOWNLOAD.format(election)).path,
-                            infer_schema=False,
-                            skip_rows_after_header=1,
+                        table = (
+                            pl.read_csv(
+                                raw.cached(SOURCE, MA_DOWNLOAD.format(election)).path,
+                                infer_schema=False,
+                                skip_rows_after_header=1,
+                            )
+                            .rename({"County/City": "City/Town"}, strict=False)
+                            .drop("Total Votes Cast", strict=False)
                         )
                         long = (
                             table.filter(pl.col("City/Town").is_not_null())
@@ -3327,7 +3335,7 @@ def emit() -> Path:
         held = set()
         for state, offices in ELSTATS.items():
             for office in offices | (MA_FEDERAL if state == "MA" else {}):
-                for year in ELSTATS_YEARS:
+                for year in MA_YEARS if state == "MA" else ELSTATS_YEARS:
                     if state == "MA" and year not in (MA_PRESIDENT if office == 1 else MA_DAYS):
                         continue
                     artifact = raw.cached(SOURCE, search(state, office, year))
