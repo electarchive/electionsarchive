@@ -5,6 +5,7 @@ from datetime import date
 from pathlib import Path
 from uuid import UUID
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -16,10 +17,63 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 HOST = "https://web.archive.org/web/2024if_/https://www.sos.wa.gov/elections/"
 ELECTIONS = {
-    3: date(1992, 11, 3),
-    17: date(1996, 11, 5),
-    20: date(2000, 11, 7),
-    67: date(2004, 11, 2),
+    137: 1898,
+    132: 1900,
+    131: 1904,
+    130: 1906,
+    129: 1908,
+    127: 1910,
+    125: 1912,
+    123: 1914,
+    120: 1916,
+    118: 1918,
+    116: 1920,
+    114: 1922,
+    112: 1924,
+    108: 1926,
+    106: 1928,
+    103: 1930,
+    102: 1932,
+    100: 1934,
+    69: 1936,
+    97: 1938,
+    92: 1940,
+    68: 1942,
+    94: 1944,
+    64: 1946,
+    95: 1948,
+    63: 1950,
+    62: 1952,
+    60: 1954,
+    58: 1956,
+    56: 1958,
+    51: 1960,
+    49: 1962,
+    47: 1964,
+    45: 1966,
+    43: 1968,
+    42: 1970,
+    41: 1972,
+    39: 1974,
+    38: 1976,
+    35: 1978,
+    33: 1980,
+    31: 1982,
+    29: 1984,
+    27: 1986,
+    25: 1988,
+    24: 1990,
+    3: 1992,
+    15: 1994,
+    17: 1996,
+    10: 1998,
+    20: 2000,
+    4: 2002,
+    67: 2004,
+}
+DAYS = {
+    election: next(day for day in (date(year, 11, n) for n in range(2, 9)) if day.weekday() == 1)
+    for election, year in ELECTIONS.items()
 }
 PUBLISHER = "Washington Secretary of State"
 OFFICES = {
@@ -65,12 +119,23 @@ def pages(election: int) -> tuple[str, list[tuple[str, str]]]:
 
 
 def fetch() -> None:
+    failed = 0
     for election in ELECTIONS:
-        raw.fetch(SOURCE, f"{HOST}results_report.aspx?e={election}", suffix=".html")
-        time.sleep(1)
-        for _, url in pages(election)[1]:
-            raw.fetch(SOURCE, url, suffix=".html")
-            time.sleep(1)
+        try:
+            raw.fetch(SOURCE, f"{HOST}results_report.aspx?e={election}", suffix=".html")
+            links = pages(election)[1]
+        except (httpx.HTTPError, FileNotFoundError):
+            failed += 1
+            continue
+        time.sleep(2)
+        for _, url in links:
+            try:
+                raw.fetch(SOURCE, url, suffix=".html")
+            except httpx.HTTPError:
+                failed += 1
+            time.sleep(2)
+    if failed:
+        raise RuntimeError(f"{failed} pages failed; run fetch again")
 
 
 def cells(text: str) -> list[str]:
@@ -87,8 +152,11 @@ def parse() -> None:
             ).fetchall()
         }
     rows: list[tuple[str, str, str, str, str, int]] = []
-    for election, day in ELECTIONS.items():
-        main = raw.cached(SOURCE, f"{HOST}results_report.aspx?e={election}").path.read_text(errors="ignore")
+    for election, day in DAYS.items():
+        try:
+            main = raw.cached(SOURCE, f"{HOST}results_report.aspx?e={election}").path.read_text(errors="ignore")
+        except LookupError:
+            continue
         for office, url in pages(election)[1]:
             printed: dict[str, int] = {}
             block = re.search(
@@ -97,20 +165,35 @@ def parse() -> None:
                 re.S,
             )[1]
             for line in re.findall(r"<tr><td class=\"ResultData\">.*?</tr>", block, re.S):
-                name, _, votes, _ = cells(line)
-                printed[name] = int(votes)
-            body = raw.cached(SOURCE, url).path.read_text(errors="ignore")
+                printed[cells(line)[0]] = int(next(c for c in cells(line)[1:] if c.isdigit()))
+            try:
+                body = raw.cached(SOURCE, url).path.read_text(errors="ignore")
+            except LookupError:
+                print(f"{day} {office}: breakdown page not fetched")
+                continue
             sums: dict[str, int] = {}
             seen: set[str] = set()
+            part: list[tuple[str, str, str, str, str, int]] = []
+            unknown: set[str] = set()
             for county, table in re.findall(r'<h3 class="reset-margin">([^<]*)</h3></td></tr>(.*?)(?=<tr class="info">|$)', body, re.S):
                 seen.add(county)
+                code = codes.get(re.sub(r"[^a-z]", "", county.lower()))
+                if code is None:
+                    unknown.add(county)
                 for line in re.findall(r"<tr><td class=\"ResultData\">.*?</tr>", table, re.S):
-                    name, party, votes = cells(line)
-                    rows.append((str(day), office, codes[re.sub(r"[^a-z]", "", county.lower())], name, party, int(votes)))
+                    name, *middle, votes = cells(line)
+                    party = middle[0] if middle else ""
+                    part.append((str(day), office, code, name, party, int(votes)))
                     sums[name] = sums.get(name, 0) + int(votes)
-            if len(seen) != 39 or sums != printed:
-                raise ValueError(f"{day} {office}: {len(seen)} counties, sums {sums}, printed {printed}")
-    frame = pl.DataFrame(rows, schema=["day", "title", "county", "candidate", "party", "votes"], orient="row")
+            if unknown or not seen or sums != printed:
+                print(f"{day} {office}: held, {len(seen)} counties, unknown {sorted(unknown)}, sums {sums}, printed {printed}")
+                continue
+            rows.extend(part)
+    frame = (
+        pl.DataFrame(rows, schema=["day", "title", "county", "candidate", "party", "votes"], orient="row")
+        .group_by("day", "title", "county", "candidate", maintain_order=True)
+        .agg(pl.col("party").first(), pl.col("votes").sum())
+    )
     frame = frame.select(
         year=pl.col("day").str.slice(0, 4).cast(pl.Int32),
         day="day",
@@ -154,10 +237,16 @@ def emit() -> Path:
                 url="https://www.sos.wa.gov/elections/results_report.aspx",
                 license="Public record",
             )
-        for election in ELECTIONS:
+        days = set(frame["day"])
+        for election, day in DAYS.items():
+            if str(day) not in days:
+                continue
             url, breakdowns = pages(election)
             for artifact in (url, *(link for _, link in breakdowns)):
-                cs.artifact(raw.cached(SOURCE, artifact), source)
+                try:
+                    cs.artifact(raw.cached(SOURCE, artifact), source)
+                except LookupError:
+                    pass
         units = dict(
             conn.execute(
                 "select code, id from reporting_unit where scheme_code = 'us.county' and code like '53%%'"
@@ -168,7 +257,10 @@ def emit() -> Path:
         )
         for (day, office), rows in frame.group_by("day", "title", maintain_order=True):
             key = f"{day}:WA:{bases[office]}"
-            contest = contests[key]
+            contest = contests.get(key)
+            if contest is None:
+                print(f"{key}: no contest in the archive")
+                continue
             result_set = cs.key(f"{SOURCE}.result_set", key)
             roots = conn.execute(
                 "select id, ballot_label from contest_option where contest_id = %s and parent_option_id is null "
@@ -182,7 +274,16 @@ def emit() -> Path:
             ).fetchall()
             ((previous,),) = conn.execute("select election_id from contest where id = %s", [contest]).fetchall()
             if len(old) != 1:
-                raise ValueError(f"{key}: {len(old)} default result sets")
+                print(f"{key}: {len(old)} default result sets")
+                continue
+            ((county_rows,),) = conn.execute(
+                """select count(*) from result_value v join result_set r on r.k = v.result_set_k
+                   join reporting_unit u on u.k = v.unit_k
+                   where r.id = %s and u.scheme_code = 'us.county'""",
+                [old[0][0]],
+            ).fetchall()
+            if county_rows:
+                continue
             row = old[0]
             if row[0] != result_set:
                 cs.add(
@@ -230,11 +331,11 @@ def emit() -> Path:
             for name in rows["candidate"].unique(maintain_order=True):
                 surname = re.sub(r"[^a-z]", "", name.split()[-1].lower())
                 found = [option for option, label in roots if surname in re.sub(r"[^a-z]", "", (label or "").lower())]
-                if len(found) != 1:
-                    raise ValueError(f"{key}: {len(found)} options for {name}")
-                targets[name] = found[0]
-            if len(set(targets.values())) != len(targets) or len(targets) != len(roots):
-                raise ValueError(f"{key}: candidates {sorted(targets)} do not match options {roots}")
+                if len(found) == 1:
+                    targets[name] = found[0]
+            if len(set(targets.values())) != len(targets) or len(targets) != len(rows["candidate"].unique()) or len(targets) != len(roots):
+                print(f"{key}: candidates {sorted(rows['candidate'].unique())} do not match options {[label for _, label in roots]}")
+                continue
             for option, kind, seats in outcomes:
                 cs.add("outcome", result_set_id=result_set, option_id=option, kind=kind, seats=seats)
             for county, name, votes in rows.select("county", "candidate", "votes").iter_rows():
