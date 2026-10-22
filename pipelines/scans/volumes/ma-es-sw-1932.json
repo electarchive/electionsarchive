@@ -1,0 +1,47 @@
+{
+ "kind": "statewide",
+ "year": 1932,
+ "day": "1932-11-08",
+ "polity": "US-MA",
+ "publisher": "Massachusetts Secretary of the Commonwealth",
+ "title": "Election Statistics 1932 (P.D. 43), state officers, total vote for",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/electionstatisti19311932mass/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/electionstatisti19311932mass"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-the-commonwealth": "Secretary of the Commonwealth",
+  "treasurer": "Treasurer",
+  "auditor": "Auditor",
+  "attorney-general": "Attorney General"
+ },
+ "leaves": [
+  46,
+  47
+ ],
+ "anchors": [
+  {
+   "contest": "1932-11-08:MA:governor",
+   "candidate": "Joseph B. Ely",
+   "official": 825479
+  },
+  {
+   "contest": "1932-11-08:MA:governor",
+   "candidate": "William Sterling Youngman",
+   "official": 704576
+  },
+  {
+   "contest": "1930-11-04:MA:governor",
+   "candidate": "Joseph B. Ely",
+   "official": 606902
+  },
+  {
+   "contest": "1930-11-04:MA:governor",
+   "candidate": "Frank G. Allen",
+   "official": 590238
+  }
+ ]
+}

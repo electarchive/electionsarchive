@@ -1,0 +1,39 @@
+{
+ "kind": "statewide",
+ "year": 1900,
+ "day": "1900-11-06",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1901), Summary of votes for state officers, November 1900",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/michiganofficial00mich_0/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/michiganofficial00mich_0"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-state": "Secretary of State",
+  "treasurer": "Treasurer",
+  "auditor-general": "Auditor General",
+  "attorney-general": "Attorney General",
+  "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+  "commissioner-of-the-state-land-office": "Commissioner of the State Land Office"
+ },
+ "leaves": [
+  643,
+  644
+ ],
+ "anchors": [
+  {
+   "contest": "1900-11-06:MI:governor",
+   "candidate": "William C. Maybury",
+   "official": 226208
+  },
+  {
+   "contest": "1900-11-06:MI:governor",
+   "candidate": "Aaron T. Bliss",
+   "official": 305612
+  }
+ ]
+}

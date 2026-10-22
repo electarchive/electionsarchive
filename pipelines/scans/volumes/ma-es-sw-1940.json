@@ -1,0 +1,36 @@
+{
+ "kind": "statewide",
+ "year": 1940,
+ "day": "1940-11-05",
+ "polity": "US-MA",
+ "publisher": "Massachusetts Secretary of the Commonwealth",
+ "title": "Election Statistics 1940 (P.D. 43), state officers, total vote for",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/electionstatisti19401941mass/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/electionstatisti19401941mass"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-the-commonwealth": "Secretary of the Commonwealth",
+  "treasurer": "Treasurer",
+  "auditor": "Auditor",
+  "attorney-general": "Attorney General"
+ },
+ "leaves": [
+  8
+ ],
+ "anchors": [
+  {
+   "contest": "1940-11-05:MA:governor",
+   "candidate": "Paul A. Dever",
+   "official": 993635
+  },
+  {
+   "contest": "1940-11-05:MA:governor",
+   "candidate": "Leverett Saltonstall",
+   "official": 999223
+  }
+ ]
+}

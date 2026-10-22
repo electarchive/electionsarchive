@@ -1,0 +1,47 @@
+{
+ "kind": "statewide",
+ "year": 1938,
+ "day": "1938-11-08",
+ "polity": "US-MA",
+ "publisher": "Massachusetts Secretary of the Commonwealth",
+ "title": "Election Statistics 1938 (P.D. 43), state officers, total vote for",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/electionstatisti19371939mass/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/electionstatisti19371939mass"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-the-commonwealth": "Secretary of the Commonwealth",
+  "treasurer": "Treasurer",
+  "auditor": "Auditor",
+  "attorney-general": "Attorney General"
+ },
+ "leaves": [
+  52,
+  53
+ ],
+ "anchors": [
+  {
+   "contest": "1938-11-08:MA:governor",
+   "candidate": "James M. Curley",
+   "official": 793884
+  },
+  {
+   "contest": "1938-11-08:MA:governor",
+   "candidate": "Leverett Saltonstall",
+   "official": 941465
+  },
+  {
+   "contest": "1936-11-03:MA:governor",
+   "candidate": "Charles F. Hurley",
+   "official": 867743
+  },
+  {
+   "contest": "1936-11-03:MA:governor",
+   "candidate": "John W. Haigis",
+   "official": 839740
+  }
+ ]
+}

@@ -1,0 +1,39 @@
+{
+ "kind": "statewide",
+ "year": 1904,
+ "day": "1904-11-08",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1905), Summary of votes for state officers, November 1904",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/michiganofficial00mich_2/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/michiganofficial00mich_2"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-state": "Secretary of State",
+  "treasurer": "Treasurer",
+  "auditor-general": "Auditor General",
+  "attorney-general": "Attorney General",
+  "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+  "commissioner-of-the-state-land-office": "Commissioner of the State Land Office"
+ },
+ "leaves": [
+  611,
+  612
+ ],
+ "anchors": [
+  {
+   "contest": "1904-11-08:MI:governor",
+   "candidate": "Woodbridge N. Ferris",
+   "official": 223571
+  },
+  {
+   "contest": "1904-11-08:MI:governor",
+   "candidate": "Fred M. Warner",
+   "official": 283799
+  }
+ ]
+}

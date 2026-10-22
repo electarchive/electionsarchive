@@ -1,0 +1,39 @@
+{
+ "kind": "statewide",
+ "year": 1892,
+ "day": "1892-11-08",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1893), Summary of votes for state officers, November 1892",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/officialdirector00mich/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/officialdirector00mich"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-state": "Secretary of State",
+  "treasurer": "Treasurer",
+  "auditor-general": "Auditor General",
+  "attorney-general": "Attorney General",
+  "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+  "commissioner-of-the-state-land-office": "Commissioner of the State Land Office"
+ },
+ "leaves": [
+  449,
+  450
+ ],
+ "anchors": [
+  {
+   "contest": "1892-11-08:MI:governor",
+   "candidate": "Allen B. Morse",
+   "official": 205138
+  },
+  {
+   "contest": "1892-11-08:MI:governor",
+   "candidate": "John T. Rich",
+   "official": 221228
+  }
+ ]
+}

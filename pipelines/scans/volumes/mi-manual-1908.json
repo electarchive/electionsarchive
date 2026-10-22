@@ -1,0 +1,39 @@
+{
+ "kind": "statewide",
+ "year": 1908,
+ "day": "1908-11-03",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1909), Summary of votes for state officers, November 1908",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/michiganofficial00mich_3/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/michiganofficial00mich_3"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-state": "Secretary of State",
+  "treasurer": "Treasurer",
+  "auditor-general": "Auditor General",
+  "attorney-general": "Attorney General",
+  "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+  "commissioner-of-the-state-land-office": "Commissioner of the State Land Office"
+ },
+ "leaves": [
+  422,
+  423
+ ],
+ "anchors": [
+  {
+   "contest": "1908-11-03:MI:governor",
+   "candidate": "Lawton T. Hemans",
+   "official": 252611
+  },
+  {
+   "contest": "1908-11-03:MI:governor",
+   "candidate": "Fred M. Warner",
+   "official": 262141
+  }
+ ]
+}

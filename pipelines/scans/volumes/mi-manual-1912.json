@@ -1,0 +1,39 @@
+{
+ "kind": "statewide",
+ "year": 1912,
+ "day": "1912-11-05",
+ "polity": "US-MI",
+ "publisher": "Michigan Secretary of State",
+ "title": "Michigan Manual (Official Directory and Legislative Manual 1913), Summary of votes for state officers, November 1912",
+ "license": "Public record",
+ "file": {
+  "url": "https://archive.org/download/michiganofficial00mich_5/page/n{page}_w2000.jpg",
+  "item": "https://archive.org/details/michiganofficial00mich_5"
+ },
+ "raw_source": "us.scans",
+ "offices": {
+  "lieutenant-governor": "Lieutenant Governor",
+  "secretary-of-state": "Secretary of State",
+  "treasurer": "Treasurer",
+  "auditor-general": "Auditor General",
+  "attorney-general": "Attorney General",
+  "superintendent-of-public-instruction": "Superintendent of Public Instruction",
+  "commissioner-of-the-state-land-office": "Commissioner of the State Land Office"
+ },
+ "leaves": [
+  487,
+  488
+ ],
+ "anchors": [
+  {
+   "contest": "1912-11-05:MI:governor",
+   "candidate": "Woodbridge N. Ferris",
+   "official": 194017
+  },
+  {
+   "contest": "1912-11-05:MI:governor",
+   "candidate": "Amos S. Musselman",
+   "official": 169963
+  }
+ ]
+}
