@@ -92,6 +92,8 @@ FORTIES = [
 ]
 MID = [s for s in ORDER if s not in ("Colorado", "Kansas", "Nebraska", "Nevada", "South Carolina", "West Virginia")]
 LATE = [s for s in ORDER if s != "Colorado"]
+EARLY_ROWS = [s for s in ORDER if s not in ("Colorado", "Nebraska")]
+V61_ROWS = [s for s in ORDER if s not in ("Colorado", "Kansas", "Nebraska", "Nevada", "West Virginia")]
 TABLES = {
     "om254a": dict(
         mask="om254",
@@ -230,6 +232,7 @@ def parse() -> None:
             writer.writerow([name, state, col, box[0], box[1], box[2], box[3], "|".join(reads)])
     print(len(tasks), "cells read")
     parse_1881()
+    parse_prints()
 
 
 def read_strip(task: tuple[str, int]) -> tuple[str, int, list[list[tuple[str, int, int]]]]:
@@ -279,6 +282,119 @@ def parse_1881() -> None:
                 writer.writerow([state, col, x0, y - 14, x1, y + 14, "|".join(c[0] for c in cell)])
 
 
+PRINTS = {
+    "v65": dict(
+        mask="v65",
+        page=71,
+        sha="7b1d0b9ba2f6f8d746338dac6f2715b31792f83e2173c87119639736e13257a3",
+        rows=EARLY_ROWS,
+        y0=2287,
+        pitch=45.03,
+        total=3927,
+        cols=[
+            (553, 705),
+            (758, 912),
+            (930, 1089),
+            (1115, 1306),
+            (1322, 1515),
+            (1543, 1722),
+            (1746, 1893),
+            (1942, 2118),
+            (2165, 2328),
+            (2338, 2499),
+        ],
+        scales=((1, "7"), (1.5, "7"), (2, "7"), (1, "8")),
+    ),
+    "v61": dict(
+        mask="v61",
+        page=64,
+        sha="97638c3d6f81aaf7970d3c337f354eac04e601cc627c3191877b552cd4af2c74",
+        rows=V61_ROWS,
+        y0=1402,
+        pitch=25.1,
+        total=2239,
+        cols=[
+            (293, 402),
+            (413, 515),
+            (527, 631),
+            (640, 744),
+            (768, 858),
+            (882, 972),
+            (987, 1086),
+            (1111, 1201),
+            (1224, 1315),
+            (1337, 1410),
+        ],
+        scales=((3, "7"), (4, "7"), (3, "8"), (2, "7")),
+    ),
+    "v69": dict(
+        mask="v69",
+        page=92,
+        sha="41e6560af4b2f77374f49231b2f25df882f3c3c79fd06615bfb9302ffb212030",
+        rows=EARLY_ROWS,
+        y0=1282,
+        pitch=29.6,
+        total=2348,
+        cols=[
+            (545, 640),
+            (657, 752),
+            (759, 859),
+            (873, 967),
+            (984, 1079),
+            (1096, 1187),
+            (1203, 1299),
+            (1318, 1411),
+            (1417, 1515),
+            (1525, 1599),
+        ],
+        scales=((2, "7"), (3, "7"), (2, "8"), (4, "7")),
+    ),
+}
+
+
+def read_print_cell(
+    task: tuple[str, str, int, int],
+) -> tuple[str, str, int, tuple[int, int, int, int], list[str]]:
+    key, state, col, yc = task
+    spec = PRINTS[key]
+    half = round(spec["pitch"] * 0.42)
+    a, b = spec["cols"][col]
+    left = spec["cols"][col - 1][1] + 2 if col > 0 else a - 60
+    box = (left, yc - half, b + 4, yc + half)
+    with Image.open(PARSED / "native" / f"{spec['mask']}-mask.png") as mask:
+        crop = ImageOps.invert(mask.convert("L").crop(box))
+    reads: list[str] = []
+    for scale, psm in spec["scales"]:
+        big = ImageOps.expand(
+            crop.resize((round(crop.width * scale), round(crop.height * scale)), Image.LANCZOS), 20, 255
+        )
+        with tempfile.NamedTemporaryFile(suffix=".png") as file:
+            big.save(file.name)
+            out = subprocess.run(
+                ["tesseract", file.name, "-", "--psm", psm, "-c", "tessedit_char_whitelist=0123456789,."],
+                capture_output=True,
+                text=True,
+            ).stdout
+        reads.append(re.sub(r"\D", "", out))
+    return key, state, col, box, reads
+
+
+def parse_prints() -> None:
+    tasks = []
+    for key, spec in PRINTS.items():
+        for state, yc in [
+            *[(state, round(spec["y0"] + spec["pitch"] * i)) for i, state in enumerate(spec["rows"])],
+            ("Total", spec["total"]),
+        ]:
+            for col in range(len(spec["cols"])):
+                tasks.append((key, state, col, yc))
+    with ProcessPoolExecutor() as pool, (PARSED / "reads_prints.tsv").open("w", newline="") as handle:
+        writer = csv.writer(handle, delimiter="\t")
+        writer.writerow(["print", "state", "col", "x0", "y0", "x1", "y1", "reads"])
+        for key, state, col, box, reads in pool.map(read_print_cell, tasks, chunksize=16):
+            writer.writerow([key, state, col, *box, "|".join(reads)])
+
+
 NOTE = (
     "The state's popular vote for president as printed in The Tribune Almanac and Political Register for 1881, which "
     "compiles the states' official returns and is a compilation rather than a certified canvass. The table prints the "
@@ -289,6 +405,20 @@ NOTE = (
     "from Wikipedia by more than 1 percent, was read from a crop of the printed page; each digitized number carries "
     "its page and box. Wikipedia's earlier figures are kept as a superseded, non-default set."
 )
+
+
+def note(year: int, volume: int) -> str:
+    return (
+        f"The state's popular vote for president in {year} as printed in {tribune_almanac.TITLES[volume]}, which "
+        "compiles the states' official returns and is a compilation rather than a certified canvass. Tickets that "
+        "Wikipedia's results-by-state table names keep that table's candidates; the printed lines are carried "
+        "and the total is their sum. Each digitized number was read from the printed page by cell OCR, checked "
+        "against a second printing or Wikipedia's figure, and settled from a crop of the page where they "
+        "disagreed; the column sums match the printed Total row, and each number carries its page and box. "
+        "Wikipedia's earlier figures are kept as a superseded, non-default set."
+    )
+
+
 DEMOTED = {(1872, "MN"), (1872, "NE"), (1872, "TN"), (1880, "LA"), (1880, "NV"), (1880, "TX")}
 HELD = (
     "The printed figure for a top-two candidate differs from Wikipedia's by more than 1 percent and no second source "
@@ -380,25 +510,181 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
+YEARS = (1860,)
+ELECTION_DAYS = {
+    1852: "1852-11-02",
+    1856: "1856-11-04",
+    1860: "1860-11-06",
+    1864: "1864-11-08",
+    1868: "1868-11-03",
+    1872: "1872-11-05",
+    1876: "1876-11-07",
+    1880: "1880-11-02",
+}
+YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69"}
+PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868}
+PRINT_COLUMNS = {
+    "v65": {
+        0: (1864, "Lincoln"),
+        1: (1864, "McClellan"),
+        3: (1860, "Lincoln"),
+        4: (1860, "Douglas"),
+        5: (1860, "Breckinridge"),
+        6: (1860, "Bell"),
+        7: (1856, "Fremont"),
+        8: (1856, "Buchanan"),
+        9: (1856, "Fillmore"),
+    },
+    "v61": {
+        7: (1852, "Scott"),
+        8: (1852, "Pierce"),
+        9: (1852, "Hale"),
+    },
+}
+FUSION = {(1860, "NY", "Douglas"), (1860, "NJ", "Douglas"), (1860, "PA", "Breckinridge")}
+CANDIDATES = {
+    "Lincoln": ("Abraham Lincoln (Republican)", "republicanparty"),
+    "Douglas": ("Stephen A. Douglas (Democratic)", "democraticparty"),
+    "Breckinridge": ("John C. Breckinridge (Southern Democratic)", "democraticparty"),
+    "Bell": ("John Bell (Constitutional Union)", "constitutionalunionparty"),
+    "Fremont": ("John C. Fremont (Republican)", "republicanparty"),
+    "Buchanan": ("James Buchanan (Democratic)", "democraticparty"),
+    "Fillmore": ("Millard Fillmore (American)", "americanparty"),
+    "Scott": ("Winfield Scott (Whig)", "whigparty"),
+    "Pierce": ("Franklin Pierce (Democratic)", "democraticparty"),
+    "Hale": ("John P. Hale (Free Soil)", "freesoilparty"),
+    "McClellan": ("George B. McClellan (Democratic)", "democraticparty"),
+}
+EARLY: dict[tuple[int, str, str], int] = {
+    (1860, "AL", "Bell"): 27875,
+    (1860, "AL", "Breckinridge"): 48831,
+    (1860, "AL", "Douglas"): 13651,
+    (1860, "AR", "Bell"): 20094,
+    (1860, "AR", "Breckinridge"): 28732,
+    (1860, "AR", "Douglas"): 5227,
+    (1860, "CA", "Bell"): 6817,
+    (1860, "CA", "Breckinridge"): 34334,
+    (1860, "CA", "Douglas"): 38516,
+    (1860, "CA", "Lincoln"): 39173,
+    (1860, "CT", "Bell"): 3291,
+    (1860, "CT", "Breckinridge"): 14641,
+    (1860, "CT", "Douglas"): 15522,
+    (1860, "CT", "Lincoln"): 43792,
+    (1860, "DE", "Bell"): 3864,
+    (1860, "DE", "Breckinridge"): 7337,
+    (1860, "DE", "Douglas"): 1023,
+    (1860, "DE", "Lincoln"): 3815,
+    (1860, "FL", "Bell"): 5437,
+    (1860, "FL", "Breckinridge"): 8543,
+    (1860, "FL", "Douglas"): 367,
+    (1860, "GA", "Bell"): 42886,
+    (1860, "GA", "Breckinridge"): 51889,
+    (1860, "GA", "Douglas"): 11590,
+    (1860, "IL", "Bell"): 4913,
+    (1860, "IL", "Breckinridge"): 2404,
+    (1860, "IL", "Douglas"): 160215,
+    (1860, "IL", "Lincoln"): 172161,
+    (1860, "IN", "Bell"): 5306,
+    (1860, "IN", "Breckinridge"): 12295,
+    (1860, "IN", "Douglas"): 115509,
+    (1860, "IN", "Lincoln"): 139033,
+    (1860, "IA", "Bell"): 1763,
+    (1860, "IA", "Breckinridge"): 1048,
+    (1860, "IA", "Douglas"): 55111,
+    (1860, "IA", "Lincoln"): 70409,
+    (1860, "KY", "Bell"): 66058,
+    (1860, "KY", "Breckinridge"): 53143,
+    (1860, "KY", "Douglas"): 25651,
+    (1860, "KY", "Lincoln"): 1364,
+    (1860, "LA", "Bell"): 20204,
+    (1860, "LA", "Breckinridge"): 22681,
+    (1860, "LA", "Douglas"): 7625,
+    (1860, "ME", "Bell"): 2046,
+    (1860, "ME", "Breckinridge"): 6368,
+    (1860, "ME", "Douglas"): 26693,
+    (1860, "ME", "Lincoln"): 62811,
+    (1860, "MD", "Bell"): 41760,
+    (1860, "MD", "Breckinridge"): 42482,
+    (1860, "MD", "Douglas"): 5966,
+    (1860, "MD", "Lincoln"): 2294,
+    (1860, "MA", "Bell"): 22331,
+    (1860, "MA", "Breckinridge"): 5939,
+    (1860, "MA", "Douglas"): 34372,
+    (1860, "MA", "Lincoln"): 106533,
+    (1860, "MI", "Bell"): 405,
+    (1860, "MI", "Breckinridge"): 805,
+    (1860, "MI", "Douglas"): 65057,
+    (1860, "MI", "Lincoln"): 88480,
+    (1860, "MN", "Bell"): 62,
+    (1860, "MN", "Breckinridge"): 748,
+    (1860, "MN", "Douglas"): 11920,
+    (1860, "MN", "Lincoln"): 22069,
+    (1860, "MS", "Bell"): 25040,
+    (1860, "MS", "Breckinridge"): 40797,
+    (1860, "MS", "Douglas"): 3283,
+    (1860, "MO", "Bell"): 58372,
+    (1860, "MO", "Breckinridge"): 31317,
+    (1860, "MO", "Douglas"): 58801,
+    (1860, "MO", "Lincoln"): 17028,
+    (1860, "NH", "Bell"): 441,
+    (1860, "NH", "Breckinridge"): 2112,
+    (1860, "NH", "Douglas"): 25881,
+    (1860, "NH", "Lincoln"): 37519,
+    (1860, "NJ", "Douglas"): 62801,
+    (1860, "NJ", "Lincoln"): 58324,
+    (1860, "NY", "Douglas"): 312510,
+    (1860, "NY", "Lincoln"): 362646,
+    (1860, "NC", "Bell"): 44990,
+    (1860, "NC", "Breckinridge"): 48539,
+    (1860, "NC", "Douglas"): 2701,
+    (1860, "OH", "Bell"): 12194,
+    (1860, "OH", "Breckinridge"): 11405,
+    (1860, "OH", "Douglas"): 187232,
+    (1860, "OH", "Lincoln"): 231610,
+    (1860, "OR", "Bell"): 183,
+    (1860, "OR", "Breckinridge"): 5006,
+    (1860, "OR", "Douglas"): 3951,
+    (1860, "OR", "Lincoln"): 5270,
+    (1860, "PA", "Bell"): 12776,
+    (1860, "PA", "Breckinridge"): 178871,
+    (1860, "PA", "Douglas"): 16765,
+    (1860, "PA", "Lincoln"): 268030,
+    (1860, "RI", "Douglas"): 7707,
+    (1860, "RI", "Lincoln"): 12244,
+    (1860, "TN", "Bell"): 69274,
+    (1860, "TN", "Breckinridge"): 64709,
+    (1860, "TN", "Douglas"): 11350,
+    (1860, "TX", "Bell"): 15438,
+    (1860, "TX", "Breckinridge"): 47548,
+    (1860, "VT", "Bell"): 1969,
+    (1860, "VT", "Breckinridge"): 218,
+    (1860, "VT", "Douglas"): 6849,
+    (1860, "VT", "Lincoln"): 33808,
+    (1860, "VA", "Bell"): 74681,
+    (1860, "VA", "Breckinridge"): 74323,
+    (1860, "VA", "Douglas"): 16290,
+    (1860, "VA", "Lincoln"): 1929,
+    (1860, "WI", "Bell"): 161,
+    (1860, "WI", "Breckinridge"): 888,
+    (1860, "WI", "Douglas"): 65021,
+    (1860, "WI", "Lincoln"): 86110,
+}
+
+
 def emit() -> Path:
-    cells: dict[tuple[str, int], tuple[list[int], tuple[int, int, int, int]]] = {}
-    with (PARSED / "reads_1881.tsv").open() as handle:
-        for row in csv.DictReader(handle, delimiter="\t"):
-            cells[(row["state"], int(row["col"]))] = (
-                [int(read) for read in row["reads"].split("|") if read],
-                (int(row["x0"]), int(row["y0"]), int(row["x1"]), int(row["y1"])),
-            )
-    with Image.open(PARSED / "native" / "v81p95-mask.png") as mask:
-        mask_width, mask_height = mask.size
-    book = raw.cached(RAW, tribune_almanac.VOLUMES[1880][0])
-    image = DATA / "pages" / SOURCE / f"{book.sha256}-95.png"
-    image.parent.mkdir(parents=True, exist_ok=True)
-    if not image.exists():
-        house_books._render(book, 95, 100, image, False)
-    with Image.open(image) as rendered:
-        width, height = rendered.size
+    boxes: dict[tuple[int, str, str], tuple[tuple[float, float, float, float], str]] = {}
+    values: dict[tuple[int, str, str], int] = {}
     skipped: list[str] = []
     differences: list[str] = []
+    needs_1881 = any(year >= 1872 for year in YEARS)
+    if needs_1881:
+        cells: dict[tuple[str, int], tuple[list[int], tuple[int, int, int, int]]] = {}
+        with (PARSED / "reads_1881.tsv").open() as handle:
+            for row in csv.DictReader(handle, delimiter="\t"):
+                cells[(row["state"], int(row["col"]))] = (
+                    [int(read) for read in row["reads"].split("|") if read],
+                    (int(row["x0"]), int(row["y0"]), int(row["x1"]), int(row["y1"])),
+                )
     with connect() as conn:
         old: dict[tuple[int, str], tuple] = {}
         for row in conn.execute(
@@ -407,11 +693,11 @@ def emit() -> Path:
                from result_set r join contest k on k.id = r.contest_id join election e on e.id = r.election_id
                join slug sl on sl.entity_id = k.id and sl.path like 'us/__/%%/president'
                join source s on s.id = r.source_id
-               where k.kind = 'elector_slate' and e.date_from in ('1872-11-05', '1876-11-07', '1880-11-02')
+               where k.kind = 'elector_slate' and e.date_from = any(%s::date[])
                  and s.publisher = 'Wikipedia'
                  and (r.is_default or exists (select 1 from result_set c join changeset ch on ch.id = c.changeset_id
                       where c.supersedes_id = r.id and ch.pipeline = %s))""",
-            [SOURCE],
+            [[ELECTION_DAYS[year] for year in YEARS], SOURCE],
         ).fetchall():
             old[(row[0], row[1])] = row[2:]
         options: dict[UUID, list[tuple]] = defaultdict(list)
@@ -440,70 +726,115 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Presidential results by state 1872, 1876, and 1880 from the Tribune Almanac, superseding Wikipedia's",
+            summary="Presidential results by state from the Tribune Almanac, superseding Wikipedia's: "
+            + ", ".join(str(year) for year in YEARS),
             polity="US",
         )
-        source = cs.source(tribune_almanac.PUBLISHER, tribune_almanac.TITLES[1880])
-        artifact = cs.artifact(book, source)
-        page = cs.page(artifact, 95)
-        if not conn.execute("select 1 from source_page where id = %s", [page]).fetchone():
-            cs.add(
-                "source_page",
-                id=page,
-                artifact_id=artifact,
-                page_number=95,
-                image_key=f"pages/{SOURCE}/{book.sha256}-95.png",
-                width=width,
-                height=height,
-            )
-        values: dict[tuple[str, int], int] = {}
-        for (name, col), (reads, box) in cells.items():
-            if name == "Total":
+        pages: dict[str, tuple[UUID, str, int, int]] = {}
+        for year in YEARS:
+            key = "v81p95" if year >= 1872 else YEAR_PRINT[year]
+            if key in pages:
                 continue
-            surname, year = NAMES[col]
-            ticket = next(
-                (
-                    value
-                    for option, label, kind, unit, measure, value in options.get(
-                        old.get((year, STATES[name]), (None,))[0], []
-                    )
-                    if kind == "ticket" and surname in (label or "")
-                ),
-                None,
-            )
-            if (name, col) in FIXES:
-                fixed = FIXES[(name, col)]
-                if fixed is not None:
-                    values[(name, col)] = fixed
-            elif ticket is not None and ticket in reads:
-                values[(name, col)] = int(ticket)
-            elif len(reads) == 3 and len(set(reads)) == 1 and reads[0] >= 10:
-                if ticket is None or abs(reads[0] - ticket) <= ticket / 100:
-                    values[(name, col)] = reads[0]
-                else:
-                    skipped.append(f"cell {name} {surname}: read {reads[0]} against Wikipedia's {ticket}, not settled")
-            elif ticket is not None:
-                common, count = (
-                    Counter(read for read in reads if abs(read - ticket) <= ticket / 100).most_common(1)[0]
-                    if any(abs(read - ticket) <= ticket / 100 for read in reads)
-                    else (0, 0)
+            volume = 1880 if key == "v81p95" else PRINT_VOLUME[key]
+            page_number = 95 if key == "v81p95" else PRINTS[key]["page"]
+            book = raw.cached(RAW, tribune_almanac.VOLUMES[volume][0])
+            image = DATA / "pages" / SOURCE / f"{book.sha256}-{page_number}.png"
+            image.parent.mkdir(parents=True, exist_ok=True)
+            if not image.exists():
+                house_books._render(book, page_number, 100, image, False)
+            with Image.open(image) as rendered:
+                width, height = rendered.size
+            source = cs.source(tribune_almanac.PUBLISHER, tribune_almanac.TITLES[volume])
+            artifact = cs.artifact(book, source)
+            page = cs.page(artifact, page_number)
+            if not conn.execute("select 1 from source_page where id = %s", [page]).fetchone():
+                cs.add(
+                    "source_page",
+                    id=page,
+                    artifact_id=artifact,
+                    page_number=page_number,
+                    image_key=f"pages/{SOURCE}/{book.sha256}-{page_number}.png",
+                    width=width,
+                    height=height,
                 )
-                if count >= 2:
-                    values[(name, col)] = common
-                else:
-                    skipped.append(f"cell {name} {surname}: reads {reads} against Wikipedia's {ticket}, not settled")
-        for col in range(8):
-            printed = cells[("Total", col)][0][0]
-            added = sum(value for (name, c), value in values.items() if c == col)
-            print(f"column {col} {NAMES[col][0]}: cells sum {added}, printed total {printed}, gap {printed - added}")
+            pages[key] = (page, source, volume, page_number)
+        if needs_1881:
+            with Image.open(PARSED / "native" / "v81p95-mask.png") as mask:
+                mask_width, mask_height = mask.size
+            for (name, col), (reads, box) in cells.items():
+                if name == "Total":
+                    continue
+                surname, year = NAMES[col]
+                if year not in YEARS:
+                    continue
+                ticket = next(
+                    (
+                        value
+                        for option, label, kind, unit, measure, value in options.get(
+                            old.get((year, STATES[name]), (None,))[0], []
+                        )
+                        if kind == "ticket" and surname in (label or "")
+                    ),
+                    None,
+                )
+                cell = (year, STATES[name], surname)
+                boxes[cell] = (
+                    (box[0] / mask_width, box[1] / mask_height, box[2] / mask_width, box[3] / mask_height),
+                    "v81p95",
+                )
+                if (name, col) in FIXES:
+                    fixed = FIXES[(name, col)]
+                    if fixed is not None:
+                        values[cell] = fixed
+                elif ticket is not None and ticket in reads:
+                    values[cell] = int(ticket)
+                elif len(reads) == 3 and len(set(reads)) == 1 and reads[0] >= 10:
+                    if ticket is None or abs(reads[0] - ticket) <= ticket / 100:
+                        values[cell] = reads[0]
+                    else:
+                        skipped.append(
+                            f"cell {name} {surname}: read {reads[0]} against Wikipedia's {ticket}, not settled"
+                        )
+                elif ticket is not None:
+                    common, count = (
+                        Counter(read for read in reads if abs(read - ticket) <= ticket / 100).most_common(1)[0]
+                        if any(abs(read - ticket) <= ticket / 100 for read in reads)
+                        else (0, 0)
+                    )
+                    if count >= 2:
+                        values[cell] = common
+                    else:
+                        skipped.append(
+                            f"cell {name} {surname}: reads {reads} against Wikipedia's {ticket}, not settled"
+                        )
+        early_keys = {YEAR_PRINT[year] for year in YEARS if year < 1872}
+        if early_keys:
+            with (PARSED / "reads_prints.tsv").open() as handle:
+                for row in csv.DictReader(handle, delimiter="\t"):
+                    if row["print"] not in early_keys or row["state"] == "Total":
+                        continue
+                    named = PRINT_COLUMNS.get(row["print"], {}).get(int(row["col"]))
+                    abbreviation = STATES[row["state"]]
+                    if named is None or named[0] not in YEARS or (named[0], abbreviation, named[1]) not in EARLY:
+                        continue
+                    with Image.open(PARSED / "native" / f"{PRINTS[row['print']]['mask']}-mask.png") as mask:
+                        mask_width, mask_height = mask.size
+                    cell = (named[0], abbreviation, named[1])
+                    values[cell] = EARLY[cell]
+                    boxes[cell] = (
+                        (
+                            int(row["x0"]) / mask_width,
+                            int(row["y0"]) / mask_height,
+                            int(row["x1"]) / mask_width,
+                            int(row["y1"]) / mask_height,
+                        ),
+                        row["print"],
+                    )
         winners_ok = 0
         for (year, state), (rs, election, contest, stage, kind, source_id, completeness) in sorted(old.items()):
-            name = next((n for n, a in STATES.items() if a == state), None)
-            if name is None:
-                continue
             tag = f"{year} {state}"
-            columns = [col for col in range(8) if NAMES[col][1] == year and (name, col) in values]
-            if not columns:
+            surnames = [surname for (y, st, surname) in values if y == year and st == state]
+            if not surnames:
                 continue
             tickets = {
                 option: (label, value)
@@ -512,14 +843,20 @@ def emit() -> Path:
             }
             unit = next(u for _, _, _, u, _, _ in options[rs])
             total_before = next(v for _, _, _, _, m, v in options[rs] if m == 4)
-            matched: dict[int, UUID] = {}
-            for col in columns:
-                hits = [option for option, (label, _) in tickets.items() if NAMES[col][0] in label]
+            matched: dict[str, UUID] = {}
+            for surname in surnames:
+                if (year, state, surname) in FUSION:
+                    continue
+                hits = [option for option, (label, _) in tickets.items() if surname in label]
                 if len(hits) == 1:
-                    matched[col] = hits[0]
+                    matched[surname] = hits[0]
                 elif len(hits) > 1:
-                    skipped.append(f"{tag}: {NAMES[col][0]} matches {len(hits)} tickets")
-            if any(col not in matched and NAMES[col][0] not in LEGENDS for col in columns):
+                    skipped.append(f"{tag}: {surname} matches {len(hits)} tickets")
+            unmatched = [surname for surname in surnames if surname not in matched]
+            if any(
+                surname not in LEGENDS and surname not in CANDIDATES and (year, state, surname) not in FUSION
+                for surname in unmatched
+            ):
                 skipped.append(f"{tag}: a printed candidate has no Wikipedia ticket")
                 continue
             winning = {option for option, *_ in outcomes[rs]}
@@ -535,22 +872,29 @@ def emit() -> Path:
                 skipped.append(f"{tag}: a winning option is not in the almanac's columns")
                 continue
             result_set = cs.key(f"{SOURCE}.result_set", f"{year}:{state}")
-            ids: dict[int, UUID] = dict(matched)
-            for col in columns:
-                if col in ids:
-                    continue
-                label, party_name = LEGENDS[NAMES[col][0]]
-                ids[col] = cs.key(f"{SOURCE}.option", f"{year}:{state}:{slug(label)}")
+            ids: dict[str, UUID] = dict(matched)
+            for surname in unmatched:
+                if (year, state, surname) in FUSION:
+                    label, party_name = "Fusion electors", None
+                else:
+                    label, party_name = LEGENDS.get(surname) or CANDIDATES[surname]
+                ids[surname] = cs.key(f"{SOURCE}.option", f"{year}:{state}:{slug(label)}")
                 cs.add(
                     "contest_option",
-                    id=ids[col],
+                    id=ids[surname],
                     contest_id=contest,
                     kind="legend",
-                    party_id=parties.get(party_name),
+                    party_id=parties.get(party_name) if party_name else None,
                     ballot_label=label,
                 )
-            total = sum(values[(name, col)] for col in columns)
-            default = (year, state) not in DEMOTED
+            total = sum(values[(year, state, surname)] for surname in surnames)
+            ranked = sorted(tickets.items(), key=lambda item: -item[1][1])[:2]
+            top_two_off = any(
+                option in matched.values()
+                and abs(next(values[(year, state, s)] for s, o in matched.items() if o == option) - value) > value / 100
+                for option, (_, value) in ranked
+            )
+            default = (year, state) not in DEMOTED and not top_two_off
             cs.add(
                 "result_set",
                 id=result_set,
@@ -558,7 +902,7 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="official",
                 kind="counted",
-                source_id=source,
+                source_id=pages["v81p95" if year >= 1872 else YEAR_PRINT[year]][1],
                 status="active",
                 is_default=default,
                 supersedes_id=rs if default else None,
@@ -576,44 +920,46 @@ def emit() -> Path:
                 is_default=not default,
                 completeness=completeness,
             )
+            volume = pages["v81p95" if year >= 1872 else YEAR_PRINT[year]][2]
             cs.add(
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=NOTE if default else NOTE + " " + HELD,
+                body_md=(NOTE if year >= 1872 else note(year, volume)) + ("" if default else " " + HELD),
             )
             if abs(total - total_before) / total_before > Decimal("0.01"):
                 differences.append(f"{tag}: printed lines total {total} against Wikipedia's {total_before}")
-            for col in columns:
-                before = tickets[matched[col]][1] if col in matched else None
-                if before and abs(values[(name, col)] - before) / before > Decimal("0.01"):
-                    differences.append(f"{tag}: {NAMES[col][0]} {values[(name, col)]} against Wikipedia's {before}")
+            for surname in surnames:
+                cell = (year, state, surname)
+                before = tickets[matched[surname]][1] if surname in matched else None
+                if before and abs(values[cell] - before) / before > Decimal("0.01"):
+                    differences.append(f"{tag}: {surname} {values[cell]} against Wikipedia's {before}")
                 cs.add(
                     "result_value",
                     result_set_id=result_set,
                     unit_id=unit,
-                    option_id=ids[col],
+                    option_id=ids[surname],
                     channel=0,
                     measure=1,
                     count_round=0,
                     flags=DIGITIZED,
-                    value=values[(name, col)],
+                    value=values[cell],
                 )
-                x0, y0, x1, y1 = cells[(name, col)][1]
+                (x0, y0, x1, y1), print_key = boxes[cell]
                 cs.add(
                     "value_locator",
                     result_set_id=result_set,
                     unit_id=unit,
-                    option_id=ids[col],
+                    option_id=ids[surname],
                     channel=0,
                     measure=1,
                     count_round=0,
-                    page_id=page,
+                    page_id=pages[print_key][0],
                     source_id=None,
-                    x0=x0 / mask_width,
-                    y0=y0 / mask_height,
-                    x1=x1 / mask_width,
-                    y1=y1 / mask_height,
+                    x0=x0,
+                    y0=y0,
+                    x1=x1,
+                    y1=y1,
                 )
             cs.add(
                 "result_value",
