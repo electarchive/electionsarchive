@@ -554,7 +554,13 @@ FIXES: dict[tuple[str, int], int | None] = {
 }
 
 
-YEARS = (1824,)
+YEARS = (1836,)
+WHIG_LABEL = "Whig candidates"
+WHIG_NOTE = (
+    'The almanac prints the Whig vote as one line, "Harrison etc.", so the Whig tickets of Wikipedia\'s table '
+    '(White or Webster in this state) are carried as one combined line, "Whig candidates", and the comparison '
+    "with Wikipedia is on their sum."
+)
 ELECTION_DAYS = {
     1824: "1824-10-26",
     1828: "1828-10-31",
@@ -572,7 +578,20 @@ ELECTION_DAYS = {
     1876: "1876-11-07",
     1880: "1880-11-02",
 }
-YEAR_PRINT = {1856: "v65", 1860: "v65", 1864: "v65", 1852: "v61", 1868: "v69", 1848: "om254", 1844: "om254", 1840: "om254", 1836: "om254t", 1832: "om254t", 1828: "om254t", 1824: "om254t"}
+YEAR_PRINT = {
+    1856: "v65",
+    1860: "v65",
+    1864: "v65",
+    1852: "v61",
+    1868: "v69",
+    1848: "om254",
+    1844: "om254",
+    1840: "om254",
+    1836: "om254t",
+    1832: "om254t",
+    1828: "om254t",
+    1824: "om254t",
+}
 PRINT_VOLUME = {"v65": 1864, "v61": 1860, "v69": 1868, "om254": 1876, "om254t": 1876}
 PRINT_COLUMNS = {
     "v65": {
@@ -1608,6 +1627,14 @@ def emit() -> Path:
                     matched[surname] = hits[0]
                 elif len(hits) > 1:
                     skipped.append(f"{tag}: {surname} matches {len(hits)} tickets")
+            whigs = [option for option, (label, _) in tickets.items() if label.endswith("(Whig)")]
+            combined = None
+            absorbed: set[UUID] = set()
+            if year == 1836 and "Harrison" in surnames and "Harrison" not in matched and whigs:
+                combined = cs.key(f"{SOURCE}.option", f"{year}:{state}:{slug(WHIG_LABEL)}")
+                absorbed = set(whigs)
+                tickets[combined] = (WHIG_LABEL, sum(tickets.pop(option)[1] for option in whigs))
+                matched["Harrison"] = combined
             unmatched = [surname for surname in surnames if surname not in matched]
             if any(
                 surname not in LEGENDS and surname not in CANDIDATES and (year, state, surname) not in FUSION
@@ -1615,7 +1642,7 @@ def emit() -> Path:
             ):
                 skipped.append(f"{tag}: a printed candidate has no Wikipedia ticket")
                 continue
-            winning = {option for option, *_ in outcomes[rs]}
+            winning = {combined if option in absorbed else option for option, *_ in outcomes[rs]}
             free = [
                 value
                 for option, (_, value) in tickets.items()
@@ -1629,6 +1656,15 @@ def emit() -> Path:
                 continue
             result_set = cs.key(f"{SOURCE}.result_set", f"{year}:{state}")
             ids: dict[str, UUID] = dict(matched)
+            if combined is not None:
+                cs.add(
+                    "contest_option",
+                    id=combined,
+                    contest_id=contest,
+                    kind="legend",
+                    party_id=parties.get("whigparty"),
+                    ballot_label=WHIG_LABEL,
+                )
             for surname in unmatched:
                 if (year, state, surname) in FUSION:
                     label, party_name = "Fusion electors", None
@@ -1681,7 +1717,9 @@ def emit() -> Path:
                 "note",
                 entity_id=result_set,
                 kind="methodology",
-                body_md=(NOTE if year >= 1872 else note(year, volume)) + ("" if default else " " + HELD),
+                body_md=(NOTE if year >= 1872 else note(year, volume))
+                + ("" if combined is None else " " + WHIG_NOTE)
+                + ("" if default else " " + HELD),
             )
             if abs(total - total_before) / total_before > Decimal("0.01"):
                 differences.append(f"{tag}: printed lines total {total} against Wikipedia's {total_before}")
@@ -1732,7 +1770,7 @@ def emit() -> Path:
                 cs.add(
                     "outcome",
                     result_set_id=result_set,
-                    option_id=option,
+                    option_id=combined if option in absorbed else option,
                     kind=okind,
                     seats=seats,
                     candidacy_id=candidacy,
