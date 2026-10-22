@@ -373,6 +373,25 @@ export const coverageBuild = pgTable("coverage_build", {
 }, (table) => [
 check("coverage_build_id_check", sql`id`),]);
 
+export const coverageGoal = pgTable("coverage_goal", {
+	goal: text().notNull(),
+	state: text().notNull(),
+	level: text().notNull(),
+	year: integer().notNull(),
+	total: integer().notNull(),
+	complete: integer().notNull(),
+	absent: integer().notNull(),
+	bare: integer().notNull(),
+	totals: integer().notNull(),
+	partial: integer().notNull(),
+	coarse: integer().notNull(),
+	turnout: integer().notNull(),
+	precincts: integer().notNull(),
+	shaped: integer().notNull(),
+}, (table) => [
+	primaryKey({ columns: [table.goal, table.state, table.level, table.year], name: "coverage_goal_pkey"}),
+]);
+
 export const coverageGovernment = pgTable("coverage_government", {
 	id: text().primaryKey(),
 	state: text().notNull(),

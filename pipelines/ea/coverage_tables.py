@@ -13,7 +13,6 @@ from ea import coverage, raw, statewide_table
 from ea.store import ROOT, connect
 
 LOCK = 7_302_019
-FEDERAL = ("president", "us_senate", "us_house")
 STATE_LEVELS = (
     "president",
     "us_senate",
@@ -25,7 +24,6 @@ STATE_LEVELS = (
     "state_lower",
     "statewide_measure",
 )
-GROUPS = ("county", "municipality", "township", "school", "special", "other")
 OFFSETS = {"us_house": 2, "state_lower": 2, "us_senate": 6}
 JUDICIAL = {
     **dict.fromkeys(
@@ -509,148 +507,46 @@ def build() -> str:
                         shaped,
                     )
                 )
-    leaves: dict[tuple[int, str, str], list[int]] = defaultdict(lambda: [0, 0, 0, 0, 0, 0, 0, 0, 0])
-    kinds = {g["id"]: (g["state"], g["kind"]) for g in governments}
-    for gid, year, expected, n, missing, precinct, precincts, shaped in years_out:
-        st, kind = kinds[gid]
-        cell = leaves[(year, st, kind)]
-        cell[0] += 1
-        cell[1] += expected
-        cell[2] += n
-        cell[3] += missing
-        cell[4] += n - precinct + (expected and n == 0)
-        cell[5] += precincts - shaped
-        cell[6] += precincts
-        cell[7] += shaped
-        cell[8] += n + (expected and n == 0)
-
-    def node(path: str, parent: str | None, year: int, sort: int, label: str, kind: str) -> dict:
-        return {
-            "path": path,
-            "parent": parent,
-            "year": year,
-            "sort": sort,
-            "label": label,
-            "kind": kind,
-            "expected": None,
-            "held": 0,
-            "governments": None,
-            "missing": None,
-            "county": None,
-            "precinct": None,
-            "shapes": None,
-            "precincts": 0,
-            "shaped": 0,
-            "county_total": None,
-            "precinct_total": None,
-            "shapes_total": None,
-            "turnout": None,
-            "turnout_total": None,
-        }
-
-    nodes: dict[str, dict] = {}
-
-    def add(parent: str | None, chain: list[tuple[str, int, str, str]], year: int, values: dict) -> None:
-        for path, sort, label, kind in chain:
-            if path not in nodes:
-                nodes[path] = node(path, parent, year, sort, label, kind)
-            row = nodes[path]
-            for field, value in values.items():
-                if value is not None:
-                    row[field] = (row[field] or 0) + value
-            parent = path
-
     names = dict(states.values())
-    order = {st: i for i, st in enumerate(sorted(names, key=lambda s: names[s]))}
-    for (st, year, level, stage), c in by_key.items():
-        if level not in STATE_LEVELS or (st != "US" and st not in names):
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 10)
+    for (st, year, level, _), c in by_key.items():
+        if level not in STATE_LEVELS or st not in names:
             continue
-        expected = None if c["expected"] == "" else c["expected"]
-        base = max(expected or 0, c["held"])
-        county = (
-            base - c["county_or_finer"]
-            if st != "US" and c["target"] in ("county", "precinct") and level not in ("state_upper", "state_lower")
-            else None
-        )
-        precinct = base - c["precinct"] if c["target"] == "precinct" else None
-        shapes = c["target"] == "precinct" and c["precincts"] > 0
-        values = {
-            "expected": expected,
-            "held": c["held"],
-            "missing": max(0, (expected or 0) - c["held"]),
-            "county": county,
-            "precinct": precinct,
-            "shapes": c["precincts"] - c["shaped_precincts"] if shapes else None,
-            "precincts": c["precincts"],
-            "shaped": c["shaped_precincts"],
-            "county_total": None if county is None else base,
-            "precinct_total": None if precinct is None else base,
-            "shapes_total": c["precincts"] if shapes else None,
-            "turnout": c["held"] - c.get("with_turnout", 0),
-            "turnout_total": c["held"],
-        }
-        if str(year) not in nodes:
-            nodes[str(year)] = node(str(year), None, year, -year, str(year), "year")
-        level_sort = STATE_LEVELS.index(level)
-        if level in FEDERAL:
-            add(
-                None if st == "US" else str(year),
-                [
-                    *([(str(year), -year, str(year), "year")] if st == "US" else []),
-                    (f"{year}/federal", -1, "federal", "federal"),
-                    (f"{year}/federal/{level}", level_sort, level, "level"),
-                    (
-                        f"{year}/federal/{level}/{st}",
-                        order.get(st, -1),
-                        "national" if st == "US" else names[st],
-                        "state",
-                    ),
-                ],
-                year,
-                values,
-            )
-        if st == "US":
+        count = c["held"]
+        base = max(0 if c["expected"] == "" else c["expected"], count)
+        county = c["county_or_finer"]
+        partial = c.get("county_partial", 0)
+        bare = c.get("no_results", 0)
+        totals = max(0, count - county - partial - bare)
+        if year >= 2000:
+            precinct = c["precinct"]
+            for goal, complete, coarse in (("county", county, 0), ("precinct", precinct, max(0, county - precinct))):
+                cell = goals[(goal, st, level, year)]
+                for i, value in enumerate(
+                    [base, complete, base - count, bare, totals, partial, coarse, c.get("with_turnout", 0)]
+                ):
+                    cell[i] += value
+                if goal == "precinct":
+                    cell[8] += c["precincts"]
+                    cell[9] += c["shaped_precincts"]
+        elif coverage.target(st, level, year) == "county":
+            cell = goals[("history", st, level, year)]
+            for i, value in enumerate([base, county, base - count, bare, totals, partial, 0, c.get("with_turnout", 0)]):
+                cell[i] += value
+    kinds = {g["id"]: (g["state"], g["kind"]) for g in governments}
+    for gid, year, expected, n, _, _, precincts, shaped in years_out:
+        st, kind = kinds[gid]
+        if st not in names or not 2000 <= year <= today.year or not (expected or n):
             continue
-        add(
-            None,
-            [
-                (str(year), -year, str(year), "year"),
-                (f"{year}/{st}", order[st], names[st], "state"),
-                (f"{year}/{st}/{level}", level_sort, level, "level"),
-                (f"{year}/{st}/{level}/{stage}", coverage.STAGES.index(stage), stage, "stage"),
-            ],
-            year,
-            values,
-        )
-    for (year, st, kind), (count, expected, n, missing, precinct, shapes, precincts, shaped, total) in leaves.items():
-        if st not in names:
-            continue
-        add(
-            None,
-            [
-                (str(year), -year, str(year), "year"),
-                (f"{year}/{st}", order[st], names[st], "state"),
-                (f"{year}/{st}/{kind}", len(STATE_LEVELS) + GROUPS.index(kind), kind, "governments"),
-            ],
-            year,
-            {
-                "expected": expected,
-                "held": n,
-                "governments": count,
-                "missing": missing,
-                "county": None,
-                "precinct": precinct if year >= 2000 else None,
-                "shapes": shapes if year >= 2000 and precincts else None,
-                "precincts": precincts,
-                "shaped": shaped,
-                "precinct_total": total if year >= 2000 else None,
-                "shapes_total": precincts if year >= 2000 and precincts else None,
-            },
-        )
-    rows = list(nodes.values())
+        cell = goals[("local", st, kind, year)]
+        cell[0] += 1
+        cell[1] += n > 0
+        cell[2] += n == 0
+        cell[8] += precincts
+        cell[9] += shaped
 
     with connect() as conn, conn.transaction():
-        conn.execute("truncate coverage_row, coverage_government_year, coverage_government")
+        conn.execute("truncate coverage_goal, coverage_government_year, coverage_government")
         with conn.cursor().copy(
             "copy coverage_government (id, state, county, kind, name, function, population, active, polity_id, period,"
             " phase, month, basis) from stdin"
@@ -683,13 +579,12 @@ def build() -> str:
             for row in years_out:
                 copy.write_row(row)
         with conn.cursor().copy(
-            "copy coverage_row (path, parent, year, sort, label, kind, expected, held, governments, missing, county,"
-            " precinct, shapes, precincts, shaped, county_total, precinct_total, shapes_total, turnout,"
-            " turnout_total) from stdin"
+            "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
+            " turnout, precincts, shaped) from stdin"
         ) as copy:
-            for row in rows:
-                copy.write_row(list(row.values()))
+            for key, values in goals.items():
+                copy.write_row([*key, *values])
     return (
         f"{len(governments):,} governments ({len(link):,} linked), {len(years_out):,} government years, "
-        f"{len(rows):,} rows in {time.monotonic() - started:.0f}s"
+        f"{len(goals):,} goal rows in {time.monotonic() - started:.0f}s"
     )

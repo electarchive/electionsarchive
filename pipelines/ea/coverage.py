@@ -120,26 +120,43 @@ delete from district_county x
 where not exists (select from area_geometry g where g.area_id = x.district_area_id and g.valid = x.district_valid)
     or not exists (select from area_geometry g where g.area_id = x.county_area_id and g.valid = x.county_valid);
 
-insert into district_county
-select dg.area_id, dg.valid, cg.area_id, cg.valid, st_area(st_intersection(cg.geom, dg.geom)) / st_area(dg.geom)
-from (select distinct c.district_area_id as area_id, g.valid
+create temp table cty as
+select g.area_id, g.valid, g.geom from area_geometry g join area a on a.id = g.area_id and a.scheme_code = 'us.county';
+
+create index on cty using gist (geom);
+
+analyze cty;
+
+create temp table dp as
+select dg.area_id, dg.valid, st_pointonsurface(dg.geom) as pt, d.dates
+from (select c.district_area_id as area_id, g.valid, array_agg(distinct e.date_from) as dates
       from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
       join area_geometry g on g.area_id = c.district_area_id and g.valid @> e.date_from
-      where cc.level = 'us_house') d
+      where cc.level in ('us_house', 'state_upper', 'state_lower')
+      group by 1, 2) d
 join area_geometry dg on dg.area_id = d.area_id and dg.valid = d.valid
-join area_geometry cg on cg.valid && dg.valid and cg.geom && dg.geom and st_intersects(cg.geom, st_pointonsurface(dg.geom))
-join area a on a.id = cg.area_id and a.scheme_code = 'us.county'
-where st_area(dg.geom) > 0
-    and not exists (select from district_county x where x.district_area_id = d.area_id and x.district_valid = d.valid)
+where st_area(dg.geom) > 0;
+
+create temp table dn as
+select distinct dp.area_id, dp.valid, c.area_id as county_area_id, c.valid as county_valid
+from dp cross join unnest(dp.dates) t(d)
+join cty c on c.valid @> t.d and st_intersects(c.geom, dp.pt)
+where not exists (select from district_county x where x.district_area_id = dp.area_id and x.district_valid = dp.valid
+    and x.county_area_id = c.area_id and x.county_valid = c.valid);
+
+insert into district_county (district_area_id, district_valid, county_area_id, county_valid, share)
+select dn.area_id, dn.valid, dn.county_area_id, dn.county_valid, st_area(st_intersection(c.geom, dg.geom)) / st_area(dg.geom)
+from dn
+join area_geometry dg on dg.area_id = dn.area_id and dg.valid = dn.valid
+join cty c on c.area_id = dn.county_area_id and c.valid = dn.county_valid
 on conflict do nothing;
 
 update district_county x set rest = coalesce((
-    select max(st_area(st_intersection(cg.geom, dg.geom)) / st_area(dg.geom))
+    select max(st_area(st_intersection(c.geom, dg.geom)) / st_area(dg.geom))
     from area_geometry dg
-    join area_geometry cg on cg.area_id <> x.county_area_id and cg.geom && dg.geom
-        and cg.valid @> coalesce(lower(x.district_valid * x.county_valid), upper(x.district_valid * x.county_valid) - 1,
+    join cty c on c.area_id <> x.county_area_id and c.geom && dg.geom
+        and c.valid @> coalesce(lower(x.district_valid * x.county_valid), upper(x.district_valid * x.county_valid) - 1,
             current_date)
-    join area a on a.id = cg.area_id and a.scheme_code = 'us.county'
     where dg.area_id = x.district_area_id and dg.valid = x.district_valid), 0)
 where x.rest is null and x.share >= 0.5 and x.share < 0.98;
 
@@ -148,7 +165,7 @@ select distinct cc.id
 from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
 join district_county x on x.district_area_id = c.district_area_id and x.district_valid @> e.date_from
     and x.county_valid @> e.date_from
-where cc.level = 'us_house' and (x.share >= 0.98 or x.rest <= 0.02);
+where cc.level in ('us_house', 'state_upper', 'state_lower') and (x.share >= 0.98 or x.rest <= 0.02);
 
 create temp table rs as
 select r.k, r.contest_id, cs.pipeline,
@@ -242,6 +259,7 @@ group by cd.contest_id, cx.n;
 create temp table cg as
 select rs.contest_id,
     bool_or(ug.grain = 'precinct') as precinct,
+    bool_or(ug.grain = 'county') as any_county,
     bool_or(ug.grain = 'county' and (ug.scheme_code <> 'us.county' or cu.contest_id is null
         or cu.expected = 0 or cu.present >= 0.9 * cu.expected)) as county,
     bool_or(ug.grain = 'county' and (ug.scheme_code <> 'us.county' or cu.contest_id is null
@@ -253,7 +271,7 @@ group by rs.contest_id;
 
 COUNT_SQL = """
 with c as (
-    select cc.*, cg.precinct, cg.county, cg.county_free, exists (select from rs where rs.contest_id = cc.id) as results,
+    select cc.*, cg.precinct, cg.county, cg.county_free, cg.any_county, exists (select from rs where rs.contest_id = cc.id) as results,
         exists (select from sc where sc.id = cc.id) and exists (select from rs where rs.contest_id = cc.id) as single,
         exists (select from sc where sc.id = cc.id)
             and exists (select from rs where rs.contest_id = cc.id and not coalesce(rs.derived, false)) as single_free,
@@ -267,7 +285,9 @@ with c as (
 select st, year, level, stage, count(*), count(*) filter (where results),
     count(*) filter (where county or precinct or cancelled or single), count(*) filter (where precinct or cancelled),
     count(*) filter (where county and not county_free and not coalesce(precinct, false) and not single_free),
-    count(*) filter (where turnout), count(*) filter (where not tacit and (multi or stage <> 'primary'))
+    count(*) filter (where turnout), count(*) filter (where not tacit and (multi or stage <> 'primary')),
+    count(*) filter (where any_county and not (coalesce(county, false) or coalesce(precinct, false) or coalesce(cancelled, false) or single)),
+    count(*) filter (where not results and not coalesce(cancelled, false))
 from c group by 1, 2, 3, 4
 """
 
@@ -469,8 +489,12 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
             "icpsr_only": icpsr,
             "turnout": turnout,
             "contested": contested,
+            "partial": partial,
+            "bare": bare,
         }
-        for st, year, level, stage, n, results, county, precinct, icpsr, turnout, contested in conn.execute(COUNT_SQL)
+        for st, year, level, stage, n, results, county, precinct, icpsr, turnout, contested, partial, bare in conn.execute(
+            COUNT_SQL
+        )
     }
     conn.execute(
         "create table if not exists coverage_cache_shapes (key text primary key, signature text not null, "
@@ -618,7 +642,13 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         for kind in ("historical", "current")
         for person in json.loads(raw.cached("us.clerk", LEGISLATORS.format(kind=kind)).path.read_text())
     ]
-    convenings = {1860: date(1861, 3, 4), 1862: date(1863, 3, 4), 1864: date(1865, 3, 4), 1866: date(1867, 3, 4), 1868: date(1869, 3, 4)}
+    convenings = {
+        1860: date(1861, 3, 4),
+        1862: date(1863, 3, 4),
+        1864: date(1865, 3, 4),
+        1866: date(1867, 3, 4),
+        1868: date(1869, 3, 4),
+    }
     unrepresented = defaultdict(set)
     for member in members:
         for term in member["terms"]:
@@ -631,7 +661,9 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         for year in range(1860, 1868, 2):
             key = (st, year, "us_house", "general")
             if key in expected:
-                expected[key] = min(expected[key], max(held.get(key, {}).get("held", 0), len(unrepresented[(st, year)])))
+                expected[key] = min(
+                    expected[key], max(held.get(key, {}).get("held", 0), len(unrepresented[(st, year)]))
+                )
 
     abbreviations = {st for st, _ in states.values()}
     seated = defaultdict(list)
@@ -720,7 +752,19 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
         st, year, level, stage = key
         if year > last:
             continue
-        cell = held.get(key, {"held": 0, "results": 0, "county": 0, "precinct": 0, "icpsr_only": 0, "turnout": 0})
+        cell = held.get(
+            key,
+            {
+                "held": 0,
+                "results": 0,
+                "county": 0,
+                "precinct": 0,
+                "icpsr_only": 0,
+                "turnout": 0,
+                "partial": 0,
+                "bare": 0,
+            },
+        )
         exp = expected.get(key)
         base = max(exp or 0, cell["held"])
         goal = target(st, level, year)
@@ -737,6 +781,8 @@ def matrix(conn: Connection, last: int = LAST) -> list[dict]:
                 "missing": max(0, (exp or 0) - cell["held"]),
                 "with_results": cell["results"],
                 "county_or_finer": cell["county"],
+                "county_partial": cell["partial"],
+                "no_results": cell["bare"],
                 "precinct": cell["precinct"],
                 "with_turnout": cell["turnout"],
                 "precinct_share": round(cell["precinct"] / cell["held"], 3) if cell["held"] else 0,
