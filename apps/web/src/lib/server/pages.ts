@@ -604,6 +604,7 @@ export async function comparison(ids: Array<string>) {
         order by r.rank desc, r.tie desc
       `);
   return {
+    kind: "comparison" as const,
     sides: found.rows,
     examples: examples?.rows ?? [],
     rivals: rivals?.rows ?? [],

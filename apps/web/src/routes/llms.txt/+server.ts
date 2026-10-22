@@ -15,7 +15,7 @@ export const GET: RequestHandler = async ({ url }) => {
 
 Every page is also available as Markdown or JSON. Add \`.md\` or \`.json\` to any page URL, or send an \`Accept: text/markdown\` or \`Accept: application/json\` header. Links inside the Markdown point to other Markdown pages, so you can browse the archive without leaving Markdown. The home page is at ${origin}/index.md.
 
-Pages follow the place, then the election, then the contest, then the reporting unit: ${origin}/us/ga/2020-11-03-general/senate/fulton-county-ga. People are at /people/<slug>, parties at /parties/<polity>/<slug>, and /id/<uuid> redirects any record to its page.
+Pages follow the place, then the election, then the contest, then the reporting unit: ${origin}/us/ga/2020-11-03-general/senate/fulton-county-ga. People are at /people/<slug>, parties at /parties/<polity>/<slug> (add \`?in=<polity path>\` for one state's or region's branch), chambers at /chambers/<polity>/<slug>, and /id/<uuid> redirects any record to its page. Add \`?vs=previous\`, or \`?vs=<election path or uuid>\`, to a contest page to compare it with an earlier election: the twins then carry the earlier share and the change in percentage points for every candidate and place. /compare?a=<uuid>&b=<uuid> sets two people, two places, or two parties side by side.
 
 ## API
 

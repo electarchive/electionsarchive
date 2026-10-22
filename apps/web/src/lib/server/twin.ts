@@ -3,11 +3,25 @@ import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { count, date, percent, points } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
-import { archive, home, party, person } from "#lib/server/pages.js";
+import {
+  archive,
+  chamber,
+  comparison,
+  home,
+  party,
+  person,
+} from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
 
 type Data = Awaited<
-  ReturnType<typeof home | typeof person | typeof party | typeof archive>
+  ReturnType<
+    | typeof home
+    | typeof person
+    | typeof party
+    | typeof chamber
+    | typeof comparison
+    | typeof archive
+  >
 >;
 type Link = (name: string, path: string | null) => string;
 
@@ -39,7 +53,7 @@ const OUTCOMES: Record<string, () => string> = {
   won: m.outcome_won,
   advanced: m.outcome_advanced,
   tied: m.outcome_tied,
-  lost: m.outcome_lost,
+  lost: m.person_lost_mark,
 };
 
 const outcome = (value: string | null) =>
@@ -116,7 +130,15 @@ async function load(segments: Array<string>, search: URLSearchParams) {
     return person(rest[0] ?? "");
   }
   if (head === "parties" && rest.length > 0) {
-    return party(rest.join("/"));
+    return party(rest.join("/"), search.get("in"));
+  }
+  if (head === "chambers" && rest.length > 0) {
+    return chamber(rest.join("/"));
+  }
+  if (head === "compare" && rest.length === 0) {
+    return comparison(
+      [search.get("a"), search.get("b")].filter((id) => id != null),
+    );
   }
   return archive(segments.join("/"), search);
 }
@@ -159,12 +181,17 @@ export async function twin({ request, url }: RequestEvent) {
       );
     }
     const base = `${url.origin}${pathname === "/" ? "/index" : pathname}`;
-    const link: Link = (name, path) =>
-      path == null ? name : `[${name}](${url.origin}/${path}.md)`;
+    const link: Link = (name, path) => {
+      if (path == null) {
+        return name;
+      }
+      const [route = "", query] = path.split("?", 2);
+      return `[${name}](${url.origin}/${route}.md${query == null ? "" : `?${query}`})`;
+    };
     return new Response(
       `${markdown(data, link).join("\n\n")}\n\n${m.twin_alternates({
-        html: `${url.origin}${pathname}`,
-        json: `${base}.json`,
+        html: `${url.origin}${pathname}${url.search}`,
+        json: `${base}.json${url.search}`,
       })}\n`,
       { headers },
     );
@@ -230,6 +257,12 @@ function markdown(data: Data, link: Link) {
     }
     case "party": {
       return partyMarkdown(data, link);
+    }
+    case "chamber": {
+      return chamberMarkdown(data, link);
+    }
+    case "comparison": {
+      return comparisonMarkdown(data, link);
     }
     case "polity": {
       return polityMarkdown(data.polity, link);
@@ -301,7 +334,9 @@ function partyMarkdown(
     ),
   ];
   return [
-    `# ${party.name}${party.short != null && party.short !== party.name ? ` (${party.short})` : ""}`,
+    party.scope == null
+      ? `# ${party.name}${party.short != null && party.short !== party.name ? ` (${party.short})` : ""}`
+      : `# ${m.party_scope_title({ party: party.name, place: party.scope.polity.name })}`,
     ...(party.polity == null
       ? []
       : [
@@ -440,22 +475,12 @@ function contestMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
   link: Link,
 ) {
-  const hasSeats = contest.rows.some((row) => row.current?.seats != null);
-  const results = contest.rows.flatMap((row) =>
-    row.current == null
-      ? []
-      : [
-          [
-            row.label,
-            count(row.current.votes),
-            percent(row.current.share),
-            ...(hasSeats
-              ? [row.current.seats == null ? null : count(row.current.seats)]
-              : []),
-            outcome(row.current.outcome),
-          ],
-        ],
-  );
+  const { target } = contest;
+  const then =
+    target == null
+      ? null
+      : String(target.year ?? target.date?.slice(0, 4) ?? target.name);
+  const compared = comparedMarkdown(contest, link, then);
   return [
     `# ${contest.name}`,
     byline(contest.breadcrumbs, link, contest.election.date),
@@ -465,19 +490,9 @@ function contestMarkdown(
           .join(" / ")
       : "",
     ...contest.notes.map((note) => `> ${note.body}`),
-    contest.current == null || results.length === 0
-      ? m.no_results()
-      : `${table(
-          [
-            m.col_option(),
-            m.col_votes(),
-            m.col_share(),
-            ...(hasSeats ? [m.col_seats()] : []),
-            m.col_result(),
-          ],
-          results,
-        )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}`,
-    ...placesMarkdown(contest.places, link),
+    ...compared,
+    resultsMarkdown(contest, then),
+    ...placesMarkdown(contest.places, link, then),
     ...(contest.children.length === 0
       ? []
       : [
@@ -501,13 +516,105 @@ function contestMarkdown(
   ].filter((block) => block !== "");
 }
 
+function resultsMarkdown(
+  contest: Extract<Data, { kind: "contest" }>["contest"],
+  then: string | null,
+) {
+  const hasSeats = contest.rows.some((row) => row.current?.seats != null);
+  const results = contest.rows
+    .filter(
+      (row) => row.current != null || (then != null && row.earlier != null),
+    )
+    .map(({ label, current, earlier, delta }) => [
+      label,
+      current && count(current.votes),
+      current && percent(current.share),
+      ...(hasSeats
+        ? [current?.seats == null ? null : count(current.seats)]
+        : []),
+      ...(then == null
+        ? []
+        : [
+            earlier && percent(earlier.share),
+            delta == null ? null : points(delta),
+          ]),
+      current?.outcome === "lost"
+        ? m.outcome_lost()
+        : outcome(current?.outcome ?? null),
+    ]);
+  return contest.current == null || results.length === 0
+    ? m.no_results()
+    : `${table(
+        [
+          m.col_option(),
+          m.col_votes(),
+          m.col_share(),
+          ...(hasSeats ? [m.col_seats()] : []),
+          ...(then == null
+            ? []
+            : [m.col_share_in({ year: then }), m.col_change()]),
+          m.col_result(),
+        ],
+        results,
+      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}`;
+}
+
+function comparedMarkdown(
+  contest: Extract<Data, { kind: "contest" }>["contest"],
+  link: Link,
+  then: string | null,
+) {
+  const { target } = contest;
+  if (target == null || then == null) {
+    return [];
+  }
+  const years = [Number(then), Number(contest.election.date?.slice(0, 4))];
+  const from = String(Math.min(...years));
+  const to = String(Math.max(...years));
+  return [
+    [
+      `${m.compare_label()}: ${link(target.name, target.path)}. ${contest.comparison.label === "exact" ? m.quality_exact_detail() : m.quality_estimated_detail()}`,
+      ...contest.comparison.notes.map((note) => {
+        if (note.code === "partial") {
+          const value = percent(Number(note.value));
+          return note.side === "target"
+            ? m.note_partial_target({ percent: value })
+            : m.note_partial_current({ percent: value });
+        }
+        if (note.code === "redrawn") {
+          return m.note_redrawn({
+            from,
+            to,
+            percent: percent(Number(note.value) / 100),
+          });
+        }
+        if (note.code === "alternative") {
+          const publisher = note.value ?? "";
+          return note.side === "target"
+            ? m.note_alternative_target({ publisher })
+            : m.note_alternative_current({ publisher });
+        }
+        return {
+          no_target: m.note_no_target,
+          not_covered: m.note_not_covered,
+          different_race: m.note_different_race,
+          annulled: m.note_annulled,
+        }[note.code]();
+      }),
+    ].join("\n\n"),
+  ];
+}
+
 function placesMarkdown(
   places: Extract<Data, { kind: "contest" }>["contest"]["places"],
   link: Link,
+  then: string | null,
 ) {
   if (places == null || places.rows.length === 0) {
     return [];
   }
+  const isCompared =
+    then != null && places.rows.some((row) => row.earlier != null);
   const noun =
     places.levels.find((level) => level.code === places.level)?.noun ??
     places.level;
@@ -519,16 +626,34 @@ function placesMarkdown(
         m.col_leader(),
         m.col_share(),
         m.col_margin(),
+        ...(isCompared ? [m.col_share_in({ year: then }), m.col_change()] : []),
         m.stat_valid(),
       ],
-      places.rows.map((row) => [
-        link(row.name, row.path),
-        row.leader == null ? null : (places.legend[row.leader]?.label ?? null),
-        row.leader == null ? null : percent(row.shares[row.leader] ?? 0),
-        row.margin == null ? null : points(row.margin),
-        count(row.valid),
-      ]),
+      places.rows.map((row) => {
+        const before =
+          row.leader == null ? null : (row.earlier?.[row.leader] ?? null);
+        return [
+          link(row.name, row.path),
+          row.leader == null
+            ? null
+            : (places.legend[row.leader]?.label ?? null),
+          row.leader == null ? null : percent(row.shares[row.leader] ?? 0),
+          row.margin == null ? null : points(row.margin),
+          ...(isCompared
+            ? [
+                before == null ? null : percent(before),
+                before == null || row.leader == null
+                  ? null
+                  : points((row.shares[row.leader] ?? 0) - before),
+              ]
+            : []),
+          count(row.valid),
+        ];
+      }),
     ),
+    ...(isCompared && places.estimated === true
+      ? [m.atlas_estimated_note({ year: then })]
+      : []),
   ];
 }
 
@@ -548,4 +673,201 @@ function sourcesMarkdown(
   return sources.length === 0
     ? []
     : [`## ${m.sources_title()}`, sources.join("\n")];
+}
+
+function chamberMarkdown(
+  { body, terms, parties, members }: Extract<Data, { kind: "chamber" }>,
+  link: Link,
+) {
+  const KINDS: Record<string, () => string> = {
+    lower_house: m.chamber_kind_lower_house,
+    upper_house: m.chamber_kind_upper_house,
+    unicameral: m.chamber_kind_unicameral,
+  };
+  const names = new Map(
+    [...parties, ...(members?.parties ?? [])].map((entry) => [
+      entry.id,
+      entry.label,
+    ]),
+  );
+  const label = (id: string | null) =>
+    id == null ? m.record_none() : (names.get(id) ?? "");
+  const last = terms.at(-1);
+  const first = last?.start.slice(0, 4) ?? "";
+  const final = last?.end?.slice(0, 4) ?? m.governments_present();
+  const sitting = (members?.members ?? []).filter((member) => member.isVoting);
+  return [
+    `# ${body.name}`,
+    byline(body.crumbs, link, null),
+    m.chamber_of({
+      kind: (KINDS[body.kind] ?? m.chamber_kind_other)(),
+      polity: link(body.polity.name, body.polity.path),
+    }),
+    `## ${m.chamber_makeup_title()}`,
+    terms.length === 0
+      ? m.chamber_no_election()
+      : table(
+          [
+            m.col_date(),
+            m.chamber_elected(),
+            m.chamber_seats(),
+            m.chamber_largest(),
+          ],
+          terms.toReversed().map((term) => {
+            const largest = term.parties.toSorted(
+              (a, b) => b.seats - a.seats,
+            )[0];
+            return [
+              date(term.start),
+              term.election == null
+                ? null
+                : link(term.election.name, term.election.path),
+              count(term.size ?? term.total),
+              largest == null
+                ? null
+                : `${label(largest.party)} (${count(largest.seats)})`,
+            ];
+          }),
+        ),
+    ...(sitting.length === 0
+      ? []
+      : [
+          `## ${(members?.isSeated === true ? m.chamber_members_title : m.chamber_members_returned)({ span: first === final ? first : m.polity_span({ first, last: final }) })}`,
+          table(
+            [m.col_name(), m.col_party(), m.chamber_joined(), m.chamber_left()],
+            sitting.map((member) => [
+              `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
+              label(member.party),
+              date(member.from),
+              date(member.to),
+            ]),
+          ),
+        ]),
+  ].filter((block) => block !== "");
+}
+
+const pair = (one: string, two: string) => `compare?a=${one}&b=${two}`;
+
+function comparisonMarkdown(
+  data: Extract<Data, { kind: "comparison" }>,
+  link: Link,
+) {
+  const [a, b] = data.sides;
+  const heading = [`# ${m.versus_title()}`];
+  if (a == null || b == null) {
+    return [
+      ...heading,
+      m.versus_lede(),
+      ...(data.examples.length === 0
+        ? []
+        : [
+            `## ${m.versus_examples()}`,
+            data.examples
+              .map(
+                (example) =>
+                  `- ${link(`${example.first} / ${example.second}`, pair(example.a, example.b))}`,
+              )
+              .join("\n"),
+          ]),
+      ...(a == null || data.rivals.length === 0
+        ? []
+        : [
+            `## ${link(a.name, `id/${a.id}`)}: ${m.versus_rivals()}`,
+            data.rivals
+              .map(
+                (rival) =>
+                  `- ${link(`${a.name} / ${rival.name}`, pair(a.id, rival.id))}`,
+              )
+              .join("\n"),
+          ]),
+    ];
+  }
+  heading.push(`${link(a.name, `id/${a.id}`)} / ${link(b.name, `id/${b.id}`)}`);
+  if (data.people != null) {
+    const [one, two] = data.people;
+    const theirs = new Map(
+      (two?.record ?? []).flatMap((entry) =>
+        entry.path == null ? [] : [[entry.path, entry]],
+      ),
+    );
+    const cell = (entry: NonNullable<typeof one>["record"][number]) =>
+      [
+        entry.votes == null || entry.total == null || entry.total === 0
+          ? null
+          : percent(entry.votes / entry.total),
+        outcome(entry.outcome),
+      ]
+        .filter((part) => part != null)
+        .join(", ");
+    const shared = (one?.record ?? []).flatMap((entry) => {
+      const other = entry.path == null ? null : theirs.get(entry.path);
+      return other == null
+        ? []
+        : [
+            [
+              entry.year,
+              link(entry.name, entry.path),
+              cell(entry),
+              cell(other),
+            ],
+          ];
+    });
+    return [
+      ...heading,
+      `## ${m.versus_head_title()}`,
+      shared.length === 0
+        ? m.versus_head_none()
+        : table([m.col_year(), m.col_contest(), a.name, b.name], shared),
+    ];
+  }
+  if (data.places != null) {
+    const top = (
+      options: Array<{ label: string; share: number }> | undefined,
+    ) => {
+      const best = options?.toSorted((x, y) => y.share - x.share)[0];
+      return best == null ? null : `${best.label}, ${percent(best.share)}`;
+    };
+    return [
+      ...heading,
+      ...(data.places.series.length === 0
+        ? [m.versus_places_none()]
+        : data.places.series.flatMap((series) => [
+            `## ${series.name ?? m.versus_overall()}`,
+            table(
+              [m.col_date(), m.col_contest(), a.name, b.name],
+              series.points
+                .toReversed()
+                .map((point) => [
+                  date(point.date),
+                  link(point.name, point.path),
+                  top(point.sides[0]),
+                  top(point.sides[1]),
+                ]),
+            ),
+          ])),
+    ];
+  }
+  if (data.parties != null) {
+    return [
+      ...heading,
+      ...(data.parties.series.length === 0
+        ? [m.versus_parties_none()]
+        : data.parties.series.flatMap((series) => [
+            `## ${series.name}`,
+            table(
+              [m.col_date(), m.col_election(), a.name, b.name],
+              series.points
+                .toReversed()
+                .map((point) => [
+                  date(point.date),
+                  link(point.name, point.path),
+                  ...point.sides.map((side) =>
+                    side == null ? null : percent(side.share),
+                  ),
+                ]),
+            ),
+          ])),
+    ];
+  }
+  return [...heading, m.versus_mismatch()];
 }
