@@ -883,7 +883,12 @@
       };
     }),
   );
-  const others = $derived(races.slice(1).filter((race) => !race.isLater));
+  const isBallot = $derived(
+    races.length > 2 && races.every((race) => race.kind === "ballot_question"),
+  );
+  const others = $derived(
+    isBallot ? races : races.slice(1).filter((race) => !race.isLater),
+  );
 </script>
 
 <header class="col-span-12 grid gap-1.5 bg-card px-3.5 pbs-4 pbe-3.5">
@@ -962,7 +967,10 @@
 {/if}
 
 {#each races as race, index (index)}
-  {#if index === 0 && race.results.length > 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
+  {#if index === 0 && isBallot}
+    {@render board()}
+  {/if}
+  {#if index === 0 && !isBallot && race.results.length > 0 && (others.length > 0 || race.balance.parts.some((part) => part.value > 0))}
     <section
       id="race-{race.anchor}"
       class="col-span-12 grid scroll-mbs-4 gap-x-10 gap-y-3 bg-card px-3.5 pbs-4 pbe-3 lg:grid-cols-[minmax(0,5fr)_minmax(0,7fr)]"
@@ -1198,48 +1206,52 @@
         publishers={[]}
         votes={shown === race.decided?.places ? m.col_votes() : race.votes}
         {isMapped}
-        limit={10}
+        limit={isBallot ? 5 : 10}
       />
     {/if}
   {/if}
-  {#if index === 0 && others.length > 0}
-    <section class="col-span-12 bg-card px-3.5" aria-labelledby="board-title">
-      <h2 id="board-title" class="sr-only">
-        {m.board_title({ count: races.length })}
-      </h2>
-      <ol
-        class="grid gap-x-10 lg:grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]"
-      >
-        {#each others as other (other.anchor)}
-          <li
-            class="grid content-start gap-3 border-bs border-border py-4 lg:border-bs-0 max-lg:first:border-bs-0"
-          >
-            <div class="grid content-start gap-1">
-              <h3
-                class="text-lg/tight font-[740] tracking-[-0.012em] text-balance"
-              >
-                <a
-                  class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
-                  href="#race-{other.anchor}">{other.name}</a
-                >
-              </h3>
-              {#if other.lede != null}
-                {@render lede(other, false)}
-              {/if}
-            </div>
-            {#if other.results.length === 0}
-              <p class="text-[0.9375rem] text-muted-foreground">
-                {m.no_results()}
-              </p>
-            {:else}
-              {@render tally(other, false)}
-            {/if}
-          </li>
-        {/each}
-      </ol>
-    </section>
+  {#if index === 0 && others.length > 0 && !isBallot}
+    {@render board()}
   {/if}
 {/each}
+
+{#snippet board()}
+  <section class="col-span-12 bg-card px-3.5" aria-labelledby="board-title">
+    <h2 id="board-title" class="sr-only">
+      {m.board_title({ count: races.length })}
+    </h2>
+    <ol
+      class="grid gap-x-10 lg:grid-cols-[repeat(auto-fit,minmax(min(100%,22rem),1fr))]"
+    >
+      {#each others as other (other.anchor)}
+        <li
+          class="grid content-start gap-3 border-bs border-border py-4 lg:border-bs-0 max-lg:first:border-bs-0"
+        >
+          <div class="grid content-start gap-1">
+            <h3
+              class="text-lg/tight font-[740] tracking-[-0.012em] text-balance"
+            >
+              <a
+                class="underline decoration-transparent underline-offset-4 hover:decoration-foreground"
+                href="#race-{other.anchor}">{other.name}</a
+              >
+            </h3>
+            {#if other.lede != null}
+              {@render lede(other, false)}
+            {/if}
+          </div>
+          {#if other.results.length === 0}
+            <p class="text-[0.9375rem] text-muted-foreground">
+              {m.no_results()}
+            </p>
+          {:else}
+            {@render tally(other, false)}
+          {/if}
+        </li>
+      {/each}
+    </ol>
+  </section>
+{/snippet}
 
 {#snippet lede(race: (typeof races)[number], isLead: boolean)}
   <p
