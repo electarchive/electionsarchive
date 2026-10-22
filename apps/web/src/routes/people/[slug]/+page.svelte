@@ -36,15 +36,27 @@
           : entry.votes / entry.total,
     })),
   );
+  const elections = $derived(
+    [...Map.groupBy(entries, (entry) => entry.election).values()].map((group) =>
+      group.map((entry) => entry.outcome),
+    ),
+  );
   const won = $derived(
-    entries.filter(
-      (entry) => entry.outcome === "elected" || entry.outcome === "won",
+    elections.filter(
+      (outcomes) => outcomes.includes("elected") || outcomes.includes("won"),
     ).length,
   );
   const advanced = $derived(
-    entries.filter((entry) => entry.outcome === "advanced").length,
+    elections.filter(
+      (outcomes) =>
+        outcomes.includes("advanced") &&
+        !outcomes.includes("elected") &&
+        !outcomes.includes("won"),
+    ).length,
   );
   const years = $derived(entries.map((entry) => entry.year));
+  const first = $derived(Math.min(...years));
+  const last = $derived(Math.max(...years));
   const today = new Date().toISOString().slice(0, 10);
   const low = $derived(
     Math.min(
@@ -157,15 +169,26 @@
           <p
             class="font-serif text-[clamp(1.0625rem,1.6vw,1.25rem)]/snug text-pretty max-inline-[60ch]"
           >
-            {entries.length === 1
-              ? m.person_lede_single({ year: String(years[0]) })
-              : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
-                  won: count(won),
-                  advanced: count(advanced),
-                  count: count(entries.length),
-                  first: String(Math.min(...years)),
-                  last: String(Math.max(...years)),
-                })}
+            {elections.length === 1
+              ? (won > 0 ? m.person_lede_single_won : m.person_lede_single)({
+                  year: String(first),
+                })
+              : first === last
+                ? (advanced > 0
+                    ? m.person_lede_advanced_year
+                    : m.person_lede_year)({
+                    won: count(won),
+                    advanced: count(advanced),
+                    count: count(elections.length),
+                    year: String(first),
+                  })
+                : (advanced > 0 ? m.person_lede_advanced : m.person_lede)({
+                    won: count(won),
+                    advanced: count(advanced),
+                    count: count(elections.length),
+                    first: String(first),
+                    last: String(last),
+                  })}
           </p>
         {/if}
         {#if person.served.length > 0}

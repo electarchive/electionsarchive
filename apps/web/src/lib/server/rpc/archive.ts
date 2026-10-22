@@ -10359,6 +10359,7 @@ export const people = {
             date: v.string(),
             year: v.number(),
             kind: v.string(),
+            election: v.string(),
             measure: v.string(),
             votes: v.nullable(v.number()),
             total: v.nullable(v.number()),
@@ -10392,6 +10393,7 @@ export const people = {
         date: string;
         year: number;
         kind: string;
+        election: string;
         measure: number | null;
         votes: number | null;
         total: number | null;
@@ -10436,7 +10438,7 @@ export const people = {
           select grp.root, c.id from contest c join grp on c.allocation_parent_id = grp.id
         ),
         placed as materialized (
-          select c.id as root, a.k as area, e.date_from as date, ${CYCLE} as year, e.kind::text as kind
+          select c.id as root, a.k as area, e.date_from as date, ${CYCLE} as year, e.kind::text as kind, e.id as election
           from contest c join election e on e.id = c.election_id
           left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
           join area a on a.id = coalesce(c.district_area_id, pt.area_id)
@@ -10478,7 +10480,7 @@ export const people = {
           where f.count_round = d.round and f.option <> 0
           group by f.root, m.main, m.appointed
         )
-        select p.root, p.date::text as date, p.year, p.kind, t.main::int as measure, t.votes,
+        select p.root, p.date::text as date, p.year, p.kind, p.election, t.main::int as measure, t.votes,
           case when t.main = 11 then coalesce(t.appointed, t.total) else t.total end as total,
           coalesce(
             (select (array_agg(x.kind::text order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
@@ -10572,6 +10574,7 @@ export const people = {
             date: row.date,
             year: row.year,
             kind: row.kind,
+            election: row.election,
             measure: MEASURES.get(row.measure ?? 1) ?? "votes",
             votes: row.votes,
             total: row.total,
