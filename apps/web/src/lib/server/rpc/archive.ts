@@ -6743,6 +6743,13 @@ async function races(
   const chambers = built
     .filter((race) => race.isNational && race.count === 1 && race.body != null)
     .map((race) => race.chamber);
+  const weights = new Map<string | null, number>();
+  for (const race of built) {
+    weights.set(
+      race.scope ?? null,
+      Math.max(weights.get(race.scope ?? null) ?? 0, race.valid),
+    );
+  }
   return built
     .filter(
       (race) =>
@@ -6756,7 +6763,9 @@ async function races(
           Number(b.kind === "ballot_question") ||
         (a.kind === "ballot_question"
           ? a.name.localeCompare(b.name, undefined, { numeric: true })
-          : a.rank - b.rank ||
+          : (weights.get(b.scope ?? null) ?? 0) -
+              (weights.get(a.scope ?? null) ?? 0) ||
+            a.rank - b.rank ||
             Number(a.rank === 1 && b.count === 1) -
               Number(a.rank === 1 && a.count === 1) ||
             b.valid - a.valid),
