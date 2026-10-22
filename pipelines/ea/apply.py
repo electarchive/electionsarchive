@@ -688,7 +688,9 @@ def defaults(
             LiteralString,
             f"""with picked as (
                   select distinct on (d.id) d.id as old, d.k as old_k, r.id as new, r.k as new_k,
-                         r.stage = d.stage as same, d.contest_id
+                         r.stage = d.stage as same, d.contest_id,
+                         exists (select from external_id x where x.scheme = 'ea.authoritative' and x.value = r.id::text)
+                           as authoritative
                   from result_set d
                   join source ds on ds.id = d.source_id and ds.kind <> 'official_body'
                   join result_set r on r.election_id = d.election_id and r.contest_id = d.contest_id
@@ -706,21 +708,22 @@ def defaults(
                 select p.old::text, p.new::text, p.same, p.contest_id::text, ({tally.format("old_k")}),
                        ({tally.format("new_k")}),
                        array(select o.k::text from outcome x join contest_option o on o.id = x.option_id
-                             where x.result_set_id = p.old and x.candidacy_id is null and x.kind in ('elected', 'won'))
+                             where x.result_set_id = p.old and x.candidacy_id is null and x.kind in ('elected', 'won')),
+                       p.authoritative
                 from picked p""",
         ),
         {"contests": contests},
     ).fetchall()
     flipped: list[tuple[str, str, bool]] = []
     skipped: list[dict[str, object]] = []
-    for old, new, same, contest, before, after, winners in picks:
+    for old, new, same, contest, before, after, winners, authoritative in picks:
         total, counted = sum(before.values()), sum(after.values())
         losing = [votes for option, votes in after.items() if option not in winners]
         reason = (
             "no votes"
             if not counted
             else f"counts {counted} against {total}"
-            if total and not 0.98 <= counted / total <= 1.02
+            if total and not authoritative and not 0.98 <= counted / total <= 1.02
             else "winner differs"
             if winners
             and (

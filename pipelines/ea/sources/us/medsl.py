@@ -702,6 +702,7 @@ def attach(
     extend: bool = False,
     canvass: bool = False,
     partial: str | None = None,
+    authoritative: str | None = None,
 ) -> None:
     tag = str(cs.manifest["pipeline"])
     located = "page_id" in congress.columns
@@ -854,10 +855,10 @@ def attach(
                 held_back |= medsl < fec * 0.9
                 overcounted |= medsl > fec
                 undercounted |= medsl < fec
-        if overcounted and not canvass:
+        if overcounted and not canvass and authoritative is None:
             print(f"{key}: a candidate's county sum exceeds the FEC total, skipped")
             continue
-        if undercounted and (strict or ":" in chamber) and (partial is None or held_back):
+        if undercounted and authoritative is None and (strict or ":" in chamber) and (partial is None or held_back):
             print(f"{key}: a candidate's county sum falls short of the FEC total, skipped")
             continue
         pooled = tallies.with_columns(
@@ -890,10 +891,17 @@ def attach(
                 f"{key}: {max(missing, key=lambda line: line[2])[1]} has over 1 percent of the vote and matches no option, skipped"
             )
             continue
-        if not canvass and counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1:
+        if (
+            not canvass
+            and authoritative is None
+            and counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() > official * 1.1
+        ):
             print(f"{key}: the county sum exceeds the official total by over 10 percent, skipped")
             continue
-        if counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() < official * 0.5:
+        if (
+            authoritative is None
+            and counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum() < official * 0.5
+        ):
             print(f"{key}: the county sum covers under half the official total, skipped")
             continue
         unmatched.extend(missing)
@@ -955,7 +963,7 @@ def attach(
             source_id=sources[lines["source"][0]],
             is_default=False,
             completeness=1
-            if canvass
+            if canvass or authoritative is not None
             else round(
                 float(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum()) / float(official), 4
             ),
@@ -969,6 +977,17 @@ def attach(
                 kind="caveat",
                 body_md=f"The county totals add up to {counted_votes:,} votes against the official {int(official):,}: {partial}.",
             )
+        if authoritative is not None:
+            if result_set in cs.minted:
+                cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
+            counted_votes = int(counted.filter(pl.col("candidate").is_in(list(picked)))["votes"].sum())
+            if abs(counted_votes - official) > max(100, official * 0.02):
+                cs.add(
+                    "note",
+                    entity_id=result_set,
+                    kind="caveat",
+                    body_md=f"The certified county totals add up to {counted_votes:,} votes. The earlier default set counts {int(official):,}. {authoritative}",
+                )
         members: dict[str, str] = {}
         for code, kind in lines.select("code", "kind").unique().iter_rows():
             if (
