@@ -46,7 +46,24 @@ MA_ROW = re.compile(
     r'id="election-id-(\d+)".*?<td[^>]*>(\d{4})</td>\s*<td[^>]*>[^<]*</td>\s*<td[^>]*>([^<]*)</td>\s*<td[^>]*>([^<]*)</td>',
     re.DOTALL,
 )
-MA_PRIMARIES = {1992: date(1992, 9, 15)}
+MA_PRIMARIES = {
+    1992: date(1992, 9, 15),
+    1994: date(1994, 9, 20),
+    1996: date(1996, 9, 17),
+    1998: date(1998, 9, 15),
+    2000: date(2000, 9, 19),
+    2002: date(2002, 9, 17),
+    2004: date(2004, 9, 14),
+    2006: date(2006, 9, 19),
+    2008: date(2008, 9, 16),
+    2010: date(2010, 9, 14),
+    2012: date(2012, 9, 6),
+    2014: date(2014, 9, 9),
+    2016: date(2016, 9, 8),
+    2018: date(2018, 9, 4),
+    2020: date(2020, 9, 1),
+    2022: date(2022, 9, 6),
+}
 MA_FIRST = 1970
 OFFICES = ["U.S. House", "U.S. Senate", "United States", "Congress"]
 DIVISIONS = {"County": "county", "Locality": "county", "City/Town": "town"}
