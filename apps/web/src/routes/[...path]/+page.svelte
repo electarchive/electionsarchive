@@ -38,9 +38,10 @@
       data.contest.scope.noun == null
         ? data.contest.name
         : `${data.contest.scope.name}, ${data.contest.name}`;
+    const tail = /, [^,]+$/u.exec(data.contest.election.name)?.[0];
     return /\b\d{4}\b/u.test(name)
       ? name
-      : `${name}, ${data.contest.election.name}`;
+      : `${tail != null && name.endsWith(tail) ? name.slice(0, -tail.length) : name}, ${data.contest.election.name}`;
   });
   const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
   const years = $derived(
