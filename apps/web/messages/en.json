@@ -166,6 +166,7 @@
   "scope_path": "Geographic path of results",
   "scope_below": "Go one level down, by {noun}",
   "series_label": "This race in other years",
+  "contest_county": "Lies within {county}",
   "origins_one": "New boundaries for {year}, drawn almost entirely from {seat} as it stood from {from} to {to}.",
   "origins_many": "New boundaries for {year}. By area, this seat came from {seats}.",
   "origins_item": "{name} ({share})",

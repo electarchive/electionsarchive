@@ -2809,6 +2809,11 @@ export const contests = {
           }),
         ),
         locator: v.optional(Places),
+        county: v.optional(
+          v.nullable(
+            v.object({ name: v.string(), path: v.nullable(v.string()) }),
+          ),
+        ),
         origins: v.optional(
           v.array(
             v.object({
@@ -3222,6 +3227,33 @@ export const contests = {
         (row) => row.counted && row.indirect === contest.indirect,
       );
       const day = contest.date;
+      const county = (async () => {
+        if (!isRoot || day == null) {
+          return null;
+        }
+        const found = await db.execute<{ polity: string }>(sql`
+          select pt.polity_id as polity
+          from contest c
+          join district_county d on d.district_area_id = c.district_area_id
+            and d.district_valid @> ${day}::date and d.county_valid @> ${day}::date
+            and (d.share >= 0.98 or d.rest <= 0.02)
+          join polity_territory pt on pt.area_id = d.county_area_id and pt.valid @> ${day}::date
+          where c.id = ${contest.root}::uuid and c.district_area_id = ${area.id}::uuid
+          limit 1
+        `);
+        const polity = found.rows[0]?.polity;
+        if (polity == null) {
+          return null;
+        }
+        const [labels, slugs] = await Promise.all([
+          names([polity], day),
+          paths([polity]),
+        ]);
+        return {
+          name: labels.full.get(polity) ?? "",
+          path: slugs.get(polity) ?? null,
+        };
+      })();
       const origins = (async () => {
         if (
           !isRoot ||
@@ -3798,6 +3830,7 @@ export const contests = {
           places: grid,
           targets,
           origins: await origins,
+          county: await county,
           locator: await locator,
         };
       }
@@ -4020,6 +4053,7 @@ export const contests = {
         })),
         targets,
         origins: await origins,
+        county: await county,
         locator: await locator,
       };
     }),

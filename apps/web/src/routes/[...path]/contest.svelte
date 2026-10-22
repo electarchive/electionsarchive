@@ -995,6 +995,20 @@
           >{/if}{/each}
     </p>
   {/if}
+  {#if contest.county != null}
+    {const parts = $derived(
+      m.contest_county({ county: "\u0001" }).split("\u0001"),
+    )}
+    <p
+      class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch] md:col-span-2"
+    >
+      {parts[0]}{#if contest.county.path == null}{contest.county
+          .name}{:else}<Preview
+          class="text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+          path={contest.county.path}>{contest.county.name}</Preview
+        >{/if}{parts[1]}
+    </p>
+  {/if}
   {#if contest.scope.trail.length > 1 || below != null}
     <nav class="md:col-span-2" aria-label={m.scope_path()}>
       <ol class="flex flex-wrap items-center gap-y-1 text-sm">
