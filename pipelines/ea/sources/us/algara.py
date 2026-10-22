@@ -198,7 +198,10 @@ def emit() -> Path:
             publisher=PUBLISHER,
             title=TITLE,
             url="https://doi.org/10.7910/DVN/DGUMFI",
-            license="CC0 1.0",
+            license=(
+                "CC0 1.0 as deposited, but compiled from CQ Press and ICPSR's United States Historical Election "
+                "Returns, so held under the ICPSR terms of use"
+            ),
         )
         cs.artifact(raw.cached(SOURCE, URL), source)
         states: dict[str, tuple[UUID, UUID, str]] = {

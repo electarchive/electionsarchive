@@ -18,13 +18,14 @@ from ea.sources.us.openelections import HOUSE, SENATE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats"
-VERSION = "5"
+VERSION = "6"
 PARSED = DATA / "parsed" / SOURCE
 FIRST, LAST = 1982, 2015
 PRIMARIES = 2022
 EARLY = {"CT": 1789, "VT": 1789}
 ORDINALS = ["first", "second", "third", "fourth", "fifth", "sixth", "seventh", "eighth", "ninth", "tenth"]
 SEARCH = "https://{tenant}.civera.com/api/download_search.csv?"
+TABLE = "https://{tenant}.civera.com/api/download_contest/{contest}_table.csv?split_party=false"
 GAZETTEER = "https://www2.census.gov/geo/docs/maps-data/data/gazetteer/2020_Gazetteer/2020_Gaz_cousubs_national.zip"
 TENANTS = {
     "CO": ("co.elstats", "Colorado Secretary of State", "https://historicalelectiondata.coloradosos.gov"),
@@ -82,6 +83,58 @@ def url(tenant: str, year: int) -> str:
     return SEARCH.format(tenant=tenant) + urlencode({"search": json.dumps(search, separators=(",", ":"))})
 
 
+def gaps(tenant: str, address: str, fetching: bool = False) -> list[str]:
+    frame = pl.read_csv(
+        (raw.fetch(SOURCE, address, suffix=".csv") if fetching else raw.cached(SOURCE, address)).path,
+        infer_schema=False,
+    )
+    if "contest_id" not in frame.columns or frame.height == 0:
+        return []
+    links = [
+        TABLE.format(tenant=tenant, contest=contest)
+        for contest in frame.group_by("contest_id")
+        .agg(pl.col("votes").cast(pl.Float64, strict=False).sum())
+        .filter((pl.col("votes") == 0) & pl.col("contest_id").str.contains(r"^\d+$"))["contest_id"]
+        .sort()
+    ]
+    if fetching:
+        for link in links:
+            raw.fetch(SOURCE, link, suffix=".csv")
+    return links
+
+
+def searched(tenant: str, address: str) -> pl.DataFrame:
+    frame = pl.read_csv(raw.cached(SOURCE, address).path, infer_schema=False)
+    squeeze = pl.col("candidate_name").fill_null("").str.replace_all(r"\s+", " ").str.strip_chars()
+    for link in gaps(tenant, address):
+        table = pl.read_csv(raw.cached(SOURCE, link).path, infer_schema=False, has_header=False)
+        names = [re.sub(r"\s+", " ", name or "").strip() for name in table.row(0)]
+        filled = pl.DataFrame(
+            [
+                {"division_type": row[0], "division_name": row[1], "key": names[index], "votes": value}
+                for row in table.slice(2).iter_rows()
+                for index, value in enumerate(row)
+                if index >= 2 and names[index]
+            ],
+            schema={"division_type": pl.String, "division_name": pl.String, "key": pl.String, "votes": pl.String},
+        )
+        if filled["votes"].cast(pl.Float64, strict=False).sum() == 0:
+            continue
+        contest = link.rsplit("/", 1)[1].split("_", 1)[0]
+        rows = frame.filter(pl.col("contest_id") == contest)
+        rows = (
+            rows.filter(pl.col("vote_channel").eq_missing(rows["vote_channel"][0]))
+            .drop("votes")
+            .with_columns(key=squeeze)
+            .join(filled, on=["division_type", "division_name", "key"], how="left")
+            .drop("key")
+            .with_columns(vote_channel=pl.lit("Total"))
+            .select(frame.columns)
+        )
+        frame = pl.concat([frame.filter(pl.col("contest_id") != contest), rows])
+    return frame
+
+
 def ma_search(office: int) -> str:
     return f"{MASSACHUSETTS}search/year_from:{FIRST}/year_to:{LAST}/office_id:{office}/stage:General"
 
@@ -112,7 +165,7 @@ def fetch() -> None:
                 raw.fetch(SOURCE, f"{MASSACHUSETTS}download/{election}/precincts_include:0/", suffix=".csv")
     for state, (tenant, _, _) in TENANTS.items():
         for year in range(EARLY.get(state, FIRST), PRIMARIES + 1):
-            raw.fetch(SOURCE, url(tenant, year), suffix=".csv")
+            gaps(tenant, url(tenant, year), fetching=True)
 
 
 def parse() -> None:
@@ -157,7 +210,7 @@ def parse() -> None:
     frames = []
     for state, (tenant, _, _) in TENANTS.items():
         for year in range(EARLY.get(state, FIRST), PRIMARIES + 1):
-            frame = pl.read_csv(raw.cached(SOURCE, url(tenant, year)).path, infer_schema=False)
+            frame = searched(tenant, url(tenant, year))
             if "office_name" not in frame.columns or frame.height == 0:
                 continue
             office = pl.col("office_name").fill_null("").str.to_lowercase()
@@ -361,6 +414,8 @@ def emit() -> Path:
             )
             for year in frame.filter(pl.col("state") == state)["year"].unique().sort():
                 cs.artifact(raw.cached(SOURCE, url(tenant, year)), sources[state])
+                for link in gaps(tenant, url(tenant, year)):
+                    cs.artifact(raw.cached(SOURCE, link), sources[state])
         sources["MA"] = cs.source(MA_PUBLISHER, TITLE)
         cs.add(
             "source",

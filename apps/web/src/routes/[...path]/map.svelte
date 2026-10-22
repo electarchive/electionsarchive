@@ -1649,13 +1649,16 @@
                           view === choice.value,
                       },
                       {
-                        "truncate max-inline-36 max-sm:max-inline-24":
+                        "max-inline-44 xl:max-inline-none":
                           typeof choice.value === "number",
                       },
                     )}
+                    title={typeof choice.value === "number"
+                      ? choice.label
+                      : undefined}
                     aria-pressed={view === choice.value}
                     onclick={() => (shading = choice.value)}
-                    >{choice.label}</button
+                    ><span class="truncate">{choice.label}</span></button
                   >
                 {/each}
               </div>

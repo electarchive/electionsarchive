@@ -899,7 +899,14 @@ def attach(
             ).fetchone()
         ):
             previous, result_set = result_set, cs.key(f"{tag}.result_set", f"{key}:{grain}:2")
-        if result_set not in cs.minted:
+        if (
+            result_set not in cs.minted
+            and not conn.execute(
+                """select 1 from result_set r where r.id = %s
+                   and not exists (select from result_value v where v.result_set_k = r.k and v.value <> 0)""",
+                [result_set],
+            ).fetchone()
+        ):
             continue
         if "pool" in picked.values():
             generic = [option for option, kind, label, _, _ in known if kind == "write_in" and label in GENERIC]
