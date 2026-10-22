@@ -127,8 +127,11 @@ function tally(side: Side, identify: (option: Option) => string) {
   }
   for (const group of groups.values()) {
     group.cell.share = side.valid > 0 ? group.cell.votes / side.valid : 0;
+    const isFused = group.members.every(
+      (member) => member.person != null && member.person === group.lead.person,
+    );
     const lines = group.members.flatMap((member) =>
-      member.line == null || member.votes === 0
+      !isFused || member.line == null || member.votes === 0
         ? []
         : [{ label: member.line, votes: member.votes }],
     );
