@@ -194,140 +194,69 @@ def fetch() -> None:
             )
 
 
-def cell(text: str) -> int | None:
-    digits = re.sub(r"\D", "", text.translate(scan.CONFUSABLE))
-    return int(digits) if digits else None
-
-
-def read(book: str, page: int, counties: dict[str, str]) -> tuple[list[dict], list[str]]:
+def boxes(
+    book: str, page: int, tables: dict[int | None, list[list[str]]]
+) -> dict[tuple[int | None, int, int], tuple[int, int, int, int]]:
     pdf = raw.cached(SOURCE, url(book, page)).path
     OCR.mkdir(parents=True, exist_ok=True)
     words = scan.words(pdf, 1, OCR / f"{book}-{page}.tsv")
-    slope = scan.skew(words)
-    lines = scan.lines(words, slope, 14)
-    blocks: list[list[list[scan.Word]]] = []
-    for line in lines:
-        joined = " ".join(w[0] for w in line)
-        if re.search(r"(?i)congressional\s+district|united\s+states\s+senator", joined) and (
-            len(line) < 9 or "VOTE FOR" in joined.upper()
-        ):
-            if "VOTE FOR MEMBERS" in joined.upper():
-                continue
-            blocks.append([])
-        elif blocks:
-            blocks[-1].append(line)
-    specs = TABLES[(book, page)]
-    notes: list[str] = []
-    if len(blocks) != len(specs):
-        return [], [f"{book} {page}: {len(blocks)} blocks for {len(specs)} tables"]
-    out: list[dict] = []
-    for block, (district, columns) in zip(blocks, specs, strict=True):
-        label = f"{book} {page} district {district}"
-        start = next(
-            (i for i, line in enumerate(block) if re.search(r"\((Dem|Rep|Lib|Tax)", " ".join(w[0] for w in line))),
-            None,
-        )
-        if start is None:
-            notes.append(f"{label}: no header")
-            continue
-        rows = []
-        for line in block[start + 1 :]:
-            cells = [w for w in line if NUMBER.match(w[0]) and w[1][0] > 600]
-            if not cells:
-                continue
-            text = " ".join(w[0] for w in line if w not in cells)
-            rows.append({"name": text, "cells": cells})
-        if not rows:
-            notes.append(f"{label}: no rows")
-            continue
-        total = next((row for row in rows if re.match(r"(?i)^\W*t[o0]t", row["name"])), None)
-        if total is not None:
-            rows.remove(total)
-        width = len(columns)
-        clean = [row for row in (*rows, *([total] if total else [])) if len(row["cells"]) == width]
-        if not clean:
-            best = max(rows, key=lambda row: len(row["cells"]))
-            notes.append(f"{label}: no row with {width} cells (best {len(best['cells'])})")
-            continue
-        anchors = [
-            sorted((row["cells"][c][1][0] + row["cells"][c][1][2]) / 2 for row in clean)[len(clean) // 2]
-            for c in range(width)
+    heads = sorted(w[1][1] for w in words if re.fullmatch(r"(?i)congressional|senator", w[0].strip(".,")))
+    if len(heads) != len(tables):
+        raise ValueError(f"{book} {page}: {len(heads)} headings for {len(tables)} tables")
+    found: dict[tuple[int | None, int, int], tuple[int, int, int, int]] = {}
+    for at, (district, rows) in enumerate(tables.items()):
+        top, bottom = heads[at], (heads[at + 1] if at + 1 < len(heads) else 10**6)
+        numbers = [
+            (w[1], re.sub(r"\D", "", w[0].translate(scan.CONFUSABLE)))
+            for w in words
+            if top < w[1][1] < bottom
+            and w[1][0] > 600
+            and re.fullmatch(r"[\dOolI|]{1,3}(?:[,.][\dOolI|]{3})*\*?", w[0])
         ]
-        known: list[str | None] = []
-        for row in rows:
-            lead = LEAD.match(row["name"].strip())
-            plain = key(re.sub(r"(?i)\(?part\)?.*", "", lead[0])) if lead else ""
-            hit = difflib.get_close_matches(plain, list(counties), 1, 0.8)
-            known.append(hit[0] if hit else None)
-        ordered = sorted(counties)
-        for i, name in enumerate(known):
-            if name is not None:
-                continue
-            before = next((k for k in reversed(known[:i]) if k), "")
-            after = next((k for k in known[i + 1 :] if k), "~")
-            pool = [c for c in ordered if before < c < after and c not in known]
-            if len(pool) == 1:
-                known[i] = pool[0]
-            else:
-                notes.append(f"{label}: row {i} {rows[i]['name']!r} between {before} and {after}: {pool}")
-        for row, name in zip(rows, known, strict=True):
-            if name is None:
-                continue
-            placed: dict[int, list[scan.Word]] = {}
-            for word in row["cells"]:
-                at = min(range(width), key=lambda c: abs(anchors[c] - (word[1][0] + word[1][2]) / 2))
-                placed.setdefault(at, []).append(word)
-            for c, found in placed.items():
-                if len(found) > 1:
-                    notes.append(f"{label}: {name} column {c} has {[w[0] for w in found]}")
-                    continue
-                value = cell(found[0][0])
-                if value is None:
-                    continue
-                row.setdefault("values", {})[c] = (value, found[0][1], found[0][0])
-            row["county"] = name
-            for c in range(width):
-                if c not in row.get("values", {}):
-                    notes.append(f"{label}: {name} column {c} missing")
-        sums = [0] * width
-        for row in rows:
-            for c, (value, _, _) in row.get("values", {}).items():
-                sums[c] += value
-        if total is not None:
-            printed = {}
-            for word in total["cells"]:
-                at = min(range(width), key=lambda c: abs(anchors[c] - (word[1][0] + word[1][2]) / 2))
-                printed[at] = cell(word[0])
-            for c in range(width):
-                if printed.get(c) != sums[c]:
-                    notes.append(f"{label}: column {c} sums to {sums[c]:,}, printed {printed.get(c)}")
-        for row in rows:
-            for c, (value, box, text) in row.get("values", {}).items():
-                party, name = columns[c]
-                out.append(
-                    {
-                        "year": BOOKS[book][1].year,
-                        "chamber": f"{'senate' if district is None else 'house'}:{PARTIES[party]}",
-                        "day": BOOKS[book][1],
-                        "special": False,
-                        "state": "WI",
-                        "district": district,
-                        "code": counties[row["county"]],
-                        "candidate": name.upper(),
-                        "measure": 1,
-                        "writein": False,
-                        "votes": value,
-                        "kind": "county",
-                        "source": f"WI{BOOKS[book][1].year}",
-                        "file": 0,
-                        "page": f"{book}:{page}",
-                        "x0": box[0],
-                        "y0": box[1],
-                        "x1": box[2],
-                        "y1": box[3],
-                    }
+        width = len(rows[0])
+        centers = sorted(((b[0] + b[2]) // 2 for b, _ in numbers))
+        cuts = sorted(sorted(range(len(centers) - 1), key=lambda i: centers[i] - centers[i + 1])[: width - 1])
+        edges = [(centers[i] + centers[i + 1]) // 2 for i in cuts]
+        sizes: list[tuple[int, int, int]] = []
+        for c in range(width):
+            low = edges[c - 1] if c > 0 else 0
+            high = edges[c] if c < width - 1 else 10**6
+            column = sorted((n for n in numbers if low <= (n[0][0] + n[0][2]) // 2 < high), key=lambda n: n[0][1])
+            wanted = [row[c] for row in rows]
+            matcher = difflib.SequenceMatcher(None, [n[1] for n in column], wanted, autojunk=False)
+            for tag, i1, i2, j1, j2 in matcher.get_opcodes():
+                if tag == "equal":
+                    for k in range(i2 - i1):
+                        found[(district, j1 + k, c)] = column[i1 + k][0]
+            sizes.append(
+                (
+                    sorted((b[0] + b[2]) // 2 for b, _ in column)[len(column) // 2],
+                    sorted(b[2] - b[0] for b, _ in column)[len(column) // 2],
+                    sorted(b[3] - b[1] for b, _ in column)[len(column) // 2],
                 )
-    return out, notes
+            )
+        mids: list[float | None] = []
+        for r in range(len(rows)):
+            ys = sorted(
+                (found[(district, r, c)][1] + found[(district, r, c)][3]) / 2
+                for c in range(width)
+                if (district, r, c) in found
+            )
+            mids.append(ys[len(ys) // 2] if ys else None)
+        known = [r for r, mid in enumerate(mids) if mid is not None]
+        for r in range(len(rows)):
+            if mids[r] is None:
+                below = [k for k in known if k < r]
+                above = [k for k in known if k > r]
+                low, high = (below[-1], above[0]) if below and above else (known[-2:] if below else known[:2])
+                mids[r] = mids[low] + (mids[high] - mids[low]) * (r - low) / (high - low)
+        for r, mid in enumerate(mids):
+            for c, (anchor, wide, tall) in enumerate(sizes):
+                found.setdefault(
+                    (district, r, c),
+                    (anchor - wide // 2, round(mid) - tall // 2, anchor + wide // 2, round(mid) + tall // 2),
+                )
+    return found
 
 
 def parse() -> None:
@@ -340,13 +269,58 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '55%%'"""
             ).fetchall()
         }
+    grouped: dict[tuple[str, int], dict[int | None, list[tuple[str, list[str]]]]] = {}
+    for line in (Path(__file__).with_suffix(".tsv")).read_text().splitlines():
+        book, page, district, county, *values = line.split("\t")
+        grouped.setdefault((book, int(page)), {}).setdefault(None if district == "S" else int(district), []).append(
+            (county, values)
+        )
     out: list[dict] = []
-    for book, page in TABLES:
-        rows, notes = read(book, page, counties)
-        out.extend(rows)
-        for note in notes:
-            print(note)
-        print(f"{book} {page}: {len(rows)} values")
+    for (book, page), tables in grouped.items():
+        located = boxes(
+            book,
+            page,
+            {district: [values for county, values in rows if county != "TOTAL"] for district, rows in tables.items()},
+        )
+        for district, rows in tables.items():
+            columns = dict(TABLES[(book, page)])[district]
+            total = next(values for county, values in rows if county == "TOTAL")
+            body = [row for row in rows if row[0] != "TOTAL"]
+            for c, printed in enumerate(total):
+                if sum(int(values[c]) for _, values in body) != int(printed):
+                    raise ValueError(
+                        f"{book} {page} district {district} column {c}: sum disagrees with the printed total"
+                    )
+            for r, (county, values) in enumerate(rows):
+                if county == "TOTAL":
+                    continue
+                for c, value in enumerate(values):
+                    party, name = columns[c]
+                    box = located[(district, r, c)]
+                    out.append(
+                        {
+                            "year": BOOKS[book][1].year,
+                            "chamber": f"{'senate' if district is None else 'house'}:{PARTIES[party]}",
+                            "day": BOOKS[book][1],
+                            "special": False,
+                            "state": "WI",
+                            "district": district,
+                            "code": counties[key(county.replace("_", " "))],
+                            "candidate": name.upper(),
+                            "measure": 1,
+                            "writein": False,
+                            "votes": int(value),
+                            "kind": "county",
+                            "source": f"WI{BOOKS[book][1].year}",
+                            "file": 0,
+                            "page": f"{book}:{page}",
+                            "x0": box[0],
+                            "y0": box[1],
+                            "x1": box[2],
+                            "y1": box[3],
+                        }
+                    )
+        print(f"{book} {page}: {sum(1 for o in out if o['page'] == f'{book}:{page}')} values")
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(out, infer_schema_length=None).with_columns(
         year=pl.col("year").cast(pl.Int32),
@@ -388,7 +362,16 @@ def emit() -> Path:
                 if not image.exists():
                     PAGES.mkdir(parents=True, exist_ok=True)
                     subprocess.run(
-                        ["pdftoppm", "-r", "300", "-gray", "-png", "-singlefile", str(pdf.path), str(image.with_suffix(""))],
+                        [
+                            "pdftoppm",
+                            "-r",
+                            "300",
+                            "-gray",
+                            "-png",
+                            "-singlefile",
+                            str(pdf.path),
+                            str(image.with_suffix("")),
+                        ],
                         check=True,
                     )
                 width, height = struct.unpack(">II", image.read_bytes()[16:24])
