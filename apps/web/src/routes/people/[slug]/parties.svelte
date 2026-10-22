@@ -34,10 +34,9 @@
   );
   const dates = $derived(
     lanes.flatMap((lane) => [
-      ...lane.spans.flatMap((span) => [
-        ...(span.from == null ? [] : [span.from]),
-        span.to ?? today,
-      ]),
+      ...lane.spans.flatMap((span) =>
+        span.from == null ? [] : [span.from, span.to ?? today],
+      ),
       ...lane.ballots.map((ballot) => ballot.date),
     ]),
   );
@@ -81,7 +80,11 @@
     return years;
   });
   const kinds = $derived(
-    new Set(lanes.flatMap((lane) => lane.spans.map((span) => span.kind))),
+    new Set(
+      lanes.flatMap((lane) =>
+        lane.spans.flatMap((span) => (span.from == null ? [] : [span.kind])),
+      ),
+    ),
   );
   const hows = $derived(
     new Set<string>(
@@ -178,7 +181,7 @@
               aria-hidden="true"
             ></span>
           {/each}
-          {#each lane.spans as span, index (index)}
+          {#each lane.spans.filter((span) => span.from != null) as span, index (index)}
             {const x0 = $derived(at(span.from))}
             {const x1 = $derived(at(span.to))}
             <span
