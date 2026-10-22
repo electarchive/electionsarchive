@@ -30,17 +30,18 @@
           ]
         : data.polity.breadcrumbs,
   );
-  const title = $derived(
-    data.kind === "contest"
-      ? data.contest.scope.noun == null
-        ? data.contest.name.includes(data.contest.election.name)
-          ? data.contest.name
-          : `${data.contest.name}, ${data.contest.election.name}`
-        : `${data.contest.scope.name}, ${data.contest.name}`
-      : data.kind === "election"
-        ? data.election.name
-        : data.polity.name,
-  );
+  const title = $derived.by(() => {
+    if (data.kind !== "contest") {
+      return data.kind === "election" ? data.election.name : data.polity.name;
+    }
+    const name =
+      data.contest.scope.noun == null
+        ? data.contest.name
+        : `${data.contest.scope.name}, ${data.contest.name}`;
+    return /\b\d{4}\b/u.test(name)
+      ? name
+      : `${name}, ${data.contest.election.name}`;
+  });
   const canonical = $derived(`${page.url.origin}${page.url.pathname}`);
   const years = $derived(
     data.kind === "polity"
