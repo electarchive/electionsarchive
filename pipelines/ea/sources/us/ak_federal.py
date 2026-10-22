@@ -13,7 +13,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.ak_federal"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://www.elections.alaska.gov/results/"
 FILES = {
@@ -22,7 +22,7 @@ FILES = {
     date(2018, 8, 21): "18PRIM/data/resultsbyprecinct.txt",
     date(2020, 8, 18): "20PRIM/data/sovc/resultsbyprecinct20.txt",
 }
-SOVC = {date(2008, 8, 26): "08PRIM", date(2010, 8, 24): "10PRIM", date(2012, 8, 28): "12PRIM"}
+SOVC = {date(2004, 8, 24): "04PRIM", date(2006, 8, 22): "06PRIM", date(2008, 8, 26): "08PRIM", date(2010, 8, 24): "10PRIM", date(2012, 8, 28): "12PRIM"}
 SOVC_URL = BASE + "{}/data/sovc/hd{}.pdf"
 PARTIES = {"DEM": "democratic", "REP": "republican", "LIB": "libertarian", "AD": "democratic"}
 STATS = {
@@ -139,7 +139,7 @@ def parse() -> None:
                 ]
                 stacks: dict[float, list[tuple[float, float, float, float, str]]] = {}
                 for w in words:
-                    if 7.1 < w[2] - w[0] < 7.3 and w[1] > 100 and w[3] < 235:
+                    if 7.1 < w[2] - w[0] < 7.3 and w[1] > 100 and w[3] < total[0][1]:
                         stacks.setdefault(round(w[0]), []).append(w)
                 heads = [
                     (x, " ".join(w[4] for w in sorted(stack, key=lambda w: -w[3])))
@@ -149,12 +149,12 @@ def parse() -> None:
                     print(day, number, "columns", len(heads), "numbers", len(numbers))
                     continue
                 titles: list[list[float | str]] = []
-                for w in sorted((w for w in words if 80 < w[1] < 100 and w[0] > 100), key=lambda w: w[0]):
-                    if titles and w[0] - titles[-1][1] < 6:
+                for w in sorted((w for w in words if 80 < w[1] < 140 and w[0] > 100), key=lambda w: (round(w[1]), w[0])):
+                    if titles and abs(w[1] - titles[-1][3]) < 2 and w[0] - titles[-1][1] < 6:
                         titles[-1][1] = w[2]
                         titles[-1][2] += f" {w[4]}"
                     else:
-                        titles.append([w[0], w[2], w[4]])
+                        titles.append([w[0], w[2], w[4], w[1]])
                 starts = [i for i, (_, label) in enumerate(heads) if label.startswith("Reg")]
                 if starts and starts[0] > 0 and blocks:
                     blocks[-1][2].extend(label for _, label in heads[: starts[0]])
@@ -163,25 +163,26 @@ def parse() -> None:
                     end = starts[k + 1] if k + 1 < len(starts) else len(heads)
                     left, right = heads[begin][0], heads[end - 1][0] + 10
                     best = max(
-                        titles,
+                        (t for t in titles if not re.fullmatch(r"HOUSE DISTRICT \d+", str(t[2]))),
                         key=lambda t: min(right, t[1]) - max(left, t[0]),
                         default=None,
                     )
-                    if best is None or not str(best[2]).startswith(("US SENATOR", "US REPRESENTATIVE")):
+                    cut = next((i for i in range(begin, end) if heads[i][1].startswith("Total")), None)
+                    if cut is None or best is None or not str(best[2]).startswith(("US SENAT", "US REPRESENTATIVE")):
                         continue
                     blocks.append(
                         [
                             str(best[2]),
-                            int(numbers[begin + 1]),
-                            [label for _, label in heads[begin + 2 : end]],
-                            [int(n) for n in numbers[begin + 2 : end]],
+                            int(numbers[cut]),
+                            [label for _, label in heads[cut + 1 : end]],
+                            [int(n) for n in numbers[cut + 1 : end]],
                         ]
                     )
             for title, printed, names, cells in blocks:
                 if sum(cells) != printed:
                     print(day, number, title, "sum", sum(cells), "printed", printed)
                     continue
-                office = "senate" if title.startswith("US SENATOR") else "house"
+                office = "senate" if title.startswith("US SENAT") else "house"
                 for label, votes in zip(names, cells, strict=True):
                     found = re.fullmatch(r"(.*) \((\w+)\)", label)
                     if found is None or found[2] not in PARTIES:
@@ -230,7 +231,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Alaska's 2008, 2010, 2012, 2014, 2016, 2018, and 2020 U.S. Senate and House primaries by House district",
+            summary="Alaska's 2004, 2006, 2008, 2010, 2012, 2014, 2016, 2018, and 2020 U.S. Senate and House primaries by House district",
             polity="US-AK",
         )
         source = cs.source(PUBLISHER, TITLE)
