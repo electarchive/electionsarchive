@@ -79,14 +79,14 @@ def url(path: str) -> str:
     return SITE + path.replace(" ", "%20")
 
 
-def table(path: str) -> list[list[str]]:
+def table(path: str, source: str = SOURCE) -> list[list[str]]:
     return [
         [
             re.sub(r"\s+", " ", html.unescape(re.sub(r"<[^>]+>", " ", cell))).strip()
             for cell in re.findall(r"<t[dh][^>]*>(.*?)</t[dh]>", row, re.DOTALL)
         ]
         for row in re.findall(
-            r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, url(path)).path.read_text(errors="replace"), re.DOTALL
+            r"<tr[^>]*>(.*?)</tr>", raw.cached(source, url(path)).path.read_text(errors="replace"), re.DOTALL
         )
     ]
 
