@@ -6666,13 +6666,13 @@ export const elections = {
         select p.id, p.polity_id, p.date_from::text, u.until::text, s.party, s.contest, false, p.own
         from picked p
         left join lateral (
-          with recursive grp(id) as (
-            select c.id from contest c where c.election_id = p.id and c.allocation_parent_id is null
+          with recursive grp(id, election_id) as (
+            select c.id, c.election_id from contest c where c.election_id = p.id and c.allocation_parent_id is null
             union all
-            select c.id from contest c join grp on c.allocation_parent_id = grp.id
+            select c.id, c.election_id from contest c join grp on c.allocation_parent_id = grp.id
           )
           select nullif(max(e.date_from), p.date_from) as until
-          from grp join contest c on c.id = grp.id join election e on e.id = c.election_id
+          from grp join election e on e.id = grp.election_id
         ) u on true
         left join lateral (
           select min(c.party_scope_id::text)::uuid as party,
