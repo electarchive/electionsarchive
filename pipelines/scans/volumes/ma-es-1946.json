@@ -1,0 +1,31 @@
+{
+  "year": 1946,
+  "day": "1946-11-05",
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "Election Statistics 1946 (P.D. 43), Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/electionstatisti19461948mass/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/electionstatisti19461948mass"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per district"
+  },
+  "leaves": [
+    263,
+    264,
+    265,
+    266,
+    267,
+    268,
+    269,
+    270,
+    271
+  ]
+}

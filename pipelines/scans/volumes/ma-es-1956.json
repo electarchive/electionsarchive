@@ -1,0 +1,31 @@
+{
+  "year": 1956,
+  "day": "1956-11-06",
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "Election Statistics 1956 (P.D. 43), Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/electionstatisti1956mass/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/electionstatisti1956mass"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per district"
+  },
+  "leaves": [
+    350,
+    351,
+    352,
+    353,
+    354,
+    355,
+    356,
+    357,
+    358
+  ]
+}

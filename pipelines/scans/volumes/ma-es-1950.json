@@ -1,0 +1,31 @@
+{
+  "year": 1950,
+  "day": "1950-11-07",
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "Election Statistics 1950 (P.D. 43), Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/electionstatisti19501951mass/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/electionstatisti19501951mass"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "offices": {
+    "house": "U.S. Representative in Congress, one table per district"
+  },
+  "leaves": [
+    269,
+    270,
+    271,
+    272,
+    273,
+    274,
+    275,
+    276,
+    277
+  ]
+}

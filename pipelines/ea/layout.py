@@ -1,0 +1,308 @@
+import base64
+import hashlib
+import itertools
+import json
+from datetime import date, timedelta
+from math import ceil
+from pathlib import Path
+from typing import NotRequired, TypedDict, cast
+
+from anthropic.types import ImageBlockParam, TextBlockParam
+from anthropic.types.message_create_params import MessageCreateParamsNonStreaming
+
+from ea import scans
+from ea.store import connect
+
+PROMPT = "1"
+VOLUMES = scans.MANIFESTS / "volumes"
+SYSTEM = (
+    "You describe the layout of one scanned page from a volume of election returns, so that a second reader can "
+    "transcribe each table band by band. Report what is printed; never compute or infer a number. Coordinates are "
+    "integers from 0 to 1000 across the width and height of the image, measured from its top left corner."
+)
+
+
+class LayoutColumn(TypedDict):
+    label: str
+    role: str
+
+
+class LayoutTable(TypedDict):
+    title: str
+    office: str
+    district: int
+    party: str
+    special: bool
+    continued: bool
+    concluded: bool
+    y0: int
+    y1: int
+    header_y1: int
+    unit: str
+    orientation: str
+    columns: list[LayoutColumn]
+
+
+class LayoutPage(TypedDict):
+    kind: str
+    notes: str
+    tables: list[LayoutTable]
+
+
+class Volume(TypedDict):
+    year: int
+    day: str
+    polity: str
+    publisher: str
+    title: str
+    license: str
+    file: dict[str, str]
+    raw_source: str
+    unit_scheme: NotRequired[str]
+    unit_codes: NotRequired[dict[str, str]]
+    offices: dict[str, str]
+    leaves: list[int]
+
+
+def schema(offices: list[str]) -> dict[str, object]:
+    table: dict[str, object] = {
+        "type": "object",
+        "properties": {
+            "title": {"type": "string"},
+            "office": {"type": "string", "enum": [*offices, "other"]},
+            "district": {"type": "integer"},
+            "party": {"type": "string"},
+            "special": {"type": "boolean"},
+            "continued": {"type": "boolean"},
+            "concluded": {"type": "boolean"},
+            "y0": {"type": "integer"},
+            "y1": {"type": "integer"},
+            "header_y1": {"type": "integer"},
+            "unit": {"type": "string", "enum": ["town", "county", "ward", "other"]},
+            "orientation": {"type": "string", "enum": ["units_down", "units_across"]},
+            "columns": {
+                "type": "array",
+                "items": {
+                    "type": "object",
+                    "properties": {
+                        "label": {"type": "string"},
+                        "role": {"type": "string", "enum": ["candidate", "blanks", "total", "other"]},
+                    },
+                    "required": ["label", "role"],
+                    "additionalProperties": False,
+                },
+            },
+        },
+        "required": [
+            "title",
+            "office",
+            "district",
+            "party",
+            "special",
+            "continued",
+            "concluded",
+            "y0",
+            "y1",
+            "header_y1",
+            "unit",
+            "orientation",
+            "columns",
+        ],
+        "additionalProperties": False,
+    }
+    return {
+        "type": "object",
+        "properties": {
+            "kind": {"type": "string", "enum": ["returns", "other"]},
+            "notes": {"type": "string"},
+            "tables": {"type": "array", "items": table},
+        },
+        "required": ["kind", "notes", "tables"],
+        "additionalProperties": False,
+    }
+
+
+def instructions(volume: Volume) -> str:
+    wanted = "; ".join(f"{key}: {text}" for key, text in volume["offices"].items())
+    return (
+        f"This page comes from {volume['title']} ({volume['year']}). List every returns table on it for these "
+        f"offices, top to bottom (office key: description): {wanted}. A page of another kind, or a table for any other "
+        "office, is kind 'other' or office 'other'.\n"
+        "For each table: title is its heading as printed; district is the district number (0 when the office has "
+        "none); party is the party named in the heading of a primary table, lowercase ('' for a general election "
+        "table); special is true for a special election; continued is true when the table began on an earlier page "
+        "and this page shows its later rows; concluded is true when its Total row is on this page. y0 is the top of "
+        "the table (its heading line, or its first row when continued) and y1 the bottom of its last row on this "
+        "page, Total row included; the next table's y0 must lie below this table's y1. header_y1 is the bottom of "
+        "the column heading block (0 when this page shows no column headings for the table). unit is what each row "
+        "is; orientation is units_down when the rows are units and units_across when the columns are. columns lists "
+        "every data column left to right, leaving out the column of unit names: label is the heading as printed "
+        "(candidate name and party, read turned if it is printed sideways), and role is candidate for a named "
+        "candidate or an all-others or scattering column, blanks for blank or void ballots, total for a total of "
+        "ballots, and other for anything else. In a table that continues, repeat the columns even if the heading is "
+        "not reprinted."
+    )
+
+
+def requests(volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.Read]:
+    model, effort, _, _ = scans.READERS[reader]
+    manifest = cast(scans.Manifest, {"file": volume["file"], "raw_source": volume["raw_source"]})
+    text = instructions(volume)
+    out: dict[str, scans.Read] = {}
+    for leaf in leaves:
+        image = scans.render(manifest, {"page": leaf}, 200)
+        media, data = scans.encode(image)
+        digest = hashlib.sha256(data + text.encode()).hexdigest()
+        blocks: list[ImageBlockParam | TextBlockParam] = [
+            ImageBlockParam(
+                type="image",
+                source={
+                    "type": "base64",
+                    "media_type": "image/jpeg" if media == "image/jpeg" else "image/png",
+                    "data": base64.b64encode(data).decode(),
+                },
+            ),
+            TextBlockParam(type="text", text=text),
+        ]
+        out[f"{reader[0]}{leaf}"] = scans.Read(
+            custom=f"{reader[0]}{leaf}",
+            section=str(leaf),
+            span=(0.0, 1.0),
+            digest=digest,
+            pixels=image.width * image.height,
+            key=f"anthropic-batch:{model}/layout{PROMPT}/{effort}/{digest}",
+            params=MessageCreateParamsNonStreaming(
+                model=model,
+                max_tokens=16000,
+                system=SYSTEM,
+                messages=[{"role": "user", "content": blocks}],
+                output_config={
+                    "effort": effort,
+                    "format": {"type": "json_schema", "schema": schema(list(volume["offices"]))},
+                },
+            ),
+        )
+    return out
+
+
+def day_of(year: int) -> str:
+    first = date(year, 11, 1)
+    return (first + timedelta(days=(-first.weekday()) % 7 + 1)).isoformat()
+
+
+def sound(page: LayoutPage) -> bool:
+    found = sorted((table for table in page["tables"] if table["office"] != "other"), key=lambda table: table["y0"])
+    return all(0 <= table["y0"] < table["y1"] <= 1000 and 0 <= table["header_y1"] <= 1000 for table in found) and all(
+        before["y1"] <= after["y0"] + 10 for before, after in itertools.pairwise(found)
+    )
+
+
+def step(name: str) -> str:
+    volume: Volume = json.loads((VOLUMES / f"{name}.json").read_text())
+    folder = scans.WORK / name
+    folder.mkdir(parents=True, exist_ok=True)
+    state_path = folder / "state.json"
+    state: dict[str, dict[str, list[scans.Batch]]] = json.loads(state_path.read_text()) if state_path.exists() else {}
+    pages: dict[int, LayoutPage] = {}
+    leaves = volume["leaves"]
+    message = ""
+    for reader in ("layout", "third"):
+        plan = requests(volume, reader, leaves)
+        if state.get("batches", {}).get(reader):
+            message = scans.collect(reader, state) or message
+        wanted = {custom: request for custom, request in plan.items() if scans.cached(request.key) is None}
+        if wanted and not state.get("batches", {}).get(reader):
+            message = f"{reader}: submitted {len(wanted)} requests in {', '.join(scans.submit(reader, wanted, state))}"
+        state_path.write_text(json.dumps(state, indent=2))
+        if any(scans.cached(request.key) is None for request in plan.values()):
+            return message or f"{reader}: waiting for the batch"
+        leaves = []
+        for request in plan.values():
+            loaded = scans.parse(scans.cached(request.key))
+            if isinstance(loaded, str):
+                return f"{reader} {request.custom}: {loaded}"
+            pages[int(request.section)] = cast(LayoutPage, loaded)
+            if not sound(pages[int(request.section)]):
+                leaves.append(int(request.section))
+        if not leaves:
+            break
+    return generate(name, volume, pages, folder)
+
+
+def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Path) -> str:
+    state = volume["polity"].removeprefix("US-")
+    contests: dict[str, scans.Contest] = {}
+    sections: list[scans.Page] = []
+    columns: dict[str, list[scans.Column]] = {}
+    unmatched: dict[str, list[str]] = {}
+    notes: list[str] = []
+    with connect() as conn:
+        ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
+        for leaf in volume["leaves"]:
+            page = pages[leaf]
+            if page["notes"]:
+                notes.append(f"{leaf}: {page['notes']}")
+            found = sorted(
+                (table for table in page["tables"] if table["office"] != "other"), key=lambda table: table["y0"]
+            )
+            for index, table in enumerate(found):
+                label = f"{table['office']}{table['district'] or ''}"
+                if table["party"] or table["special"]:
+                    notes.append(f"{leaf}: {table['title']!r} skipped ({table['party'] or 'special'})")
+                    continue
+                contest: scans.Contest = {
+                    "year": volume["year"],
+                    "chamber": table["office"],
+                    "day": volume["day"],
+                    "special": False,
+                    "state": state,
+                    "district": table["district"] or None,
+                }
+                key = scans.key_of(contest)
+                if key not in ids:
+                    notes.append(f"{leaf}: {table['title']!r} has no contest {key}")
+                    continue
+                contests[label] = contest
+                if label not in columns or (table["columns"] and not columns[label]):
+                    named, unmatched[label] = scans.match(
+                        [column["label"] for column in table["columns"] if column["role"] == "candidate"],
+                        scans.options(conn, ids[key]),
+                        label,
+                    )
+                    by_label = {column["label"]: column for column in named}
+                    columns[label] = [
+                        by_label.get(column["label"]) or {"label": column["label"], "contest": None, "candidate": ""}
+                        for column in table["columns"]
+                    ]
+                before = found[index - 1]["y1"] if index > 0 else None
+                after = found[index + 1]["y0"] if index + 1 < len(found) else None
+                top = table["y0"] if before is None else (before + table["y0"]) // 2
+                bottom = table["y1"] if after is None else (table["y1"] + after) // 2
+                top = max(0, top - (0 if table["continued"] else 4)) / 1000
+                bottom = min(1000, bottom + 4) / 1000
+                section: scans.Page = {
+                    "page": leaf,
+                    "id": f"{leaf}-{index}",
+                    "columns": columns[label],
+                    "orientation": "counties_across" if table["orientation"] == "units_across" else "counties_down",
+                    "crop": [0.0, round(top, 4), 1.0, round(bottom, 4)],
+                    "hint": f"Read only the table headed {table['title']!r}; ignore any other table visible in the image.",
+                }
+                count = max(1, ceil((bottom - top) / 0.45))
+                if count > 1 and table["header_y1"] > 0 and not table["continued"]:
+                    section["bands"] = count
+                    section["header"] = [0.0, round((table["header_y1"] / 1000 - top) / (bottom - top), 4)]
+                sections.append(section)
+    manifest = {
+        key: value
+        for key, value in volume.items()
+        if key in ("polity", "publisher", "title", "license", "file", "raw_source", "unit_scheme", "unit_codes")
+    }
+    manifest["contests"] = contests
+    manifest["pages"] = sections
+    (scans.MANIFESTS / f"{name}.json").write_text(json.dumps(manifest, indent=2))
+    report = [f"# layout {name}", "", f"{len(contests)} contests, {len(sections)} sections", ""]
+    report += [f"- {label}: unmatched columns {missed}" for label, missed in unmatched.items() if missed]
+    report += ["", *[f"- {note}" for note in notes]]
+    (folder / "layout.md").write_text("\n".join(report))
+    return f"{name}: {len(contests)} contests, {len(sections)} sections, {len(notes)} notes; {folder / 'layout.md'}"

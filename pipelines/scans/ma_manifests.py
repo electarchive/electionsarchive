@@ -1,12 +1,10 @@
 import json
 import re
 import sys
-from datetime import date, timedelta
-from math import ceil
 from pathlib import Path
 
 from ea import raw
-from ea.store import connect
+from ea.layout import day_of
 
 ITEMS = {
     "1930": "19291930",
@@ -32,90 +30,34 @@ ITEMS = {
 HEADING = re.compile(r"Representatives?\s+in\s+(the\s+\S+\s+)?Congress", re.IGNORECASE)
 PARTY = re.compile(r"REPUBLICAN|DEMOCRATIC|PROGRESSIVE|PROHIBITION")
 WORD = re.compile(r'<WORD coords="(\d+),(\d+),(\d+),(\d+)"[^>]*>([^<]*)</WORD>')
-TOTALS = re.compile(r"^T[o0]ta[l1I]s?\.?$")
-HEAD = 0.09
-TOP = 0.075
-BOTTOM = 0.985
-
-
-def day_of(year: int) -> str:
-    first = date(year, 11, 1)
-    return (first + timedelta(days=(-first.weekday()) % 7 + 1)).isoformat()
 
 
 def build(item: str, years: list[int]) -> str:
     url = f"https://archive.org/download/electionstatisti{item}mass/electionstatisti{item}mass_djvu.xml"
     xml = raw.fetch("us.scans", url, suffix=".xml").path.read_text(errors="ignore").split("<OBJECT")[1:]
-    pages = []
-    for leaf, body in enumerate(xml):
-        words = [(int(l), int(b), int(r), int(t), w.strip()) for l, b, r, t, w in WORD.findall(body)]
-        width, height = (int(re.search(rf'{key}="(\d+)"', body).group(1)) for key in ("width", "height"))
-        pages.append((leaf, words, width, height))
-    heads = [
-        leaf
-        for leaf, words, *_ in pages
-        if HEADING.search(text := " ".join(w for *_, w in words[:40])) and not PARTY.search(text)
-    ]
-    clusters: list[list[int]] = []
-    for leaf in heads:
-        if clusters and leaf - clusters[-1][-1] <= 3:
-            clusters[-1].append(leaf)
-        else:
-            clusters.append([leaf])
-    clusters = clusters[-len(years) :]
-    if len(clusters) != len(years):
-        return f"{item}: {len(clusters)} Representatives blocks for {len(years)} years, leaves {heads}"
-    out = []
-    for year, cluster in zip(years, clusters, strict=True):
-        contests: dict[str, dict[str, object]] = {}
-        sections: list[dict[str, object]] = []
-        district = 1
-        first = cluster[0]
-        while first > 0 and "Continu" in " ".join(w for *_, w in pages[first][1][:40]):
-            first -= 1
-        for leaf, words, width, height in pages[first : cluster[-1] + 1]:
-            closings = sorted(b for l, b, r, t, w in words if TOTALS.match(w) and l < 0.33 * width and t > 0.1 * height)
-            top = TOP * height
-            for index, closing in enumerate([*closings, None]):
-                bottom = BOTTOM * height if closing is None else closing + 0.004 * height
-                if bottom - top > 0.06 * height:
-                    contests.setdefault(
-                        f"d{district}",
-                        {
-                            "year": year,
-                            "chamber": "house",
-                            "day": day_of(year),
-                            "special": False,
-                            "state": "MA",
-                            "district": district,
-                        },
-                    )
-                    count = max(1, ceil((bottom - top) / height / 0.45))
-                    section: dict[str, object] = {
-                        "page": leaf,
-                        "id": f"{leaf}-{index}",
-                        "discover": f"d{district}",
-                        "orientation": "counties_down",
-                        "crop": [0.0, round(top / height, 4), 1.0, round(bottom / height, 4)],
-                        "hint": f"This is U.S. Representative, District {district}, {year}. The candidate names are printed turned sideways above the columns; Blanks and Total Ballots are columns too.",
-                    }
-                    if count > 1:
-                        section["bands"] = count
-                        section["header"] = [0.0, round(min(1.0, (HEAD * height) / (bottom - top)), 4)]
-                    sections.append(section)
-                if closing is not None:
-                    district += 1
-                    top = bottom
-        out.append((year, contests, sections))
-    for year, contests, sections in out:
-        with connect() as conn:
-            have = conn.execute(
-                "select count(*) from external_id where scheme = 'us.contest' and value ~ %s",
-                [f"^{day_of(year)}:MA:house:[0-9]+$"],
-            ).fetchone()[0]
-        if have != len(contests):
-            return f"{item} {year}: found {len(contests)} districts, database has {have}"
-        manifest = {
+    texts = [" ".join(w.strip() for *_, w in WORD.findall(body))[:400] for body in xml]
+    for year in years:
+        number = (year - 1788) // 2 + 1
+        congress = re.compile(rf"{number}(st|nd|rd|th)\s+Congress", re.IGNORECASE)
+        heads = [
+            leaf
+            for leaf, text in enumerate(texts)
+            if HEADING.search(text) and congress.search(text) and not PARTY.search(text[:200])
+        ]
+        if not heads:
+            return f"{item} {year}: no Representatives heading for the {number}th Congress"
+        clusters: list[list[int]] = []
+        for leaf in heads:
+            if clusters and leaf - clusters[-1][-1] <= 3:
+                clusters[-1].append(leaf)
+            else:
+                clusters.append([leaf])
+        biggest = max(clusters, key=lambda cluster: (len(cluster), cluster[0]))
+        first, last = biggest[0], biggest[-1]
+        first = min(first, last - 7)
+        spec = {
+            "year": year,
+            "day": day_of(year),
             "polity": "US-MA",
             "publisher": "Massachusetts Secretary of the Commonwealth",
             "title": f"Election Statistics {year} (P.D. 43), Representatives in Congress by town",
@@ -127,14 +69,15 @@ def build(item: str, years: list[int]) -> str:
             "raw_source": "us.scans",
             "unit_scheme": "town",
             "unit_codes": {"Gay Head": "25007"},
-            "contests": contests,
-            "pages": sections,
+            "offices": {"house": "U.S. Representative in Congress, one table per district"},
+            "leaves": list(range(first, last + 2)),
         }
-        (Path(__file__).parent / f"ma-es-{year}.json").write_text(json.dumps(manifest, indent=2))
-    return f"{item}: {[(y, len(c), len(s)) for y, c, s in out]}"
+        (Path(__file__).parent / "volumes" / f"ma-es-{year}.json").write_text(json.dumps(spec, indent=2))
+    return f"{item}: {years}"
 
 
 if __name__ == "__main__":
+    (Path(__file__).parent / "volumes").mkdir(exist_ok=True)
     for year, item in ITEMS.items():
         if len(sys.argv) > 1 and year not in sys.argv[1:]:
             continue

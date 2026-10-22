@@ -9,6 +9,7 @@ import re
 import subprocess
 import tempfile
 import zipfile
+from collections import Counter
 from dataclasses import dataclass, field
 from datetime import UTC, datetime
 from functools import cache
@@ -50,6 +51,7 @@ class Page(TypedDict):
     header: NotRequired[list[float]]
     turn: NotRequired[int]
     orientation: NotRequired[str]
+    start: NotRequired[Literal["second"]]
 
 
 class Contest(TypedDict):
@@ -137,7 +139,10 @@ PAGES = DATA / "pages" / SOURCE
 READERS = {
     "first": Reader("claude-haiku-5-5", "low", 0.05, 0.25),
     "second": Reader("claude-sonnet-5-5", "medium", 1.0, 5.0),
+    "third": Reader("claude-opus-5-5", "medium", 5.0, 25.0),
+    "layout": Reader("claude-sonnet-5-5", "medium", 1.0, 5.0),
 }
+ORDER = ("first", "second", "third")
 LEDGER = DATA / "scans-ledger.json"
 BUDGET = 190.0
 IMAGE_LIMIT = 4_500_000
@@ -255,6 +260,14 @@ def render(manifest: Manifest, spec: Page, dpi: int) -> Image.Image:
     return image
 
 
+def framing(spec: Page, reader: str) -> tuple[list[float], int, int]:
+    x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
+    dpi, count = spec.get("dpi", 300), spec.get("bands", 1)
+    if reader == "third":
+        return [x0, max(0.0, y0 - 0.02), x1, min(1.0, y1 + 0.02)], max(count, 2), dpi * 4 // 3
+    return [x0, y0, x1, y1], count, dpi
+
+
 @cache
 def bands(
     name: str, reader: str
@@ -264,11 +277,10 @@ def bands(
     folder.mkdir(parents=True, exist_ok=True)
     out: list[tuple[str, str, tuple[float, float], list[ImageBlockParam | TextBlockParam], str, int]] = []
     for spec in manifest["pages"]:
-        image = render(manifest, spec, spec.get("dpi", 300))
+        (x0, y0, x1, y1), count, dpi = framing(spec, reader)
+        image = render(manifest, spec, dpi)
         width, height = image.size
-        x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
         crop = image.crop((round(x0 * width), round(y0 * height), round(x1 * width), round(y1 * height)))
-        count = spec.get("bands", 1)
         overlap = round(crop.height * 0.02) if count > 1 else 0
         header = None
         if count > 1 and "header" in spec:
@@ -353,9 +365,11 @@ def bands(
 
 
 def requests(name: str, reader: str) -> dict[str, Read]:
-    model, effort, _, _ = READERS[reader]
-    return {
-        custom: Read(
+    starts = {str(spec.get("id", spec["page"])): spec.get("start") for spec in load(name)["pages"]}
+    out: dict[str, Read] = {}
+    for custom, page, span, blocks, digest, pixels in bands(name, reader):
+        model, effort, _, _ = READERS["second" if reader == "first" and starts[page] == "second" else reader]
+        out[custom] = Read(
             custom=custom,
             section=page,
             span=span,
@@ -370,8 +384,7 @@ def requests(name: str, reader: str) -> dict[str, Read]:
                 output_config={"effort": effort, "format": {"type": "json_schema", "schema": SCHEMA}},
             ),
         )
-        for custom, page, span, blocks, digest, pixels in bands(name, reader)
-    }
+    return out
 
 
 def cached(key: str) -> dict[str, object] | None:
@@ -434,7 +447,7 @@ def counties(manifest: Manifest) -> dict[str, str]:
 
 
 def cells(
-    manifest: Manifest, plan: dict[str, Read], names: dict[str, str]
+    manifest: Manifest, plan: dict[str, Read], names: dict[str, str], reader: str
 ) -> tuple[dict[tuple[str, str, int], tuple[int, list[float]]], dict[tuple[str, int], int], dict[str, str]]:
     values: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
     margin: dict[tuple[str, str, int], int] = {}
@@ -445,7 +458,7 @@ def cells(
     home: dict[str, str] = {}
     for spec in manifest["pages"]:
         across = spec.get("orientation") == "counties_across"
-        x0, y0, x1, y1 = spec.get("crop", [0, 0, 1, 1])
+        (x0, y0, x1, y1), _, _ = framing(spec, reader)
         number = str(spec.get("id", spec["page"]))
         for custom, request in plan.items():
             if request.section != number:
@@ -530,7 +543,7 @@ def cells(
 
 
 def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[str, int | None]) -> dict[str, Series]:
-    values, printed, errors = cells(manifest, requests(manifest["name"], reader), names)
+    values, printed, errors = cells(manifest, requests(manifest["name"], reader), names, reader)
     series: dict[str, Series] = {}
     joined: set[tuple[str, str]] = set()
     for spec in manifest["pages"]:
@@ -559,7 +572,7 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
             else "unchecked"
             if entry.printed is None and entry.official is None
             else "tied"
-            if entry.total == entry.printed
+            if entry.total in (entry.printed, entry.official)
             or (
                 entry.printed is None
                 and entry.official is not None
@@ -702,6 +715,34 @@ def official_totals(manifest: Manifest) -> dict[str, int | None]:
     return held
 
 
+def match(labels: list[str], held: list[tuple[str, str, int]], contest: str) -> tuple[list[Column], list[str]]:
+    surnames: list[tuple[str, set[str]]] = []
+    for name, text, _ in held:
+        found_surnames = set()
+        for form in (name, text):
+            forms = [word for word in slug(form).split() if len(word) > 1 and word not in SUFFIX_WORDS]
+            if forms:
+                found_surnames.add(forms[0] if "," in form else forms[-1])
+        surnames.append((name, found_surnames))
+    columns: list[Column] = []
+    unmatched: list[str] = []
+    for label in labels:
+        words = set(slug(label).split())
+        found_options = [name for name, options_ in surnames if options_ & words]
+        if not found_options:
+            found_options = [
+                name
+                for name, options_ in surnames
+                if any(difflib.get_close_matches(word, options_, n=1, cutoff=0.85) for word in words)
+            ]
+        if len(found_options) == 1:
+            columns.append({"label": label, "contest": contest, "candidate": found_options[0]})
+        else:
+            columns.append({"label": label, "contest": None, "candidate": ""})
+            unmatched.append(label)
+    return columns, unmatched
+
+
 def discover(manifest: Manifest, folder: Path) -> str:
     found = folder / "columns.json"
     state: dict[str, dict[str, object]] = (
@@ -725,31 +766,9 @@ def discover(manifest: Manifest, folder: Path) -> str:
                 if spec.get("orientation") == "counties_across"
                 else [entry["label"] for entry in table["header"]]
             )
-            held = options(conn, ids.get(key_of(manifest["contests"][spec["discover"]])))
-            columns: list[Column] = []
-            unmatched: list[str] = []
-            surnames: list[tuple[str, set[str]]] = []
-            for name, text, _ in held:
-                found_surnames = set()
-                for form in (name, text):
-                    forms = [word for word in slug(form).split() if len(word) > 1 and word not in SUFFIX_WORDS]
-                    if forms:
-                        found_surnames.add(forms[0] if "," in form else forms[-1])
-                surnames.append((name, found_surnames))
-            for label in labels:
-                words = set(slug(label).split())
-                found_options = [name for name, options_ in surnames if options_ & words]
-                if not found_options:
-                    found_options = [
-                        name
-                        for name, options_ in surnames
-                        if any(difflib.get_close_matches(word, options_, n=1, cutoff=0.85) for word in words)
-                    ]
-                if len(found_options) == 1:
-                    columns.append({"label": label, "contest": spec["discover"], "candidate": found_options[0]})
-                else:
-                    columns.append({"label": label, "contest": None, "candidate": ""})
-                    unmatched.append(label)
+            columns, unmatched = match(
+                labels, options(conn, ids.get(key_of(manifest["contests"][spec["discover"]]))), spec["discover"]
+            )
             state["columns"][number] = columns
             state["unmatched"][number] = unmatched
     found.write_text(json.dumps(state, indent=2))
@@ -763,7 +782,8 @@ def prepare(name: str) -> str:
     held = official_totals(manifest)
     (folder / "official.json").write_text(json.dumps(held, indent=2))
     out = []
-    for reader, (model, _, price_in, price_out) in READERS.items():
+    for reader in ORDER:
+        model = READERS[reader].model
         plan = requests(name, reader)
         out.append(
             f"{reader} ({model}): {len(plan)} requests, about ${sum(guess(reader, r) for r in plan.values()):.3f} if every page goes"
@@ -785,9 +805,14 @@ def run(name: str) -> str:
     message = ""
     outcome: dict[str, dict[str, Series]] = {}
     redo: set[str] | None = None
-    for reader in ("first", "second"):
-        if reader == "second":
-            redo = {page for entry in outcome["first"].values() if entry.status != "tied" for page in entry.pages}
+    for reader in ORDER:
+        if reader != "first":
+            redo = {
+                page
+                for name, entry in outcome["first"].items()
+                if entry.status != "tied" and (reader == "second" or outcome["second"][name].status != "tied")
+                for page in entry.pages
+            }
             if not redo:
                 break
         if state.get("batches", {}).get(reader):
@@ -807,7 +832,22 @@ def run(name: str) -> str:
             if problems:
                 return f"discovery failed: {problems}"
         outcome[reader] = evaluate(manifest, reader, names, held)
-    return finalize(manifest, folder, outcome["first"], outcome.get("second"), held)
+    return finalize(manifest, folder, outcome["first"], outcome.get("second"), outcome.get("third"), held)
+
+
+def vote(*readers: Series) -> Series:
+    voted = Series(pages=readers[-1].pages, printed=None, official=readers[-1].official)
+    for key in {key for reader in readers for key in reader.cells}:
+        found = [reader.cells[key] for reader in readers if key in reader.cells]
+        counts = Counter(value for value, _ in found)
+        best, seen = counts.most_common(1)[0]
+        value = best if seen > 1 else found[-1][0]
+        voted.cells[key] = next((v, box) for v, box in found if v == value)
+    voted.total = sum(value for value, _ in voted.cells.values())
+    printed = {reader.printed for reader in readers if reader.printed is not None}
+    voted.printed = voted.total if voted.total in printed else Counter(r.printed for r in readers).most_common(1)[0][0]
+    voted.status = "tied" if voted.total in (*printed, voted.official) else "failed"
+    return voted
 
 
 def finalize(
@@ -815,6 +855,7 @@ def finalize(
     folder: Path,
     first: dict[str, Series],
     second: dict[str, Series] | None,
+    third: dict[str, Series] | None,
     held: dict[str, int | None],
 ) -> str:
     overrides = json.loads((folder / "overrides.json").read_text()) if (folder / "overrides.json").exists() else {}
@@ -830,6 +871,7 @@ def finalize(
     review: list[dict[str, object]] = []
     for name, one in first.items():
         two = second[name] if second is not None and one.status != "tied" else None
+        three = third[name] if third is not None and two is not None and two.status != "tied" else None
         chosen, how = one, "first"
         if one.status != "tied":
             if two is not None and two.status == "tied":
@@ -842,6 +884,9 @@ def finalize(
                 and {k: v[0] for k, v in one.cells.items()} == {k: v[0] for k, v in two.cells.items()}
             ):
                 chosen, how = two, "agreed"
+            elif two is not None and three is not None:
+                chosen = vote(one, two, three)
+                how = "voted" if chosen.status == "tied" else "review"
             else:
                 chosen, how = two or one, "review"
         cellmap = {key: (value, box) for key, (value, box) in chosen.cells.items()}
@@ -900,7 +945,8 @@ def finalize(
     if passed:
         pl.DataFrame(passed).write_parquet(folder / "tables.parquet")
     lines = [f"# {manifest['name']}", ""]
-    for reader, (model, _, price_in, price_out) in READERS.items():
+    for reader in ORDER:
+        model, _, price_in, price_out = READERS[reader]
         seen: dict[str, tuple[int, int]] = {}
         for request in requests(manifest["name"], reader).values():
             response = cached(request.key)

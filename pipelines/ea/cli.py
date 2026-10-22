@@ -4,7 +4,7 @@ import subprocess
 import sys
 from pathlib import Path
 
-from ea import cache, checks, coverage, coverage_tables, fixtures, portals, raw, scans, search, tiles
+from ea import cache, checks, coverage, coverage_tables, fixtures, layout, portals, raw, scans, search, tiles
 from ea.apply import apply, publish, revert
 from ea.store import DATA, connect
 
@@ -41,7 +41,7 @@ def main() -> None:
     )
     scanning.add_argument(
         "action",
-        choices=("prepare", "run", "status", "emit"),
+        choices=("prepare", "run", "status", "emit", "layout"),
         help="render crops and fill held totals, advance the Message Batches steps once, list manifests, "
         "or emit the tables that passed",
     )
@@ -62,7 +62,13 @@ def main() -> None:
         case "portals":
             print(portals.census(args.state.upper()))
         case "scans":
-            print(scans.status() if args.action == "status" else getattr(scans, args.action)(args.name))
+            print(
+                scans.status()
+                if args.action == "status"
+                else layout.step(args.name)
+                if args.action == "layout"
+                else getattr(scans, args.action)(args.name)
+            )
         case "fixtures":
             print(fixtures.export())
         case "tiles":
