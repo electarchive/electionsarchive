@@ -709,9 +709,18 @@ WON_CONVENTION = (
     "Derived: the leader of the certified contest totals, with at least the 35 percent that avoids a nominating "
     "convention."
 )
-IN_DAYS = {2020: date(2020, 6, 2), 2022: date(2022, 5, 3)}
-IN_ARCHIVE = "https://enr.indianavoters.in.gov/archive/{}Primary/data/OffCatC_{}_B.json"
-IN_CATEGORIES = {1009: "GOVERNOR", 1018: "senate", 1039: "house"}
+IN_DAYS = {2016: date(2016, 5, 3), 2018: date(2018, 5, 8), 2020: date(2020, 6, 2), 2022: date(2022, 5, 3)}
+IN_ARCHIVE = "https://enr.indianavoters.in.gov/archive/{}Primary/data/OffCatC_{}_{}.json"
+IN_VERSIONS = {2016: "A", 2018: "A", 2020: "B", 2022: "B"}
+IN_CATEGORIES = {
+    2016: {1202: "senate", 1201: "house"},
+    2018: {1938: "senate", 1937: "house"},
+    2020: {1009: "GOVERNOR", 1018: "senate", 1039: "house"},
+    2022: {1009: "GOVERNOR", 1018: "senate", 1039: "house"},
+}
+IN_FILES = [
+    (year, category, label) for year, categories in IN_CATEGORIES.items() for category, label in categories.items()
+]
 IN_METHOD = (
     "Totals are the county rows of the Election Division's election night results archive, each candidate's rows "
     "checked against the archive's statewide summary; a county the district splits holds only the district's part. "
@@ -1023,9 +1032,8 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
-    for year in IN_DAYS:
-        for category in IN_CATEGORIES:
-            raw.fetch(SOURCE, IN_ARCHIVE.format(year, category), suffix=".json")
+    for year, category, _ in IN_FILES:
+        raw.fetch(SOURCE, IN_ARCHIVE.format(year, category, IN_VERSIONS[year]), suffix=".json")
     for url in AL_FILES.values():
         raw.fetch(SOURCE, url, suffix=".zip")
     for year in IA_DAYS:
@@ -2499,7 +2507,9 @@ def parse() -> None:
                 )
                 for county, choice, votes in rows.select("CountyName", "choice", "votes").iter_rows()
             )
-    fl_frame = pl.DataFrame(fl, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row")
+    fl_frame = pl.DataFrame(
+        fl, schema=["day", "office", "code", "party", "fips", "choice", "votes"], orient="row", infer_schema_length=None
+    )
     fl_federal = fl_frame.filter(pl.col("office").is_in(["congress", "us-senate"]))
     frames.append(
         fl_frame.filter(~pl.col("office").is_in(["congress", "us-senate"])).with_columns(
@@ -2835,12 +2845,15 @@ def parse() -> None:
         )
     )
     hoosier: list[tuple[date, str, str | None, str, str, str, int]] = []
-    for (year, in_day), (category, label) in product(IN_DAYS.items(), IN_CATEGORIES.items()):
-        root = json.loads(raw.cached(SOURCE, IN_ARCHIVE.format(year, category)).path.read_bytes().decode("utf-8-sig"))[
-            "Root"
-        ]
+    for year, category, label in IN_FILES:
+        in_day = IN_DAYS[year]
+        root = json.loads(
+            raw.cached(SOURCE, IN_ARCHIVE.format(year, category, IN_VERSIONS[year]))
+            .path.read_bytes()
+            .decode("utf-8-sig")
+        )["Root"]
         totals = {
-            (race["OFFICE_TITLE"], entry["PARTY"], entry["NAME_ON_BALLOT"]): int(entry["TOTAL"])
+            (race["OFFICE_TITLE"], entry["PARTY"], entry["NAME_ON_BALLOT"].lower()): int(entry["TOTAL"])
             for race in listed(root["StatewideSummary"]["Race"])
             for entry in listed(race["Candidates"]["Candidate"])
         }
@@ -2848,18 +2861,25 @@ def parse() -> None:
         for region in listed(root["OfficeCategory"]["Regions"]["Region"]):
             for race in listed(region["Races"]["Race"]):
                 for entry in listed(race["Candidates"]["Candidate"]):
-                    key = (race["OFFICE_TITLE"], entry["PARTY_ABBREV"], entry["NAME_ON_BALLOT"])
+                    key = (race["OFFICE_TITLE"], entry["PARTY_ABBREV"], entry["NAME_ON_BALLOT"].lower())
                     sums[key] = sums.get(key, 0) + int(entry["TOTAL_VOTES"])
+                    numbers = re.findall(r"\d+", race["OFFICE_TITLE"])
+                    ordinals = [n for n, word in enumerate(elstats.ORDINALS, 1) if word in race["OFFICE_TITLE"].lower()]
+                    district = (
+                        str(int(numbers[-1]))
+                        if numbers
+                        else str(ordinals[0])
+                        if ordinals and label == "house"
+                        else None
+                    )
                     hoosier.append(
                         (
                             in_day,
                             label if label in ("house", "senate") else OFFICES[label][0],
-                            str(int(re.findall(r"\d+", race["OFFICE_TITLE"])[-1]))
-                            if label in ("house", "senate")
-                            else None,
+                            district,
                             {"D": "DEM", "R": "REP"}[entry["PARTY_ABBREV"]],
                             race["Jurisdiction"]["FIPS"]
-                            if label in ("house", "senate")
+                            if "FIPS" in race["Jurisdiction"] and label in ("house", "senate")
                             else counties[("18", re.sub(r"[^a-z]", "", region["MAP_JURISDICTION_NAME"].lower()))],
                             re.sub(r"\s+", " ", entry["NAME_ON_BALLOT"]).strip(),
                             int(entry["TOTAL_VOTES"]),
@@ -3296,8 +3316,8 @@ def emit() -> Path:
             for race, title in tx_elchist.races(election):
                 if TX_RACE.fullmatch(title):
                     cs.artifact(raw.cached(SOURCE, f"{tx_elchist.SITE}elchist{election}_race{race}.htm"), sources["TX"])
-        for year, category in product(IN_DAYS, IN_CATEGORIES):
-            cs.artifact(raw.cached(SOURCE, IN_ARCHIVE.format(year, category)), sources["IN"])
+        for year, category, _ in IN_FILES:
+            cs.artifact(raw.cached(SOURCE, IN_ARCHIVE.format(year, category, IN_VERSIONS[year])), sources["IN"])
         for url in AL_FILES.values():
             cs.artifact(raw.cached(SOURCE, url), sources["AL"])
         for url in iowa().values():
