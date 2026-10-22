@@ -20,7 +20,7 @@ PARSED = DATA / "parsed" / SOURCE
 HOME = "https://digital.newberry.org/ahcb/"
 COUNTIES = "https://digital.newberry.org/ahcb/downloads/gis/US_AtlasHCB_Counties_Gen0001.zip"
 FIELDS = ["ID", "VERSION", "NAME", "FULL_NAME", "STATE_TERR", "FIPS", "CNTY_TYPE", "CHANGE", "CITATION"]
-STATES: set[str] | None = {"54"}
+STATES: set[str] | None = {"51", "21", "47", "37", "45", "13", "24", "10", "11"}
 NOT_COUNTY = re.compile(
     r"_nca\d*$|^dcs_|Res\.?$|Reserve|Indian lands|Western Reserve|Mare Island|Sec\. the|Terr\. Part|Disp\.|Claim"
     r"|Settlement|Province|Colony$|Mil Res|Spanish|Indian Terr\.|ANNEXATION|TERRITORY"
@@ -423,14 +423,25 @@ def emit() -> Path:
                     source_id=source_id,
                 )
 
+        counties = dict(
+            conn.execute(
+                "select c.code, a.id from area a join area_code c on c.area_id = a.id where a.scheme_code = 'us.county'"
+            ).fetchall()
+        )
         placed: dict[tuple[str, str], set[UUID]] = {}
-        for area, run in segments.items():
-            for segment in run:
-                st = states[segment.parent][2]
-                for row in segment.rows:
-                    placed.setdefault((st, re.sub(r"[^a-z]", "", proper(row.name).lower())), set()).add(area)
-                    if row.code is not None:
-                        placed.setdefault((st, row.code), set()).add(area)
+        for row in frame.iter_rows(named=True):
+            code = RECODED.get(row["fips"], row["fips"]) if row["fips"] is not None else None
+            area = (
+                counties.get(code) or uuid5(NAMESPACE, f"area:us.county@None\x1f{code}")
+                if code is not None
+                else uuid5(NAMESPACE, f"external_id:ahcb\x1f{row['id']}")
+            )
+            parent = by_name.get(STATE_NAME.sub("", row["state_terr"])) or within[row["id"], row["version"]]
+            st = states[parent][2]
+            placed.setdefault((st, re.sub(r"[^a-z]", "", proper(row["name"]).lower())), set()).add(area)
+            if code is not None:
+                placed.setdefault((st, code), set()).add(area)
+        loaded = set(counties.values()) | set(segments)
         matched: list[str] = []
         for unit, code, polity, parent, counted, relation, unit_area, kind, valid_from, valid_to in conn.execute(
             """select id, code, polity_id, parent_id, counted_with_id, area_relation::text, area_id, kind::text,
@@ -440,7 +451,9 @@ def emit() -> Path:
             st, name = code.split(":", 1)
             base = name.removesuffix("special")
             found = placed.get((st, RECODED.get(base, base))) or placed.get((st, base.removesuffix("county"))) or set()
-            if len(found) != 1:
+            if len(found) > 1 and unit_area in found:
+                found = {unit_area}
+            if len(found) != 1 or not found <= loaded:
                 continue
             (area,) = found
             target = "within" if name.endswith("special") else "equals"
