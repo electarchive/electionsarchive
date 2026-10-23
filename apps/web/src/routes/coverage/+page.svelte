@@ -21,7 +21,6 @@
   const TITLES: Record<Goal, () => string> = {
     county: m.coverage_goal_county,
     history: m.coverage_goal_history,
-    legislature_history: m.coverage_goal_legislature_history,
     precinct: m.coverage_goal_precinct,
     shapes: m.coverage_goal_shapes,
     shapes_history: m.coverage_goal_shapes_history,
@@ -30,7 +29,6 @@
   const TABS: Record<Goal, () => string> = {
     county: m.coverage_goal_tab_county,
     history: m.coverage_goal_tab_history,
-    legislature_history: m.coverage_goal_tab_legislature_history,
     precinct: m.coverage_goal_tab_precinct,
     shapes: m.coverage_goal_tab_shapes,
     shapes_history: m.coverage_goal_tab_shapes_history,
@@ -109,8 +107,6 @@
             ? {
                 county: m.coverage_reason_complete_county_def,
                 history: m.coverage_reason_complete_history_def,
-                legislature_history:
-                  m.coverage_reason_complete_legislature_history_def,
                 precinct: m.coverage_reason_complete_precinct_def,
                 shapes: m.coverage_reason_complete_shapes_def,
                 shapes_history: m.coverage_reason_complete_shapes_def,
@@ -157,12 +153,21 @@
       {/each}
     </ul>
     {#if row.goal === "history"}
+      <ul class="grid gap-1 text-sm">
+        {#each data.parts as part (part.part)}
+          <li>
+            {(part.part === "national"
+              ? m.coverage_part_national
+              : m.coverage_part_legislature)({
+              complete: count(part.complete),
+              total: count(part.total),
+              percent: percent(part.complete / Math.max(1, part.total), 1),
+            })}
+          </li>
+        {/each}
+      </ul>
       <p class="text-sm text-muted-foreground">
         {m.coverage_goal_history_note()}
-      </p>
-    {:else if row.goal === "legislature_history"}
-      <p class="text-sm text-muted-foreground">
-        {m.coverage_goal_legislature_history_note()}
       </p>
     {:else if row.goal === "local"}
       <p class="text-sm text-muted-foreground">

@@ -585,15 +585,11 @@ def build() -> str:
                     cell[9] += c["shaped_precincts"]
                 else:
                     cell[13] += c.get("icpsr_only", 0)
-        elif coverage.target(st, level, year) == "county":
+        elif coverage.target(st, level, year) == "county" or level in ("state_upper", "state_lower"):
             cell = goals[("history", st, level, year)]
             for i, value in enumerate([base, county, base - count, bare, totals, partial, 0, c.get("with_turnout", 0)]):
                 cell[i] += value
             cell[13] += c.get("icpsr_only", 0)
-        elif level in ("state_upper", "state_lower"):
-            cell = goals[("legislature_history", st, level, year)]
-            for i, value in enumerate([base, county, base - count, bare, 0, 0, 0, c.get("with_turnout", 0)]):
-                cell[i] += value
     kinds = {g["id"]: (g["state"], g["kind"]) for g in governments}
     for gid, year, expected, n, _, _, precincts, shaped in years_out:
         st, kind = kinds[gid]

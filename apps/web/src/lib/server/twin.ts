@@ -24,7 +24,6 @@ type Link = (name: string, path: string | null) => string;
 const TITLES = {
   county: m.coverage_goal_county,
   history: m.coverage_goal_history,
-  legislature_history: m.coverage_goal_legislature_history,
   precinct: m.coverage_goal_precinct,
   shapes: m.coverage_goal_shapes,
   shapes_history: m.coverage_goal_shapes_history,
@@ -333,6 +332,17 @@ function coverageMarkdown(
           ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
           : []),
       ].join(", "),
+      ...(row.goal === "history"
+        ? [
+            data.parts
+              .map(
+                (part) =>
+                  `- ${(part.part === "national" ? m.coverage_part_national : m.coverage_part_legislature)({ complete: count(part.complete), total: count(part.total), percent: percent(part.complete / Math.max(1, part.total), 1) })}`,
+              )
+              .join("\n"),
+            m.coverage_goal_history_note(),
+          ]
+        : []),
       REASONS[row.goal]
         .flatMap((reason) => [
           `- ${LABELS[reason]()}: ${count(row[reason])}`,

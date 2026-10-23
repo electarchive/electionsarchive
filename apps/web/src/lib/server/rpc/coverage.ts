@@ -7,7 +7,6 @@ import { db } from "#lib/server/db/index.js";
 const GOALS = [
   "county",
   "history",
-  "legislature_history",
   "precinct",
   "shapes",
   "shapes_history",
@@ -58,6 +57,13 @@ export const coverage = {
         builtAt: v.nullable(v.string()),
         building: v.boolean(),
         goals: v.array(v.object({ goal: v.picklist(GOALS), ...counts })),
+        parts: v.array(
+          v.object({
+            part: v.picklist(["national", "legislature"]),
+            total: v.number(),
+            complete: v.number(),
+          }),
+        ),
       }),
     )
     .handler(async ({ input }) => {
@@ -74,7 +80,19 @@ export const coverage = {
         where ${input.current} or g.year <> extract(year from current_date)
         group by g.goal
       `);
+      const parts = await db.execute<{
+        part: "national" | "legislature";
+        total: number;
+        complete: number;
+      }>(sql`
+        select case when g.level in ('state_upper', 'state_lower') then 'legislature' else 'national' end as part,
+          sum(g.total)::int as total, sum(g.complete)::int as complete
+        from coverage_goal g
+        where g.goal = 'history'
+        group by 1 order by 1 desc
+      `);
       return {
+        parts: parts.rows,
         builtAt: built.rows[0]?.builtAt ?? null,
         building: built.rows[0]?.building ?? false,
         goals: GOALS.flatMap((goal) =>

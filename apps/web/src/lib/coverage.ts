@@ -3,7 +3,6 @@ import { m } from "#lib/paraglide/messages.js";
 export const GOALS = [
   "county",
   "history",
-  "legislature_history",
   "precinct",
   "shapes",
   "shapes_history",
@@ -28,7 +27,6 @@ export type Counts = Record<
 export const REASONS: Record<Goal, Array<Reason>> = {
   county: ["complete", "partial", "totals", "bare", "absent"],
   history: ["complete", "partial", "totals", "bare", "absent"],
-  legislature_history: ["complete", "bare", "absent"],
   precinct: ["complete", "coarse", "partial", "totals", "bare", "absent"],
   shapes: ["complete", "units", "unshaped", "undrawn"],
   shapes_history: ["complete", "units", "unshaped", "undrawn"],
