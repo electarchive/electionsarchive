@@ -1,0 +1,818 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1970",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofst1970illi/officialvoteofst1970illi.pdf"
+  },
+  "contests": {
+    "state-senate33": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 33
+    },
+    "state-senate34": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 34
+    },
+    "state-senate36": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 36
+    },
+    "state-senate37": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 37
+    },
+    "state-senate38": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 38
+    },
+    "state-senate39": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 39
+    },
+    "state-senate40": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 40
+    },
+    "state-senate41": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 41
+    },
+    "state-senate42": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 42
+    },
+    "state-senate43": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 43
+    },
+    "state-senate44": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 44
+    },
+    "state-senate45": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 45
+    },
+    "state-senate46": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 46
+    },
+    "state-senate47": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 47
+    },
+    "state-senate48": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 48
+    },
+    "state-senate49": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 49
+    },
+    "state-senate50": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 50
+    },
+    "state-senate52": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 52
+    },
+    "state-senate53": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 53
+    },
+    "state-senate54": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 54
+    },
+    "state-senate55": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 55
+    },
+    "state-senate58": {
+      "year": 1970,
+      "chamber": "state-senate",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "IL",
+      "district": 58
+    }
+  },
+  "pages": [
+    {
+      "page": 43,
+      "id": "43-11",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Dennis J. Collins",
+          "contest": "state-senate33",
+          "candidate": "Dennis J. Collins"
+        },
+        {
+          "label": "Democratic Vito C. Bianco",
+          "contest": "state-senate33",
+          "candidate": "Vito C. Bianco"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.701,
+        0.98,
+        0.953
+      ],
+      "hint": "Read only the table headed '33rd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 44,
+      "id": "44-0",
+      "columns": [
+        {
+          "label": "Bertil T. Rosander, Rep.",
+          "contest": "state-senate34",
+          "candidate": "Bertil T. Rosander"
+        },
+        {
+          "label": "Richard E. Wilke, Dem.",
+          "contest": "state-senate34",
+          "candidate": "Richard E. Wilke"
+        },
+        {
+          "label": "Mr. Rosander's plurality",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.124,
+        0.98,
+        0.284
+      ],
+      "hint": "Read only the table headed '34th District\u2014Winnebago County'; ignore any other table visible in the image."
+    },
+    {
+      "page": 44,
+      "id": "44-2",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican W. K. \"Kenny\" Davidson",
+          "contest": "state-senate36",
+          "candidate": "W K. Davidson"
+        },
+        {
+          "label": "Democratic Richard Mautino",
+          "contest": "state-senate36",
+          "candidate": "Richard Mautino"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.553,
+        0.98,
+        0.898
+      ],
+      "hint": "Read only the table headed '36th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 44,
+      "id": "44-3",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William C. Harris",
+          "contest": "state-senate37",
+          "candidate": "William C. Harris"
+        },
+        {
+          "label": "Democratic Robert P. Hendon",
+          "contest": "state-senate37",
+          "candidate": "Robert P. Hendon"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.85,
+        0.98,
+        1.0
+      ],
+      "hint": "Read only the table headed '37th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 45,
+      "id": "45-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Robert W. Mitchler",
+          "contest": "state-senate38",
+          "candidate": "Robert W. Mitchler"
+        },
+        {
+          "label": "Democratic Frederick J. Steffen",
+          "contest": "state-senate38",
+          "candidate": "Frederick J. Steffen"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.112,
+        0.98,
+        0.385
+      ],
+      "hint": "Read only the table headed '38th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 45,
+      "id": "45-1",
+      "columns": [
+        {
+          "label": "Jack T. Knuepfer, Rep.",
+          "contest": "state-senate39",
+          "candidate": "Jack T. Knuepfer"
+        },
+        {
+          "label": "Robert H. Renshaw, Dem.",
+          "contest": "state-senate39",
+          "candidate": "Robert H. Renshaw"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.02,
+        0.337,
+        0.98,
+        0.544
+      ],
+      "hint": "Read only the table headed '39th District\u2014DuPage County'; ignore any other table visible in the image."
+    },
+    {
+      "page": 45,
+      "id": "45-2",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Harris W. Fawell",
+          "contest": "state-senate40",
+          "candidate": "Harris W. Fawell"
+        },
+        {
+          "label": "Democratic John T. Perry",
+          "contest": "state-senate40",
+          "candidate": "John T. Perry"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.496,
+        0.98,
+        0.798
+      ],
+      "hint": "Read only the table headed '40th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 45,
+      "id": "45-3",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Meade Baltz",
+          "contest": "state-senate41",
+          "candidate": "Mead Baltz"
+        },
+        {
+          "label": "Democratic Leroy Van Duyne",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.75,
+        0.98,
+        1.0
+      ],
+      "hint": "Read only the table headed '41st District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 46,
+      "id": "46-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Joseph D. Simmons, Jr.",
+          "contest": "state-senate42",
+          "candidate": "Joseph D. Simmons, Jr."
+        },
+        {
+          "label": "Democratic John Linebaugh Knuppel",
+          "contest": "state-senate42",
+          "candidate": "John Linebaugh Knuppel"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.126,
+        0.98,
+        0.486
+      ],
+      "hint": "Read only the table headed '42nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 46,
+      "id": "46-1",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Donald D. Carpentier",
+          "contest": "state-senate43",
+          "candidate": "Donald D. Carpenter"
+        },
+        {
+          "label": "Democratic William R. Armstrong",
+          "contest": "state-senate43",
+          "candidate": "William R. Armstrong"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.438,
+        0.98,
+        0.749
+      ],
+      "hint": "Read only the table headed '43rd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 46,
+      "id": "46-2",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Tom Merritt",
+          "contest": "state-senate44",
+          "candidate": "Tom Merritt"
+        },
+        {
+          "label": "Democratic David S. Palmer",
+          "contest": "state-senate44",
+          "candidate": "David S. Palmer"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.701,
+        0.98,
+        1.0
+      ],
+      "hint": "Read only the table headed '44th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 46,
+      "id": "46-3",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Hudson Ralph Sours",
+          "contest": "state-senate45",
+          "candidate": "Ralph Hudson Sours"
+        },
+        {
+          "label": "Democratic Daniel W. Hardy",
+          "contest": "state-senate45",
+          "candidate": "Daniel W. Hardy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.972,
+        0.98,
+        1.0
+      ],
+      "hint": "Read only the table headed '45th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 47,
+      "id": "47-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Edward McBroom",
+          "contest": "state-senate46",
+          "candidate": "Edward McBroom"
+        },
+        {
+          "label": "Democratic No Nominee",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.11,
+        0.98,
+        0.416
+      ],
+      "hint": "Read only the table headed '46th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 47,
+      "id": "47-1",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Stanley B. Weaver",
+          "contest": "state-senate47",
+          "candidate": "Stanley B. Weaver"
+        },
+        {
+          "label": "Democratic John J. McHale",
+          "contest": "state-senate47",
+          "candidate": "John McHale"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.368,
+        0.98,
+        0.708
+      ],
+      "hint": "Read only the table headed '47th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 47,
+      "id": "47-2",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Egbert B. Groen",
+          "contest": "state-senate48",
+          "candidate": "Egbert B. Groen"
+        },
+        {
+          "label": "Democratic Leo Lee Vance",
+          "contest": "state-senate48",
+          "candidate": "Leo Lee Vance"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.66,
+        0.98,
+        1.0
+      ],
+      "hint": "Read only the table headed '48th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 47,
+      "id": "47-3",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican G. William Horsley",
+          "contest": "state-senate49",
+          "candidate": "G William Horsley"
+        },
+        {
+          "label": "Democratic R. Todd Renfrow",
+          "contest": "state-senate49",
+          "candidate": "R Todd Renfrow"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.953,
+        0.98,
+        1.0
+      ],
+      "hint": "Read only the table headed '49th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 48,
+      "id": "48-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican O. George Ryan",
+          "contest": "state-senate50",
+          "candidate": "O George Ryan"
+        },
+        {
+          "label": "Democratic Robert W. McCarthy",
+          "contest": "state-senate50",
+          "candidate": "Robert W. McCarthy"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.121,
+        0.98,
+        0.414
+      ],
+      "hint": "Read only the table headed '50th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 48,
+      "id": "48-2",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Russel Adams",
+          "contest": "state-senate52",
+          "candidate": "Russel Adams"
+        },
+        {
+          "label": "Democratic Wm. \"Bill\" Lyons",
+          "contest": "state-senate52",
+          "candidate": "William Lyons"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.672,
+        0.98,
+        0.983
+      ],
+      "hint": "Read only the table headed '52nd District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 48,
+      "id": "48-3",
+      "columns": [
+        {
+          "label": "Merrill Ottwein, Rep.",
+          "contest": "state-senate53",
+          "candidate": "Merrill Ottwien"
+        },
+        {
+          "label": "Sam M. Vadalabene, Dem.",
+          "contest": "state-senate53",
+          "candidate": "Sam M. Vadalabene"
+        },
+        {
+          "label": "Mr. Vadalabene's plurality",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.02,
+        0.935,
+        0.98,
+        1.0
+      ],
+      "hint": "Read only the table headed '53rd District\u2014Madison County'; ignore any other table visible in the image."
+    },
+    {
+      "page": 49,
+      "id": "49-0",
+      "columns": [
+        {
+          "label": "Lehman D. Krause, Rep.",
+          "contest": "state-senate54",
+          "candidate": "Lehman D. Krause"
+        },
+        {
+          "label": "Kenneth Hall, Dem.",
+          "contest": "state-senate54",
+          "candidate": "Kenneth Hall"
+        }
+      ],
+      "orientation": "counties_across",
+      "crop": [
+        0.02,
+        0.145,
+        0.98,
+        0.277
+      ],
+      "hint": "Read only the table headed '54th District\u2014St. Clair County'; ignore any other table visible in the image."
+    },
+    {
+      "page": 49,
+      "id": "49-1",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican George W. Woodcock",
+          "contest": "state-senate55",
+          "candidate": "George W. Woodcock"
+        },
+        {
+          "label": "Democratic Terry L. Bruce",
+          "contest": "state-senate55",
+          "candidate": "Terry L. Bruce"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.229,
+        0.98,
+        0.642
+      ],
+      "hint": "Read only the table headed '55th District'; ignore any other table visible in the image."
+    },
+    {
+      "page": 50,
+      "id": "50-1",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Clifford B. Latherow Republican",
+          "contest": "state-senate58",
+          "candidate": "Clifford B. Latherow"
+        },
+        {
+          "label": "Neil Carrico Democratic",
+          "contest": "state-senate58",
+          "candidate": "Neil Carrico"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.02,
+        0.537,
+        0.98,
+        0.984
+      ],
+      "hint": "Read only the table headed '58th District'; ignore any other table visible in the image."
+    }
+  ]
+}
