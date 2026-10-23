@@ -109,6 +109,7 @@
     Array<{ k: number; name: string; x: number; y: number }>
   >([]);
   let isQueued = false;
+  let isFramed = true;
 
   const isCompared = $derived(
     sheet.target != null &&
@@ -1163,6 +1164,7 @@
       animate: isAnimated && !calm,
       duration: 900,
     });
+    isFramed = true;
   }
 
   function room() {
@@ -1199,6 +1201,7 @@
       ),
     );
     pinned = k;
+    isFramed = false;
     gl.flyTo({ center: [x, y], zoom, duration: calm ? 0 : 1100 });
   }
 
@@ -1228,6 +1231,7 @@
       fly(k);
       return;
     }
+    isFramed = false;
     gl.fitBounds(
       [
         [box[0] ?? 0, box[1] ?? 0],
@@ -1364,6 +1368,20 @@
           untrack(() => sheet),
         );
         map = gl;
+      });
+      gl.on("movestart", (event) => {
+        if (event.originalEvent != null) {
+          isFramed = false;
+        }
+      });
+      gl.on("resize", () => {
+        if (isFramed && map != null) {
+          frame(
+            gl,
+            untrack(() => sheet),
+            false,
+          );
+        }
       });
       gl.on("moveend", deepen);
       gl.on("move", () => {
@@ -2024,6 +2042,7 @@
               ? m.map_inset_part()
               : m.map_inset_show({ place })}
             onclick={() => {
+              isFramed = false;
               map?.fitBounds([box.west, box.south, box.east, box.north], {
                 padding: room(),
                 duration: calm ? 0 : 900,
@@ -2079,7 +2098,7 @@
 
     <section
       class={cn(
-        "absolute inset-s-3 inset-be-3 z-10 grid gap-3 rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-sm:overflow-y-auto max-sm:max-block-[60%]",
+        "absolute inset-s-3 inset-be-3 z-10 grid gap-3 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:max-block-[60%]",
         { "max-sm:hidden": !isKeyOpen },
       )}
       aria-labelledby="{uid}-key"
@@ -2181,7 +2200,8 @@
           {m.atlas_estimated_note({ year })}
         </p>
       {/if}
-      <div class="flex flex-wrap gap-1">
+      <div class="flex flex-wrap items-center gap-1">
+        <span class="pe-1 text-xs text-muted-foreground">{m.atlas_won()}</span>
         {#each leads.slice(0, 6) as lead (lead.index)}
           {const item = $derived(sheet.legend[lead.index])}
           {#if item != null}
@@ -2245,7 +2265,7 @@
           <span class="text-xs font-semibold text-muted-foreground"
             >{m.map_level()}</span
           >
-          <div class="flex">
+          <div class="flex overflow-x-auto pbe-px">
             {#each sheet.levels as level (level.code)}
               <button
                 type="button"
@@ -2330,7 +2350,7 @@
     {#if entry != null}
       <aside
         class={cn(
-          "absolute inset-e-3 inset-bs-3 z-10 rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-sm:inset-bs-auto max-sm:inset-be-3 max-sm:overflow-y-auto max-sm:max-block-[55%]",
+          "absolute inset-e-3 inset-bs-3 z-10 overflow-y-auto rounded-sm bg-card/96 p-3.5 shadow-menu ring-1 ring-border inline-[min(19.5rem,calc(100%-1.5rem))] max-block-[calc(100%-1.5rem)] max-sm:inset-bs-auto max-sm:inset-be-3 max-sm:max-block-[55%]",
           { "max-sm:hidden": pinned == null || isKeyOpen },
         )}
         aria-live="polite"

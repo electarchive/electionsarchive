@@ -4678,6 +4678,9 @@ export const contests = {
         (input.level === "coarse"
           ? levels.find((entry) => entry.tiles != null)
           : undefined) ??
+        levels.findLast(
+          (entry) => entry.tiles != null && entry.count <= 25_000,
+        ) ??
         levels.findLast((entry) => entry.tiles != null) ??
         levels.find((entry) => entry.code === federal) ??
         levels.at(-1) ??
