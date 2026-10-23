@@ -5,7 +5,7 @@
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, credit, percent, points, precision } from "#lib/format.js";
-  import { LOST, OUTCOMES } from "#lib/outcomes.js";
+  import { explain, LOST, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -433,7 +433,7 @@
                         "text-muted-foreground": LOST.has(page.outcome),
                       })}
                       label={OUTCOMES[page.outcome]?.() ?? page.outcome}
-                      definition={page.note}
+                      definition={explain(page.note)}
                     />
                   {/if}
                 {/if}

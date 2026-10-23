@@ -6,7 +6,7 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import { count, credit, date, percent } from "#lib/format.js";
-  import { LOST } from "#lib/outcomes.js";
+  import { explain, LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -328,7 +328,7 @@
                         },
                       )}
                       label={OUTCOMES[entry.outcome]?.() ?? entry.outcome}
-                      definition={entry.note}
+                      definition={explain(entry.note)}
                     />
                   {:else if entry.outcome != null}
                     <span

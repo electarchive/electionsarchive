@@ -15,7 +15,7 @@
     points,
     precision,
   } from "#lib/format.js";
-  import { MEASURES, OUTCOMES } from "#lib/outcomes.js";
+  import { explain, isDerived, MEASURES, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -607,12 +607,14 @@
     Map.groupBy(
       [
         ...contest.rows.flatMap((row) =>
-          row.current?.outcome == null || row.current.note == null
+          row.current?.outcome == null ||
+          row.current.note == null ||
+          isDerived(row.current.note)
             ? []
             : [{ label: row.label, note: row.current.note }],
         ),
         ...(contest.current == null ? (contest.declared?.rows ?? []) : [])
-          .filter((row) => row.note != null)
+          .filter((row) => row.note != null && !isDerived(row.note))
           .map((row) => ({ label: row.label, note: row.note ?? "" })),
       ],
       (row) => row.note,
@@ -1242,7 +1244,7 @@
               <Term
                 class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
                 label={OUTCOMES[row.outcome]?.() ?? row.outcome}
-                definition={row.note}
+                definition={explain(row.note)}
               />
             {/if}
           </span>

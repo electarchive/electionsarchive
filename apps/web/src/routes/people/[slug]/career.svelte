@@ -3,6 +3,7 @@
   import Export from "#lib/components/export.svelte";
   import Measured from "#lib/components/measured.svelte";
   import { percent } from "#lib/format.js";
+  import { isDerived } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
@@ -255,7 +256,7 @@
               >
             {/if}
           </span>
-          {#if lit.outcome != null && lit.note != null}
+          {#if lit.outcome != null && lit.note != null && !isDerived(lit.note)}
             <span class="text-pretty text-muted-foreground">{lit.note}</span>
           {/if}
         </div>

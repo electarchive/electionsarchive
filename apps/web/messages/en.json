@@ -107,6 +107,7 @@
   "outcome_lost": "Not passed",
   "outcome_quorum": "Turnout below quorum",
   "outcome_note": "{names}: {note}",
+  "outcome_derived": "Outcome inferred from the certified totals: {rest}",
   "stat_valid": "Valid votes",
   "measure_list_votes": "Party votes",
   "measure_electoral_votes": "Electoral votes",

@@ -4,6 +4,7 @@ import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
 import { PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
 import { count, date, percent, points } from "#lib/format.js";
+import { isDerived } from "#lib/outcomes.js";
 import { m } from "#lib/paraglide/messages.js";
 import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
 import {
@@ -620,7 +621,7 @@ function personMarkdown(
             entry.votes == null || entry.total == null || entry.total === 0
               ? null
               : percent(entry.votes / entry.total),
-            entry.note == null
+            entry.note == null || isDerived(entry.note)
               ? outcome(entry.outcome)
               : `${outcome(entry.outcome)} (${entry.note})`,
           ]),
@@ -1027,7 +1028,9 @@ function resultsMarkdown(
         results,
       )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}${contest.rows
         .flatMap((row) =>
-          row.current?.outcome == null || row.current.note == null
+          row.current?.outcome == null ||
+          row.current.note == null ||
+          isDerived(row.current.note)
             ? []
             : [
                 `\n\n${m.outcome_note({ names: row.label, note: row.current.note })}`,
