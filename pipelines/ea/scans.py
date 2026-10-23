@@ -163,6 +163,7 @@ IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
 LEGISLATURES = {"state-senate": "senate", "state-house": "house", "state-legislature": "legislature"}
 LABEL = re.compile(r"^(counties|county)$")
+HALF = re.compile(r"(?<=\d)\s*(?:½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
 SUBTOTAL = re.compile(r"^(down ?state|downstate)$")
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
@@ -587,8 +588,13 @@ def cells(
                     break
                 for c, text in enumerate(texts):
                     series, label = (r, header[c]["label"]) if across else (c, named)
+                    half = manifest.get("halves", False) and HALF.search(text) is not None
+                    if half:
+                        text = HALF.sub("", text)
                     digits = re.sub(r"[,\s.]|(?<=\d)[-~'](?=\d)", "", text)
-                    value = int(digits) if digits.isdigit() else None
+                    value = int(digits) if digits.isascii() and digits.isdigit() else None
+                    if value is not None and manifest.get("halves", False):
+                        value = value * 2 + half
                     if TOTAL.match(slug(label)):
                         if value is not None:
                             printed[(number, series)] = value
@@ -1025,6 +1031,8 @@ def run(name: str, mode: str = "auto") -> str:
     if not (folder / "official.json").exists():
         (folder / "official.json").write_text(json.dumps(official_totals(manifest), indent=2))
     held: dict[str, int | None] = json.loads((folder / "official.json").read_text())
+    if manifest.get("halves", False):
+        held = {key: None if value is None else value * 2 for key, value in held.items()}
     names = counties(manifest)
     message = ""
     outcome: dict[str, dict[str, Series]] = {}
@@ -1051,6 +1059,8 @@ def run(name: str, mode: str = "auto") -> str:
             bands.cache_clear()
             held = official_totals(manifest)
             (folder / "official.json").write_text(json.dumps(held, indent=2))
+            if manifest.get("halves", False):
+                held = {key: None if value is None else value * 2 for key, value in held.items()}
             if problems:
                 return f"discovery failed: {problems}"
         outcome[reader] = evaluate(manifest, reader, names, held)
@@ -1156,7 +1166,8 @@ def finalize(
                 "page": numbers[page],
                 "section": page,
                 "code": code,
-                "votes": value,
+                "votes": value // 2 if manifest.get("halves", False) else value,
+                "half": manifest.get("halves", False) and value % 2 == 1,
                 "x0": box[0],
                 "y0": box[1],
                 "x1": box[2],
@@ -1376,6 +1387,25 @@ def emit(name: str) -> Path:
         key_of(contests[contest]): note
         for contest, note in frame.filter(pl.col("note").is_not_null()).select("contest", "note").unique().iter_rows()
     }
+    if "half" in frame.columns:
+        for contest, text in (
+            pl.read_parquet(WORK / name / "tables.parquet")
+            .filter(pl.col("half"))
+            .group_by("contest", maintain_order=True)
+            .agg(pl.format("{} {}", pl.col("candidate"), pl.col("code")).alias("cells"))
+            .iter_rows()
+        ):
+            found = key_of(contests[contest])
+            caveats[found] = " ".join(
+                part
+                for part in (
+                    caveats.get(found),
+                    "Cumulated votes print halves; each half vote is dropped from the cell (candidate and county code): "
+                    + ", ".join(text)
+                    + ".",
+                )
+                if part
+            )
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -1434,6 +1464,7 @@ def emit(name: str) -> Path:
                     if towns
                     else ""
                 )
-                + (f" {caveats[found[0]]}" if found is not None and found[0] in caveats else ""),
+                + (f" {caveats[found[0]]}" if found is not None and found[0] in caveats else "")
+                + (f" {manifest['caveat']}" if manifest.get("caveat") else ""),
             )
         return cs.write()

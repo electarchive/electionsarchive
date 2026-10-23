@@ -1,0 +1,25 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1972,
+ "day": "1972-11-07",
+ "title": "State of Illinois official vote cast at the general election, 1972",
+ "file": {
+  "url": "https://archive.org/download/officialvote72illi/officialvote72illi.pdf"
+ },
+ "offices": {
+  "state-house": "Representative in the General Assembly, one table per district (up to three seats; cumulated votes printed with halves)"
+ },
+ "leaves": [
+  70,
+  71,
+  72,
+  73,
+  74,
+  75,
+  76,
+  77
+ ]
+}
