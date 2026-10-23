@@ -192,6 +192,17 @@ ARKANSAS = {
     date(2024, 11, 5): "GE2024_report.pdf",
 }
 HAWAII = {
+    date(2012, 11, 6): {
+        "Relating to Retired Judges": "Hawaii Appointment of Retired Judges Amendment",
+        "Relating to Dams and": "Hawaii Dam and Reservoir Owners Assistance Amendment",
+    },
+    date(2014, 11, 4): {
+        "Relating to Disclosure of": "Hawaii Disclosure of Judicial Nominees' Names, Amendment 1",
+        "Relating to Agricultural": "Hawaii Bonds for Agricultural Enterprises, Amendment 2",
+        "Relating to State Justices": "Hawaii Mandatory Retirement Age for Justices and Judges, Amendment 3",
+        "Relating to Early Childhood": "Hawaii Amendment 4, Public Funding for Private Early Childhood Education Programs Measure",
+        "Relating to Dams and": "Hawaii Bonds for Dam and Reservoir Assistance, Amendment 5",
+    },
     date(2016, 11, 8): {
         "Jury Trials in Civil Cases": "Hawaii Threshold of Financial Damage Required to Establish the Right to a Trial by "
         "Jury, Amendment 1",
@@ -238,7 +249,12 @@ NEBRASKA = {
     date(2022, 11, 8): "2022/2022%20General%20Canvass%20Book.pdf",
     date(2024, 11, 5): "2024/2024%20General%20Canvass%20Book.pdf",
 }
-ILLINOIS = {date(2016, 11, 8): 2016, date(2020, 11, 3): 2020, date(2022, 11, 8): 2022}
+ILLINOIS = {date(2016, 11, 8): 2016, date(2020, 11, 3): 2020, date(2022, 11, 8): 2022, date(2024, 11, 5): 2024}
+ILLINOIS_ADVISORY = {
+    "civil penalties": "Illinois Penalties for Candidate Interference with Election Worker's Duties Advisory Question",
+    "additional 3% tax": "Illinois Income Tax Advisory Question",
+    "assisted rep": "Illinois Assisted Reproductive Healthcare Advisory Question",
+}
 KENTUCKY = {
     date(2022, 11, 8): (
         "https://elect.ky.gov/results/2020-2029/Documents/2022%20General%20Election%20Results.pdf",
@@ -271,6 +287,7 @@ NAMED_QUESTIONS = {
     "BIPARTISAN BOARD OF ETHICS AND ELECTIONS": "North Carolina Legislative Appointments to Elections Board Amendment",
     "Constitution Of Alabama Of 2022": "Constitution of Alabama of 2022",
     **{office: office for offices in HAWAII.values() for office in offices.values()},
+    **{office: office for office in ILLINOIS_ADVISORY.values()},
 }
 CALIFORNIA = {
     date(2012, 6, 5): "2012-primary/123-ballot-measures-formatted.xls",
@@ -1321,7 +1338,8 @@ def parse() -> None:
             text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
             reading = False
             wrapped = None
-            for number, page in enumerate(text.stdout.split("\f"), start=1):
+            question = None
+            for number, page in enumerate(text.stdout.split("\f"), start=1) if day.year != 2024 else []:
                 for line in page.splitlines():
                     counts = re.findall(r"(?<![\d.,])\d[\d,]*(?![\d.,]*\s*%)", line)
                     if "CONSTITUTIONAL AMENDMENT PROPOSAL" in line:
@@ -1341,6 +1359,17 @@ def parse() -> None:
                                 records.append((county, "Constitutional Amendment", "NO", counts[3], number))
                         if county == "Total":
                             reading = False
+            ended = False
+            for number, page in enumerate(text.stdout.split("\f"), start=1) if day.year == 2024 else []:
+                for line in page.splitlines():
+                    question = next((name for phrase, name in ILLINOIS_ADVISORY.items() if phrase in line), question)
+                    for county, yes, no in re.findall(r"([A-Z][A-Za-z.' ]*?[A-Za-z.])\s{2,}([\d,]+)\s+([\d,]+)", line):
+                        county = "Total" if county in ("TOTAL", "TOTALS") else county
+                        if question is not None and (county == "Total" or elstats.plain(county) in names["IL"]):
+                            records.extend((county, question, answer, votes, number) for answer, votes in (("YES", yes), ("NO", no)))
+                    ended = ended or "TOTAL" in line
+                question = None if ended else question
+                ended = False
             table = pl.DataFrame(
                 records,
                 schema={
@@ -1354,7 +1383,8 @@ def parse() -> None:
             ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
             total = pl.col("county") == "Total"
             table = (
-                table.filter(
+                table.unique(["county", "office", "answer"], keep="first", maintain_order=True)
+                .filter(
                     (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
                         "office", "answer"
                     )
