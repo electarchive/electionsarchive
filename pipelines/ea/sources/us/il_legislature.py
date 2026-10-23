@@ -1,5 +1,5 @@
 import re
-from difflib import SequenceMatcher
+from difflib import SequenceMatcher, get_close_matches
 from pathlib import Path
 
 import polars as pl
@@ -13,15 +13,24 @@ SOURCE = "us.il_legislature"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = il_sbe.PUBLISHER
-YEARS = (1986,)
+YEARS = (1986, 1988)
 TEXT = "https://archive.org/download/{item}/{item}_djvu.txt"
 HEADING = re.compile(r"^([A-Z][A-Z -]*?) (LEGISLATIVE|REPRESENTATIVE) DISTRICT$")
-CANDIDATE = re.compile(r"^(?:\(WIN\) )?(.+?) ([A-Z]{2,4}) ([\d,]+) [\d.]+%$")
+CANDIDATE = re.compile(
+    r"^(?:\(WIN\) )?(.+?) (DEM|REP|IND|ITR|LIB|SWP|AWP|CON|USP|SOC|PRO|CPU|NON|TAX|IPP|UNA|NPA|COM|SPP|CIT|HUM) ([\d,]+) [\d.]+[%?3]$"
+)
+LOOSE = re.compile(
+    r"^(?:\(WIN\) )?(.+?) (DEM|REP|IND|ITR|LIB|SWP|AWP|CON|USP|SOC|PRO|CPU|NON|TAX|IPP|UNA|NPA|COM|SPP|CIT|HUM) [\d,^. ]+[%?3]?$"
+)
+STRAY = {"PLURALITY", "COUNTY", "STATE", "SENATOR", "REPRESENTATIVE", "IN", "THE", "GENERAL", "ASSEMBLY", "—", "-", "•"}
+ROW = re.compile(r"^([A-Z][A-Z .'-]*?) ([\d,]+) [A-Z]{2,4} ((?:[\d,]+ ?)+)$")
 PLURALITY = re.compile(r"^([\d,]+) [A-Z]{2,4}$")
 NUMBER = re.compile(r"^[\d,]+$")
-PARTY = re.compile(r"^[A-Z]{2,4}$")
-RUNNING = re.compile(r"^(STATE SENATOR|REPRESENTATIVE IN THE GENERAL ASSEMBLY|NOVEMBER \d+, \d{4})")
-ENDING = re.compile(r"^[A-Z ,]+ [—-] NOVEMBER \d+, \d{4}")
+PARTY = re.compile(
+    r"^(OEM|SOL|DEM|REP|IND|ITR|LIB|SWP|AWP|CON|USP|SOC|PRO|CPU|NON|TAX|IPP|UNA|NPA|WI|COM|SPP|CIT|HUM)$"
+)
+RUNNING = re.compile(r"^(STATE SENATOR|REPRESENTATIVE IN THE GENERAL ASSEMBLY|NOVEMBER \d+, ?\d{4})")
+ENDING = re.compile(r"^(REGIONAL SUPERINTENDENT|[A-Z ,]+ [—-] NOVEMBER \d+, ?\d{4})")
 UNITS = {
     "FIRST": 1,
     "SECOND": 2,
@@ -90,6 +99,8 @@ FIXES: dict[tuple[int, str, int], list[str]] = {
     (1986, "house", 107): ["Clay", "Crawford", "Edwards", "Effingham", "Jasper", "Lawrence", "Richland"],
     (1986, "house", 110): ["Bond", "Clinton", "Madison", "St. Clair"],
     (1986, "house", 117): ["Franklin", "Williamson"],
+    (1988, "house", 73): ["Carroll", "Henry", "Knox", "Stark", "Whiteside"],
+    (1988, "house", 95): ["Fulton", "Hancock", "Henderson", "McDonough", "Schuyler"],
 }
 MANUAL: dict[tuple[int, str, int], tuple[list[str], list[tuple[str, list[int]]]]] = {
     (1986, "senate", 54): (
@@ -238,7 +249,9 @@ def ordinal(text: str) -> int:
             return 100
     if words == ["HUNDREDTH"]:
         return 100
+    known = [*UNITS, *TENS, *(word[:-1] + "IETH" for word in TENS)]
     for word in words:
+        word = word if word in known else next(iter(get_close_matches(word, known, 1, 0.8)), word)
         if word in UNITS:
             total += UNITS[word]
         elif word in TENS:
@@ -256,20 +269,29 @@ def fetch() -> None:
 
 
 def check(
-    where: str, surnames: list[str], names: list[str], columns: list[list[int]], candidates: list[tuple[str, str, int]]
+    where: str,
+    surnames: list[str | None],
+    names: list[str],
+    columns: list[list[int]],
+    candidates: list[tuple[str, str, int | None]],
 ) -> list[tuple[str, str, int]]:
     labels = []
     for surname, column in zip(surnames, columns, strict=True):
-        full = [
-            name
-            for name, _, total in candidates
-            if SequenceMatcher(None, name.split()[-1].lower(), surname.lower()).ratio() >= 0.75
-        ]
+        if surname is None:
+            full = [name for name, _, total in candidates if total == sum(column)]
+        else:
+            full = [
+                name
+                for name, _, _ in candidates
+                if SequenceMatcher(None, name.split()[-1].lower(), surname.lower()).ratio() >= 0.75
+            ]
         if len(full) > 1:
             raise ValueError(f"{where}: {surname} matches {full}")
+        if surname is None and not full:
+            raise ValueError(f"{where}: a column of {sum(column)} matches no printed total")
         if full:
             total = next(total for name, _, total in candidates if name == full[0])
-            if sum(column) != total:
+            if total is not None and sum(column) != total:
                 raise ValueError(f"{where}: {surname} counties add up to {sum(column)} against {total}")
         labels.append(full[0] if full else surname)
     return [
@@ -277,8 +299,79 @@ def check(
     ]
 
 
+def read_rows(
+    where: str, candidates: list[tuple[str, str, int | None]], lines: list[str]
+) -> list[tuple[str, str, int]]:
+    surnames: list[str | None] = []
+    names: list[str] = []
+    columns: list[list[int]] = []
+    for line in lines:
+        if line.startswith("COUNTY PLURALITY"):
+            surnames = list(line.removeprefix("COUNTY PLURALITY").split())
+        elif match := ROW.match(line):
+            values = [int(value.replace(",", "")) for value in match.group(3).split()]
+            if len(values) != len(surnames):
+                surnames = [None] * len(values)
+            top = sorted(values, reverse=True)
+            if int(match.group(2).replace(",", "")) != top[0] - (top[1] if len(top) > 1 else 0):
+                raise ValueError(f"{where}: {line} plurality does not match its columns")
+            names.append(match.group(1))
+            columns = columns or [[] for _ in values]
+            for column, value in zip(columns, values, strict=True):
+                column.append(value)
+    if not names:
+        raise ValueError(f"{where}: no county rows")
+    return check(where, surnames, names, columns, candidates)
+
+
+def read_stream(
+    where: str, candidates: list[tuple[str, str, int | None]], lines: list[str]
+) -> list[tuple[str, str, int]]:
+    begin = next((index for index, line in enumerate(lines) if line.upper().startswith("COUNTY")), None)
+    if begin is None:
+        raise ValueError(f"{where}: no county table")
+    tokens = [
+        part
+        for line in lines[begin:]
+        for part in (line.removeprefix("COUNTY PLURALITY").split() if line.startswith("COUNTY PLURALITY") else [line])
+    ]
+    entries: list[tuple[str, list[int]]] = []
+    for token in tokens:
+        text = re.sub(r"[ .,…]+$", "", token)
+        if NUMBER.match(token) or PLURALITY.match(token):
+            if entries:
+                entries[-1][1].append(int(token.split()[0].replace(",", "")))
+        elif (
+            re.fullmatch(r"[A-Za-z .'-]+", text)
+            and text.upper() not in STRAY
+            and not all(PARTY.match(part) for part in re.sub(r"[^A-Za-z ]", " ", text).split())
+        ):
+            entries.append((text, []))
+    split = next((index for index, (_, numbers) in enumerate(entries) if numbers), len(entries))
+    surnames: list[str | None] = [word for word, _ in entries[:split]]
+    rows = entries[split:]
+    width = len(surnames)
+    if len(rows) == 1:
+        return []
+    if not rows or width == 0:
+        raise ValueError(f"{where}: no county rows in the token stream")
+    names, columns = [], [[] for _ in surnames]
+    for name, numbers in rows:
+        if len(numbers) == width + 1:
+            top = sorted(numbers[1:], reverse=True)
+            if numbers[0] != top[0] - (top[1] if width > 1 else 0):
+                raise ValueError(f"{where}: {name} plurality {numbers[0]} against {numbers[1:]}")
+            numbers = numbers[1:]
+        elif len(numbers) != width:
+            raise ValueError(f"{where}: {name} has {numbers} for {width} candidates")
+        names.append(name)
+        for column, value in zip(columns, numbers, strict=True):
+            column.append(value)
+    return check(where, surnames, names, columns, candidates)
+
+
 def read(
-    year: int, chamber: str, district: int, candidates: list[tuple[str, str, int]], lines: list[str]
+    year: int, chamber: str, district: int, candidates: list[tuple[str, str, int | None]], lines: list[str]
 ) -> list[tuple[str, str, int]]:
     where = f"{year} {chamber} {district}"
     if (year, chamber, district) in MANUAL:
@@ -290,6 +383,15 @@ def read(
             [[votes[i] for _, votes in rows] for i in range(len(surnames))],
             candidates,
         )
+    lines = [
+        part
+        for line in lines
+        for part in (
+            ["PLURALITY", *line.removeprefix("COUNTY PLURALITY").split()]
+            if line.startswith("COUNTY PLURALITY")
+            else [line]
+        )
+    ]
     plurality = [match.group(1) for line in lines if (match := PLURALITY.match(line))]
     counties = len(plurality)
     if counties == 0:
@@ -298,13 +400,23 @@ def read(
         return []
     numbers = [int(line.replace(",", "")) for line in lines if NUMBER.match(line)]
     words = [re.sub(r"[ .,…]+$", "", line) for line in lines if not NUMBER.match(line) and not PLURALITY.match(line)]
-    words = [word for word in words if word and word not in {"Plurality", "County"} and not PARTY.match(word)]
+    words = [
+        word
+        for word in words
+        if re.search(r"[A-Za-z]", word)
+        and word.upper() not in STRAY
+        and not all(PARTY.match(part) for part in re.sub(r"[^A-Za-z ]", " ", word).split())
+    ]
     if len(numbers) % counties == 1:
         numbers = numbers[:-1]
     if len(numbers) % counties:
         raise ValueError(f"{where}: {len(numbers)} numbers for {counties} counties")
     width = len(numbers) // counties
-    surnames, names = words[:width], FIXES.get((year, chamber, district), words[width:])
+    if (year, chamber, district) in FIXES:
+        names = FIXES[(year, chamber, district)]
+        surnames = [word for word in words if word.upper() not in {name.upper() for name in names}][:width]
+    else:
+        surnames, names = words[:width], words[width:]
     if len(names) != counties:
         raise ValueError(f"{where}: {len(names)} counties for {counties} rows: {names}")
     margins = [int(value.replace(",", "")) for value in plurality]
@@ -328,7 +440,9 @@ def parse() -> None:
         text = raw.cached(SOURCE, TEXT.format(item=il_sbe.ITEMS[year][0])).path.read_text()
         blocks: list[tuple[str, int, list[str]]] = []
         closed = False
-        for line in (re.sub(r"\s+", " ", line).strip() for line in text.splitlines()):
+        for line in (
+            re.sub(r"(?<=\d) ?, ?(?=\d)", ",", re.sub(r"\s+", " ", line)).strip() for line in text.splitlines()
+        ):
             if match := HEADING.match(line):
                 closed = False
                 blocks.append(("senate" if match.group(2) == "LEGISLATIVE" else "house", ordinal(match.group(1)), []))
@@ -339,13 +453,28 @@ def parse() -> None:
         failed = []
         for chamber, district, lines in blocks:
             candidates = [
-                (match.group(1), match.group(2), int(match.group(3).replace(",", "")))
+                (
+                    match.group(1),
+                    match.group(2),
+                    int(strict.group(3).replace(",", "")) if (strict := CANDIDATE.match(line)) else None,
+                )
                 for line in lines
-                if (match := CANDIDATE.match(line))
+                if (match := LOOSE.match(line))
             ]
-            table = lines[lines.index("County") + 1 :] if "County" in lines else []
+            start = next((index for index, line in enumerate(lines) if line.upper() == "COUNTY"), None)
+            table = lines[start + 1 :] if start is not None else []
+            where = f"{year} {chamber} {district}"
             try:
-                cells = read(year, chamber, district, candidates, table)
+                try:
+                    cells = (
+                        read_rows(where, candidates, lines)
+                        if any(line.startswith("COUNTY PLURALITY") for line in lines)
+                        else read(year, chamber, district, candidates, table)
+                    )
+                except ValueError:
+                    if (year, chamber, district) in MANUAL:
+                        raise
+                    cells = read_stream(where, candidates, lines)
             except ValueError as error:
                 failed.append(str(error))
                 continue
@@ -406,5 +535,5 @@ def emit() -> Path:
         )
         for year in YEARS:
             cs.artifact(raw.cached(SOURCE, TEXT.format(item=il_sbe.ITEMS[year][0])), source)
-        medsl.attach(cs, conn, frame, {"IL": source}, extend=True, authoritative=CITATION)
+        medsl.attach(cs, conn, frame, {"IL": source}, extend=True)
         return cs.write()
