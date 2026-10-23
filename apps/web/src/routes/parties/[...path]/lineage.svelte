@@ -77,16 +77,18 @@
             span: first.span,
             events,
             isAbove: events.every((event) => event.isInto),
-            notes: group.map((relation) =>
-              [
+            notes: group.map((relation) => {
+              const text =
                 RELATIONS[relation.kind]?.[relation.outgoing ? 1 : 0]?.({
                   name: title,
-                }),
-                relation.date?.slice(0, 4),
-              ]
-                .filter((part) => part != null)
-                .join(" "),
-            ),
+                }) ?? "";
+              const at = relation.date?.slice(0, 4) ?? null;
+              return {
+                text,
+                at,
+                label: [text, at].filter((part) => part != null).join(" "),
+              };
+            }),
           },
         ];
       }),
@@ -156,23 +158,30 @@
         measure(title, 13, 700),
         ...placed.rows.flatMap((lane) => [
           measure(lane.party.label, 13, 500),
-          ...lane.notes.map((note) => measure(note, 11, 400)),
+          ...lane.notes.map((note) => measure(note.label, 11, 400)),
         ]),
       ) + 4,
     ),
   );
-  const fit = (text: string, size: number, weight: number) => {
-    if (measure(text, size, weight) <= gutter) {
-      return text;
+  const fit = (
+    text: string,
+    size: number,
+    weight: number,
+    tail: string | null = null,
+  ) => {
+    const whole = tail == null ? text : `${text} ${tail}`;
+    if (measure(whole, size, weight) <= gutter) {
+      return whole;
     }
+    const ending = tail == null ? "…" : `… ${tail}`;
     let cut = text.length;
     while (
       cut > 1 &&
-      measure(`${text.slice(0, cut)}…`, size, weight) > gutter
+      measure(`${text.slice(0, cut)}${ending}`, size, weight) > gutter
     ) {
       cut -= 1;
     }
-    return `${text.slice(0, cut).trimEnd()}…`;
+    return `${text.slice(0, cut).trimEnd()}${ending}`;
   };
   const lanes = $derived(
     placed.rows.map((lane) => {
@@ -183,7 +192,7 @@
       return {
         ...lane,
         name: fit(name, 13, 500),
-        lines: lane.notes.map((note) => fit(note, 11, 400)),
+        lines: lane.notes.map((note) => fit(note.text, 11, 400, note.at)),
       };
     }),
   );
@@ -436,7 +445,11 @@
         </svg>
         <ul id="lineage-list" class="sr-only">
           {#each lanes as lane (lane.party.id)}
-            <li>{lane.party.label}: {lane.notes.join(", ")}</li>
+            <li>
+              {lane.party.label}: {lane.notes
+                .map((note) => note.label)
+                .join(", ")}
+            </li>
           {/each}
         </ul>
       </div>

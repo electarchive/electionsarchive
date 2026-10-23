@@ -7,7 +7,6 @@
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
-  import { cn } from "#lib/utils.js";
 
   const {
     elections,
@@ -127,11 +126,9 @@
           shade={found.shade}
         />
       {/key}
-    {:else}
+    {:else if hub.isPending}
       <div
-        class={cn("rounded-sm bg-muted/40 block-[min(32rem,60svh)]", {
-          "animate-pulse motion-reduce:animate-none": hub.isPending,
-        })}
+        class="animate-pulse rounded-sm bg-muted/40 block-[min(32rem,60svh)] motion-reduce:animate-none"
       ></div>
     {/if}
   </section>

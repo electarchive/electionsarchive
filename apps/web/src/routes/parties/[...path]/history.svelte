@@ -48,7 +48,7 @@
               Date.UTC(Number(point.date.slice(0, 4)), 0, 1)) /
               31_622_400_000,
           share:
-            point.votes == null || point.total == null
+            point.votes == null || point.votes === 0 || point.total == null
               ? null
               : point.votes / point.total,
           held:
@@ -300,13 +300,6 @@
             class="stroke-foreground/60"
             stroke-dasharray="3 3"
           />
-          <text
-            x={width - PAD.right}
-            y={sy(0.5) - 4}
-            text-anchor="end"
-            class="fill-muted-foreground text-[0.625rem] font-semibold"
-            >{m.party_history_majority()}</text
-          >
         {/if}
         {#each years as year (year)}
           <text
@@ -383,6 +376,16 @@
             />
           {/if}
         {/each}
+        {#if top >= 0.5}
+          <text
+            x={width - PAD.right}
+            y={sy(0.5) - 4}
+            text-anchor="end"
+            class="fill-muted-foreground stroke-card text-[0.625rem] font-semibold"
+            stroke-width="3"
+            paint-order="stroke">{m.party_history_majority()}</text
+          >
+        {/if}
         {#if lit != null}
           <line
             x1={sx(lit.at)}
