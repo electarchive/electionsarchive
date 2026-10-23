@@ -1,0 +1,152 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1954",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1954%20Count%20book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1954,
+      "chamber": "lieutenant-governor",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1954,
+      "chamber": "secretary-of-state",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1954,
+      "chamber": "attorney-general",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1954,
+      "chamber": "general-treasurer",
+      "day": "1954-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lewis",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marley",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McKiernan",
+          "contest": "lieutenant-governor",
+          "candidate": "McKiernan",
+          "party": ""
+        },
+        {
+          "label": "Leclaire",
+          "contest": "lieutenant-governor",
+          "candidate": "Leclaire",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.166,
+        0.874,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0552
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Cote",
+          "contest": "secretary-of-state",
+          "candidate": "Cote",
+          "party": ""
+        },
+        {
+          "label": "Janas",
+          "contest": "secretary-of-state",
+          "candidate": "Janas",
+          "party": ""
+        },
+        {
+          "label": "Powers",
+          "contest": "attorney-general",
+          "candidate": "Powers",
+          "party": ""
+        },
+        {
+          "label": "Cambio",
+          "contest": "attorney-general",
+          "candidate": "Cambio",
+          "party": ""
+        },
+        {
+          "label": "Hawksley",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": ""
+        },
+        {
+          "label": "Colt",
+          "contest": "general-treasurer",
+          "candidate": "Colt",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.14,
+        0.114,
+        0.856,
+        0.884
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1273
+      ]
+    }
+  ]
+}

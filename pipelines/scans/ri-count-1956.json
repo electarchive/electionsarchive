@@ -1,0 +1,147 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1956",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1956%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1956,
+      "chamber": "lieutenant-governor",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1956,
+      "chamber": "secretary-of-state",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1956,
+      "chamber": "attorney-general",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1956,
+      "chamber": "general-treasurer",
+      "day": "1956-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Del Sesto",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cote",
+          "contest": "lieutenant-governor",
+          "candidate": "Cote",
+          "party": ""
+        },
+        {
+          "label": "Broomhead",
+          "contest": "lieutenant-governor",
+          "candidate": "Broomhead",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.17,
+        0.083,
+        0.878,
+        0.679
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0822
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Notte, Jr.",
+          "contest": "secretary-of-state",
+          "candidate": "Notte, Jr.",
+          "party": ""
+        },
+        {
+          "label": "Forcier",
+          "contest": "secretary-of-state",
+          "candidate": "Forcier",
+          "party": ""
+        },
+        {
+          "label": "Powers",
+          "contest": "attorney-general",
+          "candidate": "Powers",
+          "party": ""
+        },
+        {
+          "label": "Zimmerman",
+          "contest": "attorney-general",
+          "candidate": "Zimmerman",
+          "party": ""
+        },
+        {
+          "label": "Hawksley",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": ""
+        },
+        {
+          "label": "Kane",
+          "contest": "general-treasurer",
+          "candidate": "Kane",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.134,
+        0.833,
+        0.87
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0992
+      ]
+    }
+  ]
+}

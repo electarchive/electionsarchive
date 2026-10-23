@@ -1,0 +1,147 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1984",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1984%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1984,
+      "chamber": "lieutenant-governor",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1984,
+      "chamber": "secretary-of-state",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1984,
+      "chamber": "attorney-general",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1984,
+      "chamber": "general-treasurer",
+      "day": "1984-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "DiPrete, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Solomon, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sapinsley, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Sapinsley",
+          "party": "R"
+        },
+        {
+          "label": "Licht, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "Licht",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.186,
+        0.908,
+        0.724
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4535
+      ]
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "Farmer, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Farmer",
+          "party": "R"
+        },
+        {
+          "label": "Cimino, D.",
+          "contest": "secretary-of-state",
+          "candidate": "Cimino",
+          "party": "D"
+        },
+        {
+          "label": "Violet, R.",
+          "contest": "attorney-general",
+          "candidate": "Violet",
+          "party": "R"
+        },
+        {
+          "label": "Begin, D.",
+          "contest": "general-treasurer",
+          "candidate": "Begin",
+          "party": "D"
+        },
+        {
+          "label": "Roberts, D.",
+          "contest": "attorney-general",
+          "candidate": "Roberts",
+          "party": "D"
+        },
+        {
+          "label": "Levesque, R.",
+          "contest": "general-treasurer",
+          "candidate": "Levesque",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.1,
+        0.146,
+        0.91,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2904
+      ]
+    }
+  ]
+}

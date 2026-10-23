@@ -1,0 +1,65 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1964",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1964%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1964,
+      "chamber": "lieutenant-governor",
+      "day": "1964-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "Gallogly D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chafee R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Folcarelli D.",
+          "contest": "lieutenant-governor",
+          "candidate": "Folcarelli",
+          "party": "D"
+        },
+        {
+          "label": "O'Donnell, Jr., R.",
+          "contest": "lieutenant-governor",
+          "candidate": "O'Donnell, Jr.",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.132,
+        0.164,
+        0.828,
+        0.72
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0108
+      ]
+    }
+  ]
+}

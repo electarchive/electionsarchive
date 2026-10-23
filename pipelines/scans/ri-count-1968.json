@@ -1,0 +1,97 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1968",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1968%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "secretary-of-state": {
+      "year": 1968,
+      "chamber": "secretary-of-state",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1968,
+      "chamber": "attorney-general",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1968,
+      "chamber": "general-treasurer",
+      "day": "1968-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "La France, D.",
+          "contest": "secretary-of-state",
+          "candidate": "La France",
+          "party": "D"
+        },
+        {
+          "label": "Tondreau, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Tondreau",
+          "party": "R"
+        },
+        {
+          "label": "Brosco, D.",
+          "contest": "attorney-general",
+          "candidate": "Brosco",
+          "party": "D"
+        },
+        {
+          "label": "DeSimone, R.",
+          "contest": "attorney-general",
+          "candidate": "DeSimone",
+          "party": "R"
+        },
+        {
+          "label": "Hawksley, D.",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": "D"
+        },
+        {
+          "label": "Wynne, R.",
+          "contest": "general-treasurer",
+          "candidate": "Wynne",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.191,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY-GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2237
+      ]
+    }
+  ]
+}

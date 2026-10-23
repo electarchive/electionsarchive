@@ -1,0 +1,163 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1986",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1986%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1986,
+      "chamber": "lieutenant-governor",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1986,
+      "chamber": "secretary-of-state",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1986,
+      "chamber": "attorney-general",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1986,
+      "chamber": "general-treasurer",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 30,
+      "id": "30-0",
+      "columns": [
+        {
+          "label": "DiPrete, R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Sundlun, D",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Affigne, CP",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Healey, Jr., CM",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Farmer, R",
+          "contest": "lieutenant-governor",
+          "candidate": "Farmer",
+          "party": "R"
+        },
+        {
+          "label": "Licht, D",
+          "contest": "lieutenant-governor",
+          "candidate": "Licht",
+          "party": "D"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.124,
+        0.933,
+        0.885
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2221
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "Lyle, Jr., R",
+          "contest": "secretary-of-state",
+          "candidate": "Lyle, Jr.",
+          "party": "R"
+        },
+        {
+          "label": "Connell, D",
+          "contest": "secretary-of-state",
+          "candidate": "Connell",
+          "party": "D"
+        },
+        {
+          "label": "Violet, R",
+          "contest": "attorney-general",
+          "candidate": "Violet",
+          "party": "R"
+        },
+        {
+          "label": "O'Neil, D",
+          "contest": "attorney-general",
+          "candidate": "O'Neil",
+          "party": "D"
+        },
+        {
+          "label": "Bianchi, R",
+          "contest": "general-treasurer",
+          "candidate": "Bianchi",
+          "party": "R"
+        },
+        {
+          "label": "Begin, D",
+          "contest": "general-treasurer",
+          "candidate": "Begin",
+          "party": "D"
+        },
+        {
+          "label": "Gilman, I",
+          "contest": "general-treasurer",
+          "candidate": "Gilman",
+          "party": "I"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.101,
+        0.121,
+        0.9,
+        0.936
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2589
+      ]
+    }
+  ]
+}

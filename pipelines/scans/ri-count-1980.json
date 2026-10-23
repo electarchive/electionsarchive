@@ -1,0 +1,147 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1980",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1980%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1980,
+      "chamber": "lieutenant-governor",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1980,
+      "chamber": "secretary-of-state",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1980,
+      "chamber": "attorney-general",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1980,
+      "chamber": "general-treasurer",
+      "day": "1980-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "Garrahy, D",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Cianci, R",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DiLuglio, D",
+          "contest": "lieutenant-governor",
+          "candidate": "DiLuglio",
+          "party": "D"
+        },
+        {
+          "label": "DeCelles, R",
+          "contest": "lieutenant-governor",
+          "candidate": "DeCelles",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.11,
+        0.156,
+        0.913,
+        0.972
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2034
+      ]
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "Burns, D",
+          "contest": "secretary-of-state",
+          "candidate": "Burns",
+          "party": "D"
+        },
+        {
+          "label": "Farmer, R",
+          "contest": "secretary-of-state",
+          "candidate": "Farmer",
+          "party": "R"
+        },
+        {
+          "label": "Roberts, D",
+          "contest": "attorney-general",
+          "candidate": "Roberts",
+          "party": "D"
+        },
+        {
+          "label": "Perillo, R",
+          "contest": "attorney-general",
+          "candidate": "Perillo",
+          "party": "R"
+        },
+        {
+          "label": "Solomon, D",
+          "contest": "general-treasurer",
+          "candidate": "Solomon",
+          "party": "D"
+        },
+        {
+          "label": "Braga, R",
+          "contest": "general-treasurer",
+          "candidate": "Braga",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.161,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2431
+      ]
+    }
+  ]
+}

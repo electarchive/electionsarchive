@@ -1,0 +1,147 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1962",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1962%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1962,
+      "chamber": "lieutenant-governor",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1962,
+      "chamber": "secretary-of-state",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1962,
+      "chamber": "attorney-general",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1962,
+      "chamber": "general-treasurer",
+      "day": "1962-11-06",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "Notte, Jr., D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Chafee R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Gallogly D.",
+          "contest": "lieutenant-governor",
+          "candidate": "Gallogly",
+          "party": "D"
+        },
+        {
+          "label": "O'Donnell, Jr., R.",
+          "contest": "lieutenant-governor",
+          "candidate": "O'Donnell, Jr.",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.194,
+        0.86,
+        0.908
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0714
+      ]
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "LaFrance, D.",
+          "contest": "secretary-of-state",
+          "candidate": "LaFrance",
+          "party": "D"
+        },
+        {
+          "label": "De Saint, R.",
+          "contest": "secretary-of-state",
+          "candidate": "De Saint",
+          "party": "R"
+        },
+        {
+          "label": "Nugent, D.",
+          "contest": "attorney-general",
+          "candidate": "Nugent",
+          "party": "D"
+        },
+        {
+          "label": "Votolato, Jr., R.",
+          "contest": "attorney-general",
+          "candidate": "Votolato, Jr.",
+          "party": "R"
+        },
+        {
+          "label": "Hawksley, D.",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": "D"
+        },
+        {
+          "label": "Nunes, R.",
+          "contest": "general-treasurer",
+          "candidate": "Nunes",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.172,
+        0.176,
+        0.883,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE ATTORNEY-GENERAL, AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3167
+      ]
+    }
+  ]
+}

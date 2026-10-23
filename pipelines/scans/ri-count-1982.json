@@ -1,0 +1,157 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1982",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1982%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1982,
+      "chamber": "lieutenant-governor",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1982,
+      "chamber": "secretary-of-state",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1982,
+      "chamber": "attorney-general",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1982,
+      "chamber": "general-treasurer",
+      "day": "1982-11-02",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Garrahy, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Marzullo, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Salk, I.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Van Daam, I.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DiLuglio, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "DiLuglio",
+          "party": "D"
+        },
+        {
+          "label": "Doolittle, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Doolittle",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.096,
+        0.116,
+        0.904,
+        0.872
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2646
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Lederberg, D.",
+          "contest": "secretary-of-state",
+          "candidate": "Lederberg",
+          "party": "D"
+        },
+        {
+          "label": "Farmer, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Farmer",
+          "party": "R"
+        },
+        {
+          "label": "Roberts, D.",
+          "contest": "attorney-general",
+          "candidate": "Roberts",
+          "party": "D"
+        },
+        {
+          "label": "Violet, R.",
+          "contest": "attorney-general",
+          "candidate": "Violet",
+          "party": "R"
+        },
+        {
+          "label": "Solomon, D.",
+          "contest": "general-treasurer",
+          "candidate": "Solomon",
+          "party": "D"
+        },
+        {
+          "label": "Stromberg, R.",
+          "contest": "general-treasurer",
+          "candidate": "Stromberg",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.127,
+        0.136,
+        0.943,
+        0.997
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2892
+      ]
+    }
+  ]
+}

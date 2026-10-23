@@ -1,0 +1,97 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1974",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1974%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "secretary-of-state": {
+      "year": 1974,
+      "chamber": "secretary-of-state",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1974,
+      "chamber": "attorney-general",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1974,
+      "chamber": "general-treasurer",
+      "day": "1974-11-05",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Burns, D",
+          "contest": "secretary-of-state",
+          "candidate": "Burns",
+          "party": "democratic"
+        },
+        {
+          "label": "Ianniti, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Ianniti",
+          "party": "republican"
+        },
+        {
+          "label": "Michaelson, D.",
+          "contest": "attorney-general",
+          "candidate": "Michaelson",
+          "party": "democratic"
+        },
+        {
+          "label": "Israel, R.",
+          "contest": "attorney-general",
+          "candidate": "Israel",
+          "party": "republican"
+        },
+        {
+          "label": "Hawksley, D.",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": "democratic"
+        },
+        {
+          "label": "Daluz, Jr., R.",
+          "contest": "general-treasurer",
+          "candidate": "Daluz, Jr.",
+          "party": "republican"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.117,
+        0.108,
+        0.913,
+        0.842
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY-GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.312
+      ]
+    }
+  ]
+}

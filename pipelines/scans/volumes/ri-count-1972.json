@@ -1,5 +1,4 @@
 {
-  "kind": "statewide",
   "year": 1972,
   "day": "1972-11-07",
   "polity": "US-RI",
@@ -20,5 +19,6 @@
   "leaves": [
     28,
     29
-  ]
+  ],
+  "unit_scheme": "town"
 }

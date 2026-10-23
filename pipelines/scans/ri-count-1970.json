@@ -1,0 +1,158 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1970",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1970%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1970,
+      "chamber": "lieutenant-governor",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1970,
+      "chamber": "secretary-of-state",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1970,
+      "chamber": "attorney-general",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1970,
+      "chamber": "general-treasurer",
+      "day": "1970-11-03",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Licht, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DeSimone, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Powers, Jr., S.W.P.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Garrahy, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "Garrahy",
+          "party": "D."
+        },
+        {
+          "label": "Gorham, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Gorham",
+          "party": "R."
+        },
+        {
+          "label": "Traugott, S.W.P.",
+          "contest": "lieutenant-governor",
+          "candidate": "Traugott",
+          "party": "S.W.P."
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.144,
+        0.893,
+        0.877
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.3192
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "LaFrance, D.",
+          "contest": "secretary-of-state",
+          "candidate": "LaFrance",
+          "party": "D"
+        },
+        {
+          "label": "McGovern, R.",
+          "contest": "secretary-of-state",
+          "candidate": "McGovern",
+          "party": "R"
+        },
+        {
+          "label": "Caprio, D.",
+          "contest": "attorney-general",
+          "candidate": "Caprio",
+          "party": "D"
+        },
+        {
+          "label": "Israel, R.",
+          "contest": "attorney-general",
+          "candidate": "Israel",
+          "party": "R"
+        },
+        {
+          "label": "Hawksley, D.",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": "D"
+        },
+        {
+          "label": "Tellier, Jr., R.",
+          "contest": "general-treasurer",
+          "candidate": "Tellier, Jr.",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.135,
+        0.146,
+        0.963,
+        0.9
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY-GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1737
+      ]
+    }
+  ]
+}

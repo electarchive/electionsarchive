@@ -1,0 +1,103 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1966",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1966%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "secretary-of-state": {
+      "year": 1966,
+      "chamber": "secretary-of-state",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1966,
+      "chamber": "attorney-general",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1966,
+      "chamber": "general-treasurer",
+      "day": "1966-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "LaFrance, D.",
+          "contest": "secretary-of-state",
+          "candidate": "LaFrance",
+          "party": "D"
+        },
+        {
+          "label": "Kiven, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Kiven",
+          "party": "R"
+        },
+        {
+          "label": "Kiven, I.",
+          "contest": "secretary-of-state",
+          "candidate": "Kiven",
+          "party": "I"
+        },
+        {
+          "label": "Nugent, D.",
+          "contest": "attorney-general",
+          "candidate": "Nugent",
+          "party": "D"
+        },
+        {
+          "label": "DeSimone, R.",
+          "contest": "attorney-general",
+          "candidate": "DeSimone",
+          "party": "R"
+        },
+        {
+          "label": "Hawksley, D.",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": "D"
+        },
+        {
+          "label": "Bergeron, R.",
+          "contest": "general-treasurer",
+          "candidate": "Bergeron",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.074,
+        0.119,
+        0.903,
+        0.932
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY-GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2571
+      ]
+    }
+  ]
+}

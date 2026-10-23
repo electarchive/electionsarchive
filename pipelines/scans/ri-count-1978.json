@@ -1,0 +1,103 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1978",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1978%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "secretary-of-state": {
+      "year": 1978,
+      "chamber": "secretary-of-state",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1978,
+      "chamber": "attorney-general",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1978,
+      "chamber": "general-treasurer",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 29,
+      "id": "29-0",
+      "columns": [
+        {
+          "label": "Burns, D.",
+          "contest": "secretary-of-state",
+          "candidate": "Burns",
+          "party": "D"
+        },
+        {
+          "label": "Murray, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Murray",
+          "party": "R"
+        },
+        {
+          "label": "Roberts, D.",
+          "contest": "attorney-general",
+          "candidate": "Roberts",
+          "party": "D"
+        },
+        {
+          "label": "Dimitri, R.",
+          "contest": "attorney-general",
+          "candidate": "Dimitri",
+          "party": "R"
+        },
+        {
+          "label": "Nugent, Ind.",
+          "contest": "general-treasurer",
+          "candidate": "Nugent",
+          "party": "Ind"
+        },
+        {
+          "label": "Solomon, D.",
+          "contest": "general-treasurer",
+          "candidate": "Solomon",
+          "party": "D"
+        },
+        {
+          "label": "Montgomery, R.",
+          "contest": "general-treasurer",
+          "candidate": "Montgomery",
+          "party": "R"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.092,
+        0.121,
+        0.931,
+        0.862
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY-GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2726
+      ]
+    }
+  ]
+}

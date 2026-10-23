@@ -1,0 +1,149 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1952",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1952%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1952,
+      "chamber": "lieutenant-governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1952,
+      "chamber": "secretary-of-state",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1952,
+      "chamber": "attorney-general",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1952,
+      "chamber": "general-treasurer",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": "lieutenant-governor",
+          "candidate": "Roberts",
+          "party": ""
+        },
+        {
+          "label": "Archambault",
+          "contest": "lieutenant-governor",
+          "candidate": "Archambault",
+          "party": ""
+        },
+        {
+          "label": "McKiernan",
+          "contest": "lieutenant-governor",
+          "candidate": "McKiernan",
+          "party": ""
+        },
+        {
+          "label": "Cioci",
+          "contest": "lieutenant-governor",
+          "candidate": "Cioci",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.152,
+        0.093,
+        0.863,
+        0.677
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0856
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Cote",
+          "contest": "secretary-of-state",
+          "candidate": "Cote",
+          "party": ""
+        },
+        {
+          "label": "McCaughey",
+          "contest": "secretary-of-state",
+          "candidate": "McCaughey",
+          "party": ""
+        },
+        {
+          "label": "Powers",
+          "contest": "attorney-general",
+          "candidate": "Powers",
+          "party": ""
+        },
+        {
+          "label": "Temkin",
+          "contest": "attorney-general",
+          "candidate": "Temkin",
+          "party": ""
+        },
+        {
+          "label": "Hawksley",
+          "contest": "general-treasurer",
+          "candidate": "Hawksley",
+          "party": ""
+        },
+        {
+          "label": "Brower",
+          "contest": "general-treasurer",
+          "candidate": "Brower",
+          "party": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.147,
+        0.141,
+        0.866,
+        0.864
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE, ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0913
+      ]
+    }
+  ]
+}

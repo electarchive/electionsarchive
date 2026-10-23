@@ -1,0 +1,158 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1988",
+  "license": "Public record",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1988%20Count%20Book.pdf"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1988,
+      "chamber": "lieutenant-governor",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "secretary-of-state": {
+      "year": 1988,
+      "chamber": "secretary-of-state",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "attorney-general": {
+      "year": 1988,
+      "chamber": "attorney-general",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    },
+    "general-treasurer": {
+      "year": 1988,
+      "chamber": "general-treasurer",
+      "day": "1988-11-08",
+      "special": false,
+      "state": "RI",
+      "district": null,
+      "create": true
+    }
+  },
+  "pages": [
+    {
+      "page": 39,
+      "id": "39-0",
+      "columns": [
+        {
+          "label": "Sundlun, D.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DiPrete, R.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Begin, D.",
+          "contest": "lieutenant-governor",
+          "candidate": "Begin, D.",
+          "party": ""
+        },
+        {
+          "label": "Lippitt, R.",
+          "contest": "lieutenant-governor",
+          "candidate": "Lippitt, R.",
+          "party": ""
+        },
+        {
+          "label": "White, I.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.097,
+        0.156,
+        0.91,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT GOVERNOR'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2855
+      ]
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "Connell, D.",
+          "contest": "secretary-of-state",
+          "candidate": "Connell",
+          "party": "D"
+        },
+        {
+          "label": "Lukens, R.",
+          "contest": "secretary-of-state",
+          "candidate": "Lukens",
+          "party": "R"
+        },
+        {
+          "label": "O'Neil, D.",
+          "contest": "attorney-general",
+          "candidate": "O'Neil",
+          "party": "D"
+        },
+        {
+          "label": "Voccola, R.",
+          "contest": "attorney-general",
+          "candidate": "Voccola",
+          "party": "R"
+        },
+        {
+          "label": "Solomon, D.",
+          "contest": "general-treasurer",
+          "candidate": "Solomon",
+          "party": "D"
+        },
+        {
+          "label": "Goldstein, R.",
+          "contest": "general-treasurer",
+          "candidate": "Goldstein",
+          "party": "R"
+        },
+        {
+          "label": "Corrente, I.",
+          "contest": "general-treasurer",
+          "candidate": "Corrente",
+          "party": "I"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.098,
+        0.208,
+        0.91,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE ATTORNEY GENERAL AND GENERAL TREASURER'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4987
+      ]
+    }
+  ]
+}
