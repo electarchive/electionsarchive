@@ -1,3 +1,4 @@
+import gzip
 import re
 from datetime import date, timedelta
 from pathlib import Path
@@ -13,6 +14,7 @@ SOURCE = "us.ks_sos_generals"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 WAYBACK = "https://web.archive.org/web/{stamp}id_/http://www.kssos.org/elections/"
+MIRROR = "https://raw.githubusercontent.com/openelections/openelections-sources-ks/master/"
 PUBLISHER = "Kansas Secretary of State"
 TITLE = "General election official results by precinct"
 LANDING = "https://sos.ks.gov/elections/election-results.html"
@@ -51,7 +53,10 @@ FILES = {
     (date(2010, 11, 2), "governor"): ("20111224084852", "10elec/2010_general_governor_official_results.xls"),
     (date(2010, 11, 2), "state_house"): ("20111224085726", "10elec/2010_general_ks_house_official_results.xls"),
     (date(2010, 11, 2), "state_senate"): ("20111224083223", "10elec/2010_general_ks_senate_official_results.xls"),
-    (date(2010, 11, 2), "attorney-general"): ("20111224085143", "10elec/2010_general_attorney_general_official_results.xls"),
+    (date(2010, 11, 2), "attorney-general"): (
+        "20111224085143",
+        "10elec/2010_general_attorney_general_official_results.xls",
+    ),
     (date(2010, 11, 2), "secretary-of-state"): (
         "20111224074643",
         "10elec/2010_general_secretary_of_state_official_results.xls",
@@ -63,6 +68,7 @@ FILES = {
     ),
     (date(2012, 11, 6), "state_house"): ("20130920195721", "12elec/2012_general_ks_house_official_results.xlsx"),
     (date(2012, 11, 6), "state_senate"): ("20130920203211", "12elec/2012_general_ks_senate_official_results.xlsx"),
+    (date(2014, 11, 4), "state_house"): (None, "2014/2014_general_ks_house_official_results.xls.gz"),
 }
 
 
@@ -81,7 +87,7 @@ COLUMNS = ["COUNTY", "PRECINCT", "RACE", "DISTRICT", "CANDIDATE", "FIRST", "MIDD
 
 def url(key: tuple[date, str]) -> str:
     stamp, name = FILES[key]
-    return WAYBACK.format(stamp=stamp) + name
+    return MIRROR + name if stamp is None else WAYBACK.format(stamp=stamp) + name
 
 
 def fetch() -> None:
@@ -93,7 +99,7 @@ def clean(text: object) -> str:
     return " ".join(str(text or "").split())
 
 
-def long_rows(path: Path) -> list[tuple[str, str, str | None, str, str, object]]:
+def long_rows(path: Path | bytes) -> list[tuple[str, str, str | None, str, str, object]]:
     grid = pl.read_excel(path, sheet_id=1, has_header=False, infer_schema_length=0).rows()
     head = next(r for r, row in enumerate(grid) if "SUFFIX" in map(clean, row))
     columns = {clean(name): i for i, name in enumerate(grid[head]) if clean(name)} | {
@@ -140,7 +146,9 @@ def wide_rows(path: Path) -> list[tuple[str, str, str | None, str, str, object]]
             if row[i] is None or grid[0][i] is None:
                 continue
             district = re.search(r"District (\d+)", grid[1][i] or "")
-            out.append((county, precinct, district[1] if district else None, clean(grid[0][i]), clean(grid[2][i]), row[i]))
+            out.append(
+                (county, precinct, district[1] if district else None, clean(grid[0][i]), clean(grid[2][i]), row[i])
+            )
             totals[(county, -i - 1)] = totals.get((county, -i - 1), 0) + int(row[i])
     for (name, i), value in totals.items():
         if i < 0:
@@ -167,7 +175,11 @@ def parse() -> None:
     for key in FILES:
         day, office = key
         path = raw.cached(SOURCE, url(key)).path
-        rows = wide_rows(path) if day.year == 2000 else long_rows(path)
+        rows = (
+            wide_rows(path)
+            if day.year == 2000
+            else long_rows(gzip.decompress(path.read_bytes()) if path.suffix == ".gz" else path)
+        )
         frame = pl.DataFrame(
             rows, schema=["county", "precinct", "district", "candidate", "party", "votes"], orient="row"
         ).with_columns(
@@ -176,7 +188,11 @@ def parse() -> None:
             .str.replace(r" county$", "")
             .str.replace_all(r"[^a-z]", "")
             .replace_strict(counties, default=None),
-            votes=pl.col("votes").cast(pl.String).str.replace_all(",", "").cast(pl.Float64, strict=False).cast(pl.Int64),
+            votes=pl.col("votes")
+            .cast(pl.String)
+            .str.replace_all(",", "")
+            .cast(pl.Float64, strict=False)
+            .cast(pl.Int64),
         )
         lost = frame.filter(pl.col("fips").is_null())["county"].unique().to_list()
         if lost:
@@ -224,7 +240,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Kansas's federal, statewide, and legislative general elections by precinct, 2000-2012 "
+            summary="Kansas's federal, statewide, and legislative general elections by precinct, 2000-2014 "
             "(Secretary of State)",
             polity="US-KS",
         )
@@ -249,7 +265,7 @@ def emit() -> Path:
                    join changeset g on g.id = r.changeset_id and g.pipeline <> %s
                    join result_value v on v.result_set_k = r.k
                    join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct'
-                   where x.scheme = 'us.contest' and x.value ~ '^20(0[0-9]|1[0-2])-..-..:KS:'""",
+                   where x.scheme = 'us.contest' and x.value ~ '^20(0[0-9]|1[0-4])-..-..:KS:'""",
                 [SOURCE],
             ).fetchall()
         }
