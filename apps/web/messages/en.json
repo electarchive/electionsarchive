@@ -532,6 +532,7 @@
   "polity_lede": "{elections} from {first} to {last}",
   "polity_within": "and {count} more in subdivisions",
   "polity_latest": "Latest election",
+  "polity_latest_local": "Latest local election",
   "polity_filter_label": "Show",
   "polity_filter_all": "All",
   "polity_filter_general": "General",

@@ -8839,6 +8839,7 @@ export const polities = {
         ),
         within: v.number(),
         dates: v.number(),
+        held: v.number(),
         years: v.array(v.number()),
         results: v.array(
           v.object({
@@ -8881,6 +8882,7 @@ export const polities = {
             name: v.string(),
             path: v.nullable(v.string()),
             date: v.nullable(v.string()),
+            isLocal: v.boolean(),
             races: v.array(
               v.object({
                 contest: v.nullable(v.string()),
@@ -8970,6 +8972,7 @@ export const polities = {
           db.execute<{
             id: string;
             parent: string | null;
+            host: string;
             path: string;
             date: string;
             year: number | null;
@@ -8990,7 +8993,7 @@ export const polities = {
               where t.polity_id = ${input.id}::uuid
               order by upper(t.valid) desc nulls first limit 1
             )
-            select c.id, c.allocation_parent_id as parent, s.path, e.date_from::text as date, ${CYCLE} as year,
+            select c.id, c.allocation_parent_id as parent, e.polity_id as host, s.path, e.date_from::text as date, ${CYCLE} as year,
               place.id as area, place.k,
               case
                 when c.kind = 'ballot_question' then 5
@@ -9094,7 +9097,7 @@ export const polities = {
       const shown = new Set<string>();
       let total = 0;
       for (const [day, size] of sizes) {
-        if (!input.all && shown.size > 0 && total + size > 16) {
+        if (!input.all && shown.size > 0 && total + size > 16 && total >= 8) {
           break;
         }
         shown.add(day);
@@ -9179,6 +9182,9 @@ export const polities = {
           ),
         within: subdivisions.rows[0]?.within ?? 0,
         dates: sizes.length,
+        held:
+          electionRows.rows.length +
+          new Set(here.rows.map((row) => `${row.host}:${row.date}`)).size,
         years: [
           ...new Set(
             kept.flatMap((row) => (row.year == null ? [] : [row.year])),
@@ -9233,6 +9239,7 @@ export const polities = {
                 name: labels.full.get(recent.id) ?? "",
                 path: slugs.get(recent.id) ?? null,
                 date: recent.date,
+                isLocal: (sizes[0]?.[0] ?? "") > (recent.date ?? ""),
                 races: raced.map((race) => {
                   let contested = 0;
                   for (const row of race.results) {

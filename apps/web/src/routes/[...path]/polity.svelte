@@ -114,9 +114,12 @@
       .toArray(),
   );
   const span = $derived.by(() => {
-    const dated = polity.elections.flatMap((election) =>
-      election.year == null ? [] : [election.year],
-    );
+    const dated = [
+      ...polity.elections.flatMap((election) =>
+        election.year == null ? [] : [election.year],
+      ),
+      ...polity.years,
+    ];
     return dated.length === 0
       ? null
       : { first: Math.min(...dated), last: Math.max(...dated) };
@@ -292,7 +295,7 @@
   {#if span != null}
     <p class="text-[0.9375rem] text-muted-foreground">
       {m.polity_lede({
-        elections: m.home_elections({ count: polity.elections.length }),
+        elections: m.home_elections({ count: polity.held }),
         first: String(span.first),
         last: String(span.last),
       })}{#if polity.within > 0}{" "}{m.polity_within({
@@ -360,7 +363,7 @@
       })}
     >
       <h2 id="{uid}-latest" class="text-[0.8125rem] font-bold">
-        {m.polity_latest()}
+        {polity.latest.isLocal ? m.polity_latest_local() : m.polity_latest()}
       </h2>
       {#if polity.latest.path == null}
         <span class="heading">{polity.latest.name}</span>
