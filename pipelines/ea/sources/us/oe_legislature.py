@@ -16,7 +16,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 COMMITS = {
     "AL": ("ba3999b3a63736d5a09d9b90db2774639bede8aa", (2018,)),
-    "AR": ("834ccef3cdcf64c8a381811e4d3ad02ec72ba336", (2022,)),
+    "AR": ("834ccef3cdcf64c8a381811e4d3ad02ec72ba336", (2002, 2010, 2022)),
     "AZ": ("bf14331521f62f74cb17848ab11ca3dfd27f4f82", (2016, 2018, 2022)),
     "CA": ("84c2cbb08a268c683800b513726a1ac7dbf08dac", (2002, 2004, 2006, 2008, 2010, 2012, 2014, 2022)),
     "CT": ("f948d0a1ce36871de4a1d696612ab2a268fd0758", (2000, 2002, 2006, 2008, 2018)),
