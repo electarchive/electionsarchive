@@ -144,7 +144,20 @@ PRIMARIES = {
     "una": ("unaffiliated", None),
 }
 MISDATED = {"1974-11-04": "1974-11-05"}
-CORRECTED = {398272: (2393, "l"), 398273: (3586, "w"), 398299: (4288, "w"), 398409: (3256, "w"), 398410: (2819, "l")}
+UNDATED = {("ID", 2016, 11): (5, 17)}
+CORRECTED = {
+    398272: (2393, "l"),
+    398273: (3586, "w"),
+    398299: (4288, "w"),
+    398409: (3256, "w"),
+    398410: (2819, "l"),
+    321600: (2086, "withdrew"),
+}
+WITHDREW = {
+    321600: 'Withdrew from the July 15 runoff on June 12, 2014, leaving David Faulkner the nominee (al.com, "Steve '
+    'French drops out of Alabama House District 46 race, will support David Faulkner," June 12, 2014).'
+}
+VA_CLEANUP = {*range(392452, 392456), *range(392585, 392589)}
 SUFFIXES = {"jr": "Jr.", "sr": "Sr."}
 RANK = {"w": 0, "t": 1, "r": 2, "withdrew": 3}
 MONTHS = [
@@ -208,7 +221,14 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    lines = pl.read_parquet(PARSED / "lines.parquet").sort("caseid")
+    lines = pl.read_parquet(PARSED / "lines.parquet").filter(~pl.col("caseid").is_in(VA_CLEANUP)).sort("caseid")
+    for (sab, year, month), (fixed, day) in UNDATED.items():
+        undated = (
+            (pl.col("sab") == sab) & (pl.col("year") == year) & (pl.col("month") == month) & pl.col("day").is_null()
+        )
+        lines = lines.with_columns(
+            month=pl.when(undated).then(fixed).otherwise("month"), day=pl.when(undated).then(day).otherwise("day")
+        )
     with connect() as conn:
         cs = Changeset(
             conn,
@@ -253,15 +273,29 @@ def emit() -> Path:
                 [SOURCE],
             ).fetchall()
         )
-        demoted = {
-            result_set
-            for (result_set,) in conn.execute(
-                """select r.id from result_set r join changeset c on c.id = r.changeset_id
+        owned = {
+            entity
+            for (entity,) in conn.execute(
+                """select x.id from (select id, changeset_id from contest union all select id, changeset_id from candidacy) x
+                   join changeset c on c.id = x.changeset_id where c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+        chained = {
+            contest
+            for (contest,) in conn.execute(
+                """select c.previous_round_id from contest c join contest p on p.id = c.previous_round_id
+                   where c.election_id <> p.election_id"""
+            ).fetchall()
+        }
+        demoted: dict[UUID, str] = dict(
+            conn.execute(
+                """select r.id, r.status::text from result_set r join changeset c on c.id = r.changeset_id
                    join external_id e on e.entity_id = r.id and e.scheme = %s
                    where c.pipeline <> %s and not r.is_default""",
                 [f"{SOURCE}.result_set", SOURCE],
             ).fetchall()
-        }
+        )
         parties_known = {
             value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'").fetchall()
         }
@@ -428,6 +462,12 @@ def emit() -> Path:
             return path
 
         cs.renamed.update({right: wrong for wrong, right in MISDATED.items()})
+        cs.renamed.update(
+            {
+                f"{year}-{fixed:02}-{day:02}:{sab}:": f"{year}-{month:02}:{sab}:"
+                for (sab, year, month), (fixed, day) in UNDATED.items()
+            }
+        )
         merged = {entity for entities in cs.merged.values() for entity in entities}
         for wrong, right in MISDATED.items():
             for value in sorted(value for value in elections_known if value.startswith(wrong)):
@@ -548,12 +588,22 @@ def emit() -> Path:
 
         contests: dict[tuple[object, ...], tuple[UUID, date]] = {}
         values: list[tuple[str, str, str, int]] = []
-        ordered = sorted(
-            lines.group_by(*CONTEST, "code"),
-            key=lambda group: (
-                days[(str(group[0][4]), int(group[0][0]), int(group[0][1]), group[0][2], str(group[0][3]))][1],
-                group[1]["caseid"].min(),
-            ),
+        dating = ["sab", "year", "month", "day", "etype"]
+        ordered = (
+            lines.join(
+                pl.DataFrame(
+                    [(*key, value[1]) for key, value in days.items()],
+                    schema={**{column: lines.schema[column] for column in dating}, "on": pl.Date},
+                    orient="row",
+                ),
+                on=dating,
+                how="left",
+                nulls_equal=True,
+            )
+            .with_columns(earliest=pl.col("caseid").min().over(*CONTEST, "code"))
+            .sort("on", "earliest", "caseid")
+            .drop("on", "earliest")
+            .group_by(*CONTEST, "code", maintain_order=True)
         )
         for keys, group in ordered:
             year, month, day, etype, sab, sen, _, _, _, mmdpost, code = keys
@@ -631,31 +681,32 @@ def emit() -> Path:
                 system = "fptp"
             else:
                 system = "block"
-            cs.add(
-                "contest",
-                id=contest,
-                election_id=elections[(sab, year, month, day, etype)],
-                kind="body_seats",
-                body_id=body,
-                district_area_id=area,
-                magnitude=magnitude,
-                term="remainder" if etype == "gs" else "full",
-                round_number=2 if previous is not None else 1,
-                previous_round_id=previous,
-                electoral_system_id=systems[system],
-                default_result_kind="counted",
-                party_scope_id=party(sab, None, scope)[0] if scope in ("d", "r") else party(sab, scope, "nm")[0],
-            )
+            if contest in cs.minted or contest in owned:
+                cs.add(
+                    "contest",
+                    id=contest,
+                    election_id=elections[(sab, year, month, day, etype)],
+                    kind="body_seats",
+                    body_id=body,
+                    district_area_id=area,
+                    magnitude=magnitude,
+                    term="remainder" if etype == "gs" else "full",
+                    round_number=2 if previous is not None else 1,
+                    previous_round_id=previous,
+                    electoral_system_id=systems[system],
+                    default_result_kind="counted",
+                    party_scope_id=party(sab, None, scope)[0] if scope in ("d", "r") else party(sab, scope, "nm")[0],
+                )
+                where = shown + (f", Post {post}" if post else "")
+                name(contest, f"{year} {body_name} {label}, {where}")
+                path = (
+                    f"us/{sab.lower()}/{datekey}-{kind}/{'state-' if body_slug in ('senate', 'house') else ''}{body_slug}-{code}"
+                    + (f"-post-{post}" if post else "")
+                    + ("" if label == "election" else f"-{slug(label)}")
+                    + (f"-{etype[-1]}" if etype[-1].isdigit() else "")
+                )
+                cs.add("slug", path=unique(path, contest), entity_id=contest)
             contests[(sab, sen, code, mmdpost, etype, year)] = (contest, on)
-            where = shown + (f", Post {post}" if post else "")
-            name(contest, f"{year} {body_name} {label}, {where}")
-            path = (
-                f"us/{sab.lower()}/{datekey}-{kind}/{'state-' if body_slug in ('senate', 'house') else ''}{body_slug}-{code}"
-                + (f"-post-{post}" if post else "")
-                + ("" if label == "election" else f"-{slug(label)}")
-                + (f"-{etype[-1]}" if etype[-1].isdigit() else "")
-            )
-            cs.add("slug", path=unique(path, contest), entity_id=contest)
             first = cs.key(f"{SOURCE}.result_set", contest_key)
             result_set = (
                 cs.key(f"{SOURCE}.result_set", f"{contest_key}:2")
@@ -687,7 +738,7 @@ def emit() -> Path:
                 contest_id=contest,
                 stage="certified",
                 kind="counted",
-                status="active",
+                status="superseded" if demoted.get(result_set) == "superseded" else "active",
                 source_id=source,
                 is_default=contest_key not in RANKED_ROUNDS and first not in demoted,
                 supersedes_id=None if result_set == first else first,
@@ -704,18 +755,21 @@ def emit() -> Path:
                 labels = [(label, partyz) for label, partyz in rows.select("party", "partyz").iter_rows()]
                 resolved = [party(sab, label, partyz) for label, partyz in labels]
                 ballot = "Scattered write-ins" if scattered else person_name(row)
-                cs.add(
-                    "contest_option",
-                    id=root,
-                    contest_id=contest,
-                    kind="write_in" if write_in else "candidate",
-                    party_id=published.get(root, resolved[0][0] if len(rows) == 1 else None),
-                    ballot_label=ballot,
-                )
-                if not scattered:
+                if root in cs.minted or root in published:
+                    cs.add(
+                        "contest_option",
+                        id=root,
+                        contest_id=contest,
+                        kind="write_in" if write_in else "candidate",
+                        party_id=published.get(root, resolved[0][0] if len(rows) == 1 else None),
+                        ballot_label=ballot,
+                    )
+                if not scattered and (
+                    (candidacy := cs.key("us.candidacy", f"{option_key}:head")) in cs.minted or candidacy in owned
+                ):
                     cs.add(
                         "candidacy",
-                        id=cs.key("us.candidacy", f"{option_key}:head"),
+                        id=candidacy,
                         person_id=persons[str(candid[0])],
                         option_id=root,
                         role="head",
@@ -729,15 +783,16 @@ def emit() -> Path:
                         if partyz == "w" and line_label is not None and "writein" not in line_label:
                             text += " write-in"
                         target = cs.key("us.option", f"{option_key}:{slug(text)}")
-                        cs.add(
-                            "contest_option",
-                            id=target,
-                            contest_id=contest,
-                            parent_option_id=root,
-                            kind="write_in" if partyz == "w" else "candidate",
-                            party_id=published.get(target, party_id),
-                            ballot_label=f"{ballot} ({text})",
-                        )
+                        if target in cs.minted or target in published:
+                            cs.add(
+                                "contest_option",
+                                id=target,
+                                contest_id=contest,
+                                parent_option_id=root,
+                                kind="write_in" if partyz == "w" else "candidate",
+                                party_id=published.get(target, party_id),
+                                ballot_label=f"{ballot} ({text})",
+                            )
                     if fresh and votes is not None:
                         values.append((str(result_set), str(unit), str(target), votes))
                 outcome = outcomes.get(str(candid[0]))
@@ -748,7 +803,9 @@ def emit() -> Path:
                         else "withdrew"
                         if outcome == "withdrew"
                         else "advanced"
-                        if outcome == "r" or etype == "ttp"
+                        if outcome == "r"
+                        or etype == "ttp"
+                        or (outcome == "w" and contest in chained and not etype.endswith("fpartunsettled"))
                         else "won"
                         if nomination
                         else "elected"
@@ -759,6 +816,7 @@ def emit() -> Path:
                         option_id=root,
                         kind=kind_,
                         seats=1 if kind_ == "elected" else None,
+                        notes=WITHDREW.get(row["caseid"]) if kind_ == "withdrew" else None,
                     )
         cs.frame(
             "result_value",
