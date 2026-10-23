@@ -598,6 +598,10 @@ PEOPLE = {
         ("us.clerk.person", "VT:bernard-sanders"),
         ("us.elstats_gov.person", "VT:bernard-sanders"),
     ),
+    "Kamala Harris, San Francisco district attorney elected in 2003 and 2007": (
+        ("wikidata", "Q10853588"),
+        ("us.alged.person", "61715"),
+    ),
 }
 PLACEHOLDERS = re.compile(
     r"\b(unknown|scatter\w*|write[- ]?ins?|all other|others?|blank|void|none of|uncommitted|vacan\w*|no candidate)\b"
