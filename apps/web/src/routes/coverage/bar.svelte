@@ -14,18 +14,23 @@
     class: className,
   }: { counts: Counts; goal: Goal; class?: string } = $props();
 
-  const tether = TooltipPrimitive.createTether<Reason>();
-  const parts = $derived(REASONS[goal].filter((reason) => counts[reason] > 0));
+  const tether = TooltipPrimitive.createTether<Reason | "icpsr">();
+  const parts = $derived(
+    REASONS[goal]
+      .flatMap((reason): Array<Reason | "icpsr"> =>
+        reason === "complete" ? [reason, "icpsr"] : [reason],
+      )
+      .filter((part) => counts[part] > 0),
+  );
+  const label = (part: Reason | "icpsr") =>
+    part === "icpsr" ? m.coverage_icpsr() : LABELS[part]();
 </script>
 
 <span
   role="img"
   aria-label={parts
     .map((reason) =>
-      m.coverage_count({
-        label: LABELS[reason](),
-        count: count(counts[reason]),
-      }),
+      m.coverage_count({ label: label(reason), count: count(counts[reason]) }),
     )
     .join(", ")}
   class={cn("flex overflow-hidden rounded-xs bg-muted", className)}
@@ -36,7 +41,10 @@
         <span
           {...props}
           class="block-full"
-          style:inline-size="{(counts[reason] / Math.max(1, counts.total)) *
+          style:inline-size="{((reason === 'complete'
+            ? counts.complete - counts.icpsr
+            : counts[reason]) /
+            Math.max(1, counts.total)) *
             100}%"
         >
           <Tone {reason} class="block block-full inline-full" />
@@ -51,7 +59,7 @@
     {const reason = $derived(parts.find((part) => part === payload))}
     {#if reason != null}
       <Tooltip.Content collisionPadding={8} class="grid gap-0.5 leading-snug">
-        <span class="font-semibold">{LABELS[reason]()}</span>
+        <span class="font-semibold">{label(reason)}</span>
         <span class="tabular-nums"
           >{count(counts[reason])} · {percent(
             counts[reason] / Math.max(1, counts.total),

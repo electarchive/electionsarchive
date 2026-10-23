@@ -313,9 +313,19 @@ function coverageMarkdown(
     }),
     ...data.goals.flatMap((row) => [
       `## ${TITLES[row.goal]()}`,
-      `${(row.goal === "local" ? m.coverage_progress_local : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+      [
+        `${(row.goal === "local" ? m.coverage_progress_local : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+        ...(row.icpsr > 0
+          ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
+          : []),
+      ].join(", "),
       REASONS[row.goal]
-        .map((reason) => `- ${LABELS[reason]()}: ${count(row[reason])}`)
+        .flatMap((reason) => [
+          `- ${LABELS[reason]()}: ${count(row[reason])}`,
+          ...(reason === "complete" && row.icpsr > 0
+            ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
+            : []),
+        ])
         .join("\n"),
     ]),
     `## ${m.coverage_where()}`,

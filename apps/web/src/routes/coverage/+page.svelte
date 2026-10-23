@@ -90,6 +90,11 @@
           percent: percent(row.complete / Math.max(1, row.total), 1),
         })}
       </span>
+      {#if row.icpsr > 0}
+        <span class="text-muted-foreground">
+          {m.coverage_icpsr_of({ count: count(row.icpsr) })}
+        </span>
+      {/if}
       <span class="text-muted-foreground">
         {m.coverage_short({ count: count(row.total - row.complete) })}
       </span>
@@ -128,6 +133,18 @@
             <span class="block text-muted-foreground">{definition}</span>
           </span>
         </li>
+        {#if reason === "complete" && row.icpsr > 0}
+          <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2 ps-5">
+            <Tone reason="icpsr" class="mbs-1 rounded-xs block-3 inline-3" />
+            <span>
+              <span class="font-semibold">{m.coverage_icpsr()}</span>
+              <span class="tabular-nums">{count(row.icpsr)}</span>
+              <span class="block text-muted-foreground"
+                >{m.coverage_icpsr_def()}</span
+              >
+            </span>
+          </li>
+        {/if}
       {/each}
     </ul>
     {#if row.goal === "history"}

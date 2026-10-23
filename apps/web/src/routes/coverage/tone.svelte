@@ -6,7 +6,7 @@
     reason,
     class: className,
     style,
-  }: { reason: Reason; class?: string; style?: string } = $props();
+  }: { reason: Reason | "icpsr"; class?: string; style?: string } = $props();
 </script>
 
 <span
@@ -15,7 +15,7 @@
   class={cn(
     className,
     {
-      "bg-(--yes)": reason === "complete",
+      "bg-(--yes)": reason === "complete" || reason === "icpsr",
       "bg-(--done-most)": reason === "coarse" || reason === "units",
       "bg-(--done-half)": reason === "partial" || reason === "unshaped",
       "bg-(--done-some)": reason === "totals",
@@ -24,6 +24,10 @@
     {
       "border border-muted-foreground/70 bg-muted bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1.5px,transparent_1.5px_5px)]":
         reason === "absent",
+    },
+    {
+      "bg-[repeating-linear-gradient(135deg,var(--card)_0_1.5px,transparent_1.5px_4.5px)]":
+        reason === "icpsr",
     },
   )}
 ></span>

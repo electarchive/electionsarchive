@@ -20,7 +20,7 @@ export type Reason =
   | "unshaped"
   | "undrawn";
 export type Counts = Record<
-  Reason | "total" | "turnout" | "precincts" | "shaped",
+  Reason | "total" | "turnout" | "precincts" | "shaped" | "icpsr",
   number
 >;
 

@@ -550,7 +550,7 @@ def build() -> str:
                     )
                 )
     names = dict(states.values())
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 13)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 14)
     for st, year, level, total, complete, unshaped, units, undrawn in shapes:
         if level not in STATE_LEVELS or st not in names:
             continue
@@ -583,10 +583,13 @@ def build() -> str:
                 if goal == "precinct":
                     cell[8] += c["precincts"]
                     cell[9] += c["shaped_precincts"]
+                else:
+                    cell[13] += c.get("icpsr_only", 0)
         elif coverage.target(st, level, year) == "county":
             cell = goals[("history", st, level, year)]
             for i, value in enumerate([base, county, base - count, bare, totals, partial, 0, c.get("with_turnout", 0)]):
                 cell[i] += value
+            cell[13] += c.get("icpsr_only", 0)
     kinds = {g["id"]: (g["state"], g["kind"]) for g in governments}
     for gid, year, expected, n, _, _, precincts, shaped in years_out:
         st, kind = kinds[gid]
@@ -635,7 +638,7 @@ def build() -> str:
                 copy.write_row(row)
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
-            " turnout, precincts, shaped, unshaped, units, undrawn) from stdin"
+            " turnout, precincts, shaped, unshaped, units, undrawn, icpsr) from stdin"
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])

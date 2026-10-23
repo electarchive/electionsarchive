@@ -26,6 +26,7 @@ const counts = {
   unshaped: v.number(),
   units: v.number(),
   undrawn: v.number(),
+  icpsr: v.number(),
 };
 const Current = v.optional(
   v.pipe(
