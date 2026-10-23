@@ -1,0 +1,299 @@
+{
+ "polity": "US-AR",
+ "publisher": "Arkansas Secretary of State",
+ "title": "2008 presidential preferential primary results by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://www.sos.arkansas.gov/uploads/elections/Presidential_Primary_Elections_Results.pdf"
+ },
+ "raw_source": "us.ar_sos_2008_pp",
+ "contests": {
+  "d": {
+   "year": 2008,
+   "chamber": "president:democratic",
+   "day": "2008-02-05",
+   "special": false,
+   "state": "AR",
+   "district": null
+  },
+  "r": {
+   "year": 2008,
+   "chamber": "president:republican",
+   "day": "2008-02-05",
+   "special": false,
+   "state": "AR",
+   "district": null
+  },
+  "g": {
+   "year": 2008,
+   "chamber": "president:green",
+   "day": "2008-02-05",
+   "special": false,
+   "state": "AR",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "d2",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Biden",
+     "contest": "d",
+     "candidate": "Biden"
+    },
+    {
+     "label": "Clinton",
+     "contest": "d",
+     "candidate": "Clinton"
+    },
+    {
+     "label": "Dodd",
+     "contest": "d",
+     "candidate": "Dodd"
+    },
+    {
+     "label": "Edwards",
+     "contest": "d",
+     "candidate": "Edwards"
+    },
+    {
+     "label": "Gravel",
+     "contest": "d",
+     "candidate": "Gravel"
+    },
+    {
+     "label": "Kucinich",
+     "contest": "d",
+     "candidate": "Kucinich"
+    },
+    {
+     "label": "Obama",
+     "contest": "d",
+     "candidate": "Obama"
+    },
+    {
+     "label": "Richardson",
+     "contest": "d",
+     "candidate": "Richardson"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.98
+   ]
+  },
+  {
+   "page": 3,
+   "id": "d3",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Biden",
+     "contest": "d",
+     "candidate": "Biden"
+    },
+    {
+     "label": "Clinton",
+     "contest": "d",
+     "candidate": "Clinton"
+    },
+    {
+     "label": "Dodd",
+     "contest": "d",
+     "candidate": "Dodd"
+    },
+    {
+     "label": "Edwards",
+     "contest": "d",
+     "candidate": "Edwards"
+    },
+    {
+     "label": "Gravel",
+     "contest": "d",
+     "candidate": "Gravel"
+    },
+    {
+     "label": "Kucinich",
+     "contest": "d",
+     "candidate": "Kucinich"
+    },
+    {
+     "label": "Obama",
+     "contest": "d",
+     "candidate": "Obama"
+    },
+    {
+     "label": "Richardson",
+     "contest": "d",
+     "candidate": "Richardson"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.98
+   ],
+   "turn": -90
+  },
+  {
+   "page": 4,
+   "id": "r4",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Giuliani",
+     "contest": "r",
+     "candidate": "Giuliani"
+    },
+    {
+     "label": "Huckabee",
+     "contest": "r",
+     "candidate": "Huckabee"
+    },
+    {
+     "label": "McCain",
+     "contest": "r",
+     "candidate": "McCain"
+    },
+    {
+     "label": "Paul",
+     "contest": "r",
+     "candidate": "Paul"
+    },
+    {
+     "label": "Romney",
+     "contest": "r",
+     "candidate": "Romney"
+    },
+    {
+     "label": "Thompson",
+     "contest": "r",
+     "candidate": "Thompson"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.98
+   ]
+  },
+  {
+   "page": 5,
+   "id": "r5",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Giuliani",
+     "contest": "r",
+     "candidate": "Giuliani"
+    },
+    {
+     "label": "Huckabee",
+     "contest": "r",
+     "candidate": "Huckabee"
+    },
+    {
+     "label": "McCain",
+     "contest": "r",
+     "candidate": "McCain"
+    },
+    {
+     "label": "Paul",
+     "contest": "r",
+     "candidate": "Paul"
+    },
+    {
+     "label": "Romney",
+     "contest": "r",
+     "candidate": "Romney"
+    },
+    {
+     "label": "Thompson",
+     "contest": "r",
+     "candidate": "Thompson"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.98
+   ],
+   "turn": -90
+  },
+  {
+   "page": 6,
+   "id": "g6",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Ball",
+     "contest": "g",
+     "candidate": "Ball"
+    },
+    {
+     "label": "McKinney",
+     "contest": "g",
+     "candidate": "McKinney"
+    },
+    {
+     "label": "Mesplay",
+     "contest": "g",
+     "candidate": "Mesplay"
+    },
+    {
+     "label": "Swift",
+     "contest": "g",
+     "candidate": "Swift"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.98
+   ]
+  },
+  {
+   "page": 7,
+   "id": "g7",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Ball",
+     "contest": "g",
+     "candidate": "Ball"
+    },
+    {
+     "label": "McKinney",
+     "contest": "g",
+     "candidate": "McKinney"
+    },
+    {
+     "label": "Mesplay",
+     "contest": "g",
+     "candidate": "Mesplay"
+    },
+    {
+     "label": "Swift",
+     "contest": "g",
+     "candidate": "Swift"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.98
+   ],
+   "turn": -90
+  }
+ ]
+}
