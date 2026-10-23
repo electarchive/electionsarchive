@@ -270,10 +270,27 @@ def emit() -> Path:
             kind="counted",
             status="active",
             source_id=sources["general"],
-            is_default=False,
+            is_default=True,
             completeness=None,
         )
         cs.add("note", entity_id=result_set, kind="caveat", body_md=GENERAL_NOTE)
+        for label, _ in COLUMNS.values():
+            if label != "Write-ins":
+                cs.add(
+                    "outcome",
+                    result_set_id=result_set,
+                    option_id=options[label],
+                    kind="elected" if label == "Brad Finstad" else "lost",
+                )
+        columns = (
+            "id", "election_id", "contest_id", "stage", "kind", "status", "source_id", "as_of", "completeness",
+            "supersedes_id",
+        )  # fmt: skip
+        for row in conn.execute(
+            f"select {', '.join(columns)} from result_set where contest_id = %s and is_default and id <> %s",
+            [general, result_set],
+        ).fetchall():
+            cs.add("result_set", **dict(zip(columns, row, strict=True)), is_default=False)
         counties: dict[tuple[str, UUID], int] = {}
         for county, precinct, row in precincts:
             unit = cs.unit("us.precinct", f"{GENERAL}:MN:{county}::{precinct}", GENERAL)
