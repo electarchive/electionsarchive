@@ -703,6 +703,7 @@ def attach(
     partial: str | None = None,
     authoritative: str | None = None,
     declared: dict[str, tuple[str, str]] | None = None,
+    empty: bool = False,
 ) -> None:
     declared = declared or {}
     tag = str(cs.manifest["pipeline"])
@@ -757,6 +758,12 @@ def attach(
                where c.id = %s group by 1, 2, 3 order by 3 limit 1""",
             [contest],
         ).fetchone() or (None, None, None, None)
+        emptied = empty and election is None
+        if emptied:
+            election, district_area = conn.execute(
+                "select election_id, district_area_id from contest where id = %s", [contest]
+            ).fetchone()
+            first, official = 1, int(lines.filter(pl.col("measure") == 1)["votes"].sum())
         if election is None or first is None or not official or first > 1:
             print(f"{key}: no official total or first round, skipped")
             continue
@@ -873,7 +880,7 @@ def attach(
                 ),
             )
         )
-        if key not in declared and (
+        if key not in declared and not emptied and (
             max(known, key=lambda option: option[4] or 0)[0]
             != max(known, key=lambda option: int(pooled.filter(pl.col("option") == str(option[0]))["votes"].sum()))[0]
         ):
@@ -1030,6 +1037,8 @@ def attach(
                 members[code] = str(counties[code][0])
             elif kind == "precinct":
                 members[code] = str(cs.unit("us.precinct", code))
+            elif kind == "town":
+                members[code] = str(cs.unit("us.town", code))
             else:
                 members[code] = str(cs.unit("us.ak_house_district" if kind == "district" else "us.aggregate", code))
         values.append(
