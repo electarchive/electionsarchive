@@ -63,6 +63,14 @@
    "special": false,
    "state": "SC",
    "district": null
+  },
+  "commissioner-of-agriculture": {
+   "year": 1982,
+   "chamber": "commissioner-of-agriculture",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
   }
  },
  "pages": [
@@ -200,6 +208,29 @@
      "label": "Misc write-ins",
      "contest": null,
      "candidate": ""
+    }
+   ],
+   "hint": "Digits and commas only. The county names are the row labels and the last row is STATE TOTALS. Every row must have exactly one cell per column."
+  },
+  {
+   "page": 27,
+   "id": "27-0",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Les Tindal",
+     "contest": "commissioner-of-agriculture",
+     "candidate": "Les Tindal"
+    },
+    {
+     "label": "G. Patrick Bryan",
+     "contest": "commissioner-of-agriculture",
+     "candidate": "G. Patrick Bryan"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "commissioner-of-agriculture",
+     "candidate": "MISC WRITE INS"
     }
    ],
    "hint": "Digits and commas only. The county names are the row labels and the last row is STATE TOTALS. Every row must have exactly one cell per column."

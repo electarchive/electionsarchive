@@ -1168,7 +1168,7 @@ def finalize(
         )
     (folder / "review.json").write_text(json.dumps(review, indent=2))
     if passed:
-        pl.DataFrame(passed).write_parquet(folder / "tables.parquet")
+        pl.DataFrame(passed, infer_schema_length=None).write_parquet(folder / "tables.parquet")
     lines = [f"# {manifest['name']}", ""]
     for reader in ORDER:
         model, _, price_in, price_out = READERS[reader]
