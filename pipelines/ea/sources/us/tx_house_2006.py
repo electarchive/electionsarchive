@@ -11,29 +11,35 @@ from ea.sources.us.tx_elchist import PUBLISHER, SITE, cells
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_house_2006"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
-DAY = date(2006, 11, 7)
-ELECTION = 128
-RACES = {77: 15, 83: 21, 84: 22, 85: 23, 87: 25, 90: 28}
+RACES = {
+    (128, 77): (date(2006, 11, 7), 15),
+    (128, 83): (date(2006, 11, 7), 21),
+    (128, 84): (date(2006, 11, 7), 22),
+    (128, 85): (date(2006, 11, 7), 23),
+    (128, 87): (date(2006, 11, 7), 25),
+    (128, 90): (date(2006, 11, 7), 28),
+    (129, 85): (date(2006, 12, 12), 23),
+}
 TITLE = "Texas election history: 2006 special November elections by county"
 
 
-def url(race: int) -> str:
-    return f"{SITE}elchist{ELECTION}_race{race}.htm"
+def url(election: int, race: int) -> str:
+    return f"{SITE}elchist{election}_race{race}.htm"
 
 
 def fetch() -> None:
-    for race in RACES:
-        raw.fetch(SOURCE, url(race), suffix=".htm")
+    for election, race in RACES:
+        raw.fetch(SOURCE, url(election, race), suffix=".htm")
 
 
 def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)["TX"]
     rows = []
-    for race, district in RACES.items():
-        text = raw.cached(SOURCE, url(race)).path.read_text(errors="replace")
+    for (election, race), (day, district) in RACES.items():
+        text = raw.cached(SOURCE, url(election, race)).path.read_text(errors="replace")
         lines = re.findall(r"<TR[^>]*>(.*?)</TR>", text, re.IGNORECASE | re.DOTALL)
         headers = [cells(line, "TH") for line in lines if re.search(r"<TH", line, re.IGNORECASE)]
         data = [cells(line, "TD") for line in lines if re.search(r"<TD", line, re.IGNORECASE)]
@@ -51,11 +57,11 @@ def parse() -> None:
             if sum(votes) != int(total[column].replace(",", "")):
                 raise ValueError(f"{district} {name}: counties sum to {sum(votes)}, not {total[column]}")
             rows.extend(
-                (district, name, county[0], count)
+                (day, district, name, county[0], count)
                 for county, count in zip(counties, votes, strict=True)
                 if int(county[width].replace(",", "") or 0) > 0
             )
-    frame = pl.DataFrame(rows, schema=["district", "candidate", "county", "votes"], orient="row").with_columns(
+    frame = pl.DataFrame(rows, schema=["day", "district", "candidate", "county", "votes"], orient="row").with_columns(
         code=pl.col("county").str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips, default=None)
     )
     lost = frame.filter(pl.col("code").is_null())
@@ -64,7 +70,7 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.select(
         state=pl.lit("TX"),
-        day=pl.lit(DAY),
+        day=pl.col("day"),
         year=pl.lit(2006, pl.Int32),
         chamber=pl.lit("house"),
         district=pl.col("district").cast(pl.Int16),
@@ -86,7 +92,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Texas's U.S. House elections of November 7, 2006 in the five districts redrawn by the court and the District 22 unexpired term, by county from the Secretary of State",
+            summary="Texas's U.S. House elections of November 7, 2006 in the five districts redrawn by the court and the District 22 unexpired term, and the December 12 District 23 runoff, by county from the Secretary of State",
             polity="US-TX",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -99,7 +105,7 @@ def emit() -> Path:
             url=f"{SITE}index.htm",
             license="Public record",
         )
-        for race in RACES:
-            cs.artifact(raw.cached(SOURCE, url(race)), source)
+        for election, race in RACES:
+            cs.artifact(raw.cached(SOURCE, url(election, race)), source)
         medsl.attach(cs, conn, frame, {"TX": source}, extend=True)
         return cs.write()
