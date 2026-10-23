@@ -7,7 +7,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
-  import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
+  import { AFFILIATIONS } from "#lib/relations.js";
   import type { PageData } from "./$types";
   import History from "./history.svelte";
   import Lineage from "./lineage.svelte";
@@ -27,32 +27,14 @@
 
   const party = $derived(data.party);
   const color = $derived(swatch(party.color, `party:${data.id}`));
-  const links = $derived([
-    ...party.relations.flatMap((relation) => {
-      const phrase = RELATIONS[relation.kind]?.[relation.outgoing ? 0 : 1];
-      return phrase == null
-        ? []
-        : [
-            {
-              text: phrase({ name: relation.party.label }),
-              party: relation.party,
-              year: relation.date?.slice(0, 4) ?? null,
-            },
-          ];
-    }),
-    ...party.parents.flatMap((parent) => {
+  const links = $derived(
+    party.parents.flatMap((parent) => {
       const phrase = AFFILIATIONS[parent.kind];
       return phrase == null
         ? []
-        : [
-            {
-              text: phrase({ name: parent.party.label }),
-              party: parent.party,
-              year: null,
-            },
-          ];
+        : [{ text: phrase({ name: parent.party.label }), party: parent.party }];
     }),
-  ]);
+  );
   const years = $derived(
     Map.groupBy(data.record.elections, (election) => election.year)
       .entries()

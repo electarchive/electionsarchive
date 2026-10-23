@@ -3,6 +3,8 @@
   import Export from "#lib/components/export.svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { RELATIONS } from "#lib/relations.js";
+  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
   const {
@@ -12,11 +14,7 @@
   }: {
     party: PageData["party"];
     color: string;
-    links: Array<{
-      text: string;
-      party: { id: string; color: string | null };
-      year: string | null;
-    }>;
+    links: Array<{ text: string; party: { id: string; color: string | null } }>;
   } = $props();
 
   const INTO = new Set([
@@ -26,14 +24,29 @@
     "successor_of:out",
     "split_from:out",
   ]);
-  const ROW = 30;
-  const PAD = { top: 8, bottom: 24, side: 14 };
+  const LINE = 14;
+  const GAP = 10;
 
   let width = $state(720);
+  let lit = $state<string | null>(null);
+  let chart = $state<SVGSVGElement | null>(null);
 
   const year = (value: string) =>
     Number(value.slice(0, 4)) + (Number(value.slice(5, 7) || "7") - 1) / 12;
+  const measure = $derived.by(() => {
+    const context =
+      chart == null ? null : document.createElement("canvas").getContext("2d");
+    const family = chart == null ? "" : getComputedStyle(chart).fontFamily;
+    return (text: string, size: number, weight: number) => {
+      if (context == null) {
+        return text.length * size * 0.56;
+      }
+      context.font = `${weight} ${size}px ${family}`;
+      return context.measureText(text).width;
+    };
+  });
 
+  const title = $derived(party.short ?? party.name);
   const self = $derived({
     from: party.span == null ? null : year(party.span.from),
     to: party.span == null ? null : year(party.span.to),
@@ -47,48 +60,37 @@
     )
       .values()
       .toArray()
-      .flatMap((group) =>
-        group[0] == null
-          ? []
-          : [
-              {
-                party: group[0].party,
-                span: group[0].span,
-                events: group.map((relation) => ({
-                  at: relation.date == null ? null : year(relation.date),
-                  isInto: INTO.has(
-                    `${relation.kind}:${relation.outgoing ? "out" : "in"}`,
-                  ),
-                })),
-              },
-            ],
-      ),
-  );
-  const extent = $derived.by(() => {
-    const found: Array<number> = [];
-    for (const value of [self.from, self.to]) {
-      if (value != null) {
-        found.push(value);
-      }
-    }
-    for (const other of others) {
-      for (const event of other.events) {
-        if (event.at != null) {
-          found.push(event.at);
+      .flatMap((group) => {
+        const first = group[0];
+        if (first == null) {
+          return [];
         }
-      }
-      if (other.span != null) {
-        found.push(year(other.span.from), year(other.span.to));
-      }
-    }
-    if (found.length === 0) {
-      return { low: 2000, high: 2001 };
-    }
-    const low = Math.min(...found);
-    const high = Math.max(...found);
-    const pad = Math.max(2, (high - low) * 0.04);
-    return { low: low - pad, high: high + pad };
-  });
+        const events = group.map((relation) => ({
+          at: relation.date == null ? null : year(relation.date),
+          isInto: INTO.has(
+            `${relation.kind}:${relation.outgoing ? "out" : "in"}`,
+          ),
+        }));
+        return [
+          {
+            party: first.party,
+            span: first.span,
+            events,
+            isAbove: events.every((event) => event.isInto),
+            notes: group.map((relation) =>
+              [
+                RELATIONS[relation.kind]?.[relation.outgoing ? 1 : 0]?.({
+                  name: title,
+                }),
+                relation.date?.slice(0, 4),
+              ]
+                .filter((part) => part != null)
+                .join(" "),
+            ),
+          },
+        ];
+      }),
+  );
   const main = $derived.by(() => {
     let from = self.from ?? Infinity;
     let to = self.to ?? -Infinity;
@@ -102,49 +104,120 @@
     }
     return { from, to };
   });
-  const rows = $derived.by(() => {
-    const placed = others.map((other) => {
+  const placed = $derived.by(() => {
+    const spans = others.map((other) => {
       const dates = other.events.flatMap((event) =>
         event.at == null ? [] : [event.at],
       );
-      const isAbove = other.events.every((event) => event.isInto);
-      const fallback = isAbove ? main.from : main.to;
-      const from = Math.min(
-        ...(other.span == null ? [] : [year(other.span.from)]),
-        ...dates,
-        ...(dates.length === 0 && other.span == null ? [fallback - 4] : []),
-      );
-      const to = Math.max(
-        ...(other.span == null ? [] : [year(other.span.to)]),
-        ...dates,
-        ...(dates.length === 0 && other.span == null ? [fallback + 4] : []),
-      );
-      return { ...other, isAbove, from, to: Math.max(to, from + 0.6) };
+      const anchor =
+        dates.length > 0
+          ? other.isAbove
+            ? Math.max(...dates)
+            : Math.min(...dates)
+          : other.isAbove
+            ? main.from
+            : main.to;
+      const from =
+        other.span == null
+          ? Math.min(...dates, other.isAbove ? anchor - 4 : anchor)
+          : Math.min(year(other.span.from), ...dates);
+      const to =
+        other.span == null
+          ? Math.max(...dates, other.isAbove ? anchor : anchor + 4)
+          : Math.max(year(other.span.to), ...dates);
+      return { ...other, anchor, from, to };
     });
-    const above = placed
+    const above = spans
       .filter((entry) => entry.isAbove)
-      .toSorted((a, b) => b.to - a.to);
-    const below = placed
+      .toSorted((a, b) => a.to - b.to || a.anchor - b.anchor);
+    const below = spans
       .filter((entry) => !entry.isAbove)
-      .toSorted((a, b) => a.from - b.from);
-    return [
-      ...above.map((entry, index) => ({ ...entry, row: above.length - index })),
-      ...below.map((entry, index) => ({ ...entry, row: -(index + 1) })),
-    ];
+      .toSorted((a, b) => b.from - a.from || b.anchor - a.anchor);
+    const rows: Array<(typeof spans)[number] & { offset: number }> = [];
+    let cursor = -GAP - 8;
+    for (const entry of above) {
+      const tall = 18 + LINE * entry.notes.length;
+      rows.push({ ...entry, offset: cursor - tall + 9 });
+      cursor -= tall + GAP;
+    }
+    const top = cursor + GAP;
+    cursor = GAP + 8;
+    for (const entry of below) {
+      rows.push({ ...entry, offset: cursor + 9 });
+      cursor += 18 + LINE * entry.notes.length + GAP;
+    }
+    return { rows, top, bottom: cursor - GAP };
   });
-  const lift = $derived(
-    Math.max(0, ...rows.filter((r) => r.isAbove).map((r) => r.row)),
+  const gutter = $derived(
+    Math.min(
+      240,
+      Math.max(96, width * 0.36),
+      Math.max(
+        measure(title, 13, 700),
+        ...placed.rows.flatMap((lane) => [
+          measure(lane.party.label, 13, 500),
+          ...lane.notes.map((note) => measure(note, 11, 400)),
+        ]),
+      ) + 4,
+    ),
   );
-  const drop = $derived(rows.filter((r) => !r.isAbove).length);
-  const height = $derived(PAD.top + (lift + drop + 1) * ROW + PAD.bottom);
+  const fit = (text: string, size: number, weight: number) => {
+    if (measure(text, size, weight) <= gutter) {
+      return text;
+    }
+    let cut = text.length;
+    while (
+      cut > 1 &&
+      measure(`${text.slice(0, cut)}…`, size, weight) > gutter
+    ) {
+      cut -= 1;
+    }
+    return `${text.slice(0, cut).trimEnd()}…`;
+  };
+  const lanes = $derived(
+    placed.rows.map((lane) => {
+      const name =
+        lane.party.short != null && measure(lane.party.label, 13, 500) > gutter
+          ? lane.party.short
+          : lane.party.label;
+      return {
+        ...lane,
+        name: fit(name, 13, 500),
+        lines: lane.notes.map((note) => fit(note, 11, 400)),
+      };
+    }),
+  );
+  const extent = $derived.by(() => {
+    const found: Array<number> = [];
+    for (const value of [main.from, main.to]) {
+      if (Number.isFinite(value)) {
+        found.push(value);
+      }
+    }
+    for (const lane of lanes) {
+      found.push(lane.from, lane.to);
+    }
+    if (found.length === 0) {
+      return { low: 2000, high: 2001 };
+    }
+    const low = Math.min(...found);
+    const high = Math.max(...found);
+    const pad = Math.max(1, (high - low) * 0.02);
+    return { low: low - pad, high: high + pad };
+  });
+  const axis = $derived(4 - placed.top);
+  const height = $derived(axis + placed.bottom + 30);
+  const start = $derived(gutter + 20);
+  const end = $derived(width - 6);
+  const bend = $derived(Math.min(56, Math.max(20, (end - start) * 0.05)));
   const sx = (value: number) =>
-    PAD.side +
-    ((value - extent.low) / (extent.high - extent.low)) *
-      (width - PAD.side * 2);
-  const sy = (row: number) => PAD.top + (lift - row) * ROW + ROW / 2;
+    start + ((value - extent.low) / (extent.high - extent.low)) * (end - start);
   const ticks = $derived.by(() => {
     const span = extent.high - extent.low;
-    const step = span > 60 ? 20 : span > 30 ? 10 : span > 12 ? 5 : 2;
+    const room = Math.max(1, Math.floor((end - start) / 56));
+    const step =
+      [1, 2, 5, 10, 20, 25, 50, 100].find((value) => span / value <= room) ??
+      100;
     const found: Array<number> = [];
     for (
       let tick = Math.ceil(extent.low / step) * step;
@@ -157,13 +230,13 @@
   });
 </script>
 
-{#if rows.length > 0 || links.length > 0}
+{#if lanes.length > 0 || links.length > 0}
   <section
     class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] gap-3 bg-card px-3.5 pbs-3.5 pbe-3"
     aria-labelledby="lineage-title"
     data-export
   >
-    {#if rows.length > 0}
+    {#if lanes.length > 0}
       <Export name="lineage" class="absolute inset-e-2 inset-bs-2" />
     {/if}
     <div class="grid gap-0.5 pe-8">
@@ -172,115 +245,204 @@
           ? m.party_relations()
           : m.party_lineage_title()}
       </h2>
-      {#if rows.length > 0}
+      {#if lanes.length > 0}
         <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
           {m.party_lineage_lede()}
         </p>
       {/if}
     </div>
-    {#if rows.length > 0}
-      <div class="min-inline-0" bind:clientWidth={width}>
+    {#if lanes.length > 0}
+      <div class="pbs-1 min-inline-0" bind:clientWidth={width}>
         <svg
+          bind:this={chart}
           class="block overflow-visible block-auto max-inline-full"
           viewBox="0 0 {width} {height}"
           {width}
           {height}
           role="img"
-          aria-label={m.party_lineage_title()}
-          aria-describedby={links.length > 0 ? "lineage-links" : undefined}
+          aria-labelledby="lineage-title"
+          aria-describedby="lineage-list"
         >
           {#each ticks as tick (tick)}
             <line
               x1={sx(tick)}
               x2={sx(tick)}
-              y1={PAD.top}
-              y2={height - PAD.bottom}
-              class="stroke-border"
-              stroke-dasharray="2 3"
+              y1={0}
+              y2={height - 22}
+              class="stroke-border/60"
             />
             <text
               x={sx(tick)}
               y={height - 6}
               text-anchor="middle"
-              class="fill-muted-foreground font-figures text-[0.625rem] tabular-nums"
+              class="fill-muted-foreground font-figures text-[0.6875rem] tabular-nums"
               >{tick}</text
             >
           {/each}
-          {#each rows as entry (entry.party.id)}
+          {#each lanes as lane (lane.party.id)}
             {const tint = $derived(
-              swatch(entry.party.color, `party:${entry.party.id}`),
+              swatch(lane.party.color, `party:${lane.party.id}`),
             )}
-            {#each entry.events as event, index (index)}
-              {#if event.at != null}
-                {const x = $derived(sx(event.at))}
-                {const y0 = $derived(sy(entry.row))}
-                {const y1 = $derived(sy(0))}
-                <path
-                  d={event.isInto
-                    ? `M${x - 18},${y0} Q${x},${y0} ${x},${(y0 + y1) / 2} L${x},${y1}`
-                    : `M${x},${y1} L${x},${(y0 + y1) / 2} Q${x},${y0} ${x + 18},${y0}`}
-                  fill="none"
-                  stroke={tint}
-                  stroke-width="2"
-                  stroke-opacity="0.85"
+            {const y = $derived(axis + lane.offset)}
+            {const marks = $derived(
+              lane.events
+                .flatMap((event) =>
+                  event.at == null ? [] : [{ ...event, x: sx(event.at) }],
+                )
+                .toSorted((a, b) => a.x - b.x),
+            )}
+            {const turn = $derived(
+              Math.min(
+                bend,
+                ...marks
+                  .slice(1)
+                  .map((mark, index) =>
+                    Math.max(8, (mark.x - (marks[index]?.x ?? 0)) / 2 - 2),
+                  ),
+              ),
+            )}
+            {const span = $derived.by(() => {
+              let from = sx(lane.from);
+              let to = sx(lane.to);
+              for (const { x, isInto } of marks) {
+                if (isInto && to <= x + 1) {
+                  to = Math.max(from, x - turn);
+                }
+                if (!isInto && from >= x - 1) {
+                  from = Math.min(to, x + turn);
+                }
+              }
+              return { from, to };
+            })}
+            {const path = $derived(
+              [
+                ...marks.map(({ x, isInto }) =>
+                  isInto
+                    ? `M${x - turn},${y} C${x - turn / 2},${y} ${x - turn / 2},${axis} ${x},${axis}`
+                    : `M${x},${axis} C${x + turn / 2},${axis} ${x + turn / 2},${y} ${x + turn},${y}`,
+                ),
+                span.to - span.from > 0.5
+                  ? `M${span.from},${y} H${span.to}`
+                  : "",
+              ].join(" "),
+            )}
+            {const reach = $derived(measure(lane.name, 13, 500) + 8)}
+            {const left = $derived(
+              Math.min(
+                span.to - span.from > 0.5 ? span.from : Infinity,
+                ...marks.map(({ x, isInto }) => (isInto ? x - turn : x + turn)),
+              ),
+            )}
+            <g
+              role="presentation"
+              class={cn("transition-opacity duration-200", {
+                "opacity-20": lit != null && lit !== lane.party.id,
+              })}
+              onpointerenter={() => (lit = lane.party.id)}
+              onpointerleave={() => (lit = null)}
+            >
+              {#if left - reach > 12}
+                <line
+                  x1={reach}
+                  x2={left - 6}
+                  y1={y}
+                  y2={y}
+                  class="stroke-muted-foreground/45"
+                  stroke-dasharray="1 4"
+                  stroke-linecap="round"
                 />
+              {/if}
+              <path
+                d={path}
+                fill="none"
+                class="stroke-card"
+                stroke-width="9"
+                stroke-linecap="round"
+              />
+              <path
+                d={path}
+                fill="none"
+                stroke={tint}
+                stroke-width="4"
+                stroke-linecap="round"
+              />
+              <a href={resolve("/id/[id]", { id: lane.party.id })}>
+                <text
+                  x="0"
+                  y={y + 4.5}
+                  class="fill-foreground text-[0.8125rem] font-medium hover:underline"
+                  >{lane.name}<title>{lane.party.label}</title></text
+                >
+              </a>
+              {#each lane.lines as line, index (index)}
+                <text
+                  x="0"
+                  y={y + 4.5 + LINE * (index + 1)}
+                  class="fill-muted-foreground text-[0.6875rem] tabular-nums"
+                  >{line}</text
+                >
+              {/each}
+            </g>
+          {/each}
+          {#if Number.isFinite(main.from)}
+            <g
+              class={cn("transition-opacity duration-200", {
+                "opacity-40": lit != null,
+              })}
+            >
+              {#if sx(main.from) - measure(title, 13, 700) > 20}
+                <line
+                  x1={measure(title, 13, 700) + 8}
+                  x2={sx(main.from) - 8}
+                  y1={axis}
+                  y2={axis}
+                  class="stroke-muted-foreground/45"
+                  stroke-dasharray="1 4"
+                  stroke-linecap="round"
+                />
+              {/if}
+              <rect
+                x={sx(main.from)}
+                y={axis - 5}
+                width={Math.max(10, sx(main.to) - sx(main.from))}
+                height="10"
+                rx="5"
+                fill={color}
+              />
+              <text
+                x="0"
+                y={axis + 4.5}
+                class="fill-foreground text-[0.8125rem] font-bold"
+                >{fit(title, 13, 700)}</text
+              >
+            </g>
+          {/if}
+          {#each lanes as lane (lane.party.id)}
+            {#each lane.events as event, index (index)}
+              {#if event.at != null}
                 <circle
-                  cx={x}
-                  cy={y1}
-                  r="3.5"
-                  fill={tint}
-                  class="stroke-card"
+                  cx={sx(event.at)}
+                  cy={axis}
+                  r="4.5"
+                  fill={swatch(lane.party.color, `party:${lane.party.id}`)}
+                  class={cn("stroke-card transition-opacity duration-200", {
+                    "opacity-20": lit != null && lit !== lane.party.id,
+                  })}
+                  stroke-width="2"
                 />
               {/if}
             {/each}
-            <rect
-              x={sx(entry.from)}
-              y={sy(entry.row) - 3}
-              width={Math.max(4, sx(entry.to) - sx(entry.from))}
-              height="6"
-              rx="3"
-              fill={tint}
-            />
-          {/each}
-          {#if Number.isFinite(main.from)}
-            <rect
-              x={sx(main.from)}
-              y={sy(0) - 5}
-              width={Math.max(6, sx(main.to) - sx(main.from))}
-              height="10"
-              rx="5"
-              fill={color}
-            />
-            <text
-              x={Math.min(sx(main.from), width - 140)}
-              y={sy(0) - 10}
-              class="fill-foreground stroke-card text-[0.8125rem] font-bold"
-              stroke-width="4"
-              stroke-linejoin="round"
-              paint-order="stroke">{party.short ?? party.name}</text
-            >
-          {/if}
-          {#each rows as entry (entry.party.id)}
-            <a href={resolve("/id/[id]", { id: entry.party.id })}>
-              <text
-                x={Math.min(sx(entry.from), width - 120)}
-                y={sy(entry.row) - 7}
-                class="fill-foreground stroke-card text-[0.75rem] font-semibold hover:underline"
-                stroke-width="4"
-                stroke-linejoin="round"
-                paint-order="stroke"
-                >{entry.party.short ?? entry.party.label}</text
-              >
-            </a>
           {/each}
         </svg>
+        <ul id="lineage-list" class="sr-only">
+          {#each lanes as lane (lane.party.id)}
+            <li>{lane.party.label}: {lane.notes.join(", ")}</li>
+          {/each}
+        </ul>
       </div>
     {/if}
     {#if links.length > 0}
-      <ul
-        id="lineage-links"
-        class="grid gap-x-6 gap-y-1 text-sm md:grid-cols-2"
-      >
+      <ul class="grid gap-x-6 gap-y-1 text-sm md:grid-cols-2">
         {#each links as link, index (index)}
           <li class="flex items-baseline gap-2">
             <span
@@ -294,12 +456,6 @@
               class="hover:highlighter"
               href={resolve("/id/[id]", { id: link.party.id })}>{link.text}</a
             >
-            {#if link.year != null}
-              <span
-                class="font-figures text-xs text-muted-foreground tabular-nums"
-                >{link.year}</span
-              >
-            {/if}
           </li>
         {/each}
       </ul>
