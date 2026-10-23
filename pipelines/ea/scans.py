@@ -578,7 +578,7 @@ def cells(
                 if SUBTOTAL.match(slug(row["label"])):
                     continue
                 texts = row["values"]
-                if header and slug(header[0]["label"]) and texts and re.fullmatch(r"[A-Za-z]", texts[0].strip()):
+                if header and slug(header[0]["label"]) and texts and re.fullmatch(r"[A-WYZa-wyz]", texts[0].strip()):
                     texts = [*texts[1:], ""] if len(texts) == len(header) else texts[1:]
                 if len(texts) != len(header):
                     errors[number] = f"{custom}: row {row['label']!r} has {len(texts)} cells for {len(header)}"
