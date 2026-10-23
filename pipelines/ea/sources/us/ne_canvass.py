@@ -77,7 +77,26 @@ def parse() -> None:
             tables.clear()
             header.clear()
 
-        for line in lines[start:end]:
+        block: list[str] = []
+        moved = ""
+        for index in range(start, end):
+            line = lines[index]
+            found = list(CELL.finditer(line))
+            if (
+                found
+                and re.search(r"\bCounty\b", line)
+                and not any(c[1] == "Total" for c in found)
+                and re.match(r"\s*Total\s+\d", lines[index + 1])
+            ):
+                moved = " " * found[0].start() + line[found[0].start() :]
+                line = line[: found[0].start()]
+                block.append(line)
+                continue
+            block.append(line)
+            if moved:
+                block.append(moved)
+                moved = ""
+        for line in block:
             for joined, split in SPLITS.items():
                 line = line.replace(joined, split)
             if re.match(r"\s+President of the United States\s*$", line):
@@ -234,7 +253,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Nebraska's 2018 federal primaries by county",
+            summary="Nebraska's 2018 House 3 Democratic and Senate Libertarian primaries by county",
             polity="US-NE",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -252,7 +271,13 @@ def emit() -> Path:
         medsl.attach(
             cs,
             conn,
-            pl.read_parquet(PARSED / "counties.parquet").filter(pl.col("day") == date(2018, 5, 15)),
+            pl.read_parquet(PARSED / "counties.parquet").filter(
+                (pl.col("day") == date(2018, 5, 15))
+                & (
+                    (pl.col("chamber") == "senate:libertarian")
+                    | ((pl.col("chamber") == "house:democratic") & (pl.col("district") == 3))
+                )
+            ),
             {"NE": source},
             strict=True,
         )
