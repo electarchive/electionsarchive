@@ -111,7 +111,7 @@
     </p>
     <Bar counts={row} goal={row.goal} class={isLead ? "block-4" : "block-3"} />
     <ul class="grid gap-x-6 gap-y-2 text-sm sm:grid-cols-2">
-      {#each REASONS[row.goal] as reason (reason)}
+      {#each REASONS[row.goal].filter((reason) => reason === "complete" || row[reason] > 0) as reason (reason)}
         {const definition = $derived(
           reason === "complete"
             ? {
@@ -288,8 +288,12 @@
                 class="mbs-0.5 shrink-0 text-muted-foreground transition-transform block-4 inline-4 group-open:rotate-90"
               />
               <span class="grid flex-1 gap-1 min-inline-0">
-                <span class="font-semibold">{TITLES[row.goal]()}</span>
-                <span class="text-sm text-muted-foreground tabular-nums">
+                <span class="font-semibold text-pretty max-inline-[70ch]"
+                  >{TITLES[row.goal]()}</span
+                >
+                <span
+                  class="text-sm text-muted-foreground tabular-nums group-open:hidden"
+                >
                   {(row.goal === "local"
                     ? m.coverage_progress_local
                     : row.goal === "turnout"
@@ -302,6 +306,11 @@
                     percent: percent(row.complete / Math.max(1, row.total), 1),
                   })}
                 </span>
+                <Bar
+                  counts={row}
+                  goal={row.goal}
+                  class="block-1.5 max-inline-80 group-open:hidden"
+                />
               </span>
             </summary>
             <div class="px-3.5 ps-9.5 pbe-4">
@@ -312,7 +321,9 @@
       </section>
     {/if}
     <section aria-labelledby="coverage-where" class="grid gap-px bg-border">
-      <div class="grid gap-2 bg-card px-3.5 pbs-4 pbe-3">
+      <div
+        class="grid grid-cols-[minmax(0,1fr)] gap-2 bg-card px-3.5 pbs-4 pbe-3"
+      >
         <h2 id="coverage-where" class="text-lg font-bold">
           {m.coverage_where()}
         </h2>
@@ -321,14 +332,14 @@
           <div
             role="group"
             aria-label={m.coverage_goal_tabs()}
-            class="flex flex-wrap rounded-sm border border-border p-0.5 text-sm inline-fit"
+            class="flex overflow-x-auto rounded-sm border border-border p-0.5 text-sm max-inline-full min-inline-0"
           >
             {#each GOALS as option (option)}
               <button
                 type="button"
                 aria-pressed={goal === option}
                 class={cn(
-                  "rounded-[3px] px-2 block-7 focus-visible:outline-2 focus-visible:outline-ring",
+                  "shrink-0 rounded-[3px] px-2 whitespace-nowrap block-7 focus-visible:outline-2 focus-visible:-outline-offset-2 focus-visible:outline-ring",
                   {
                     "bg-foreground text-background": goal === option,
                     "text-muted-foreground hover:text-foreground":
@@ -370,7 +381,7 @@
       <div role="treegrid" aria-label={m.coverage_where()} class="grid gap-px">
         <div
           role="row"
-          class="grid grid-cols-[minmax(0,1fr)_3.5rem_7rem] items-end gap-x-3 bg-card px-3.5 py-1.5 text-xs/tight font-bold sm:grid-cols-[minmax(0,1fr)_5rem_16rem]"
+          class="grid grid-cols-[minmax(0,1fr)_3.5rem_7rem] items-end gap-x-3 bg-card px-3.5 py-1.5 text-xs/tight font-bold sm:grid-cols-[minmax(0,1fr)_5rem_16rem] lg:grid-cols-[minmax(0,30rem)_5rem_16rem]"
         >
           <span role="columnheader">{m.coverage_column_name()}</span>
           <span role="columnheader" class="text-end"

@@ -374,7 +374,7 @@
                 : null,
           )}
           <li
-            class="grid grid-cols-[minmax(0,1fr)] items-center gap-x-4 gap-y-0.5 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,1.4fr)]"
+            class="grid grid-cols-[minmax(0,1fr)_minmax(0,45%)] items-center gap-x-4 gap-y-0.5 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,1.4fr)]"
             style:--party={tint(member.party)}
           >
             <span class="flex items-center gap-1.5 truncate">
@@ -388,7 +388,7 @@
               >
             </span>
             <span
-              class="flex items-baseline gap-1.5 truncate text-muted-foreground max-sm:ps-4"
+              class="flex items-baseline gap-1.5 truncate text-muted-foreground max-sm:justify-end"
             >
               {#if member.path == null}
                 <span class="truncate"
@@ -412,9 +412,10 @@
             </span>
             {#if start != null}
               <span
-                class={cn("flex items-center gap-3 self-stretch", {
-                  "max-sm:hidden": change == null,
-                })}
+                class={cn(
+                  "flex items-center gap-3 self-stretch max-sm:col-span-2",
+                  { "max-sm:hidden": change == null },
+                )}
               >
                 <span
                   class="relative -my-1.5 flex-1 self-stretch max-sm:hidden"

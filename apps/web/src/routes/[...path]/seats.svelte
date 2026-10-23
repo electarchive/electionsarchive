@@ -500,7 +500,7 @@
 </script>
 
 <section
-  class="relative col-span-12 grid content-start gap-3 bg-card p-3.5 lg:col-span-4"
+  class="relative col-span-12 grid grid-cols-[minmax(0,1fr)] content-start gap-3 bg-card p-3.5 lg:col-span-4"
   aria-labelledby="{uid}-title"
   data-export
 >
@@ -792,7 +792,7 @@
       <span class="text-end inline-16">{m.seats_col_share()}</span>
     </div>
   {/if}
-  <ul class="grid gap-px text-sm/tight">
+  <ul class="grid grid-cols-[minmax(0,1fr)] gap-px text-sm/tight">
     {#each ordered.toSorted((a, b) => b.seats - a.seats) as party (party.key)}
       {const id = $derived(
         /^(?:party:)?([0-9a-f]{8}-[0-9a-f-]{27})$/.exec(party.key)?.[1] ?? null,

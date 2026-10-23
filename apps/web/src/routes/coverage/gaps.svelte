@@ -77,7 +77,7 @@
     role="row"
     aria-level={depth + 1}
     aria-expanded={depth < 2 ? isOpen : undefined}
-    class="grid grid-cols-[minmax(0,1fr)_3.5rem_7rem] items-center gap-x-3 bg-card px-3.5 py-1.5 text-sm tabular-nums sm:grid-cols-[minmax(0,1fr)_5rem_16rem]"
+    class="grid grid-cols-[minmax(0,1fr)_3.5rem_7rem] items-center gap-x-3 bg-card px-3.5 py-1.5 text-sm tabular-nums sm:grid-cols-[minmax(0,1fr)_5rem_16rem] lg:grid-cols-[minmax(0,30rem)_5rem_16rem]"
   >
     <span
       role="gridcell"
