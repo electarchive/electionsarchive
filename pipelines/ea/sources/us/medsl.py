@@ -965,12 +965,15 @@ def attach(
             if pool in cs.minted:
                 cs.add("contest_option", id=pool, contest_id=contest, kind="write_in", ballot_label="Write-ins")
             picked = {candidate: str(pool) if option == "pool" else option for candidate, option in picked.items()}
+        inherited = False
         if previous is not None:
             columns = ("id", "election_id", "contest_id", "stage", "kind", "source_id", "is_default", "completeness")
             row = conn.execute(f"select {', '.join(columns)} from result_set where id = %s", [previous]).fetchone()
             if row is None:
                 raise ValueError(f"{key}: no result set to supersede")
-            cs.add("result_set", **dict(zip(columns, row, strict=True)), status="superseded")
+            prior = dict(zip(columns, row, strict=True))
+            inherited = bool(prior["is_default"])
+            cs.add("result_set", **(prior | {"is_default": False}), status="superseded")
         cs.add(
             "result_set",
             id=result_set,
@@ -980,7 +983,7 @@ def attach(
             kind="counted",
             status="active",
             source_id=sources[lines["source"][0]],
-            is_default=key in declared,
+            is_default=key in declared or inherited,
             completeness=1
             if authoritative is not None
             else round(

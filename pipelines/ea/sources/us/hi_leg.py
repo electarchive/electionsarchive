@@ -185,6 +185,15 @@ def emit() -> Path:
             conn,
             frame,
             {"HI": source},
+            redone=frozenset(
+                f"{day}:HI:{chamber}"
+                for day, chamber in frame.filter(
+                    pl.col("year").is_between(2002, 2010), ~pl.col("code").str.contains(r":\d\d-\d\d$")
+                )
+                .select("day", "chamber")
+                .unique()
+                .iter_rows()
+            ),
             grain="precinct",
             strict=True,
             authoritative="Source: the Office of Elections' precinct detail reports.",
