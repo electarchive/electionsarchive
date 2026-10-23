@@ -20,6 +20,8 @@
       end: string | null;
       total: number;
       size: number | null;
+      apportioned: number | null;
+      seceded: number;
       isSeated: boolean;
       parties: Array<{ party: string | null; seats: number }>;
       election: { name: string; path: string | null; date: string } | null;
@@ -76,7 +78,12 @@
     PAD.side +
     ((value - low) / Math.max(high - low, 1)) * (width - 2 * PAD.side);
   const peak = $derived(
-    Math.max(1, ...terms.map((term) => Math.max(term.total, term.size ?? 0))),
+    Math.max(
+      1,
+      ...terms.map((term) =>
+        Math.max(term.total + term.seceded, term.size ?? 0),
+      ),
+    ),
   );
   const order = $derived.by(() => {
     const held = new Map(
@@ -105,11 +112,13 @@
     terms.map((term, index) => {
       const x0 = sx(Date.parse(term.start));
       const x1 = sx(Date.parse(term.end ?? today));
+      const full =
+        term.seceded > 0 ? (term.apportioned ?? term.size) : term.size;
       const empty =
-        term.isSeated && term.size != null
-          ? Math.max(0, term.size - term.total)
+        term.isSeated && full != null
+          ? Math.max(0, full - term.total - term.seceded)
           : 0;
-      const whole = Math.max(term.total + empty, 1);
+      const whole = Math.max(term.total + term.seceded + empty, 1);
       const unit = isShare ? inner / whole : inner / peak;
       const seats = new Map(
         term.parties.map((entry) => [entry.party, entry.seats]),
@@ -136,9 +145,14 @@
         x1,
         stack: new Map(layers),
         empty,
-        vacant: {
+        whole,
+        seceded: {
           y0: PAD.top + inner - below * unit,
-          y1: PAD.top + inner - (below + empty) * unit,
+          y1: PAD.top + inner - (below + term.seceded) * unit,
+        },
+        vacant: {
+          y0: PAD.top + inner - (below + term.seceded) * unit,
+          y1: PAD.top + inner - (below + term.seceded + empty) * unit,
         },
         line:
           PAD.top +
@@ -394,6 +408,17 @@
             opacity="0.55"
           />
         {/each}
+        {#each columns.filter((column) => column.term.seceded > 0) as column (column.index)}
+          <rect
+            x={column.x0}
+            y={column.seceded.y1}
+            width={Math.max(column.x1 - column.x0, 0.5)}
+            height={column.seceded.y0 - column.seceded.y1}
+            class="fill-muted stroke-muted-foreground"
+            stroke-width="0.75"
+            stroke-dasharray="3 2"
+          />
+        {/each}
         {#each bands as entry (entry.party ?? "none")}
           <path
             d={entry.d}
@@ -518,13 +543,27 @@
               <span class="font-figures tabular-nums"
                 ><span class="font-semibold">{count(entry.seats)}</span>
                 <span class="text-muted-foreground"
-                  >{percent(
-                    entry.seats / Math.max(lit.term.total + lit.empty, 1),
-                  )}</span
+                  >{percent(entry.seats / lit.whole)}</span
                 ></span
               >
             </li>
           {/each}
+          {#if lit.term.seceded > 0}
+            <li class="flex items-center justify-between gap-3">
+              <span class="flex items-center gap-1.5 truncate">
+                <span
+                  class="shrink-0 rounded-xs border border-dashed border-muted-foreground bg-muted block-2.5 inline-2.5"
+                ></span>
+                <span class="truncate">{m.seats_seceded()}</span>
+              </span>
+              <span class="font-figures tabular-nums"
+                ><span class="font-semibold">{count(lit.term.seceded)}</span>
+                <span class="text-muted-foreground"
+                  >{percent(lit.term.seceded / lit.whole)}</span
+                ></span
+              >
+            </li>
+          {/if}
           {#if lit.empty > 0}
             <li class="flex items-center justify-between gap-3">
               <span class="flex items-center gap-1.5 truncate">
@@ -536,13 +575,20 @@
               <span class="font-figures tabular-nums"
                 ><span class="font-semibold">{count(lit.empty)}</span>
                 <span class="text-muted-foreground"
-                  >{percent(lit.empty / (lit.term.total + lit.empty))}</span
+                  >{percent(lit.empty / lit.whole)}</span
                 ></span
               >
             </li>
           {/if}
         </ul>
-        {#if leader != null}
+        {#if lit.term.seceded > 0 && lit.term.size != null}
+          <span class="text-muted-foreground"
+            >{m.seats_official({
+              count: count(lit.term.size),
+              majority: count(Math.floor(lit.term.size / 2) + 1),
+            })}</span
+          >
+        {:else if leader != null}
           <span class="text-muted-foreground"
             >{m.record_seats({
               seats: count(leader.seats),
@@ -596,5 +642,13 @@
         {/if}
       </li>
     {/each}
+    {#if terms.some((term) => term.seceded > 0)}
+      <li class="flex items-center gap-1.5">
+        <span
+          class="rounded-xs border border-dashed border-muted-foreground bg-muted block-2.5 inline-2.5"
+        ></span>
+        <span class="text-muted-foreground">{m.seats_seceded()}</span>
+      </li>
+    {/if}
   </ul>
 </section>

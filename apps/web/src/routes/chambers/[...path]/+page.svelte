@@ -87,7 +87,7 @@
         (!members.data.isSeated ||
           ((member.from ?? "") <= on && (member.to == null || member.to > on))),
     );
-    return members.data.seats.length === 0
+    return members.data.apportionment.length === 0
       ? present
       : Map.groupBy(present, (member) => member.seat ?? member.person)
           .values()
@@ -101,10 +101,17 @@
           .toArray();
   });
   const open = $derived(
-    (members.data?.seats ?? []).filter(
-      (seat) => seat.from <= on && (seat.to == null || seat.to > on),
+    (members.data?.apportionment ?? []).filter(
+      (row) => row.from <= on && (row.to == null || row.to > on),
     ),
   );
+  const apportioned = $derived.by(() => {
+    let total = 0;
+    for (const row of open) {
+      total += row.seats;
+    }
+    return total;
+  });
   const isCounted = $derived(
     members.data?.isSeated === true && (open.length > 0 || on !== first),
   );
@@ -180,14 +187,18 @@
     return total;
   });
   const seceded = $derived.by(() => {
-    const taken = new Set(sitting.map((member) => member.seat));
-    return open.filter(
-      (seat) =>
-        !taken.has(seat.label) &&
-        seat.gaps.some(
+    const taken = Map.groupBy(sitting, (member) => member.region);
+    let total = 0;
+    for (const row of open) {
+      if (
+        row.gaps.some(
           (gap) => gap.from <= on && (gap.to == null || gap.to > on),
-        ),
-    ).length;
+        )
+      ) {
+        total += Math.max(0, row.seats - (taken.get(row.area)?.length ?? 0));
+      }
+    }
+    return total;
   });
   const change = $derived.by(() => {
     if (previous == null) {
@@ -475,12 +486,12 @@
           place={body.name}
           link={null}
           size={open.length > 0
-            ? open.length
+            ? apportioned
             : term.size != null && held <= term.size
               ? term.size
               : null}
           vacant={open.length > 0
-            ? Math.max(0, open.length - held - seceded)
+            ? Math.max(0, apportioned - held - seceded)
             : term.size == null || !term.isSeated
               ? 0
               : Math.max(0, term.size - held)}

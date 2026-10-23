@@ -10176,6 +10176,8 @@ export const bodies = {
         makeup: v.array(
           v.object({
             start: v.string(),
+            apportioned: v.nullable(v.number()),
+            seceded: v.number(),
             parties: v.array(
               v.object({
                 party: v.nullable(v.string()),
@@ -10288,6 +10290,25 @@ export const bodies = {
       ]);
       const home = slugs.get(body.polity) ?? null;
       const held = [...new Set(makeup.rows.flatMap((row) => row.party ?? []))];
+      const starts = [...new Set(makeup.rows.map((row) => row.start))];
+      const apportioned = await db.execute<{
+        start: string;
+        seats: number;
+        seceded: number;
+      }>(sql`
+        select s.start::text as start, sum(a.seats)::int as seats,
+          coalesce(sum(greatest(0, a.seats - (
+            select count(distinct t.seat_id) from tenure t join seat st on st.id = t.seat_id
+            where t.body_id = a.body_id and st.voting and st.apportioned_area_id = a.area_id
+              and t.from_date <= s.start and coalesce(t.to_date, 'infinity'::date) > s.start
+          ))) filter (where exists (
+            select from representation_gap g where g.body_id = a.body_id and g.area_id = a.area_id and g.valid @> s.start
+          )), 0)::int as seceded
+        from unnest(${sql.param(starts)}::date[]) s(start)
+        join body_apportionment a on a.body_id = ${input.id}::uuid and a.valid @> s.start
+        group by s.start
+      `);
+      const entitled = new Map(apportioned.rows.map((row) => [row.start, row]));
       const last = await db.execute<{ id: string; date: string }>(sql`
         select c.id, e.date_from::text as date from contest c join election e on e.id = c.election_id
         where c.body_id = ${input.id}::uuid and c.allocation_parent_id is null
@@ -10339,6 +10360,8 @@ export const bodies = {
           .entries()
           .map(([start, rows]) => ({
             start,
+            apportioned: entitled.get(start)?.seats ?? null,
+            seceded: entitled.get(start)?.seceded ?? 0,
             parties: rows.map((row) => ({
               party: row.party,
               seats: row.seats,
@@ -10384,6 +10407,7 @@ export const bodies = {
             place: v.nullable(v.string()),
             path: v.nullable(v.string()),
             seat: v.nullable(v.string()),
+            region: v.nullable(v.string()),
             from: v.nullable(v.string()),
             to: v.nullable(v.string()),
             acquired: v.nullable(v.string()),
@@ -10391,9 +10415,10 @@ export const bodies = {
             isVoting: v.boolean(),
           }),
         ),
-        seats: v.array(
+        apportionment: v.array(
           v.object({
-            label: v.string(),
+            area: v.string(),
+            seats: v.number(),
             from: v.string(),
             to: v.nullable(v.string()),
             gaps: v.array(
@@ -10441,6 +10466,7 @@ export const bodies = {
               place: string | null;
               contest: string | null;
               seat: string | null;
+              region: string | null;
               from: string | null;
               to: string | null;
               acquired: string;
@@ -10450,7 +10476,7 @@ export const bodies = {
               select t.person_id as person, t.from_date::text as from, t.to_date::text as to,
                 coalesce(s.voting, true) as "isVoting",
                 t.acquired_via::text as acquired, t.ended_via::text as ended, t.contest_id as contest,
-                s.label as seat, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id) as place,
+                s.label as seat, s.apportioned_area_id as region, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id) as place,
                 coalesce(
                   (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
                     left join entity_merge pm on pm.entity_id = a.party_id
@@ -10515,6 +10541,7 @@ export const bodies = {
               ...row,
               left: null,
               seat: null,
+              region: null,
               from: null,
               to: null,
               acquired: null,
@@ -10528,7 +10555,7 @@ export const bodies = {
             .filter((id) => id != null),
         ),
       ];
-      const [labels, slugs, colors, positions, branches, seats] =
+      const [labels, slugs, colors, positions, branches, apportionment] =
         await Promise.all([
           names([
             ...new Set([
@@ -10551,21 +10578,21 @@ export const bodies = {
             order by a.party_id, lower(a.valid) desc nulls last
           `),
           db.execute<{
-            label: string;
+            area: string;
+            seats: number;
             from: string;
             to: string | null;
             gaps: Array<{ from: string; to: string | null }>;
           }>(sql`
-            select s.label, s.valid_from::text as from, s.valid_to::text as to,
+            select a.area_id as area, a.seats, a.valid_from::text as from, a.valid_to::text as to,
               coalesce(json_agg(json_build_object('from', g.valid_from::text, 'to', g.valid_to::text)
                 order by g.valid_from) filter (where g.valid_from is not null), '[]') as gaps
-            from seat s
-            left join representation_gap g on g.body_id = s.body_id and g.area_id = s.district_area_id
+            from body_apportionment a
+            left join representation_gap g on g.body_id = a.body_id and g.area_id = a.area_id
               and g.valid && daterange(${start ?? input.from}::date, ${end}::date)
-            where s.body_id = ${input.id}::uuid and s.voting and s.label is not null
-              and s.valid && daterange(${start ?? input.from}::date, ${end}::date)
-              and not exists (select from seat x where x.body_id = s.body_id and x.voting and x.valid_from is null)
-            group by s.id
+            where a.body_id = ${input.id}::uuid and ${returned == null}
+              and a.valid && daterange(${start ?? input.from}::date, ${end}::date)
+            group by a.area_id, a.seats, a.valid_from, a.valid_to
           `),
         ]);
       const lean = new Map(
@@ -10587,13 +10614,14 @@ export const bodies = {
             row.place == null ? null : (labels.full.get(row.place) ?? null),
           path: row.contest == null ? null : (slugs.get(row.contest) ?? null),
           seat: row.seat,
+          region: row.region,
           from: row.from,
           to: row.to,
           acquired: row.acquired,
           ended: row.ended,
           isVoting: row.isVoting,
         })),
-        seats: seats.rows,
+        apportionment: apportionment.rows,
         parties: parties.map((id) => ({
           ...(colors.get(id) ?? { id, label: "", short: null, color: null }),
           lean: lean.get(id) ?? null,
