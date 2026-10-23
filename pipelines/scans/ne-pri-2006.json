@@ -1,0 +1,536 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2006 Primary Election Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/2006%20Primary.pdf"
+ },
+ "raw_source": "us.ne_pri_2008",
+ "contests": {
+  "sr": {
+   "year": 2006,
+   "chamber": "senate:republican",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "sd": {
+   "year": 2006,
+   "chamber": "senate:democratic",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "h1r": {
+   "year": 2006,
+   "chamber": "house:republican",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": 1
+  },
+  "h1d": {
+   "year": 2006,
+   "chamber": "house:democratic",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": 1
+  },
+  "h2r": {
+   "year": 2006,
+   "chamber": "house:republican",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": 2
+  },
+  "h2d": {
+   "year": 2006,
+   "chamber": "house:democratic",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": 2
+  },
+  "h3r": {
+   "year": 2006,
+   "chamber": "house:republican",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": 3
+  },
+  "h3d": {
+   "year": 2006,
+   "chamber": "house:democratic",
+   "day": "2006-05-09",
+   "special": false,
+   "state": "NE",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 11,
+   "id": "sr1",
+   "orientation": "counties_down",
+   "crop": [
+    0.08,
+    0.1,
+    0.885,
+    0.885
+   ],
+   "columns": [
+    {
+     "label": "David J. Kramer Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "David J. Kramer Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "David J. Kramer Total",
+     "contest": "sr",
+     "candidate": "David J. Kramer"
+    },
+    {
+     "label": "Don Stenberg Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Don Stenberg Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Don Stenberg Total",
+     "contest": "sr",
+     "candidate": "Don Stenberg"
+    },
+    {
+     "label": "Pete Ricketts Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Pete Ricketts Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Pete Ricketts Total",
+     "contest": "sr",
+     "candidate": "Pete Ricketts"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 12,
+   "id": "sr2",
+   "orientation": "counties_down",
+   "crop": [
+    0.08,
+    0.085,
+    0.885,
+    0.9
+   ],
+   "columns": [
+    {
+     "label": "David J. Kramer Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "David J. Kramer Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "David J. Kramer Total",
+     "contest": "sr",
+     "candidate": "David J. Kramer"
+    },
+    {
+     "label": "Don Stenberg Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Don Stenberg Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Don Stenberg Total",
+     "contest": "sr",
+     "candidate": "Don Stenberg"
+    },
+    {
+     "label": "Pete Ricketts Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Pete Ricketts Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Pete Ricketts Total",
+     "contest": "sr",
+     "candidate": "Pete Ricketts"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 13,
+   "id": "sd1",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.085,
+    0.47,
+    0.91
+   ],
+   "columns": [
+    {
+     "label": "Ben Nelson Democratic voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ben Nelson Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ben Nelson Total",
+     "contest": "sd",
+     "candidate": "Ben Nelson"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 13,
+   "id": "sd2",
+   "orientation": "counties_down",
+   "crop": [
+    0.52,
+    0.085,
+    0.89,
+    0.87
+   ],
+   "columns": [
+    {
+     "label": "Ben Nelson Democratic voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ben Nelson Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Ben Nelson Total",
+     "contest": "sd",
+     "candidate": "Ben Nelson"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 14,
+   "id": "h1r",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.19,
+    0.55,
+    0.69
+   ],
+   "columns": [
+    {
+     "label": "Jeff Fortenberry Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jeff Fortenberry Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jeff Fortenberry Total",
+     "contest": "h1r",
+     "candidate": "Jeff Fortenberry"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 15,
+   "id": "h1d",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.105,
+    0.89,
+    0.61
+   ],
+   "columns": [
+    {
+     "label": "Maxine B. Moul Democratic voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Maxine B. Moul Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Maxine B. Moul Total",
+     "contest": "h1d",
+     "candidate": "Maxine B. Moul"
+    },
+    {
+     "label": "James Wilson Democratic voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "James Wilson Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "James Wilson Total",
+     "contest": "h1d",
+     "candidate": "James Wilson"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 16,
+   "id": "h2r",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.105,
+    0.89,
+    0.225
+   ],
+   "columns": [
+    {
+     "label": "Lee Terry Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Lee Terry Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Lee Terry Total",
+     "contest": "h2r",
+     "candidate": "Lee Terry"
+    },
+    {
+     "label": "Steven Laird Republican voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Laird Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Laird Total",
+     "contest": "h2r",
+     "candidate": "Steven Laird"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 16,
+   "id": "h2d",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.255,
+    0.55,
+    0.375
+   ],
+   "columns": [
+    {
+     "label": "Jim Esch Democratic voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jim Esch Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jim Esch Total",
+     "contest": "h2d",
+     "candidate": "Jim Esch"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 19,
+   "id": "h3r1",
+   "orientation": "counties_down",
+   "crop": [
+    0.08,
+    0.125,
+    0.5,
+    0.77
+   ],
+   "columns": [
+    {
+     "label": "Douglas Polk",
+     "contest": "h3r",
+     "candidate": "Douglas Polk"
+    },
+    {
+     "label": "John Hanson",
+     "contest": "h3r",
+     "candidate": "John Hanson"
+    },
+    {
+     "label": "Adrian Smith",
+     "contest": "h3r",
+     "candidate": "Adrian Smith"
+    },
+    {
+     "label": "Jay Vavricek",
+     "contest": "h3r",
+     "candidate": "Jay Vavricek"
+    },
+    {
+     "label": "David Harris",
+     "contest": "h3r",
+     "candidate": "David Harris"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 19,
+   "id": "h3r2",
+   "orientation": "counties_down",
+   "crop": [
+    0.5,
+    0.125,
+    0.885,
+    0.76
+   ],
+   "columns": [
+    {
+     "label": "Douglas Polk",
+     "contest": "h3r",
+     "candidate": "Douglas Polk"
+    },
+    {
+     "label": "John Hanson",
+     "contest": "h3r",
+     "candidate": "John Hanson"
+    },
+    {
+     "label": "Adrian Smith",
+     "contest": "h3r",
+     "candidate": "Adrian Smith"
+    },
+    {
+     "label": "Jay Vavricek",
+     "contest": "h3r",
+     "candidate": "Jay Vavricek"
+    },
+    {
+     "label": "David Harris",
+     "contest": "h3r",
+     "candidate": "David Harris"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 20,
+   "id": "h3d1",
+   "orientation": "counties_down",
+   "crop": [
+    0.09,
+    0.105,
+    0.48,
+    0.8
+   ],
+   "columns": [
+    {
+     "label": "Scott Kleeb Democratic voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Scott Kleeb Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Scott Kleeb Total",
+     "contest": "h3d",
+     "candidate": "Scott Kleeb"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  },
+  {
+   "page": 20,
+   "id": "h3d2",
+   "orientation": "counties_down",
+   "crop": [
+    0.52,
+    0.105,
+    0.9,
+    0.78
+   ],
+   "columns": [
+    {
+     "label": "Scott Kleeb Democratic voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Scott Kleeb Nonpartisan voters",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Scott Kleeb Total",
+     "contest": "h3d",
+     "candidate": "Scott Kleeb"
+    }
+   ],
+   "hint": "Each figure is a vote count. A leading asterisk on a figure is a footnote mark: read the digits that follow it. Douglas County has no separate nonpartisan figure."
+  }
+ ]
+}
