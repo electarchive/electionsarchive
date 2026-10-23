@@ -33,12 +33,16 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '54%%'"""
             ).fetchall()
         }
-        seats: dict[tuple[date, int], list[str]] = {}
-        for (value,) in conn.execute(
-            "select value from external_id where scheme = 'us.contest' and value ~ '^20(08|10|12)-11-..:WV:senate:[0-9]+:[0-9]:g$'"
+        seats: dict[date, dict[tuple[str, str], set[str]]] = {}
+        for value, label in conn.execute(
+            """select x.value, o.ballot_label from external_id x
+               left join contest_option o on o.contest_id = x.entity_id and o.kind = 'candidate'
+               where x.scheme = 'us.contest' and x.value ~ '^20(08|10|12)-11-..:WV:senate:[0-9]+:[0-9]:g$'"""
         ).fetchall():
             held, _, _, district, seat, _ = value.split(":")
-            seats.setdefault((date.fromisoformat(held), int(district)), []).append(seat)
+            seats.setdefault(date.fromisoformat(held), {}).setdefault((district, seat), set()).update(
+                [re.sub(r",? (Jr|Sr|II|III)\.?$", "", label).split()[-1].upper()] if label else []
+            )
     frames = []
     for election, day in ELECTIONS.items():
         frame = pl.read_csv(raw.cached(SOURCE, URL.format(election)).path, infer_schema=False)
@@ -56,10 +60,15 @@ def parse() -> None:
         "day", "OfficeCode", "District", "CountyName", "Name", "Votes"
     ).iter_rows():
         if office == "KA":
-            found = seats.get((day, int(district)), [])
+            found = {
+                key: surnames for key, surnames in seats.get(day, {}).items() if key[0] == str(int(district))
+            } or seats.get(day, {})
+            if len(found) > 1:
+                surname = re.sub(r",? (Jr|Sr|II|III)\.?$", "", re.sub(r"\s+", " ", name).strip()).split()[-1].upper()
+                found = {key: surnames for key, surnames in found.items() if surname in surnames}
             if len(found) != 1:
                 continue
-            chamber = f"senate:{int(district)}:{found[0]}:g"
+            chamber = ":".join(["senate", *next(iter(found)), "g"])
         else:
             chamber = f"house-of-delegates:{int(district)}:g"
         rows.append(

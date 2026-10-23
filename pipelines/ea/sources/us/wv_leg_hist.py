@@ -43,12 +43,16 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '54%%'"""
             ).fetchall()
         }
-        seats: dict[tuple[date, int], list[str]] = {}
-        for (value,) in conn.execute(
-            "select value from external_id where scheme = 'us.contest' and value ~ '^200[0246]-11-..:WV:senate:[0-9]+:[0-9]:g$'"
+        seats: dict[date, dict[tuple[str, str], set[str]]] = {}
+        for value, label in conn.execute(
+            """select x.value, o.ballot_label from external_id x
+               left join contest_option o on o.contest_id = x.entity_id and o.kind = 'candidate'
+               where x.scheme = 'us.contest' and x.value ~ '^200[0246]-11-..:WV:senate:[0-9]+:[0-9]:g$'"""
         ).fetchall():
             held, _, _, district, seat, _ = value.split(":")
-            seats.setdefault((date.fromisoformat(held), int(district)), []).append(seat)
+            seats.setdefault(date.fromisoformat(held), {}).setdefault((district, seat), set()).update(
+                [re.sub(r",? (Jr|Sr|II|III)\.?$", "", label).split()[-1].upper()] if label else []
+            )
     rows = []
     for year, day in DAYS.items():
         for office in FILES:
@@ -95,8 +99,20 @@ def parse() -> None:
                         sum(votes[k] for _, votes in counted if len(votes) == len(totals)) for k in range(len(totals))
                     ]
                     if office == "senate":
-                        found_seats = seats.get((day, district), [])
-                        chamber = f"senate:{district}:{found_seats[0]}:g" if len(found_seats) == 1 else None
+                        found_seats = {
+                            key: surnames for key, surnames in seats.get(day, {}).items() if key[0] == str(district)
+                        } or seats.get(day, {})
+                        if len(found_seats) > 1:
+                            found_seats = {
+                                key: surnames
+                                for key, surnames in found_seats.items()
+                                if any(
+                                    re.sub(r",? (Jr|Sr|II|III)\.?$", "", " ".join(name)).split()[-1].upper() in surnames
+                                    for name in names
+                                    if name
+                                )
+                            }
+                        chamber = ":".join(["senate", *next(iter(found_seats)), "g"]) if len(found_seats) == 1 else None
                     else:
                         chamber = f"house-of-delegates:{district}:g"
                     if (
