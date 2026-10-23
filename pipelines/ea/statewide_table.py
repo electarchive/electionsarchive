@@ -73,6 +73,15 @@ def rebuild(conn: Connection) -> int:
             years = {year for year in years if year <= max(recent)}
         if st == "CO" and key in ("member-of-the-state-board-of-education", "regent-of-the-university-of-colorado"):
             years &= recent
+        if st == "ND" and key in (
+            "attorney-general",
+            "secretary-of-state",
+            "commissioner-of-agriculture",
+            "tax-commissioner",
+        ):
+            years.discard(2002)
+        if st == "IN" and key == "superintendent-of-public-instruction":
+            years = {year for year in years if year <= 2016}
         if st == "GA" and key == "public-service-commissioner":
             years = years - {2022, 2024} | {2025}
         kind = next((name for pattern, name in CLASSES if re.search(pattern, key)), "other")
