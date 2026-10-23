@@ -1,0 +1,433 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1986",
+  "file": {
+    "url": "https://archive.org/download/officialvote1986illi/officialvote1986illi.pdf"
+  },
+  "contests": {
+    "attorney-general": {
+      "year": 1986,
+      "chamber": "attorney-general",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "secretary-of-state": {
+      "year": 1986,
+      "chamber": "secretary-of-state",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "comptroller": {
+      "year": 1986,
+      "chamber": "comptroller",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "treasurer": {
+      "year": 1986,
+      "chamber": "treasurer",
+      "day": "1986-11-04",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 21,
+      "id": "21-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Hartigan",
+          "contest": "attorney-general",
+          "candidate": "Neil Hartigan"
+        },
+        {
+          "label": "REP Carey",
+          "contest": "attorney-general",
+          "candidate": "Bernard Carey"
+        },
+        {
+          "label": "SOL Keith",
+          "contest": "attorney-general",
+          "candidate": "John Ray Keith"
+        },
+        {
+          "label": "LIB Clark",
+          "contest": "attorney-general",
+          "candidate": "Natalie Loder Clark"
+        },
+        {
+          "label": "SWP Dombeck",
+          "contest": "attorney-general",
+          "candidate": "Scott Dombeck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.062,
+        0.193,
+        0.93,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ATTORNEY GENERAL \u2014 NOVEMBER 4, 1986'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.197
+      ]
+    },
+    {
+      "page": 22,
+      "id": "22-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Hartigan",
+          "contest": "attorney-general",
+          "candidate": "Neil Hartigan"
+        },
+        {
+          "label": "REP Carey",
+          "contest": "attorney-general",
+          "candidate": "Bernard Carey"
+        },
+        {
+          "label": "SOL Keith",
+          "contest": "attorney-general",
+          "candidate": "John Ray Keith"
+        },
+        {
+          "label": "LIB Clark",
+          "contest": "attorney-general",
+          "candidate": "Natalie Loder Clark"
+        },
+        {
+          "label": "SWP Dombeck",
+          "contest": "attorney-general",
+          "candidate": "Scott Dombeck"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.178,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'ATTORNEY GENERAL \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0742
+      ]
+    },
+    {
+      "page": 23,
+      "id": "23-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP Edgar",
+          "contest": "secretary-of-state",
+          "candidate": "Jim Edgar"
+        },
+        {
+          "label": "SOL Spirgel",
+          "contest": "secretary-of-state",
+          "candidate": "Jane N. Spirgel"
+        },
+        {
+          "label": "DEM Hart",
+          "contest": "secretary-of-state",
+          "candidate": "Janice A. Hart"
+        },
+        {
+          "label": "LIB Givot",
+          "contest": "secretary-of-state",
+          "candidate": "Steven L. Givot"
+        },
+        {
+          "label": "SWP Harkness",
+          "contest": "secretary-of-state",
+          "candidate": "Holly Harkness"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.196,
+        0.933,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SECRETARY OF STATE \u2014 NOVEMBER 4, 1986'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.4851
+      ]
+    },
+    {
+      "page": 24,
+      "id": "24-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "REP Edgar",
+          "contest": "secretary-of-state",
+          "candidate": "Jim Edgar"
+        },
+        {
+          "label": "SOL Spirgel",
+          "contest": "secretary-of-state",
+          "candidate": "Jane N. Spirgel"
+        },
+        {
+          "label": "DEM Hart",
+          "contest": "secretary-of-state",
+          "candidate": "Janice A. Hart"
+        },
+        {
+          "label": "LIB Givot",
+          "contest": "secretary-of-state",
+          "candidate": "Steven L. Givot"
+        },
+        {
+          "label": "SWP Harkness",
+          "contest": "secretary-of-state",
+          "candidate": "Holly Harkness"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.067,
+        0.188,
+        0.918,
+        1.0
+      ],
+      "hint": "Read only the table headed 'SECRETARY OF STATE \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0702
+      ]
+    },
+    {
+      "page": 25,
+      "id": "25-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Burris",
+          "contest": "comptroller",
+          "candidate": "Roland W. Burris"
+        },
+        {
+          "label": "REP Geo-Karis",
+          "contest": "comptroller",
+          "candidate": "Adeline Jay Geo-Karis"
+        },
+        {
+          "label": "SOL Scott",
+          "contest": "comptroller",
+          "candidate": "A. Patricia Scott"
+        },
+        {
+          "label": "LIB Morris",
+          "contest": "comptroller",
+          "candidate": "Donald Morris"
+        },
+        {
+          "label": "SWP Miles",
+          "contest": "comptroller",
+          "candidate": "Jim Miles"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.194,
+        0.924,
+        1.0
+      ],
+      "hint": "Read only the table headed 'COMPTROLLER \u2014 NOVEMBER 4, 1986'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1861
+      ]
+    },
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Burris",
+          "contest": "comptroller",
+          "candidate": "Roland W. Burris"
+        },
+        {
+          "label": "REP Geo-Karis",
+          "contest": "comptroller",
+          "candidate": "Adeline Jay Geo-Karis"
+        },
+        {
+          "label": "SOL Scott",
+          "contest": "comptroller",
+          "candidate": "A. Patricia Scott"
+        },
+        {
+          "label": "LIB Morris",
+          "contest": "comptroller",
+          "candidate": "Donald Morris"
+        },
+        {
+          "label": "SWP Miles",
+          "contest": "comptroller",
+          "candidate": "Jim Miles"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.15,
+        0.92,
+        1.0
+      ],
+      "hint": "Read only the table headed 'COMPTROLLER \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.0565
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Cosentino",
+          "contest": "treasurer",
+          "candidate": "Jerry Cosentino"
+        },
+        {
+          "label": "REP Houston",
+          "contest": "treasurer",
+          "candidate": "Mike Houston"
+        },
+        {
+          "label": "SOL Skedd",
+          "contest": "treasurer",
+          "candidate": "William E. Skedd"
+        },
+        {
+          "label": "LIB Marsh",
+          "contest": "treasurer",
+          "candidate": "Jay D. Marsh"
+        },
+        {
+          "label": "SWP Robbins",
+          "contest": "treasurer",
+          "candidate": "Lucille Robbins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.185,
+        0.922,
+        1.0
+      ],
+      "hint": "Read only the table headed 'TREASURER \u2014 NOVEMBER 4, 1986'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1877
+      ]
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "DEM Cosentino",
+          "contest": "treasurer",
+          "candidate": "Jerry Cosentino"
+        },
+        {
+          "label": "REP Houston",
+          "contest": "treasurer",
+          "candidate": "Mike Houston"
+        },
+        {
+          "label": "SOL Skedd",
+          "contest": "treasurer",
+          "candidate": "William E. Skedd"
+        },
+        {
+          "label": "LIB Marsh",
+          "contest": "treasurer",
+          "candidate": "Jay D. Marsh"
+        },
+        {
+          "label": "SWP Robbins",
+          "contest": "treasurer",
+          "candidate": "Lucille Robbins"
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.181,
+        0.931,
+        0.385
+      ],
+      "hint": "Read only the table headed 'TREASURER \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image."
+    }
+  ]
+}

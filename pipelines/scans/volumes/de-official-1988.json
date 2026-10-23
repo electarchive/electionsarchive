@@ -17,5 +17,6 @@
   "leaves": [
     4,
     5
-  ]
+  ],
+  "autorotate": true
 }

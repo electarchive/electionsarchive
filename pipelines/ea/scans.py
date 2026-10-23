@@ -81,6 +81,7 @@ class Manifest(TypedDict):
     raw_source: NotRequired[str]
     unit_codes: NotRequired[dict[str, str]]
     unit_scheme: NotRequired[Literal["town"]]
+    autorotate: NotRequired[bool]
 
 
 class Header(TypedDict):
@@ -268,9 +269,60 @@ def render(manifest: Manifest, spec: Page, dpi: int) -> Image.Image:
             image.load()
     else:
         image = Image.open(source.path).convert("L")
-    if "turn" in spec:
-        image = image.rotate(spec["turn"], expand=True)
+    turn = spec.get("turn")
+    if turn is None and manifest.get("autorotate"):
+        turn = orientation(manifest, spec["page"], image)
+    if turn:
+        image = image.rotate(turn, expand=True)
     return image
+
+
+@cache
+def county_words(polity: str) -> frozenset[str]:
+    with connect() as conn:
+        found = conn.execute(
+            """select n.text from reporting_unit u
+               join name n on n.entity_id = u.area_id
+               join polity p on p.id = u.polity_id
+               where u.scheme_code = 'us.county' and p.iso_code = %s""",
+            [polity],
+        ).fetchall()
+    return frozenset(
+        word
+        for (text,) in found
+        for word in re.sub(
+            r"[^a-z ]", "", re.sub(r"\s+(county|parish)\b.*$", "", text, flags=re.IGNORECASE).lower()
+        ).split()
+        if len(word) > 3
+    )
+
+
+TURNS: dict[tuple[str, int], int] = {}
+
+
+def orientation(manifest: Manifest, page: int, image: Image.Image) -> int:
+    key = (manifest["file"]["url"], page)
+    if key not in TURNS:
+        words = county_words(manifest["polity"])
+        small = image.copy()
+        small.thumbnail((1800, 1800))
+        counts: dict[int, int] = {}
+        with tempfile.TemporaryDirectory() as folder:
+            for turn in (0, 90, 180, 270):
+                small.rotate(turn, expand=True).save(f"{folder}/p.png")
+                found = subprocess.run(
+                    ["tesseract", f"{folder}/p.png", "-", "--psm", "6", "tsv"], capture_output=True, text=True
+                ).stdout
+                counts[turn] = sum(
+                    1
+                    for line in found.splitlines()[1:]
+                    if len(fields := line.split("\t")) == 12
+                    and fields[0] == "5"
+                    and re.sub(r"[^a-z]", "", fields[11].lower()) in words
+                )
+        best = max(counts, key=lambda turn: (counts[turn], turn == 0))
+        TURNS[key] = (best - 360 if best > 180 else best) if counts[best] >= 3 else 0
+    return TURNS[key]
 
 
 def framing(spec: Page, reader: str) -> tuple[list[float], int, int]:

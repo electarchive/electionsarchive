@@ -68,6 +68,7 @@ class Volume(TypedDict):
     offices: dict[str, str]
     leaves: list[int]
     create: NotRequired[bool]
+    autorotate: NotRequired[bool]
 
 
 def schema(offices: list[str]) -> dict[str, object]:
@@ -163,7 +164,15 @@ def instructions(volume: Volume) -> str:
 
 def requests(volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.Read]:
     model, effort, _, _ = scans.READERS[reader]
-    manifest = cast(scans.Manifest, {"file": volume["file"], "raw_source": volume["raw_source"]})
+    manifest = cast(
+        scans.Manifest,
+        {
+            "file": volume["file"],
+            "raw_source": volume["raw_source"],
+            "polity": volume["polity"],
+            "autorotate": volume.get("autorotate", False),
+        },
+    )
     text = instructions(volume)
     out: dict[str, scans.Read] = {}
     for leaf in leaves:
@@ -257,6 +266,11 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
     cache: dict[str, list[LayoutColumn]] = {}
     unmatched: dict[str, list[str]] = {}
     notes: list[str] = []
+    turns: dict[int, int] = {}
+    source = cast(
+        scans.Manifest,
+        {"file": volume["file"], "raw_source": volume["raw_source"], "polity": volume["polity"]},
+    )
     with connect() as conn:
         ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
         for leaf in volume["leaves"]:
@@ -336,9 +350,13 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 after = min((other["y0"] for other in beside if other["y0"] > table["y0"]), default=None)
                 top = table["y0"] if before is None else (before + table["y0"]) // 2
                 bottom = table["y1"] if after is None else (table["y1"] + after) // 2
+                if not table["concluded"] and after is None:
+                    bottom = 1000
                 top = max(0, top - (0 if table["continued"] else 4)) / 1000
                 bottom = min(1000, bottom + 4) / 1000
                 left, right = max(0, table["x0"] - 8) / 1000, min(1000, table["x1"] + 8) / 1000
+                if volume.get("autorotate") and leaf not in turns:
+                    turns[leaf] = scans.orientation(source, leaf, scans.render(source, {"page": leaf, "turn": 0}, 150))
                 section: scans.Page = {
                     "page": leaf,
                     "id": f"{leaf}-{index}",
@@ -347,6 +365,8 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                     "crop": [round(left, 4), round(top, 4), round(right, 4), round(bottom, 4)],
                     "hint": f"Read only the table headed {table['title']!r}; ignore any other table visible in the image.",
                 }
+                if turns.get(leaf):
+                    section["turn"] = turns[leaf]
                 count = max(1, ceil((bottom - top) / 0.45))
                 if count > 1 and table["header_y1"] > 0:
                     section["bands"] = count

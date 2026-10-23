@@ -81,6 +81,7 @@ class Volume(TypedDict):
     dpi: NotRequired[int]
     anchors: NotRequired[list[Anchor]]
     create: NotRequired[bool]
+    autorotate: NotRequired[bool]
 
 
 def offices(volume: Volume) -> dict[str, str]:
@@ -100,7 +101,15 @@ def number(text: str) -> int | None:
 
 def requests(name: str, volume: Volume, reader: str, leaves: list[int]) -> dict[str, scans.Read]:
     model, effort, _, _ = scans.READERS[reader]
-    manifest = cast(scans.Manifest, {"file": volume["file"], "raw_source": volume["raw_source"]})
+    manifest = cast(
+        scans.Manifest,
+        {
+            "file": volume["file"],
+            "raw_source": volume["raw_source"],
+            "polity": volume["polity"],
+            "autorotate": volume.get("autorotate", False),
+        },
+    )
     wanted = "; ".join(f"{key}: {text}" for key, text in offices(volume).items())
     text = (
         f"This page comes from {volume['title']}. List every table of statewide returns for these offices (office "
