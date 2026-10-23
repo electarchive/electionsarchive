@@ -885,7 +885,12 @@
             : (race.runoff.isWon
                 ? m.race_lede_runoff_won
                 : m.race_lede_runoff_led)({
-                party: race.runoff.label,
+                party:
+                  [leader, runner].some(
+                    (row) => row != null && named(row) === race.runoff?.label,
+                  ) && race.runoff.short != null
+                    ? race.runoff.short
+                    : race.runoff.label,
                 date: new Intl.DateTimeFormat(getLocale(), {
                   month: "long",
                   day: "numeric",
@@ -897,7 +902,12 @@
                 }).format(new Date(`${race.runoff.date ?? ""}T00:00:00Z`)),
                 share: percent(race.runoff.share),
                 margin: points(race.runoff.margin).replace(/^\+/u, ""),
-                runner: race.runoff.runner,
+                runner:
+                  [leader, runner].some(
+                    (row) => row != null && named(row) === race.runoff?.runner,
+                  ) && race.runoff.runnerShort != null
+                    ? race.runoff.runnerShort
+                    : race.runoff.runner,
               }),
       };
     }),
