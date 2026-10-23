@@ -12,7 +12,7 @@ from ea.sources.us.nj_federal import COUNTIES
 from ea.store import DATA, connect
 
 SOURCE = "us.nj_legislature"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://www.nj.gov/state/elections/assets/pdf/election-results/"
 LANDING = "https://www.nj.gov/state/elections/election-information-results.shtml"
@@ -32,6 +32,7 @@ FILES = {
     (date(2013, 11, 5), "senate"): "2013/2013-official-general-election-results-state-senate.pdf",
     (date(2013, 11, 5), "general-assembly"): "2013/2013-official-general-election-results-general-assembly.pdf",
     (date(2015, 11, 3), "general-assembly"): "2015/2015-official-ge-results-nj-general-assembly.pdf",
+    (date(2015, 6, 2), "general-assembly"): "2015/2015-official-primary-results-nj-general-assembly-0810.pdf",
 }
 UNITS = ["First", "Second", "Third", "Fourth", "Fifth", "Sixth", "Seventh", "Eighth", "Ninth"]
 ORDINALS = {
@@ -84,8 +85,9 @@ def parse() -> None:
         district: int | None = None
         column = 0
         name: str | None = None
+        stage = "g"
         lines: list[tuple[str, int]] = []
-        candidates: dict[int, list[tuple[str, str, int]]] = {}
+        candidates: dict[int, list[tuple[str, str, int, str]]] = {}
         broken: set[int] = set()
         for line in text.splitlines():
             if found := re.search(r"\bCounty\s+Slogan\b", line):
@@ -101,7 +103,7 @@ def parse() -> None:
                     )
                     broken.add(district)
                 else:
-                    candidates.setdefault(district, []).extend((code, name, votes) for code, votes in lines)
+                    candidates.setdefault(district, []).extend((code, name, votes, stage) for code, votes in lines)
                 name, lines = None, []
             else:
                 head = re.split(r"\s+\*|\s+\(w\)|\s{2,}", line.strip(), maxsplit=1)[0]
@@ -113,6 +115,8 @@ def parse() -> None:
                     and not re.search(r"[()]|\bNJ\b,?\s*\d{5}", head)
                 ):
                     name = head
+                    party = re.search(r"\s(Democratic|Republican)\s*$", line)
+                    stage = "g" if day.month == 11 else f"{party[1][0].lower()}p" if party else ""
                 if name is not None and (found := LINE.search(line[max(0, column - 12) :])):
                     lines.append((COUNTIES[found[1].upper()], int(found[2].replace(",", ""))))
         for district, entries in candidates.items():
@@ -120,8 +124,15 @@ def parse() -> None:
                 print(f"{day} {chamber} {district}: skipped")
                 continue
             rows.extend(
-                (day, f"{chamber}:{district}:g", code, name.upper().replace("DEL PILAR RIVAS", "DELPILARRIVAS"), votes)
-                for code, name, votes in entries
+                (
+                    day,
+                    f"{chamber}:{district}:{stage}",
+                    code,
+                    name.upper().replace("DEL PILAR RIVAS", "DELPILARRIVAS"),
+                    votes,
+                )
+                for code, name, votes, stage in entries
+                if stage
             )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
@@ -146,7 +157,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Jersey's State Senate and General Assembly generals by county, 2001-2015 (Division of Elections official lists)",
+            summary="New Jersey's State Senate and General Assembly generals by county, 2001-2015, and its 2015 General Assembly primaries (Division of Elections official lists)",
             polity="US-NJ",
         )
         source = cs.source(PUBLISHER, TITLE)
