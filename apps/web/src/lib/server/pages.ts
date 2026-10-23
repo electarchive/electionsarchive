@@ -590,6 +590,15 @@ export async function archive(path: string, search: URLSearchParams) {
   error(404);
 }
 
+export async function results(search: URLSearchParams) {
+  const q = (search.get("q") ?? "").trim().slice(0, 200);
+  return {
+    kind: "search" as const,
+    q,
+    hits: await call(router.search.query, { q, limit: 50 }),
+  };
+}
+
 export async function comparison(ids: Array<string>) {
   const found = await db.execute<{
     id: string;

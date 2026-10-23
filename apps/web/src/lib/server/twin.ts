@@ -14,6 +14,7 @@ import {
   home,
   party,
   person,
+  results,
 } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
 
@@ -143,21 +144,18 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   if (head === "chambers" && rest.length > 0) {
     return chamber(rest.join("/"));
   }
-  if (head === "coverage" && rest.length === 0) {
-    return coverage(search);
-  }
-  if (head === "search" && rest.length === 0) {
-    const q = (search.get("q") ?? "").trim().slice(0, 200);
-    return {
-      kind: "search" as const,
-      q,
-      hits: await call(router.search.query, { q, limit: 50 }),
-    };
-  }
-  if (head === "compare" && rest.length === 0) {
-    return comparison(
-      [search.get("a"), search.get("b")].filter((id) => id != null),
-    );
+  switch (rest.length === 0 ? head : "") {
+    case "coverage": {
+      return coverage(search);
+    }
+    case "compare": {
+      return comparison(
+        [search.get("a"), search.get("b")].filter((id) => id != null),
+      );
+    }
+    case "search": {
+      return results(search);
+    }
   }
   return archive(segments.join("/"), search);
 }
