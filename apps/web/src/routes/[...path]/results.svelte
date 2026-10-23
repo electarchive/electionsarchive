@@ -386,22 +386,30 @@
                   width="28"
                   height="28"
                 />
+              {:else if isPictured && (page ?? other)?.person == null}
+                <span
+                  class="grid shrink-0 place-items-center self-center block-7 inline-7"
+                  aria-hidden="true"
+                >
+                  {#if (page ?? other)?.party != null}
+                    <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"
+                    ></span>
+                  {/if}
+                </span>
               {:else if isPictured}
                 <span
                   class="grid shrink-0 place-items-center self-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none block-7 inline-7"
                   aria-hidden="true"
-                  >{(page ?? other)?.person == null
-                    ? ""
-                    : row.label
-                        .split(/\s+/u)
-                        .filter(
-                          (word) => !/^(?:jr|sr|ii|iii|iv)\.?,?$/iu.test(word),
-                        )
-                        .filter((word, index, words) =>
-                          [0, words.length - 1].includes(index),
-                        )
-                        .map((word) => word.slice(0, 1))
-                        .join("")}</span
+                  >{row.label
+                    .split(/\s+/u)
+                    .filter(
+                      (word) => !/^(?:jr|sr|ii|iii|iv)\.?,?$/iu.test(word),
+                    )
+                    .filter((word, index, words) =>
+                      [0, words.length - 1].includes(index),
+                    )
+                    .map((word) => word.slice(0, 1))
+                    .join("")}</span
                 >
               {:else}
                 <span
