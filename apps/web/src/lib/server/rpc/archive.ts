@@ -4,9 +4,17 @@ import { ancestry, compare } from "@ea/analytics";
 import { openapi } from "@orpc/openapi";
 import { ORPCError } from "@orpc/server";
 import { sql } from "drizzle-orm";
+import { existsSync } from "node:fs";
+import path from "node:path";
 import * as v from "valibot";
 import { os } from "#lib/server/cache.js";
 import { db } from "#lib/server/db/index.js";
+
+const stored = (tiles: string | null | undefined) =>
+  tiles != null &&
+  existsSync(path.resolve("../../data/tiles", `${tiles}.pmtiles`))
+    ? tiles
+    : null;
 
 const STAGES = sql.raw(
   "array['court_revised','recount','certified','official','preliminary','live','alternative']::stage[]",
@@ -4347,7 +4355,7 @@ export const contests = {
               noun: row.noun,
               vintage: row.vintage,
               asOf: row.asOf,
-              tiles: row.tiles,
+              tiles: stored(row.tiles),
               isApproximate: row.qualities.includes("synthetic"),
               sources: row.sources ?? [],
               count: group.ids.length,
@@ -4606,7 +4614,7 @@ export const contests = {
           code,
           noun: known.get(code)?.noun ?? "",
           count: rows.length,
-          tiles: known.get(code)?.tiles ?? null,
+          tiles: stored(known.get(code)?.tiles),
           rank: known.get(code)?.rank ?? 0,
         }))
         .toArray()
@@ -4770,7 +4778,7 @@ export const contests = {
           })),
         ],
         date: contest.date,
-        outline: known.get(own.rows[0]?.scheme ?? "")?.tiles ?? null,
+        outline: stored(known.get(own.rows[0]?.scheme ?? "")?.tiles),
         frames,
         levels: levels.map(({ rank: _rank, ...entry }) => entry),
         level: level?.code ?? null,
@@ -6069,9 +6077,13 @@ async function sketch(
       day,
     ),
   ]);
-  const inside = nested.rows[0]?.tiles;
-  const tiled = found.rows.find((row) => row.scheme === level);
-  const own = found.rows.find((row) => row.scheme !== level);
+  const inside = stored(nested.rows[0]?.tiles);
+  const tiled = found.rows.find(
+    (row) => row.scheme === level && stored(row.tiles) != null,
+  );
+  const own = found.rows.find(
+    (row) => row.scheme !== level && stored(row.tiles) != null,
+  );
   return tiled == null || frames.length === 0
     ? null
     : {
