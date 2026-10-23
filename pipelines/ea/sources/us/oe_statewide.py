@@ -272,7 +272,7 @@ def fetch() -> None:
         raw.fetch(SOURCE, url, suffix=next((end for end in (".json", ".html") if url.endswith(end)), ".pdf"))
 
 
-def parse() -> None:
+def load() -> tuple[pl.DataFrame, dict[str, dict[str, str]]]:
     with connect() as conn:
         fips = openelections.counties(conn)
     frames = []
@@ -361,6 +361,11 @@ def parse() -> None:
         )
         .with_columns(candidate=pl.when("writein").then(pl.lit("WRITE-INS")).otherwise("candidate"))
     )
+    return frame, fips
+
+
+def parse() -> None:
+    frame, fips = load()
     named = []
     for (office,) in frame.select("office").unique().iter_rows():
         for pattern, title in medsl_statewide.OFFICES:
@@ -370,13 +375,21 @@ def parse() -> None:
                 and "Justice" not in title
                 and "Judge" not in title
             ):
-                named.append((office, title))
+                named.append((office, title, None))
                 break
-    frame = frame.join(pl.DataFrame(named, schema=["office", "title"], orient="row"), on="office").with_columns(
+    shape(frame, fips, named, PARSED)
+
+
+def shape(
+    frame: pl.DataFrame, fips: dict[str, dict[str, str]], named: list[tuple[str, str, str | None]], parsed: Path
+) -> None:
+    frame = frame.join(
+        pl.DataFrame(named, schema={"office": pl.String, "title": pl.String, "post": pl.String}, orient="row"),
+        on="office",
+    ).with_columns(
         title=pl.when(pl.col("state") == "CT", pl.col("title") == "Secretary of State")
         .then(pl.lit("Secretary of the State"))
         .otherwise("title"),
-        post=pl.lit(None, pl.String),
         magnitude=pl.lit(1, pl.Int16),
         kind=pl.lit("county"),
         code="county",
@@ -415,11 +428,11 @@ def parse() -> None:
             (pl.col("title").is_in(list(medsl_statewide.EXECUTIVE)) | (pl.col("top") >= 0.8)),
         )
     )
-    PARSED.mkdir(parents=True, exist_ok=True)
+    parsed.mkdir(parents=True, exist_ok=True)
     frame.join(races.select(contest), on=contest, nulls_equal=True).group_by(
         *contest, "magnitude", "kind", "code", "county", "candidate", "party", "writein", "measure", maintain_order=True
-    ).agg(pl.col("votes").sum()).write_parquet(PARSED / "returns.parquet")
-    races.select(*contest, "magnitude", "present", "counties").write_parquet(PARSED / "races.parquet")
+    ).agg(pl.col("votes").sum()).write_parquet(parsed / "returns.parquet")
+    races.select(*contest, "magnitude", "present", "counties").write_parquet(parsed / "races.parquet")
     print(races.group_by("state").len().sort("state").rows())
 
 
