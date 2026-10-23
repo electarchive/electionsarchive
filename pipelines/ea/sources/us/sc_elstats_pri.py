@@ -11,24 +11,25 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.sc_elstats_pri"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SEARCH = "https://sc.elstats.civera.com/api/download_search.csv?"
 YEARS = [2010, 2012, 2014]
-OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "President of the United States": "president"}
+BY_CANDIDATE = {2016: "Sanders", 2020: "Biden"}
+OFFICES = {"U.S. House": "house", "U.S. Senate": "senate", "Presidential Preference": "president"}
 PUBLISHER = "South Carolina State Election Commission"
 TITLE = "South Carolina Elections Database"
 SITE = "https://electionhistory.scvotes.gov"
 
 
-def url(year: int) -> str:
+def url(year: int, candidate: str | None = None) -> str:
     search = {
         "global": {"years": {"from": year, "to": year}},
         "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
         "contests": {
-            "candidates": [],
+            "candidates": [{"free": candidate}] if candidate else [],
             "divisions": [],
-            "offices": [{"free": office} for office in ("U.S. House", "U.S. Senate", "President")],
+            "offices": [] if candidate else [{"free": office} for office in ("U.S. House", "U.S. Senate", "President")],
         },
         "specialElectionsOnly": False,
         "voterStats": False,
@@ -37,12 +38,16 @@ def url(year: int) -> str:
     return SEARCH + urlencode({"search": json.dumps(search, separators=(",", ":"))})
 
 
+WIDE = {"6235": ("2016-02-27", "Democratic")}
+FILES = [f"{SITE}/api/download_contest/{contest}_table.csv?split_party=false" for contest in WIDE] + [url(year) for year in YEARS] + [url(year, candidate) for year, candidate in BY_CANDIDATE.items()]
+
+
 def fetch() -> None:
-    for year in YEARS:
+    for file in FILES:
         try:
-            raw.cached(SOURCE, url(year))
+            raw.cached(SOURCE, file)
         except LookupError:
-            raw.fetch(SOURCE, url(year), suffix=".csv")
+            raw.fetch(SOURCE, file, suffix=".csv")
 
 
 def parse() -> None:
@@ -55,8 +60,33 @@ def parse() -> None:
             ).fetchall()
         }
     frames = []
-    for year in YEARS:
-        frame = pl.read_csv(raw.cached(SOURCE, url(year)).path, infer_schema=False, truncate_ragged_lines=True)
+    for file in FILES:
+        if "download_contest" in file:
+            day, party = WIDE[file.split("/")[-1].split("_")[0]]
+            table = pl.read_csv(raw.cached(SOURCE, file).path, has_header=False, infer_schema=False, truncate_ragged_lines=True)
+            names = table.row(0)
+            frame = pl.DataFrame(
+                [
+                    {
+                        "election_date": day,
+                        "election_type": "Primary",
+                        "office_name": "Presidential Preference",
+                        "primary_party": party,
+                        "district_name": "",
+                        "division_type": "County",
+                        "division_name": row[1],
+                        "candidate_name": name,
+                        "votes": row[column],
+                    }
+                    for row in table.iter_rows()
+                    if row[0] == "County"
+                    for column, name in enumerate(names)
+                    if column > 1 and name is not None
+                ],
+                infer_schema_length=None,
+            )
+        else:
+            frame = pl.read_csv(raw.cached(SOURCE, file).path, infer_schema=False, truncate_ragged_lines=True)
         frames.append(
             frame.filter(
                 pl.col("election_type").is_in(["Primary", "Primary Runoff"]),
@@ -65,7 +95,7 @@ def parse() -> None:
                 ~pl.col("candidate_name").is_in(["Total Votes Cast", "Overvotes/Undervotes", "Total Ballots Cast"]),
             )
         )
-    frame = pl.concat(frames)
+    frame = pl.concat(frames, how="diagonal")
     unknown = sorted({name for name in frame["division_name"] if re.sub(r"[^a-z]", "", name.lower()) not in counties})
     if unknown:
         raise ValueError(f"unmatched counties: {unknown}")
@@ -105,7 +135,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Carolina's 2010–2014 U.S. House primaries and runoffs by county",
+            summary="South Carolina's 2012, 2016, and 2020 presidential preference primaries by county",
             polity="US-SC",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -118,7 +148,13 @@ def emit() -> Path:
             url=SITE,
             license="Public record",
         )
-        for year in YEARS:
-            cs.artifact(raw.cached(SOURCE, url(year)), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"SC": source}, strict=True)
+        for file in FILES:
+            cs.artifact(raw.cached(SOURCE, file), source)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet").filter(pl.col("chamber").str.starts_with("president")),
+            {"SC": source},
+            strict=True,
+        )
         return cs.write()

@@ -12,10 +12,14 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.sc_enr_pri"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://www.enr-scvotes.org/SC/"
-ELECTIONS = {date(2010, 6, 8): "16117/28318", date(2014, 6, 10): "51763/133986"}
+ELECTIONS = {
+    date(2010, 6, 8): "16117/28318",
+    date(2010, 6, 22): "16213/29430",
+    date(2014, 6, 10): "51763/133986",
+}
 PARTIES = {"REP": "republican", "DEM": "democratic"}
 PUBLISHER = "South Carolina State Election Commission"
 TITLE = "Election results"
@@ -47,15 +51,20 @@ def parse() -> None:
         with zipfile.ZipFile(raw.cached(SOURCE, address(path)).path) as archive:
             root = ElementTree.fromstring(archive.read("detail.xml"))
         for contest in root.iter("Contest"):
-            found = re.fullmatch(r"U\.S\. Senate( \(Unexpired Term\))? ?- ?(REP|DEM)", contest.get("text", ""))
+            found = re.fullmatch(
+                r"U\.S\. (?:Senate|House of Representatives District (\d+))( \(Unexpired Term\))? ?- ?(REP|DEM)",
+                contest.get("text", ""),
+            )
             if found is None:
                 continue
+            district = int(found[1]) if found[1] else None
             for choice in contest.iter("Choice"):
                 for county in [*choice.iter("County"), *choice.iter("Precinct")]:
                     rows.append(
                         {
                             "day": day,
-                            "chamber": f"senate:{'special:' if found[1] else ''}{PARTIES[found[2]]}",
+                            "chamber": f"{'house' if district else 'senate'}:{'special:' if found[2] else ''}{PARTIES[found[3]]}",
+                            "district": district,
                             "candidate": re.sub(r"\s+", " ", choice.get("text", "")).strip().upper(),
                             "code": counties[re.sub(r"[^a-z]", "", county.get("name", "").lower())],
                             "votes": int(county.get("votes", "0")),
@@ -63,14 +72,13 @@ def parse() -> None:
                     )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = (
-        pl.DataFrame(rows)
-        .group_by("day", "chamber", "candidate", "code")
+        pl.DataFrame(rows, schema_overrides={"district": pl.Int16})
+        .group_by("day", "chamber", "district", "candidate", "code")
         .agg(pl.col("votes").sum())
         .with_columns(
             year=pl.col("day").dt.year().cast(pl.Int32),
             special=pl.lit(False),
             state=pl.lit("SC"),
-            district=pl.lit(None, pl.Int16),
             writein=pl.lit(False),
             measure=pl.lit(1, pl.Int16),
             kind=pl.lit("county"),
@@ -78,7 +86,7 @@ def parse() -> None:
         )
     )
     frame.write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("day", "chamber").agg(pl.col("votes").sum(), pl.col("code").n_unique()).sort("day", "chamber"))
+    print(frame.group_by("day", "chamber", "district").agg(pl.col("votes").sum(), pl.col("code").n_unique()).sort("day", "chamber", "district"))
 
 
 def emit() -> Path:
@@ -87,7 +95,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Carolina's 2010 and 2014 U.S. Senate primaries by county",
+            summary="South Carolina's 2010 U.S. House Republican runoffs by county",
             polity="US-SC",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -102,5 +110,11 @@ def emit() -> Path:
         )
         for path in ELECTIONS.values():
             cs.artifact(raw.cached(SOURCE, address(path)), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"SC": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            pl.read_parquet(PARSED / "counties.parquet").filter(pl.col("day") == date(2010, 6, 22)),
+            {"SC": source},
+            strict=True,
+        )
         return cs.write()
