@@ -1259,6 +1259,7 @@
         map.keyboard.disable();
         map.getCanvas().removeAttribute("role");
         map.getCanvas().removeAttribute("aria-label");
+        map.getCanvas().tabIndex = -1;
         map.addImage(
           "arrow",
           {

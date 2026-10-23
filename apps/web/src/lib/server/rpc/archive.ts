@@ -9153,7 +9153,7 @@ export const polities = {
               select 1 from result_set rs
               where rs.contest_id = c.id and rs.status = 'active' and exists (
                 select from result_rollup r where r.result_set_k = rs.k and r.area_k = place.k and r.measure = any(${COUNTED}) offset 0
-              )
+              ) offset 0
             )
           `),
           db.execute<{ date: string }>(sql`

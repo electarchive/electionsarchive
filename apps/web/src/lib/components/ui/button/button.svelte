@@ -9,7 +9,7 @@
   import { cn } from "#lib/utils.js";
 
   export const buttonVariants = tv({
-    base: "group/button inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border border-input bg-card text-sm font-semibold whitespace-nowrap text-foreground outline-none select-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
+    base: "group/button inline-flex shrink-0 items-center justify-center gap-1.5 rounded-sm border border-input bg-card text-sm font-semibold whitespace-nowrap text-foreground select-none disabled:pointer-events-none disabled:opacity-50 aria-disabled:pointer-events-none aria-disabled:opacity-50 aria-invalid:border-destructive [&_svg]:pointer-events-none [&_svg]:shrink-0 [&_svg:not([class*='size-'])]:size-4",
     variants: {
       variant: {
         default:

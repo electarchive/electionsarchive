@@ -162,10 +162,17 @@
   <Tooltip.Provider>
     {#if embed == null}
       <div class="grid grid-rows-[auto_1fr] min-block-dvh">
+        <a
+          href="#content"
+          class="fixed inset-s-3 inset-bs-3 z-50 -translate-y-24 rounded-sm border border-foreground bg-card px-3 py-2 text-sm font-semibold focus-visible:translate-y-0"
+          >{m.skip_to_content()}</a
+        >
         <Header />
         <div
+          id="content"
+          tabindex="-1"
           class={cn(
-            "mx-auto transition-opacity duration-200 inline-full max-inline-7xl motion-reduce:transition-none",
+            "mx-auto transition-opacity duration-200 outline-none inline-full max-inline-7xl motion-reduce:transition-none",
             { "opacity-55 delay-150": isPending },
           )}
           aria-busy={isPending}

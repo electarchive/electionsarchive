@@ -1164,7 +1164,6 @@
               sources={shape.credits}
               noun={places.levels[0]?.noun ?? ""}
               tallies={race.electors == null ||
-              swing != null ||
               region != null ||
               places.level !== race.places.level
                 ? null

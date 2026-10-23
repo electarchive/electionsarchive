@@ -740,11 +740,13 @@
                   aria-hidden="true"
                 >
                   {#each row.shares as share, index (index)}
-                    <span
-                      class="shrink-0 bg-(--party) not-last:border-e not-last:border-card"
-                      style:--party={colors[index]}
-                      style:inline-size="{share * 100}%"
-                    ></span>
+                    {#if share > 0}
+                      <span
+                        class="shrink-0 bg-(--party) not-last:border-e not-last:border-card"
+                        style:--party={colors[index]}
+                        style:inline-size="{share * 100}%"
+                      ></span>
+                    {/if}
                   {/each}
                 </span>
               {/if}
@@ -764,19 +766,21 @@
                       aria-hidden="true"
                     >
                       {#each row.shares as share, index (index)}
-                        <span
-                          class={cn(
-                            "shrink-0 bg-(--party) not-last:border-e not-last:border-card",
-                            {
-                              "opacity-35":
-                                only != null &&
-                                only !== "flip" &&
-                                only !== index,
-                            },
-                          )}
-                          style:--party={colors[index]}
-                          style:inline-size="{share * 100}%"
-                        ></span>
+                        {#if share > 0}
+                          <span
+                            class={cn(
+                              "shrink-0 bg-(--party) not-last:border-e not-last:border-card",
+                              {
+                                "opacity-35":
+                                  only != null &&
+                                  only !== "flip" &&
+                                  only !== index,
+                              },
+                            )}
+                            style:--party={colors[index]}
+                            style:inline-size="{share * 100}%"
+                          ></span>
+                        {/if}
                       {/each}
                     </svelte:element>
                   {/snippet}
