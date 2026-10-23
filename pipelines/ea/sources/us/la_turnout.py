@@ -1,5 +1,4 @@
 import json
-import re
 from datetime import date, datetime
 from pathlib import Path
 
@@ -15,10 +14,6 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Louisiana Secretary of State"
 DATA_URL = "https://voterportal.sos.la.gov/ElectionResults/ElectionResults/Data?blob="
 DATES = DATA_URL + "ElectionDates.htm"
-
-
-def plain(name: str) -> str:
-    return re.sub(r"[^a-z]", "", re.sub(r"(?i) parish$", "", name).lower())
 
 
 def blob(day: date, name: str) -> str:
@@ -44,37 +39,24 @@ def fetch() -> None:
 
 
 def parse() -> None:
-    with connect() as conn:
-        codes = {
-            plain(name): code
-            for code, name in conn.execute(
-                """select u.code, n.text from reporting_unit u join name n on n.entity_id = u.area_id and n.kind = 'short'
-                   where u.scheme_code = 'us.county' and u.code like '22%'"""
-            )
-        }
     rows = []
     for day in days():
         try:
             stats = json.loads(raw.cached(SOURCE, blob(day, "StatsParish.htm")).path.read_text())["Stats"]["Parish"]
-            categories = json.loads(raw.cached(SOURCE, blob(day, "StatsCategories.htm")).path.read_text())["Dropdown"]["Category"]
         except (LookupError, ValueError, KeyError):
             print(f"{day}: no stats")
             continue
-        names = next(c["Option"] for c in categories if c["CategoryName"] == "Parish")
         found = {}
         for entry in [stats] if isinstance(stats, dict) else stats:
-            if not isinstance(entry, dict) or "All_Voted" not in entry:
+            if "All_Voted" not in entry or int(entry["All_Voted"]) == 0:
                 continue
-            index = int(entry["Option"]) - 1
-            code = codes.get(plain(names[index])) if index < len(names) else None
             registered, voted = int(entry["All"]), int(entry["All_Voted"])
-            if code is None or registered == 0 or voted > registered:
-                continue
-            found[code] = (registered, voted)
+            if voted > registered:
+                raise ValueError(f"{day} parish {entry['Option']}: {voted} voted of {registered}")
+            found[f"22{2 * int(entry['Option']) - 1:03d}"] = (registered, voted)
         print(f"{day}: {len(found)} parishes {sum(v[0] for v in found.values())}/{sum(v[1] for v in found.values())}")
-        if len(found) >= 60 and sum(v[1] for v in found.values()) > 0:
-            for code, (registered, voted) in found.items():
-                rows.append({"date": day, "code": code, "registered": registered, "voters": voted})
+        for code, (registered, voted) in found.items():
+            rows.append({"date": day, "code": code, "registered": registered, "voters": voted})
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows).write_parquet(PARSED / "parishes.parquet")
 
@@ -98,7 +80,9 @@ def emit() -> Path:
         held = {
             election_id
             for (election_id,) in conn.execute(
-                "select election_id from result_set where contest_id is null and is_default and status <> 'withdrawn'"
+                """select r.election_id from result_set r join changeset c on c.id = r.changeset_id
+                   where r.contest_id is null and r.is_default and r.status <> 'withdrawn' and c.pipeline <> %s""",
+                [SOURCE],
             )
         }
         title = "Official election results"
