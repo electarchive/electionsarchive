@@ -1291,6 +1291,25 @@ def apply(folder: Path) -> str:
                     chunk.write_csv(buffer, include_header=False, quote_style="non_numeric")
                     copy.write(buffer.getvalue())
         stage = _stage(conn, changeset_id)
+        if "is_default" in stage.tables.get("result_set", []):
+            kind = sql.SQL("(select k.kind from {} k where k.id = {}.source_id)")
+            sources = stage.either("source", "id", "kind")
+            conn.execute(
+                sql.SQL(
+                    """update {staged} s set is_default = false
+                       from public.result_set p
+                       where p.id = s.id and s.is_default and not p.is_default and exists (
+                         select from public.result_set d
+                         where d.is_default and d.id <> s.id and d.election_id = s.election_id
+                           and d.contest_id is not distinct from s.contest_id and d.stage = s.stage
+                           and not exists (select from {staged} x where x.id = d.id and not x.is_default)
+                           and ({new} <> 'official_body' or {old} = 'official_body'))"""
+                ).format(
+                    staged=stage.staged("result_set"),
+                    new=kind.format(sources, sql.Identifier("s")),
+                    old=kind.format(sources, sql.Identifier("d")),
+                )
+            )
         findings = checks.run(conn, stage)
         diff = _diff(conn, stage)
         if not findings and all(
