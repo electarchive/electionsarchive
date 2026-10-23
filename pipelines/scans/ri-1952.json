@@ -1,0 +1,51 @@
+{
+  "polity": "US-RI",
+  "publisher": "Rhode Island Board of Elections",
+  "title": "Official Count of the Ballots Cast, 1952",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "file": {
+    "url": "https://elections.ri.gov/publications/Election_Publications/Countbooks/1952%20Count%20Book.pdf"
+  },
+  "unit_scheme": "town",
+  "contests": {
+    "lieutenant-governor": {
+      "year": 1952,
+      "chamber": "lieutenant-governor",
+      "day": "1952-11-04",
+      "special": false,
+      "state": "RI",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 27,
+      "id": "27-0",
+      "orientation": "counties_down",
+      "hint": "Read the table headed 'VOTE FOR GOVERNOR AND LIEUTENANT-GOVERNOR'; every town row has four numbers and the last row is Total. Digits and commas only.",
+      "columns": [
+        {
+          "label": "Roberts",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Archambault",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McKiernan",
+          "contest": "lieutenant-governor",
+          "candidate": "McKiernan"
+        },
+        {
+          "label": "Cioci",
+          "contest": "lieutenant-governor",
+          "candidate": "Cioci"
+        }
+      ]
+    }
+  ]
+}
