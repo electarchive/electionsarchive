@@ -379,10 +379,21 @@
                       ></span>
                     {/each}
                   </div>
+                  {const other = $derived.by(() => {
+                    let sum = 0;
+                    for (const part of panel.bar) {
+                      if (
+                        !panel.lead.some((lead) => lead.party === part.party)
+                      ) {
+                        sum += part.value;
+                      }
+                    }
+                    return sum;
+                  })}
                   <div
                     class="flex justify-between gap-3 font-figures text-xs tabular-nums"
                   >
-                    {#each panel.lead as part (part.party)}
+                    {#each panel.lead as part, index (part.party)}
                       <span
                         class="flex items-center gap-1.5 truncate min-inline-0"
                       >
@@ -395,6 +406,16 @@
                         >
                         <span class="font-semibold">{count(part.value)}</span>
                       </span>
+                      {#if index === 0 && other > 0}
+                        <span
+                          class="flex items-center gap-1.5 truncate text-muted-foreground min-inline-0"
+                        >
+                          <span class="truncate font-sans"
+                            >{m.board_after_other()}</span
+                          >
+                          <span class="font-semibold">{count(other)}</span>
+                        </span>
+                      {/if}
                     {/each}
                   </div>
                 </div>
