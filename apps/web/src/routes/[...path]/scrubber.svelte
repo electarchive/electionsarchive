@@ -571,6 +571,15 @@
               </div>
             {/if}
           </div>
+          {#if hub.data?.coverage != null}
+            <p class="mbe-2 text-[0.8125rem] font-semibold lg:hidden">
+              {m.election_partial({
+                held: count(hub.data.coverage.held),
+                of: count(hub.data.coverage.of),
+                noun: hub.data.coverage.noun,
+              })}
+            </p>
+          {/if}
         {/if}
         {#if race?.map != null && places != null}
           {#key `${race.map.tiles}:${race.map.own?.tiles ?? ""}`}
@@ -619,6 +628,15 @@
               href={resolve("/[...path]", { path: step.path })}
               >{hub.data.name}</a
             >
+            {#if hub.data.coverage != null}
+              <p class="text-[0.8125rem] font-semibold text-pretty">
+                {m.election_partial({
+                  held: count(hub.data.coverage.held),
+                  of: count(hub.data.coverage.of),
+                  noun: hub.data.coverage.noun,
+                })}
+              </p>
+            {/if}
           {/if}
         </div>
 

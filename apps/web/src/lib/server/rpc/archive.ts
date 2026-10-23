@@ -6984,6 +6984,8 @@ async function races(
     .toSorted(
       (a, b) =>
         (a.day ?? "").localeCompare(b.day ?? "") ||
+        Number(a.count === 1 && !a.isNational) -
+          Number(b.count === 1 && !b.isNational) ||
         Number(a.kind === "ballot_question") -
           Number(b.kind === "ballot_question") ||
         (a.kind === "ballot_question"
