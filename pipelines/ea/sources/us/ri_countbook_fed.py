@@ -27,6 +27,60 @@ HEAD = re.compile(
 ROW = re.compile(r"^\s*([A-Z][A-Z .]+?)\s*\*?\s{2,}((?:[\d,]+|N/A)(?:\s+(?:[\d,]+|N/A))*)\s*$")
 
 
+COUNTY_NAMES = {"BRISTOL": "44001", "KENT": "44003", "NEWPORT": "44005", "PROVIDENCE": "44007", "WASHINGTON": "44009"}
+HEAD_2010 = re.compile(
+    r"^\s*(?:US|U\.S\.) CONGRESS(?: -)? ?DISTRICT (\d)(?: [-–] (DEMOCRAT|REPUBLICAN) RESULTS| (?:ELECTION RESULTS )?by COUNTY)\s*$",
+    re.IGNORECASE,
+)
+
+
+def parse_2010(lines: list[str]) -> list[tuple]:
+    rows = []
+    for index, line in enumerate(lines):
+        found = HEAD_2010.match(line)
+        if found is None or index < 150:
+            continue
+        district = int(found[1])
+        party = found[2].lower() + ("ic" if found[2].upper() == "DEMOCRAT" else "") if found[2] else None
+        header = []
+        county = None
+        subtotals: dict[str, list[int]] = {}
+        towns: dict[str, dict[str, list[int]]] = {}
+        for follow in lines[index + 1 : index + 80]:
+            if re.match(r"^\s*STATE TOTALS?", follow, re.IGNORECASE):
+                break
+            if (m := re.match(r"^\s*([A-Z]+) COUNTY\s*$", follow)) and m[1] in COUNTY_NAMES:
+                county = COUNTY_NAMES[m[1]]
+            elif county is None:
+                header.append(follow)
+            elif m := re.match(r"^\s*County Total\s+([\d\s]+)$", follow):
+                subtotals[county] = [int(x) for x in m[1].split()]
+            elif m := re.match(r"^\s*([A-Za-z][A-Za-z .]+?)\s{2,}([\d\s]+)$", follow):
+                if m[1].strip().lower() in TOWNS:
+                    towns.setdefault(county, {})[m[1].strip().lower()] = [int(x) for x in m[2].split()]
+        label = [h for h in header if h.strip()]
+        position = next(i for i, h in enumerate(label) if "MUNICIPALITY" in h)
+        surnames_line = label[position].replace("MUNICIPALITY", "")
+        if not surnames_line.strip():
+            surnames_line = label[position + 1] if party is None else label[position - 1]
+        surnames = [m[0].strip() for m in re.finditer(r"\S+(?: \S+)*", surnames_line) if len(m[0].strip()) > 1]
+        if party is None:
+            parties = [m[1].upper() for h in label for m in re.finditer(r"\(([A-Za-z]+)\)", h)]
+        else:
+            parties = [party] * len(surnames)
+        if party is None:
+            day = date(2010, 11, 2)
+            counties = {c: [sum(v[i] for v in t.values()) for i in range(len(surnames))] for c, t in towns.items()}
+        else:
+            day = date(2010, 9, 14)
+            counties = subtotals
+        print(2010, party or "general", district, surnames, parties, len(counties))
+        for fips, votes in counties.items():
+            for surname, vote in zip(surnames, votes, strict=True):
+                rows.append((2010, "house" if party is None else f"house:{party}", day, False, "RI", district, fips, surname.upper(), 1, False, vote, "county"))
+    return rows
+
+
 def fetch() -> None:
     for name in BOOKS.values():
         raw.fetch("us.ri_countbook", BASE + name, suffix=".pdf")
@@ -42,6 +96,9 @@ def parse() -> None:
             check=True,
         ).stdout
         lines = text.splitlines()
+        if general.year == 2010:
+            rows.extend(parse_2010(lines))
+            continue
         for index, line in enumerate(lines):
             found = HEAD.match(line)
             if found is None:
