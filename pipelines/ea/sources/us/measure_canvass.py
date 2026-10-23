@@ -223,6 +223,8 @@ RHODE_ISLAND = {
 }
 TENNESSEE = {date(2022, 11, 8): ("20240213031752", "20221108AllbyPrecinct.xlsx")}
 OHIO = {
+    date(2015, 11, 3): ("20211009165730", "2015/general/officialsummary.xlsx"),
+    date(2018, 11, 6): ("20250306204759", "2018/gen/2018-11-06_stateissuecounty.xlsx"),
     date(2022, 11, 8): ("20241007174602", "2022/gen/issues-summary.xlsx"),
     date(2023, 8, 8): ("20250314030933", "2023/spec/issues_summary.xlsx"),
     date(2023, 11, 7): ("20240401063409", "2023/gen/issues-summary.xlsx"),
@@ -1016,7 +1018,7 @@ def parse() -> None:
             records = []
             cells = fastexcel.read_excel(path).load_sheet(0, header_row=None).to_polars().rows()
             start = next(index for index, row in enumerate(cells) if row[0] == "County Name")
-            for column in range(6, len(cells[start]), 2):
+            for column in range(cells[start].index("For"), len(cells[start]), 2):
                 office = (cells[start - 1][column] or "").strip()
                 for row in cells[start + 1 :]:
                     if row[0] in (None, "Percentage") or (
