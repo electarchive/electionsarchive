@@ -271,7 +271,19 @@
     return placed;
   });
   const colors = $derived(
-    new Map(folded.map((party) => [party.key, swatch(party.color, party.key)])),
+    new Map(
+      folded.map((party) => {
+        const head =
+          folded
+            .filter((other) =>
+              partners.some(
+                (pair) => pair.includes(party.key) && pair.includes(other.key),
+              ),
+            )
+            .toSorted((a, b) => b.seats - a.seats)[0] ?? party;
+        return [party.key, swatch(head.color, head.key)];
+      }),
+    ),
   );
   const labels = $derived(
     new Map(folded.map((party) => [party.key, party.label])),
