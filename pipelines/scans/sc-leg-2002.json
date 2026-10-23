@@ -1,0 +1,518 @@
+{
+ "polity": "US-SC",
+ "publisher": "South Carolina State Election Commission",
+ "title": "2002 Election Report, official results of the 2002-11-05 general election",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_2002.pdf"
+ },
+ "contests": {
+  "h26": {
+   "year": 2002,
+   "chamber": "house:26:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h29": {
+   "year": 2002,
+   "chamber": "house:29:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h41": {
+   "year": 2002,
+   "chamber": "house:41:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h46": {
+   "year": 2002,
+   "chamber": "house:46:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h49": {
+   "year": 2002,
+   "chamber": "house:49:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h58": {
+   "year": 2002,
+   "chamber": "house:58:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h67": {
+   "year": 2002,
+   "chamber": "house:67:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h79": {
+   "year": 2002,
+   "chamber": "house:79:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h93": {
+   "year": 2002,
+   "chamber": "house:93:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h96": {
+   "year": 2002,
+   "chamber": "house:96:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h104": {
+   "year": 2002,
+   "chamber": "house:104:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h105": {
+   "year": 2002,
+   "chamber": "house:105:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h106": {
+   "year": 2002,
+   "chamber": "house:106:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h109": {
+   "year": 2002,
+   "chamber": "house:109:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h110": {
+   "year": 2002,
+   "chamber": "house:110:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h111": {
+   "year": 2002,
+   "chamber": "house:111:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h112": {
+   "year": 2002,
+   "chamber": "house:112:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h113": {
+   "year": 2002,
+   "chamber": "house:113:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h114": {
+   "year": 2002,
+   "chamber": "house:114:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h115": {
+   "year": 2002,
+   "chamber": "house:115:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h116": {
+   "year": 2002,
+   "chamber": "house:116:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h117": {
+   "year": 2002,
+   "chamber": "house:117:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h119": {
+   "year": 2002,
+   "chamber": "house:119:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "h122": {
+   "year": 2002,
+   "chamber": "house:122:g",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 49,
+   "id": "49-h26",
+   "orientation": "counties_down",
+   "discover": "h26",
+   "crop": [
+    0.02,
+    0.535,
+    0.99,
+    0.661
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 50,
+   "id": "50-h29",
+   "orientation": "counties_down",
+   "discover": "h29",
+   "crop": [
+    0.02,
+    0.072,
+    0.99,
+    0.21
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 51,
+   "id": "51-h41",
+   "orientation": "counties_down",
+   "discover": "h41",
+   "crop": [
+    0.02,
+    0.672,
+    0.99,
+    0.797
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 52,
+   "id": "52-h46",
+   "orientation": "counties_down",
+   "discover": "h46",
+   "crop": [
+    0.02,
+    0.444,
+    0.99,
+    0.558
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 52,
+   "id": "52-h49",
+   "orientation": "counties_down",
+   "discover": "h49",
+   "crop": [
+    0.02,
+    0.787,
+    0.99,
+    0.945
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 54,
+   "id": "54-h58",
+   "orientation": "counties_down",
+   "discover": "h58",
+   "crop": [
+    0.02,
+    0.192,
+    0.99,
+    0.307
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 55,
+   "id": "55-h67",
+   "orientation": "counties_down",
+   "discover": "h67",
+   "crop": [
+    0.02,
+    0.464,
+    0.99,
+    0.59
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 57,
+   "id": "57-h79",
+   "orientation": "counties_down",
+   "discover": "h79",
+   "crop": [
+    0.02,
+    0.075,
+    0.99,
+    0.202
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 59,
+   "id": "59-h93",
+   "orientation": "counties_down",
+   "discover": "h93",
+   "crop": [
+    0.02,
+    0.076,
+    0.99,
+    0.214
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 59,
+   "id": "59-h96",
+   "orientation": "counties_down",
+   "discover": "h96",
+   "crop": [
+    0.02,
+    0.455,
+    0.99,
+    0.58
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 60,
+   "id": "60-h104",
+   "orientation": "counties_down",
+   "discover": "h104",
+   "crop": [
+    0.02,
+    0.546,
+    0.99,
+    0.66
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 60,
+   "id": "60-h105",
+   "orientation": "counties_down",
+   "discover": "h105",
+   "crop": [
+    0.02,
+    0.66,
+    0.99,
+    0.773
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 60,
+   "id": "60-h106",
+   "orientation": "counties_down",
+   "discover": "h106",
+   "crop": [
+    0.02,
+    0.773,
+    0.99,
+    0.888
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 61,
+   "id": "61-h109",
+   "orientation": "counties_down",
+   "discover": "h109",
+   "crop": [
+    0.02,
+    0.204,
+    0.99,
+    0.318
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 61,
+   "id": "61-h110",
+   "orientation": "counties_down",
+   "discover": "h110",
+   "crop": [
+    0.02,
+    0.318,
+    0.99,
+    0.432
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 61,
+   "id": "61-h111",
+   "orientation": "counties_down",
+   "discover": "h111",
+   "crop": [
+    0.02,
+    0.432,
+    0.99,
+    0.546
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 61,
+   "id": "61-h112",
+   "orientation": "counties_down",
+   "discover": "h112",
+   "crop": [
+    0.02,
+    0.546,
+    0.99,
+    0.661
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 61,
+   "id": "61-h113",
+   "orientation": "counties_down",
+   "discover": "h113",
+   "crop": [
+    0.02,
+    0.661,
+    0.99,
+    0.774
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 61,
+   "id": "61-h114",
+   "orientation": "counties_down",
+   "discover": "h114",
+   "crop": [
+    0.02,
+    0.774,
+    0.99,
+    0.932
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 62,
+   "id": "62-h115",
+   "orientation": "counties_down",
+   "discover": "h115",
+   "crop": [
+    0.02,
+    0.077,
+    0.99,
+    0.192
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 62,
+   "id": "62-h116",
+   "orientation": "counties_down",
+   "discover": "h116",
+   "crop": [
+    0.02,
+    0.192,
+    0.99,
+    0.319
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 62,
+   "id": "62-h117",
+   "orientation": "counties_down",
+   "discover": "h117",
+   "crop": [
+    0.02,
+    0.319,
+    0.99,
+    0.444
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 62,
+   "id": "62-h119",
+   "orientation": "counties_down",
+   "discover": "h119",
+   "crop": [
+    0.02,
+    0.558,
+    0.99,
+    0.673
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  },
+  {
+   "page": 63,
+   "id": "63-h122",
+   "orientation": "counties_down",
+   "discover": "h122",
+   "crop": [
+    0.02,
+    0.077,
+    0.99,
+    0.204
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  }
+ ]
+}
