@@ -373,6 +373,9 @@ def parse() -> None:
                 named.append((office, title))
                 break
     frame = frame.join(pl.DataFrame(named, schema=["office", "title"], orient="row"), on="office").with_columns(
+        title=pl.when(pl.col("state") == "CT", pl.col("title") == "Secretary of State")
+        .then(pl.lit("Secretary of the State"))
+        .otherwise("title"),
         post=pl.lit(None, pl.String),
         magnitude=pl.lit(1, pl.Int16),
         kind=pl.lit("county"),
