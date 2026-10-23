@@ -6262,7 +6262,9 @@ async function races(
     names(
       owned.flatMap((row) => [
         row.id,
-        ...[row.owner, row.area, row.party].filter((id) => id != null),
+        ...[row.owner, row.office, row.area, row.party].filter(
+          (id) => id != null,
+        ),
       ]),
       date,
     ),
@@ -6661,8 +6663,11 @@ async function races(
         office: head?.office ?? null,
         election: head?.election ?? "",
         day: head?.day ?? null,
-        chamber: labels.full.get(head?.owner ?? "") ?? null,
-        isNational: head?.area === nation.id,
+        chamber:
+          labels.full.get(
+            (head?.isOffice === true ? head.office : head?.owner) ?? "",
+          ) ?? null,
+        isNational: head?.area == null || head.area === nation.id,
         rank:
           head == null
             ? 4
@@ -6785,7 +6790,12 @@ async function races(
       }),
   );
   const chambers = built
-    .filter((race) => race.isNational && race.count === 1 && race.body != null)
+    .filter(
+      (race) =>
+        race.isNational &&
+        race.count === 1 &&
+        (race.body != null || race.isOffice),
+    )
     .map((race) => race.chamber);
   const weights = new Map<string | null, number>();
   for (const race of built) {
@@ -6832,7 +6842,7 @@ async function races(
           stage == null && race.measure === "electoral_votes" ? race : stage
         )?.results;
         const name =
-          isNational && race.count === 1 && race.body != null
+          isNational && race.count === 1 && (race.body != null || race.isOffice)
             ? chambers.indexOf(chamber) === chambers.lastIndexOf(chamber)
               ? (chamber ?? race.name)
               : [chamber ?? "", ...race.name.split(", ").slice(1)].join(", ")
