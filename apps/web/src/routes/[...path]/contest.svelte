@@ -1954,12 +1954,12 @@
       {/if}
       {#if single != null}
         <div class="flex flex-wrap items-baseline gap-x-2 gap-y-0.5">
-          <dt class="text-[0.8125rem] text-muted-foreground">
+          <dt class="sr-only">
             {m.stat_seat()}
           </dt>
           <dd class="font-figures text-xl font-[760] tracking-[-0.015em]">
             1 <span class="text-sm font-normal text-muted-foreground"
-              >{m.seats_of({ count: count(single.total) })}</span
+              >{m.seats_of_total({ count: count(single.total) })}</span
             >
           </dd>
           <dd class="text-[0.8125rem] text-muted-foreground">

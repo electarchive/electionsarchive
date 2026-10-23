@@ -200,6 +200,7 @@
   "seats_majority": "{count} for a majority",
   "seats_focus": "{place} provided {count} of the {total} seats.",
   "seats_of": "of {count}",
+  "seats_of_total": "of {count} seats",
   "stat_seat": "Seat",
   "seats_single_national": [
     {
