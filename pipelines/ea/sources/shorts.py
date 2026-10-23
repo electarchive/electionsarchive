@@ -6,7 +6,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "shorts"
-VERSION = "2"
+VERSION = "3"
 PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...]]] = {
     "us": {
         "Democratic Party": "Democratic",
@@ -131,6 +131,42 @@ BODIES = {
     "it": {"Parliament in joint session with regional delegates": "Parliament"},
     "tr": {"Grand National Assembly of Türkiye": "Grand National Assembly", "Senate of the Republic": "Senate"},
 }
+PARTICLES = {
+    "de",
+    "da",
+    "do",
+    "dos",
+    "das",
+    "del",
+    "della",
+    "delle",
+    "di",
+    "du",
+    "des",
+    "la",
+    "le",
+    "van",
+    "von",
+    "der",
+    "den",
+    "ten",
+    "ter",
+    "bin",
+    "ibn",
+    "al",
+    "el",
+    "st",
+    "st.",
+}
+COMPOUND_SURNAMES = (
+    "Lloyd George",
+    "Alberti Casellati",
+    "Lula da Silva",
+    "Giscard d'Estaing",
+    "Barton Boysko",
+)
+HONORIFICS = {"sir", "dr", "dr.", "hon", "hon.", "rev", "rev.", "lord", "dame", "lady"}
+SUFFIXES = {"jr", "sr", "ii", "iii", "iv", "junior", "júnior", "filho", "neto", "sobrinho"}
 CHAMBERS = {
     "House of Representatives": "State House",
     "Senate": "State Senate",
@@ -219,6 +255,56 @@ def emit() -> Path:
         for entity, rests in local.items():
             if len(rests) == 1 and entity not in shorts:
                 shorts[entity] = {(next(iter(rests)), None, None)}
+        people: dict[tuple[str, str], str] = {}
+        for entity, roots, lang, text in conn.execute(
+            """with heads as (
+                 select distinct ca.person_id, split_part(sl.path, '/', 1) as root
+                 from candidacy ca
+                 join contest_option co on co.id = ca.option_id
+                 join contest c on c.id = co.contest_id
+                 join office o on o.id = c.office_id
+                 join slug sl on sl.entity_id = o.polity_id and sl.is_current
+                 union
+                 select g.head_person_id, split_part(sl.path, '/', 1)
+                 from government g join slug sl on sl.entity_id = g.polity_id and sl.is_current
+                 where g.head_person_id is not null
+               )
+               select distinct on (h.person_id, n.lang) h.person_id, array_agg(h.root) over (partition by h.person_id),
+                 n.lang, n.text
+               from heads h
+               join name n on n.entity_id = h.person_id and n.kind in ('official', 'english')
+               where not exists (select from entity_merge m where m.entity_id = h.person_id)
+                 and not exists (select from name s where s.entity_id = h.person_id and s.kind = 'short')
+               order by h.person_id, n.lang, n.is_preferred desc, n.kind, n.text"""
+        ):
+            tokens = re.sub(r'"[^"]*"|“[^”]*”|\([^)]*\)', " ", text).replace(",", " ").split()
+            while tokens and tokens[0].lower() in HONORIFICS:
+                tokens.pop(0)
+            tail = []
+            while len(tokens) > 2 and tokens[-1].lower().rstrip(".") in SUFFIXES:
+                tail.insert(0, tokens.pop())
+            if "br" not in roots:
+                tail = []
+            if len(tokens) < 2:
+                continue
+            compound = next(
+                (name for name in COMPOUND_SURNAMES if " ".join(tokens).lower().endswith(f" {name.lower()}")), None
+            )
+            if compound is not None:
+                surname = compound
+            else:
+                start = len(tokens) - 1
+                while start > 1 and (
+                    tokens[start - 1].lower() in PARTICLES or tokens[start - 1].lower().startswith("d'")
+                ):
+                    start -= 1
+                surname = " ".join(tokens[start:])
+            if surname.isupper():
+                surname = surname.title()
+            surname = " ".join([surname, *tail])
+            if len(surname.rstrip(".")) < 2:
+                continue
+            people[str(entity), lang] = surname
         missing = [
             f"{kind} {root} {text}"
             for kind, table in (("party", PARTIES), ("office", OFFICES), ("body", BODIES))
@@ -244,4 +330,6 @@ def emit() -> Path:
                     valid_to=None if end is None else date.fromisoformat(end),
                     is_preferred=False,
                 )
+        for (entity, lang), surname in sorted(people.items()):
+            cs.add("name", entity_id=entity, text=surname, lang=lang, kind="short", is_preferred=False)
         return cs.write()
