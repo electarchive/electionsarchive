@@ -40,7 +40,7 @@ CORRECTED = {
         ),
     ),
 }
-DISTRICT = re.compile(r"(?i)State (House|Senate)(?: District)?\s+(\d+)")
+DISTRICT = re.compile(r"(?i)State\s+(House|Senate)(?:\s+Dist[a-z]*)?\s+(\d+)")
 
 
 def cached(year: int) -> raw.Artifact:
