@@ -58,6 +58,21 @@
             Infinity,
         }))
         .toSorted((a, b) => a.lean - b.lean);
+      const bySeats = columns
+        .map((column, index) => ({
+          index,
+          seats:
+            totals.find((entry) => entry.party === column.party)?.seats ?? 0,
+        }))
+        .toSorted((a, b) => b.seats - a.seats || a.index - b.index);
+      const slots = bySeats.map((entry, index) =>
+        entry.index === index
+          ? [{ column: index, only: null }]
+          : [
+              { column: index, only: "wide" },
+              { column: entry.index, only: "narrow" },
+            ],
+      );
       const isFolded = totals.length > columns.length;
       const rows = chamber.regions.map((region) => {
         const cells = columns.map(
@@ -92,6 +107,7 @@
         name: chamber.name,
         noun: chamber.noun,
         columns,
+        slots,
         isFolded,
         rows,
         total,
@@ -177,26 +193,29 @@
             >
               {chamber.noun ?? m.regions_place()}
             </th>
-            {#each chamber.columns as column (column.key)}
-              <th scope="col" class="px-0.5 py-1.5 text-end">
+            {#each chamber.slots.flat() as slot, position (position)}
+              {const key = $derived(chamber.columns[slot.column]?.key ?? "")}
+              <th
+                scope="col"
+                class={cn("px-0.5 py-1.5 text-end", {
+                  "max-sm:hidden": slot.only === "wide",
+                  "sm:hidden": slot.only === "narrow",
+                })}
+              >
                 <button
                   type="button"
                   class={cn(
                     "inline-flex items-center gap-1.5 rounded-xs px-1.5 text-xs font-semibold whitespace-nowrap block-7 hover:bg-secondary",
-                    {
-                      "bg-secondary ring-1 ring-foreground":
-                        sorted === column.key,
-                    },
+                    { "bg-secondary ring-1 ring-foreground": sorted === key },
                   )}
-                  aria-pressed={sorted === column.key}
-                  onclick={() =>
-                    (sorted = sorted === column.key ? null : column.key)}
+                  aria-pressed={sorted === key}
+                  onclick={() => (sorted = sorted === key ? null : key)}
                 >
                   <span
                     class="shrink-0 rounded-xs block-2 inline-2"
-                    style:background={column.color}
+                    style:background={chamber.columns[slot.column]?.color}
                   ></span>
-                  {column.label}
+                  {chamber.columns[slot.column]?.label}
                 </button>
               </th>
             {/each}
@@ -225,12 +244,18 @@
               >
                 {row.name}
               </th>
-              {#each row.cells as cell, column (column)}
+              {#each chamber.slots.flat() as slot, position (position)}
+                {const cell = $derived(row.cells[slot.column] ?? 0)}
                 {const share = $derived(cell / Math.max(1, row.seats))}
                 {const fill = $derived(
-                  `color-mix(in oklab, ${chamber.columns[column]?.color} ${Math.round(12 + share * 58)}%, var(--card))`,
+                  `color-mix(in oklab, ${chamber.columns[slot.column]?.color} ${Math.round(12 + share * 58)}%, var(--card))`,
                 )}
-                <td class="p-0.5">
+                <td
+                  class={cn("p-0.5", {
+                    "max-sm:hidden": slot.only === "wide",
+                    "sm:hidden": slot.only === "narrow",
+                  })}
+                >
                   <span
                     class={cn(
                       "grid place-items-end rounded-xs px-2 font-figures text-[0.8125rem] block-7",
@@ -268,10 +293,15 @@
             >
               {m.regions_total()}
             </th>
-            {#each chamber.total as value, column (column)}
+            {#each chamber.slots.flat() as slot, position (position)}
               <td
-                class="px-2 py-1.5 text-end font-figures text-[0.8125rem] font-semibold"
-                >{count(value)}</td
+                class={cn(
+                  "px-2 py-1.5 text-end font-figures text-[0.8125rem] font-semibold",
+                  {
+                    "max-sm:hidden": slot.only === "wide",
+                    "sm:hidden": slot.only === "narrow",
+                  },
+                )}>{count(chamber.total[slot.column] ?? 0)}</td
               >
             {/each}
             {#if chamber.isFolded}
