@@ -16,12 +16,44 @@ PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Virginia Department of Elections"
 BASE = "https://apps.elections.virginia.gov/SBE_CSV/ELECTIONS/ELECTIONTURNOUT/Turnout-"
 FILES = [
+    "2007%20June%20Democratic%20Primary",
+    "2007%20June%20Republican%20Primary",
     "2008%20February%20Democratic%20Presidential%20Primary",
     "2008%20February%20Republican%20Presidential%20Primary",
+    "2008%20June%20Democratic%20Primary",
+    "2008%20June%20Republican%20Primary",
+    "2009%20June%20Democratic%20Primary",
+    "2009%20June%20Republican%20Primary",
+    "2010%20June%20Republican%20Primary",
+    "2010%20March%20Democratic%20Primary",
+    "2011%20August%20Democratic%20Primary",
+    "2011%20August%20Republican%20Primary",
+    "2012%20June%20Democratic%20Primary",
+    "2012%20June%20Republican%20Primary",
     "2012%20March%20Republican%20Presidential%20Primary",
+    "2013%20June%20Democratic%20Primary",
+    "2013%20June%20Republican%20Primary",
+    "2014%20June%20Democratic%20Primary",
+    "2014%20June%20Republican%20Primary",
+    "2015%20June%20Democratic%20Primary",
+    "2015%20June%20Republican%20Primary",
+    "2016%20June%20Democratic%20Primary",
+    "2016%20June%20Republican%20Primary",
     "2016%20March%20Democratic%20Presidential%20Primary",
     "2016%20March%20Republican%20Presidential%20Primary",
+    "2017%20June%20Democratic%20Primary",
+    "2017%20June%20Republican%20Primary",
+    "2018%20June%20Democratic%20Primary%20",
+    "2018%20June%20Republican%20Primary%20",
+    "2019%20June%20Democratic%20Primary",
+    "2019%20June%20Republican%20Primary",
+    "2020%20June%20Democratic%20Primary",
+    "2020%20June%20Republican%20Primary",
     "2020%20March%20Democratic%20Presidential%20Primary",
+    "2021%20June%20Democratic%20Primary",
+    "2021%20June%20Republican%20Primary",
+    "2022%20June%20Democratic%20Primary",
+    "2022%20June%20Republican%20Primary",
 ]
 COUNTIES_SQL = """
 select u.code, n.text from reporting_unit u
@@ -92,7 +124,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Virginia's registered voters and ballots cast by locality for the presidential primaries of 2008, 2012, 2016, and 2020, "
+            summary="Virginia's registered voters and ballots cast by locality for the primaries of 2007 to 2022, "
             "from the Department of Elections' election turnout files",
             polity="US",
         )
