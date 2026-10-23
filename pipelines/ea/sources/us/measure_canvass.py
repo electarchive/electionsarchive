@@ -236,11 +236,17 @@ SOUTH_DAKOTA = {
 }
 HAWAII_REPORTS = "https://files.hawaii.gov/elections/files/results/{}/general/{}.pdf"
 NORTH_DAKOTA = {
+    date(2012, 6, 12): "&eid=33",
+    date(2012, 11, 6): "&eid=35",
+    date(2014, 6, 10): "&eid=120",
+    date(2014, 11, 4): "&eid=126",
     date(2016, 6, 14): "&eid=291",
     date(2016, 11, 8): "&eid=292",
     date(2018, 6, 12): "&eid=302",
     date(2018, 11, 6): "&eid=303",
     date(2022, 11, 8): "&eid=326",
+    date(2020, 11, 3): "&eid=313",
+    date(2024, 6, 11): "&eid=329",
     date(2024, 11, 5): "",
 }
 NEBRASKA = {
@@ -279,6 +285,11 @@ NORTH_CAROLINA = {
     ),
 }
 NAMED_QUESTIONS = {
+    "Elimination of Annual Poll Tax": "North Dakota Poll Tax Amendment, Measure 1",
+    "Oaths of Office for Elected and Appointed Officials": "North Dakota Oaths of Office Amendment, Measure 2",
+    "Relating to the Practices of Farming and Ranching": "North Dakota Farming and Ranching Amendment, Measure 3",
+    "Relating to Prohibiting Smoking in Public Places and Worksites": "North Dakota Smoking Ban Initiative, Measure 4",
+    "Relating to the Prevention of Animal Cruelty": "North Dakota Prevention of Animal Cruelty Initiative, Measure 5",
     "PROTECT RIGHT TO HUNT AND FISH": "North Carolina Right to Hunt and Fish Amendment",
     "STRENGTHENING VICTIMS RIGHTS": "North Carolina Marsy's Law Crime Victims Rights Amendment",
     "MAXIMUM INCOME TAX RATE OF 7.0%": "North Carolina Income Tax Cap Amendment",
@@ -1129,14 +1140,13 @@ def parse() -> None:
             page = path.read_text()
             for race in (
                 re.findall(r'value="County" raceid="(\d+)"', page)
-                if re.search(rf"Official\s+{day.year}\s+General", re.sub(r"<[^>]+>", " ", page))
+                if re.search(rf"Official\s+{day.year}\s+(General|Primary)", re.sub(r"<[^>]+>", " ", page))
                 else []
             ):
-                sheet = (
-                    fastexcel.read_excel(raw.cached(SOURCE, f"{url}#{race}").path)
-                    .load_sheet(0, header_row=None)
-                    .to_polars()
-                )
+                export = raw.cached(SOURCE, f"{url}#{race}").path
+                if export.read_bytes()[:2] != b"PK":
+                    continue
+                sheet = fastexcel.read_excel(export).load_sheet(0, header_row=None).to_polars()
                 cells = sheet.rows()
                 start = next(index for index, row in enumerate(cells) if row[1] == "County")
                 office, answers = cells[start][0].strip(), cells[start][3:]
