@@ -1,0 +1,20 @@
+{
+  "kind": "statewide",
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor"
+  },
+  "year": 1992,
+  "day": "1992-11-03",
+  "title": "Official results of general election, 1992",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect92/pdfs/1992_General_Election.pdf"
+  },
+  "leaves": [
+    4
+  ]
+}

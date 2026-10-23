@@ -1,0 +1,21 @@
+{
+  "kind": "statewide",
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor"
+  },
+  "year": 1988,
+  "day": "1988-11-08",
+  "title": "Official results of general election, 1988",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect88/pdfs/1988.pdf"
+  },
+  "leaves": [
+    4,
+    5
+  ]
+}

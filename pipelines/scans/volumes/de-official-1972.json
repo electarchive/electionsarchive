@@ -1,0 +1,20 @@
+{
+  "kind": "statewide",
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor"
+  },
+  "year": 1972,
+  "day": "1972-11-07",
+  "title": "Official results of general election, 1972",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect72/pdfs/1972.pdf"
+  },
+  "leaves": [
+    3
+  ]
+}

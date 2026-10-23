@@ -1,0 +1,21 @@
+{
+  "kind": "statewide",
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor"
+  },
+  "year": 1996,
+  "day": "1996-11-05",
+  "title": "Official results of general election, 1996",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect96/elect96_general/Presidential_General_1996.pdf"
+  },
+  "leaves": [
+    4,
+    5
+  ]
+}

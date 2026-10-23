@@ -1,0 +1,21 @@
+{
+  "kind": "statewide",
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor"
+  },
+  "year": 1976,
+  "day": "1976-11-02",
+  "title": "Official results of general election, 1976",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect76/pdfs/1976.pdf"
+  },
+  "leaves": [
+    3,
+    4
+  ]
+}

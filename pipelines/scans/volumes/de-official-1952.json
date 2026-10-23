@@ -1,0 +1,21 @@
+{
+  "kind": "statewide",
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "offices": {
+    "lieutenant-governor": "Lieutenant Governor"
+  },
+  "year": 1952,
+  "day": "1952-11-04",
+  "title": "Official results of general election, 1952",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect40To52/pdfs/1940.pdf"
+  },
+  "leaves": [
+    14,
+    15
+  ]
+}
