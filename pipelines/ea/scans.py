@@ -938,7 +938,7 @@ def run(name: str, mode: str = "auto") -> str:
     message = ""
     outcome: dict[str, dict[str, Series]] = {}
     redo: set[str] | None = None
-    for reader in ORDER:
+    for reader in ORDER[: int(os.environ.get("EA_SCANS_READERS", len(ORDER)))]:
         if reader != "first":
             redo = {
                 page
