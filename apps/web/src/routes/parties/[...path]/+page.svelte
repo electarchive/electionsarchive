@@ -23,6 +23,7 @@
     bloc: m.party_kind_bloc,
     nuance: m.party_kind_nuance,
     parliamentary_group: m.party_kind_parliamentary_group,
+    caucus: m.party_kind_caucus,
   };
 
   const party = $derived(data.party);

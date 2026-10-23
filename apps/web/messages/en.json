@@ -415,6 +415,7 @@
   "party_kind_bloc": "Bloc",
   "party_kind_nuance": "Political label",
   "party_kind_parliamentary_group": "Parliamentary group",
+  "party_kind_caucus": "Caucus",
   "party_ballot": "On the ballot",
   "party_contests": "Contests",
   "rel_merged_into_out": "Merged into {name}",
@@ -433,6 +434,7 @@
   "aff_federation": "Part of {name}",
   "aff_international": "Member of {name}",
   "aff_regional_branch": "Regional branch of {name}",
+  "aff_coalition": "Governing coalition with {name}",
   "lists_title": "Candidate lists",
   "lists_summary": [
     {

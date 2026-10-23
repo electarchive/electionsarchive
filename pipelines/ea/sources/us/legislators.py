@@ -14,7 +14,7 @@ from ea.sources.us.secession import STATES
 from ea.store import connect
 
 SOURCE = "us.legislators"
-VERSION = "4"
+VERSION = "5"
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
         "query": """SELECT ?bioguide ?start ?startPrecision ?end ?endPrecision ?cause WHERE {
@@ -47,6 +47,23 @@ EXPELLED = {
     "038Breckinridge": [("Breckinridge", "KY")],
     "039CivilWarCases": [("Polk", "MO"), ("Johnson", "MO")],
     "040JesseBright": [("Bright", "IN")],
+}
+DIVISIONS = [
+    "https://www.senate.gov/history/partydiv.htm",
+    "https://www.senate.gov/senators/SenatorsWhoChangedPartiesDuringSenateService.htm",
+    "https://www.senate.gov/about/parties-leadership/presidents-death-eases-senate-deadlock.htm",
+]
+AMENDED = {
+    "M000067": [
+        {"start": "1881-03-04", "end": "1885-03-03", "party": "Readjuster", "caucus": "Republican"},
+        {"start": "1885-03-04", "end": "1887-03-03", "party": "Republican"},
+    ],
+    "S000369": [
+        {"start": "1923-03-04", "end": "1935-01-02", "party": "Farmer-Labor"},
+        {"start": "1935-01-03", "end": "1941-01-02", "party": "Farmer-Labor", "caucus": "Republican"},
+        {"start": "1941-01-03", "end": "1947-01-03", "party": "Republican"},
+    ],
+    "B001026": [{"start": "1971-01-21", "end": "1977-01-03", "party": "Conservative", "caucus": "Republican"}],
 }
 PUBLISHER = "The @unitedstates project"
 TITLE = "congress-legislators: members of Congress, 1789 to the present"
@@ -175,6 +192,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, EXPULSIONS.format(page=page), suffix=".html")
     for ordinal in CONGRESSES.values():
         raw.fetch(SOURCE, CONGRESS.format(ordinal=ordinal), suffix=".wiki")
+    for page in DIVISIONS:
+        raw.fetch(SOURCE, page, suffix=".html")
 
 
 def emit() -> Path:
@@ -254,6 +273,17 @@ def emit() -> Path:
             title="Expulsion cases",
             url="https://www.senate.gov/about/powers-procedures/expulsion.htm",
         )
+        divisions = cs.source("United States Senate", "Party Division")
+        cs.add(
+            "source",
+            id=divisions,
+            kind="official_body",
+            publisher="United States Senate",
+            title="Party Division",
+            url=DIVISIONS[0],
+        )
+        for page in DIVISIONS:
+            cs.artifact(raw.cached(SOURCE, page), divisions)
         expelled: dict[tuple[str, str], date] = {}
         for page, names in EXPELLED.items():
             artifact = raw.cached(SOURCE, EXPULSIONS.format(page=page))
@@ -540,9 +570,21 @@ def emit() -> Path:
                         actor="United States Senate",
                         source_id=senate,
                     )
-                affiliations = term.get("party_affiliations") or [
-                    {"start": term["start"], "end": term["end"], "party": term.get("party")}
-                ]
+                affiliations = [
+                    {**span, "start": max(span["start"], term["start"]), "end": min(span["end"], term["end"])}
+                    for span in AMENDED.get(ids["bioguide"], [])
+                    if span["start"] <= term["end"] and span["end"] >= term["start"]
+                ] or (
+                    term.get("party_affiliations")
+                    or [
+                        {
+                            "start": term["start"],
+                            "end": term["end"],
+                            "party": term.get("party"),
+                            "caucus": term.get("caucus"),
+                        }
+                    ]
+                )
                 for index, affiliation in enumerate(affiliations):
                     label = LABELS.get(affiliation["party"], affiliation["party"])
                     if label is None or label in UNAFFILIATED - {"Independent"}:
@@ -581,8 +623,8 @@ def emit() -> Path:
                         valid_to=None if until > today else until + timedelta(days=1),
                         valid_to_precision="day",
                     )
-                    caucus = term.get("caucus")
-                    if caucus is not None and label == "Independent":
+                    caucus = affiliation.get("caucus")
+                    if caucus is not None:
                         cs.add(
                             "tenure_affiliation",
                             tenure_id=tenure,

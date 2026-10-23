@@ -119,7 +119,14 @@
     }
     return starts;
   });
-  const named = $derived(lanes.filter((lane) => lane.party != null).length);
+  const named = $derived(
+    lanes.filter(
+      (lane) =>
+        lane.party != null &&
+        (lane.ballots.length > 0 ||
+          lane.spans.some((span) => span.kind !== "group")),
+    ).length,
+  );
 </script>
 
 {#snippet mark(how: string, color: string)}

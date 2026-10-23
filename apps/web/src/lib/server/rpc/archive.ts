@@ -11181,7 +11181,8 @@ export const people = {
         )
         select coalesce(pm.into_id, x.party) as party, x.start::text as start, x.stop::text as stop from (
           select m.party_id as party, m.valid_from as start, m.valid_to as stop, 0 as rank
-          from person_party_membership m where m.person_id in (select id from ids)
+          from person_party_membership m join party k on k.id = m.party_id and k.kind <> 'caucus'
+          where m.person_id in (select id from ids)
           union all
           select a.party_id, coalesce(lower(a.valid), t.from_date), coalesce(upper(a.valid), t.to_date), 1
           from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'party'
@@ -11321,8 +11322,10 @@ export const people = {
             select em.entity_id from entity_merge em join ids on em.into_id = ids.id
           )
           select coalesce(bm.into_id, br.parent_party_id, pm.into_id, x.party) as party, x.kind, x.from, x.to from (
-            select m.party_id as party, 'member' as kind, m.valid_from::text as from, m.valid_to::text as to
-            from person_party_membership m where m.person_id in (select id from ids)
+            select m.party_id as party, case when k.kind = 'caucus' then 'group' else 'member' end as kind,
+              m.valid_from::text as from, m.valid_to::text as to
+            from person_party_membership m join party k on k.id = m.party_id
+            where m.person_id in (select id from ids)
             union all
             select a.party_id, case when a.kind = 'party' then 'office' else 'group' end,
               coalesce(lower(a.valid), t.from_date)::text, coalesce(upper(a.valid), t.to_date)::text

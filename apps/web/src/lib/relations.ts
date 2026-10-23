@@ -18,4 +18,5 @@ export const AFFILIATIONS: Record<string, (input: { name: string }) => string> =
     federation: m.aff_federation,
     international: m.aff_international,
     regional_branch: m.aff_regional_branch,
+    coalition: m.aff_coalition,
   };
