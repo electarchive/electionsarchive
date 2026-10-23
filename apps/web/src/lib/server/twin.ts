@@ -157,7 +157,10 @@ async function load(segments: Array<string>, search: URLSearchParams) {
       return results(search);
     }
   }
-  return archive(segments.join("/"), search);
+  const found = await archive(segments.join("/"), search);
+  return found.kind === "polity"
+    ? { ...found, record: await call(router.polities.record, { id: found.id }) }
+    : found;
 }
 
 export async function twin({ request, url }: RequestEvent) {
@@ -278,33 +281,13 @@ function markdown(data: Data, link: Link) {
       ];
     }
     case "home": {
-      return [
-        `# ${m.wordmark()}`,
-        m.home_intro(),
-        `## ${m.home_polities()}`,
-        table(
-          [
-            m.col_polity(),
-            m.polity_elections(),
-            m.person_years(),
-            m.home_latest(),
-          ],
-          data.polities.map((polity) => [
-            link(polity.name, polity.path),
-            count(polity.elections + polity.within),
-            span(polity.first, polity.last),
-            polity.latest == null
-              ? null
-              : link(polity.latest.name, polity.latest.path),
-          ]),
-        ),
-      ];
+      return homeMarkdown(data, link);
     }
     case "coverage": {
       return coverageMarkdown(data, link);
     }
     case "person": {
-      return personMarkdown(data.person, link);
+      return personMarkdown(data.person, data.parties, link);
     }
     case "party": {
       return partyMarkdown(data, link);
@@ -316,13 +299,13 @@ function markdown(data: Data, link: Link) {
       return comparisonMarkdown(data, link);
     }
     case "polity": {
-      return polityMarkdown(data.polity, link);
+      return polityMarkdown(data.polity, data.record, link);
     }
     case "election": {
       return electionMarkdown(data.election, link);
     }
     default: {
-      return contestMarkdown(data.contest, link);
+      return contestMarkdown(data.contest, data.cycle, link);
     }
   }
 }
@@ -376,10 +359,127 @@ function coverageMarkdown(
   ];
 }
 
+function homeMarkdown(data: Extract<Data, { kind: "home" }>, link: Link) {
+  const listed = data.polities.filter((polity) => polity.first != null);
+  let elections = 0;
+  const years: Array<number> = [];
+  for (const polity of listed) {
+    elections += polity.elections + polity.within;
+    years.push(...[polity.first, polity.last].filter((year) => year != null));
+  }
+  return [
+    `# ${m.wordmark()}`,
+    years.length === 0
+      ? m.home_intro()
+      : m.home_title({
+          elections: count(elections),
+          first: String(Math.min(...years)),
+          last: String(Math.max(...years)),
+        }),
+    ...(data.recent.length === 0 ? [] : [`## ${m.home_recent()}`]),
+    ...data.recent.flatMap((election) => {
+      const race = election.lead;
+      if (race == null) {
+        return [
+          `### ${link(election.name, election.path)}, ${date(election.date)}`,
+        ];
+      }
+      const isSeated = race.contested > 1;
+      const rows = race.results.map((row) => [
+        row.label,
+        isSeated
+          ? `${count(row.seats ?? 0)} / ${count(race.contested)}`
+          : percent(row.share),
+        row.isLost === true
+          ? race.quorum != null && row.share > 0.5
+            ? m.outcome_quorum()
+            : m.outcome_lost()
+          : null,
+      ]);
+      const isDecided = rows.some((row) => row[2] != null);
+      return [
+        `### ${link(election.name, election.path)}, ${date(election.date)}`,
+        ...(race.question == null ? [] : [race.question]),
+        table(
+          [
+            m.col_option(),
+            isSeated
+              ? race.results[0]?.person == null
+                ? m.col_seats()
+                : m.col_electors()
+              : m.col_share(),
+            ...(isDecided ? [m.col_result()] : []),
+          ],
+          rows.map((row) => (isDecided ? row : row.slice(0, 2))),
+        ),
+      ];
+    }),
+    ...(data.upcoming.length === 0
+      ? []
+      : [
+          `## ${m.home_upcoming()}`,
+          table(
+            [m.col_date(), m.col_election()],
+            data.upcoming.map((election) => [
+              date(election.date),
+              link(election.name, election.path),
+            ]),
+          ),
+        ]),
+    ...(data.today.length === 0
+      ? []
+      : [
+          `## ${m.home_today()}`,
+          m.home_today_lede(),
+          table(
+            [m.col_date(), m.col_election(), m.col_polity()],
+            data.today.map((election) => [
+              date(election.date),
+              link(election.name, election.path),
+              election.polity,
+            ]),
+          ),
+        ]),
+    `## ${m.home_polities()}`,
+    table(
+      [m.col_polity(), m.polity_elections(), m.person_years(), m.home_latest()],
+      listed.map((polity) => [
+        link(polity.name, polity.path),
+        count(polity.elections + polity.within),
+        span(polity.first, polity.last),
+        polity.latest == null
+          ? null
+          : link(polity.latest.name, polity.latest.path),
+      ]),
+    ),
+  ];
+}
+
 function personMarkdown(
   person: Extract<Data, { kind: "person" }>["person"],
+  lanes: Extract<Data, { kind: "person" }>["parties"],
   link: Link,
 ) {
+  const years = (from: string | null, to: string | null) =>
+    to == null
+      ? m.person_served_now({ from: from?.slice(0, 4) ?? "" })
+      : m.person_served_span({
+          from: from?.slice(0, 4) ?? "",
+          to: to.slice(0, 4),
+        });
+  const roles = {
+    member: m.person_parties_member,
+    office: m.person_parties_office,
+    group: m.person_parties_group,
+  };
+  const ways = {
+    nominated: m.person_parties_nominated,
+    line: m.person_parties_line,
+    endorsed: m.person_parties_endorsed,
+    supported: m.person_parties_supported,
+    member: m.person_parties_member_ran,
+    independent: m.person_parties_independent,
+  };
   const born =
     person.born == null
       ? null
@@ -405,6 +505,55 @@ function personMarkdown(
     ]
       .filter((part) => part != null)
       .join(", "),
+    ...[
+      { title: m.person_served(), spells: person.served },
+      { title: m.person_elected(), spells: person.elected },
+    ].flatMap(({ title, spells }) =>
+      spells.length === 0
+        ? []
+        : [
+            `## ${title}`,
+            table(
+              [m.col_name(), m.person_years()],
+              spells.map((spell) => [
+                spell.isBody ? link(spell.name, `id/${spell.id}`) : spell.name,
+                years(spell.from, spell.to),
+              ]),
+            ),
+          ],
+    ),
+    ...(lanes.length === 0
+      ? []
+      : [
+          `## ${m.person_parties()}`,
+          table(
+            [m.col_party(), m.col_role(), m.person_years()],
+            lanes.flatMap((lane) => {
+              const party = lane.party?.label ?? m.person_parties_none();
+              return [
+                ...lane.spans.map((spell) => [
+                  party,
+                  roles[spell.kind](),
+                  spell.from == null && spell.to == null
+                    ? null
+                    : years(spell.from, spell.to),
+                ]),
+                ...Map.groupBy(lane.ballots, (ballot) => ballot.how)
+                  .entries()
+                  .map(([how, ballots]) => {
+                    const held = ballots.map((ballot) =>
+                      Number(ballot.date.slice(0, 4)),
+                    );
+                    return [
+                      party,
+                      ways[how](),
+                      span(Math.min(...held), Math.max(...held)),
+                    ];
+                  }),
+              ];
+            }),
+          ),
+        ]),
     `## ${m.person_record()}`,
     person.record.length === 0
       ? m.person_empty()
@@ -501,11 +650,83 @@ function partyMarkdown(
 
 function polityMarkdown(
   polity: Extract<Data, { kind: "polity" }>["polity"],
+  record: Extract<Data, { kind: "polity" }>["record"],
   link: Link,
 ) {
+  const latest = polity.latest;
+  const labels = new Map(
+    record.parties.map((party) => [party.id, party.short ?? party.label]),
+  );
   return [
     `# ${polity.name}`,
     byline(polity.breadcrumbs, link, null),
+    ...(latest == null || latest.races.length === 0
+      ? []
+      : [
+          `## ${latest.isLocal ? m.polity_latest_local() : m.polity_latest()}`,
+          [
+            link(latest.name, latest.path),
+            latest.date == null ? null : date(latest.date),
+          ]
+            .filter((part) => part != null)
+            .join(", "),
+          ...latest.races.flatMap((race) => {
+            const isSeated = race.results.some((row) => row.seats != null);
+            return [
+              `### ${link(race.name, race.path)}`,
+              table(
+                [
+                  m.col_option(),
+                  m.col_votes(),
+                  m.col_share(),
+                  ...(isSeated ? [m.col_seats()] : []),
+                ],
+                race.results
+                  .slice(0, 8)
+                  .map((row) => [
+                    row.label,
+                    count(row.votes),
+                    percent(row.share),
+                    ...(isSeated
+                      ? [row.seats == null ? null : count(row.seats)]
+                      : []),
+                  ]),
+              ),
+            ];
+          }),
+        ]),
+    ...(record.series.length === 0
+      ? []
+      : [`## ${m.scrubber_title({ place: polity.name })}`]),
+    ...record.series.flatMap((series) => [
+      `### ${series.name}`,
+      table(
+        [m.col_year(), m.col_election(), m.col_result()],
+        series.points.toReversed().map((point) => {
+          const parties = point.parties
+            .toSorted((a, b) => b.seats - a.seats)
+            .map((row) => ({
+              label: labels.get(row.party ?? "") ?? m.person_parties_none(),
+              seats: row.seats,
+            }));
+          return [
+            point.year,
+            link(point.name, point.path),
+            series.isOffice
+              ? [
+                  parties[0]?.label,
+                  point.share == null ? null : percent(point.share),
+                ]
+                  .filter((part) => part != null)
+                  .join(", ")
+              : parties
+                  .slice(0, 4)
+                  .map((row) => `${row.label} ${count(row.seats)}`)
+                  .join(", "),
+          ];
+        }),
+      ),
+    ]),
     `## ${m.polity_elections()}`,
     polity.elections.length === 0
       ? m.polity_no_elections()
@@ -631,8 +852,34 @@ function electionMarkdown(
 
 function contestMarkdown(
   contest: Extract<Data, { kind: "contest" }>["contest"],
+  cycle: Extract<Data, { kind: "contest" }>["cycle"],
   link: Link,
 ) {
+  const groups: Record<string, () => string> = {
+    owner: () => "",
+    governor: m.cycle_governor,
+    legislature: m.cycle_legislature,
+    regional_office: m.cycle_regional_office,
+    national_measure: m.cycle_national_measure,
+    regional_measure: m.cycle_regional_measure,
+    local: m.cycle_local,
+    local_measure: m.cycle_local_measure,
+  };
+  const steps = [
+    ...cycle.primaries.map((step) => ({
+      ...step,
+      name:
+        step.party == null
+          ? m.cycle_general()
+          : (step.until == null ? m.cycle_primary : m.cycle_primaries)({
+              party: step.party.label,
+            }),
+    })),
+    ...(cycle.general == null || cycle.primaries.length === 0
+      ? []
+      : [{ ...cycle.general, name: m.cycle_general() }]),
+  ];
+  const day = cycle.day.groups.filter((group) => group.path != null);
   const { target } = contest;
   const then =
     target == null
@@ -667,6 +914,30 @@ function contestMarkdown(
             .map(
               (entry) =>
                 `- ${entry.current ? entry.name : link(entry.name, entry.path)}${entry.winner == null ? "" : `: ${entry.winner.label}${entry.winner.total > 0 ? `, ${percent(entry.winner.share)}` : ""}`}`,
+            )
+            .join("\n"),
+        ]),
+    ...(steps.length === 0
+      ? []
+      : [
+          `## ${m.cycle_road()}`,
+          table(
+            [m.col_date(), m.col_contest(), m.cycle_winner()],
+            steps.map((step) => [
+              step.date == null ? null : date(step.date),
+              step.isCurrent ? step.name : link(step.name, step.path),
+              step.winners.map((winner) => winner.label).join(", "),
+            ]),
+          ),
+        ]),
+    ...(day.length === 0 || cycle.day.date == null
+      ? []
+      : [
+          `## ${m.cycle_day({ date: date(cycle.day.date) })}`,
+          day
+            .map(
+              (group) =>
+                `- ${link(group.label ?? groups[group.kind]?.() ?? "", group.path)}${group.count > 1 ? ` (${count(group.count)})` : ""}`,
             )
             .join("\n"),
         ]),

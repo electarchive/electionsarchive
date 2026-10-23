@@ -1086,6 +1086,7 @@
   "download_retrieved": "Retrieved: {date}",
   "download_sources": "Sources: {sources}",
   "col_outcome": "Outcome",
+  "col_role": "Role",
   "provenance_title": "Sources and methods",
   "provenance_value_title": "Source for this number",
   "provenance_scan": "Digitized from page {page} of {title}. The highlighted box marks the number.",
