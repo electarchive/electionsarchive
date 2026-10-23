@@ -252,6 +252,11 @@
      "label": "Swift",
      "contest": "g",
      "candidate": "Swift"
+    },
+    {
+     "label": "Uncommitted",
+     "contest": "g",
+     "candidate": "Uncommitted"
     }
    ],
    "crop": [
@@ -285,6 +290,11 @@
      "label": "Swift",
      "contest": "g",
      "candidate": "Swift"
+    },
+    {
+     "label": "Uncommitted",
+     "contest": "g",
+     "candidate": "Uncommitted"
     }
    ],
    "crop": [
