@@ -1619,7 +1619,13 @@
                   style:background-color={part.color}
                 ></span>
               {/if}
-              <span class="truncate">{part.label}</span>
+              <span
+                class={cn({
+                  truncate: !isLead || part.photo == null,
+                  "line-clamp-2 leading-tight text-balance":
+                    isLead && part.photo != null,
+                })}>{part.label}</span
+              >
               {#if part.delta !== undefined}
                 <span
                   class={cn(

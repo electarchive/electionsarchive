@@ -937,6 +937,9 @@ async function load(
           join election xe on xe.id = xk.election_id
           left join entity_merge xm on xm.entity_id = xo.party_id
           where xc.person_id = cy.person_id and xc.id <> cy.id and not xc.is_independent
+            and (o.alliance_id is null or exists (
+              select from alliance_member am where am.alliance_id = o.alliance_id and am.party_id in (xo.party_id, xm.into_id)
+            ))
             and xe.date_from between (select e.date_from - 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
               and (select e.date_from + 2200 from contest k join election e on e.id = k.election_id where k.id = o.contest_id)
           order by abs(xe.date_from - (select e.date_from from contest k join election e on e.id = k.election_id where k.id = o.contest_id)), xe.date_from desc

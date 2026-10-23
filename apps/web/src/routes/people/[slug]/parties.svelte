@@ -35,15 +35,31 @@
   const dates = $derived(
     lanes.flatMap((lane) => [
       ...lane.spans.flatMap((span) =>
-        span.from == null ? [] : [span.from, span.to ?? today],
+        span.from == null
+          ? span.to == null
+            ? []
+            : [span.to]
+          : [span.from, span.to ?? today],
       ),
       ...lane.ballots.map((ballot) => ballot.date),
     ]),
   );
+  const first = $derived(
+    Number(
+      dates.toSorted((a, b) => a.localeCompare(b))[0]?.slice(0, 4) ?? 2000,
+    ),
+  );
   const low = $derived(
     Date.UTC(
-      Number(
-        dates.toSorted((a, b) => a.localeCompare(b))[0]?.slice(0, 4) ?? 2000,
+      Math.min(
+        first,
+        ...lanes.flatMap((lane) =>
+          lane.spans.flatMap((span) =>
+            span.from == null && span.to != null
+              ? [Number(span.to.slice(0, 4)) - 4]
+              : [],
+          ),
+        ),
       ),
       0,
       1,
@@ -82,7 +98,9 @@
   const kinds = $derived(
     new Set(
       lanes.flatMap((lane) =>
-        lane.spans.flatMap((span) => (span.from == null ? [] : [span.kind])),
+        lane.spans.flatMap((span) =>
+          span.from == null && span.to == null ? [] : [span.kind],
+        ),
       ),
     ),
   );
@@ -132,7 +150,7 @@
       <p class="text-sm text-muted-foreground">
         {m.person_parties_lede({
           count: String(named),
-          first: String(new Date(low).getUTCFullYear()),
+          first: String(first),
           last: String(new Date(high).getUTCFullYear() - 1),
         })}
       </p>
@@ -143,9 +161,16 @@
       <div class="max-sm:hidden"></div>
       <div class="relative block-5" aria-hidden="true">
         {#each ticks as year (year)}
+          {const x = $derived(at(`${year}-01-01`))}
           <span
-            class="absolute inset-bs-0 -translate-x-1/2 font-figures text-[0.6875rem] text-muted-foreground tabular-nums"
-            style:inset-inline-start="{at(`${year}-01-01`) * 100}%">{year}</span
+            class={cn(
+              "absolute inset-bs-0 font-figures text-[0.6875rem] text-muted-foreground tabular-nums",
+              {
+                "-translate-x-1/2": x > 0.04 && x < 0.96,
+                "-translate-x-full": x >= 0.96,
+              },
+            )}
+            style:inset-inline-start="{x * 100}%">{year}</span
           >
         {/each}
       </div>
@@ -181,8 +206,8 @@
               aria-hidden="true"
             ></span>
           {/each}
-          {#each lane.spans.filter((span) => span.from != null) as span, index (index)}
-            {const x0 = $derived(at(span.from))}
+          {#each lane.spans.filter((span) => span.from != null || span.to != null) as span, index (index)}
+            {const x0 = $derived(span.from == null ? 0 : at(span.from))}
             {const x1 = $derived(at(span.to))}
             <span
               class={cn("absolute rounded-full", {
@@ -194,6 +219,9 @@
               })}
               style:inset-inline-start="{x0 * 100}%"
               style:inline-size="max(0.25rem, {Math.max(x1 - x0, 0) * 100}%)"
+              style:mask-image={span.from == null
+                ? "linear-gradient(to right, transparent, black 70%)"
+                : undefined}
               aria-hidden="true"
             ></span>
           {/each}

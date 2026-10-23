@@ -145,6 +145,17 @@
       ),
     ),
   );
+  const bands = $derived(
+    (active?.points ?? []).map((point, index, points) => {
+      let room = band;
+      for (const other of [points[index - 1], points[index + 1]]) {
+        if (other?.held != null) {
+          room = Math.min(room, Math.abs(sx(other.at) - sx(point.at)) - 2);
+        }
+      }
+      return Math.max(2, room);
+    }),
+  );
   const traced = $derived(
     (active?.points ?? []).filter((point) => point.share != null),
   );
@@ -309,18 +320,19 @@
         {#if !isOffice}
           {#each active.points as point, index (index)}
             {#if point.held != null}
+              {const wide = $derived(bands[index] ?? band)}
               <rect
-                x={sx(point.at) - band / 2}
+                x={sx(point.at) - wide / 2}
                 y={sy(point.held)}
-                width={band}
+                width={wide}
                 height={Math.max(0, sy(0) - sy(point.held))}
                 fill="color-mix(in oklab, var(--party) {hovered === index
                   ? 34
                   : 20}%, transparent)"
               />
               <line
-                x1={sx(point.at) - band / 2}
-                x2={sx(point.at) + band / 2}
+                x1={sx(point.at) - wide / 2}
+                x2={sx(point.at) + wide / 2}
                 y1={sy(point.held)}
                 y2={sy(point.held)}
                 stroke="var(--party)"
