@@ -108,7 +108,8 @@
           aria-pressed={party === entry.key}
           onclick={() => (party = party === entry.key ? null : entry.key)}
         >
-          <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+          <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+          ></span>
           <span class="font-semibold">{labels.get(entry.key)}</span>
           <span class="font-figures text-xs text-muted-foreground tabular-nums"
             >{entry.members.filter((member) => member.name != null)

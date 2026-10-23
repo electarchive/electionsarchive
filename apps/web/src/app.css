@@ -170,6 +170,14 @@
   outline: none;
 }
 
+@utility chip {
+  box-shadow: inset 0 0 0 1px
+    light-dark(
+      color-mix(in oklab, var(--foreground) 16%, transparent),
+      transparent
+    );
+}
+
 @utility keycap {
   transition-property: background-color, color, border-color;
   transition-duration: 80ms;

@@ -381,7 +381,8 @@
                   aria-hidden="true"
                 >
                   {#if (page ?? other)?.party != null}
-                    <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"
+                    <span
+                      class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
                     ></span>
                   {/if}
                 </span>
@@ -402,7 +403,7 @@
                 >
               {:else}
                 <span
-                  class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
+                  class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
                 ></span>
               {/if}
               <span class="flex-1 min-inline-0">

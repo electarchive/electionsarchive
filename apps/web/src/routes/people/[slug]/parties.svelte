@@ -286,7 +286,8 @@
     >
       {#if kinds.has("office")}
         <li class="flex items-center gap-1.5">
-          <span class="rounded-full bg-(--party) block-2.5 inline-5"></span>
+          <span class="rounded-full bg-(--party) chip block-2.5 inline-5"
+          ></span>
           {m.person_parties_office()}
         </li>
       {/if}

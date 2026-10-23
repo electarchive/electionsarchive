@@ -339,7 +339,7 @@
                     style:--party={lead.tone}
                   >
                     <span
-                      class="shrink-0 rounded-xs bg-(--party) block-2 inline-2"
+                      class="shrink-0 rounded-xs bg-(--party) chip block-2 inline-2"
                     ></span>
                     <span
                       class="font-sans text-xs text-muted-foreground max-sm:sr-only"

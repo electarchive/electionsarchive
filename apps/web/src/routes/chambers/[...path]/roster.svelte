@@ -364,7 +364,7 @@
           >
             <span class="flex items-center gap-1.5 truncate">
               <span
-                class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
+                class="shrink-0 rounded-xs bg-(--party) chip block-2.5 inline-2.5"
               ></span>
               <a
                 class="truncate font-semibold hover:underline hover:underline-offset-4"

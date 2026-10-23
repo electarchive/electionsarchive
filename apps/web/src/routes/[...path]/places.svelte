@@ -4,6 +4,7 @@
   import ArrowDownIcon from "@lucide/svelte/icons/arrow-down";
   import ArrowUpIcon from "@lucide/svelte/icons/arrow-up";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
+  import { on } from "svelte/events";
   import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import { Input } from "#lib/components/ui/input/index.js";
@@ -283,10 +284,11 @@
 )}
   <button
     type="button"
+    tabindex={-1}
     class="relative z-1 cursor-help underline decoration-transparent decoration-dotted underline-offset-4 hover:decoration-current focus-visible:decoration-current"
     onclick={() => {
       provenance.value = {
-        label: `${row.name}, ${label.toLocaleLowerCase()}`,
+        label: `${row.name}, ${label}`,
         figure: text,
         measure,
         path: trace,
@@ -531,7 +533,7 @@
           all = false;
         }}
       >
-        <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+        <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"></span>
         <span class="font-semibold">{titles[index]}</span>
         {#if won > 0}
           <span class="font-figures text-xs text-muted-foreground tabular-nums"
@@ -585,7 +587,43 @@
     </p>
   {/if}
   <div class="-mx-2 overflow-x-auto">
-    <table class="border-collapse text-sm/tight inline-full">
+    <table
+      class="border-collapse text-sm/tight inline-full"
+      {@attach (table: HTMLTableElement) => {
+        const steps = new Map([
+          ["ArrowLeft", [0, -1]],
+          ["ArrowRight", [0, 1]],
+          ["ArrowUp", [-1, 0]],
+          ["ArrowDown", [1, 0]],
+        ]);
+        const stops = (line: Element | undefined) =>
+          [...(line?.querySelectorAll<HTMLElement>("a, button") ?? [])].filter(
+            (element) =>
+              element.getAttribute("aria-hidden") !== "true" &&
+              element.getClientRects().length > 0,
+          );
+        const walk = (event: KeyboardEvent) => {
+          const [down = 0, across = 0] = steps.get(event.key) ?? [];
+          const from = event.target;
+          const row =
+            from instanceof HTMLElement ? from.closest("tbody tr") : null;
+          if ((down === 0 && across === 0) || row == null) {
+            return;
+          }
+          const rows = [...(row.parentElement?.children ?? [])];
+          const at = stops(row).findIndex((element) => element === from);
+          const next = stops(rows[rows.indexOf(row) + down]);
+          const target =
+            next[Math.min(Math.max(at + across, 0), next.length - 1)];
+          if (at < 0 || target == null) {
+            return;
+          }
+          event.preventDefault();
+          target.focus();
+        };
+        return on(table, "keydown", walk);
+      }}
+    >
       <thead>
         <tr class="border-be text-[0.8125rem] text-muted-foreground">
           {#each columns as entry (entry.key)}
@@ -791,6 +829,7 @@
                   <span class="flex items-center gap-1.5">
                     <Name
                       class="relative z-1 truncate font-semibold max-inline-40"
+                      tabindex={-1}
                       label={titles[row.leader] ?? ""}
                       color={colors[row.leader]}
                       person={places.legend[row.leader]?.person}
@@ -802,7 +841,7 @@
                           percent(row.shares[row.leader] ?? 0),
                           "share",
                           row,
-                          `${titles[row.leader] ?? ""} ${m.col_share()}`,
+                          `${titles[row.leader] ?? ""} ${m.col_share().toLocaleLowerCase()}`,
                         )}{/if}</span
                     >
                   </span>
@@ -819,7 +858,7 @@
                     points(row.margin),
                     "margin",
                     row,
-                    m.col_margin(),
+                    m.col_margin().toLocaleLowerCase(),
                   )}
                 {/if}
               </td>
@@ -831,7 +870,12 @@
               )}
             >
               {#if row.valid > 0}
-                {@render cite(count(row.valid), "votes", row, votes)}
+                {@render cite(
+                  count(row.valid),
+                  "votes",
+                  row,
+                  votes.toLocaleLowerCase(),
+                )}
               {/if}
             </td>
             {#if comparing}
@@ -913,7 +957,7 @@
                           class="flex shrink-0 items-center justify-end gap-1 font-figures text-[0.8125rem] tabular-nums inline-16"
                         >
                           <span
-                            class="rounded-xs bg-(--party) block-2 inline-2 md:hidden"
+                            class="rounded-xs bg-(--party) chip block-2 inline-2 md:hidden"
                           ></span>
                           {points(Math.abs(shift))}
                         </span>

@@ -136,7 +136,7 @@
             >
               <span class="flex items-baseline gap-1.5 min-inline-0">
                 <span
-                  class="shrink-0 self-center rounded-xs bg-(--party) block-2 inline-2"
+                  class="shrink-0 self-center rounded-xs bg-(--party) chip block-2 inline-2"
                 ></span>
                 <span class="truncate font-semibold">{row.label}</span>
                 {#if row.current?.outcome != null}

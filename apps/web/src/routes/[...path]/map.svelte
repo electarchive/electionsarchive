@@ -2194,7 +2194,8 @@
             ></span>
             <span class="text-muted-foreground">{names[from]}</span>
             <span aria-hidden="true" class="text-muted-foreground">›</span>
-            <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+            <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+            ></span>
             <span class="font-semibold">{names[to]}</span>
             <span
               class="font-figures text-xs text-muted-foreground tabular-nums"
@@ -2305,7 +2306,8 @@
               only = only === index ? null : index;
             }}
           >
-            <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+            <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+            ></span>
             <span class="font-semibold">{names[index]}</span>
             {#if tallies?.[index] != null}
               <span
@@ -2593,7 +2595,7 @@
         <span
           class="flex shrink-0 items-center gap-1 rounded-xs bg-secondary px-1.5 text-xs font-semibold"
           style:--party={colors[moved.to]}
-          ><span class="rounded-xs bg-(--party) block-2 inline-2"
+          ><span class="rounded-xs bg-(--party) chip block-2 inline-2"
           ></span>{m.map_flipped()}</span
         >
       {:else if current.margin != null}
@@ -2659,7 +2661,7 @@
         class="flex items-center gap-2 text-[0.8125rem]"
         style:--party={colors[current.leader]}
       >
-        <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+        <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"></span>
         <span class="font-semibold"
           >{places.legend[current.leader]?.label ?? names[current.leader]}</span
         >

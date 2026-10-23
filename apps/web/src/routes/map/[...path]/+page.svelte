@@ -2197,7 +2197,8 @@
               title={m.atlas_only({ name: item.label })}
               onclick={() => (only = only === item.key ? null : item.key)}
             >
-              <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
+              <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
+              ></span>
               <span class="font-semibold">{item.label}</span>
               <span
                 class="font-figures text-xs text-muted-foreground tabular-nums"

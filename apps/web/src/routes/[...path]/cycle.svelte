@@ -94,7 +94,9 @@
 {#snippet link(path: string | null, text: string, isCurrent: boolean)}
   {#if path == null || isCurrent}
     <span
-      class={cn("font-semibold", { "bg-marker/45 px-0.5": isCurrent })}
+      class={cn("font-semibold", {
+        "bg-marker/45 px-0.5 dark:bg-marker dark:text-[#15171a]": isCurrent,
+      })}
       aria-current={isCurrent ? "page" : undefined}>{text}</span
     >
   {:else}

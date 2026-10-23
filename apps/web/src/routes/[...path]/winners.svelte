@@ -217,7 +217,7 @@
                 style:--party={row.tone}
               >
                 <span
-                  class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
+                  class="shrink-0 self-center rounded-xs bg-(--party) chip block-2.5 inline-2.5"
                 ></span>
                 <Preview
                   class={cn("truncate hover:highlighter", {

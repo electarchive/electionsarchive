@@ -14,6 +14,7 @@
     hasSwatch = true,
     person = null,
     party = null,
+    tabindex,
     class: className,
   }: {
     label: string;
@@ -21,6 +22,7 @@
     hasSwatch?: boolean;
     person?: string | null;
     party?: string | null;
+    tabindex?: number;
     class?: string;
   } = $props();
 
@@ -32,7 +34,7 @@
 {#snippet face()}
   {#if hasSwatch && color != null}
     <span
-      class="me-[0.35em] inline-block shrink-0 rounded-[0.15em] bg-(--swatch) align-[-0.02em] block-[0.62em] inline-[0.62em]"
+      class="me-[0.35em] inline-block shrink-0 rounded-[0.15em] bg-(--swatch) align-[-0.02em] chip block-[0.62em] inline-[0.62em]"
       style:--swatch={color}
       aria-hidden="true"
     ></span>
@@ -48,6 +50,7 @@
         <button
           {...props}
           type="button"
+          {tabindex}
           class={cn(
             "cursor-pointer text-start underline decoration-transparent decoration-1 underline-offset-[0.22em] transition-[text-decoration-color] hover:decoration-current focus-visible:decoration-current",
             className,

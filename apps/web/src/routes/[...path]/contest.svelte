@@ -1139,7 +1139,7 @@
           style:--party={swatch(row.color, row.key)}
         >
           <span
-            class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
+            class="shrink-0 self-center rounded-xs bg-(--party) chip block-2.5 inline-2.5"
           ></span>
           <span class="min-inline-0">
             <Name
@@ -1285,7 +1285,7 @@
                 onfocus={() => (focus = row.k)}
                 onblur={() => (focus = null)}
               >
-                <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"
+                <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"
                 ></span>
                 <span class="font-semibold">{row.name}</span>
                 <span
