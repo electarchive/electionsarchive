@@ -679,7 +679,11 @@ def link(state: str, day: date) -> tuple[str, str]:
         )
     if state == "NV":
         return SOURCE, (
-            f"https://www.nvsos.gov/SOSelectionPages/results/{day.year}StateWideGeneral/ElectionSummary.aspx"
+            WAYBACK.format(
+                "2015", f"http://www.nvsos.gov/soselectionpages/results/{day.year}StatewideGeneral/ElectionSummary.aspx"
+            )
+            if day.year < 2016
+            else f"https://www.nvsos.gov/SOSelectionPages/results/{day.year}StateWideGeneral/ElectionSummary.aspx"
             if day in NEVADA
             else ""
         )
@@ -2031,7 +2035,7 @@ def parse() -> None:
             records = []
             page = path.read_text(encoding="utf-8", errors="replace")
             for number, body in re.findall(
-                r"(?is)<strong>\s*(?:state\s+)?(?:ballot\s+)?question\s+no\.\s*(\d+).*?<table[^>]*>(.*?)</table>", page
+                r"(?is)<(?:strong|b)>\s*(?:state\s+)?(?:ballot\s+)?question\s+no\.\s*(\d+).*?<table[^>]*>(.*?)</table>", page
             ):
                 headers = [
                     re.sub(r"<[^>]+>|&nbsp;", "", cell).strip()
