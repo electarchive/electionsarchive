@@ -41,6 +41,10 @@ WINNERS = (
     "Winners are those declared in Klarner's state legislative election returns for this race. The state's election "
     "archive marks only who led in each town, not who won the seat."
 )
+DOUBLED = (
+    "Klarner's state legislative election returns give every candidate in this race exactly twice the votes in the "
+    "town and ward results here."
+)
 
 
 def search(state: str, year: int) -> str:
@@ -234,6 +238,13 @@ def emit() -> Path:
                 [f"{SOURCE}.result_set", WINNERS],
             ).fetchall()
         )
+        flagged = dict(
+            conn.execute(
+                """select n.entity_id, n.id from note n join external_id x on x.entity_id = n.entity_id
+                   where x.scheme = %s and n.kind = 'caveat' and n.body_md like 'Klarner''s state legislative election returns give every candidate%%'""",
+                [f"{SOURCE}.result_set"],
+            ).fetchall()
+        )
         journal = cs.source("Vermont House of Representatives", "Journal of the House, January 4, 2017")
         if journal in cs.minted:
             cs.add(
@@ -339,7 +350,8 @@ def emit() -> Path:
                 off = [
                     name for name, (_, votes) in matched.items() if abs(sums[name] - votes) > max(10, votes * TOLERANCE)
                 ]
-                if stray or off:
+                doubled = bool(off) and all(votes == 2 * sums[name] for name, (_, votes) in matched.items())
+                if stray or (off and not doubled):
                     skipped.setdefault("a precinct sum misses the official total", []).append(key)
                     continue
                 result_set = cs.key(f"{SOURCE}.result_set", f"{key}:precinct")
@@ -353,8 +365,18 @@ def emit() -> Path:
                     status="active",
                     source_id=sources[state],
                     is_default=False,
-                    completeness=round(sum(sums[name] for name in matched) / official, 4),
+                    completeness=round(sum(sums[name] for name in matched) / official * (2 if doubled else 1), 4),
                 )
+                if doubled:
+                    cs.add("external_id", entity_id=result_set, scheme="ea.authoritative", value=str(result_set))
+                    if (str(result_set), DOUBLED) not in caveats:
+                        cs.add(
+                            "note",
+                            **({"id": flagged[result_set]} if result_set in flagged else {}),
+                            entity_id=result_set,
+                            kind="caveat",
+                            body_md=DOUBLED,
+                        )
                 picked = rows.filter(pl.col("name").is_in(list(matched)), pl.col("votes") > 0).with_columns(
                     code=pl.concat_str(
                         pl.lit(str(day.year)), pl.lit(state), "fips", pl.lit(""), "precinct", separator=":"
