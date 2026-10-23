@@ -1,6 +1,7 @@
 import re
 import subprocess
 from datetime import date
+from html import unescape
 from pathlib import Path
 
 import polars as pl
@@ -13,17 +14,20 @@ from ea.store import DATA, connect
 SOURCE = "us.ut_leg_pdf"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
-DAYS = {2000: date(2000, 11, 7), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7)}
-NUMBER = re.compile(r"\d[\d,]*")
+DAYS = {2000: date(2000, 11, 7), 2002: date(2002, 11, 5), 2004: date(2004, 11, 2), 2006: date(2006, 11, 7)}
+WORD = re.compile(r'<word xMin="([\d.]+)" yMin="([\d.]+)" xMax="([\d.]+)" yMax="[\d.]+">([^<]*)</word>')
 
 
 def cached(year: int) -> raw.Artifact:
-    stamp, path = ut_sos.FILES[(year, "general")]
+    stamp, path = ("20110927154946", "General/2002Gen.pdf") if year == 2002 else ut_sos.FILES[(year, "general")]
     return raw.cached(ut_sos.SOURCE, ut_sos.WAYBACK.format(stamp, ut_sos.SITE + path))
 
 
 def fetch() -> None:
     ut_sos.fetch()
+    raw.fetch(
+        ut_sos.SOURCE, ut_sos.WAYBACK.format("20110927154946", ut_sos.SITE + "General/2002Gen.pdf"), suffix=".pdf"
+    )
 
 
 def parse() -> None:
@@ -41,41 +45,57 @@ def parse() -> None:
                join result_set r on r.contest_id = x.entity_id and r.is_default
                join result_value v on v.result_set_k = r.k and v.measure = 1
                join contest_option o on o.k = v.option_k and o.kind = 'candidate'
-               where x.scheme = 'us.contest' and x.value ~ '^20(00|04|06)-11-0[0-9]:UT:(house|senate):\\d+:g$'
+               where x.scheme = 'us.contest' and x.value ~ '^20(00|02|04|06)-11-0[0-9]:UT:(house|senate):\\d+:g$'
                group by 1, 2"""
         ).fetchall():
             day = date.fromisoformat(key[:10])
             held.setdefault((day, int(votes)), []).append((key.split(":", 2)[2], label))
     rows: list[tuple[date, str, str, str, int]] = []
     for year, day in DAYS.items():
-        text = subprocess.run(
-            ["pdftotext", "-layout", str(cached(year).path), "-"], capture_output=True, text=True, check=True
+        html = subprocess.run(
+            ["pdftotext", "-bbox", str(cached(year).path), "-"], capture_output=True, text=True, check=True
         ).stdout
-        for number, page in enumerate(text.split("\f"), 1):
-            lines = page.splitlines()
-            total = next((line for line in lines if re.match(r"\s*total\b", line, re.IGNORECASE)), None)
-            if total is None or not re.search(r"(?i)senate|house", page):
+        pages = [
+            [(float(x1), float(y), unescape(text)) for _, y, x1, text in WORD.findall(page)]
+            for page in html.split("<page ")[1:]
+        ]
+        grids: list[tuple[float, dict[str, float]]] = []
+        for words in pages:
+            lines: dict[float, list[str]] = {}
+            for _, y, text in words:
+                if re.fullmatch(r"[A-Za-z]+", text):
+                    lines.setdefault(round(y, 1), []).append(text)
+            labels = sorted((y, "".join(texts).lower()) for y, texts in lines.items())
+            places: dict[str, float] = {}
+            for (y, label), following in zip(labels, [*labels[1:], (0.0, "")], strict=True):
+                if label == "washingto" and following[1] == "n":
+                    places[codes["washington"]] = following[0]
+                elif (code := codes.get(label)) is not None:
+                    places[code] = y
+            total = next((y for y, label in labels if label == "total"), None)
+            if total is not None and len(places) >= 25 and (total, places) not in grids:
+                grids.append((total, places))
+        for number, words in enumerate(pages, 1):
+            if not re.search(r"(?i)senate|house", " ".join(text for _, _, text in words)):
                 continue
-            anchors = [match.end() for match in NUMBER.finditer(total)]
-            printed = [int(match[0].replace(",", "")) for match in NUMBER.finditer(total)]
-            cells: dict[int, list[tuple[str, int]]] = {}
-            for line in lines:
-                label = re.match(r"\s*([A-Za-z][A-Za-z .]*?)\s{2,}\d", line)
-                if label is None or (code := codes.get(re.sub(r"[^a-z]", "", label[1].lower()))) is None:
+            figures = [(x, y, int(text.replace(",", ""))) for x, y, text in words if re.fullmatch(r"\d[\d,]*", text)]
+            for total, places in grids:
+                printed = sorted((x, value) for x, y, value in figures if abs(y - total) < 2)
+                if len(printed) < 3:
                     continue
-                for match in NUMBER.finditer(line):
-                    column = min(range(len(anchors)), key=lambda index: abs(anchors[index] - match.end()))
-                    if abs(anchors[column] - match.end()) <= 4:
-                        cells.setdefault(column, []).append((code, int(match[0].replace(",", ""))))
-            for column in range(2, len(anchors)):
-                found = held.get((day, printed[column]), [])
-                if sum(votes for _, votes in cells.get(column, [])) != printed[column]:
-                    print(f"{year} page {number} column {column}: counties do not sum to {printed[column]}, skipped")
-                elif len(found) != 1:
-                    print(f"{year} page {number} column {column}: {len(found)} held options total {printed[column]}")
-                else:
-                    key, label = found[0]
-                    rows.extend((day, key, code, label, votes) for code, votes in cells[column])
+                for anchor, expected in printed:
+                    cells = [
+                        (code, value)
+                        for code, place in places.items()
+                        for x, y, value in figures
+                        if abs(y - place) < 2 and abs(x - anchor) <= 4
+                    ]
+                    found = held.get((day, expected), [])
+                    if sum(value for _, value in cells) != expected or len(cells) < 1:
+                        continue
+                    if len(found) == 1:
+                        key, label = found[0]
+                        rows.extend((day, key, code, label, value) for code, value in cells)
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(rows, schema=["day", "chamber", "code", "candidate", "votes"], orient="row").unique().select(
         year=pl.col("day").dt.year().cast(pl.Int32),
@@ -101,7 +121,7 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from external_id x
                    join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
-                   where x.scheme = 'us.contest' and x.value ~ '^20(00|04|06)-11-0[0-9]:UT:(house|senate):'
+                   where x.scheme = 'us.contest' and x.value ~ '^20(00|02|04|06)-11-0[0-9]:UT:(house|senate):'
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k and u.scheme_code in ('us.precinct', 'us.county', 'us.county_part'))"""
             ).fetchall()
