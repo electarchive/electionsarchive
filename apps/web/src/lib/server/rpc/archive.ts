@@ -1558,7 +1558,7 @@ async function chamber(
   const seated = (entry: { side: Side } | undefined) =>
     entry == null
       ? []
-      : compare(entry.side, null, lineage, "party").filter(
+      : compare(entry.side, null, lineage, "party", "party").filter(
           (row) => (row.current?.seats ?? 0) > 0,
         );
   const own = seated(shape == null ? undefined : current.get(area.k));
@@ -1580,6 +1580,12 @@ async function chamber(
   const here = new Map(own.map((row) => [row.key, row]));
   const rows = isFocus ? wide : own;
   const isAlone = shape == null || shape.roots.length === 0;
+  const parties = await names(
+    rows.flatMap((row) =>
+      row.key.startsWith("party:") ? [row.key.slice("party:".length)] : [],
+    ),
+    contest.date,
+  );
   const { places, seats } = await holders(
     isAlone ? [contest.id] : shape.roots,
     contest.date,
@@ -1607,8 +1613,8 @@ async function chamber(
     here: at === -1 ? null : at,
     parties: rows.map((row) => ({
       key: row.key,
-      label: row.label,
-      short: row.short,
+      label: parties.full.get(row.key.slice("party:".length)) ?? row.label,
+      short: parties.short.get(row.key.slice("party:".length)) ?? row.short,
       color: here.get(row.key)?.color ?? row.color,
       lean: row.lean,
       seats: row.current?.seats ?? 0,
