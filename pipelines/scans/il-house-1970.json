@@ -232,10 +232,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.054,
+    0.02,
     0.146,
-    0.76,
-    0.422
+    1.0,
+    0.419
    ],
    "hint": "Read only the table headed '33rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -261,10 +261,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.054,
+    0.02,
     0.414,
-    0.76,
-    0.556
+    1.0,
+    0.553
    ],
    "hint": "Read only the table headed '34th District—Winnebago County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -290,10 +290,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.054,
+    0.02,
     0.548,
-    0.76,
-    0.833
+    1.0,
+    0.83
    ],
    "hint": "Read only the table headed '35th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -319,10 +319,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.054,
+    0.02,
     0.825,
-    0.76,
-    0.981
+    1.0,
+    1.0
    ],
    "hint": "Read only the table headed '36th District—Kane County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -348,10 +348,10 @@
    ],
    "orientation": "counties_across",
    "crop": [
-    0.07,
+    0.02,
     0.163,
-    0.773,
-    0.279
+    1.0,
+    0.276
    ],
    "hint": "Read only the table headed '38th District—DuPage County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -387,10 +387,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.07,
+    0.02,
     0.271,
-    0.773,
-    0.581
+    1.0,
+    0.578
    ],
    "hint": "Read only the table headed '39th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -416,10 +416,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.07,
+    0.02,
     0.573,
-    0.773,
-    0.854
+    1.0,
+    0.851
    ],
    "hint": "Read only the table headed '40th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -450,10 +450,10 @@
    ],
    "orientation": "counties_across",
    "crop": [
-    0.07,
+    0.02,
     0.846,
-    0.773,
-    0.987
+    1.0,
+    1.0
    ],
    "hint": "Read only the table headed '41st District—Will County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -484,10 +484,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.06,
+    0.02,
     0.144,
-    0.748,
-    0.419
+    1.0,
+    0.564
    ],
    "hint": "Read only the table headed '42nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -518,10 +518,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.06,
+    0.02,
     0.559,
-    0.748,
-    0.817
+    1.0,
+    0.814
    ],
    "hint": "Read only the table headed '44th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -547,9 +547,9 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.06,
+    0.02,
     0.809,
-    0.748,
+    1.0,
     1.0
    ],
    "hint": "Read only the table headed '45th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
@@ -581,10 +581,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.06,
+    0.02,
     0.146,
-    0.77,
-    0.411
+    1.0,
+    0.408
    ],
    "hint": "Read only the table headed '46th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -610,10 +610,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.06,
+    0.02,
     0.403,
-    0.77,
-    0.705
+    1.0,
+    0.702
    ],
    "hint": "Read only the table headed '47th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -644,10 +644,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.06,
+    0.02,
     0.697,
-    0.77,
-    0.969
+    1.0,
+    0.966
    ],
    "hint": "Read only the table headed '48th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -678,9 +678,9 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.06,
+    0.02,
     0.961,
-    0.77,
+    1.0,
     1.0
    ],
    "hint": "Read only the table headed '49th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
@@ -712,10 +712,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.067,
+    0.02,
     0.144,
-    0.773,
-    0.443
+    1.0,
+    0.44
    ],
    "hint": "Read only the table headed '50th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -746,10 +746,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.067,
+    0.02,
     0.435,
-    0.773,
-    0.691
+    1.0,
+    0.688
    ],
    "hint": "Read only the table headed '51st District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -780,10 +780,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.067,
+    0.02,
     0.683,
-    0.773,
-    0.942
+    1.0,
+    0.939
    ],
    "hint": "Read only the table headed '52nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -814,9 +814,9 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.067,
+    0.02,
     0.934,
-    0.773,
+    1.0,
     1.0
    ],
    "hint": "Read only the table headed '53rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
@@ -848,10 +848,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.037,
+    0.02,
     0.159,
-    0.746,
-    0.516
+    1.0,
+    0.513
    ],
    "hint": "Read only the table headed '54th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -882,10 +882,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.037,
+    0.02,
     0.508,
-    0.746,
-    0.69
+    1.0,
+    0.687
    ],
    "hint": "Read only the table headed '55th District—Madison County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -916,10 +916,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.037,
+    0.02,
     0.682,
-    0.746,
-    0.827
+    1.0,
+    0.824
    ],
    "hint": "Read only the table headed '56th District—St. Clair County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -950,9 +950,9 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.037,
+    0.02,
     0.819,
-    0.746,
+    1.0,
     1.0
    ],
    "hint": "Read only the table headed '57th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
@@ -984,10 +984,10 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.07,
+    0.02,
     0.152,
-    0.775,
-    0.454
+    1.0,
+    0.451
    ],
    "hint": "Read only the table headed '58th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
   },
@@ -1018,12 +1018,13 @@
    ],
    "orientation": "counties_down",
    "crop": [
-    0.07,
+    0.02,
     0.446,
-    0.775,
-    0.794
+    1.0,
+    1.0
    ],
-   "hint": "Read only the table headed '59th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+   "hint": "Read only the table headed '59th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "bands": 2
   }
  ],
  "halves": true,
