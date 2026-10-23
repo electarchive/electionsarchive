@@ -1,0 +1,374 @@
+{
+ "polity": "US-KS",
+ "publisher": "Kansas Secretary of State",
+ "title": "2014 primary election official results by county",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.ks.gov/elections/14elec/2014_Official_Primary_Election_Results_by_county.pdf"
+ },
+ "raw_source": "us.ks_pri_2014",
+ "contests": {
+  "g": {
+   "year": 2014,
+   "chamber": "governor:republican",
+   "day": "2014-08-05",
+   "special": false,
+   "state": "KS",
+   "district": null
+  },
+  "s": {
+   "year": 2014,
+   "chamber": "secretary-of-state:republican",
+   "day": "2014-08-05",
+   "special": false,
+   "state": "KS",
+   "district": null
+  },
+  "i": {
+   "year": 2014,
+   "chamber": "commissioner-of-insurance:republican",
+   "day": "2014-08-05",
+   "special": false,
+   "state": "KS",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 12,
+   "id": "g12",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Davis / Docking",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Brownback / Colyer",
+     "contest": "g",
+     "candidate": "Sam Brownback"
+    },
+    {
+     "label": "Winn / Lais",
+     "contest": "g",
+     "candidate": "Jennifer Winn"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 13,
+   "id": "g13",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Davis / Docking",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Brownback / Colyer",
+     "contest": "g",
+     "candidate": "Sam Brownback"
+    },
+    {
+     "label": "Winn / Lais",
+     "contest": "g",
+     "candidate": "Jennifer Winn"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 14,
+   "id": "g14",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Davis / Docking",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Brownback / Colyer",
+     "contest": "g",
+     "candidate": "Sam Brownback"
+    },
+    {
+     "label": "Winn / Lais",
+     "contest": "g",
+     "candidate": "Jennifer Winn"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 15,
+   "id": "s15",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Jean Kurtis Schodorf",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kris Kobach",
+     "contest": "s",
+     "candidate": "Kris Kobach"
+    },
+    {
+     "label": "Scott Morgan",
+     "contest": "s",
+     "candidate": "Scott Morgan"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 16,
+   "id": "s16",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Jean Kurtis Schodorf",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kris Kobach",
+     "contest": "s",
+     "candidate": "Kris Kobach"
+    },
+    {
+     "label": "Scott Morgan",
+     "contest": "s",
+     "candidate": "Scott Morgan"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 17,
+   "id": "s17",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Jean Kurtis Schodorf",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kris Kobach",
+     "contest": "s",
+     "candidate": "Kris Kobach"
+    },
+    {
+     "label": "Scott Morgan",
+     "contest": "s",
+     "candidate": "Scott Morgan"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 24,
+   "id": "i24",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Dennis Anderson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Beverly Gossage",
+     "contest": "i",
+     "candidate": "Beverly Gossage"
+    },
+    {
+     "label": "David J. Powell",
+     "contest": "i",
+     "candidate": "David J. Powell"
+    },
+    {
+     "label": "Ken Selzer",
+     "contest": "i",
+     "candidate": "Ken Selzer"
+    },
+    {
+     "label": "Clark Shultz",
+     "contest": "i",
+     "candidate": "Clark Shultz"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 26,
+   "id": "i26",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Dennis Anderson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Beverly Gossage",
+     "contest": "i",
+     "candidate": "Beverly Gossage"
+    },
+    {
+     "label": "David J. Powell",
+     "contest": "i",
+     "candidate": "David J. Powell"
+    },
+    {
+     "label": "Ken Selzer",
+     "contest": "i",
+     "candidate": "Ken Selzer"
+    },
+    {
+     "label": "Clark Shultz",
+     "contest": "i",
+     "candidate": "Clark Shultz"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 28,
+   "id": "i28",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Dennis Anderson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Beverly Gossage",
+     "contest": "i",
+     "candidate": "Beverly Gossage"
+    },
+    {
+     "label": "David J. Powell",
+     "contest": "i",
+     "candidate": "David J. Powell"
+    },
+    {
+     "label": "Ken Selzer",
+     "contest": "i",
+     "candidate": "Ken Selzer"
+    },
+    {
+     "label": "Clark Shultz",
+     "contest": "i",
+     "candidate": "Clark Shultz"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 25,
+   "id": "i25",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "John M. Toplikar",
+     "contest": "i",
+     "candidate": "John M. Toplikar"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 27,
+   "id": "i27",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "John M. Toplikar",
+     "contest": "i",
+     "candidate": "John M. Toplikar"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  },
+  {
+   "page": 29,
+   "id": "i29",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "John M. Toplikar",
+     "contest": "i",
+     "candidate": "John M. Toplikar"
+    }
+   ],
+   "crop": [
+    0.03,
+    0.08,
+    0.99,
+    0.97
+   ]
+  }
+ ]
+}
