@@ -12254,6 +12254,7 @@ export const search = {
               when t.type = 'person' then coalesce((
                 select 0.1 * ln(1 + count(*)) + 0.15 * bool_or(tn.office_id is not null)::int
                 from tenure tn where tn.person_id = t.entity_id), 0)
+                + 0.2 * exists (select from external_id z where z.entity_id = t.entity_id and z.scheme = 'wikidata')::int
                 + coalesce((
                 select 0.2 * greatest(0, least(1, (extract(year from max(e.date_from)) - 1850) / 176))
                 from candidacy cy join contest_option o on o.id = cy.option_id
@@ -12274,10 +12275,12 @@ export const search = {
           select
             case top.type
               when 'person' then (
-                select c.id from candidacy cy
+                select case when c.kind = 'list_allocation' then c.id else coalesce(c.allocation_parent_id, c.id) end
+                from candidacy cy
                 join contest_option o on o.id = cy.option_id join contest c on c.id = o.contest_id
                 join election e on e.id = c.election_id
-                where cy.person_id = top.entity_id order by e.date_from desc nulls last limit 1)
+                where cy.person_id = top.entity_id order by o.kind = 'write_in', extract(year from e.date_from) desc nulls last,
+                  e.kind = 'indirect', e.date_from desc limit 1)
               when 'party' then (
                 select c.id from contest_option o join contest c on c.id = o.contest_id
                 join election e on e.id = c.election_id
