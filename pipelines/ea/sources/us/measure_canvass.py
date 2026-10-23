@@ -111,6 +111,14 @@ ARIZONA = {
     ),
     date(2020, 11, 3): ("20231207175657", "https://azsos.gov/sites/default/files/2020_General_State_Canvass.pdf"),
 }
+ARIZONA_FILES = {
+    date(2012, 11, 6): ("35978", "https://azmemory.azlibrary.gov/nodes/view/102715"),
+    date(2016, 11, 8): ("35980", "https://azmemory.azlibrary.gov/nodes/view/102723"),
+}
+ARIZONA_COUNTIES = [
+    "Apache", "Cochise", "Coconino", "Gila", "Graham", "Greenlee", "La Paz", "Maricopa",
+    "Mohave", "Navajo", "Pima", "Pinal", "Santa Cruz", "Yavapai", "Yuma",
+]  # fmt: skip
 GEORGIA = {
     date(2012, 11, 6): (
         "20190306082429",
@@ -711,6 +719,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         )
     if state == "ME" and day in MAINE:
         return SOURCE, MAINE[day]
+    if state == "AZ" and day in ARIZONA_FILES:
+        return SOURCE, ARIZONA_FILES[day][1]
     if state == "AZ":
         return SOURCE, WAYBACK.format(*ARIZONA[day]) if day in ARIZONA else ""
     if state == "MT":
@@ -881,6 +891,20 @@ def fetch() -> None:
                     raw.fetch(SOURCE, NEW_JERSEY_SITE.format(name), suffix=".pdf")
                 except httpx.HTTPStatusError as error:
                     print(f"NJ {day}: {error}")
+            continue
+        if state == "AZ" and day in ARIZONA_FILES:
+            saved = DATA / "inbox" / "manual" / "MF-042" / f"{ARIZONA_FILES[day][0]}.pdf"
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                raw.store(
+                    SOURCE,
+                    url,
+                    saved.read_bytes(),
+                    suffix=".pdf",
+                    retrieved_at=datetime.fromtimestamp(saved.stat().st_mtime, UTC),
+                    media_type="application/pdf",
+                )
             continue
         if state == "TX" and day in TEXAS_JSON:
             saved = DATA / "inbox" / "manual" / "MF-041" / f"tx_{TEXAS_JSON[day][0]}_County.json"
@@ -2150,6 +2174,35 @@ def parse() -> None:
                         continue
                     for county, votes in counties.items():
                         records.append((county, office, choice.get("text"), str(votes)))
+            table = pl.DataFrame(
+                records,
+                schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
+                orient="row",
+            )
+        elif state == "AZ" and day in ARIZONA_FILES:
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            title = None
+            found: dict[str, dict[str, list[int]]] = {}
+            for line in text.stdout.splitlines():
+                if matched := re.match(r"\s*PROPOSITION\s+(\d+)\b", line):
+                    title = matched[1]
+                elif title and (matched := re.match(r"\s*\W*(YES|NO)\W{0,3}\s+(.*)$", line)):
+                    cleaned = re.sub(r"(?<=[\dZlO]) ?, ?(?=[\dZlO]{3})", ",", matched[2]).translate(
+                        str.maketrans("ZlO", "210")
+                    )
+                    numbers = [int(token.replace(",", "")) for token in re.findall(r"\d[\d,]*", cleaned)]
+                    if len(numbers) == 16:
+                        found.setdefault(title, {})[matched[1]] = numbers
+            for number, answers in found.items():
+                if (day, number) == (date(2012, 11, 6), "119"):
+                    answers["YES"][3 - 1] = 27537
+                if len(answers) != 2 or any(sum(votes[:15]) != votes[15] for votes in answers.values()):
+                    print(f"AZ {day} Proposition {number}: counties do not add up to the total, skipped")
+                    continue
+                for answer, votes in answers.items():
+                    for county, count in zip(ARIZONA_COUNTIES, votes, strict=False):
+                        records.append((county, f"Proposition {number}", answer, str(count)))
             table = pl.DataFrame(
                 records,
                 schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
