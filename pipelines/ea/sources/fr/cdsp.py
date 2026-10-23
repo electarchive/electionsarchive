@@ -741,6 +741,15 @@ def emit() -> Path:
             summary="French presidential elections 1965–2022 by département and legislative elections 1958–2022 by constituency",
             polity="FR",
         )
+        empty = {
+            str(result_set)
+            for (result_set,) in conn.execute(
+                """select r.id from result_set r join changeset c on c.id = r.changeset_id
+                   where c.pipeline = %s and r.status = 'active'
+                   and not exists (select from result_value v where v.result_set_k = r.k)""",
+                [SOURCE],
+            ).fetchall()
+        }
 
         def name(
             entity: UUID,
@@ -1111,7 +1120,7 @@ def emit() -> Path:
                             is_default=year not in COUNCIL,
                             completeness=None if partial else 1,
                         )
-                        fresh = result_set in cs.minted
+                        fresh = result_set in cs.minted or str(result_set) in empty
                         declared = council.filter((pl.col("year") == year) & (pl.col("round") == number))
                         official = cs.key(f"{SOURCE}.result_set", f"{contest_key}:council") if year in COUNCIL else None
                         if official is not None:
@@ -1226,7 +1235,7 @@ def emit() -> Path:
                             is_default=True,
                             completeness=1,
                         )
-                        fresh = result_set in cs.minted
+                        fresh = result_set in cs.minted or str(result_set) in empty
                         unit = circ_units[(circ, era)]
                         tendencies = year < 1988
                         if fresh and tendencies:
