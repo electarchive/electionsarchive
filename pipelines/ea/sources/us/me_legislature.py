@@ -88,6 +88,13 @@ def parse() -> None:
             text=True,
             check=True,
         ).stdout
+        if (day, chamber) == (date(2004, 11, 2), "house"):
+            text = re.sub(
+                r"(WALDO\s+216\s+53\.9%)(\s+0\s+0\.0%)(.*?)\n\s+185\s+46\.1%\n",
+                r"\1   185   46.1%\2\3\n",
+                text,
+                flags=re.DOTALL,
+            )
         coded = day.year >= 2012
         block = -1
         district = None
@@ -377,6 +384,8 @@ def emit() -> Path:
                 )
                 match = town(spelling) if town(spelling) in places else close[0] if close else None
                 candidates[name] = {COUNTIES[county]} if county else places[match] if match else set()
+                if (chamber, town(spelling)) == ("senate", town("T3 ND TWP")):
+                    candidates[name] = {"23009"}
                 resolved[name] = next(iter(candidates[name])) if len(candidates[name]) == 1 else None
                 labels[name] = name if county or match is None else spelled[match]
             known = {fips for fips in resolved.values() if fips}
