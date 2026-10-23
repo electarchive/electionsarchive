@@ -33,6 +33,7 @@ type Link = (name: string, path: string | null) => string;
 const TITLES = {
   county: m.coverage_goal_county,
   history: m.coverage_goal_history,
+  legislature_history: m.coverage_goal_legislature_history,
   precinct: m.coverage_goal_precinct,
   shapes: m.coverage_goal_shapes,
   shapes_history: m.coverage_goal_shapes_history,

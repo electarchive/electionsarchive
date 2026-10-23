@@ -7,6 +7,7 @@ import { db } from "#lib/server/db/index.js";
 const GOALS = [
   "county",
   "history",
+  "legislature_history",
   "precinct",
   "shapes",
   "shapes_history",
