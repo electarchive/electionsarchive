@@ -64,8 +64,13 @@
   "home_polities": "Polities",
   "home_elections": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} election",
         "countPlural=*": "{count} elections"
@@ -181,6 +186,7 @@
   "places_shared": "Located in {place}",
   "places_deeper": "View {noun} results by {finer}",
   "places_title": "Results by {noun}",
+  "places_unrecorded": "No results recorded",
   "places_no_earlier": "{year} has no results at this level; shifts cannot be shown.",
   "places_level": "Show results by",
   "places_filter": "Filter by name",
@@ -194,7 +200,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {nouns}"
@@ -203,8 +211,13 @@
   ],
   "map_electoral": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} electoral vote",
         "countPlural=*": "{count} electoral votes"
@@ -241,7 +254,9 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{party} won {count} seat in {where}",
         "countPlural=*": "{party} won {count} seats in {where}"
@@ -271,8 +286,13 @@
   "check_votes_valid_unit": "{name}: votes add up to {votes}, but {valid} valid ballots are reported",
   "checks_turnout": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} unit reports more ballots than registered voters",
         "countPlural=*": "{count} units report more ballots than registered voters"
@@ -281,8 +301,13 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} unit reports votes that don't add up to its valid ballots",
         "countPlural=*": "{count} units report votes that don't add up to their valid ballots"
@@ -294,8 +319,13 @@
   "election_unplaced_detail": "These contests, such as university seats, have no geographic area and are excluded from the table and map.",
   "election_parts": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} part",
         "countPlural=*": "{count} parts"
@@ -334,8 +364,13 @@
   "race_contests_nonvoting": "{count} contests, including {nonvoting} nonvoting delegate races",
   "race_contests": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} contest",
         "countPlural=*": "{count} contests"
@@ -473,8 +508,13 @@
   "lists_title": "Candidate lists",
   "lists_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} seat filled from ranked party lists",
         "seatsPlural=*": "{seats} seats filled from ranked party lists"
@@ -484,8 +524,13 @@
   "lists_winners": "Lists that won seats",
   "lists_all": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "All {count} list",
         "countPlural=*": "All {count} lists"
@@ -496,8 +541,13 @@
   "lists_collapse": "Show top of lists",
   "lists_more": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} more candidate",
         "countPlural=*": "{count} more candidates"
@@ -506,8 +556,13 @@
   ],
   "lists_seats": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} seat",
         "countPlural=*": "{count} seats"
@@ -1123,6 +1178,19 @@
   "coverage_goal_county": "Every federal, statewide, and state legislative contest since 2000, primaries and runoffs included, with results by county or finer",
   "coverage_goal_history": "Every contest before 2000, including primaries and runoffs: federal and statewide contests from 1824 with results by county, and state legislative contests with district totals",
   "coverage_goal_history_note": "Most states printed only district totals for their legislatures before 2000, so that is the goal for those contests. Federal and statewide contests before 1824 are not counted yet.",
+  "coverage_goal_turnout": "Registered voters and ballots cast for every statewide election day: general elections from 1948; primaries, runoffs, and statewide referendums from 2000",
+  "coverage_goal_tab_turnout": "Turnout",
+  "coverage_goal_turnout_note": "Before 1948, many states kept no statewide count of registered voters, so earlier elections are not counted yet. North Dakota has had no voter registration since 1951, so its elections need only ballots cast.",
+  "coverage_progress_turnout": "{complete} of {total} election days",
+  "coverage_reason_complete_turnout_def": "The archive has both the number of registered voters and the number of ballots cast or voters checked in.",
+  "coverage_reason_turnout_partial": "One figure missing",
+  "coverage_reason_turnout_partial_def": "The archive has registered voters or ballots cast, but not both.",
+  "coverage_reason_turnout_coarse": "Survey estimate only",
+  "coverage_reason_turnout_coarse_def": "The archive has only the Census Bureau's survey estimate of registration and voting, not the official counts.",
+  "coverage_reason_turnout_absent": "No turnout",
+  "coverage_reason_turnout_absent_def": "Election days with no turnout figures in the archive yet.",
+  "coverage_part_turnout_recent": "Since 2000, every statewide election day: {complete} of {total} ({percent})",
+  "coverage_part_turnout_earlier": "1948 to 1999, general elections: {complete} of {total} ({percent})",
   "coverage_part_national": "Federal and statewide, by county: {complete} of {total} ({percent})",
   "coverage_part_legislature": "State legislatures, by district total: {complete} of {total} ({percent})",
   "coverage_goal_precinct": "Every federal, statewide, and state legislative contest since 2000, primaries and runoffs included, with results by precinct",
@@ -1177,7 +1245,7 @@
   "coverage_column_name": "State, office, and year",
   "coverage_column_short": "Short",
   "coverage_column_done": "Meets goal",
-  "coverage_column_note": "Short is the number of contests (or election years for local governments) that do not meet the goal. Bar colors match the legend.",
+  "coverage_column_note": "Short is the number of contests that do not meet the goal, or election days for turnout and election years for local governments. Bar colors match the legend.",
   "coverage_count": "{label}: {count}",
   "coverage_icpsr": "ICPSR only",
   "coverage_icpsr_def": "Meets the goal, but the only county results come from ICPSR's historical files or from Algara and Amlani's returns compiled from them. Official returns will replace them.",
@@ -1198,6 +1266,10 @@
   "coverage_level_state_upper": "State senate",
   "coverage_level_state_lower": "State house",
   "coverage_level_statewide_measure": "Statewide ballot measures",
+  "coverage_level_general": "General elections",
+  "coverage_level_primary": "Primaries",
+  "coverage_level_runoff": "Runoffs",
+  "coverage_level_referendum": "Statewide referendums",
   "coverage_group_county": "Counties",
   "coverage_group_municipality": "Municipalities",
   "coverage_group_township": "Townships and towns",

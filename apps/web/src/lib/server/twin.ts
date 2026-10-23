@@ -67,6 +67,33 @@ const OUTCOMES: Record<string, () => string> = {
 const outcome = (value: string | null) =>
   value == null ? null : (OUTCOMES[value]?.() ?? value);
 
+const leading = (
+  row: {
+    leader: number | null;
+    shares: Array<number>;
+    valid: number;
+    isRecorded?: boolean;
+    declared?: { kind: string; isTacit: boolean; label: string } | null;
+  },
+  legend: Array<{ label: string }>,
+) => {
+  if (row.valid === 0 && row.declared != null) {
+    return [
+      row.leader == null
+        ? row.declared.label
+        : (legend[row.leader]?.label ?? null),
+      row.declared.isTacit ? m.map_unopposed() : outcome(row.declared.kind),
+    ];
+  }
+  if (row.leader == null) {
+    return [row.isRecorded === false ? m.places_unrecorded() : null, null];
+  }
+  return [
+    legend[row.leader]?.label ?? null,
+    percent(row.shares[row.leader] ?? 0),
+  ];
+};
+
 const span = (first: number | null, last: number | null) => {
   if (first == null || last == null) {
     return "";
@@ -812,10 +839,7 @@ function electionMarkdown(
             [m.col_name(), m.col_leader(), m.col_share()],
             districts.rows.map((row) => [
               link(row.name, row.path),
-              row.leader == null
-                ? null
-                : (districts.legend[row.leader]?.label ?? null),
-              row.leader == null ? null : percent(row.shares[row.leader] ?? 0),
+              ...leading(row, districts.legend),
             ]),
           ),
         ];
@@ -1073,10 +1097,7 @@ function placesMarkdown(
           row.leader == null ? null : (row.earlier?.[row.leader] ?? null);
         return [
           link(row.name, row.path),
-          row.leader == null
-            ? null
-            : (places.legend[row.leader]?.label ?? null),
-          row.leader == null ? null : percent(row.shares[row.leader] ?? 0),
+          ...leading(row, places.legend),
           row.margin == null ? null : points(row.margin),
           ...(isCompared
             ? [
@@ -1086,7 +1107,7 @@ function placesMarkdown(
                   : points((row.shares[row.leader] ?? 0) - before),
               ]
             : []),
-          count(row.valid),
+          row.valid === 0 && row.declared != null ? null : count(row.valid),
         ];
       }),
     ),

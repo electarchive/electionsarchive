@@ -202,7 +202,11 @@
             : a.value - b.value;
         return (
           Number(a.row.isCounted === false) -
-            Number(b.row.isCounted === false) || (descending ? -order : order)
+            Number(b.row.isCounted === false) ||
+          (column === "name"
+            ? 0
+            : Number(a.row.valid === 0) - Number(b.row.valid === 0)) ||
+          (descending ? -order : order)
         );
       })
       .map((entry) => {
@@ -240,7 +244,11 @@
         .replaceAll("%2F", "/"),
     })),
   );
-  const isSolo = $derived(places.legend.length === 1 && !comparing);
+  const isSolo = $derived(
+    places.legend.length === 1 &&
+      !comparing &&
+      listed.every((row) => row.leader != null || row.declared == null),
+  );
   const columns = $derived([
     { key: "name" as const, label: heading, numeric: false },
     ...(isSolo
@@ -301,6 +309,14 @@
       provenance.isOpen = true;
     }}>{text}</button
   >
+{/snippet}
+
+{#snippet status(row: (typeof visible)[number])}
+  {#if row.declared?.isTacit === false}
+    {row.declared.kind === "elected" ? m.outcome_elected() : m.outcome_won()}
+  {:else}
+    {m.map_unopposed()}
+  {/if}
 {/snippet}
 
 {#snippet breakdown(row: (typeof visible)[number] | undefined)}
@@ -842,7 +858,9 @@
                     />
                     <span
                       class="font-figures text-[0.8125rem] text-muted-foreground tabular-nums"
-                      >{#if row.valid === 0}{m.map_unopposed()}{:else}{@render cite(
+                      >{#if row.valid === 0}{@render status(
+                          row,
+                        )}{:else}{@render cite(
                           percent(row.shares[row.leader] ?? 0),
                           "share",
                           row,
@@ -850,6 +868,27 @@
                         )}{/if}</span
                     >
                   </span>
+                {:else if row.declared != null}
+                  <span class="flex items-center gap-1.5">
+                    <Name
+                      class="relative z-1 truncate font-semibold max-inline-40"
+                      tabindex={-1}
+                      label={row.declared.label}
+                      color={swatch(
+                        row.declared.color,
+                        `party:${row.declared.party}`,
+                      )}
+                      person={row.declared.person}
+                      party={row.declared.party}
+                    />
+                    <span class="text-[0.8125rem] text-muted-foreground"
+                      >{@render status(row)}</span
+                    >
+                  </span>
+                {:else if row.isRecorded === false}
+                  <span class="text-[0.8125rem] text-muted-foreground"
+                    >{m.places_unrecorded()}</span
+                  >
                 {/if}
               </td>
               <td

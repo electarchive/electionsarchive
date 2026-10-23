@@ -23,6 +23,7 @@
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
+  import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
@@ -681,6 +682,14 @@
         continue;
       }
       if (row.leader == null) {
+        if (view === "winner" && only == null && row.declared != null) {
+          result.push([
+            row.k,
+            read(
+              `color-mix(in oklab, ${swatch(row.declared.color, `party:${row.declared.party}`)} 100%, var(--map-low))`,
+            ),
+          ]);
+        }
         continue;
       }
       const dimmed =
@@ -2656,17 +2665,28 @@
             })}</span
       >
     {/if}
-    {#if current.valid === 0 && current.leader != null}
+    {#if current.valid === 0 && (current.leader != null || current.declared != null)}
       <span
         class="flex items-center gap-2 text-[0.8125rem]"
-        style:--party={colors[current.leader]}
+        style:--party={current.leader == null
+          ? swatch(current.declared?.color, `party:${current.declared?.party}`)
+          : colors[current.leader]}
       >
         <span class="rounded-xs bg-(--party) chip block-2.5 inline-2.5"></span>
         <span class="font-semibold"
-          >{places.legend[current.leader]?.label ?? names[current.leader]}</span
+          >{current.leader == null
+            ? current.declared?.label
+            : (places.legend[current.leader]?.label ??
+              names[current.leader])}</span
         >
         {#if !isDeclared}
-          <span class="text-muted-foreground">{m.map_unopposed()}</span>
+          <span class="text-muted-foreground"
+            >{current.declared?.isTacit === false
+              ? current.declared.kind === "elected"
+                ? m.outcome_elected()
+                : m.outcome_won()
+              : m.map_unopposed()}</span
+          >
         {/if}
       </span>
     {/if}

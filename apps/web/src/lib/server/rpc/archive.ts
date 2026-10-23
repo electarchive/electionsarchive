@@ -308,6 +308,19 @@ const PlaceRow = v.object({
   within: v.optional(v.number()),
   seats: v.optional(v.nullable(v.number())),
   isCounted: v.optional(v.boolean()),
+  declared: v.optional(
+    v.nullable(
+      v.object({
+        kind: v.picklist(["elected", "won"]),
+        isTacit: v.boolean(),
+        label: v.string(),
+        color: v.nullable(v.string()),
+        person: v.nullable(v.string()),
+        party: v.nullable(v.string()),
+      }),
+    ),
+  ),
+  isRecorded: v.optional(v.boolean()),
 });
 
 const Places = v.nullable(
@@ -2288,32 +2301,77 @@ async function tabulate(
   const root = ancestry(lineage, "party");
   const declared = await db.execute<{
     contest: string;
+    isRecorded: boolean;
+    isTacit: boolean;
+    kind: "elected" | "won" | null;
     party: string | null;
     person: string | null;
+    color: string | null;
   }>(sql`
-    select distinct on (o.contest_id) o.contest_id as contest, coalesce(pm.into_id, o.party_id) as party,
-      coalesce(m.into_id, cy.person_id) as person
-    from contest_option o
-    join outcome x on x.option_id = o.id and x.kind in ('elected', 'won')
-    join result_set rs on rs.id = x.result_set_id and rs.is_default
-    left join entity_merge pm on pm.entity_id = o.party_id
-    left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
-    left join entity_merge m on m.entity_id = cy.person_id
-    where o.contest_id = any(${sql.param(silent)}::uuid[])
-    order by o.contest_id, o.k
+    select c.id as contest, rs.id is not null as "isRecorded", rs.kind is not distinct from 'tacit' as "isTacit",
+      w.kind, w.party, w.person,
+      (select pc.color from party_color pc where pc.party_id = w.party
+        order by pc.valid @> e.date_from desc, upper(pc.valid) desc nulls first limit 1) as color
+    from contest c
+    join election e on e.id = c.election_id
+    left join lateral (
+      select rs.id, rs.kind::text as kind from result_set rs
+      where rs.contest_id = c.id and rs.is_default order by rs.stage desc limit 1
+    ) rs on true
+    left join lateral (
+      select x.kind::text as kind, coalesce(pm.into_id, o.party_id) as party, coalesce(m.into_id, cy.person_id) as person
+      from outcome x
+      join contest_option o on o.id = x.option_id
+      left join entity_merge pm on pm.entity_id = o.party_id
+      left join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+      left join entity_merge m on m.entity_id = cy.person_id
+      where x.result_set_id = rs.id and x.kind in ('elected', 'won')
+      order by o.k limit 1
+    ) w on true
+    where c.id = any(${sql.param(silent)}::uuid[])
   `);
+  const winners = await names(
+    declared.rows.flatMap((row) =>
+      [row.person, row.party].filter((id) => id != null),
+    ),
+    date,
+  );
   const unopposed = new Map(
-    declared.rows.flatMap((row) => {
+    declared.rows.map((row) => {
       const key = [
         row.party == null ? null : `party:${root(row.party)}`,
         row.person == null ? null : `person:${row.person}`,
       ].find((entry) => entry != null && legend.has(entry));
       const item = legend.get(key ?? "");
-      if (key == null || item == null) {
-        return [];
+      if (item != null) {
+        item.lead = true;
       }
-      item.lead = true;
-      return [[row.contest, key] as const];
+      return [
+        row.contest,
+        {
+          key: item == null ? null : (key ?? null),
+          declared:
+            row.kind == null
+              ? null
+              : {
+                  kind: row.kind,
+                  isTacit: row.isTacit,
+                  label:
+                    (row.person == null
+                      ? null
+                      : winners.full.get(row.person)) ??
+                    (row.party == null
+                      ? null
+                      : (winners.short.get(row.party) ??
+                        winners.full.get(row.party))) ??
+                    "",
+                  color: row.color,
+                  person: row.person,
+                  party: row.party,
+                },
+          isRecorded: row.isRecorded,
+        },
+      ] as const;
     }),
   );
   const ranked = legend
@@ -2364,8 +2422,11 @@ async function tabulate(
             result.find((entry) => entry.key === item.key)?.current?.share ?? 0,
         ),
         leader:
-          position.get(leader?.key ?? unopposed.get(row.owner ?? "") ?? "") ??
-          null,
+          position.get(
+            leader?.key ?? unopposed.get(row.owner ?? "")?.key ?? "",
+          ) ?? null,
+        declared: unopposed.get(row.owner ?? "")?.declared ?? null,
+        isRecorded: unopposed.get(row.owner ?? "")?.isRecorded ?? true,
         margin:
           leader?.current == null
             ? null
