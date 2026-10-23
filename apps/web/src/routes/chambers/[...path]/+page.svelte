@@ -95,6 +95,28 @@
         (!members.data.isSeated ||
           ((member.from ?? "") <= on && (member.to == null || member.to > on))),
     );
+    const held = new Set(present.map((member) => member.seat));
+    const late =
+      on === first && members.data.isSeated
+        ? Map.groupBy(
+            roll
+              .filter(
+                (member) =>
+                  member.isVoting &&
+                  member.seat != null &&
+                  !held.has(member.seat) &&
+                  member.from != null &&
+                  member.from > on &&
+                  Date.parse(member.from) - Date.parse(on) < 30 * DAY,
+              )
+              .toSorted((a, b) => (a.from ?? "").localeCompare(b.from ?? "")),
+            (member) => member.seat,
+          )
+            .values()
+            .flatMap((group) => group.slice(0, 1))
+            .toArray()
+        : [];
+    present.push(...late);
     return members.data.apportionment.length === 0
       ? present
       : Map.groupBy(present, (member) => member.seat ?? member.person)
