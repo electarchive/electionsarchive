@@ -49,6 +49,14 @@ FILES = [
         "Constitutional Amend.",
         0,
     ),
+    (
+        2019,
+        "20091",
+        "Johnson",
+        "https://www.jocoelection.org/sites/default/files/2022-05/2019_general_election_-_official_final_results.pdf",
+        "Question Submitted",
+        0,
+    ),
     (2012, "20045", "Douglas", DOUGLAS.format("20200928012636", 2012), "Constitutional Amendment", 0),
     (2019, "20045", "Douglas", DOUGLAS.format("20210922000455", 2019), "Constitutional Amend", 60),
     *(
@@ -67,10 +75,31 @@ FILES = [
         )
     ),
 ]
+SCANNED = [
+    (2014, "20177", "Shawnee", "https://cdn.snco.gov/elections/prev/2014GeneralElectionSOVC.pdf", 42497, 15901),
+    (
+        2016,
+        "20177",
+        "Shawnee",
+        "https://cdn.snco.gov/elections/document/2016_General_Final_Official_Results.pdf",
+        56106,
+        15155,
+    ),
+    (
+        2014,
+        "20209",
+        "Wyandotte",
+        "https://www.wycovotes.org/s/2014-General-Abstract-November-4-2014.pdf",
+        19021,
+        7102,
+    ),
+    (2014, "20045", "Douglas", DOUGLAS.format("20200928012636", 2014), 27371, 8547),
+    (2016, "20045", "Douglas", DOUGLAS.format("20200928012636", 2016), 31653, 17214),
+]
 
 
 def fetch() -> None:
-    for *_, url, _, _ in FILES:
+    for url in [*(file[-3] for file in FILES), *(file[3] for file in SCANNED)]:
         raw.fetch(SOURCE, url, suffix=Path(url.split("?")[0]).suffix or ".html")
 
 
@@ -96,6 +125,8 @@ def parse() -> None:
         }
         print(year, county, votes)
         rows += [(year, fips, county, url, answer.upper(), value) for answer, value in votes.items()]
+    for year, fips, county, url, yes, no in SCANNED:
+        rows += [(year, fips, county, url, "YES", yes), (year, fips, county, url, "NO", no)]
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
         rows,
@@ -133,7 +164,10 @@ def emit() -> Path:
                 url=LANDING,
                 license="Public record",
             )
-        artifacts = {url: cs.artifact(raw.cached(SOURCE, url), source) for *_, url, _, _ in FILES}
+        artifacts = {
+            url: cs.artifact(raw.cached(SOURCE, url), source)
+            for url in [*(file[-3] for file in FILES), *(file[3] for file in SCANNED)]
+        }
         for year, key in CONTESTS.items():
             counted = frame.filter(pl.col("year") == year)
             election, contest, statewide = conn.execute(
