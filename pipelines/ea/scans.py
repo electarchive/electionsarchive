@@ -66,6 +66,7 @@ class Contest(TypedDict):
     state: str
     district: int | None
     create: NotRequired[bool]
+    suffix: NotRequired[str]
 
 
 class Manifest(TypedDict):
@@ -217,7 +218,7 @@ def client() -> anthropic.Anthropic:
 def key_of(contest: Contest) -> str:
     chamber, day, state, district = contest["chamber"], contest["day"], contest["state"], contest["district"]
     if chamber in LEGISLATURES:
-        return f"{day}:{state}:{LEGISLATURES[chamber]}:{district}:{'gs' if contest['special'] else 'g'}"
+        return f"{day}:{state}:{LEGISLATURES[chamber]}:{district}:{contest.get('suffix', 'gs' if contest['special'] else 'g')}"
     base = (
         f"{day}:{state}-{district:02}:president"
         if chamber == "president" and district is not None

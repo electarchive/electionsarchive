@@ -1,0 +1,1152 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065"
+ },
+ "title": "Democratic primary runoff certified results, August 25, 2015",
+ "file": {
+  "url": "https://www.sos.ms.gov/elections/electionResults/2015%20State%20Democratic%20Primary%20Runoff%20Certified%20Results.pdf"
+ },
+ "contests": {
+  "s34": {
+   "year": 2015,
+   "chamber": "state-senate",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 34,
+   "suffix": "dprunoff"
+  },
+  "s38": {
+   "year": 2015,
+   "chamber": "state-senate",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 38,
+   "suffix": "dprunoff"
+  },
+  "h27": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 27,
+   "suffix": "dprunoff"
+  },
+  "h30": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 30,
+   "suffix": "dprunoff"
+  },
+  "h36": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 36,
+   "suffix": "dprunoff"
+  },
+  "h42": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 42,
+   "suffix": "dprunoff"
+  },
+  "h70": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 70,
+   "suffix": "dprunoff"
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "p1",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  },
+  {
+   "page": 2,
+   "id": "p2",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  },
+  {
+   "page": 3,
+   "id": "p3",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  },
+  {
+   "page": 4,
+   "id": "p4",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  },
+  {
+   "page": 5,
+   "id": "p5",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  },
+  {
+   "page": 6,
+   "id": "p6",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  },
+  {
+   "page": 7,
+   "id": "p7",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  },
+  {
+   "page": 8,
+   "id": "p8",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.09,
+    1.0,
+    0.87
+   ],
+   "hint": "Return every grid row under the county header in order, including the shaded heading rows and the rows with no numbers; the 24 rows are the same on every page, and the leftmost labels print on page 1 only. Every row must have exactly one cell per county column, an empty string for an empty cell, so never drop an empty cell and count the cells against the header. A column named Total is the district total; ignore Percentages and unlabeled columns.",
+   "columns": [
+    {
+     "label": "Central District Transportation Com.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert Amos",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Mary H. Coleman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "State Senate, Dist. 34",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Juan Barnett",
+     "contest": "s34",
+     "candidate": "Juan Barnett"
+    },
+    {
+     "label": "Trey Chinn",
+     "contest": "s34",
+     "candidate": "Trey Chinn"
+    },
+    {
+     "label": "State Senate, Dist. 38",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Angela Baker Brooks",
+     "contest": "s38",
+     "candidate": "Angela Baker Brooks"
+    },
+    {
+     "label": "Tammy Felder Witherspoon",
+     "contest": "s38",
+     "candidate": "Tammy Felder Witherspoon"
+    },
+    {
+     "label": "State House, Dist. 27",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Leroy Lacy",
+     "contest": "h27",
+     "candidate": "Leroy Lacy"
+    },
+    {
+     "label": "Kenneth Walker",
+     "contest": "h27",
+     "candidate": "Kenneth Walker"
+    },
+    {
+     "label": "State House, Dist. 30",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Robert E. Huddleston",
+     "contest": "h30",
+     "candidate": "Robert E. Huddleston"
+    },
+    {
+     "label": "Lester Williams",
+     "contest": "h30",
+     "candidate": "Lester Williams"
+    },
+    {
+     "label": "State House, Dist. 36",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jimmy Davidson",
+     "contest": "h36",
+     "candidate": "Jimmy Davidson"
+    },
+    {
+     "label": "Karl Malinski Gibbs",
+     "contest": "h36",
+     "candidate": "Karl Malinski Gibbs"
+    },
+    {
+     "label": "State House, Dist. 42",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Eugene Crosby",
+     "contest": "h42",
+     "candidate": "Eugene Crosby"
+    },
+    {
+     "label": "Carl L. Mickens",
+     "contest": "h42",
+     "candidate": "Carl L. Mickens"
+    },
+    {
+     "label": "State House, Dist. 70",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Samuel Lee Begley",
+     "contest": "h70",
+     "candidate": "Samuel Lee Begley"
+    },
+    {
+     "label": "Kathy Sykes",
+     "contest": "h70",
+     "candidate": "Kathy Sykes"
+    }
+   ]
+  }
+ ]
+}

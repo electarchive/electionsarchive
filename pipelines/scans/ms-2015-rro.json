@@ -1,0 +1,182 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065"
+ },
+ "title": "Republican primary runoff certified results, August 25, 2015",
+ "file": {
+  "url": "https://www.sos.ms.gov/elections/electionResults/2015%20State%20Republican%20Party%20Certified%20Primary%20Runoff%20Election%20Results.pdf"
+ },
+ "contests": {
+  "s18": {
+   "year": 2015,
+   "chamber": "state-senate",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 18,
+   "suffix": "rprunoff"
+  },
+  "s47": {
+   "year": 2015,
+   "chamber": "state-senate",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 47,
+   "suffix": "rprunoff"
+  },
+  "h24": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 24,
+   "suffix": "rprunoff"
+  },
+  "h46": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 46,
+   "suffix": "rprunoff"
+  },
+  "h87": {
+   "year": 2015,
+   "chamber": "state-house",
+   "day": "2015-08-25",
+   "special": false,
+   "state": "MS",
+   "district": 87,
+   "suffix": "rprunoff"
+  }
+ },
+ "pages": [
+  {
+   "page": 3,
+   "id": "p3",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.06,
+    0.9,
+    0.2
+   ],
+   "hint": "Rows are the two candidates only; the last column, TOTAL, is the district total.",
+   "columns": [
+    {
+     "label": "Jennifer B. Branning",
+     "contest": "s18",
+     "candidate": "Jennifer B. Branning"
+    },
+    {
+     "label": "Mark Forsman",
+     "contest": "s18",
+     "candidate": "Mark Forsman"
+    }
+   ]
+  },
+  {
+   "page": 4,
+   "id": "p4",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.06,
+    0.9,
+    0.2
+   ],
+   "hint": "Rows are the two candidates only; the last column, TOTAL, is the district total.",
+   "columns": [
+    {
+     "label": "Joseph M. Seymour",
+     "contest": "s47",
+     "candidate": "Joseph M. Seymour"
+    },
+    {
+     "label": "Mike Tyson",
+     "contest": "s47",
+     "candidate": "Mike Tyson"
+    }
+   ]
+  },
+  {
+   "page": 5,
+   "id": "p5",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.06,
+    0.9,
+    0.2
+   ],
+   "hint": "Rows are the two candidates only; the last column, TOTAL, is the district total.",
+   "columns": [
+    {
+     "label": "Jeff Hale",
+     "contest": "h24",
+     "candidate": "Jeff Hale"
+    },
+    {
+     "label": "Rob Goudy",
+     "contest": "h24",
+     "candidate": "Rob Goudy"
+    }
+   ]
+  },
+  {
+   "page": 6,
+   "id": "p6",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.06,
+    0.9,
+    0.2
+   ],
+   "hint": "Rows are the two candidates only; the last column, TOTAL, is the district total.",
+   "columns": [
+    {
+     "label": "Shed Hill Hunger, IV",
+     "contest": "h46",
+     "candidate": "Shed Hill Hunger, IV"
+    },
+    {
+     "label": "Karl Oliver",
+     "contest": "h46",
+     "candidate": "Karl Oliver"
+    }
+   ]
+  },
+  {
+   "page": 7,
+   "id": "p7",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.06,
+    0.9,
+    0.2
+   ],
+   "hint": "Rows are the two candidates only; the last column, TOTAL, is the district total.",
+   "columns": [
+    {
+     "label": "Michael D. Davis",
+     "contest": "h87",
+     "candidate": "Michael D. Davis"
+    },
+    {
+     "label": "Chris Johnson",
+     "contest": "h87",
+     "candidate": "Chris Johnson"
+    }
+   ]
+  }
+ ]
+}
