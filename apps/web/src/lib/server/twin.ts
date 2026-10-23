@@ -409,7 +409,7 @@ function personMarkdown(
 }
 
 function partyMarkdown(
-  { party, record }: Extract<Data, { kind: "party" }>,
+  { party, record, members }: Extract<Data, { kind: "party" }>,
   link: Link,
 ) {
   const related = [
@@ -437,6 +437,17 @@ function partyMarkdown(
     ...(related.length === 0
       ? []
       : [`## ${m.party_relations()}`, related.join("\n")]),
+    ...(members.length === 0
+      ? []
+      : [
+          `## ${m.party_members_title()}`,
+          members
+            .map(
+              (member) =>
+                `- ${link(member.name, `id/${member.person}`)} (${member.from ?? ""}–${member.to ?? ""})`,
+            )
+            .join("\n"),
+        ]),
     `## ${m.party_elections()}`,
     record.elections.length === 0
       ? m.party_none()

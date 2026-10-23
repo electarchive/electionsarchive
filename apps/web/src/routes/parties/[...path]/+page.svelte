@@ -47,6 +47,11 @@
       .toArray(),
   );
   const opened = new SvelteSet<number | null>();
+  const months = new Intl.DateTimeFormat(getLocale(), {
+    month: "short",
+    year: "numeric",
+    timeZone: "UTC",
+  });
 </script>
 
 <svelte:head>
@@ -221,6 +226,53 @@
 
     {#if data.elections.length > 0}
       <Strength elections={data.elections} party={data.id} name={party.name} />
+    {/if}
+
+    {#if data.members.length > 0}
+      <section
+        class="col-span-12 grid gap-2 bg-card px-3.5 pbs-3.5 pbe-3"
+        aria-labelledby="members-title"
+      >
+        <div class="grid gap-0.5">
+          <h2 id="members-title" class="heading">
+            {m.party_members_title()}
+          </h2>
+          <p class="text-[0.8125rem] text-muted-foreground max-inline-[64ch]">
+            {m.party_members_lede({ name: party.name })}
+          </p>
+        </div>
+        <ul class="grid text-sm">
+          {#each data.members as member, index (index)}
+            {const from = $derived(
+              member.from == null ? null : new Date(`${member.from}T00:00:00Z`),
+            )}
+            {const to = $derived(
+              member.to == null
+                ? null
+                : new Date(Date.parse(`${member.to}T00:00:00Z`) - 864e5),
+            )}
+            <li
+              class="grid grid-cols-[minmax(0,1fr)_auto] items-baseline gap-x-3 border-be border-border/60 py-1.5 last:border-be-0"
+            >
+              <a
+                class="hover:highlighter"
+                href={resolve("/id/[id]", { id: member.person })}
+                >{member.name}</a
+              >
+              <span
+                class="font-figures text-xs whitespace-nowrap text-muted-foreground tabular-nums"
+                >{from != null && to != null
+                  ? months.formatRange(from, to)
+                  : from != null
+                    ? m.party_member_since({ date: months.format(from) })
+                    : to != null
+                      ? m.party_member_until({ date: months.format(to) })
+                      : ""}</span
+              >
+            </li>
+          {/each}
+        </ul>
+      </section>
     {/if}
 
     {#if party.scope == null}

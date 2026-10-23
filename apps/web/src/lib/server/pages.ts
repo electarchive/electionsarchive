@@ -200,7 +200,7 @@ export async function party(path: string, place: string | null = null) {
   if (scope != null && within == null) {
     error(404);
   }
-  const [page, generals] = await Promise.all([
+  const [page, generals, members] = await Promise.all([
     (async () => {
       if (within == null) {
         const stored = await db.execute<{
@@ -232,8 +232,31 @@ export async function party(path: string, place: string | null = null) {
         )
       order by e.date_from desc
     `),
+    db.execute<{
+      person: string;
+      name: string;
+      from: string | null;
+      to: string | null;
+    }>(sql`
+      select coalesce(pm.into_id, m.person_id) as person, n.text as name,
+        m.valid_from::text as from, m.valid_to::text as to
+      from person_party_membership m join party k on k.id = m.party_id and k.kind = 'caucus'
+      left join entity_merge pm on pm.entity_id = m.person_id
+      cross join lateral (
+        select n.text from name n where n.entity_id = coalesce(pm.into_id, m.person_id)
+        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1
+      ) n
+      where m.party_id = ${id}::uuid or m.party_id in (select entity_id from entity_merge where into_id = ${id}::uuid)
+      order by m.valid_from nulls first, n.text
+    `),
   ]);
-  return { kind: "party" as const, id, ...page, elections: generals.rows };
+  return {
+    kind: "party" as const,
+    id,
+    ...page,
+    elections: generals.rows,
+    members: members.rows,
+  };
 }
 
 export async function contents(id: string, within?: string) {
