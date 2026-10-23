@@ -1,20 +1,3 @@
-<script lang="ts" module>
-  import { m } from "#lib/paraglide/messages.js";
-
-  export const OUTCOMES: Record<string, () => string> = {
-    elected: m.outcome_elected,
-    won: m.outcome_won,
-    advanced: m.outcome_advanced,
-    tied: m.outcome_tied,
-    lost: m.outcome_lost,
-  };
-  export const MEASURES: Record<string, () => string> = {
-    list_votes: m.measure_list_votes,
-    electoral_votes: m.measure_electoral_votes,
-    state_delegate_equivalents: m.measure_state_delegate_equivalents,
-  };
-</script>
-
 <script lang="ts">
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import Download from "#lib/components/download.svelte";
@@ -22,6 +5,8 @@
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, percent, points, precision } from "#lib/format.js";
+  import { OUTCOMES } from "#lib/outcomes.js";
+  import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { provenance } from "#lib/provenance.svelte.js";

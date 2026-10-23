@@ -4,6 +4,7 @@
   import { count, date } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
 
@@ -73,7 +74,31 @@
   let isOpen = $state(false);
 
   const today = new Date().toISOString().slice(0, 10);
-  const info = $derived(new Map(parties.map((entry) => [entry.id, entry])));
+  const groups = $derived([
+    ...Map.groupBy(parties, (entry) =>
+      entry.label.trim().toLocaleLowerCase(),
+    ).values(),
+  ]);
+  const info = $derived(
+    new Map(
+      groups.flatMap((group) =>
+        group.map((entry) => [
+          entry.id,
+          new Set(group.map((other) => other.short)).size > 1
+            ? { ...entry, short: null }
+            : entry,
+        ]),
+      ),
+    ),
+  );
+  const kin = $derived(
+    new Map(
+      groups.flatMap((group) =>
+        group.map((entry) => [entry.id, group[0]?.id ?? entry.id]),
+      ),
+    ),
+  );
+  const fold = (id: string | null) => (id == null ? null : (kin.get(id) ?? id));
   const tint = (id: string | null) =>
     swatch(info.get(id ?? "")?.color ?? null, `party:${id ?? ""}`);
   const label = (id: string | null) =>
@@ -90,6 +115,25 @@
         ((value == null ? fallback : Date.parse(value)) - low) / (high - low),
       ),
     );
+  const short = new Intl.DateTimeFormat(getLocale(), {
+    dateStyle: "medium",
+    timeZone: "UTC",
+  });
+  const years = $derived.by(() => {
+    const bands: Array<{ year: number; from: number; to: number }> = [];
+    for (
+      let year = new Date(low).getUTCFullYear();
+      Date.UTC(year, 0, 1) < high;
+      year += 1
+    ) {
+      bands.push({
+        year,
+        from: Math.max(0, (Date.UTC(year, 0, 1) - low) / (high - low)),
+        to: Math.min(1, (Date.UTC(year + 1, 0, 1) - low) / (high - low)),
+      });
+    }
+    return bands;
+  });
   const isLate = (member: (typeof members)[number]) =>
     start != null && member.from != null && member.from > start;
   const isEarly = (member: (typeof members)[number]) =>
@@ -98,13 +142,13 @@
     member.ended !== "term_end";
 
   const ordered = $derived(
-    [...new Set(members.map((member) => member.party))].toSorted(
+    [...new Set(members.map((member) => fold(member.party)))].toSorted(
       (a, b) =>
         Number(a == null) - Number(b == null) ||
         (info.get(a ?? "")?.lean ?? Infinity) -
           (info.get(b ?? "")?.lean ?? Infinity) ||
-        members.filter((member) => member.party === b).length -
-          members.filter((member) => member.party === a).length,
+        members.filter((member) => fold(member.party) === b).length -
+          members.filter((member) => fold(member.party) === a).length,
     ),
   );
   const shown = $derived.by(() => {
@@ -112,14 +156,14 @@
     return members
       .filter(
         (member) =>
-          (party == null || (member.party ?? "none") === party) &&
+          (party == null || (fold(member.party) ?? "none") === party) &&
           (needle === "" ||
             member.name.toLocaleLowerCase().includes(needle) ||
             (member.place?.toLocaleLowerCase().includes(needle) ?? false)),
       )
       .toSorted(
         (a, b) =>
-          ordered.indexOf(a.party) - ordered.indexOf(b.party) ||
+          ordered.indexOf(fold(a.party)) - ordered.indexOf(fold(b.party)) ||
           Number(a.place == null) - Number(b.place == null) ||
           (a.place ?? "").localeCompare(b.place ?? "", undefined, {
             numeric: true,
@@ -250,74 +294,157 @@
           ></span>
           <span class="font-semibold">{label(entry)}</span>
           <span class="font-figures text-xs text-muted-foreground tabular-nums"
-            >{members.filter((member) => member.party === entry).length}</span
+            >{members.filter((member) => fold(member.party) === entry)
+              .length}</span
           >
         </button>
       {/each}
     </div>
-    <ul
+    <div
       class="grid overflow-hidden rounded-sm text-[0.8125rem]/snug ring-1 ring-border"
     >
-      {#each isOpen || query !== "" || party != null ? shown : shown.slice(0, 40) as member, index (index)}
-        {const x0 = $derived(at(member.from, low))}
-        {const x1 = $derived(at(member.to, high))}
-        <li
-          class="grid grid-cols-[minmax(0,1fr)] items-center gap-x-4 gap-y-1 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,1.4fr)]"
-          style:--party={tint(member.party)}
-        >
-          <span class="flex items-center gap-1.5 truncate">
-            <span class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
-            ></span>
-            <a
-              class="truncate font-semibold hover:underline hover:underline-offset-4"
-              href={resolve("/id/[id]", { id: member.person })}>{member.name}</a
-            >
+      <div
+        class="grid grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,1.4fr)] items-end gap-x-4 border-be border-border bg-secondary/60 px-2.5 pbs-1.5 pbe-1 text-xs text-muted-foreground max-sm:hidden"
+        aria-hidden="true"
+      >
+        <span>{m.chamber_column_member()}</span>
+        <span>{m.chamber_column_seat()}</span>
+        {#if start != null}
+          <span class="flex items-end gap-3">
+            <span class="relative flex-1 block-4">
+              {#each years as band (band.year)}
+                {#if band.from > 0}
+                  <span
+                    class="absolute -inset-be-1 bg-border block-2 inline-px"
+                    style:inset-inline-start="{band.from * 100}%"
+                  ></span>
+                {/if}
+                {#if band.to - band.from >= 0.1}
+                  <span
+                    class="absolute inset-bs-0 ps-1 font-figures tabular-nums"
+                    style:inset-inline-start="{band.from * 100}%"
+                    >{band.year}</span
+                  >
+                {/if}
+              {/each}
+              {#if end == null}
+                <span class="absolute inset-e-0 inset-bs-0 text-foreground"
+                  >{m.chamber_today()}</span
+                >
+              {/if}
+            </span>
+            <span class="shrink-0 inline-48">{m.chamber_column_change()}</span>
           </span>
-          <span
-            class="flex items-baseline gap-1.5 truncate text-muted-foreground"
+        {/if}
+      </div>
+      <ul class="grid">
+        {#each isOpen || query !== "" || party != null ? shown : shown.slice(0, 40) as member, index (index)}
+          {const x0 = $derived(at(member.from, low))}
+          {const x1 = $derived(at(member.to, high))}
+          {const change = $derived(
+            isEarly(member)
+              ? {
+                  why: ENDS[member.ended ?? ""]?.() ?? m.chamber_left(),
+                  on: member.to,
+                }
+              : isLate(member)
+                ? {
+                    why: VIA[member.acquired ?? ""]?.() ?? m.chamber_joined(),
+                    on: member.from,
+                  }
+                : null,
+          )}
+          <li
+            class="grid grid-cols-[minmax(0,1fr)] items-center gap-x-4 gap-y-0.5 border-be border-border/60 px-2.5 py-1.5 last:border-be-0 sm:grid-cols-[minmax(0,15rem)_minmax(0,1fr)_minmax(0,1.4fr)]"
+            style:--party={tint(member.party)}
           >
-            {#if member.path == null}
-              <span class="truncate">{member.place ?? member.seat ?? ""}</span>
-            {:else}
+            <span class="flex items-center gap-1.5 truncate">
+              <span
+                class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
+              ></span>
               <a
-                class="truncate hover:text-foreground hover:underline hover:underline-offset-4"
-                href={resolve("/[...path]", { path: member.path })}
-                >{member.place ?? member.seat ?? ""}</a
-              >
-            {/if}
-            {#if !member.isVoting}
-              <span class="shrink-0 text-xs">{m.chamber_nonvoting()}</span>
-            {/if}
-            {#if member.left != null}
-              <span class="shrink-0 text-xs font-semibold text-foreground"
-                >{m.chamber_switched({ party: label(member.left) })}</span
-              >
-            {/if}
-          </span>
-          {#if start != null}
-            <span class="flex items-center gap-2">
-              <span
-                class="relative block flex-1 rounded-full bg-muted block-2"
-                aria-hidden="true"
-              >
-                <span
-                  class="absolute inset-y-0 rounded-full bg-(--party)"
-                  style:inset-inline-start="{x0 * 100}%"
-                  style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
-                ></span>
-              </span>
-              <span
-                class="shrink-0 text-end text-xs text-muted-foreground inline-24"
-                >{#if isEarly(member)}{ENDS[member.ended ?? ""]?.() ??
-                    date(member.to)}{:else if isLate(member)}{VIA[
-                    member.acquired ?? ""
-                  ]?.() ?? date(member.from)}{/if}</span
+                class="truncate font-semibold hover:underline hover:underline-offset-4"
+                href={resolve("/id/[id]", { id: member.person })}
+                >{member.name}</a
               >
             </span>
-          {/if}
-        </li>
-      {/each}
-    </ul>
+            <span
+              class="flex items-baseline gap-1.5 truncate text-muted-foreground max-sm:ps-4"
+            >
+              {#if member.path == null}
+                <span class="truncate">{member.place ?? member.seat ?? ""}</span
+                >
+              {:else}
+                <a
+                  class="truncate hover:text-foreground hover:underline hover:underline-offset-4"
+                  href={resolve("/[...path]", { path: member.path })}
+                  >{member.place ?? member.seat ?? ""}</a
+                >
+              {/if}
+              {#if !member.isVoting}
+                <span class="shrink-0 text-xs">{m.chamber_nonvoting()}</span>
+              {/if}
+              {#if member.left != null}
+                <span class="shrink-0 text-xs font-semibold text-foreground"
+                  >{m.chamber_switched({ party: label(member.left) })}</span
+                >
+              {/if}
+            </span>
+            {#if start != null}
+              <span
+                class={cn("flex items-center gap-3 self-stretch", {
+                  "max-sm:hidden": change == null,
+                })}
+              >
+                <span
+                  class="relative -my-1.5 flex-1 self-stretch max-sm:hidden"
+                >
+                  {#each years as band (band.year)}
+                    {#if band.from > 0}
+                      <span
+                        class="absolute inset-y-0 bg-border/70 inline-px"
+                        style:inset-inline-start="{band.from * 100}%"
+                      ></span>
+                    {/if}
+                  {/each}
+                  <span
+                    class="absolute inset-bs-1/2 -translate-y-1/2 rounded-full bg-(--party) block-1.5"
+                    style:inset-inline-start="{x0 * 100}%"
+                    style:inline-size="{Math.max(x1 - x0, 0.01) * 100}%"
+                  ></span>
+                  <span class="sr-only"
+                    >{m.chamber_served({
+                      from: short.format(
+                        new Date(`${member.from ?? start}T00:00:00Z`),
+                      ),
+                      to:
+                        member.to == null
+                          ? m.governments_present()
+                          : short.format(new Date(`${member.to}T00:00:00Z`)),
+                    })}</span
+                  >
+                </span>
+                <span
+                  class="flex shrink-0 items-baseline gap-1.5 text-xs whitespace-nowrap sm:inline-48 max-sm:ps-4"
+                >
+                  {#if change != null}
+                    <span class="font-semibold">{change.why}</span>
+                    <span
+                      class="font-figures text-muted-foreground tabular-nums"
+                      >{change.on == null
+                        ? ""
+                        : short.format(
+                            new Date(`${change.on}T00:00:00Z`),
+                          )}</span
+                    >
+                  {/if}
+                </span>
+              </span>
+            {/if}
+          </li>
+        {/each}
+      </ul>
+    </div>
     {#if shown.length === 0}
       <p class="text-sm text-muted-foreground">{m.members_none()}</p>
     {:else if !isOpen && query === "" && party == null && shown.length > 40}

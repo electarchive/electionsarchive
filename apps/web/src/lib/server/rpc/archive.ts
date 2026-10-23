@@ -346,7 +346,9 @@ const Sketch = v.object({
       north: v.number(),
     }),
   ),
-  blank: v.optional(v.array(v.object({ k: v.number(), name: v.string() }))),
+  blank: v.optional(
+    v.array(v.object({ k: v.number(), name: v.string(), isHeld: v.boolean() })),
+  ),
   isApproximate: v.boolean(),
   shaped: v.optional(v.nullable(v.number())),
   credits: v.optional(v.nullable(v.array(v.string()))),
@@ -738,9 +740,10 @@ async function load(
   date: string,
   outcomes: Array<string>,
   owners: Array<string> = [],
-  round: number | null = null,
+  step: number | null = null,
   facts: keyof typeof FACTS = "area",
   spread: Map<number, Array<[number, number]>> | null = null,
+  isFirst = false,
 ) {
   const loaded = new Map<
     number,
@@ -765,6 +768,7 @@ async function load(
     status: string;
     completeness: number | null;
     is_default: boolean;
+    single: boolean;
     kind: string;
     publisher: string;
     title: string;
@@ -801,6 +805,7 @@ async function load(
         array_position(${STAGES}, rs.stage), hit.options desc, rs.completeness desc nulls last
     )
     select p.area, p.k, p.contest, p.root, p.stage::text, p.status::text, p.completeness::float8 as completeness, p.is_default,
+      coalesce((select c.magnitude from contest c where c.id = p.contest), 1) <= 1 as single,
       s.kind::text, s.publisher, s.title, s.url, s.license, s.attribution,
       (select f.details from flag f where f.result_set_id = p.id and f.check_code = 'reconcile.official' limit 1) as unreconciled
     from picked p join source s on s.id = p.source_id
@@ -821,11 +826,16 @@ async function load(
     with fetched as materialized (
       select r.result_set_k as set, r.area_k as area, r.option_k as option, r.measure, r.count_round,
         r.value::float8 as value, r.complete,
-        coalesce(${round}::int, min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)) as first,
-        min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as opening
-      from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[]) as p(set, area)
+        coalesce(${step}::int, case when p.single and ${!isFirst}
+          then max(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure)
+          else min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) end) as first,
+        min(r.count_round) over (partition by r.result_set_k, r.area_k, r.measure) as opening,
+        p.single and ${!isFirst}
+          and max(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k)
+            > min(r.count_round) filter (where r.measure = any(${COUNTED})) over (partition by r.result_set_k, r.area_k) as late
+      from unnest(${sql.param(picked.rows.map((row) => row.k))}::int[], ${sql.param(picked.rows.map((row) => row.area))}::int[], ${sql.param(picked.rows.map((row) => row.single))}::boolean[]) as p(set, area, single)
       join lateral (${FACTS[facts](sql`p.set`, sql`p.area`)}) r on true
-      where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4 and ${round}::int is null))
+      where (r.measure = any(${COUNTED}) or r.option_k = 0 and (r.measure = 2 or r.measure = 4 and ${step}::int is null))
     ),
     mains as materialized (
       select area, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main from fetched group by area
@@ -834,7 +844,7 @@ async function load(
       select r.result_set_k as set, r.option_k as option
       from unnest(${sql.param([...new Set(picked.rows.map((row) => row.k))])}::int[]) as s(k) cross join lateral (
         select x.result_set_k, x.option_k, x.value from result_rollup x
-        where ${round}::int is not null and x.result_set_k = s.k and x.measure = any(${COUNTED}) and x.count_round = ${round}::int
+        where ${step}::int is not null and x.result_set_k = s.k and x.measure = any(${COUNTED}) and x.count_round = ${step}::int
         offset 0
       ) r
       group by 1, 2 having max(r.value) = 0
@@ -853,7 +863,7 @@ async function load(
         when r.measure = 2 and r.main = 11 then 'appointed'
       end as role
     ) x
-    where r.kept and r.count_round = r.first and x.role is not null
+    where r.kept and r.count_round = r.first and x.role is not null and not (r.late and x.role = 'valid')
       and not exists (select from gone g where g.set = r.set and g.option = r.option)
     union all
     select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, r.rank::float8
@@ -2041,17 +2051,6 @@ async function places(
     ),
   ]);
   const seats = new Map(allocated.rows.map((row) => [row.k, row.seats]));
-  const share = (
-    entry:
-      | { registered: number; voters: number; reporting: number; of: number }
-      | undefined,
-    valid: number,
-  ) =>
-    entry == null ||
-    valid === 0 ||
-    entry.voters < valid * (entry.reporting === entry.of ? 0.98 : 0.9)
-      ? null
-      : entry.voters / entry.registered;
   const turnouts = (row: (typeof tabulated.rows)[number]) => {
     const entry = turned.get(row.k);
     const now = share(entry, row.valid);
@@ -2154,6 +2153,7 @@ async function tabulate(
           null,
           "area",
           chosen.spread ?? null,
+          round === 1,
         ),
   ]);
   const legend = new Map<
@@ -3743,6 +3743,11 @@ export const contests = {
                 [area.k],
                 chosen.date ?? "infinity",
                 [chosen.id].filter(() => isRoot),
+                [],
+                null,
+                "area",
+                null,
+                round === 1,
               ),
           places(
             contest,
@@ -3996,18 +4001,15 @@ export const contests = {
           })),
         }))
         .toArray();
-      const overlap = earlier == null ? undefined : shifted.get(area.k);
       const notesOut: Array<Note> = [
         ...picked,
-        ...(overlap == null
-          ? []
-          : [
-              {
-                code: "redrawn" as const,
-                side: null,
-                value: String(Math.round(overlap * 100)),
-              },
-            ]),
+        ...[earlier == null ? undefined : shifted.get(area.k)]
+          .filter((overlap) => overlap != null)
+          .map((overlap) => ({
+            code: "redrawn" as const,
+            side: null,
+            value: String(Math.round(overlap * 100)),
+          })),
         ...caveats("current", current.sets),
         ...caveats("target", earlier?.sets ?? []),
       ];
@@ -4074,48 +4076,24 @@ export const contests = {
           votes: row.votes,
         }))
         .toSorted((a, b) => b.votes - a.votes);
-      const [faces, pooled, prior] = await Promise.all([
+      const [faces, attended] = await Promise.all([
         portraits(
           rows.flatMap(
             (row) => row.current?.person ?? row.earlier?.person ?? [],
           ),
         ),
-        page.turnout == null ? turnout(contest.id, [area.k]) : null,
-        chosen == null || earlier == null ? null : turnout(chosen.id, [area.k]),
+        attendance(
+          page.turnout,
+          contest.id,
+          area.k,
+          current.side.valid,
+          chosen?.id ?? null,
+          earlier?.side.valid ?? null,
+        ),
       ]);
-      const sane = (
-        entry:
-          | {
-              registered: number;
-              voters: number;
-              reporting?: number;
-              of?: number;
-            }
-          | null
-          | undefined,
-        valid: number,
-      ) =>
-        entry == null ||
-        entry.voters <
-          valid * ((entry.reporting ?? 0) === (entry.of ?? 0) ? 0.98 : 0.9)
-          ? null
-          : entry;
-      const turned = sane(
-        page.turnout ?? pooled?.get(area.k),
-        current.side.valid,
-      );
       return {
         ...page,
-        turnout:
-          turned == null
-            ? null
-            : {
-                registered: turned.registered,
-                voters: turned.voters,
-                reporting: turned.reporting,
-                of: turned.of,
-                earlier: sane(prior?.get(area.k), earlier?.side.valid ?? 0),
-              },
+        turnout: attended,
         series,
         places: grid,
         checks,
@@ -4148,7 +4126,7 @@ export const contests = {
           label:
             target == null
               ? null
-              : current.complete && target.complete
+              : [current, target].every((side) => side.complete)
                 ? "exact"
                 : "estimated",
           notes: notesOut,
@@ -4236,7 +4214,9 @@ export const contests = {
           count: v.number(),
           missing: v.array(v.string()),
           k: v.nullable(v.number()),
-          blank: v.array(v.object({ k: v.number(), name: v.string() })),
+          blank: v.array(
+            v.object({ k: v.number(), name: v.string(), isHeld: v.boolean() }),
+          ),
           frames: v.array(
             v.object({
               west: v.number(),
@@ -4312,7 +4292,11 @@ export const contests = {
         ),
       ]);
       const blank = absent
-        .map((row) => ({ k: row.k, name: blankLabels.full.get(row.id) ?? "" }))
+        .map((row) => ({
+          k: row.k,
+          name: blankLabels.full.get(row.id) ?? "",
+          isHeld: row.held,
+        }))
         .toSorted((a, b) => a.name.localeCompare(b.name));
       const drawn = await Promise.all(
         groups.map(async (group) => {
@@ -5960,21 +5944,97 @@ async function redrawn(
   );
 }
 
+function share(
+  entry:
+    | { registered: number; voters: number; reporting: number; of: number }
+    | undefined,
+  valid: number,
+) {
+  return entry == null ||
+    valid === 0 ||
+    entry.voters < valid * (entry.reporting === entry.of ? 0.98 : 0.9)
+    ? null
+    : entry.voters / entry.registered;
+}
+
+function sane(
+  entry:
+    | { registered: number; voters: number; reporting?: number; of?: number }
+    | null
+    | undefined,
+  valid: number,
+) {
+  return entry == null ||
+    entry.voters <
+      valid * ((entry.reporting ?? 0) === (entry.of ?? 0) ? 0.98 : 0.9)
+    ? null
+    : entry;
+}
+
+function merge<
+  T extends { owner: string; from: string | null; to: string | null },
+>(rows: Array<T>, days: number) {
+  const merged: Array<T> = [];
+  for (const row of rows) {
+    const last = merged.at(-1);
+    if (
+      last?.owner === row.owner &&
+      last.to != null &&
+      row.from != null &&
+      Date.parse(row.from) - Date.parse(last.to) < days * 864e5
+    ) {
+      last.to = row.to;
+    } else {
+      merged.push({ ...row });
+    }
+  }
+  return merged;
+}
+
+async function attendance(
+  known: { registered: number; voters: number } | null,
+  contest: string,
+  k: number,
+  valid: number,
+  before: string | null,
+  prior: number | null,
+) {
+  const [pooled, earlier] = await Promise.all([
+    known == null ? turnout(contest, [k]) : null,
+    turnout(prior == null ? null : before, [k]),
+  ]);
+  const turned = sane(known ?? pooled?.get(k), valid);
+  return turned == null
+    ? null
+    : {
+        registered: turned.registered,
+        voters: turned.voters,
+        reporting: turned.reporting,
+        of: turned.of,
+        earlier: sane(earlier.get(k), prior ?? 0),
+      };
+}
+
 async function universe(
   contest: string,
   level: string,
   area: string,
   day: string,
 ) {
-  const found = await db.execute<{ id: string; k: number }>(sql`
+  const found = await db.execute<{ id: string; k: number; held: boolean }>(sql`
     with recursive candidate as (
-      select distinct a.id, a.k from contest c
+      select a.id, a.k,
+        bool_or(er.date_from between ec.date_from and coalesce(ec.date_to, ec.date_from)) as held
+      from contest c
+      join election ec on ec.id = c.election_id
       join contest r on (case when c.office_id is null then r.body_id = c.body_id else r.office_id = c.office_id
           or exists (select from contest p where p.id = r.allocation_parent_id and p.office_id = c.office_id) end)
         and (r.party_scope_id is null or r.party_scope_id = c.party_scope_id)
       join area a on a.id = r.district_area_id and a.scheme_code = ${level}
+      join election er on er.id = r.election_id
       where c.id = ${contest}::uuid and (c.office_id is not null or c.body_id is not null)
         and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
+      group by a.id, a.k
     ),
     up(start, id, depth) as (
       select id, id, 0 from candidate
@@ -5982,7 +6042,7 @@ async function universe(
       select up.start, p.parent_id, up.depth + 1 from area_parent p join up on p.area_id = up.id
       where p.valid @> ${day}::date and up.depth < 4
     )
-    select distinct candidate.id, candidate.k from candidate
+    select distinct candidate.id, candidate.k, candidate.held from candidate
     join up on up.start = candidate.id where up.id = ${area}::uuid
   `);
   return found.rows;
@@ -6104,7 +6164,11 @@ async function sketch(
         nested: inside == null ? null : { tiles: inside, ks: inner },
         frames,
         blank: absent
-          .map((row) => ({ k: row.k, name: labels.full.get(row.id) ?? "" }))
+          .map((row) => ({
+            k: row.k,
+            name: labels.full.get(row.id) ?? "",
+            isHeld: row.held,
+          }))
           .toSorted((a, b) => a.name.localeCompare(b.name)),
         isApproximate: tiled.synthetic,
         shaped: ks.length === 0 ? null : tiled.shaped,
@@ -6161,6 +6225,105 @@ async function sequel(
     margin: lead.share - (runner?.share ?? 0),
     isWon: lead.outcome === "elected" || lead.outcome === "won",
   };
+}
+
+function reckon(
+  side: Side | undefined,
+  relations: Array<Relation>,
+  grouping: Grouping,
+  isPooled: boolean,
+) {
+  if (side == null) {
+    return [];
+  }
+  return compare(
+    side,
+    null,
+    relations,
+    "party",
+    isPooled || grouping === "alliance" ? grouping : "option",
+  ).flatMap((row) =>
+    row.current == null ? [] : [{ ...row, cell: row.current }],
+  );
+}
+
+function carried(
+  rows: Array<{ party: string | null; seats: number }> | null,
+  filled: number,
+  parentOf: Map<string, string>,
+) {
+  if (rows == null) {
+    return null;
+  }
+  let earlier = 0;
+  for (const row of rows) {
+    earlier += row.seats;
+  }
+  if (earlier < filled * 0.9 || earlier > filled * 1.1) {
+    return null;
+  }
+  return Map.groupBy(rows, (row) =>
+    row.party == null
+      ? "none"
+      : `party:${parentOf.get(row.party) ?? row.party}`,
+  )
+    .entries()
+    .map(([key, group]) => {
+      let seats = 0;
+      for (const row of group) {
+        seats += row.seats;
+      }
+      return { key, seats };
+    })
+    .toArray();
+}
+
+function naming(
+  head:
+    | {
+        id: string;
+        owner: string | null;
+        office: string | null;
+        elects: string | null;
+        party: string | null;
+        isOffice: boolean;
+      }
+    | undefined,
+  single: { id: string } | null,
+  groups: Array<
+    Array<{ owner: string | null; office: string | null; party: string | null }>
+  >,
+) {
+  const titled =
+    head?.isOffice === true ? head.office : (head?.elects ?? head?.owner);
+  const isShared =
+    head != null &&
+    groups.filter((other) =>
+      head.isOffice
+        ? other[0]?.office === head.office && other[0].party === head.party
+        : other[0]?.owner === head.owner && other[0].party === head.party,
+    ).length > 1;
+  const isTitled =
+    single == null ||
+    ((head?.party != null || head?.isOffice === true) && !isShared);
+  return { titled, named: (isTitled ? titled : single.id) ?? head?.id ?? "" };
+}
+
+function standing(
+  head:
+    | { isExecutive: boolean; isOffice: boolean; isHome: boolean }
+    | undefined,
+) {
+  if (head == null) {
+    return 4;
+  }
+  if (head.isExecutive) {
+    return 0;
+  }
+  if (head.isOffice) {
+    return 2;
+  }
+  return head.isHome ? 3 : 1;
 }
 
 async function races(
@@ -6313,18 +6476,6 @@ async function races(
       const single =
         head != null && group.length === 1 ? await find(head.id) : null;
       const place = single?.place ?? nation;
-      const final =
-        single == null
-          ? null
-          : ((
-              await db.execute<{ last: number | null }>(sql`
-                select max(r.count_round)::int as last from result_set rs cross join lateral (
-                  select x.count_round from result_rollup x
-                  where x.result_set_k = rs.k and x.area_k = ${place.k}::int and x.measure = any(${COUNTED}) offset 0
-                ) r
-                where rs.contest_id = ${single.id}::uuid and rs.is_default
-              `)
-            ).rows[0]?.last ?? null);
       const districts = group.filter((row) => row.k != null);
       const first = districts[0];
       const isPrimaries =
@@ -6355,8 +6506,6 @@ async function races(
           [place.k],
           day,
           counted.length > 0 ? counted : roots,
-          [],
-          final != null && final > 1 ? final : null,
         ),
         single == null || isBrief
           ? null
@@ -6458,19 +6607,7 @@ async function races(
         db.execute<{ from: string; to: string }>(sisters(roots, day)),
       ]);
       const here = totals.get(place.k);
-      const rows = (
-        here == null
-          ? []
-          : compare(
-              here.side,
-              null,
-              lineage,
-              "party",
-              single == null || grouping === "alliance" ? grouping : "option",
-            )
-      ).flatMap((row) =>
-        row.current == null ? [] : [{ ...row, cell: row.current }],
-      );
+      const rows = reckon(here?.side, lineage, grouping, single == null);
       const folded = Map.groupBy(rows, (row) =>
         single == null && row.cell.party != null
           ? `party:${parentOf.get(row.cell.party) ?? row.cell.party}`
@@ -6627,7 +6764,7 @@ async function races(
             group by 1
           `),
         sequel(group, isBrief, place.k, lineage),
-        isBrief || group.length < 2 || filled === 0
+        isBrief || filled === 0 || group.length < 2
           ? null
           : holders(
               [...new Set([...roots, ...counted])],
@@ -6637,48 +6774,8 @@ async function races(
               null,
             ),
       ]);
-      const prior = previous?.rows ?? [];
-      let earlier = 0;
-      for (const row of prior) {
-        earlier += row.seats;
-      }
-      const before =
-        previous == null || earlier < filled * 0.9 || earlier > filled * 1.1
-          ? null
-          : Map.groupBy(previous.rows, (row) =>
-              row.party == null
-                ? "none"
-                : `party:${parentOf.get(row.party) ?? row.party}`,
-            )
-              .entries()
-              .map(([key, rows]) => {
-                let seats = 0;
-                for (const row of rows) {
-                  seats += row.seats;
-                }
-                return { key, seats };
-              })
-              .toArray();
-      const titled =
-        head?.isOffice === true ? head.office : (head?.elects ?? head?.owner);
-      const named =
-        (single == null ||
-        (head?.isOffice === true &&
-          groups.filter(
-            (other) =>
-              other[0]?.office === head.office &&
-              other[0]?.party === head.party,
-          ).length === 1) ||
-        (head?.isOffice === false &&
-          head.party != null &&
-          groups.filter(
-            (other) =>
-              other[0]?.owner === head.owner && other[0]?.party === head.party,
-          ).length === 1)
-          ? titled
-          : single.id) ??
-        head?.id ??
-        "";
+      const before = carried(previous?.rows ?? null, filled, parentOf);
+      const { titled, named } = naming(head, single, groups);
       return {
         map,
         before,
@@ -6687,10 +6784,10 @@ async function races(
         anchor: segment(labels.full.get(head?.owner ?? head?.id ?? "") ?? ""),
         name: labels.short.get(named) ?? labels.full.get(named) ?? "",
         scope:
-          head?.party == null
-            ? null
-            : (labels.short.get(head.party) ?? labels.full.get(head.party)),
-        path: single == null ? null : (slugs.get(single.id) ?? null),
+          labels.short.get(head?.party ?? "") ??
+          labels.full.get(head?.party ?? "") ??
+          null,
+        path: slugs.get(single?.id ?? "") ?? null,
         kind: head?.kind ?? "",
         isOffice: head?.isOffice ?? false,
         isRemainder: head?.isRemainder ?? false,
@@ -6705,16 +6802,7 @@ async function races(
           labels.full.get(titled ?? "") ??
           null,
         isNational: head?.area == null || head.area === nation.id,
-        rank:
-          head == null
-            ? 4
-            : head.isExecutive
-              ? 0
-              : head.isOffice
-                ? 2
-                : head.isHome
-                  ? 3
-                  : 1,
+        rank: standing(head),
         count: group.length,
         nonvoting: group.filter((row) => !row.isVoting).length,
         sample: table?.sample ?? null,
@@ -10983,25 +11071,7 @@ export const people = {
         from tenure t where t.person_id in (select id from ids)
         order by coalesce(t.body_id, t.office_id), t.from_date nulls first
       `);
-      const spells: Array<{
-        owner: string;
-        isBody: boolean;
-        from: string | null;
-        to: string | null;
-      }> = [];
-      for (const row of tenures.rows) {
-        const last = spells.at(-1);
-        if (
-          last?.owner === row.owner &&
-          last.to != null &&
-          row.from != null &&
-          Date.parse(row.from) - Date.parse(last.to) < 365 * 864e5
-        ) {
-          last.to = row.to;
-        } else {
-          spells.push({ ...row });
-        }
-      }
+      const spells = merge(tenures.rows, 365);
       const won = new Set(
         rows.rows
           .filter((row) => row.outcome === "elected" || row.outcome === "won")
@@ -11034,25 +11104,20 @@ export const people = {
           and e.kind in ('general', 'by_election', 'special', 'runoff', 'local')
         order by 1, e.date_from
       `);
-      const terms: Array<{
-        owner: string;
-        isBody: boolean;
-        from: string;
-        to: string | null;
-      }> = [];
-      for (const row of wins.rows) {
-        if (seated.has(row.owner)) {
-          continue;
-        }
-        const last = terms.at(-1);
-        if (
-          last?.owner === row.owner &&
-          last.to != null &&
-          Date.parse(row.from) - Date.parse(last.to) < 120 * 864e5
-        ) {
-          last.to = row.to;
-        } else {
-          terms.push({ ...row });
+      const terms = merge(
+        wins.rows.filter((row) => !seated.has(row.owner)),
+        120,
+      );
+      for (const term of terms) {
+        for (const other of [...terms, ...spells]) {
+          if (
+            other.owner !== term.owner &&
+            other.from != null &&
+            other.from > term.from &&
+            (term.to == null || other.from < term.to)
+          ) {
+            term.to = other.from;
+          }
         }
       }
       const [labels, slugs] = await Promise.all([

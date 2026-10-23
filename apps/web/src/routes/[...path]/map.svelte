@@ -60,7 +60,7 @@
     own: { tiles: string; k: number } | null;
     nested?: { tiles: string; ks: Array<number> } | null;
     frames: Array<{ west: number; south: number; east: number; north: number }>;
-    blank?: Array<{ k: number; name: string }> | null;
+    blank?: Array<{ k: number; name: string; isHeld: boolean }> | null;
     isApproximate: boolean;
     noun: string;
     votes: string;
@@ -106,6 +106,7 @@
 
   const uid = $props.id();
   let maps = $state<Array<Maplibre.Map>>([]);
+  const ready = new WeakSet<Maplibre.Map>();
   let isLoaded = $state(false);
   let opening = $state<number | null>(null);
   let still = $state(
@@ -187,6 +188,7 @@
     across: number;
     down: number;
   } | null = null;
+  let traced: Array<[number, number]> | null = null;
 
   const rows = $derived(
     new Map(
@@ -195,8 +197,10 @@
   );
   const inner = $derived(new Set(nested?.ks ?? []));
   const blanks = $derived(
-    new Map((blank ?? []).map((entry) => [entry.k, entry.name])),
+    new Map((blank ?? []).map((entry) => [entry.k, entry])),
   );
+  const missing = $derived((blank ?? []).filter((entry) => entry.isHeld));
+  const idle = $derived((blank ?? []).filter((entry) => !entry.isHeld));
   const scopes = $derived(
     frames.map((frame): Maplibre.FilterSpecification | null => {
       if (frames.length < 2) {
@@ -942,7 +946,7 @@
                   ],
                 },
               },
-              ...(blanks.size === 0
+              ...(missing.length === 0
                 ? []
                 : [
                     {
@@ -953,7 +957,7 @@
                       filter: [
                         "in",
                         ["id"],
-                        ["literal", [...blanks.keys()]],
+                        ["literal", missing.map((entry) => entry.k)],
                       ] as Maplibre.FilterSpecification,
                       paint: { "fill-pattern": "hatch" },
                     },
@@ -1384,7 +1388,7 @@
         map.on("load", () => {
           ready.add(map);
           if (index === 0) {
-            const watcher = new ResizeObserver(() => {
+            const settle = () => {
               if (frame != null && !isMoved && opening == null) {
                 snug = null;
                 map.resize();
@@ -1393,8 +1397,12 @@
                   [frame.west, frame.south, frame.east, frame.north],
                   { padding: room, animate: false },
                 );
-                const kept = new Set(
-                  places.rows.flatMap((row) =>
+                if (traced == null && !map.areTilesLoaded()) {
+                  map.once("idle", settle);
+                  return;
+                }
+                if (traced == null) {
+                  const kept = places.rows.flatMap((row) =>
                     row.at != null &&
                     row.at[0] >= frame.west &&
                     row.at[0] <= frame.east &&
@@ -1402,8 +1410,36 @@
                     row.at[1] <= frame.north
                       ? [row.k]
                       : [],
-                  ),
-                );
+                  );
+                  const found = [
+                    ...map.querySourceFeatures("places", {
+                      sourceLayer: "areas",
+                      filter: ["in", ["id"], ["literal", kept]],
+                    }),
+                    ...(own == null || map.getSource("own") == null
+                      ? []
+                      : map.querySourceFeatures("own", {
+                          sourceLayer: "areas",
+                          filter: ["==", ["id"], own.k],
+                        })),
+                  ].flatMap((feature) =>
+                    JSON.stringify(feature.geometry)
+                      .matchAll(/\[([\d.e-]+),([\d.e-]+)\]/g)
+                      .map((pair): [number, number] => [
+                        Number(pair[1]),
+                        Number(pair[2]),
+                      ])
+                      .filter(
+                        ([lng, lat]) =>
+                          lng >= frame.west &&
+                          lng <= frame.east &&
+                          lat >= frame.south &&
+                          lat <= frame.north,
+                      )
+                      .toArray(),
+                  );
+                  traced = found.length > 0 ? found : null;
+                }
                 const points: Array<[number, number]> = [];
                 const extent = {
                   left: Infinity,
@@ -1411,25 +1447,13 @@
                   right: -Infinity,
                   bottom: -Infinity,
                 };
-                for (const feature of map.queryRenderedFeatures({
-                  layers: ["fill"],
-                })) {
-                  if (typeof feature.id !== "number" || !kept.has(feature.id)) {
-                    continue;
-                  }
-                  for (const pair of JSON.stringify(feature.geometry).matchAll(
-                    /\[([\d.e-]+),([\d.e-]+)\]/g,
-                  )) {
-                    const point = map.project([
-                      Number(pair[1]),
-                      Number(pair[2]),
-                    ]);
-                    points.push([point.x, point.y]);
-                    extent.left = Math.min(extent.left, point.x);
-                    extent.top = Math.min(extent.top, point.y);
-                    extent.right = Math.max(extent.right, point.x);
-                    extent.bottom = Math.max(extent.bottom, point.y);
-                  }
+                for (const pair of traced ?? []) {
+                  const point = map.project(pair);
+                  points.push([point.x, point.y]);
+                  extent.left = Math.min(extent.left, point.x);
+                  extent.top = Math.min(extent.top, point.y);
+                  extent.right = Math.max(extent.right, point.x);
+                  extent.bottom = Math.max(extent.bottom, point.y);
                 }
                 const canvas = map.getCanvas();
                 const origin = canvas.getBoundingClientRect();
@@ -1512,7 +1536,8 @@
                 map.setMinZoom(map.getZoom());
               }
               isLoaded = true;
-            });
+            };
+            const watcher = new ResizeObserver(settle);
             watcher.observe(host);
             cleanup.push(() => watcher.disconnect());
             if (own != null && neighbors != null) {
@@ -1577,7 +1602,6 @@
     };
   };
 
-  const ready = new WeakSet<Maplibre.Map>();
   let repaint = $state(0);
   $effect(() => {
     const bump = () => requestAnimationFrame(() => (repaint += 1));
@@ -2068,8 +2092,13 @@
         {#if current != null}
           {@render readout()}
         {:else if empty != null}
-          <span class="font-semibold text-pretty">{blanks.get(empty)}</span>
-          <span class="text-xs text-muted-foreground">{m.map_no_results()}</span
+          <span class="font-semibold text-pretty"
+            >{blanks.get(empty)?.name}</span
+          >
+          <span class="text-xs text-muted-foreground"
+            >{blanks.get(empty)?.isHeld === true
+              ? m.map_no_results()
+              : m.map_no_race()}</span
           >
         {:else if beside != null}
           <span class="font-semibold text-pretty">{beside.name}</span>
@@ -2288,16 +2317,30 @@
             {/if}
           </button>
         {/each}
-        {#if blanks.size > 0}
+        {#if idle.length > 0}
           <span
             class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
-            title={[...blanks.values()].join(", ")}
+            title={idle.map((entry) => entry.name).join(", ")}
+          >
+            <span
+              class="rounded-xs bg-[color-mix(in_oklab,var(--muted-foreground)_14%,var(--card))] ring-1 ring-border block-2.5 inline-2.5"
+            ></span>
+            <span>{m.map_idle_key()}</span>
+            <span class="font-figures text-xs tabular-nums">{idle.length}</span>
+          </span>
+        {/if}
+        {#if missing.length > 0}
+          <span
+            class="flex items-center gap-1.5 px-1.5 text-[0.8125rem] text-muted-foreground block-7"
+            title={missing.map((entry) => entry.name).join(", ")}
           >
             <span
               class="rounded-xs bg-[repeating-linear-gradient(135deg,var(--muted-foreground)_0_1px,transparent_1px_3px)] ring-1 ring-border block-2.5 inline-2.5"
             ></span>
             <span>{m.map_blank_key()}</span>
-            <span class="font-figures text-xs tabular-nums">{blanks.size}</span>
+            <span class="font-figures text-xs tabular-nums"
+              >{missing.length}</span
+            >
           </span>
         {/if}
       </div>

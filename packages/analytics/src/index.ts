@@ -255,7 +255,7 @@ export function compare(
       )
       .map((line) => root(line.party ?? "")),
   );
-  const identify = (option: Option) => {
+  const base = (option: Option) => {
     if (grouping === "alliance" && option.alliance != null) {
       const anchor = anchors.get(option.alliance.id)?.party;
       return `alliance:${anchor == null ? option.alliance.id : root(anchor)}`;
@@ -290,6 +290,27 @@ export function compare(
       ? `kind:others:${option.label.toLowerCase()}`
       : `kind:${option.kind}`;
   };
+  const both = new Set(
+    current.options
+      .map((option) => option.person)
+      .filter(
+        (person) =>
+          person != null &&
+          earlier?.options.some((option) => option.person === person) === true,
+      ),
+  );
+  const personal = new Set(
+    options
+      .filter(
+        (option) =>
+          both.has(option.person) && base(option).startsWith("person:"),
+      )
+      .map((option) => option.person),
+  );
+  const identify = (option: Option) =>
+    personal.has(option.person) && !base(option).startsWith("alliance:")
+      ? `person:${option.person}`
+      : base(option);
   const now = tally(current, identify);
   const then =
     earlier == null ? new Map<string, Group>() : tally(earlier, identify);

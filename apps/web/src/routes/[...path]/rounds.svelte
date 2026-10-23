@@ -1,11 +1,11 @@
 <script lang="ts">
   import Name from "#lib/components/name.svelte";
   import { date, percent } from "#lib/format.js";
+  import { OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
   import Preview from "./preview.svelte";
-  import { OUTCOMES } from "./results.svelte";
 
   const {
     rounds,

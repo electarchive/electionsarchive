@@ -4,10 +4,10 @@
   import { resolve } from "$app/paths";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { count, date, percent } from "#lib/format.js";
+  import { MEASURES, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import type { PageData } from "./$types";
-  import { MEASURES, OUTCOMES } from "./results.svelte";
 
   const {
     path,
@@ -67,7 +67,7 @@
   bind:open
   openDelay={450}
   closeDelay={120}
-  onOpenChange={(value) => {
+  onOpenChange={(value: boolean) => {
     if (value && loaded?.path !== path) {
       const at = path;
       loaded = { path: at, data: null, failed: false };

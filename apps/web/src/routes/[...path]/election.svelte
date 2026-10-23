@@ -9,6 +9,7 @@
   import { tick, untrack } from "svelte";
   import { MediaQuery } from "svelte/reactivity";
   import { count, date, percent, points } from "#lib/format.js";
+  import { MEASURES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -22,7 +23,7 @@
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
   import Regions from "./regions.svelte";
-  import Results, { MEASURES } from "./results.svelte";
+  import Results from "./results.svelte";
   import Seated from "./seated.svelte";
   import Tiers from "./tiers.svelte";
   import Winners from "./winners.svelte";
@@ -1597,12 +1598,12 @@
             {#if part.photo != null}
               <img
                 class={cn(
-                  "row-span-2 self-end rounded-full bg-muted object-cover object-top ring-2 ring-offset-2 ring-offset-card",
+                  "row-span-2 self-center rounded-full bg-muted object-cover object-top ring-2 ring-offset-2 ring-offset-card",
                   {
                     "block-11 inline-11 sm:block-14 sm:inline-14": isLead,
                     "block-11 inline-11": !isLead,
                   },
-                  { "col-start-2": at === 1 },
+                  { "col-start-2 row-start-1": at === 1 },
                 )}
                 style:--tw-ring-color={part.color}
                 src={part.photo.src}

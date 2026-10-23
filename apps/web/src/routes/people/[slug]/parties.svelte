@@ -123,24 +123,46 @@
 </script>
 
 {#snippet mark(how: string, color: string)}
-  <span
-    class={cn(
-      "block border-2 border-(--party) block-2.5 inline-2.5",
-      {
-        "bg-(--party)":
-          how === "nominated" || how === "line" || how === "member",
-        "bg-card": how === "endorsed" || how === "supported",
-        "border-dashed bg-card": how === "independent",
-      },
-      {
-        "rounded-full":
-          how === "nominated" || how === "endorsed" || how === "independent",
-        "rounded-[1px]": how === "line" || how === "supported",
-        "scale-90 rotate-45 rounded-[1px]": how === "member",
-      },
-    )}
-    style:--party={color}
-  ></span>
+  {#if how === "independent"}
+    <svg
+      class="block overflow-visible block-2.5 inline-2.5"
+      viewBox="0 0 10 10"
+      style:--party={color}
+    >
+      <circle
+        cx="5"
+        cy="5"
+        r="4"
+        class="fill-card stroke-card"
+        stroke-width="6"
+      />
+      <circle
+        cx="5"
+        cy="5"
+        r="4"
+        class="fill-card stroke-(--party)"
+        stroke-width="1.75"
+      />
+      <circle cx="5" cy="5" r="1.6" class="fill-(--party)" />
+    </svg>
+  {:else}
+    <span
+      class={cn(
+        "block border-2 border-(--party) ring-2 ring-card block-2.5 inline-2.5",
+        {
+          "bg-(--party)":
+            how === "nominated" || how === "line" || how === "member",
+          "bg-card": how === "endorsed" || how === "supported",
+        },
+        {
+          "rounded-full": how === "nominated" || how === "endorsed",
+          "rounded-[1px]": how === "line" || how === "supported",
+          "scale-90 rotate-45 rounded-[1px]": how === "member",
+        },
+      )}
+      style:--party={color}
+    ></span>
+  {/if}
 {/snippet}
 
 {#if isShown}

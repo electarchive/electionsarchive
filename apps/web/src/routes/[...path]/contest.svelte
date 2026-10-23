@@ -8,6 +8,7 @@
   import { Combobox } from "#lib/components/ui/combobox/index.js";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, date, percent, points, precision } from "#lib/format.js";
+  import { MEASURES, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -26,7 +27,7 @@
   import PlaceSwitcher from "./place-switcher.svelte";
   import Places from "./places.svelte";
   import Preview from "./preview.svelte";
-  import Results, { MEASURES, OUTCOMES } from "./results.svelte";
+  import Results from "./results.svelte";
   import Rounds from "./rounds.svelte";
   import Seats from "./seats.svelte";
   import Series from "./series.svelte";
@@ -113,7 +114,7 @@
     }
     const winners = contest.chamber.parties.filter((party) => party.here > 0);
     const [winner] = winners;
-    if (winners.length !== 1 || winner == null || winner.here !== 1) {
+    if (winners.length !== 1 || winner?.here !== 1) {
       return null;
     }
     let total = 0;
@@ -431,7 +432,7 @@
         count: level.count,
         path: here,
         query,
-        isCurrent: level.code === placed?.level,
+        isCurrent: level.code === placed.level,
       };
     }) ?? [],
   );
@@ -1208,7 +1209,7 @@
           bind:focus
         />
       {/key}
-      {#if grouped != null && placed?.rows.some( (row) => placed.legend[row.leader ?? -1]?.key.startsWith("kind:others") )}
+      {#if grouped != null && placed.rows.some( (row) => placed.legend[row.leader ?? -1]?.key.startsWith("kind:others") )}
         <p class="px-1 pbs-1 text-xs text-pretty text-muted-foreground">
           {m.places_others_note({ name: grouped.label })}
         </p>
@@ -1283,7 +1284,39 @@
         {/each}
       </section>
     {/if}
-  {:else if locating == null}
+  {:else if locating != null}
+    <div
+      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-7 xl:col-span-8"
+    >
+      <PlaceMap
+        places={locating.places}
+        colors={locating.colors}
+        tiles={locating.tiles}
+        own={locating.own}
+        frames={locating.frames}
+        isApproximate={locating.isApproximate}
+        noun={locating.noun}
+        sources={locating.sources}
+        explore={upward?.path ?? null}
+        up={upward}
+        votes={m.col_votes()}
+        names={locating.names}
+        levels={[]}
+        span={null}
+        isLinked
+      />
+    </div>
+    <div
+      class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
+    >
+      {@render stats(true)}
+      <div
+        class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
+      >
+        {@render results()}
+      </div>
+    </div>
+  {:else}
     {@render stats(false)}
   {/if}
   {#if contest.count != null}
@@ -1308,7 +1341,7 @@
         placeholder={m.compare_placeholder()}
         search={m.compare_search()}
         empty={m.compare_empty()}
-        onValueChange={(value) => {
+        onValueChange={(value: string | null) => {
           const query = new URLSearchParams(page.url.search);
           if (value == null || value === "none") {
             query.delete("vs");
@@ -1516,7 +1549,7 @@
         ?.value ?? null}
       places={placed}
       picked={only}
-      onpick={(value) => {
+      onpick={(value: string | null) => {
         filter = { at: page.url.href, value };
         if (value != null) {
           document.querySelector("[data-places]")?.scrollIntoView();
@@ -1529,46 +1562,14 @@
         {span}
         colors={tones}
         names={titles}
-        noun={placed.levels.find((level) => level.code === placed?.level)
+        noun={placed.levels.find((level) => level.code === placed.level)
           ?.noun ?? ""}
         bind:focus
       />
     {/if}
   {/if}
 
-  {#if locating != null}
-    <div
-      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-7 xl:col-span-8"
-    >
-      <PlaceMap
-        places={locating.places}
-        colors={locating.colors}
-        tiles={locating.tiles}
-        own={locating.own}
-        frames={locating.frames}
-        isApproximate={locating.isApproximate}
-        noun={locating.noun}
-        sources={locating.sources}
-        explore={upward?.path ?? null}
-        up={upward}
-        votes={m.col_votes()}
-        names={locating.names}
-        levels={[]}
-        span={null}
-        isLinked
-      />
-    </div>
-    <div
-      class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
-    >
-      {@render stats(true)}
-      <div
-        class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
-      >
-        {@render results()}
-      </div>
-    </div>
-  {:else if drawn == null || chamber != null}
+  {#if locating == null && (drawn == null || chamber != null)}
     {#if drawn != null}
       {@render stats(false)}
     {/if}

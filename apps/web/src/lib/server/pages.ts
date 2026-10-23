@@ -200,24 +200,20 @@ export async function party(path: string, place: string | null = null) {
   if (scope != null && within == null) {
     error(404);
   }
-  if (within == null) {
-    const stored = await db.execute<{
-      page: Awaited<ReturnType<typeof contents>>;
-    }>(sql`select page from party_page where party_id = ${id}::uuid`);
-    const page = stored.rows[0]?.page;
-    if (page != null) {
-      return { kind: "party" as const, id, ...page };
-    }
-  }
-  return { kind: "party" as const, id, ...(await contents(id, within)) };
-}
-
-export async function contents(id: string, within?: string) {
-  const [party, record, history, latest] = await Promise.all([
-    call(router.parties.get, { id, within }),
-    call(router.parties.elections, { id, within }),
-    call(router.parties.history, { id, within }),
-    db.execute<{ id: string }>(sql`
+  const [page, generals] = await Promise.all([
+    (async () => {
+      if (within == null) {
+        const stored = await db.execute<{
+          page: Awaited<ReturnType<typeof contents>>;
+        }>(sql`select page from party_page where party_id = ${id}::uuid`);
+        const found = stored.rows[0]?.page;
+        if (found != null) {
+          return found;
+        }
+      }
+      return contents(id, within);
+    })(),
+    db.execute<{ id: string; date: string }>(sql`
       with ids as (
         select ${id}::uuid as id
         union
@@ -225,7 +221,7 @@ export async function contents(id: string, within?: string) {
         union
         select party_id from party_affiliation where kind = 'regional_branch' and parent_party_id = ${id}::uuid
       )
-      select e.id from election e
+      select e.id, e.date_from::text as date from election e
       where e.kind = 'general' and e.date_from <= current_date
         and case when ${within ?? null}::uuid is null
           then e.parent_id is null and e.polity_id = (select polity_id from party where id = ${id}::uuid)
@@ -234,10 +230,19 @@ export async function contents(id: string, within?: string) {
           select from contest c join contest_option o on o.contest_id = c.id
           where c.election_id = e.id and o.party_id in (select id from ids)
         )
-      order by e.date_from desc limit 1
+      order by e.date_from desc
     `),
   ]);
-  return { party, record, history, election: latest.rows[0]?.id ?? null };
+  return { kind: "party" as const, id, ...page, elections: generals.rows };
+}
+
+export async function contents(id: string, within?: string) {
+  const [party, record, history] = await Promise.all([
+    call(router.parties.get, { id, within }),
+    call(router.parties.elections, { id, within }),
+    call(router.parties.history, { id, within }),
+  ]);
+  return { party, record, history };
 }
 
 function total(parties: Array<{ seats: number }>) {
@@ -324,6 +329,22 @@ export async function chamber(path: string) {
         ...later,
       ]
     : results;
+  const groups = Map.groupBy(
+    [
+      ...record.parties,
+      ...body.parties.filter((party) =>
+        record.parties.every((entry) => entry.id !== party.id),
+      ),
+    ],
+    (party) => party.label.trim().toLocaleLowerCase(),
+  )
+    .values()
+    .toArray();
+  const kin = new Map(
+    groups.flatMap((group) =>
+      group.map((party) => [party.id, group[0]?.id ?? party.id] as const),
+    ),
+  );
   const terms = raw.map((term, index) => {
     const next = raw[index + 1]?.start ?? null;
     const lapse = body.sizes.find(
@@ -338,7 +359,15 @@ export async function chamber(path: string) {
     )?.to;
     const seats = new Map<string | null, number>();
     for (const entry of term.parties) {
-      const key = effective(entry);
+      const key = effective({
+        ...entry,
+        party:
+          entry.party == null ? null : (kin.get(entry.party) ?? entry.party),
+        caucus:
+          "caucus" in entry && entry.caucus != null
+            ? (kin.get(entry.caucus) ?? entry.caucus)
+            : null,
+      });
       seats.set(key, (seats.get(key) ?? 0) + entry.seats);
     }
     return {
@@ -367,12 +396,13 @@ export async function chamber(path: string) {
     governments: record.governments,
     parties: stand(
       terms.flatMap((term) => term.parties.map((entry) => entry.party)),
-      [
-        ...record.parties,
-        ...body.parties.filter((party) =>
-          record.parties.every((entry) => entry.id !== party.id),
+      groups.flatMap((group) =>
+        group.map((party) =>
+          new Set(group.map((entry) => entry.short)).size > 1
+            ? { ...party, short: null }
+            : party,
         ),
-      ],
+      ),
     ),
     members,
   };

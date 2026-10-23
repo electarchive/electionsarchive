@@ -212,8 +212,8 @@
       {color}
     />
 
-    {#if data.election != null}
-      <Strength election={data.election} party={data.id} name={party.name} />
+    {#if data.elections.length > 0}
+      <Strength elections={data.elections} party={data.id} name={party.name} />
     {/if}
 
     {#if party.scope == null}
