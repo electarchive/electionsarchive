@@ -721,19 +721,21 @@
                 >{child.name}</Preview
               >
             {/if}
-            <span class="text-xs text-muted-foreground tabular-nums"
-              >{m.home_elections({
-                count: child.elections,
-              })}{#if child.first != null && child.last != null}<span
-                  class="ms-2 font-figures text-[0.6875rem]"
-                  >{child.first === child.last
-                    ? child.first
-                    : m.polity_span({
-                        first: String(child.first),
-                        last: String(child.last),
-                      })}</span
-                >{/if}</span
-            >
+            {#if child.elections > 0}
+              <span class="text-xs text-muted-foreground tabular-nums"
+                >{m.home_elections({
+                  count: child.elections,
+                })}{#if child.first != null && child.last != null}<span
+                    class="ms-2 font-figures text-[0.6875rem]"
+                    >{child.first === child.last
+                      ? child.first
+                      : m.polity_span({
+                          first: String(child.first),
+                          last: String(child.last),
+                        })}</span
+                  >{/if}</span
+              >
+            {/if}
           </li>
         {/each}
       </ul>

@@ -6775,6 +6775,12 @@ async function races(
               join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
               join result_set rs on rs.id = x.result_set_id and rs.is_default
               where not exists (select from contest k where k.allocation_parent_id = t.id)
+                and not (o.kind = 'candidate' and exists (
+                  select from contest_option l
+                  join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
+                  join result_set lr on lr.id = lx.result_set_id and lr.is_default
+                  where l.contest_id = o.contest_id and l.kind = 'list'
+                ))
               group by o.id, o.contest_id, o.party_id
             ),
             leads as (
@@ -9175,7 +9181,7 @@ export const polities = {
           db.execute<{ date: string }>(sql`
             select e.date_from::text as date
             from election e
-            join contest c on c.election_id = e.id and c.allocation_parent_id is null and c.party_scope_id is null
+            join contest c on c.election_id = e.id and (c.allocation_parent_id is null or c.kind = 'elector_slate') and c.party_scope_id is null
             join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
             where e.polity_id = ${input.id}::uuid and e.status = 'held' and e.date_from <= current_date
               and (c.district_area_id is null or c.district_area_id = pt.area_id)
@@ -9191,7 +9197,7 @@ export const polities = {
                   join area_parent ap on ap.area_id = a.id and ap.parent_id = pt.area_id
                 )
               )
-            order by e.date_from desc
+            order by c.kind = 'ballot_question', e.date_from desc
             limit 1
           `),
         ]);
@@ -9621,6 +9627,12 @@ export const polities = {
           join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
           join result_set rs on rs.id = x.result_set_id and rs.is_default
           where not exists (select from contest k where k.allocation_parent_id = t.id)
+            and not (o.kind = 'candidate' and exists (
+              select from contest_option l
+              join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
+              join result_set lr on lr.id = lx.result_set_id and lr.is_default
+              where l.contest_id = o.contest_id and l.kind = 'list'
+            ))
           group by t.root, t.id, o.id, o.party_id
         ),
         lines as materialized (
