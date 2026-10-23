@@ -300,7 +300,8 @@
      "contest": "d20",
      "candidate": "William R. Down"
     }
-   ]
+   ],
+   "hint": "Every figure is digits and commas only; a trailing 0 is the digit zero, never the letter D or O."
   }
  ]
 }
