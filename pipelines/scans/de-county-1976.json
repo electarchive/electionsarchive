@@ -1,0 +1,211 @@
+{
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Official results of general election, 1976",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect76/pdfs/1976.pdf"
+  },
+  "unit_scheme": "split",
+  "unit_codes": {
+    "City of Wilmington": "10003",
+    "Wilmington": "10003",
+    "Rural New Castle County": "10003",
+    "Rural New Castle": "10003",
+    "New Castle County": "10003",
+    "New Castle": "10003",
+    "Kent County": "10001",
+    "Kent": "10001",
+    "Sussex County": "10005",
+    "Sussex": "10005"
+  },
+  "contests": {
+    "lg": {
+      "year": 1976,
+      "chamber": "lieutenant-governor",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "DE",
+      "district": null
+    },
+    "sen": {
+      "year": 1976,
+      "chamber": "senate",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "DE",
+      "district": null
+    },
+    "rep": {
+      "year": 1976,
+      "chamber": "house",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "DE",
+      "district": 0
+    }
+  },
+  "pages": [
+    {
+      "page": 3,
+      "id": "3-0",
+      "orientation": "counties_across",
+      "crop": [
+        0.0,
+        0.17,
+        1.0,
+        0.67
+      ],
+      "hint": "The county columns are New Castle County, Kent County, Sussex County, then the total column, which is printed as Total Votes Received or Total Votes Cast; leave out the Majority column. Every line of a candidate or of a total is a row, even where some cells are blank; a line with no figures at all is not a row.",
+      "turn": 0,
+      "columns": [
+        {
+          "label": "CARTER",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "FORD",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "ANDERSON",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "BUBAR",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LEVIN",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "LaROUCHE",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "McCARTHY",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "MALONEY",
+          "contest": "sen",
+          "candidate": "Thomas C. Maloney"
+        },
+        {
+          "label": "ROTH",
+          "contest": "sen",
+          "candidate": "William V. Roth, Jr."
+        },
+        {
+          "label": "GIES",
+          "contest": "sen",
+          "candidate": "Donald G. Gies"
+        },
+        {
+          "label": "MASSIMILLA",
+          "contest": "sen",
+          "candidate": "John A. Massimilla"
+        },
+        {
+          "label": "McINERNEY",
+          "contest": "sen",
+          "candidate": "Joseph F. McInerney"
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "SHIPLEY",
+          "contest": "rep",
+          "candidate": "Samuel L. Shipley"
+        },
+        {
+          "label": "EVANS",
+          "contest": "rep",
+          "candidate": "Thomas B. Evans, Jr."
+        },
+        {
+          "label": "LoPRESTI",
+          "contest": "rep",
+          "candidate": "Robert G. LoPresti"
+        },
+        {
+          "label": "GREEN",
+          "contest": "rep",
+          "candidate": "Raymond R. Green"
+        },
+        {
+          "label": "HOLLON",
+          "contest": "rep",
+          "candidate": "Joseph B. Hollon, Sr."
+        },
+        {
+          "label": "VALENTI",
+          "contest": "rep",
+          "candidate": "Philip Valenti"
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        }
+      ]
+    },
+    {
+      "page": 4,
+      "id": "4-0",
+      "orientation": "counties_across",
+      "crop": [
+        0.0,
+        0.17,
+        1.0,
+        0.38
+      ],
+      "hint": "The county columns are New Castle County, Kent County, Sussex County, then the total column, which is printed as Total Votes Received or Total Votes Cast; leave out the Majority column. Every line of a candidate or of a total is a row, even where some cells are blank; a line with no figures at all is not a row.",
+      "turn": 0,
+      "columns": [
+        {
+          "label": "McGINNIS",
+          "contest": "lg",
+          "candidate": "James D. McGinnis"
+        },
+        {
+          "label": "FOLTZ",
+          "contest": "lg",
+          "candidate": "Andrew Foltz"
+        },
+        {
+          "label": "MERCER",
+          "contest": "lg",
+          "candidate": "Margaret Mercer"
+        },
+        {
+          "label": "APPLING",
+          "contest": "lg",
+          "candidate": "Robert Appling"
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        }
+      ]
+    }
+  ]
+}

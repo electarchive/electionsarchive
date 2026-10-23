@@ -1,0 +1,153 @@
+{
+  "polity": "US-DE",
+  "publisher": "Delaware Department of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "Official results of general election, 1992",
+  "file": {
+    "url": "https://elections.delaware.gov/elections/resultsarchive/elect92/pdfs/1992_General_Election.pdf"
+  },
+  "unit_scheme": "split",
+  "unit_codes": {
+    "City of Wilmington": "10003",
+    "Wilmington": "10003",
+    "Rural New Castle County": "10003",
+    "Rural New Castle": "10003",
+    "New Castle County": "10003",
+    "New Castle": "10003",
+    "Kent County": "10001",
+    "Kent": "10001",
+    "Sussex County": "10005",
+    "Sussex": "10005"
+  },
+  "contests": {
+    "lg": {
+      "year": 1992,
+      "chamber": "lieutenant-governor",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "DE",
+      "district": null
+    },
+    "rep": {
+      "year": 1992,
+      "chamber": "house",
+      "day": "1992-11-03",
+      "special": false,
+      "state": "DE",
+      "district": 0
+    }
+  },
+  "pages": [
+    {
+      "page": 4,
+      "id": "4-0",
+      "orientation": "counties_across",
+      "crop": [
+        0.0,
+        0.2,
+        1.0,
+        0.61
+      ],
+      "hint": "The county columns are City of Wilmington, Rural New Castle County, Kent County, Sussex County, then the total column, which is printed as Total Votes Received or Total Votes Cast; leave out the Majority column. Every line of a candidate or of a total is a row, even where some cells are blank; a line with no figures at all is not a row.",
+      "turn": 0,
+      "columns": [
+        {
+          "label": "Bill Clinton",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "George Bush",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Andre Marrou",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Lenora B. Fulani",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ross Perot",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "S.B. Woo",
+          "contest": "rep",
+          "candidate": "S.B. Woo"
+        },
+        {
+          "label": "Michael N. Castle",
+          "contest": "rep",
+          "candidate": "Michael N. Castle"
+        },
+        {
+          "label": "Peggy Schmitt",
+          "contest": "rep",
+          "candidate": "Peggy Schmitt"
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Thomas R. Carper",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "B. Gary Scott",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Floyd E. McDowell, Sr.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Richard A. Cohen",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Ruth Ann Minner",
+          "contest": "lg",
+          "candidate": "Ruth Ann Minner"
+        },
+        {
+          "label": "Philip D. Cloutier",
+          "contest": "lg",
+          "candidate": "Philip D. Cloutier"
+        },
+        {
+          "label": "Lawrence D. Sullivan",
+          "contest": "lg",
+          "candidate": "Lawrence D. Sullivan"
+        },
+        {
+          "label": "Total Votes Cast",
+          "contest": null,
+          "candidate": ""
+        }
+      ]
+    }
+  ]
+}

@@ -80,7 +80,7 @@ class Manifest(TypedDict):
     license: NotRequired[str]
     raw_source: NotRequired[str]
     unit_codes: NotRequired[dict[str, str]]
-    unit_scheme: NotRequired[Literal["town"]]
+    unit_scheme: NotRequired[Literal["town", "split"]]
     autorotate: NotRequired[bool]
 
 
@@ -159,6 +159,9 @@ COST_REPORT = "https://api.anthropic.com/v1/organizations/cost_report"
 BILLED_FROM = "2026-10-22T00:00:00Z"
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
+LEGISLATURES = {"state-senate": "senate", "state-house": "house"}
+LABEL = re.compile(r"^(counties|county)$")
+SUBTOTAL = re.compile(r"^(down ?state|downstate)$")
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
 ABBREVIATION = re.compile(r"^(mt|w|e|n|s|no|so)\.? ", re.IGNORECASE)
@@ -212,6 +215,8 @@ def client() -> anthropic.Anthropic:
 
 def key_of(contest: Contest) -> str:
     chamber, day, state, district = contest["chamber"], contest["day"], contest["state"], contest["district"]
+    if chamber in LEGISLATURES:
+        return f"{day}:{state}:{LEGISLATURES[chamber]}:{district}:{'gs' if contest['special'] else 'g'}"
     base = (
         f"{day}:{state}-{district:02}:president"
         if chamber == "president" and district is not None
@@ -311,7 +316,10 @@ def orientation(manifest: Manifest, page: int, image: Image.Image) -> int:
             for turn in (0, 90, 180, 270):
                 small.rotate(turn, expand=True).save(f"{folder}/p.png")
                 found = subprocess.run(
-                    ["tesseract", f"{folder}/p.png", "-", "--psm", "6", "tsv"], capture_output=True, text=True
+                    ["tesseract", f"{folder}/p.png", "-", "--psm", "6", "tsv"],
+                    check=False,
+                    capture_output=True,
+                    text=True,
                 ).stdout
                 counts[turn] = sum(
                     1
@@ -520,6 +528,7 @@ def cells(
     errors: dict[str, str] = {}
     extra = {slug(label).replace(" ", ""): code for label, code in manifest.get("unit_codes", {}).items()}
     towns = manifest.get("unit_scheme") == "town"
+    folded = towns or manifest.get("unit_scheme") == "split"
     home: dict[str, str] = {}
     for spec in manifest["pages"]:
         across = spec.get("orientation") == "counties_across"
@@ -533,6 +542,15 @@ def cells(
                 errors[number] = f"{custom}: {table}"
                 continue
             header, rows = table["header"], table["rows"]
+            labels = [index for index, entry in enumerate(header) if LABEL.match(slug(entry["label"]))]
+            if labels:
+                rows = [
+                    {**row, "values": [text for c, text in enumerate(row["values"]) if c not in labels]}
+                    if len(row["values"]) == len(header)
+                    else row
+                    for row in rows
+                ]
+                header = [entry for index, entry in enumerate(header) if index not in labels]
             if "columns" not in spec:
                 errors[number] = f"{custom}: columns not discovered"
                 continue
@@ -557,10 +575,15 @@ def cells(
                     else row["label"]
                 )
                 heading = WARD.sub("", named)
-                if len(row["values"]) != len(header):
-                    errors[number] = f"{custom}: row {row['label']!r} has {len(row['values'])} cells for {len(header)}"
+                if SUBTOTAL.match(slug(row["label"])):
+                    continue
+                texts = row["values"]
+                if texts and re.fullmatch(r"[A-Za-z]", texts[0].strip()):
+                    texts = [*texts[1:], ""] if len(texts) == len(header) else texts[1:]
+                if len(texts) != len(header):
+                    errors[number] = f"{custom}: row {row['label']!r} has {len(texts)} cells for {len(header)}"
                     break
-                for c, text in enumerate(row["values"]):
+                for c, text in enumerate(texts):
                     series, label = (r, header[c]["label"]) if across else (c, named)
                     digits = re.sub(r"[,\s.]|(?<=\d)[-~'](?=\d)", "", text)
                     value = int(digits) if digits.isdigit() else None
@@ -585,7 +608,7 @@ def cells(
                             f"{custom}: {'town' if towns else 'county'} {label!r} is not in {manifest['polity']}"
                         )
                         break
-                    unit = slug(label).replace(" ", "") if towns else code
+                    unit = slug(label).replace(" ", "") if folded else code
                     home[unit] = code
                     box = [
                         x0 + (x1 - x0) * header[c]["x0"] / 1000,
@@ -600,14 +623,14 @@ def cells(
                 else:
                     continue
                 break
-    if towns:
-        folded: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
+    if folded:
+        summed: dict[tuple[str, str, int], tuple[int, list[float]]] = {}
         for (number, unit, series), (value, box) in values.items():
-            before = folded.get((number, home[unit], series))
-            folded[(number, home[unit], series)] = (
+            before = summed.get((number, home[unit], series))
+            summed[(number, home[unit], series)] = (
                 (value + before[0], before[1]) if before is not None else (value, box)
             )
-        values = folded
+        values = summed
     return values, printed, errors
 
 
@@ -1000,11 +1023,12 @@ def run(name: str, mode: str = "auto") -> str:
             }
             if not redo:
                 break
-        message = settle(reader, state, mode) or message
-        message = dispatch(reader, pending(name, reader, redo), state, mode) or message
-        state_path.write_text(json.dumps(state, indent=2))
-        if pending(name, reader, redo):
-            return message or f"{reader}: waiting for the batch"
+        if "EA_SCANS_CACHED" not in os.environ:
+            message = settle(reader, state, mode) or message
+            message = dispatch(reader, pending(name, reader, redo), state, mode) or message
+            state_path.write_text(json.dumps(state, indent=2))
+            if pending(name, reader, redo):
+                return message or f"{reader}: waiting for the batch"
         if reader == "first" and any("discover" in spec and "columns" not in spec for spec in manifest["pages"]):
             problems = discover(manifest, folder)
             manifest = load(name)
@@ -1076,8 +1100,9 @@ def finalize(
         if how == "review" and fixes:
             for item in fixes:
                 key = (str(item.get("section", item.get("page"))), str(item["county"]))
-                if key in cellmap:
-                    cellmap[key] = (int(item["value"]), cellmap[key][1])
+                seen = cellmap.get(key) or one.cells.get(key) or (two.cells.get(key) if two is not None else None)
+                if seen is not None:
+                    cellmap[key] = (int(item["value"]), seen[1])
             target = chosen.printed if chosen.printed is not None else held.get(name)
             slack = 0 if chosen.printed is not None else max(50, (target or 0) * 0.01)
             if target is not None and abs(sum(value for value, _ in cellmap.values()) - target) <= slack:
@@ -1309,9 +1334,15 @@ def emit(name: str) -> Path:
         frame = frame.group_by("contest", "candidate", "code", maintain_order=True).agg(
             pl.col("votes").sum(), pl.exclude("contest", "candidate", "code", "votes").first()
         )
+    seats = {
+        label: {**contest, "chamber": key_of(contest).split(":", 2)[2], "special": False, "district": None}
+        if contest["chamber"] in LEGISLATURES
+        else contest
+        for label, contest in contests.items()
+    }
     frame = frame.with_columns(
         **{
-            name_: pl.col("contest").replace_strict({key: value[name_] for key, value in contests.items()})
+            name_: pl.col("contest").replace_strict({key: value[name_] for key, value in seats.items()})
             for name_ in ("year", "chamber", "day", "special", "state", "district")
         },
         measure=pl.lit(1, pl.Int16),

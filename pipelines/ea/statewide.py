@@ -233,7 +233,7 @@ def step(name: str, mode: str = "auto") -> str:
     reads: dict[str, dict[str, scans.Read]] = {}
     outcome: dict[str, dict[tuple[int, int, str], dict[str, object]]] = {}
     message = ""
-    for reader in ("second", "third")[: int(os.environ.get("EA_SCANS_READERS", 3)) - 1]:
+    for reader in ("second", "third")[: int(os.environ.get("EA_SCANS_READERS", "3")) - 1]:
         plan = requests(name, volume, reader, leaves)
         message = scans.settle(reader, state, mode) or message
         wanted = {custom: request for custom, request in plan.items() if scans.cached(request.key) is None}
