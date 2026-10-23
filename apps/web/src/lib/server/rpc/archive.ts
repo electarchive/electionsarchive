@@ -2969,6 +2969,13 @@ export const contests = {
             exists (
               select from result_set rs join note n on n.entity_id = rs.id and n.kind = 'methodology'
               where rs.contest_id = ${contest.id}::uuid and not rs.is_default
+                and exists (
+                  select from result_rollup_unit u
+                  where u.result_set_k = rs.k and not exists (
+                    select from result_set d join result_rollup_unit w on w.result_set_k = d.k and w.area_k = u.area_k
+                    where d.contest_id = ${contest.id}::uuid and d.is_default
+                  )
+                )
             ) as derived
           from (
             select max(r.count_round)::int as last from result_set rs cross join lateral (

@@ -33,6 +33,9 @@
   } = $props();
 
   let expanded = $state(false);
+  const isQuestion = $derived(
+    rows.some((row) => row.key.startsWith("answer:")),
+  );
 
   const here = $derived(span?.forward === true ? span.from : span?.to);
   const there = $derived(span?.forward === true ? span.to : span?.from);
@@ -225,7 +228,7 @@
   class="-mbe-2 justify-end"
   name="results"
   columns={[
-    m.col_option(),
+    isQuestion ? m.col_answer() : m.col_option(),
     votes,
     `${m.col_share()} (%)`,
     ...(seats == null ? [] : [seats]),
@@ -269,7 +272,7 @@
     <thead>
       <tr class="border-be text-[0.8125rem] text-muted-foreground">
         <th class="px-2 py-1.5 text-start font-medium" scope="col"
-          >{m.col_option()}</th
+          >{isQuestion ? m.col_answer() : m.col_option()}</th
         >
         <th
           class={cn("px-2 py-1.5 text-end font-medium", {

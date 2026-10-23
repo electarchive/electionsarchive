@@ -232,22 +232,26 @@
     return top?.current == null || top.current.votes < total * 0.9 ? null : top;
   });
   const placed = $derived(
-    contest.places == null || grouped == null
-      ? contest.places
-      : {
-          ...contest.places,
-          legend: contest.places.legend.map((item) =>
-            item.key.startsWith("kind:others")
-              ? {
-                  ...item,
-                  label: m.places_others_with({ name: grouped.label }),
-                  color: grouped.color,
-                  person: grouped.current?.person ?? null,
-                  party: grouped.current?.party ?? null,
-                }
-              : item,
-          ),
-        },
+    contest.places == null ||
+      (contest.places.rows.length > 0 &&
+        contest.places.rows.every((row) => row.valid === 0))
+      ? null
+      : grouped == null
+        ? contest.places
+        : {
+            ...contest.places,
+            legend: contest.places.legend.map((item) =>
+              item.key.startsWith("kind:others")
+                ? {
+                    ...item,
+                    label: m.places_others_with({ name: grouped.label }),
+                    color: grouped.color,
+                    person: grouped.current?.person ?? null,
+                    party: grouped.current?.party ?? null,
+                  }
+                : item,
+            ),
+          },
   );
   const drawn = $derived.by(() => {
     const places = placed;
@@ -329,7 +333,8 @@
       chamber != null ||
       places == null ||
       own?.tiles == null ||
-      own.k == null
+      own.k == null ||
+      places.rows.every((row) => row.k === own.k)
     ) {
       return null;
     }
@@ -617,12 +622,37 @@
         .toSorted(
           (a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0),
         )[0];
+      const next = contest.rows
+        .filter((row) => row.current != null && row !== top)
+        .toSorted(
+          (a, b) => (b.current?.share ?? 0) - (a.current?.share ?? 0),
+        )[0];
       return top?.current?.outcome === "lost"
         ? m.race_lede_lost({
             answer: named(top),
             share: percent(top.current.share),
           })
-        : null;
+        : top?.current?.outcome === "won" &&
+            next?.current != null &&
+            /^(?:yes|for|approve)/iu.test(top.label)
+          ? m.race_lede_measure_passed({ share: percent(top.current.share) })
+          : top?.current?.outcome === "won" &&
+              next?.current != null &&
+              /^(?:no|against|reject)/iu.test(top.label)
+            ? m.race_lede_measure_failed({ share: percent(top.current.share) })
+            : top?.current?.outcome === "won" && next?.current != null
+              ? m.race_lede_won({
+                  party: named(top),
+                  share: percent(
+                    top.current.share,
+                    precision(top.current.share - next.current.share),
+                  ),
+                  margin: points(
+                    top.current.share - next.current.share,
+                  ).replace(/^\+/u, ""),
+                  runner: named(next),
+                })
+              : null;
     }
     const [elector, second] = contest.electors?.rows ?? [];
     if (elector != null) {
