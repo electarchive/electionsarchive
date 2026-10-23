@@ -48,12 +48,19 @@ FILES = [
         "congress",
     ),
 ]
+SHEETS = [
+    ("20131023194734id_/http://www.maine.gov/sos/cec/elec/2012/2012cg1.xls", date(2012, 11, 6)),
+    ("20131023193306id_/http://www.maine.gov/sos/cec/elec/2012/2012cg2.xls", date(2012, 11, 6)),
+    ("20150317215422id_/http://www.maine.gov:80/sos/cec/elec/2014/congressgen.xlsx", date(2014, 11, 4)),
+]
 UNLISTED = {"CHEBEAGUEISLAND": "CUM", "NO14": "WAS"}
 
 
 def fetch() -> None:
     for path, *_ in FILES:
         raw.fetch(SOURCE, WAYBACK.format(path), suffix=".txt")
+    for path, _ in SHEETS:
+        raw.fetch(SOURCE, WAYBACK.format(path), suffix=Path(path).suffix)
 
 
 def parse() -> None:
@@ -155,6 +162,48 @@ def parse() -> None:
                             int((votes or "0").replace(",", "")),
                         )
                     )
+    for path, day in SHEETS:
+        sheets = pl.read_excel(
+            raw.cached(SOURCE, WAYBACK.format(path)).path,
+            sheet_id=0,
+            has_header=False,
+            engine="calamine",
+            raise_if_empty=False,
+        )
+        for sheet, table in sheets.items():
+            if not re.fullmatch(r"CG[12]", sheet):
+                continue
+            rows = [[cell.strip() if cell is not None else "" for cell in row] for row in table.iter_rows()]
+            header = next(row for row in rows if "," in row[1])
+            columns = [
+                (index, name)
+                for index, name in enumerate(header)
+                if index and name and name.upper() not in ("%", "BLANK") and not name.upper().startswith("TOTAL")
+            ]
+            counted: dict[str, int] = {}
+            for row in rows:
+                label = row[0]
+                county = re.fullmatch(r"(\w+) County Totals", label)
+                if county is None and label.upper() not in ("STATE UOCAVA", "EMERGENCY UTILITY WORKERS"):
+                    if re.fullmatch(r"(District [12] )?Totals", label):
+                        for index, name in columns:
+                            if counted.get(name) != int(float(row[index])):
+                                raise ValueError(f"{path} {sheet}: {name} counties sum to {counted.get(name)}")
+                    continue
+                for index, name in columns:
+                    votes = int(float(row[index] or 0))
+                    counted[name] = counted.get(name, 0) + votes
+                    lines.append(
+                        (
+                            day,
+                            "congress",
+                            int(sheet[-1]),
+                            county[1][:3].upper() if county else None,
+                            label,
+                            " ".join(name.split()),
+                            votes,
+                        )
+                    )
     frame = pl.DataFrame(
         lines,
         schema={
@@ -176,6 +225,7 @@ def parse() -> None:
         .str.replace_all(r"[^A-Z0-9]", ""),
         county=pl.col("county").str.strip_chars(),
         uocava=pl.col("town").str.to_uppercase().str.contains("UOCAVA"),
+        emergency=pl.col("town").str.to_uppercase().str.contains("EMERGENCY"),
     )
     homes = frame.filter(pl.col("county").is_not_null()).select("place", "county").unique()
     if homes.filter(pl.len().over("place") > 1).height:
@@ -184,7 +234,7 @@ def parse() -> None:
     frame = frame.join(homes.rename({"county": "home"}), on="place", how="left").with_columns(
         county=pl.coalesce("county", "home", pl.col("place").replace_strict(UNLISTED, default=None))
     )
-    lost = frame.filter(pl.col("county").is_null(), ~pl.col("uocava"))
+    lost = frame.filter(pl.col("county").is_null(), ~pl.col("uocava"), ~pl.col("emergency"))
     if lost.height:
         raise ValueError(f"no county for {lost['town'].unique().to_list()}")
     PARSED.mkdir(parents=True, exist_ok=True)
@@ -200,8 +250,10 @@ def parse() -> None:
             district=pl.when(pl.col("chamber") == "congress").then("district").otherwise(pl.lit(None, pl.Int16)),
             code=pl.when("uocava")
             .then(pl.lit("ME:uocava"))
+            .when("emergency")
+            .then(pl.lit("ME:emergency"))
             .otherwise(pl.col("county").replace_strict(COUNTIES, default=None)),
-            kind=pl.when("uocava").then(pl.lit("aggregate")).otherwise(pl.lit("county")),
+            kind=pl.when(pl.col("uocava") | pl.col("emergency")).then(pl.lit("aggregate")).otherwise(pl.lit("county")),
             candidate=pl.col("candidate").str.to_uppercase(),
             measure=pl.lit(1, pl.Int16),
             writein=pl.col("candidate").str.contains("(?i)write|others"),
@@ -222,7 +274,7 @@ def emit() -> Path:
                 """select distinct x.value from external_id x
                    join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
                    where x.scheme = 'us.contest' and (x.value ~ '^20(00|02|06|08|10)-11-0[0-9]:ME:(house|senate):[0-9]+:g$'
-                                                  or x.value ~ '^20(00|02|04|06|08|10)-11-0[0-9]:ME:house:[12]$')
+                                                  or x.value ~ '^20(00|02|04|06|08|10|12|14)-11-0[0-9]:ME:house:[12]$')
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
                                    and u.scheme_code in ('us.precinct', 'us.county', 'us.town', 'us.county_part'))"""
@@ -232,7 +284,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Maine's 2000, 2002, 2006, 2008, and 2010 State House and Senate generals and 2000–2010 U.S. House generals by county",
+            summary="Maine's 2000, 2002, 2006, 2008, and 2010 State House and Senate generals and 2000–2014 U.S. House generals by county",
             polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -245,7 +297,7 @@ def emit() -> Path:
             url="https://www.maine.gov/sos/cec/elec/results/index.html",
             license="Public record",
         )
-        for path, *_ in FILES:
+        for path, *_ in [*FILES, *SHEETS]:
             cs.artifact(raw.cached(SOURCE, WAYBACK.format(path)), source)
         frame = pl.read_parquet(PARSED / "counties.parquet").filter(
             ~pl.concat_str(pl.col("day").cast(pl.String), pl.lit("ME"), "chamber", separator=":").is_in(list(filled))
