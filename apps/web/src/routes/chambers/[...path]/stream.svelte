@@ -32,6 +32,8 @@
       short: string | null;
       color: string | null;
       lean: number | null;
+      isStriped: boolean;
+      isMade: boolean;
     }>;
     governments: Array<{
       name: string;
@@ -286,13 +288,15 @@
   );
   const legend = $derived(
     order
-      .filter((party) =>
-        terms.some((term) =>
-          term.parties.some(
-            (entry) =>
-              entry.party === party && entry.seats >= 0.06 * term.total,
+      .filter(
+        (party) =>
+          info.get(party ?? "")?.isStriped === true ||
+          terms.some((term) =>
+            term.parties.some(
+              (entry) =>
+                entry.party === party && entry.seats >= 0.06 * term.total,
+            ),
           ),
-        ),
       )
       .filter(
         (party, index, all) =>
@@ -396,6 +400,15 @@
         >
           <rect width="1" height="4" class="fill-muted-foreground" />
         </pattern>
+        <pattern
+          id="{uid}-stripe"
+          width="5"
+          height="5"
+          patternUnits="userSpaceOnUse"
+          patternTransform="rotate(45)"
+        >
+          <rect width="1.5" height="5" class="fill-card" />
+        </pattern>
       </defs>
       <g>
         {#each columns.filter((column) => column.empty > 0) as column (column.index)}
@@ -427,6 +440,14 @@
             stroke-width="0.5"
             stroke-linejoin="round"
           />
+          {#if info.get(entry.party ?? "")?.isStriped === true}
+            <path
+              d={entry.d}
+              fill="url(#{uid}-stripe)"
+              opacity="0.6"
+              class="pointer-events-none"
+            />
+          {/if}
         {/each}
       </g>
       {#if lit != null}
@@ -632,8 +653,11 @@
         <span
           class="rounded-xs block-2.5 inline-2.5"
           style:background={tint(party)}
+          style:background-image={info.get(party ?? "")?.isStriped === true
+            ? "repeating-linear-gradient(45deg, transparent 0 2px, var(--card) 2px 3px)"
+            : null}
         ></span>
-        {#if party == null}
+        {#if party == null || info.get(party)?.isMade === true}
           <span class="text-muted-foreground">{label(party)}</span>
         {:else}
           <a class="hover:underline" href={resolve("/id/[id]", { id: party })}

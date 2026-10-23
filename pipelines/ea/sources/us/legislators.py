@@ -14,7 +14,7 @@ from ea.sources.us.secession import STATES
 from ea.store import connect
 
 SOURCE = "us.legislators"
-VERSION = "3"
+VERSION = "4"
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
         "query": """SELECT ?bioguide ?start ?startPrecision ?end ?endPrecision ?cause WHERE {
@@ -581,6 +581,20 @@ def emit() -> Path:
                         valid_to=None if until > today else until + timedelta(days=1),
                         valid_to_precision="day",
                     )
+                    caucus = term.get("caucus")
+                    if caucus is not None and label == "Independent":
+                        cs.add(
+                            "tenure_affiliation",
+                            tenure_id=tenure,
+                            kind="parliamentary_group",
+                            party_id=cs.key(
+                                "us.party", "republican-party" if caucus == "Republican" else NATIONAL[caucus]
+                            ),
+                            valid_from=since,
+                            valid_from_precision="day",
+                            valid_to=None if until > today else until + timedelta(days=1),
+                            valid_to_precision="day",
+                        )
         for seat, label, area in conn.execute(
             "select id, label, district_area_id from seat where id = any(%s::uuid[])", [list(states)]
         ).fetchall():

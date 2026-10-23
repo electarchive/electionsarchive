@@ -1,6 +1,7 @@
 import { call, ORPCError } from "@orpc/server";
 import { error, redirect } from "@sveltejs/kit";
 import { sql } from "drizzle-orm";
+import { effective, stand } from "#lib/caucus.js";
 import { db } from "#lib/server/db/index.js";
 import { router } from "#lib/server/rpc/router.js";
 import land from "#lib/server/world.txt?raw";
@@ -335,8 +336,14 @@ export async function chamber(path: string) {
         next != null &&
         Date.parse(next) - Date.parse(entry.to) > 3.2e10,
     )?.to;
+    const seats = new Map<string | null, number>();
+    for (const entry of term.parties) {
+      const key = effective(entry);
+      seats.set(key, (seats.get(key) ?? 0) + entry.seats);
+    }
     return {
       ...term,
+      parties: [...seats].map(([party, count]) => ({ party, seats: count })),
       end: lapse ?? next,
       total: total(term.parties),
       size: size(term.start),
@@ -358,12 +365,15 @@ export async function chamber(path: string) {
         : ("seated" as const)
       : ("results" as const),
     governments: record.governments,
-    parties: [
-      ...record.parties,
-      ...body.parties.filter((party) =>
-        record.parties.every((entry) => entry.id !== party.id),
-      ),
-    ],
+    parties: stand(
+      terms.flatMap((term) => term.parties.map((entry) => entry.party)),
+      [
+        ...record.parties,
+        ...body.parties.filter((party) =>
+          record.parties.every((entry) => entry.id !== party.id),
+        ),
+      ],
+    ),
     members,
   };
 }

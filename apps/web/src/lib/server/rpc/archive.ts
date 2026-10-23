@@ -10181,6 +10181,7 @@ export const bodies = {
             parties: v.array(
               v.object({
                 party: v.nullable(v.string()),
+                caucus: v.nullable(v.string()),
                 seats: v.number(),
                 isIndependent: v.boolean(),
               }),
@@ -10228,6 +10229,7 @@ export const bodies = {
         db.execute<{
           start: string;
           party: string | null;
+          caucus: string | null;
           seats: number;
           isIndependent: boolean;
         }>(sql`
@@ -10270,26 +10272,39 @@ export const bodies = {
             left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
             order by t.id
           )
-          select x.start::text as start, coalesce(bm.into_id, br.parent_party_id, x.party) as party, count(*)::int as seats,
+          select x.start::text as start, coalesce(bm.into_id, br.parent_party_id, x.party) as party,
+            nullif(x.caucus, coalesce(bm.into_id, br.parent_party_id, x.party)) as caucus, count(*)::int as seats,
             bool_and(x.party is null and coalesce(x.independent, false)) as "isIndependent"
           from (
-            select s.start, f.independent, coalesce(
-              (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
-                left join entity_merge pm on pm.entity_id = a.party_id
-                where a.tenure_id = s.id and a.kind = 'party' and a.party_id is not null
-                order by coalesce(a.valid @> s.start, false) desc, lower(a.valid) nulls first limit 1),
-              f.party
-            ) as party
+            select s.start,
+              case when a.found then a.party_id is null else f.independent end as independent,
+              case when a.found then a.party else f.party end as party,
+              (select coalesce(pm.into_id, g.party_id) from tenure_affiliation g
+                left join entity_merge pm on pm.entity_id = g.party_id
+                where g.tenure_id = s.id and g.kind = 'parliamentary_group' and g.party_id is not null
+                  and g.valid @> s.start limit 1) as caucus
             from sat s left join fallback f on f.id = s.id
+            left join lateral (
+              select a.party_id, coalesce(pm.into_id, a.party_id) as party, true as found from tenure_affiliation a
+              left join entity_merge pm on pm.entity_id = a.party_id
+              where a.tenure_id = s.id and a.kind = 'party'
+              order by coalesce(a.valid @> s.start, false) desc, a.party_id is null, lower(a.valid) nulls first limit 1
+            ) a on true
           ) x
           left join party_affiliation br on br.party_id = x.party
             and br.kind = 'regional_branch' and br.valid @> x.start
           left join entity_merge bm on bm.entity_id = br.parent_party_id
-          group by 1, 2 order by 1, 3 desc
+          group by 1, 2, 3 order by 1, 4 desc
         `),
       ]);
       const home = slugs.get(body.polity) ?? null;
-      const held = [...new Set(makeup.rows.flatMap((row) => row.party ?? []))];
+      const held = [
+        ...new Set(
+          makeup.rows.flatMap((row) =>
+            [row.party, row.caucus].filter((party) => party != null),
+          ),
+        ),
+      ];
       const starts = [...new Set(makeup.rows.map((row) => row.start))];
       const apportioned = await db.execute<{
         start: string;
@@ -10364,6 +10379,7 @@ export const bodies = {
             seceded: entitled.get(start)?.seceded ?? 0,
             parties: rows.map((row) => ({
               party: row.party,
+              caucus: row.caucus,
               seats: row.seats,
               isIndependent: row.isIndependent,
             })),
@@ -10403,6 +10419,8 @@ export const bodies = {
             person: v.string(),
             name: v.string(),
             party: v.nullable(v.string()),
+            caucus: v.nullable(v.string()),
+            isIndependent: v.boolean(),
             left: v.nullable(v.string()),
             place: v.nullable(v.string()),
             path: v.nullable(v.string()),
@@ -10462,6 +10480,8 @@ export const bodies = {
           : await db.execute<{
               person: string;
               party: string | null;
+              caucus: string | null;
+              isIndependent: boolean;
               left: string | null;
               place: string | null;
               contest: string | null;
@@ -10477,12 +10497,12 @@ export const bodies = {
                 coalesce(s.voting, true) as "isVoting",
                 t.acquired_via::text as acquired, t.ended_via::text as ended, t.contest_id as contest,
                 s.label as seat, s.apportioned_area_id as region, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id) as place,
-                coalesce(
-                  (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
-                    left join entity_merge pm on pm.entity_id = a.party_id
-                    where a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
-                    order by coalesce(a.valid @> greatest(t.from_date, ${start}::date), false) desc,
-                      lower(a.valid) nulls first limit 1),
+                coalesce(a.found and a.party_id is null, false) as "isIndependent",
+                (select coalesce(pm.into_id, g.party_id) from tenure_affiliation g
+                  left join entity_merge pm on pm.entity_id = g.party_id
+                  where g.tenure_id = t.id and g.kind = 'parliamentary_group' and g.party_id is not null
+                    and g.valid @> greatest(t.from_date, ${start}::date) limit 1) as caucus,
+                case when a.found then a.party else
                   (select coalesce(pm.into_id, o.party_id, po.party_id) from contest_option o
                     join candidacy cd on cd.option_id = o.id and cd.person_id = t.person_id
                     left join contest_option po on po.id = o.parent_option_id
@@ -10490,7 +10510,7 @@ export const bodies = {
                     where o.contest_id = t.contest_id or o.contest_id in (
                       select k.id from contest k where k.allocation_parent_id = t.contest_id)
                     limit 1)
-                ) as party,
+                end as party,
                 (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
                   left join entity_merge pm on pm.entity_id = a.party_id
                   where a.tenure_id = t.id and a.kind = 'party' and a.party_id is not null
@@ -10499,6 +10519,13 @@ export const bodies = {
               left join seat s on s.id = t.seat_id
               left join contest c on c.id = t.contest_id
               left join contest pc on pc.id = c.allocation_parent_id
+              left join lateral (
+                select a.party_id, coalesce(pm.into_id, a.party_id) as party, true as found from tenure_affiliation a
+                left join entity_merge pm on pm.entity_id = a.party_id
+                where a.tenure_id = t.id and a.kind = 'party'
+                order by coalesce(a.valid @> greatest(t.from_date, ${start}::date), false) desc, a.party_id is null,
+                  lower(a.valid) nulls first limit 1
+              ) a on true
               where t.body_id = ${input.id}::uuid
                 and coalesce(t.from_date, '-infinity'::date) < coalesce(${end}::date, 'infinity'::date)
                 and coalesce(t.to_date, 'infinity'::date) > ${start}::date
@@ -10509,6 +10536,7 @@ export const bodies = {
           ? await db.execute<{
               person: string;
               party: string | null;
+              isIndependent: boolean;
               place: string | null;
               contest: string;
             }>(sql`
@@ -10520,7 +10548,7 @@ export const bodies = {
                   and e.kind in ('general', 'local')
               )
               select distinct on (cd.person_id) cd.person_id as person, c.id as contest,
-                coalesce(pm.into_id, o.party_id, po.party_id) as party,
+                coalesce(pm.into_id, o.party_id, po.party_id) as party, coalesce(cd.is_independent, false) as "isIndependent",
                 coalesce(c.district_area_id, pc.district_area_id) as place
               from picked c
               left join contest pc on pc.id = c.allocation_parent_id
@@ -10539,6 +10567,7 @@ export const bodies = {
           ? (seated?.rows ?? [])
           : returned.rows.map((row) => ({
               ...row,
+              caucus: null,
               left: null,
               seat: null,
               region: null,
@@ -10551,7 +10580,7 @@ export const bodies = {
       const parties = [
         ...new Set(
           rows
-            .flatMap((row) => [row.party, row.left])
+            .flatMap((row) => [row.party, row.left, row.caucus])
             .filter((id) => id != null),
         ),
       ];
@@ -10609,6 +10638,8 @@ export const bodies = {
           person: row.person,
           name: labels.full.get(row.person) ?? "",
           party: row.party,
+          caucus: row.caucus === row.party ? null : row.caucus,
+          isIndependent: row.isIndependent,
           left: row.left === row.party ? null : row.left,
           place:
             row.place == null ? null : (labels.full.get(row.place) ?? null),
@@ -10760,6 +10791,7 @@ export const people = {
         wikidata: v.nullable(v.string()),
         photo: Photo,
         party: v.nullable(PartyRef),
+        caucus: v.nullable(PartyRef),
         isIndependent: v.boolean(),
         served: v.array(
           v.object({
@@ -11115,9 +11147,26 @@ export const people = {
           general?.party ??
           rows.rows.find((row) => row.party != null)?.party ??
           null);
+      const sits = await db.execute<{ party: string; stop: string | null }>(sql`
+        with recursive ids(id) as (
+          select ${person.id}::uuid
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        )
+        select coalesce(pm.into_id, a.party_id) as party, coalesce(upper(a.valid), t.to_date)::text as stop
+        from tenure t join tenure_affiliation a on a.tenure_id = t.id and a.kind = 'parliamentary_group'
+        left join entity_merge pm on pm.entity_id = a.party_id
+        where t.person_id in (select id from ids) and a.party_id is not null
+        order by coalesce(upper(a.valid), t.to_date) desc nulls first limit 1
+      `);
+      const sat = sits.rows[0];
+      const caucus =
+        sat != null && sat.stop === current?.stop && sat.party !== own
+          ? sat.party
+          : null;
       const [faces, owned] = await Promise.all([
         portraits([person.id]),
-        refs(own == null ? [] : [own]),
+        refs([own, caucus].filter((id) => id != null)),
       ]);
       return {
         name: labels.full.get(person.id) ?? "",
@@ -11126,6 +11175,7 @@ export const people = {
         wikidata: person.wikidata,
         photo: faces.get(person.id) ?? null,
         party: own == null ? null : (owned.get(own) ?? null),
+        caucus: caucus == null ? null : (owned.get(caucus) ?? null),
         isIndependent,
         served: spells
           .map((spell) => ({

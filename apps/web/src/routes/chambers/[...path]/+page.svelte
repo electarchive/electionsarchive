@@ -5,6 +5,7 @@
   import ChevronLeftIcon from "@lucide/svelte/icons/chevron-left";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { createQuery, keepPreviousData } from "@tanstack/svelte-query";
+  import { effective, stand } from "#lib/caucus.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Slider } from "#lib/components/ui/slider/index.js";
   import { count, date } from "#lib/format.js";
@@ -33,10 +34,6 @@
   const info = $derived(
     new Map(data.parties.map((party) => [party.id, party])),
   );
-  const label = (party: string | null) =>
-    party == null
-      ? m.record_none()
-      : (info.get(party)?.short ?? info.get(party)?.label ?? "");
   const year = (value: string | null) => value?.slice(0, 4) ?? "";
   const span = (from: string, to: string | null) =>
     to != null && year(from) === year(to)
@@ -63,7 +60,18 @@
     };
   });
 
-  const roll = $derived(members.data?.members ?? []);
+  const roll = $derived(
+    (members.data?.members ?? []).map((member) => ({
+      ...member,
+      party: effective(member),
+    })),
+  );
+  const crew = $derived(
+    stand(
+      roll.map((member) => member.party),
+      members.data?.parties ?? [],
+    ),
+  );
   let chosen = $state<{ term: string; day: string } | null>(null);
   const first = $derived(members.data?.start ?? term?.start ?? "");
   const on = $derived(
@@ -115,9 +123,13 @@
   const isCounted = $derived(
     members.data?.isSeated === true && (open.length > 0 || on !== first),
   );
-  const own = $derived(
-    new Map((members.data?.parties ?? []).map((party) => [party.id, party])),
-  );
+  const own = $derived(new Map(crew.map((party) => [party.id, party])));
+  const label = (party: string | null) => {
+    const found = info.get(party ?? "") ?? own.get(party ?? "");
+    return party == null
+      ? m.record_none()
+      : (found?.short ?? found?.label ?? "");
+  };
   const places = $derived(
     [
       ...new Map(
@@ -218,18 +230,26 @@
     Map.groupBy(
       parties,
       (row) =>
+        (info.get(row.party ?? "") ?? own.get(row.party ?? ""))?.caucus ??
         body.partners.find((pair) => pair.includes(row.party ?? ""))?.[0] ??
         row.party,
     )
-      .values()
-      .map((rows) => {
+      .entries()
+      .map(([key, rows]) => {
         let seats = 0;
         for (const row of rows) {
           seats += row.seats;
         }
+        const caucus = rows.some(
+          (row) =>
+            (info.get(row.party ?? "") ?? own.get(row.party ?? ""))?.caucus ===
+            key,
+        );
         return {
-          party: rows[0]?.party ?? null,
-          name: rows.map((row) => label(row.party)).join("/"),
+          party: caucus ? key : (rows[0]?.party ?? null),
+          name: caucus
+            ? label(key)
+            : rows.map((row) => label(row.party)).join("/"),
           seats,
         };
       })
@@ -572,7 +592,7 @@
           <Roster
             mode="changes"
             members={roll}
-            parties={members.data.parties}
+            parties={crew}
             start={members.data.start}
             end={members.data.end}
           />
@@ -583,7 +603,7 @@
         <Roster
           mode="all"
           members={roll}
-          parties={members.data?.parties ?? []}
+          parties={crew}
           start={members.data?.start ?? null}
           end={members.data?.end ?? null}
           title={members.data?.isSeated === true

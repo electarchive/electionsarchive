@@ -1,6 +1,7 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
+import { effective, stand } from "#lib/caucus.js";
 import { LABELS, REASONS } from "#lib/coverage.js";
 import { count, date, percent, points } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
@@ -350,7 +351,17 @@ function personMarkdown(
       : `[${m.card_wikidata()}](https://www.wikidata.org/wiki/${person.wikidata})`;
   return [
     `# ${person.name}`,
-    [person.party?.label, born, wikidata]
+    [
+      person.party?.label ??
+        (person.isIndependent ? m.person_parties_none() : null),
+      person.caucus == null
+        ? null
+        : m.person_caucus({
+            caucus: person.caucus.short ?? person.caucus.label,
+          }),
+      born,
+      wikidata,
+    ]
       .filter((part) => part != null)
       .join(", "),
     `## ${m.person_record()}`,
@@ -816,12 +827,15 @@ function chamberMarkdown(
     upper_house: m.chamber_kind_upper_house,
     unicameral: m.chamber_kind_unicameral,
   };
-  const names = new Map(
-    [...parties, ...(members?.parties ?? [])].map((entry) => [
-      entry.id,
-      entry.label,
-    ]),
-  );
+  const everyone = [
+    ...parties,
+    ...stand(
+      (members?.members ?? []).map((member) => effective(member)),
+      members?.parties ?? [],
+    ),
+  ];
+  const names = new Map(everyone.map((entry) => [entry.id, entry.label]));
+  const caucuses = new Map(everyone.map((entry) => [entry.id, entry.caucus]));
   const label = (id: string | null) =>
     id == null ? m.record_none() : (names.get(id) ?? "");
   const last = terms.at(-1);
@@ -846,9 +860,14 @@ function chamberMarkdown(
             m.chamber_largest(),
           ],
           terms.toReversed().map((term) => {
-            const largest = term.parties.toSorted(
-              (a, b) => b.seats - a.seats,
-            )[0];
+            const seats = new Map<string | null, number>();
+            for (const entry of term.parties) {
+              const key = caucuses.get(entry.party ?? "") ?? entry.party;
+              seats.set(key, (seats.get(key) ?? 0) + entry.seats);
+            }
+            const largest = [...seats]
+              .map(([party, held]) => ({ party, seats: held }))
+              .toSorted((a, b) => b.seats - a.seats)[0];
             return [
               date(term.start),
               term.election == null
@@ -869,7 +888,7 @@ function chamberMarkdown(
             [m.col_name(), m.col_party(), m.chamber_joined(), m.chamber_left()],
             sitting.map((member) => [
               `${link(member.name, `id/${member.person}`)}${member.place == null ? "" : ` (${link(member.place, member.path)})`}`,
-              label(member.party),
+              label(effective(member)),
               date(member.from),
               date(member.to),
             ]),

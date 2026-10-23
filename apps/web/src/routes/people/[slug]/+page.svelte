@@ -204,6 +204,13 @@
             >{m.person_parties_none()}</span
           >
         {/if}
+        {#if person.caucus != null}
+          <span
+            >{m.person_caucus({
+              caucus: person.caucus.short ?? person.caucus.label,
+            })}</span
+          >
+        {/if}
         {#if person.born != null}
           <span
             >{person.precision === "day"
