@@ -425,9 +425,14 @@
         0.071,
         0.181,
         0.931,
-        0.385
+        0.995
       ],
-      "hint": "Read only the table headed 'TREASURER \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'TREASURER \u2014 NOVEMBER 4, 1986 \u2014 Concluded'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1
+      ]
     }
   ]
 }
