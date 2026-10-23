@@ -54,6 +54,7 @@ WA_PUBLISHER = "Washington Secretary of State"
 WA_TITLE = "November 5, 2024 General Election Results"
 PREFERENCES = {"DEMOCRATIC": "DEMOCRAT", "GOP": "REPUBLICAN", "STATES NO": "NO PARTY"}
 DAY = date(2024, 11, 5)
+REGULAR = {("TX", "56")}
 LEADERS = {"house:6", "house:28", "house:36", "house:38", "house:40", "senate:d", "senate:f", "senate:l"}
 SWAPPED = {
     ("AZ", "YAVAPAI", "JAY MARCIA"): "MARCIA SMITH",
@@ -639,9 +640,9 @@ def emit() -> Path:
             election = cs.key("us.election", f"{DAY}:{state}")
             if election in cs.minted:
                 raise ValueError(f"no election {DAY}:{state}")
-            special_race = special == "TRUE"
+            special_race = special == "TRUE" and (state, code) not in REGULAR
             contest_key = (
-                f"{DAY}:{state}:{body_slug}:{code}" + (f":{post}" if post else "") + (":gs" if special_race else ":g")
+                f"{DAY}:{state}:{body_slug}:{code}" + (f":{post}" if post else "") + (":gs" if special == "TRUE" else ":g")
             )
             contest = cs.key("us.contest", contest_key)
             magnitude = int(group["magnitude"][0])
