@@ -81,6 +81,7 @@ class Manifest(TypedDict):
     raw_source: NotRequired[str]
     unit_codes: NotRequired[dict[str, str]]
     unit_scheme: NotRequired[Literal["town", "split"]]
+    authoritative: NotRequired[str]
     autorotate: NotRequired[bool]
 
 
@@ -159,7 +160,7 @@ COST_REPORT = "https://api.anthropic.com/v1/organizations/cost_report"
 BILLED_FROM = "2026-10-22T00:00:00Z"
 IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
-LEGISLATURES = {"state-senate": "senate", "state-house": "house"}
+LEGISLATURES = {"state-senate": "senate", "state-house": "house", "state-legislature": "legislature"}
 LABEL = re.compile(r"^(counties|county)$")
 SUBTOTAL = re.compile(r"^(down ?state|downstate)$")
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
@@ -1406,7 +1407,7 @@ def emit(name: str) -> Path:
                 height=height,
             )
         frame = frame.with_columns(page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String), page=pl.lit(1))
-        medsl.attach(cs, conn, frame, {f"SC{name}": source}, strict=True)
+        medsl.attach(cs, conn, frame, {f"SC{name}": source}, strict=True, authoritative=manifest.get("authoritative"))
         for row in list(cs.rows.get("result_set", [])):
             found = conn.execute(
                 "select value from external_id where scheme = 'us.contest' and entity_id = %s", [row["contest_id"]]
