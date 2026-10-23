@@ -6,7 +6,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "shorts"
-VERSION = "1"
+VERSION = "2"
 PARTIES: dict[str, dict[str, str | tuple[tuple[str, str | None, str | None], ...]]] = {
     "us": {
         "Democratic Party": "Democratic",
@@ -150,8 +150,9 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Short names for the main parties, national offices, and legislatures of each polity, and for US "
-                "state offices and legislatures, for headings and labels where the polity is already given"
+                "Short names for the main parties, national offices, and legislatures of each polity, for US state "
+                "legislatures, and for US state and local offices named after their polity, for headings and labels "
+                "where the polity is already given"
             ),
             polity=None,
             kind="edit",
@@ -170,15 +171,17 @@ def emit() -> Path:
                  and not exists (select from entity_merge m where m.entity_id = e.id)
                  and coalesce(pt.path, ot.path, bt.path) is not null"""
         ).fetchall()
-        states = dict(
-            conn.execute(
-                """select s.path, n.text from slug s
-                   join name n on n.entity_id = s.entity_id and n.kind in ('official', 'english') and n.lang = 'en'
-                   where s.is_current and s.path ~ '^us/[a-z]{2}$'"""
-            ).fetchall()
-        )
+        states: dict[str, list[str]] = {}
+        for path, text in conn.execute(
+            """select s.path, n.text from slug s
+               join name n on n.entity_id = s.entity_id and n.kind in ('official', 'english') and n.lang = 'en'
+               where s.is_current and s.path ~ '^us/[a-z]{2}(/[^/]+)*$'
+               order by length(n.text) desc"""
+        ).fetchall():
+            states.setdefault(path, []).append(text)
         kinds = dict(conn.execute("select id, kind::text from body").fetchall())
         shorts: dict[str, set[tuple[str, str | None, str | None]]] = {}
+        local: dict[str, set[str]] = {}
         hit: set[tuple[str, str, str]] = set()
         for entity, kind, path, text in found:
             root = path.split("/", 1)[0]
@@ -189,17 +192,33 @@ def emit() -> Path:
                 spans = ((wanted, None, None),) if isinstance(wanted, str) else wanted
                 shorts.setdefault(str(entity), set()).update(spans)
                 continue
-            state = states.get(path)
-            if state is None:
+            known = states.get(path)
+            if known is None:
                 continue
+            state = known[0]
             if kind == "office":
-                rest = re.sub(rf"^{re.escape(state)} | of {re.escape(state)}$", "", text)
-                if rest != text and not rest.startswith("House") and not rest.endswith("University"):
-                    shorts.setdefault(str(entity), set()).add((rest, None, None))
+                rest = next(
+                    (
+                        cut
+                        for name in known
+                        if (cut := re.sub(rf"^{re.escape(name)} | of {re.escape(name)}$", "", text).strip()) != text
+                    ),
+                    text,
+                )
+                if (
+                    rest != text
+                    and rest[:1].isupper()
+                    and not rest.startswith("House")
+                    and not rest.endswith("University")
+                ):
+                    local.setdefault(str(entity), set()).add(rest)
             elif kind == "body" and kinds[entity] in ("lower_house", "upper_house", "unicameral"):
                 chamber = CHAMBERS.get(text.removeprefix(f"{state} "))
                 if text.startswith(f"{state} ") and chamber is not None:
                     shorts.setdefault(str(entity), set()).add((chamber, None, None))
+        for entity, rests in local.items():
+            if len(rests) == 1 and entity not in shorts:
+                shorts[entity] = {(next(iter(rests)), None, None)}
         missing = [
             f"{kind} {root} {text}"
             for kind, table in (("party", PARTIES), ("office", OFFICES), ("body", BODIES))
@@ -210,7 +229,9 @@ def emit() -> Path:
         if missing:
             raise ValueError(f"no entity for: {missing}")
         for entity, spans in sorted(shorts.items()):
-            if len({text for text, _, _ in spans}) > 1 and all(start is None and end is None for _, start, end in spans):
+            if len({text for text, _, _ in spans}) > 1 and all(
+                start is None and end is None for _, start, end in spans
+            ):
                 raise ValueError(f"{entity}: several short names {sorted(spans)}")
             for text, start, end in sorted(spans, key=lambda span: span[1] or ""):
                 cs.add(

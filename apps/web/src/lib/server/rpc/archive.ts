@@ -5491,7 +5491,9 @@ export const contests = {
                 null;
               return {
                 kind: row.kind,
-                label,
+                label: isSingle
+                  ? label
+                  : (labels.short.get(row.owner ?? "") ?? label),
                 count: row.count,
                 path: isSingle ? (slugs.get(row.sample) ?? null) : hub,
                 anchor: isSingle
@@ -9580,7 +9582,7 @@ export const polities = {
             const rows = found.rows.filter((row) => row.seat === seat);
             return {
               id: seat,
-              name: labels.full.get(seat) ?? "",
+              name: labels.short.get(seat) ?? labels.full.get(seat) ?? "",
               isOffice: rows.some((row) => row.isOffice),
               points: Map.groupBy(rows, (row) => row.bucket)
                 .values()
@@ -9885,7 +9887,9 @@ export const polities = {
             name:
               group[0]?.owner == null
                 ? null
-                : (labels.full.get(group[0].owner) ?? null),
+                : (labels.short.get(group[0].owner) ??
+                  labels.full.get(group[0].owner) ??
+                  null),
             isQuestion: group[0]?.isQuestion ?? false,
             points: group.map((point) => ({
               name: labels.full.get(point.id) ?? "",
