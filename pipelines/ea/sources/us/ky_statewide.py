@@ -13,10 +13,11 @@ SOURCE = "us.ky_statewide"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://web.archive.org/web/2020id_/https://elect.ky.gov/SiteCollectionDocuments/Election%20Results/2000-2009/{}/General%20Election/{}.txt"
-YEARS = {2003: "2003", 2007: "2007-11-06"}
+YEARS = {2003: "2003-11-04", 2007: "2007-11-06"}
 PUBLISHER = "Kentucky State Board of Elections"
 TITLE = "Official election night tally results by county"
 OFFICES = {
+    "D05": "Governor",
     "D07": "Secretary of State",
     "D08": "Attorney General",
     "D09": "Auditor",
@@ -57,8 +58,8 @@ def parse() -> None:
         for line in raw.cached(SOURCE, address(year, "office")).path.read_text(errors="replace").splitlines():
             if match := re.match(r"\s*OFF/DST/DIV: (D\d\d)/", line):
                 office = match[1]
-            elif office in OFFICES and (match := re.match(r"\s+([DRI])\s{2,}(\S.*?)\s{2,}[\d,]+\s+[\d.]+%", line)):
-                parties[(office, re.sub(r"\s+", " ", match[2]).upper())] = PARTIES[match[1]]
+            elif office in OFFICES and (year, office) != (2007, "D05") and (match := re.match(r"\s+([DRI])\s{2,}(\S.*?)\s{2,}[\d,]+\s+[\d.]+%", line)):
+                parties[(office, re.sub(r"\s+", " ", match[2]).split(" & ")[0].upper())] = PARTIES[match[1]]
         office = None
         totals: dict[tuple[str, str], int] = {}
         columns: list[str] = []
@@ -66,7 +67,7 @@ def parse() -> None:
         abbreviations: list[str] = []
         for line in raw.cached(SOURCE, address(year, "county")).path.read_text(errors="replace").splitlines():
             if match := re.search(r"OFFICE: (\w\d\d)/", line):
-                office = match[1] if match[1] in OFFICES else None
+                office = match[1] if match[1] in OFFICES and (year, match[1]) != (2007, "D05") else None
                 columns = []
                 continue
             if office is None:
@@ -84,7 +85,7 @@ def parse() -> None:
             if split is None:
                 raise ValueError(f"{year} {office}: unreadable line {line!r}")
             cells = split[2].split()
-            candidate = re.sub(r"\s+", " ", split[1]).upper()
+            candidate = re.sub(r"\s+", " ", split[1]).split(" & ")[0].upper()
             if len(cells) == 1 and len(columns) > 1:
                 totals[(office, candidate)] = int(cells[0].replace(",", ""))
                 continue
@@ -130,6 +131,8 @@ def parse() -> None:
         measure=pl.lit(1, pl.Int16),
         votes=pl.col("votes").cast(pl.Int64),
     )
+    frame.filter(pl.col("title") == "Governor").write_parquet(PARSED / "governor.parquet")
+    frame = frame.filter(pl.col("title") != "Governor")
     frame.write_parquet(PARSED / "returns.parquet")
     frame.group_by(["year", "day", "state", "title", "post", "special"], maintain_order=True).agg(
         pl.col("magnitude").max(),
@@ -166,4 +169,5 @@ def emit() -> Path:
         "of agriculture by county from the State Board of Elections' official results",
         cite=cite,
         method=METHOD,
+        renamed={"2003-11-04:KY": "2003:KY"},
     )

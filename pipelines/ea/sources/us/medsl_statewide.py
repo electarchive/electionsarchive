@@ -316,7 +316,9 @@ def emit(
     declared: dict[str, tuple[str, str]] | None = None,
     pages: Callable[[Changeset], dict[int, tuple[UUID, int, int]]] | None = None,
     season: str | None = None,
+    renamed: dict[str, str] | None = None,
 ) -> Path:
+    renamed = renamed or {}
     returns = pl.read_parquet(parsed / "returns.parquet").filter(pl.col("measure") == 1)
     races = pl.read_parquet(parsed / "races.parquet")
     days = sorted({str(day) for day in races["day"].unique()})
@@ -328,10 +330,12 @@ def emit(
                        where cy.option_id = o.id and cy.role = 'head' limit 1)
                from external_id cx join contest c on c.id = cx.entity_id and c.kind = 'office'
                join contest_option o on o.contest_id = c.id and o.parent_option_id is null and o.kind <> 'write_in'
-               where cx.scheme = 'us.contest' and left(cx.value, 10) = any(%s)
-                 and cx.value ~ '^[0-9-]{10}:[A-Z]{2}:[a-z]' and cx.value !~ ':(president|senate|house)'""",
-            [days],
+               where cx.scheme = 'us.contest' and (left(cx.value, 10) = any(%s) or cx.value like any(%s))
+                 and cx.value ~ '^[0-9-]{4,10}:[A-Z]{2}:[a-z]' and cx.value !~ ':(president|senate|house)'""",
+            [days, [f"{old}:%" for old in renamed.values()]],
         ).fetchall():
+            for new, old in renamed.items():
+                key = key.replace(old, new, 1)
             existing[(key[:10], key[11:13])][key].append([slug(text) for text in (label, person) if text])
         keys = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.contest'")}
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
@@ -371,7 +375,7 @@ def emit(
             ).fetchall()
         )
         own: dict[str, tuple[UUID, UUID, UUID, UUID, UUID | None, int]] = {
-            key: (result_set, election, contest, source, supersedes, int(total))
+            next((key.replace(old, new, 1) for new, old in renamed.items() if key.startswith(old)), key): (result_set, election, contest, source, supersedes, int(total))
             for key, result_set, election, contest, source, supersedes, total in conn.execute(
                 """select regexp_replace(x.value, ':([0-9]+|folded)$', ''), r.id, r.election_id, r.contest_id, r.source_id,
                           r.supersedes_id,
@@ -409,6 +413,19 @@ def emit(
             summary=summary,
             polity="US",
         )
+        cs.renamed.update(renamed)
+        for new in renamed:
+            new_day, new_state = new.split(":")
+            cs.add(
+                "election",
+                id=cs.key("us.election", new),
+                polity_id=cs.polity(f"US-{new_state}"),
+                kind="general",
+                date_from=date.fromisoformat(new_day),
+                date_to=date.fromisoformat(new_day),
+                date_precision="day",
+                status="held",
+            )
 
         def name(entity: UUID, text: str) -> None:
             cs.add("name", entity_id=entity, text=text, lang="en", kind="official", is_preferred=True)
