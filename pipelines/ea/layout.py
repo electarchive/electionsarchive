@@ -267,6 +267,7 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
     unmatched: dict[str, list[str]] = {}
     notes: list[str] = []
     turns: dict[int, int] = {}
+    open_table: scans.Page | None = None
     source = cast(
         scans.Manifest,
         {"file": volume["file"], "raw_source": volume["raw_source"], "polity": volume["polity"]},
@@ -275,11 +276,37 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
         ids = dict(conn.execute("select value, entity_id from external_id where scheme = 'us.contest'").fetchall())
         for leaf in volume["leaves"]:
             page = pages[leaf]
+            if volume.get("autorotate"):
+                turns[leaf] = scans.orientation(source, leaf, scans.render(source, {"page": leaf, "turn": 0}, 150))
             if page["notes"]:
                 notes.append(f"{leaf}: {page['notes']}")
             found = sorted(
-                (table for table in page["tables"] if table["office"] != "other"), key=lambda table: table["y0"]
+                (
+                    table
+                    for table in page["tables"]
+                    if table["office"] != "other" and not (table["continued"] and not table["title"])
+                ),
+                key=lambda table: table["y0"],
             )
+            if not found and open_table is not None:
+                left, right = open_table["crop"][0], open_table["crop"][2]
+                sections.append(
+                    {
+                        **open_table,
+                        "id": f"{leaf}-0",
+                        "page": leaf,
+                        "crop": [left, 0.0, right, 1.0],
+                        "hint": "This page continues the table of the previous page and prints no headings.",
+                    }
+                )
+                sections[-1].pop("bands", None)
+                sections[-1].pop("turn", None)
+                if turns.get(leaf):
+                    sections[-1]["turn"] = turns[leaf]
+                sections[-1].pop("header", None)
+                notes.append(f"{leaf}: continuation of {open_table['id']} with its columns")
+                continue
+            open_table = None
             for index, table in enumerate(found):
                 if table["party"] or table["special"]:
                     notes.append(f"{leaf}: {table['title']!r} skipped ({table['party'] or 'special'})")
@@ -355,8 +382,6 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                 top = max(0, top - (0 if table["continued"] else 4)) / 1000
                 bottom = min(1000, bottom + 4) / 1000
                 left, right = max(0, table["x0"] - 8) / 1000, min(1000, table["x1"] + 8) / 1000
-                if volume.get("autorotate") and leaf not in turns:
-                    turns[leaf] = scans.orientation(source, leaf, scans.render(source, {"page": leaf, "turn": 0}, 150))
                 section: scans.Page = {
                     "page": leaf,
                     "id": f"{leaf}-{index}",
@@ -372,6 +397,7 @@ def generate(name: str, volume: Volume, pages: dict[int, LayoutPage], folder: Pa
                     section["bands"] = count
                     section["header"] = [0.0, round((table["header_y1"] / 1000 - top) / (bottom - top), 4)]
                 sections.append(section)
+                open_table = None if table["concluded"] else section
     manifest = {
         key: value
         for key, value in volume.items()

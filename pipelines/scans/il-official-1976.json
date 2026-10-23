@@ -1,0 +1,613 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1976",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofst1976illi/officialvoteofst1976illi.pdf"
+  },
+  "contests": {
+    "attorney-general": {
+      "year": 1976,
+      "chamber": "attorney-general",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "secretary-of-state": {
+      "year": 1976,
+      "chamber": "secretary-of-state",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "comptroller": {
+      "year": 1976,
+      "chamber": "comptroller",
+      "day": "1976-11-02",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 26,
+      "id": "26-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William J. Scott",
+          "contest": "attorney-general",
+          "candidate": "William J. Scott"
+        },
+        {
+          "label": "Democratic Cecil A. Partee",
+          "contest": "attorney-general",
+          "candidate": "Cecil Partee"
+        },
+        {
+          "label": "Communist Theodore Pearson",
+          "contest": "attorney-general",
+          "candidate": "Theodore Pearson"
+        },
+        {
+          "label": "Socialist Labor George P. Milonas",
+          "contest": "attorney-general",
+          "candidate": "George P. Milonas"
+        },
+        {
+          "label": "U.S. Labor Richard Leebove",
+          "contest": "attorney-general",
+          "candidate": "Richard D. Leebove"
+        },
+        {
+          "label": "Socialist Workers Nancy J. Cohen",
+          "contest": "attorney-general",
+          "candidate": "Nancy J. Cohen"
+        },
+        {
+          "label": "Libertarian John C. Reis",
+          "contest": "attorney-general",
+          "candidate": "John C. Reis"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.08,
+        0.915,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR ATTORNEY GENERAL\u2014NOVEMBER 2, 1976'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1815
+      ]
+    },
+    {
+      "page": 27,
+      "id": "27-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William J. Scott",
+          "contest": "attorney-general",
+          "candidate": "William J. Scott"
+        },
+        {
+          "label": "Democratic Cecil A. Partee",
+          "contest": "attorney-general",
+          "candidate": "Cecil Partee"
+        },
+        {
+          "label": "Communist Theodore Pearson",
+          "contest": "attorney-general",
+          "candidate": "Theodore Pearson"
+        },
+        {
+          "label": "Socialist Labor George P. Milonas",
+          "contest": "attorney-general",
+          "candidate": "George P. Milonas"
+        },
+        {
+          "label": "U.S. Labor Richard Leebove",
+          "contest": "attorney-general",
+          "candidate": "Richard D. Leebove"
+        },
+        {
+          "label": "Socialist Workers Nancy J. Cohen",
+          "contest": "attorney-general",
+          "candidate": "Nancy J. Cohen"
+        },
+        {
+          "label": "Libertarian John C. Reis",
+          "contest": "attorney-general",
+          "candidate": "John C. Reis"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.069,
+        0.0,
+        0.915,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 28,
+      "id": "28-0",
+      "columns": [
+        {
+          "label": "",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William J. Scott",
+          "contest": "attorney-general",
+          "candidate": "William J. Scott"
+        },
+        {
+          "label": "Democratic Cecil A. Partee",
+          "contest": "attorney-general",
+          "candidate": "Cecil Partee"
+        },
+        {
+          "label": "Communist Theodore Pearson",
+          "contest": "attorney-general",
+          "candidate": "Theodore Pearson"
+        },
+        {
+          "label": "Socialist Labor George P. Milonas",
+          "contest": "attorney-general",
+          "candidate": "George P. Milonas"
+        },
+        {
+          "label": "U.S. Labor Richard Leebove",
+          "contest": "attorney-general",
+          "candidate": "Richard D. Leebove"
+        },
+        {
+          "label": "Socialist Workers Nancy J. Cohen",
+          "contest": "attorney-general",
+          "candidate": "Nancy J. Cohen"
+        },
+        {
+          "label": "Libertarian John C. Reis",
+          "contest": "attorney-general",
+          "candidate": "John C. Reis"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.148,
+        0.92,
+        0.849
+      ],
+      "hint": "Read only the table headed 'VOTE FOR ATTORNEY GENERAL\u2014NOVEMBER 2, 1976\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2696
+      ]
+    },
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William C. Harris",
+          "contest": "secretary-of-state",
+          "candidate": "William C. Harris"
+        },
+        {
+          "label": "Democratic Alan J. Dixon",
+          "contest": "secretary-of-state",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "Communist Frances Gabow",
+          "contest": "secretary-of-state",
+          "candidate": "Frances Gabow"
+        },
+        {
+          "label": "Socialist Labor Ben Leonik",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Leonik"
+        },
+        {
+          "label": "U.S. Labor John Brown",
+          "contest": "secretary-of-state",
+          "candidate": "John H. Brown, Jr."
+        },
+        {
+          "label": "Socialist Workers Eva Lynn Masterson",
+          "contest": "secretary-of-state",
+          "candidate": "Eva Lynn Masterson"
+        },
+        {
+          "label": "Libertarian Ellyn Powelson",
+          "contest": "secretary-of-state",
+          "candidate": "Ellyn Powelson"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.071,
+        0.086,
+        0.92,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE\u2014NOVEMBER 2, 1976'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.2068
+      ]
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William C. Harris",
+          "contest": "secretary-of-state",
+          "candidate": "William C. Harris"
+        },
+        {
+          "label": "Democrat Alan J. Dixon",
+          "contest": "secretary-of-state",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "Communist Frances Gabow",
+          "contest": "secretary-of-state",
+          "candidate": "Frances Gabow"
+        },
+        {
+          "label": "Socialist Labor Ben Leonik",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Leonik"
+        },
+        {
+          "label": "U.S. Labor John Brown",
+          "contest": "secretary-of-state",
+          "candidate": "John H. Brown, Jr."
+        },
+        {
+          "label": "Socialist Workers Eva Lynn Masterson",
+          "contest": "secretary-of-state",
+          "candidate": "Eva Lynn Masterson"
+        },
+        {
+          "label": "Libertarian Ellyn Powelson",
+          "contest": "secretary-of-state",
+          "candidate": "Ellyn Powelson"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.03,
+        0.913,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE\u2014NOVEMBER 2, 1976 \u2014Continued'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1825
+      ]
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William C. Harris",
+          "contest": "secretary-of-state",
+          "candidate": "William C. Harris"
+        },
+        {
+          "label": "Democrat Alan J. Dixon",
+          "contest": "secretary-of-state",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "Communist Frances Gabow",
+          "contest": "secretary-of-state",
+          "candidate": "Frances Gabow"
+        },
+        {
+          "label": "Socialist Labor Ben Leonik",
+          "contest": "secretary-of-state",
+          "candidate": "Ben Leonik"
+        },
+        {
+          "label": "U.S. Labor John Brown",
+          "contest": "secretary-of-state",
+          "candidate": "John H. Brown, Jr."
+        },
+        {
+          "label": "Socialist Workers Eva Lynn Masterson",
+          "contest": "secretary-of-state",
+          "candidate": "Eva Lynn Masterson"
+        },
+        {
+          "label": "Libertarian Ellyn Powelson",
+          "contest": "secretary-of-state",
+          "candidate": "Ellyn Powelson"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.0,
+        0.913,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican George W. Lindberg",
+          "contest": "comptroller",
+          "candidate": "George W. Lindberg"
+        },
+        {
+          "label": "Democratic Michael J. Bakalis",
+          "contest": "comptroller",
+          "candidate": "Michael Bakalis"
+        },
+        {
+          "label": "Communist Charles Hunter",
+          "contest": "comptroller",
+          "candidate": "Charles Hunter"
+        },
+        {
+          "label": "Socialist Labor Gregory P. Lyngas",
+          "contest": "comptroller",
+          "candidate": "Gregory P. Lyngas"
+        },
+        {
+          "label": "U.S. Labor Michael Braun",
+          "contest": "comptroller",
+          "candidate": "Michael Braun"
+        },
+        {
+          "label": "Socialist Workers Clemens R. Bak",
+          "contest": "comptroller",
+          "candidate": "Clemens R. Bak"
+        },
+        {
+          "label": "Libertarian Mark B. Wallace",
+          "contest": "comptroller",
+          "candidate": "Mark B. Wallace"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.08,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR COMPTROLLER\u2014NOVEMBER 2, 1976'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1815
+      ]
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican George W. Lindberg",
+          "contest": "comptroller",
+          "candidate": "George W. Lindberg"
+        },
+        {
+          "label": "Democratic Michael J. Bakalis",
+          "contest": "comptroller",
+          "candidate": "Michael Bakalis"
+        },
+        {
+          "label": "Communist Charles Hunter",
+          "contest": "comptroller",
+          "candidate": "Charles Hunter"
+        },
+        {
+          "label": "Socialist Labor Gregory P. Lyngas",
+          "contest": "comptroller",
+          "candidate": "Gregory P. Lyngas"
+        },
+        {
+          "label": "U.S. Labor Michael Braun",
+          "contest": "comptroller",
+          "candidate": "Michael Braun"
+        },
+        {
+          "label": "Socialist Workers Clemens R. Bak",
+          "contest": "comptroller",
+          "candidate": "Clemens R. Bak"
+        },
+        {
+          "label": "Libertarian Mark B. Wallace",
+          "contest": "comptroller",
+          "candidate": "Mark B. Wallace"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.07,
+        0.0,
+        0.911,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican George W. Lindberg",
+          "contest": "comptroller",
+          "candidate": "George W. Lindberg"
+        },
+        {
+          "label": "Democratic Michael J. Bakalis",
+          "contest": "comptroller",
+          "candidate": "Michael Bakalis"
+        },
+        {
+          "label": "Communist Charles Hunter",
+          "contest": "comptroller",
+          "candidate": "Charles Hunter"
+        },
+        {
+          "label": "Socialist Labor Gregory P. Lyngas",
+          "contest": "comptroller",
+          "candidate": "Gregory P. Lyngas"
+        },
+        {
+          "label": "U.S. Labor Michael Braun",
+          "contest": "comptroller",
+          "candidate": "Michael Braun"
+        },
+        {
+          "label": "Socialist Workers Clemens R. Bak",
+          "contest": "comptroller",
+          "candidate": "Clemens R. Bak"
+        },
+        {
+          "label": "Libertarian Mark B. Wallace",
+          "contest": "comptroller",
+          "candidate": "Mark B. Wallace"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.072,
+        0.17,
+        0.905,
+        0.862
+      ],
+      "hint": "Read only the table headed 'VOTE FOR COMPTROLLER\u2014NOVEMBER 2, 1976\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2832
+      ]
+    }
+  ]
+}

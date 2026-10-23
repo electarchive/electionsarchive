@@ -1,0 +1,503 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1978",
+  "file": {
+    "url": "https://archive.org/download/officialvote78illi/officialvote78illi.pdf"
+  },
+  "contests": {
+    "secretary-of-state": {
+      "year": 1978,
+      "chamber": "secretary-of-state",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "comptroller": {
+      "year": 1978,
+      "chamber": "comptroller",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "treasurer": {
+      "year": 1978,
+      "chamber": "treasurer",
+      "day": "1978-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 31,
+      "id": "31-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Sharon Sharp",
+          "contest": "secretary-of-state",
+          "candidate": "Sharon Sharp"
+        },
+        {
+          "label": "Democratic Alan J. Dixon",
+          "contest": "secretary-of-state",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "Socialist Workers Marie Cobbs",
+          "contest": "secretary-of-state",
+          "candidate": "Marie Cobbs"
+        },
+        {
+          "label": "U.S. Labor Edward Waffle",
+          "contest": "secretary-of-state",
+          "candidate": "Edward Waffle"
+        },
+        {
+          "label": "Libertarian Ed May",
+          "contest": "secretary-of-state",
+          "candidate": "Ed May"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.011,
+        0.901,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE\u2014NOVEMBER 7, 1978'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.181
+      ]
+    },
+    {
+      "page": 32,
+      "id": "32-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Sharon Sharp",
+          "contest": "secretary-of-state",
+          "candidate": "Sharon Sharp"
+        },
+        {
+          "label": "Democratic Alan J. Dixon",
+          "contest": "secretary-of-state",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "Socialist Workers Marie Cobbs",
+          "contest": "secretary-of-state",
+          "candidate": "Marie Cobbs"
+        },
+        {
+          "label": "U.S. Labor Edward Waffle",
+          "contest": "secretary-of-state",
+          "candidate": "Edward Waffle"
+        },
+        {
+          "label": "Libertarian Ed May",
+          "contest": "secretary-of-state",
+          "candidate": "Ed May"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.0,
+        0.901,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 33,
+      "id": "33-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Sharon Sharp",
+          "contest": "secretary-of-state",
+          "candidate": "Sharon Sharp"
+        },
+        {
+          "label": "Democratic Alan J. Dixon",
+          "contest": "secretary-of-state",
+          "candidate": "Alan J. Dixon"
+        },
+        {
+          "label": "Socialist Workers Marie Cobbs",
+          "contest": "secretary-of-state",
+          "candidate": "Marie Cobbs"
+        },
+        {
+          "label": "U.S. Labor Edward Waffle",
+          "contest": "secretary-of-state",
+          "candidate": "Edward Waffle"
+        },
+        {
+          "label": "Libertarian Ed May",
+          "contest": "secretary-of-state",
+          "candidate": "Ed May"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.045,
+        0.0,
+        0.901,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican John W. Castle",
+          "contest": "comptroller",
+          "candidate": "John W. Castle"
+        },
+        {
+          "label": "Democratic Roland W. Burris",
+          "contest": "comptroller",
+          "candidate": "Roland W. Burris"
+        },
+        {
+          "label": "Socialist Workers John Eriksen",
+          "contest": "comptroller",
+          "candidate": "John Eriksen"
+        },
+        {
+          "label": "U.S. Labor Carol Leebove",
+          "contest": "comptroller",
+          "candidate": "Carol Leebove"
+        },
+        {
+          "label": "Libertarian Mark B. Wallace",
+          "contest": "comptroller",
+          "candidate": "Mark B. Wallace"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.028,
+        0.885,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR COMPTROLLER\u2014NOVEMBER 7, 1978'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1512
+      ]
+    },
+    {
+      "page": 37,
+      "id": "37-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican John W. Castle",
+          "contest": "comptroller",
+          "candidate": "John W. Castle"
+        },
+        {
+          "label": "Democratic Roland W. Burris",
+          "contest": "comptroller",
+          "candidate": "Roland W. Burris"
+        },
+        {
+          "label": "Socialist Workers John Eriksen",
+          "contest": "comptroller",
+          "candidate": "John Eriksen"
+        },
+        {
+          "label": "U.S. Labor Carol Leebove",
+          "contest": "comptroller",
+          "candidate": "Carol Leebove"
+        },
+        {
+          "label": "Libertarian Mark B. Wallace",
+          "contest": "comptroller",
+          "candidate": "Mark B. Wallace"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.028,
+        0.0,
+        0.885,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 38,
+      "id": "38-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican John W. Castle",
+          "contest": "comptroller",
+          "candidate": "John W. Castle"
+        },
+        {
+          "label": "Democratic Roland W. Burris",
+          "contest": "comptroller",
+          "candidate": "Roland W. Burris"
+        },
+        {
+          "label": "Socialist Workers John Eriksen",
+          "contest": "comptroller",
+          "candidate": "John Eriksen"
+        },
+        {
+          "label": "U.S. Labor Carol Leebove",
+          "contest": "comptroller",
+          "candidate": "Carol Leebove"
+        },
+        {
+          "label": "Libertarian Mark B. Wallace",
+          "contest": "comptroller",
+          "candidate": "Mark B. Wallace"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.031,
+        0.04,
+        0.886,
+        0.279
+      ],
+      "hint": "Read only the table headed 'VOTE FOR COMPTROLLER\u2014NOVEMBER 7, 1978\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 41,
+      "id": "41-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican James M. Skelton",
+          "contest": "treasurer",
+          "candidate": "James M. Skelton"
+        },
+        {
+          "label": "Democratic Jerome A. Cosentino",
+          "contest": "treasurer",
+          "candidate": "Jerome A. \"Jerry\" Cosentino"
+        },
+        {
+          "label": "Socialist Workers Randi Lawrence",
+          "contest": "treasurer",
+          "candidate": "Randi Lawrence"
+        },
+        {
+          "label": "U.S. Labor John H. Brown, Jr.",
+          "contest": "treasurer",
+          "candidate": "John H. Brown, Jr."
+        },
+        {
+          "label": "Libertarian Everett Moffat",
+          "contest": "treasurer",
+          "candidate": "Everett Moffat"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.026,
+        0.876,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR TREASURER\u2014NOVEMBER 7, 1978'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1838
+      ]
+    },
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican James M. Skelton",
+          "contest": "treasurer",
+          "candidate": "James M. Skelton"
+        },
+        {
+          "label": "Democratic Jerome A. Cosentino",
+          "contest": "treasurer",
+          "candidate": "Jerome A. \"Jerry\" Cosentino"
+        },
+        {
+          "label": "Socialist Workers Randi Lawrence",
+          "contest": "treasurer",
+          "candidate": "Randi Lawrence"
+        },
+        {
+          "label": "U.S. Labor John H. Brown, Jr.",
+          "contest": "treasurer",
+          "candidate": "John H. Brown, Jr."
+        },
+        {
+          "label": "Libertarian Everett Moffat",
+          "contest": "treasurer",
+          "candidate": "Everett Moffat"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.0,
+        0.876,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 43,
+      "id": "43-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican James M. Skelton",
+          "contest": "treasurer",
+          "candidate": "James M. Skelton"
+        },
+        {
+          "label": "Democratic Jerome A. Cosentino",
+          "contest": "treasurer",
+          "candidate": "Jerome A. \"Jerry\" Cosentino"
+        },
+        {
+          "label": "Socialist Workers Randi Lawrence",
+          "contest": "treasurer",
+          "candidate": "Randi Lawrence"
+        },
+        {
+          "label": "U.S. Labor John H. Brown, Jr.",
+          "contest": "treasurer",
+          "candidate": "John H. Brown, Jr."
+        },
+        {
+          "label": "Libertarian Everett Moffat",
+          "contest": "treasurer",
+          "candidate": "Everett Moffat"
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.035,
+        0.0,
+        0.876,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    }
+  ]
+}

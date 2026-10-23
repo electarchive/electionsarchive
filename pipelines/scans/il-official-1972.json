@@ -1,0 +1,648 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "title": "State of Illinois official vote cast at the general election, 1972",
+  "file": {
+    "url": "https://archive.org/download/officialvote72illi/officialvote72illi.pdf"
+  },
+  "contests": {
+    "attorney-general": {
+      "year": 1972,
+      "chamber": "attorney-general",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "secretary-of-state": {
+      "year": 1972,
+      "chamber": "secretary-of-state",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    },
+    "comptroller": {
+      "year": 1972,
+      "chamber": "comptroller",
+      "day": "1972-11-07",
+      "special": false,
+      "state": "IL",
+      "district": null
+    }
+  },
+  "pages": [
+    {
+      "page": 34,
+      "id": "34-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William J. Scott",
+          "contest": "attorney-general",
+          "candidate": "William J. Scott"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Thomas G. Lyons",
+          "contest": "attorney-general",
+          "candidate": "Thomas G. Lyons"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George P. Milonas",
+          "contest": "attorney-general",
+          "candidate": "George P. Milonas"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.051,
+        0.911,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR ATTORNEY GENERAL\u2014NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1307
+      ]
+    },
+    {
+      "page": 35,
+      "id": "35-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William J. Scott",
+          "contest": "attorney-general",
+          "candidate": "William J. Scott"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Thomas G. Lyons",
+          "contest": "attorney-general",
+          "candidate": "Thomas G. Lyons"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George P. Milonas",
+          "contest": "attorney-general",
+          "candidate": "George P. Milonas"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.0,
+        0.911,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 36,
+      "id": "36-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican William J. Scott",
+          "contest": "attorney-general",
+          "candidate": "William J. Scott"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Thomas G. Lyons",
+          "contest": "attorney-general",
+          "candidate": "Thomas G. Lyons"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor George P. Milonas",
+          "contest": "attorney-general",
+          "candidate": "George P. Milonas"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Linda R. Appelhans",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.056,
+        0.025,
+        0.908,
+        0.501
+      ],
+      "hint": "Read only the table headed 'VOTE FOR ATTORNEY GENERAL\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.1639
+      ]
+    },
+    {
+      "page": 40,
+      "id": "40-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edmund J. Kucharski Republican",
+          "contest": "secretary-of-state",
+          "candidate": "Edmund J. Kucharski"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Michael J. Howlett Democratic",
+          "contest": "secretary-of-state",
+          "candidate": "Michael Howlett"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elizabeth Schnur Socialist Labor",
+          "contest": "secretary-of-state",
+          "candidate": "Elizabeth Schnur"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frances Gahow Communist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.011,
+        0.903,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE\u2014NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1203
+      ]
+    },
+    {
+      "page": 41,
+      "id": "41-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Edmund J. Kucharski Republican",
+          "contest": "secretary-of-state",
+          "candidate": "Edmund J. Kucharski"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Michael J. Howlett Democratic",
+          "contest": "secretary-of-state",
+          "candidate": "Michael Howlett"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Elizabeth Schnur Socialist Labor",
+          "contest": "secretary-of-state",
+          "candidate": "Elizabeth Schnur"
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Frances Gahow Communist",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.053,
+        0.0,
+        0.903,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 42,
+      "id": "42-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican Edmund J Kucharski",
+          "contest": "secretary-of-state",
+          "candidate": "Edmund J. Kucharski"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Michael J Howlett",
+          "contest": "secretary-of-state",
+          "candidate": "Michael Howlett"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor Elizabeth Schnur",
+          "contest": "secretary-of-state",
+          "candidate": "Elizabeth Schnur"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Frances Gabow",
+          "contest": "secretary-of-state",
+          "candidate": "Frances Gabow"
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.018,
+        0.906,
+        0.377
+      ],
+      "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90
+    },
+    {
+      "page": 46,
+      "id": "46-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican George W. Lindberg",
+          "contest": "comptroller",
+          "candidate": "George W. Lindberg"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Dean Barringer",
+          "contest": "comptroller",
+          "candidate": "Dean Barringer"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor Clarys L. Essex",
+          "contest": "comptroller",
+          "candidate": "Clarys L. Essex"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Nathan Sharpe",
+          "contest": "comptroller",
+          "candidate": "Nathan Sharpe"
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.018,
+        0.906,
+        1.0
+      ],
+      "hint": "Read only the table headed 'VOTE FOR COMPTROLLER\u2014NOVEMBER 7, 1972'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 3,
+      "header": [
+        0.0,
+        0.1344
+      ]
+    },
+    {
+      "page": 47,
+      "id": "47-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican George W. Lindberg",
+          "contest": "comptroller",
+          "candidate": "George W. Lindberg"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Dean Barringer",
+          "contest": "comptroller",
+          "candidate": "Dean Barringer"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor Clarys L. Essex",
+          "contest": "comptroller",
+          "candidate": "Clarys L. Essex"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Nathan Sharpe",
+          "contest": "comptroller",
+          "candidate": "Nathan Sharpe"
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.0,
+        0.906,
+        1.0
+      ],
+      "hint": "This page continues the table of the previous page and prints no headings.",
+      "turn": -90
+    },
+    {
+      "page": 48,
+      "id": "48-0",
+      "columns": [
+        {
+          "label": "Plurality",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Republican George W. Lindberg",
+          "contest": "comptroller",
+          "candidate": "George W. Lindberg"
+        },
+        {
+          "label": "Republican Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Democratic Dean Barringer",
+          "contest": "comptroller",
+          "candidate": "Dean Barringer"
+        },
+        {
+          "label": "Democratic Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Socialist Labor Clarys L. Essex",
+          "contest": "comptroller",
+          "candidate": "Clarys L. Essex"
+        },
+        {
+          "label": "Socialist Labor Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Communist Nathan Sharpe",
+          "contest": "comptroller",
+          "candidate": "Nathan Sharpe"
+        },
+        {
+          "label": "Communist Per Cent",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Write-Ins",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.018,
+        0.913,
+        0.495
+      ],
+      "hint": "Read only the table headed 'VOTE FOR COMPTROLLER\u2014NOVEMBER 7, 1972\u2014Concluded'; ignore any other table visible in the image.",
+      "turn": -90,
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2809
+      ]
+    }
+  ]
+}
