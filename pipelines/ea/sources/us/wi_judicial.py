@@ -56,13 +56,20 @@ FILES: list[tuple[date, str, str | None]] = [
     (date(2023, 2, 21), DOCUMENTS + "County%20by%20County%20Report_Spring%20Primary_Supreme%20Court_2_21_23.pdf", None),
     (date(2023, 4, 4), DOCUMENTS + "County%20by%20County%20Report_SCOWIS.pdf", None),
     (date(2023, 4, 4), DOCUMENTS + "County%20by%20County%20Report_Court%20of%20Appeals.pdf", None),
+    (date(2024, 4, 2), DOCUMENTS + "County%20by%20County%20Report_all%20contests.pdf", None),
 ]
+WORKBOOKS: list[tuple[date, str]] = [
+    (date(2025, 4, 1), DOCUMENTS + "April%201%202025%20Spring%20Election_County%20by%20County%20Report.xlsx"),
+    (date(2026, 4, 7), DOCUMENTS + "County%20by%20County%20Report_Spring%20Election%202026_All%20State%20Contests.xlsx"),
+]
+DISCREPANT = {(date(2026, 4, 7), "Supreme Court"): [20, 20, 0, 0], (date(2026, 4, 7), "District 4"): [19, 19, 0]}
 SPELLED = {(date(2010, 4, 6), "District 4"): ["Edward E. Leineweber", "Brian Blanchard"]}
 METHOD = (
     "County totals are the rows of the Wisconsin Elections Commission's county-by-county canvass report for the "
     "spring election (the Government Accountability Board's or the State Elections Board's report before 2016). "
     "Each candidate's county rows add up to the report's printed office total. Votes for people not on the ballot are "
-    "the report's scattering column."
+    "the report's scattering column. In the 2026 report the printed office totals for the Supreme Court and the District 4 "
+    "Court of Appeals race are 20 and 19 votes below the sum of the county rows; the county rows are stored."
 )
 OFFICE = re.compile(
     r"^\s*(JUSTICE OF THE SUPREME COURT|Supreme Court|COURT OF APPEALS(?: JUDGE)?[,\s-]*DISTRICT\s+(\d)|Court of Appeals,?\s+District\s+(\d))\b",
@@ -77,6 +84,8 @@ def fetch() -> None:
         raw.fetch(SOURCE, report, suffix=".pdf")
         if summary is not None:
             raw.fetch(SOURCE, summary, suffix=".pdf")
+    for _, workbook in WORKBOOKS:
+        raw.fetch(SOURCE, workbook, suffix=".xlsx")
 
 
 def offices(url: str, plain: dict[str, str]) -> list[dict]:
@@ -109,6 +118,34 @@ def offices(url: str, plain: dict[str, str]) -> list[dict]:
             current["heading"] = False
         elif current.get("heading") and not numbers and current["centers"] is None:
             current["header"].append(line)
+    return found
+
+
+def sheets(url: str, plain: dict[str, str]) -> list[dict]:
+    found: list[dict] = []
+    for frame in pl.read_excel(raw.cached(SOURCE, url).path, sheet_id=0, has_header=False).values():
+        rows = [[cell for cell in row if cell is not None and str(cell).strip() != ""] for row in frame.rows()]
+        title = next((row[0] for row in rows if row and OFFICE.match(str(row[0]))), None)
+        if title is None:
+            continue
+        match = OFFICE.match(str(title))
+        post = "Supreme Court" if match.group(2) is None and match.group(3) is None else f"District {match.group(2) or match.group(3)}"
+        entry = {"post": post, "rows": [], "totals": None, "candidates": None, "centers": None}
+        for row in rows:
+            label = re.sub(r"[^a-z]", "", re.sub(r"(?i)\s+county\b", "", str(row[0]).strip()).lower())
+            if label == "county":
+                continue
+            if label == "officetotals":
+                entry["totals"] = [int(cell) for cell in row[1:]]
+            elif label in plain and len(row) > 1:
+                entry["rows"].append((plain[label], [int(cell) for cell in row[1:]]))
+            elif entry["candidates"] is None and len(row) > 1 and not str(row[0]).startswith(("WEC", "20")) and entry["rows"] == []:
+                names = [re.sub(r"\s+", " ", str(cell)).strip() for cell in row]
+                if names[0] not in ("NP", "County") and names[-1].upper() == "SCATTERING":
+                    entry["candidates"] = [re.sub(r"(?i)\s*\(write-in\)", "", name) for name in names[:-1]]
+        if entry["totals"] is not None:
+            entry["centers"] = [0] * len(entry["totals"])
+            found.append(entry)
     return found
 
 
@@ -151,21 +188,22 @@ def parse() -> None:
     codes = {re.sub(r"[^a-z]", "", name.lower()): name for name in plain}
     returns: list[dict] = []
     races: list[dict] = []
-    for day, report, summary in FILES:
+    for day, report, summary in [*FILES, *((day, workbook, None) for day, workbook in WORKBOOKS)]:
         printed = summary_names(summary) if summary is not None else {}
-        for entry in offices(report, codes):
+        for entry in sheets(report, codes) if report.endswith(".xlsx") else offices(report, codes):
             if entry["totals"] is None or entry["centers"] is None:
                 raise ValueError(f"{day} {entry['post']}: no office totals")
             width = len(entry["centers"])
             sums = [sum(row[1][index] for row in entry["rows"]) for index in range(width)]
-            if sums != entry["totals"] or any(len(row[1]) != width for row in entry["rows"]):
+            gap = DISCREPANT.get((day, entry["post"]), [0] * width)
+            if [total - stated for total, stated in zip(sums, entry["totals"])] != gap or any(len(row[1]) != width for row in entry["rows"]):
                 raise ValueError(f"{day} {entry['post']}: county rows do not add up to the office total")
             if summary is not None:
                 label = "Supreme Court" if entry["post"] == "Supreme Court" else f"Court of Appeals, {entry['post']}"
                 lookup = {re.sub(r"\s+", " ", office): votes for office, votes in printed.items()}[label]
                 candidates = [lookup[total] for total in entry["totals"][1:-1]]
             else:
-                candidates = SPELLED.get((day, entry["post"])) or header_names(entry)[1:-1]
+                candidates = entry.get("candidates") or SPELLED.get((day, entry["post"])) or header_names(entry)[1:-1]
             if len(candidates) != width - 2 or not all(candidates):
                 raise ValueError(f"{day} {entry['post']}: candidates {candidates}")
             title = SUPREME if entry["post"] == "Supreme Court" else APPEALS
@@ -228,6 +266,8 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, report), source)
             if summary is not None:
                 cs.artifact(raw.cached(SOURCE, summary), source)
+        for _, workbook in WORKBOOKS:
+            cs.artifact(raw.cached(SOURCE, workbook), source)
         return {"WI": source}
 
     return medsl_statewide.emit(
