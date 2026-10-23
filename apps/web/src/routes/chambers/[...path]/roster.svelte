@@ -63,6 +63,9 @@
     expelled: m.chamber_end_expelled,
     lost_seat: m.chamber_end_lost_seat,
     disqualified: m.chamber_end_disqualified,
+    elevated: m.chamber_end_elevated,
+    appointed: m.chamber_end_appointed,
+    withdrew: m.chamber_end_withdrew,
     term_end: m.chamber_end_term_end,
   };
 

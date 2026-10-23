@@ -13,7 +13,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "wikidata"
-VERSION = "6"
+VERSION = "7"
 TITLE = "Political parties and their colors"
 POSITIONED = "Political positions of parties"
 COUNTRIES = {
@@ -165,6 +165,7 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("FR", "The Greens", None): "3FA34D",
     ("GB", "Coalition Labour", None): "D97B7B",
     ("GB", "National Labour Organisation", None): "C27BA0",
+    ("GB", "Radicals", None): "C2185B",
     ("GB", "All-for-Ireland", None): "8DB600",
     ("GB", "Alliance for Green Socialism", None): "7CBA00",
     ("GB", "Anti-Federalist League", None): "9B4F96",
@@ -251,7 +252,7 @@ PAINTED: dict[tuple[str, str, int | None], str] = {
     ("GB", "UK Independence Party", None): "6D3177",
     ("GB", "Ulster Liberal", None): "FFAA00",
     ("GB", "Ulster Popular Unionist", None): "7799CC",
-    ("GB", "Unionist Party (Scotland)", None): "0087DC",
+    ("GB", "Unionist Party (Scotland)", None): "5E4FA2",
     ("GB", "United Democratic", None): "B8B8B8",
     ("GB", "United Ulster Unionist", None): "5577BB",
     ("GB", "Unity", None): "4C9A2A",

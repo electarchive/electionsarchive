@@ -31,17 +31,14 @@ ENDED = {
     "Q40430404": "disqualified",
     "Q152074": "disqualified",
     "Q63418438": "removed",
+    "Q36717319": "elevated",
+    "Q46992747": "elevated",
+    "Q4021063": "elevated",
+    "Q46993416": "appointed",
+    "Q52112831": "appointed",
+    "Q51212178": "appointed",
 }
-VACATED = {
-    *ENDED,
-    "Q52112831",
-    "Q51212178",
-    "Q46993416",
-    "Q36717319",
-    "Q46992747",
-    "Q50393121",
-    "Q4021063",
-}
+VACATED = {*ENDED, "Q50393121"}
 TITLES = {"sir", "lord", "dr", "hon", "rev", "captain", "major", "colonel", "general", "admiral", "viscount", "earl"}
 
 

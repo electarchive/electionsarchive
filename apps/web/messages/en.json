@@ -914,6 +914,8 @@
   "chamber_end_withdrew": "Withdrew",
   "chamber_end_lost_seat": "Lost seat",
   "chamber_end_disqualified": "Disqualified",
+  "chamber_end_elevated": "Elevated to peerage",
+  "chamber_end_appointed": "Appointed to office",
   "chamber_end_term_end": "Term ended",
   "chamber_members_title": "Members, {span}",
   "chamber_members_returned": "Members returned, {span}",
