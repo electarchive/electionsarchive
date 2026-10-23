@@ -15,6 +15,7 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 BASE = "https://files.hawaii.gov/elections/files/results/"
 DAYS = {
+    date(2000, 11, 7): (6, 12, 14),
     date(2002, 11, 5): (7, 13, 16),
     date(2004, 11, 2): (7, 13, 16),
     date(2006, 11, 7): (7, 13, 16),
@@ -28,9 +29,15 @@ DAYS = {
     date(2022, 11, 8): (8, 14, 17),
 }
 COUNTIES = ("15001", "15009", "15007", "15003")
-PRECINCT = re.compile(r"^\s*(?:PRECINCT|MAIL|IN-PERSON)\s+(\d\d-\d\d)\b\s*-?\s*(.*?)\s*(?:Printed on.*)?$", re.MULTILINE)
+PRECINCT = re.compile(
+    r"^\s*(?:PRECINCT|MAIL|IN-PERSON|AB (?:MAIL|Mail|WALK|Walk))\s+(\d\d-\d\d)\b\s*-?\s*(.*?)\s*(?:Printed on.*)?$",
+    re.MULTILINE,
+)
+BATCH = re.compile(r"^\s*AB (?:MAIL|Mail|WALK|Walk) (\d\d) ?([(<][^)>]*[)>]) ?BT ?(\d+)", re.MULTILINE)
 HEADER = re.compile(r"State (Representative|Senator)\b[^│\d]*?(\d+)(.*?)(?= {3}|$)", re.IGNORECASE)
-CANDIDATE = re.compile(r"(?:\([A-Z]{1,2}\)\s+)?([A-Z][A-Za-z'’.\- ]*?,[^\d│]*?)\s*(?:\([A-Z]{1,2}\))?\s+([\d,]+)\s+[\d.]+%?")
+CANDIDATE = re.compile(
+    r"(?:\([A-Z]{1,2}\)\s+)?([A-Z][A-Za-z'’.\- ]*?,[^\d│]*?)\s*(?:\([A-Z]{1,2}\))?\s+([\d,]+)\s+[\d.]+%?"
+)
 OVER = re.compile(r"over votes", re.IGNORECASE)
 PUBLISHER = "Hawaii Office of Elections"
 TITLE = "General election precinct detail reports"
@@ -67,6 +74,10 @@ def parse() -> None:
                 precinct = found[1]
                 names.setdefault((day.year, precinct), found[2].strip(" -"))
                 contests = {}
+            elif found := BATCH.search(page):
+                precinct = f"{found[1]}-AB{int(found[3]):03d}"
+                names.setdefault((day.year, precinct), f"absentee ballots of precincts {found[1]} {found[2]}")
+                contests = {}
             if precinct is None:
                 continue
             for line in page.splitlines():
@@ -88,7 +99,13 @@ def parse() -> None:
     frame = (
         pl.DataFrame(
             rows,
-            schema={"day": pl.Date, "chamber": pl.String, "precinct": pl.String, "candidate": pl.String, "votes": pl.Int64},
+            schema={
+                "day": pl.Date,
+                "chamber": pl.String,
+                "precinct": pl.String,
+                "candidate": pl.String,
+                "votes": pl.Int64,
+            },
             orient="row",
         )
         .group_by("day", "chamber", "precinct", "candidate")
@@ -97,7 +114,9 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     frame.with_columns(
         district=pl.col("precinct").str.slice(0, 2).cast(pl.Int32),
-        cuts=pl.col("day").replace_strict({day: list(bounds) for day, bounds in DAYS.items()}, return_dtype=pl.List(pl.Int32)),
+        cuts=pl.col("day").replace_strict(
+            {day: list(bounds) for day, bounds in DAYS.items()}, return_dtype=pl.List(pl.Int32)
+        ),
     ).select(
         year=pl.col("day").dt.year().cast(pl.Int32),
         chamber="chamber",
@@ -108,7 +127,12 @@ def parse() -> None:
         code=pl.concat_str(
             pl.col("day").dt.year().cast(pl.String),
             pl.lit("HI"),
-            pl.when(pl.col("district") <= pl.col("cuts").list.get(0))
+            pl.when(
+                (pl.col("day").dt.year() == 2000)
+                & pl.col("precinct").is_in(["12-06", "12-07", "12-08", "12-09", "12-AB026"])
+            )
+            .then(pl.lit(COUNTIES[2]))
+            .when(pl.col("district") <= pl.col("cuts").list.get(0))
             .then(pl.lit(COUNTIES[0]))
             .when(pl.col("district") <= pl.col("cuts").list.get(1))
             .then(pl.lit(COUNTIES[1]))
@@ -140,7 +164,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Hawaii's 2002 to 2022 State House and Senate generals by precinct from the Office of Elections' "
+            summary="Hawaii's 2000 to 2022 State House and Senate generals by precinct from the Office of Elections' "
             "precinct detail reports",
             polity="US-HI",
         )
