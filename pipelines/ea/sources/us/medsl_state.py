@@ -48,6 +48,9 @@ NEW_YORK = elstats.SEARCH.format(tenant=elstats.TENANTS["NY"][0]) + urlencode(
 RHODE_ISLAND = "https://raw.githubusercontent.com/openelections/openelections-data-ri/977565f9d7cf7a32d3a2a454282b5fd291cef291/2024/20241105__ri__general__town.csv"
 RI_TITLE = "Rhode Island 2024 general election results by town"
 RI_PARTIES = {"DEM": "DEMOCRAT", "REP": "REPUBLICAN", "Ind": "INDEPENDENT"}
+SUFFOLK = "https://apps2.suffolkcountyny.gov/boe/eleres/24ge/sd.htm"
+SUFFOLK_PUBLISHER = "Suffolk County Board of Elections"
+SUFFOLK_TITLE = "General election results, November 5, 2024: New York State Senate"
 NY_PUBLISHER = "New York State Board of Elections"
 NY_TITLE = "Election results, Member of Assembly, 2024"
 WA_PUBLISHER = "Washington Secretary of State"
@@ -115,6 +118,7 @@ def fetch() -> None:
     raw.fetch(SOURCE, NEW_MEXICO, suffix=".csv")
     raw.fetch(SOURCE, NEW_YORK, suffix=".csv")
     raw.fetch(SOURCE, RHODE_ISLAND, suffix=".csv")
+    raw.fetch(SOURCE, SUFFOLK, suffix=".htm")
 
 
 def _district(state: str, text: str) -> tuple[str, str | None]:
@@ -393,6 +397,53 @@ def parse() -> None:
             how="anti",
         )
     )
+    rows = []
+    page = raw.cached(SOURCE, SUFFOLK).path.read_text(errors="replace")
+    for district, section in re.findall(
+        r"State Senator, (\d+)\w\w Senatorial District \(Elect 1\)(.*?)(?=State Senator, \d+\w\w Senatorial District \(Elect|$)",
+        page,
+        re.DOTALL,
+    ):
+        candidate = None
+        for row in re.findall(r"<tr>(.*?)</tr>", section, re.DOTALL):
+            cells = [
+                re.sub(r"<[^>]+>", "", cell).strip() for cell in re.findall(r"<td[^>]*>(.*?)</td>", row, re.DOTALL)
+            ]
+            if len(cells) == 4:
+                surname, given = cells.pop(0).split(", ", 1)
+                candidate = f"{given} {surname}".upper()
+            if len(cells) == 3 and cells[0] != "Total" and candidate is not None:
+                rows.append((district, candidate, cells[0].upper(), int(cells[1].replace(",", ""))))
+    suffolk = (
+        pl.DataFrame(
+            rows,
+            schema={"code": pl.String, "candidate": pl.String, "party_detailed": pl.String, "votes": pl.Int64},
+            orient="row",
+        )
+        .filter(pl.col("code").is_in(["1", "2", "3", "4"]))
+        .select(
+            state_po=pl.lit("NY"),
+            office=pl.lit("STATE SENATE"),
+            district=pl.col("code").str.zfill(3),
+            special=pl.lit("FALSE"),
+            candidate="candidate",
+            party_detailed=pl.col("party_detailed").replace({"DEMOCRATIC": "DEMOCRAT"}),
+            pooled=pl.lit(False),
+            votes="votes",
+            masked=pl.lit(False),
+            magnitude=pl.lit(1, pl.Int32),
+            state_fips=pl.lit("36"),
+            code="code",
+            post=pl.lit(None, pl.String),
+        )
+        .join(
+            lines.filter(pl.col("state_po") == "NY").select("office", "code").unique(),
+            on=["office", "code"],
+            how="anti",
+        )
+    )
+    if suffolk.select("code").n_unique() != 4:
+        raise ValueError(f"Suffolk: {suffolk['code'].unique().to_list()} of State Senate districts 1-4")
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat(
         [
@@ -401,6 +452,7 @@ def parse() -> None:
             new_mexico.with_columns(origin=pl.lit("openelections")),
             new_york.with_columns(origin=pl.lit("ny")),
             rhode_island.with_columns(origin=pl.lit("ri")),
+            suffolk.with_columns(origin=pl.lit("suffolk")),
         ]
     ).sort(
         "state_po",
@@ -540,7 +592,25 @@ def emit() -> Path:
             license=None,
         )
         cs.artifact(raw.cached(SOURCE, RHODE_ISLAND), rhode)
-        sources = {"medsl": source, "wa": secretary, "openelections": community, "ny": board, "ri": rhode}
+        county = cs.source(SUFFOLK_PUBLISHER, SUFFOLK_TITLE)
+        cs.add(
+            "source",
+            id=county,
+            kind="official_body",
+            publisher=SUFFOLK_PUBLISHER,
+            title=SUFFOLK_TITLE,
+            url="https://apps2.suffolkcountyny.gov/boe/eleres/24ge/default.htm",
+            license="Public record",
+        )
+        cs.artifact(raw.cached(SOURCE, SUFFOLK), county)
+        sources = {
+            "medsl": source,
+            "wa": secretary,
+            "openelections": community,
+            "ny": board,
+            "ri": rhode,
+            "suffolk": county,
+        }
         fptp, block = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "block")
         irv = cs.key("us.electoral_system", "irv")
         states = dict(
@@ -642,7 +712,9 @@ def emit() -> Path:
                 raise ValueError(f"no election {DAY}:{state}")
             special_race = special == "TRUE" and (state, code) not in REGULAR
             contest_key = (
-                f"{DAY}:{state}:{body_slug}:{code}" + (f":{post}" if post else "") + (":gs" if special == "TRUE" else ":g")
+                f"{DAY}:{state}:{body_slug}:{code}"
+                + (f":{post}" if post else "")
+                + (":gs" if special == "TRUE" else ":g")
             )
             contest = cs.key("us.contest", contest_key)
             magnitude = int(group["magnitude"][0])
