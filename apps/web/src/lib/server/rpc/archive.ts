@@ -10583,8 +10583,10 @@ export const bodies = {
             }>(sql`
               select t.person_id as person, t.from_date::text as from, t.to_date::text as to,
                 coalesce(s.voting, true) as "isVoting",
-                t.acquired_via::text as acquired, t.ended_via::text as ended, t.contest_id as contest,
-                s.label as seat, s.apportioned_area_id as region, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id) as place,
+                case when t.acquired_via = 'elected' and t.contest_id is null and t.succeeds_tenure_id is not null
+                  then 'by_election' else t.acquired_via::text end as acquired,
+                t.ended_via::text as ended, t.contest_id as contest,
+                s.label as seat, s.apportioned_area_id as region, coalesce(c.district_area_id, pc.district_area_id, s.district_area_id, inherited.place) as place,
                 coalesce(a.found and a.party_id is null, false) as "isIndependent",
                 (select coalesce(pm.into_id, g.party_id) from tenure_affiliation g
                   left join entity_merge pm on pm.entity_id = g.party_id
@@ -10607,6 +10609,16 @@ export const bodies = {
               left join seat s on s.id = t.seat_id
               left join contest c on c.id = t.contest_id
               left join contest pc on pc.id = c.allocation_parent_id
+              left join lateral (
+                with recursive up(succeeds, contest) as (
+                  select p.succeeds_tenure_id, p.contest_id from tenure p
+                  where p.id = t.succeeds_tenure_id and t.contest_id is null
+                  union all
+                  select p.succeeds_tenure_id, p.contest_id from tenure p join up on p.id = up.succeeds
+                  where up.contest is null
+                )
+                select k.district_area_id as place from up join contest k on k.id = up.contest limit 1
+              ) inherited on true
               left join lateral (
                 select a.party_id, coalesce(pm.into_id, a.party_id) as party, true as found from tenure_affiliation a
                 left join entity_merge pm on pm.entity_id = a.party_id

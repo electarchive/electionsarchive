@@ -47,6 +47,7 @@
   const VIA: Record<string, () => string> = {
     appointed: m.chamber_via_appointed,
     elected: m.chamber_via_elected,
+    by_election: m.chamber_via_by_election,
     succession: m.chamber_via_succession,
     list_replacement: m.chamber_via_list_replacement,
     co_opted: m.chamber_via_co_opted,

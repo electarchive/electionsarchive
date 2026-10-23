@@ -890,6 +890,7 @@
   "chamber_left": "Left",
   "chamber_via_appointed": "Appointed",
   "chamber_via_elected": "Joined via election",
+  "chamber_via_by_election": "Won by-election",
   "chamber_independent": "Independent",
   "chamber_caucus": "{party} ({caucus} caucus)",
   "chamber_via_succession": "Succeeded",
