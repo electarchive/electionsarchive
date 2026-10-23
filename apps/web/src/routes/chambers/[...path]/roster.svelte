@@ -112,7 +112,7 @@
     return members
       .filter(
         (member) =>
-          (party == null || member.party === party) &&
+          (party == null || (member.party ?? "none") === party) &&
           (needle === "" ||
             member.name.toLocaleLowerCase().includes(needle) ||
             (member.place?.toLocaleLowerCase().includes(needle) ?? false)),
@@ -238,10 +238,11 @@
           type="button"
           class={cn(
             "flex items-center gap-1.5 rounded-xs px-1.5 text-[0.8125rem] block-7 hover:bg-secondary",
-            { "marked bg-secondary": party === entry },
+            { "marked bg-secondary": party === (entry ?? "none") },
           )}
-          aria-pressed={party === entry}
-          onclick={() => (party = party === entry ? null : entry)}
+          aria-pressed={party === (entry ?? "none")}
+          onclick={() =>
+            (party = party === (entry ?? "none") ? null : (entry ?? "none"))}
         >
           <span
             class="rounded-xs block-2.5 inline-2.5"

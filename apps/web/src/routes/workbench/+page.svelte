@@ -3,7 +3,7 @@
   import PlaceMap from "#routes/[...path]/map.svelte";
   import Seats from "#routes/[...path]/seats.svelte";
   import { enhance } from "$app/forms";
-  import { goto, replaceState } from "$app/navigation";
+  import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import { decodeId, encodeId } from "@ea/view-spec";
@@ -115,11 +115,11 @@
       );
     }
     if (url.search !== page.url.search) {
-      void replaceState(
+      void goto(
         url.search === ""
           ? resolve("/workbench")
           : resolve(`/workbench?${url.searchParams.toString()}`),
-        {},
+        { state: {}, shallow: true, replace: true },
       );
     }
   });

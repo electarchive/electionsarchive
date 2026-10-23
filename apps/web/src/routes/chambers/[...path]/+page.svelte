@@ -208,39 +208,42 @@
       previous.parties.map((entry) => [entry.party ?? "none", entry.seats]),
     );
     return Object.fromEntries(
-      (term?.parties ?? []).flatMap((entry) => {
-        const was = before.get(entry.party ?? "none");
-        return was == null ? [] : [[entry.party ?? "none", entry.seats - was]];
+      hemicycle.flatMap((entry) => {
+        const was = before.get(entry.key);
+        return was == null ? [] : [[entry.key, entry.seats - was]];
       }),
     );
   });
-  const leaders = $derived(
-    data.terms.map(
-      (entry) =>
-        Map.groupBy(
-          entry.parties,
-          (row) =>
-            body.partners.find((pair) => pair.includes(row.party ?? ""))?.[0] ??
-            row.party,
-        )
-          .values()
-          .map((rows) => {
-            let seats = 0;
-            for (const row of rows) {
-              seats += row.seats;
-            }
-            return {
-              party: rows[0]?.party ?? null,
-              name: rows.map((row) => label(row.party)).join("/"),
-              seats,
-            };
-          })
-          .toArray()
-          .toSorted((a, b) => b.seats - a.seats)[0] ?? null,
+  const lead = (parties: Array<{ party: string | null; seats: number }>) =>
+    Map.groupBy(
+      parties,
+      (row) =>
+        body.partners.find((pair) => pair.includes(row.party ?? ""))?.[0] ??
+        row.party,
+    )
+      .values()
+      .map((rows) => {
+        let seats = 0;
+        for (const row of rows) {
+          seats += row.seats;
+        }
+        return {
+          party: rows[0]?.party ?? null,
+          name: rows.map((row) => label(row.party)).join("/"),
+          seats,
+        };
+      })
+      .toArray()
+      .toSorted((a, b) => b.seats - a.seats)[0] ?? null;
+  const leader = $derived(
+    lead(
+      hemicycle.map((entry) => ({
+        party: entry.key === "none" ? null : entry.key,
+        seats: entry.seats,
+      })),
     ),
   );
-  const leader = $derived(leaders[selected] ?? null);
-  const largest = $derived(leaders.at(-1) ?? null);
+  const largest = $derived(lead(data.terms.at(-1)?.parties ?? []));
   const whole = $derived(term == null ? 0 : (term.size ?? term.total));
   const cabinets = $derived(
     term == null

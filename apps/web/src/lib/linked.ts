@@ -1,4 +1,4 @@
-import { replaceState } from "$app/navigation";
+import { goto } from "$app/navigation";
 import { page } from "$app/state";
 import { untrack } from "svelte";
 
@@ -12,9 +12,10 @@ export function keep(params: Record<string, string | null>) {
     }
   }
   if (url.search !== location.search) {
-    void replaceState(
-      url,
-      untrack(() => page.state),
-    );
+    void goto(url, {
+      state: untrack(() => page.state),
+      shallow: true,
+      replace: true,
+    });
   }
 }
