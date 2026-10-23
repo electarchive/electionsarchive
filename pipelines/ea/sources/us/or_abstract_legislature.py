@@ -25,6 +25,7 @@ ABSTRACTS = {
     2010: (6873642, date(2010, 11, 2), SOURCE),
     2012: (6873690, date(2012, 11, 6), SOURCE),
     2014: (6873735, date(2014, 11, 4), SOURCE),
+    2020: (13735450, date(2020, 11, 3), SOURCE),
 }
 PUBLISHER = "Oregon Secretary of State"
 TITLE = "General Election Abstract of Votes"
@@ -126,7 +127,7 @@ def parse() -> None:
             if not body or body[0] is not None:
                 print(f"{year} {chamber} {district}: no County line, skipped")
                 continue
-            if year in (2000, 2012, 2014):
+            if year in (2000, 2012, 2014, 2020):
                 tokens = [
                     [(found.start(), found.end(), found[0]) for found in CELL.finditer(line)]
                     for line in takewhile(lambda line: not ROW.match(line), lines)
@@ -246,7 +247,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oregon's 2000 through 2014 state House and Senate general elections by county from the abstracts of votes",
+            summary="Oregon's 2000 through 2020 state House and Senate general elections by county from the abstracts of votes",
             polity="US-OR",
         )
         source = cs.source(PUBLISHER, TITLE)
