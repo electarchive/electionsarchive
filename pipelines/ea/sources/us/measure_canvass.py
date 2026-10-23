@@ -286,7 +286,7 @@ NEBRASKA = {
     date(2022, 11, 8): "2022/2022%20General%20Canvass%20Book.pdf",
     date(2024, 11, 5): "2024/2024%20General%20Canvass%20Book.pdf",
 }
-ILLINOIS = {date(2016, 11, 8): 2016, date(2020, 11, 3): 2020, date(2022, 11, 8): 2022, date(2024, 11, 5): 2024}
+ILLINOIS = {date(2012, 11, 6): 2012, date(2014, 11, 4): 2014, date(2016, 11, 8): 2016, date(2020, 11, 3): 2020, date(2022, 11, 8): 2022, date(2024, 11, 5): 2024}
 ILLINOIS_ADVISORY = {
     "civil penalties": "Illinois Penalties for Candidate Interference with Election Worker's Duties Advisory Question",
     "additional 3% tax": "Illinois Income Tax Advisory Question",
@@ -348,6 +348,17 @@ NAMED_QUESTIONS = {
     "Constitution Of Alabama Of 2022": "Constitution of Alabama of 2022",
     **{office: office for offices in HAWAII.values() for office in offices.values()},
     **{office: office for office in ILLINOIS_ADVISORY.values()},
+    **{
+        office: office
+        for office in (
+            "Illinois Public Pension Amendment, HJRCA 49",
+            "Illinois Marsy's Law Crime Victims' Bill of Rights Amendment",
+            "Illinois Right to Vote Amendment",
+            "Illinois Minimum Wage Increase Question",
+            "Illinois Birth Control in Prescription Drug Coverage Question",
+            "Illinois Millionaire Tax Increase for Education Question",
+        )
+    },
 }
 CALIFORNIA = {
     date(2012, 6, 5): "2012-primary/123-ballot-measures-formatted.xls",
