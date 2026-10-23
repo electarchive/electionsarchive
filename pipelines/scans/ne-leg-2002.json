@@ -1,0 +1,465 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2002 General Election Canvass, Member of the Legislature",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/2002%20General.pdf"
+ },
+ "raw_source": "us.ne_house_generals",
+ "contests": {
+  "l2": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 2
+  },
+  "l16": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 16
+  },
+  "l18": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 18
+  },
+  "l22": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 22
+  },
+  "l24": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 24
+  },
+  "l30": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 30
+  },
+  "l32": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 32
+  },
+  "l34": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 34
+  },
+  "l36": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 36
+  },
+  "l37": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": true,
+   "state": "NE",
+   "district": 37
+  },
+  "l38": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 38
+  },
+  "l40": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 40
+  },
+  "l41": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": true,
+   "state": "NE",
+   "district": 41
+  },
+  "l44": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 44
+  },
+  "l49": {
+   "year": 2002,
+   "chamber": "state-legislature",
+   "day": "2002-11-05",
+   "special": true,
+   "state": "NE",
+   "district": 49
+  }
+ },
+ "pages": [
+  {
+   "page": 27,
+   "id": "l2",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.068,
+    0.9,
+    0.198
+   ],
+   "hint": "Read only the table headed District 2, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Roger R. Wehrbein",
+     "contest": "l2",
+     "candidate": "Roger R. Wehrbein"
+    },
+    {
+     "label": "David K. Kentsmith",
+     "contest": "l2",
+     "candidate": "David K. Kentsmith"
+    }
+   ]
+  },
+  {
+   "page": 27,
+   "id": "l16",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.796,
+    0.9,
+    0.933
+   ],
+   "hint": "Read only the table headed District 16, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Matt Connealy",
+     "contest": "l16",
+     "candidate": "Matt Connealy"
+    }
+   ]
+  },
+  {
+   "page": 28,
+   "id": "l18",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.065,
+    0.9,
+    0.149
+   ],
+   "hint": "Read only the table headed District 18, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Mick Mines",
+     "contest": "l18",
+     "candidate": "Mick Mines"
+    },
+    {
+     "label": "James L. Kovarik",
+     "contest": "l18",
+     "candidate": "James L. Kovarik"
+    }
+   ]
+  },
+  {
+   "page": 28,
+   "id": "l22",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.255,
+    0.9,
+    0.339
+   ],
+   "hint": "Read only the table headed District 22, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Jennie Robak",
+     "contest": "l22",
+     "candidate": "Jennie Robak"
+    },
+    {
+     "label": "Arnie Stuthman",
+     "contest": "l22",
+     "candidate": "Arnie Stuthman"
+    }
+   ]
+  },
+  {
+   "page": 28,
+   "id": "l24",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.365,
+    0.9,
+    0.468
+   ],
+   "hint": "Read only the table headed District 24, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Elaine Stuhr",
+     "contest": "l24",
+     "candidate": "Elaine Stuhr"
+    }
+   ]
+  },
+  {
+   "page": 28,
+   "id": "l30",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.652,
+    0.9,
+    0.736
+   ],
+   "hint": "Read only the table headed District 30, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Dennis M. Byars",
+     "contest": "l30",
+     "candidate": "Dennis M. Byars"
+    }
+   ]
+  },
+  {
+   "page": 28,
+   "id": "l32",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.763,
+    0.9,
+    0.879
+   ],
+   "hint": "Read only the table headed District 32, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Jeanne M. Combs",
+     "contest": "l32",
+     "candidate": "Jeanne M. Combs"
+    },
+    {
+     "label": "Dave Biba",
+     "contest": "l32",
+     "candidate": "Dave Biba"
+    }
+   ]
+  },
+  {
+   "page": 29,
+   "id": "l34",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.064,
+    0.9,
+    0.206
+   ],
+   "hint": "Read only the table headed District 34, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Bob Kremer",
+     "contest": "l34",
+     "candidate": "Bob Kremer"
+    },
+    {
+     "label": "Jerry D. Willhoft",
+     "contest": "l34",
+     "candidate": "Jerry D. Willhoft"
+    }
+   ]
+  },
+  {
+   "page": 29,
+   "id": "l36",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.22,
+    0.9,
+    0.309
+   ],
+   "hint": "Read only the table headed District 36, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Jim D. Cudaback",
+     "contest": "l36",
+     "candidate": "Jim D. Cudaback"
+    }
+   ]
+  },
+  {
+   "page": 29,
+   "id": "l37",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.33,
+    0.9,
+    0.438
+   ],
+   "hint": "Read only the table headed District 37, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Joel T. Johnson",
+     "contest": "l37",
+     "candidate": "Joel T. Johnson"
+    }
+   ]
+  },
+  {
+   "page": 29,
+   "id": "l38",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.457,
+    0.9,
+    0.63
+   ],
+   "hint": "Read only the table headed District 38, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Ed Schrock",
+     "contest": "l38",
+     "candidate": "Ed Schrock"
+    },
+    {
+     "label": "Scott Sheierman",
+     "contest": "l38",
+     "candidate": "Scott Sheierman"
+    }
+   ]
+  },
+  {
+   "page": 29,
+   "id": "l40",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.645,
+    0.9,
+    0.783
+   ],
+   "hint": "Read only the table headed District 40, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Douglas D. Cunningham",
+     "contest": "l40",
+     "candidate": "Douglas D. Cunningham"
+    },
+    {
+     "label": "Merton L. Dierks",
+     "contest": "l40",
+     "candidate": "Merton L. Dierks"
+    }
+   ]
+  },
+  {
+   "page": 30,
+   "id": "l41",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.072,
+    0.9,
+    0.284
+   ],
+   "hint": "Read only the table headed District 41, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Vickie D. McDonald",
+     "contest": "l41",
+     "candidate": "Vickie D. McDonald"
+    },
+    {
+     "label": "Jerry Schmitt",
+     "contest": "l41",
+     "candidate": "Jerry Schmitt"
+    }
+   ]
+  },
+  {
+   "page": 30,
+   "id": "l44",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.387,
+    0.9,
+    0.58
+   ],
+   "hint": "Read only the table headed District 44, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "Thomas C. Baker",
+     "contest": "l44",
+     "candidate": "Thomas C. Baker"
+    }
+   ]
+  },
+  {
+   "page": 30,
+   "id": "l49",
+   "orientation": "counties_down",
+   "crop": [
+    0.17,
+    0.765,
+    0.9,
+    0.949
+   ],
+   "hint": "Read only the table headed District 49, the legislative district; the TOTAL row, when printed, is the first data row.",
+   "columns": [
+    {
+     "label": "LeRoy J. Louden",
+     "contest": "l49",
+     "candidate": "LeRoy J. Louden"
+    },
+    {
+     "label": "Fred Hlava",
+     "contest": "l49",
+     "candidate": "Fred Hlava"
+    }
+   ]
+  }
+ ],
+ "authoritative": "Source: the Secretary of State's general election canvass, whose county rows add up to each candidate's printed total."
+}
