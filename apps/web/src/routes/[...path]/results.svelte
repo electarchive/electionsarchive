@@ -16,6 +16,7 @@
 </script>
 
 <script lang="ts">
+  import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import Download from "#lib/components/download.svelte";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
@@ -654,9 +655,16 @@
   </table>
 </div>
 {#if credits.length > 0}
-  <div class="px-2 pbs-3 text-xs/relaxed text-muted-foreground">
-    <p class="font-medium">{m.results_photos()}</p>
-    <ul class="flex flex-wrap gap-x-3">
+  <details class="group px-2 pbs-2 text-xs/relaxed text-muted-foreground">
+    <summary
+      class="flex cursor-pointer list-none items-center gap-1 rounded-xs inline-fit hover:text-foreground focus-visible:outline-2 focus-visible:outline-ring [&::-webkit-details-marker]:hidden"
+    >
+      <ChevronRightIcon
+        class="transition-transform block-3.5 inline-3.5 group-open:rotate-90"
+      />
+      {m.results_photos()}
+    </summary>
+    <ul class="flex flex-wrap gap-x-3 ps-4.5 pbs-1">
       {#each credits as row (row.key)}
         <li>
           {row.label}:
@@ -674,5 +682,5 @@
         </li>
       {/each}
     </ul>
-  </div>
+  </details>
 {/if}
