@@ -156,6 +156,7 @@ PUBLISHERS = {
     "MA": "Massachusetts Secretary of the Commonwealth",
     "NH": "New Hampshire Secretary of State",
     "MS": "Mississippi Secretary of State",
+    "IN": "Indiana Election Division",
     "MI": "Michigan Bureau of Elections",
     "WI": "Wisconsin Elections Commission",
     "TX": "Texas Secretary of State",
@@ -430,6 +431,11 @@ SPECIALS: dict[str, tuple[str, str, str | None]] = {
     "2025-03-25:MS:house:23": (
         "transcribed",
         "https://www.sos.ms.gov/elections/electionresults/2025LegislativeSpecial/HD%2023%20Special%20Election/Calhoun_Results%20(2).pdf",
+        None,
+    ),
+    "2024-11-05:IN:house:27:general": (
+        "transcribed",
+        "https://enr.indianavoters.in.gov/archive/2024General/download/AllOfficeResults.csv",
         None,
     ),
     "2025-03-25:MS:house:82": (
@@ -882,6 +888,10 @@ TRANSCRIBED: dict[str, list[tuple[str | None, str | None, int]]] = {
         ("Andy Clark", None, 171),
         ("Danny Lampley", None, 30),
         ("Travis E. Wright", None, 583),
+    ],
+    "2024-11-05:IN:house:27:general": [
+        ("Sheila J. Klinker", "Democratic", 13398),
+        ("Oscar Alvarez", "Republican", 8383),
     ],
     "2025-03-25:MS:house:82": [
         ("Joseph A. Denson", None, 410),
