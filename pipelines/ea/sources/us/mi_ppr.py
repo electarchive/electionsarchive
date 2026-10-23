@@ -1,4 +1,5 @@
 import re
+from datetime import UTC, datetime
 from pathlib import Path
 
 import polars as pl
@@ -10,15 +11,23 @@ from ea.sources.us.mi_cenr import FILE, PUBLISHER
 from ea.store import DATA, connect
 
 SOURCE = "us.mi_ppr"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 FILES = ["2008PPR", "2012PPR"]
+MVIC = "https://mvic.sos.state.mi.us/VoteHistory/GetElectionResultFile?electionId=696"
+INBOX = DATA / "inbox" / "manual" / "MF-030" / "2024PRESIDENTIAL_PRIMARY_MI_CENR_BY_COUNTY.txt"
 TITLE = "Official presidential primary results by county"
 
 
 def fetch() -> None:
     for name in FILES:
         raw.fetch(SOURCE, FILE.format(name), suffix=".txt")
+    try:
+        raw.cached(SOURCE, MVIC)
+    except LookupError:
+        raw.store(
+            SOURCE, MVIC, INBOX.read_bytes(), suffix=".txt", retrieved_at=datetime.now(UTC), media_type="text/plain"
+        )
 
 
 def parse() -> None:
@@ -32,10 +41,18 @@ def parse() -> None:
             ).fetchall()
         }
     frame = pl.concat(
-        pl.read_csv(
-            raw.cached(SOURCE, FILE.format(name)).path, separator="\t", infer_schema=False, quote_char=None, truncate_ragged_lines=True
-        ).filter(pl.col("OfficeDescription").str.starts_with("President"))
-        for name in FILES
+        [
+            pl.read_csv(
+                raw.cached(SOURCE, url).path,
+                separator="\t",
+                infer_schema=False,
+                quote_char=None,
+                truncate_ragged_lines=True,
+                skip_rows=skip,
+            ).filter(pl.col("OfficeDescription").str.to_uppercase().str.starts_with("PRESIDENT"))
+            for url, skip in [*((FILE.format(name), 0) for name in FILES), (MVIC, 1)]
+        ],
+        how="diagonal",
     ).select(
         year=pl.col("ElectionDate").str.slice(0, 4).cast(pl.Int32),
         chamber=pl.concat_str(
@@ -77,7 +94,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Michigan's 2008 and 2012 presidential primaries by county",
+            summary="Michigan's 2008, 2012, and 2024 presidential primaries by county",
             polity="US-MI",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -90,7 +107,7 @@ def emit() -> Path:
             url="https://miboecfr.nictusa.com/election/results/",
             license="Public record",
         )
-        for name in FILES:
-            cs.artifact(raw.cached(SOURCE, FILE.format(name)), source)
+        for url in [*(FILE.format(name) for name in FILES), MVIC]:
+            cs.artifact(raw.cached(SOURCE, url), source)
         medsl.attach(cs, conn, frame, {"MI": source}, strict=True)
         return cs.write()
