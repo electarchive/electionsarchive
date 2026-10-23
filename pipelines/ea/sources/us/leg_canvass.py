@@ -105,7 +105,20 @@ KS_HOUSE = (
     "https://sos.ks.gov/elections/22elec/2022-General-Election-Kansas-House-of-Representatives-Results-By-Precinct.xlsx"
 )
 IN_YEARS = [2018, 2020, 2022, 2024]
-LA_DAYS = [date(2019, 10, 12), date(2019, 11, 16), date(2023, 10, 14), date(2023, 11, 18)]
+LA_DAYS = [
+    date(2003, 10, 4),
+    date(2003, 11, 15),
+    date(2007, 10, 20),
+    date(2007, 11, 17),
+    date(2011, 10, 22),
+    date(2011, 11, 19),
+    date(2015, 10, 24),
+    date(2015, 11, 21),
+    date(2019, 10, 12),
+    date(2019, 11, 16),
+    date(2023, 10, 14),
+    date(2023, 11, 18),
+]
 LA_FILES = ["Votes_Multiparish.htm", "RacesCandidates_Multiparish.htm"] + [
     f"VotesParish/Votes_{parish}.htm" for parish in la_sos.PARISHES
 ]
@@ -299,7 +312,7 @@ def parse() -> None:
         keys = {
             key
             for (key,) in conn.execute(
-                "select value from external_id where scheme = 'us.contest' and value ~ '^20(19|23)-1[01]-..:LA:(house|senate):'"
+                "select value from external_id where scheme = 'us.contest' and value ~ '^20(03|07|11|15|19|23)-1[01]-..:LA:(house|senate):'"
             ).fetchall()
         }
     rows = []
