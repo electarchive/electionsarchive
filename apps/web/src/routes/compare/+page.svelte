@@ -8,6 +8,7 @@
   import * as Command from "#lib/components/ui/command/index.js";
   import * as Popover from "#lib/components/ui/popover/index.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
@@ -197,27 +198,51 @@
         <h2 id="examples" class="text-[0.8125rem] font-bold">
           {m.versus_examples()}
         </h2>
-        <ul class="grid grid-cols-[repeat(auto-fill,minmax(16rem,1fr))] gap-2">
+        <ul class="grid gap-2 sm:grid-cols-2 lg:grid-cols-3">
           {#each data.examples as example (example.a)}
-            <li>
+            <li class="grid">
               <a
-                class="grid grid-cols-[auto_minmax(0,1fr)] items-center gap-x-2.5 gap-y-1 rounded-sm border border-input px-3 py-2.5 hover:border-foreground hover:bg-secondary"
+                class="grid grid-cols-[auto_minmax(0,1fr)] content-start items-center gap-x-2.5 gap-y-1.5 rounded-sm border border-input px-3 py-2.5 hover:border-foreground hover:bg-secondary"
                 href={resolve(`/compare?a=${example.a}&b=${example.b}`)}
               >
-                <span
-                  class="rounded-full bg-foreground block-2.5 inline-2.5"
-                  aria-hidden="true"
-                ></span>
-                <span class="truncate text-base font-[720]"
-                  >{example.first}</span
-                >
-                <span
-                  class="bg-foreground block-2.5 inline-2.5"
-                  aria-hidden="true"
-                ></span>
-                <span class="truncate text-base font-[720]"
-                  >{example.second}</span
-                >
+                {#each example.sides as side, at (side.id)}
+                  {#if side.photo != null}
+                    <img
+                      class="justify-self-center rounded-full bg-muted object-cover object-top ring-2 ring-(--party) ring-offset-1 ring-offset-card block-7 inline-7"
+                      style:--party={swatch(side.color, side.party ?? side.id)}
+                      src={side.photo}
+                      alt=""
+                      loading="lazy"
+                      width="28"
+                      height="28"
+                    />
+                  {:else}
+                    <span
+                      class={cn("justify-self-center block-3 inline-3", {
+                        "rounded-full": at === 0,
+                        "rounded-xs": at === 1 && side.color != null,
+                        "bg-foreground": side.color == null,
+                      })}
+                      style:background={side.color == null
+                        ? null
+                        : swatch(side.color, side.party ?? side.id)}
+                      aria-hidden="true"
+                    ></span>
+                  {/if}
+                  <span class="truncate text-base font-[720]">{side.name}</span>
+                {/each}
+                {#if example.year != null}
+                  <span
+                    class="col-span-2 pbs-0.5 text-[0.8125rem] text-muted-foreground"
+                    >{(example.kind === "person"
+                      ? m.versus_example_person
+                      : example.kind === "party"
+                        ? m.versus_example_party
+                        : m.versus_example_polity)({
+                      year: String(example.year),
+                    })}</span
+                  >
+                {/if}
               </a>
             </li>
           {/each}

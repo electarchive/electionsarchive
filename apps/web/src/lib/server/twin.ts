@@ -839,7 +839,17 @@ function comparisonMarkdown(
             data.examples
               .map(
                 (example) =>
-                  `- ${link(`${example.first} / ${example.second}`, pair(example.a, example.b))}`,
+                  `- ${link(example.sides.map((side) => side.name).join(" / "), pair(example.a, example.b))}${
+                    example.year == null
+                      ? ""
+                      : `: ${(example.kind === "person"
+                          ? m.versus_example_person
+                          : example.kind === "party"
+                            ? m.versus_example_party
+                            : m.versus_example_polity)({
+                          year: String(example.year),
+                        })}`
+                  }`,
               )
               .join("\n"),
           ]),

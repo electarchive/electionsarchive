@@ -486,8 +486,15 @@ export async function comparison(ids: Array<string>) {
       : await db.execute<{
           a: string;
           b: string;
-          first: string;
-          second: string;
+          kind: "person" | "polity" | "party";
+          year: number | null;
+          sides: Array<{
+            id: string;
+            name: string;
+            photo: string | null;
+            color: string | null;
+            party: string | null;
+          }>;
         }>(sql`
           with pairs(at, a, b, kind) as (
             values (1, 'Donald J. Trump', 'Kamala D. Harris', 'person'),
@@ -498,7 +505,7 @@ export async function comparison(ids: Array<string>) {
               (6, 'Cumhuriyet Halk Partisi', 'Adalet ve Kalkınma Partisi', 'party')
           ),
           picked as (
-            select p.at, x.side, coalesce(
+            select p.at, p.kind, x.side, coalesce(
               (select s.entity_id from slug s where p.kind = 'polity' and s.is_current and s.path = x.key limit 1),
               (select n.entity_id from name n join entity e on e.id = n.entity_id and e.type = 'person'
                 where p.kind = 'person' and n.text = x.key limit 1),
@@ -506,10 +513,52 @@ export async function comparison(ids: Array<string>) {
                 where p.kind = 'party' and n.text = x.key limit 1)
             ) as id
             from pairs p cross join lateral (values (1, p.a), (2, p.b)) x(side, key)
+          ),
+          sided as (
+            select k.at, k.side, k.id,
+              (select n.text from name n where n.entity_id = k.id order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as name,
+              (select '/' || i.path from person_image i where i.person_id = k.id order by i.recorded_from desc limit 1) as photo,
+              case when k.kind = 'party' then k.id else (
+                select o.party_id from candidacy cy
+                join contest_option o on o.id = cy.option_id
+                join contest c on c.id = o.contest_id
+                join election e on e.id = c.election_id
+                where k.kind = 'person' and cy.person_id = k.id and cy.role = 'head' and o.party_id is not null
+                order by e.date_from desc limit 1
+              ) end as party
+            from picked k
+            where k.id is not null
           )
-          select a.id as a, b.id as b,
-            (select n.text from name n where n.entity_id = a.id order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as first,
-            (select n.text from name n where n.entity_id = b.id order by n.is_preferred desc, (n.lang = 'en') desc limit 1) as second
+          select a.id as a, b.id as b, a.kind, case a.kind
+            when 'person' then (
+              select max(extract(year from e.date_from))::int
+              from candidacy x
+              join contest_option ox on ox.id = x.option_id
+              join contest_option oy on oy.contest_id = ox.contest_id
+              join candidacy y on y.option_id = oy.id and y.role = 'head' and y.person_id = b.id
+              join contest c on c.id = ox.contest_id
+              join election e on e.id = c.election_id
+              where x.person_id = a.id and x.role = 'head'
+            )
+            when 'party' then (
+              select min(extract(year from e.date_from))::int from election e
+              where exists (select from contest c join contest_option o on o.contest_id = c.id where c.election_id = e.id and o.party_id = a.id)
+                and exists (select from contest c join contest_option o on o.contest_id = c.id where c.election_id = e.id and o.party_id = b.id)
+            )
+            else (
+              select greatest(
+                min(extract(year from e.date_from)) filter (where e.polity_id = a.id),
+                min(extract(year from e.date_from)) filter (where e.polity_id = b.id)
+              )::int
+              from election e where e.polity_id in (a.id, b.id)
+            ) end as year,
+            (
+              select json_agg(json_build_object(
+                'id', s.id, 'name', s.name, 'photo', s.photo, 'party', s.party,
+                'color', (select pc.color from party_color pc where pc.party_id = s.party and upper_inf(pc.valid))
+              ) order by s.side)
+              from sided s where s.at = a.at
+            ) as sides
           from picked a join picked b on b.at = a.at and b.side = 2
           where a.side = 1 and a.id is not null and b.id is not null
           order by a.at
