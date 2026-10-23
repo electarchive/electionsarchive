@@ -1,0 +1,438 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "State of Illinois official vote cast at the general election, 1982",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1982illi/officialvoteofst1982illi.pdf"
+ },
+ "contests": {
+  "attorney-general": {
+   "year": 1982,
+   "chamber": "attorney-general",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "IL",
+   "district": null
+  },
+  "secretary-of-state": {
+   "year": 1982,
+   "chamber": "secretary-of-state",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "IL",
+   "district": null
+  },
+  "comptroller": {
+   "year": 1982,
+   "chamber": "comptroller",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "IL",
+   "district": null
+  },
+  "treasurer": {
+   "year": 1982,
+   "chamber": "treasurer",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "IL",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 14,
+   "id": "14-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Ty Fahner",
+     "contest": "attorney-general",
+     "candidate": "Ty Fahner"
+    },
+    {
+     "label": "Democratic Neil F. Hartigan",
+     "contest": "attorney-general",
+     "candidate": "Neil F. Hartigan"
+    },
+    {
+     "label": "Libertarian Natalie L. C. Stason",
+     "contest": "attorney-general",
+     "candidate": "Natalie Loder Clark"
+    },
+    {
+     "label": "Taxpayers Gordon James Arnett",
+     "contest": "attorney-general",
+     "candidate": "Gordon James Arnett"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.011,
+    0.846,
+    1.0
+   ],
+   "hint": "Read only the table headed 'VOTE FOR ATTORNEY GENERAL'; ignore any other table visible in the image.",
+   "bands": 3,
+   "header": [
+    0.0,
+    0.1628
+   ]
+  },
+  {
+   "page": 15,
+   "id": "15-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Ty Fahner",
+     "contest": "attorney-general",
+     "candidate": "Ty Fahner"
+    },
+    {
+     "label": "Democratic Neil F. Hartigan",
+     "contest": "attorney-general",
+     "candidate": "Neil F. Hartigan"
+    },
+    {
+     "label": "Libertarian Natalie L. C. Stason",
+     "contest": "attorney-general",
+     "candidate": "Natalie Loder Clark"
+    },
+    {
+     "label": "Taxpayers Gordon James Arnett",
+     "contest": "attorney-general",
+     "candidate": "Gordon James Arnett"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.008,
+    0.075,
+    0.942,
+    0.92
+   ],
+   "hint": "Read only the table headed 'VOTE FOR ATTORNEY GENERAL'; ignore any other table visible in the image.",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.0864
+   ]
+  },
+  {
+   "page": 18,
+   "id": "18-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Jim Edgar",
+     "contest": "secretary-of-state",
+     "candidate": "Jim Edgar"
+    },
+    {
+     "label": "Democratic Jerry Cosentino",
+     "contest": "secretary-of-state",
+     "candidate": "Jerome Cosentino"
+    },
+    {
+     "label": "Libertarian Roger Hosbein",
+     "contest": "secretary-of-state",
+     "candidate": "Roger Hosbein"
+    },
+    {
+     "label": "Taxpayers Kenneth J. Prazak",
+     "contest": "secretary-of-state",
+     "candidate": "Kenneth J. Prazak"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.022,
+    0.008,
+    0.853,
+    1.0
+   ],
+   "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE'; ignore any other table visible in the image.",
+   "bands": 3,
+   "header": [
+    0.0,
+    0.1633
+   ]
+  },
+  {
+   "page": 19,
+   "id": "19-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Jim Edgar",
+     "contest": "secretary-of-state",
+     "candidate": "Jim Edgar"
+    },
+    {
+     "label": "Democratic Jerry Cosentino",
+     "contest": "secretary-of-state",
+     "candidate": "Jerome Cosentino"
+    },
+    {
+     "label": "Libertarian Roger Hosbein",
+     "contest": "secretary-of-state",
+     "candidate": "Roger Hosbein"
+    },
+    {
+     "label": "Taxpayers Kenneth J. Prazak",
+     "contest": "secretary-of-state",
+     "candidate": "Kenneth J. Prazak"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.014,
+    0.025,
+    0.953,
+    0.892
+   ],
+   "hint": "Read only the table headed 'VOTE FOR SECRETARY OF STATE'; ignore any other table visible in the image.",
+   "bands": 2,
+   "header": [
+    0.0,
+    0.1269
+   ]
+  },
+  {
+   "page": 22,
+   "id": "22-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Cal Skinner, Jr.",
+     "contest": "comptroller",
+     "candidate": "Cal Skinner Jr."
+    },
+    {
+     "label": "Democratic Roland W. Burris",
+     "contest": "comptroller",
+     "candidate": "Roland W. Burris"
+    },
+    {
+     "label": "Libertarian Stephen M. Johnson",
+     "contest": "comptroller",
+     "candidate": "Stephen M. Johnson"
+    },
+    {
+     "label": "Taxpayers Leland W. Bormann",
+     "contest": "comptroller",
+     "candidate": "Leland W. Bormann"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.025,
+    0.005,
+    0.854,
+    0.945
+   ],
+   "hint": "Read only the table headed 'VOTE FOR COMPTROLLER'; ignore any other table visible in the image.",
+   "bands": 3,
+   "header": [
+    0.0,
+    0.1649
+   ]
+  },
+  {
+   "page": 23,
+   "id": "23-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Cal Skinner, Jr.",
+     "contest": "comptroller",
+     "candidate": "Cal Skinner Jr."
+    },
+    {
+     "label": "Democratic Roland W. Burris",
+     "contest": "comptroller",
+     "candidate": "Roland W. Burris"
+    },
+    {
+     "label": "Libertarian Stephen M. Johnson",
+     "contest": "comptroller",
+     "candidate": "Stephen M. Johnson"
+    },
+    {
+     "label": "Taxpayers Leland W. Bormann",
+     "contest": "comptroller",
+     "candidate": "Leland W. Bormann"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.01,
+    0.04,
+    0.838,
+    1.0
+   ],
+   "hint": "Read only the table headed 'VOTE FOR COMPTROLLER'; ignore any other table visible in the image.",
+   "bands": 3,
+   "header": [
+    0.0,
+    0.1646
+   ]
+  },
+  {
+   "page": 26,
+   "id": "26-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican John P. Dailey",
+     "contest": "treasurer",
+     "candidate": "John P. Dailey"
+    },
+    {
+     "label": "Democratic James H. Donnewald",
+     "contest": "treasurer",
+     "candidate": "James H. Donnewald"
+    },
+    {
+     "label": "Libertarian Walter E. Edge",
+     "contest": "treasurer",
+     "candidate": "Walter E. Edge"
+    },
+    {
+     "label": "Taxpayers Naomi F. Wilson",
+     "contest": "treasurer",
+     "candidate": "Naomi F. Wilson"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.014,
+    0.008,
+    0.871,
+    0.941
+   ],
+   "hint": "Read only the table headed 'VOTE FOR TREASURER'; ignore any other table visible in the image.",
+   "bands": 3,
+   "header": [
+    0.0,
+    0.1447
+   ]
+  },
+  {
+   "page": 27,
+   "id": "27-0",
+   "columns": [
+    {
+     "label": "Plurality",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican John P. Dailey",
+     "contest": "treasurer",
+     "candidate": "John P. Dailey"
+    },
+    {
+     "label": "Democratic James H. Donnewald",
+     "contest": "treasurer",
+     "candidate": "James H. Donnewald"
+    },
+    {
+     "label": "Libertarian Walter E. Edge",
+     "contest": "treasurer",
+     "candidate": "Walter E. Edge"
+    },
+    {
+     "label": "Taxpayers Naomi F. Wilson",
+     "contest": "treasurer",
+     "candidate": "Naomi F. Wilson"
+    },
+    {
+     "label": "Write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.022,
+    0.048,
+    0.846,
+    1.0
+   ],
+   "hint": "Read only the table headed 'VOTE FOR TREASURER'; ignore any other table visible in the image.",
+   "bands": 3,
+   "header": [
+    0.0,
+    0.1786
+   ]
+  }
+ ]
+}
