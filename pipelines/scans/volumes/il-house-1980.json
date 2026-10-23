@@ -1,0 +1,37 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1980,
+ "day": "1980-11-04",
+ "title": "State of Illinois official vote cast at the general election, 1980",
+ "file": {
+  "url": "https://archive.org/download/officialvote1980illi/officialvote1980illi.pdf"
+ },
+ "offices": {
+  "state-house": "Representative in the General Assembly, one table per district (up to three seats; cumulated votes printed with halves)"
+ },
+ "leaves": [
+  35,
+  36,
+  37,
+  38,
+  39,
+  40,
+  41,
+  42,
+  43,
+  44,
+  45,
+  46,
+  47,
+  48,
+  49,
+  50,
+  51,
+  52,
+  53,
+  54
+ ]
+}

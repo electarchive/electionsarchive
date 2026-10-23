@@ -1,0 +1,40 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1976,
+ "day": "1976-11-02",
+ "title": "State of Illinois official vote cast at the general election, 1976",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1976illi/officialvoteofst1976illi.pdf"
+ },
+ "offices": {
+  "state-house": "Representative in the General Assembly, one table per district (up to three seats; cumulated votes printed with halves)"
+ },
+ "leaves": [
+  53,
+  54,
+  55,
+  56,
+  57,
+  58,
+  59,
+  60,
+  61,
+  62,
+  63,
+  64,
+  65,
+  66,
+  67,
+  68,
+  69,
+  70,
+  71,
+  72,
+  73,
+  74,
+  75
+ ]
+}

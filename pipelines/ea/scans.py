@@ -163,7 +163,7 @@ IMAGE_LIMIT = 4_500_000
 BATCH_LIMIT = 200_000_000
 LEGISLATURES = {"state-senate": "senate", "state-house": "house", "state-legislature": "legislature"}
 LABEL = re.compile(r"^(counties|county)$")
-HALF = re.compile(r"(?<=\d)\s*(?:½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
+HALF = re.compile(r"(?<=\d)\s*(?:\.5|½|¹\s*[⁄/]?\s*₂|1\s*[⁄/]\s*2|'\s*/\s*2)\s*$")
 SUBTOTAL = re.compile(r"^(down ?state|downstate)$")
 TOTAL = re.compile(r"^(state |grand |county )?totals?\b|^all counties$")
 SUFFIX_WORDS = {"jr", "sr", "ii", "iii", "iv"}
@@ -589,8 +589,8 @@ def cells(
                 for c, text in enumerate(texts):
                     series, label = (r, header[c]["label"]) if across else (c, named)
                     half = manifest.get("halves", False) and HALF.search(text) is not None
-                    if half:
-                        text = HALF.sub("", text)
+                    if manifest.get("halves", False):
+                        text = HALF.sub("", re.sub(r"(?<=\d)\.0\s*$", "", text.strip()))
                     digits = re.sub(r"[,\s.]|(?<=\d)[-~'](?=\d)", "", text)
                     value = int(digits) if digits.isascii() and digits.isdigit() else None
                     if value is not None and manifest.get("halves", False):

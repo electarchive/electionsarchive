@@ -1,0 +1,38 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "year": 1974,
+ "day": "1974-11-05",
+ "title": "State of Illinois official vote cast at the general election, 1974",
+ "file": {
+  "url": "https://archive.org/download/officialvote1974illi/officialvote1974illi.pdf"
+ },
+ "offices": {
+  "state-house": "Representative in the General Assembly, one table per district (up to three seats; cumulated votes printed with halves)"
+ },
+ "leaves": [
+  35,
+  36,
+  37,
+  38,
+  39,
+  40,
+  41,
+  42,
+  43,
+  44,
+  45,
+  46,
+  47,
+  48,
+  49,
+  50,
+  51,
+  52,
+  53,
+  54
+ ],
+ "autorotate": true
+}
