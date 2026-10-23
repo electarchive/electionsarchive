@@ -480,12 +480,26 @@ export async function archive(path: string, search: URLSearchParams) {
 }
 
 export async function comparison(ids: Array<string>) {
-  const found = await db.execute<{ id: string; type: string; name: string }>(
+  const found = await db.execute<{
+    id: string;
+    type: string;
+    name: string;
+    context: string | null;
+  }>(
     sql`
       select e.id, e.type::text as type, coalesce((
         select n.text from name n where n.entity_id = e.id and n.kind in ('official', 'english')
         order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'official') desc limit 1
-      ), '') as name
+      ), '') as name, (
+        select n.text from name n
+        where n.entity_id = case e.type
+            when 'party' then (select p.polity_id from party p where p.id = e.id)
+            when 'polity' then (select pp.parent_id from polity_parent pp join polity y on y.id = pp.parent_id
+              where pp.polity_id = e.id order by y.kind = 'supranational' limit 1)
+          end
+          and n.kind in ('official', 'english')
+        order by n.is_preferred desc, (n.lang = 'en') desc, (n.kind = 'english') desc limit 1
+      ) as context
       from unnest(${sql.param(ids.filter((id) => /^[0-9a-f-]{36}$/u.test(id)))}::uuid[]) with ordinality as x(asked, at)
       join entity e on e.id = coalesce((select into_id from entity_merge where entity_id = x.asked), x.asked)
       where e.type in ('person', 'polity', 'party')

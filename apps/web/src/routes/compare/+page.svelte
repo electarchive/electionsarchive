@@ -110,7 +110,14 @@
                     : m.versus_pick()}</span
             >
           {:else}
-            <span class="truncate text-lg font-[720]">{side.name}</span>
+            <span class="grid text-start min-inline-0">
+              <span class="truncate text-lg/tight font-[720]">{side.name}</span>
+              {#if side.context != null}
+                <span class="truncate text-xs text-muted-foreground"
+                  >{side.context}</span
+                >
+              {/if}
+            </span>
           {/if}
           <ChevronsUpDownIcon class="text-muted-foreground block-4 inline-4" />
         </button>
