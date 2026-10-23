@@ -578,7 +578,7 @@ def cells(
                 if SUBTOTAL.match(slug(row["label"])):
                     continue
                 texts = row["values"]
-                if texts and re.fullmatch(r"[A-Za-z]", texts[0].strip()):
+                if header and slug(header[0]["label"]) and texts and re.fullmatch(r"[A-Za-z]", texts[0].strip()):
                     texts = [*texts[1:], ""] if len(texts) == len(header) else texts[1:]
                 if len(texts) != len(header):
                     errors[number] = f"{custom}: row {row['label']!r} has {len(texts)} cells for {len(header)}"
@@ -636,6 +636,7 @@ def cells(
 
 def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[str, int | None]) -> dict[str, Series]:
     values, printed, errors = cells(manifest, requests(manifest["name"], reader), names, reader)
+    folded = manifest.get("unit_scheme") in ("town", "split")
     series: dict[str, Series] = {}
     joined: set[tuple[str, str]] = set()
     for spec in manifest["pages"]:
@@ -654,6 +655,8 @@ def evaluate(manifest: Manifest, reader: str, names: dict[str, str], held: dict[
                 entry.printed = (entry.printed or 0) + printed[(page, index)] if again else printed[(page, index)]
             for (found, code, position), (value, box) in values.items():
                 if found == page and position == index:
+                    if not folded and any(seen == code and other != page for other, seen in entry.cells):
+                        continue
                     entry.total += value
                     before = entry.cells.get((page, code))
                     entry.cells[(page, code)] = (value + before[0], before[1]) if before is not None else (value, box)
@@ -1090,6 +1093,8 @@ def finalize(
                 and {k: v[0] for k, v in one.cells.items()} == {k: v[0] for k, v in two.cells.items()}
             ):
                 chosen, how = two, "agreed"
+            elif three is not None and not three.errors and three.total in (three.printed, three.official):
+                chosen, how = three, "third"
             elif two is not None and three is not None:
                 chosen = vote(one, two, three)
                 how = "voted" if chosen.status == "tied" else "review"
