@@ -3,6 +3,7 @@ import io
 import json
 import re
 import subprocess
+import tempfile
 import zipfile
 from datetime import UTC, date, datetime
 from difflib import SequenceMatcher
@@ -42,6 +43,8 @@ ANSWERS = {
     "REPEALED": ("NO", "MAINTAINED"),
     "FOR": ("YES", "FOR"),
     "AGAINST": ("NO", "FOR"),
+    "RETAIN": ("YES", "RETAIN"),
+    "REPEAL": ("NO", "RETAIN"),
 }
 TAG = (
     r"(?i:(initiative|referendum|advisory vote|resolution|amendment|proposition|question|measure|issue|referred law)\b"
@@ -76,10 +79,10 @@ OREGON = {
     date(2020, 11, 3): ("20210124071153", "november-general-2020.pdf"),
 }
 MISSOURI = {
-    date(2012, 8, 7): "2012PrimaryElection.pdf",
-    date(2012, 11, 6): "2012GeneralElection.pdf",
-    date(2014, 8, 5): "2014PrimaryElection.pdf",
-    date(2014, 11, 4): "2014GeneralElection.pdf",
+    date(2012, 8, 7): "OfficialResults8-7-12.pdf",
+    date(2012, 11, 6): "OfficialResults11-6-12.pdf",
+    date(2014, 8, 5): "OfficialResults8-5-14.pdf",
+    date(2014, 11, 4): "OfficialResults11-4-14.pdf",
     date(2016, 11, 8): "ActualResults-November82016-GeneralElection.pdf",
     date(2018, 8, 7): "ActualResults-August72018.pdf",
     date(2018, 11, 6): "ActualResults-November62018-FINAL.pdf",
@@ -181,6 +184,7 @@ MONTANA_KINDS = {
     "INITIATIVE": "I",
 }
 WYOMING = {
+    date(2014, 11, 4): "2014/Results/General/2014_Statewide_Constitutional_Amendments.pdf",
     date(2016, 11, 8): "2016/Results/General/2016_Wyoming_General_Election_Results.pdf",
     date(2020, 11, 3): "2020/Results/General/2020_General_Statewide_Constitutional_Amendment_Summary.pdf",
     date(2022, 11, 8): "2022/Results/General/2022_General_Statewide_Constitutional_Amendment_Summary.pdf",
@@ -221,7 +225,15 @@ RHODE_ISLAND = {
     date(2022, 11, 8): "2023-06/RIGEN22%20%282%29.xlsx",
     date(2024, 11, 5): "2025-01/Gen24EX%20%281%29.xlsx",
 }
-TENNESSEE = {date(2022, 11, 8): ("20240213031752", "20221108AllbyPrecinct.xlsx")}
+RHODE_ISLAND_PRECINCTS = {
+    date(2012, 11, 6): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen12.xls",
+    date(2014, 11, 4): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen14.xls",
+    date(2016, 11, 8): "https://web.archive.org/web/2025id_/https://elections.ri.gov/sites/g/files/xkgbur756/files/2022-02/rigen16.xls",
+}
+TENNESSEE = {
+    date(2014, 11, 4): "https://sos-tn-gov-files.s3.amazonaws.com/20141104_CountyTotals_01.pdf",
+    date(2022, 11, 8): ("20240213031752", "20221108AllbyPrecinct.xlsx"),
+}
 OHIO = {
     date(2015, 11, 3): ("20211009165730", "2015/general/officialsummary.xlsx"),
     date(2018, 11, 6): ("20250306204759", "2018/gen/2018-11-06_stateissuecounty.xlsx"),
@@ -230,6 +242,9 @@ OHIO = {
     date(2023, 11, 7): ("20240401063409", "2023/gen/issues-summary.xlsx"),
     date(2024, 11, 5): ("20250306194809", "2024/gen/official/issue-summary.xlsx"),
     date(2025, 5, 6): ("20250621212835", "2025/pri/issues-final-summary.xlsx"),
+}
+WASHINGTON = {
+    date(2013, 11, 5): "https://results.vote.wa.gov/results/20131105/export/20131105_AllCounties_20131210_0314.csv"
 }
 SOUTH_DAKOTA = {
     date(2014, 11, 4): "https://www.sdsos.gov/docs/2014ElectionReturn.pdf",
@@ -256,6 +271,8 @@ NORTH_DAKOTA = {
     date(2024, 11, 5): "",
 }
 NEBRASKA = {
+    date(2014, 11, 4): "2014/2014-General-Canvass-Recount-Final.pdf",
+    date(2016, 11, 8): "2016/2016-canvass-book.pdf",
     date(2012, 11, 6): "2012/2012-general-canvass.pdf",
     date(2018, 11, 6): "2018/2018-general-election-official-results.pdf",
     date(2020, 11, 3): "2020/2020-General-Canvass-Book.pdf",
@@ -375,6 +392,7 @@ REPLACED = {
     "Wikipedia": "the totals transcribed from the English Wikipedia",
     "MIT Election Data and Science Lab": "MEDSL's totals summed from its precinct returns",
     "OpenElections": "OpenElections' totals summed from its precinct returns",
+    "Missouri Secretary of State": "the statewide totals the Missouri Secretary of State published",
 }
 DIGITIZED = (
     " The canvass is a scanned image, so its county figures were digitized in two passes: a hand transcription, "
@@ -603,6 +621,7 @@ def replaceable(conn) -> list[tuple[str, date]]:
            join result_set rs on rs.contest_id = c.id and rs.is_default join source s on s.id = rs.source_id
            where c.kind = 'ballot_question' and s.publisher = any(%s) and substr(p.iso_code, 4) = any(%s)
              and e.date_from between '2000-01-01' and '2025-12-31'
+             and (s.publisher <> 'Missouri Secretary of State' or (select count(distinct w.unit_k) from result_value w where w.result_set_k = rs.k) = 1)
            order by 1, 2""",
         [list(REPLACED), list(DOCUMENTS)],
     ).fetchall()
@@ -651,6 +670,8 @@ def link(state: str, day: date) -> tuple[str, str]:
             if day in ILLINOIS
             else ""
         )
+    if state == "RI" and day in RHODE_ISLAND_PRECINCTS:
+        return SOURCE, RHODE_ISLAND_PRECINCTS[day]
     if state == "RI":
         entry = RHODE_ISLAND.get(day, "")
         return SOURCE, (
@@ -662,7 +683,9 @@ def link(state: str, day: date) -> tuple[str, str]:
         )
     if state == "TN":
         return SOURCE, (
-            WAYBACK.format(
+            TENNESSEE[day]
+            if isinstance(TENNESSEE.get(day), str)
+            else WAYBACK.format(
                 TENNESSEE[day][0], "https://sos-prod.tnsosgovfiles.com/s3fs-public/document/" + TENNESSEE[day][1]
             )
             if day in TENNESSEE
@@ -731,6 +754,8 @@ def link(state: str, day: date) -> tuple[str, str]:
             if day in OREGON
             else ""
         )
+    if state == "WA" and day in WASHINGTON:
+        return SOURCE, WASHINGTON[day]
     owner, url = (
         (wa_local.SOURCE, wa_local.PRECINCTS.format(day=day).replace("_allstateprecincts.csv", "_AllCounties.csv"))
         if state == "WA"
@@ -860,12 +885,12 @@ def fetch() -> None:
                         SOURCE,
                         each,
                         suffix="." + each.rsplit(".", 1)[1]
-                        if state in ("AL", "AR", "CA", "DC", "GA", "SC", "UT", "WV")
+                        if state in ("AL", "AR", "CA", "DC", "GA", "SC", "UT", "WV") or day in RHODE_ISLAND_PRECINCTS
                         else {
                             "WA": ".csv",
                             "FL": ".tsv",
                             "OH": ".xlsx",
-                            "TN": ".xlsx",
+                            "TN": ".pdf" if day < date(2020, 1, 1) else ".xlsx",
                             "RI": ".xlsx",
                             "GA": ".zip",
                         }.get(state, ".pdf")
@@ -982,6 +1007,40 @@ def parse() -> None:
                 .filter(~total)
                 .drop("count")
             )
+        elif state == "RI" and day in RHODE_ISLAND_PRECINCTS:
+            with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
+                gazetteer = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).filter(
+                    pl.col("USPS") == "RI"
+                )
+            towns = {}
+            for geoid, name in gazetteer.select("GEOID", "NAME").iter_rows():
+                towns.setdefault(elstats.plain(re.sub(elstats.SUFFIXES, "", name.lower())), geoid[:5])
+            data = path.read_bytes()
+            with tempfile.NamedTemporaryFile(suffix=".xlsx" if data[:2] == b"PK" else ".xls") as copy:
+                copy.write(data)
+                copy.flush()
+                sheet = fastexcel.read_excel(copy.name).load_sheet(0).to_polars()
+            sheet = sheet.rename(
+                {
+                    column: {"Precinct Name": "town", "City/Town": "town", "Contest Title": "office", "Contest": "office",
+                             "Office Title": "office", "Candidate Name": "answer", "Candidate": "answer"}[column]
+                    for column in sheet.columns
+                    if column in ("Precinct Name", "City/Town", "Contest Title", "Contest", "Office Title", "Candidate Name", "Candidate")
+                }
+            )
+            sheet = sheet.filter(pl.col("answer").str.contains("(?i)\\b(approve|reject)$"))
+            table = (
+                sheet.with_columns(votes=pl.col("Total").cast(pl.Int64), town=pl.col("town").str.replace(r"(\s+Limited)?(\s+\d+)?$", ""))
+                .filter(pl.col("town").n_unique().over("office") > 30)
+                .group_by("town", "office", "answer")
+                .agg(pl.col("votes").sum())
+                .select(
+                    fips=pl.col("town").map_elements(elstats.plain, return_dtype=pl.String).replace_strict(towns, default=None),
+                    office="office",
+                    answer=pl.col("answer").str.extract(r"(?i)(approve|reject)$").str.to_titlecase().replace({"Approve": "Approved", "Reject": "Rejected"}),
+                    votes=pl.col("votes").cast(pl.String),
+                )
+            )
         elif state == "RI":
             with zipfile.ZipFile(raw.cached(elstats.SOURCE, elstats.GAZETTEER).path) as archive:
                 gazetteer = pl.read_csv(archive.read(archive.namelist()[0]), separator="\t", infer_schema=False).filter(
@@ -1002,6 +1061,44 @@ def parse() -> None:
                 office=pl.col("Contest"),
                 answer=pl.col("Candidate").replace({"Approve": "Approved", "Reject": "Rejected"}),
                 votes=pl.col("Total").cast(pl.Int64).cast(pl.String),
+            )
+        elif state == "TN" and path.suffix == ".pdf":
+            records = []
+            text = subprocess.run(["pdftotext", "-layout", str(path), "-"], capture_output=True, text=True, check=True)
+            office = None
+            for number, page in enumerate(text.stdout.split("\f"), start=1):
+                for line in page.splitlines():
+                    if heading := re.fullmatch(r"\s*(Constitutional Amendment \d+)\s*", line):
+                        office = heading[1]
+                    elif office and (row := re.fullmatch(r"([A-Z][A-Za-z ]+?)\s+([\d,]+)\s+([\d,]+)", line.strip())):
+                        county = "Total" if row[1] == "STATEWIDE TOTALS" else row[1]
+                        if county == "Total" or elstats.plain(county) in names["TN"]:
+                            for answer, votes in zip(("YES", "NO"), (row[2], row[3]), strict=True):
+                                records.append((county, office, answer, votes, number))
+                        if county == "Total":
+                            office = None
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "page": pl.Int64,
+                },
+                orient="row",
+            ).with_columns(count=pl.col("votes").str.replace_all(",", "").cast(pl.Int64))
+            total = pl.col("county") == "Total"
+            table = (
+                table.filter(
+                    (pl.col("count").filter(total).sum() == pl.col("count").filter(~total).sum()).over(
+                        "office", "answer"
+                    )
+                    & (total.sum().over("office", "answer") == 1)
+                    & (pl.len().over("office", "answer") == 96)
+                )
+                .filter(~total)
+                .drop("count")
             )
         elif state == "TN":
             sheet = fastexcel.read_excel(path).load_sheet(0).to_polars()
@@ -1301,15 +1398,19 @@ def parse() -> None:
             for number, page in enumerate(text.stdout.split("\f"), start=1):
                 for line in page.splitlines():
                     if heading := re.fullmatch(
-                        r"\s*(Proposed Amendment No\. \d+|Amendment Number \d+|(?:Initiative|Referendum) Measure \d+)\s*",
+                        r"\s*(Proposed Amendment No\. \d+|Amendment Number \d+|(?:Initiative|Referendum) Measure [#]?\d+|Referendum No\. \d+)\s*",
                         line,
                     ):
-                        office = heading[1].replace("Number", "No.")
+                        office = heading[1].replace("Number", "No.").replace("#", "")
                     elif office:
                         for name, yes, no in re.findall(r"([A-Z][A-Za-z]*(?: [A-Za-z]+)*)\s+([\d,]+)\s+([\d,]+)", line):
                             county = "Total" if name.title() in ("Total", "Statewide Total") else name
                             if county == "Total" or elstats.plain(county) in names["NE"]:
-                                for answer, votes in zip(("FOR", "AGAINST"), (yes, no), strict=True):
+                                for answer, votes in zip(
+                                    ("RETAIN", "REPEAL") if office.startswith("Referendum No.") else ("FOR", "AGAINST"),
+                                    (yes, no),
+                                    strict=True,
+                                ):
                                     records.append((county, office, answer, votes, number))
                 office = None
             table = pl.DataFrame(
@@ -2067,9 +2168,12 @@ def parse() -> None:
                 title = None
                 lines = page.splitlines()
                 for index, line in enumerate(lines):
-                    if matched := re.fullmatch(r"\s*((?:Amendment|Proposition)\s+\w+)\s+(YES)\s+(NO)\s+Total\s*", line):
-                        title = matched[1]
-                    elif title and (matched := re.fullmatch(r"\s*(\S.*?)\s{2,}(\d+)\s+(\d+)\s+(\d+)\s*", line)):
+                    if matched := re.fullmatch(
+                        r"\s*((?:Amendment|Proposition)\s+\w+)\s+(YES)\s+(NO)\s+Total\s*|\s*((?:Constitutional )?(?:Amendment|Proposition) \w+)(?:\s+\d{1,2}/\d{1,2}/\d{4})?\s*",
+                        line,
+                    ):
+                        title = matched[1] or matched[4]
+                    elif title and (matched := re.fullmatch(r"\s*(\S.*?)\s{2,}([\d,]+)\s+([\d,]+)\s+([\d,]+)\s*", line)):
                         if matched[1].strip().upper() == "TOTAL":
                             title = None
                             continue
@@ -2326,6 +2430,7 @@ def emit() -> Path:
                    join contest_option o on o.k = v.option_k
                    where c.kind = 'ballot_question' and substr(p.iso_code, 4) = any(%s)
                      and split_part(x.value, ':', 2) = substr(p.iso_code, 4)
+                     and (s.publisher <> 'Missouri Secretary of State' or (select count(distinct w.unit_k) from result_value w where w.result_set_k = rs.k) = 1)
                    group by c.id, s.publisher, 1, 2, 3, 4, 5, 6, 7, 8, 9, 10""",
                 [list(REPLACED), list(DOCUMENTS)],
             ).fetchall(),
@@ -2373,7 +2478,7 @@ def emit() -> Path:
                 .when(pl.col("state") == "LA")
                 .then(pl.concat_str(pl.lit("amendment "), pl.col("office").str.extract(r"(?i)^CA No\. (\d+) ")))
                 .when(pl.col("state") == "RI")
-                .then(pl.concat_str(pl.lit("question "), pl.col("office").str.extract(r"^(\d+)\. ")))
+                .then(pl.concat_str(pl.lit("question "), pl.col("office").str.extract(r"(?i)^(?:question\s+)?(\d+)\b")))
                 .otherwise(
                     pl.concat_str(
                         pl.col("office").str.extract(TAG, 1).str.to_lowercase(),
@@ -2446,9 +2551,9 @@ def emit() -> Path:
         landed: dict[str, int] = {}
         for row in pairs.iter_rows(named=True):
             result_set = cs.key(f"{SOURCE}.result_set", f"{row['key']}:county")
-            if result_set not in cs.minted:
-                continue
             old = UUID(row["set"])
+            if result_set not in cs.minted and result_set != old:
+                continue
             outcomes = conn.execute(
                 "select option_id, kind, seats from outcome where result_set_id = %s", [old]
             ).fetchall()
@@ -2460,18 +2565,19 @@ def emit() -> Path:
                     f"{row['key']}: the document marks {row['winner']} as passing, unlike the recorded outcome, skipped"
                 )
                 continue
-            cs.add(
-                "result_set",
-                id=old,
-                election_id=UUID(row["election"]),
-                contest_id=UUID(row["contest"]),
-                stage=row["stage"],
-                kind=row["kind"],
-                source_id=UUID(row["source"]),
-                status="superseded",
-                is_default=False,
-                completeness=row["completeness"],
-            )
+            if result_set != old:
+                cs.add(
+                    "result_set",
+                    id=old,
+                    election_id=UUID(row["election"]),
+                    contest_id=UUID(row["contest"]),
+                    stage=row["stage"],
+                    kind=row["kind"],
+                    source_id=UUID(row["source"]),
+                    status="superseded",
+                    is_default=False,
+                    completeness=row["completeness"],
+                )
             cs.add(
                 "result_set",
                 id=result_set,
@@ -2482,7 +2588,9 @@ def emit() -> Path:
                 source_id=sources[row["state"]],
                 status="active",
                 is_default=True,
-                supersedes_id=old,
+                supersedes_id=old
+                if result_set != old
+                else conn.execute("select supersedes_id from result_set where id = %s", [old]).fetchone()[0],
                 completeness=1,
             )
             cs.add(
