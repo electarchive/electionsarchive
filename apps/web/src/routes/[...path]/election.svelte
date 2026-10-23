@@ -421,7 +421,10 @@
         total += row.seats ?? 0;
       }
       const loose = winners.filter(
-        (row) => row.party == null && row.key.startsWith("person:"),
+        (row) =>
+          row.party == null &&
+          row.isIndependent === true &&
+          row.key.startsWith("person:"),
       );
       let unaffiliated = 0;
       for (const row of loose) {

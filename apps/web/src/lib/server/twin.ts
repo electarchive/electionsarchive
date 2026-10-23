@@ -750,7 +750,9 @@ function polityMarkdown(
           const parties = point.parties
             .toSorted((a, b) => b.seats - a.seats)
             .map((row) => ({
-              label: labels.get(row.party ?? "") ?? m.person_parties_none(),
+              label:
+                labels.get(row.party ?? "") ??
+                (series.isOffice ? null : m.record_none()),
               seats: row.seats,
             }));
           return [

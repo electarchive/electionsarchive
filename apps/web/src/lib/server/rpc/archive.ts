@@ -965,6 +965,7 @@ async function load(
     seats: number | null;
     alliance: string | null;
     is_line: boolean;
+    independent: boolean;
   }>(sql`
     select o.k, o.contest_id as contest, o.kind::text, coalesce(pm.into_id, o.party_id, (
         select coalesce(mm.into_id, cy.member_of_party_id, ta.party_id, nm.party_id, nb.party)
@@ -1005,6 +1006,7 @@ async function load(
         limit 1
       )) as party, o.ballot_label as label,
       o.alliance_id as alliance, o.parent_option_id is not null as is_line,
+      exists (select from candidacy cy where cy.option_id = o.id and cy.role = 'head' and cy.is_independent) as independent,
       (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
@@ -1235,6 +1237,7 @@ async function load(
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
             note: row.note,
+            isIndependent: row.independent,
             seats: row.seats,
             alliance:
               row.alliance == null
@@ -6817,6 +6820,7 @@ async function races(
             seats,
             isWon: ["elected", "won"].includes(String(lead?.cell.outcome)),
             isLost: lead?.cell.outcome === "lost",
+            isIndependent: members.every((row) => row.cell.isIndependent),
           };
         })
         .filter((row) => !row.key.startsWith("kind:") || row.votes > 0)
@@ -7293,6 +7297,7 @@ export const elections = {
                 seats: v.nullable(v.number()),
                 isWon: v.optional(v.boolean()),
                 isLost: v.optional(v.boolean()),
+                isIndependent: v.optional(v.boolean()),
                 photo: Photo,
               }),
             ),
@@ -8548,7 +8553,7 @@ export const elections = {
         region: string;
         scheme: string;
         party: string | null;
-        isCandidate: boolean;
+        isIndependent: boolean;
         seats: number;
       }>(sql`
         with recursive tree(id) as (
@@ -8580,7 +8585,7 @@ export const elections = {
           where not exists (select from contest k where k.allocation_parent_id = g.id)
         ),
         winners as materialized (
-          select l.id as leaf, l.root, o.id, o.party_id, o.alliance_id, o.kind = 'candidate' as candidate, max(coalesce(x.seats, 1))::int as seats
+          select l.id as leaf, l.root, o.id, o.party_id, o.alliance_id, o.kind = 'candidate' and exists (select from candidacy cd where cd.option_id = o.id and cd.is_independent) as independent, max(coalesce(x.seats, 1))::int as seats
           from leaves l
           join result_set rs on rs.contest_id = l.id and rs.is_default
           join outcome x on x.result_set_id = rs.id and x.candidacy_id is null and x.kind in ('elected', 'won')
@@ -8616,7 +8621,7 @@ export const elections = {
             order by z.valid_from desc nulls last limit 1) as size,
           w.leaf, up.area as region, a.scheme_code as scheme,
           coalesce(bm.into_id, br.parent_party_id, pm.into_id, w.party_id, ld.party_id, w.alliance_id) as party,
-          w.candidate as "isCandidate", w.seats
+          w.independent as "isIndependent", w.seats
         from winners w
         join roots r on r.id = w.root
         join up on up.leaf = w.leaf
@@ -8744,7 +8749,7 @@ export const elections = {
             .map(([region, rows]) => {
               const tally = Map.groupBy(
                 rows,
-                (row) => row.party ?? (row.isCandidate ? "independent" : ""),
+                (row) => row.party ?? (row.isIndependent ? "independent" : ""),
               )
                 .entries()
                 .map(([party, group]) => {

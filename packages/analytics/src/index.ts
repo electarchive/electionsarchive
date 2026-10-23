@@ -14,6 +14,7 @@ export type Option = {
   votes: number;
   outcome: string | null;
   note?: string | null;
+  isIndependent?: boolean;
   seats: number | null;
   alliance: { id: string; label: string; anchor: string | null } | null;
   line: string | null;
@@ -40,6 +41,7 @@ export type Cell = {
   share: number;
   outcome: string | null;
   note: string | null;
+  isIndependent: boolean;
   seats: number | null;
   lines: Array<{ label: string; votes: number }>;
 };
@@ -108,6 +110,7 @@ function tally(side: Side, identify: (option: Option) => string) {
           share: 0,
           outcome: option.outcome,
           note: option.note ?? null,
+          isIndependent: option.isIndependent ?? false,
           seats: option.seats,
           lines: [],
         },
@@ -119,6 +122,7 @@ function tally(side: Side, identify: (option: Option) => string) {
     group.cell.votes += option.votes;
     group.cell.outcome ??= option.outcome;
     group.cell.note ??= option.note ?? null;
+    group.cell.isIndependent &&= option.isIndependent ?? false;
     if (option.seats != null) {
       group.cell.seats = (group.cell.seats ?? 0) + option.seats;
     }
