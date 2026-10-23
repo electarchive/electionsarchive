@@ -17,7 +17,7 @@ SOURCE = "br.tse_history"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 TSE = "https://cdn.tse.jus.br/estatistica/sead/odsele/"
-YEARS = (1994, 1998, 2002, 2006, 2010, 2014, 2018)
+YEARS = (1994, 1998, 2002, 2006, 2010, 2014, 2018, 2026)
 FILES = {
     (year, kind): f"{TSE}{folder}/{folder}_{year}.zip"
     for year in YEARS
@@ -38,7 +38,8 @@ DROPPED = {
         "November 2020. Her votes are missing here."
     )
 }
-SENATORS = {1994: 2, 1998: 1, 2002: 2, 2006: 1, 2010: 2, 2014: 1, 2018: 2}
+SENATORS = {1994: 2, 1998: 1, 2002: 2, 2006: 1, 2010: 2, 2014: 1, 2018: 2, 2026: 2}
+SCHEDULED = {2026: date(2026, 10, 25)}
 ASSEMBLIES = {
     "DF": ("Legislative Chamber of the Federal District", "Câmara Legislativa do Distrito Federal"),
 }
@@ -87,7 +88,11 @@ def scan(year: int, kind: str) -> pl.LazyFrame:
         member = next(name for name in archive.namelist() if name.endswith("_BRASIL.csv"))
         with archive.open(member) as source, (PARSED / member).open("w", encoding="utf-8") as target:
             shutil.copyfileobj(io.TextIOWrapper(source, encoding="latin-1"), target, 16 << 20)
-    return pl.scan_csv(PARSED / member, separator=";", infer_schema=False)
+    frame = pl.scan_csv(PARSED / member, separator=";", infer_schema=False)
+    present = frame.collect_schema().names()
+    return frame.with_columns(
+        pl.lit(None, pl.String).alias(column) for column in ("NR_FEDERACAO", "NM_FEDERACAO") if column not in present
+    )
 
 
 def parse() -> None:
@@ -151,11 +156,17 @@ def parse() -> None:
                 party_number="NR_PARTIDO",
                 party_abbreviation=pl.col("SG_PARTIDO").str.strip_chars(),
                 party_label="NM_PARTIDO",
-                coalition=pl.when(pl.col("TP_AGREMIACAO").str.to_uppercase() == "COLIGAÇÃO").then(
-                    pl.concat_str(pl.lit(str(year)), "SQ_COLIGACAO", separator=":")
+                coalition=pl.when(pl.col("TP_AGREMIACAO").str.to_uppercase().is_in(["COLIGAÇÃO", "FEDERAÇÃO"])).then(
+                    pl.when(pl.col("TP_AGREMIACAO").str.to_uppercase() == "FEDERAÇÃO")
+                    .then(pl.concat_str(pl.lit(f"{year}:F"), "NR_FEDERACAO"))
+                    .otherwise(pl.concat_str(pl.lit(str(year)), "SQ_COLIGACAO", separator=":"))
                 ),
-                coalition_label="NM_COLIGACAO",
-                coalition_members="DS_COMPOSICAO_COLIGACAO",
+                coalition_label=pl.when(pl.col("TP_AGREMIACAO").str.to_uppercase() == "FEDERAÇÃO")
+                .then(pl.col("NM_FEDERACAO"))
+                .otherwise(pl.col("NM_COLIGACAO")),
+                coalition_members=pl.col("DS_COMPOSICAO_COLIGACAO").str.replace_all(
+                    r"FEDERAÇÃO[^(/]*\(([^)]*)\)", "$1"
+                ),
                 status="DS_SIT_TOT_TURNO",
                 situation="DS_SITUACAO_CANDIDATURA",
             )
@@ -194,8 +205,12 @@ def parse() -> None:
                 votes=pl.col(legend).cast(pl.Int64).sum(),
                 party_abbreviation=pl.col("SG_PARTIDO").str.strip_chars().first(),
                 party_label=pl.col("NM_PARTIDO").first(),
-                coalition=pl.when(pl.col("TP_AGREMIACAO").str.to_uppercase() == "COLIGAÇÃO")
-                .then(pl.concat_str(pl.lit(str(year)), "SQ_COLIGACAO", separator=":"))
+                coalition=pl.when(pl.col("TP_AGREMIACAO").str.to_uppercase().is_in(["COLIGAÇÃO", "FEDERAÇÃO"]))
+                .then(
+                    pl.when(pl.col("TP_AGREMIACAO").str.to_uppercase() == "FEDERAÇÃO")
+                    .then(pl.concat_str(pl.lit(f"{year}:F"), "NR_FEDERACAO"))
+                    .otherwise(pl.concat_str(pl.lit(str(year)), "SQ_COLIGACAO", separator=":"))
+                )
                 .first(),
             )
             .collect()
@@ -222,7 +237,7 @@ def parse() -> None:
 
     totals = votes.group_by("contest", "candidate").agg(pl.col("valid").sum())
     race = pl.col("contest").str.replace(r"^(\d+):\d:", "$1:")
-    runoffs = candidates.filter(pl.col("round") == "2").select(race=race).unique()
+    runoffs = candidates.filter((pl.col("round") == "2") | (pl.col("outcome") == "advanced")).select(race=race).unique()
     rank = pl.col("votes").rank("ordinal", descending=True).over("contest")
     majority = (
         candidates.filter(pl.col("office").is_in(["president", "governor", "senate"]))
@@ -299,6 +314,17 @@ def parse() -> None:
             f"candidate totals fall short of the valid nominal votes: {excess.filter(pl.col('excess') < 0)}"
         )
 
+    pending = candidates.filter(
+        (pl.col("round") == "1") & (pl.col("outcome") == "advanced") & pl.col("year").is_in(list(SCHEDULED))
+    )
+    candidates = pl.concat(
+        [
+            candidates,
+            pending.with_columns(
+                contest=pl.col("contest").str.replace(r"^(\d+):1:", "$1:2:"), round=pl.lit("2"), outcome=pl.lit(None)
+            ).join(candidates, on=["contest", "candidate"], how="anti"),
+        ]
+    )
     candidates.write_parquet(PARSED / "candidates.parquet")
     votes.write_parquet(PARSED / "votes.parquet")
     legends.write_parquet(PARSED / "legends.parquet")
@@ -320,8 +346,8 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary=(
-                "Brazil's general elections from 1994 to 2018 by municipality: president, governors, senators, "
-                "federal deputies, and state deputies"
+                "Brazil's general elections from 1994 to 2018 and in 2026 by municipality: president, governors, "
+                "senators, federal deputies, and state deputies"
             ),
             polity="BR",
         )
@@ -387,6 +413,7 @@ def emit() -> Path:
         systems: dict[str, UUID] = {}
         for key, rules, label, methodology in (
             ("presidential-two-round", None, None, None),
+            ("chamber-open-list", None, None, None),
             ("governor-two-round", {"formula": "two_round"}, "Brazilian gubernatorial two-round system", GOVERNOR),
             ("senate-plurality", {"formula": "block"}, "Brazilian Senate plurality system", SENATE),
             (
@@ -413,6 +440,7 @@ def emit() -> Path:
         cycles: dict[int, UUID] = {}
         dates: dict[str, date] = {}
         for year, first, last in days.sort("year").iter_rows():
+            last = SCHEDULED.get(year, last)
             cycles[year] = cs.key("br.election", f"{first}:general-elections")
             cs.add(
                 "election",
@@ -438,7 +466,7 @@ def emit() -> Path:
                     kind=stage,
                     date_from=day,
                     date_to=day,
-                    status="held",
+                    status="scheduled" if round == "2" and year in SCHEDULED else "held",
                 )
                 name(rounds[code], f"{year} Brazilian general election, {ordinal} round", "en")
                 cs.add("slug", path=f"br/{day}-{stage}", entity_id=rounds[code])
@@ -551,6 +579,7 @@ def emit() -> Path:
         options: dict[str, str] = {}
         result_sets: dict[str, str] = {}
         contests: dict[str, UUID] = {}
+        tallied = set(detail["contest"].unique())
         for code in sorted(candidates["contest"].unique()):
             year, round, cargo, uf = code.split(":")
             office = OFFICES[cargo]
@@ -590,7 +619,9 @@ def emit() -> Path:
                 1 if office in ("president", "governor") else SENATORS[int(year)] if office == "senate" else elected
             )
             override = None
-            if office in ("chamber", "assembly") and year != "2018":
+            if office in ("chamber", "assembly") and int(year) in SCHEDULED:
+                override = {"threshold": {"percent": 80 / magnitude, "level": "list"}}
+            elif office in ("chamber", "assembly") and year != "2018":
                 counted, blank = totals[code]
                 share = (counted + blank) / counted if year == "1994" else 1
                 override = {"threshold": {"percent": float(f"{100 * share / magnitude:.6f}"), "level": "list"}}
@@ -620,6 +651,8 @@ def emit() -> Path:
                     if office == "governor"
                     else "senate-plurality"
                     if office == "senate"
+                    else "chamber-open-list"
+                    if int(year) in SCHEDULED
                     else "open-list-2018"
                     if year == "2018"
                     else "open-list-quotient"
@@ -633,20 +666,21 @@ def emit() -> Path:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=EXCESS.format(excess=f"{excess[code]:,}"))
             if code in DROPPED:
                 cs.add("note", entity_id=contest, kind="caveat", body_md=DROPPED[code])
-            result_set = cs.key(f"{SOURCE}.result_set", key)
-            cs.add(
-                "result_set",
-                id=result_set,
-                election_id=rounds[f"{year}:{round}"],
-                contest_id=contest,
-                stage="official",
-                kind="counted",
-                status="active",
-                source_id=results[int(year)],
-                is_default=True,
-                completeness=1,
-            )
-            if result_set in cs.minted:
+            result_set = cs.key(f"{SOURCE}.result_set", key) if code in tallied else None
+            if result_set is not None:
+                cs.add(
+                    "result_set",
+                    id=result_set,
+                    election_id=rounds[f"{year}:{round}"],
+                    contest_id=contest,
+                    stage="official",
+                    kind="counted",
+                    status="active",
+                    source_id=results[int(year)],
+                    is_default=True,
+                    completeness=1,
+                )
+            if result_set is not None and result_set in cs.minted:
                 result_sets[code] = str(result_set)
 
             lists: dict[str, UUID] = {}

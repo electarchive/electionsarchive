@@ -8,6 +8,7 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.names import initials
 from ea.sources.us.ak_dor import CONTESTS as RANKED_ROUNDS
 from ea.store import DATA, connect
 
@@ -153,6 +154,17 @@ CORRECTED = {
     398410: (2819, "l"),
     321600: (2086, "withdrew"),
 }
+RELOCATED = {caseid: ("29", "2838", "harri anne") for caseid in (335434, 335435, 335436)}
+OUTCOMES = {335434: "w", 335435: "w", 335436: "w", 335475: "l", 335476: "l", 335477: "l"}
+RETIRED = {
+    (
+        "us.option",
+        "2014-11-04:AL:senate:24:g:335434",
+    ): "Harri Anne Smith ran in Senate District 29, not 24 (Alabama SOS "
+    "certified 2014 general results); the Klarner line filed under District 24 was moved to District 29.",
+    ("us.candidacy", "2014-11-04:AL:senate:24:g:335434:head"): "Harri Anne Smith ran in Senate District 29, not 24 "
+    "(Alabama SOS certified 2014 general results); the Klarner line filed under District 24 was moved to District 29.",
+}
 WITHDREW = {
     321600: 'Withdrew from the July 15 runoff on June 12, 2014, leaving David Faulkner the nominee (al.com, "Steve '
     'French drops out of Alabama House District 46 race, will support David Faulkner," June 12, 2014).'
@@ -195,10 +207,22 @@ def parse() -> None:
                 return_dtype=pl.Int64,
             ),
             outcome=pl.col("caseid").replace_strict(
-                {caseid: outcome for caseid, (_, outcome) in CORRECTED.items()},
+                {caseid: outcome for caseid, (_, outcome) in CORRECTED.items()} | OUTCOMES,
                 default=pl.col("outcome"),
                 return_dtype=pl.String,
             ),
+        )
+        .with_columns(
+            *(
+                pl.col("caseid")
+                .replace_strict(
+                    {caseid: fields[index] for caseid, fields in RELOCATED.items()},
+                    default=pl.col(column),
+                    return_dtype=pl.String,
+                )
+                .alias(column)
+                for index, column in enumerate(("dno", "candid", "first"))
+            )
         )
     )
     lines = (
@@ -397,6 +421,8 @@ def emit() -> Path:
                 return "runoff", "runoff" if label == "election" else f"{label} runoff", scope, True
             return kind, label, scope, False
 
+        principals = {cs.key("us.party", "democratic-party"), cs.key("us.party", "republican-party")}
+
         def party(sab: str, label: str | None, partyz: str) -> tuple[UUID | None, bool]:
             if partyz == "d" and label not in STATE_PARTIES:
                 return cs.key("us.party", "democratic-party"), False
@@ -431,7 +457,7 @@ def emit() -> Path:
         def person_name(row: dict[str, object]) -> str:
             first, middle, last, suffix = (row[column] for column in ("first", "middle", "last", "suffix"))
             if not isinstance(last, str):
-                return title(str(row["cand"]))
+                return initials(title(str(row["cand"])))
             parts = [
                 title(first) if isinstance(first, str) else None,
                 (title(middle) + ("." if len(middle) == 1 else "")) if isinstance(middle, str) else None,
@@ -440,7 +466,7 @@ def emit() -> Path:
             text = " ".join(part for part in parts if part)
             if isinstance(suffix, str):
                 text += f", {SUFFIXES.get(suffix, suffix.upper())}"
-            return text
+            return initials(text)
 
         days: dict[tuple[str, int, int, int | None, str], tuple[str, date, str]] = {}
         dated = (
@@ -710,7 +736,7 @@ def emit() -> Path:
             first = cs.key(f"{SOURCE}.result_set", contest_key)
             result_set = (
                 cs.key(f"{SOURCE}.result_set", f"{contest_key}:2")
-                if first not in cs.minted and group["caseid"].is_in(list(CORRECTED)).any()
+                if first not in cs.minted and group["caseid"].is_in([*CORRECTED, *OUTCOMES]).any()
                 else first
             )
             if result_set != first:
@@ -755,13 +781,24 @@ def emit() -> Path:
                 labels = [(label, partyz) for label, partyz in rows.select("party", "partyz").iter_rows()]
                 resolved = [party(sab, label, partyz) for label, partyz in labels]
                 ballot = "Scattered write-ins" if scattered else person_name(row)
+                majors = {id for id, _ in resolved if id in principals}
+                named = [(votes or 0, id) for (id, _), votes in zip(resolved, rows["votes"], strict=True) if id]
+                principal = (
+                    resolved[0][0]
+                    if len(rows) == 1
+                    else next(iter(majors))
+                    if len(majors) == 1
+                    else max(named)[1]
+                    if named
+                    else None
+                )
                 if root in cs.minted or root in published:
                     cs.add(
                         "contest_option",
                         id=root,
                         contest_id=contest,
                         kind="write_in" if write_in else "candidate",
-                        party_id=published.get(root, resolved[0][0] if len(rows) == 1 else None),
+                        party_id=published.get(root) or principal if len(rows) > 1 else published.get(root, principal),
                         ballot_label=ballot,
                     )
                 if not scattered and (
@@ -831,4 +868,11 @@ def emit() -> Path:
                 flags=pl.lit(0, pl.Int16),
             ),
         )
+        for (scheme, value), reason in RETIRED.items():
+            if (scheme, value) in conn.execute(
+                """select x.scheme, x.value from external_id x join entity e on e.id = x.entity_id
+                   where x.scheme = %s and x.value = %s and e.retired_by is null""",
+                [scheme, value],
+            ).fetchall():
+                cs.add("entity_retirement", entity_id=cs.key(scheme, value), reason=reason)
         return cs.write()

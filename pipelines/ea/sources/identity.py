@@ -6,6 +6,7 @@ from itertools import pairwise
 from pathlib import Path
 from uuid import UUID
 
+from ea import names
 from ea.changeset import Changeset
 from ea.store import connect
 
@@ -826,4 +827,35 @@ def emit() -> Path:
                 **dict(zip(("id", "entity_id", "text", "lang", "script", "kind", "source_id"), row, strict=True)),
                 is_preferred=False,
             )
+        columns = ("id", "entity_id", "text", "lang", "script", "kind", "source_id")
+        fuller: set[UUID] = set()
+        for row in conn.execute(
+            """select distinct on (p.id) p.id, p.entity_id, p.text, p.lang, p.script, p.kind, p.source_id,
+                      f.id, f.entity_id, f.text, f.lang, f.script, f.kind, f.source_id
+               from name p join entity e on e.id = p.entity_id and e.type = 'person'
+               join name f on f.entity_id = p.entity_id and f.lang = p.lang and not f.is_preferred
+                 and f.valid_from is null and f.valid_to is null and f.text ~ ' ' and f.text ilike '%% ' || p.text
+               where p.is_preferred and p.text !~ ' ' and p.valid_from is null and p.valid_to is null
+               order by p.id, length(f.text) desc""",
+        ).fetchall():
+            cs.add("name", **dict(zip(columns, row[:7], strict=True)), is_preferred=False)
+            cs.add("name", **dict(zip(columns, row[7:], strict=True)), is_preferred=True)
+            fuller.add(row[1])
+        for entity, text, lang, script, kind, source in conn.execute(
+            """select n.entity_id, n.text, n.lang, n.script, n.kind, n.source_id from name n
+               join entity e on e.id = n.entity_id and e.type = 'person'
+               where n.is_preferred and n.valid_from is null and n.valid_to is null
+                 and n.text ~ '(^|[[:space:]])[A-Z][[:space:]]'"""
+        ).fetchall():
+            if entity not in fuller and (fixed := names.initials(text)) != text:
+                cs.add(
+                    "name",
+                    entity_id=entity,
+                    text=fixed,
+                    lang=lang,
+                    script=script,
+                    kind=kind,
+                    source_id=source,
+                    is_preferred=True,
+                )
         return cs.write()

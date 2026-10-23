@@ -14,6 +14,7 @@ from psycopg.types.range import Range
 
 from ea import names, raw
 from ea.changeset import Changeset, slug
+from ea.names import initials
 from ea.sources import thea
 from ea.sources.us.clerk import LEGISLATORS, STATES, plain
 from ea.store import DATA, connect
@@ -691,7 +692,7 @@ def emit() -> Path:
                 else:
                     people.setdefault(person_of(row), []).append(row)
             found = list(people)
-            labels = {person: lines[0]["member_name"] or lines[0]["name"] for person, lines in people.items()}
+            labels = {person: initials(lines[0]["member_name"] or lines[0]["name"]) for person, lines in people.items()}
             before = {person: list(lines) for person, lines in people.items()}
             folded = names.fold(
                 [people[person][0]["name"] for person in found],
