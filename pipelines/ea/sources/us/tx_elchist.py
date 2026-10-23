@@ -13,7 +13,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.tx_elchist"
-VERSION = "3"
+VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://elections.sos.state.tx.us/"
 STATEWIDE = re.compile(
@@ -23,7 +23,8 @@ STATEWIDE = re.compile(
     r"|Judge, Court of Criminal Appeals Place \d)( - Unexpired Term)?$"
 )
 HOUSE = re.compile(r"^U\. ?S\. Representative District (\d+)$")
-HOUSES = (56, 57, 72)
+HOUSES = (56, 57, 72, 319)
+LEGISLATURE = re.compile(r"^State (Senator|Representative),? District (\d+)$")
 PUBLISHER = "Texas Secretary of State"
 TITLE = "Texas election history: statewide returns by county, 1992–1998"
 LATER = "Texas election history: statewide returns by county, 2000–2014"
@@ -96,6 +97,7 @@ PRIMARIES = (
     173,
     174,
 )
+PAGES = (*((election, HOUSE) for election in HOUSES), *((election, LEGISLATURE) for election in GENERALS))
 
 
 def races(election: int) -> list[tuple[int, str]]:
@@ -108,7 +110,7 @@ def races(election: int) -> list[tuple[int, str]]:
 
 def fetch() -> None:
     raw.fetch(SOURCE, f"{SITE}index.htm", suffix=".htm")
-    for election in (*ELECTIONS, *PRIMARIES, *GENERALS):
+    for election in dict.fromkeys((*ELECTIONS, *PRIMARIES, *GENERALS, *HOUSES)):
         raw.fetch(SOURCE, f"{SITE}elchist{election}_raceselect.htm", suffix=".htm")
         time.sleep(1)
         for race, title in races(election):
@@ -119,9 +121,9 @@ def fetch() -> None:
                 except LookupError:
                     raw.fetch(SOURCE, url, suffix=".htm")
                     time.sleep(1)
-    for election in HOUSES:
+    for election, pattern in PAGES:
         for race, title in races(election):
-            if HOUSE.match(title):
+            if pattern.match(title):
                 url = f"{SITE}elchist{election}_race{race}.htm"
                 try:
                     raw.cached(SOURCE, url)
@@ -192,9 +194,9 @@ def parse() -> None:
                     for row, value in zip(counties, votes, strict=True)
                 )
     house: list[dict[str, object]] = []
-    for election in HOUSES:
+    for election, pattern in PAGES:
         for race, title in races(election):
-            district = HOUSE.match(title)
+            district = pattern.match(title)
             if district is None:
                 continue
             text = raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm").path.read_text(errors="replace")
@@ -222,7 +224,10 @@ def parse() -> None:
                     {
                         "election": election,
                         "day": date(int(stamp[3]), int(stamp[1]), int(stamp[2])),
-                        "district": int(district[1]),
+                        "chamber": "house"
+                        if pattern is HOUSE
+                        else f"{'senate' if district[1] == 'Senator' else 'house'}:{int(district[2])}:g",
+                        "district": int(district[1]) if pattern is HOUSE else None,
                         "candidate": candidate,
                         "party": headers[-1][column],
                         "county": row[0],
@@ -631,9 +636,9 @@ def emit() -> Path:
             filled += 1
         print(filled, "contests filled")
         house = pl.read_parquet(PARSED / "house.parquet")
-        for election in HOUSES:
+        for election, pattern in PAGES:
             for race, title in races(election):
-                if HOUSE.match(title):
+                if pattern.match(title):
                     cs.artifact(raw.cached(SOURCE, f"{SITE}elchist{election}_race{race}.htm"), source)
         codes: dict[str, str] = {
             plain(text): code
@@ -647,7 +652,7 @@ def emit() -> Path:
             conn,
             house.select(
                 year=pl.col("day").dt.year(),
-                chamber=pl.lit("house"),
+                chamber="chamber",
                 day="day",
                 special=pl.lit(False),
                 state=pl.lit("TX"),
