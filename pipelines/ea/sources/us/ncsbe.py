@@ -159,6 +159,7 @@ def emit() -> Path:
                    join external_id x on x.entity_id = r.contest_id and x.scheme = 'us.contest'
                    join changeset c on c.id = r.changeset_id
                    where r.status = 'active' and c.pipeline <> %s and x.value ~ ':NC:(house|senate):[0-9]+:g$'
+                     and coalesce(r.completeness, 1) >= 0.98
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
                                    and u.scheme_code in ('us.county', 'us.county_part', 'us.precinct'))""",
