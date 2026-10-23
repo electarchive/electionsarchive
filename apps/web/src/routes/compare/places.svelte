@@ -55,13 +55,9 @@
         const rows = series.points.map((point) => ({
           ...point,
           margins: point.sides.map((side) => {
-            if (side.length === 0 || first == null || second == null) {
-              return null;
-            }
-            return (
-              (side.find((entry) => entry.key === first.key)?.share ?? 0) -
-              (side.find((entry) => entry.key === second.key)?.share ?? 0)
-            );
+            const one = side.find((entry) => entry.key === first?.key);
+            const two = side.find((entry) => entry.key === second?.key);
+            return one == null || two == null ? null : one.share - two.share;
           }),
         }));
         const reach = Math.max(

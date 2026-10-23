@@ -116,7 +116,9 @@
                     height="36"
                   />
                 {/if}
-                <span class="truncate font-semibold">{hit.name}</span>
+                <span class="line-clamp-2 font-semibold text-pretty"
+                  >{hit.name}</span
+                >
                 {#if hit.context != null || hit.date != null}
                   <span
                     class="col-start-2 truncate text-[0.8125rem] text-muted-foreground"

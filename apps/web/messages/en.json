@@ -895,7 +895,7 @@
   "versus_head_lede": "Contests both candidates ran in.",
   "versus_head_none": "They never ran in the same contest.",
   "versus_shares_title": "Vote share over time",
-  "versus_shares_lede": "Includes every race where either person received votes. Filled marks are wins, hollow marks are losses, and faded marks are primaries. Lines join general elections only.",
+  "versus_shares_lede": "Includes every popular vote where either person received votes. Filled marks are wins, hollow marks are losses, and faded marks are primaries. Lines join the first rounds of general elections only.",
   "versus_action": "Compare",
   "versus_even": "Even",
   "governments_title": "Governments",

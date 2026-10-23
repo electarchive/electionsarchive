@@ -37,7 +37,10 @@
             Date.UTC(Number(entry.date.slice(0, 4)), 0, 1)) /
             31_622_400_000,
         share:
-          entry.votes == null || entry.total == null || entry.total === 0
+          entry.kind === "indirect" ||
+          entry.votes == null ||
+          entry.total == null ||
+          entry.total === 0
             ? null
             : entry.votes / entry.total,
         isWon:
@@ -50,10 +53,18 @@
         ),
       }));
       const years = marks.map((mark) => mark.year);
+      const elections = [
+        ...Map.groupBy(marks, (mark) => mark.election).values(),
+      ];
       return {
         ...person,
         marks,
-        won: marks.filter((mark) => mark.isWon).length,
+        ran: elections.length,
+        won: elections.filter((group) =>
+          group.some(
+            (mark) => mark.outcome === "elected" || mark.outcome === "won",
+          ),
+        ).length,
         span:
           years.length === 0
             ? "–"
@@ -179,9 +190,20 @@
             color={swatch(side.party.color, `party:${side.party.id}`)}
             party={side.party.id}
           />
+        {:else if side.isIndependent}
+          <span class="text-[0.8125rem] font-semibold"
+            >{m.person_parties_none()}</span
+          >
+        {/if}
+        {#if side.caucus != null}
+          <span class="text-[0.8125rem] text-muted-foreground"
+            >{m.person_caucus({
+              caucus: side.caucus.short ?? side.caucus.label,
+            })}</span
+          >
         {/if}
         <span class="flex flex-wrap gap-x-4 gap-y-1.5">
-          {#each [[m.person_ran(), count(side.marks.length)], [m.person_won(), count(side.won)], [m.person_years(), side.span]] as [label, value] (label)}
+          {#each [[m.person_ran(), count(side.ran)], [m.person_won(), count(side.won)], [m.person_years(), side.span]] as [label, value] (label)}
             <span class="grid gap-0.5">
               <span class="text-xs text-muted-foreground">{label}</span>
               <span
@@ -300,7 +322,12 @@
         {#each sides as side, index (side.id)}
           <polyline
             points={side.marks
-              .filter((mark) => mark.share != null && mark.kind !== "primary")
+              .filter(
+                (mark) =>
+                  mark.share != null &&
+                  mark.kind !== "primary" &&
+                  mark.kind !== "runoff",
+              )
               .toSorted((a, b) => a.at - b.at)
               .map((mark) => `${sx(mark.at)},${sy(mark.share ?? 0)}`)
               .join(" ")}

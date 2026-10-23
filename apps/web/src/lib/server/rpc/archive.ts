@@ -10068,7 +10068,7 @@ export const polities = {
                       ],
                 )
                 .toSorted((first, second) => second.share - first.share)
-                .slice(0, 4);
+                .slice(0, 8);
         }),
       }));
       const parties = await refs(
@@ -11079,7 +11079,7 @@ export const people = {
           order by rs.contest_id, rs.is_default desc, array_position(${STAGES}, rs.stage), rs.completeness desc nulls last
         ),
         fetched as (
-          select p.root, r.* from picked p cross join lateral (
+          select p.root, p.k as rk, r.* from picked p cross join lateral (
             select r.option_k as option, r.measure, r.value::float8 as value, r.count_round,
               min(r.count_round) over (partition by r.measure) as first,
               max(r.count_round) over (partition by r.measure) as last
@@ -11089,9 +11089,9 @@ export const people = {
           ) r
         ),
         rounds as (
-          select f.root, f.measure,
+          select f.root, f.rk, f.measure,
             case when bool_or(f.count_round = f.last and f.value > 0 and f.option in (select k from lines)) then max(f.last) else min(f.first) end as round
-          from fetched f group by f.root, f.measure
+          from fetched f group by f.root, f.rk, f.measure
         ),
         mains as (
           select root, (${COUNTED})[min(array_position(${COUNTED}, measure))] as main,
@@ -11102,7 +11102,7 @@ export const people = {
           select f.root, m.main, m.appointed, sum(f.value) as total,
             coalesce(sum(f.value) filter (where f.option in (select k from lines)), 0) as votes
           from fetched f join mains m on m.root = f.root and m.main = f.measure
-            join rounds d on d.root = f.root and d.measure = f.measure
+            join rounds d on d.root = f.root and d.rk = f.rk and d.measure = f.measure
           where f.count_round = d.round and f.option <> 0
           group by f.root, m.main, m.appointed
         )
@@ -12421,11 +12421,31 @@ export const search = {
         "u.s.": "united states",
         "u.k.": "united kingdom",
         eu: "european union",
+        nyc: "new york city",
+        dc: "district of columbia",
       };
-      const q = input.q.replace(
-        /^(?:great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu)(?=\s|$)/iu,
-        (word) => ALIASES[word.toLowerCase()] ?? word,
-      );
+      const district = /^([a-z]{2})[-\s]?(\d{1,2}|al)$/iu.exec(input.q);
+      const states =
+        district == null
+          ? null
+          : await db.execute<{ name: string }>(sql`
+            select n.text as name from polity p join name n on n.entity_id = p.id and n.kind = 'official'
+            where p.iso_code = ${`US-${district[1]?.toUpperCase() ?? ""}`}
+            order by n.is_preferred desc limit 1
+          `);
+      const state = states?.rows[0]?.name;
+      const seat = Number(district?.[2]);
+      const q =
+        state == null
+          ? input.q.replace(
+              /^(?:great britain|u\.s\.|u\.k\.|uk|gb|britain|usa|us|eu|nyc|dc)(?=\s|$)/iu,
+              (word) => ALIASES[word.toLowerCase()] ?? word,
+            )
+          : `${state}'s ${
+              Number.isNaN(seat)
+                ? "at-large"
+                : `${seat}${{ one: "st", two: "nd", few: "rd", other: "th", zero: "th", many: "th" }[new Intl.PluralRules("en", { type: "ordinal" }).select(seat)]}`
+            } congressional district`;
       const chambers = db.execute<{
         id: string;
         polity: string;
@@ -12531,6 +12551,8 @@ export const search = {
                 join contest c on c.id = o.contest_id join election e on e.id = c.election_id
                 where cy.person_id = t.entity_id), 0)
               when t.polity_id is not null then coalesce((
+                select case when y.kind in ('sovereign_state', 'supranational') then 0.3 when y.kind = 'federal_unit' then 0.25 end
+                from polity y where y.id = t.polity_id), (
                 select least(0.3, greatest(0, 0.1 * (log(max(g.population)) - 4)))
                 from coverage_government g where g.polity_id = t.polity_id), 0)
               else 0
