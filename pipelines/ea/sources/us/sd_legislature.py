@@ -23,16 +23,20 @@ WIDE = {
     "2002/2002_legislature_official_returns.aspx": date(2002, 11, 5),
     "2004/2004_legislature_official_Returns.aspx": date(2004, 11, 2),
 }
+BLOCKS = {"2006/2006_general_election_legislature_official_returns.aspx": date(2006, 11, 7)}
+UNNAMED = {"15": ["MINNEHAHA"]}
 HEADING = re.compile(r"(RECOUNT )?(?:(SENATE|HOUSE) )?DISTRICT\s*#?\s*0*(\d+)\s*-?\s*([AB]?)", re.IGNORECASE)
 PDFS = {
-    "http://web.archive.org/web/2016id_/https://sdsos.gov/elections-voting/assets/2012%20Assets/2012generalelectionlegislaturebycounty.pdf": date(2012, 11, 6),
+    "http://web.archive.org/web/2016id_/https://sdsos.gov/elections-voting/assets/2012%20Assets/2012generalelectionlegislaturebycounty.pdf": date(
+        2012, 11, 6
+    ),
     SITE + "2014/legislativeracesbycounty%20.pdf": date(2014, 11, 4),
 }
 TITLE_LINE = re.compile(r"State (Senator|Representatives?) - (?:District )?0*(\d+)([AB]?)")
 
 
 def fetch() -> None:
-    for path in [*LONG, *WIDE]:
+    for path in [*LONG, *WIDE, *BLOCKS]:
         raw.fetch(SOURCE, url(path), suffix=".html")
     for pdf in PDFS:
         raw.fetch(SOURCE, pdf, suffix=".pdf")
@@ -46,6 +50,7 @@ def parse() -> None:
     with connect() as conn:
         fips = openelections.counties(conn)["SD"]
     rows = []
+    recounted: dict[tuple[date, str, str, str], int] = {}
     for path, day in LONG.items():
         for row in table(path, SOURCE):
             if len(row) < 6 or not row[5].isdigit():
@@ -64,15 +69,50 @@ def parse() -> None:
     for path, day in WIDE.items():
         counties: dict[str, list[str]] = {}
         block: dict | None = None
-        for cells in table(path, SOURCE):
+        recount: str | None = None
+        for cells in [*table(path, SOURCE), ["DISTRICT #0"]]:
             if not cells:
                 continue
             if found := HEADING.match(cells[0]):
-                named = [cell for cell in cells[1:] if cell and not re.match(r"(?i)totals?$|percent", cell) and not re.match(r"[\d.,%]+$", cell)]
+                if block is not None and block["rows"]:
+                    places = counties[block["district"]]
+                    total = sum(sum(values) for _, values in block["rows"])
+                    if total in block["totals"] or all(sum(values) in block["totals"] for _, values in block["rows"]):
+                        rows.extend(
+                            (day, block["chamber"], code, name, value)
+                            for name, values in block["rows"]
+                            for code, value in zip(places, values, strict=True)
+                        )
+                    else:
+                        print(
+                            f"{day.year} {block['chamber']}: counties sum to {total}, printed {block['totals']}, skipped"
+                        )
+                named = [
+                    cell
+                    for cell in cells[1:]
+                    if cell and not re.match(r"(?i)totals?$|percent", cell) and not re.match(r"[\d.,%]+$", cell)
+                ]
                 district = found[3] + (f"-{found[4].lower()}" if found[4] else "")
                 if named:
                     counties[district] = [fips[re.sub(r"[^a-z]", "", name.lower())] for name in named]
-                block = None if found[1] or not found[2] else {"chamber": f"{found[2].lower()}:{district}:g", "district": district, "rows": []}
+                recount = f"{found[2].lower()}:{district}:g" if found[1] and found[2] else None
+                block = (
+                    None
+                    if found[1] or not found[2]
+                    else {
+                        "chamber": f"{found[2].lower()}:{district}:g",
+                        "district": district,
+                        "rows": [],
+                        "totals": {int(cell) for cell in cells[1:] if re.fullmatch(r"\d+", cell)},
+                    }
+                )
+                continue
+            if recount is not None:
+                places = counties[recount.split(":")[1]]
+                if cells[0] and all(re.fullmatch(r"\d+", cell) for cell in cells[1 : 1 + len(places)]):
+                    name = re.sub(r"\s*-\s*[A-Z]{1,3}$", "", cells[0]).upper()
+                    for code, value in zip(places, cells[1 : 1 + len(places)], strict=True):
+                        recounted[(day, recount, code, name)] = int(value)
                 continue
             if block is None:
                 continue
@@ -80,18 +120,66 @@ def parse() -> None:
             if cells[0] and places and all(re.fullmatch(r"\d+", cell) for cell in cells[1 : 1 + len(places)]):
                 name = re.sub(r"\s*-\s*[A-Z]{1,3}$", "", cells[0])
                 block["rows"].append((name.upper(), [int(cell) for cell in cells[1 : 1 + len(places)]]))
-            elif not cells[0] and block["rows"]:
-                printed = [int(cell) for cell in cells if re.fullmatch(r"\d+", cell)]
-                total = sum(sum(values) for _, values in block["rows"])
-                if printed[-1:] != [total]:
-                    print(f"{day.year} {block['chamber']}: counties sum to {total}, printed {printed}, skipped")
-                else:
-                    rows.extend(
-                        (day, block["chamber"], code, name, value)
-                        for name, values in block["rows"]
-                        for code, value in zip(places, values, strict=True)
+                block["totals"] |= {int(cell) for cell in cells[1 + len(places) :] if re.fullmatch(r"\d+", cell)}
+            elif not cells[0]:
+                block["totals"] |= {int(cell) for cell in cells if re.fullmatch(r"\d+", cell)}
+    rows = [
+        (day, chamber, code, name, recounted.get((day, chamber, code, name), votes))
+        for day, chamber, code, name, votes in rows
+    ]
+    for path, day in BLOCKS.items():
+        district, places, chamber_key, names, counts = "", [], "", [], []
+        results: dict[str, list[tuple[str, str, int]]] = {}
+        for cells in [*table(path, SOURCE), ["SENATE"]]:
+            if not cells:
+                continue
+            found = HEADING.match(cells[0])
+            office = re.fullmatch(r"(?:RECOUNT )?(SENATE|HOUSE)", cells[0])
+            if (found or office) and names:
+                codes = [fips[re.sub(r"[^a-z]", "", place.lower())] for place in places]
+                results[chamber_key] = [
+                    (code, name, value)
+                    for name, values in zip(names, counts, strict=True)
+                    for code, value in zip(codes, values, strict=True)
+                ]
+                names, counts = [], []
+            named = [
+                cell
+                for cell in cells[1:]
+                if re.fullmatch(r"[A-Z][A-Z ]+", cell) and cell not in ("TOTAL", "PERCENTAGE")
+            ]
+            if found:
+                part = found[4].lower()
+                if not found[2]:
+                    district = found[3]
+                    places = named or UNNAMED[district]
+                elif named:
+                    places = named
+                if found[2]:
+                    chamber_key = f"{found[2].lower()}:{found[3]}" + (f"-{part}" if part else "") + ":g"
+                continue
+            if office:
+                chamber_key = f"{office[1].lower()}:{district}:g"
+                if named:
+                    places = named
+            numbers = [int(cell) for cell in cells[1:] if cell.isdigit()]
+            if len(numbers) == 1 and not cells[0]:
+                if numbers[0] != sum(sum(values) for values in counts):
+                    print(
+                        f"2006 {chamber_key}: candidates sum to {sum(sum(values) for values in counts)}, printed {numbers}"
                     )
-                block = None
+            elif numbers:
+                if len(numbers) != len(places) + 1 or sum(numbers[:-1]) != numbers[-1]:
+                    raise ValueError(f"2006 {chamber_key}: {cells} does not fit {places}")
+                counts.append(numbers[:-1])
+            if cells[0] and not office:
+                names.append(re.sub(r"\s*-\s*[A-Z]{1,3}$", "", cells[0]).upper())
+            total = next((cell for cell in cells if cell.startswith("Total:")), None)
+            if total and sum(sum(values) for values in counts) != int(total.removeprefix("Total:")):
+                print(f"2006 {chamber_key}: candidates sum to {sum(sum(values) for values in counts)}, printed {total}")
+        rows.extend(
+            (day, key, code, name, value) for key, found_rows in results.items() for code, name, value in found_rows
+        )
     for pdf, day in PDFS.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, pdf).path), "-"], capture_output=True, check=True, text=True
@@ -114,7 +202,9 @@ def parse() -> None:
                 if row is None:
                     block["header"].append(piece)
                 elif row[1] != "TOTAL":
-                    block["rows"].append((fips[re.sub(r"[^a-z]", "", row[1].lower())], [int(cell) for cell in row[2].split()]))
+                    block["rows"].append(
+                        (fips[re.sub(r"[^a-z]", "", row[1].lower())], [int(cell) for cell in row[2].split()])
+                    )
                 else:
                     blocks[column] = None
                     printed = [int(cell) for cell in row[2].split()]
@@ -122,12 +212,26 @@ def parse() -> None:
                     words: dict[int, list[str]] = {}
                     for text_line in block["header"]:
                         for word in re.finditer(r"\S+", text_line):
-                            if word[0] != "County" and (column_at := max((i for i, x in enumerate(places) if x <= word.start() + 1), default=None)) is not None:
+                            if (
+                                word[0] != "County"
+                                and (
+                                    column_at := max(
+                                        (i for i, x in enumerate(places) if x <= word.start() + 1), default=None
+                                    )
+                                )
+                                is not None
+                            ):
                                 words.setdefault(column_at, []).append(word[0])
                     names = [" ".join(words.get(i, [])) for i in range(len(printed) - 1)]
                     sums = [sum(values[i] for _, values in block["rows"]) for i in range(len(printed))]
-                    if sums != printed or any(len(values) != len(printed) for _, values in block["rows"]) or not all(names):
-                        print(f"{day.year} {block['chamber']}: {names} counties sum to {sums}, printed {printed}, skipped")
+                    if (
+                        sums != printed
+                        or any(len(values) != len(printed) for _, values in block["rows"])
+                        or not all(names)
+                    ):
+                        print(
+                            f"{day.year} {block['chamber']}: {names} counties sum to {sums}, printed {printed}, skipped"
+                        )
                         continue
                     rows.extend(
                         (day, block["chamber"], code, name.upper(), values[i])
@@ -157,7 +261,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="South Dakota's legislative generals by county, 2000-2004 and 2008-2014 (Secretary of State election history)",
+            summary="South Dakota's legislative generals by county, 2000-2014 (Secretary of State election history)",
             polity="US-SD",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -171,9 +275,20 @@ def emit() -> Path:
                 url=SITE,
                 license="Public record",
             )
-        for path in [*LONG, *WIDE]:
+        for path in [*LONG, *WIDE, *BLOCKS]:
             cs.artifact(raw.cached(SOURCE, url(path)), source)
         for pdf in PDFS:
             cs.artifact(raw.cached(SOURCE, pdf), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"SD": source}, strict=True)
+        frame = pl.read_parquet(PARSED / "counties.parquet")
+        drifted = (pl.col("day") == date(2002, 11, 5)) & (pl.col("chamber") == "house:26:g")
+        medsl.attach(cs, conn, frame.filter(~drifted), {"SD": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            frame.filter(drifted),
+            {"SD": source},
+            strict=True,
+            authoritative="Source: the Secretary of State's official returns, whose candidate totals and grand total "
+            "agree; the earlier set's figures run about 40 percent lower.",
+        )
         return cs.write()

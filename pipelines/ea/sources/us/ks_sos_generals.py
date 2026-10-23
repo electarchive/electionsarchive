@@ -78,6 +78,7 @@ SWAPPED = {
         'FERGUSON, BENNIE LEE "BEN"': "Bennie Lee Ferguson",
     },
 }
+WRITE_INS = {"2004-11-02:KS:house:13:g": "COMPTON, MARY", "2008-11-04:KS:house:118:g": "BEAMER, VIRGINIA"}
 CAVEAT = (
     "Klarner's returns give each candidate the other's party and votes. The Secretary of State's precinct file "
     "and its official results agree with each other, so this set replaces Klarner's as the default."
@@ -262,6 +263,7 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from external_id x
                    join result_set r on r.contest_id = x.entity_id and r.status = 'active'
+                     and coalesce(r.completeness, 1) >= 0.98
                    join changeset g on g.id = r.changeset_id and g.pipeline <> %s
                    join result_value v on v.result_set_k = r.k
                    join reporting_unit u on u.k = v.unit_k and u.scheme_code = 'us.precinct'
@@ -279,7 +281,15 @@ def emit() -> Path:
                 separator=":",
             )
         )
-        frame = keyed.filter(~pl.col("key").is_in(list(filled))).drop("key")
+        frame = (
+            keyed.filter(~pl.col("key").is_in(list(filled)))
+            .with_columns(
+                candidate=pl.when(pl.col("candidate") == "WRITE-INS")
+                .then(pl.col("key").replace_strict(WRITE_INS, default=pl.col("candidate")))
+                .otherwise(pl.col("candidate").str.replace("^LA BOEUF,", "LABOEUF,"))
+            )
+            .drop("key")
+        )
         medsl.attach(cs, conn, frame.drop("fips"), {"KS": source}, grain="precinct", strict=True)
         for key, labels in SWAPPED.items():
             previous, election, contest, stage, kind, origin, completeness, first = conn.execute(
