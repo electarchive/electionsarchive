@@ -31,6 +31,8 @@ FILES = {
     (date(2012, 6, 5), "president"): "2012/2012-official-primary-results-president-0723.pdf",
     (date(2012, 6, 5), "senate"): "2012/2012-official-primary-results-us-senate-0723.pdf",
     (date(2012, 6, 5), "house"): "2012/2012-official-primary-results-house-of-rep-0723.pdf",
+    (date(2012, 6, 5), "special"): "2012/2012-official-primary-results-special-house-0723.pdf",
+    (date(2014, 6, 3), "special"): "2014/2014-official-special-primary-results-us-house.pdf",
     (date(2014, 6, 3), "senate"): "2014/2014-official-primary-results-us-senate.pdf",
     (date(2014, 6, 3), "house"): "2014/2014-official-primary-results-us-house.pdf",
     (date(2016, 6, 7), "president"): "2016/2016-official-primary-results-president.pdf",
@@ -77,7 +79,7 @@ def parse() -> None:
                    where u.scheme_code = 'us.county' and u.code like '34%%'"""
             ).fetchall()
         }
-    rows: list[tuple[date, str, int | None, str, str, int]] = []
+    rows: list[tuple[date, str, int | None, str, str, int, bool]] = []
     for (day, kind), path in FILES.items():
         text = subprocess.run(
             ["pdftotext", "-layout", str(raw.cached(SOURCE, BASE + path).path), "-"],
@@ -95,7 +97,11 @@ def parse() -> None:
                 district = ORDINALS.index(found[1].lower()) + 1
             if re.match(r"\s*Name\b", line) and "County" in line:
                 party_at = line.find("Designation") if "Designation" in line else line.find("Party")
-                columns = (party_at, line.find("County"), line.find("Address") if "Address" in line and day.year >= 2012 else party_at)
+                columns = (
+                    party_at,
+                    line.find("County"),
+                    line.find("Address") if "Address" in line and day.year >= 2012 else party_at,
+                )
                 continue
             if columns is None:
                 continue
@@ -108,11 +114,12 @@ def parse() -> None:
                     rows.extend(
                         (
                             day,
-                            f"{kind}:{party.lower()}",
-                            district if kind == "house" else None,
+                            f"{'house' if kind == 'special' else kind}:{party.lower()}",
+                            district if kind in ("house", "special") else None,
                             candidate,
                             county,
                             count,
+                            kind == "special",
                         )
                         for county, count in votes.items()
                     )
@@ -143,12 +150,12 @@ def parse() -> None:
                 "candidate": pl.String,
                 "code": pl.String,
                 "votes": pl.Int64,
+                "special": pl.Boolean,
             },
             orient="row",
         )
         .with_columns(
             year=pl.col("day").dt.year().cast(pl.Int32),
-            special=pl.lit(False),
             state=pl.lit("NJ"),
             measure=pl.lit(1, dtype=pl.Int16),
             writein=pl.lit(False),

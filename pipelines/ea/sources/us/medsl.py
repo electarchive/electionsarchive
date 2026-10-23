@@ -738,7 +738,10 @@ def attach(
             else f"{day}:{state}:house:{district}{chamber.removeprefix('house')}"
         )
         at_large = f"{day}:{state}:house:0{chamber.removeprefix('house')}"
-        tried = [*([f"{base}:special"] if special else []), base]
+        tried = [
+            *([f"{day}:{state}:house:{district}:special{chamber.removeprefix('house')}", f"{base}:special"] if special else []),
+            base,
+        ]
         if chamber.startswith("house"):
             tried.append(at_large)
         key = next((k for k in tried if k in contests), None)
