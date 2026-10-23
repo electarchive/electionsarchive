@@ -188,6 +188,7 @@ WYOMING = {
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
 ARKANSAS = {
     date(2012, 11, 6): "Voices2012_Web.pdf",
+    date(2014, 11, 4): "2014_GE.pdf",
     date(2016, 11, 8): 1836,
     date(2018, 11, 6): 1838,
     date(2020, 11, 3): 1841,
@@ -1229,7 +1230,7 @@ def parse() -> None:
             office = None
             for number, page in enumerate(text.stdout.split("\f"), start=1):
                 for line in page.splitlines():
-                    if heading := re.match(r"\s*(Issue No\. \d+):|\s*Proposed Issue #(\d+) ", line):
+                    if heading := re.match(r"(?i)\s*(Issue No\.? \d+):|\s*Proposed Issue #(\d+) ", line):
                         office = heading[1] or f"Issue No. {heading[2]}"
                     elif re.match(r"[^\d]*\S:", line):
                         office = None
