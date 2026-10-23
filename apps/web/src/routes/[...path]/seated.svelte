@@ -99,7 +99,9 @@
       const party = entry.party == null ? null : info.get(entry.party);
       return {
         key,
-        label: party?.label ?? m.record_none(),
+        label:
+          party?.label ??
+          (entry.isIndependent ? m.seats_independents() : m.record_none()),
         short: party?.short ?? null,
         color: party?.color ?? null,
         lean: party?.lean ?? null,

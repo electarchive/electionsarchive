@@ -10128,7 +10128,11 @@ export const bodies = {
           v.object({
             start: v.string(),
             parties: v.array(
-              v.object({ party: v.nullable(v.string()), seats: v.number() }),
+              v.object({
+                party: v.nullable(v.string()),
+                seats: v.number(),
+                isIndependent: v.boolean(),
+              }),
             ),
           }),
         ),
@@ -10170,7 +10174,12 @@ export const bodies = {
             order by lower(valid) nulls first
           `,
         ),
-        db.execute<{ start: string; party: string | null; seats: number }>(sql`
+        db.execute<{
+          start: string;
+          party: string | null;
+          seats: number;
+          isIndependent: boolean;
+        }>(sql`
           with t as materialized (
             select t.id, t.seat_id, t.from_date, coalesce(t.to_date, 'infinity'::date) as to_date, t.contest_id, t.person_id,
               (select e.date_from from contest c join election e on e.id = c.election_id where c.id = t.contest_id) as won
@@ -10200,7 +10209,8 @@ export const bodies = {
             ) r where r.rank <= r.cap
           ),
           fallback as materialized (
-            select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id) as party
+            select distinct on (t.id) t.id, coalesce(pm.into_id, o.party_id, po.party_id) as party,
+              cd.is_independent as independent
             from t
             join contest_option o on o.contest_id = t.contest_id
               or o.contest_id in (select k.id from contest k where k.allocation_parent_id = t.contest_id)
@@ -10209,9 +10219,10 @@ export const bodies = {
             left join entity_merge pm on pm.entity_id = coalesce(o.party_id, po.party_id)
             order by t.id
           )
-          select x.start::text as start, coalesce(bm.into_id, br.parent_party_id, x.party) as party, count(*)::int as seats
+          select x.start::text as start, coalesce(bm.into_id, br.parent_party_id, x.party) as party, count(*)::int as seats,
+            bool_and(x.party is null and coalesce(x.independent, false)) as "isIndependent"
           from (
-            select s.start, coalesce(
+            select s.start, f.independent, coalesce(
               (select coalesce(pm.into_id, a.party_id) from tenure_affiliation a
                 left join entity_merge pm on pm.entity_id = a.party_id
                 where a.tenure_id = s.id and a.kind = 'party' and a.party_id is not null
@@ -10282,6 +10293,7 @@ export const bodies = {
             parties: rows.map((row) => ({
               party: row.party,
               seats: row.seats,
+              isIndependent: row.isIndependent,
             })),
           }))
           .toArray(),
