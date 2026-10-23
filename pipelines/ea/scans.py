@@ -1449,7 +1449,9 @@ def emit(name: str) -> Path:
                 height=height,
             )
         frame = frame.with_columns(page_id=pl.col("page").replace_strict(pages, return_dtype=pl.String), page=pl.lit(1))
-        medsl.attach(cs, conn, frame, {f"SC{name}": source}, strict=True, authoritative=manifest.get("authoritative"))
+        medsl.attach(
+            cs, conn, frame, {f"SC{name}": source}, strict=not manifest.get("authoritative_loose"), authoritative=manifest.get("authoritative")
+        )
         for row in list(cs.rows.get("result_set", [])):
             found = conn.execute(
                 "select value from external_id where scheme = 'us.contest' and entity_id = %s", [row["contest_id"]]

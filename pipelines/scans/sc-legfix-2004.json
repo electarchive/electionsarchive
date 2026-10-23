@@ -1,0 +1,37 @@
+{
+ "polity": "US-SC",
+ "publisher": "South Carolina State Election Commission",
+ "title": "2004 Election Report, official results of the 2004-11-02 general election",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_2004.pdf"
+ },
+ "contests": {
+  "h75": {
+   "year": 2004,
+   "chamber": "house:75:g",
+   "day": "2004-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 66,
+   "id": "66-h75",
+   "orientation": "counties_down",
+   "discover": "h75",
+   "crop": [
+    0.02,
+    0.544,
+    0.99,
+    0.646
+   ],
+   "hint": "One boxed table for a single South Carolina legislative district: candidate names stacked over two or three lines in the header (first names above surnames, a party letter below, a WINNER marker above), county names down the left, and a STATE TOTAL row. Merge each candidate's stacked name into one label. Ignore the WINNER marker and any other district's table visible in the crop."
+  }
+ ],
+ "authoritative": "The state's own printed district total and the county rows tie, and they differ from the earlier default set, which is replaced by this one.",
+ "authoritative_loose": true
+}
