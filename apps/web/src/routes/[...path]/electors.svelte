@@ -164,7 +164,13 @@
         {/each}
       {:else}
         {#each ladder as rung, index (rung.k)}
-          <Tooltip.Trigger tether={rungs} payload={index} tabindex={-1}>
+          <Tooltip.Trigger
+            tether={rungs}
+            payload={index}
+            tabindex={-1}
+            onpointerenter={() => (focus = rung.k)}
+            onpointerleave={() => (focus = null)}
+          >
             {#snippet child({ props })}
               <svelte:element
                 this={rung.path == null ? "span" : "a"}
@@ -178,8 +184,6 @@
                 })}
                 style:background-color={rung.color}
                 style:width="calc({(rung.seats / total) * 100}% - 1px)"
-                onpointerenter={() => (focus = rung.k)}
-                onpointerleave={() => (focus = null)}
               />
             {/snippet}
           </Tooltip.Trigger>
