@@ -19,6 +19,10 @@ WIDE = {
     "2002/2002_US_representative_official_returns.aspx": (date(2002, 11, 5), ["house"]),
     "2004/2004_general_election_official_returns_us_house_of_representatives.aspx": (date(2004, 11, 2), ["house"]),
     "2006/2006_general_election_official_returns_us_house_of_representatives.aspx": (date(2006, 11, 7), ["house"]),
+    "2002/2002_us_senate_official_returns.aspx": (date(2002, 11, 5), ["senate"]),
+    "2002/2002_governor_official_returns.aspx": (date(2002, 11, 5), ["governor"]),
+    "2004/2004_general_election_official_returns_us_senate.aspx": (date(2004, 11, 2), ["senate"]),
+    "2006/2006_general_election_official_returns_governor_lt_governor.aspx": (date(2006, 11, 7), ["governor"]),
     "2000/2000_statewide_primaries.aspx": (date(2000, 6, 6), [None, "house:democratic"]),
     "2002/2002_statewide_primary_official_returns.aspx": (
         date(2002, 6, 4),
@@ -29,11 +33,11 @@ WIDE = {
 LONG = {
     "2008/2008_general_election_statewide_races_county_totals.aspx": (
         date(2008, 11, 4),
-        {("United States Representative", ""): "house"},
+        {("United States Representative", ""): "house", ("United States Senate", ""): "senate"},
     ),
     "2010/2010_general_election_statewide_candidates_by_county.aspx": (
         date(2010, 11, 2),
-        {("United States Representative", ""): "house"},
+        {("United States Representative", ""): "house", ("United States Senator", ""): "senate"},
     ),
     "2008/2008_primary_statewide_races_by_county.aspx": (
         date(2008, 6, 3),
@@ -69,7 +73,9 @@ def parse() -> None:
         for cells in table(path, SOURCE):
             if not cells or not any(cells):
                 continue
-            if re.match(r"TOTALS?\s*[-:]", cells[0]):
+            if cells[0].upper().startswith("TOTAL VOTES"):
+                continue
+            if re.match(r"TOTALS?(\s*[-:]|$)", cells[0]):
                 printed = [int(number) for number in re.findall(r"\d+", " ".join(cells))]
                 blocks[-1] = (blocks[-1][0], blocks[-1][1], printed)
             elif cells[0].upper().startswith("PERCENT"):
@@ -79,6 +85,8 @@ def parse() -> None:
                     (fips[re.sub(r"[^a-z]", "", cells[0].lower())], [int(cell or 0) for cell in cells[1:]])
                 )
             else:
+                if blocks and not blocks[-1][1]:
+                    blocks.pop()
                 blocks.append(([re.sub(r"\s+-\s*[A-Za-z]{1,3}$", "", cell) for cell in cells[1:] if cell], [], []))
         if len(blocks) < len(chambers):
             raise ValueError(f"{path}: {len(blocks)} blocks")
@@ -86,10 +94,10 @@ def parse() -> None:
             if chamber is None:
                 continue
             sums = [sum(values[k] for _, values in counties) for k in range(len(names))]
-            if len(counties) != 66 or printed != [sum(sums), *sums]:
+            if len(counties) != 66 or printed not in ([sum(sums), *sums], sums):
                 raise ValueError(f"{path} {chamber}: {len(counties)} counties sum to {sums}, printed {printed}")
             rows.extend(
-                (day, chamber, code, name.upper(), values[k])
+                (day, chamber, code, name.split("/")[0].strip().upper(), values[k])
                 for code, values in counties
                 for k, name in enumerate(names)
             )
