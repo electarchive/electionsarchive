@@ -780,6 +780,18 @@
       </span>
     </div>
   {/if}
+  {#if link == null}
+    <div
+      class="flex items-end gap-2 border-be px-1.5 pbe-1 text-xs text-muted-foreground"
+    >
+      <span class="flex-1 ps-4.5">{m.seats_col_party()}</span>
+      {#if moved != null}
+        <span class="text-end inline-12">{m.seats_col_change()}</span>
+      {/if}
+      <span class="text-end inline-10">{m.seats_col_seats()}</span>
+      <span class="text-end inline-16">{m.seats_col_share()}</span>
+    </div>
+  {/if}
   <ul class="grid gap-px text-sm/tight">
     {#each ordered.toSorted((a, b) => b.seats - a.seats) as party (party.key)}
       {const id = $derived(
@@ -826,7 +838,7 @@
           {#if moved != null}
             <span
               class={cn(
-                "text-end font-figures text-xs tabular-nums inline-10",
+                "text-end font-figures text-xs tabular-nums inline-12",
                 {
                   "text-muted-foreground":
                     party.delta == null || party.delta === 0,
@@ -839,11 +851,12 @@
                   : `${party.delta > 0 ? "+" : "−"}${count(Math.abs(party.delta))}`}</span
             >
           {/if}
-          <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
+          <span
+            class="text-end font-figures text-[0.8125rem] font-semibold tabular-nums inline-10"
             >{count(party.seats)}</span
           >
           <span
-            class="text-end font-figures text-[0.8125rem] text-muted-foreground tabular-nums inline-14"
+            class="text-end font-figures text-[0.8125rem] text-muted-foreground tabular-nums inline-16"
             >{percent(party.seats / totals.all)}</span
           >
         {:else}
@@ -868,13 +881,14 @@
           >{m.seats_seceded()}</span
         >
         {#if moved != null}
-          <span class="inline-10"></span>
+          <span class="inline-12"></span>
         {/if}
-        <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
+        <span
+          class="text-end font-figures text-[0.8125rem] font-semibold tabular-nums inline-10"
           >{count(seceded)}</span
         >
         <span
-          class="text-end font-figures text-[0.8125rem] tabular-nums inline-14"
+          class="text-end font-figures text-[0.8125rem] tabular-nums inline-16"
           >{percent(seceded / totals.all)}</span
         >
       </li>
@@ -890,13 +904,14 @@
           >{m.seats_vacant()}</span
         >
         {#if moved != null}
-          <span class="inline-10"></span>
+          <span class="inline-12"></span>
         {/if}
-        <span class="font-figures text-[0.8125rem] font-semibold tabular-nums"
+        <span
+          class="text-end font-figures text-[0.8125rem] font-semibold tabular-nums inline-10"
           >{count(vacant)}</span
         >
         <span
-          class="text-end font-figures text-[0.8125rem] tabular-nums inline-14"
+          class="text-end font-figures text-[0.8125rem] tabular-nums inline-16"
           >{percent(vacant / totals.all)}</span
         >
       </li>
