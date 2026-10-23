@@ -60,10 +60,8 @@ def fetch() -> None:
             )
 
 
-def lines_of(year: int) -> list[tuple[int, float, float, list[tuple[str, float, float, float, float]]]]:
-    xml = subprocess.run(
-        ["pdftotext", "-bbox", str(raw.cached(SOURCE, url(year)).path), "-"], capture_output=True, text=True, check=True
-    ).stdout
+def lines_of(path: Path) -> list[tuple[int, float, float, list[tuple[str, float, float, float, float]]]]:
+    xml = subprocess.run(["pdftotext", "-bbox", str(path), "-"], capture_output=True, text=True, check=True).stdout
     root = ElementTree.fromstring(
         re.sub(r"<!DOCTYPE[^>]*>", "", xml).replace('xmlns="http://www.w3.org/1999/xhtml"', "")
     )
@@ -114,7 +112,7 @@ def parse() -> None:
         header: list[list[tuple[str, float]]] = []
         table: list[tuple[str, int, float, float, list[tuple[int, float, float, float, float]]]] = []
         after_banner = False
-        for page, width, height, row in lines_of(year):
+        for page, width, height, row in lines_of(raw.cached(SOURCE, url(year)).path):
             text = " ".join(w[0] for w in row)
             if "Primary Election Abstract of Votes" in text:
                 after_banner = True
