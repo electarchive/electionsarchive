@@ -88,7 +88,7 @@ def parse() -> None:
                     f"{chamber}:{party}",
                     "Unexpired" in title,
                     int(district[1]) if district else None,
-                    re.sub(r"\s*\([A-Z]+\)$", "", " ".join(candidate.split())).upper(),
+                    re.sub(r"(?:\s*\([A-Z]+\)\*?)+$", "", " ".join(candidate.split())).upper(),
                     counties[re.sub(r"[^a-z]", "", county.lower())],
                     votes,
                 )
