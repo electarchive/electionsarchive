@@ -27,6 +27,9 @@ FOLDERS = [
     "2020/statewide_primary",
     "2022/statewide_primary",
     "2024/presidential_preference_primary",
+    "2010/general_election",
+    "2012/general_election",
+    "2014/general_election",
 ]
 COUNTIES = {
     "44001": "barrington bristol warren",
@@ -115,10 +118,15 @@ def parse() -> None:
                             designation or candidate.get("party_code") or contest.get("contest_party_designation") or ""
                         ).upper()
                     )
-                    if party is None:
+                    general = folder.endswith("general_election")
+                    if party is None and not general:
                         continue
                     name = re.sub(r"\s+", " ", html.unescape(candidate["name"])).rstrip("*").strip().upper()
-                    key = (f"{chamber}:{party}", str(district), "WRITE-INS" if name == "WRITE-IN" else name)
+                    key = (
+                        chamber if general else f"{chamber}:{party}",
+                        str(district),
+                        "WRITE-INS" if name == "WRITE-IN" else name,
+                    )
                     votes = int(candidate["votes"].replace(",", ""))
                     if town == "statewide":
                         statewide[key] = statewide.get(key, 0) + votes
@@ -183,7 +191,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Rhode Island's 2008 to 2024 president, U.S. Senate, and House primaries by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
+            summary="Rhode Island's 2008 to 2024 president, U.S. Senate, and House primaries and 2010 to 2014 U.S. Senate and House generals by county, with the presidential primaries' centrally counted mail ballots as a statewide row",
             polity="US-RI",
         )
         source = cs.source(PUBLISHER, TITLE)
