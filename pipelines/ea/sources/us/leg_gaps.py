@@ -115,14 +115,6 @@ def emit() -> Path:
                    where p.iso_code like 'US-%'"""
             ).fetchall()
         )
-        own = {
-            value
-            for (value,) in conn.execute(
-                """select x.value from external_id x join changeset c on c.id = x.changeset_id
-                   where x.scheme = 'us.contest' and c.pipeline = %s""",
-                [SOURCE],
-            ).fetchall()
-        }
         system = cs.key("us.electoral_system", "two_round")
         for (day, state, chamber, district, party), group in frame.group_by(
             "day", "state", "chamber", "district", "party", maintain_order=True
@@ -130,8 +122,6 @@ def emit() -> Path:
             party_key, party_name, letter = PARTIES[party]
             body_name, scheme = BODIES[chamber]
             contest_key = f"{day}:{state}:{chamber}:{district}:{letter}prunoff"
-            if contest_key in own:
-                continue
             body = cs.key("us.body", f"{state}:{chamber}")
             area = cs.area(scheme, f"{state}:{district}")
             election = cs.key("us.election", f"{day}:{state}:runoff")
@@ -224,6 +214,17 @@ def emit() -> Path:
                         value=votes,
                     )
                 ranked.append((int(rows["votes"].sum()), option))
+                cs.add(
+                    "result_value",
+                    result_set_id=result_set,
+                    unit_id=cs.unit(scheme, f"{state}:{district}"),
+                    option_id=option,
+                    channel=0,
+                    measure=1,
+                    count_round=0,
+                    flags=0,
+                    value=int(rows["votes"].sum()),
+                )
             ranked.sort(key=lambda pair: -pair[0])
             if ranked[0][0] == ranked[1][0]:
                 raise ValueError(f"{contest_key}: tie")
