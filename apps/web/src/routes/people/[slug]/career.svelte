@@ -255,6 +255,9 @@
               >
             {/if}
           </span>
+          {#if lit.outcome != null && lit.note != null}
+            <span class="text-pretty text-muted-foreground">{lit.note}</span>
+          {/if}
         </div>
       {/if}
     </Measured>

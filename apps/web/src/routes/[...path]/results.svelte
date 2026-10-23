@@ -419,12 +419,23 @@
                   party={(page ?? other)?.party}
                 />
                 {#if page?.outcome != null && seats == null}
-                  <span
-                    class={cn("ms-1 px-1 text-xs font-semibold", {
-                      "highlighter text-foreground": !LOST.has(page.outcome),
-                      "text-muted-foreground": LOST.has(page.outcome),
-                    })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
-                  >
+                  {#if page.note == null}
+                    <span
+                      class={cn("ms-1 px-1 text-xs font-semibold", {
+                        "highlighter text-foreground": !LOST.has(page.outcome),
+                        "text-muted-foreground": LOST.has(page.outcome),
+                      })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
+                    >
+                  {:else}
+                    <Term
+                      class={cn("ms-1 px-1 text-xs font-semibold", {
+                        "highlighter text-foreground": !LOST.has(page.outcome),
+                        "text-muted-foreground": LOST.has(page.outcome),
+                      })}
+                      label={OUTCOMES[page.outcome]?.() ?? page.outcome}
+                      definition={page.note}
+                    />
+                  {/if}
                 {/if}
                 {#if row.short != null && !row.label.includes(row.short) && !isOneParty && (span != null || (page?.lines.length ?? 0) === 0)}
                   <span class="block text-[0.8125rem] text-pretty">

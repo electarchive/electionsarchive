@@ -13,6 +13,7 @@ export type Option = {
   lean: number | null;
   votes: number;
   outcome: string | null;
+  note?: string | null;
   seats: number | null;
   alliance: { id: string; label: string; anchor: string | null } | null;
   line: string | null;
@@ -38,6 +39,7 @@ export type Cell = {
   votes: number;
   share: number;
   outcome: string | null;
+  note: string | null;
   seats: number | null;
   lines: Array<{ label: string; votes: number }>;
 };
@@ -105,6 +107,7 @@ function tally(side: Side, identify: (option: Option) => string) {
           votes: option.votes,
           share: 0,
           outcome: option.outcome,
+          note: option.note ?? null,
           seats: option.seats,
           lines: [],
         },
@@ -115,6 +118,7 @@ function tally(side: Side, identify: (option: Option) => string) {
     group.members.push(option);
     group.cell.votes += option.votes;
     group.cell.outcome ??= option.outcome;
+    group.cell.note ??= option.note ?? null;
     if (option.seats != null) {
       group.cell.seats = (group.cell.seats ?? 0) + option.seats;
     }

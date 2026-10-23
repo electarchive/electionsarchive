@@ -603,6 +603,31 @@
           margin: (top.current?.share ?? 0) - (next.current?.share ?? 0),
         };
   });
+  const footnotes = $derived(
+    Map.groupBy(
+      [
+        ...contest.rows.flatMap((row) =>
+          row.current?.outcome == null || row.current.note == null
+            ? []
+            : [{ label: row.label, note: row.current.note }],
+        ),
+        ...(contest.current == null ? (contest.declared?.rows ?? []) : [])
+          .filter((row) => row.note != null)
+          .map((row) => ({ label: row.label, note: row.note ?? "" })),
+      ],
+      (row) => row.note,
+    )
+      .entries()
+      .map(([note, rows]) =>
+        m.outcome_note({
+          names: new Intl.ListFormat(getLocale(), {
+            type: "conjunction",
+          }).format(rows.map((row) => row.label)),
+          note,
+        }),
+      )
+      .toArray(),
+  );
   const verdict = $derived.by(() => {
     if (contest.current == null) {
       return null;
@@ -1093,6 +1118,13 @@
         {verdict}
       </p>
     {/if}
+    {#each footnotes as line (line)}
+      <p
+        class="text-[0.9375rem] text-pretty text-muted-foreground max-inline-[60ch]"
+      >
+        {line}
+      </p>
+    {/each}
   </div>
   {#if contest.series.length > 1}
     <Series series={contest.series} />
@@ -1201,10 +1233,18 @@
                 party={row.party}
               />
             {/if}
-            <span
-              class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
-              >{OUTCOMES[row.outcome]?.() ?? row.outcome}</span
-            >
+            {#if row.note == null}
+              <span
+                class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
+                >{OUTCOMES[row.outcome]?.() ?? row.outcome}</span
+              >
+            {:else}
+              <Term
+                class="ms-1 highlighter px-1 text-xs font-semibold text-foreground"
+                label={OUTCOMES[row.outcome]?.() ?? row.outcome}
+                definition={row.note}
+              />
+            {/if}
           </span>
         </li>
       {/each}

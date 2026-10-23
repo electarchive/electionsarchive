@@ -4,6 +4,7 @@
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import Name from "#lib/components/name.svelte";
+  import Term from "#lib/components/term.svelte";
   import { count, credit, date, percent } from "#lib/format.js";
   import { LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -316,7 +317,20 @@
                       >{entry.name}</a
                     >
                   {/if}
-                  {#if entry.outcome != null}
+                  {#if entry.outcome != null && entry.note != null}
+                    <Term
+                      class={cn(
+                        "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
+                        {
+                          highlighter: !LOST.has(entry.outcome),
+                          "rounded-xs bg-secondary text-muted-foreground":
+                            LOST.has(entry.outcome),
+                        },
+                      )}
+                      label={OUTCOMES[entry.outcome]?.() ?? entry.outcome}
+                      definition={entry.note}
+                    />
+                  {:else if entry.outcome != null}
                     <span
                       class={cn(
                         "ms-1 px-1 text-xs font-semibold whitespace-nowrap",

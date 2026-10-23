@@ -2,7 +2,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
-import { label as reasonLabel, PARTS, REASONS } from "#lib/coverage.js";
+import { PARTS, label as reasonLabel, REASONS } from "#lib/coverage.js";
 import { count, date, percent, points } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
@@ -620,7 +620,9 @@ function personMarkdown(
             entry.votes == null || entry.total == null || entry.total === 0
               ? null
               : percent(entry.votes / entry.total),
-            outcome(entry.outcome),
+            entry.note == null
+              ? outcome(entry.outcome)
+              : `${outcome(entry.outcome)} (${entry.note})`,
           ]),
         ),
   ].filter((block) => block !== "");
@@ -1023,7 +1025,15 @@ function resultsMarkdown(
           m.col_result(),
         ],
         results,
-      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}`;
+      )}\n\n${m.stat_valid()}: ${count(contest.current.valid)}${contest.rows
+        .flatMap((row) =>
+          row.current?.outcome == null || row.current.note == null
+            ? []
+            : [
+                `\n\n${m.outcome_note({ names: row.label, note: row.current.note })}`,
+              ],
+        )
+        .join("")}`;
 }
 
 function comparedMarkdown(

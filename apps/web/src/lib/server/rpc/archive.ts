@@ -279,6 +279,7 @@ const Cell = v.nullable(
     votes: v.number(),
     share: v.number(),
     outcome: v.nullable(v.string()),
+    note: v.optional(v.nullable(v.string())),
     seats: v.nullable(v.number()),
     lines: v.array(v.object({ label: v.string(), votes: v.number() })),
   }),
@@ -960,6 +961,7 @@ async function load(
     person: string | null;
     label: string | null;
     outcome: string | null;
+    note: string | null;
     seats: number | null;
     alliance: string | null;
     is_line: boolean;
@@ -1007,7 +1009,7 @@ async function load(
        where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
          and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
        order by cy.option_id = o.id desc, cy.id limit 1) as person,
-      oc.kind::text as outcome,
+      oc.kind::text as outcome, oc.note,
       case when o.parent_option_id is null or not exists (
         select from outcome y join result_set ry on ry.id = y.result_set_id and ry.is_default
         where y.option_id = o.parent_option_id and y.kind in ('elected', 'won') and y.candidacy_id is null
@@ -1016,6 +1018,7 @@ async function load(
     left join entity_merge pm on pm.entity_id = o.party_id
     left join lateral (
       select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)))[1] as kind,
+        (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)))[1] as note,
         coalesce(max(x.seats), nullif(count(*) filter (where x.kind = 'elected'), 0))::int as seats
       from outcome x join result_set rs on rs.id = x.result_set_id
       where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and rs.is_default
@@ -1231,6 +1234,7 @@ async function load(
             lean: lean.get(stand(row) ?? "") ?? null,
             votes: area.votes.get(row.k) ?? 0,
             outcome: row.outcome,
+            note: row.note,
             seats: row.seats,
             alliance:
               row.alliance == null
@@ -2805,6 +2809,7 @@ export const contests = {
                 person: v.nullable(v.string()),
                 party: v.nullable(v.string()),
                 outcome: v.string(),
+                note: v.nullable(v.string()),
               }),
             ),
           }),
@@ -3134,13 +3139,14 @@ export const contests = {
           person: string | null;
           label: string | null;
           outcome: string;
+          note: string | null;
         }>(sql`
            select o.id as key, rs.kind::text, coalesce(pm.into_id, o.party_id) as party, o.ballot_label as label,
              (select coalesce(m.into_id, cy.person_id) from candidacy cy left join entity_merge m on m.entity_id = cy.person_id
               where cy.option_id in (o.id, o.parent_option_id) and cy.role = 'head'
           and not exists (select from candidacy cz where cz.option_id = cy.option_id and cz.role = 'head' and cz.id <> cy.id)
               order by cy.option_id = o.id desc, cy.id limit 1) as person,
-             x.kind::text as outcome
+             x.kind::text as outcome, x.notes as note
            from result_set rs
            join outcome x on x.result_set_id = rs.id and x.candidacy_id is null
            join contest_option o on o.id = x.option_id
@@ -3276,6 +3282,7 @@ export const contests = {
                   person: row.person,
                   party: row.party,
                   outcome: row.outcome,
+                  note: row.note,
                 })),
               },
         turnout: roll.rows[0] ?? null,
@@ -11235,6 +11242,7 @@ export const people = {
             votes: v.nullable(v.number()),
             total: v.nullable(v.number()),
             outcome: v.nullable(v.string()),
+            note: v.optional(v.nullable(v.string())),
             electoral: v.nullable(
               v.object({ votes: v.number(), total: v.number() }),
             ),
@@ -11269,6 +11277,7 @@ export const people = {
         votes: number | null;
         total: number | null;
         outcome: string | null;
+        note: string | null;
         party: string | null;
         independent: boolean;
         scoped: boolean;
@@ -11363,6 +11372,11 @@ export const people = {
               join result_set rs on rs.id = x.result_set_id and rs.is_default
               where o.contest_id = p.root limit 1)
           ) as outcome,
+          (select (array_agg(x.notes order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1]
+            from mine m join outcome x on x.option_id = m.option
+              and (x.candidacy_id = m.candidacy or (x.candidacy_id is null and m.role = 'head'))
+            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            where m.contest_id = p.root) as note,
           lead.party, coalesce(lead.independent, false) as independent, coalesce(lead.scoped, false) as scoped,
           (select n.text from name n where n.entity_id = lead.party and n.kind in ('official', 'english')
             order by coalesce(n.valid @> p.date, false) desc, n.is_preferred desc, (n.lang = 'en') desc,
@@ -11508,6 +11522,7 @@ export const people = {
               votes: row.votes,
               total: row.total,
               outcome: indirect == null ? row.outcome : indirect.outcome,
+              note: indirect == null ? row.note : null,
               electoral:
                 indirect?.votes == null || indirect.total == null
                   ? null
