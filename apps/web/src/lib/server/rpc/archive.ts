@@ -122,8 +122,8 @@ const abbreviate = (party: SQL, date: SQL) => sql`
         (f.lang = a.lang) desc, (f.kind = 'official') desc
       limit 1
     ) f on true
-    where a.entity_id = ${party} and a.kind = 'abbreviation'
-    order by coalesce(a.valid @> coalesce(${date}, current_date), false) desc,
+    where a.entity_id = ${party} and a.kind in ('short', 'abbreviation')
+    order by (a.kind = 'short') desc, coalesce(a.valid @> coalesce(${date}, current_date), false) desc,
       (lower_inf(a.valid) and upper_inf(a.valid)), a.is_preferred desc, (a.lang = 'en') desc,
       coalesce(
         upper(array_to_string(array(
