@@ -96,6 +96,41 @@ def parse() -> None:
             check=True,
         ).stdout
         lines = text.splitlines()
+        if general.year == 2004:
+            span = next(i for i, l in enumerate(lines) if i > 200 and "VOTE TOTALS FOR PRESIDENTIAL CANDIDATES" in l)
+            end = next(i for i, l in enumerate(lines) if i > span and "RHODE ISLAND STATEWIDE PRIMARY" in l)
+            columns = (
+                [("democratic", n) for n in "KERRY EDWARDS DEAN KUCINICH LIEBERMAN CLARK UNCOMMIT LAROUCHE".split()]
+                + [("republican", n) for n in "BUSH UNCOMMIT".split()]
+                + [("green", n) for n in "COBB MESPLAY UNCOMMIT".split()]
+            )
+            tally: dict[tuple[str, str, str], int] = {}
+            district_totals = [0] * len(columns)
+            for follow in lines[span:end]:
+                if t := re.match(r"^\s*District Total\s+([\d,\s]+)$", follow):
+                    values = [int(x.replace(",", "")) for x in t[1].split()]
+                    district_totals = [a + b for a, b in zip(district_totals, values, strict=True)]
+                    continue
+                m = re.match(r"^\s*(?:\d+\s+)?([A-Z][A-Z .]+?)\*?\s{2,}([\d,\s]+)$", follow)
+                if m is None or m[1].strip().lower() not in TOWNS:
+                    continue
+                values = [int(x.replace(",", "")) for x in m[2].split()]
+                if len(values) != len(columns):
+                    print("president row", follow.strip(), len(values))
+                    continue
+                for (party, name), vote in zip(columns, values, strict=True):
+                    key = (TOWNS[m[1].strip().lower()], party, name)
+                    tally[key] = tally.get(key, 0) + vote
+            day = date(2004, 3, 2)
+            for (party, name), total in zip(columns, district_totals, strict=True):
+                counted = sum(v for (_, p, n), v in tally.items() if (p, n) == (party, name))
+                if total > counted:
+                    tally[("RI:statewide", party, name)] = total - counted
+            rows.extend(
+                (2004, f"president:{party}", day, False, "RI", None, fips, name, 1, False, vote, "aggregate" if fips == "RI:statewide" else "county", 3 if fips == "RI:statewide" else 0, 33 if fips == "RI:statewide" else 0)
+                for (fips, party, name), vote in tally.items()
+            )
+            print(2004, "president", len(tally))
         if general.year == 2010:
             rows.extend(parse_2010(lines))
             continue
@@ -176,7 +211,7 @@ def parse() -> None:
             print(general.year, "primary" if primary else "general", office, district, [s for _, s in surnames], parties)
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.DataFrame(
-        rows,
+        [row if len(row) == 14 else (*row, 0, 0) for row in rows],
         schema={
             "year": pl.Int32,
             "chamber": pl.String,
@@ -190,6 +225,8 @@ def parse() -> None:
             "writein": pl.Boolean,
             "votes": pl.Int64,
             "kind": pl.String,
+            "channel": pl.Int16,
+            "flags": pl.Int16,
         },
         orient="row",
     ).with_columns(source=pl.lit("RI")).write_parquet(PARSED / "counties.parquet")
