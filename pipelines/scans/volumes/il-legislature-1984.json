@@ -1,0 +1,47 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1984,
+  "day": "1984-11-06",
+  "title": "State of Illinois official vote cast at the general election, 1984",
+  "file": {
+    "url": "https://archive.org/download/officialvote84illi/officialvote84illi.pdf"
+  },
+  "offices": {
+    "state-senate": "State Senator, one table per district",
+    "state-house": "Representative in the General Assembly, one table per district"
+  },
+  "leaves": [
+    40,
+    41,
+    42,
+    43,
+    44,
+    45,
+    46,
+    47,
+    48,
+    49,
+    50,
+    51,
+    52,
+    53,
+    54,
+    55,
+    56,
+    57,
+    58,
+    59,
+    60,
+    61,
+    62,
+    63,
+    64,
+    65,
+    66,
+    67,
+    68
+  ]
+}

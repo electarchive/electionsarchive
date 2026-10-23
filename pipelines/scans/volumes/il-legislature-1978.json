@@ -1,0 +1,42 @@
+{
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "year": 1978,
+  "day": "1978-11-07",
+  "title": "State of Illinois official vote cast at the general election, 1978",
+  "file": {
+    "url": "https://archive.org/download/officialvote78illi/officialvote78illi.pdf"
+  },
+  "offices": {
+    "state-senate": "State Senator, one table per district",
+    "state-house": "Representative in the General Assembly, one table per district (up to three seats; cumulated votes printed with halves)"
+  },
+  "leaves": [
+    64,
+    65,
+    66,
+    67,
+    68,
+    69,
+    70,
+    71,
+    72,
+    73,
+    74,
+    75,
+    76,
+    77,
+    78,
+    79,
+    80,
+    81,
+    82,
+    83,
+    84,
+    85,
+    86
+  ],
+  "autorotate": true
+}
