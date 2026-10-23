@@ -74,7 +74,7 @@ def emit() -> Path:
         made = 0
         for body, party, day, district in frame.sort("day", "body", "district", "party").iter_rows():
             key = f"{day}:MA:house:{district}:{party}" if body == "house" else f"{day}:MA:senate:{party}"
-            if key in held or (body == "senate" and party == "green-rainbow" and f"{day}:MA:senate:green" in held):
+            if key in held or (party == "green-rainbow" and key.replace("green-rainbow", "green") in held):
                 continue
             like = f"^{day}:MA:house:{district}:[a-z-]+$" if body == "house" else f"^{day}:MA:senate:[a-z-]+$"
             sibling = conn.execute(

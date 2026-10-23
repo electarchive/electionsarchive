@@ -11,7 +11,7 @@ from ea.sources.us import elstats, medsl, state_primaries
 from ea.store import DATA, connect
 
 SOURCE = "us.ma_empty_primaries"
-VERSION = "2"
+VERSION = "3"
 PARSED = DATA / "parsed" / SOURCE
 
 
@@ -93,7 +93,13 @@ def emit() -> Path:
         source = cs.source(elstats.MA_PUBLISHER, elstats.TITLE)
         if source in cs.minted:
             raise ValueError("the Massachusetts source should already exist")
-        frame = pl.read_parquet(PARSED / "counties.parquet")
+        frame = pl.read_parquet(PARSED / "counties.parquet").with_columns(
+            pl.when(pl.col("year") == 2002)
+            .then(pl.col("chamber").str.replace("green-rainbow", "green"))
+            .otherwise(pl.col("chamber"))
+            .alias("chamber"),
+            pl.when(pl.col("year") == 2002).then(pl.col("party").str.replace("green-rainbow", "green")).otherwise(pl.col("party")).alias("party"),
+        )
         held = {
             value
             for (value,) in conn.execute(
