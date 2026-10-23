@@ -148,7 +148,14 @@ def emit() -> Path:
         frame = pl.read_parquet(PARSED / "counties.parquet").filter(
             ~pl.concat_str(pl.col("day").cast(pl.String), pl.lit("UT"), "chamber", separator=":").is_in(filled)
         )
-        medsl.attach(cs, conn, frame, {"UT": source}, strict=True, canvass=True)
+        medsl.attach(
+            cs,
+            conn,
+            frame,
+            {"UT": source},
+            strict=True,
+            authoritative="Source: the Lieutenant Governor's Office of Elections' official canvass by county.",
+        )
         for (year, key, _), (*_, caveat) in CORRECTED.items():
             result_set = cs.key(f"{SOURCE}.result_set", f"{DAYS[year]}:UT:{key}:county")
             if result_set in {row["id"] for row in cs.rows.get("result_set", [])}:

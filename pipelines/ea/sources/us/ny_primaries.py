@@ -221,10 +221,12 @@ def emit() -> Path:
             for (key,) in conn.execute(
                 """select distinct x.value from external_id x
                    join result_set r on r.contest_id = x.entity_id and r.status <> 'withdrawn'
+                   join changeset g on g.id = r.changeset_id and g.pipeline <> %s
                    where x.scheme = 'us.contest' and x.value like '%%:NY:%%'
                      and exists (select from result_value v join reporting_unit u on u.k = v.unit_k
                                  where v.result_set_k = r.k
-                                   and u.scheme_code in ('us.precinct', 'us.county', 'us.county_part', 'us.nyc_ed'))"""
+                                   and u.scheme_code in ('us.precinct', 'us.county', 'us.county_part', 'us.nyc_ed'))""",
+                [SOURCE],
             ).fetchall()
         ]
         frame = pl.read_parquet(PARSED / "counties.parquet").filter(
@@ -261,5 +263,21 @@ def emit() -> Path:
         for names in FILES.values():
             for name in names:
                 cs.artifact(raw.cached(SOURCE, WAYBACK + name), source)
-        medsl.attach(cs, conn, frame, {"NY": source}, strict=True, canvass=True)
+        medsl.attach(
+            cs,
+            conn,
+            frame,
+            {"NY": source},
+            strict=True,
+            authoritative="Source: the State Board of Elections' certified primary canvass by county.",
+            declared={
+                "2014-09-09:NY:assembly:86:dp": (
+                    "VICTOR M. PICHARDO",
+                    (
+                        "The State Board of Elections' certified canvass has Victor M. Pichardo winning 1,888 to 1,886. "
+                        "Klarner's state legislative returns name Hector R. Ramirez the winner, 1,764 to 1,753."
+                    ),
+                )
+            },
+        )
         return cs.write()

@@ -114,5 +114,12 @@ def emit() -> Path:
         frame = pl.read_parquet(PARSED / "counties.parquet").filter(
             ~pl.concat_str(pl.col("day").cast(pl.String), pl.lit("MD"), "chamber", separator=":").is_in(filled)
         )
-        medsl.attach(cs, conn, frame, {"MD": source}, strict=True, canvass=True)
+        medsl.attach(
+            cs,
+            conn,
+            frame,
+            {"MD": source},
+            strict=True,
+            authoritative="Source: the State Board of Elections' official county results.",
+        )
         return cs.write()
