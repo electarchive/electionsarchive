@@ -1758,6 +1758,7 @@ async function places(
     const defaults = sets.rows
       .filter((row) => row.isDefault)
       .map((row) => row.k);
+    const within = [area.id, ...kids.map((kid) => kid.id)];
     const units = await db.execute<{
       k: number;
       id: string;
@@ -1774,7 +1775,7 @@ async function places(
         ) as "isDefault"
       from reporting_unit u join scheme s on s.code = u.scheme_code
       where u.area_relation = 'within'
-        and (u.area_id = ${area.id}::uuid or u.id in (select m.unit_id from reporting_unit_area m where m.area_id = ${area.id}::uuid))
+        and (u.area_id = any(${sql.param(within)}::uuid[]) or u.id in (select m.unit_id from reporting_unit_area m where m.area_id = any(${sql.param(within)}::uuid[])))
         and exists (
           select from result_value v
           where v.result_set_k = any(${sql.param(sets.rows.map((row) => row.k))}::int[]) and v.unit_k = u.k
