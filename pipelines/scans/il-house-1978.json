@@ -622,15 +622,10 @@
     0.03,
     0.868,
     0.99,
-    0.99
+    1.0
    ],
    "hint": "Read only the table headed '5th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '\u00bd' directly after the digits, for example 68,317\u00bd (transcribe halves).",
-   "turn": -90,
-   "bands": 2,
-   "header": [
-    0.0,
-    0.9493
-   ]
+   "turn": -90
   },
   {
    "page": 73,
