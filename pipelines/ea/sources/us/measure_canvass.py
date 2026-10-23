@@ -187,6 +187,7 @@ WYOMING = {
 }
 IOWA = {date(2020, 11, 3): 2020, date(2024, 11, 5): 2024}
 ARKANSAS = {
+    date(2012, 11, 6): "Voices2012_Web.pdf",
     date(2016, 11, 8): 1836,
     date(2018, 11, 6): 1838,
     date(2020, 11, 3): 1841,
@@ -1228,19 +1229,21 @@ def parse() -> None:
             office = None
             for number, page in enumerate(text.stdout.split("\f"), start=1):
                 for line in page.splitlines():
-                    if heading := re.match(r"(Issue No\. \d+):", line):
-                        office = heading[1]
-                    elif re.match(r"\S.*:", line):
+                    if heading := re.match(r"\s*(Issue No\. \d+):|\s*Proposed Issue #(\d+) ", line):
+                        office = heading[1] or f"Issue No. {heading[2]}"
+                    elif re.match(r"[^\d]*\S:", line):
                         office = None
-                    elif office and (matched := re.fullmatch(r"([A-Z][A-Za-z ]*?)\s+(\d+)\s+(\d+)\s+(\d+)\s*", line)):
-                        if int(matched[2]) + int(matched[3]) != int(matched[4]):
-                            continue
-                        county = "Total" if matched[1] == "Totals" else matched[1]
-                        if county == "Total" or elstats.plain(county) in names["AR"]:
-                            for answer, votes in zip(("FOR", "AGAINST"), matched.group(2, 3), strict=True):
-                                records.append((county, office, answer, votes, number))
-                        if county == "Total":
-                            office = None
+                    elif office:
+                        for matched in re.finditer(r"([A-Z][A-Za-z. ]*?):?\s+([\d,]+)\s+([\d,]+)\s+([\d,]+)", line):
+                            votes = [cell.replace(",", "") for cell in matched.group(2, 3, 4)]
+                            if int(votes[0]) + int(votes[1]) != int(votes[2]):
+                                continue
+                            county = "Total" if matched[1] == "Totals" else matched[1].strip()
+                            if county == "Total" or elstats.plain(county) in names["AR"]:
+                                for answer, count in zip(("FOR", "AGAINST"), votes, strict=False):
+                                    records.append((county, office, answer, count, number))
+                            if county == "Total":
+                                office = None
             table = pl.DataFrame(
                 records,
                 schema={
