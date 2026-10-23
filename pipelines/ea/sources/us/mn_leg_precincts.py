@@ -13,19 +13,23 @@ SOURCE = "us.mn_leg_precincts"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 OFFICES = {"senate": ("mnsen", "statesen"), "house": ("mnleg", "statehouse")}
+FILE_2000 = mn_sos.MEDIA + "1545/2000_general_results.xls"
+RENAMED_2000 = {"IND": "IP", "GREEN": "GP"}
 
 
 def fetch() -> None:
-    pass
+    raw.fetch(SOURCE, FILE_2000, suffix=".xls")
 
 
 def parse() -> None:
     rows = []
-    for year, path in mn_sos.FILES.items():
+    for year, path in ({2000: None} | mn_sos.FILES).items():
         day = date(year, 11, 2 + (-date(year, 11, 1).weekday()) % 7)
         cells = pl.read_excel(
-            raw.cached(mn_sos_precincts.SOURCE, mn_sos.MEDIA + path).path,
-            sheet_name="Results",
+            raw.cached(SOURCE, FILE_2000).path
+            if path is None
+            else raw.cached(mn_sos_precincts.SOURCE, mn_sos.MEDIA + path).path,
+            sheet_name="full_00results" if path is None else "Results",
             engine="calamine",
             has_header=False,
             infer_schema_length=0,
@@ -33,15 +37,26 @@ def parse() -> None:
         start = 2 if year == 2002 else 0
         header = [re.sub(r"\s+", " ", str(cell)).strip() for cell in cells[start]]
         column = {name: index for index, name in enumerate(header)}
-        fields = {
-            chamber: [
-                (party, index)
-                for index, name in enumerate(header)
-                if (prefix := next((p for p in prefixes if name.lower().startswith(p)), None)) is not None
-                and (party := name[len(prefix) :].upper()) not in ("", "TOT")
-            ]
-            for chamber, prefixes in OFFICES.items()
-        }
+        fields = (
+            {
+                chamber: [
+                    (RENAMED_2000.get(name.removesuffix(suffix), name.removesuffix(suffix)), index)
+                    for index, name in enumerate(header)
+                    if name.endswith(suffix)
+                ]
+                for chamber, suffix in (("senate", "_SEN"), ("house", "_HSE"))
+            }
+            if path is None
+            else {
+                chamber: [
+                    (party, index)
+                    for index, name in enumerate(header)
+                    if (prefix := next((p for p in prefixes if name.lower().startswith(p)), None)) is not None
+                    and (party := name[len(prefix) :].upper()) not in ("", "TOT")
+                ]
+                for chamber, prefixes in OFFICES.items()
+            }
+        )
         for row in cells[start + 1 :]:
             leg = str(row[column["LEG"]] or "")
             if row[0] is None or row[column["CG"]] is None or not re.fullmatch(r"\d\d[AB]", leg):
@@ -50,15 +65,17 @@ def parse() -> None:
                 r"\s+",
                 " ",
                 " ".join(
-                    str(row[column[name]]) for name in mn_sos_precincts.PLACES[year] if row[column[name]] is not None
+                    str(row[column[name]])
+                    for name in mn_sos_precincts.PLACES[year if path else 2002]
+                    if row[column[name]] is not None
                 ),
             ).strip()
-            county = "27" + str(int(row[column[mn_sos_precincts.COUNTY[year]]]) * 2 - 1).zfill(3)
+            county = "27" + str(int(row[column[mn_sos_precincts.COUNTY[year if path else 2002]]]) * 2 - 1).zfill(3)
             for chamber, found in fields.items():
                 district = f"{int(leg[:2])}-{leg[2].lower()}" if chamber == "house" else str(int(leg[:2]))
                 rows.extend(
                     (year, f"{chamber}:{district}:g", day, f"{year}:MN:{county}::{precinct}", county, party,
-                     party == "WI", int(float(row[index] or 0)))
+                     party == "WI", int(float(str(row[index] or 0).strip() or 0)))
                     for party, index in found
                 )  # fmt: skip
     frame = pl.DataFrame(
@@ -91,13 +108,14 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Minnesota's State Senate and House generals 2002–2010 by precinct from the Secretary of State's "
+            summary="Minnesota's State Senate and House generals 2000–2010 by precinct from the Secretary of State's "
             "precinct results spreadsheets",
             polity="US-MN",
         )
         source = cs.source(mn_sos_precincts.PUBLISHER, mn_sos_precincts.TITLE)
         if source in cs.minted:
             raise ValueError("the precinct spreadsheets source must already exist")
+        cs.artifact(raw.cached(SOURCE, FILE_2000), source)
         labels: dict[tuple[str, str], str | None] = {}
         for key, label, party in conn.execute(
             """select x.value, o.ballot_label, lower(n.text) from external_id x
