@@ -1,0 +1,796 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "title": "Republican primary amended certified results, June 5, 2018",
+ "license": "Public record",
+ "file": {
+  "url": "https://www.sos.ms.gov/elections/electionResults/2018%20Republican%20Primary%20Certified%20Results.pdf"
+ },
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065",
+  "Jefferson Davis": "28065"
+ },
+ "contests": {
+  "h1": {
+   "year": 2018,
+   "chamber": "house:republican",
+   "day": "2018-06-05",
+   "special": false,
+   "state": "MS",
+   "district": 1
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "p2a",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.015,
+    0.85,
+    0.462
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 2,
+   "id": "p2b",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.462,
+    0.85,
+    0.92
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 3,
+   "id": "p3a",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.015,
+    0.85,
+    0.462
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 3,
+   "id": "p3b",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.462,
+    0.85,
+    0.92
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 4,
+   "id": "p4a",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.015,
+    0.85,
+    0.462
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 4,
+   "id": "p4b",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.462,
+    0.85,
+    0.92
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 5,
+   "id": "p5a",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.015,
+    0.85,
+    0.462
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 5,
+   "id": "p5b",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.462,
+    0.85,
+    0.92
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 6,
+   "id": "p6a",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.015,
+    0.85,
+    0.462
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 6,
+   "id": "p6b",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.462,
+    0.85,
+    0.92
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 7,
+   "id": "p7a",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.015,
+    0.85,
+    0.462
+   ],
+   "hint": "Rows are the eleven candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "Richard Warren Boyanton",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Roger F. Wicker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Trent Kelly",
+     "contest": "h1",
+     "candidate": "Trent Kelly"
+    },
+    {
+     "label": "Sally Doty",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Morgan Dunn",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Michael Guest",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Perry Parker",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "K. 'Bitzi' Tate",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Steven Palazzo",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "E. Brian Rose",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  }
+ ]
+}

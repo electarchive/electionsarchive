@@ -1,0 +1,126 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "title": "Republican primary runoff certified results, June 26, 2018",
+ "license": "Public record",
+ "file": {
+  "url": "https://www.sos.ms.gov/elections/electionResults/2018%20State%20Republican%20Party%20Certified%20Primary%20Runoff%20Results.pdf"
+ },
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065",
+  "Jefferson Davis": "28065"
+ },
+ "contests": {
+  "h3": {
+   "year": 2018,
+   "chamber": "house:republican",
+   "day": "2018-06-26",
+   "special": false,
+   "state": "MS",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "b1",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.02,
+    0.85,
+    0.25
+   ],
+   "hint": "Rows are the candidates only (Michael Guest, then Whit Hughes); skip the district heading row.",
+   "columns": [
+    {
+     "label": "Michael Guest",
+     "contest": "h3",
+     "candidate": "Michael Guest"
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": "h3",
+     "candidate": "Whit Hughes"
+    }
+   ]
+  },
+  {
+   "page": 2,
+   "id": "b2",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.16,
+    0.85,
+    0.385
+   ],
+   "hint": "Rows are the candidates only (Michael Guest, then Whit Hughes); skip the district heading row.",
+   "columns": [
+    {
+     "label": "Michael Guest",
+     "contest": "h3",
+     "candidate": "Michael Guest"
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": "h3",
+     "candidate": "Whit Hughes"
+    }
+   ]
+  },
+  {
+   "page": 2,
+   "id": "b3",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.335,
+    0.85,
+    0.545
+   ],
+   "hint": "Rows are the candidates only (Michael Guest, then Whit Hughes); skip the district heading row.",
+   "columns": [
+    {
+     "label": "Michael Guest",
+     "contest": "h3",
+     "candidate": "Michael Guest"
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": "h3",
+     "candidate": "Whit Hughes"
+    }
+   ]
+  },
+  {
+   "page": 2,
+   "id": "b4",
+   "turn": -90,
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.49,
+    0.85,
+    0.74
+   ],
+   "hint": "Rows are the candidates only (Michael Guest, then Whit Hughes); skip the district heading row.",
+   "columns": [
+    {
+     "label": "Michael Guest",
+     "contest": "h3",
+     "candidate": "Michael Guest"
+    },
+    {
+     "label": "Whit Hughes",
+     "contest": "h3",
+     "candidate": "Whit Hughes"
+    }
+   ]
+  }
+ ]
+}

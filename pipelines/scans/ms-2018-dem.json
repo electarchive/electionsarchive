@@ -1,0 +1,366 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "title": "Democratic primary certified results, June 5, 2018",
+ "license": "Public record",
+ "file": {
+  "url": "https://www.sos.ms.gov/elections/electionResults/2018%20Democratic%20Primary%20Certified%20Results.pdf"
+ },
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065",
+  "Jefferson Davis": "28065"
+ },
+ "contests": {
+  "h3": {
+   "year": 2018,
+   "chamber": "house:democratic",
+   "day": "2018-06-05",
+   "special": false,
+   "state": "MS",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "orientation": "counties_across",
+   "crop": [
+    0.03,
+    0.08,
+    0.93,
+    0.68
+   ],
+   "hint": "Rows are the candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "David Baria",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jensen Bohren",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jerone Garland",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Victor G. Maurice, Jr.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Omeria Scott",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Howard Sherman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Randy Mack Wadkins",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Bennie Thompson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kevin Michael Aycox",
+     "contest": "h3",
+     "candidate": "Kevin Michael Aycox"
+    },
+    {
+     "label": "Michael Ted Evans",
+     "contest": "h3",
+     "candidate": "Michael Ted Evans"
+    },
+    {
+     "label": "Jeramey Anderson",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 3,
+   "orientation": "counties_across",
+   "crop": [
+    0.03,
+    0.08,
+    0.93,
+    0.68
+   ],
+   "hint": "Rows are the candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "David Baria",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jensen Bohren",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jerone Garland",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Victor G. Maurice, Jr.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Omeria Scott",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Howard Sherman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Randy Mack Wadkins",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Bennie Thompson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kevin Michael Aycox",
+     "contest": "h3",
+     "candidate": "Kevin Michael Aycox"
+    },
+    {
+     "label": "Michael Ted Evans",
+     "contest": "h3",
+     "candidate": "Michael Ted Evans"
+    },
+    {
+     "label": "Jeramey Anderson",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 4,
+   "orientation": "counties_across",
+   "crop": [
+    0.03,
+    0.08,
+    0.93,
+    0.68
+   ],
+   "hint": "Rows are the candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "David Baria",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jensen Bohren",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jerone Garland",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Victor G. Maurice, Jr.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Omeria Scott",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Howard Sherman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Randy Mack Wadkins",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Bennie Thompson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kevin Michael Aycox",
+     "contest": "h3",
+     "candidate": "Kevin Michael Aycox"
+    },
+    {
+     "label": "Michael Ted Evans",
+     "contest": "h3",
+     "candidate": "Michael Ted Evans"
+    },
+    {
+     "label": "Jeramey Anderson",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 5,
+   "orientation": "counties_across",
+   "crop": [
+    0.03,
+    0.08,
+    0.93,
+    0.68
+   ],
+   "hint": "Rows are the candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "David Baria",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jensen Bohren",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jerone Garland",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Victor G. Maurice, Jr.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Omeria Scott",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Howard Sherman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Randy Mack Wadkins",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Bennie Thompson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kevin Michael Aycox",
+     "contest": "h3",
+     "candidate": "Kevin Michael Aycox"
+    },
+    {
+     "label": "Michael Ted Evans",
+     "contest": "h3",
+     "candidate": "Michael Ted Evans"
+    },
+    {
+     "label": "Jeramey Anderson",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  },
+  {
+   "page": 6,
+   "orientation": "counties_across",
+   "crop": [
+    0.03,
+    0.08,
+    0.93,
+    0.68
+   ],
+   "hint": "Rows are the candidates only, in the order listed; skip office headings and rows with no name. A blank cell is outside the candidate's district; return it as an empty string.",
+   "columns": [
+    {
+     "label": "David Baria",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jensen Bohren",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Jerone Garland",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Victor G. Maurice, Jr.",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Omeria Scott",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Howard Sherman",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Randy Mack Wadkins",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Bennie Thompson",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Kevin Michael Aycox",
+     "contest": "h3",
+     "candidate": "Kevin Michael Aycox"
+    },
+    {
+     "label": "Michael Ted Evans",
+     "contest": "h3",
+     "candidate": "Michael Ted Evans"
+    },
+    {
+     "label": "Jeramey Anderson",
+     "contest": null,
+     "candidate": ""
+    }
+   ]
+  }
+ ]
+}
