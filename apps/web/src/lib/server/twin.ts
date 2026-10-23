@@ -17,17 +17,7 @@ import {
 } from "#lib/server/pages.js";
 import { router } from "#lib/server/rpc/router.js";
 
-type Data = Awaited<
-  ReturnType<
-    | typeof home
-    | typeof person
-    | typeof party
-    | typeof chamber
-    | typeof comparison
-    | typeof coverage
-    | typeof archive
-  >
->;
+type Data = Awaited<ReturnType<typeof load>>;
 type Link = (name: string, path: string | null) => string;
 
 const TITLES = {
@@ -156,6 +146,14 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   if (head === "coverage" && rest.length === 0) {
     return coverage(search);
   }
+  if (head === "search" && rest.length === 0) {
+    const q = (search.get("q") ?? "").trim().slice(0, 200);
+    return {
+      kind: "search" as const,
+      q,
+      hits: await call(router.search.query, { q, limit: 50 }),
+    };
+  }
   if (head === "compare" && rest.length === 0) {
     return comparison(
       [search.get("a"), search.get("b")].filter((id) => id != null),
@@ -250,6 +248,37 @@ function failure(
 
 function markdown(data: Data, link: Link) {
   switch (data.kind) {
+    case "search": {
+      const groups = [
+        ["polity", m.search_group_polity()],
+        ["body", m.search_group_body()],
+        ["election", m.search_group_election()],
+        ["contest", m.search_group_contest()],
+        ["party", m.search_group_party()],
+        ["person", m.search_group_person()],
+      ] as const;
+      return [
+        `# ${m.search_title()}`,
+        ...(data.q === ""
+          ? [m.search_hint()]
+          : data.hits.length === 0
+            ? [m.search_empty({ query: data.q })]
+            : groups.flatMap(([type, heading]) => {
+                const hits = data.hits.filter((hit) => hit.type === type);
+                return hits.length === 0
+                  ? []
+                  : [
+                      `## ${heading}`,
+                      hits
+                        .map(
+                          (hit) =>
+                            `- ${[link(hit.name, hit.path), hit.context, date(hit.date)].filter((part) => part != null && part !== "").join(", ")}`,
+                        )
+                        .join("\n"),
+                    ];
+              })),
+      ];
+    }
     case "home": {
       return [
         `# ${m.wordmark()}`,
