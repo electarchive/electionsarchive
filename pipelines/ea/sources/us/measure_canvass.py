@@ -392,6 +392,15 @@ WISCONSIN = DATA / "inbox" / "manual" / "MF-021"
 WISCONSIN_SITE = "https://elections.wi.gov/elections-voting/results#{}/{}"
 TEXAS = {date(2013, 11, 5): 167, date(2015, 11, 3): 190, date(2017, 11, 7): 320}
 TEXAS_SITE = "https://elections.sos.state.tx.us/elchist{}_{}.htm"
+TEXAS_JSON = {
+    date(2019, 11, 5): (42840, "https://results.texas-election.com/static/data/election/42840/County.json"),
+    date(2021, 11, 2): (45706, "https://results.texas-election.com/static/data/election/45706/County.json"),
+    date(2023, 11, 7): (48312, "https://results.texas-election.com/static/data/election/48312/County.json"),
+    date(2025, 11, 4): (
+        51031,
+        "https://goelect.txelections.civixapps.com/ivis-enr-ui/api-ivis-system/api/s3/enr/election/countyInfo/51031",
+    ),
+}
 MARYLAND_SITE = "https://elections.maryland.gov/elections/archive/{}"
 MARYLAND = {
     date(2012, 11, 6): ("2012/results/general/gen_detail_qresults_2012_4_000{}S-.html", 7),
@@ -673,6 +682,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, NEW_JERSEY_SITE.format(NEW_JERSEY[day][0]) if day in NEW_JERSEY else ""
     if state == "MD":
         return SOURCE, MARYLAND_SITE.format(MARYLAND[day][0].format(1)) if day in MARYLAND else ""
+    if state == "TX" and day in TEXAS_JSON:
+        return SOURCE, TEXAS_JSON[day][1]
     if state == "TX":
         return SOURCE, TEXAS_SITE.format(TEXAS[day], "raceselect") if day in TEXAS else ""
     if state == "PA":
@@ -870,6 +881,20 @@ def fetch() -> None:
                     raw.fetch(SOURCE, NEW_JERSEY_SITE.format(name), suffix=".pdf")
                 except httpx.HTTPStatusError as error:
                     print(f"NJ {day}: {error}")
+            continue
+        if state == "TX" and day in TEXAS_JSON:
+            saved = DATA / "inbox" / "manual" / "MF-041" / f"tx_{TEXAS_JSON[day][0]}_County.json"
+            try:
+                raw.cached(SOURCE, url)
+            except LookupError:
+                raw.store(
+                    SOURCE,
+                    url,
+                    saved.read_bytes(),
+                    suffix=".json",
+                    retrieved_at=datetime.fromtimestamp(saved.stat().st_mtime, UTC),
+                    media_type="application/json",
+                )
             continue
         if state == "TX":
             if url:
@@ -1974,6 +1999,33 @@ def parse() -> None:
                     if row[0] != "Total":
                         for answer, count in zip(("YES", "NO"), row[1:], strict=True):
                             records.append((row[0], f"Public Question {number[1]}", answer, count, question_url))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "url": pl.String,
+                },
+                orient="row",
+            )
+        elif state == "TX" and day in TEXAS_JSON:
+            records = []
+            counties = json.loads(path.read_text())
+            propositions: set[str] = set()
+            for county in counties.values():
+                for contest in county["Races"].values():
+                    if contest["OT"] not in {"Q", "STATEWIDE PROPOSITIONS"}:
+                        continue
+                    number = re.search(r"(?i)proposition (?:number )?(\d+)", contest.get("ON") or contest["N"])
+                    if number is None:
+                        continue
+                    for choice in contest["C"].values():
+                        answer = choice["N"].upper()
+                        propositions.add(number[1])
+                        records.append((county["N"], f"Proposition {number[1]}", answer, str(choice["V"]), url))
+            print(f"TX {day}: {len(propositions)} propositions from {len(counties)} counties")
             table = pl.DataFrame(
                 records,
                 schema={
