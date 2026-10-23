@@ -1,0 +1,93 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "title": "Wisconsin Blue Book 2003-2004, p. 899: September 09/10 2002 primary by county",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A2JUOJDUUULAKX8L/pages/AUEM5GCRKCHRGF8T",
+  "item": "https://search.library.wisc.edu/digital/A2JUOJDUUULAKX8L"
+ },
+ "contests": {
+  "h4d": {
+   "year": 2002,
+   "chamber": "house:democratic",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 4
+  },
+  "h4w": {
+   "year": 2002,
+   "chamber": "house:wisconsin-green",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 4
+  },
+  "h5r": {
+   "year": 2002,
+   "chamber": "house:republican",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 5
+  },
+  "h6r": {
+   "year": 2002,
+   "chamber": "house:republican",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 6
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "899-4",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.15,
+    0.97,
+    0.27
+   ],
+   "discover": [
+    "h4d",
+    "h4w"
+   ],
+   "hint": "Take only the table headed 'Fourth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "899-5",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.315,
+    0.97,
+    0.485
+   ],
+   "discover": [
+    "h5r"
+   ],
+   "hint": "Take only the table headed 'Fifth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "899-6",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.53,
+    0.97,
+    0.77
+   ],
+   "discover": [
+    "h6r"
+   ],
+   "hint": "Take only the table headed 'Sixth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  }
+ ]
+}

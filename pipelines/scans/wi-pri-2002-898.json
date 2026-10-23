@@ -1,0 +1,129 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "title": "Wisconsin Blue Book 2003-2004, p. 898: September 09/10 2002 primary by county",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A2JUOJDUUULAKX8L/pages/ATYP56ZFJ3ZOHI83",
+  "item": "https://search.library.wisc.edu/digital/A2JUOJDUUULAKX8L"
+ },
+ "contests": {
+  "h1d": {
+   "year": 2002,
+   "chamber": "house:democratic",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 1
+  },
+  "h1l": {
+   "year": 2002,
+   "chamber": "house:libertarian",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 1
+  },
+  "h1r": {
+   "year": 2002,
+   "chamber": "house:republican",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 1
+  },
+  "h2d": {
+   "year": 2002,
+   "chamber": "house:democratic",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 2
+  },
+  "h2r": {
+   "year": 2002,
+   "chamber": "house:republican",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 2
+  },
+  "h3d": {
+   "year": 2002,
+   "chamber": "house:democratic",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 3
+  },
+  "h3l": {
+   "year": 2002,
+   "chamber": "house:libertarian",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 3
+  },
+  "h3r": {
+   "year": 2002,
+   "chamber": "house:republican",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "898-1",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.15,
+    0.97,
+    0.31
+   ],
+   "discover": [
+    "h1d",
+    "h1l",
+    "h1r"
+   ],
+   "hint": "Take only the table headed 'First Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "898-2",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.33,
+    0.97,
+    0.495
+   ],
+   "discover": [
+    "h2d",
+    "h2r"
+   ],
+   "hint": "Take only the table headed 'Second Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "898-3",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.51,
+    0.97,
+    0.81
+   ],
+   "discover": [
+    "h3d",
+    "h3l",
+    "h3r"
+   ],
+   "hint": "Take only the table headed 'Third Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  }
+ ]
+}

@@ -1,0 +1,152 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "title": "Wisconsin Blue Book 2001-2002, p. 909: September 09/12 2000 primary by county",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N/pages/AKQ3OCVJSXAURL8B",
+  "item": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N"
+ },
+ "contests": {
+  "h4d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 4
+  },
+  "h4l": {
+   "year": 2000,
+   "chamber": "house:libertarian",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 4
+  },
+  "h4r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 4
+  },
+  "h5d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 5
+  },
+  "h5r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 5
+  },
+  "h6d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 6
+  },
+  "h6r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 6
+  },
+  "h7d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 7
+  },
+  "h7r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 7
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "909-4",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.15,
+    0.97,
+    0.26
+   ],
+   "discover": [
+    "h4d",
+    "h4l",
+    "h4r"
+   ],
+   "hint": "Take only the table headed 'Fourth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "909-5",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.3,
+    0.97,
+    0.4
+   ],
+   "discover": [
+    "h5d",
+    "h5r"
+   ],
+   "hint": "Take only the table headed 'Fifth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "909-6",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.43,
+    0.97,
+    0.65
+   ],
+   "discover": [
+    "h6d",
+    "h6r"
+   ],
+   "hint": "Take only the table headed 'Sixth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "909-7",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.68,
+    0.97,
+    0.95
+   ],
+   "discover": [
+    "h7d",
+    "h7r"
+   ],
+   "hint": "Take only the table headed 'Seventh Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  }
+ ]
+}

@@ -1,0 +1,66 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "title": "Wisconsin Blue Book 2001-2002, p. 906: September 09/12 2000 primary by county",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N/pages/AVKLUXFNZIFS5A8A",
+  "item": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N"
+ },
+ "contests": {
+  "sc": {
+   "year": 2000,
+   "chamber": "senate:constitution",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": null
+  },
+  "sd": {
+   "year": 2000,
+   "chamber": "senate:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": null
+  },
+  "sl": {
+   "year": 2000,
+   "chamber": "senate:libertarian",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": null
+  },
+  "sr": {
+   "year": 2000,
+   "chamber": "senate:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "906-S",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.13,
+    0.97,
+    0.86
+   ],
+   "discover": [
+    "sc",
+    "sd",
+    "sl",
+    "sr"
+   ],
+   "hint": "Take the table headed 'County Vote for United States Senator'.",
+   "bands": 3
+  }
+ ]
+}

@@ -1,0 +1,79 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "title": "Wisconsin Blue Book 2001-2002, p. 910: September 09/12 2000 primary by county",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N/pages/A5BNQEM2CYKDCD8W",
+  "item": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N"
+ },
+ "contests": {
+  "h8d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 8
+  },
+  "h8r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 8
+  },
+  "h9d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 9
+  },
+  "h9r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 9
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "910-8",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.15,
+    0.97,
+    0.375
+   ],
+   "discover": [
+    "h8d",
+    "h8r"
+   ],
+   "hint": "Take only the table headed 'Eighth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "910-9",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.405,
+    0.97,
+    0.56
+   ],
+   "discover": [
+    "h9d",
+    "h9r"
+   ],
+   "hint": "Take only the table headed 'Ninth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  }
+ ]
+}

@@ -1,0 +1,88 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "title": "Wisconsin Blue Book 2003-2004, p. 900: September 09/10 2002 primary by county",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/A2JUOJDUUULAKX8L/pages/AEZ2GPVYMOPLJA8Q",
+  "item": "https://search.library.wisc.edu/digital/A2JUOJDUUULAKX8L"
+ },
+ "contests": {
+  "h7d": {
+   "year": 2002,
+   "chamber": "house:democratic",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 7
+  },
+  "h7r": {
+   "year": 2002,
+   "chamber": "house:republican",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 7
+  },
+  "h8d": {
+   "year": 2002,
+   "chamber": "house:democratic",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 8
+  },
+  "h8r": {
+   "year": 2002,
+   "chamber": "house:republican",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 8
+  },
+  "h8w": {
+   "year": 2002,
+   "chamber": "house:wisconsin-green",
+   "day": "2002-09-10",
+   "special": false,
+   "state": "WI",
+   "district": 8
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "900-7",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.15,
+    0.97,
+    0.455
+   ],
+   "discover": [
+    "h7d",
+    "h7r"
+   ],
+   "hint": "Take only the table headed 'Seventh Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "900-8",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.5,
+    0.97,
+    0.78
+   ],
+   "discover": [
+    "h8d",
+    "h8r",
+    "h8w"
+   ],
+   "hint": "Take only the table headed 'Eighth Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  }
+ ]
+}

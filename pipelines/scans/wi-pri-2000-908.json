@@ -1,0 +1,111 @@
+{
+ "polity": "US-WI",
+ "publisher": "Wisconsin Elections Board",
+ "title": "Wisconsin Blue Book 2001-2002, p. 908: September 09/12 2000 primary by county",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N/pages/ADP7QRUNGZMQQJ9A",
+  "item": "https://search.library.wisc.edu/digital/ADQ3K7D5OERWA48N"
+ },
+ "contests": {
+  "h1d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 1
+  },
+  "h1r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 1
+  },
+  "h2d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 2
+  },
+  "h2r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 2
+  },
+  "h3d": {
+   "year": 2000,
+   "chamber": "house:democratic",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 3
+  },
+  "h3r": {
+   "year": 2000,
+   "chamber": "house:republican",
+   "day": "2000-09-12",
+   "special": false,
+   "state": "WI",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 1,
+   "id": "908-1",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.145,
+    0.97,
+    0.305
+   ],
+   "discover": [
+    "h1d",
+    "h1r"
+   ],
+   "hint": "Take only the table headed 'First Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "908-2",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.325,
+    0.97,
+    0.5
+   ],
+   "discover": [
+    "h2d",
+    "h2r"
+   ],
+   "hint": "Take only the table headed 'Second Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  },
+  {
+   "page": 1,
+   "id": "908-3",
+   "orientation": "counties_down",
+   "crop": [
+    0.03,
+    0.515,
+    0.97,
+    0.78
+   ],
+   "discover": [
+    "h3d",
+    "h3r"
+   ],
+   "hint": "Take only the table headed 'Third Congressional District'. Rows are counties, and the scan is slightly skewed, so keep each number with its county in the same row."
+  }
+ ]
+}
