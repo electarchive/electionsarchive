@@ -27,7 +27,10 @@ TYPES = {
     "veto referendum": "optional_referendum",
     "advisory question": "plebiscite",
 }
-DATES = {("MO", "Missouri Amendment 1, State Executive Term Limits Amendment"): (date(2020, 3, 3), date(2020, 11, 3))}
+DATES = {
+    ("MO", "Missouri Amendment 1, State Executive Term Limits Amendment"): (date(2020, 3, 3), date(2020, 11, 3)),
+    ("OH", "Ohio Issue 3, Marijuana Legalization Initiative"): (date(2015, 5, 5), date(2015, 11, 3)),
+}
 TITLE = "United States ballot measures, by year"
 NOTE = (
     "Statewide totals as tabulated in the English Wikipedia's yearly lists of ballot measures, which transcribe "
