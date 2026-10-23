@@ -23,7 +23,8 @@ LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 URL = "https://www.sos.alabama.gov/sites/default/files/election-data/2017-06/2014General-precinctLevel.zip"
 DAY = date(2014, 11, 4)
 OFFICE = re.compile(
-    r"STATE (REPRESENTATIVE|SENATOR),?\s+DISTRICT NO\.\s*(\d+)|State (Rep|Sen)\.?\s*(?:Dist\.?)?\s*(\d+)", re.IGNORECASE
+    r"STATE (REPRESENTATIVE|SENATOR),?\s+(?:D\d+\s+)?DISTRICT(?: NO\.)?\s*(\d+)|State (Rep|Sen)\.?\s*(?:Dist\.?)?\s*(\d+)",
+    re.IGNORECASE,
 )
 DROPPED = {"over votes", "under votes"}
 
@@ -49,7 +50,7 @@ def parse() -> None:
             code = counties[re.sub(r"[^a-z]", "", county.lower())]
             if name.endswith(".csv"):
                 table = csv.DictReader(io.StringIO(archive.read(name).decode("utf-8-sig")))
-                cells = [["Contest Title"]] + [
+                cells = [["Contest Title", "", "", "Total"]] + [
                     [
                         row["Contest Title"].strip(),
                         row["Party Code"].strip(),
@@ -75,7 +76,8 @@ def parse() -> None:
                 for row in cells[1:]:
                     found = OFFICE.fullmatch(row[0])
                     if found and row[2].lower() not in DROPPED:
-                        votes = sum(int(float(cell)) for cell in row[3:] if cell)
+                        total = cells[0][3].startswith("Total")
+                        votes = sum(int(float(cell)) for cell in (row[3:4] if total else row[3:]) if cell)
                         chamber = "house" if found[1].upper() == "REPRESENTATIVE" else "senate"
                         rows.append((f"{chamber}:{int(found[2])}:g", code, row[2], row[2] == "Write-In", votes))
                 continue
@@ -83,8 +85,9 @@ def parse() -> None:
             for cell in cells[0]:
                 current = cell or current
                 titles.append(current)
-            reported = next((row for row in cells if row[0].upper() == "REPORTED TOTALS"), None)
-            precincts = [row for row in cells[2:] if row[0] and "TOTALS" not in row[0].upper()]
+            totals = re.compile(r"(CALCULATED|REPORTED)( TOTALS)?", re.IGNORECASE)
+            reported = next((row for row in cells if re.fullmatch(r"REPORTED( TOTALS)?", row[0], re.IGNORECASE)), None)
+            precincts = [row for row in cells[2:] if row[0] and not totals.fullmatch(row[0])]
             for column, title in enumerate(titles):
                 found = OFFICE.fullmatch(title)
                 if not found or column == 0 or not cells[1][column]:
@@ -97,27 +100,33 @@ def parse() -> None:
                 chamber = "house" if found[3].lower() == "rep" else "senate"
                 rows.append((f"{chamber}:{int(found[4])}:g", code, candidate, candidate.lower() == "write-in", votes))
     PARSED.mkdir(parents=True, exist_ok=True)
-    pl.DataFrame(
-        rows,
-        schema={
-            "chamber": pl.String,
-            "code": pl.String,
-            "candidate": pl.String,
-            "writein": pl.Boolean,
-            "votes": pl.Int64,
-        },
-        orient="row",
-    ).with_columns(
-        candidate=pl.col("candidate").str.to_uppercase().str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
-        year=pl.lit(DAY.year, pl.Int32),
-        day=pl.lit(DAY),
-        district=pl.lit(None, pl.Int16),
-        special=pl.lit(False),
-        state=pl.lit("AL"),
-        measure=pl.lit(1, pl.Int16),
-        kind=pl.lit("county"),
-        source=pl.lit("AL"),
-    ).write_parquet(PARSED / "counties.parquet")
+    (
+        pl.DataFrame(
+            rows,
+            schema={
+                "chamber": pl.String,
+                "code": pl.String,
+                "candidate": pl.String,
+                "writein": pl.Boolean,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        )
+        .group_by("chamber", "code", "candidate", "writein")
+        .agg(pl.col("votes").sum())
+        .with_columns(
+            candidate=pl.col("candidate").str.to_uppercase().str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
+            year=pl.lit(DAY.year, pl.Int32),
+            day=pl.lit(DAY),
+            district=pl.lit(None, pl.Int16),
+            special=pl.lit(False),
+            state=pl.lit("AL"),
+            measure=pl.lit(1, pl.Int16),
+            kind=pl.lit("county"),
+            source=pl.lit("AL"),
+        )
+        .write_parquet(PARSED / "counties.parquet")
+    )
 
 
 def emit() -> Path:
