@@ -286,6 +286,7 @@ CALIFORNIA = {
     date(2024, 3, 5): "2024-primary/sov/csv-ballot-measures.xlsx",
     date(2022, 11, 8): "2022-general/sov/csv-ballotmeasures.xlsx",
     date(2024, 11, 5): "2024-general/sov/csv-ballot-measures.xlsx",
+    date(2025, 11, 4): "2025-special/sov/csv-ballot-measure.xlsx",
 }
 NEW_JERSEY = {
     date(2012, 11, 6): ["2012/2012-official-general-results-question1-020513", "2012/2012-official-general-results-question2-020513"],
