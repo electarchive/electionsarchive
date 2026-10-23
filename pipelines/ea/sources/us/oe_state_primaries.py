@@ -14,6 +14,11 @@ PARSED = DATA / "parsed" / SOURCE
 FILES = {
     ("IL", "2014-03-18"): ("1fa096f60367a0fe22dc380cc9799abd5228b89c", "2014/20140318__il__primary__county.csv"),
     ("OR", "2014-05-20"): ("76c478184965392b18afeaf8ab0746e5f401a2e9", "2014/20140520__or__primary__county.csv"),
+    ("GA", "2014-05-20"): (
+        "36b7453793848c02d8f41601d9304a66ad828dd0",
+        "2014/20140520__ga__general__primary__county-level.csv",
+    ),
+    ("ID", "2014-05-20"): ("f950e6ac1c5e571d7bae0d1b01ddbb1606dcf126", "2014/20140520__id__primary__county.csv"),
 }
 VARIANTS = ("", "fsettled", "funsettled", "fpartunsettled")
 
@@ -38,17 +43,26 @@ def parse() -> None:
             infer_schema_length=0,
             truncate_ragged_lines=True,
         )
+        if "votes" not in frame.columns:
+            frame = frame.with_columns(
+                votes=pl.sum_horizontal(
+                    pl.col(column).str.replace_all(r"[,\s]", "").cast(pl.Int64, strict=False)
+                    for column in frame.columns
+                    if column.endswith("_votes")
+                ).cast(pl.String)
+            )
         frames.append(
             frame.filter(
-                pl.col("office").is_in(["State House", "State Senate"]),
+                pl.col("office").is_in(["State House", "State Representative", "State Senate"]),
                 pl.col("party").str.slice(0, 1).str.to_uppercase().is_in(["D", "R"]),
-                pl.col("district").str.contains(r"^\d+$"),
+                pl.col("district").str.contains(r"^\d+[AB]?$"),
             ).select(
                 state=pl.lit(state),
                 day=pl.lit(day).str.to_date(),
                 chamber=pl.concat_str(
-                    pl.when(pl.col("office") == "State House").then(pl.lit("house")).otherwise(pl.lit("senate")),
-                    pl.col("district").cast(pl.Int32).cast(pl.String),
+                    pl.when(pl.col("office") == "State Senate").then(pl.lit("senate")).otherwise(pl.lit("house")),
+                    pl.col("district").str.extract(r"^(\d+)").cast(pl.Int32).cast(pl.String)
+                    + pl.col("district").str.extract(r"([AB])$").replace_strict({"A": ":1", "B": ":2"}, default=""),
                     pl.when(pl.col("party").str.to_uppercase().str.starts_with("D"))
                     .then(pl.lit("dp"))
                     .otherwise(pl.lit("rp")),
@@ -70,7 +84,9 @@ def parse() -> None:
     PARSED.mkdir(parents=True, exist_ok=True)
     (
         frame.with_columns(
-            measure=pl.col("candidate").str.to_uppercase().replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
+            measure=pl.col("candidate")
+            .str.to_uppercase()
+            .replace_strict(medsl.PSEUDO, default=1, return_dtype=pl.Int16),
             writein=pl.col("candidate").str.to_uppercase().is_in([*medsl.POOLED, "MISC."])
             | pl.col("candidate").str.to_uppercase().str.contains("WRITE"),
         )
@@ -96,7 +112,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="State House and Senate primaries by county from OpenElections, 2014 (Illinois and Oregon)",
+            summary="State House and Senate primaries by county from OpenElections, 2014 (Georgia, Idaho, Illinois, and "
+            "Oregon)",
             polity="US",
         )
         sources = {}
@@ -118,18 +135,20 @@ def emit() -> Path:
         keys = {
             value
             for (value,) in conn.execute(
-                "select value from external_id where scheme = 'us.contest' and value ~ '^2014-[0-9]{2}-[0-9]{2}:[A-Z]{2}:(house|senate):[0-9]+:[dr]p'"
+                "select value from external_id where scheme = 'us.contest' and value ~ '^2014-[0-9]{2}-[0-9]{2}:[A-Z]{2}:(house|senate):[0-9]+(:[12])?:[dr]p'"
             ).fetchall()
         }
         held = {
             value
             for (value,) in conn.execute(
                 """select e.value from external_id e
-                   where e.scheme = 'us.contest' and e.value ~ '^2014-[0-9]{2}-[0-9]{2}:[A-Z]{2}:(house|senate):[0-9]+:[dr]p'
+                   where e.scheme = 'us.contest' and e.value ~ '^2014-[0-9]{2}-[0-9]{2}:[A-Z]{2}:(house|senate):[0-9]+(:[12])?:[dr]p'
                      and exists (select 1 from result_set rs join result_value v on v.result_set_k = rs.k
                                  join reporting_unit u on u.k = v.unit_k
                                  where rs.contest_id = e.entity_id and rs.status = 'active'
-                                   and u.scheme_code in ('us.county', 'us.county_part', 'us.precinct'))"""
+                                   and rs.changeset_id not in (select id from changeset where pipeline = %s)
+                                   and u.scheme_code in ('us.county', 'us.county_part', 'us.precinct'))""",
+                [SOURCE],
             ).fetchall()
         }
         frame = frame.with_columns(
