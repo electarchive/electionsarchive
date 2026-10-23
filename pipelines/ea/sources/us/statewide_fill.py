@@ -1,4 +1,5 @@
 import io
+import json
 import re
 from datetime import date
 from pathlib import Path
@@ -26,6 +27,18 @@ GA_PATHS = {
     date(2002, 11, 5): "2002/20021105__ga__general.csv",
     date(2006, 11, 7): "2006/20061107__ga__general.csv",
     date(2014, 11, 4): "2014/20141104__ga__general__county-level.csv",
+}
+GA_RUNOFFS = {
+    date(2006, 12, 5): "2006/20061205__ga__general__runoff.csv",
+    date(2021, 1, 5): "2021/20210105__ga__runoff.csv",
+}
+GA_TREE = f"https://api.github.com/repos/openelections/openelections-data-ga/git/trees/{openelections.COMMITS['GA']}?recursive=1"
+GA_2018 = re.compile(r"2018/20181204__ga__general_runoff__\w+__precinct\.csv")
+FIRSTS = {
+    (date(2006, 12, 5), "Public Service Commissioner", "3"): "2006-11-07:GA:public-service-commissioner:district-3",
+    (date(2018, 12, 4), "Secretary of State", None): "2018-11-06:GA:secretary-of-state",
+    (date(2018, 12, 4), "Public Service Commissioner", "3"): "2018-11-06:GA:public-service-commissioner:metro-atlanta",
+    (date(2021, 1, 5), "Public Service Commissioner", "4"): "2020-11-03:GA:public-service-commissioner:district-4",
 }
 GA_VOTES = ["election_day_votes", "advanced_votes", "absentee_by_mail_votes", "provisional_votes"]
 OE_TITLE = "{state} precinct-level results"
@@ -59,14 +72,22 @@ def md_urls() -> list[str]:
     ]
 
 
+def ga_2018() -> list[str]:
+    tree = json.loads(raw.cached(SOURCE, GA_TREE).path.read_text())
+    return [oe("GA", item["path"]) for item in tree["tree"] if GA_2018.fullmatch(item["path"])]
+
+
 def fetch() -> None:
     raw.fetch(ca_sen_2022.SOURCE, ca_sen_2022.URL, suffix=".xlsx")
     for url in md_urls():
         raw.fetch(SOURCE, url, suffix=".csv")
     raw.fetch(SOURCE, oe("RI", RI_PATH), suffix=".csv")
     raw.fetch(SOURCE, oe("WA", WA_PATH), suffix=".csv")
-    for path in GA_PATHS.values():
+    for path in [*GA_PATHS.values(), *GA_RUNOFFS.values()]:
         raw.fetch(SOURCE, oe("GA", path), suffix=".csv")
+    raw.fetch(SOURCE, GA_TREE, suffix=".json")
+    for url in ga_2018():
+        raw.fetch(SOURCE, url, suffix=".csv")
 
 
 def parse() -> None:
@@ -171,6 +192,40 @@ def parse() -> None:
                 else pl.col("votes").cast(pl.Int64),
             )
         )
+    runoffs = [
+        (day, pl.read_csv(io.BytesIO(raw.cached(SOURCE, oe("GA", path)).path.read_bytes()), infer_schema_length=0))
+        for day, path in GA_RUNOFFS.items()
+    ] + [
+        (
+            date(2018, 12, 4),
+            pl.concat(
+                [
+                    pl.read_csv(io.BytesIO(raw.cached(SOURCE, url).path.read_bytes()), infer_schema_length=0)
+                    for url in ga_2018()
+                ],
+                how="diagonal_relaxed",
+            ),
+        )
+    ]
+    for day, ga in runoffs:
+        frames.append(
+            ga.filter(pl.col("office").str.contains(r"(?i)^(public service|secretary of state)")).select(
+                year=pl.lit(day.year),
+                day=pl.lit(day),
+                state=pl.lit("GA"),
+                title=pl.when(pl.col("office").str.contains("(?i)^secretary"))
+                .then(pl.lit("Secretary of State"))
+                .otherwise(pl.lit("Public Service Commissioner")),
+                post="district",
+                county=pl.col("county").str.to_lowercase().str.replace_all(r"[^a-z]", "").replace_strict(fips["GA"]),
+                candidate="candidate",
+                party=pl.col("party").str.strip_chars("() "),
+                writein=pl.lit(False),
+                votes=pl.sum_horizontal(pl.col(GA_VOTES).cast(pl.Int64))
+                if "votes" not in ga.columns
+                else pl.col("votes").cast(pl.Int64),
+            )
+        )
     contest = ["year", "day", "state", "title", "post", "special"]
     returns = (
         pl.concat(
@@ -206,6 +261,11 @@ def parse() -> None:
         pl.col("county").filter(pl.col("votes") > 0).unique().sort().alias("present"),
         counties=pl.col("state").first().replace_strict(COUNTIES),
     )
+    races = races.with_columns(
+        first=pl.struct("day", "title", "post").map_elements(
+            lambda race: FIRSTS.get((race["day"], race["title"], race["post"])), return_dtype=pl.String
+        )
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     returns.write_parquet(PARSED / "returns.parquet")
     races.write_parquet(PARSED / "races.parquet")
@@ -231,8 +291,8 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), sources["MD"])
         cs.artifact(raw.cached(SOURCE, oe("RI", RI_PATH)), sources["RI"])
         cs.artifact(raw.cached(SOURCE, oe("WA", WA_PATH)), sources["WA"])
-        for path in GA_PATHS.values():
-            cs.artifact(raw.cached(SOURCE, oe("GA", path)), sources["GA"])
+        for url in [oe("GA", path) for path in [*GA_PATHS.values(), *GA_RUNOFFS.values()]] + ga_2018():
+            cs.artifact(raw.cached(SOURCE, url), sources["GA"])
         return sources
 
     return medsl_statewide.emit(
@@ -241,9 +301,17 @@ def emit() -> Path:
         parsed=PARSED,
         summary="California's 2022 secretary of state, treasurer, and superintendent of public instruction, Maryland's "
         "2018 attorney general, Rhode Island's 2018 secretary of state, Washington's 2020 insurance commissioner, and "
-        "Georgia's 2002, 2006, and 2014 public service commissioner generals by county",
+        "Georgia's 2002, 2006, and 2014 public service commissioner generals by county, and Georgia's December 2006 "
+        "and 2018 and January 2021 general runoffs for secretary of state and public service commissioner by county",
         cite=cite,
         method=METHOD,
         close="The leading candidates were within half a percent in these totals, so no outcome is recorded from them.",
         absent="The source has no rows for {counties} in this race, so those votes are missing from these totals.",
+        declared={
+            "2021-01-05:GA:public-service-commissioner:district-4:runoff": (
+                "Lauren Bubba McDonald Jr.",
+                "Bubba McDonald leads by 15,794 votes in these totals, which lack Camden, Chattooga, Grady, and Greene "
+                "counties. He was certified the winner and took his seat again in January 2021.",
+            )
+        },
     )

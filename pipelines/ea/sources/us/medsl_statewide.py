@@ -1,6 +1,7 @@
 import re
 from collections import defaultdict
 from collections.abc import Callable
+from datetime import date
 from pathlib import Path
 from uuid import UUID
 
@@ -314,6 +315,7 @@ def emit(
     close: str = CLOSE,
     declared: dict[str, tuple[str, str]] | None = None,
     pages: Callable[[Changeset], dict[int, tuple[UUID, int, int]]] | None = None,
+    season: str | None = None,
 ) -> Path:
     returns = pl.read_parquet(parsed / "returns.parquet").filter(pl.col("measure") == 1)
     races = pl.read_parquet(parsed / "races.parquet")
@@ -335,6 +337,17 @@ def emit(
         offices_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.office'")}
         parties_known = {value for (value,) in conn.execute("select value from external_id where scheme = 'us.party'")}
         slugs = dict(conn.execute("select path, entity_id from slug").fetchall())
+        held = {
+            (day, state): (value, path)
+            for day, state, value, path in conn.execute(
+                """select e.date_from, substr(p.iso_code, 4), x.value, s.path from election e
+                   join external_id x on x.entity_id = e.id and x.scheme = 'us.election'
+                   join slug s on s.entity_id = e.id
+                   join polity p on p.id = e.polity_id and p.iso_code like 'US-%%'
+                   where %s and e.date_from = any(%s)""",
+                [season is not None, [date.fromisoformat(day) for day in days]],
+            ).fetchall()
+        }
         counties = dict(
             conn.execute(
                 """select code, id from reporting_unit
@@ -369,6 +382,16 @@ def emit(
                 [f"{pipeline}.result_set"],
             ).fetchall()
         }
+        firsts = [key for key in races["first"].drop_nulls().to_list()] if "first" in races.columns else []
+        runners: dict[str, dict[str, UUID]] = defaultdict(dict)
+        for key, ballot, person in conn.execute(
+            """select x.value, cy.ballot_name, cy.person_id from external_id x
+               join contest_option o on o.contest_id = x.entity_id
+               join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+               where x.scheme = 'us.contest' and x.value = any(%s)""",
+            [firsts],
+        ).fetchall():
+            runners[key][slug(ballot)] = person
         cs = Changeset(
             conn,
             pipeline=pipeline,
@@ -423,6 +446,7 @@ def emit(
         folds: dict[UUID, list[UUID]] = {}
         outcomes: list[tuple[UUID, UUID, str, int | None]] = []
         mapping: list[tuple[int, str, str, str | None, bool, str]] = []
+        made: set[UUID] = set()
         contest_columns = ["year", "day", "state", "title", "post", "special"]
         for row in races.sort("state", "year", "title", "post", nulls_last=True).iter_rows(named=True):
             year, day, state, office, post, special = (row[column] for column in contest_columns)
@@ -446,8 +470,15 @@ def emit(
             if post:
                 shown = f"{PLACES.get(state, 'Seat')} {post}" if post.isdigit() else title(post.strip("()"))
             contest_key = (
-                f"{day}:{state}:{slug(office)}" + (f":{slug(shown)}" if shown else "") + (":special" if special else "")
+                f"{day}:{state}:{slug(office)}"
+                + (f":{slug(shown)}" if shown else "")
+                + (":special" if special else "")
+                + (":runoff" if row.get("first") else "")
             )
+            first = row.get("first")
+            previous = cs.key("us.contest", first) if first else None
+            if previous is not None and previous in cs.minted:
+                raise ValueError(f"{contest_key}: no first round {first}")
             leaders = [
                 (surname(re.split(r" AND | & |/", candidate)[0]), set(slug(candidate).split("-")))
                 for candidate in ranked["candidate"].head(min(2, magnitude + 1))
@@ -525,9 +556,45 @@ def emit(
             else:
                 keys.add(contest_key)
                 mapping.append((year, state, office, post, special, contest_key))
-            election = cs.key("us.election", f"{day}:{state}")
-            if election in cs.minted:
-                raise ValueError(f"no election {day}:{state}")
+            election_value, election_path = held.get(
+                (day, state),
+                (
+                    f"{day}:{state}" + (":runoff" if first else ""),
+                    f"us/{state.lower()}/{day}-runoff" if first else None,
+                ),
+            )
+            election = cs.key("us.election", election_value)
+            if election in cs.minted and first and election not in made:
+                made.add(election)
+                cs.add(
+                    "election",
+                    id=election,
+                    polity_id=cs.polity(f"US-{state}"),
+                    kind="runoff",
+                    date_from=day,
+                    date_to=day,
+                    date_precision="day",
+                    status="held",
+                )
+                name(election, f"{day:%B} {day.day}, {day.year} {states[state]} runoff election")
+                cs.add("slug", path=election_path, entity_id=election)
+            elif election in cs.minted and not first:
+                if season is None:
+                    raise ValueError(f"no election {day}:{state}")
+                if election not in made:
+                    made.add(election)
+                    cs.add(
+                        "election",
+                        id=election,
+                        polity_id=cs.polity(f"US-{state}"),
+                        kind="primary" if "primary" in season else "general",
+                        date_from=day,
+                        date_to=day,
+                        date_precision="day",
+                        status="held",
+                    )
+                    name(election, f"{year} {states[state]} {season}")
+                    cs.add("slug", path=f"us/{state.lower()}/{day}-{slug(season)}", entity_id=election)
             office_key = f"{slug(office)}:{state}"
             office_id = cs.key("us.office", office_key)
             if revised is None and office_key not in offices_known:
@@ -554,7 +621,8 @@ def emit(
                 district_area_id=state_units[state][1],
                 term="remainder" if special else "full",
                 magnitude=magnitude,
-                round_number=1,
+                round_number=2 if first else 1,
+                previous_round_id=previous,
                 electoral_system_id=systems["two_round"]
                 if state in MAJORITY
                 else systems["fptp"]
@@ -564,11 +632,11 @@ def emit(
             )
             name(
                 contest,
-                f"{year} {states[state]} {office} {'special election' if special else 'election'}"
+                f"{year} {states[state]} {office} {'special election' if special else 'primary election' if season and 'primary' in season else 'runoff' if first else 'election'}"
                 + (f" ({shown})" if shown else ""),
             )
             path = (
-                f"us/{state.lower()}/{day}-general/{slug(office)}"
+                f"{election_path or f'us/{state.lower()}/{day}-' + (slug(season) if season else 'general')}/{slug(office)}"
                 + (f"-{slug(shown)}" if shown else "")
                 + ("-special" if special else "")
             )
@@ -658,7 +726,15 @@ def emit(
                 )
                 if not (pooled or nota):
                     person_key = f"{state}:{slug(str(candidate))}"
-                    person = cs.key(f"{pipeline}.person", person_key)
+                    person = None
+                    if first:
+                        found = [
+                            entity
+                            for text, entity in runners[first].items()
+                            if text == slug(ballot) or text.split("-")[-1] == slug(ballot).split("-")[-1]
+                        ]
+                        person = found[0] if len(set(found)) == 1 else None
+                    person = person or cs.key(f"{pipeline}.person", person_key)
                     if person in cs.minted and person_key not in persons:
                         persons.add(person_key)
                         cs.add("person", id=person)
