@@ -82,7 +82,9 @@
     sources?: Array<string> | null;
     explore?: string | null;
     neighbors?:
-      | (() => Promise<Array<{ k: number; name: string; path: string }>>)
+      | (() => Promise<
+          Array<{ k: number; name: string; path: string; isAdjacent: boolean }>
+        >)
       | null;
     up?: { name: string; path: string } | null;
   } = $props();
@@ -123,7 +125,9 @@
   let pointer = $state<{ x: number; y: number } | null>(null);
   let near = $state<number | null>(null);
   let nearPinned = $state(false);
-  let nearby = $state<Array<{ k: number; name: string; path: string }>>([]);
+  let nearby = $state<
+    Array<{ k: number; name: string; path: string; isAdjacent: boolean }>
+  >([]);
   let seen = $state<Array<number>>([]);
   let isMoved = false;
   let boxWidth = $state(0);
@@ -136,7 +140,11 @@
     seen
       .flatMap((k) => {
         const entry = besides.get(k);
-        return entry == null || k === own?.k ? [] : [entry];
+        return entry == null ||
+          k === own?.k ||
+          (!entry.isAdjacent && nearby.some((other) => other.isAdjacent))
+          ? []
+          : [entry];
       })
       .toSorted((a, b) =>
         a.name.localeCompare(b.name, undefined, { numeric: true }),

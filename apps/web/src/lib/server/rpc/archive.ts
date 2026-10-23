@@ -9289,13 +9289,24 @@ export const polities = {
       }),
     )
     .output(
-      v.array(v.object({ k: v.number(), name: v.string(), path: v.string() })),
+      v.array(
+        v.object({
+          k: v.number(),
+          name: v.string(),
+          path: v.string(),
+          isAdjacent: v.boolean(),
+        }),
+      ),
     )
     .handler(async ({ input }) => {
       const day = input.on ?? new Date().toISOString().slice(0, 10);
-      const found = await db.execute<{ id: string; k: number }>(sql`
+      const found = await db.execute<{
+        id: string;
+        k: number;
+        isAdjacent: boolean;
+      }>(sql`
         with me as (
-          select a.scheme_code from polity_territory t join area a on a.id = t.area_id
+          select a.id, a.scheme_code from polity_territory t join area a on a.id = t.area_id
           where t.polity_id = ${input.id}::uuid
           order by t.valid @> ${day}::date desc, upper(t.valid) desc nulls first limit 1
         ),
@@ -9303,7 +9314,12 @@ export const polities = {
           select parent_id from polity_parent where polity_id = ${input.id}::uuid
           order by valid @> ${day}::date desc, upper_inf(valid) desc, upper(valid) desc limit 1
         )
-        select distinct on (p.polity_id) p.polity_id as id, a.k
+        select distinct on (p.polity_id) p.polity_id as id, a.k,
+          exists (
+            select from area_geometry g join area_geometry o on o.area_id = (select id from me)
+            where g.area_id = a.id and g.valid @> ${day}::date and o.valid @> ${day}::date
+              and st_dwithin(g.geom, o.geom, 0.002)
+          ) as "isAdjacent"
         from polity_parent p
         join polity_territory t on t.polity_id = p.polity_id
         join area a on a.id = t.area_id and a.scheme_code = (select scheme_code from me)
@@ -9317,7 +9333,14 @@ export const polities = {
         const path = slugs.get(row.id);
         return path == null
           ? []
-          : [{ k: row.k, name: labels.full.get(row.id) ?? "", path }];
+          : [
+              {
+                k: row.k,
+                name: labels.full.get(row.id) ?? "",
+                path,
+                isAdjacent: row.isAdjacent,
+              },
+            ];
       });
     }),
   record: os

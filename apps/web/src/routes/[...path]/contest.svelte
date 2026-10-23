@@ -201,7 +201,9 @@
         by: siblings.level,
       });
       return (found?.rows ?? []).flatMap((row) =>
-        row.path == null ? [] : [{ k: row.k, name: row.name, path: row.path }],
+        row.path == null
+          ? []
+          : [{ k: row.k, name: row.name, path: row.path, isAdjacent: false }],
       );
     };
   });
