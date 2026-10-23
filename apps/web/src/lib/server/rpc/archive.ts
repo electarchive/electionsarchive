@@ -6625,34 +6625,35 @@ async function races(
                 return { key, seats };
               })
               .toArray();
+      const named =
+        (single == null ||
+        (head?.isOffice === true &&
+          groups.filter(
+            (other) =>
+              other[0]?.office === head.office &&
+              other[0]?.party === head.party,
+          ).length === 1) ||
+        (head?.isOffice === false &&
+          head.party != null &&
+          groups.filter(
+            (other) =>
+              other[0]?.owner === head.owner && other[0]?.party === head.party,
+          ).length === 1)
+          ? head?.owner
+          : single.id) ??
+        head?.id ??
+        "";
       return {
         map,
         before,
         runoff,
         contest: single?.id ?? null,
         anchor: segment(labels.full.get(head?.owner ?? head?.id ?? "") ?? ""),
-        name:
-          labels.full.get(
-            (single == null ||
-            (head?.isOffice === true &&
-              groups.filter(
-                (other) =>
-                  other[0]?.office === head.office &&
-                  other[0]?.party === head.party,
-              ).length === 1) ||
-            (head?.isOffice === false &&
-              head.party != null &&
-              groups.filter(
-                (other) =>
-                  other[0]?.owner === head.owner &&
-                  other[0]?.party === head.party,
-              ).length === 1)
-              ? head?.owner
-              : single.id) ??
-              head?.id ??
-              "",
-          ) ?? "",
-        scope: head?.party == null ? null : labels.full.get(head.party),
+        name: labels.short.get(named) ?? labels.full.get(named) ?? "",
+        scope:
+          head?.party == null
+            ? null
+            : (labels.short.get(head.party) ?? labels.full.get(head.party)),
         path: single == null ? null : (slugs.get(single.id) ?? null),
         kind: head?.kind ?? "",
         isOffice: head?.isOffice ?? false,
@@ -6664,9 +6665,13 @@ async function races(
         election: head?.election ?? "",
         day: head?.day ?? null,
         chamber:
+          labels.short.get(
+            (head?.isOffice === true ? head.office : head?.owner) ?? "",
+          ) ??
           labels.full.get(
             (head?.isOffice === true ? head.office : head?.owner) ?? "",
-          ) ?? null,
+          ) ??
+          null,
         isNational: head?.area == null || head.area === nation.id,
         rank:
           head == null

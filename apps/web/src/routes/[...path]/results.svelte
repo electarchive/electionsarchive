@@ -425,7 +425,7 @@
                   person={(page ?? other)?.person}
                   party={(page ?? other)?.party}
                 />
-                {#if row.short != null && row.short !== row.label && !isOneParty && (span != null || (page?.lines.length ?? 0) === 0)}
+                {#if row.short != null && !row.label.includes(row.short) && !isOneParty && (span != null || (page?.lines.length ?? 0) === 0)}
                   <Name
                     class="text-[0.8125rem] text-muted-foreground"
                     label={row.short}

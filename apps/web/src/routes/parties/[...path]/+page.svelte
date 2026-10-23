@@ -114,7 +114,7 @@
                 party: party.name,
                 place: party.scope.polity.name,
               })}
-          {#if party.scope == null && party.short != null && party.short !== party.name}
+          {#if party.scope == null && party.short != null && !party.name.includes(party.short)}
             <span
               class="ms-1 font-sans text-[0.5em] font-semibold tracking-normal text-muted-foreground"
               >{party.short}</span

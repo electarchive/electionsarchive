@@ -335,7 +335,7 @@ function partyMarkdown(
   ];
   return [
     party.scope == null
-      ? `# ${party.name}${party.short != null && party.short !== party.name ? ` (${party.short})` : ""}`
+      ? `# ${party.name}${party.short != null && !party.name.includes(party.short) ? ` (${party.short})` : ""}`
       : `# ${m.party_scope_title({ party: party.name, place: party.scope.polity.name })}`,
     ...(party.polity == null
       ? []

@@ -109,7 +109,7 @@
       ></span>
       <span>
         {party.name}
-        {#if party.short != null && party.short !== party.name}
+        {#if party.short != null && !party.name.includes(party.short)}
           <span
             class="ms-1 font-sans text-[0.8125rem] font-normal text-muted-foreground"
             >{party.short}</span

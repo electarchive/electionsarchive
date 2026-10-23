@@ -79,7 +79,7 @@
         ></span>
         <span class="font-semibold">{row.label}</span>
       </span>
-      {#if row.short != null && row.short !== row.label}
+      {#if row.short != null && !row.label.includes(row.short)}
         <span class="text-xs opacity-80">{row.short}</span>
       {/if}
       <span
@@ -113,7 +113,7 @@
           person={row.person}
           party={row.party}
         />
-        {#if row.short != null && row.short !== row.label}
+        {#if row.short != null && !row.label.includes(row.short)}
           <Name
             class="text-muted-foreground max-sm:hidden"
             label={row.short}
