@@ -1,12 +1,14 @@
 import html
+import json
 import re
+from datetime import datetime
 from pathlib import Path
 
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset
-from ea.sources.us import elstats, medsl, nv_primaries, state_primaries
+from ea.sources.us import elstats, medsl, nv_primaries, ri_federal, state_primaries
 from ea.store import DATA, connect
 
 SOURCE = "us.leg_primary_counties"
@@ -27,7 +29,7 @@ def parse() -> None:
         pl.col("code").is_not_null(),
         pl.col("scheme") == "us.county",
     )
-    nevada = []
+    extra = []
     for day, stamp, url in nv_primaries.FILES:
         text = raw.cached(nv_primaries.SOURCE, nv_primaries.address(stamp, url)).path.read_text(errors="ignore")
         text = re.sub(r"<script.*?</script>|<style.*?</style>", "", text, flags=re.DOTALL)
@@ -50,8 +52,9 @@ def parse() -> None:
             while cursor + 2 + len(names) < len(tokens) and re.fullmatch(r"[\d.]+%", tokens[cursor + 1]):
                 for county, cell in zip(names, tokens[cursor + 3 : cursor + 3 + len(names)], strict=True):
                     if cell != "N/A" and not re.match(r"(NONE OF|UNDER VOTES|OVER VOTES)", tokens[cursor].upper()):
-                        nevada.append(
+                        extra.append(
                             (
+                                "NV",
                                 day,
                                 f"{found[1].lower()}:{int(found[2])}:{NV_PARTIES[found[3]]}",
                                 nv_primaries.COUNTIES[county],
@@ -60,6 +63,30 @@ def parse() -> None:
                             )
                         )
                 cursor += 3 + len(names)
+    for folder in ri_federal.FOLDERS:
+        if not folder.endswith("statewide_primary"):
+            continue
+        for town, fips in ri_federal.TOWNS.items():
+            if (folder, town) in ri_federal.MISSING:
+                continue
+            data = json.loads(raw.cached(ri_federal.SOURCE, f"{ri_federal.BASE}{folder}/{town}.json").path.read_text())
+            day = datetime.strptime(data["election_date"], "%B %d, %Y").date()
+            for contest in data["contests"]:
+                found = re.match(r"(SENATOR|REP) IN GENERAL ASSEMBLY DISTRICT (\d+)$", contest["name"].upper().strip())
+                party = {"DEM": "dp", "REP": "rp"}.get((contest.get("contest_party_designation") or "").upper())
+                if found is None or party is None:
+                    continue
+                for candidate in contest["candidates"]:
+                    extra.append(
+                        (
+                            "RI",
+                            day,
+                            f"{'senate' if found[1] == 'SENATOR' else 'house'}:{int(found[2])}:{party}",
+                            fips,
+                            " ".join(html.unescape(candidate["name"]).split()).rstrip("*").strip().upper(),
+                            int(str(candidate["votes"]).replace(",", "")),
+                        )
+                    )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat(
         [
@@ -89,12 +116,15 @@ def parse() -> None:
                 kind=pl.lit("county"),
                 source="state",
             ),
-            pl.DataFrame(nevada, schema=["day", "chamber", "code", "candidate", "votes"], orient="row").select(
+            pl.DataFrame(extra, schema=["state", "day", "chamber", "code", "candidate", "votes"], orient="row")
+            .group_by("state", "day", "chamber", "code", "candidate")
+            .agg(pl.col("votes").sum())
+            .select(
                 year=pl.col("day").dt.year().cast(pl.Int32),
                 chamber="chamber",
                 day="day",
                 special=pl.lit(False),
-                state=pl.lit("NV"),
+                state="state",
                 district=pl.lit(None, pl.Int16),
                 code="code",
                 candidate="candidate",
@@ -102,7 +132,7 @@ def parse() -> None:
                 writein=pl.lit(False),
                 votes="votes",
                 kind=pl.lit("county"),
-                source=pl.lit("NV"),
+                source="state",
             ),
         ]
     ).write_parquet(PARSED / "counties.parquet")
@@ -116,15 +146,15 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="State House, Senate, and Assembly primaries by county from the ElectionStats archives of "
-            "Connecticut, Idaho, New York, and Vermont and Nevada's election summary pages, for contests held only as "
-            "district totals",
+            "Connecticut, Idaho, New York, and Vermont, Nevada's election summary pages, and Rhode Island's town results, "
+            "for contests held only as district totals",
             polity="US",
         )
         totals = {
             value
             for (value,) in conn.execute(
                 """select x.value from external_id x
-                   where x.scheme = 'us.contest' and x.value ~ '^20[0-9-]{8}:(CT|ID|NV|NY|VT):(house|senate|assembly):'
+                   where x.scheme = 'us.contest' and x.value ~ '^20[0-9-]{8}:(CT|ID|NV|NY|RI|VT):(house|senate|assembly):'
                      and exists (select from result_set r where r.contest_id = x.entity_id and r.status <> 'withdrawn')
                      and not exists (select from result_set r join result_value v on v.result_set_k = r.k
                                      join reporting_unit u on u.k = v.unit_k
@@ -151,5 +181,15 @@ def emit() -> Path:
         for day, stamp, url in nv_primaries.FILES:
             if day in frame.filter(pl.col("state") == "NV")["day"].to_list():
                 cs.artifact(raw.cached(nv_primaries.SOURCE, nv_primaries.address(stamp, url)), sources["NV"])
+        sources["RI"] = cs.source(ri_federal.PUBLISHER, ri_federal.TITLE)
+        if sources["RI"] in cs.minted:
+            raise ValueError(f"no source {ri_federal.TITLE}")
+        for year in frame.filter(pl.col("state") == "RI")["year"].unique():
+            for town in ri_federal.TOWNS:
+                if (f"{year}/statewide_primary", town) not in ri_federal.MISSING:
+                    cs.artifact(
+                        raw.cached(ri_federal.SOURCE, f"{ri_federal.BASE}{year}/statewide_primary/{town}.json"),
+                        sources["RI"],
+                    )
         medsl.attach(cs, conn, frame, sources, extend=True)
         return cs.write()
