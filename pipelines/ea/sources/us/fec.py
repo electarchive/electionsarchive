@@ -1022,6 +1022,7 @@ COLUMNS = (
     (r"PRIMARY|PRIMARY RESULTS|PRIMARY VOTES", "primary"),
     (r"RUNOFF|RUNOFF RESULTS|RUNOFF VOTES", "primary_runoff"),
     (r"PE WINNER INDICATOR", "nominee"),
+    (r"FOOTNOTES", "footnote"),
 )
 SWITCHES = {
     (2002, "H8PA10055"): "R/D",
@@ -1643,6 +1644,7 @@ def parse() -> None:
                             second,
                             row.get("nominee"),
                             held,
+                            row.get("footnote"),
                         )
                     )
                     pending.append((primary or 0, second or 0))
@@ -1677,6 +1679,7 @@ def parse() -> None:
                         *rounds,
                         row.get("winner"),
                         "[" in (row.get("general") or ""),
+                        row.get("footnote"),
                     )
                 )
         sheet = next((sheet for sheet in sheets if "pres primary results" in sheet.lower()), None)
@@ -1864,6 +1867,7 @@ def parse() -> None:
             "rcv3": pl.Int64,
             "flag": pl.String,
             "bracketed": pl.Boolean,
+            "footnote": pl.String,
         },
         orient="row",
     )
@@ -1915,6 +1919,7 @@ def parse() -> None:
                 "runoff": pl.Int64,
                 "flag": pl.String,
                 "held": pl.Date,
+                "footnote": pl.String,
             },
             orient="row",
         )
@@ -5089,6 +5094,12 @@ def emit() -> Path:
             if cs.key("us.party", folded) != cs.key("us.party", into):
                 cs.merge(cs.key("us.party", folded), cs.key("us.party", into))
         cs.renamed["republican-party-of-minnesota"] = "independent-republican"
+        cs.renamed |= {
+            "2006-06-13:VA": "2006-09-09:VA",
+            "2006-09-09:VI": "2006-06-13:VI",
+            "2012-03-06:OH": "2012-06-12:OH",
+            "2012-05-29:TX": "2012-04-03:TX",
+        }
 
         persons: dict[str, UUID] = {}
         by_name: dict[str, UUID] = {}
@@ -5808,9 +5819,14 @@ def emit() -> Path:
                 previous = contest
                 if annulled:
                     continue
+                footnotes = {
+                    row["person"]: row["footnote"]
+                    for row in rows.iter_rows(named=True)
+                    if row["person"] is not None and row["footnote"] is not None
+                }
                 withdrawn = {row["person"] for row in rows.iter_rows(named=True) if (year, row["fec_id"]) in WITHDREW}
                 for person in withdrawn:
-                    cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="withdrew")
+                    cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="withdrew", notes=footnotes.get(person))
                 ranked = [
                     person for person in sorted(totals, key=totals.__getitem__, reverse=True) if person not in withdrawn
                 ]
@@ -5821,7 +5837,7 @@ def emit() -> Path:
                 }
                 if number + 1 < len(stages):
                     for person in stages[number + 1][2]["person"].drop_nulls().unique():
-                        cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced")
+                        cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced", notes=footnotes.get(person))
                     continue
                 if blanket:
                     advancing = 4 if state == "AK" else 2
@@ -5834,9 +5850,21 @@ def emit() -> Path:
                         )
                     for person in ranked:
                         if person in chosen:
-                            cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced")
+                            cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced", notes=footnotes.get(person))
                     continue
-                if not ranked or (len(ranked) > 1 and totals[ranked[0]] == totals[ranked[1]]):
+                if not ranked:
+                    continue
+                if len(ranked) > 1 and totals[ranked[0]] == totals[ranked[1]]:
+                    tied = [person for person in ranked if totals[person] == totals[ranked[0]]]
+                    if any(person in footnotes for person in tied):
+                        for person in tied:
+                            cs.add(
+                                "outcome",
+                                result_set_id=result_set,
+                                option_id=roots[person],
+                                kind="tied",
+                                notes=footnotes.get(person),
+                            )
                     continue
                 winner = ranked[0]
                 if flagged and winner not in flagged:
@@ -5846,7 +5874,7 @@ def emit() -> Path:
                     continue
                 if tacit and len(ranked) != 1:
                     raise ValueError(f"{contest_key}: {len(ranked)} unopposed candidates")
-                cs.add("outcome", result_set_id=result_set, option_id=roots[winner], kind="won")
+                cs.add("outcome", result_set_id=result_set, option_id=roots[winner], kind="won", notes=footnotes.get(winner))
         if unmatched:
             raise ValueError(f"primary outcomes disagree with the FEC's flags or general lists: {unmatched}")
 
@@ -6396,6 +6424,11 @@ def emit() -> Path:
                                 y1=box[3],
                             )
 
+                footnotes = {
+                    row["person"]: row["footnote"]
+                    for row in rows.iter_rows(named=True)
+                    if row["person"] is not None and row["footnote"] is not None
+                }
                 ranked = sorted(totals, key=totals.__getitem__, reverse=True)
                 share = totals[ranked[0]] / (rows["votes"].sum() or 1)
                 majority = 0.45 if system == "two_round_45" else 0.5
@@ -6406,7 +6439,7 @@ def emit() -> Path:
                     if share >= majority:
                         raise ValueError(f"{contest_key}: a runoff after a {share:.1%} majority")
                     for person in runoff["person"].unique():
-                        cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced")
+                        cs.add("outcome", result_set_id=result_set, option_id=roots[person], kind="advanced", notes=footnotes.get(person))
                     continue
                 flagged = {
                     row["person"]
@@ -6427,7 +6460,7 @@ def emit() -> Path:
                     )
                 ):
                     raise ValueError(f"{contest_key}: unclear winner {totals}, {flagged}")
-                cs.add("outcome", result_set_id=result_set, option_id=roots[winner], kind="elected", seats=1)
+                cs.add("outcome", result_set_id=result_set, option_id=roots[winner], kind="elected", seats=1, notes=footnotes.get(winner))
                 if contest_key in canvasses:
                     canvass, page, read = canvasses[contest_key]
                     corrected = cs.key(f"{SOURCE}.result_set", f"{contest_key}:canvass")
@@ -6488,6 +6521,7 @@ def emit() -> Path:
                                 result_set_id=result_set,
                                 option_id=roots[person],
                                 kind="lost" if totals[person] else "eliminated",
+                                notes=footnotes.get(person),
                             )
 
         if RUNOFFS.keys() - runoffs or NOTES.keys() - noted:
