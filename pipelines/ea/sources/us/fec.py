@@ -1064,6 +1064,12 @@ REPLACEMENTS: dict[tuple[int, str, str, int | None], date] = {
     (2010, "OH", "house", 3): date(2010, 7, 13),
 }
 SPECIAL_PRIMARIES = {(2010, "WV", "senate", None): date(2010, 8, 28), (2012, "MI", "house", 11): date(2012, 9, 5)}
+DATE_FIXES: dict[tuple[int, str], date] = {
+    (2006, "VA"): date(2006, 6, 13),
+    (2006, "VI"): date(2006, 9, 9),
+    (2012, "OH"): date(2012, 3, 6),
+    (2012, "TX"): date(2012, 5, 29),
+}
 PRIMARY_RUNOFFS = {
     (1996, "GA"): date(1996, 8, 6),
     (1998, "AR"): date(1998, 6, 9),
@@ -1716,7 +1722,7 @@ def parse() -> None:
                     (
                         year,
                         state,
-                        date.fromisoformat((row["PRIMARY DATE"] or "")[:10]),
+                        DATE_FIXES.get((year, state)) or date.fromisoformat((row["PRIMARY DATE"] or "")[:10]),
                         labels[wrapped[2] if wrapped else code],
                         "UN" if wrapped and wrapped[1] == "UN" else wrapped[2] if wrapped else code,
                         SURNAMES.get(name) if row["FEC ID"] in (None, "n/a") else row["FEC ID"],
@@ -1993,6 +1999,7 @@ def parse() -> None:
                 days.append(None)
         if days[0] is None:
             continue
+        days[0] = DATE_FIXES.get((year, places.get(" ".join(place.split()).upper(), "")), days[0])
         if days[1] is None:
             days[1] = PRIMARY_RUNOFFS.get((year, places.get(" ".join(place.split()).upper(), "")))
         if (state := places.get(" ".join(place.split()).upper())) is None:
