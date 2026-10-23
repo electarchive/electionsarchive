@@ -22,7 +22,7 @@ export const areaRelation = pgEnum("area_relation", ["equals", "within", "unloca
 export const reportingUnitKind = pgEnum("reporting_unit_kind", ["standard", "abroad_mission", "customs_gate", "prison", "mobile", "postal_district", "aggregate"])
 export const crosswalkFromKind = pgEnum("crosswalk_from_kind", ["boundary_set", "reporting_scheme"])
 export const crosswalkMethod = pgEnum("crosswalk_method", ["exact", "registered_voters", "population", "area"])
-export const partyKind = pgEnum("party_kind", ["party", "independent_group", "list_vehicle", "federation", "bloc", "nuance", "parliamentary_group"])
+export const partyKind = pgEnum("party_kind", ["party", "independent_group", "list_vehicle", "federation", "bloc", "nuance", "parliamentary_group", "caucus"])
 export const partyRelationKind = pgEnum("party_relation_kind", ["merged_into", "split_from", "successor_of", "refounded_as", "absorbed_by", "closed_by_court", "list_vehicle_for"])
 export const partyAffiliationKind = pgEnum("party_affiliation_kind", ["ep_group", "federation", "international", "regional_branch"])
 export const bodyKind = pgEnum("body_kind", ["lower_house", "upper_house", "unicameral", "council", "electoral_college", "constituent_assembly", "appointed_assembly"])
@@ -831,6 +831,12 @@ export const personImage = pgTable("person_image", {
 	sourceId: uuid("source_id").references(() => source.id),
 	changesetId: uuid("changeset_id").notNull().references(() => changeset.id),
 	recordedFrom: timestamp("recorded_from", { withTimezone: true }).default(sql`now()`).notNull(),
+	takenText: text("taken_text"),
+	takenFrom: date("taken_from"),
+	takenFromPrecision: datePrecision("taken_from_precision").default("unknown").notNull(),
+	takenTo: date("taken_to"),
+	takenToPrecision: datePrecision("taken_to_precision").default("unknown").notNull(),
+	uploadedAt: timestamp("uploaded_at", { withTimezone: true }),
 }, (table) => [
 	index("person_image_person_idx").using("btree", table.personId.asc().nullsLast()),
 ]);
