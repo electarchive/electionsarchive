@@ -22,6 +22,7 @@
   let query = $state("");
   let opened = $state<Array<string>>([]);
   let level = $state<string | null>(null);
+  let isAll = $state(false);
 
   const winners = createQuery(() => ({
     ...orpc.elections.winners.queryOptions({ input: { id } }),
@@ -167,7 +168,7 @@
     <ul
       class="grid gap-px overflow-hidden rounded-sm bg-border ring-1 ring-border sm:grid-cols-2 xl:grid-cols-3"
     >
-      {#each shown as group (group.id)}
+      {#each isAll || query !== "" ? shown : shown.slice(0, 12) as group (group.id)}
         {const isOpen = $derived(opened.includes(group.id) || query !== "")}
         {const total = $derived(group.rows.length)}
         <li class="grid content-start gap-2 bg-card px-3 pbs-2.5 pbe-3">
@@ -256,5 +257,16 @@
         </li>
       {/each}
     </ul>
+    {#if shown.length > 12 && query === ""}
+      <button
+        type="button"
+        class="justify-self-start text-[0.8125rem] font-semibold underline decoration-border underline-offset-4 hover:decoration-foreground pointer-coarse:py-2"
+        aria-expanded={isAll}
+        onclick={() => (isAll = !isAll)}
+        >{isAll
+          ? m.winners_fewer()
+          : m.winners_more({ count: count(shown.length) })}</button
+      >
+    {/if}
   </section>
 {/if}
