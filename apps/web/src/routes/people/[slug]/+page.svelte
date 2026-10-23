@@ -4,7 +4,7 @@
   import ArrowLeftRightIcon from "@lucide/svelte/icons/arrow-left-right";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import Name from "#lib/components/name.svelte";
-  import { count, date, percent } from "#lib/format.js";
+  import { count, credit, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -236,13 +236,7 @@
         <a
           class="self-end justify-self-start text-xs text-muted-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
           href={person.photo.source}
-          rel="external noopener"
-          >{person.photo.artist == null
-            ? m.photo_credit_anonymous({ license: person.photo.license })
-            : m.photo_credit({
-                artist: person.photo.artist,
-                license: person.photo.license,
-              })}</a
+          rel="external noopener">{credit(person.photo)}</a
         >
       {/if}
     </header>

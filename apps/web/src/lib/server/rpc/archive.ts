@@ -264,6 +264,9 @@ const Photo = v.nullable(
     license: v.string(),
     artist: v.nullable(v.string()),
     source: v.string(),
+    taken: v.nullable(
+      v.object({ from: v.nullable(v.number()), to: v.nullable(v.number()) }),
+    ),
   }),
 );
 
@@ -10058,8 +10061,11 @@ async function portraits(ids: Array<string>) {
     license: string;
     artist: string | null;
     source: string;
+    from: number | null;
+    to: number | null;
   }>(sql`
-    select distinct on (person_id) person_id as person, path, license, artist, source_url as source
+    select distinct on (person_id) person_id as person, path, license, artist, source_url as source,
+      extract(year from taken_from)::int as from, extract(year from taken_to)::int as to
     from person_image where person_id = any(${sql.param([...new Set(ids)])}::uuid[])
     order by person_id, recorded_from desc
   `);
@@ -10071,6 +10077,11 @@ async function portraits(ids: Array<string>) {
         license: row.license,
         artist: row.artist,
         source: row.source,
+        taken:
+          (row.from == null && row.to == null) ||
+          (row.from != null && row.to != null && row.to - row.from > 25)
+            ? null
+            : { from: row.from, to: row.to },
       },
     ]),
   );

@@ -2,7 +2,7 @@
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
-  import { count, percent } from "#lib/format.js";
+  import { count, credit, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -192,13 +192,7 @@
           <a
             class="justify-self-start text-[0.6875rem] text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
             href={side.photo.source}
-            rel="external noopener"
-            >{side.photo.artist == null
-              ? m.photo_credit_anonymous({ license: side.photo.license })
-              : m.photo_credit({
-                  artist: side.photo.artist,
-                  license: side.photo.license,
-                })}</a
+            rel="external noopener">{credit(side.photo)}</a
           >
         {/if}
       </dd>

@@ -4,7 +4,7 @@
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
-  import { count, percent, points, precision } from "#lib/format.js";
+  import { count, credit, percent, points, precision } from "#lib/format.js";
   import { OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -676,13 +676,7 @@
           <a
             class="underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
             href={row.photo.source}
-            rel="external noopener"
-            >{row.photo.artist == null
-              ? m.photo_credit_anonymous({ license: row.photo.license })
-              : m.photo_credit({
-                  artist: row.photo.artist,
-                  license: row.photo.license,
-                })}</a
+            rel="external noopener">{credit(row.photo)}</a
           >
         </li>
       {/each}

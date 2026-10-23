@@ -3,7 +3,7 @@
   import { page } from "$app/state";
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { createQuery } from "@tanstack/svelte-query";
-  import { count, date, percent } from "#lib/format.js";
+  import { count, credit, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -94,13 +94,7 @@
       <a
         class="self-end justify-self-start text-[0.6875rem] text-muted-foreground underline decoration-border underline-offset-4 hover:text-foreground hover:decoration-foreground"
         href={person.photo.source}
-        rel="external noopener"
-        >{person.photo.artist == null
-          ? m.photo_credit_anonymous({ license: person.photo.license })
-          : m.photo_credit({
-              artist: person.photo.artist,
-              license: person.photo.license,
-            })}</a
+        rel="external noopener">{credit(person.photo)}</a
       >
     {/if}
   </div>
