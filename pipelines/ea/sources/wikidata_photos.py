@@ -146,7 +146,7 @@ def _infos(files: dict[str, str]) -> dict[str, dict[str, str]]:
             if page is None or "imageinfo" not in page:
                 continue
             info = page["imageinfo"][0]
-            meta = {key: str(value["value"]) for key, value in info.get("extmetadata", {}).items()}
+            meta = {key: str(value["value"]) for key, value in (info.get("extmetadata") or {}).items()}
             infos[title] = {
                 "thumb": info.get("thumburl", info["url"]),
                 "page": info["descriptionurl"],
