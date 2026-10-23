@@ -244,7 +244,9 @@ where u.k in (select unit_k from coverage_cache_unit_k);
 create temp table cd as
 select cc.id as contest_id, cc.st, e.date_from as d
 from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
-where cc.year >= 2000 and cc.level in ('president', 'us_senate', 'governor', 'statewide_exec', 'judicial', 'statewide_measure');
+where cc.year >= 2000 and cc.level in ('president', 'us_senate', 'governor', 'statewide_exec', 'judicial', 'statewide_measure')
+    and not (cc.level = 'judicial' and exists (select from external_id y where y.entity_id = cc.id
+        and y.scheme = 'us.contest' and y.value ~ '(appell|appeal|circuit|district|supreme-court:[0-9])'));
 
 create temp table cx as
 select s.st, s.d, count(u.k) as n
