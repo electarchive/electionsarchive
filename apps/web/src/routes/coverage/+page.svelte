@@ -131,20 +131,25 @@
             <span class="font-semibold">{LABELS[reason]()}</span>
             <span class="tabular-nums">{count(row[reason])}</span>
             <span class="block text-muted-foreground">{definition}</span>
+            {#if reason === "complete" && row.icpsr > 0}
+              <span
+                class="mbs-2 grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2"
+              >
+                <Tone
+                  reason="icpsr"
+                  class="mbs-1 rounded-xs block-3 inline-3"
+                />
+                <span>
+                  <span class="font-semibold">{m.coverage_icpsr()}</span>
+                  <span class="tabular-nums">{count(row.icpsr)}</span>
+                  <span class="block text-muted-foreground"
+                    >{m.coverage_icpsr_def()}</span
+                  >
+                </span>
+              </span>
+            {/if}
           </span>
         </li>
-        {#if reason === "complete" && row.icpsr > 0}
-          <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2 ps-5">
-            <Tone reason="icpsr" class="mbs-1 rounded-xs block-3 inline-3" />
-            <span>
-              <span class="font-semibold">{m.coverage_icpsr()}</span>
-              <span class="tabular-nums">{count(row.icpsr)}</span>
-              <span class="block text-muted-foreground"
-                >{m.coverage_icpsr_def()}</span
-              >
-            </span>
-          </li>
-        {/if}
       {/each}
     </ul>
     {#if row.goal === "history"}
