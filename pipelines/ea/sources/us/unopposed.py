@@ -1,3 +1,5 @@
+import html
+import re
 from datetime import date
 from pathlib import Path
 
@@ -17,6 +19,11 @@ CITATIONS = {
         "American Press",
         "2011 elections break new ground",
         "https://americanpress.com/2011/09/22/2011-elections-break-new-ground/",
+    ),
+    "la-legislature-2023": (
+        "Louisiana Legislature",
+        "2023 Unopposed Races",
+        "https://legis.la.gov/Legis/Election/Unopposed.aspx",
     ),
     "hi-oe-2024": (
         "Hawaii Office of Elections",
@@ -73,6 +80,25 @@ ROWS = [
         ]
     ),
 ]
+OFFICIAL = {"la-legislature-2023", "hi-oe-2024"}
+LA_PARTIES = {
+    "Dennis Bamburg, Jr.": "republican-party",
+    "Adrian Fisher": "democratic-party",
+    "Chad M. Boyer": "republican-party",
+    "Joseph A. Orgeron": "republican-party",
+    "Beth Billings": "republican-party",
+    "Laurie Schlegel": "republican-party",
+    "Alonzo L. Knox": "democratic-party",
+    "Vanessa Caston LaFleur": "democratic-party",
+    "Delisha Boyd": "democratic-party",
+    "Royce Duplessis": "democratic-party",
+    "Caleb Kleinpeter": "republican-party",
+    "Jean-Paul Coussan": "republican-party",
+    "Jeremy Stine": "republican-party",
+    'Rashid "Mon" Young': "republican-party",
+    "Gary Carter": "democratic-party",
+}
+MAJORITY = {"LA"}
 BODIES = {"house": ("House of Representatives", "us.sldl"), "senate": ("Senate", "us.sldu")}
 CONTEXT = {
     "LA": "Louisiana leaves a candidate with no opponent at the close of qualifying off the ballot and declares that "
@@ -80,6 +106,33 @@ CONTEXT = {
     "HI": "Hawaii declares a nominee elected after the primary when no other candidate remains for the general "
     "election (Haw. Rev. Stat. §12-41(a)), so the seat was not on the general election ballot.",
 }
+
+
+def louisiana() -> list[tuple[date, str, str, str, str | None, str]]:
+    page = raw.cached(SOURCE, CITATIONS["la-legislature-2023"][2]).path.read_text(errors="replace")
+    rows: list[tuple[date, str, str, str, str | None, str]] = []
+    chamber = None
+    for match in re.finditer(
+        r"(HOUSE OF REPRESENTATIVES|>SENATE<)|District (\d+)</td>\s*<td>(?:<a[^>]*>)?([^<]+)<",
+        re.sub(r"<!--.*?-->", "", page, flags=re.DOTALL),
+    ):
+        if match[1]:
+            chamber = "house" if match[1].startswith("HOUSE") else "senate"
+            continue
+        candidate = re.sub(r"^(Representative|Senator)(-Elect)? ", "", html.unescape(match[3]).strip())
+        rows.append(
+            (
+                date(2023, 10, 14),
+                "LA",
+                f"{chamber}:{match[2]}",
+                candidate,
+                LA_PARTIES.get(candidate),
+                "la-legislature-2023",
+            )
+        )
+    if len(rows) != 68:
+        raise ValueError(f"expected 68 unopposed Louisiana legislators, found {len(rows)}")
+    return rows
 
 
 def fetch() -> None:
@@ -93,8 +146,9 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Louisiana's statewide officers declared elected without opposition, 2003–2023, and Hawaii's "
-            "2024 legislators declared elected after the primary",
+            summary="Louisiana's statewide officers declared elected without opposition, 2003–2023, Louisiana's "
+            "2023 legislators elected at the close of qualifying, and Hawaii's 2024 legislators declared elected after "
+            "the primary",
             polity="US",
         )
 
@@ -105,7 +159,7 @@ def emit() -> Path:
         for key, (publisher, title, url) in CITATIONS.items():
             sources[key] = cs.source(publisher, title)
             if sources[key] in cs.minted:
-                official = "Office of Elections" in publisher
+                official = key in OFFICIAL
                 cs.add(
                     "source",
                     id=sources[key],
@@ -140,20 +194,22 @@ def emit() -> Path:
             ).fetchall()
         }
         systems = {key: cs.key("us.electoral_system", key) for key in ("two_round", "fptp")}
-        for day, state, seat, candidate, party, cited in ROWS:
+        for day, state, seat, candidate, party, cited in [*ROWS, *louisiana()]:
             chamber, _, rest = seat.partition(":")
             body_seats = chamber in BODIES and rest != ""
             district, _, special = rest.partition(":")
             election = cs.key("us.election", f"{day}:{state}")
-            party_id = cs.key("us.party", party)
+            words = [word.strip('".,') for word in re.sub(r",? (Jr\.|Sr\.|III|II|IV)$", "", candidate).split()]
+            surname = words[-1]
+            given = "|".join(re.escape(word) for word in words[:-1] if len(word) > 1)
             if body_seats:
                 chamber_name, scheme = BODIES[chamber]
                 contest_key = f"{day}:{state}:{chamber}:{district}:{'gs' if special else 'g'}"
                 body = cs.key("us.body", f"{state}:{chamber}")
                 area = cs.area(scheme, f"{state}:{district}")
-                required = {election, party_id, body, area, systems["fptp"]}
+                system = systems["two_round" if state in MAJORITY else "fptp"]
+                required = {election, body, area, system}
                 fields = {"kind": "body_seats", "body_id": body, "district_area_id": area}
-                system = systems["fptp"]
                 where = f"{states[state]} {chamber_name} {'special election' if special else 'election'}, District {district}"
                 path = f"state-{chamber}-{district}" + ("-special-election" if special else "")
                 prior = "c.body_id = %s and c.district_area_id = %s"
@@ -161,41 +217,50 @@ def emit() -> Path:
             else:
                 office_id = cs.key("us.office", f"{slug(seat)}:{state}")
                 contest_key = f"{day}:{state}:{slug(seat)}"
-                required = {office_id, election, party_id, systems["two_round"]}
-                fields = {"kind": "office", "office_id": office_id, "district_area_id": areas[state]}
                 system = systems["two_round"]
+                required = {office_id, election, system}
+                fields = {"kind": "office", "office_id": office_id, "district_area_id": areas[state]}
                 where = f"{states[state]} {seat} election"
                 path = slug(seat)
                 prior = "c.office_id = %s"
                 scope = [office_id]
             if cs.minted & required:
-                raise ValueError(f"{contest_key}: its election, party, district, office or body, and system must exist")
+                raise ValueError(f"{contest_key}: its election, district, office or body, and system must exist")
             if contest_key in own:
                 continue
             contest = cs.key("us.contest", contest_key)
             if contest not in cs.minted:
                 raise ValueError(f"{contest_key} is already held")
             found = conn.execute(
-                f"""select cy.person_id from candidacy cy
+                f"""select cy.person_id,
+                           (select x.value from external_id x where x.entity_id = o.party_id and x.scheme = 'us.party'
+                            limit 1)
+                    from candidacy cy
                     join contest_option o on o.id = cy.option_id
                     join contest c on c.id = o.contest_id and {prior}
                     join election e on e.id = c.election_id
                     join name n on n.entity_id = cy.person_id and n.is_preferred
-                    where cy.role = 'head' and n.text ilike %s
+                    where cy.role = 'head' and n.text ilike %s and n.text ~* %s
                     order by e.date_from desc limit 1""",
-                [*scope, f"%{candidate.split()[-1]}%"],
+                [*scope, f"%{surname}%", given],
             ).fetchall()
             if not found:
                 found = conn.execute(
-                    """select distinct cy.person_id from candidacy cy
+                    """select distinct cy.person_id, null from candidacy cy
                        join contest_option o on o.id = cy.option_id
                        join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
                        join name n on n.entity_id = cy.person_id and n.is_preferred
                        where cy.role = 'head' and x.value like %s and n.text ilike %s and n.text ilike %s""",
-                    [f"%:{state}:%", f"%{candidate.split()[0]}%", f"%{candidate.split()[-1]}%"],
+                    [f"%:{state}:%", f"%{candidate.split()[0]}%", f"%{surname}%"],
                 ).fetchall()
                 found = found if len(found) == 1 else []
             person = found[0][0] if found else cs.key(f"{SOURCE}.person", f"{state}:{slug(candidate)}")
+            party = party or (found[0][1] if found else None)
+            if party is None:
+                raise ValueError(f"{contest_key}: no party for {candidate}")
+            party_id = cs.key("us.party", party)
+            if party_id in cs.minted:
+                raise ValueError(f"{contest_key}: no party {party}")
             if person in cs.minted:
                 cs.add("person", id=person)
                 name(person, candidate)
