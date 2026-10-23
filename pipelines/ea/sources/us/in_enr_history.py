@@ -1,5 +1,3 @@
-import io
-import re
 from datetime import date
 from pathlib import Path
 from urllib.parse import urlencode
@@ -29,17 +27,18 @@ DAYS = {
     2016: date(2016, 5, 3),
     2018: date(2018, 5, 8),
 }
+GENERALS = {year: date(year, 11, 2 + (7 - date(year, 11, 1).weekday()) % 7) for year in range(2002, 2025, 2)}
 OFFICES = {"United States Representative": "house", "United States Senator": "senate", "President": "president"}
 RENAMED = {"US Representative": "house", "US Senator": "senate"}
 
 
-def links(year: int) -> list[str]:
+def links(year: int, kind: str = "Primary") -> list[str]:
     return [
         EXPORT
         + urlencode(
             {
                 "year": year,
-                "electionType": "Primary",
+                "electionType": kind,
                 "candidateName": "",
                 "county": ",".join(NAMES[start : start + 10]),
                 "office": office,
@@ -51,29 +50,43 @@ def links(year: int) -> list[str]:
             }
         )
         for office in (RENAMED if year >= 2018 else OFFICES)
+        if kind == "Primary" or office != "President" or year % 4 == 0
         for start in range(0, len(NAMES), 10)
     ]
 
 
+def files() -> list[tuple[str, int, date, bool]]:
+    return [(link, year, day, False) for year, day in DAYS.items() for link in links(year)] + [
+        (link, year, day, True) for year, day in GENERALS.items() for link in links(year, "General")
+    ]
+
+
 def fetch() -> None:
-    for year in DAYS:
-        for link in links(year):
-            raw.fetch(SOURCE, link, suffix=".csv")
+    for link, *_ in files():
+        raw.fetch(SOURCE, link, suffix=".csv")
 
 
 def parse() -> None:
     frames = []
-    for year, day in DAYS.items():
-        for link in links(year):
-            text = raw.cached(SOURCE, link).path.read_text(encoding="utf-8-sig", errors="replace")
-            frame = pl.read_csv(io.StringIO(text), infer_schema=False)
-            if frame.height:
-                frames.append(frame.with_columns(year=pl.lit(year, pl.Int32), day=pl.lit(day)))
+    for link, year, day, general in files():
+        text = raw.cached(SOURCE, link).path.read_text(encoding="utf-8-sig", errors="replace")
+        lines = [line.split(",") for line in text.splitlines()[1:] if line.strip()]
+        frame = pl.DataFrame(
+            [(f[0], f[1], ",".join(f[2:-3]).strip('"'), f[-3], f[-2], f[-1]) for f in lines],
+            schema=["County", "Office", "Candidate", "Party", "District", "Votes"],
+            orient="row",
+        )
+        if frame.height:
+            frames.append(frame.with_columns(year=pl.lit(year, pl.Int32), day=pl.lit(day), general=pl.lit(general)))
     frame = (
         pl.concat(frames)
-        .filter(pl.col("Party").is_in(list(PARTIES)) & ~pl.col("Candidate").str.contains("(?i)write"))
+        .filter(
+            (pl.col("general") | pl.col("Party").is_in(list(PARTIES))) & ~pl.col("Candidate").str.contains("(?i)write")
+        )
         .with_columns(
-            chamber=pl.col("Office").replace_strict(OFFICES | RENAMED) + ":" + pl.col("Party").replace(PARTIES),
+            chamber=pl.when(pl.col("general"))
+            .then(pl.col("Office").replace_strict(OFFICES | RENAMED))
+            .otherwise(pl.col("Office").replace_strict(OFFICES | RENAMED) + ":" + pl.col("Party").replace(PARTIES)),
             district=pl.col("District").str.extract(r"^(?:District )?(\d+)$", 1).cast(pl.Int16),
             code=pl.col("County").str.to_lowercase().str.replace_all("[^a-z]", "").replace_strict(CODES),
             candidate=pl.col("Candidate").str.to_uppercase(),
@@ -81,7 +94,9 @@ def parse() -> None:
         )
     )
     PARSED.mkdir(parents=True, exist_ok=True)
-    frame.group_by("year", "day", "chamber", "district", "code", "candidate").agg(pl.col("votes").sum()).with_columns(
+    frame.filter(pl.col("district").is_not_null() | ~pl.col("chamber").str.starts_with("house")).group_by(
+        "year", "day", "chamber", "district", "code", "candidate"
+    ).agg(pl.col("votes").sum()).with_columns(
         special=pl.lit(False),
         state=pl.lit("IN"),
         measure=pl.lit(1, pl.Int16),
@@ -89,7 +104,11 @@ def parse() -> None:
         kind=pl.lit("county"),
         source=pl.lit("IN"),
     ).write_parquet(PARSED / "counties.parquet")
-    print(frame.group_by("year", "chamber").agg(pl.col("district").n_unique(), pl.col("code").n_unique()).sort("year", "chamber"))
+    print(
+        frame.group_by("year", "chamber")
+        .agg(pl.col("district").n_unique(), pl.col("code").n_unique())
+        .sort("year", "chamber")
+    )
 
 
 def emit() -> Path:
@@ -98,7 +117,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Indiana's U.S. House, Senate, and presidential primaries by county, 2002-2018 (Election Division)",
+            summary="Indiana's U.S. House, Senate, and presidential primaries by county, 2002-2018, and generals, "
+            "2002-2024 (Election Division)",
             polity="US-IN",
         )
         source = cs.source(PUBLISHER, TITLE)
@@ -112,8 +132,7 @@ def emit() -> Path:
                 url=LANDING,
                 license="Public record",
             )
-        for year in DAYS:
-            for link in links(year):
-                cs.artifact(raw.cached(SOURCE, link), source)
+        for link, *_ in files():
+            cs.artifact(raw.cached(SOURCE, link), source)
         medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"IN": source}, strict=True)
         return cs.write()
