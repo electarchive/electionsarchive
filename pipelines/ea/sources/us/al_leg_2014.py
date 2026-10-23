@@ -23,7 +23,7 @@ LANDING = "https://www.sos.alabama.gov/alabama-votes/voter/election-data"
 URL = "https://www.sos.alabama.gov/sites/default/files/election-data/2017-06/2014General-precinctLevel.zip"
 DAY = date(2014, 11, 4)
 OFFICE = re.compile(
-    r"STATE (REPRESENTATIVE|SENATOR),?\s+DISTRICT NO\.\s*(\d+)|State (Rep|Sen)\.? Dist\.? (\d+)", re.IGNORECASE
+    r"STATE (REPRESENTATIVE|SENATOR),?\s+DISTRICT NO\.\s*(\d+)|State (Rep|Sen)\.?\s*(?:Dist\.?)?\s*(\d+)", re.IGNORECASE
 )
 DROPPED = {"over votes", "under votes"}
 
@@ -83,8 +83,8 @@ def parse() -> None:
             for cell in cells[0]:
                 current = cell or current
                 titles.append(current)
-            reported = next((row for row in cells if row[0] == "REPORTED TOTALS"), None)
-            precincts = [row for row in cells[2:] if row[0] and "TOTALS" not in row[0]]
+            reported = next((row for row in cells if row[0].upper() == "REPORTED TOTALS"), None)
+            precincts = [row for row in cells[2:] if row[0] and "TOTALS" not in row[0].upper()]
             for column, title in enumerate(titles):
                 found = OFFICE.fullmatch(title)
                 if not found or column == 0 or not cells[1][column]:
