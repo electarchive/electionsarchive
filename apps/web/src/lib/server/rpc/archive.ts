@@ -3883,17 +3883,21 @@ export const contests = {
         if (!isRoot || grid == null || grid.rows.length === 0) {
           return null;
         }
+        const active = await db.execute<{ k: number }>(sql`
+          select k from result_set where contest_id = ${contest.id}::uuid and status = 'active'
+        `);
         const found = await db.execute<{ noun: string }>(sql`
           select sc.noun
-          from result_set rs
-          join result_value x on x.result_set_k = rs.k
+          from (
+            select distinct unit_k from result_value
+            where result_set_k = any(${sql.param(active.rows.map((row) => row.k))}::int[])
+          ) x
           join reporting_unit ru on ru.k = x.unit_k and ru.area_relation = 'within'
           join scheme sc on sc.code = ru.scheme_code
-          where rs.contest_id = ${contest.id}::uuid and rs.status = 'active'
-            and ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
+          where ru.scheme_code <> all(${sql.param(grid.levels.map((level) => level.code))}::text[])
             and sc.rank > (select rank from scheme where code = ${grid.level})
           group by sc.noun, sc.rank
-          having count(distinct ru.k) > ${grid.rows.length}
+          having count(*) > ${grid.rows.length}
           order by sc.rank desc
           limit 1
         `);
