@@ -71,6 +71,8 @@ def rebuild(conn: Connection) -> int:
         years = {year for year in range(max(start, MODERN), LAST + 1) if year % period == phase} | old | modern
         if max(recent) < 2016:
             years = {year for year in years if year <= max(recent)}
+        if st == "GA" and key == "public-service-commissioner":
+            years = years - {2022, 2024} | {2025}
         kind = next((name for pattern, name in CLASSES if re.search(pattern, key)), "other")
         for year in sorted(years):
             if year > LAST:
