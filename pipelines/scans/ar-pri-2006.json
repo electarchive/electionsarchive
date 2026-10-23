@@ -1,0 +1,45 @@
+{
+ "polity": "US-AR",
+ "publisher": "Arkansas Secretary of State",
+ "title": "2006 primary election results, U.S. Congress District 2 Republican",
+ "license": "Public record",
+ "file": {
+  "url": "https://www.sos.arkansas.gov/uploads/elections/2006_PP__GE_Election_Results.pdf"
+ },
+ "raw_source": "us.ar_sos_2006",
+ "contests": {
+  "h2": {
+   "year": 2006,
+   "chamber": "house:republican",
+   "day": "2006-05-23",
+   "special": false,
+   "state": "AR",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 11,
+   "id": "h2",
+   "orientation": "counties_down",
+   "crop": [
+    0.18,
+    0.1,
+    0.85,
+    0.45
+   ],
+   "columns": [
+    {
+     "label": "Tom Formicola",
+     "contest": "h2",
+     "candidate": "Tom Formicola"
+    },
+    {
+     "label": "Andy Mayberry",
+     "contest": "h2",
+     "candidate": "Andy Mayberry"
+    }
+   ]
+  }
+ ]
+}
