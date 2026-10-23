@@ -24,5 +24,6 @@
   "leaves": [
     43,
     44
-  ]
+  ],
+  "hint": "Each page is a county table with the candidates' names printed turned sideways above their columns and a STATE TOTALS row at the bottom. For each office give one table whose candidates' votes are the STATE TOTALS row values for that candidate's column; ignore the county rows."
 }

@@ -1,0 +1,242 @@
+{
+ "polity": "US-SC",
+ "publisher": "South Carolina State Election Commission",
+ "title": "Report of the State Election Commission, votes cast in the general election held 1974-11-05",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1974-1975.pdf"
+ },
+ "contests": {
+  "governor": {
+   "year": 1974,
+   "chamber": "governor",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "lieutenant-governor": {
+   "year": 1974,
+   "chamber": "lieutenant-governor",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "secretary-of-state": {
+   "year": 1974,
+   "chamber": "secretary-of-state",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "treasurer": {
+   "year": 1974,
+   "chamber": "treasurer",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "attorney-general": {
+   "year": 1974,
+   "chamber": "attorney-general",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "comptroller-general": {
+   "year": 1974,
+   "chamber": "comptroller-general",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "superintendent-of-education": {
+   "year": 1974,
+   "chamber": "superintendent-of-education",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "commissioner-of-agriculture": {
+   "year": 1974,
+   "chamber": "commissioner-of-agriculture",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "senate": {
+   "year": 1974,
+   "chamber": "senate",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "SC",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 43,
+   "id": "43-0",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Dorn",
+     "contest": "governor",
+     "candidate": "Dorn"
+    },
+    {
+     "label": "Edwards",
+     "contest": "governor",
+     "candidate": "Edwards"
+    },
+    {
+     "label": "Jennings",
+     "contest": "governor",
+     "candidate": "Jennings"
+    },
+    {
+     "label": "Harvey",
+     "contest": "lieutenant-governor",
+     "candidate": "Harvey"
+    },
+    {
+     "label": "Campbell",
+     "contest": "lieutenant-governor",
+     "candidate": "Campbell"
+    },
+    {
+     "label": "Cole",
+     "contest": "lieutenant-governor",
+     "candidate": "Cole"
+    },
+    {
+     "label": "Thornton",
+     "contest": "secretary-of-state",
+     "candidate": "Thornton"
+    },
+    {
+     "label": "Clinkscales",
+     "contest": "secretary-of-state",
+     "candidate": "Clinkscales"
+    },
+    {
+     "label": "Lloyd",
+     "contest": "secretary-of-state",
+     "candidate": "Lloyd"
+    },
+    {
+     "label": "Patterson",
+     "contest": "treasurer",
+     "candidate": "Patterson"
+    },
+    {
+     "label": "Cole",
+     "contest": "treasurer",
+     "candidate": "Cole"
+    },
+    {
+     "label": "McLeod",
+     "contest": "attorney-general",
+     "candidate": "McLeod"
+    },
+    {
+     "label": "Powell",
+     "contest": "attorney-general",
+     "candidate": "Powell"
+    },
+    {
+     "label": "Prince",
+     "contest": "attorney-general",
+     "candidate": "Prince"
+    }
+   ],
+   "hint": "Digits and commas only. The last row is STATE TOTALS."
+  },
+  {
+   "page": 44,
+   "id": "44-0",
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Mills",
+     "contest": "comptroller-general",
+     "candidate": "Mills"
+    },
+    {
+     "label": "Crout",
+     "contest": "comptroller-general",
+     "candidate": "Crout"
+    },
+    {
+     "label": "Lanier",
+     "contest": "comptroller-general",
+     "candidate": "Lanier"
+    },
+    {
+     "label": "Busbee",
+     "contest": "superintendent-of-education",
+     "candidate": "Busbee"
+    },
+    {
+     "label": "Hough",
+     "contest": "superintendent-of-education",
+     "candidate": "Hough"
+    },
+    {
+     "label": "McCrady",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Dupre",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Dillingham",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Arrelson",
+     "contest": "commissioner-of-agriculture",
+     "candidate": "Arrelson"
+    },
+    {
+     "label": "Cause",
+     "contest": "commissioner-of-agriculture",
+     "candidate": "Cause"
+    },
+    {
+     "label": "Kemmerlin",
+     "contest": "commissioner-of-agriculture",
+     "candidate": "Kemmerlin"
+    },
+    {
+     "label": "Hollings",
+     "contest": "senate",
+     "candidate": "Hollings"
+    },
+    {
+     "label": "Bush",
+     "contest": "senate",
+     "candidate": "Bush"
+    },
+    {
+     "label": "Hough",
+     "contest": "senate",
+     "candidate": "Hough"
+    }
+   ],
+   "hint": "Digits and commas only. The last row is STATE TOTALS."
+  }
+ ]
+}

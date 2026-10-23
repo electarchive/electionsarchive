@@ -1,0 +1,208 @@
+{
+ "polity": "US-SC",
+ "publisher": "South Carolina State Election Commission",
+ "title": "Report of the State Election Commission, votes cast in the general election held November 2, 1982",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "file": {
+  "url": "https://scvotes.gov/wp-content/uploads/2022/08/Election_Report_1982-1983.pdf"
+ },
+ "contests": {
+  "governor": {
+   "year": 1982,
+   "chamber": "governor",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "lieutenant-governor": {
+   "year": 1982,
+   "chamber": "lieutenant-governor",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "secretary-of-state": {
+   "year": 1982,
+   "chamber": "secretary-of-state",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "treasurer": {
+   "year": 1982,
+   "chamber": "treasurer",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "attorney-general": {
+   "year": 1982,
+   "chamber": "attorney-general",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "comptroller-general": {
+   "year": 1982,
+   "chamber": "comptroller-general",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  },
+  "superintendent-of-education": {
+   "year": 1982,
+   "chamber": "superintendent-of-education",
+   "day": "1982-11-02",
+   "special": false,
+   "state": "SC",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 25,
+   "id": "25-0",
+   "turn": -90,
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Dick Riley",
+     "contest": "governor",
+     "candidate": "Dick Riley"
+    },
+    {
+     "label": "William Workman Jr",
+     "contest": "governor",
+     "candidate": "William Workman Jr"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "governor",
+     "candidate": "MISC WRITE INS"
+    },
+    {
+     "label": "Mike Daniel",
+     "contest": "lieutenant-governor",
+     "candidate": "Mike Daniel"
+    },
+    {
+     "label": "Norma Russell",
+     "contest": "lieutenant-governor",
+     "candidate": "Norma Russell"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "lieutenant-governor",
+     "candidate": "MISC WRITE INS"
+    },
+    {
+     "label": "John T Campbell",
+     "contest": "secretary-of-state",
+     "candidate": "John T Campbell"
+    },
+    {
+     "label": "Jan L Chapman",
+     "contest": "secretary-of-state",
+     "candidate": "Jan L Chapman"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "secretary-of-state",
+     "candidate": "MISC WRITE INS"
+    },
+    {
+     "label": "Grady L Patterson Jr",
+     "contest": "treasurer",
+     "candidate": "Grady L Patterson Jr"
+    },
+    {
+     "label": "Thomas P Waloenfels",
+     "contest": "treasurer",
+     "candidate": "Thomas P Waloenfels"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "treasurer",
+     "candidate": "MISC WRITE INS"
+    }
+   ],
+   "hint": "Digits and commas only. The county names are the row labels and the last row is STATE TOTALS. Every row must have exactly one cell per column."
+  },
+  {
+   "page": 26,
+   "id": "26-0",
+   "turn": -90,
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "T. Travis Medlock",
+     "contest": "attorney-general",
+     "candidate": "T. Travis Medlock"
+    },
+    {
+     "label": "Donald V. Myers",
+     "contest": "attorney-general",
+     "candidate": "Donald V. Myers"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "attorney-general",
+     "candidate": "Misc. Write-Ins"
+    },
+    {
+     "label": "Earle E. Morris, Jr.",
+     "contest": "comptroller-general",
+     "candidate": "Earle E. Morris, Jr."
+    },
+    {
+     "label": "Richard Winchell",
+     "contest": "comptroller-general",
+     "candidate": "Richard Winchell"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "comptroller-general",
+     "candidate": "Misc. Write-Ins"
+    },
+    {
+     "label": "Charlie G. Williams",
+     "contest": "superintendent-of-education",
+     "candidate": "Charlie G. Williams"
+    },
+    {
+     "label": "P. T. Williams",
+     "contest": "superintendent-of-education",
+     "candidate": "P. T. Williams"
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": "superintendent-of-education",
+     "candidate": "Misc. Write-Ins"
+    },
+    {
+     "label": "Adjutant general D",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Adjutant general R",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Misc write-ins",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "hint": "Digits and commas only. The county names are the row labels and the last row is STATE TOTALS. Every row must have exactly one cell per column."
+  }
+ ]
+}

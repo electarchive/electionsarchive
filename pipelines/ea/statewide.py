@@ -82,6 +82,7 @@ class Volume(TypedDict):
     anchors: NotRequired[list[Anchor]]
     create: NotRequired[bool]
     autorotate: NotRequired[bool]
+    hint: NotRequired[str]
 
 
 def offices(volume: Volume) -> dict[str, str]:
@@ -120,6 +121,7 @@ def requests(name: str, volume: Volume, reader: str, leaves: list[int]) -> dict[
         "'Total vote' line exactly as printed ('' when it prints none). A candidate printed in several rows (one per "
         "party line) is one row per printed line. A volume that prints years down the page gives one table per "
         "year and office."
+        + (f" {volume['hint']}" if "hint" in volume else "")
     )
     out: dict[str, scans.Read] = {}
     for leaf in leaves:

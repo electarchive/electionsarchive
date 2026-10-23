@@ -22,6 +22,10 @@
     "commissioner-of-agriculture": "State Commissioner of Agriculture"
   },
   "leaves": [
-    25
-  ]
+    25,
+    26,
+    27
+  ],
+  "autorotate": true,
+  "hint": "Each page is a county table, printed turned sideways, with the candidates' names printed vertically above their columns and a STATE TOTALS row at the bottom. For each office give one table whose candidates' votes are the STATE TOTALS row values for that candidate's column; ignore the county rows and the write-in columns."
 }
