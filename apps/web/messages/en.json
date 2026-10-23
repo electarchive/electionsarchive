@@ -24,6 +24,9 @@
   "title": "Home",
   "skip_to_content": "Skip to content",
   "wordmark": "Elections Archive",
+  "beta_label": "Beta",
+  "beta_definition": "The archive is still being filled in. Pages and numbers can change.",
+  "footer_credit": "Made by",
   "theme_menu": "Theme",
   "theme_system": "System",
   "theme_light": "Light",
@@ -64,8 +67,13 @@
   "home_polities": "Polities",
   "home_elections": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} election",
         "countPlural=*": "{count} elections"
@@ -197,7 +205,9 @@
         "input nouns",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} {noun}",
         "countPlural=*": "{count} {nouns}"
@@ -206,8 +216,13 @@
   ],
   "map_electoral": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} electoral vote",
         "countPlural=*": "{count} electoral votes"
@@ -244,7 +259,9 @@
         "input where",
         "local countPlural = count: plural"
       ],
-      "selectors": ["countPlural"],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{party} won {count} seat in {where}",
         "countPlural=*": "{party} won {count} seats in {where}"
@@ -274,8 +291,13 @@
   "check_votes_valid_unit": "{name}: votes add up to {votes}, but {valid} valid ballots are reported",
   "checks_turnout": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} unit reports more ballots than registered voters",
         "countPlural=*": "{count} units report more ballots than registered voters"
@@ -284,8 +306,13 @@
   ],
   "checks_votes_valid": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} unit reports votes that don't add up to its valid ballots",
         "countPlural=*": "{count} units report votes that don't add up to their valid ballots"
@@ -297,8 +324,13 @@
   "election_unplaced_detail": "These contests, such as university seats, have no geographic area and are excluded from the table and map.",
   "election_parts": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} part",
         "countPlural=*": "{count} parts"
@@ -337,8 +369,13 @@
   "race_contests_nonvoting": "{count} contests, including {nonvoting} nonvoting delegate races",
   "race_contests": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} contest",
         "countPlural=*": "{count} contests"
@@ -476,8 +513,13 @@
   "lists_title": "Candidate lists",
   "lists_summary": [
     {
-      "declarations": ["input seats", "local seatsPlural = seats: plural"],
-      "selectors": ["seatsPlural"],
+      "declarations": [
+        "input seats",
+        "local seatsPlural = seats: plural"
+      ],
+      "selectors": [
+        "seatsPlural"
+      ],
       "match": {
         "seatsPlural=one": "{seats} seat filled from ranked party lists",
         "seatsPlural=*": "{seats} seats filled from ranked party lists"
@@ -487,8 +529,13 @@
   "lists_winners": "Lists that won seats",
   "lists_all": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "All {count} list",
         "countPlural=*": "All {count} lists"
@@ -499,8 +546,13 @@
   "lists_collapse": "Show top of lists",
   "lists_more": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} more candidate",
         "countPlural=*": "{count} more candidates"
@@ -509,8 +561,13 @@
   ],
   "lists_seats": [
     {
-      "declarations": ["input count", "local countPlural = count: plural"],
-      "selectors": ["countPlural"],
+      "declarations": [
+        "input count",
+        "local countPlural = count: plural"
+      ],
+      "selectors": [
+        "countPlural"
+      ],
       "match": {
         "countPlural=one": "{count} seat",
         "countPlural=*": "{count} seats"
