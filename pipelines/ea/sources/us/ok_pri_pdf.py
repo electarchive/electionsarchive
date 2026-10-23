@@ -24,6 +24,10 @@ FILES = [
     (date(2002, 8, 27), "2002-election-results/2002-primary-election-results/02reppri.pdf"),
     (date(2002, 9, 17), "2002-election-results/2002-runoff-primary-election-results/02demrun.pdf"),
     (date(2002, 9, 17), "2002-election-results/2002-runoff-primary-election-results/02reprun.pdf"),
+    (date(2004, 2, 3), "2004-election-results/2004-ppp-election-results/04-d-ppp.pdf"),
+    (date(2004, 2, 3), "2004-election-results/2004-ppp-election-results/04-r-ppp.pdf"),
+    (date(2008, 2, 5), "2008-election-results/2008-ppp-election-results/08-d-ppp.pdf"),
+    (date(2008, 2, 5), "2008-election-results/2008-ppp-election-results/08-r-ppp.pdf"),
     (date(2004, 7, 27), "2004-election-results/2004-primary-election-results/04dempri.pdf"),
     (date(2004, 7, 27), "2004-election-results/2004-primary-election-results/04reppri.pdf"),
     (date(2004, 8, 24), "2004-election-results/2004-runoff-primary-election-results/04demrun.pdf"),
@@ -39,10 +43,17 @@ FILES = [
     (date(2010, 7, 27), "2010-election-results/2010-primary-results/primary-results-county-20100727.pdf"),
     (date(2010, 8, 24), "2010-election-results/2010-runoff-primary-results/runoff-primary-results-county-20100824.pdf"),
 ]
-PARTIES = {"DEMOCRAT": "democratic", "DEMOCRATIC": "democratic", "REPUBLICAN": "republican", "LIBERTARIAN": "libertarian"}
+PARTIES = {
+    "DEMOCRAT": "democratic",
+    "DEMOCRATIC": "democratic",
+    "REPUBLICAN": "republican",
+    "LIBERTARIAN": "libertarian",
+}
 PUBLISHER = "Oklahoma State Election Board"
 TITLE = "Election results: primary results by county"
-RACE = re.compile(r"(?:UNITED STATES|FOR U\.S\.) (SENATOR|REPRESENTATIVE)(?:, DISTRICT (?:NO\. )?(\d+))?\s*$")
+RACE = re.compile(
+    r"(?:(?:UNITED STATES|FOR U\.S\.) (SENATOR|REPRESENTATIVE)(?:, DISTRICT (?:NO\. )?(\d+))?|(PRESIDENT) OF THE UNITED STATES)\s*$"
+)
 ROW = re.compile(r"^([A-Za-z][A-Za-z' .:]*?)\s{2,}([\d,]+(?:\s+[\d,]+)*)\s*$")
 
 
@@ -93,7 +104,9 @@ def parse() -> None:
                 title = stripped
             if title is not None:
                 found = RACE.match(title)
-                office, district, party, current = (found[1], found[2], None, None) if found else (None,) * 4
+                office, district, party, current = (
+                    (found[1] or found[3], found[2], None, None) if found else (None,) * 4
+                )
                 if found and not stripped.startswith("Race:"):
                     party = PARTIES.get(lines[i + 1].split()[0].upper())
                 continue
@@ -112,8 +125,12 @@ def parse() -> None:
                         for chunk in re.finditer(r"\S+(?: \S+)*", lines[i - back]):
                             centre = (chunk.start() + chunk.end()) / 2
                             k = min(range(len(segments)), key=lambda s: abs(centre - sum(segments[s]) / 2))
-                            names[k] = f"{chunk.group()} {names[k]}".strip() if back == 2 else f"{names[k]} {chunk.group()}".strip()
-                    totaled = True
+                            names[k] = (
+                                f"{chunk.group()} {names[k]}".strip()
+                                if back == 2
+                                else f"{names[k]} {chunk.group()}".strip()
+                            )
+                    totaled = any("TOTAL" in lines[i - back].upper() for back in (1, 2))
                 names = names[1:] if headed else names
                 if totaled:
                     names = names[:-1]
@@ -121,7 +138,14 @@ def parse() -> None:
                 options = blocks.setdefault(key, [])
                 current = next((blk for blk in options if blk["names"] == names), None)
                 if current is None:
-                    current = {"segments": segments, "headed": headed, "names": names, "totaled": totaled, "counties": {}, "total": None}
+                    current = {
+                        "segments": segments,
+                        "headed": headed,
+                        "names": names,
+                        "totaled": totaled,
+                        "counties": {},
+                        "total": None,
+                    }
                     options.append(current)
                 continue
             if current is None:
@@ -150,7 +174,9 @@ def parse() -> None:
                 print(day, office, district, party, "county lists differ", [len(blk["counties"]) for blk in options])
                 continue
             names = [name for blk in options for name in blk["names"]]
-            table = {label: [n for blk in options for n in blk["counties"][label][: len(blk["names"])]] for label in labels}
+            table = {
+                label: [n for blk in options for n in blk["counties"][label][: len(blk["names"])]] for label in labels
+            }
             sums = [sum(v[k] for v in table.values()) for k in range(len(names))]
             bad = False
             for label, cells in table.items():
@@ -160,7 +186,10 @@ def parse() -> None:
                         bad = True
             offset = 0
             for blk in options:
-                if blk["total"] is not None and blk["total"][: len(blk["names"])] != sums[offset : offset + len(blk["names"])]:
+                if (
+                    blk["total"] is not None
+                    and blk["total"][: len(blk["names"])] != sums[offset : offset + len(blk["names"])]
+                ):
                     print(day, office, district, party, "sum", sums, "printed", blk["total"])
                     bad = True
                 offset += len(blk["names"])
@@ -174,7 +203,7 @@ def parse() -> None:
                     rows.append(
                         (
                             day.year,
-                            f"{'senate' if office == 'SENATOR' else 'house'}:{party}",
+                            f"{ {'SENATOR': 'senate', 'PRESIDENT': 'president'}.get(office, 'house') }:{party}",
                             day,
                             False,
                             "OK",
@@ -210,7 +239,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oklahoma's 2000 to 2010 U.S. Senate and House primaries and runoffs by county from the State Election Board's results PDFs",
+            summary="Oklahoma's 2000 to 2010 U.S. Senate, House, and presidential primaries and runoffs by county from the State Election Board's results PDFs",
             polity="US-OK",
         )
         source = cs.source(PUBLISHER, TITLE)
