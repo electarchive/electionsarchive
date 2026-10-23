@@ -1,5 +1,6 @@
 import json
 from pathlib import Path
+from uuid import UUID
 from urllib.parse import urlencode
 
 import polars as pl
@@ -18,6 +19,15 @@ YEARS = [2015, 2017, 2019, 2023, 2024, 2025, 2026]
 TITLE = "Election statistics archive: state legislative primaries, specials, and generals"
 OFFICE = r"(?i)^(state senat\w*|state representative|member,? house of delegates)$"
 PREFERENCE = ["", "s", "g", "gs"]
+AUTHORITATIVE = {
+    "2019-11-05:VA:senate:33:g",
+    "2019-11-05:VA:house-of-delegates:86:g",
+    "2023-03-28:VA:senate:9:s",
+}
+MERGES = {
+    "d4bfe48e-349c-51df-b3a8-20ce3d109a0c": "c44f6635-bd24-5a17-922b-9902fb962c50",
+    "a43f8531-60bb-5d52-bddc-9f7d90cd03aa": "3c66ad29-f5af-57f8-9ff3-0dd59da78387",
+}
 
 
 def search(year: int) -> str:
@@ -137,5 +147,16 @@ def emit() -> Path:
         cs.add("source", id=source, kind="official_body", publisher=PUBLISHER, title=TITLE, url=SITE, license="Public record")
         for year in YEARS:
             cs.artifact(raw.cached(SOURCE, search(year)), source)
-        medsl.attach(cs, conn, frame, {"VA": source}, strict=True)
+        for duplicate, survivor in MERGES.items():
+            cs.merge(UUID(duplicate), UUID(survivor))
+        fixed = pl.concat_str(pl.col("day").cast(pl.String), pl.lit("VA"), "chamber", separator=":").is_in(AUTHORITATIVE)
+        medsl.attach(cs, conn, frame.filter(~fixed), {"VA": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            frame.filter(fixed),
+            {"VA": source},
+            extend=True,
+            authoritative="Virginia Department of Elections certified results",
+        )
         return cs.write()
