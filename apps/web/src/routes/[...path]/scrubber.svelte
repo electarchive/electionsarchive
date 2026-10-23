@@ -110,7 +110,9 @@
   });
   const step = $derived(
     steps[index] ??
-      (latest?.path == null || latest.date == null || record.isPending
+      (latest?.path == null ||
+      latest.date == null ||
+      (record.isPending && wanted != null)
         ? null
         : {
             path: latest.path,
@@ -128,25 +130,6 @@
     const path = step?.path ?? null;
     const timer = setTimeout(() => (settled = path), isDragging ? 260 : 0);
     return () => clearTimeout(timer);
-  });
-
-  $effect(() => {
-    if (isDragging) {
-      return;
-    }
-    for (const near of [steps[index - 1], steps[index + 1]]) {
-      if (near != null) {
-        void client
-          .ensureQueryData(
-            orpc.elections.locate.queryOptions({ input: { path: near.path } }),
-          )
-          .then(async (found) =>
-            client.prefetchQuery(
-              orpc.elections.get.queryOptions({ input: { id: found.id } }),
-            ),
-          );
-      }
-    }
   });
 
   $effect(() => {
@@ -176,6 +159,26 @@
     enabled: located.data != null,
     placeholderData: keepPreviousData,
   }));
+
+  $effect(() => {
+    if (isDragging || hub.isPending) {
+      return;
+    }
+    for (const near of [steps[index - 1], steps[index + 1]]) {
+      if (near != null) {
+        void client
+          .ensureQueryData(
+            orpc.elections.locate.queryOptions({ input: { path: near.path } }),
+          )
+          .then(async (found) =>
+            client.prefetchQuery(
+              orpc.elections.get.queryOptions({ input: { id: found.id } }),
+            ),
+          );
+      }
+    }
+  });
+
   const race = $derived(
     hub.data?.races.find(
       (entry) => entry.map != null && entry.places != null,

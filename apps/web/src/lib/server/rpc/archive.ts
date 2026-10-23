@@ -6062,17 +6062,29 @@ async function universe(
   day: string,
 ) {
   const found = await db.execute<{ id: string; k: number; held: boolean }>(sql`
-    with recursive candidate as (
+    with recursive base as (
+      select c.office_id, c.body_id, c.party_scope_id, ec.date_from, ec.date_to
+      from contest c join election ec on ec.id = c.election_id
+      where c.id = ${contest}::uuid and (c.office_id is not null or c.body_id is not null)
+    ),
+    peers as (
+      select r.district_area_id, r.election_id, r.party_scope_id
+      from base b join contest r on b.office_id is null and r.body_id = b.body_id
+      union all
+      select r.district_area_id, r.election_id, r.party_scope_id
+      from base b join contest r on r.office_id = b.office_id
+      union all
+      select r.district_area_id, r.election_id, r.party_scope_id
+      from base b join contest p on p.office_id = b.office_id join contest r on r.allocation_parent_id = p.id
+    ),
+    candidate as (
       select a.id, a.k,
-        bool_or(er.date_from between ec.date_from and coalesce(ec.date_to, ec.date_from)) as held
-      from contest c
-      join election ec on ec.id = c.election_id
-      join contest r on (case when c.office_id is null then r.body_id = c.body_id else r.office_id = c.office_id
-          or exists (select from contest p where p.id = r.allocation_parent_id and p.office_id = c.office_id) end)
-        and (r.party_scope_id is null or r.party_scope_id = c.party_scope_id)
+        bool_or(er.date_from between b.date_from and coalesce(b.date_to, b.date_from)) as held
+      from base b
+      cross join peers r
       join area a on a.id = r.district_area_id and a.scheme_code = ${level}
       join election er on er.id = r.election_id
-      where c.id = ${contest}::uuid and (c.office_id is not null or c.body_id is not null)
+      where (r.party_scope_id is null or r.party_scope_id = b.party_scope_id)
         and exists (select from area_geometry g where g.area_id = a.id and g.valid @> ${day}::date)
       group by a.id, a.k
     ),
@@ -8759,8 +8771,12 @@ export const elections = {
           group by r.id, r.part, r.tier, o.id, o.party_id
         ),
         lines as materialized (
-          select ch.parent_option_id as parent, ch.party_id, ch.k, ch.contest_id
+          select ch.parent_option_id as parent, ch.party_id, ch.k, ch.contest_id, a.k as area
           from winners w join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id
+          join contest c on c.id = ch.contest_id
+          join election e on e.id = c.election_id
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = coalesce(c.district_area_id, pt.area_id)
           where w.party_id is null and ch.party_id is not null
         ),
         leads as (
@@ -8769,7 +8785,7 @@ export const elections = {
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
           cross join lateral (
             select max(y.value) as value from result_rollup y
-            where y.result_set_k = rs.k and y.option_k = l.k
+            where y.result_set_k = rs.k and y.area_k = l.area and y.option_k = l.k
           ) y
           where y.value is not null
           order by l.parent, y.value desc
@@ -9623,23 +9639,32 @@ export const polities = {
           select tree.root, c.id from contest c join tree on c.allocation_parent_id = tree.id
         ),
         winners as materialized (
-          select t.root, t.id as contest, o.id, o.party_id, max(coalesce(x.seats, 1)) as seats
+          select t.root, t.id as contest, o.id, o.party_id, max(coalesce(o.seats, 1)) as seats
           from tree t
-          join contest_option o on o.contest_id = t.id
-          join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
-          join result_set rs on rs.id = x.result_set_id and rs.is_default
+          cross join lateral (
+            select o.id, o.party_id, o.kind, x.seats
+            from contest_option o
+            join outcome x on x.option_id = o.id and x.kind in ('elected', 'won') and x.candidacy_id is null
+            join result_set rs on rs.id = x.result_set_id and rs.is_default
+            where o.contest_id = t.id
+            offset 0
+          ) o
           where not exists (select from contest k where k.allocation_parent_id = t.id)
             and not (o.kind = 'candidate' and exists (
               select from contest_option l
               join outcome lx on lx.option_id = l.id and lx.kind in ('elected', 'won') and lx.candidacy_id is null
               join result_set lr on lr.id = lx.result_set_id and lr.is_default
-              where l.contest_id = o.contest_id and l.kind = 'list'
+              where l.contest_id = t.id and l.kind = 'list'
             ))
           group by t.root, t.id, o.id, o.party_id
         ),
         lines as materialized (
-          select ch.parent_option_id as parent, ch.party_id, ch.k, ch.contest_id
+          select ch.parent_option_id as parent, ch.party_id, ch.k, ch.contest_id, a.k as area
           from winners w join contest_option ch on ch.contest_id = w.contest and ch.parent_option_id = w.id
+          join contest c on c.id = ch.contest_id
+          join election e on e.id = c.election_id
+          left join polity_territory pt on pt.polity_id = e.polity_id and pt.valid @> e.date_from
+          join area a on a.id = coalesce(c.district_area_id, pt.area_id)
           where w.party_id is null and ch.party_id is not null
         ),
         leads as (
@@ -9648,7 +9673,7 @@ export const polities = {
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
           cross join lateral (
             select max(y.value) as value from result_rollup y
-            where y.result_set_k = rs.k and y.option_k = l.k
+            where y.result_set_k = rs.k and y.area_k = l.area and y.option_k = l.k
           ) y
           where y.value is not null
           order by l.parent, y.value desc
@@ -12483,15 +12508,19 @@ export const search = {
             from q, regexp_split_to_table(q.t, '\\s+') with ordinality as t(w, n) where w <> ''
           ) words
         ),
-        hits as (
+        strict as materialized (
           select d.entity_id, d.type, ts_rank(d.tsv, terms.tq) + 0.5 + 0.5 * word_similarity(q.t, d.text) + 0.5 * (d.tsv @@ plainto_tsquery('simple', q.t))::int + d.rank_boost * 0.15 as score, true as matched,
             d.tsv @@ plainto_tsquery('simple', q.t) as exact
           from search_document d, q, terms
           where d.tsv @@ terms.tq
+        ),
+        hits as (
+          select * from strict
           union all
           select d.entity_id, d.type, word_similarity(q.t, d.text) + d.rank_boost * 0.15, false, false
           from search_document d, q, terms
           where q.t <% d.text and not d.tsv @@ terms.tq
+            and (select count(*) from (select from strict limit ${input.limit * 2}) enough) < ${input.limit * 2}
         ),
         pool as (select * from hits order by score desc limit ${q.length < 3 ? 1000 : 50_000}),
         seats as (
@@ -12574,10 +12603,9 @@ export const search = {
                 where cy.person_id = top.entity_id order by o.kind = 'write_in', extract(year from e.date_from) desc nulls last,
                   e.kind = 'indirect', e.date_from desc limit 1)
               when 'party' then (
-                select c.id from contest_option o join contest c on c.id = o.contest_id
-                join election e on e.id = c.election_id
-                where o.party_id = top.entity_id and c.allocation_parent_id is null
-                order by e.date_from desc nulls last limit 1)
+                select top.entity_id where exists (
+                  select from contest_option o join contest c on c.id = o.contest_id
+                  where o.party_id = top.entity_id and c.allocation_parent_id is null))
               else top.entity_id
             end as target,
             case top.type
