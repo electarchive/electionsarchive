@@ -3363,7 +3363,7 @@ export const contests = {
               where g.area_id = c.district_area_id and (upper(g.valid) > e.date_from or upper_inf(g.valid))
               order by lower(g.valid) nulls first limit 1
             ) g
-            where c.id = ${contest.root}::uuid
+            where c.id = ${contest.root}::uuid and (c.body_id is not null or c.office_id is not null)
           ),
           peers as (
             select c.* from me join contest c
@@ -12033,6 +12033,7 @@ export const search = {
           path: v.nullable(v.string()),
           context: v.nullable(v.string()),
           date: v.nullable(v.string()),
+          photo: v.nullable(v.string()),
         }),
       ),
     )
@@ -12214,7 +12215,13 @@ export const search = {
       const ids = rows.flatMap((row) =>
         [row.id, row.target, row.context].filter((id) => id != null),
       );
-      const [labels, slugs] = await Promise.all([names(ids), paths(ids)]);
+      const [labels, slugs, faces] = await Promise.all([
+        names(ids),
+        paths(ids),
+        portraits(
+          rows.filter((row) => row.type === "person").map((row) => row.id),
+        ),
+      ]);
       return rows
         .map((row) => ({
           id: row.id,
@@ -12228,6 +12235,7 @@ export const search = {
               (row.type === "person" ? row.target : row.context) ?? "",
             ) ?? null,
           date: row.date,
+          photo: faces.get(row.id)?.src ?? null,
         }))
         .filter((row) => row.path != null && row.name !== "")
         .toSorted(

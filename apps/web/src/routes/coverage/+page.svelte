@@ -161,14 +161,16 @@
       <p class="text-[0.9375rem] text-muted-foreground max-inline-[72ch]">
         {m.coverage_lede()}
       </p>
-      <div class="flex items-center gap-2 text-xs text-muted-foreground">
+      <div
+        class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
+      >
         {built}
         {#if data.dev}
           <form method="POST" action="?/refresh" use:enhance>
             <button
               type="submit"
               disabled={data.building}
-              class="rounded-sm border border-border px-2 text-foreground block-6 hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50 disabled:hover:bg-transparent"
+              class="rounded-sm border border-border px-2 whitespace-nowrap text-foreground block-6 hover:bg-muted focus-visible:outline-2 focus-visible:outline-ring disabled:opacity-50 disabled:hover:bg-transparent"
               >{m.coverage_refresh()}</button
             >
           </form>

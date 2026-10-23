@@ -94,10 +94,28 @@
                 class="grid grid-cols-[auto_minmax(0,1fr)] items-baseline gap-x-2.5 py-2 hover:bg-secondary"
                 href={resolve("/[...path]", { path: hit.path ?? "" })}
               >
-                <group.icon
-                  class="self-center text-muted-foreground block-4 inline-4"
-                  aria-hidden="true"
-                />
+                {#if group.type !== "person"}
+                  <group.icon
+                    class="self-center text-muted-foreground block-4 inline-4"
+                    aria-hidden="true"
+                  />
+                {:else if hit.photo == null}
+                  <span
+                    class="row-span-2 grid place-items-center self-center rounded-full bg-muted text-muted-foreground block-9 inline-9"
+                    aria-hidden="true"
+                  >
+                    <group.icon class="block-4 inline-4" />
+                  </span>
+                {:else}
+                  <img
+                    class="row-span-2 self-center rounded-full bg-muted object-cover object-top block-9 inline-9"
+                    src={hit.photo}
+                    alt=""
+                    loading="lazy"
+                    width="36"
+                    height="36"
+                  />
+                {/if}
                 <span class="truncate font-semibold">{hit.name}</span>
                 {#if hit.context != null || hit.date != null}
                   <span
