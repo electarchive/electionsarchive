@@ -1,0 +1,30 @@
+{
+  "kind": "statewide",
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "year": 1978,
+  "day": "1978-11-07",
+  "title": "State of Illinois official vote cast at the general election, 1978",
+  "file": {
+    "url": "https://archive.org/download/officialvote78illi/officialvote78illi.pdf"
+  },
+  "offices": {
+    "secretary-of-state": "Secretary of State",
+    "comptroller": "Comptroller",
+    "treasurer": "Treasurer"
+  },
+  "leaves": [
+    31,
+    32,
+    33,
+    36,
+    37,
+    38,
+    41,
+    42,
+    43
+  ]
+}

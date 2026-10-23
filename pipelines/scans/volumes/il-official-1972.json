@@ -1,0 +1,30 @@
+{
+  "kind": "statewide",
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "year": 1972,
+  "day": "1972-11-07",
+  "title": "State of Illinois official vote cast at the general election, 1972",
+  "file": {
+    "url": "https://archive.org/download/officialvote72illi/officialvote72illi.pdf"
+  },
+  "offices": {
+    "attorney-general": "Attorney General",
+    "secretary-of-state": "Secretary of State",
+    "comptroller": "Comptroller"
+  },
+  "leaves": [
+    34,
+    35,
+    36,
+    40,
+    41,
+    42,
+    46,
+    47,
+    48
+  ]
+}

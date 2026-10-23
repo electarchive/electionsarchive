@@ -1,0 +1,30 @@
+{
+  "kind": "statewide",
+  "polity": "US-IL",
+  "publisher": "Illinois State Board of Elections",
+  "license": "Public record",
+  "raw_source": "us.scans",
+  "create": true,
+  "year": 1982,
+  "day": "1982-11-02",
+  "title": "State of Illinois official vote cast at the general election, 1982",
+  "file": {
+    "url": "https://archive.org/download/officialvoteofst1982illi/officialvoteofst1982illi.pdf"
+  },
+  "offices": {
+    "attorney-general": "Attorney General",
+    "secretary-of-state": "Secretary of State",
+    "comptroller": "Comptroller",
+    "treasurer": "Treasurer"
+  },
+  "leaves": [
+    14,
+    15,
+    18,
+    19,
+    22,
+    23,
+    26,
+    27
+  ]
+}
