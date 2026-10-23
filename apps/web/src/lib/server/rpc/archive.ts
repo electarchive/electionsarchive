@@ -2349,6 +2349,9 @@ async function tabulate(
       const item = legend.get(key ?? "");
       if (item != null) {
         item.lead = true;
+        if (row.person != null) {
+          item.people.add(row.person);
+        }
       }
       return [
         row.contest,
@@ -2401,7 +2404,8 @@ async function tabulate(
       short: item.key.startsWith("person:") ? null : item.short,
       color: item.color,
       person:
-        item.key.startsWith("person:") || item.people.size === 1
+        item.key.startsWith("person:") ||
+        (item.people.size === 1 && rows.every((row) => !row.isContest))
           ? item.person
           : null,
       party: item.party,
@@ -6728,7 +6732,7 @@ async function races(
                         }),
                       },
                   lineage,
-                  "party",
+                  isPrimaries ? "person" : "party",
                   isPrimaries ? "option" : grouping,
                 ),
                 anchors(
