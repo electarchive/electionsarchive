@@ -14,9 +14,17 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import special_counties, special_files, special_md, special_nc, special_nm_1997, special_pdfs, special_wi_1993
-from ea.sources.us.elstats import SOURCE as ARCHIVE
+from ea.sources.us import (
+    special_counties,
+    special_files,
+    special_md,
+    special_nc,
+    special_nm_1997,
+    special_pdfs,
+    special_wi_1993,
+)
 from ea.sources.us.elstats import GAZETTEER, MASSACHUSETTS, SUFFIXES, TENANTS, plain, url
+from ea.sources.us.elstats import SOURCE as ARCHIVE
 from ea.store import DATA, connect
 
 SOURCE = "us.elstats_specials"
@@ -43,8 +51,16 @@ CALIFORNIA_FILES = [
     ("2022-cd22", "general", "xlsx", date(2022, 6, 7)),
 ]
 TEXAS = "https://elections.sos.state.tx.us/elchist{}_race{}.htm"
-TEXAS_PAGES = [(61, 90, date(1997, 3, 15), 28, False), (64, 90, date(1997, 4, 12), 28, True), (329, 89, date(2018, 6, 30), 27, False)]
-MASSACHUSETTS_SPECIALS = {106102: (date(2001, 10, 16), 9), 103450: (date(2007, 10, 16), 5), 124836: (date(2013, 12, 10), 5)}
+TEXAS_PAGES = [
+    (61, 90, date(1997, 3, 15), 28, False),
+    (64, 90, date(1997, 4, 12), 28, True),
+    (329, 89, date(2018, 6, 30), 27, False),
+]
+MASSACHUSETTS_SPECIALS = {
+    106102: (date(2001, 10, 16), 9),
+    103450: (date(2007, 10, 16), 5),
+    124836: (date(2013, 12, 10), 5),
+}
 STATES = {
     "MA": "Massachusetts",
     "NY": "New York",
@@ -68,8 +84,15 @@ STATES = {
     "OK": "Oklahoma",
     "MT": "Montana",
     "WI": "Wisconsin",
+    "SD": "South Dakota",
 }
 OFFICIAL = {
+    "SD": (
+        "South Dakota Secretary of State",
+        "Election history: official returns",
+        "https://sdsos.gov/elections-voting/election-resources/election-history/default.aspx",
+        [special_pdfs.SOUTH_DAKOTA],
+    ),
     "NC": (
         "North Carolina State Board of Elections",
         "Election results data",
@@ -131,6 +154,13 @@ PARTIES = {
 }
 MAIN = {"Democratic", "Republican", "DEM", "REP"}
 INDEPENDENT = {"IND", "NOPTY", "NPTY", "NOP"}
+WITHDREW = {
+    "2001-12-11:OK:house:1:republican": {
+        "Cathy Keating": "Withdrew from the January 8, 2002 runoff primary on December 14, 2001, so the special general "
+        "was held that day instead (State Election Board, Candidates for Special Election, United States Representative "
+        "District 1: https://oklahoma.gov/elections/candidates/candidate-filing-archives/cd01list.html)."
+    }
+}
 
 
 def fetch() -> None:
@@ -212,9 +242,9 @@ def emit() -> Path:
             ).fetchall()
         ]
     for day in LOUISIANA_DAYS:
-        races = json.loads(raw.cached(SOURCE, LOUISIANA.format(day, "RacesCandidates_Multiparish.htm")).path.read_text())[
-            "Races"
-        ]["Race"]
+        races = json.loads(
+            raw.cached(SOURCE, LOUISIANA.format(day, "RacesCandidates_Multiparish.htm")).path.read_text()
+        )["Races"]["Race"]
         totals = {}
         for race in json.loads(raw.cached(SOURCE, LOUISIANA.format(day, "Votes_Multiparish.htm")).path.read_text())[
             "Races"
@@ -282,7 +312,13 @@ def emit() -> Path:
             if row[0] in (None, "TOTALS"):
                 continue
             code = massachusetts_towns.get(
-                plain(re.sub(r"^([NSEW])\. ", lambda hit: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[hit[1]], row[0]))
+                plain(
+                    re.sub(
+                        r"^([NSEW])\. ",
+                        lambda hit: {"N": "North ", "S": "South ", "E": "East ", "W": "West "}[hit[1]],
+                        row[0],
+                    )
+                )
             )
             if code is None:
                 raise ValueError(f"{election}: no town for {row[0]}")
@@ -321,7 +357,13 @@ def emit() -> Path:
         for index, row in enumerate(sheet):
             if row[0] == "County**":
                 break
-            if row[0] is None and row[1] is None and row[2] is not None and (sheet[index - 1][2] is None or (sheet[index - 1][0] or "").startswith("Percentage")) and sheet[index + 3][0] not in (None, "Total Votes Cast"):
+            if (
+                row[0] is None
+                and row[1] is None
+                and row[2] is not None
+                and (sheet[index - 1][2] is None or (sheet[index - 1][0] or "").startswith("Percentage"))
+                and sheet[index + 3][0] not in (None, "Total Votes Cast")
+            ):
                 block = []
                 for line in sheet[index + 3 :]:
                     if line[0] is None or line[0].startswith(("Total", "Votes", "Percentage")):
@@ -349,7 +391,9 @@ def emit() -> Path:
                     "candidate_party_name": cell["party"],
                     "division_name": cell["county"],
                     "votes": str(cell["votes"]),
-                    "outcome": ("Elected" if stage == "general" else "Runoff") if cell["name"] in leaders else "Defeated",
+                    "outcome": ("Elected" if stage == "general" else "Runoff")
+                    if cell["name"] in leaders
+                    else "Defeated",
                     "runoff": stage == "general",
                 }
             )
@@ -357,20 +401,40 @@ def emit() -> Path:
     texas: list[dict[str, object]] = []
     for election, race, day, district, runoff in TEXAS_PAGES:
         rows = [
-            [re.sub(r"\s+", " ", re.sub(r"<[^>]*>", "", cell)).strip() for cell in re.findall(r"<T[HD][^>]*>(.*?)</T[HD]>", row, re.S | re.I)]
-            for row in re.findall(r"<tr[^>]*>(.*?)</tr>", raw.cached(SOURCE, TEXAS.format(election, race)).path.read_text(errors="replace"), re.S | re.I)
+            [
+                re.sub(r"\s+", " ", re.sub(r"<[^>]*>", "", cell)).strip()
+                for cell in re.findall(r"<T[HD][^>]*>(.*?)</T[HD]>", row, re.DOTALL | re.IGNORECASE)
+            ]
+            for row in re.findall(
+                r"<tr[^>]*>(.*?)</tr>",
+                raw.cached(SOURCE, TEXAS.format(election, race)).path.read_text(errors="replace"),
+                re.DOTALL | re.IGNORECASE,
+            )
         ]
         firsts, lasts, parties = rows[0], rows[1], rows[2]
         stop = parties.index("Votes")
         cells = []
         for row in rows[4:]:
             for column in range(1, stop):
-                name = re.sub(r",? (III|Jr\.|Sr\.)$", "", f"{firsts[column]} {lasts[column]}") if parties[column] != "W-I" else "Write-ins"
-                cells.append({"name": name, "party": parties[column], "county": row[0].title(), "votes": int(row[column].replace(",", ""))})
+                name = (
+                    re.sub(r",? (III|Jr\.|Sr\.)$", "", f"{firsts[column]} {lasts[column]}")
+                    if parties[column] != "W-I"
+                    else "Write-ins"
+                )
+                cells.append(
+                    {
+                        "name": name,
+                        "party": parties[column],
+                        "county": row[0].title(),
+                        "votes": int(row[column].replace(",", "")),
+                    }
+                )
         by_name: dict[str, int] = {}
         for cell in cells:
             by_name[cell["name"]] = by_name.get(cell["name"], 0) + cell["votes"]
-        ranked = sorted(((name, count) for name, count in by_name.items() if name != "Write-ins"), key=lambda item: -item[1])
+        ranked = sorted(
+            ((name, count) for name, count in by_name.items() if name != "Write-ins"), key=lambda item: -item[1]
+        )
         majority = ranked[0][1] * 2 > sum(by_name.values())
         leaders = {name for name, _ in ranked[: 1 if runoff or majority else 2]}
         for cell in cells:
@@ -383,7 +447,9 @@ def emit() -> Path:
                     "candidate_party_name": None if cell["party"] in ("W-I", "IND") else cell["party"],
                     "division_name": cell["county"],
                     "votes": str(cell["votes"]),
-                    "outcome": ("Elected" if runoff or majority else "Runoff") if cell["name"] in leaders else "Defeated",
+                    "outcome": ("Elected" if runoff or majority else "Runoff")
+                    if cell["name"] in leaders
+                    else "Defeated",
                     "runoff": runoff,
                 }
             )
@@ -416,6 +482,7 @@ def emit() -> Path:
             if int(code[2:]) >= 500:
                 names[f"{plain(text)}city"] = code
             names.setdefault(plain(text), code)
+        counties["SD"][plain("Shannon")] = "46102"
         cs = Changeset(
             conn,
             pipeline=SOURCE,
@@ -471,6 +538,8 @@ def emit() -> Path:
                 for owner, link in special_files.STORED:
                     if owner == state:
                         cs.artifact(raw.cached(SOURCE, link), sources[state])
+                if state == "WI":
+                    cs.artifact(raw.cached(SOURCE, special_pdfs.WISCONSIN), sources[state])
                 continue
             if state in OFFICIAL:
                 publisher, title, site, links = OFFICIAL[state]
@@ -646,7 +715,11 @@ def emit() -> Path:
                 cs.add("slug", path=f"us/{state.lower()}/{day}-{stage}", entity_id=election)
             contest = cs.key("us.contest", key)
             contests[key] = contest
-            ordinal = "at-large" if district == 0 else f"{district}{'th' if district % 100 in (11, 12, 13) else {1: 'st', 2: 'nd', 3: 'rd'}.get(district % 10, 'th')}"
+            ordinal = (
+                "at-large"
+                if district == 0
+                else f"{district}{'th' if district % 100 in (11, 12, 13) else {1: 'st', 2: 'nd', 3: 'rd'}.get(district % 10, 'th')}"
+            )
             cs.add(
                 "contest",
                 id=contest,
@@ -670,7 +743,13 @@ def emit() -> Path:
                 )
                 if runoff
                 else None,
-                electoral_system_id={"LA": two_round, "TX": two_round, "GA": two_round, "MS": two_round, "CA": top_two}.get(state, fptp),
+                electoral_system_id={
+                    "LA": two_round,
+                    "TX": two_round,
+                    "GA": two_round,
+                    "MS": two_round,
+                    "CA": top_two,
+                }.get(state, fptp),
                 default_result_kind="counted",
             )
             cs.add(
@@ -775,7 +854,14 @@ def emit() -> Path:
                     "outcome",
                     result_set_id=result_set,
                     option_id=option,
-                    kind=("won" if primary else "elected") if name in winners else "advanced" if outcomes.get(name) == "Runoff" else "lost",
+                    kind="withdrew"
+                    if name in WITHDREW.get(key, {})
+                    else ("won" if primary else "elected")
+                    if name in winners
+                    else "advanced"
+                    if outcomes.get(name) == "Runoff"
+                    else "lost",
+                    notes=WITHDREW.get(key, {}).get(name),
                 )
                 by_unit = {
                     str(division): int(count)
@@ -784,14 +870,18 @@ def emit() -> Path:
                     .agg(pl.col("votes").sum())
                     .iter_rows()
                 }
-                located = {
-                    str(division): (int(page), list(box))
-                    for division, page, box in lines.filter(
-                        (pl.col("candidate_name") == name) & pl.col("page").is_not_null()
-                    )
-                    .select("division_name", "page", "box")
-                    .iter_rows()
-                } if "page" in lines.columns else {}
+                located = (
+                    {
+                        str(division): (int(page), list(box))
+                        for division, page, box in lines.filter(
+                            (pl.col("candidate_name") == name) & pl.col("page").is_not_null()
+                        )
+                        .select("division_name", "page", "box")
+                        .iter_rows()
+                    }
+                    if "page" in lines.columns
+                    else {}
+                )
                 options.append((option, by_unit, located))
             write_in = cs.key("us.option", f"{key}:write_in")
             cs.add("contest_option", id=write_in, contest_id=contest, kind="write_in", ballot_label="Write-ins")
