@@ -14,11 +14,12 @@ SOURCE = "us.in_leg_2000"
 VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "Indiana Secretary of State"
-TITLE = "Indiana General Elections 2000: State Representative and State Senator by district"
+TITLE = "Indiana General Elections 2000: U.S. Representative, State Representative, and State Senator by district"
 DAY = date(2000, 11, 7)
 URL = "https://web.archive.org/web/20021122id_/http://www.state.in.us/serv/sos_ge2000v?act=district&district={:03}&office={}"
 LANDING = "http://www.state.in.us/serv/sos_ge2000v"
 DISTRICTS = {
+    "us_house": ("US+Representative", range(1, 11)),
     "house": ("State+Representative", range(1, 101)),
     "senate": (
         "State+Senator",
@@ -74,24 +75,37 @@ def parse() -> None:
             else:
                 parts.append((counties[re.sub(r"[^a-z]", "", row[0].lower())], votes))
         sums = [sum(votes[k] for _, votes in parts) for k in range(len(names))]
-        if sums != totals:
+        if sums != (totals or (sums if len(parts) == 1 else [])):
             print(f"{chamber} {district}: {names} counties sum to {sums}, printed {totals}, skipped")
             continue
         rows.extend(
-            (f"{chamber}:{district}:g", code, name, votes[k]) for code, votes in parts for k, name in enumerate(names)
+            ("house", district, code, name, votes[k])
+            if chamber == "us_house"
+            else (f"{chamber}:{district}:g", None, code, name, votes[k])
+            for code, votes in parts
+            for k, name in enumerate(names)
         )
     PARSED.mkdir(parents=True, exist_ok=True)
     frame = pl.DataFrame(
-        rows, schema={"chamber": pl.String, "code": pl.String, "candidate": pl.String, "votes": pl.Int64}, orient="row"
+        rows,
+        schema={
+            "chamber": pl.String,
+            "district": pl.Int16,
+            "code": pl.String,
+            "candidate": pl.String,
+            "votes": pl.Int64,
+        },
+        orient="row",
     )
     print(
-        frame.group_by(pl.col("chamber").str.split(":").list.first().alias("office")).agg(pl.col("chamber").n_unique())
+        frame.group_by(pl.col("chamber").str.split(":").list.first().alias("office")).agg(
+            pl.concat_str("chamber", "district", ignore_nulls=True).n_unique()
+        )
     )
     frame.with_columns(
         candidate=pl.col("candidate").str.to_uppercase().str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
         year=pl.lit(DAY.year, pl.Int32),
         day=pl.lit(DAY),
-        district=pl.lit(None, pl.Int16),
         special=pl.lit(False),
         state=pl.lit("IN"),
         measure=pl.lit(1, pl.Int16),
@@ -107,7 +121,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Indiana's 2000 State House and Senate generals by county (Secretary of State results pages, via the Wayback Machine)",
+            summary="Indiana's 2000 U.S. House, State House, and State Senate generals by county (Secretary of State results pages, via the Wayback Machine)",
             polity="US-IN",
         )
         source = cs.source(PUBLISHER, TITLE)
