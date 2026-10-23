@@ -668,5 +668,6 @@
       ],
       "hint": "Read only the table headed 'District 11.'; ignore any other table visible in the image."
     }
-  ]
+  ],
+  "authoritative": "Source: the Secretary of the Commonwealth's Election Statistics, whose town rows add up to each candidate's printed total."
 }

@@ -1109,7 +1109,7 @@ def finalize(
                 key = (str(item.get("section", item.get("page"))), str(item["county"]))
                 seen = cellmap.get(key) or one.cells.get(key) or (two.cells.get(key) if two is not None else None)
                 if seen is not None:
-                    cellmap[key] = (int(item["value"]), seen[1])
+                    cellmap[key] = (int(item["value"]) if "value" in item else seen[0] + int(item["delta"]), seen[1])
             target = chosen.printed if chosen.printed is not None else held.get(name)
             slack = 0 if chosen.printed is not None else max(50, (target or 0) * 0.01)
             if target is not None and abs(sum(value for value, _ in cellmap.values()) - target) <= slack:

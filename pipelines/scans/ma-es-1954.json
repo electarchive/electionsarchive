@@ -282,11 +282,16 @@
       "orientation": "counties_down",
       "crop": [
         0.045,
-        0.645,
+        0.455,
         0.961,
         0.943
       ],
-      "hint": "Read only the table headed 'District 3.'; ignore any other table visible in the image."
+      "hint": "Read only the table headed 'District 3.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.37,
+        0.455
+      ]
     },
     {
       "page": 315,
