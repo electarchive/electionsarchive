@@ -51,18 +51,23 @@ def parse() -> None:
             day = date.fromisoformat(key[:10])
             held.setdefault((day, int(votes)), []).append((key.split(":", 2)[2], label))
     rows: list[tuple[date, str, str, str, int]] = []
+    redrawn: set[str] = set()
     for year, day in DAYS.items():
         html = subprocess.run(
             ["pdftotext", "-bbox", str(cached(year).path), "-"], capture_output=True, text=True, check=True
         ).stdout
         pages = [
-            [(float(x1), float(y), unescape(text)) for _, y, x1, text in WORD.findall(page)]
+            [
+                (float(x1), float(y), unescape(text), (float(x0) + float(x1)) / 2)
+                for x0, y, x1, text in WORD.findall(page)
+            ]
             for page in html.split("<page ")[1:]
         ]
+        ballots = [(key, label, votes) for (when, votes), found in held.items() if when == day for key, label in found]
         grids: list[tuple[float, dict[str, float]]] = []
         for words in pages:
             lines: dict[float, list[str]] = {}
-            for _, y, text in words:
+            for _, y, text, _ in words:
                 if re.fullmatch(r"[A-Za-z]+", text):
                     lines.setdefault(round(y, 1), []).append(text)
             labels = sorted((y, "".join(texts).lower()) for y, texts in lines.items())
@@ -76,23 +81,51 @@ def parse() -> None:
             if total is not None and len(places) >= 25 and (total, places) not in grids:
                 grids.append((total, places))
         for number, words in enumerate(pages, 1):
-            if not re.search(r"(?i)senate|house", " ".join(text for _, _, text in words)):
+            if not re.search(r"(?i)senate|house", " ".join(text for _, _, text, _ in words)):
                 continue
-            figures = [(x, y, int(text.replace(",", ""))) for x, y, text in words if re.fullmatch(r"\d[\d,]*", text)]
+            figures = [
+                (x, y, int(text.replace(",", "")), center)
+                for x, y, text, center in words
+                if re.fullmatch(r"\d[\d,]*", text)
+            ]
             for total, places in grids:
-                printed = sorted((x, value) for x, y, value in figures if abs(y - total) < 2)
+                printed = sorted((x, value, center) for x, y, value, center in figures if abs(y - total) < 2)
                 if len(printed) < 3:
                     continue
-                for anchor, expected in printed:
+                texts = {anchor: "" for anchor, _, _ in printed}
+                for _, y, text, center in sorted(words, key=lambda word: (round(word[1]), word[0])):
+                    if y < min(places.values()) - 2 and re.fullmatch(r"[A-Za-z.,'\"]+", text):
+                        nearest = min(printed, key=lambda column: abs(column[2] - center))[0]
+                        texts[nearest] += re.sub(r"[^a-z]", "", text.lower())
+                for anchor, expected, _ in printed:
                     cells = [
                         (code, value)
                         for code, place in places.items()
-                        for x, y, value in figures
+                        for x, y, value, _ in figures
                         if abs(y - place) < 2 and abs(x - anchor) <= 4
                     ]
-                    found = held.get((day, expected), [])
                     if sum(value for _, value in cells) != expected or len(cells) < 1:
                         continue
+                    found = held.get((day, expected), [])
+                    named = [
+                        (key, label, votes)
+                        for key, label, votes in ballots
+                        if all(token in texts[anchor] for token in re.findall(r"[a-z]{3,}", label.lower()))
+                    ]
+                    if len(named) == 1 and (len(found) != 1 or named[0][:2] != found[0]):
+                        key, label, votes = named[0]
+                        held_digits, printed_digits = str(votes), str(expected)
+                        if len(held_digits) == len(printed_digits) and (
+                            sorted(held_digits) == sorted(printed_digits)
+                            or sum(a != b for a, b in zip(held_digits, printed_digits, strict=True)) <= 1
+                        ):
+                            rows.extend((day, key, code, label, value) for code, value in cells)
+                            if votes != expected:
+                                print(f"{day} {key}: {label} prints {expected}, held {votes}")
+                                redrawn.add(f"{day}:UT:{key}")
+                            continue
+                        if len(found) == 1 and re.findall(r"[a-z]{3,}", found[0][1].lower())[-1] not in texts[anchor]:
+                            continue
                     if len(found) == 1:
                         key, label = found[0]
                         rows.extend((day, key, code, label, value) for code, value in cells)
@@ -112,6 +145,7 @@ def parse() -> None:
         votes="votes",
         source=pl.lit("UT"),
     ).write_parquet(PARSED / "counties.parquet")
+    pl.DataFrame({"key": sorted(redrawn)}, schema={"key": pl.String}).write_parquet(PARSED / "redrawn.parquet")
 
 
 def emit() -> Path:
@@ -142,5 +176,15 @@ def emit() -> Path:
         frame = pl.read_parquet(PARSED / "counties.parquet").filter(
             ~pl.concat_str(pl.col("day").cast(pl.String), pl.lit("UT"), "chamber", separator=":").is_in(filled)
         )
-        medsl.attach(cs, conn, frame, {"UT": source}, strict=True)
+        redrawn = pl.read_parquet(PARSED / "redrawn.parquet")["key"].to_list()
+        keys = pl.concat_str(pl.col("day").cast(pl.String), pl.lit("UT"), "chamber", separator=":")
+        medsl.attach(cs, conn, frame.filter(~keys.is_in(redrawn)), {"UT": source}, strict=True)
+        medsl.attach(
+            cs,
+            conn,
+            frame.filter(keys.is_in(redrawn)),
+            {"UT": source},
+            authoritative="Source: the Office of Elections' official canvass, whose county cells add up to its printed "
+            "candidate totals.",
+        )
         return cs.write()
