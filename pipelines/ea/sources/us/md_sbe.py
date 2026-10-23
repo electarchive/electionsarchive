@@ -55,8 +55,10 @@ def fetch() -> None:
             raw.fetch(SOURCE, f"{ARCHIVE}{year}/election_data/{name}", suffix=".csv")
 
 
-def chamber(office: str) -> str | None:
+def chamber(office: str, governor: bool = False) -> str | None:
     office = office.strip().lower()
+    if governor and office.startswith("governor"):
+        return "governor"
     if "state" in office:
         return None
     if SENATE.search(office):
@@ -119,7 +121,7 @@ def parse() -> None:
             for office, district, candidate, votes in frame.select(
                 "Office Name", "Office District", label, "Total Votes"
             ).iter_rows():
-                office = chamber(office or "")
+                office = chamber(office or "", governor=True)
                 if office is not None and votes != "#NULL#":
                     rows.append(
                         (
@@ -169,7 +171,7 @@ def emit() -> Path:
             pipeline=SOURCE,
             version=VERSION,
             summary="Maryland's House and Senate general elections by county, 1990–2014",
-            polity="US-MD",
+            polity="US",
         )
         source = cs.source(PUBLISHER, TITLE)
         cs.add(
@@ -186,5 +188,7 @@ def emit() -> Path:
         for year in COUNTY_FILES:
             for name in files(year):
                 cs.artifact(raw.cached(SOURCE, f"{ARCHIVE}{year}/election_data/{name}"), source)
-        medsl.attach(cs, conn, frame, {"MD": source})
+        statewide = pl.col("chamber") == "governor"
+        medsl.attach(cs, conn, frame.filter(~statewide), {"MD": source})
+        medsl.attach(cs, conn, frame.filter(statewide), {"MD": source}, strict=True, extend=True)
         return cs.write()
