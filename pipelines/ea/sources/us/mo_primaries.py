@@ -1,9 +1,10 @@
 import csv
 import re
 import subprocess
-from datetime import date
+from datetime import UTC, date, datetime
 from pathlib import Path
 
+import httpx
 import polars as pl
 
 from ea import raw
@@ -15,10 +16,14 @@ SOURCE = "us.mo_primaries"
 VERSION = "4"
 PARSED = DATA / "parsed" / SOURCE
 SITE = "https://web.archive.org/web/2025id_/https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
+LIVE = "https://www.sos.mo.gov/CMSImages/ElectionResultsStatistics/"
 FILES = {
     date(1998, 8, 4): [SITE + "CountyPrimary1998.pdf"],
     date(2000, 8, 8): [SITE + "CountyPrimary2000.pdf"],
     date(2004, 8, 3): [SITE + "CountyPrimary2004.pdf", SITE + "CountyPrimary2004Part2.pdf"],
+    date(2006, 8, 8): [LIVE + "CountyPrimary2006.pdf", LIVE + "CountyPrimary2006Part2.pdf"],
+    date(2008, 2, 5): [LIVE + "CountyPresidential2008.pdf", LIVE + "CountyPresidential2008Part2.pdf"],
+    date(2008, 8, 5): [LIVE + "CountyPrimary2008.pdf", LIVE + "CountyPrimary2008Part2.pdf"],
     date(2012, 2, 7): [SITE + "CountyPresidential2012.pdf", SITE + "CountyPresidential2012Part2.pdf"],
 }
 PARTIAL = {date(2000, 8, 8): 5}
@@ -55,7 +60,17 @@ OE_TITLE = "Missouri primary results by county, 2012 and 2014"
 def fetch() -> None:
     for urls in FILES.values():
         for url in urls:
-            raw.fetch(SOURCE, url, suffix=".pdf")
+            if url.startswith(LIVE):
+                try:
+                    raw.cached(SOURCE, url)
+                    continue
+                except LookupError:
+                    pass
+                response = httpx.get(url, headers={"User-Agent": "Mozilla/5.0 (X11; Linux x86_64) Chrome/130.0 Safari/537.36"})
+                response.raise_for_status()
+                raw.store(SOURCE, url, response.content, suffix=".pdf", retrieved_at=datetime.now(UTC), media_type="application/pdf")
+            else:
+                raw.fetch(SOURCE, url, suffix=".pdf")
     for name in MATRICES.values():
         raw.fetch(SOURCE, STATS + name, suffix=".pdf")
     for path in SHEETS.values():
