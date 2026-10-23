@@ -18,6 +18,11 @@ CITATIONS = {
         "2011 elections break new ground",
         "https://americanpress.com/2011/09/22/2011-elections-break-new-ground/",
     ),
+    "hi-oe-2024": (
+        "Hawaii Office of Elections",
+        "2024 Candidate Election Status",
+        "https://elections.hawaii.gov/wp-content/uploads/Office-of-Elections-_-2024-Candidate-Election-Status.pdf",
+    ),
     "times-picayune-2023": (
         "The Times-Picayune",
         "Republicans win dozens of Louisiana races unopposed",
@@ -41,16 +46,45 @@ ROWS = [
         "republican-party",
         "times-picayune-2023",
     ),
+    *(
+        (date(2024, 11, 5), "HI", seat, candidate, party, "hi-oe-2024")
+        for seat, candidate, party in [
+            ("senate:1", "Lorraine Rodero Inouye", "democratic-party"),
+            ("senate:4", "Tim Richards", "democratic-party"),
+            ("senate:5:special", "Troy N. Hashimoto", "democratic-party"),
+            ("senate:19", "Henry J.C. Aquino", "democratic-party"),
+            ("senate:24", "Jarrett Keohokalole", "democratic-party"),
+            ("house:1", "Mark M. Nakashima", "democratic-party"),
+            ("house:2", "Sue Lee Loy", "democratic-party"),
+            ("house:9", "Justin H. Woodson", "democratic-party"),
+            ("house:10", "Tyson K. Miyake", "democratic-party"),
+            ("house:18", "Gene Ward", "republican-party"),
+            ("house:19", "Mark Jun Hashem", "democratic-party"),
+            ("house:23", "Ikaika M. Olds", "democratic-party"),
+            ("house:25", "Kim Coco Iwamoto", "democratic-party"),
+            ("house:26", "Della Au Belatti", "democratic-party"),
+            ("house:28", "Daniel Holt", "democratic-party"),
+            ("house:33", "Sam Satoru Kong", "democratic-party"),
+            ("house:35", "Cory M. Chun", "democratic-party"),
+            ("house:36", "Rachele F. Lamosao", "democratic-party"),
+            ("house:43", "Kanani Souza", "republican-party"),
+            ("house:44", "Darius K. Kila", "democratic-party"),
+            ("house:51", "Lisa Marten", "democratic-party"),
+        ]
+    ),
 ]
+BODIES = {"house": ("House of Representatives", "us.sldl"), "senate": ("Senate", "us.sldu")}
 CONTEXT = {
     "LA": "Louisiana leaves a candidate with no opponent at the close of qualifying off the ballot and declares that "
-    "candidate elected, so no votes were cast in this race."
+    "candidate elected, so no votes were cast in this race.",
+    "HI": "Hawaii declares a nominee elected after the primary when no other candidate remains for the general "
+    "election (Haw. Rev. Stat. §12-41(a)), so the seat was not on the general election ballot.",
 }
 
 
 def fetch() -> None:
     for _, _, url in CITATIONS.values():
-        raw.fetch(SOURCE, url, suffix=".html")
+        raw.fetch(SOURCE, url, suffix="." + url.rsplit(".", 1)[1] if url.endswith(".pdf") else ".html")
 
 
 def emit() -> Path:
@@ -59,7 +93,8 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Louisiana's statewide officers declared elected without opposition, 2003–2023",
+            summary="Louisiana's statewide officers declared elected without opposition, 2003–2023, and Hawaii's "
+            "2024 legislators declared elected after the primary",
             polity="US",
         )
 
@@ -70,14 +105,15 @@ def emit() -> Path:
         for key, (publisher, title, url) in CITATIONS.items():
             sources[key] = cs.source(publisher, title)
             if sources[key] in cs.minted:
+                official = "Office of Elections" in publisher
                 cs.add(
                     "source",
                     id=sources[key],
-                    kind="news_agency",
+                    kind="official_body" if official else "news_agency",
                     publisher=publisher,
                     title=title,
                     url=url,
-                    license=None,
+                    license="Public record" if official else None,
                 )
             cs.artifact(raw.cached(SOURCE, url), sources[key])
         areas = dict(
@@ -95,28 +131,70 @@ def emit() -> Path:
                    where p.iso_code like 'US-%'"""
             ).fetchall()
         )
-        two_round = cs.key("us.electoral_system", "two_round")
-        for day, state, office, candidate, party, cited in ROWS:
-            office_slug = slug(office)
-            office_id = cs.key("us.office", f"{office_slug}:{state}")
+        own = {
+            value
+            for (value,) in conn.execute(
+                """select x.value from external_id x join changeset c on c.id = x.changeset_id
+                   where x.scheme = 'us.contest' and c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        }
+        systems = {key: cs.key("us.electoral_system", key) for key in ("two_round", "fptp")}
+        for day, state, seat, candidate, party, cited in ROWS:
+            chamber, _, rest = seat.partition(":")
+            body_seats = chamber in BODIES and rest != ""
+            district, _, special = rest.partition(":")
             election = cs.key("us.election", f"{day}:{state}")
             party_id = cs.key("us.party", party)
-            if cs.minted & {office_id, election, party_id, two_round}:
-                raise ValueError(f"{day} {state} {office}: the office, election, party, and system must exist")
-            contest_key = f"{day}:{state}:{office_slug}"
+            if body_seats:
+                chamber_name, scheme = BODIES[chamber]
+                contest_key = f"{day}:{state}:{chamber}:{district}:{'gs' if special else 'g'}"
+                body = cs.key("us.body", f"{state}:{chamber}")
+                area = cs.area(scheme, f"{state}:{district}")
+                required = {election, party_id, body, area, systems["fptp"]}
+                fields = {"kind": "body_seats", "body_id": body, "district_area_id": area}
+                system = systems["fptp"]
+                where = f"{states[state]} {chamber_name} {'special election' if special else 'election'}, District {district}"
+                path = f"state-{chamber}-{district}" + ("-special-election" if special else "")
+                prior = "c.body_id = %s and c.district_area_id = %s"
+                scope = [body, area]
+            else:
+                office_id = cs.key("us.office", f"{slug(seat)}:{state}")
+                contest_key = f"{day}:{state}:{slug(seat)}"
+                required = {office_id, election, party_id, systems["two_round"]}
+                fields = {"kind": "office", "office_id": office_id, "district_area_id": areas[state]}
+                system = systems["two_round"]
+                where = f"{states[state]} {seat} election"
+                path = slug(seat)
+                prior = "c.office_id = %s"
+                scope = [office_id]
+            if cs.minted & required:
+                raise ValueError(f"{contest_key}: its election, party, district, office or body, and system must exist")
+            if contest_key in own:
+                continue
             contest = cs.key("us.contest", contest_key)
             if contest not in cs.minted:
                 raise ValueError(f"{contest_key} is already held")
             found = conn.execute(
-                """select cy.person_id from candidacy cy
-                   join contest_option o on o.id = cy.option_id
-                   join contest c on c.id = o.contest_id and c.office_id = %s
-                   join election e on e.id = c.election_id
-                   join name n on n.entity_id = cy.person_id and n.is_preferred
-                   where cy.role = 'head' and n.text ilike %s
-                   order by e.date_from desc limit 1""",
-                [office_id, f"%{candidate.split()[-1]}%"],
+                f"""select cy.person_id from candidacy cy
+                    join contest_option o on o.id = cy.option_id
+                    join contest c on c.id = o.contest_id and {prior}
+                    join election e on e.id = c.election_id
+                    join name n on n.entity_id = cy.person_id and n.is_preferred
+                    where cy.role = 'head' and n.text ilike %s
+                    order by e.date_from desc limit 1""",
+                [*scope, f"%{candidate.split()[-1]}%"],
             ).fetchall()
+            if not found:
+                found = conn.execute(
+                    """select distinct cy.person_id from candidacy cy
+                       join contest_option o on o.id = cy.option_id
+                       join external_id x on x.entity_id = o.contest_id and x.scheme = 'us.contest'
+                       join name n on n.entity_id = cy.person_id and n.is_preferred
+                       where cy.role = 'head' and x.value like %s and n.text ilike %s and n.text ilike %s""",
+                    [f"%:{state}:%", f"%{candidate.split()[0]}%", f"%{candidate.split()[-1]}%"],
+                ).fetchall()
+                found = found if len(found) == 1 else []
             person = found[0][0] if found else cs.key(f"{SOURCE}.person", f"{state}:{slug(candidate)}")
             if person in cs.minted:
                 cs.add("person", id=person)
@@ -125,17 +203,15 @@ def emit() -> Path:
                 "contest",
                 id=contest,
                 election_id=election,
-                kind="office",
-                office_id=office_id,
-                district_area_id=areas[state],
-                term="full",
+                **fields,
+                term="remainder" if special else "full",
                 magnitude=1,
                 round_number=1,
-                electoral_system_id=two_round,
+                electoral_system_id=system,
                 default_result_kind="tacit",
             )
-            name(contest, f"{day.year} {states[state]} {office} election")
-            cs.add("slug", path=f"us/{state.lower()}/{day}-general/{office_slug}", entity_id=contest)
+            name(contest, f"{day.year} {where}")
+            cs.add("slug", path=f"us/{state.lower()}/{day}-general/{path}", entity_id=contest)
             option = cs.key("us.option", f"{contest_key}:{slug(candidate)}")
             cs.add(
                 "contest_option",
