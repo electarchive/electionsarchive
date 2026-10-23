@@ -448,6 +448,39 @@ export async function archive(path: string, search: URLSearchParams) {
       unit,
       level: contest.places?.level,
     });
+    const siblings = contest.scope.trail.at(-1)?.siblings;
+    const level = boundaries.find(
+      (entry) => entry.scheme === contest.places?.level,
+    );
+    const own = boundaries.find(
+      (entry) => entry.k != null && entry.scheme !== contest.places?.level,
+    );
+    const surround = await (async () => {
+      if (
+        siblings == null ||
+        contest.locator != null ||
+        (own != null && level?.tiles != null && own.frames.length > 0)
+      ) {
+        return null;
+      }
+      try {
+        const [places, bounds] = await Promise.all([
+          call(router.contests.places, {
+            id: siblings.contest,
+            unit: siblings.unit ?? undefined,
+            by: siblings.level,
+          }),
+          call(router.contests.boundaries, {
+            id: siblings.contest,
+            unit: siblings.unit ?? undefined,
+            level: siblings.level,
+          }),
+        ]);
+        return { places, bounds };
+      } catch {
+        return null;
+      }
+    })();
     return {
       kind: "contest" as const,
       contest,
@@ -456,6 +489,7 @@ export async function archive(path: string, search: URLSearchParams) {
       ballot,
       cycle,
       boundaries,
+      surround,
       match,
       within,
     };

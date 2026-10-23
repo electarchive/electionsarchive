@@ -376,10 +376,14 @@
           style:--party={swatch(row.color, row.key)}
         >
           <th class="px-2 py-1.5 text-start font-normal" scope="row">
-            <span class="flex items-baseline gap-2">
+            <span
+              class={cn("flex items-center gap-2.5", {
+                "min-block-9": isPictured,
+              })}
+            >
               {#if row.photo != null}
                 <img
-                  class="shrink-0 self-center rounded-full bg-muted object-cover object-top ring-2 ring-(--party) ring-offset-1 ring-offset-card block-7 inline-7"
+                  class="shrink-0 rounded-full bg-muted object-cover object-top ring-2 ring-(--party) ring-offset-1 ring-offset-card block-7 inline-7"
                   src={row.photo.src}
                   alt=""
                   loading="lazy"
@@ -388,7 +392,7 @@
                 />
               {:else if isPictured && (page ?? other)?.person == null}
                 <span
-                  class="grid shrink-0 place-items-center self-center block-7 inline-7"
+                  class="grid shrink-0 place-items-center block-7 inline-7"
                   aria-hidden="true"
                 >
                   {#if (page ?? other)?.party != null}
@@ -398,7 +402,7 @@
                 </span>
               {:else if isPictured}
                 <span
-                  class="grid shrink-0 place-items-center self-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none block-7 inline-7"
+                  class="grid shrink-0 place-items-center rounded-full bg-secondary text-[0.625rem] font-semibold text-muted-foreground ring-2 ring-(--party) ring-offset-1 ring-offset-card select-none block-7 inline-7"
                   aria-hidden="true"
                   >{row.label
                     .split(/\s+/u)
@@ -413,7 +417,7 @@
                 >
               {:else}
                 <span
-                  class="shrink-0 self-center rounded-xs bg-(--party) block-2.5 inline-2.5"
+                  class="shrink-0 rounded-xs bg-(--party) block-2.5 inline-2.5"
                 ></span>
               {/if}
               <span class="flex-1 min-inline-0">
@@ -425,15 +429,6 @@
                   person={(page ?? other)?.person}
                   party={(page ?? other)?.party}
                 />
-                {#if row.short != null && !row.label.includes(row.short) && !isOneParty && (span != null || (page?.lines.length ?? 0) === 0)}
-                  <Name
-                    class="text-[0.8125rem] text-muted-foreground"
-                    label={row.short}
-                    color={swatch(row.color, row.key)}
-                    hasSwatch={false}
-                    party={(page ?? other)?.party}
-                  />
-                {/if}
                 {#if page?.outcome != null && seats == null}
                   <span
                     class={cn("ms-1 px-1 text-xs font-semibold", {
@@ -441,6 +436,17 @@
                       "text-muted-foreground": page.outcome === "lost",
                     })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
                   >
+                {/if}
+                {#if row.short != null && !row.label.includes(row.short) && !isOneParty && (span != null || (page?.lines.length ?? 0) === 0)}
+                  <span class="block text-[0.8125rem] text-pretty">
+                    <Name
+                      class="text-muted-foreground"
+                      label={row.short}
+                      color={swatch(row.color, row.key)}
+                      hasSwatch={false}
+                      party={(page ?? other)?.party}
+                    />
+                  </span>
                 {/if}
                 {#if span != null && there != null}
                   {#if page == null}
@@ -491,16 +497,22 @@
           </td>
           {#if span == null}
             <td
-              class="relative px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
+              class="px-2 py-1.5 text-end font-figures text-[0.8125rem] whitespace-nowrap tabular-nums"
             >
               {#if page != null}
-                {@render cite(percent(page.share, digits), "share", row)}
+                <span class="relative inline-block min-inline-12">
+                  {@render cite(percent(page.share, digits), "share", row)}
+                  <span
+                    class="absolute inset-x-0 inset-bs-[calc(100%+0.25rem)] flex justify-end overflow-hidden rounded-full bg-secondary block-1"
+                    aria-hidden="true"
+                  >
+                    <span
+                      class="rounded-full bg-(--party)"
+                      style:inline-size="{(page.share / topShare) * 100}%"
+                    ></span>
+                  </span>
+                </span>
               {/if}
-              <span
-                class="absolute inset-e-2 inset-be-0.5 bg-(--party) block-0.5"
-                style:width="calc({((page?.share ?? 0) / topShare) * 100}% -
-                1rem)"
-              ></span>
             </td>
           {:else}
             {#each [line.before, line.after] as cell, index (index)}

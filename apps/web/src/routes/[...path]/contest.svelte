@@ -2,7 +2,6 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
-  import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
@@ -41,6 +40,7 @@
     ballot,
     cycle,
     boundaries,
+    surround,
     match,
   }: {
     contest: Extract<PageData, { kind: "contest" }>["contest"];
@@ -49,6 +49,7 @@
     ballot: Extract<PageData, { kind: "contest" }>["ballot"];
     cycle: Extract<PageData, { kind: "contest" }>["cycle"];
     boundaries: Extract<PageData, { kind: "contest" }>["boundaries"];
+    surround: Extract<PageData, { kind: "contest" }>["surround"];
     match: string;
   } = $props();
 
@@ -209,12 +210,9 @@
   });
   const upward = $derived.by(() => {
     const parent = contest.scope.trail.at(-2);
-    if (parent?.path != null) {
-      return { name: parent.name, path: parent.path };
-    }
-    return contest.election.path == null
+    return parent?.path == null
       ? null
-      : { name: contest.election.name, path: contest.election.path };
+      : { name: parent.name, path: parent.path };
   });
   const grouped = $derived.by(() => {
     const legend = contest.places?.legend ?? [];
@@ -304,28 +302,11 @@
           ],
         };
   });
-  const neighborhood = createQuery(() => {
-    const siblings = contest.scope.trail.at(-1)?.siblings;
-    return {
-      ...orpc.contests.places.queryOptions({
-        input: {
-          id: siblings?.contest ?? "",
-          unit: siblings?.unit ?? undefined,
-          by: siblings?.level,
-        },
-      }),
-      enabled:
-        siblings != null &&
-        drawn == null &&
-        chamber == null &&
-        contest.locator == null,
-    };
-  });
   const locating = $derived.by(() => {
     const own = boundaries.find(
       (entry) => entry.k != null && entry.frames.length > 0,
     );
-    const places = contest.locator ?? neighborhood.data ?? null;
+    const places = contest.locator ?? surround?.places ?? null;
     if (
       drawn != null ||
       chamber != null ||
@@ -336,20 +317,25 @@
       return null;
     }
     const legend = places.legend;
+    const parent = surround?.bounds.find(
+      (entry) => entry.k != null && entry.frames.length > 0,
+    );
     return {
       places,
       tiles: own.tiles,
       own: { tiles: own.tiles, k: own.k },
-      frames: own.frames.map((frame) => {
-        const wide = (frame.east - frame.west) * 1.5;
-        const tall = (frame.north - frame.south) * 1.5;
-        return {
-          west: frame.west - wide,
-          south: frame.south - tall,
-          east: frame.east + wide,
-          north: frame.north + tall,
-        };
-      }),
+      frames:
+        parent?.frames ??
+        own.frames.map((frame) => {
+          const wide = (frame.east - frame.west) * 1.5;
+          const tall = (frame.north - frame.south) * 1.5;
+          return {
+            west: frame.west - wide,
+            south: frame.south - tall,
+            east: frame.east + wide,
+            north: frame.north + tall,
+          };
+        }),
       isApproximate: own.isApproximate,
       noun: own.noun,
       sources: [
@@ -362,7 +348,9 @@
         ),
       ],
       colors: legend.map((item) => swatch(item.color, item.key)),
-      names: legend.map((item) => item.short ?? item.label),
+      names: legend.map((item) =>
+        item.person == null ? (item.short ?? item.label) : item.label,
+      ),
     };
   });
   const unmapped = $derived.by(() => {
@@ -1295,7 +1283,7 @@
         {/each}
       </section>
     {/if}
-  {:else}
+  {:else if locating == null}
     {@render stats(false)}
   {/if}
   {#if contest.count != null}
@@ -1548,50 +1536,50 @@
     {/if}
   {/if}
 
-  {#if drawn == null || chamber != null}
+  {#if locating != null}
+    <div
+      class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-7 xl:col-span-8"
+    >
+      <PlaceMap
+        places={locating.places}
+        colors={locating.colors}
+        tiles={locating.tiles}
+        own={locating.own}
+        frames={locating.frames}
+        isApproximate={locating.isApproximate}
+        noun={locating.noun}
+        sources={locating.sources}
+        explore={upward?.path ?? null}
+        up={upward}
+        votes={m.col_votes()}
+        names={locating.names}
+        levels={[]}
+        span={null}
+        isLinked
+      />
+    </div>
+    <div
+      class="col-span-12 grid grid-rows-[auto_1fr] gap-px bg-border min-inline-0 lg:col-span-5 xl:col-span-4"
+    >
+      {@render stats(true)}
+      <div
+        class="@container grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5"
+      >
+        {@render results()}
+      </div>
+    </div>
+  {:else if drawn == null || chamber != null}
     {#if drawn != null}
       {@render stats(false)}
     {/if}
     <div
       class={cn(
         "@container col-span-12 grid content-start gap-1 bg-card px-1.5 pbs-2 pbe-2.5",
-        {
-          "lg:col-span-8": chamber != null && drawn == null,
-          "lg:col-span-7 xl:col-span-8": locating != null,
-        },
+        { "lg:col-span-8": chamber != null && drawn == null },
       )}
     >
       {@render results()}
     </div>
-    {#if locating != null}
-      <div
-        class="col-span-12 bg-card px-3.5 pbs-3 pbe-3.5 min-inline-0 lg:col-span-5 xl:col-span-4"
-      >
-        <p class="pbe-2 text-xs text-muted-foreground">
-          {(locating.places.legend.length === 1
-            ? m.locator_key_margin
-            : m.locator_key)({
-            noun: locating.noun,
-            count: count(locating.places.rows.length),
-          })}
-        </p>
-        <PlaceMap
-          places={locating.places}
-          colors={locating.colors}
-          tiles={locating.tiles}
-          own={locating.own}
-          frames={locating.frames}
-          isApproximate={locating.isApproximate}
-          noun={locating.noun}
-          sources={locating.sources}
-          votes={m.col_votes()}
-          names={locating.names}
-          levels={[]}
-          span={null}
-          isLinked
-        />
-      </div>
-    {/if}
   {/if}
 
   {#if chamber != null && drawn == null}

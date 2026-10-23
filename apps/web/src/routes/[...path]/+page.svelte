@@ -172,6 +172,7 @@
         ballot={data.ballot}
         cycle={data.cycle}
         boundaries={data.boundaries}
+        surround={data.surround}
         match={data.match}
       />
     {:else if data.kind === "election"}

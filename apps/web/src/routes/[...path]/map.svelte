@@ -179,6 +179,14 @@
     bottom: 24,
     left: 24,
   };
+  let snug: {
+    zoom: number;
+    center: Maplibre.LngLat;
+    wide: number;
+    tall: number;
+    across: number;
+    down: number;
+  } | null = null;
 
   const rows = $derived(
     new Map(
@@ -200,7 +208,7 @@
       const east = frame.east + padX;
       return [
         "any",
-        ["!", ["in", ["id"], ["literal", [...rows.keys()]]]],
+        ["in", ["id"], ["literal", [...blanks.keys()]]],
         [
           "in",
           ["id"],
@@ -524,39 +532,68 @@
     opening = k;
     pinned = k;
     focus = k;
+    const frame = frames[0];
+    const x = ((box[0] ?? 0) + (box[2] ?? 0)) / 2;
+    const y = ((box[1] ?? 0) + (box[3] ?? 0)) / 2;
+    if (
+      frames.length > 1 &&
+      frame != null &&
+      (x < frame.west || x > frame.east || y < frame.south || y > frame.north)
+    ) {
+      isLoaded = false;
+      const go = async () => {
+        try {
+          await goto(href);
+        } finally {
+          opening = null;
+        }
+      };
+      void loading.then(go, go);
+      return;
+    }
     let isGone = false;
     const leave = () => {
       if (!isGone) {
         isGone = true;
-        void loading.then(
-          () => {
-            try {
-              handoff = {
-                path: href,
-                image: map.getCanvas().toDataURL("image/webp", 0.85),
-              };
-            } catch {
-              handoff = null;
-            }
-            void goto(href).finally(() => {
-              opening = null;
-            });
-          },
-          () => {
-            opening = null;
-            void goto(href);
-          },
-        );
+        try {
+          handoff = {
+            path: href,
+            image: map.getCanvas().toDataURL("image/webp", 0.85),
+          };
+        } catch {
+          handoff = null;
+        }
+        void goto(href).finally(() => {
+          opening = null;
+        });
       }
     };
-    map.once("moveend", leave);
-    setTimeout(leave, 1200);
-    map.fitBounds(
-      [
-        [box[0] ?? 0, box[1] ?? 0],
-        [box[2] ?? 0, box[3] ?? 0],
-      ],
-      { padding: fit, duration: 650, essential: false },
+    void loading.then(
+      (result) => {
+        const data: unknown = result.type === "loaded" ? result.data : null;
+        if (
+          typeof data === "object" &&
+          data != null &&
+          "surround" in data &&
+          data.surround != null
+        ) {
+          leave();
+          return;
+        }
+        map.once("moveend", leave);
+        setTimeout(leave, 1200);
+        map.fitBounds(
+          [
+            [box[0] ?? 0, box[1] ?? 0],
+            [box[2] ?? 0, box[3] ?? 0],
+          ],
+          { padding: fit, duration: 650, essential: false },
+        );
+      },
+      () => {
+        opening = null;
+        void goto(href);
+      },
     );
   }
 
@@ -848,7 +885,7 @@
       const room = {
         top: edge + (up == null ? 0 : 20),
         right: edge + 36,
-        bottom: (surfaces[1]?.clientHeight ?? 0) + edge,
+        bottom: edge,
         left: edge,
       };
       fit = room;
@@ -1148,6 +1185,43 @@
           interactive: index === 0,
           cooperativeGestures: index === 0,
           dragRotate: false,
+          transformCameraUpdate:
+            index !== 0
+              ? null
+              : ({ center, zoom }) => {
+                  if (snug == null) {
+                    return {};
+                  }
+                  const k = 2 ** (zoom - snug.zoom);
+                  const give = Math.min(1, Math.max(0, k - 1));
+                  const wide =
+                    Math.max(
+                      0,
+                      (snug.wide * k - surface.clientWidth) / 2 +
+                        surface.clientWidth * 0.15 * give,
+                    ) /
+                    (snug.across * k);
+                  const tall =
+                    Math.max(
+                      0,
+                      (snug.tall * k - surface.clientHeight) / 2 +
+                        surface.clientHeight * 0.15 * give,
+                    ) /
+                    (snug.down * k);
+                  const shift =
+                    ((((center.lng - snug.center.lng + 540) % 360) + 360) %
+                      360) -
+                    180;
+                  return {
+                    center: new maplibre.LngLat(
+                      snug.center.lng + Math.min(wide, Math.max(-wide, shift)),
+                      Math.min(
+                        snug.center.lat + tall,
+                        Math.max(snug.center.lat - tall, center.lat),
+                      ),
+                    ),
+                  };
+                },
           pitchWithRotate: false,
           touchPitch: false,
           locale: {
@@ -1174,20 +1248,6 @@
               isMoved = true;
             }
           });
-          const watcher = new ResizeObserver(() => {
-            if (frame == null || isMoved || opening != null) {
-              return;
-            }
-            map.resize();
-            map.setMinZoom(0);
-            map.fitBounds([frame.west, frame.south, frame.east, frame.north], {
-              padding: room,
-              animate: false,
-            });
-            map.setMinZoom(Math.max(0, map.getZoom() - 1.25));
-          });
-          watcher.observe(host);
-          cleanup.push(() => watcher.disconnect());
         }
         map.touchZoomRotate.disableRotation();
         map.keyboard.disable();
@@ -1324,7 +1384,137 @@
         map.on("load", () => {
           ready.add(map);
           if (index === 0) {
-            isLoaded = true;
+            const watcher = new ResizeObserver(() => {
+              if (frame != null && !isMoved && opening == null) {
+                snug = null;
+                map.resize();
+                map.setMinZoom(0);
+                map.fitBounds(
+                  [frame.west, frame.south, frame.east, frame.north],
+                  { padding: room, animate: false },
+                );
+                const kept = new Set(
+                  places.rows.flatMap((row) =>
+                    row.at != null &&
+                    row.at[0] >= frame.west &&
+                    row.at[0] <= frame.east &&
+                    row.at[1] >= frame.south &&
+                    row.at[1] <= frame.north
+                      ? [row.k]
+                      : [],
+                  ),
+                );
+                const points: Array<[number, number]> = [];
+                const extent = {
+                  left: Infinity,
+                  top: Infinity,
+                  right: -Infinity,
+                  bottom: -Infinity,
+                };
+                for (const feature of map.queryRenderedFeatures({
+                  layers: ["fill"],
+                })) {
+                  if (typeof feature.id !== "number" || !kept.has(feature.id)) {
+                    continue;
+                  }
+                  for (const pair of JSON.stringify(feature.geometry).matchAll(
+                    /\[([\d.e-]+),([\d.e-]+)\]/g,
+                  )) {
+                    const point = map.project([
+                      Number(pair[1]),
+                      Number(pair[2]),
+                    ]);
+                    points.push([point.x, point.y]);
+                    extent.left = Math.min(extent.left, point.x);
+                    extent.top = Math.min(extent.top, point.y);
+                    extent.right = Math.max(extent.right, point.x);
+                    extent.bottom = Math.max(extent.bottom, point.y);
+                  }
+                }
+                const canvas = map.getCanvas();
+                const origin = canvas.getBoundingClientRect();
+                const strip =
+                  surfaces[1]?.parentElement?.parentElement?.getBoundingClientRect();
+                const reserve =
+                  strip == null
+                    ? 0
+                    : Math.max(
+                        0,
+                        origin.bottom - strip.top + edge - room.bottom,
+                      );
+                const middle = {
+                  x: (extent.left + extent.right) / 2,
+                  y: (extent.top + extent.bottom) / 2,
+                };
+                let size = {
+                  wide: canvas.clientWidth,
+                  tall: canvas.clientHeight,
+                };
+                for (let step = 0; step <= 8; step++) {
+                  const bottom = room.bottom + (reserve * step) / 8;
+                  const scale =
+                    Math.min(
+                      (canvas.clientWidth - room.left - room.right) /
+                        (extent.right - extent.left),
+                      (canvas.clientHeight - room.top - bottom) /
+                        (extent.bottom - extent.top),
+                    ) * 0.98;
+                  const x =
+                    room.left +
+                    (canvas.clientWidth - room.left - room.right) / 2;
+                  const y =
+                    room.top + (canvas.clientHeight - room.top - bottom) / 2;
+                  if (
+                    !Number.isFinite(scale) ||
+                    scale < 0.25 ||
+                    scale > 4 ||
+                    (step < 8 &&
+                      strip != null &&
+                      points.some(([px, py]) => {
+                        const sx = x + (px - middle.x) * scale;
+                        const sy = y + (py - middle.y) * scale;
+                        return (
+                          sx >= strip.left - origin.left - 6 &&
+                          sx <= strip.right - origin.left + 6 &&
+                          sy >= strip.top - origin.top - 6
+                        );
+                      }))
+                  ) {
+                    continue;
+                  }
+                  map.jumpTo({
+                    center: map.unproject([middle.x, middle.y]),
+                    zoom: map.getZoom() + Math.log2(scale),
+                  });
+                  map.panBy(
+                    [canvas.clientWidth / 2 - x, canvas.clientHeight / 2 - y],
+                    { animate: false },
+                  );
+                  fit = { ...room, bottom };
+                  size = {
+                    wide: (extent.right - extent.left) * scale,
+                    tall: (extent.bottom - extent.top) * scale,
+                  };
+                  break;
+                }
+                const center = map.getCenter();
+                snug = {
+                  center,
+                  zoom: map.getZoom(),
+                  ...size,
+                  across:
+                    map.project([center.lng + 0.5, center.lat]).x -
+                    map.project([center.lng - 0.5, center.lat]).x,
+                  down:
+                    map.project([center.lng, center.lat - 0.5]).y -
+                    map.project([center.lng, center.lat + 0.5]).y,
+                };
+                map.setMinZoom(map.getZoom());
+              }
+              isLoaded = true;
+            });
+            watcher.observe(host);
+            cleanup.push(() => watcher.disconnect());
             if (own != null && neighbors != null) {
               const look = () => {
                 seen = [
@@ -1356,15 +1546,15 @@
             (box.clientWidth * box.clientHeight) /
               Math.max(1, places.rows.length),
           );
-          const fit = map.getZoom();
+          const settled = map.getZoom();
           if (side < 16) {
             map.setPaintProperty("seam", "line-width", [
               "interpolate",
               ["exponential", 2],
               ["zoom"],
-              fit,
+              settled,
               Math.max(0.15, side / 16),
-              fit + 4,
+              settled + 4,
               1.6,
             ]);
           }
@@ -1839,13 +2029,9 @@
         aria-label={m.map_reset()}
         title={m.map_reset()}
         onclick={() => {
-          const frame = frames[0];
-          if (frame != null) {
+          if (snug != null) {
             isMoved = false;
-            maps[0]?.fitBounds(
-              [frame.west, frame.south, frame.east, frame.north],
-              { padding: fit },
-            );
+            maps[0]?.easeTo({ center: snug.center, zoom: snug.zoom });
           }
         }}
       >

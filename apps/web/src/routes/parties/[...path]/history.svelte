@@ -498,7 +498,7 @@
         </span>
       {/if}
     </div>
-    <ol class="flex gap-1 overflow-x-auto pbe-1 text-xs">
+    <ol class="flex gap-1 overflow-x-auto overflow-y-hidden overscroll-x-contain pbe-1 text-xs">
       {#each active.points.toReversed() as point, index (index)}
         {const isTwin = $derived(
           active.points.filter((other) => other.year === point.year).length > 1,

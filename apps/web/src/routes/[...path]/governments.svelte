@@ -65,7 +65,7 @@
       </p>
     </div>
     <ol
-      class="grid auto-cols-[minmax(16rem,1fr)] grid-flow-col gap-3 overflow-x-auto pbe-1 max-sm:auto-cols-fr max-sm:grid-flow-row"
+      class="grid auto-cols-[minmax(16rem,1fr)] grid-flow-col gap-3 overflow-x-auto overflow-y-hidden overscroll-x-contain pbe-1 max-sm:auto-cols-fr max-sm:grid-flow-row"
     >
       {#each cards as card (card.from + card.name)}
         <li

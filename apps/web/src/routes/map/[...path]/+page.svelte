@@ -604,6 +604,129 @@
   let groups: Array<{ rank: number; first: string }> = [];
   let painted: Record<string, string> = {};
   let marked: Array<{ source: string; k: number }> = [];
+  let library: typeof Maplibre | null = null;
+  let minis = $state.raw<Array<Maplibre.Map | null>>([]);
+  let away = $state<Array<boolean>>([]);
+  const surfaces: Array<HTMLElement | null> = [];
+  const dressed = new WeakSet<Maplibre.Map>();
+
+  const veiled = (x: number, y: number) =>
+    sheet.frames.some(
+      (box, i) =>
+        away[i] === true &&
+        x >= box.west &&
+        x <= box.east &&
+        y >= box.south &&
+        y <= box.north,
+    );
+
+  function survey(gl: Maplibre.Map) {
+    const base = sheet.frames[0];
+    const overview =
+      base == null
+        ? 0
+        : (gl.cameraForBounds([base.west, base.south, base.east, base.north], {
+            padding: room(),
+          })?.zoom ?? 0);
+    const width = gl.getCanvas().clientWidth;
+    const height = gl.getCanvas().clientHeight;
+    const isWide = sheet.frames.length > 1 && gl.getZoom() <= overview + 1.5;
+    away = sheet.frames.map((box) => {
+      const at = gl.project([
+        (box.west + box.east) / 2,
+        (box.south + box.north) / 2,
+      ]);
+      return (
+        isWide &&
+        !(
+          at.x >= width * 0.15 &&
+          at.x <= width * 0.85 &&
+          at.y >= height * 0.15 &&
+          at.y <= height * 0.85
+        )
+      );
+    });
+    for (const [i, target] of [gl, ...minis].entries()) {
+      const veil = target?.getSource("veil");
+      if (
+        target == null ||
+        veil?.type !== "geojson" ||
+        (i > 0 && dressed.has(target))
+      ) {
+        continue;
+      }
+      dressed.add(target);
+      void (veil as Maplibre.GeoJSONSource).setData({
+        type: "FeatureCollection",
+        features: sheet.frames.flatMap((box, j) =>
+          (i === 0 ? away[j] === true : j !== i - 1)
+            ? [
+                {
+                  type: "Feature" as const,
+                  properties: {},
+                  geometry: {
+                    type: "Polygon" as const,
+                    coordinates: [
+                      [
+                        [box.west - 0.3, box.south - 0.3],
+                        [box.east + 0.3, box.south - 0.3],
+                        [box.east + 0.3, box.north + 0.3],
+                        [box.west - 0.3, box.north + 0.3],
+                        [box.west - 0.3, box.south - 0.3],
+                      ],
+                    ],
+                  },
+                },
+              ]
+            : [],
+        ),
+      });
+    }
+  }
+
+  function mirror(gl: Maplibre.Map, next: Sheet) {
+    for (const mini of minis) {
+      mini?.remove();
+    }
+    minis = [];
+    const maplibre = library;
+    if (maplibre == null || next.frames.length < 2) {
+      return;
+    }
+    const style = gl.getStyle();
+    const made = next.frames.map((box, i) => {
+      const surface = surfaces[i];
+      return surface == null
+        ? null
+        : new maplibre.Map({
+            container: surface,
+            style,
+            bounds: [box.west, box.south, box.east, box.north],
+            fitBoundsOptions: { padding: 6 },
+            interactive: false,
+            attributionControl: false,
+            renderWorldCopies: false,
+            fadeDuration: 0,
+          });
+    });
+    let waiting = made.filter((mini) => mini != null).length;
+    for (const mini of made) {
+      mini?.once("style.load", () => {
+        for (const id of gl.listImages()) {
+          const image = gl.getImage(id);
+          if (!mini.hasImage(id)) {
+            mini.addImage(id, image.data, { pixelRatio: image.pixelRatio });
+          }
+        }
+        waiting -= 1;
+        if (waiting === 0 && map === gl) {
+          painted = {};
+          minis = made;
+          survey(gl);
+        }
+      });
+    }
+  }
 
   function credit(tiles: string) {
     void import("pmtiles").then(async ({ PMTiles }) => {
@@ -922,6 +1045,7 @@
         0,
       );
     }
+    mirror(gl, next);
   }
 
   function paint(gl: Maplibre.Map, set: Sheet, id: string, mark: string) {
@@ -937,14 +1061,20 @@
     );
     for (const [i, k] of set.places.k.entries()) {
       const color = reader.color(tone(set, i));
-      gl.setFeatureState(
-        { source: id, sourceLayer: "areas", id: k },
-        {
-          color: isDotted ? ground : color,
-          on: true,
-          hatched: needsBefore && (set.estimated || read(set, i).isUnmatched),
-        },
-      );
+      const state = {
+        color: isDotted ? ground : color,
+        on: true,
+        hatched: needsBefore && (set.estimated || read(set, i).isUnmatched),
+      };
+      gl.setFeatureState({ source: id, sourceLayer: "areas", id: k }, state);
+      for (const mini of minis) {
+        if (mini?.getSource(id) != null) {
+          mini.setFeatureState(
+            { source: id, sourceLayer: "areas", id: k },
+            state,
+          );
+        }
+      }
       if (gl.getSource(dots) != null) {
         gl.setFeatureState(
           { source: dots, id: k },
@@ -1122,7 +1252,7 @@
     const order: Array<number> = [];
     for (const [i, x] of set.places.x.entries()) {
       const y = set.places.y[i];
-      if (x != null && y != null && box.contains([x, y])) {
+      if (x != null && y != null && box.contains([x, y]) && !veiled(x, y)) {
         order.push(i);
       }
     }
@@ -1181,13 +1311,19 @@
       }
       maplibre.setWorkerUrl(worker.default);
       maplibre.addProtocol("pmtiles", new Protocol().tile);
+      library = maplibre;
       const reader = probe(host);
       const gl = new maplibre.Map({
         container: host,
         style: {
           version: 8,
           projection: { type: "globe" },
-          sources: {},
+          sources: {
+            veil: {
+              type: "geojson",
+              data: { type: "FeatureCollection", features: [] },
+            },
+          },
           layers: [
             {
               id: "paper",
@@ -1199,6 +1335,12 @@
               type: "background" as const,
               layout: { visibility: "none" as const },
             })),
+            {
+              id: "veil",
+              type: "fill",
+              source: "veil",
+              paint: { "fill-color": reader.color("var(--card)") },
+            },
           ],
         },
         renderWorldCopies: false,
@@ -1227,7 +1369,10 @@
       gl.on("move", () => {
         if (!isQueued) {
           isQueued = true;
-          requestAnimationFrame(() => letter(gl));
+          requestAnimationFrame(() => {
+            survey(gl);
+            letter(gl);
+          });
         }
       });
       gl.on("mousemove", (event) => {
@@ -1236,9 +1381,9 @@
           .map((group) => group.first)
           .filter((id) => gl.getLayer(id) != null);
         let k: number | null = null;
-        for (const feature of gl.queryRenderedFeatures(event.point, {
-          layers: fills,
-        })) {
+        for (const feature of veiled(event.lngLat.lng, event.lngLat.lat)
+          ? []
+          : gl.queryRenderedFeatures(event.point, { layers: fills })) {
           if (typeof feature.id === "number" && lookup[feature.id] != null) {
             k = feature.id;
             break;
@@ -1258,9 +1403,9 @@
           .map((group) => group.first)
           .filter((id) => gl.getLayer(id) != null);
         let k: number | null = null;
-        for (const feature of gl.queryRenderedFeatures(event.point, {
-          layers: fills,
-        })) {
+        for (const feature of veiled(event.lngLat.lng, event.lngLat.lat)
+          ? []
+          : gl.queryRenderedFeatures(event.point, { layers: fills })) {
           if (typeof feature.id === "number" && lookup[feature.id] != null) {
             k = feature.id;
             break;
@@ -1337,6 +1482,7 @@
       const reader = probe(gl.getContainer());
       const paper = reader.color("var(--card)");
       gl.setPaintProperty("paper", "background-color", paper);
+      gl.setPaintProperty("veil", "fill-color", paper);
       const [r = 255, g = 255, b = 255] = (paper.match(/[\d.]+/g) ?? []).map(
         Number,
       );
@@ -1383,10 +1529,28 @@
       }
       reader.done();
       painted = {};
+      mirror(gl, sheet);
     });
   });
 
   $effect(() => {
+    for (const [i, isAway] of away.entries()) {
+      const mini = minis[i];
+      const box = sheet.frames[i];
+      if (isAway && mini != null && box != null) {
+        requestAnimationFrame(() => {
+          mini.resize();
+          mini.fitBounds([box.west, box.south, box.east, box.north], {
+            padding: 6,
+            animate: false,
+          });
+        });
+      }
+    }
+  });
+
+  $effect(() => {
+    void minis;
     const mark = JSON.stringify([
       shown,
       whom?.key,
@@ -1824,6 +1988,67 @@
     >
       <div class="block-full inline-full" {@attach mount}></div>
     </div>
+    {#if sheet.frames.length > 1}
+      <div
+        class="pointer-events-none absolute inset-s-3 inset-bs-3 z-10 flex gap-2"
+      >
+        {#each sheet.frames as box, i (i)}
+          {const place = $derived.by(() => {
+            if (i === 0) {
+              return sheet.scope.name;
+            }
+            const inside = sheet.places.k.flatMap((_, j) => {
+              const x = sheet.places.x[j];
+              const y = sheet.places.y[j];
+              return x != null &&
+                y != null &&
+                x >= box.west &&
+                x <= box.east &&
+                y >= box.south &&
+                y <= box.north
+                ? [sheet.places.name[j] ?? ""]
+                : [];
+            });
+            return inside.length === 1 ? (inside[0] ?? null) : null;
+          })}
+          <button
+            type="button"
+            class={cn(
+              "pointer-events-auto relative overflow-hidden rounded-sm bg-card shadow-menu ring-1 ring-border block-16 inline-24 hover:ring-foreground focus-visible:outline-2 focus-visible:outline-offset-2 focus-visible:outline-ring sm:block-22 sm:inline-32",
+              { hidden: away[i] !== true },
+            )}
+            aria-label={place == null
+              ? m.map_inset_part()
+              : m.map_inset_show({ place })}
+            title={place == null
+              ? m.map_inset_part()
+              : m.map_inset_show({ place })}
+            onclick={() => {
+              map?.fitBounds([box.west, box.south, box.east, box.north], {
+                padding: room(),
+                duration: calm ? 0 : 900,
+              });
+            }}
+          >
+            <div
+              class="pointer-events-none block-full inline-full"
+              {@attach (node: HTMLElement) => {
+                surfaces[i] = node;
+                return () => {
+                  surfaces[i] = null;
+                };
+              }}
+            ></div>
+            {#if place != null}
+              <span
+                class="pointer-events-none absolute inset-s-1.5 inset-be-1 truncate text-[0.6875rem] font-semibold text-foreground [-webkit-text-stroke:3px_var(--card)] [paint-order:stroke_fill] max-inline-[calc(100%-0.75rem)]"
+                >{place}</span
+              >
+            {/if}
+          </button>
+        {/each}
+      </div>
+    {/if}
     <div
       class="pointer-events-none absolute inset-0 overflow-hidden"
       aria-hidden="true"

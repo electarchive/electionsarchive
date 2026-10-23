@@ -783,7 +783,7 @@
   {:else if current != null}
     {#if !wide.current}
       <nav
-        class="flex gap-1.5 overflow-x-auto"
+        class="flex gap-1.5 overflow-x-auto overflow-y-hidden overscroll-x-contain"
         aria-label={m.workbench_panels()}
       >
         {#each panels as panel, index (index)}
@@ -810,7 +810,7 @@
       class={cn(
         {
           "grid grid-cols-12 gap-4": wide.current,
-          "-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto px-4":
+          "-mx-4 flex snap-x snap-mandatory scroll-px-4 gap-4 overflow-x-auto overflow-y-hidden overscroll-x-contain px-4":
             !wide.current,
         },
         { "opacity-60 transition-opacity": contest.isFetching },

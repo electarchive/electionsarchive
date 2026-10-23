@@ -246,7 +246,7 @@
 >
   {@render step(previous, "[", m.series_previous, ChevronLeftIcon)}
   <div
-    class="flex flex-1 scrollbar-none flex-row-reverse overflow-x-auto min-inline-0"
+    class="flex flex-1 scrollbar-none flex-row-reverse overflow-x-auto overflow-y-hidden overscroll-x-contain min-inline-0"
     {@attach (strip: HTMLDivElement) => {
       const index = at;
       const fade = () => {
