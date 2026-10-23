@@ -287,19 +287,19 @@
           >
         {/each}
         {const labeled = $derived.by(() => {
-          const kept: Array<number> = [];
+          const kept: Array<string> = [];
           let last = Infinity;
           for (const row of race.rows.toSorted((a, b) => b.year - a.year)) {
             const x = sx(race, row.year);
             if (last - x >= 34) {
-              kept.push(row.year);
+              kept.push(row.date);
               last = x;
             }
           }
           return kept;
         })}
         {#each race.rows as row (row.date)}
-          {#if labeled.includes(row.year) || focus === row}
+          {#if labeled.includes(row.date) || focus === row}
             <text
               x={sx(race, row.year)}
               y={height - 6}
