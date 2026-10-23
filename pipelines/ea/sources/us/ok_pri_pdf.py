@@ -24,6 +24,18 @@ FILES = [
     (date(2002, 8, 27), "2002-election-results/2002-primary-election-results/02reppri.pdf"),
     (date(2002, 9, 17), "2002-election-results/2002-runoff-primary-election-results/02demrun.pdf"),
     (date(2002, 9, 17), "2002-election-results/2002-runoff-primary-election-results/02reprun.pdf"),
+    (date(2004, 7, 27), "2004-election-results/2004-primary-election-results/04dempri.pdf"),
+    (date(2004, 7, 27), "2004-election-results/2004-primary-election-results/04reppri.pdf"),
+    (date(2004, 8, 24), "2004-election-results/2004-runoff-primary-election-results/04demrun.pdf"),
+    (date(2004, 8, 24), "2004-election-results/2004-runoff-primary-election-results/04reprun.pdf"),
+    (date(2006, 7, 25), "2006-election-results/2006-primary-election-results/06dempri.pdf"),
+    (date(2006, 7, 25), "2006-election-results/2006-primary-election-results/06reppri.pdf"),
+    (date(2006, 8, 22), "2006-election-results/2006-runoff-primary-election-results/06demrun.pdf"),
+    (date(2006, 8, 22), "2006-election-results/2006-runoff-primary-election-results/06reprun.pdf"),
+    (date(2008, 7, 29), "2008-election-results/2008-primary-election-results/08dempri.pdf"),
+    (date(2008, 7, 29), "2008-election-results/2008-primary-election-results/08reppri.pdf"),
+    (date(2008, 8, 26), "2008-election-results/2008-runoff-primary-election-results/08demrun.pdf"),
+    (date(2008, 8, 26), "2008-election-results/2008-runoff-primary-election-results/08reprun.pdf"),
     (date(2010, 7, 27), "2010-election-results/2010-primary-results/primary-results-county-20100727.pdf"),
     (date(2010, 8, 24), "2010-election-results/2010-runoff-primary-results/runoff-primary-results-county-20100824.pdf"),
 ]
@@ -198,7 +210,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Oklahoma's 2000, 2002, and 2010 U.S. Senate and House primaries and runoffs by county from the State Election Board's results PDFs",
+            summary="Oklahoma's 2000 to 2010 U.S. Senate and House primaries and runoffs by county from the State Election Board's results PDFs",
             polity="US-OK",
         )
         source = cs.source(PUBLISHER, TITLE)
