@@ -889,6 +889,19 @@ async function load(
       select f.*, m.main, bool_or(f.measure = m.main) over (partition by f.set, f.area) as kept,
         sum(f.value) filter (where f.count_round = f.opening and f.measure = m.main) over (partition by f.option) as rank
       from fetched f join mains m on m.area = f.area
+    ),
+    whole as (
+      select distinct on (x.option_k) x.option_k as option, x.value::float8 as total
+      from (select distinct set from fetched) s
+      join result_set rs on rs.k = s.set
+      join contest c on c.id = rs.contest_id
+      join area a on a.id = c.district_area_id
+      cross join lateral (
+        select y.option_k, y.measure, y.count_round, y.value from result_rollup y
+        where y.result_set_k = s.set and y.area_k = a.k and y.measure = any(${COUNTED}) and y.option_k <> 0
+        offset 0
+      ) x
+      order by x.option_k, array_position(${COUNTED}, x.measure), x.count_round
     )
     select r.set, r.area, r.option, x.role, r.main, r.value, r.complete, 0::float8 as rank
     from flagged r
@@ -902,8 +915,8 @@ async function load(
     where r.kept and r.count_round = r.first and x.role is not null and not (r.late and x.role = 'valid')
       and not exists (select from gone g where g.set = r.set and g.option = r.option)
     union all
-    select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, r.rank::float8
-    from flagged r where r.rank is not null
+    select distinct on (r.option) r.set, r.area, r.option, 'rank', r.main, 0, true, coalesce(w.total, r.rank)::float8
+    from flagged r left join whole w on w.option = r.option where r.rank is not null or w.total is not null
   `);
   const counts = rollup.rows
     .filter((row) => row.role !== "rank")
@@ -3900,6 +3913,7 @@ export const contests = {
           noun: string;
           party: string | null;
           option: number | null;
+          person: string | null;
           label: string | null;
           color: string | null;
           valid: number;
@@ -3922,7 +3936,7 @@ export const contests = {
               and c.party_scope_id is not distinct from me.party_scope_id and c.allocation_parent_id is null
             join area a on a.id = c.district_area_id and a.scheme_code = me.scheme
           )
-          select p.id, p.area, p.k, p.scheme, sc.noun, w.party, w.option, w.label,
+          select p.id, p.area, p.k, p.scheme, sc.noun, w.party, w.option, w.person, w.label,
             ${paint(sql`w.party`, sql`${contest.election}::uuid`, sql`p.day`)} as color,
             coalesce(w.valid, 0)::float8 as valid,
             case when w.valid > 0 then ((w.first - w.second) / w.valid)::float8 end as margin
@@ -3930,6 +3944,9 @@ export const contests = {
           join scheme sc on sc.code = p.scheme
           left join lateral (
             select coalesce(pm.into_id, o.party_id) as party, o.k as option, o.ballot_label as label,
+              (select coalesce(m.into_id, ca.person_id) from candidacy ca
+                left join entity_merge m on m.entity_id = ca.person_id
+                where ca.option_id = o.id and ca.role = 'head' limit 1) as person,
               t.first, t.second, t.valid
             from (
               select rs.k from result_set rs where rs.contest_id = p.id and rs.is_default limit 1
@@ -3960,17 +3977,25 @@ export const contests = {
         }
         const [labels, slugs] = await Promise.all([
           names(
-            found.rows.flatMap((row) =>
-              row.party == null ? [row.area] : [row.area, row.party],
-            ),
+            found.rows.flatMap((row) => [
+              row.area,
+              ...(row.party == null ? [] : [row.party]),
+              ...(row.person == null ? [] : [row.person]),
+            ]),
             contest.date,
           ),
           paths(found.rows.map((row) => row.id)),
         ]);
+        const isPersonal =
+          new Set(found.rows.map((row) => row.party)).size <= 1 &&
+          found.rows.some((row) => row.person != null);
         const keyed = (row: (typeof found.rows)[number]) =>
-          row.party == null
-            ? `option:${row.option ?? ""}`
-            : `party:${row.party}`;
+          (isPersonal || row.party == null) && row.person != null
+            ? `person:${row.person}`
+            : row.party == null
+              ? `option:${row.option ?? ""}`
+              : `party:${row.party}`;
+        const own = found.rows.find((row) => row.id === contest.root);
         const legend = Map.groupBy(
           found.rows.filter((row) => row.option != null),
           keyed,
@@ -3978,15 +4003,37 @@ export const contests = {
           .entries()
           .map(([key, rows]) => ({ key, rows }))
           .toArray()
-          .toSorted((a, b) => b.rows.length - a.rows.length)
-          .map(({ key, rows }) => {
+          .toSorted(
+            (a, b) =>
+              Number(b.key === (own == null ? "" : keyed(own))) -
+                Number(a.key === (own == null ? "" : keyed(own))) ||
+              b.rows.length - a.rows.length,
+          )
+          .map(({ key, rows }, at) => {
             const party = rows[0]?.party ?? null;
+            const person = key.startsWith("person:") ? key.slice(7) : null;
+            const base = rows[0]?.color ?? null;
             return {
               key,
-              label: labels.full.get(party ?? "") ?? rows[0]?.label ?? "",
-              short: labels.short.get(party ?? "") ?? null,
-              color: rows[0]?.color ?? null,
-              person: null,
+              label:
+                (person == null ? null : labels.full.get(person)) ??
+                labels.full.get(party ?? "") ??
+                rows[0]?.label ??
+                "",
+              short:
+                person == null ? (labels.short.get(party ?? "") ?? null) : null,
+              color:
+                person == null
+                  ? base
+                  : base == null
+                    ? (UNAFFILIATED[
+                        Number.parseInt(person.slice(-4), 16) %
+                          UNAFFILIATED.length
+                      ] ?? null)
+                    : at === 0
+                      ? base
+                      : `oklch(from ${base} l max(c, 0.1) calc(h + ${at * 137.5}))`,
+              person,
               party,
             };
           });
