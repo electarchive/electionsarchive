@@ -27,6 +27,16 @@ FILES = {
     (date(2008, 6, 3), "senate"): "2008/2008-official-pri-elect-senate-candidate-tallies-071108.pdf",
     (date(2008, 6, 3), "house"): "2008/2008-official-pri-elect-house-candidate-tallies-071108.pdf",
     (date(2008, 2, 5), "president"): "2008/2008-presidential-official-primary-results-032808.pdf",
+    (date(2010, 6, 8), "house"): "2010/2010-official-primary-house-tallies-071210.pdf",
+    (date(2012, 6, 5), "president"): "2012/2012-official-primary-results-president-0723.pdf",
+    (date(2012, 6, 5), "senate"): "2012/2012-official-primary-results-us-senate-0723.pdf",
+    (date(2012, 6, 5), "house"): "2012/2012-official-primary-results-house-of-rep-0723.pdf",
+    (date(2014, 6, 3), "senate"): "2014/2014-official-primary-results-us-senate.pdf",
+    (date(2014, 6, 3), "house"): "2014/2014-official-primary-results-us-house.pdf",
+    (date(2016, 6, 7), "president"): "2016/2016-official-primary-results-president.pdf",
+    (date(2016, 6, 7), "house"): "2016/2016-official-primary-results-house-of-rep.pdf",
+    (date(2018, 6, 5), "senate"): "2018/2018-official-primary-results-us-senate.pdf",
+    (date(2018, 6, 5), "house"): "2018/2018-official-primary-results-us-house.pdf",
     (date(2020, 7, 7), "president"): "2020/2020-official-primary-results-us-president-amended-0826.pdf",
     (date(2020, 7, 7), "senate"): "2020/2020-official-primary-results-us-senate-amended-0826.pdf",
     (date(2020, 7, 7), "house"): "2020/2020-official-primary-results-us-house-amended-0826.pdf",
@@ -85,7 +95,7 @@ def parse() -> None:
                 district = ORDINALS.index(found[1].lower()) + 1
             if re.match(r"\s*Name\b", line) and "County" in line:
                 party_at = line.find("Designation") if "Designation" in line else line.find("Party")
-                columns = (party_at, line.find("County"), line.find("Address") if "Address" in line and day.year >= 2020 else party_at)
+                columns = (party_at, line.find("County"), line.find("Address") if "Address" in line and day.year >= 2012 else party_at)
                 continue
             if columns is None:
                 continue
@@ -155,7 +165,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="New Jersey's 2000–2008 House, Senate, and presidential primaries by county",
+            summary="New Jersey's 2000–2018 House, Senate, and presidential primaries by county",
             polity="US-NJ",
         )
         source = cs.source(PUBLISHER, TITLE)
