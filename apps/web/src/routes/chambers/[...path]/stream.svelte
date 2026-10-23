@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import Export from "#lib/components/export.svelte";
+  import Measured from "#lib/components/measured.svelte";
   import { count, date, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -50,7 +51,7 @@
   const uid = $props.id();
   const PAD = { top: 10, side: 1, axis: 22 };
 
-  let width = $state(960);
+  let width = $state(0);
   let isShare = $state(page.url.searchParams.get("scale") === "share");
 
   $effect(() => {
@@ -356,7 +357,11 @@
       {/each}
     </div>
   </div>
-  <div class="relative min-inline-0" bind:clientWidth={width}>
+  <Measured
+    bind:width
+    class="relative min-inline-0"
+    reserve={"clamp(230px, (100vw - 640px) * 100, 320px)"}
+  >
     <svg
       class="block cursor-pointer touch-pan-y overflow-visible rounded-sm outline-none block-auto max-inline-full focus-visible:outline-2 focus-visible:outline-offset-4 focus-visible:outline-ring"
       viewBox="0 0 {width} {height}"
@@ -619,7 +624,7 @@
         {/if}
       </div>
     {/if}
-  </div>
+  </Measured>
   {#if cabinets.length > 0}
     <p
       class="flex flex-wrap items-baseline gap-x-3 gap-y-0.5 text-[0.8125rem] min-block-5"

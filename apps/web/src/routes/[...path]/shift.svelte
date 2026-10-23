@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
+  import Measured from "#lib/components/measured.svelte";
   import { count, points } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
@@ -26,7 +27,7 @@
 
   const PAD = { top: 14, right: 14, bottom: 34, left: 40 };
 
-  let width = $state(560);
+  let width = $state(0);
 
   const dots = $derived(
     places.rows.flatMap((row) => {
@@ -127,7 +128,11 @@
           })}
         </p>
       </div>
-      <div class="relative min-inline-0" bind:clientWidth={width}>
+      <Measured
+        bind:width
+        class="relative min-inline-0"
+        reserve={"clamp(260px, 58vw, 400px)"}
+      >
         <svg
           class="block overflow-visible block-auto max-inline-full"
           viewBox="0 0 {width} {height}"
@@ -266,7 +271,7 @@
             >
           </div>
         {/if}
-      </div>
+      </Measured>
     </div>
     <div
       class="col-span-12 grid content-start gap-2 bg-card px-3.5 py-3 min-inline-0 lg:col-span-5"

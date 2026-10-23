@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
+  import Measured from "#lib/components/measured.svelte";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { RELATIONS } from "#lib/relations.js";
@@ -27,7 +28,7 @@
   const LINE = 14;
   const GAP = 10;
 
-  let width = $state(720);
+  let width = $state(0);
   let lit = $state<string | null>(null);
   let chart = $state<SVGSVGElement | null>(null);
 
@@ -261,7 +262,7 @@
       {/if}
     </div>
     {#if lanes.length > 0}
-      <div class="pbs-1 min-inline-0" bind:clientWidth={width}>
+      <Measured bind:width class="pbs-1 min-inline-0">
         <svg
           bind:this={chart}
           class="block overflow-visible block-auto max-inline-full"
@@ -452,7 +453,7 @@
             </li>
           {/each}
         </ul>
-      </div>
+      </Measured>
     {/if}
     {#if links.length > 0}
       <ul class="grid gap-x-6 gap-y-1 text-sm md:grid-cols-2">

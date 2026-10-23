@@ -1,6 +1,7 @@
 <script lang="ts">
   import { resolve } from "$app/paths";
   import Export from "#lib/components/export.svelte";
+  import Measured from "#lib/components/measured.svelte";
   import { percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
@@ -19,7 +20,7 @@
     disqualified: m.outcome_disqualified,
   };
 
-  let width = $state(720);
+  let width = $state(0);
   let hovered = $state<number | null>(null);
 
   const marks = $derived(
@@ -125,7 +126,11 @@
         {/if}
       </p>
     </div>
-    <div class="relative min-inline-0" bind:clientWidth={width}>
+    <Measured
+      bind:width
+      class="relative min-inline-0"
+      reserve={"clamp(190px, 32vw, 280px)"}
+    >
       <svg
         class="block overflow-visible block-auto max-inline-full"
         viewBox="0 0 {width} {height}"
@@ -252,6 +257,6 @@
           </span>
         </div>
       {/if}
-    </div>
+    </Measured>
   </section>
 {/if}

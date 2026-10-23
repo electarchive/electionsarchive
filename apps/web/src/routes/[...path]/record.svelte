@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { createQuery } from "@tanstack/svelte-query";
   import Export from "#lib/components/export.svelte";
+  import Measured from "#lib/components/measured.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
   import { count, date, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
@@ -20,7 +21,7 @@
   );
 
   let chosen = $state<string | null>(null);
-  let width = $state(960);
+  let width = $state(0);
   let hovered = $state<number | null>(null);
   let seated = $state<string | null>(null);
 
@@ -297,7 +298,7 @@
       {/if}
     </div>
     {#if current == null}
-      <div class="min-inline-0" bind:clientWidth={width}>
+      <Measured bind:width class="min-inline-0" reserve={`${height}px`}>
         <svg
           class="block overflow-visible block-auto max-inline-full"
           viewBox="0 0 {width} 60"
@@ -350,9 +351,13 @@
             >
           {/each}
         </svg>
-      </div>
+      </Measured>
     {:else}
-      <div class="relative min-inline-0" bind:clientWidth={width}>
+      <Measured
+        bind:width
+        class="relative min-inline-0"
+        reserve={`${height}px`}
+      >
         <svg
           class="block overflow-visible block-auto max-inline-full"
           viewBox="0 0 {width} {height}"
@@ -487,7 +492,7 @@
             {/if}
           </div>
         {/if}
-      </div>
+      </Measured>
     {/if}
     {#if cabinets.length > 0}
       <p

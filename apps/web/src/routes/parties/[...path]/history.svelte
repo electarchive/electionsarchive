@@ -2,6 +2,7 @@
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import Export from "#lib/components/export.svelte";
+  import Measured from "#lib/components/measured.svelte";
   import { count, percent } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { palette } from "#lib/palette.svelte.js";
@@ -28,7 +29,7 @@
 
   const PAD = { top: 16, right: 18, bottom: 26, left: 40 };
 
-  let width = $state(720);
+  let width = $state(0);
   let chosen = $state<string | null>(page.url.searchParams.get("series"));
 
   $effect(() => {
@@ -261,7 +262,11 @@
         {/each}
       </div>
     {/if}
-    <div class="relative min-inline-0" bind:clientWidth={width}>
+    <Measured
+      bind:width
+      class="relative min-inline-0"
+      reserve={"clamp(220px, 42vw, 340px)"}
+    >
       <svg
         class="block touch-pan-y overflow-visible block-auto max-inline-full"
         viewBox="0 0 {width} {height}"
@@ -442,7 +447,7 @@
           {/if}
         </div>
       {/if}
-    </div>
+    </Measured>
     <div
       class="flex flex-wrap items-center gap-x-5 gap-y-1.5 text-[0.8125rem] text-muted-foreground"
     >
