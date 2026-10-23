@@ -8444,47 +8444,61 @@ export const elections = {
         positions.rows.map((row) => [row.party_id, row.lean]),
       );
       const noun = new Map(nouns.rows.map((row) => [row.code, row.noun]));
-      return best.map((chamber) => ({
-        name: labels.full.get(chamber.body) ?? "",
-        noun: noun.get(chamber.scheme) ?? null,
-        regions: Map.groupBy(chamber.rows, (row) => row.region)
-          .entries()
-          .map(([region, rows]) => {
-            const tally = Map.groupBy(rows, (row) => row.party ?? "")
-              .entries()
-              .map(([party, group]) => {
-                let won = 0;
-                for (const row of group) {
-                  won += row.seats;
-                }
-                return { party: party === "" ? null : party, seats: won };
-              })
-              .toArray()
-              .toSorted((a, b) => b.seats - a.seats);
-            let won = 0;
-            for (const entry of tally) {
-              won += entry.seats;
-            }
-            return {
-              name: labels.full.get(region) ?? "",
-              seats: won,
-              parties: tally,
-            };
-          })
-          .toArray()
-          .toSorted((a, b) =>
-            a.name.localeCompare(b.name, undefined, { numeric: true }),
-          ),
-        parties: [
-          ...new Set(chamber.rows.flatMap((row) => row.party ?? [])),
-        ].map((id) => ({
-          id,
-          label: colors.get(id)?.label ?? "",
-          short: colors.get(id)?.short ?? null,
-          color: colors.get(anchor.get(id) ?? id)?.color ?? null,
-          lean: lean.get(anchor.get(id) ?? id) ?? null,
-        })),
-      }));
+      return best.map((chamber) => {
+        const titles = [...new Set(chamber.rows.map((row) => row.region))].map(
+          (region) => labels.full.get(region) ?? "",
+        );
+        const lead = titles[0]?.split(", ", 1)[0] ?? "";
+        const shared =
+          titles.length > 1 &&
+          titles.every((title) => title.startsWith(`${lead}, `))
+            ? lead.length + 2
+            : 0;
+        return {
+          name:
+            labels.short.get(chamber.body) ??
+            labels.full.get(chamber.body) ??
+            "",
+          noun: noun.get(chamber.scheme) ?? null,
+          regions: Map.groupBy(chamber.rows, (row) => row.region)
+            .entries()
+            .map(([region, rows]) => {
+              const tally = Map.groupBy(rows, (row) => row.party ?? "")
+                .entries()
+                .map(([party, group]) => {
+                  let won = 0;
+                  for (const row of group) {
+                    won += row.seats;
+                  }
+                  return { party: party === "" ? null : party, seats: won };
+                })
+                .toArray()
+                .toSorted((a, b) => b.seats - a.seats);
+              let won = 0;
+              for (const entry of tally) {
+                won += entry.seats;
+              }
+              return {
+                name: (labels.full.get(region) ?? "").slice(shared),
+                seats: won,
+                parties: tally,
+              };
+            })
+            .toArray()
+            .toSorted((a, b) =>
+              a.name.localeCompare(b.name, undefined, { numeric: true }),
+            ),
+          parties: [
+            ...new Set(chamber.rows.flatMap((row) => row.party ?? [])),
+          ].map((id) => ({
+            id,
+            label: colors.get(id)?.label ?? "",
+            short: colors.get(id)?.short ?? null,
+            color: colors.get(anchor.get(id) ?? id)?.color ?? null,
+            lean: lean.get(anchor.get(id) ?? id) ?? null,
+          })),
+        };
+      });
     }),
   tiers: os
     .meta(
