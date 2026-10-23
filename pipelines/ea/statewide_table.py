@@ -79,7 +79,7 @@ def rebuild(conn: Connection) -> int:
             "commissioner-of-agriculture",
             "tax-commissioner",
         ):
-            years.discard(2002)
+            years -= {1994, 1998, 2002}
         if st == "IN" and key == "superintendent-of-public-instruction":
             years = {year for year in years if year <= 2016}
         if st == "GA" and key == "public-service-commissioner":
