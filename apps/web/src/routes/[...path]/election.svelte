@@ -1587,7 +1587,7 @@
                 class={cn(
                   "row-span-2 self-end rounded-full bg-muted object-cover object-top ring-2 ring-offset-2 ring-offset-card",
                   {
-                    "block-14 inline-14": isLead,
+                    "block-11 inline-11 sm:block-14 sm:inline-14": isLead,
                     "block-11 inline-11": !isLead,
                   },
                   { "col-start-2": at === 1 },
@@ -1602,7 +1602,10 @@
             <span
               class={cn(
                 "font-figures leading-none font-[780] tracking-[-0.02em]",
-                { "text-[2.5rem]": isLead, "text-[1.75rem]": !isLead },
+                {
+                  "text-[2rem] sm:text-[2.5rem]": isLead,
+                  "text-[1.75rem]": !isLead,
+                },
               )}>{bar.isCount ? count(part.value) : percent(part.value)}</span
             >
             <span
