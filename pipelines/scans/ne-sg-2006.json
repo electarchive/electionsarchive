@@ -1,0 +1,70 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2006 General Election Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/2006%20General.pdf"
+ },
+ "raw_source": "us.ne_house_generals",
+ "contests": {
+  "sen": {
+   "year": 2006,
+   "chamber": "senate",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  },
+  "gov": {
+   "year": 2006,
+   "chamber": "governor",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 14,
+   "id": "senl",
+   "crop": [
+    0.03,
+    0.05,
+    0.52,
+    0.98
+   ],
+   "orientation": "counties_down",
+   "hint": "Read only the United States Senator table.",
+   "discover": "sen"
+  },
+  {
+   "page": 14,
+   "id": "senr",
+   "crop": [
+    0.48,
+    0.05,
+    0.97,
+    0.98
+   ],
+   "orientation": "counties_down",
+   "hint": "Read only the United States Senator table.",
+   "discover": "sen"
+  },
+  {
+   "page": 2,
+   "id": "gova",
+   "orientation": "counties_down",
+   "hint": "Read only the Governor and Lieutenant Governor table; use the Governor's name.",
+   "discover": "gov"
+  },
+  {
+   "page": 3,
+   "id": "govb",
+   "orientation": "counties_down",
+   "hint": "Read only the Governor and Lieutenant Governor table; use the Governor's name.",
+   "discover": "gov"
+  }
+ ]
+}

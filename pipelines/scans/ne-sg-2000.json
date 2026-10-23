@@ -1,0 +1,36 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2000 General Election Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/elections/2000/2000%20General.pdf"
+ },
+ "raw_source": "us.ne_house_generals",
+ "contests": {
+  "sen": {
+   "year": 2000,
+   "chamber": "senate",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": null
+  }
+ },
+ "pages": [
+  {
+   "page": 13,
+   "id": "sena",
+   "orientation": "counties_down",
+   "hint": "Read the United States Senator table.",
+   "discover": "sen"
+  },
+  {
+   "page": 14,
+   "id": "senb",
+   "orientation": "counties_down",
+   "hint": "Read the United States Senator table.",
+   "discover": "sen"
+  }
+ ]
+}
