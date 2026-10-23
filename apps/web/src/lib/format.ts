@@ -28,7 +28,9 @@ export function points(value: number, digits = precision(value)) {
     signDisplay: "exceptZero",
     minimumFractionDigits: digits,
     maximumFractionDigits: digits,
-  }).format(value * 100);
+  })
+    .format(value * 100)
+    .replace("-", "−");
 }
 
 export function date(value: string | null) {
