@@ -17,9 +17,12 @@ PARSED = DATA / "parsed" / SOURCE
 TITLE = "Iowa Official Results, November 7, 2000 General Election: State Senate and State House of Representatives"
 DAY = date(2000, 11, 7)
 WAYBACK = "https://web.archive.org/web/{}id_/http://sos.iowa.gov/elections/pdf/2000%20G%20{}.pdf"
-FILES = {"senate": ("20130128043033", "IS"), "house": ("20130128043800", "IH")}
+HOUSE_TITLE = "Iowa Official Results, November 7, 2000 General Election: U.S. House of Representatives"
+FILES = {"senate": ("20130128043033", "IS"), "house": ("20130128043800", "IH"), "us_house": ("2013", "USH%20USS")}
 DISTRICT = re.compile(r"^\s*(\d+)\w\w District:\s*$")
-JUNK = re.compile(r"^\s*-\s*\d+\s*-\s*$|General Election|Iowa Official Results|^\s*State (?:Senate|House)")
+JUNK = re.compile(
+    r"^\s*-\s*\d+\s*-\s*$|General Election|Iowa Official Results|^\s*State (?:Senate|House)|^\s*U\.S\. House"
+)
 ROW = re.compile(r"^\s*([A-Z][A-Za-z.' ]*?)\s{2,}(\d[\d,]*(?:\s+\d[\d,]*)*)\s*$")
 
 
@@ -93,7 +96,14 @@ def parse() -> None:
                 print(f"{chamber} {district}: {labels} counties sum to {sums}, printed {cells}, skipped")
             else:
                 rows.extend(
-                    (f"{chamber}:{district}:g", code, labels[k].upper(), values.get(k, 0), k == len(centers))
+                    (
+                        "house" if chamber == "us_house" else f"{chamber}:{district}:g",
+                        district if chamber == "us_house" else None,
+                        code,
+                        labels[k].upper(),
+                        values.get(k, 0),
+                        k == len(centers),
+                    )
                     for code, values in parts
                     for k in columns
                     if labels[k]
@@ -104,6 +114,7 @@ def parse() -> None:
         rows,
         schema={
             "chamber": pl.String,
+            "district": pl.Int16,
             "code": pl.String,
             "candidate": pl.String,
             "votes": pl.Int64,
@@ -112,13 +123,14 @@ def parse() -> None:
         orient="row",
     )
     print(
-        frame.group_by(pl.col("chamber").str.split(":").list.first().alias("office")).agg(pl.col("chamber").n_unique())
+        frame.group_by(pl.col("chamber").str.split(":").list.first().alias("office")).agg(
+            pl.concat_str("chamber", "district", ignore_nulls=True).n_unique()
+        )
     )
     frame.with_columns(
         candidate=pl.col("candidate").str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
         year=pl.lit(DAY.year, pl.Int32),
         day=pl.lit(DAY),
-        district=pl.lit(None, pl.Int16),
         special=pl.lit(False),
         state=pl.lit("IA"),
         measure=pl.lit(1, pl.Int16),
@@ -133,21 +145,24 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Iowa's 2000 State Senate and State House generals by county (Secretary of State official results, via the Wayback Machine)",
+            summary="Iowa's 2000 U.S. House, State Senate, and State House generals by county (Secretary of State official results, via the Wayback Machine)",
             polity="US-IA",
         )
-        source = cs.source(PUBLISHER, TITLE)
-        if source in cs.minted:
-            cs.add(
-                "source",
-                id=source,
-                kind="official_body",
-                publisher=PUBLISHER,
-                title=TITLE,
-                url=LANDING,
-                license="Public record",
-            )
-        for file in FILES.values():
-            cs.artifact(raw.cached(SOURCE, WAYBACK.format(*file)), source)
-        medsl.attach(cs, conn, pl.read_parquet(PARSED / "counties.parquet"), {"IA": source}, strict=True)
+        frame = pl.read_parquet(PARSED / "counties.parquet")
+        for title, house in ((TITLE, False), (HOUSE_TITLE, True)):
+            source = cs.source(PUBLISHER, title)
+            if source in cs.minted:
+                cs.add(
+                    "source",
+                    id=source,
+                    kind="official_body",
+                    publisher=PUBLISHER,
+                    title=title,
+                    url=LANDING,
+                    license="Public record",
+                )
+            for chamber, file in FILES.items():
+                if (chamber == "us_house") == house:
+                    cs.artifact(raw.cached(SOURCE, WAYBACK.format(*file)), source)
+            medsl.attach(cs, conn, frame.filter((pl.col("chamber") == "house") == house), {"IA": source}, strict=True)
         return cs.write()
