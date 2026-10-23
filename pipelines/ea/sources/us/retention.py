@@ -22,6 +22,10 @@ VERSION = "1"
 PARSED = DATA / "parsed" / SOURCE
 PAGES = DATA / "pages" / SOURCE
 KANSAS = "https://sos.ks.gov/elections/"
+KANSAS_PRECINCTS = {
+    "2022-11-08": "22elec/2022-General-Election-Supreme-Court-Results-By-Precinct.xlsx",
+    "2024-11-05": "24elec/2024-General-Election-Court-of-Appeals-Precinct-Results.xlsx",
+}
 KANSAS_FILES = {
     "2004-11-02": "04elec/2004GeneralOfficialResults.pdf",
     "2006-11-07": "06elec/2006GeneralElectionOfficialResults.pdf",
@@ -198,6 +202,8 @@ def display(text: str) -> str:
 def fetch() -> None:
     for path in KANSAS_FILES.values():
         raw.fetch(SOURCE, KANSAS + path, suffix=".pdf")
+    for path in KANSAS_PRECINCTS.values():
+        raw.fetch(SOURCE, KANSAS + path, suffix=".xlsx")
     for url in ARIZONA_CANVASSES.values():
         raw.fetch(SOURCE, url, suffix=".pdf")
     raw.fetch(SOURCE, INDIANA, suffix=".html")
@@ -414,6 +420,119 @@ def oklahoma() -> list[dict[str, object]]:
     return rows
 
 
+COLUMNS = [
+    "year",
+    "day",
+    "state",
+    "court",
+    "person",
+    "number",
+    "at_large",
+    "post",
+    "chief",
+    "unit",
+    "code",
+    "county",
+    "answer",
+    "votes",
+]
+
+
+def kansas_precincts() -> None:
+    official = pl.read_parquet(PARSED / "official.parquet")
+    with connect() as conn:
+        kansas_counties = {
+            re.sub(r"[^a-z]", "", text.lower()): code
+            for code, text in conn.execute(
+                """select u.code, n.text from reporting_unit u
+                   join name n on n.entity_id = u.area_id and n.kind = 'short'
+                   where u.scheme_code = 'us.county' and u.code like '20%%'"""
+            ).fetchall()
+        }
+    kansas_rows = []
+    for day, path in KANSAS_PRECINCTS.items():
+        sheets = pl.read_excel(raw.cached(SOURCE, KANSAS + path).path, sheet_id=0, has_header=False)
+        judges = official.filter(pl.col("state") == "KS", pl.col("day") == day, pl.col("answer") == "yes")
+        for sheet, grid in sheets.items():
+            lines: list[tuple[str, str, str, int]] = []
+            if sheet == "Supreme Court":
+                for row in grid.slice(1).iter_rows():
+                    if row[0] and row[0] != "County" and row[5] is not None:
+                        county = re.sub(r"\s+", " ", row[0]).strip()
+                        precinct = f"{re.sub(r' +', ' ', row[1]).strip()} {row[6]}"
+                        lines.append((county, precinct, f"{row[2]} {row[3]}", int(row[5])))
+            elif not sheet.startswith("Sheet"):
+                multi = day == "2024-11-05"
+                county = f"{int(grid['column_0'][2]):03d}" if multi else sheet
+                for index in range(3 if multi else 2, grid.width):
+                    heading = str(grid[f"column_{index}"][0])
+                    if not re.search(r"Supreme|Court of Appeals", heading):
+                        continue
+                    answer = str(grid[f"column_{index}"][1]).strip().upper()
+                    for row in grid.slice(2).iter_rows():
+                        if str(row[0 + multi]).strip() != "ZZZ" and str(row[index]).isdigit():
+                            lines.append(
+                                (county, f"{row[multi]} {row[multi + 1]}", f'{heading} "{answer}"', int(row[index]))
+                            )
+            for county, precinct, heading, votes in lines:
+                found = re.search(r'"(YES|NO)"$', heading.strip().replace("\u201c", '"').replace("\u201d", '"'))
+                if found is None:
+                    continue
+                court = "supreme-court" if "Supreme" in heading else "court-of-appeals"
+                seat = re.search(r"(?:Justice(?: Position)?|Pos #?) ?(\d+)", heading)
+                if seat:
+                    number = int(seat[1])
+                else:
+                    surnames = {
+                        number: identity(name)[1]
+                        for number, name in judges.filter(pl.col("court") == court).select("number", "name").iter_rows()
+                    }
+                    text = plain(heading).upper()
+                    matched = [number for number, last in surnames.items() if re.search(rf"\b{last}\b", text)]
+                    if len(matched) != 1:
+                        raise ValueError(f"Kansas {day} {sheet}: no seat for {heading}")
+                    number = matched[0]
+                if day == "2022-11-08":
+                    fips = kansas_counties[re.sub(r"[^a-z]", "", county.lower())]
+                else:
+                    fips = f"20{county}"
+                kansas_rows.append((day, court, number, county, fips, precinct, found[1].lower(), votes))
+    PARSED.mkdir(parents=True, exist_ok=True)
+    precincts = (
+        pl.DataFrame(
+            kansas_rows,
+            schema={
+                "day": pl.String,
+                "court": pl.String,
+                "number": pl.Int16,
+                "jurisdiction": pl.String,
+                "county": pl.String,
+                "precinct": pl.String,
+                "answer": pl.String,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        )
+        .join(
+            official.filter(pl.col("state") == "KS").select("day", "court", "number", "person").unique(),
+            on=["day", "court", "number"],
+        )
+        .with_columns(
+            year=pl.col("day").str.slice(0, 4).cast(pl.Int32),
+            state=pl.lit("KS"),
+            at_large=pl.lit(False),
+            post=pl.lit(None, pl.Int16),
+            chief=pl.lit(False),
+            unit=pl.lit("precinct"),
+        )
+        .with_columns(code=pl.concat_str("year", "state", "county", "jurisdiction", "precinct", separator=":"))
+        .select(COLUMNS)
+        .group_by(COLUMNS[:-1])
+        .agg(pl.col("votes").sum())
+    )
+    precincts.write_parquet(PARSED / "kansas.parquet")
+
+
 def parse() -> None:
     frame = (
         pl.concat(
@@ -623,6 +742,7 @@ def parse() -> None:
         "answer",
     ).agg(pl.col("votes").sum()).write_parquet(PARSED / "medsl.parquet")
     official.write_parquet(PARSED / "official.parquet")
+    kansas_precincts()
     pl.DataFrame(
         [(key, text) for key, text in names.items()], schema={"person": pl.String, "name": pl.String}, orient="row"
     ).write_parquet(PARSED / "names.parquet")
@@ -639,7 +759,7 @@ def parse() -> None:
 
 
 def emit() -> Path:
-    medsl_rows = pl.read_parquet(PARSED / "medsl.parquet")
+    medsl_rows = pl.concat([pl.read_parquet(PARSED / "medsl.parquet"), pl.read_parquet(PARSED / "kansas.parquet")])
     official = pl.read_parquet(PARSED / "official.parquet")
     names = dict(pl.read_parquet(PARSED / "names.parquet").iter_rows())
     race = ["day", "state", "court", "person"]
