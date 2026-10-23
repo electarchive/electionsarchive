@@ -140,7 +140,7 @@ OKLAHOMA = [
     date(2023, 3, 7),
     date(2024, 11, 5),
 ]
-NEVADA = [date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3), date(2024, 11, 5)]
+NEVADA = [date(2012, 11, 6), date(2014, 11, 4), date(2016, 11, 8), date(2018, 11, 6), date(2020, 11, 3), date(2024, 11, 5)]
 MAINE = {
     date(
         2024, 11, 5
@@ -253,6 +253,7 @@ NORTH_DAKOTA = {
     date(2024, 11, 5): "",
 }
 NEBRASKA = {
+    date(2012, 11, 6): "2012/2012-general-canvass.pdf",
     date(2018, 11, 6): "2018/2018-general-election-official-results.pdf",
     date(2020, 11, 3): "2020/2020-General-Canvass-Book.pdf",
     date(2022, 11, 8): "2022/2022%20General%20Canvass%20Book.pdf",
@@ -288,6 +289,7 @@ NORTH_CAROLINA = {
     ),
 }
 NAMED_QUESTIONS = {
+    "Referendum Measure No. 4: Relating to University of North Dakota Athletic Nickname and Logo.": 'North Dakota University "Fighting Sioux" Referendum, Measure 4',
     "Elimination of Annual Poll Tax": "North Dakota Poll Tax Amendment, Measure 1",
     "Oaths of Office for Elected and Appointed Officials": "North Dakota Oaths of Office Amendment, Measure 2",
     "Relating to the Practices of Farming and Ranching": "North Dakota Farming and Ranching Amendment, Measure 3",
@@ -1275,12 +1277,13 @@ def parse() -> None:
             for number, page in enumerate(text.stdout.split("\f"), start=1):
                 for line in page.splitlines():
                     if heading := re.fullmatch(
-                        r"\s*(Proposed Amendment No\. \d+|(?:Initiative|Referendum) Measure \d+)\s*", line
+                        r"\s*(Proposed Amendment No\. \d+|Amendment Number \d+|(?:Initiative|Referendum) Measure \d+)\s*",
+                        line,
                     ):
-                        office = heading[1]
+                        office = heading[1].replace("Number", "No.")
                     elif office:
                         for name, yes, no in re.findall(r"([A-Z][A-Za-z]*(?: [A-Za-z]+)*)\s+([\d,]+)\s+([\d,]+)", line):
-                            county = "Total" if name in ("Total", "Statewide Total") else name
+                            county = "Total" if name.title() in ("Total", "Statewide Total") else name
                             if county == "Total" or elstats.plain(county) in names["NE"]:
                                 for answer, votes in zip(("FOR", "AGAINST"), (yes, no), strict=True):
                                     records.append((county, office, answer, votes, number))
