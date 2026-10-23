@@ -4,6 +4,7 @@ import json
 import re
 import subprocess
 import tempfile
+import zipfile
 from collections import defaultdict
 from datetime import date
 from pathlib import Path
@@ -92,6 +93,13 @@ COUNTY_SHEETS = {
 MISSISSIPPI_QUALIFYING = (
     "https://www.sos.ms.gov/Content/documents/Elections/candidate%20qualifying/2023%20Qualifying%20List%202023.6.3.pdf"
 )
+GEORGIA_QUALIFYING = (
+    "https://web.archive.org/web/2025id_/https://sos.ga.gov/sites/default/files/2024-06/List_of_Candidates_v5.zip"
+)
+GEORGIA_QUALIFIED = {
+    "2024-04-09:GA:house:139": "State House Representative, District 139",
+    "2024-05-07:GA:house:139:runoff": "State House Representative, District 139",
+}
 MISSISSIPPI_READINGS = {
     "Dianne BD. Black": "Dianne D. Black",
     "Layd B. 'Rob' Roberson II": "Loyd B. 'Rob' Roberson II",
@@ -1047,6 +1055,7 @@ def fetch() -> None:
         if system == "louisiana":
             raw.fetch(SOURCE, url.replace("Votes_", "RacesCandidates_"), suffix=".json")
     raw.fetch(SOURCE, MISSISSIPPI_QUALIFYING, suffix=".pdf")
+    raw.fetch(SOURCE, GEORGIA_QUALIFYING, suffix=".zip")
     for url in (url for sheets in COUNTY_SHEETS.values() for url in sheets):
         raw.fetch(SOURCE, url, suffix=".pdf")
     for election, url in GENERALS.items():
@@ -1076,6 +1085,14 @@ def _party(state: str, text: str | None) -> str | None:
 
 def parse() -> None:
     rows: list[dict[str, object]] = []
+    with zipfile.ZipFile(raw.cached(SOURCE, GEORGIA_QUALIFYING).path) as archive:
+        qualified = {
+            (re.sub(r" \(\w\)$", "", office), name.split()[-1]): party
+            for name, office, party in pl.read_excel(archive.read(archive.namelist()[0]), infer_schema_length=0)
+            .select("Candidate Name", "Office Name", "Candidate Party")
+            .iter_rows()
+            if name and office
+        }
     for key, (system, url, select) in SPECIALS.items():
         state = key.split(":")[1]
         found: list[tuple[str | None, str | None, int]] = []
@@ -1183,6 +1200,8 @@ def parse() -> None:
         if not found:
             raise ValueError(f"{key}: no candidates")
         for label, party, votes in found:
+            if key in GEORGIA_QUALIFIED and label is not None:
+                party = party or qualified.get((GEORGIA_QUALIFIED[key], label.upper().split()[-1]))
             rows.append({"key": key, "url": url, "candidate": label, "party": _party(state, party), "votes": votes})
     for election, url in GENERALS.items():
         day, state = election.split(":")[:2]
@@ -1440,7 +1459,11 @@ def emit() -> Path:
                 )
             source = sources[(publisher, day)]
             for cite in (
-                (url, MISSISSIPPI_QUALIFYING) if regular and state == "MS" else (url, *COUNTY_SHEETS.get(key, ()))
+                (url, MISSISSIPPI_QUALIFYING)
+                if regular and state == "MS"
+                else (url, GEORGIA_QUALIFYING)
+                if key in GEORGIA_QUALIFIED
+                else (url, *COUNTY_SHEETS.get(key, ()))
             ):
                 if cite not in cited:
                     cited.add(cite)
@@ -1502,7 +1525,7 @@ def emit() -> Path:
                 etype = ("gs" if on_general else "s") + ("runoff" if runoff else "")
             contest_key = f"{day}:{state}:{body_slug}:{code}" + (f":{post}" if post else "") + f":{etype}"
             contest = contests[key] = cs.key("us.contest", contest_key)
-            if contest_key in published:
+            if contest_key in published and key not in GEORGIA_QUALIFIED:
                 continue
             previous = None
             if runoff:
