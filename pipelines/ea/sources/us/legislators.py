@@ -9,10 +9,12 @@ from uuid import UUID, uuid5
 from ea import raw
 from ea.changeset import NAMESPACE, Changeset, slug
 from ea.sources.us.clerk import LEGISLATORS
+from ea.sources.us.secession import MONTHS as FULL
+from ea.sources.us.secession import STATES
 from ea.store import connect
 
 SOURCE = "us.legislators"
-VERSION = "2"
+VERSION = "3"
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
         "query": """SELECT ?bioguide ?start ?startPrecision ?end ?endPrecision ?cause WHERE {
@@ -25,6 +27,8 @@ OPTIONAL { ?held pq:P1534 ?cause } }""",
 )
 CAUSES = {"Q796919": "resigned", "Q5247364": "died", "Q4": "died"}
 MONTHS = ["Jan", "Feb", "Mar", "Apr", "May", "Jun", "Jul", "Aug", "Sep", "Oct", "Nov", "Dec"]
+CONGRESSES = {37: "37th", 38: "38th", 39: "39th", 40: "40th", 41: "41st"}
+CONGRESS = "https://en.wikipedia.org/w/index.php?title={ordinal}_United_States_Congress&action=raw"
 EXPULSIONS = "https://www.senate.gov/about/powers-procedures/expulsion/{page}_expulsion.htm"
 EXPELLED = {
     "Blount": [("Blount", "TN")],
@@ -169,6 +173,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, SERVICE, suffix=".json")
     for page in EXPELLED:
         raw.fetch(SOURCE, EXPULSIONS.format(page=page), suffix=".html")
+    for ordinal in CONGRESSES.values():
+        raw.fetch(SOURCE, CONGRESS.format(ordinal=ordinal), suffix=".wiki")
 
 
 def emit() -> Path:
@@ -270,6 +276,62 @@ def emit() -> Path:
         }
         if not withdrawn:
             raise ValueError("run us.secession first")
+        wikipedia = cs.source("Wikipedia", "Changes in membership, 37th to 41st United States Congresses")
+        cs.add(
+            "source",
+            id=wikipedia,
+            kind="community",
+            publisher="Wikipedia",
+            title="Changes in membership, 37th to 41st United States Congresses",
+            url="https://en.wikipedia.org/wiki/37th_United_States_Congress#Changes_in_membership",
+            license="CC BY-SA 4.0",
+            license_url="https://creativecommons.org/licenses/by-sa/4.0/",
+        )
+        installed: dict[tuple[str, int], list[tuple[str, date]]] = {}
+        for ordinal in CONGRESSES.values():
+            artifact = raw.cached(SOURCE, CONGRESS.format(ordinal=ordinal))
+            cs.artifact(artifact, wikipedia)
+            table = artifact.path.read_text(encoding="utf-8").split("{{Ordinal US Congress change|House}}", 1)[1]
+            carried: dict[int, tuple[int, str]] = {}
+            for row in table.split("\n|}", 1)[0].split("\n|-")[1:]:
+                cells = [cell.strip() for cell in row.strip().removeprefix("|").split("\n|")]
+                columns: list[str] = []
+                for column in range(5):
+                    span, value = carried.get(column, (0, ""))
+                    if span > 0:
+                        carried[column] = (span - 1, value)
+                    elif cells:
+                        value = cells.pop(0)
+                        spanned = re.match(r"rowspan=\"?(\d+)\"?[^|\[{]*\|\s*(.*)", value, re.DOTALL)
+                        if spanned:
+                            value = spanned[2]
+                            carried[column] = (int(spanned[1]) - 1, value)
+                        elif value.startswith(("nowrap", "style")) and " | " in value:
+                            value = value.split(" | ", 1)[1]
+                    columns.append(value)
+                district = re.search(r"\{\{ushr\|([^|]+)\|([^|}]+)", columns[0])
+                successor = re.search(r"\[\[(?:[^|\]]*\|)?([^\]]+)\]\]", columns[3])
+                day = re.search(r"(" + "|".join(FULL) + r") (\d+), (\d{4})", columns[4])
+                if district and successor and day and district[1] in STATES:
+                    installed.setdefault(
+                        (STATES[district[1]], 0 if district[2] == "AL" else int(district[2])), []
+                    ).append((successor[1], date(int(day[3]), FULL.index(day[1]) + 1, int(day[2]))))
+            for state, place, name, month, day, year in re.findall(
+                r"\{\{ushr\|([^|]+)\|([^|}]+)\|E\}\}\. \[\[(?:[^|\]]*\|)?([^\]]+)\]\][^,\n]*, from ("
+                + "|".join(FULL)
+                + r") (\d+), (\d{4})",
+                artifact.path.read_text(encoding="utf-8"),
+            ):
+                if state in STATES:
+                    installed.setdefault((STATES[state], 0 if place == "AL" else int(place)), []).append(
+                        (name, date(int(year), FULL.index(month) + 1, int(day)))
+                    )
+        if not installed:
+            raise ValueError("no seats installed in the changes tables")
+        existing = dict(
+            conn.execute("select value, entity_id from external_id where scheme = %s", [f"{SOURCE}.tenure"]).fetchall()
+        )
+        unseated: list[UUID] = []
         states: dict[UUID, str] = {}
 
         def named(entity: UUID, text: str) -> None:
@@ -340,6 +402,7 @@ def emit() -> Path:
                 began = ended = "day"
                 cause = vote = None
                 seat = None
+                district = 0
                 if chamber == "senate":
                     seat = cs.key("us.seat", f"senate:{term['state']}:{term['class']}")
                     states[seat] = term["state"]
@@ -386,7 +449,7 @@ def emit() -> Path:
                         cause = "withdrew"
                 elif term["state"] in ("AS", "DC", "GU", "MP", "PR", "VI"):
                     seat = cs.key("us.seat", f"house:{term['state']}")
-                elif end <= ADMITTED.get(term["state"], date.min):
+                elif end <= ADMITTED.get(term["state"], date.min) or term["state"] not in areas:
                     seat = cs.key("us.seat", f"house:{term['state']}:territory")
                     if seat not in seated:
                         seated.add(seat)
@@ -436,6 +499,22 @@ def emit() -> Path:
                             valid_to=None,
                             valid_to_precision="day",
                         )
+                gap = withdrawn.get(term["state"]) if chamber == "house" else None
+                if gap is not None and gap[0] <= start < (gap[1] or date.max):
+                    seating = [
+                        day
+                        for (state, place), entries in installed.items()
+                        if state == term["state"] and place in (district, 0)
+                        for name, day in entries
+                        if member["name"]["last"].lower() in name.lower() and start < day < end
+                    ]
+                    if seating:
+                        start = min(seating)
+                    elif (start.month, start.day) in ((3, 4), (1, 3)):
+                        known_tenure = existing.get(f"{ids['bioguide']}:{chamber}:{term['start']}")
+                        if known_tenure is not None:
+                            unseated.append(known_tenure)
+                        continue
                 tenure = cs.key(f"{SOURCE}.tenure", f"{ids['bioguide']}:{chamber}:{term['start']}")
                 cs.add(
                     "tenure",
@@ -517,4 +596,16 @@ def emit() -> Path:
                 valid_to=None,
                 valid_to_precision="day",
             )
+        for tenure in unseated:
+            cs.add("entity_retirement", entity_id=tenure, reason="Elected but never seated in this Congress")
+        for (seat,) in conn.execute(
+            """select s.id from seat s
+               join changeset c on c.id = s.changeset_id and c.pipeline = %s
+               join entity e on e.id = s.id and e.retired_by is null
+               where not exists (select from tenure t where t.seat_id = s.id)
+                 and not exists (select from contest k where k.seat_id = s.id)""",
+            [SOURCE],
+        ).fetchall():
+            if seat not in seated and seat not in states:
+                cs.add("entity_retirement", entity_id=seat, reason="No member of Congress held this seat")
         return cs.write()

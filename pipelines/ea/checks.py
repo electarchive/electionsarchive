@@ -333,6 +333,35 @@ def _geometry(stage: Stage) -> list[tuple[str, sql.Composed]]:
     ]
 
 
+def _seated(stage: Stage) -> list[tuple[str, sql.Composed]]:
+    columns = stage.tables.get("tenure", [])
+    if not {"body_id", "seat_id", "from_date"} <= set(columns):
+        return []
+    staged = (
+        sql.SQL("left join {} ss on ss.id = t.seat_id").format(stage.staged("seat"))
+        if "apportioned_area_id" in stage.tables.get("seat", [])
+        else sql.SQL("left join (select null::uuid as id, null::uuid as apportioned_area_id) ss on false")
+    )
+    return [
+        (
+            "tenure.placeholder_start",
+            sql.SQL(
+                """select t.id, null::uuid, jsonb_build_object('from', t.from_date, 'area', g.area_id)
+                   from {tenure} t {staged}
+                   left join public.seat ps on ps.id = t.seat_id
+                   join public.representation_gap g on g.body_id = t.body_id
+                     and g.area_id = coalesce(ss.apportioned_area_id, ps.apportioned_area_id) and g.valid @> t.from_date
+                   where {precision} extract(year from t.from_date)::int % 2 = 1
+                     and to_char(t.from_date, 'MM-DD') in ('03-04', '01-03')"""
+            ).format(
+                tenure=stage.staged("tenure"),
+                staged=staged,
+                precision=sql.SQL("t.from_precision = 'day' and" if "from_precision" in columns else ""),
+            ),
+        )
+    ]
+
+
 def _scope(stage: Stage) -> list[tuple[str, sql.Composed]]:
     queries: list[tuple[str, sql.Composed]] = []
     for table, columns in stage.tables.items():
@@ -443,6 +472,7 @@ def run(conn: Connection, stage: Stage) -> list[Finding]:
         *_accounting(stage),
         *_outcomes(stage),
         *_geometry(stage),
+        *_seated(stage),
         *_scope(stage),
     ]:
         findings.extend(

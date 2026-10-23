@@ -497,6 +497,18 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             retiring.setdefault(kind, []).append(entity)
         held: list[str] = []
         for kind, ids in retiring.items():
+            if kind == "tenure":
+                for owned, column in (
+                    ("tenure_affiliation", "tenure_id"),
+                    ("tenure_event", "tenure_id"),
+                    ("citation", "entity_id"),
+                ):
+                    conn.execute(
+                        sql.SQL("delete from public.{} where {} = any(%s::uuid[])").format(
+                            sql.Identifier(owned), sql.Identifier(column)
+                        ),
+                        [ids],
+                    )
             for relation, column in conn.execute(
                 """select distinct c.conrelid::regclass::text, a.attname from pg_constraint c
                    join pg_attribute a on a.attrelid = c.conrelid and a.attnum = c.conkey[1]
