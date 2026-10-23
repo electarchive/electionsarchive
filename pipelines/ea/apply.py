@@ -1,5 +1,6 @@
 import io
 import json
+import unicodedata
 from collections import Counter
 from pathlib import Path
 from typing import LiteralString, cast
@@ -306,6 +307,24 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             ).format(staged)
         ).fetchone() != (False,):
             raise ValueError("a merge joins two types or targets an entity that is itself merged")
+        conn.execute(
+            sql.SQL(
+                """with merging as (select entity_id from {0} union select into_id from {0}),
+                   moving as (
+                     select r.id, coalesce(e.into_id, r.election_id) as election, coalesce(c.into_id, r.contest_id) as contest,
+                            r.stage, o.kind = 'official_body' as official, e.entity_id is null and c.entity_id is null as staying
+                     from public.result_set r join public.source o on o.id = r.source_id
+                     left join {0} e on e.entity_id = r.election_id
+                     left join {0} c on c.entity_id = r.contest_id
+                     where r.is_default and (r.election_id in (select entity_id from merging)
+                                             or r.contest_id in (select entity_id from merging))
+                   )
+                   update public.result_set r set is_default = false
+                   from (select id, row_number() over (partition by election, contest, stage
+                                                       order by official desc, staying desc, id) as n from moving) x
+                   where x.id = r.id and x.n > 1"""
+            ).format(staged)
+        )
         types = [
             kind
             for (kind,) in conn.execute(
@@ -476,7 +495,7 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
                         current=sql.SQL(", ").join(sql.SQL("p.{}").format(column) for column in filled),
                     )
                 )
-            if kind in ("contest_option", "candidacy"):
+            if kind in ("contest_option", "candidacy", "contest"):
                 conn.execute(
                     sql.SQL("delete from public.{} where id in (select entity_id from {})").format(
                         sql.Identifier(kind), staged
@@ -1311,6 +1330,112 @@ def apply(folder: Path) -> str:
                     chunk.write_csv(buffer, include_header=False, quote_style="non_numeric")
                     copy.write(buffer.getvalue())
         stage = _stage(conn, changeset_id)
+        if "entity_merge" in stage.tables:
+            staged = stage.staged("entity_merge")
+            contests = conn.execute(
+                sql.SQL("select s.entity_id, s.into_id from {} s join public.contest c on c.id = s.entity_id").format(
+                    staged
+                )
+            ).fetchall()
+            if contests:
+                merged = sql.SQL(
+                    "(select entity_id, into_id from public.entity_merge union all select entity_id, into_id from {})"
+                ).format(staged)
+                taken = {
+                    entity
+                    for (entity,) in conn.execute(
+                        sql.SQL("select entity_id from {0} union select into_id from {0}").format(staged)
+                    ).fetchall()
+                }
+                options: dict[object, list[tuple[object, str, object, object, str, frozenset[object]]]] = {}
+                for option, contest, kind, parent, party, label, persons in conn.execute(
+                    sql.SQL(
+                        """select o.id, o.contest_id, o.kind::text, o.parent_option_id, o.party_id, o.ballot_label,
+                                  array_remove(array_agg(distinct coalesce(m.into_id, k.person_id)), null)
+                           from public.contest_option o
+                           left join public.candidacy k on k.option_id = o.id and k.role = 'head'
+                           left join {} m on m.entity_id = k.person_id
+                           where o.contest_id = any(%s) group by o.id"""
+                    ).format(merged),
+                    [[contest for pair in contests for contest in pair]],
+                ).fetchall():
+                    if option not in taken:
+                        folded = "".join(
+                            character
+                            for character in unicodedata.normalize("NFKD", label or "").lower()
+                            if character.isalnum() and not unicodedata.combining(character)
+                        )
+                        options.setdefault(contest, []).append(
+                            (option, kind, parent, party, folded, frozenset(persons))
+                        )
+                explicit = conn.execute(
+                    sql.SQL(
+                        "select o.contest_id, s.entity_id, s.into_id from {} s join public.contest_option o on o.id = s.entity_id"
+                    ).format(staged)
+                ).fetchall()
+                paired: dict[object, object] = {}
+                for duplicate, survivor in contests:
+                    groups = [
+                        (None, None),
+                        *((left, right) for contest, left, right in explicit if contest == duplicate),
+                    ]
+                    while groups:
+                        left, right = groups.pop()
+                        lefts = [option for option in options.get(duplicate, []) if option[2] == left]
+                        rights = [option for option in options.get(survivor, []) if option[2] == right]
+                        for rule in ("person", "party", "label"):
+                            held: dict[object, tuple[list[object], list[object]]] = {}
+                            for side, group in ((0, lefts), (1, rights)):
+                                for option, kind, _, party, folded, persons in group:
+                                    key = (
+                                        persons or None
+                                        if rule == "person"
+                                        else party
+                                        if rule == "party" and not persons
+                                        else (kind, folded)
+                                        if rule == "label" and folded
+                                        else None
+                                    )
+                                    if key is not None:
+                                        held.setdefault(key, ([], []))[side].append(option)
+                            for ours, theirs in held.values():
+                                if len(ours) == len(theirs) == 1:
+                                    paired[ours[0]] = theirs[0]
+                                    groups.append((ours[0], theirs[0]))
+                            lefts = [option for option in lefts if option[0] not in paired]
+                            rights = [option for option in rights if option[0] not in set(paired.values())]
+                pairs = [*paired.items(), *((left, right) for _, left, right in explicit)]
+                candidacies: dict[object, list[tuple[object, str, object]]] = {}
+                for candidacy, option, role, person in conn.execute(
+                    sql.SQL(
+                        """select k.id, k.option_id, k.role::text, coalesce(m.into_id, k.person_id)
+                           from public.candidacy k left join {} m on m.entity_id = k.person_id
+                           where k.option_id = any(%s)"""
+                    ).format(merged),
+                    [[option for pair in pairs for option in pair]],
+                ).fetchall():
+                    if candidacy not in taken:
+                        candidacies.setdefault(option, []).append((candidacy, role, person))
+                for left, right in pairs:
+                    lefts = candidacies.get(left, [])
+                    rights = candidacies.get(right, [])
+                    for rule in ("person", "role"):
+                        held = {}
+                        for side, group in ((0, lefts), (1, rights)):
+                            for candidacy, role, person in group:
+                                held.setdefault((role, person) if rule == "person" else role, ([], []))[side].append(
+                                    candidacy
+                                )
+                        for ours, theirs in held.values():
+                            if len(ours) == len(theirs) == 1:
+                                paired[ours[0]] = theirs[0]
+                        lefts = [candidacy for candidacy in lefts if candidacy[0] not in paired]
+                        rights = [candidacy for candidacy in rights if candidacy[0] not in set(paired.values())]
+                with conn.cursor() as cursor:
+                    cursor.executemany(
+                        sql.SQL("insert into {} (entity_id, into_id) values (%s, %s)").format(staged),
+                        list(paired.items()),
+                    )
         if "is_default" in stage.tables.get("result_set", []):
             kind = sql.SQL("(select k.kind from {} k where k.id = {}.source_id)")
             sources = stage.either("source", "id", "kind")
