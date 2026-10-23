@@ -10,10 +10,10 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
-  import type { Counts, Goal } from "#lib/coverage.js";
+  import type { Counts, Goal, Reason } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
   import Gaps from "./gaps.svelte";
-  import { GOALS, LABELS, REASONS } from "#lib/coverage.js";
+  import { GOALS, label, PARTS, REASONS } from "#lib/coverage.js";
   import Tone from "./tone.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -21,6 +21,7 @@
   const TITLES: Record<Goal, () => string> = {
     county: m.coverage_goal_county,
     history: m.coverage_goal_history,
+    turnout: m.coverage_goal_turnout,
     precinct: m.coverage_goal_precinct,
     shapes: m.coverage_goal_shapes,
     shapes_history: m.coverage_goal_shapes_history,
@@ -29,10 +30,17 @@
   const TABS: Record<Goal, () => string> = {
     county: m.coverage_goal_tab_county,
     history: m.coverage_goal_tab_history,
+    turnout: m.coverage_goal_tab_turnout,
     precinct: m.coverage_goal_tab_precinct,
     shapes: m.coverage_goal_tab_shapes,
     shapes_history: m.coverage_goal_tab_shapes_history,
     local: m.coverage_goal_tab_local,
+  };
+
+  const TURNOUT_DEFINITIONS: Partial<Record<Reason, () => string>> = {
+    partial: m.coverage_reason_turnout_partial_def,
+    coarse: m.coverage_reason_turnout_coarse_def,
+    absent: m.coverage_reason_turnout_absent_def,
   };
 
   const year = String(new Date().getFullYear());
@@ -80,7 +88,9 @@
       >
         {(row.goal === "local"
           ? m.coverage_progress_local
-          : m.coverage_progress)({
+          : row.goal === "turnout"
+            ? m.coverage_progress_turnout
+            : m.coverage_progress)({
           complete: count(row.complete),
           total: count(row.total),
         })}
@@ -107,6 +117,7 @@
             ? {
                 county: m.coverage_reason_complete_county_def,
                 history: m.coverage_reason_complete_history_def,
+                turnout: m.coverage_reason_complete_turnout_def,
                 precinct: m.coverage_reason_complete_precinct_def,
                 shapes: m.coverage_reason_complete_shapes_def,
                 shapes_history: m.coverage_reason_complete_shapes_def,
@@ -114,21 +125,23 @@
               }[row.goal]()
             : reason === "absent" && row.goal === "local"
               ? m.coverage_reason_absent_local_def()
-              : {
-                  coarse: m.coverage_reason_coarse_def,
-                  partial: m.coverage_reason_partial_def,
-                  totals: m.coverage_reason_totals_def,
-                  bare: m.coverage_reason_bare_def,
-                  absent: m.coverage_reason_absent_def,
-                  units: m.coverage_reason_units_def,
-                  unshaped: m.coverage_reason_unshaped_def,
-                  undrawn: m.coverage_reason_undrawn_def,
-                }[reason](),
+              : row.goal === "turnout"
+                ? (TURNOUT_DEFINITIONS[reason]?.() ?? "")
+                : {
+                    coarse: m.coverage_reason_coarse_def,
+                    partial: m.coverage_reason_partial_def,
+                    totals: m.coverage_reason_totals_def,
+                    bare: m.coverage_reason_bare_def,
+                    absent: m.coverage_reason_absent_def,
+                    units: m.coverage_reason_units_def,
+                    unshaped: m.coverage_reason_unshaped_def,
+                    undrawn: m.coverage_reason_undrawn_def,
+                  }[reason](),
         )}
         <li class="grid grid-cols-[0.75rem_minmax(0,1fr)] gap-x-2">
           <Tone {reason} class="mbs-1 rounded-xs block-3 inline-3" />
           <span>
-            <span class="font-semibold">{LABELS[reason]()}</span>
+            <span class="font-semibold">{label(row.goal, reason)}</span>
             <span class="tabular-nums">{count(row[reason])}</span>
             <span class="block text-muted-foreground">{definition}</span>
             {#if reason === "complete" && row.icpsr > 0}
@@ -152,13 +165,11 @@
         </li>
       {/each}
     </ul>
-    {#if row.goal === "history"}
+    {#if row.goal === "history" || row.goal === "turnout"}
       <ul class="grid gap-1 text-sm">
-        {#each data.parts as part (part.part)}
+        {#each data.parts.filter((part) => part.goal === row.goal) as part (part.part)}
           <li>
-            {(part.part === "national"
-              ? m.coverage_part_national
-              : m.coverage_part_legislature)({
+            {PARTS[part.part]({
               complete: count(part.complete),
               total: count(part.total),
               percent: percent(part.complete / Math.max(1, part.total), 1),
@@ -167,7 +178,9 @@
         {/each}
       </ul>
       <p class="text-sm text-muted-foreground">
-        {m.coverage_goal_history_note()}
+        {(row.goal === "history"
+          ? m.coverage_goal_history_note
+          : m.coverage_goal_turnout_note)()}
       </p>
     {:else if row.goal === "local"}
       <p class="text-sm text-muted-foreground">
@@ -279,7 +292,9 @@
                 <span class="text-sm text-muted-foreground tabular-nums">
                   {(row.goal === "local"
                     ? m.coverage_progress_local
-                    : m.coverage_progress)({
+                    : row.goal === "turnout"
+                      ? m.coverage_progress_turnout
+                      : m.coverage_progress)({
                     complete: count(row.complete),
                     total: count(row.total),
                   })},

@@ -7,6 +7,7 @@ import { db } from "#lib/server/db/index.js";
 const GOALS = [
   "county",
   "history",
+  "turnout",
   "precinct",
   "shapes",
   "shapes_history",
@@ -59,7 +60,8 @@ export const coverage = {
         goals: v.array(v.object({ goal: v.picklist(GOALS), ...counts })),
         parts: v.array(
           v.object({
-            part: v.picklist(["national", "legislature"]),
+            goal: v.picklist(["history", "turnout"]),
+            part: v.picklist(["national", "legislature", "recent", "earlier"]),
             total: v.number(),
             complete: v.number(),
           }),
@@ -81,15 +83,19 @@ export const coverage = {
         group by g.goal
       `);
       const parts = await db.execute<{
-        part: "national" | "legislature";
+        goal: "history" | "turnout";
+        part: "national" | "legislature" | "recent" | "earlier";
         total: number;
         complete: number;
       }>(sql`
-        select case when g.level in ('state_upper', 'state_lower') then 'legislature' else 'national' end as part,
+        select g.goal,
+          case when g.goal = 'turnout' then case when g.year >= 2000 then 'recent' else 'earlier' end
+            when g.level in ('state_upper', 'state_lower') then 'legislature' else 'national' end as part,
           sum(g.total)::int as total, sum(g.complete)::int as complete
         from coverage_goal g
-        where g.goal = 'history'
-        group by 1 order by 1 desc
+        where g.goal in ('history', 'turnout')
+          and (${input.current} or g.year <> extract(year from current_date))
+        group by 1, 2 order by 1, 2 desc
       `);
       return {
         parts: parts.rows,

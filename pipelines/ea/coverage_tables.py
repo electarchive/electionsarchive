@@ -226,6 +226,35 @@ where p.id in (select id from uspol) and p.kind not in ('sovereign_state', 'fede
 """
 
 
+TURNOUT_SQL = """
+with m as (
+    select r.election_id, bool_or(cm.measure = 2) as registered, bool_or(cm.measure in (3, 14)) as ballots,
+        bool_or(cm.measure in (24, 25)) as survey
+    from result_set r join coverage_cache_measure cm on cm.result_set_k = r.k
+    where r.contest_id is null and r.status = 'active'
+    group by 1
+), days as (
+    select substr(p.iso_code, 4) as st, e.date_from, e.kind::text as kind,
+        bool_or(coalesce(m.registered, false)) as registered, bool_or(coalesce(m.ballots, false)) as ballots,
+        bool_or(coalesce(m.survey, false)) as survey
+    from election e
+    join polity p on p.id = e.polity_id and p.kind in ('federal_unit', 'region') and p.iso_code like 'US-%%'
+    left join m on m.election_id = e.id
+    where e.status <> 'scheduled' and e.date_from < current_date
+        and e.kind in ('general', 'primary', 'runoff', 'referendum')
+        and (extract(year from e.date_from) >= 2000 or e.kind = 'general' and extract(year from e.date_from) >= 1948)
+        and exists (select from contest c where c.election_id = e.id)
+    group by 1, 2, 3
+)
+select st, extract(year from date_from)::int, kind,
+    count(*) filter (where ballots and (registered or st = 'ND' and date_from >= '1952-01-01')),
+    count(*) filter (where (ballots or registered) and not (ballots and (registered or st = 'ND' and date_from >= '1952-01-01'))),
+    count(*) filter (where survey and not (ballots or registered)),
+    count(*) filter (where not (ballots or registered or survey))
+from days group by 1, 2, 3
+"""
+
+
 def tokens(text: str) -> frozenset[str]:
     text = re.sub(r"\([^)]*\)", " ", text.upper().replace("'", "").replace("’", ""))
     match = PREFIX.match(text)
@@ -314,6 +343,7 @@ def build() -> str:
         for statement in SHAPES_SQL.split(";\n\n"):
             conn.execute(statement)
         shapes = list(conn.execute(SHAPES_COUNT_SQL))
+        turnout = list(conn.execute(TURNOUT_SQL))
 
         by_key = {(c["state"], c["year"], c["level"], c["stage"]): c for c in cells}
         season = {
@@ -590,6 +620,15 @@ def build() -> str:
             for i, value in enumerate([base, county, base - count, bare, totals, partial, 0, c.get("with_turnout", 0)]):
                 cell[i] += value
             cell[13] += c.get("icpsr_only", 0)
+    for st, year, kind, complete, partial, coarse, absent in turnout:
+        if st not in names:
+            continue
+        cell = goals[("turnout", st, kind, year)]
+        cell[0] += complete + partial + coarse + absent
+        cell[1] += complete
+        cell[2] += absent
+        cell[5] += partial
+        cell[6] += coarse
     kinds = {g["id"]: (g["state"], g["kind"]) for g in governments}
     for gid, year, expected, n, _, _, precincts, shaped in years_out:
         st, kind = kinds[gid]

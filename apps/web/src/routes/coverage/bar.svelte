@@ -5,7 +5,7 @@
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
   import type { Counts, Goal, Reason } from "#lib/coverage.js";
-  import { LABELS, REASONS } from "#lib/coverage.js";
+  import { REASONS, label as reasonLabel } from "#lib/coverage.js";
   import Tone from "./tone.svelte";
 
   const {
@@ -23,7 +23,7 @@
       .filter((part) => counts[part] > 0),
   );
   const label = (part: Reason | "icpsr") =>
-    part === "icpsr" ? m.coverage_icpsr() : LABELS[part]();
+    part === "icpsr" ? m.coverage_icpsr() : reasonLabel(goal, part);
 </script>
 
 <span

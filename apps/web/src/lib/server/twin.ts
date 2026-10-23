@@ -2,7 +2,7 @@ import type { RequestEvent } from "@sveltejs/kit";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { effective, stand } from "#lib/caucus.js";
-import { LABELS, REASONS } from "#lib/coverage.js";
+import { label as reasonLabel, PARTS, REASONS } from "#lib/coverage.js";
 import { count, date, percent, points } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
@@ -24,6 +24,7 @@ type Link = (name: string, path: string | null) => string;
 const TITLES = {
   county: m.coverage_goal_county,
   history: m.coverage_goal_history,
+  turnout: m.coverage_goal_turnout,
   precinct: m.coverage_goal_precinct,
   shapes: m.coverage_goal_shapes,
   shapes_history: m.coverage_goal_shapes_history,
@@ -354,25 +355,28 @@ function coverageMarkdown(
     ...data.goals.flatMap((row) => [
       `## ${TITLES[row.goal]()}`,
       [
-        `${(row.goal === "local" ? m.coverage_progress_local : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+        `${(row.goal === "local" ? m.coverage_progress_local : row.goal === "turnout" ? m.coverage_progress_turnout : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
         ...(row.icpsr > 0
           ? [m.coverage_icpsr_of({ count: count(row.icpsr) })]
           : []),
       ].join(", "),
-      ...(row.goal === "history"
+      ...(row.goal === "history" || row.goal === "turnout"
         ? [
             data.parts
+              .filter((part) => part.goal === row.goal)
               .map(
                 (part) =>
-                  `- ${(part.part === "national" ? m.coverage_part_national : m.coverage_part_legislature)({ complete: count(part.complete), total: count(part.total), percent: percent(part.complete / Math.max(1, part.total), 1) })}`,
+                  `- ${PARTS[part.part]({ complete: count(part.complete), total: count(part.total), percent: percent(part.complete / Math.max(1, part.total), 1) })}`,
               )
               .join("\n"),
-            m.coverage_goal_history_note(),
+            (row.goal === "history"
+              ? m.coverage_goal_history_note
+              : m.coverage_goal_turnout_note)(),
           ]
         : []),
       REASONS[row.goal]
         .flatMap((reason) => [
-          `- ${LABELS[reason]()}: ${count(row[reason])}`,
+          `- ${reasonLabel(row.goal, reason)}: ${count(row[reason])}`,
           ...(reason === "complete" && row.icpsr > 0
             ? [`  - ${m.coverage_icpsr()}: ${count(row.icpsr)}`]
             : []),
