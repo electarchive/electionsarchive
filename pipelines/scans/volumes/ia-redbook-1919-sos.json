@@ -36,7 +36,7 @@
   "1874": "1874-10-13",
   "1876": "1876-10-10",
   "1878": "1878-10-08",
-  "1880": "1880-10-12",
+  "1880": "1880-11-02",
   "1882": "1882-11-07",
   "1884": "1884-11-04",
   "1886": "1886-11-02",
@@ -57,5 +57,5 @@
   "1916": "1916-11-07",
   "1918": "1918-11-05"
  },
- "note": "Years run down the page, one candidate list per year with a printed Total Vote per year; the day for each year is in `days` (year-01-01 before 1906 to match the archive's year-precision elections). Page 572 holds governor 1912-1918 above the secretary of state table that starts at 1846. Election days before 1906 follow Iowa's statutes (Oct 26 1846 sourced; first Monday in August 1848-1854; second Tuesday in October 1856-1880; November from 1882), not read from the page."
+ "note": "Years run down the page, one candidate list per year with a printed Total Vote per year; the day for each year is in `days` (year-01-01 before 1906 to match the archive's year-precision elections). Page 572 holds governor 1912-1918 above the secretary of state table that starts at 1846. Election days before 1906 follow Iowa's statutes (Oct 26 1846 sourced; first Monday in August 1848-1854; second Tuesday in October 1856-1878, checked against the 1904 Official Register's dates for the State Register and Secretary of State (1858, 1862, 1866, 1870, 1874, 1878), Nov 2 1880 and November from then on (Treasurer Conger elected Nov 2 1880, Secretary of State Jackson Nov 4 1884, Auditor Lyons Nov 2 1886, Secretary of State McFarland Nov 4 1890, Railroad Commissioners Nov 8 1892); 1882 is Nov 7 by the first-Tuesday-after-first-Monday rule, unprinted), not read from the page."
 }
