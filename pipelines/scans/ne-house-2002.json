@@ -1,0 +1,141 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2002 General Election Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/2002%20General.pdf"
+ },
+ "raw_source": "us.ne_house_generals",
+ "contests": {
+  "d1": {
+   "year": 2002,
+   "chamber": "house",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 1
+  },
+  "d2": {
+   "year": 2002,
+   "chamber": "house",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 2
+  },
+  "d3": {
+   "year": 2002,
+   "chamber": "house",
+   "day": "2002-11-05",
+   "special": false,
+   "state": "NE",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 22,
+   "id": "d1",
+   "crop": [
+    0.2,
+    0.1,
+    0.8,
+    0.56
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Doug Bereuter",
+     "contest": "d1",
+     "candidate": "Doug Bereuter"
+    },
+    {
+     "label": "Robert Eckerson",
+     "contest": "d1",
+     "candidate": "Robert Eckerson"
+    }
+   ]
+  },
+  {
+   "page": 22,
+   "id": "d2",
+   "crop": [
+    0.2,
+    0.6,
+    0.8,
+    0.705
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Lee Terry",
+     "contest": "d2",
+     "candidate": "Lee Terry"
+    },
+    {
+     "label": "Jim Simon",
+     "contest": "d2",
+     "candidate": "Jim Simon"
+    },
+    {
+     "label": "Dave Stock",
+     "contest": "d2",
+     "candidate": "Dave Stock"
+    },
+    {
+     "label": "Doug Paterson",
+     "contest": "d2",
+     "candidate": "Doug Paterson"
+    }
+   ]
+  },
+  {
+   "page": 23,
+   "id": "d3a",
+   "crop": [
+    0.2,
+    0.1,
+    0.8,
+    0.96
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Tom Osborne",
+     "contest": "d3",
+     "candidate": "Tom Osborne"
+    },
+    {
+     "label": "Jerry Hickman",
+     "contest": "d3",
+     "candidate": "Jerry Hickman"
+    }
+   ],
+   "bands": 2
+  },
+  {
+   "page": 24,
+   "id": "d3b",
+   "crop": [
+    0.2,
+    0.03,
+    0.8,
+    0.37
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Tom Osborne",
+     "contest": "d3",
+     "candidate": "Tom Osborne"
+    },
+    {
+     "label": "Jerry Hickman",
+     "contest": "d3",
+     "candidate": "Jerry Hickman"
+    }
+   ]
+  }
+ ]
+}

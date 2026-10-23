@@ -1,0 +1,171 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2000 General Election Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/elections/2000/2000%20General.pdf"
+ },
+ "raw_source": "us.ne_house_generals",
+ "contests": {
+  "d1": {
+   "year": 2000,
+   "chamber": "house",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 1
+  },
+  "d2": {
+   "year": 2000,
+   "chamber": "house",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 2
+  },
+  "d3": {
+   "year": 2000,
+   "chamber": "house",
+   "day": "2000-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 15,
+   "id": "d1",
+   "crop": [
+    0.05,
+    0.145,
+    0.95,
+    0.645
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Doug Bereuter",
+     "contest": "d1",
+     "candidate": "Doug Bereuter"
+    },
+    {
+     "label": "Alan Jacobsen",
+     "contest": "d1",
+     "candidate": "Alan Jacobsen"
+    },
+    {
+     "label": "David Oenbring",
+     "contest": "d1",
+     "candidate": "David Oenbring"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": "Write In"
+    }
+   ]
+  },
+  {
+   "page": 15,
+   "id": "d2",
+   "crop": [
+    0.05,
+    0.725,
+    0.95,
+    0.845
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Lee Terry",
+     "contest": "d2",
+     "candidate": "Lee Terry"
+    },
+    {
+     "label": "Shelley Kiel",
+     "contest": "d2",
+     "candidate": "Shelley Kiel"
+    },
+    {
+     "label": "John J. Graziano",
+     "contest": "d2",
+     "candidate": "John J. Graziano"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": "Write In"
+    }
+   ]
+  },
+  {
+   "page": 16,
+   "id": "d3a",
+   "crop": [
+    0.05,
+    0.135,
+    0.95,
+    0.915
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Tom Osborne",
+     "contest": "d3",
+     "candidate": "Tom Osborne"
+    },
+    {
+     "label": "Roland E. Reynolds",
+     "contest": "d3",
+     "candidate": "Roland E. Reynolds"
+    },
+    {
+     "label": "Jerry Hickman",
+     "contest": "d3",
+     "candidate": "Jerry Hickman"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": "Write In"
+    }
+   ],
+   "bands": 2
+  },
+  {
+   "page": 17,
+   "id": "d3b",
+   "crop": [
+    0.05,
+    0.105,
+    0.95,
+    0.56
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Tom Osborne",
+     "contest": "d3",
+     "candidate": "Tom Osborne"
+    },
+    {
+     "label": "Roland E. Reynolds",
+     "contest": "d3",
+     "candidate": "Roland E. Reynolds"
+    },
+    {
+     "label": "Jerry Hickman",
+     "contest": "d3",
+     "candidate": "Jerry Hickman"
+    },
+    {
+     "label": "Write In",
+     "contest": null,
+     "candidate": "Write In"
+    }
+   ]
+  }
+ ]
+}

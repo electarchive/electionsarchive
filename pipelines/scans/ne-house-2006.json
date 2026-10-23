@@ -1,0 +1,130 @@
+{
+ "polity": "US-NE",
+ "publisher": "Nebraska Secretary of State",
+ "title": "2006 General Election Canvass",
+ "license": "Public record",
+ "file": {
+  "url": "https://sos.nebraska.gov/sites/default/files/doc/2006%20General.pdf"
+ },
+ "raw_source": "us.ne_house_generals",
+ "contests": {
+  "d1": {
+   "year": 2006,
+   "chamber": "house",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 1
+  },
+  "d2": {
+   "year": 2006,
+   "chamber": "house",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 2
+  },
+  "d3": {
+   "year": 2006,
+   "chamber": "house",
+   "day": "2006-11-07",
+   "special": false,
+   "state": "NE",
+   "district": 3
+  }
+ },
+ "pages": [
+  {
+   "page": 15,
+   "id": "d1",
+   "crop": [
+    0.1,
+    0.11,
+    0.53,
+    0.56
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Jeff Fortenberry",
+     "contest": "d1",
+     "candidate": "Jeff Fortenberry"
+    },
+    {
+     "label": "Maxine B. Moul",
+     "contest": "d1",
+     "candidate": "Maxine B. Moul"
+    }
+   ]
+  },
+  {
+   "page": 15,
+   "id": "d2",
+   "crop": [
+    0.1,
+    0.57,
+    0.53,
+    0.7
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Lee Terry",
+     "contest": "d2",
+     "candidate": "Lee Terry"
+    },
+    {
+     "label": "Jim Esch",
+     "contest": "d2",
+     "candidate": "Jim Esch"
+    }
+   ]
+  },
+  {
+   "page": 16,
+   "id": "d3a",
+   "crop": [
+    0.1,
+    0.1,
+    0.46,
+    0.64
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Adrian Smith",
+     "contest": "d3",
+     "candidate": "Adrian Smith"
+    },
+    {
+     "label": "Scott Kleeb",
+     "contest": "d3",
+     "candidate": "Scott Kleeb"
+    }
+   ]
+  },
+  {
+   "page": 16,
+   "id": "d3b",
+   "crop": [
+    0.52,
+    0.09,
+    0.88,
+    0.64
+   ],
+   "orientation": "counties_down",
+   "columns": [
+    {
+     "label": "Adrian Smith",
+     "contest": "d3",
+     "candidate": "Adrian Smith"
+    },
+    {
+     "label": "Scott Kleeb",
+     "contest": "d3",
+     "candidate": "Scott Kleeb"
+    }
+   ]
+  }
+ ]
+}
