@@ -1,0 +1,1279 @@
+{
+  "polity": "US-MA",
+  "publisher": "Massachusetts Secretary of the Commonwealth",
+  "title": "Election Statistics 1942 (P.D. 43), Representatives in Congress by town",
+  "license": "Public record",
+  "file": {
+    "url": "https://archive.org/download/electionstatisti1942mass/page/n{page}_w2000.jpg",
+    "item": "https://archive.org/details/electionstatisti1942mass"
+  },
+  "raw_source": "us.scans",
+  "unit_scheme": "town",
+  "unit_codes": {
+    "Gay Head": "25007"
+  },
+  "contests": {
+    "house1": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 1
+    },
+    "house2": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 2
+    },
+    "house3": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 3
+    },
+    "house4": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 4
+    },
+    "house5": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 5
+    },
+    "house6": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 6
+    },
+    "house7": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 7
+    },
+    "house8": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 8
+    },
+    "house9": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 9
+    },
+    "house10": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 10
+    },
+    "house11": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 11
+    },
+    "house12": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 12
+    },
+    "house13": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 13
+    },
+    "house14": {
+      "year": 1942,
+      "chamber": "house",
+      "day": "1942-11-03",
+      "special": false,
+      "state": "MA",
+      "district": 14
+    }
+  },
+  "pages": [
+    {
+      "page": 258,
+      "id": "258-0",
+      "columns": [
+        {
+          "label": "Charles H. Daniels of North Adams, Socialist Party.",
+          "contest": "house1",
+          "candidate": "Charles H. Daniels"
+        },
+        {
+          "label": "Frank Hurley of Holyoke, Democratic.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Allen T. Treadway of Stockbridge, Republican.",
+          "contest": "house1",
+          "candidate": "Allen T. Treadway"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.075,
+        0.948,
+        0.261
+      ],
+      "hint": "Read only the table headed 'District 1 \u2014 Con.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 258,
+      "id": "258-1",
+      "columns": [
+        {
+          "label": "Charles R. Clason of Springfield, Republican.",
+          "contest": "house2",
+          "candidate": "Charles R. Clason"
+        },
+        {
+          "label": "John J. Granfield of Springfield, Democratic.",
+          "contest": "house2",
+          "candidate": "John J. Granfield"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.253,
+        0.948,
+        0.588
+      ],
+      "hint": "Read only the table headed 'District 2.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 258,
+      "id": "258-2",
+      "columns": [
+        {
+          "label": "Philip J. Philbin of Clinton, Democratic.",
+          "contest": "house3",
+          "candidate": "Philip J. Philbin"
+        },
+        {
+          "label": "Alfred Woollacott of Fitchburg, Republican.",
+          "contest": "house3",
+          "candidate": "Alfred Woollacott"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.022,
+        0.58,
+        0.948,
+        1.0
+      ],
+      "hint": "Read only the table headed 'District 3.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-0",
+      "columns": [
+        {
+          "label": "Philip J. Philbin of Clinton, Democratic.",
+          "contest": "house3",
+          "candidate": "Philip J. Philbin"
+        },
+        {
+          "label": "Alfred Woollacott Fitchburg, of Republican.",
+          "contest": "house3",
+          "candidate": "Alfred Woollacott"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.06,
+        0.125,
+        0.981,
+        0.428
+      ],
+      "hint": "Read only the table headed 'District 3 \u2014 Con.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-1",
+      "columns": [
+        {
+          "label": "Pehr G. Holmes of Worcester, Republican.",
+          "contest": "house4",
+          "candidate": "Pehr G. Holmes"
+        },
+        {
+          "label": "John S. Sullivan of Worcester, Democratic.",
+          "contest": "house4",
+          "candidate": "John S. Sullivan"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.42,
+        0.978,
+        0.748
+      ],
+      "hint": "Read only the table headed 'District 4.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 259,
+      "id": "259-2",
+      "columns": [
+        {
+          "label": "Edith Nourse Rogers of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "Edith Nourse Rogers"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.057,
+        0.74,
+        0.978,
+        1.0
+      ],
+      "hint": "Read only the table headed 'District 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 260,
+      "id": "260-0",
+      "columns": [
+        {
+          "label": "Edith Nourse Rogers of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "Edith Nourse Rogers"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.075,
+        0.938,
+        0.389
+      ],
+      "hint": "Read only the table headed 'District 5 \u2014 Con.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 260,
+      "id": "260-1",
+      "columns": [
+        {
+          "label": "George J. Bates of Salem, Republican.",
+          "contest": "house6",
+          "candidate": "George J. Bates"
+        },
+        {
+          "label": "James D. Burns of Salem, Democratic.",
+          "contest": "house6",
+          "candidate": "James D. Burns"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.381,
+        0.938,
+        0.785
+      ],
+      "hint": "Read only the table headed 'District 6.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 260,
+      "id": "260-2",
+      "columns": [
+        {
+          "label": "Thomas J. Lane of Lawrence, Republican, Democratic.",
+          "contest": "house7",
+          "candidate": "Thomas J. Lane"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.014,
+        0.777,
+        0.938,
+        1.0
+      ],
+      "hint": "Read only the table headed 'District 7.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 261,
+      "id": "261-0",
+      "columns": [
+        {
+          "label": "Thomas J. Lane of Lawrence, Republican, Democratic.",
+          "contest": "house7",
+          "candidate": "Thomas J. Lane"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.12,
+        0.968,
+        0.233
+      ],
+      "hint": "Read only the table headed 'District 7 \u2014 Con.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 261,
+      "id": "261-1",
+      "columns": [
+        {
+          "label": "Angier L. Goodwin of Melrose, Republican.",
+          "contest": "house8",
+          "candidate": "Angier L. Goodwin"
+        },
+        {
+          "label": "Frederick T. McDermott of Medford, Democratic.",
+          "contest": "house8",
+          "candidate": "Frederick T. McDermott"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.225,
+        0.968,
+        0.49
+      ],
+      "hint": "Read only the table headed 'District 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 261,
+      "id": "261-2",
+      "columns": [
+        {
+          "label": "George F. Backus of New Bedford, Democratic.",
+          "contest": "house9",
+          "candidate": "George F. Backus"
+        },
+        {
+          "label": "Charles L. Gifford of Barnstable, Republican.",
+          "contest": "house9",
+          "candidate": "Charles L. Gifford"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.047,
+        0.482,
+        0.973,
+        1.0
+      ],
+      "hint": "Read only the table headed 'District 9.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2278
+      ]
+    },
+    {
+      "page": 262,
+      "id": "262-0",
+      "columns": [
+        {
+          "label": "George F. Backus of New Bedford, Democratic.",
+          "contest": "house9",
+          "candidate": "George F. Backus"
+        },
+        {
+          "label": "Charles L. Gifford of Barnstable, Republican.",
+          "contest": "house9",
+          "candidate": "Charles L. Gifford"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.004,
+        0.06,
+        0.928,
+        0.402
+      ],
+      "hint": "Read only the table headed 'District 9 \u2014 Con.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 262,
+      "id": "262-1",
+      "columns": [
+        {
+          "label": "William A. Carey of Boston, Democratic.",
+          "contest": "house10",
+          "candidate": "William A. Carey"
+        },
+        {
+          "label": "Christian A. Herter of Boston, Republican.",
+          "contest": "house10",
+          "candidate": "Christian A. Herter"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.004,
+        0.394,
+        0.928,
+        0.582
+      ],
+      "hint": "Read only the table headed 'District 10.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 262,
+      "id": "262-2",
+      "columns": [
+        {
+          "label": "James M. Curley of Boston, Democratic.",
+          "contest": "house11",
+          "candidate": "James M. Curley"
+        },
+        {
+          "label": "Vincent Mottola of Boston, Republican.",
+          "contest": "house11",
+          "candidate": "Vincent Mottola"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.004,
+        0.574,
+        0.928,
+        0.77
+      ],
+      "hint": "Read only the table headed 'District 11.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 262,
+      "id": "262-3",
+      "columns": [
+        {
+          "label": "John W. McCormack of Boston, Democratic.",
+          "contest": "house12",
+          "candidate": "John W. McCormack"
+        },
+        {
+          "label": "Francis P. O'Neill of Boston, Republican.",
+          "contest": "house12",
+          "candidate": "Francis P. O'Neill"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.004,
+        0.762,
+        0.928,
+        1.0
+      ],
+      "hint": "Read only the table headed 'District 12.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-0",
+      "columns": [
+        {
+          "label": "Francis H. Foy of Quincy, Democratic.",
+          "contest": "house13",
+          "candidate": "Francis H. Foy"
+        },
+        {
+          "label": "Richard B. Wigglesworth of Milton, Republican.",
+          "contest": "house13",
+          "candidate": "Richard B. Wigglesworth"
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.111,
+        0.991,
+        0.336
+      ],
+      "hint": "Read only the table headed 'District 13.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 263,
+      "id": "263-1",
+      "columns": [
+        {
+          "label": "Terrance J. Lomax, Jr. of Fall River, Democratic.",
+          "contest": "house14",
+          "candidate": "Terrance J. Lomax, Jr."
+        },
+        {
+          "label": "Joseph William Martin, Jr. of North Attleborough, Republican.",
+          "contest": "house14",
+          "candidate": "Joseph W. Martin, Jr."
+        },
+        {
+          "label": "All Others.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.068,
+        0.328,
+        0.993,
+        0.797
+      ],
+      "hint": "Read only the table headed 'District 14.'; ignore any other table visible in the image.",
+      "bands": 2,
+      "header": [
+        0.0,
+        0.2324
+      ]
+    },
+    {
+      "page": 264,
+      "id": "264-0",
+      "columns": [
+        {
+          "label": "Edith Nourse Rogers of Lowell, Republican.",
+          "contest": "house5",
+          "candidate": "Edith Nourse Rogers"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.475,
+        0.113,
+        0.933,
+        0.319
+      ],
+      "hint": "Read only the table headed 'District 5.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 264,
+      "id": "264-1",
+      "columns": [
+        {
+          "label": "Charles H. Daniels of North Adams, Socialist Party.",
+          "contest": "house1",
+          "candidate": "Charles H. Daniels"
+        },
+        {
+          "label": "Frank Hurley of Holyoke, Democratic.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Allen T. Treadway of Stockbridge, Republican.",
+          "contest": "house1",
+          "candidate": "Allen T. Treadway"
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.191,
+        0.463,
+        0.344
+      ],
+      "hint": "Read only the table headed 'District 1.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 264,
+      "id": "264-2",
+      "columns": [
+        {
+          "label": "George J. Bates of Salem, Republican.",
+          "contest": "house6",
+          "candidate": "George J. Bates"
+        },
+        {
+          "label": "James D. Burns of Salem, Democratic.",
+          "contest": "house6",
+          "candidate": "James D. Burns"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.475,
+        0.311,
+        0.933,
+        0.527
+      ],
+      "hint": "Read only the table headed 'District 6.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 264,
+      "id": "264-3",
+      "columns": [
+        {
+          "label": "Charles R. Clason of Springfield. Republican.",
+          "contest": "house2",
+          "candidate": "Charles R. Clason"
+        },
+        {
+          "label": "John J. Granfield, of Springfield, Democratic.",
+          "contest": "house2",
+          "candidate": "John J. Granfield"
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.007,
+        0.336,
+        0.463,
+        0.542
+      ],
+      "hint": "Read only the table headed 'District 2.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 264,
+      "id": "264-4",
+      "columns": [
+        {
+          "label": "Thomas J. Lane of Lawrence, Republican, Democratic.",
+          "contest": "house7",
+          "candidate": "Thomas J. Lane"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.475,
+        0.519,
+        0.933,
+        0.719
+      ],
+      "hint": "Read only the table headed 'District 7.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 264,
+      "id": "264-5",
+      "columns": [
+        {
+          "label": "Philip J. Philbin of Clinton, Democratic.",
+          "contest": "house3",
+          "candidate": "Philip J. Philbin"
+        },
+        {
+          "label": "Alfred Woollacott of Fitchburg, Republican.",
+          "contest": "house3",
+          "candidate": "Alfred Woollacott"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.002,
+        0.534,
+        0.463,
+        0.78
+      ],
+      "hint": "Read only the table headed 'District 3.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 264,
+      "id": "264-6",
+      "columns": [
+        {
+          "label": "Angier L. Goodwin of Melrose, Republican.",
+          "contest": "house8",
+          "candidate": "Angier L. Goodwin"
+        },
+        {
+          "label": "Frederick T. McDermott of Medford, Democratic.",
+          "contest": "house8",
+          "candidate": "Frederick T. McDermott"
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.475,
+        0.711,
+        0.933,
+        0.9
+      ],
+      "hint": "Read only the table headed 'District 8.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 264,
+      "id": "264-7",
+      "columns": [
+        {
+          "label": "Pehr G. Holmes of Worcester, Republican.",
+          "contest": "house4",
+          "candidate": "Pehr G. Holmes"
+        },
+        {
+          "label": "John S. Sullivan of Worcester, Democratic.",
+          "contest": "house4",
+          "candidate": "John S. Sullivan"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.002,
+        0.772,
+        0.463,
+        0.959
+      ],
+      "hint": "Read only the table headed 'District 4.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 265,
+      "id": "265-0",
+      "columns": [
+        {
+          "label": "George F. Backus of New Bedford, Democratic.",
+          "contest": "house9",
+          "candidate": "George F. Backus"
+        },
+        {
+          "label": "Charles L. Gifford of Barnstable, Republican.",
+          "contest": "house9",
+          "candidate": "Charles L. Gifford"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.111,
+        0.505,
+        0.341
+      ],
+      "hint": "Read only the table headed 'District 9.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 265,
+      "id": "265-1",
+      "columns": [
+        {
+          "label": "John W. McCormack of Boston, Democratic.",
+          "contest": "house12",
+          "candidate": "John W. McCormack"
+        },
+        {
+          "label": "Francis P. O'Neill of Boston, Republican.",
+          "contest": "house12",
+          "candidate": "Francis P. O'Neill"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.524,
+        0.12,
+        0.976,
+        0.27
+      ],
+      "hint": "Read only the table headed 'District 12.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 265,
+      "id": "265-2",
+      "columns": [
+        {
+          "label": "Francis H. Foy of Quincy, Democratic.",
+          "contest": "house13",
+          "candidate": "Francis H. Foy"
+        },
+        {
+          "label": "Richard B. Wigglesworth of Milton, Republican.",
+          "contest": "house13",
+          "candidate": "Richard B. Wigglesworth"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.524,
+        0.266,
+        0.976,
+        0.52
+      ],
+      "hint": "Read only the table headed 'District 13.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 265,
+      "id": "265-3",
+      "columns": [
+        {
+          "label": "William A. Carey of Boston, Democratic.",
+          "contest": "house10",
+          "candidate": "William A. Carey"
+        },
+        {
+          "label": "Christian A. Herter of Boston, Republican.",
+          "contest": "house10",
+          "candidate": "Christian A. Herter"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.333,
+        0.505,
+        0.516
+      ],
+      "hint": "Read only the table headed 'District 10.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 265,
+      "id": "265-4",
+      "columns": [
+        {
+          "label": "James M. Curley of Boston, Democratic.",
+          "contest": "house11",
+          "candidate": "James M. Curley"
+        },
+        {
+          "label": "Vincent Mottola of Boston, Republican.",
+          "contest": "house11",
+          "candidate": "Vincent Mottola"
+        },
+        {
+          "label": "Blanks.",
+          "contest": null,
+          "candidate": ""
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.054,
+        0.508,
+        0.505,
+        0.689
+      ],
+      "hint": "Read only the table headed 'District 11.'; ignore any other table visible in the image."
+    },
+    {
+      "page": 265,
+      "id": "265-5",
+      "columns": [
+        {
+          "label": "Terrance J. Lomax, Jr. of Fall River, Democratic.",
+          "contest": "house14",
+          "candidate": "Terrance J. Lomax, Jr."
+        },
+        {
+          "label": "Joseph William Martin, Jr. of North Attleborough, Republican.",
+          "contest": "house14",
+          "candidate": "Joseph W. Martin, Jr."
+        },
+        {
+          "label": "Total Ballots.",
+          "contest": null,
+          "candidate": ""
+        }
+      ],
+      "orientation": "counties_down",
+      "crop": [
+        0.524,
+        0.516,
+        0.976,
+        0.737
+      ],
+      "hint": "Read only the table headed 'District 14.'; ignore any other table visible in the image."
+    }
+  ]
+}
