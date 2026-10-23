@@ -177,6 +177,45 @@ where ug.grain = 'precinct'
 group by 1, 2
 """
 
+SHAPES_SQL = """
+create temp table sg as
+select cc.id, cc.st, cc.year, cc.level, e.date_from as d,
+    case when cc.level in ('us_house', 'state_upper', 'state_lower') then c.district_area_id
+        else coalesce(c.district_area_id, (select pt.area_id from polity_territory pt
+            where pt.polity_id = e.polity_id and pt.valid @> e.date_from limit 1)) end as area_id
+from cc join contest c on c.id = cc.id join election e on e.id = c.election_id
+where cc.st <> 'US' and cc.level not in ('county', 'municipal', 'school', 'special_district', 'local_measure');
+
+analyze sg;
+
+create temp table su as
+select sg.id, bool_and(u.area_relation = 'equals'
+        and exists (select from area_geometry g where g.area_id = u.area_id and g.valid @> sg.d)) as shaped
+from sg
+join result_set r on r.contest_id = sg.id and r.is_default
+join rsu on rsu.result_set_k = r.k
+join reporting_unit u on u.k = rsu.unit_k
+    and u.scheme_code in ('us.county', 'us.former_county', 'us.town', 'us.ak_house_district')
+group by sg.id;
+
+analyze su;
+"""
+
+SHAPES_COUNT_SQL = """
+select sg.st, sg.year, sg.level, count(*),
+    count(*) filter (where t.shape = 'complete'),
+    count(*) filter (where t.shape = 'unshaped'),
+    count(*) filter (where t.shape = 'units'),
+    count(*) filter (where t.shape = 'undrawn')
+from sg left join su on su.id = sg.id
+cross join lateral (select case
+    when sg.area_id is null or not exists (select from area_geometry g where g.area_id = sg.area_id) then 'undrawn'
+    when not exists (select from area_geometry g where g.area_id = sg.area_id and g.valid @> sg.d) then 'unshaped'
+    when not coalesce(su.shaped, true) then 'units'
+    else 'complete' end as shape) t
+group by 1, 2, 3
+"""
+
 POLITIES_SQL = """
 select p.id, p.kind::text, e.value, n.text, ps.st
 from polity p
@@ -272,6 +311,9 @@ def build() -> str:
         for polity, year, n, shaped in conn.execute(LOCAL_SHAPES_SQL):
             held[str(polity)][year][4:6] = [n, shaped]
         polities = {str(pid): (kind, code, name, st) for pid, kind, code, name, st in conn.execute(POLITIES_SQL)}
+        for statement in SHAPES_SQL.split(";\n\n"):
+            conn.execute(statement)
+        shapes = list(conn.execute(SHAPES_COUNT_SQL))
 
         by_key = {(c["state"], c["year"], c["level"], c["stage"]): c for c in cells}
         season = {
@@ -508,7 +550,16 @@ def build() -> str:
                     )
                 )
     names = dict(states.values())
-    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 10)
+    goals: dict[tuple[str, str, str, int], list[int]] = defaultdict(lambda: [0] * 13)
+    for st, year, level, total, complete, unshaped, units, undrawn in shapes:
+        if level not in STATE_LEVELS or st not in names:
+            continue
+        cell = goals[("shapes" if year >= 2000 else "shapes_history", st, level, year)]
+        cell[0] += total
+        cell[1] += complete
+        cell[10] += unshaped
+        cell[11] += units
+        cell[12] += undrawn
     for (st, year, level, _), c in by_key.items():
         if level not in STATE_LEVELS or st not in names:
             continue
@@ -581,7 +632,7 @@ def build() -> str:
                 copy.write_row(row)
         with conn.cursor().copy(
             "copy coverage_goal (goal, state, level, year, total, complete, absent, bare, totals, partial, coarse,"
-            " turnout, precincts, shaped) from stdin"
+            " turnout, precincts, shaped, unshaped, units, undrawn) from stdin"
         ) as copy:
             for key, values in goals.items():
                 copy.write_row([*key, *values])

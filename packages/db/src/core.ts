@@ -388,6 +388,9 @@ export const coverageGoal = pgTable("coverage_goal", {
 	turnout: integer().notNull(),
 	precincts: integer().notNull(),
 	shaped: integer().notNull(),
+	unshaped: integer().default(0).notNull(),
+	units: integer().default(0).notNull(),
+	undrawn: integer().default(0).notNull(),
 }, (table) => [
 	primaryKey({ columns: [table.goal, table.state, table.level, table.year], name: "coverage_goal_pkey"}),
 ]);
