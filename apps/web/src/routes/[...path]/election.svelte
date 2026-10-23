@@ -1163,6 +1163,16 @@
               isApproximate={shape.isApproximate}
               sources={shape.credits}
               noun={places.levels[0]?.noun ?? ""}
+              tallies={race.electors == null ||
+              swing != null ||
+              region != null ||
+              places.level !== race.places.level
+                ? null
+                : places.legend.map(
+                    (item) =>
+                      race.electors?.rows.find((row) => row.key === item.key)
+                        ?.votes ?? null,
+                  )}
               votes={final == null ? race.votes : m.col_votes()}
               names={swing == null && region == null
                 ? (final?.titles ?? race.titles)

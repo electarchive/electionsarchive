@@ -83,3 +83,18 @@ export function definite(label: string, isStart = false) {
     ? `${isStart ? "The" : "the"} ${label}`
     : label;
 }
+
+export function plural(noun: string) {
+  const fixed: Record<string, string> = {
+    "country abroad": "countries abroad",
+    "province or territory": "provinces or territories",
+  };
+  return (
+    fixed[noun] ??
+    (/[^aeiou]y$/u.test(noun)
+      ? `${noun.slice(0, -1)}ies`
+      : /(?:s|x|ch|sh)$/u.test(noun)
+        ? `${noun}es`
+        : `${noun}s`)
+  );
+}

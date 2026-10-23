@@ -181,6 +181,31 @@
   "places_filter": "Filter by name",
   "places_filter_empty": "No place matches “{query}”.",
   "places_leads": "{label} leads in {count}",
+  "map_won": [
+    {
+      "declarations": [
+        "input count",
+        "input noun",
+        "input nouns",
+        "local countPlural = count: plural"
+      ],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} {noun}",
+        "countPlural=*": "{count} {nouns}"
+      }
+    }
+  ],
+  "map_electoral": [
+    {
+      "declarations": ["input count", "local countPlural = count: plural"],
+      "selectors": ["countPlural"],
+      "match": {
+        "countPlural=one": "{count} electoral vote",
+        "countPlural=*": "{count} electoral votes"
+      }
+    }
+  ],
   "places_flipped": "Changed hands",
   "places_show_all": "Show all {count}",
   "places_sources": "These results come from {publisher}.",

@@ -19,7 +19,7 @@
   import { fade, fly } from "svelte/transition";
   import Export from "#lib/components/export.svelte";
   import * as Select from "#lib/components/ui/select/index.js";
-  import { count, percent, points, precision } from "#lib/format.js";
+  import { count, percent, plural, points, precision } from "#lib/format.js";
   import { keep } from "#lib/linked.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
@@ -53,6 +53,7 @@
     explore = null,
     neighbors = null,
     up = null,
+    tallies = null,
   }: {
     places: Places;
     colors: Array<string>;
@@ -87,6 +88,7 @@
         >)
       | null;
     up?: { name: string; path: string } | null;
+    tallies?: Array<number | null> | null;
   } = $props();
 
   const BINS = [0.05, 0.1, 0.2];
@@ -2298,20 +2300,25 @@
             )}
             style:--party={colors[index]}
             aria-pressed={only === index}
-            aria-label={m.places_leads({
-              label: names[index] ?? "",
-              count: won,
-            })}
             onclick={() => {
               only = only === index ? null : index;
             }}
           >
             <span class="rounded-xs bg-(--party) block-2.5 inline-2.5"></span>
             <span class="font-semibold">{names[index]}</span>
-            {#if won > 0}
+            {#if tallies?.[index] != null}
               <span
                 class="font-figures text-xs text-muted-foreground tabular-nums"
-                >{won}</span
+                >{m.map_electoral({ count: count(tallies[index]) })}</span
+              >
+            {:else if won > 0}
+              <span
+                class="font-figures text-xs text-muted-foreground tabular-nums"
+                >{m.map_won({
+                  count: count(won),
+                  noun,
+                  nouns: plural(noun),
+                })}</span
               >
             {/if}
           </button>
