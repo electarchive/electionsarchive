@@ -4,6 +4,7 @@ import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
 import { LABELS, REASONS } from "#lib/coverage.js";
 import { count, date, percent, points } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
+import { AFFILIATIONS, RELATIONS } from "#lib/relations.js";
 import {
   archive,
   chamber,
@@ -383,11 +384,11 @@ function partyMarkdown(
   const related = [
     ...party.relations.map(
       (relation) =>
-        `- ${relation.kind.replaceAll("_", " ")}: ${link(relation.party.label, `id/${relation.party.id}`)}${relation.date == null ? "" : ` (${relation.date.slice(0, 4)})`}`,
+        `- ${RELATIONS[relation.kind]?.[relation.outgoing ? 0 : 1]({ name: link(relation.party.label, `id/${relation.party.id}`) }) ?? link(relation.party.label, `id/${relation.party.id}`)}${relation.date == null ? "" : ` (${relation.date.slice(0, 4)})`}`,
     ),
     ...party.parents.map(
       (parent) =>
-        `- ${parent.kind.replaceAll("_", " ")}: ${link(parent.party.label, `id/${parent.party.id}`)}`,
+        `- ${AFFILIATIONS[parent.kind]?.({ name: link(parent.party.label, `id/${parent.party.id}`) }) ?? link(parent.party.label, `id/${parent.party.id}`)}`,
     ),
   ];
   return [
@@ -441,7 +442,7 @@ function polityMarkdown(
       : table(
           [m.col_date(), m.col_election()],
           polity.elections.map((election) => [
-            election.date ?? election.year,
+            election.date == null ? election.year : date(election.date),
             link(election.name, election.path),
           ]),
         ),
@@ -453,7 +454,7 @@ function polityMarkdown(
             [m.col_date(), m.col_contest(), m.col_leader(), m.col_share()],
             polity.results.flatMap((group) =>
               group.races.map((race) => [
-                group.date,
+                date(group.date),
                 link(race.name, race.path),
                 race.leaders[0]?.label ?? null,
                 race.leaders[0] == null ? null : percent(race.leaders[0].share),
