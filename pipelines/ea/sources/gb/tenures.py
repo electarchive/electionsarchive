@@ -12,7 +12,7 @@ from ea.changeset import Changeset
 from ea.store import connect
 
 SOURCE = "gb.tenures"
-VERSION = "2"
+VERSION = "3"
 SERVICE = "https://query.wikidata.org/sparql?" + urlencode(
     {
         "query": """SELECT ?item ?name ?pos ?start ?end ?cause ?district ?group ?mnis WHERE {
@@ -262,7 +262,15 @@ def emit() -> Path:
                     continue
                 item = str(member["item"])
                 place = places.get((pos, str(member["district"])), "")
-                person = found.get(item) or linked.get(f"wikidata:{item}") or linked.get(f"mnis:{numbers.get(item)}")
+                person = (
+                    next(
+                        (other["person"] for other in members if other["item"] == member["item"] and "person" in other),
+                        None,
+                    )
+                    or found.get(item)
+                    or linked.get(f"wikidata:{item}")
+                    or linked.get(f"mnis:{numbers.get(item)}")
+                )
                 words = fold(names[item])
                 party = None
                 for neighbor in (election, next((e for e, d in elections if end is not None and d == end), None)):
@@ -330,6 +338,7 @@ def emit() -> Path:
                         valid_to=upto if upto is None or stop is None else min(upto, stop),
                         valid_to_precision="day",
                     )
+                member["person"] = person
                 tenures[(pos, str(member["district"]))].append({**member, "tenure": tenure, "stop": stop})
                 joined += 1
         print(

@@ -1944,7 +1944,6 @@
             aria-current={pick == null && level.isCurrent ? "true" : undefined}
             aria-pressed={pick == null ? undefined : level.isCurrent}
             data-sveltekit-reset="false"
-            data-sveltekit-noscroll
             onclick={() => pick?.(level.code)}
             >{level.label}
             <span class="font-figures text-[0.6875rem] font-normal tabular-nums"

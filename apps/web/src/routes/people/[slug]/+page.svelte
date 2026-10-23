@@ -27,9 +27,14 @@
   const entries = $derived(
     person.record.map((entry) => ({
       ...entry,
-      name: entry.name.startsWith(`${entry.year} `)
-        ? entry.name.slice(String(entry.year).length + 1)
-        : entry.name,
+      name:
+        entry.kind === "seated"
+          ? entry.name === ""
+            ? m.person_record_by_election_unplaced()
+            : m.person_record_by_election({ place: entry.name })
+          : entry.name.startsWith(`${entry.year} `)
+            ? `${entry.name.charAt(String(entry.year).length + 1).toLocaleUpperCase()}${entry.name.slice(String(entry.year).length + 2)}`
+            : entry.name,
       share:
         entry.votes == null || entry.total == null || entry.total === 0
           ? null

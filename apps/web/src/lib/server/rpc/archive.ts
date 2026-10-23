@@ -11083,6 +11083,31 @@ export const people = {
         from tenure t where t.person_id in (select id from ids)
         order by coalesce(t.body_id, t.office_id), t.from_date nulls first
       `);
+      const joins = await db.execute<{
+        id: string;
+        date: string;
+        year: number;
+        place: string | null;
+      }>(sql`
+        with recursive ids(id) as (
+          select ${person.id}::uuid
+          union
+          select em.entity_id from entity_merge em join ids on em.into_id = ids.id
+        )
+        select t.id, t.from_date::text as date, extract(year from t.from_date)::int as year, inherited.place
+        from tenure t
+        left join lateral (
+          with recursive up(succeeds, contest) as (
+            select p.succeeds_tenure_id, p.contest_id from tenure p where p.id = t.succeeds_tenure_id
+            union all
+            select p.succeeds_tenure_id, p.contest_id from tenure p join up on p.id = up.succeeds
+            where up.contest is null
+          )
+          select k.district_area_id as place from up join contest k on k.id = up.contest limit 1
+        ) inherited on true
+        where t.person_id in (select id from ids) and t.acquired_via = 'elected' and t.contest_id is null
+          and t.succeeds_tenure_id is not null and t.from_date is not null
+      `);
       const spells = merge(tenures.rows, 365);
       const won = new Set(
         rows.rows
@@ -11137,50 +11162,70 @@ export const people = {
           person.id,
           ...roots,
           ...new Set([...spells, ...terms].map((spell) => spell.owner)),
+          ...joins.rows.flatMap((row) =>
+            row.place == null ? [] : [row.place],
+          ),
         ]),
         paths(roots),
       ]);
-      const record = rows.rows
-        .filter(
-          (row) =>
-            row.kind !== "indirect" ||
-            rows.rows.every(
-              (peer) => !(peer.kind === "general" && peer.year === row.year),
-            ),
-        )
-        .map((row) => {
-          const indirect =
-            row.kind === "general"
-              ? rows.rows.find(
-                  (peer) => peer.kind === "indirect" && peer.year === row.year,
-                )
-              : undefined;
-          return {
-            name: labels.full.get(row.root) ?? "",
-            path: slugs.get(row.root) ?? null,
-            date: row.date,
-            year: row.year,
-            kind: row.kind,
-            election: row.election,
-            measure: MEASURES.get(row.measure ?? 1) ?? "votes",
-            votes: row.votes,
-            total: row.total,
-            outcome: indirect == null ? row.outcome : indirect.outcome,
-            electoral:
-              indirect?.votes == null || indirect.total == null
-                ? null
-                : { votes: indirect.votes, total: indirect.total },
-            party:
-              row.party == null
-                ? null
-                : {
-                    id: row.party,
-                    label: row.party_label ?? "",
-                    short: row.party_short,
-                    color: row.party_color,
-                  },
-          };
-        });
+      const record = [
+        ...rows.rows
+          .filter(
+            (row) =>
+              row.kind !== "indirect" ||
+              rows.rows.every(
+                (peer) => !(peer.kind === "general" && peer.year === row.year),
+              ),
+          )
+          .map((row) => {
+            const indirect =
+              row.kind === "general"
+                ? rows.rows.find(
+                    (peer) =>
+                      peer.kind === "indirect" && peer.year === row.year,
+                  )
+                : undefined;
+            return {
+              name: labels.full.get(row.root) ?? "",
+              path: slugs.get(row.root) ?? null,
+              date: row.date,
+              year: row.year,
+              kind: row.kind,
+              election: row.election,
+              measure: MEASURES.get(row.measure ?? 1) ?? "votes",
+              votes: row.votes,
+              total: row.total,
+              outcome: indirect == null ? row.outcome : indirect.outcome,
+              electoral:
+                indirect?.votes == null || indirect.total == null
+                  ? null
+                  : { votes: indirect.votes, total: indirect.total },
+              party:
+                row.party == null
+                  ? null
+                  : {
+                      id: row.party,
+                      label: row.party_label ?? "",
+                      short: row.party_short,
+                      color: row.party_color,
+                    },
+            };
+          }),
+        ...joins.rows.map((row) => ({
+          name: row.place == null ? "" : (labels.full.get(row.place) ?? ""),
+          path: null,
+          date: row.date,
+          year: row.year,
+          kind: "seated",
+          election: row.id,
+          measure: "votes",
+          votes: null,
+          total: null,
+          outcome: "elected",
+          electoral: null,
+          party: null,
+        })),
+      ].toSorted((a, b) => b.date.localeCompare(a.date));
       const held = await db.execute<{
         party: string | null;
         start: string | null;

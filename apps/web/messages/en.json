@@ -574,6 +574,8 @@
   "results_photos": "Photos via Wikimedia Commons",
   "photo_alt": "Portrait of {name}",
   "person_record_more": "Show all {count} races",
+  "person_record_by_election": "By-election in {place}",
+  "person_record_by_election_unplaced": "By-election",
   "person_record_fewer": "Show fewer races",
   "person_empty": "No results published for this person yet.",
   "col_year": "Year",

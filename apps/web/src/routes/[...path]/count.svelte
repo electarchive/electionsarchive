@@ -65,8 +65,7 @@
       class="flex shrink-0 items-center justify-center rounded-sm border border-input bg-card keycap block-8 inline-8 hover:bg-secondary"
       href={href(round)}
       aria-label={label}
-      data-sveltekit-noscroll
-      data-sveltekit-keepfocus><Icon class="block-4 inline-4" /></a
+      data-sveltekit-reset="false"><Icon class="block-4 inline-4" /></a
     >
   {/if}
 {/snippet}
@@ -107,8 +106,7 @@
               aria-label={round === count.last
                 ? m.count_final()
                 : m.count_round({ round })}
-              data-sveltekit-noscroll
-              data-sveltekit-keepfocus>{round}</a
+              data-sveltekit-reset="false">{round}</a
             >
           </li>
         {/each}

@@ -45,8 +45,9 @@
       .toSorted((a, b) => a.at - b.at),
   );
   const range = $derived.by(() => {
-    const low = Math.min(...marks.map((mark) => mark.at));
-    const high = Math.max(...marks.map((mark) => mark.at));
+    const counted = marks.filter((mark) => mark.share != null);
+    const low = Math.min(...counted.map((mark) => mark.at));
+    const high = Math.max(...counted.map((mark) => mark.at));
     const pad = Math.max(1, (high - low) * 0.04);
     return { low: low - pad, high: high + pad };
   });

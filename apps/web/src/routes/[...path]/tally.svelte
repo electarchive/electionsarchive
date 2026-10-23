@@ -75,8 +75,7 @@
                 class="font-figures tabular-nums hover:text-foreground"
                 href={href(round)}
                 aria-current={round === count.round ? "step" : undefined}
-                data-sveltekit-noscroll
-                data-sveltekit-keepfocus
+                data-sveltekit-reset="false"
                 >{round === count.last
                   ? m.count_final()
                   : m.count_round({ round })}</a

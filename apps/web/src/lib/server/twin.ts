@@ -388,7 +388,14 @@ function personMarkdown(
           ],
           person.record.map((entry) => [
             entry.year,
-            link(entry.name, entry.path),
+            link(
+              entry.kind !== "seated"
+                ? entry.name
+                : entry.name === ""
+                  ? m.person_record_by_election_unplaced()
+                  : m.person_record_by_election({ place: entry.name }),
+              entry.path,
+            ),
             entry.party?.label ?? null,
             entry.votes == null || entry.total == null || entry.total === 0
               ? null
