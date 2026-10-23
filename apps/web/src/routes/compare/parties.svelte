@@ -8,7 +8,13 @@
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
-  const { data }: { data: NonNullable<PageData["parties"]> } = $props();
+  const {
+    data,
+    first,
+  }: {
+    data: NonNullable<PageData["parties"]>;
+    first: { id: string; name: string } | undefined;
+  } = $props();
 
   const PAD = { top: 12, right: 12, bottom: 24, left: 36 };
 
@@ -111,6 +117,13 @@
 {#if charts.length === 0}
   <p class="col-span-12 bg-card px-3.5 py-4 text-sm text-muted-foreground">
     {m.versus_parties_none()}
+    {#if first != null}
+      <a
+        class="mbs-1 block font-semibold text-foreground underline decoration-border underline-offset-4 hover:decoration-foreground"
+        href={resolve(`/compare?a=${first.id}`)}
+        >{m.versus_none_rivals({ name: first.name })}</a
+      >
+    {/if}
   </p>
 {/if}
 

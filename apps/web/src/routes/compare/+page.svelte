@@ -286,7 +286,7 @@
     {:else if data.places != null}
       <Places data={data.places} />
     {:else if data.parties != null}
-      <Parties data={data.parties} />
+      <Parties data={data.parties} first={sides[0]} />
     {/if}
   </article>
 </main>
