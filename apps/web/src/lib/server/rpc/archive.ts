@@ -8877,6 +8877,7 @@ export const polities = {
           }),
         ),
         mapped: v.nullable(v.string()),
+        local: v.nullable(v.string()),
         latest: v.nullable(
           v.object({
             name: v.string(),
@@ -9163,6 +9164,15 @@ export const polities = {
             }),
         ),
       ]);
+      const local =
+        built
+          .filter((row) => row != null)
+          .toSorted(
+            (a, b) =>
+              Number(a.tier > 1) - Number(b.tier > 1) ||
+              b.date.localeCompare(a.date) ||
+              a.tier - b.tier,
+          )[0]?.id ?? null;
       return {
         name: labels.full.get(input.id) ?? "",
         kind: polity.kind,
@@ -9232,6 +9242,7 @@ export const polities = {
                 },
         })),
         mapped: ranked?.rows[0]?.id ?? null,
+        local,
         latest:
           recent == null
             ? null

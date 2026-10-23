@@ -2,6 +2,7 @@
   import { goto } from "$app/navigation";
   import { resolve } from "$app/paths";
   import { page } from "$app/state";
+  import { createQuery } from "@tanstack/svelte-query";
   import { Tooltip as TooltipPrimitive } from "bits-ui";
   import Name from "#lib/components/name.svelte";
   import Term from "#lib/components/term.svelte";
@@ -301,22 +302,40 @@
           ],
         };
   });
+  const neighborhood = createQuery(() => {
+    const siblings = contest.scope.trail.at(-1)?.siblings;
+    return {
+      ...orpc.contests.places.queryOptions({
+        input: {
+          id: siblings?.contest ?? "",
+          unit: siblings?.unit ?? undefined,
+          by: siblings?.level,
+        },
+      }),
+      enabled:
+        siblings != null &&
+        drawn == null &&
+        chamber == null &&
+        contest.locator == null,
+    };
+  });
   const locating = $derived.by(() => {
     const own = boundaries.find(
       (entry) => entry.k != null && entry.frames.length > 0,
     );
+    const places = contest.locator ?? neighborhood.data ?? null;
     if (
       drawn != null ||
       chamber != null ||
-      contest.locator == null ||
+      places == null ||
       own?.tiles == null ||
       own.k == null
     ) {
       return null;
     }
-    const legend = contest.locator.legend;
+    const legend = places.legend;
     return {
-      places: contest.locator,
+      places,
       tiles: own.tiles,
       own: { tiles: own.tiles, k: own.k },
       frames: own.frames.map((frame) => {

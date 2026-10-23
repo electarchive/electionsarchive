@@ -171,7 +171,12 @@
   );
 
   const source = $derived.by(() => {
-    const race = isLocal ? polity.results[0]?.races[0] : undefined;
+    const race = isLocal
+      ? (polity.results
+          .flatMap((entry) => entry.races)
+          .find((entry) => entry.id === polity.local) ??
+        polity.results[0]?.races[0])
+      : undefined;
     if (race?.path != null) {
       return {
         key: `${race.id}/${race.path}`,
@@ -189,6 +194,10 @@
     id: string;
     contest: Awaited<ReturnType<typeof orpc.contests.get.call>>;
     bounds: Awaited<ReturnType<typeof orpc.contests.boundaries.call>>;
+    around: {
+      contest: Awaited<ReturnType<typeof orpc.contests.get.call>>;
+      bounds: Awaited<ReturnType<typeof orpc.contests.boundaries.call>>;
+    } | null;
   } | null>(null);
   let failed = $state<string | null>(null);
 
@@ -209,8 +218,26 @@
           unit: wanted.unit,
           level: contest.places?.level,
         });
+        const isDrawn = bounds.some(
+          (entry) =>
+            entry.scheme === contest.places?.level && entry.tiles != null,
+        );
+        const whole =
+          isDrawn || wanted.unit == null
+            ? null
+            : await orpc.contests.get.call({ id: wanted.id });
+        const around =
+          whole?.places == null
+            ? null
+            : {
+                contest: whole,
+                bounds: await orpc.contests.boundaries.call({
+                  id: wanted.id,
+                  level: whole.places.level,
+                }),
+              };
         if (!stop.signal.aborted) {
-          loaded = { id: wanted.key, contest, bounds };
+          loaded = { id: wanted.key, contest, bounds, around };
         }
       } catch {
         loaded = null;
@@ -223,18 +250,28 @@
   });
 
   const drawn = $derived.by(() => {
-    const places = loaded?.contest.places;
-    if (loaded == null || places == null) {
+    if (loaded == null) {
       return null;
     }
-    const level = loaded.bounds.find((entry) => entry.scheme === places.level);
     const own = loaded.bounds.find(
-      (entry) => entry.k != null && entry.scheme !== places.level,
-    );
-    const inner = loaded.bounds.find(
       (entry) =>
-        entry.k == null && entry.scheme !== places.level && entry.tiles != null,
+        entry.k != null && entry.scheme !== loaded?.contest.places?.level,
     );
+    const isAround = loaded.around != null;
+    const bounds = loaded.around?.bounds ?? loaded.bounds;
+    const places = (loaded.around?.contest ?? loaded.contest).places;
+    if (places == null) {
+      return null;
+    }
+    const level = bounds.find((entry) => entry.scheme === places.level);
+    const inner = isAround
+      ? undefined
+      : bounds.find(
+          (entry) =>
+            entry.k == null &&
+            entry.scheme !== places.level &&
+            entry.tiles != null,
+        );
     const districts = places.districts ?? [];
     return level?.tiles == null || own == null || own.frames.length === 0
       ? null
@@ -249,7 +286,18 @@
             inner?.tiles == null || districts.length === 0
               ? null
               : { tiles: inner.tiles, ks: districts.map((row) => row.k) },
-          frames: own.frames,
+          frames: isAround
+            ? own.frames.map((frame) => {
+                const wide = (frame.east - frame.west) * 1.5;
+                const tall = (frame.north - frame.south) * 1.5;
+                return {
+                  west: frame.west - wide,
+                  south: frame.south - tall,
+                  east: frame.east + wide,
+                  north: frame.north + tall,
+                };
+              })
+            : own.frames,
           isApproximate: level.isApproximate,
           noun:
             places.levels.find((entry) => entry.code === places.level)?.noun ??
