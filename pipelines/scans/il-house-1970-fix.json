@@ -1,0 +1,139 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "State of Illinois official vote cast at the general election, 1970",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1970illi/officialvoteofst1970illi.pdf"
+ },
+ "contests": {
+  "state-house46": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 46
+  },
+  "state-house47": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 47
+  },
+  "state-house56": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 56
+  }
+ },
+ "pages": [
+  {
+   "page": 56,
+   "id": "56-0",
+   "columns": [
+    {
+     "label": "Republican Wilbur H. Lauterbach",
+     "contest": "state-house46",
+     "candidate": "Wilbur H. Lauterbach"
+    },
+    {
+     "label": "Republican William L. Waldmeier",
+     "contest": "state-house46",
+     "candidate": "William L. Waldmeier"
+    },
+    {
+     "label": "Democratic Gale Schisler",
+     "contest": "state-house46",
+     "candidate": "Gale Schisler"
+    },
+    {
+     "label": "Democratic James (Jim) Von Boeckman",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.146,
+    1.0,
+    0.408
+   ],
+   "hint": "Read only the table headed '46th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 56,
+   "id": "56-1",
+   "columns": [
+    {
+     "label": "Republican Edward R. Madigan",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Harber H. Hall",
+     "contest": "state-house47",
+     "candidate": "Harber H. Hall"
+    },
+    {
+     "label": "Democratic Gerald A. Bradley",
+     "contest": "state-house47",
+     "candidate": "Gerald A. Bradley"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.403,
+    1.0,
+    0.702
+   ],
+   "hint": "Read only the table headed '47th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 58,
+   "id": "58-2",
+   "columns": [
+    {
+     "label": "Ed Lehman, Rep.",
+     "contest": "state-house56",
+     "candidate": "Ed Lehman"
+    },
+    {
+     "label": "G. W. King, Rep.",
+     "contest": "state-house56",
+     "candidate": "G W. King"
+    },
+    {
+     "label": "James G. \"Bud\" Krause, Dem.",
+     "contest": "state-house56",
+     "candidate": "James G. Krause"
+    },
+    {
+     "label": "Monroe L. Flinn, Dem.",
+     "contest": "state-house56",
+     "candidate": "Monroe L. Flinn"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.02,
+    0.682,
+    1.0,
+    0.824
+   ],
+   "hint": "Read only the table headed '56th District—St. Clair County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  }
+ ],
+ "halves": true,
+ "caveat": "Illinois elected its House members by cumulative voting, so each candidate's figure is the cumulated vote as printed and is not a count of voters.",
+ "authoritative": "The book's own printed district total and the county rows tie, and they differ from the earlier default set, which is replaced by this one.",
+ "authoritative_loose": true
+}

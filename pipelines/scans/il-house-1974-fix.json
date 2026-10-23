@@ -1,0 +1,114 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "State of Illinois official vote cast at the general election, 1974",
+ "file": {
+  "url": "https://archive.org/download/officialvote1974illi/officialvote1974illi.pdf"
+ },
+ "contests": {
+  "state-house39": {
+   "year": 1974,
+   "chamber": "state-house",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 39
+  },
+  "state-house44": {
+   "year": 1974,
+   "chamber": "state-house",
+   "day": "1974-11-05",
+   "special": false,
+   "state": "IL",
+   "district": 44
+  }
+ },
+ "pages": [
+  {
+   "page": 46,
+   "id": "46-2",
+   "columns": [
+    {
+     "label": "Democratic John Jerome \"Jack\" Hill",
+     "contest": "state-house39",
+     "candidate": "John Jerome Hill"
+    },
+    {
+     "label": "Democratic Clifford J. Sinclair",
+     "contest": "state-house39",
+     "candidate": "Clifford J. Sinclair"
+    },
+    {
+     "label": "Republican Allan L. \"Al\" Schoeberlein",
+     "contest": "state-house39",
+     "candidate": "Allan L. Schoeberlein"
+    },
+    {
+     "label": "Republican William L. Kempiners",
+     "contest": "state-house39",
+     "candidate": "William L. Kempiners"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.594,
+    0.965,
+    0.83
+   ],
+   "hint": "Read only the table headed '39th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
+  },
+  {
+   "page": 48,
+   "id": "48-1",
+   "columns": [
+    {
+     "label": "Democratic Gerald A. Bradley",
+     "contest": "state-house44",
+     "candidate": "Gerald A. Bradley"
+    },
+    {
+     "label": "Democratic Jon Christian Svensson",
+     "contest": "state-house44",
+     "candidate": "Jon Christian Svensson"
+    },
+    {
+     "label": "Republican Gilbert L. (Gil) Deavers",
+     "contest": "state-house44",
+     "candidate": "Gilbert L. Deavers"
+    },
+    {
+     "label": "Republican John R. Lauer",
+     "contest": "state-house44",
+     "candidate": "John R. Lauer"
+    },
+    {
+     "label": "(Write-ins) Art Mettler",
+     "contest": "state-house44",
+     "candidate": "Art Mettler"
+    },
+    {
+     "label": "(Write-ins) Kelly Bailey",
+     "contest": "state-house44",
+     "candidate": "Kelly Bailey"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.079,
+    0.264,
+    0.958,
+    0.461
+   ],
+   "hint": "Read only the table headed '44th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves).",
+   "turn": -90
+  }
+ ],
+ "halves": true,
+ "caveat": "Illinois elected its House members by cumulative voting, so each candidate's figure is the cumulated vote as printed and is not a count of voters.",
+ "authoritative": "The book's own printed district total and the county rows tie, and they differ from the earlier default set, which is replaced by this one.",
+ "authoritative_loose": true
+}
