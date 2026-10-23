@@ -392,6 +392,16 @@ def emit(
             [firsts],
         ).fetchall():
             runners[key][slug(ballot)] = person
+        ran: dict[str, dict[str, UUID]] = defaultdict(dict)
+        for key, ballot, person in conn.execute(
+            """select f.value, cy.ballot_name, cy.person_id from external_id f
+               join contest c on c.office_id = f.entity_id
+               join contest_option o on o.contest_id = c.id
+               join candidacy cy on cy.option_id = o.id and cy.role = 'head'
+               where f.scheme = 'us.office' and f.value = any(%s) and cy.ballot_name is not null""",
+            [list({f"{slug(title)}:{state}" for title, state in races.select("title", "state").iter_rows()})],
+        ).fetchall():
+            ran[key][slug(ballot)] = person
         cs = Changeset(
             conn,
             pipeline=pipeline,
@@ -732,6 +742,14 @@ def emit(
                             entity
                             for text, entity in runners[first].items()
                             if text == slug(ballot) or text.split("-")[-1] == slug(ballot).split("-")[-1]
+                        ]
+                        person = found[0] if len(set(found)) == 1 else None
+                    elif revised is None:
+                        words = slug(ballot).split("-")
+                        found = [
+                            entity
+                            for text, entity in ran[office_key].items()
+                            if text.split("-")[0] == words[0] and text.split("-")[-1] == words[-1]
                         ]
                         person = found[0] if len(set(found)) == 1 else None
                     person = person or cs.key(f"{pipeline}.person", person_key)

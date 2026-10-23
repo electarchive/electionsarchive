@@ -34,6 +34,7 @@ GA_RUNOFFS = {
 }
 GA_TREE = f"https://api.github.com/repos/openelections/openelections-data-ga/git/trees/{openelections.COMMITS['GA']}?recursive=1"
 GA_2018 = re.compile(r"2018/20181204__ga__general_runoff__\w+__precinct\.csv")
+GA_2025 = "https://results.sos.ga.gov/results/public/api/elections/Georgia/MunicipalGeneralSpecialElectionPSC11042025/ballot-items"
 FIRSTS = {
     (date(2006, 12, 5), "Public Service Commissioner", "3"): "2006-11-07:GA:public-service-commissioner:district-3",
     (date(2018, 12, 4), "Secretary of State", None): "2018-11-06:GA:secretary-of-state",
@@ -72,6 +73,11 @@ def md_urls() -> list[str]:
     ]
 
 
+def ga_2025() -> list[str]:
+    items = json.loads(raw.cached(SOURCE, GA_2025).path.read_text())["data"]
+    return [f"{GA_2025}/{item['id']}" for item in items if item["name"][0]["text"].startswith("PSC - District")]
+
+
 def ga_2018() -> list[str]:
     tree = json.loads(raw.cached(SOURCE, GA_TREE).path.read_text())
     return [oe("GA", item["path"]) for item in tree["tree"] if GA_2018.fullmatch(item["path"])]
@@ -86,6 +92,9 @@ def fetch() -> None:
     for path in [*GA_PATHS.values(), *GA_RUNOFFS.values()]:
         raw.fetch(SOURCE, oe("GA", path), suffix=".csv")
     raw.fetch(SOURCE, GA_TREE, suffix=".json")
+    raw.fetch(SOURCE, GA_2025, suffix=".json")
+    for url in ga_2025():
+        raw.fetch(SOURCE, url, suffix=".json")
     for url in ga_2018():
         raw.fetch(SOURCE, url, suffix=".csv")
 
@@ -226,6 +235,35 @@ def parse() -> None:
                 else pl.col("votes").cast(pl.Int64),
             )
         )
+    for url in ga_2025():
+        item = json.loads(raw.cached(SOURCE, url).path.read_text())
+        frames.append(
+            pl.DataFrame(
+                [
+                    {
+                        "county": re.sub(
+                            r"[^a-z]", "", county["locality"]["name"][0]["text"].lower().removesuffix(" county")
+                        ),
+                        "candidate": re.sub(r"\s*\((I|Rep|Dem)\)", "", option["name"][0]["text"]),
+                        "party": option["party"]["abbreviation"].upper(),
+                        "votes": option["voteCount"],
+                    }
+                    for county in item["breakdownResults"]
+                    for option in county["ballotOptions"]
+                ]
+            ).select(
+                year=pl.lit(2025),
+                day=pl.lit(date(2025, 11, 4)),
+                state=pl.lit("GA"),
+                title=pl.lit("Public Service Commissioner"),
+                post=pl.lit(item["name"][0]["text"].removeprefix("PSC - District ")),
+                county=pl.col("county").replace_strict(fips["GA"]),
+                candidate="candidate",
+                party="party",
+                writein=pl.lit(False),
+                votes=pl.col("votes").cast(pl.Int64),
+            )
+        )
     contest = ["year", "day", "state", "title", "post", "special"]
     returns = (
         pl.concat(
@@ -291,7 +329,7 @@ def emit() -> Path:
             cs.artifact(raw.cached(SOURCE, url), sources["MD"])
         cs.artifact(raw.cached(SOURCE, oe("RI", RI_PATH)), sources["RI"])
         cs.artifact(raw.cached(SOURCE, oe("WA", WA_PATH)), sources["WA"])
-        for url in [oe("GA", path) for path in [*GA_PATHS.values(), *GA_RUNOFFS.values()]] + ga_2018():
+        for url in [oe("GA", path) for path in [*GA_PATHS.values(), *GA_RUNOFFS.values()]] + ga_2018() + ga_2025():
             cs.artifact(raw.cached(SOURCE, url), sources["GA"])
         return sources
 
@@ -302,7 +340,8 @@ def emit() -> Path:
         summary="California's 2022 secretary of state, treasurer, and superintendent of public instruction, Maryland's "
         "2018 attorney general, Rhode Island's 2018 secretary of state, Washington's 2020 insurance commissioner, and "
         "Georgia's 2002, 2006, and 2014 public service commissioner generals by county, and Georgia's December 2006 "
-        "and 2018 and January 2021 general runoffs for secretary of state and public service commissioner by county",
+        "and 2018 and January 2021 general runoffs for secretary of state and public service commissioner by county, and "
+        "Georgia's November 2025 public service commissioner elections by county",
         cite=cite,
         method=METHOD,
         close="The leading candidates were within half a percent in these totals, so no outcome is recorded from them.",
@@ -310,8 +349,10 @@ def emit() -> Path:
         declared={
             "2021-01-05:GA:public-service-commissioner:district-4:runoff": (
                 "Lauren Bubba McDonald Jr.",
-                "Bubba McDonald leads by 15,794 votes in these totals, which lack Camden, Chattooga, Grady, and Greene "
-                "counties. He was certified the winner and took his seat again in January 2021.",
+                (
+                    "Bubba McDonald leads by 15,794 votes in these totals, which lack Camden, Chattooga, Grady, and Greene "
+                    "counties. He was certified the winner and took his seat again in January 2021."
+                ),
             )
         },
     )
