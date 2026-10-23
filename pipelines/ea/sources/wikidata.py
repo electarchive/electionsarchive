@@ -38,6 +38,11 @@ NAMES = """SELECT DISTINCT ?item ?kind ?name WHERE {{
   UNION {{ ?item wdt:P1448 ?name . BIND("label" AS ?kind) }}
   FILTER(LANG(?name) IN ({languages}))
 }}"""
+LABELS = """SELECT DISTINCT ?item ?name WHERE {{
+  {scope}
+  ?item rdfs:label ?name .
+  FILTER(LANG(?name) = "en")
+}}"""
 SPANS = """SELECT DISTINCT ?item ?inception ?dissolved ?links WHERE {{
   {scope}
   ?item wikibase:sitelinks ?links .
@@ -456,8 +461,8 @@ def _extra(template: str) -> str:
 
 def _urls() -> list[str]:
     return [
-        _url(template, _scope(country)) for country in COUNTRIES.values() for template in (NAMES, SPANS, COLORS)
-    ] + [_extra(COLORS)]
+        _url(template, _scope(country)) for country in COUNTRIES.values() for template in (NAMES, LABELS, SPANS, COLORS)
+    ] + [_extra(COLORS), _extra(LABELS)]
 
 
 def _placed() -> list[str]:
@@ -584,6 +589,17 @@ def emit() -> Path:
                where not exists (select from entity_merge m where m.entity_id = p.id)
                order by p.id"""
         ).fetchall()
+        others: defaultdict[UUID, set[str]] = defaultdict(set)
+        for entity, text in conn.execute(
+            """select n.entity_id, n.text from name n join party p on p.id = n.entity_id
+               join changeset c on c.id = n.changeset_id where c.pipeline <> %s""",
+            [SOURCE],
+        ).fetchall():
+            others[entity].add(text.casefold())
+        english: dict[str, str] = {}
+        for url in [_url(LABELS, _scope(country)) for country in COUNTRIES.values()] + [_extra(LABELS)]:
+            for row in _rows(url):
+                english.setdefault(row["item"].rsplit("/", 1)[1], row["name"])
         states: dict[str, str] = dict(
             conn.execute(
                 """select po.iso_code, n.text from polity po
@@ -716,6 +732,20 @@ def emit() -> Path:
             item, inherited, _ = found[party]
             if party in linked and taken.get(linked[party]) != party:
                 cs.add("external_id", entity_id=party, scheme="wikidata", value=linked[party])
+            label = english.get(linked[party]) if party in linked else None
+            if label is not None and label.casefold() not in others[party]:
+                cs.add(
+                    "name",
+                    entity_id=party,
+                    text=label,
+                    lang="en",
+                    kind="english",
+                    is_preferred=False,
+                    valid_from_precision="day",
+                    valid_to_precision="day",
+                    source_id=wikidata,
+                )
+                report[scope, "named"] += 1
             if party in linked:
                 report[scope, "linked"] += 1
             sourced = spectrum(linked.get(party)) or spectrum(inherited)
@@ -765,7 +795,7 @@ def emit() -> Path:
             print(
                 f"{scope}: {report[scope, 'linked']} of {report[scope, 'parties']} parties linked, "
                 f"{report[scope, 'painted']} of {report[scope, 'options']} options colored, "
-                f"{report[scope, 'positioned']} positioned"
+                f"{report[scope, 'positioned']} positioned, {report[scope, 'named']} given an English name"
             )
         for party, color, start, end in conn.execute(
             """select pc.party_id, pc.color, pc.valid_from, pc.valid_to from party_color pc
