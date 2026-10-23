@@ -304,6 +304,15 @@ WISCONSIN = DATA / "inbox" / "manual" / "MF-021"
 WISCONSIN_SITE = "https://elections.wi.gov/elections-voting/results#{}/{}"
 TEXAS = {date(2013, 11, 5): 167, date(2015, 11, 3): 190, date(2017, 11, 7): 320}
 TEXAS_SITE = "https://elections.sos.state.tx.us/elchist{}_{}.htm"
+MARYLAND_SITE = "https://elections.maryland.gov/elections/archive/{}"
+MARYLAND = {
+    date(2012, 11, 6): ("2012/results/general/gen_detail_qresults_2012_4_000{}S-.html", 7),
+    date(2014, 11, 4): ("2014/results/general/gen_detail_qresults_2014_2_000{}S-.html", 2),
+    date(2016, 11, 8): ("2016/results/general/gen_detail_qresults_2016_4_000{}S-.html", 1),
+    date(2018, 11, 6): ("2018/results/general/gen_detail_qresults_2018_2_000{}S-.html", 2),
+    date(2020, 11, 3): ("2020/results/general/gen_detail_qresults_2020_4_000{}S-.html", 2),
+    date(2024, 11, 5): ("2024/General_Results/gen_detail_qresults_2024_1_{}.html", 1),
+}
 NCSBE = "https://s3.amazonaws.com/dl.ncsbe.gov/State_Board_Meeting_Docs/"
 METHOD = (
     "{level} totals from {document}, the state's certified results. They replace {replaced} as this question's "
@@ -349,6 +358,12 @@ DOCUMENTS = {
         "County by County Report",
         "https://elections.wi.gov/elections-voting/results",
         "the Wisconsin Elections Commission's county-by-county canvass report",
+    ),
+    "MD": (
+        "Maryland State Board of Elections",
+        "Official results for all state questions",
+        "https://elections.maryland.gov/elections/",
+        "the Maryland State Board of Elections' official results for statewide questions",
     ),
     "TX": (
         "Texas Secretary of State",
@@ -554,6 +569,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, WISCONSIN_SITE.format(day, names[0]) if names else ""
     if state == "NJ":
         return SOURCE, NEW_JERSEY_SITE.format(NEW_JERSEY[day][0]) if day in NEW_JERSEY else ""
+    if state == "MD":
+        return SOURCE, MARYLAND_SITE.format(MARYLAND[day][0].format(1)) if day in MARYLAND else ""
     if state == "TX":
         return SOURCE, TEXAS_SITE.format(TEXAS[day], "raceselect") if day in TEXAS else ""
     if state == "OK":
@@ -717,6 +734,13 @@ def fetch() -> None:
                         retrieved_at=datetime.now(UTC),
                         media_type="application/octet-stream",
                     )
+            continue
+        if state == "MD":
+            for number in range(1, MARYLAND[day][1] + 1) if url else []:
+                try:
+                    raw.fetch(SOURCE, MARYLAND_SITE.format(MARYLAND[day][0].format(number)), suffix=".html")
+                except httpx.HTTPStatusError as error:
+                    print(f"MD {day}: {error}")
             continue
         if state == "NJ":
             for name in NEW_JERSEY.get(day, []):
@@ -2069,6 +2093,45 @@ def parse() -> None:
                 schema={"county": pl.String, "office": pl.String, "answer": pl.String, "votes": pl.String},
                 orient="row",
             ).with_columns(votes=pl.col("votes").cast(pl.Float64, strict=False).cast(pl.Int64).cast(pl.String))
+        elif state == "MD":
+            records = []
+            for number in range(1, MARYLAND[day][1] + 1):
+                question_url = MARYLAND_SITE.format(MARYLAND[day][0].format(number))
+                body = raw.cached(SOURCE, question_url).path.read_text(errors="replace")
+                cells = [
+                    cell.replace("Winner Selected", "").strip()
+                    for cell in re.sub(r"\s+", " ", re.sub(r"(?s)<(script|style)\b.*?</\1>|<[^>]+>", "|", html.unescape(body))).split("|")
+                ]
+                cells = [cell for cell in cells if cell]
+                rows = [
+                    (re.sub(r"\s+County$", "", cells[i]), cells[i + 1], cells[i + 2])
+                    for i in range(len(cells) - 2)
+                    if re.fullmatch(r"[\d,]+", cells[i + 1])
+                    and re.fullmatch(r"[\d,]+", cells[i + 2])
+                    and elstats.plain(re.sub(r"\s+County$", "", cells[i])) in names["MD"]
+                ]
+                total = [
+                    int(re.match(r"[\d,]+", cells[cells.index("Totals") + offset])[0].replace(",", "")) for offset in (1, 2)
+                ]
+                if len(rows) != 24 or [
+                    sum(int(row[column].replace(",", "")) for row in rows) for column in (1, 2)
+                ] != total:
+                    print(f"MD {day} question {number}: counties do not add up to the printed totals, skipped")
+                    continue
+                for county, yes, no in rows:
+                    for answer, count in (("YES", yes), ("NO", no)):
+                        records.append((county, f"Question {number}", answer, count, question_url))
+            table = pl.DataFrame(
+                records,
+                schema={
+                    "county": pl.String,
+                    "office": pl.String,
+                    "answer": pl.String,
+                    "votes": pl.String,
+                    "url": pl.String,
+                },
+                orient="row",
+            )
         elif state == "WA":
             table = (
                 pl.read_csv(path, infer_schema=False, encoding="utf8-lossy")
