@@ -8350,6 +8350,7 @@ export const elections = {
         left join party_affiliation br on br.party_id = coalesce(pm.into_id, w.party_id, ld.party_id)
           and br.kind = 'regional_branch' and br.valid @> r.day
         left join entity_merge bm on bm.entity_id = br.parent_party_id
+        where up.depth > 0
       `);
       const best = Map.groupBy(found.rows, (row) => row.body)
         .values()

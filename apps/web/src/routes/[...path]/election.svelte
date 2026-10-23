@@ -1090,7 +1090,9 @@
         (race.kind !== "body_seats" || race.body != null),
     )}
     {const isMapped = $derived(
-      race.map != null && race.places != null && index < 4,
+      race.map != null &&
+        race.places != null &&
+        (index < 4 || race.body != null),
     )}
     {#if isMapped && race.map != null && race.places != null}
       <div

@@ -574,7 +574,7 @@
     {/if}
   </div>
 
-  {#if shared != null}
+  {#if shared != null && !noun.endsWith("district")}
     <p class="-mbs-1.5 text-[0.8125rem] text-muted-foreground">
       {m.places_shared({ place: shared })}
     </p>
