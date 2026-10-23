@@ -1,13 +1,16 @@
+import json
 import re
 from collections import Counter, defaultdict
 from datetime import date
 from pathlib import Path
+from urllib.parse import urlencode
 from uuid import UUID
 
 import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
+from ea.sources.us import elstats
 from ea.sources.us.ak_dor import CONTESTS as RANKED_ROUNDS
 from ea.sources.us.ak_dor import MEDSL
 from ea.sources.us.klarner import LOWER, UPPER
@@ -27,6 +30,26 @@ NEW_MEXICO = "https://raw.githubusercontent.com/openelections/openelections-data
 NM_PUBLISHER = "OpenElections"
 NM_TITLE = "New Mexico 2024 general election results by county"
 NM_PARTIES = {"DEM": "DEMOCRAT", "REP": "REPUBLICAN", "LIB": "LIBERTARIAN", "IND": "INDEPENDENT"}
+NEW_YORK = elstats.SEARCH.format(tenant=elstats.TENANTS["NY"][0]) + urlencode(
+    {
+        "search": json.dumps(
+            {
+                "global": {"years": {"from": 2024, "to": 2024}},
+                "ballotQuestions": {"text": "", "types": [], "number": "", "divisions": []},
+                "contests": {"candidates": [], "divisions": [], "offices": [{"id": 14}]},
+                "specialElectionsOnly": False,
+                "voterStats": False,
+                "stages": [],
+            },
+            separators=(",", ":"),
+        )
+    }
+)
+RHODE_ISLAND = "https://raw.githubusercontent.com/openelections/openelections-data-ri/977565f9d7cf7a32d3a2a454282b5fd291cef291/2024/20241105__ri__general__town.csv"
+RI_TITLE = "Rhode Island 2024 general election results by town"
+RI_PARTIES = {"DEM": "DEMOCRAT", "REP": "REPUBLICAN", "Ind": "INDEPENDENT"}
+NY_PUBLISHER = "New York State Board of Elections"
+NY_TITLE = "Election results, Member of Assembly, 2024"
 WA_PUBLISHER = "Washington Secretary of State"
 WA_TITLE = "November 5, 2024 General Election Results"
 PREFERENCES = {"DEMOCRATIC": "DEMOCRAT", "GOP": "REPUBLICAN", "STATES NO": "NO PARTY"}
@@ -89,6 +112,8 @@ def fetch() -> None:
     raw.fetch(SOURCE, README, suffix=".md")
     raw.fetch(SOURCE, WASHINGTON, suffix=".csv")
     raw.fetch(SOURCE, NEW_MEXICO, suffix=".csv")
+    raw.fetch(SOURCE, NEW_YORK, suffix=".csv")
+    raw.fetch(SOURCE, RHODE_ISLAND, suffix=".csv")
 
 
 def _district(state: str, text: str) -> tuple[str, str | None]:
@@ -309,12 +334,72 @@ def parse() -> None:
             how="anti",
         )
     )
+    new_york = (
+        pl.read_csv(raw.cached(SOURCE, NEW_YORK).path, infer_schema=False)
+        .filter(
+            pl.col("election_type") == "General",
+            pl.col("election_date").str.starts_with(str(DAY)),
+            pl.col("candidate_party_name").is_not_null() | (pl.col("candidate_name") == "Scattering"),
+        )
+        .with_columns(pooled=pl.col("candidate_name") == "Scattering")
+        .group_by("district_name", "candidate_name", "candidate_party_name", "pooled")
+        .agg(pl.col("votes").cast(pl.Int64).sum())
+        .select(
+            state_po=pl.lit("NY"),
+            office=pl.lit("STATE HOUSE"),
+            district=pl.col("district_name").str.zfill(3),
+            special=pl.lit("FALSE"),
+            candidate=pl.when("pooled").then(pl.lit("WRITE-IN")).otherwise(pl.col("candidate_name").str.to_uppercase()),
+            party_detailed=pl.col("candidate_party_name").str.to_uppercase().replace({"DEMOCRATIC": "DEMOCRAT"}),
+            pooled="pooled",
+            votes="votes",
+            masked=pl.lit(False),
+            magnitude=pl.lit(1, pl.Int32),
+            state_fips=pl.lit("36"),
+            code=pl.col("district_name"),
+            post=pl.lit(None, pl.String),
+        )
+        .join(
+            lines.filter(pl.col("state_po") == "NY").select("office", "code").unique(),
+            on=["office", "code"],
+            how="anti",
+        )
+    )
+    rhode_island = (
+        pl.read_csv(raw.cached(SOURCE, RHODE_ISLAND).path, infer_schema_length=0)
+        .filter(pl.col("office").is_in(["State House", "State Senate"]))
+        .with_columns(pooled=pl.col("party") == "NON")
+        .group_by("office", "district", "candidate", "party", "pooled")
+        .agg(pl.col("votes").cast(pl.Int64).sum())
+        .select(
+            state_po=pl.lit("RI"),
+            office=pl.col("office").str.to_uppercase(),
+            district=pl.col("district").str.zfill(3),
+            special=pl.lit("FALSE"),
+            candidate=pl.when("pooled").then(pl.lit("WRITE-IN")).otherwise(pl.col("candidate").str.to_uppercase()),
+            party_detailed=pl.when("pooled").then(None).otherwise(pl.col("party").replace(RI_PARTIES)),
+            pooled="pooled",
+            votes="votes",
+            masked=pl.lit(False),
+            magnitude=pl.lit(1, pl.Int32),
+            state_fips=pl.lit("44"),
+            code="district",
+            post=pl.lit(None, pl.String),
+        )
+        .join(
+            lines.filter(pl.col("state_po") == "RI").select("office", "code").unique(),
+            on=["office", "code"],
+            how="anti",
+        )
+    )
     PARSED.mkdir(parents=True, exist_ok=True)
     pl.concat(
         [
             lines.filter(pl.col("state_po") != "WA").with_columns(origin=pl.lit("medsl")),
             washington.with_columns(origin=pl.lit("wa")),
             new_mexico.with_columns(origin=pl.lit("openelections")),
+            new_york.with_columns(origin=pl.lit("ny")),
+            rhode_island.with_columns(origin=pl.lit("ri")),
         ]
     ).sort(
         "state_po",
@@ -364,6 +449,13 @@ def emit() -> Path:
                 continue
             past[(body, words[-1])][code].add(person)
             past[(body, f"{words[0]} {words[-1]}")][code].add(person)
+        held: dict[UUID, UUID] = dict(
+            conn.execute(
+                """select cd.id, cd.person_id from candidacy cd join changeset c on c.id = cd.changeset_id
+                   where c.pipeline = %s""",
+                [SOURCE],
+            ).fetchall()
+        )
         last_party: dict[UUID, UUID] = dict(
             conn.execute(
                 """select distinct on (cd.person_id) cd.person_id, o.party_id
@@ -425,7 +517,29 @@ def emit() -> Path:
             license=None,
         )
         cs.artifact(raw.cached(SOURCE, NEW_MEXICO), community)
-        sources = {"medsl": source, "wa": secretary, "openelections": community}
+        board = cs.source(NY_PUBLISHER, NY_TITLE)
+        cs.add(
+            "source",
+            id=board,
+            kind="official_body",
+            publisher=NY_PUBLISHER,
+            title=NY_TITLE,
+            url="https://results.elections.ny.gov",
+            license="Public record",
+        )
+        cs.artifact(raw.cached(SOURCE, NEW_YORK), board)
+        rhode = cs.source(NM_PUBLISHER, RI_TITLE)
+        cs.add(
+            "source",
+            id=rhode,
+            kind="community",
+            publisher=NM_PUBLISHER,
+            title=RI_TITLE,
+            url="https://github.com/openelections/openelections-data-ri",
+            license=None,
+        )
+        cs.artifact(raw.cached(SOURCE, RHODE_ISLAND), rhode)
+        sources = {"medsl": source, "wa": secretary, "openelections": community, "ny": board, "ri": rhode}
         fptp, block = cs.key("us.electoral_system", "fptp"), cs.key("us.electoral_system", "block")
         irv = cs.key("us.electoral_system", "irv")
         states = dict(
@@ -595,7 +709,10 @@ def emit() -> Path:
                         if len(found) == 1:
                             break
                     person_key = (state, str(candidate))
-                    if len(found) == 1:
+                    head = cs.key("us.candidacy", f"{option_key}:head")
+                    if head in held:
+                        person = held[head]
+                    elif len(found) == 1:
                         person = next(iter(found))
                     else:
                         person = persons.get(person_key) or cs.key(
@@ -607,7 +724,6 @@ def emit() -> Path:
                             if len(str(candidate).split()) == 1:
                                 problems.append(f"surname only: {state} {office} {district} {candidate}")
                     persons[person_key] = person
-                    head = cs.key("us.candidacy", f"{option_key}:head")
                     cs.add(
                         "candidacy",
                         id=head,
