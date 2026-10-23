@@ -20,7 +20,17 @@ import polars as pl
 
 from ea import raw
 from ea.changeset import Changeset, slug
-from ea.sources.us import elstats, fl_sos, me_legislature, medsl, nyc_general, tx_elchist, wa_local
+from ea.sources.us import (
+    elstats,
+    fl_sos,
+    me_legislature,
+    medsl,
+    nyc_general,
+    tx_elchist,
+    ut_canvass,
+    ut_primaries,
+    wa_local,
+)
 from ea.sources.us.city_precincts import WA_COUNTIES
 from ea.sources.us.county_changes import ct_regions
 from ea.sources.us.ncsbe import COLUMNS, FILES, HEADERLESS, PUBLISHER, TITLE
@@ -364,6 +374,13 @@ STATES = {
         "Texas election history: legislative primaries by county, 2000–2014",
         "https://elections.sos.state.tx.us/",
     ),
+    "UT": (
+        "49",
+        "Utah",
+        ut_canvass.PUBLISHER,
+        ut_canvass.TITLE,
+        "https://vote.utah.gov/historical-election-results/",
+    ),
     "MN": (
         "27",
         "Minnesota",
@@ -579,6 +596,26 @@ ME_METHOD = (
     "or more candidates, the candidate with a majority of first choices. Votes are first choices."
 )
 WON_MAJORITY = "Derived: a majority of first choices in the certified contest totals."
+UT_FILES = {
+    date(2000, 6, 27): ("2023/09/2000Pri.xls", ["2000 Primary Election"]),
+    date(2010, 6, 22): ("2023/09/2010-Primary-Canvass-Reports.xls", ["Primary Multi County Races"]),
+    date(2012, 6, 26): ("2023/09/2012-Primary-Canvass-Reports-1.xlsx", ["Primary Multi County Races", "Utah Leg Single"]),
+    date(2016, 6, 28): (
+        "2023/09/2016-Primary-Election-State-Canvass-2-1.xlsx",
+        ["Utah Leg. - Multi County", "Utah Leg. - Single County"],
+    ),
+    date(2018, 6, 26): (
+        "2023/09/2018-Primary-Election-State-Canvass-1.xlsx",
+        ["Utah Leg. - Multi County", "Utah Leg. - Single County"],
+    ),
+    date(2020, 6, 30): (
+        "2021/02/2020-Primary-Election-State-Canvass.xlsx",
+        ["Legislature - Multi-County", "Legislature - Single County"],
+    ),
+}
+UT_LEGISLATIVE = re.compile(r"(?<!U\.S\. )(Senate|House)(?: of Representatives)?(?: District)?\s*#?\s*(\d+)")
+UT_EXPORT = re.compile(r"(Republican|Democratic) For State (Senate|House) (\d+)\s*")
+UT_PARTIES = {"Republican": "REP", "Democratic": "DEM", "Libertarian": "LIB", "Constitution": "CST"}
 KY_DAYS = {
     2000: date(2000, 5, 23),
     2002: date(2002, 5, 28),
@@ -1149,7 +1186,7 @@ def parse() -> None:
         for code, text in conn.execute(
             """select u.code, n.text from reporting_unit u
                join name n on n.entity_id = u.area_id and n.kind = 'short'
-               where u.scheme_code = 'us.county' and u.code ~ '^(01|37|53|06|08|09|12|16|17|18|19|21|33|35|36|42|45|48|50|51)' order by u.code"""
+               where u.scheme_code = 'us.county' and u.code ~ '^(01|37|53|06|08|09|12|16|17|18|19|21|33|35|36|42|45|48|49|50|51)' order by u.code"""
         ).fetchall():
             plain = re.sub(r"[^a-z]", "", unicodedata.normalize("NFKD", text).lower())
             if code.startswith("36"):
@@ -3190,6 +3227,105 @@ def parse() -> None:
             seats=pl.lit(1, pl.Int16),
         )
     )
+    utah = []
+    for day, (path, sheets) in UT_FILES.items():
+        book = fastexcel.read_excel(raw.cached(ut_canvass.SOURCE, ut_canvass.BASE + path).path)
+        for sheet in sheets:
+            cells = [
+                [re.sub(r"\s+", " ", cell or "").strip() for cell in row]
+                for row in book.load_sheet(sheet, header_row=None, dtypes="string").to_polars().iter_rows()
+            ]
+            first = next(index for index, row in enumerate(cells) if row[0].upper().startswith("BEAVER"))
+            last = next(index for index, row in enumerate(cells) if row[0].upper().startswith("TOTAL"))
+            heads = [
+                {column: text for column, text in enumerate(row) if text and column > 0} for row in cells[: first - 1]
+            ]
+            for column, candidate in enumerate(cells[first - 1]):
+                if column == 0 or not candidate or re.search(r"(?i)regist|ballots|voting|% of|percent", candidate):
+                    continue
+                label = " ".join(
+                    row[max(start for start in row if start <= column)]
+                    for row in heads
+                    if any(start <= column for start in row)
+                )
+                found = UT_LEGISLATIVE.search(label)
+                if found is None:
+                    continue
+                quoted = re.search(r'"(\w)"', candidate)
+                party = next(
+                    (code for word, code in UT_PARTIES.items() if word in label),
+                    {"R": "REP", "D": "DEM", "L": "LIB", "C": "CST"}.get(quoted[1]) if quoted else None,
+                )
+                if party is None:
+                    raise ValueError(f"{day} {sheet} {candidate}: no party in {label!r}")
+                counts = {
+                    counties[("49", re.sub(r"[^a-z]", "", row[0].lower().removesuffix(" county")))]: int(
+                        float(row[column])
+                    )
+                    for row in cells[first:last]
+                    if row[column]
+                }
+                if (sum(counts.values()) != int(float(cells[last][column])) if cells[last][column] else len(counts) != 1):
+                    raise ValueError(f"{day} {sheet} {candidate}: the counties do not add up to the total")
+                utah.extend(
+                    (
+                        day,
+                        found[1].lower(),
+                        found[2].lstrip("0"),
+                        party,
+                        fips,
+                        re.sub(r'\s*"\w"', "", candidate).strip(),
+                        votes,
+                    )
+                    for fips, votes in counts.items()
+                )
+    for day, path in ut_primaries.FILES.items():
+        export = json.loads(raw.cached(ut_primaries.SOURCE, ut_primaries.BASE + path).path.read_bytes())
+        for item in export["results"]["ballotItems"]:
+            found = UT_EXPORT.fullmatch(item["name"])
+            if found is None:
+                continue
+            counted = {option["name"].strip(): 0 for option in item["ballotOptions"]}
+            for county in export["localResults"]:
+                for local in (local for local in county["ballotItems"] if local["name"] == item["name"]):
+                    fips = counties[("49", re.sub(r"[^a-z]", "", county["name"].lower().removesuffix(" county")))]
+                    for option in local["ballotOptions"]:
+                        counted[option["name"].strip()] += option["voteCount"]
+                        utah.append(
+                            (
+                                day,
+                                found[2].lower(),
+                                found[3],
+                                UT_PARTIES[found[1]],
+                                fips,
+                                option["name"].strip(),
+                                option["voteCount"],
+                            )
+                        )
+            if counted != {option["name"].strip(): option["voteCount"] for option in item["ballotOptions"]}:
+                raise ValueError(f"{day} {item['name']}: the counties do not add up to the total")
+    frames.append(
+        pl.DataFrame(
+            utah,
+            schema={
+                "day": pl.Date,
+                "office": pl.String,
+                "code": pl.String,
+                "party": pl.String,
+                "fips": pl.String,
+                "choice": pl.String,
+                "votes": pl.Int64,
+            },
+            orient="row",
+        ).with_columns(
+            state=pl.lit("UT"),
+            label="party",
+            scheme=pl.lit("us.county"),
+            unit="fips",
+            writein=pl.lit(False),
+            seats=pl.lit(1, pl.Int16),
+        )
+    )
     partisan = pl.col("day").dt.year() < 2012
     frames.append(
         ca.filter(~pl.col("office").is_in(["house", "us-senate"]))
@@ -3244,8 +3380,9 @@ def emit() -> Path:
             "Kentucky 2000–2008 by county from the State Board of Elections' county reports, South Carolina 2010–2022 by "
             "county from the State Election Commission's detail results, Pennsylvania 2000–2022 by county from the "
             "Department of State's election returns, Indiana 2020 by county from the Election Division's results "
-            "archive, Alabama 2022 by county from the Secretary of State's precinct results, and Iowa 2010–2016 by county "
-            "from the Secretary of State's county precinct results",
+            "archive, Alabama 2022 by county from the Secretary of State's precinct results, Iowa 2010–2016 by county "
+            "from the Secretary of State's county precinct results, and Utah's legislative primaries of 2000, "
+            "2010–2012, and 2016–2024 by county from the Lieutenant Governor's canvasses",
             polity="US",
         )
 
@@ -3362,6 +3499,10 @@ def emit() -> Path:
         for day in MN_DAYS:
             for file in ("allracesbyprecinct", "PrctTbl"):
                 cs.artifact(raw.cached(SOURCE, MN_FILES.format(day=day, name=file)), sources["MN"])
+        for path, _ in UT_FILES.values():
+            cs.artifact(raw.cached(ut_canvass.SOURCE, ut_canvass.BASE + path), sources["UT"])
+        for path in ut_primaries.FILES.values():
+            cs.artifact(raw.cached(ut_primaries.SOURCE, ut_primaries.BASE + path), sources["UT"])
         for day in WA_DAYS:
             for url in (wa_local.FILES[day], wa_local.PRECINCTS.format(day=day)):
                 cs.artifact(raw.cached(wa_local.SOURCE, url), sources["WA"])
@@ -3530,6 +3671,7 @@ def emit() -> Path:
             *(("IA", day, None) for day in IA_DAYS.values()),
             *(("FL", day, first) for day, first in FL_DAYS.items()),
             *(("KY", day, None) for day in KY_DAYS.values()),
+            *(("UT", day, None) for day in [*UT_FILES, *ut_primaries.FILES]),
             *(
                 (state, day, None)
                 for state, day in lines.filter(pl.col("state").is_in(list(ELSTATS)))
@@ -3663,7 +3805,7 @@ def emit() -> Path:
                     else "irv"
                     if state == "ME" and day.year >= 2018
                     else "fptp"
-                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "IA", *ELSTATS)
+                    if state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "IA", "UT", *ELSTATS)
                     else "two_round"
                     if state in ("TX", "SC", "AL") or (state == "FL" and day.year == 2000)
                     else "fptp"
@@ -3844,7 +3986,7 @@ def emit() -> Path:
                         wins = [(names[0], "won", WON_CONVENTION)]
                     elif tallies[0] > tallies[1] and nominated.get(names[0]):
                         wins = [(names[0], "won", WON_NOMINEE)]
-            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", *ELSTATS) or (state == "FL" and day.year > 2000):
+            elif state in ("MN", "CA", "ME", "IL", "KY", "PA", "IN", "UT", *ELSTATS) or (state == "FL" and day.year > 2000):
                 if len(tallies) <= magnitude:
                     wins = [(choice, "won", WON_ALONE) for choice in names]
                 elif (tallies[magnitude - 1] - tallies[magnitude]) * 100 > total and tallies[magnitude - 1] - tallies[
