@@ -1,0 +1,108 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065"
+ },
+ "title": "Republican congressional primary official results, June 1, 2010",
+ "file": {
+  "url": "https://www.sos.ms.gov/sites/default/files/elections/2010-republican-congressional-primary.pdf"
+ },
+ "contests": {
+  "h1": {
+   "year": 2010,
+   "chamber": "house:republican",
+   "day": "2010-06-01",
+   "special": false,
+   "state": "MS",
+   "district": 1
+  },
+  "h4": {
+   "year": 2010,
+   "chamber": "house:republican",
+   "day": "2010-06-01",
+   "special": false,
+   "state": "MS",
+   "district": 4
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "h1",
+   "turn": 90,
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    1.0,
+    1.0
+   ],
+   "hint": "Skip the title; columns are PRE. RPTING, PRE. TOTAL, then candidates; the last row is Total.",
+   "columns": [
+    {
+     "label": "PRE. RPTING",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "PRE. TOTAL",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "McGLOWAN",
+     "contest": "h1",
+     "candidate": "Angela McGlowan"
+    },
+    {
+     "label": "NUNNLEE",
+     "contest": "h1",
+     "candidate": "Alan Nunnelee"
+    },
+    {
+     "label": "ROSS",
+     "contest": "h1",
+     "candidate": "Henry Ross"
+    }
+   ]
+  },
+  {
+   "page": 4,
+   "id": "h4",
+   "turn": -90,
+   "orientation": "counties_down",
+   "crop": [
+    0.0,
+    0.0,
+    1.0,
+    1.0
+   ],
+   "hint": "Skip the title; columns are PRE. RPTING, PRE. TOTAL, then candidates; the last row is Total.",
+   "columns": [
+    {
+     "label": "PRE. RPTING",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "PRE. TOTAL",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "PALAZZO",
+     "contest": "h4",
+     "candidate": "Steven Palazzo"
+    },
+    {
+     "label": "TEGERDIN",
+     "contest": "h4",
+     "candidate": "Joe Tegerdine"
+    }
+   ]
+  }
+ ]
+}

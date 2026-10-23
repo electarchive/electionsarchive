@@ -1,0 +1,97 @@
+{
+ "polity": "US-MS",
+ "publisher": "Mississippi Secretary of State",
+ "license": "Public record",
+ "raw_source": "us.ms_pri_scans",
+ "unit_codes": {
+  "Jeff Davis": "28065"
+ },
+ "title": "Republican primary runoff certified results, June 23, 2020",
+ "file": {
+  "url": "https://www.sos.ms.gov/elections/electionResults/Certified%20Official%20RecapRepRunoff2020.pdf"
+ },
+ "contests": {
+  "h2": {
+   "year": 2020,
+   "chamber": "house:republican",
+   "day": "2020-06-23",
+   "special": false,
+   "state": "MS",
+   "district": 2
+  }
+ },
+ "pages": [
+  {
+   "page": 2,
+   "id": "p2",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.1,
+    1.0,
+    0.45
+   ],
+   "hint": "Rows are the candidates only (Thomas L. Carey, then Brian Flowers); skip the district heading row. Empty trailing columns are blank.",
+   "columns": [
+    {
+     "label": "Thomas L. Carey",
+     "contest": "h2",
+     "candidate": "Thomas L. Carey"
+    },
+    {
+     "label": "Brian Flowers",
+     "contest": "h2",
+     "candidate": "Brian Flowers"
+    }
+   ]
+  },
+  {
+   "page": 3,
+   "id": "p3",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.1,
+    1.0,
+    0.45
+   ],
+   "hint": "Rows are the candidates only (Thomas L. Carey, then Brian Flowers); skip the district heading row. Empty trailing columns are blank.",
+   "columns": [
+    {
+     "label": "Thomas L. Carey",
+     "contest": "h2",
+     "candidate": "Thomas L. Carey"
+    },
+    {
+     "label": "Brian Flowers",
+     "contest": "h2",
+     "candidate": "Brian Flowers"
+    }
+   ]
+  },
+  {
+   "page": 4,
+   "id": "p4",
+   "orientation": "counties_across",
+   "crop": [
+    0.0,
+    0.1,
+    1.0,
+    0.45
+   ],
+   "hint": "Rows are the candidates only (Thomas L. Carey, then Brian Flowers); skip the district heading row. Empty trailing columns are blank.",
+   "columns": [
+    {
+     "label": "Thomas L. Carey",
+     "contest": "h2",
+     "candidate": "Thomas L. Carey"
+    },
+    {
+     "label": "Brian Flowers",
+     "contest": "h2",
+     "candidate": "Brian Flowers"
+    }
+   ]
+  }
+ ]
+}
