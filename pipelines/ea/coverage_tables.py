@@ -569,8 +569,11 @@ def build() -> str:
         partial = c.get("county_partial", 0)
         bare = c.get("no_results", 0)
         totals = max(0, count - county - partial - bare)
+        precinct = c["precinct"]
+        if coverage.target(st, level, year) == "total":
+            county = precinct = count - bare
+            partial = totals = 0
         if year >= 2000:
-            precinct = c["precinct"]
             for goal, complete, coarse in (("county", county, 0), ("precinct", precinct, max(0, county - precinct))):
                 cell = goals[(goal, st, level, year)]
                 for i, value in enumerate(
