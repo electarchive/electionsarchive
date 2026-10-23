@@ -243,6 +243,12 @@ def _publish_table(conn: Connection, stage: Stage, table: str) -> None:
             if compared
             else sql.SQL("do nothing")
         )
+        if table == "result_set":
+            conn.execute(
+                sql.SQL(
+                    "update public.result_set p set is_default = false from {} s where s.id = p.id and p.is_default and not s.is_default"
+                ).format(staged)
+            )
         conn.execute(
             sql.SQL("insert into public.{} ({}) select {} from {} where id is not null on conflict (id) {}").format(
                 target, listed, listed, staged, conflict
