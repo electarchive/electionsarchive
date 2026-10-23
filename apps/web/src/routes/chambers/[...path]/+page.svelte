@@ -8,7 +8,7 @@
   import { effective, stand } from "#lib/caucus.js";
   import * as Select from "#lib/components/ui/select/index.js";
   import { Slider } from "#lib/components/ui/slider/index.js";
-  import { count, date } from "#lib/format.js";
+  import { count, date, definite } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -250,6 +250,11 @@
           name: caucus
             ? label(key)
             : rows.map((row) => label(row.party)).join("/"),
+          full:
+            !caucus && rows.length === 1 && rows[0]?.party != null
+              ? ((info.get(rows[0].party) ?? own.get(rows[0].party))?.label ??
+                label(rows[0].party))
+              : null,
           seats,
         };
       })
@@ -533,13 +538,13 @@
           >
             {#if leader.seats >= Math.floor(whole / 2) + 1}
               {m.chamber_majority({
-                party: leader.name,
+                party: definite(leader.full ?? leader.name, true),
                 seats: count(leader.seats),
                 total: count(whole),
               })}
             {:else}
               {m.chamber_plurality({
-                party: leader.name,
+                party: definite(leader.full ?? leader.name),
                 seats: count(leader.seats),
                 total: count(whole),
               })}

@@ -15,6 +15,8 @@
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
     lost: m.person_lost_mark,
+    withdrew: m.outcome_withdrew,
+    disqualified: m.outcome_disqualified,
   };
 
   let width = $state(720);

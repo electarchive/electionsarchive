@@ -4,9 +4,10 @@
   import { resolve } from "$app/paths";
   import * as HoverCard from "#lib/components/ui/hover-card/index.js";
   import { count, date, percent } from "#lib/format.js";
-  import { MEASURES, OUTCOMES } from "#lib/outcomes.js";
+  import { LOST, MEASURES, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
+  import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
 
   const {
@@ -141,7 +142,10 @@
                 <span class="truncate font-semibold">{row.label}</span>
                 {#if row.current?.outcome != null}
                   <span
-                    class="shrink-0 highlighter px-1 text-[0.6875rem] font-semibold"
+                    class={cn("shrink-0 px-1 text-[0.6875rem] font-semibold", {
+                      highlighter: !LOST.has(row.current.outcome),
+                      "text-muted-foreground": LOST.has(row.current.outcome),
+                    })}
                     >{OUTCOMES[row.current.outcome]?.() ??
                       row.current.outcome}</span
                   >

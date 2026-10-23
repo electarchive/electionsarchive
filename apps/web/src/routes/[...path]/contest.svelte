@@ -742,7 +742,16 @@
       return null;
     }
     const isWon = ["won", "elected"].includes(top.current.outcome ?? "");
-    return (isWon ? m.race_lede_won : m.race_lede_votes)({
+    const withdrew = contest.rows.find(
+      (row) => row.current?.outcome === "withdrew",
+    );
+    const lede = (
+      isWon && withdrew?.key === next.key
+        ? m.race_lede_won_withdrew
+        : isWon
+          ? m.race_lede_won
+          : m.race_lede_votes
+    )({
       party: definite(named(top), true),
       share: percent(
         top.current.share,
@@ -754,6 +763,9 @@
       ),
       runner: named(next),
     });
+    return isWon && withdrew != null && withdrew.key !== next.key
+      ? `${lede} ${m.race_lede_withdrew({ name: named(withdrew) })}`
+      : lede;
   });
   const items = $derived.by(() => {
     const winners = new Map(
@@ -1675,7 +1687,10 @@
           : m.cycle_primaries({ party: step.party.label }),
     color: step.party?.color ?? null,
   }))}
-  general={cycle.general}
+  general={cycle.primaries.length === 0 &&
+  rounds.some((round) => round.path === cycle.general?.path)
+    ? null
+    : cycle.general}
   others={cycle.others.map((entry) => ({
     key: entry.party.id,
     label: entry.party.label,

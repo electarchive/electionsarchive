@@ -983,11 +983,11 @@ async function load(
     from contest_option o
     left join entity_merge pm on pm.entity_id = o.party_id
     left join lateral (
-      select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied']::outcome_kind[], x.kind)))[1] as kind,
+      select (array_agg(x.kind order by array_position(array['elected', 'advanced', 'won', 'tied', 'withdrew', 'disqualified']::outcome_kind[], x.kind)))[1] as kind,
         coalesce(max(x.seats), nullif(count(*) filter (where x.kind = 'elected'), 0))::int as seats
       from outcome x join result_set rs on rs.id = x.result_set_id
       where x.option_id = o.id and o.contest_id = any(${sql.param(outcomes)}::uuid[]) and rs.is_default
-        and (x.kind in ('elected', 'won', 'advanced', 'tied') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
+        and (x.kind in ('elected', 'won', 'advanced', 'tied', 'withdrew', 'disqualified') or x.kind = 'lost' and o.kind = 'answer') and x.candidacy_id is null
     ) oc on true
     where (o.k = any(${sql.param([...optionKs])}::int[]) or o.contest_id = any(${sql.param(outcomes)}::uuid[]))
       and (o.k = any(${sql.param([...optionKs])}::int[]) or oc.kind is not null)
@@ -8738,14 +8738,10 @@ export const elections = {
         leads as (
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
-          join contest lc on lc.id = l.contest_id
-          join election le on le.id = lc.election_id
-          left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
-          join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
           cross join lateral (
             select max(y.value) as value from result_rollup y
-            where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = l.k
+            where y.result_set_k = rs.k and y.option_k = l.k
           ) y
           where y.value is not null
           order by l.parent, y.value desc
@@ -9615,14 +9611,10 @@ export const polities = {
         leads as (
           select distinct on (l.parent) l.parent, l.party_id
           from lines l
-          join contest lc on lc.id = l.contest_id
-          join election le on le.id = lc.election_id
-          left join polity_territory lt on lt.polity_id = le.polity_id and lt.valid @> le.date_from
-          join area la on la.id = coalesce(lc.district_area_id, lt.area_id)
           join result_set rs on rs.contest_id = l.contest_id and rs.is_default
           cross join lateral (
             select max(y.value) as value from result_rollup y
-            where y.result_set_k = rs.k and y.area_k = la.k and y.option_k = l.k
+            where y.result_set_k = rs.k and y.option_k = l.k
           ) y
           where y.value is not null
           order by l.parent, y.value desc

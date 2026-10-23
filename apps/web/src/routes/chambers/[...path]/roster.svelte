@@ -155,6 +155,19 @@
           members.filter((member) => fold(member.party) === a).length,
     ),
   );
+  const shared = $derived.by(() => {
+    const lead = members
+      .find((member) => member.place != null)
+      ?.place?.split(", ", 1)[0];
+    return lead != null &&
+      members.length > 1 &&
+      members.every(
+        (member) =>
+          member.place == null || member.place.startsWith(`${lead}, `),
+      )
+      ? lead.length + 2
+      : 0;
+  });
   const shown = $derived.by(() => {
     const needle = query.trim().toLocaleLowerCase();
     return members
@@ -234,7 +247,9 @@
                 >{event.member.name}</a
               >
               <span class="truncate text-muted-foreground"
-                >{event.member.place ?? event.member.seat ?? ""}</span
+                >{event.member.place?.slice(shared) ??
+                  event.member.seat ??
+                  ""}</span
               >
             </span>
             <span
@@ -376,13 +391,14 @@
               class="flex items-baseline gap-1.5 truncate text-muted-foreground max-sm:ps-4"
             >
               {#if member.path == null}
-                <span class="truncate">{member.place ?? member.seat ?? ""}</span
+                <span class="truncate"
+                  >{member.place?.slice(shared) ?? member.seat ?? ""}</span
                 >
               {:else}
                 <a
                   class="truncate hover:text-foreground hover:underline hover:underline-offset-4"
                   href={resolve("/[...path]", { path: member.path })}
-                  >{member.place ?? member.seat ?? ""}</a
+                  >{member.place?.slice(shared) ?? member.seat ?? ""}</a
                 >
               {/if}
               {#if !member.isVoting}

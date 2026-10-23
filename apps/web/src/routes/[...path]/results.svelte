@@ -5,7 +5,7 @@
   import Term from "#lib/components/term.svelte";
   import * as Tooltip from "#lib/components/ui/tooltip/index.js";
   import { count, credit, percent, points, precision } from "#lib/format.js";
-  import { OUTCOMES } from "#lib/outcomes.js";
+  import { LOST, OUTCOMES } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { swatch } from "#lib/party.js";
@@ -418,8 +418,8 @@
                 {#if page?.outcome != null && seats == null}
                   <span
                     class={cn("ms-1 px-1 text-xs font-semibold", {
-                      "highlighter text-foreground": page.outcome !== "lost",
-                      "text-muted-foreground": page.outcome === "lost",
+                      "highlighter text-foreground": !LOST.has(page.outcome),
+                      "text-muted-foreground": LOST.has(page.outcome),
                     })}>{OUTCOMES[page.outcome]?.() ?? page.outcome}</span
                   >
                 {/if}

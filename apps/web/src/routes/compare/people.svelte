@@ -3,6 +3,7 @@
   import Export from "#lib/components/export.svelte";
   import Name from "#lib/components/name.svelte";
   import { count, credit, percent } from "#lib/format.js";
+  import { LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -17,6 +18,8 @@
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
     lost: m.person_lost_mark,
+    withdrew: m.outcome_withdrew,
+    disqualified: m.outcome_disqualified,
   };
 
   let width = $state(720);
@@ -369,9 +372,10 @@
                 {#if mark.outcome != null}
                   <span
                     class={cn("px-1 text-xs font-semibold whitespace-nowrap", {
-                      highlighter: mark.outcome !== "lost",
-                      "rounded-xs bg-secondary text-muted-foreground":
-                        mark.outcome === "lost",
+                      highlighter: !LOST.has(mark.outcome),
+                      "rounded-xs bg-secondary text-muted-foreground": LOST.has(
+                        mark.outcome,
+                      ),
                     })}>{OUTCOMES[mark.outcome]?.() ?? mark.outcome}</span
                   >
                 {/if}

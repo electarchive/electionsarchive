@@ -69,6 +69,8 @@ const OUTCOMES: Record<string, () => string> = {
   advanced: m.outcome_advanced,
   tied: m.outcome_tied,
   lost: m.person_lost_mark,
+  withdrew: m.outcome_withdrew,
+  disqualified: m.outcome_disqualified,
 };
 
 const outcome = (value: string | null) =>

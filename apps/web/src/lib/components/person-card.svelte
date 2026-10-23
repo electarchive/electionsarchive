@@ -4,6 +4,7 @@
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import { createQuery } from "@tanstack/svelte-query";
   import { count, credit, date, percent } from "#lib/format.js";
+  import { LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { orpc } from "#lib/rpc.js";
@@ -17,6 +18,8 @@
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
     lost: m.person_lost_mark,
+    withdrew: m.outcome_withdrew,
+    disqualified: m.outcome_disqualified,
   };
 
   const query = createQuery(() => ({
@@ -132,9 +135,9 @@
                     class={cn(
                       "ms-0.5 px-1 text-[0.6875rem] font-semibold whitespace-nowrap",
                       {
-                        highlighter: entry.outcome !== "lost",
+                        highlighter: !LOST.has(entry.outcome),
                         "rounded-xs bg-secondary text-muted-foreground":
-                          entry.outcome === "lost",
+                          LOST.has(entry.outcome),
                       },
                     )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
                   >

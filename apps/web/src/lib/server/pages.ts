@@ -345,8 +345,22 @@ export async function chamber(path: string) {
       group.map((party) => [party.id, group[0]?.id ?? party.id] as const),
     ),
   );
+  const gaps = raw
+    .slice(1)
+    .map(
+      (term, index) =>
+        Date.parse(term.start) - Date.parse(raw[index]?.start ?? term.start),
+    )
+    .toSorted((a, b) => a - b);
+  const typical = gaps[Math.floor(gaps.length / 2)] ?? null;
   const terms = raw.map((term, index) => {
     const next = raw[index + 1]?.start ?? null;
+    const stranded =
+      next != null &&
+      typical != null &&
+      Date.parse(next) - Date.parse(term.start) > 3 * typical
+        ? new Date(Date.parse(term.start) + typical).toISOString().slice(0, 10)
+        : null;
     const lapse = body.sizes.find(
       (entry) =>
         entry.from != null &&
@@ -373,7 +387,7 @@ export async function chamber(path: string) {
     return {
       ...term,
       parties: [...seats].map(([party, count]) => ({ party, seats: count })),
-      end: lapse ?? next,
+      end: lapse ?? stranded ?? next,
       total: total(term.parties),
       size: size(term.start),
     };

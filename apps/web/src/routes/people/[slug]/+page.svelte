@@ -5,6 +5,7 @@
   import ArrowUpRightIcon from "@lucide/svelte/icons/arrow-up-right";
   import Name from "#lib/components/name.svelte";
   import { count, credit, date, percent } from "#lib/format.js";
+  import { LOST } from "#lib/outcomes.js";
   import { m } from "#lib/paraglide/messages.js";
   import { swatch } from "#lib/party.js";
   import { cn } from "#lib/utils.js";
@@ -20,6 +21,8 @@
     advanced: m.outcome_advanced,
     tied: m.outcome_tied,
     lost: m.person_lost_mark,
+    withdrew: m.outcome_withdrew,
+    disqualified: m.outcome_disqualified,
   };
 
   let isOpen = $state(false);
@@ -318,9 +321,9 @@
                       class={cn(
                         "ms-1 px-1 text-xs font-semibold whitespace-nowrap",
                         {
-                          highlighter: entry.outcome !== "lost",
+                          highlighter: !LOST.has(entry.outcome),
                           "rounded-xs bg-secondary text-muted-foreground":
-                            entry.outcome === "lost",
+                            LOST.has(entry.outcome),
                         },
                       )}>{OUTCOMES[entry.outcome]?.() ?? entry.outcome}</span
                     >
