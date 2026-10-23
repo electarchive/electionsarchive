@@ -1,17 +1,19 @@
 <script lang="ts">
   import { enhance } from "$app/forms";
-  import { invalidateAll } from "$app/navigation";
+  import { goto, invalidateAll } from "$app/navigation";
+  import { resolve } from "$app/paths";
   import { page } from "$app/state";
   import ChevronRightIcon from "@lucide/svelte/icons/chevron-right";
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
+  import { Switch } from "#lib/components/ui/switch/index.js";
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { cn } from "#lib/utils.js";
   import type { PageData } from "./$types";
-  import type { Counts, Goal } from "./reasons.js";
+  import type { Counts, Goal } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
   import Gaps from "./gaps.svelte";
-  import { GOALS, LABELS, REASONS } from "./reasons.js";
+  import { GOALS, LABELS, REASONS } from "#lib/coverage.js";
   import Tone from "./tone.svelte";
 
   const { data }: { data: PageData } = $props();
@@ -32,6 +34,8 @@
     shapes_history: m.coverage_goal_tab_shapes_history,
     local: m.coverage_goal_tab_local,
   };
+
+  const year = String(new Date().getFullYear());
 
   let goal = $state<Goal>("county");
   let order = $state<"gap" | "name">("gap");
@@ -161,6 +165,24 @@
       <p class="text-[0.9375rem] text-muted-foreground max-inline-[72ch]">
         {m.coverage_lede()}
       </p>
+      <div class="grid gap-1 pbs-1">
+        <label class="flex items-center gap-2 text-[0.8125rem] font-semibold">
+          <Switch
+            checked={!data.current}
+            onCheckedChange={(value: boolean) =>
+              void goto(
+                value
+                  ? resolve("/coverage")
+                  : `${resolve("/coverage")}?current=1`,
+                { replace: true, reset: false },
+              )}
+          />
+          {m.coverage_current({ year })}
+        </label>
+        <p class="text-xs text-muted-foreground">
+          {m.coverage_current_hint({ year })}
+        </p>
+      </div>
       <div
         class="flex flex-wrap items-center gap-x-2 gap-y-1 text-xs text-muted-foreground"
       >
@@ -306,8 +328,13 @@
           >
           <span role="columnheader">{m.coverage_column_done()}</span>
         </div>
-        {#key goal}
-          <Gaps {goal} {order} rows={goal === "county" ? data.gaps : null} />
+        {#key `${goal}:${data.current}`}
+          <Gaps
+            {goal}
+            {order}
+            current={data.current}
+            rows={goal === "county" ? data.gaps : null}
+          />
         {/key}
       </div>
     </section>

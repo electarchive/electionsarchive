@@ -7,10 +7,10 @@
   import { getLocale } from "#lib/paraglide/runtime.js";
   import { orpc } from "#lib/rpc.js";
   import { cn } from "#lib/utils.js";
-  import type { Counts, Goal } from "./reasons.js";
+  import type { Counts, Goal } from "#lib/coverage.js";
   import Bar from "./bar.svelte";
   import Self from "./gaps.svelte";
-  import { LEVELS } from "./reasons.js";
+  import { LEVELS } from "#lib/coverage.js";
 
   const {
     goal,
@@ -18,9 +18,11 @@
     rows = null,
     place = null,
     level = null,
+    current,
   }: {
     goal: Goal;
     order: "gap" | "name";
+    current: boolean;
     rows?: Array<Counts & { key: string; label: string | null }> | null;
     place?: string | null;
     level?: string | null;
@@ -28,12 +30,17 @@
 
   const fetched = createQuery(() => ({
     ...orpc.coverage.gaps.queryOptions({
-      input: { goal, state: place ?? undefined, level: level ?? undefined },
+      input: {
+        goal,
+        state: place ?? undefined,
+        level: level ?? undefined,
+        current,
+      },
     }),
     enabled: rows == null,
   }));
   const depth = $derived(place == null ? 0 : level == null ? 1 : 2);
-  const current = new Date().getFullYear();
+  const year = new Date().getFullYear();
   const all = $derived.by(() => {
     const named = (rows ?? fetched.data ?? []).map((row) => ({
       row,
@@ -42,7 +49,7 @@
           ? (row.label ?? row.key)
           : depth === 1
             ? (LEVELS[row.key]?.() ?? row.key)
-            : Number(row.key) === current
+            : Number(row.key) === year
               ? m.coverage_in_progress({ year: row.key })
               : row.key,
     }));
@@ -122,6 +129,7 @@
       {order}
       place={depth === 0 ? row.key : place}
       level={depth === 1 ? row.key : null}
+      {current}
     />
   {/if}
 {/each}

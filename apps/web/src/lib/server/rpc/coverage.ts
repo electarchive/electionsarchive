@@ -27,6 +27,13 @@ const counts = {
   units: v.number(),
   undrawn: v.number(),
 };
+const Current = v.optional(
+  v.pipe(
+    v.union([v.boolean(), v.string()]),
+    v.transform((value) => [true, "1", "true"].includes(value)),
+  ),
+  false,
+);
 const SUMS = sql.raw(
   Object.keys(counts)
     .map((key) => `sum(g.${key})::int as ${key}`)
@@ -40,9 +47,10 @@ export const coverage = {
         method: "GET",
         path: "/coverage",
         summary:
-          "US coverage goals, each with the contests it counts, how many meet it, and why the rest fall short",
+          "US coverage goals, each with the contests it counts, how many meet it, and why the rest fall short; the current year, still under way, counts only with current=1",
       }),
     )
+    .input(v.optional(v.object({ current: Current }), {}))
     .output(
       v.object({
         builtAt: v.nullable(v.string()),
@@ -50,7 +58,7 @@ export const coverage = {
         goals: v.array(v.object({ goal: v.picklist(GOALS), ...counts })),
       }),
     )
-    .handler(async () => {
+    .handler(async ({ input }) => {
       const built = await db.execute<{
         builtAt: string | null;
         building: boolean;
@@ -60,7 +68,9 @@ export const coverage = {
       const found = await db.execute<
         { goal: (typeof GOALS)[number] } & Record<keyof typeof counts, number>
       >(sql`
-        select g.goal, ${SUMS} from coverage_goal g group by g.goal
+        select g.goal, ${SUMS} from coverage_goal g
+        where ${input.current} or g.year <> extract(year from current_date)
+        group by g.goal
       `);
       return {
         builtAt: built.rows[0]?.builtAt ?? null,
@@ -76,7 +86,7 @@ export const coverage = {
         method: "GET",
         path: "/coverage/gaps",
         summary:
-          "Where a US coverage goal falls short: by state, then by office within a state, then by year within an office, largest gap first",
+          "Where a US coverage goal falls short: by state, then by office within a state, then by year within an office, largest gap first; the current year counts only with current=1",
       }),
     )
     .input(
@@ -84,6 +94,7 @@ export const coverage = {
         goal: v.picklist(GOALS),
         state: v.optional(v.pipe(v.string(), v.regex(/^[A-Z]{2}$/))),
         level: v.optional(v.pipe(v.string(), v.maxLength(40))),
+        current: Current,
       }),
     )
     .output(
@@ -109,6 +120,7 @@ export const coverage = {
           select ${key} as key, ${SUMS} from coverage_goal g
           where g.goal = ${input.goal} and (${state}::text is null or g.state = ${state})
             and (${level}::text is null or g.level = ${level})
+            and (${input.current} or g.year <> extract(year from current_date))
           group by 1
         ) r
         left join polity p on ${state == null} and p.iso_code = 'US-' || r.key

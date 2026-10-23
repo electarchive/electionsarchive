@@ -1,6 +1,6 @@
 <script lang="ts">
   import { cn } from "#lib/utils.js";
-  import type { Reason } from "./reasons.js";
+  import type { Reason } from "#lib/coverage.js";
 
   const {
     reason,

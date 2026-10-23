@@ -7,12 +7,13 @@ import type { Actions, PageServerLoad } from "./$types";
 
 const isDev = import.meta.env.DEV;
 
-export const load: PageServerLoad = async () => {
+export const load: PageServerLoad = async ({ url }) => {
+  const current = url.searchParams.get("current") === "1";
   const [goals, gaps] = await Promise.all([
-    call(router.coverage.goals, undefined),
-    call(router.coverage.gaps, { goal: "county" }),
+    call(router.coverage.goals, { current }),
+    call(router.coverage.gaps, { goal: "county", current }),
   ]);
-  return { ...goals, gaps, dev: isDev };
+  return { ...goals, gaps, current, dev: isDev };
 };
 
 export const actions: Actions = {

@@ -1,12 +1,14 @@
 import type { RequestEvent } from "@sveltejs/kit";
 import { call } from "@orpc/server";
 import { error, isHttpError, isRedirect, redirect } from "@sveltejs/kit";
+import { LABELS, REASONS } from "#lib/coverage.js";
 import { count, date, percent, points } from "#lib/format.js";
 import { m } from "#lib/paraglide/messages.js";
 import {
   archive,
   chamber,
   comparison,
+  coverage,
   home,
   party,
   person,
@@ -20,10 +22,20 @@ type Data = Awaited<
     | typeof party
     | typeof chamber
     | typeof comparison
+    | typeof coverage
     | typeof archive
   >
 >;
 type Link = (name: string, path: string | null) => string;
+
+const TITLES = {
+  county: m.coverage_goal_county,
+  history: m.coverage_goal_history,
+  precinct: m.coverage_goal_precinct,
+  shapes: m.coverage_goal_shapes,
+  shapes_history: m.coverage_goal_shapes_history,
+  local: m.coverage_goal_local,
+};
 
 const TYPES = {
   json: "application/json; charset=utf-8",
@@ -134,6 +146,9 @@ async function load(segments: Array<string>, search: URLSearchParams) {
   }
   if (head === "chambers" && rest.length > 0) {
     return chamber(rest.join("/"));
+  }
+  if (head === "coverage" && rest.length === 0) {
+    return coverage(search);
   }
   if (head === "compare" && rest.length === 0) {
     return comparison(
@@ -252,6 +267,9 @@ function markdown(data: Data, link: Link) {
         ),
       ];
     }
+    case "coverage": {
+      return coverageMarkdown(data, link);
+    }
     case "person": {
       return personMarkdown(data.person, link);
     }
@@ -274,6 +292,45 @@ function markdown(data: Data, link: Link) {
       return contestMarkdown(data.contest, link);
     }
   }
+}
+
+function coverageMarkdown(
+  data: Extract<Data, { kind: "coverage" }>,
+  link: Link,
+) {
+  const year = String(new Date().getFullYear());
+  const share = (row: { complete: number; total: number }) =>
+    m.coverage_percent({
+      percent: percent(row.complete / Math.max(1, row.total), 1),
+    });
+  return [
+    `# ${m.coverage_title()}`,
+    m.coverage_lede(),
+    (data.current ? m.twin_coverage_current_on : m.twin_coverage_current)({
+      year,
+    }),
+    ...data.goals.flatMap((row) => [
+      `## ${TITLES[row.goal]()}`,
+      `${(row.goal === "local" ? m.coverage_progress_local : m.coverage_progress)({ complete: count(row.complete), total: count(row.total) })}, ${share(row)}`,
+      REASONS[row.goal]
+        .map((reason) => `- ${LABELS[reason]()}: ${count(row[reason])}`)
+        .join("\n"),
+    ]),
+    `## ${m.coverage_where()}`,
+    TITLES.county(),
+    table(
+      [
+        m.coverage_column_name(),
+        m.coverage_column_short(),
+        m.coverage_column_done(),
+      ],
+      data.gaps.map((row) => [
+        link(row.label ?? row.key, null),
+        count(row.total - row.complete),
+        share(row),
+      ]),
+    ),
+  ];
 }
 
 function personMarkdown(

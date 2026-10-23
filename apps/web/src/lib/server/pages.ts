@@ -160,6 +160,15 @@ export async function home() {
   };
 }
 
+export async function coverage(search: URLSearchParams) {
+  const isCurrent = search.get("current") === "1";
+  const [goals, gaps] = await Promise.all([
+    call(router.coverage.goals, { current: isCurrent }),
+    call(router.coverage.gaps, { goal: "county", current: isCurrent }),
+  ]);
+  return { kind: "coverage" as const, current: isCurrent, ...goals, gaps };
+}
+
 export async function person(slug: string) {
   const { id } = await found(call(router.people.locate, { slug }));
   const [record, parties] = await Promise.all([
@@ -286,6 +295,8 @@ export async function chamber(path: string) {
     parties: point.parties,
     election: { name: point.name, path: point.path, date: point.date },
     isSeated: false,
+    apportioned: null,
+    seceded: 0,
   }));
   const first = Date.parse(body.makeup[0]?.start ?? "9999-12-31") - 2e10;
   const earlier = results.filter((term) => Date.parse(term.start) < first);
@@ -300,6 +311,8 @@ export async function chamber(path: string) {
             start: term.start,
             parties: term.parties,
             isSeated: true,
+            apportioned: term.apportioned,
+            seceded: term.seceded,
             election:
               point == null ||
               Date.parse(term.start) - Date.parse(point.date) > 8e10

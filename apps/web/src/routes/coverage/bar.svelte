@@ -4,8 +4,8 @@
   import { count, percent } from "#lib/format.js";
   import { m } from "#lib/paraglide/messages.js";
   import { cn } from "#lib/utils.js";
-  import type { Counts, Goal, Reason } from "./reasons.js";
-  import { LABELS, REASONS } from "./reasons.js";
+  import type { Counts, Goal, Reason } from "#lib/coverage.js";
+  import { LABELS, REASONS } from "#lib/coverage.js";
   import Tone from "./tone.svelte";
 
   const {
