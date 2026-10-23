@@ -1,0 +1,1031 @@
+{
+ "polity": "US-IL",
+ "publisher": "Illinois State Board of Elections",
+ "license": "Public record",
+ "raw_source": "us.scans",
+ "title": "State of Illinois official vote cast at the general election, 1970",
+ "file": {
+  "url": "https://archive.org/download/officialvoteofst1970illi/officialvoteofst1970illi.pdf"
+ },
+ "contests": {
+  "state-house33": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 33
+  },
+  "state-house34": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 34
+  },
+  "state-house35": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 35
+  },
+  "state-house36": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 36
+  },
+  "state-house38": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 38
+  },
+  "state-house39": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 39
+  },
+  "state-house40": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 40
+  },
+  "state-house41": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 41
+  },
+  "state-house42": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 42
+  },
+  "state-house44": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 44
+  },
+  "state-house45": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 45
+  },
+  "state-house46": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 46
+  },
+  "state-house47": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 47
+  },
+  "state-house48": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 48
+  },
+  "state-house49": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 49
+  },
+  "state-house50": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 50
+  },
+  "state-house51": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 51
+  },
+  "state-house52": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 52
+  },
+  "state-house53": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 53
+  },
+  "state-house54": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 54
+  },
+  "state-house55": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 55
+  },
+  "state-house56": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 56
+  },
+  "state-house57": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 57
+  },
+  "state-house58": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 58
+  },
+  "state-house59": {
+   "year": 1970,
+   "chamber": "state-house",
+   "day": "1970-11-03",
+   "special": false,
+   "state": "IL",
+   "district": 59
+  }
+ },
+ "pages": [
+  {
+   "page": 53,
+   "id": "53-0",
+   "columns": [
+    {
+     "label": "Republican Lester Cunningham",
+     "contest": "state-house33",
+     "candidate": "Lester Cunningham"
+    },
+    {
+     "label": "Republican R. Bruce Waddell",
+     "contest": "state-house33",
+     "candidate": "R Bruce Waddell"
+    },
+    {
+     "label": "Democratic Thomas J. Hanahan",
+     "contest": "state-house33",
+     "candidate": "Thomas J. Hanahan"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.054,
+    0.146,
+    0.76,
+    0.422
+   ],
+   "hint": "Read only the table headed '33rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 53,
+   "id": "53-1",
+   "columns": [
+    {
+     "label": "Frank P. (Pat) North, Rep.",
+     "contest": "state-house34",
+     "candidate": "Frank North"
+    },
+    {
+     "label": "W. Timothy Simms, Rep.",
+     "contest": "state-house34",
+     "candidate": "W Timothy Simms"
+    },
+    {
+     "label": "E. J. (Zeke) Giorgi, Dem.",
+     "contest": "state-house34",
+     "candidate": "E J. Giorgi"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.054,
+    0.414,
+    0.76,
+    0.556
+   ],
+   "hint": "Read only the table headed '34th District—Winnebago County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 53,
+   "id": "53-2",
+   "columns": [
+    {
+     "label": "Republican Merle K. Anderson",
+     "contest": "state-house35",
+     "candidate": "Merle K. Anderson"
+    },
+    {
+     "label": "Republican David C. Shapiro",
+     "contest": "state-house35",
+     "candidate": "David C. Shapiro"
+    },
+    {
+     "label": "Democratic Robert E. Brinkmeier",
+     "contest": "state-house35",
+     "candidate": "Robert E. Brinkmeier"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.054,
+    0.548,
+    0.76,
+    0.833
+   ],
+   "hint": "Read only the table headed '35th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 53,
+   "id": "53-3",
+   "columns": [
+    {
+     "label": "Allan L. \"Al\" Schoeberlein, Rep.",
+     "contest": "state-house36",
+     "candidate": "Allan L. Schoeberlein"
+    },
+    {
+     "label": "John E. Friedland, Rep.",
+     "contest": "state-house36",
+     "candidate": "John E. Friedland"
+    },
+    {
+     "label": "John Jerome (Jack) Hill, Dem.",
+     "contest": "state-house36",
+     "candidate": "John Jerome Hill"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.054,
+    0.825,
+    0.76,
+    0.981
+   ],
+   "hint": "Read only the table headed '36th District—Kane County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 54,
+   "id": "54-0",
+   "columns": [
+    {
+     "label": "George \"Ray\" Hudson, Rep.",
+     "contest": "state-house38",
+     "candidate": "George Hudson"
+    },
+    {
+     "label": "Mrs. Robert C. (Giddy) Dyer, Rep.",
+     "contest": "state-house38",
+     "candidate": "Robert C. Dyer"
+    },
+    {
+     "label": "J. Glenn Schneider, Dem.",
+     "contest": "state-house38",
+     "candidate": "J Glenn Schneider"
+    }
+   ],
+   "orientation": "counties_across",
+   "crop": [
+    0.07,
+    0.163,
+    0.773,
+    0.279
+   ],
+   "hint": "Read only the table headed '38th District—DuPage County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 54,
+   "id": "54-1",
+   "columns": [
+    {
+     "label": "Kenneth W. Miller (Republican)",
+     "contest": "state-house39",
+     "candidate": "Kenneth W. Miller"
+    },
+    {
+     "label": "James D. Nowlan (Republican)",
+     "contest": "state-house39",
+     "candidate": "James D. Nowlan"
+    },
+    {
+     "label": "Tobias (Toby) Barry (Democratic)",
+     "contest": "state-house39",
+     "candidate": "Tobias Barry"
+    },
+    {
+     "label": "Melvin Haak (Write-in)",
+     "contest": "state-house39",
+     "candidate": "Melvin Haak"
+    },
+    {
+     "label": "Write-ins",
+     "contest": "state-house39",
+     "candidate": "Scattered write-ins"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.271,
+    0.773,
+    0.581
+   ],
+   "hint": "Read only the table headed '39th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 54,
+   "id": "54-2",
+   "columns": [
+    {
+     "label": "Carl T. Hunsicker (Republican)",
+     "contest": "state-house40",
+     "candidate": "Carl T. Hunsicker"
+    },
+    {
+     "label": "Carl W. Soderstrom (Republican)",
+     "contest": "state-house40",
+     "candidate": "Carl W. Soderstrom"
+    },
+    {
+     "label": "Joseph Fennessey (Democratic)",
+     "contest": "state-house40",
+     "candidate": "Joseph Fennessey"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.573,
+    0.773,
+    0.854
+   ],
+   "hint": "Read only the table headed '40th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 54,
+   "id": "54-3",
+   "columns": [
+    {
+     "label": "W. Robert Blair, Rep.",
+     "contest": "state-house41",
+     "candidate": "W Robert Blair"
+    },
+    {
+     "label": "George M. O'Brien, Rep.",
+     "contest": "state-house41",
+     "candidate": "George M. Obrien"
+    },
+    {
+     "label": "John J. Houlihan, Dem.",
+     "contest": "state-house41",
+     "candidate": "John J. Houlihan"
+    },
+    {
+     "label": "Leo J. Meehan, Dem.",
+     "contest": "state-house41",
+     "candidate": "Leo J. Meehan"
+    }
+   ],
+   "orientation": "counties_across",
+   "crop": [
+    0.07,
+    0.846,
+    0.773,
+    0.987
+   ],
+   "hint": "Read only the table headed '41st District—Will County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 55,
+   "id": "55-0",
+   "columns": [
+    {
+     "label": "Republican James R. Washburn",
+     "contest": "state-house42",
+     "candidate": "James R. Washburn"
+    },
+    {
+     "label": "Republican Thomas R. Houde",
+     "contest": "state-house42",
+     "candidate": "Thomas R. Houde"
+    },
+    {
+     "label": "Democratic C. R. (Russ) Hamilton",
+     "contest": "state-house42",
+     "candidate": "C R. Hamilton"
+    },
+    {
+     "label": "Democratic William F. Shea",
+     "contest": "state-house42",
+     "candidate": "William F. Shea"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.144,
+    0.748,
+    0.419
+   ],
+   "hint": "Read only the table headed '42nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 55,
+   "id": "55-2",
+   "columns": [
+    {
+     "label": "Republican Donald A. Henss",
+     "contest": "state-house44",
+     "candidate": "Donald A. Henss"
+    },
+    {
+     "label": "Republican Pete Pappas",
+     "contest": "state-house44",
+     "candidate": "Pete Pappas"
+    },
+    {
+     "label": "Democratic Oral \"Jake\" Jacobs",
+     "contest": "state-house44",
+     "candidate": "Oral Jacobs"
+    },
+    {
+     "label": "Democratic Ronald C. Taber",
+     "contest": "state-house44",
+     "candidate": "Ronald C. Taber"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.559,
+    0.748,
+    0.817
+   ],
+   "hint": "Read only the table headed '44th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 55,
+   "id": "55-3",
+   "columns": [
+    {
+     "label": "Republican Clarence E. Neff",
+     "contest": "state-house45",
+     "candidate": "Clarence E. Neff"
+    },
+    {
+     "label": "Republican A. T. \"Tom\" McMaster",
+     "contest": "state-house45",
+     "candidate": "A T. McMaster"
+    },
+    {
+     "label": "Democratic Louis A. Markert",
+     "contest": "state-house45",
+     "candidate": "Louis A. Markert"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.809,
+    0.748,
+    1.0
+   ],
+   "hint": "Read only the table headed '45th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 56,
+   "id": "56-0",
+   "columns": [
+    {
+     "label": "Republican Wilbur H. Lauterbach",
+     "contest": "state-house46",
+     "candidate": "Wilbur H. Lauterbach"
+    },
+    {
+     "label": "Republican William L. Waldmeier",
+     "contest": "state-house46",
+     "candidate": "William L. Waldmeier"
+    },
+    {
+     "label": "Democratic Gale Schisler",
+     "contest": "state-house46",
+     "candidate": "Gale Schisler"
+    },
+    {
+     "label": "Democratic James (Jim) Von Boeckman",
+     "contest": null,
+     "candidate": ""
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.146,
+    0.77,
+    0.411
+   ],
+   "hint": "Read only the table headed '46th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 56,
+   "id": "56-1",
+   "columns": [
+    {
+     "label": "Republican Edward R. Madigan",
+     "contest": null,
+     "candidate": ""
+    },
+    {
+     "label": "Republican Harber H. Hall",
+     "contest": "state-house47",
+     "candidate": "Harber H. Hall"
+    },
+    {
+     "label": "Democratic Gerald A. Bradley",
+     "contest": "state-house47",
+     "candidate": "Gerald A. Bradley"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.403,
+    0.77,
+    0.705
+   ],
+   "hint": "Read only the table headed '47th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 56,
+   "id": "56-2",
+   "columns": [
+    {
+     "label": "Republican John C. Hirschfeld",
+     "contest": "state-house48",
+     "candidate": "John C. Hirschfeld"
+    },
+    {
+     "label": "Republican Charles W. Clabaugh",
+     "contest": "state-house48",
+     "candidate": "Charles W. Clabaugh"
+    },
+    {
+     "label": "Democratic Paul Stone",
+     "contest": "state-house48",
+     "candidate": "Paul Stone"
+    },
+    {
+     "label": "Democratic Joe H. Kerr",
+     "contest": "state-house48",
+     "candidate": "Joe H. Kerr"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.697,
+    0.77,
+    0.969
+   ],
+   "hint": "Read only the table headed '48th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 56,
+   "id": "56-3",
+   "columns": [
+    {
+     "label": "Republican William D. (Bill) Cox",
+     "contest": "state-house49",
+     "candidate": "William D. Cox"
+    },
+    {
+     "label": "Republican Charles M. (Chuck) Campbell",
+     "contest": "state-house49",
+     "candidate": "Charles M. Campbell"
+    },
+    {
+     "label": "Democratic Robert \"Bob\" Craig",
+     "contest": "state-house49",
+     "candidate": "Robert Craig"
+    },
+    {
+     "label": "Democratic Harry C. George",
+     "contest": "state-house49",
+     "candidate": "Harry C. George"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.06,
+    0.961,
+    0.77,
+    1.0
+   ],
+   "hint": "Read only the table headed '49th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 57,
+   "id": "57-0",
+   "columns": [
+    {
+     "label": "Thomas C. Rose",
+     "contest": "state-house50",
+     "candidate": "Thomas C. Rose"
+    },
+    {
+     "label": "H. B. Ihnen",
+     "contest": "state-house50",
+     "candidate": "H B. Ihnen"
+    },
+    {
+     "label": "Elmo (Mac) McClain",
+     "contest": "state-house50",
+     "candidate": "Elmo McClain"
+    },
+    {
+     "label": "Jerry Corbett",
+     "contest": "state-house50",
+     "candidate": "Jerry Corbett"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.067,
+    0.144,
+    0.773,
+    0.443
+   ],
+   "hint": "Read only the table headed '50th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 57,
+   "id": "57-1",
+   "columns": [
+    {
+     "label": "J. David Jones",
+     "contest": "state-house51",
+     "candidate": "J David Jones"
+    },
+    {
+     "label": "W. Joseph Gibbs",
+     "contest": "state-house51",
+     "candidate": "W Joseph Gibbs"
+    },
+    {
+     "label": "James T. Londrigan",
+     "contest": "state-house51",
+     "candidate": "James T. Londrigan"
+    },
+    {
+     "label": "Douglas N. Kane",
+     "contest": "state-house51",
+     "candidate": "Douglas N. Kane"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.067,
+    0.435,
+    0.773,
+    0.691
+   ],
+   "hint": "Read only the table headed '51st District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 57,
+   "id": "57-2",
+   "columns": [
+    {
+     "label": "Webber Borchers",
+     "contest": "state-house52",
+     "candidate": "Webber Borchers"
+    },
+    {
+     "label": "Jim Doster",
+     "contest": "state-house52",
+     "candidate": "Jim Doster"
+    },
+    {
+     "label": "Rolland F. Tipsword",
+     "contest": "state-house52",
+     "candidate": "Rolland F. Tipsword"
+    },
+    {
+     "label": "John W. Alsup",
+     "contest": "state-house52",
+     "candidate": "John W. Alsup"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.067,
+    0.683,
+    0.773,
+    0.942
+   ],
+   "hint": "Read only the table headed '52nd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 57,
+   "id": "57-3",
+   "columns": [
+    {
+     "label": "Ben C. Harpstrite",
+     "contest": "state-house53",
+     "candidate": "Ben C. Harpstrite"
+    },
+    {
+     "label": "A. C. \"Junie\" Bartulis",
+     "contest": "state-house53",
+     "candidate": "A C. Bartulis"
+    },
+    {
+     "label": "Ken Boyle",
+     "contest": "state-house53",
+     "candidate": "Ken Boyle"
+    },
+    {
+     "label": "William H. Jenkins",
+     "contest": "state-house53",
+     "candidate": "William H. Jenkins"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.067,
+    0.934,
+    0.773,
+    1.0
+   ],
+   "hint": "Read only the table headed '53rd District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 58,
+   "id": "58-0",
+   "columns": [
+    {
+     "label": "Republican Roscoe D. Cunningham",
+     "contest": "state-house54",
+     "candidate": "Roscoe D. Cunningham"
+    },
+    {
+     "label": "Republican Leslie N. Jones",
+     "contest": "state-house54",
+     "candidate": "Leslie N. Jones"
+    },
+    {
+     "label": "Democratic Charles F. Keller",
+     "contest": "state-house54",
+     "candidate": "Charles F. Keller"
+    },
+    {
+     "label": "Democratic Don E. Brummet",
+     "contest": "state-house54",
+     "candidate": "Don E. Brummet"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.037,
+    0.159,
+    0.746,
+    0.516
+   ],
+   "hint": "Read only the table headed '54th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 58,
+   "id": "58-1",
+   "columns": [
+    {
+     "label": "Robert J. Walters, Rep.",
+     "contest": "state-house55",
+     "candidate": "Robert J. Walters"
+    },
+    {
+     "label": "Horace L. Calvo, Dem.",
+     "contest": "state-house55",
+     "candidate": "Horace L. Calvo"
+    },
+    {
+     "label": "Leland J. Kennedy, Dem.",
+     "contest": "state-house55",
+     "candidate": "Leland J. Kennedy"
+    },
+    {
+     "label": "Write-ins",
+     "contest": "state-house55",
+     "candidate": "Scattered write-ins"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.037,
+    0.508,
+    0.746,
+    0.69
+   ],
+   "hint": "Read only the table headed '55th District—Madison County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 58,
+   "id": "58-2",
+   "columns": [
+    {
+     "label": "Ed Lehman, Rep.",
+     "contest": "state-house56",
+     "candidate": "Ed Lehman"
+    },
+    {
+     "label": "G. W. King, Rep.",
+     "contest": "state-house56",
+     "candidate": "G W. King"
+    },
+    {
+     "label": "James G. \"Bud\" Krause, Dem.",
+     "contest": "state-house56",
+     "candidate": "James G. Krause"
+    },
+    {
+     "label": "Monroe L. Flinn, Dem.",
+     "contest": "state-house56",
+     "candidate": "Monroe L. Flinn"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.037,
+    0.682,
+    0.746,
+    0.827
+   ],
+   "hint": "Read only the table headed '56th District—St. Clair County'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 58,
+   "id": "58-3",
+   "columns": [
+    {
+     "label": "Republican Norbert G. Springer",
+     "contest": "state-house57",
+     "candidate": "Norbert Springer"
+    },
+    {
+     "label": "Republican William J. \"Bill\" Cunningham",
+     "contest": "state-house57",
+     "candidate": "William J. Cunningham"
+    },
+    {
+     "label": "Democratic James D. Holloway",
+     "contest": "state-house57",
+     "candidate": "James D. Holloway"
+    },
+    {
+     "label": "Democratic William B. Starnes",
+     "contest": "state-house57",
+     "candidate": "William B. Starnes"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.037,
+    0.819,
+    0.746,
+    1.0
+   ],
+   "hint": "Read only the table headed '57th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 59,
+   "id": "59-0",
+   "columns": [
+    {
+     "label": "Republican Ben C. Blades",
+     "contest": "state-house58",
+     "candidate": "Ben C. Blades"
+    },
+    {
+     "label": "Democratic Harold D. Stedelin",
+     "contest": "state-house58",
+     "candidate": "Harold D. Stedelin"
+    },
+    {
+     "label": "Democratic Richard O. Hart",
+     "contest": "state-house58",
+     "candidate": "Richard O. Hart"
+    },
+    {
+     "label": "Independent Clarence \"Red\" Lowery",
+     "contest": "state-house58",
+     "candidate": "Clarence Lowery"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.152,
+    0.775,
+    0.454
+   ],
+   "hint": "Read only the table headed '58th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  },
+  {
+   "page": 59,
+   "id": "59-1",
+   "columns": [
+    {
+     "label": "Republican Gale Williams",
+     "contest": "state-house59",
+     "candidate": "Gale Williams"
+    },
+    {
+     "label": "Republican C. L. McCormick",
+     "contest": "state-house59",
+     "candidate": "C L. McCormick"
+    },
+    {
+     "label": "Democratic Clyde L. Choate",
+     "contest": "state-house59",
+     "candidate": "Clyde L. Choate"
+    },
+    {
+     "label": "Democratic Kenneth V. Buzbee",
+     "contest": "state-house59",
+     "candidate": "Kenneth V. Buzbee"
+    }
+   ],
+   "orientation": "counties_down",
+   "crop": [
+    0.07,
+    0.446,
+    0.775,
+    0.794
+   ],
+   "hint": "Read only the table headed '59th District'; ignore any other table visible in the image. Cumulated vote cells may end in a small one-half fraction; transcribe halves as '½' directly after the digits, for example 68,317½ (transcribe halves)."
+  }
+ ],
+ "halves": true,
+ "caveat": "Illinois elected its House members by cumulative voting, so each candidate's figure is the cumulated vote as printed and is not a count of voters."
+}
