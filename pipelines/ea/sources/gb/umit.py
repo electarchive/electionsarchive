@@ -150,6 +150,8 @@ ERAS = {
     ("National Liberal", 1931): "liberal-national",
     ("Socialist Labour", 1918): "socialist-labour-party-1903",
     ("Socialist Labour", 1992): "socialist-labour-party",
+    ("Reform UK", 1997): "reform-uk-2001",
+    ("Reform UK", 2018): "reform-uk",
 }
 NAMES = {
     "scottish-unionist": "Unionist Party (Scotland)",
