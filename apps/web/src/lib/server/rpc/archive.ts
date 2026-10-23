@@ -12145,6 +12145,9 @@ export const search = {
         ),
         top as (
           select t.entity_id, t.type, t.score
+            + (t.matched and q.t like '% %' and exists (
+              select from name n where n.entity_id = t.entity_id and n.kind <> 'short' and lower(unaccent(n.text)) = q.t
+            ))::int
             + case
               when not t.matched then 0
               when t.type = 'person' then coalesce((
@@ -12160,7 +12163,7 @@ export const search = {
                 from coverage_government g where g.polity_id = t.polity_id), 0)
               else 0
             end as score
-          from tiered t
+          from tiered t cross join q
           order by score desc nulls last, t.date_from desc nulls last limit ${input.limit * 2}
         )
         select top.entity_id as id, top.type::text as type, x.target, x.context,
