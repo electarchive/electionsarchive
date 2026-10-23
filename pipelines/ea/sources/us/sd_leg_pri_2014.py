@@ -11,7 +11,7 @@ from ea.sources.us import medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.sd_leg_pri_2014"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 PUBLISHER = "South Dakota Secretary of State"
 TITLE = "2014 primary election results by county: state legislative races"
@@ -28,6 +28,9 @@ CAPTURES = [
     ("20140609034451", 295, "REP", 310),
     ("20140609034457", 353, "DEM", 310),
     ("20140609025350", 396, "DEM", 310),
+    ("20140609025355", 866, "REP", 310),
+    ("20140609034512", 889, "REP", 300),
+    ("20140609034517", 962, "REP", 310),
     ("20140609024617", 397, "DEM", 300),
     ("20140609024622", 397, "REP", 300),
     ("20140609033126", 400, "REP", 310),
