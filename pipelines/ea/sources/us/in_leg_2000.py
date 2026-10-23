@@ -103,7 +103,10 @@ def parse() -> None:
         )
     )
     frame.with_columns(
-        candidate=pl.col("candidate").str.to_uppercase().str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
+        candidate=pl.col("candidate")
+        .str.to_uppercase()
+        .str.replace_all("-", "")
+        .str.replace(r",?\s+(JR|SR|II|III|IV)\.?$", ""),
         year=pl.lit(DAY.year, pl.Int32),
         day=pl.lit(DAY),
         special=pl.lit(False),
