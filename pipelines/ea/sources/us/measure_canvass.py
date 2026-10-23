@@ -27,6 +27,7 @@ from ea.sources.us import (
     measure_precincts,
     mo_sos,
     ncsbe,
+    openelections,
     wa_local,
 )
 from ea.store import DATA, connect
@@ -508,6 +509,12 @@ DOCUMENTS = {
         "https://www.sos.ca.gov/elections/prior-elections/statewide-election-results",
         "the California Secretary of State's Statement of Vote",
     ),
+    "PA": (
+        "Pennsylvania Department of State",
+        "Official returns of the 2021 primary election by county, as compiled by OpenElections",
+        "https://github.com/openelections/openelections-data-pa",
+        "the Pennsylvania Department of State's county returns for the 2021 statewide referenda, as compiled by OpenElections",
+    ),
     "WY": (
         "Wyoming Secretary of State",
         "Statewide constitutional amendments official summary",
@@ -645,6 +652,14 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, MARYLAND_SITE.format(MARYLAND[day][0].format(1)) if day in MARYLAND else ""
     if state == "TX":
         return SOURCE, TEXAS_SITE.format(TEXAS[day], "raceselect") if day in TEXAS else ""
+    if state == "PA":
+        return SOURCE, (
+            openelections.REPOSITORY.format(
+                state="pa", commit=openelections.COMMITS["PA"], path="2021/20210518__pa__primary__county.csv"
+            )
+            if day == date(2021, 5, 18)
+            else ""
+        )
     if state == "OK":
         return (
             SOURCE,
@@ -892,6 +907,7 @@ def fetch() -> None:
                             "OH": ".xlsx",
                             "TN": ".pdf" if day < date(2020, 1, 1) else ".xlsx",
                             "RI": ".xlsx",
+                            "PA": ".csv",
                             "GA": ".zip",
                         }.get(state, ".pdf")
                         if state != "NC" or day not in NORTH_CAROLINA_QUESTIONS
@@ -1972,6 +1988,20 @@ def parse() -> None:
                     "url": pl.String,
                 },
                 orient="row",
+            )
+        elif state == "PA":
+            table = (
+                pl.read_csv(path, infer_schema=False)
+                .filter(pl.col("office").str.contains("^(PROPOSED CONSTITUTIONAL AMENDMENT|STATEWIDE REFERENDUM)"))
+                .select(
+                    county="county",
+                    office=pl.concat_str(
+                        pl.lit("Question "),
+                        pl.col("office").str.extract(r"AMENDMENT (\d)").fill_null(pl.lit("4")),
+                    ),
+                    answer=pl.col("candidate").str.to_uppercase(),
+                    votes="votes",
+                )
             )
         elif state == "OK":
             with zipfile.ZipFile(path) as archive:
