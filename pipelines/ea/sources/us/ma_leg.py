@@ -12,10 +12,10 @@ from ea.sources.us import elstats, medsl
 from ea.store import DATA, connect
 
 SOURCE = "us.ma_leg"
-VERSION = "1"
+VERSION = "2"
 PARSED = DATA / "parsed" / SOURCE
 OFFICES = {8: "house", 9: "senate"}
-YEARS = range(1990, 2000, 2)
+YEARS = (*range(1990, 2000, 2), 2002, 2004, 2006, 2010, 2012, 2016)
 DROPPED = {"", "ALL OTHERS", "BLANKS", "TOTAL VOTES CAST"}
 
 
@@ -121,7 +121,7 @@ def emit() -> Path:
             conn,
             pipeline=SOURCE,
             version=VERSION,
-            summary="Massachusetts's 1990–1998 State Representative and State Senate generals by county",
+            summary="Massachusetts's 1990–2016 State Representative and State Senate generals by county",
             polity="US-MA",
         )
         source = cs.source(elstats.MA_PUBLISHER, "Massachusetts election statistics")
