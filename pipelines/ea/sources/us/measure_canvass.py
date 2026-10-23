@@ -266,6 +266,10 @@ ILLINOIS_ADVISORY = {
     "assisted rep": "Illinois Assisted Reproductive Healthcare Advisory Question",
 }
 KENTUCKY = {
+    date(2020, 11, 3): (
+        "https://elect.ky.gov/results/2020-2029/Documents/2020%20General%20Election%20Results.pdf",
+        {"crime victims": "Constitutional Amendment 1", "term of Commonwealth's Attorneys": "Constitutional Amendment 2"},
+    ),
     date(2022, 11, 8): (
         "https://elect.ky.gov/results/2020-2029/Documents/2022%20General%20Election%20Results.pdf",
         {"sections 36, 42, and 55": "Constitutional Amendment 1", "Section 26A": "Constitutional Amendment 2"},
