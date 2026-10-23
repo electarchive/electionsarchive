@@ -28,6 +28,13 @@ PARTIES_BY_CODE = {
     "GRN": "green",
     "AI": "american independent",
 }
+CANVASS = {
+    "assembly:28:g": "The Statement of Vote gives John Vogel (Reform) 2,038 votes; the earlier stored total was 2,891.",
+    "assembly:78:g": "The Statement of Vote gives Dennis Triglia (Libertarian) 5,978 votes; the earlier stored total was "
+    "35,978.",
+    "senate:5:g": "The Statement of Vote gives William S. Nicolas (Natural Law) 2,667 votes; the earlier stored total "
+    "was 2,267.",
+}
 PUBLISHER = "California Secretary of State"
 TITLE = "Statement of Vote, November 7, 2000 General Election"
 
@@ -168,12 +175,20 @@ def emit() -> Path:
             )
         for name in FILES:
             cs.artifact(raw.cached(SOURCE, SITE + name), source)
-        medsl.attach(
-            cs,
-            conn,
-            frame,
-            {"CA": source},
-            strict=True,
-            authoritative="Source: the Secretary of State's Statement of Vote.",
-        )
+        for strict in (True, False):
+            medsl.attach(
+                cs,
+                conn,
+                frame.filter(pl.col("chamber").is_in(["assembly:28:g", "assembly:78:g"]) != strict),
+                {"CA": source},
+                strict=strict,
+                authoritative="Source: the Secretary of State's Statement of Vote, the certified canvass.",
+            )
+        for chamber, body in CANVASS.items():
+            cs.add(
+                "note",
+                entity_id=cs.key(f"{SOURCE}.result_set", f"{DAY}:CA:{chamber}:county"),
+                kind="caveat",
+                body_md=body,
+            )
         return cs.write()
