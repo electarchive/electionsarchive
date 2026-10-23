@@ -88,6 +88,7 @@ MISSOURI = {
     date(2024, 11, 5): "ActualResults-November52024.pdf",
 }
 ALABAMA = {
+    date(2012, 11, 6): "voter-pdfs/2012/2012GeneralResults-AllStateAndFederalOfficesAndAmendments-WithoutWrite-inAppendix.pdf",
     date(2012, 9, 18): "voter-pdfs/2012/scae-results-certified-2012-10-09.pdf",
     date(2014, 11, 4): "voter-pdfs/2014/2014GeneralResults-WithoutWriteIn.pdf",
     date(2016, 11, 8): "voter-pdfs/2016/2016-Official-General-Election-Results-Certified-2016-11-29.pdf",
