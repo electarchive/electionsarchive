@@ -129,7 +129,13 @@ GEORGIA = {
     date(2024, 11, 5): "https://results.sos.ga.gov/cdn/results/09378a07-e6cf-4f66-be7c-ca4aa534f99a/"
     "Total%20Votes%20Results_3675bf50-5eeb-4407-b538-c04b909ccd08.xlsx",
 }
-SOUTH_CAROLINA = {date(2024, 11, 5): "https://www.enr-scvotes.org/SC/122436/359624/reports/detailxml.zip"}
+SOUTH_CAROLINA = {
+    date(2018, 11, 6): "https://electionhistory.scvotes.gov/api/download_contest/4537_table.csv?split_party=false#.csv",
+    date(2024, 11, 5): "https://www.enr-scvotes.org/SC/122436/359624/reports/detailxml.zip",
+}
+MISSISSIPPI = {
+    date(2014, 11, 4): "https://www.sos.ms.gov/elections/electionresults/2014General/certified%20results/Amendment%20Number%201%20HCR%2030.pdf"
+}
 DISTRICT = {
     date(2024, 11, 5): "https://electionresults.dcboe.org/Downloads/Reports/"
     "November_5_2024_General_Election_Certified_Results.csv"
@@ -539,6 +545,12 @@ DOCUMENTS = {
         "https://elections.ri.gov/elections/results/",
         "the Rhode Island Board of Elections' official results by precinct, summed by county",
     ),
+    "MS": (
+        "Mississippi Secretary of State",
+        "Total votes reported by county",
+        "https://www.sos.ms.gov/elections/electionresults_aspx/elections_results_2014_certified.aspx",
+        "the Mississippi Secretary of State's certified totals reported by county",
+    ),
     "SC": (
         "South Carolina Election Commission",
         "Official election results",
@@ -640,8 +652,8 @@ def link(state: str, day: date) -> tuple[str, str]:
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
     if state == "WV" and day in WV_JSON:
         return SOURCE, WAYBACK.format(WV_JSON[day][1], CLARITY_JSON.format(WV_JSON[day][0], "details"))
-    if state in ("GA", "WV", "SC", "DC"):
-        entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT}[state].get(day, "")
+    if state in ("GA", "WV", "SC", "DC", "MS"):
+        entry = {"GA": GEORGIA, "WV": WEST_VIRGINIA, "SC": SOUTH_CAROLINA, "DC": DISTRICT, "MS": MISSISSIPPI}[state].get(day, "")
         return SOURCE, entry if isinstance(entry, str) else WAYBACK.format(*entry)
     if state == "WI":
         names = sorted(path.name for path in (WISCONSIN / f"{day}").glob("*")) if (WISCONSIN / f"{day}").exists() else []
